@@ -1,0 +1,12 @@
+{
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "name": "hentai-library",
+      "database": "C:\\Users\\banki\\AppData\\Roaming\\com.example\\hentai_library\\my_database.sqlite"
+    }
+  ],
+  "sqltools.useNodeRuntime": true,
+  "cmake.ignoreCMakeListsMissing": true
+}

@@ -1,0 +1,99 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/domain/library/comic_list_query.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_query.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_view_settings_providers.dart';
+
+const LibraryComicProjection _libraryComicProjection = LibraryComicProjection();
+
+/// Projection 层（系列）：负责生成系列区块渲染所需的只读视图数据。
+@immutable
+class LibrarySeriesViewData {
+  const LibrarySeriesViewData({
+    required this.headerTotalSeriesWithItemsCount,
+    required this.seriesWithItemsCount,
+    required this.filteredSeries,
+  });
+  final int headerTotalSeriesWithItemsCount;
+  final int seriesWithItemsCount;
+  final List<Series> filteredSeries;
+}
+
+/// 系列视图投影：统一组合设置、intent、漫画索引和系列源数据。
+final Provider<LibrarySeriesViewData> librarySeriesViewDataProvider =
+    Provider<LibrarySeriesViewData>((Ref ref) {
+      final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
+      final LibraryViewSettings viewSettings = ref.watch(
+        libraryViewSettingsProvider,
+      );
+      ref.watch(
+        comicAggregateProvider.select(
+          (ComicAggregateState s) => s.changeGeneration,
+        ),
+      );
+      final AsyncValue<List<Comic>> comicsAsync = ref.watch(
+        librarySeriesComicsByIdSourceProvider,
+      );
+      final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
+      return seriesAsync.when(
+        data: (List<Series> list) {
+          final Map<String, Comic> comicsById = comicsAsync.maybeWhen(
+            data: (List<Comic> comics) => <String, Comic>{
+              for (final Comic comic in comics) comic.comicId: comic,
+            },
+            orElse: () => <String, Comic>{},
+          );
+          final LibrarySeriesQueryResult result = LibrarySeriesQuery(
+            showR18: _libraryComicProjection.showR18(
+              isHealthyMode: viewSettings.isHealthyMode,
+            ),
+            query: '',
+            sortOption: intent.sortOption,
+            comicsById: comicsById,
+          ).apply(list);
+          return LibrarySeriesViewData(
+            headerTotalSeriesWithItemsCount:
+                result.headerTotalSeriesWithItemsCount,
+            seriesWithItemsCount: result.seriesWithItemsCount,
+            filteredSeries: result.filteredSeries,
+          );
+        },
+        loading: () => const LibrarySeriesViewData(
+          headerTotalSeriesWithItemsCount: 0,
+          seriesWithItemsCount: 0,
+          filteredSeries: <Series>[],
+        ),
+        error: (Object _, StackTrace _) => const LibrarySeriesViewData(
+          headerTotalSeriesWithItemsCount: 0,
+          seriesWithItemsCount: 0,
+          filteredSeries: <Series>[],
+        ),
+        skipLoadingOnReload: true,
+      );
+    });
+
+final FutureProvider<List<Comic>> librarySeriesComicsByIdSourceProvider =
+    FutureProvider<List<Comic>>((Ref ref) async {
+      ref.watch(
+        comicAggregateProvider.select(
+          (ComicAggregateState s) => s.changeGeneration,
+        ),
+      );
+      return ref.read(comicRepoProvider).getAll();
+    });
+
+final Provider<int> libraryDisplayedSeriesCountProvider = Provider<int>((
+  Ref ref,
+) {
+  final LibrarySeriesViewData viewData = ref.watch(
+    librarySeriesViewDataProvider,
+  );
+  return viewData.filteredSeries.length;
+});

@@ -1,0 +1,146 @@
+import 'package:drift/drift.dart';
+
+import 'package:hentai_library/domain/models/enums.dart';
+
+@DataClassName('DbComic')
+class Comics extends Table {
+  TextColumn get comicId => text()();
+  TextColumn get path => text()();
+  TextColumn get resourceType => textEnum<ResourceType>()();
+  TextColumn get title => text()();
+  TextColumn get contentRating =>
+      textEnum<ContentRating>().withDefault(const Constant('unknown'))();
+  IntColumn get pageCount => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {comicId};
+}
+
+/// 漫画封面缩略图（JPEG，列表/详情展示用）。
+@DataClassName('DbComicThumbnail')
+class ComicThumbnails extends Table {
+  TextColumn get comicId =>
+      text().references(Comics, #comicId, onDelete: KeyAction.cascade)();
+  BlobColumn get thumbnail => blob()();
+  IntColumn get sourceModifiedMs => integer()();
+  IntColumn get sourceSize => integer()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {comicId};
+}
+
+@DataClassName('DbTag')
+class Tags extends Table {
+  TextColumn get name => text()();
+
+  @override
+  Set<Column> get primaryKey => {name};
+}
+
+@DataClassName('DbComicTag')
+class ComicTags extends Table {
+  TextColumn get comicId => text()();
+  TextColumn get tagName => text()();
+
+  @override
+  Set<Column> get primaryKey => {comicId, tagName};
+
+  @override
+  List<String> get customConstraints => [
+    'FOREIGN KEY(comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE',
+    'FOREIGN KEY(tag_name) REFERENCES tags(name) ON DELETE CASCADE',
+  ];
+}
+
+@DataClassName('DbAuthor')
+class Authors extends Table {
+  TextColumn get name => text()();
+
+  @override
+  Set<Column> get primaryKey => {name};
+}
+
+@DataClassName('DbComicAuthor')
+class ComicAuthors extends Table {
+  TextColumn get comicId => text()();
+  TextColumn get authorName => text()();
+
+  @override
+  Set<Column> get primaryKey => {comicId, authorName};
+
+  @override
+  List<String> get customConstraints => [
+    'FOREIGN KEY(comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE',
+    'FOREIGN KEY(author_name) REFERENCES authors(name) ON DELETE CASCADE',
+  ];
+}
+
+@DataClassName('DbSeries')
+class SeriesTable extends Table {
+  @override
+  String get tableName => 'series';
+
+  TextColumn get name => text().unique()();
+
+  @override
+  Set<Column> get primaryKey => {name};
+}
+
+@DataClassName('DbSeriesItem')
+class SeriesItems extends Table {
+  TextColumn get seriesName => text()();
+  TextColumn get comicId => text()();
+  IntColumn get sortOrder => integer()();
+
+  @override
+  Set<Column> get primaryKey => {seriesName, comicId};
+
+  @override
+  List<String> get customConstraints => [
+    'UNIQUE(comic_id)',
+    'FOREIGN KEY(series_name) REFERENCES series(name) ON DELETE CASCADE ON UPDATE CASCADE',
+    'FOREIGN KEY(comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE ON UPDATE CASCADE',
+  ];
+}
+
+// 用户保存的文件系统路径
+class SavedPaths extends Table {
+  TextColumn get rawPath => text().unique()();
+  // 针对 macOS/iOS 的安全凭证，Android 可能是 Tree Document URI
+  TextColumn get securityBookmark => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {rawPath};
+}
+
+/// 单本漫画阅读历史（与 [Comic] 标识对齐：comicId、title + 进度）。
+@DataClassName('ComicReadingHistoryRow')
+@TableIndex(name: 'idx_read_time', columns: {#lastReadTime})
+class ComicReadingHistories extends Table {
+  TextColumn get comicId => text()();
+  TextColumn get title => text()();
+  DateTimeColumn get lastReadTime => dateTime()();
+  IntColumn get pageIndex => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {comicId};
+}
+
+/// 系列维度阅读历史（与 [Series.name] 对齐 + 最后打开的漫画与页码）。
+@DataClassName('SeriesReadingHistoryRow')
+@TableIndex(name: 'idx_series_read_time', columns: {#lastReadTime})
+class SeriesReadingHistories extends Table {
+  TextColumn get seriesName => text()();
+  TextColumn get lastReadComicId => text()();
+  DateTimeColumn get lastReadTime => dateTime()();
+  IntColumn get pageIndex => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {seriesName};
+
+  @override
+  List<String> get customConstraints => [
+    'FOREIGN KEY(series_name) REFERENCES series(name) ON DELETE CASCADE ON UPDATE CASCADE',
+  ];
+}
