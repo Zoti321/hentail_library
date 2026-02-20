@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
-import 'package:tray_manager/tray_manager.dart';
+import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // 判断是否为桌面平台
@@ -14,23 +15,6 @@ bool get isDesktop {
     TargetPlatform.macOS,
     TargetPlatform.linux,
   ].contains(defaultTargetPlatform);
-}
-
-// 初始化系统托盘
-Future<void> initTray() async {
-  // await trayManager.setIcon();
-
-  await trayManager.setToolTip('hentai library');
-
-  Menu menu = Menu(
-    items: [
-      MenuItem(key: 'show_window', label: '显示窗口'),
-      MenuItem.separator(),
-      MenuItem(key: 'exit_app', label: '退出应用'),
-    ],
-  );
-
-  await trayManager.setContextMenu(menu);
 }
 
 // 生成漫画哈希id
@@ -66,6 +50,55 @@ Future<void> openFolder(String path) async {
     // 也可以尝试直接调用命令行（兜底方案）
     throw '无法打开文件夹：$path';
   }
+}
+
+Future<void> showInFileExplorer(String path) async {
+  final String normalizedPath = path.trim();
+  if (normalizedPath.isEmpty) {
+    throw ValidationException('无法在文件资源管理器中显示该项目：路径为空');
+  }
+  if (Platform.isWindows) {
+    final ProcessResult result = await Process.run('explorer.exe', <String>[
+      '/select,',
+      normalizedPath,
+    ]);
+    if (result.exitCode == 0) {
+      return;
+    }
+    throw AppException(
+      '无法在文件资源管理器中显示该项目',
+      cause: 'windows exitCode=${result.exitCode}, stderr=${result.stderr}',
+    );
+  }
+  if (Platform.isMacOS) {
+    final ProcessResult result = await Process.run('open', <String>[
+      '-R',
+      normalizedPath,
+    ]);
+    if (result.exitCode == 0) {
+      return;
+    }
+    throw AppException(
+      '无法在文件资源管理器中显示该项目',
+      cause: 'macos exitCode=${result.exitCode}, stderr=${result.stderr}',
+    );
+  }
+  if (Platform.isLinux) {
+    final ProcessResult result = await Process.run('xdg-open', <String>[
+      normalizedPath,
+    ]);
+    if (result.exitCode == 0) {
+      return;
+    }
+    throw AppException(
+      '无法在文件资源管理器中显示该项目',
+      cause: 'linux exitCode=${result.exitCode}, stderr=${result.stderr}',
+    );
+  }
+  throw AppException(
+    '无法在文件资源管理器中显示该项目',
+    cause: 'unsupported platform: $defaultTargetPlatform',
+  );
 }
 
 // 文件大小格式化

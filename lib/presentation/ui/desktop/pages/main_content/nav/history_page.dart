@@ -1,0 +1,312 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/ui/desktop/theme_token/token.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
+import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
+import 'package:hentai_library/presentation/dto/history_grid_item_dto.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/element/card/reading_history_card.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/clear_reading_history_confirm_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+class HistoryPage extends ConsumerWidget {
+  const HistoryPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return CustomScrollView(
+      slivers: const <Widget>[
+        SliverPadding(
+          padding: mainContentPadding,
+          sliver: SliverToBoxAdapter(child: _Header()),
+        ),
+        SliverToBoxAdapter(child: SizedBox(height: 16)),
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 48),
+          sliver: _HistoryListSliver(),
+        ),
+      ],
+    );
+  }
+}
+
+class _Header extends ConsumerWidget {
+  const _Header();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final int totalCount = ref.watch(
+      historyFeedViewProvider.select(
+        (HistoryFeedViewData value) => value.totalCount,
+      ),
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(2),
+      child: Row(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 6,
+            children: [
+              Text(
+                "阅读历史",
+                style: TextStyle(
+                  color: theme.colorScheme.textPrimary,
+                  fontSize: titleFontSize,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.4,
+                ),
+              ),
+              Text(
+                "$totalCount 条记录 • 最长保留 30 天",
+                style: TextStyle(
+                  fontSize: subtitleFontSize,
+                  fontWeight: FontWeight.w400,
+                  color: theme.colorScheme.textTertiary,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.2,
+            child: CustomTextField(
+              hintText: "搜索历史记录...",
+              onChanged: (String value) =>
+                  ref.read(historySearchQueryProvider.notifier).setQuery(value),
+            ),
+          ),
+          const SizedBox(width: 12),
+          _buildClearBtn(context, ref, totalCount > 0),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildClearBtn(BuildContext context, WidgetRef ref, bool enabled) {
+    final cs = Theme.of(context).colorScheme;
+    return GhostButton.iconText(
+      icon: LucideIcons.trash2,
+      text: '清空',
+      tooltip: '清空阅读历史',
+      semanticLabel: '清空阅读历史',
+      onPressed: !enabled
+          ? null
+          : () async {
+              final bool confirmed =
+                  await showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext context) =>
+                        const ClearReadingHistoryConfirmDialog(),
+                  ) ??
+                  false;
+              if (!confirmed) {
+                return;
+              }
+              try {
+                await ref.read(readingHistoryRepoProvider).clearAllHistory();
+                if (context.mounted) {
+                  showSuccessToast(context, '已清空阅读历史');
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  showErrorToast(context, e);
+                }
+              }
+            },
+      foregroundColor: cs.warning,
+      hoverColor: cs.error.withAlpha(24),
+      overlayColor: cs.error.withAlpha(20),
+    );
+  }
+}
+
+class _HistoryListSliver extends ConsumerWidget {
+  const _HistoryListSliver();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ThemeData theme = Theme.of(context);
+    final bool isLoading = ref.watch(
+      historyFeedViewProvider.select((HistoryFeedViewData d) => d.isLoading),
+    );
+    if (isLoading) {
+      return const SliverToBoxAdapter(
+        child: Padding(
+          padding: EdgeInsets.only(top: 48),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
+    final bool hasError = ref.watch(
+      historyFeedViewProvider.select((HistoryFeedViewData d) => d.hasError),
+    );
+    if (hasError) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 48),
+          child: Center(
+            child: Text(
+              '加载失败',
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.textSecondary,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    final List<HistoryGridItemDto> merged = ref.watch(
+      historyFeedViewProvider.select((HistoryFeedViewData d) => d.mergedItems),
+    );
+    final String query = ref.watch(historySearchQueryProvider);
+    final String q = query.trim().toLowerCase();
+
+    if (merged.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 48),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 8,
+              children: [
+                Icon(
+                  LucideIcons.bookOpen,
+                  size: 48,
+                  color: theme.colorScheme.textTertiary,
+                ),
+                Text(
+                  q.isEmpty ? '暂无阅读历史' : '没有匹配的历史记录',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: theme.colorScheme.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SliverLayoutBuilder(
+      builder: (BuildContext context, constraints) {
+        final double width = constraints.crossAxisExtent;
+        final int crossAxisCount = _resolveCrossAxisCount(width);
+        return SliverGrid(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            mainAxisExtent: 138,
+          ),
+          delegate: SliverChildBuilderDelegate((
+            BuildContext context,
+            int index,
+          ) {
+            final HistoryGridItemDto item = merged[index];
+            if (item is ComicHistoryGridItemDto) {
+              return ReadingHistoryCard.comic(
+                comicId: item.comicId,
+                title: item.title,
+                lastReadTime: item.lastReadTime,
+                pageIndex: item.pageIndex,
+                onTap: () => appRouter.pushNamed(
+                  ReaderRouteArgs.readerRouteName,
+                  queryParameters: ReaderRouteArgs(
+                    comicId: item.comicId,
+                    readType: ReaderRouteArgs.readTypeComic,
+                  ).toQueryParameters(),
+                ),
+                onDelete: () => _handleDeleteComicHistory(
+                  context: context,
+                  ref: ref,
+                  comicId: item.comicId,
+                ),
+              );
+            }
+            final SeriesHistoryGridItemDto seriesItem =
+                item as SeriesHistoryGridItemDto;
+            return ReadingHistoryCard.series(
+              seriesName: seriesItem.seriesName,
+              lastReadComicId: seriesItem.lastReadComicId,
+              lastReadTime: seriesItem.lastReadTime,
+              pageIndex: seriesItem.pageIndex,
+              lastReadComicOrder: seriesItem.lastReadComicOrder,
+              onTap: () => appRouter.pushNamed(
+                ReaderRouteArgs.readerRouteName,
+                queryParameters: ReaderRouteArgs(
+                  comicId: seriesItem.lastReadComicId,
+                  readType: ReaderRouteArgs.readTypeSeries,
+                  seriesName: seriesItem.seriesName,
+                ).toQueryParameters(),
+              ),
+              onDelete: () => _handleDeleteSeriesHistory(
+                context: context,
+                ref: ref,
+                seriesName: seriesItem.seriesName,
+              ),
+            );
+          }, childCount: merged.length),
+        );
+      },
+    );
+  }
+
+  int _resolveCrossAxisCount(double width) {
+    if (width >= 1600) {
+      return 5;
+    }
+    if (width >= 1300) {
+      return 4;
+    }
+    if (width >= 980) {
+      return 3;
+    }
+    return 2;
+  }
+
+  Future<void> _handleDeleteComicHistory({
+    required BuildContext context,
+    required WidgetRef ref,
+    required String comicId,
+  }) async {
+    try {
+      await ref.read(readingHistoryRepoProvider).deleteByComicId(comicId);
+      if (context.mounted) {
+        showSuccessToast(context, '已删除记录');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showErrorToast(context, e);
+      }
+    }
+  }
+
+  Future<void> _handleDeleteSeriesHistory({
+    required BuildContext context,
+    required WidgetRef ref,
+    required String seriesName,
+  }) async {
+    try {
+      await ref
+          .read(readingHistoryRepoProvider)
+          .deleteSeriesReadingBySeriesName(seriesName);
+      if (context.mounted) {
+        showSuccessToast(context, '已删除记录');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showErrorToast(context, e);
+      }
+    }
+  }
+}

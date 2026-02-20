@@ -1,0 +1,260 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/domain/usecases/purge_comics_side_effects.dart';
+import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
+import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
+import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/context_menu.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/element/image/app_comic_image.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+class ComicTile extends HookConsumerWidget {
+  final Comic comic;
+  final VoidCallback onTap;
+
+  const ComicTile({super.key, required this.comic, required this.onTap});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final tokens = context.tokens;
+    final isHovered = useState(false);
+    final ComicCoverDisplayData? coverData = ref
+        .watch(comicCoverDisplayProvider(comicId: comic.comicId))
+        .maybeWhen(data: (ComicCoverDisplayData? v) => v, orElse: () => null);
+    final int pageCount = comic.pageCount ?? 0;
+    final int coverCacheWidth = AppComicImage.resolveCacheWidth(
+      context: context,
+      logicalWidth: 56 * 3,
+      maxWidth: 768,
+    );
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => isHovered.value = true,
+      onExit: (_) => isHovered.value = false,
+
+      child: GestureDetector(
+        onTap: onTap,
+        onSecondaryTapUp: (TapUpDetails details) {
+          final RenderBox overlay =
+              Overlay.of(context).context.findRenderObject() as RenderBox;
+          final Offset relativePosition = overlay.globalToLocal(
+            details.globalPosition,
+          );
+          FluentContextMenu.show(
+            context,
+            position: relativePosition,
+            mangaTitle: comic.title,
+            onAction: (ComicContextAction action) {
+              switch (action) {
+                case ComicContextAction.read:
+                  appRouter.pushNamed(
+                    ReaderRouteArgs.readerRouteName,
+                    queryParameters: ReaderRouteArgs(
+                      comicId: comic.comicId,
+                      readType: ReaderRouteArgs.readTypeComic,
+                    ).toQueryParameters(),
+                  );
+                  break;
+                case ComicContextAction.detail:
+                  appRouter.pushNamed(
+                    '漫画详情',
+                    pathParameters: {'id': comic.comicId},
+                  );
+                  break;
+                case ComicContextAction.edit:
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => EditMetadataDialog(
+                      comic: comic,
+                      onSave: (data) async {
+                        await ref.read(updateComicMetadataUseCaseProvider)(
+                          comic.comicId,
+                          data,
+                        );
+                      },
+                    ),
+                  );
+                  break;
+                case ComicContextAction.showInExplorer:
+                  showInFileExplorer(comic.path).catchError((
+                    Object error,
+                    StackTrace stackTrace,
+                  ) {
+                    debugPrint(
+                      'showInFileExplorer failed for "${comic.path}": $error',
+                    );
+                    if (!context.mounted) {
+                      return;
+                    }
+                    if (error is AppException) {
+                      showErrorToast(context, error);
+                      return;
+                    }
+                    showErrorToast(
+                      context,
+                      AppException(
+                        '无法在文件资源管理器中显示该项目',
+                        cause: error,
+                        stackTrace: stackTrace,
+                      ),
+                    );
+                  });
+                  break;
+                case ComicContextAction.delete:
+                  showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text('删除漫画？'),
+                      content: Text('将删除「${comic.title}」。此操作不可撤销。'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text('取消'),
+                        ),
+                        FilledButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          child: const Text('删除'),
+                        ),
+                      ],
+                    ),
+                  ).then((bool? confirmed) async {
+                    if (confirmed != true || !context.mounted) {
+                      return;
+                    }
+                    try {
+                      await purgeComicsFromApp(
+                        libraryComics: ref.read(comicRepoProvider),
+                        readingHistory: ref.read(readingHistoryRepoProvider),
+                        librarySeries: ref.read(librarySeriesRepoProvider),
+                        comicIds: <String>[comic.comicId],
+                      );
+                      if (context.mounted) {
+                        showSuccessToast(context, '已删除漫画');
+                      }
+                    } catch (err) {
+                      if (context.mounted) {
+                        showErrorToast(context, err);
+                      }
+                    }
+                  });
+                  break;
+              }
+            },
+          );
+        },
+
+        child: Container(
+          margin: EdgeInsets.only(bottom: tokens.spacing.md),
+          padding: EdgeInsets.fromLTRB(
+            tokens.spacing.sm,
+            tokens.spacing.sm,
+            tokens.spacing.lg,
+            tokens.spacing.sm,
+          ),
+          decoration: BoxDecoration(
+            color: isHovered.value
+                ? theme.colorScheme.surfaceContainer
+                : theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(tokens.radius.md),
+            border: Border.all(color: theme.colorScheme.borderSubtle, width: 1),
+          ),
+          child: Row(
+            children: [
+              // 封面图片
+              ClipRRect(
+                borderRadius: BorderRadius.circular(tokens.radius.sm),
+                child: Container(
+                  width: 56,
+                  height: 80,
+                  color: theme.colorScheme.imagePlaceholder,
+                  child: AppComicImage(
+                    filePath: coverData?.filePath,
+                    memoryBytes: coverData?.memoryBytes,
+                    fit: BoxFit.cover,
+                    cacheWidth: coverCacheWidth,
+                    placeholder: Icon(
+                      Icons.broken_image,
+                      color: theme.colorScheme.iconSecondary,
+                    ),
+                    errorPlaceholder: Icon(
+                      Icons.broken_image,
+                      color: theme.colorScheme.iconSecondary,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: tokens.spacing.lg),
+
+              // --- 文本信息 ---
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // 标题
+                    Text(
+                      comic.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: tokens.text.bodyMd,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: tokens.spacing.xs - 2),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.subtleTagBackground,
+                            borderRadius: BorderRadius.circular(
+                              tokens.radius.xs,
+                            ),
+                            border: Border.all(
+                              color: theme.colorScheme.borderSubtle,
+                            ),
+                          ),
+                          child: Text(
+                            comic.resourceType.name,
+                            style: TextStyle(
+                              fontSize: tokens.text.labelXs - 1,
+                              fontWeight: FontWeight.w500,
+                              color: theme.colorScheme.textSecondary,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: tokens.spacing.md),
+                        Text(
+                          '${pageCount}p',
+                          style: TextStyle(
+                            fontSize: tokens.text.labelXs,
+                            color: theme.colorScheme.textTertiary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ).animate(target: isHovered.value ? 1 : 0),
+      ),
+    );
+  }
+}

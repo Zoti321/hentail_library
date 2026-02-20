@@ -52,4 +52,8 @@ app.*.map.json
 
 /out
 
+*.sql
+
 development.md
+.cursor
+/dist_installer/
