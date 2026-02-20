@@ -40,17 +40,21 @@ class ComicRepositoryImpl extends ComicRepository {
 
   @override
   Future<entity.Comic?> findById(String comicId) async {
-    final entry =
-        await _comicDao.getComicWithChaptersAndTagsById(comicId);
+    final entry = await _comicDao.getComicWithChaptersAndTagsById(comicId);
     return entry?.toEntity();
   }
 
   @override
-  Future<void> ingestComicResources(
+  Future<entity.SyncReport?> ingestComicResources(
     List<String> rootDirs, {
     bool Function()? isCancelled,
+    void Function(entity.SyncProgress)? onProgress,
   }) async {
-    await _syncService.runSync(rootDirs, isCancelled: isCancelled);
+    return _syncService.runSync(
+      rootDirs,
+      isCancelled: isCancelled,
+      onProgress: onProgress,
+    );
   }
 
   @override

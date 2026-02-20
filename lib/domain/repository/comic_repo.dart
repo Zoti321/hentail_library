@@ -10,10 +10,11 @@ abstract class ComicRepository {
   // 根据 id 获取单本漫画聚合，不存在时返回 null
   Future<Comic?> findById(String comicId);
 
-  // 扫描指定目录并将漫画资源与本地数据库进行同步
-  Future<void> ingestComicResources(
+  // 扫描指定目录并将漫画资源与本地数据库进行同步。返回扫描报告，取消时返回带 cancelled 的报告。
+  Future<SyncReport?> ingestComicResources(
     List<String> dirs, {
     bool Function()? isCancelled,
+    void Function(SyncProgress)? onProgress,
   });
 
   // 更新漫画的元数据及分类标签等信息

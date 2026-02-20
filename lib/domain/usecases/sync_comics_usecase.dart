@@ -1,3 +1,4 @@
+import 'package:hentai_library/domain/entity/entities.dart';
 import 'package:hentai_library/domain/repository/comic_repo.dart';
 import 'package:hentai_library/domain/repository/dir_repo.dart';
 
@@ -13,11 +14,16 @@ class SyncComicsUseCase {
   );
 
   /// 获取已选目录列表并触发漫画资源同步。
-  ///
-  /// 即使当前未配置任何「扫描目录」，也会调用同步逻辑，
-  /// 由仓储/同步服务自行决定如何处理空目录列表（保持与旧行为一致）。
-  Future<void> call({bool Function()? isCancelled}) async {
+  /// 返回 [SyncReport]；取消时报告带 cancelled: true，异常时抛出。
+  Future<SyncReport?> call({
+    bool Function()? isCancelled,
+    void Function(SyncProgress)? onProgress,
+  }) async {
     final dirs = await _directoryRepository.getAllDirs();
-    await _comicRepository.ingestComicResources(dirs, isCancelled: isCancelled);
+    return _comicRepository.ingestComicResources(
+      dirs,
+      isCancelled: isCancelled,
+      onProgress: onProgress,
+    );
   }
 }

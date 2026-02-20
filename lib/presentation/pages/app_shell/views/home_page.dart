@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
+import 'package:hentai_library/domain/entity/entities.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/button/home_refresh_button.dart';
+import 'package:hentai_library/presentation/widgets/dialog/scan_progress_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomePage extends ConsumerWidget {
@@ -70,11 +71,23 @@ class HomePage extends ConsumerWidget {
             ),
             FilledButton.icon(
               onPressed: () async {
-                try {
-                  await ref.read(syncComicsUseCaseProvider).call();
-                } on AppException catch (e) {
-                  if (context.mounted) showErrorSnackBar(context, e);
-                }
+                if (!context.mounted) return;
+
+                showDialog<void>(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => ScanProgressDialog(
+                    onBackgroundComplete: (SyncReport? report) {
+                      if (!context.mounted) return;
+                      ref.invalidate(rawDataComicsProvider);
+                      if (report == null || report.cancelled) return;
+                      showSuccessSnackBar(
+                        context,
+                        '扫描完成，新增 ${report.addedCount} 条，移除 ${report.removedCount} 条',
+                      );
+                    },
+                  ),
+                );
               },
               icon: const Icon(Icons.add, size: 18),
               label: const Text('扫描漫画库'),

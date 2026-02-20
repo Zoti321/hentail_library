@@ -8,6 +8,8 @@ import 'package:hentai_library/data/services/comic/parser/directory_parse.dart';
 import 'package:hentai_library/data/services/comic/scanner/comic_scanner.dart';
 import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart';
+import 'package:hentai_library/domain/entity/entities.dart';
+import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:path/path.dart' as p;
 import 'package:talker/talker.dart';
 
@@ -27,17 +29,20 @@ class ComicSyncService {
   );
 
   /// 执行同步：校验目录 → 扫描 → 计算差异 → 写入/删除 DB 与缓存。
-  Future<void> runSync(
+  /// 返回 [SyncReport]；取消时返回带 cancelled: true 的报告，异常时抛出。
+  Future<SyncReport?> runSync(
     List<String> rootDirs, {
     bool Function()? isCancelled,
+    void Function(SyncProgress)? onProgress,
   }) async {
     final syncId = _generateSyncId();
     LogManager.instance.info(
       '[SYNC][START][syncId=$syncId] 本次同步的根目录数量=${rootDirs.length}',
     );
     final stopwatch = Stopwatch()..start();
+    void report(SyncProgress p) => onProgress?.call(p);
 
-    final dirs = rootDirs.map((p) => Directory(p)).toList();
+    final dirs = rootDirs.map((path) => Directory(path)).toList();
 
     await _validateRootDirs(dirs);
 
@@ -45,12 +50,24 @@ class ComicSyncService {
       LogManager.instance.info(
         '[SYNC][CANCEL][syncId=$syncId] 在开始扫描前被取消',
       );
-      return;
+      return SyncReport(
+        scannedItems: [],
+        addedCount: 0,
+        removedCount: 0,
+        cancelled: true,
+      );
     }
 
-    final (scanComics, scanChapters) = await _getComicsFromScanDirectory(
+    report(SyncProgress(
+      phase: SyncPhase.collecting,
+      message: '正在收集路径…',
+    ));
+
+    final (scanComics, scanChapters, scannedList) =
+        await _getComicsFromScanDirectory(
       dirs,
       isCancelled: isCancelled,
+      onProgress: report,
       syncId: syncId,
     );
 
@@ -58,11 +75,38 @@ class ComicSyncService {
 
     _logDiff(diff, syncId);
 
+    report(SyncProgress(
+      phase: SyncPhase.applying,
+      total: 1,
+      current: 0,
+      message: '正在写入数据库…',
+    ));
+
     await _applyDiff(diff, syncId);
 
     stopwatch.stop();
     LogManager.instance.info(
       '[SYNC][END][syncId=$syncId] 本次同步耗时=${stopwatch.elapsedMilliseconds}ms',
+    );
+
+    final insertedIds = diff.comicsToInsert.toSet();
+    final items = scannedList
+        .where((e) => insertedIds.contains(e.comicId))
+        .map((e) => ScannedItemReport(
+              path: e.path,
+              type: e.path.toLowerCase().endsWith('.epub')
+                  ? ScannedItemType.epub
+                  : ScannedItemType.folder,
+              pageCount: e.pageCount,
+              title: e.title,
+            ))
+        .toList();
+
+    return SyncReport(
+      scannedItems: items,
+      addedCount: diff.comicsToInsert.length,
+      removedCount: diff.comicsToDelete.length,
+      cancelled: false,
     );
   }
 
@@ -171,22 +215,35 @@ class ComicSyncService {
     }
   }
 
-  Future<(Map<String, ComicsCompanion>, Map<String, ChaptersCompanion>)>
-      _getComicsFromScanDirectory(
+  Future<(
+    Map<String, ComicsCompanion>,
+    Map<String, ChaptersCompanion>,
+    List<_ScannedEntry>,
+  )> _getComicsFromScanDirectory(
     List<Directory> rootDirs, {
     bool Function()? isCancelled,
+    void Function(SyncProgress)? onProgress,
     required String syncId,
   }) async {
     final comicsMap = <String, ComicsCompanion>{};
     final chaptersMap = <String, ChaptersCompanion>{};
+    final scannedList = <_ScannedEntry>[];
     final paths = await _collectComicPaths(
       rootDirs,
       isCancelled: isCancelled,
       syncId: syncId,
     );
 
+    onProgress?.call(SyncProgress(
+      phase: SyncPhase.collecting,
+      total: paths.length,
+      current: paths.length,
+      message: '已收集 ${paths.length} 个路径',
+    ));
+
     var scannedOk = 0;
     var scannedFailed = 0;
+    var index = 0;
 
     for (final path in paths) {
       if (isCancelled?.call() == true) {
@@ -195,9 +252,25 @@ class ComicSyncService {
         );
         break;
       }
+
+      index++;
+      onProgress?.call(SyncProgress(
+        phase: SyncPhase.scanning,
+        currentPath: path,
+        current: index,
+        total: paths.length,
+        message: '正在扫描 $index/${paths.length}',
+      ));
+
       final model = await _scannerService.scanPath(path);
       if (model != null) {
         scannedOk++;
+        scannedList.add(_ScannedEntry(
+          path: path,
+          comicId: model.comicId,
+          pageCount: model.pageCount,
+          title: model.title,
+        ));
         final (comic, chapter) = _scannedModelToCompanions(model);
         comicsMap[model.comicId] = comic;
         chaptersMap[model.chapterId] = chapter;
@@ -219,7 +292,7 @@ class ComicSyncService {
       '本次共扫描路径=${paths.length} 个，成功=$scannedOk 个，失败/跳过=$scannedFailed 个',
     );
 
-    return (comicsMap, chaptersMap);
+    return (comicsMap, chaptersMap, scannedList);
   }
 
   /// 将扫描 DTO 转为 Drift companions，由本服务集中处理持久化形态。
@@ -298,6 +371,20 @@ class ComicSyncService {
     }
     return epubs;
   }
+}
+
+/// 扫描阶段收集的单条成功记录，用于组装报告
+class _ScannedEntry {
+  final String path;
+  final String comicId;
+  final int? pageCount;
+  final String? title;
+  _ScannedEntry({
+    required this.path,
+    required this.comicId,
+    this.pageCount,
+    this.title,
+  });
 }
 
 /// 漫画资源同步的差异描述

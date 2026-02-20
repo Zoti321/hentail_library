@@ -22,6 +22,12 @@ enum CategoryTagType {
   }
 }
 
+// 同步进度阶段
+enum SyncPhase { collecting, scanning, applying }
+
+// 扫描项类型（用于报告）
+enum ScannedItemType { folder, epub }
+
 // 漫画图源类型
 enum ComicImageSourceType {
   cbzcbr,

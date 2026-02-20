@@ -4,3 +4,6 @@ export 'category_tag.dart';
 export 'reading_history.dart';
 export 'form/comic_metadata_form.dart';
 export 'form/comic_archive_form.dart';
+export 'scanned_item_report.dart';
+export 'sync_progress.dart';
+export 'sync_report.dart';
