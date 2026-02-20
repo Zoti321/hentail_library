@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/domain/entity/entities.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/routes/routes.dart';
+import 'package:hentai_library/presentation/widgets/card_item/reading_history_card.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HistoryPage extends ConsumerWidget {
@@ -16,7 +18,7 @@ class HistoryPage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: .start,
         spacing: 16,
-        children: [_Header()],
+        children: [const _Header(), const _HistoryList()],
       ),
     );
   }
@@ -121,6 +123,78 @@ class _Header extends ConsumerWidget {
   }
 }
 
+class _HistoryList extends ConsumerWidget {
+  const _HistoryList();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final rawData = ref.watch(readingHistoryStreamProvider);
+
+    return rawData.when(
+      data: (history) {
+        if (history.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.only(top: 48),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 8,
+                children: [
+                  Icon(
+                    LucideIcons.bookOpen,
+                    size: 48,
+                    color: theme.colorScheme.textTertiary,
+                  ),
+                  Text(
+                    '暂无阅读历史',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: theme.colorScheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: history
+              .map(
+                (h) => ReadingHistoryCard(
+                  history: h,
+                  onTap: () => appRouter.pushNamed(
+                    '阅读页面',
+                    pathParameters: {'id': h.comicId},
+                  ),
+                ),
+              )
+              .toList(),
+        );
+      },
+      loading: () => const Padding(
+        padding: EdgeInsets.only(top: 48),
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (err, _) => Padding(
+        padding: const EdgeInsets.only(top: 48),
+        child: Center(
+          child: Text(
+            '加载失败',
+            style: TextStyle(
+              fontSize: 14,
+              color: theme.colorScheme.textSecondary,
+            ),
+          ),
+        ),
+      ),
+      skipLoadingOnReload: true,
+      skipLoadingOnRefresh: true,
+    );
+  }
+}
+
 class CustomTextField extends HookWidget {
   const CustomTextField({super.key, this.onChanged, this.hintText = ""});
 
@@ -183,10 +257,7 @@ class CustomTextField extends HookWidget {
               controller: controller,
               focusNode: focusNode,
               onChanged: onChanged,
-              style: TextStyle(
-                fontSize: 13,
-                color: colorScheme.textPrimary,
-              ),
+              style: TextStyle(fontSize: 13, color: colorScheme.textPrimary),
               cursorColor: colorScheme.onSurface,
               cursorWidth: 0.8,
               cursorHeight: 16,
