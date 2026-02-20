@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
-import 'package:tray_manager/tray_manager.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // 判断是否为桌面平台
@@ -14,23 +13,6 @@ bool get isDesktop {
     TargetPlatform.macOS,
     TargetPlatform.linux,
   ].contains(defaultTargetPlatform);
-}
-
-// 初始化系统托盘
-Future<void> initTray() async {
-  // await trayManager.setIcon();
-
-  await trayManager.setToolTip('hentai library');
-
-  Menu menu = Menu(
-    items: [
-      MenuItem(key: 'show_window', label: '显示窗口'),
-      MenuItem.separator(),
-      MenuItem(key: 'exit_app', label: '退出应用'),
-    ],
-  );
-
-  await trayManager.setContextMenu(menu);
 }
 
 // 生成漫画哈希id

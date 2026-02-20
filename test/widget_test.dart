@@ -9,7 +9,8 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
 
     await tester.pumpWidget(const MyApp());
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('首页'), findsAtLeast(1));
   });

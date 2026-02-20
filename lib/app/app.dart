@@ -1,42 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/config/app_theme.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
+import 'package:hentai_library/core/util/app_theme_mode.dart';
+import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/domain/entity/entities.dart' show AppSetting;
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/routes/routes.dart';
+import 'package:hentai_library/presentation/ui/mobile/theme/mobile_material_theme.dart';
+import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ProviderScope(
-      child: Consumer(
-        builder: (context, ref, child) {
-          final settingsAsync = ref.watch(settingsProvider);
+    return const ProviderScope(child: _AppRoot());
+  }
+}
 
-          final themeMode = settingsAsync.maybeWhen(
-            data: (data) => data.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-            orElse: () => ThemeMode.light,
-          );
+class _AppRoot extends ConsumerStatefulWidget {
+  const _AppRoot();
 
-          return MaterialApp.router(
-            locale: const Locale('zh', 'CN'),
-            title: 'hentai library',
-            debugShowCheckedModeBanner: false,
-            theme: buildAppTheme(
-              appFluentLightScheme.primary,
-              Brightness.light,
-            ),
-            darkTheme: buildAppTheme(
-              appFluentDarkScheme.primary,
-              Brightness.dark,
-            ),
-            themeMode: themeMode,
-            routerConfig: appRouter,
-          );
-        },
-      ),
+  @override
+  ConsumerState<_AppRoot> createState() => _AppRootState();
+}
+
+class _AppRootState extends ConsumerState<_AppRoot> {
+  @override
+  Widget build(BuildContext context) {
+    ref.watch(appStartupCoordinatorProvider);
+
+    final AsyncValue<AppSetting> settingsAsync = ref.watch(settingsProvider);
+    final ThemeMode themeMode = settingsAsync.maybeWhen(
+      data: (AppSetting data) => themeModeFromPreference(data.themePreference),
+      orElse: () => ThemeMode.system,
+    );
+
+    return MaterialApp.router(
+      locale: const Locale('zh', 'CN'),
+      title: 'hentai library',
+      debugShowCheckedModeBanner: false,
+      theme: isDesktop
+          ? buildAppTheme(Brightness.light)
+          : buildMobileMaterialTheme(Brightness.light),
+      darkTheme: isDesktop
+          ? buildAppTheme(Brightness.dark)
+          : buildMobileMaterialTheme(Brightness.dark),
+      themeMode: themeMode,
+      routerConfig: appRouter,
     );
   }
 }

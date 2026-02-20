@@ -1,27 +1,36 @@
-import "../entity/entities.dart";
+import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/domain/entity/comic/tag.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 
+/// [replaceByScan] 应用结果统计（供 UI 进度等）。
+typedef ComicReplaceByScanResult = ({
+  int removedCount,
+  int addedCount,
+  int keptCount,
+});
+
+/// v2 Comic 仓储：仅定义领域契约，不暴露数据层细节。
 abstract class ComicRepository {
-  // 监听并聚合漫画实体及其关联的卷、章、标签数据。将扁平记录组装为树状响应式流
-  Stream<List<Comic>> watchComicAggregate();
+  Stream<List<Comic>> watchAll();
 
-  // 获取漫画及其关联数据的聚合视图
-  Future<List<Comic>> getComicAggregate();
+  Future<List<Comic>> getAll();
 
-  // 根据 id 获取单本漫画聚合，不存在时返回 null
   Future<Comic?> findById(String comicId);
 
-  // 扫描指定目录并将漫画资源与本地数据库进行同步
-  Future<void> ingestComicResources(
-    List<String> dirs, {
-    bool Function()? isCancelled,
+  /// 用于扫描导入（写入/更新）。
+  Future<void> upsertMany(List<Comic> comics);
+
+  Future<void> deleteByIds(List<String> comicIds);
+
+  /// 用户编辑覆盖解析值：title/authors/contentRating/tags 等。
+  Future<void> updateUserMeta(
+    String comicId, {
+    String? title,
+    List<String>? authors,
+    ContentRating? contentRating,
+    List<Tag>? tags,
   });
 
-  // 更新漫画的元数据及分类标签等信息
-  Future<void> updateComicMetaData(String comicId, ComicMetadataForm data);
-
-  // 章节、卷归档到目标漫画（使用表单封装目标 comicId 与待归档的 chapterIds）
-  Future<void> archiveChaptersToComic(ComicArchiveForm form);
-
-  // 增加漫画的阅读次数
-  Future<void> incrementReadCount(String comicId);
+  /// 扫描 diff：删除库中本次未出现的条目并清理关联；新增与保留条目写入（保留合并用户元数据）。
+  Future<ComicReplaceByScanResult> replaceByScan(List<Comic> scanned);
 }

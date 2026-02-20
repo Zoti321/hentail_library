@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:hentai_library/app/app.dart';
+import 'package:hentai_library/core/image/image_quality_policy.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final ImageQualityPolicy imageQualityPolicy = configureImageQualityPolicy();
+  final ImageCache imageCache = PaintingBinding.instance.imageCache;
+  imageCache.maximumSize = imageQualityPolicy.imageCacheMaxEntries;
+  imageCache.maximumSizeBytes = imageQualityPolicy.imageCacheMaxBytes;
 
   if (isDesktop) {
     await WindowManager.instance.ensureInitialized();
@@ -16,7 +21,7 @@ void main() async {
         TitleBarStyle.hidden,
         windowButtonVisibility: true,
       );
-      await windowManager.setMinimumSize(Size(800, 600));
+      await windowManager.setMinimumSize(Size(1280, 720));
       await windowManager.center();
       await windowManager.show();
       await windowManager.setPreventClose(true);
@@ -25,13 +30,12 @@ void main() async {
 
     await Window.initialize();
     await Window.setEffect(
-      effect: WindowEffect.acrylic,
+      effect: WindowEffect.solid,
       color: Colors.white,
       dark: false,
     );
   }
 
-  await initTray();
   LogManager.init();
   try {
     final logWriter = LogFileWriter(LogManager.instance);
