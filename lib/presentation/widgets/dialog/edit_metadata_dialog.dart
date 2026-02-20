@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/domain/entity/entities.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/presentation/widgets/form/content_rating_field.dart';
@@ -18,7 +20,7 @@ class EditMetadataDialog extends StatefulHookConsumerWidget {
   });
 
   final Comic comic;
-  final Function(ComicMetadataForm) onSave;
+  final Future<void> Function(ComicMetadataForm) onSave;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -375,9 +377,21 @@ class _DialogFooter extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           ElevatedButton(
-            onPressed: () {
-              widget.onSave(_formData);
-              Navigator.of(context).pop();
+            onPressed: () async {
+              try {
+                await widget.onSave(_formData);
+                if (context.mounted) {
+                  showSuccessSnackBar(context, '已保存');
+                  Navigator.of(context).pop();
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  showErrorSnackBar(
+                    context,
+                    e is AppException ? e : e.toString(),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryColor,

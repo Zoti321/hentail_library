@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/button/home_refresh_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -72,11 +73,7 @@ class HomePage extends ConsumerWidget {
                 try {
                   await ref.read(syncComicsUseCaseProvider).call();
                 } on AppException catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text(e.message)));
-                  }
+                  if (context.mounted) showErrorSnackBar(context, e);
                 }
               },
               icon: const Icon(Icons.add, size: 18),

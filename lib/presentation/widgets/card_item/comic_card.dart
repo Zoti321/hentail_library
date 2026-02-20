@@ -59,12 +59,11 @@ class ComicCard extends HookConsumerWidget {
                   context: context,
                   builder: (context) => EditMetadataDialog(
                     comic: comic,
-                    onSave: (data) {
-                      ref
-                          .read(updateComicMetadataUseCaseProvider)(
-                            comic.id,
-                            data,
-                          );
+                    onSave: (data) async {
+                      await ref.read(updateComicMetadataUseCaseProvider)(
+                        comic.id,
+                        data,
+                      );
                     },
                   ),
                 );

@@ -90,14 +90,19 @@ class _Header extends ConsumerWidget {
     );
   }
 
-  TextButton _buildClearBtn() {
-    return TextButton.icon(
-      onPressed: () {},
-      icon: Icon(LucideIcons.trash2, size: 16),
-      label: const Text(
-        '清空',
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-      ),
+  Widget _buildClearBtn() {
+    return Tooltip(
+      message: '清空阅读历史',
+      child: Semantics(
+        label: '清空阅读历史',
+        button: true,
+        child: TextButton.icon(
+          onPressed: () {},
+          icon: Icon(LucideIcons.trash2, size: 16),
+          label: const Text(
+            '清空',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
       style: ButtonStyle(
         foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
           if (states.contains(MaterialState.hovered)) {
@@ -119,6 +124,8 @@ class _Header extends ConsumerWidget {
         ),
         overlayColor: MaterialStateProperty.all(Colors.red.withOpacity(0.08)),
       ),
+    ),
+    ),
     );
   }
 }

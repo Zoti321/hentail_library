@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -104,7 +105,14 @@ class _DirectoryPageHeader extends ConsumerWidget {
               onPressed: () async {
                 final dir = await FilePicker.platform.getDirectoryPath();
                 if (dir == null) return;
-                await ref.read(dirRepoProvider).addDir(dir);
+                try {
+                  await ref.read(dirRepoProvider).addDir(dir);
+                  if (context.mounted) {
+                    showSuccessSnackBar(context, '已添加目录');
+                  }
+                } catch (e) {
+                  if (context.mounted) showErrorSnackBar(context, e);
+                }
               },
               icon: const Icon(LucideIcons.plus, size: 16),
               label: const Text('添加目录'),
@@ -355,7 +363,14 @@ class _DirectoryTile extends ConsumerWidget {
                 IconButton(
                   tooltip: '移除目录',
                   onPressed: () async {
-                    await ref.read(dirRepoProvider).removeDir(dir);
+                    try {
+                      await ref.read(dirRepoProvider).removeDir(dir);
+                      if (context.mounted) {
+                        showSuccessSnackBar(context, '已移除目录');
+                      }
+                    } catch (e) {
+                      if (context.mounted) showErrorSnackBar(context, e);
+                    }
                   },
                   icon: Icon(
                     LucideIcons.trash2,

@@ -1,4 +1,6 @@
 import 'dart:io';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
@@ -18,7 +20,32 @@ class ComicDetailPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final comic = ref.watch(comicByIdProvider(id: comicId))!;
+    final rawData = ref.watch(rawDataComicsProvider);
+
+    return rawData.when(
+      loading: () => const _DetailLoading(),
+      error: (error, _) =>
+          _DetailError(onRetry: () => ref.invalidate(rawDataComicsProvider)),
+      data: (comics) {
+        final comic = comics.firstWhereOrNull((c) => c.id == comicId);
+        if (comic == null) {
+          return _DetailEmpty(comicId: comicId);
+        }
+        return _DetailContent(comic: comic);
+      },
+      skipLoadingOnReload: true,
+      skipLoadingOnRefresh: true,
+    );
+  }
+}
+
+class _DetailContent extends StatelessWidget {
+  final Comic comic;
+
+  const _DetailContent({required this.comic});
+
+  @override
+  Widget build(BuildContext context) {
     final authors = comic.tags
         .where((tag) => tag.type == CategoryTagType.author)
         .toList();
@@ -38,15 +65,12 @@ class ComicDetailPage extends HookConsumerWidget {
         crossAxisAlignment: .stretch,
         spacing: 32,
         children: [
-          // header
           Container(
             padding: .symmetric(vertical: 4),
             child: Row(
               mainAxisAlignment: .spaceBetween,
               children: [
-                // 返回按钮
-                _BackBtn(),
-                // 编辑按钮
+                const _BackBtn(),
                 _ComicEditBtn(comic: comic),
               ],
             ),
@@ -55,7 +79,6 @@ class ComicDetailPage extends HookConsumerWidget {
             spacing: 64,
             crossAxisAlignment: .start,
             children: [
-              // --- 左侧：封面与操作 ---
               Flexible(
                 flex: 1,
                 child: _LeftColumn(
@@ -63,7 +86,6 @@ class ComicDetailPage extends HookConsumerWidget {
                   pageCount: comic.totalPageCount,
                 ),
               ),
-              // --- 右侧：信息详情 ---
               Flexible(
                 flex: 2,
                 child: _RightColumn(
@@ -79,6 +101,113 @@ class ComicDetailPage extends HookConsumerWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _DetailLoading extends StatelessWidget {
+  const _DetailLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 16,
+          children: [
+            const CircularProgressIndicator(),
+            Text(
+              '加载中…',
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DetailError extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _DetailError({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 16,
+          children: [
+            Icon(
+              LucideIcons.circleAlert,
+              size: 48,
+              color: theme.colorScheme.textTertiary,
+            ),
+            Text(
+              '加载失败，请重试',
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.textSecondary,
+              ),
+            ),
+            TextButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(LucideIcons.refreshCw, size: 16),
+              label: const Text('重试'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DetailEmpty extends StatelessWidget {
+  final String comicId;
+
+  const _DetailEmpty({required this.comicId});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 16,
+          children: [
+            Icon(
+              LucideIcons.bookOpen,
+              size: 48,
+              color: theme.colorScheme.textTertiary,
+            ),
+            Text(
+              '漫画不存在或已移除',
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.textSecondary,
+              ),
+            ),
+            TextButton.icon(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: const Icon(LucideIcons.arrowLeft, size: 16),
+              label: const Text('返回'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -110,7 +239,7 @@ class _LeftColumn extends HookConsumerWidget {
               borderRadius: .circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(10),
+                  color: Colors.black.withOpacity(0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -120,7 +249,7 @@ class _LeftColumn extends HookConsumerWidget {
             child: AspectRatio(
               aspectRatio: 2 / 3,
               child: Container(
-                color: Colors.grey[300],
+                color: theme.colorScheme.surfaceContainerHighest,
                 child: coverUrl != null
                     ? Image.file(File(coverUrl), fit: .cover)
                           .animate(target: isCoverHover.value ? 1 : 0)
@@ -138,27 +267,33 @@ class _LeftColumn extends HookConsumerWidget {
         const SizedBox(height: 36),
 
         // 2. 操作按钮 (Actions)
-        ElevatedButton.icon(
-          onPressed: () async {
-            await ref.read(incrementReadCountUseCaseProvider).call(comic.id);
-            await ref.read(recordReadingProgressUseCaseProvider).call(
-                  ReadingHistory(
-                    comicId: comic.id,
-                    title: comic.title,
-                    coverUrl: comic.coverUrl,
-                    lastReadTime: DateTime.now(),
-                  ),
-                );
-            appRouter.pushNamed('阅读页面', pathParameters: {'id': comic.id});
-          },
-          icon: Icon(LucideIcons.play, size: 16),
-          label: Text("开始阅读"),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+        Semantics(
+          label: '开始阅读',
+          button: true,
+          child: ElevatedButton.icon(
+            onPressed: () async {
+              await ref.read(incrementReadCountUseCaseProvider).call(comic.id);
+              await ref
+                  .read(recordReadingProgressUseCaseProvider)
+                  .call(
+                    ReadingHistory(
+                      comicId: comic.id,
+                      title: comic.title,
+                      coverUrl: comic.coverUrl,
+                      lastReadTime: DateTime.now(),
+                    ),
+                  );
+              appRouter.pushNamed('阅读页面', pathParameters: {'id': comic.id});
+            },
+            icon: Icon(LucideIcons.play, size: 16),
+            label: Text("开始阅读"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
           ),
         ),
@@ -168,8 +303,8 @@ class _LeftColumn extends HookConsumerWidget {
         Container(
           padding: .all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey[200]!),
+            color: theme.colorScheme.surface,
+            border: Border.all(color: theme.colorScheme.borderSubtle),
             borderRadius: .circular(8),
           ),
           child: Column(
@@ -224,12 +359,16 @@ class _RightColumn extends StatelessWidget {
         if (date != null)
           Row(
             children: [
-              Icon(Icons.access_time, size: 14, color: Colors.grey[500]),
+              Icon(
+                Icons.access_time,
+                size: 14,
+                color: theme.colorScheme.textTertiary,
+              ),
               const SizedBox(width: 4),
               Text(
                 date.toString(),
                 style: TextStyle(
-                  color: Colors.grey[500],
+                  color: theme.colorScheme.textTertiary,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -242,10 +381,10 @@ class _RightColumn extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontSize: 32,
+            fontSize: 28,
             fontWeight: FontWeight.bold,
             height: 1.1,
-            color: Colors.black87,
+            color: theme.colorScheme.textPrimary,
           ),
         ),
         const SizedBox(height: 32),
@@ -279,18 +418,26 @@ class _RightColumn extends StatelessWidget {
         // 3. 简介
         Row(
           children: [
-            Icon(LucideIcons.bookOpen, size: 16, color: Colors.grey[600]),
+            Icon(
+              LucideIcons.bookOpen,
+              size: 16,
+              color: theme.colorScheme.textSecondary,
+            ),
             const SizedBox(width: 8),
-            const Text(
+            Text(
               "简介",
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.textPrimary,
+              ),
             ),
           ],
         ),
         const SizedBox(height: 8),
         Text(
           description ?? '暂无',
-          style: TextStyle(color: Colors.grey[700], height: 1.5),
+          style: TextStyle(color: theme.colorScheme.textSecondary, height: 1.5),
           maxLines: 4,
           overflow: TextOverflow.ellipsis,
         ),
@@ -312,22 +459,30 @@ class _StatRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       mainAxisAlignment: .spaceBetween,
       children: [
         Row(
           children: [
-            Icon(icon, size: 14, color: Colors.grey[500]),
+            Icon(icon, size: 14, color: theme.colorScheme.textTertiary),
             const SizedBox(width: 8),
             Text(
               label,
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.colorScheme.textSecondary,
+              ),
             ),
           ],
         ),
         Text(
           value,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: theme.colorScheme.textPrimary,
+          ),
         ),
       ],
     );
@@ -347,6 +502,7 @@ class _InfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: .start,
       children: [
@@ -354,7 +510,7 @@ class _InfoSection extends StatelessWidget {
           padding: const .symmetric(vertical: 12),
           child: Row(
             children: [
-              Icon(icon, size: 14, color: Colors.grey[600]),
+              Icon(icon, size: 14, color: theme.colorScheme.textSecondary),
               const SizedBox(width: 6),
               Text(
                 title.toUpperCase(),
@@ -362,7 +518,7 @@ class _InfoSection extends StatelessWidget {
                   fontSize: 14,
                   fontWeight: FontWeight.w400,
                   letterSpacing: 1.0,
-                  color: Colors.grey[600],
+                  color: theme.colorScheme.textSecondary,
                 ),
               ),
             ],
@@ -384,18 +540,19 @@ class _ChipPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(color: theme.colorScheme.borderSubtle),
       ),
       child: Text(
         text,
         style: TextStyle(
           fontSize: 12,
-          color: Colors.grey[800],
+          color: theme.colorScheme.textPrimary,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -415,18 +572,22 @@ class _BackBtn extends HookWidget {
       cursor: SystemMouseCursors.click,
       onEnter: (_) => useBackBtnHover.value = true,
       onExit: (_) => useBackBtnHover.value = false,
-      child: GestureDetector(
-        onTap: () => Navigator.pop(context),
-        child: Row(
-          spacing: 6,
-          children: [
-            Icon(LucideIcons.arrowLeft, size: 18)
-                .animate(target: useBackBtnHover.value ? 1 : 0)
-                .tint(duration: 200.ms, color: theme.colorScheme.primary),
-            Text("回到漫画库")
-                .animate(target: useBackBtnHover.value ? 1 : 0)
-                .tint(duration: 200.ms, color: theme.colorScheme.primary),
-          ],
+      child: Semantics(
+        label: '返回漫画库',
+        button: true,
+        child: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Row(
+            spacing: 6,
+            children: [
+              Icon(LucideIcons.arrowLeft, size: 18)
+                  .animate(target: useBackBtnHover.value ? 1 : 0)
+                  .tint(duration: 200.ms, color: theme.colorScheme.primary),
+              Text("回到漫画库")
+                  .animate(target: useBackBtnHover.value ? 1 : 0)
+                  .tint(duration: 200.ms, color: theme.colorScheme.primary),
+            ],
+          ),
         ),
       ),
     );
@@ -443,36 +604,50 @@ class _ComicEditBtn extends HookConsumerWidget {
     final useEditBtnHover = useState<bool>(false);
     final theme = Theme.of(context);
 
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => useEditBtnHover.value = true,
-      onExit: (_) => useEditBtnHover.value = false,
-      child: GestureDetector(
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) => EditMetadataDialog(
-              comic: comic,
-              onSave: (data) {
-                ref.read(updateComicMetadataUseCaseProvider)(comic.id, data);
-              },
-            ),
-          );
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: .all(8),
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(
-              width: 1,
-              color: useEditBtnHover.value
-                  ? theme.colorScheme.borderSubtle
-                  : theme.colorScheme.borderSubtle.withAlpha(0),
+    return Tooltip(
+      message: '编辑元数据',
+      child: Semantics(
+        label: '编辑元数据',
+        button: true,
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          onEnter: (_) => useEditBtnHover.value = true,
+          onExit: (_) => useEditBtnHover.value = false,
+          child: GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => EditMetadataDialog(
+                  comic: comic,
+                  onSave: (data) async {
+                    await ref.read(updateComicMetadataUseCaseProvider)(
+                      comic.id,
+                      data,
+                    );
+                  },
+                ),
+              );
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: .all(8),
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  width: 1,
+                  color: useEditBtnHover.value
+                      ? theme.colorScheme.borderSubtle
+                      : theme.colorScheme.borderSubtle.withAlpha(0),
+                ),
+              ),
+              child: Icon(
+                LucideIcons.pencil,
+                size: 14,
+                color: theme.colorScheme.textSecondary,
+              ),
             ),
           ),
-          child: Icon(LucideIcons.pencil, size: 14, color: Colors.black54),
         ),
       ),
     );

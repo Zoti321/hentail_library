@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/core/l10n/app_strings.dart';
 import 'package:hentai_library/domain/entity/entities.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
@@ -50,7 +51,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   crossAxisAlignment: .center,
                   children: [
                     Text(
-                      "漫画库",
+                      AppStrings.libraryTitle,
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w600,
@@ -70,7 +71,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                         border: Border.all(color: Colors.grey[300]!),
                       ),
                       child: Text(
-                        "$comicCount 本",
+                        AppStrings.comicCount(comicCount),
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -198,33 +199,39 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   // 构建网格视图
   Widget _buildGridView() {
     return comics.when(
-      data: (comics) => SliverGrid.builder(
-        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 200,
-          mainAxisExtent: 356,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
+      data: (comics) {
+        if (comics.isEmpty) return _EmptyLibrarySliver();
+        return SliverGrid.builder(
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200,
+            mainAxisExtent: 356,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+          ),
+          itemCount: comics.length,
+          itemBuilder: (context, index) {
+            final manga = comics[index];
+            return Center(
+              child: ComicCard(
+                key: Key(manga.id),
+                comic: manga,
+                size: Size(double.infinity, double.infinity),
+                onTap: () {
+                  appRouter.pushNamed('漫画详情', pathParameters: {'id': manga.id});
+                },
+                onPlay: () {},
+                onRightClick: (val) {},
+              ),
+            );
+          },
+        );
+      },
+      error: (err, stack) => SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text('Error: $err'),
         ),
-        itemCount: comics.length,
-        itemBuilder: (context, index) {
-          final manga = comics[index];
-
-          return Center(
-            child: ComicCard(
-              key: Key(manga.id),
-              comic: manga,
-              size: Size(double.infinity, double.infinity),
-              onTap: () {
-                // 跳转到漫画详情页
-                appRouter.pushNamed('漫画详情', pathParameters: {'id': manga.id});
-              },
-              onPlay: () {},
-              onRightClick: (val) {},
-            ),
-          );
-        },
       ),
-      error: (err, stack) => Text('Error: $err'),
       loading: () => SliverToBoxAdapter(
         child: const Center(child: CircularProgressIndicator()),
       ),
@@ -235,24 +242,76 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   // 构建列表视图
   Widget _buildListView() {
     return comics.when(
-      data: (comics) => SliverList.separated(
-        itemCount: comics.length,
-        separatorBuilder: (ctx, i) => const SizedBox(height: 8),
-        itemBuilder: (context, index) {
-          final manga = comics[index];
-          return ComicTile(
-            key: Key(manga.id),
-            comic: manga,
-            onTap: () {
-              appRouter.pushNamed('漫画详情', pathParameters: {'id': manga.id});
-            },
-            onRightClick: (val) {},
-          );
-        },
+      data: (comics) {
+        if (comics.isEmpty) return _EmptyLibrarySliver();
+        return SliverList.separated(
+          itemCount: comics.length,
+          separatorBuilder: (ctx, i) => const SizedBox(height: 8),
+          itemBuilder: (context, index) {
+            final manga = comics[index];
+            return ComicTile(
+              key: Key(manga.id),
+              comic: manga,
+              onTap: () {
+                appRouter.pushNamed('漫画详情', pathParameters: {'id': manga.id});
+              },
+              onRightClick: (val) {},
+            );
+          },
+        );
+      },
+      error: (err, stack) => SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text('Error: $err'),
+        ),
       ),
-      error: (err, stack) => Text('Error: $err'),
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => SliverFillRemaining(
+        hasScrollBody: false,
+        child: const Center(child: CircularProgressIndicator()),
+      ),
       skipLoadingOnReload: true,
+    );
+  }
+}
+
+class _EmptyLibrarySliver extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 80),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 12,
+            children: [
+              Icon(
+                LucideIcons.library,
+                size: 56,
+                color: theme.colorScheme.textTertiary,
+              ),
+              Text(
+                AppStrings.libraryEmptyTitle,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.textPrimary,
+                ),
+              ),
+              Text(
+                AppStrings.libraryEmptyHint,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: theme.colorScheme.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -270,14 +329,17 @@ class _ToolbarIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(6),
-        child: Container(
-          padding: const EdgeInsets.all(6),
-          child: Icon(icon, size: 16, color: Colors.grey[600]),
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(6),
+          child: Container(
+            padding: const EdgeInsets.all(6),
+            child: Icon(icon, size: 16, color: Colors.grey[600]),
+          ),
         ),
       ),
     );
