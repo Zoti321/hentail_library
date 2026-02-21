@@ -26,7 +26,7 @@ enum CategoryTagType {
 enum SyncPhase { collecting, scanning, applying }
 
 // 扫描项类型（用于报告）
-enum ScannedItemType { folder, epub }
+enum ScannedItemType { folder, epub, archive }
 
 // 漫画图源类型
 enum ComicImageSourceType {

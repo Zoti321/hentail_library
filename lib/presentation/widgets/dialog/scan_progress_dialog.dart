@@ -344,7 +344,11 @@ class _ReportRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final typeLabel = item.type == ScannedItemType.epub ? 'epub' : '漫画文件夹';
+    final typeLabel = switch (item.type) {
+      ScannedItemType.epub => 'epub',
+      ScannedItemType.archive => '压缩包',
+      ScannedItemType.folder => '漫画文件夹',
+    };
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

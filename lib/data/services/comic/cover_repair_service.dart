@@ -12,6 +12,14 @@ import 'package:path/path.dart' as p;
 /// 当前仅在 presentation/providers 中注入，供后续设置页或维护功能（如批量修复缺失封面）调用。
 /// 若从 UI 触发，建议经 domain 层用例（如 RepairComicCoverUseCase）封装，入参使用 comicId 或领域实体。
 class CoverRepairService {
+  static const _repairableExtensions = {
+    '.epub',
+    '.cbz',
+    '.zip',
+    '.cbr',
+    '.rar',
+  };
+
   final ComicScannerService _scannerService;
 
   CoverRepairService({required ComicScannerService scannerService})
@@ -28,7 +36,8 @@ class CoverRepairService {
 
     final sourcePath = firstChapter.sourcePath;
     if (sourcePath == null || sourcePath.isEmpty) return;
-    if (p.extension(sourcePath).toLowerCase() != '.epub') return;
+    final ext = p.extension(sourcePath).toLowerCase();
+    if (!_repairableExtensions.contains(ext)) return;
     if (!await File(sourcePath).exists()) return;
 
     LogManager.instance.info(

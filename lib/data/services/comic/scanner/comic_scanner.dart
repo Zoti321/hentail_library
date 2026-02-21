@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
+import 'package:archive/archive.dart';
 import 'package:epub_image_extractor/epub_image_extractor.dart';
 import 'package:path/path.dart' as p;
 import 'package:hentai_library/core/logging/log_manager.dart';
@@ -193,6 +194,82 @@ class DirectoryScannerStrategy implements ComicScannerStrategy {
   }
 }
 
+/// ZIP/CBZ 压缩包扫描策略
+class ZipArchiveStrategy implements ComicScannerStrategy {
+  static const _imageExtensions = {'.jpg', '.jpeg', '.png', '.webp', '.bmp'};
+
+  static bool _isImageEntry(String entryName) {
+    final ext = p.extension(entryName).toLowerCase();
+    return _imageExtensions.contains(ext);
+  }
+
+  @override
+  bool canHandle(FileSystemEntity entity) {
+    if (entity is! File) return false;
+    final ext = p.extension(entity.path).toLowerCase();
+    return ext == '.cbz' || ext == '.zip';
+  }
+
+  @override
+  Future<bool> validate(FileSystemEntity entity) async {
+    if (entity is! File) return false;
+    try {
+      final bytes = await entity.readAsBytes();
+      final archive = ZipDecoder().decodeBytes(bytes);
+      final hasImage = archive.any((f) => f.isFile && _isImageEntry(f.name));
+      return hasImage;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  @override
+  Future<ComicMetadata> getMetadata(FileSystemEntity entity) async {
+    final file = entity as File;
+    final metadata = ComicMetadata();
+    metadata.title = p.basenameWithoutExtension(file.path);
+    try {
+      final bytes = await file.readAsBytes();
+      final archive = ZipDecoder().decodeBytes(bytes);
+      final imageEntries = archive
+          .where((f) => f.isFile && _isImageEntry(f.name))
+          .toList();
+      imageEntries.sort((a, b) => a.name.compareTo(b.name));
+      metadata.pageCount = imageEntries.isNotEmpty ? imageEntries.length : null;
+    } catch (_) {
+      metadata.pageCount = null;
+    }
+    return metadata;
+  }
+
+  @override
+  Future<Uint8List?> getCoverBytes(FileSystemEntity entity) async {
+    final file = entity as File;
+    try {
+      final bytes = await file.readAsBytes();
+      final archive = ZipDecoder().decodeBytes(bytes);
+      final imageEntries = archive
+          .where((f) => f.isFile && _isImageEntry(f.name))
+          .toList();
+      imageEntries.sort((a, b) => a.name.compareTo(b.name));
+      if (imageEntries.isEmpty) return null;
+      final first = imageEntries.first;
+      final content = first.content as List<int>?;
+      return content != null && content.isNotEmpty
+          ? Uint8List.fromList(content)
+          : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<String?> getCoverPath(FileSystemEntity entity) async => null;
+}
+
+// RAR/CBR 占位：暂不实现解析，.cbr/.rar 仍由 comic_sync_service 收集并显示为「压缩包」，但无对应策略故扫描时跳过，后续可接入实现。
+// class RarArchiveStrategy implements ComicScannerStrategy { ... }
+
 class EpubScannerStrategy implements ComicScannerStrategy {
   final EpubParser _epubParser = EpubParser();
 
@@ -265,6 +342,7 @@ class ComicScannerService {
   final List<ComicScannerStrategy> _strategies = [
     DirectoryScannerStrategy(),
     EpubScannerStrategy(),
+    ZipArchiveStrategy(),
   ];
 
   ComicScannerService({required ComicFileCacheService cacheService})
@@ -290,9 +368,11 @@ class ComicScannerService {
 
       if (strategy is EpubScannerStrategy) {
         return await _scanEpubToModel(entity.path);
-      } else {
-        return await _scanDirectoryToModel(entity.path);
       }
+      if (strategy is ZipArchiveStrategy) {
+        return await _scanZipToModel(entity.path);
+      }
+      return await _scanDirectoryToModel(entity.path);
     } catch (e, stackTrace) {
       LogManager.instance.handle(
         e,
@@ -358,6 +438,57 @@ class ComicScannerService {
     return model;
   }
 
+  Future<ScannedComicModel?> _scanZipToModel(String path) async {
+    final scanResult = await Isolate.run(() => _parseZipInBackground(path));
+    if (scanResult == null ||
+        scanResult.title.isEmpty ||
+        scanResult.contentImages.isEmpty) {
+      return null;
+    }
+    final title = scanResult.title;
+    final pageCount = scanResult.contentImages.length;
+    final comicId = generateComicId(title, description: null);
+    final coverExt = scanResult.coverExt;
+    if (scanResult.coverBytes != null && scanResult.coverBytes!.isNotEmpty) {
+      await _cacheService.saveCover(
+        comicId,
+        scanResult.coverBytes!,
+        extension: coverExt,
+      );
+    } else {
+      return null;
+    }
+    final coverPath = await _cacheService.getCoverCacheDir(comicId);
+    final coverFilePath = p.join(coverPath, 'cover.$coverExt');
+
+    final contentWithExt = scanResult.contentImages
+        .map((e) => (e.$1, e.$2.startsWith('.') ? e.$2.substring(1) : e.$2))
+        .toList();
+    await _cacheService.saveContentImages(comicId, contentWithExt);
+    final contentDir = await _cacheService.getContentCacheDir(comicId);
+    final chapterId = generateChapterId(title, contentDir, pageCount, 1);
+
+    final model = ScannedComicModel(
+      comicId: comicId,
+      title: title,
+      description: null,
+      coverUrl: coverFilePath,
+      firstPublishedAt: null,
+      lastUpdatedAt: null,
+      chapterId: chapterId,
+      chapterTitle: null,
+      chapterCoverUrl: coverFilePath,
+      pageCount: pageCount > 0 ? pageCount : null,
+      imageDir: contentDir,
+      sourcePath: path,
+      chapterNumber: 1,
+    );
+    LogManager.instance.debug(
+      '[SCAN][ZIP] title=$title pageCount=$pageCount cacheDir=$contentDir',
+    );
+    return model;
+  }
+
   Future<ScannedComicModel?> _scanDirectoryToModel(String path) async {
     final scanResult = await Isolate.run(
       () => _parseDirectoryInBackground(path),
@@ -417,6 +548,21 @@ class _DirectoryScanResult {
   });
 }
 
+/// ZIP 扫描结果（用于 isolate 间传递）
+class _ZipScanResult {
+  final String title;
+  final Uint8List? coverBytes;
+  final String coverExt;
+  final List<(Uint8List bytes, String extension)> contentImages;
+
+  _ZipScanResult({
+    required this.title,
+    this.coverBytes,
+    required this.coverExt,
+    required this.contentImages,
+  });
+}
+
 /// 在后台 isolate 中解析文件夹漫画
 Future<_DirectoryScanResult?> _parseDirectoryInBackground(String path) async {
   try {
@@ -437,6 +583,52 @@ Future<_DirectoryScanResult?> _parseDirectoryInBackground(String path) async {
       pageCount: meta.pageCount ?? 0,
       coverPath: coverPath,
       imageDir: path,
+    );
+  } catch (_) {
+    return null;
+  }
+}
+
+/// 在后台 isolate 中解析 ZIP/CBZ
+Future<_ZipScanResult?> _parseZipInBackground(String path) async {
+  const imageExtensions = {'.jpg', '.jpeg', '.png', '.webp', '.bmp'};
+  bool isImageEntry(String name) =>
+      imageExtensions.contains(p.extension(name).toLowerCase());
+
+  try {
+    final file = File(path);
+    final bytes = await file.readAsBytes();
+    final archive = ZipDecoder().decodeBytes(bytes);
+    final imageEntries = archive
+        .where((f) => f.isFile && isImageEntry(f.name))
+        .toList();
+    imageEntries.sort((a, b) => a.name.compareTo(b.name));
+    if (imageEntries.isEmpty) return null;
+
+    final title = p.basenameWithoutExtension(path);
+    final first = imageEntries.first;
+    final firstContent = first.content as List<int>?;
+    final coverBytes = firstContent != null && firstContent.isNotEmpty
+        ? Uint8List.fromList(firstContent)
+        : null;
+    final coverExt = p.extension(first.name).toLowerCase();
+    final coverExtNorm = coverExt.startsWith('.')
+        ? coverExt.substring(1)
+        : coverExt;
+
+    final contentImages = <(Uint8List, String)>[];
+    for (final entry in imageEntries) {
+      final content = entry.content as List<int>?;
+      if (content == null || content.isEmpty) continue;
+      final ext = p.extension(entry.name).toLowerCase();
+      final extNorm = ext.startsWith('.') ? ext.substring(1) : ext;
+      contentImages.add((Uint8List.fromList(content), extNorm));
+    }
+    return _ZipScanResult(
+      title: title,
+      coverBytes: coverBytes,
+      coverExt: coverExtNorm,
+      contentImages: contentImages,
     );
   } catch (_) {
     return null;

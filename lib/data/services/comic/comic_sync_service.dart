@@ -94,9 +94,7 @@ class ComicSyncService {
         .where((e) => insertedIds.contains(e.comicId))
         .map((e) => ScannedItemReport(
               path: e.path,
-              type: e.path.toLowerCase().endsWith('.epub')
-                  ? ScannedItemType.epub
-                  : ScannedItemType.folder,
+              type: ComicSyncService.typeFromPath(e.path),
               pageCount: e.pageCount,
               title: e.title,
             ))
@@ -108,6 +106,18 @@ class ComicSyncService {
       removedCount: diff.comicsToDelete.length,
       cancelled: false,
     );
+  }
+
+  static const _archiveExtensions = {'.cbz', '.zip', '.cbr', '.rar'};
+
+  /// 根据路径扩展名返回报告中的扫描项类型（仅用于测试与报告展示）。
+  static ScannedItemType typeFromPath(String path) {
+    final lower = path.toLowerCase();
+    if (lower.endsWith('.epub')) return ScannedItemType.epub;
+    if (_archiveExtensions.any((ext) => lower.endsWith(ext))) {
+      return ScannedItemType.archive;
+    }
+    return ScannedItemType.folder;
   }
 
   String _generateSyncId() =>
@@ -340,6 +350,9 @@ class ComicSyncService {
       for (final epubPath in await _findEpubFiles(root)) {
         paths.add(epubPath);
       }
+      for (final archivePath in await _findArchiveFiles(root)) {
+        paths.add(archivePath);
+      }
     }
 
     LogManager.instance.info(
@@ -370,6 +383,31 @@ class ComicSyncService {
       );
     }
     return epubs;
+  }
+
+  Future<List<String>> _findArchiveFiles(Directory dir) async {
+    final archives = <String>[];
+    const extensions = {'.cbz', '.zip', '.cbr', '.rar'};
+    try {
+      await for (final entity in dir.list(
+        recursive: true,
+        followLinks: false,
+      )) {
+        if (entity is File) {
+          final ext = p.extension(entity.path).toLowerCase();
+          if (extensions.contains(ext)) {
+            archives.add(entity.path);
+          }
+        }
+      }
+    } catch (e, st) {
+      LogManager.instance.handle(
+        e,
+        st,
+        '[SYNC][ERROR] 查找压缩包失败，目录=${dir.path}',
+      );
+    }
+    return archives;
   }
 }
 
