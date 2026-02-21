@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/domain/entity/category_tag.dart';
-import 'package:hentai_library/domain/entity/chapter.dart' show Chapter;
+import 'package:hentai_library/domain/entity/comic/category_tag.dart';
+import 'package:hentai_library/domain/entity/comic/chapter.dart' show Chapter;
 
 part 'comic.freezed.dart';
 

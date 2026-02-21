@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:hentai_library/domain/entity/category_tag.dart';
+import 'package:hentai_library/domain/entity/comic/category_tag.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/value_objects/comic_filter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
