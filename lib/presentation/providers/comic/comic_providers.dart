@@ -81,3 +81,12 @@ RecordReadingProgressUseCase recordReadingProgressUseCase(Ref ref) {
 Future<int> comicCacheSize(Ref ref) {
   return ref.watch(comicFileCacheServiceProvider).getCacheDiskUsage();
 }
+
+/// 扫描漫画库是否进行中。用于单例约束：扫描中不允许再打开新扫描对话框。
+@Riverpod(keepAlive: true)
+class ScanInProgressNotifier extends _$ScanInProgressNotifier {
+  @override
+  bool build() => false;
+
+  void setInProgress(bool value) => state = value;
+}

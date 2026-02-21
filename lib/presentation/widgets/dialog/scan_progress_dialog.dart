@@ -14,10 +14,14 @@ class ScanProgressDialog extends ConsumerStatefulWidget {
   const ScanProgressDialog({
     super.key,
     this.onBackgroundComplete,
+    this.onScanEnd,
   });
 
   /// 用户点击「后台扫描」后，同步在后台完成时回调（用于 SnackBar 或打开报告）。
   final void Function(SyncReport?)? onBackgroundComplete;
+
+  /// 同步任务结束时回调（成功、失败或取消）。用于单例约束：仅在此后允许再次打开扫描。
+  final VoidCallback? onScanEnd;
 
   @override
   ConsumerState<ScanProgressDialog> createState() => _ScanProgressDialogState();
@@ -54,6 +58,7 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
       if (_runInBackground) {
         widget.onBackgroundComplete?.call(report);
       }
+      widget.onScanEnd?.call();
     }).catchError((e, _) {
       if (mounted) {
         setState(() {
@@ -62,6 +67,7 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
         });
       }
       if (_runInBackground) widget.onBackgroundComplete?.call(null);
+      widget.onScanEnd?.call();
     });
   }
 

@@ -8,7 +8,7 @@ const double _kSnackBarMaxWidth = 380;
 const double _kSnackBarInset = 24;
 
 /// 计算右下角定位的 margin（左侧留白使条贴右）。
-EdgeInsets _snackBarMargin(BuildContext context) {
+EdgeInsets snackBarMargin(BuildContext context) {
   final w = MediaQuery.sizeOf(context).width;
   return EdgeInsets.only(
     left: w > _kSnackBarMaxWidth + _kSnackBarInset * 2
@@ -29,7 +29,7 @@ void showSuccessSnackBar(BuildContext context, String message) {
       content: Text(message),
       backgroundColor: theme.colorScheme.primary,
       behavior: SnackBarBehavior.floating,
-      margin: _snackBarMargin(context),
+      margin: snackBarMargin(context),
     ),
   );
 }
@@ -45,7 +45,7 @@ void showErrorSnackBar(BuildContext context, Object error) {
       content: Text(message),
       backgroundColor: theme.colorScheme.error,
       behavior: SnackBarBehavior.floating,
-      margin: _snackBarMargin(context),
+      margin: snackBarMargin(context),
     ),
   );
 }
