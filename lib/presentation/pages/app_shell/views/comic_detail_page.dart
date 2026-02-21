@@ -133,10 +133,17 @@ class _DetailLoading extends StatelessWidget {
   }
 }
 
-class _DetailError extends StatelessWidget {
+class _DetailError extends StatefulWidget {
   final VoidCallback onRetry;
 
   const _DetailError({required this.onRetry});
+
+  @override
+  State<_DetailError> createState() => _DetailErrorState();
+}
+
+class _DetailErrorState extends State<_DetailError> {
+  bool _retrying = false;
 
   @override
   Widget build(BuildContext context) {
@@ -162,9 +169,23 @@ class _DetailError extends StatelessWidget {
               ),
             ),
             TextButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(LucideIcons.refreshCw, size: 16),
-              label: const Text('重试'),
+              onPressed: _retrying
+                  ? null
+                  : () {
+                      setState(() => _retrying = true);
+                      widget.onRetry();
+                    },
+              icon: _retrying
+                  ? SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: theme.colorScheme.primary,
+                      ),
+                    )
+                  : const Icon(LucideIcons.refreshCw, size: 16),
+              label: Text(_retrying ? '重试中…' : '重试'),
             ),
           ],
         ),

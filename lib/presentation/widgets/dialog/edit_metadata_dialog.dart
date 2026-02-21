@@ -30,6 +30,7 @@ class EditMetadataDialog extends StatefulHookConsumerWidget {
 class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   late ComicMetadataForm _formData;
   String activeTab = 'details';
+  bool _saving = false;
 
   bool get _isR18 => _formData.tags.any((e) => e.isR18) || _formData.isR18;
 
@@ -58,6 +59,23 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     setState(() {
       _formData = _formData.copyWith(tags: [..._formData.tags]..remove(tag));
     });
+  }
+
+  Future<void> _handleSave() async {
+    setState(() => _saving = true);
+    try {
+      await widget.onSave(_formData);
+      if (mounted) {
+        showSuccessSnackBar(context, '已保存');
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        showErrorSnackBar(context, e is AppException ? e : e.toString());
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   @override
@@ -141,9 +159,9 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
 
                 _DialogFooter(
                   borderSubtle: theme.colorScheme.borderSubtle,
-                  widget: widget,
-                  formData: _formData,
                   primaryColor: theme.colorScheme.primary,
+                  saving: _saving,
+                  onSave: _handleSave,
                 ),
               ],
             ),
@@ -346,15 +364,15 @@ class _DialogHeader extends StatelessWidget {
 class _DialogFooter extends StatelessWidget {
   const _DialogFooter({
     required this.borderSubtle,
-    required this.widget,
-    required ComicMetadataForm formData,
     required this.primaryColor,
-  }) : _formData = formData;
+    required this.saving,
+    required this.onSave,
+  });
 
   final Color borderSubtle;
-  final EditMetadataDialog widget;
-  final ComicMetadataForm _formData;
   final Color primaryColor;
+  final bool saving;
+  final VoidCallback onSave;
 
   @override
   Widget build(BuildContext context) {
@@ -377,22 +395,7 @@ class _DialogFooter extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           ElevatedButton(
-            onPressed: () async {
-              try {
-                await widget.onSave(_formData);
-                if (context.mounted) {
-                  showSuccessSnackBar(context, '已保存');
-                  Navigator.of(context).pop();
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  showErrorSnackBar(
-                    context,
-                    e is AppException ? e : e.toString(),
-                  );
-                }
-              }
-            },
+            onPressed: saving ? null : onSave,
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryColor,
               foregroundColor: colorScheme.onPrimary,
@@ -403,7 +406,23 @@ class _DialogFooter extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text("保存更改"),
+            child: saving
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: colorScheme.onPrimary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text('保存中…'),
+                    ],
+                  )
+                : const Text("保存更改"),
           ),
         ],
       ),

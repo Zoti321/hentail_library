@@ -37,7 +37,7 @@ class DirectoryPage extends ConsumerWidget {
   }
 }
 
-class _DirectoryPageHeader extends ConsumerWidget {
+class _DirectoryPageHeader extends ConsumerStatefulWidget {
   const _DirectoryPageHeader({
     required this.totalCount,
     required this.selectedCount,
@@ -51,7 +51,14 @@ class _DirectoryPageHeader extends ConsumerWidget {
   final bool hasData;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_DirectoryPageHeader> createState() => _DirectoryPageHeaderState();
+}
+
+class _DirectoryPageHeaderState extends ConsumerState<_DirectoryPageHeader> {
+  bool _isAddingDirectory = false;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final notifier = ref.read(directoryViewProvider.notifier);
 
@@ -84,11 +91,11 @@ class _DirectoryPageHeader extends ConsumerWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _MetaChip(icon: LucideIcons.folder, label: '目录 $totalCount'),
-                  if (isSelectionMode)
+                  _MetaChip(icon: LucideIcons.folder, label: '目录 ${widget.totalCount}'),
+                  if (widget.isSelectionMode)
                     _MetaChip(
                       icon: LucideIcons.circleCheckBig,
-                      label: '已选 $selectedCount',
+                      label: '已选 ${widget.selectedCount}',
                       highlighted: true,
                     ),
                 ],
@@ -102,20 +109,31 @@ class _DirectoryPageHeader extends ConsumerWidget {
           runSpacing: 8,
           children: [
             FilledButton.icon(
-              onPressed: () async {
-                final dir = await FilePicker.platform.getDirectoryPath();
-                if (dir == null) return;
-                try {
-                  await ref.read(dirRepoProvider).addDir(dir);
-                  if (context.mounted) {
-                    showSuccessSnackBar(context, '已添加目录');
-                  }
-                } catch (e) {
-                  if (context.mounted) showErrorSnackBar(context, e);
-                }
-              },
-              icon: const Icon(LucideIcons.plus, size: 16),
-              label: const Text('添加目录'),
+              onPressed: _isAddingDirectory
+                  ? null
+                  : () async {
+                      setState(() => _isAddingDirectory = true);
+                      try {
+                        final dir = await FilePicker.platform.getDirectoryPath();
+                        if (dir == null) return;
+                        await ref.read(dirRepoProvider).addDir(dir);
+                        if (mounted) {
+                          showSuccessSnackBar(context, '已添加目录');
+                        }
+                      } catch (e) {
+                        if (mounted) showErrorSnackBar(context, e);
+                      } finally {
+                        if (mounted) setState(() => _isAddingDirectory = false);
+                      }
+                    },
+              icon: _isAddingDirectory
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(LucideIcons.plus, size: 16),
+              label: Text(_isAddingDirectory ? '添加中…' : '添加目录'),
               style: FilledButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
@@ -129,14 +147,14 @@ class _DirectoryPageHeader extends ConsumerWidget {
               ),
             ),
             OutlinedButton.icon(
-              onPressed: hasData ? notifier.toggleSelectionMode : null,
+              onPressed: widget.hasData ? notifier.toggleSelectionMode : null,
               icon: Icon(
-                isSelectionMode
+                widget.isSelectionMode
                     ? LucideIcons.squareX
                     : LucideIcons.squareCheckBig,
                 size: 16,
               ),
-              label: Text(isSelectionMode ? '退出选择' : '选择模式'),
+              label: Text(widget.isSelectionMode ? '退出选择' : '选择模式'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: theme.colorScheme.onSurface,
                 side: BorderSide(color: theme.colorScheme.borderSubtle),
@@ -149,7 +167,7 @@ class _DirectoryPageHeader extends ConsumerWidget {
                 ),
               ),
             ),
-            if (isSelectionMode && selectedCount > 0)
+            if (widget.isSelectionMode && widget.selectedCount > 0)
               TextButton.icon(
                 onPressed: notifier.clearSelection,
                 icon: const Icon(LucideIcons.eraser, size: 16),
@@ -308,7 +326,7 @@ class _DirectoryCard extends StatelessWidget {
   }
 }
 
-class _DirectoryTile extends ConsumerWidget {
+class _DirectoryTile extends ConsumerStatefulWidget {
   const _DirectoryTile({
     required this.dir,
     required this.isSelectionMode,
@@ -320,9 +338,19 @@ class _DirectoryTile extends ConsumerWidget {
   final bool isSelected;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_DirectoryTile> createState() => _DirectoryTileState();
+}
+
+class _DirectoryTileState extends ConsumerState<_DirectoryTile> {
+  bool _isRemoving = false;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final notifier = ref.read(directoryViewProvider.notifier);
+    final dir = widget.dir;
+    final isSelectionMode = widget.isSelectionMode;
+    final isSelected = widget.isSelected;
 
     final textColor = isSelected
         ? theme.colorScheme.primary
@@ -382,24 +410,38 @@ class _DirectoryTile extends ConsumerWidget {
                   ),
                 ),
               ),
-              if (!isSelectionMode)
+              if (!widget.isSelectionMode)
                 IconButton(
                   tooltip: '移除目录',
-                  onPressed: () async {
-                    try {
-                      await ref.read(dirRepoProvider).removeDir(dir);
-                      if (context.mounted) {
-                        showSuccessSnackBar(context, '已移除目录');
-                      }
-                    } catch (e) {
-                      if (context.mounted) showErrorSnackBar(context, e);
-                    }
-                  },
-                  icon: Icon(
-                    LucideIcons.trash2,
-                    size: 16,
-                    color: theme.colorScheme.iconDefault,
-                  ),
+                  onPressed: _isRemoving
+                      ? null
+                      : () async {
+                          setState(() => _isRemoving = true);
+                          try {
+                            await ref.read(dirRepoProvider).removeDir(dir);
+                            if (mounted) {
+                              showSuccessSnackBar(context, '已移除目录');
+                            }
+                          } catch (e) {
+                            if (mounted) showErrorSnackBar(context, e);
+                          } finally {
+                            if (mounted) setState(() => _isRemoving = false);
+                          }
+                        },
+                  icon: _isRemoving
+                      ? SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: theme.colorScheme.primary,
+                          ),
+                        )
+                      : Icon(
+                          LucideIcons.trash2,
+                          size: 16,
+                          color: theme.colorScheme.iconDefault,
+                        ),
                 ),
             ],
           ),
@@ -434,13 +476,20 @@ class _LoadingCard extends StatelessWidget {
   }
 }
 
-class _ErrorCard extends ConsumerWidget {
+class _ErrorCard extends ConsumerStatefulWidget {
   const _ErrorCard({required this.error});
 
   final Object error;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ErrorCard> createState() => _ErrorCardState();
+}
+
+class _ErrorCardState extends ConsumerState<_ErrorCard> {
+  bool _isRetrying = false;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Container(
@@ -452,7 +501,7 @@ class _ErrorCard extends ConsumerWidget {
         border: Border.all(color: theme.colorScheme.borderSubtle),
       ),
       child: Column(
-        crossAxisAlignment: .start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             '目录加载失败',
@@ -464,7 +513,7 @@ class _ErrorCard extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            error.toString(),
+            widget.error.toString(),
             style: TextStyle(
               fontSize: 13,
               color: theme.colorScheme.textTertiary,
@@ -472,11 +521,27 @@ class _ErrorCard extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           OutlinedButton.icon(
-            onPressed: () {
-              ref.read(directoryViewProvider.notifier).refreshDirs();
-            },
-            icon: const Icon(LucideIcons.rotateCw, size: 16),
-            label: const Text('重试'),
+            onPressed: _isRetrying
+                ? null
+                : () async {
+                    setState(() => _isRetrying = true);
+                    try {
+                      await ref.read(directoryViewProvider.notifier).refreshDirs();
+                    } finally {
+                      if (mounted) setState(() => _isRetrying = false);
+                    }
+                  },
+            icon: _isRetrying
+                ? SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: theme.colorScheme.primary,
+                    ),
+                  )
+                : const Icon(LucideIcons.rotateCw, size: 16),
+            label: Text(_isRetrying ? '重试中…' : '重试'),
             style: OutlinedButton.styleFrom(
               foregroundColor: theme.colorScheme.onSurface,
               side: BorderSide(color: theme.colorScheme.borderSubtle),

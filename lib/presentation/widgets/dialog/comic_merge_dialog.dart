@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/domain/entity/entities.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
@@ -228,6 +229,7 @@ class _DialogFooter extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final hasConfirmed = useState(false);
 
     return Container(
       padding: const .all(16),
@@ -251,9 +253,10 @@ class _DialogFooter extends HookConsumerWidget {
             child: const Text("取消"),
           ),
           FilledButton(
-            onPressed: selectedIds.isEmpty
+            onPressed: selectedIds.isEmpty || hasConfirmed.value
                 ? null
                 : () {
+                    hasConfirmed.value = true;
                     onConfirm(selectedIds.toList());
                     Navigator.of(context).pop();
                   },
