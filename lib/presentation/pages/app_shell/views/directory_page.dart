@@ -25,7 +25,7 @@ class DirectoryPage extends ConsumerWidget {
             isSelectionMode: viewState?.isSelectionMode ?? false,
             hasData: viewState != null,
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
           asyncState.when(
             data: (state) => _DirectoryCard(viewState: state),
             loading: () => const _LoadingCard(),
@@ -71,7 +71,7 @@ class _DirectoryPageHeader extends ConsumerWidget {
                   color: theme.colorScheme.textPrimary,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Text(
                 '管理本地漫画目录，支持批量选择',
                 style: TextStyle(
@@ -137,12 +137,33 @@ class _DirectoryPageHeader extends ConsumerWidget {
                 size: 16,
               ),
               label: Text(isSelectionMode ? '退出选择' : '选择模式'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: theme.colorScheme.onSurface,
+                side: BorderSide(color: theme.colorScheme.borderSubtle),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
             ),
             if (isSelectionMode && selectedCount > 0)
               TextButton.icon(
                 onPressed: notifier.clearSelection,
                 icon: const Icon(LucideIcons.eraser, size: 16),
                 label: const Text('清空选择'),
+                style: TextButton.styleFrom(
+                  foregroundColor: theme.colorScheme.onSurface,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
           ],
         ),
@@ -170,13 +191,13 @@ class _MetaChip extends StatelessWidget {
         : theme.colorScheme.onSurfaceVariant;
     final bgColor = highlighted
         ? theme.colorScheme.primaryContainer.withAlpha(130)
-        : theme.colorScheme.surfaceContainerHighest.withAlpha(90);
+        : theme.colorScheme.surfaceContainerHighest;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: theme.colorScheme.borderSubtle),
       ),
       child: Row(
@@ -217,7 +238,7 @@ class _DirectoryCard extends StatelessWidget {
         border: Border.all(color: theme.colorScheme.borderSubtle),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(4),
+            color: theme.colorScheme.cardShadow,
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -228,9 +249,9 @@ class _DirectoryCard extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withAlpha(90),
+                color: theme.colorScheme.surfaceContainerHighest,
                 border: Border(
                   bottom: BorderSide(color: theme.colorScheme.borderSubtle),
                 ),
@@ -322,6 +343,8 @@ class _DirectoryTile extends ConsumerWidget {
           notifier.setSelectionMode(true);
           notifier.toggleDirSelection(dir);
         },
+        splashColor: theme.colorScheme.buttonRipple,
+        highlightColor: theme.colorScheme.buttonPressed,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
@@ -343,7 +366,7 @@ class _DirectoryTile extends ConsumerWidget {
                         LucideIcons.folder,
                         key: const ValueKey<String>('folder'),
                         size: 20,
-                        color: Colors.amber[700],
+                        color: theme.colorScheme.iconDefault,
                       ),
               ),
               const SizedBox(width: 12),
@@ -375,7 +398,7 @@ class _DirectoryTile extends ConsumerWidget {
                   icon: Icon(
                     LucideIcons.trash2,
                     size: 16,
-                    color: theme.colorScheme.onSurfaceVariant,
+                    color: theme.colorScheme.iconDefault,
                   ),
                 ),
             ],
@@ -401,7 +424,12 @@ class _LoadingCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: theme.colorScheme.borderSubtle),
       ),
-      child: const Center(child: CircularProgressIndicator(strokeWidth: 2.2)),
+      child: Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2.2,
+          color: theme.colorScheme.primary,
+        ),
+      ),
     );
   }
 }
@@ -449,6 +477,13 @@ class _ErrorCard extends ConsumerWidget {
             },
             icon: const Icon(LucideIcons.rotateCw, size: 16),
             label: const Text('重试'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: theme.colorScheme.onSurface,
+              side: BorderSide(color: theme.colorScheme.borderSubtle),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
           ),
         ],
       ),
@@ -474,7 +509,7 @@ class _EmptyDirectories extends StatelessWidget {
               size: 28,
               color: theme.colorScheme.onSurfaceVariant,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Text(
               '暂无目录，请先添加本地文件夹',
               style: TextStyle(
