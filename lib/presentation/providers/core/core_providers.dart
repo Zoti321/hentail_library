@@ -25,6 +25,10 @@ SelectedDirectoryDao dirDao(Ref ref) =>
     SelectedDirectoryDao(ref.read(databaseProvider));
 
 @Riverpod(keepAlive: true)
+ReadingSessionDao readingSessionDao(Ref ref) =>
+    ReadingSessionDao(ref.read(databaseProvider));
+
+@Riverpod(keepAlive: true)
 Talker logManager(Ref ref) {
   return LogManager.instance;
 }

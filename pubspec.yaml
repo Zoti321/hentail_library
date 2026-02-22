@@ -22,6 +22,7 @@ dependencies:
   system_theme: ^3.1.2
   flutter_acrylic: ^1.1.4 # windows 亚克力效果
   custom_pop_up_menu: ^1.2.4
+  flutter_heatmap_calendar: ^1.0.5
 
   async: ^2.11.0
   collection: ^1.0.8

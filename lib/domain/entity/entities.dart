@@ -2,6 +2,7 @@ export 'comic/comic.dart';
 export 'comic/chapter.dart';
 export 'comic/category_tag.dart';
 export 'reading_history.dart';
+export 'reading_session.dart';
 export 'form/comic_metadata_form.dart';
 export 'form/comic_archive_form.dart';
 export 'sync_report/scanned_item_report.dart';

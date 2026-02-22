@@ -20,6 +20,15 @@ class ReaderPage extends HookConsumerWidget {
     final theme = Theme.of(context);
     final viewAsync = ref.watch(readerViewProvider(comicId));
 
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(readingSessionStartProvider.notifier).setStartedAt(DateTime.now());
+      });
+      return () {
+        ref.read(readingSessionStartProvider.notifier).setStartedAt(null);
+      };
+    }, [comicId]);
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -67,6 +76,26 @@ void _saveProgress(WidgetRef ref, String comicId) {
   if (state == null) return;
   final currentIndex = state.currentIndex;
   final firstChapter = comic.chapters.isNotEmpty ? comic.chapters.first : null;
+
+  final sessionStart = ref.read(readingSessionStartProvider);
+  if (sessionStart != null) {
+    final durationSeconds =
+        DateTime.now().difference(sessionStart).inSeconds;
+    if (durationSeconds > 0) {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      ref.read(recordReadingSessionUseCaseProvider).call(
+            entity.ReadingSession(
+              comicId: comicId,
+              date: today,
+              durationSeconds: durationSeconds,
+            ),
+          );
+    }
+    ref.read(readingSessionStartProvider.notifier).setStartedAt(null);
+    ref.invalidate(readingStatsProvider);
+  }
+
   ref
       .read(recordReadingProgressUseCaseProvider)
       .call(

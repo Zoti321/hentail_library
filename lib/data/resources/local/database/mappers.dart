@@ -65,3 +65,24 @@ extension ReadingHistoryEntityToCompanion on entity.ReadingHistory {
   }
 }
 
+// 阅读会话 Row <-> Entity 映射（Drift ReadingSession 来自 database.dart）
+extension ReadingSessionRowToEntity on ReadingSession {
+  entity.ReadingSession toEntity() {
+    return entity.ReadingSession(
+      comicId: comicId,
+      date: date,
+      durationSeconds: durationSeconds,
+    );
+  }
+}
+
+extension ReadingSessionEntityToCompanion on entity.ReadingSession {
+  ReadingSessionsCompanion toCompanion() {
+    return ReadingSessionsCompanion.insert(
+      comicId: comicId,
+      date: date,
+      durationSeconds: durationSeconds,
+    );
+  }
+}
+

@@ -36,6 +36,7 @@ class Chapters extends Table {
   IntColumn get pageCount => integer().nullable()();
 
   TextColumn get imageDir => text().nullable().unique()();
+
   /// 原始图源路径（EPUB 文件路径或文件夹路径），用于缓存被清理后重新提取
   TextColumn get sourcePath => text().nullable()();
 }
@@ -95,4 +96,18 @@ class ReadingHistories extends Table {
   // 阅读进度：章节 id、1-based 页码（nullable 兼容旧数据）
   TextColumn get chapterId => text().nullable()();
   IntColumn get pageIndex => integer().nullable()();
+}
+
+// 阅读会话（用于统计每日阅读时长）
+@TableIndex(name: 'idx_session_date', columns: {#date})
+class ReadingSessions extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  TextColumn get comicId =>
+      text().references(Comics, #comicId, onDelete: KeyAction.cascade)();
+
+  /// 会话日期（当天 0 点，便于按日聚合）
+  DateTimeColumn get date => dateTime()();
+
+  IntColumn get durationSeconds => integer()();
 }

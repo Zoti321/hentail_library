@@ -1,6 +1,7 @@
 // 统一入口：按领域分解后的各域 provider 聚合导出，保证现有 import 路径不变。
 export 'core/core_providers.dart';
 export 'reading_history/reading_history_providers.dart';
+export 'reading_stats/reading_stats_providers.dart';
 export 'directory/directory_providers.dart';
 export 'comic/comics.dart';
 export 'comic/comic_providers.dart';

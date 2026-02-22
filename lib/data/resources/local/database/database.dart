@@ -17,13 +17,14 @@ part 'database.g.dart';
     ComicTags,
     SelectedDirectories,
     ReadingHistories,
+    ReadingSessions,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? excutor]) : super(excutor ?? _openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -33,6 +34,7 @@ class AppDatabase extends _$AppDatabase {
       if (from < 2) await _migrateToV2(m);
       if (from < 3) await _migrateToV3(m);
       if (from < 4) await _migrateToV4(m);
+      if (from < 5) await _migrateToV5(m);
     },
   );
 
@@ -47,6 +49,10 @@ class AppDatabase extends _$AppDatabase {
   Future<void> _migrateToV4(Migrator m) async {
     await m.addColumn(readingHistories, readingHistories.chapterId);
     await m.addColumn(readingHistories, readingHistories.pageIndex);
+  }
+
+  Future<void> _migrateToV5(Migrator m) async {
+    await m.createTable(readingSessions);
   }
 
   static QueryExecutor _openConnection() {
