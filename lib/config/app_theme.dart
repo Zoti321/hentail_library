@@ -14,6 +14,23 @@ ThemeData buildAppTheme(Color color, Brightness brightness) {
     fontFamily: 'MI_Sans_Regular',
     appBarTheme: _buildAppBarThemeData(colorScheme),
     navigationRailTheme: _buildNavRailThemeData(colorScheme),
+    scrollbarTheme: ScrollbarThemeData(
+      thumbVisibility: WidgetStateProperty.all(true),
+      thickness: WidgetStateProperty.all(6),
+      radius: const Radius.circular(999),
+      thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+        final base = colorScheme.onSurfaceVariant;
+        if (states.contains(WidgetState.dragged)) {
+          return base.withOpacity(0.95);
+        }
+        if (states.contains(WidgetState.hovered)) {
+          return base.withOpacity(0.85);
+        }
+        return base.withOpacity(0.65);
+      }),
+      trackColor: WidgetStateProperty.all(Colors.transparent),
+      trackBorderColor: WidgetStateProperty.all(Colors.transparent),
+    ),
     inputDecorationTheme: InputDecorationTheme(hintMaxLines: 1),
     pageTransitionsTheme: const PageTransitionsTheme(
       builders: {

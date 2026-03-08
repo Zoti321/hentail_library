@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/domain/entity/entities.dart' as entity;
+import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/extensions/extensions.dart';
 import 'package:hentai_library/presentation/providers/comic/comic_providers.dart';
 import 'package:hentai_library/presentation/providers/comic/notifiers/comic_filter.dart';
@@ -17,6 +18,34 @@ part 'comics.g.dart';
 @Riverpod(keepAlive: true)
 Stream<List<entity.Comic>> rawDataComics(Ref ref) {
   return ref.watch(comicRepoProvider).watchComicAggregate();
+}
+
+/// 书库中出现的全部标签，按类型分组（作者/系列/登场人物/标签），用于筛选弹窗。
+@Riverpod(keepAlive: true)
+AsyncValue<Map<CategoryTagType, List<entity.CategoryTag>>> libraryTagsByType(
+  Ref ref,
+) {
+  final comicsAsync = ref.watch(rawDataComicsProvider);
+  return comicsAsync.when(
+    data: (comics) {
+      final map = <CategoryTagType, List<entity.CategoryTag>>{};
+      final seen = <String>{};
+      for (final c in comics) {
+        for (final t in c.tags) {
+          final key = '${t.name}|${t.type.name}|${t.isR18}';
+          if (seen.contains(key)) continue;
+          seen.add(key);
+          map.putIfAbsent(t.type, () => []).add(t);
+        }
+      }
+      for (final list in map.values) {
+        list.sort((a, b) => a.name.compareTo(b.name));
+      }
+      return AsyncValue.data(map);
+    },
+    loading: () => const AsyncValue.loading(),
+    error: (e, st) => AsyncValue.error(e, st),
+  );
 }
 
 // library页面渲染的数据(经过 属性过滤 关键词过滤 排序等操作后的数据)

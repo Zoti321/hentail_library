@@ -34,6 +34,27 @@ class ComicFilterNotifier extends _$ComicFilterNotifier {
     state = state.copyWith(tags: tags);
   }
 
+  void updateTagsAny(Set<CategoryTag> tagsAny) {
+    state = state.copyWith(tagsAny: tagsAny);
+  }
+
+  void updateTagsExclude(Set<CategoryTag> tagsExclude) {
+    state = state.copyWith(tagsExclude: tagsExclude);
+  }
+
+  /// 一次性写入三组标签（用于标签选择面板确认）。
+  void updateTagFilter({
+    Set<CategoryTag>? tags,
+    Set<CategoryTag>? tagsAny,
+    Set<CategoryTag>? tagsExclude,
+  }) {
+    state = state.copyWith(
+      tags: tags,
+      tagsAny: tagsAny,
+      tagsExclude: tagsExclude,
+    );
+  }
+
   void updateImageSourceType(Set<ComicImageSourceType> imageSourceTypes) {
     state = state.copyWith(imageSourceTypes: imageSourceTypes);
   }

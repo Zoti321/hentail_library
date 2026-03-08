@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/domain/entity/entities.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
@@ -51,10 +50,7 @@ class _ReadingStatsSection extends ConsumerWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.borderMedium,
-          width: 0.8,
-        ),
+        border: Border.all(color: theme.colorScheme.borderMedium, width: 0.8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,51 +76,57 @@ class _ReadingStatsSection extends ConsumerWidget {
           ),
           statsAsync.when(
             data: (stats) {
-              final end = DateTime.now();
-              final start = end.subtract(const Duration(days: 365));
               final colorScheme = theme.colorScheme;
-              // 按当日阅读秒数分档：0 / 1分钟 / 5分钟 / 15分钟 / 1小时
-              final colorsets = <int, Color>{
-                0: colorScheme.surfaceContainerHighest,
-                60: colorScheme.primary.withOpacity(0.3),
-                300: colorScheme.primary.withOpacity(0.5),
-                900: colorScheme.primary.withOpacity(0.7),
-                3600: colorScheme.primary,
-              };
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 12,
+              return Wrap(
+                spacing: 24,
+                runSpacing: 8,
                 children: [
-                  HeatMap(
-                    datasets: stats.heatmapData,
-                    startDate: start,
-                    endDate: end,
-                    colorMode: ColorMode.color,
-                    defaultColor: colorScheme.surfaceContainerHighest,
-                    colorsets: colorsets,
-                    size: 12,
-                    fontSize: 10,
-                    showColorTip: false,
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: colorScheme.borderSubtle,
+                        width: 1,
+                      ),
+                    ),
+                    child: _StatChip(
+                      label: '累计阅读',
+                      value: _formatDuration(stats.totalSeconds),
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 24,
-                    runSpacing: 8,
-                    children: [
-                      _StatChip(
-                        label: '累计阅读',
-                        value: _formatDuration(stats.totalSeconds),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: colorScheme.borderSubtle,
+                        width: 1,
                       ),
-                      _StatChip(
-                        label: '每日平均',
-                        value: stats.daysWithReading > 0
-                            ? _formatDuration(stats.averageSecondsPerDay)
-                            : '0 分钟',
-                        subtitle: stats.daysWithReading > 0
-                            ? '（${stats.daysWithReading} 天有阅读）'
-                            : null,
+                    ),
+                    child: _StatChip(
+                      label: '每日平均',
+                      value: stats.daysWithReading > 0
+                          ? _formatDuration(stats.averageSecondsPerDay)
+                          : '0 分钟',
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: colorScheme.borderSubtle,
+                        width: 1,
                       ),
-                    ],
+                    ),
+                    child: _StatChip(
+                      label: '有阅读天数',
+                      value: '${stats.daysWithReading} 天',
+                    ),
                   ),
                 ],
               );
@@ -148,15 +150,10 @@ class _ReadingStatsSection extends ConsumerWidget {
 }
 
 class _StatChip extends StatelessWidget {
-  const _StatChip({
-    required this.label,
-    required this.value,
-    this.subtitle,
-  });
+  const _StatChip({required this.label, required this.value});
 
   final String label;
   final String value;
-  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -181,16 +178,6 @@ class _StatChip extends StatelessWidget {
             color: theme.colorScheme.textPrimary,
           ),
         ),
-        if (subtitle != null) ...[
-          const SizedBox(height: 2),
-          Text(
-            subtitle!,
-            style: TextStyle(
-              fontSize: 11,
-              color: theme.colorScheme.textTertiary,
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -275,29 +262,31 @@ class _Header extends ConsumerWidget {
             '清空',
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
-      style: ButtonStyle(
-        foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.hovered)) {
-            return Colors.red.shade700;
-          }
-          return Colors.red.shade600;
-        }),
-        backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-          if (states.contains(MaterialState.hovered)) {
-            return Colors.red.shade50;
-          }
-          return Colors.transparent;
-        }),
-        shape: WidgetStateProperty.all(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          style: ButtonStyle(
+            foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+              if (states.contains(MaterialState.hovered)) {
+                return Colors.red.shade700;
+              }
+              return Colors.red.shade600;
+            }),
+            backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+              if (states.contains(MaterialState.hovered)) {
+                return Colors.red.shade50;
+              }
+              return Colors.transparent;
+            }),
+            shape: WidgetStateProperty.all(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            padding: WidgetStateProperty.all(
+              const .symmetric(horizontal: 12, vertical: 8),
+            ),
+            overlayColor: MaterialStateProperty.all(
+              Colors.red.withOpacity(0.08),
+            ),
+          ),
         ),
-        padding: WidgetStateProperty.all(
-          const .symmetric(horizontal: 12, vertical: 8),
-        ),
-        overlayColor: MaterialStateProperty.all(Colors.red.withOpacity(0.08)),
       ),
-    ),
-    ),
     );
   }
 }
