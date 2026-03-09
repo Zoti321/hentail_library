@@ -7,6 +7,7 @@ import 'package:hentai_library/presentation/pages/app_shell/views/history_page.d
 import 'package:hentai_library/presentation/pages/app_shell/views/home_page.dart';
 import 'package:hentai_library/presentation/pages/app_shell/views/library_page.dart';
 import 'package:hentai_library/presentation/pages/app_shell/views/settings_page.dart';
+import 'package:hentai_library/presentation/pages/app_shell/views/tag_management_page.dart';
 import 'package:hentai_library/presentation/pages/reader_page.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -52,6 +53,11 @@ final appRouter = GoRouter(
           path: '/settings',
           name: '设置',
           builder: (context, state) => const SettingsPage(),
+        ),
+        GoRoute(
+          path: '/tags',
+          name: '标签管理',
+          builder: (context, state) => const TagManagementPage(),
         ),
       ],
     ),

@@ -24,9 +24,7 @@ class ReaderPage extends HookConsumerWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(readingSessionStartProvider.notifier).setStartedAt(DateTime.now());
       });
-      return () {
-        ref.read(readingSessionStartProvider.notifier).setStartedAt(null);
-      };
+      return null;
     }, [comicId]);
 
     return PopScope(

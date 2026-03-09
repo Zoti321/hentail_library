@@ -25,4 +25,16 @@ abstract class ComicRepository {
 
   // 增加漫画的阅读次数
   Future<void> incrementReadCount(String comicId);
+
+  // 标签管理：获取全部标签
+  Future<List<CategoryTag>> listAllTags();
+
+  // 标签管理：新增标签
+  Future<void> addTag(CategoryTag tag);
+
+  // 标签管理：批量删除标签
+  Future<void> deleteTags(List<CategoryTag> tags);
+
+  // 标签管理：重命名单个标签
+  Future<void> renameTag(CategoryTag oldTag, String newName);
 }

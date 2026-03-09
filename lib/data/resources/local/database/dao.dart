@@ -297,6 +297,26 @@ class CategoryTagDao extends DatabaseAccessor<AppDatabase>
   Future<int> deleteTag(int tagId) {
     return (delete(categoryTags)..where((t) => t.id.equals(tagId))).go();
   }
+
+  // 批量删除标签（同时清理关联的 comicTags）
+  Future<void> deleteTagsByIds(List<int> tagIds) async {
+    if (tagIds.isEmpty) return;
+    await transaction(() async {
+      // 先删除关联表中的记录
+      await (delete(comicTags)..where((t) => t.tagId.isIn(tagIds))).go();
+      // 再删除标签本身
+      await (delete(categoryTags)..where((t) => t.id.isIn(tagIds))).go();
+    });
+  }
+
+  // 重命名单个标签
+  Future<int> renameTag(int tagId, String newName) {
+    return (update(categoryTags)..where((t) => t.id.equals(tagId))).write(
+      CategoryTagsCompanion(
+        name: Value(newName),
+      ),
+    );
+  }
 }
 
 // 选择的目录DAO

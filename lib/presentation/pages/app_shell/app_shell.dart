@@ -62,6 +62,9 @@ class _AppShellState extends ConsumerState<AppShell> with TrayListener {
       case 'folders':
         context.go('/folders');
         break;
+      case 'tags':
+        context.go('/tags');
+        break;
       case 'history':
         context.go('/history');
       case 'settings':

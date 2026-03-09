@@ -145,4 +145,84 @@ class ComicRepositoryImpl extends ComicRepository {
       throw AppException('增加阅读次数失败', cause: e, stackTrace: st);
     }
   }
+
+  @override
+  Future<List<entity.CategoryTag>> listAllTags() async {
+    try {
+      final rows = await _categoryTagDao.getAllTags();
+      rows.sort((a, b) {
+        final typeCompare = a.type.index.compareTo(b.type.index);
+        if (typeCompare != 0) return typeCompare;
+        return a.name.compareTo(b.name);
+      });
+      return rows
+          .map(
+            (t) =>
+                entity.CategoryTag(name: t.name, type: t.type, isR18: t.isR18),
+          )
+          .toList();
+    } catch (e, st) {
+      LogManager.instance.handle(e, st, '[COMIC_REPO] 获取全部标签失败');
+      throw AppException('获取标签列表失败', cause: e, stackTrace: st);
+    }
+  }
+
+  @override
+  Future<void> addTag(entity.CategoryTag tag) async {
+    try {
+      final companion = CategoryTagsCompanion.insert(
+        name: tag.name,
+        type: Value(tag.type),
+        isR18: Value(tag.isR18),
+      );
+      await _categoryTagDao.insertTag(companion);
+    } catch (e, st) {
+      LogManager.instance.handle(e, st, '[COMIC_REPO] 新增标签失败, tag=${tag.name}');
+      throw AppException('新增标签失败', cause: e, stackTrace: st);
+    }
+  }
+
+  @override
+  Future<void> deleteTags(List<entity.CategoryTag> tags) async {
+    if (tags.isEmpty) return;
+    try {
+      final ids = <int>[];
+      for (final t in tags) {
+        final row = await _categoryTagDao.getTagByNameAndType(t.name, t.type);
+        if (row != null) {
+          ids.add(row.id);
+        }
+      }
+      if (ids.isEmpty) return;
+      await _categoryTagDao.deleteTagsByIds(ids);
+    } catch (e, st) {
+      LogManager.instance.handle(
+        e,
+        st,
+        '[COMIC_REPO] 删除标签失败, count=${tags.length}',
+      );
+      throw AppException('删除标签失败', cause: e, stackTrace: st);
+    }
+  }
+
+  @override
+  Future<void> renameTag(entity.CategoryTag oldTag, String newName) async {
+    try {
+      final row = await _categoryTagDao.getTagByNameAndType(
+        oldTag.name,
+        oldTag.type,
+      );
+      if (row == null) {
+        return;
+      }
+      await _categoryTagDao.renameTag(row.id, newName);
+    } catch (e, st) {
+      LogManager.instance.handle(
+        e,
+        st,
+        '[COMIC_REPO] 重命名标签失败, from=${oldTag.name}, to=$newName',
+      );
+      throw AppException('重命名标签失败', cause: e, stackTrace: st);
+    }
+  }
 }
