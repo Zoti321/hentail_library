@@ -383,6 +383,16 @@ class ReadingHistoryDao extends DatabaseAccessor<AppDatabase>
     )..orderBy([(t) => OrderingTerm.desc(t.lastReadTime)])).watch();
   }
 
+  Future<int> deleteByComicId(String comicId) {
+    return (delete(
+      readingHistories,
+    )..where((t) => t.comicId.equals(comicId))).go();
+  }
+
+  Future<int> clearAllHistory() {
+    return delete(readingHistories).go();
+  }
+
   Future<void> clearExpiredHistory() async {
     final limitDate = DateTime.now().subtract(const Duration(days: 365));
     await (delete(

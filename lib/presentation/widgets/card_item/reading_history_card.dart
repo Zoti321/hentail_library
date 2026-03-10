@@ -10,11 +10,13 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 class ReadingHistoryCard extends StatefulWidget {
   final ReadingHistory history;
   final VoidCallback onTap;
+  final VoidCallback? onDelete;
 
   const ReadingHistoryCard({
     super.key,
     required this.history,
     required this.onTap,
+    this.onDelete,
   });
 
   @override
@@ -99,6 +101,20 @@ class _ReadingHistoryCardState extends State<ReadingHistoryCard> {
                 size: 18,
                 color: cs.textTertiary,
               ),
+              if (widget.onDelete != null) ...[
+                const SizedBox(width: 8),
+                Tooltip(
+                  message: '删除记录',
+                  child: IconButton(
+                    onPressed: widget.onDelete,
+                    icon: Icon(
+                      LucideIcons.trash2,
+                      size: 18,
+                      color: cs.textTertiary,
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

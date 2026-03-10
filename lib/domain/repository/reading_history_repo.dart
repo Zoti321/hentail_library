@@ -7,5 +7,9 @@ abstract class ReadingHistoryRepository {
 
   Stream<List<ReadingHistory>> watchAllHistory();
 
+  Future<void> deleteByComicId(String comicId);
+
+  Future<void> clearAllHistory();
+
   Future<void> clearExpiredHistory();
 }

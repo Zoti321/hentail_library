@@ -39,6 +39,34 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   }
 
   @override
+  Future<void> deleteByComicId(String comicId) async {
+    try {
+      await _dao.deleteByComicId(comicId);
+    } catch (e, st) {
+      LogManager.instance.handle(
+        e,
+        st,
+        '[READING_HISTORY_REPO] 删除阅读历史失败，comicId=$comicId',
+      );
+      throw AppException('删除阅读历史失败', cause: e, stackTrace: st);
+    }
+  }
+
+  @override
+  Future<void> clearAllHistory() async {
+    try {
+      await _dao.clearAllHistory();
+    } catch (e, st) {
+      LogManager.instance.handle(
+        e,
+        st,
+        '[READING_HISTORY_REPO] 清空阅读历史失败',
+      );
+      throw AppException('清空阅读历史失败', cause: e, stackTrace: st);
+    }
+  }
+
+  @override
   Future<void> clearExpiredHistory() async {
     try {
       await _dao.clearExpiredHistory();

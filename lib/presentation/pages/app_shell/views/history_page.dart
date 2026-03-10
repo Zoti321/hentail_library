@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/domain/entity/entities.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/card_item/reading_history_card.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class HistoryPage extends ConsumerWidget {
+class HistoryPage extends HookConsumerWidget {
   const HistoryPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final query = useState<String>('');
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
       child: Column(
@@ -20,8 +23,11 @@ class HistoryPage extends ConsumerWidget {
         spacing: 16,
         children: [
           const _ReadingStatsSection(),
-          const _Header(),
-          const _HistoryList(),
+          _Header(
+            query: query.value,
+            onQueryChanged: (v) => query.value = v,
+          ),
+          _HistoryList(query: query.value),
         ],
       ),
     );
@@ -184,7 +190,10 @@ class _StatChip extends StatelessWidget {
 }
 
 class _Header extends ConsumerWidget {
-  const _Header();
+  const _Header({required this.query, required this.onQueryChanged});
+
+  final String query;
+  final ValueChanged<String> onQueryChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -240,23 +249,44 @@ class _Header extends ConsumerWidget {
           const Spacer(),
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.2,
-            child: CustomTextField(hintText: "搜索历史记录..."),
+            child: CustomTextField(
+              hintText: "搜索历史记录...",
+              onChanged: onQueryChanged,
+            ),
           ),
           const SizedBox(width: 12),
-          _buildClearBtn(),
+          _buildClearBtn(context, ref, history.isNotEmpty),
         ],
       ),
     );
   }
 
-  Widget _buildClearBtn() {
+  Widget _buildClearBtn(BuildContext context, WidgetRef ref, bool enabled) {
     return Tooltip(
       message: '清空阅读历史',
       child: Semantics(
         label: '清空阅读历史',
         button: true,
         child: TextButton.icon(
-          onPressed: () {},
+          onPressed: !enabled
+              ? null
+              : () async {
+                  final confirmed =
+                      await showDialog<bool>(
+                        context: context,
+                        builder: (context) => const _ConfirmClearHistoryDialog(),
+                      ) ??
+                      false;
+                  if (!confirmed) return;
+                  try {
+                    await ref.read(readingHistoryRepoProvider).clearAllHistory();
+                    if (context.mounted) {
+                      showSuccessSnackBar(context, '已清空阅读历史');
+                    }
+                  } catch (e) {
+                    if (context.mounted) showErrorSnackBar(context, e);
+                  }
+                },
           icon: Icon(LucideIcons.trash2, size: 16),
           label: const Text(
             '清空',
@@ -292,7 +322,9 @@ class _Header extends ConsumerWidget {
 }
 
 class _HistoryList extends ConsumerWidget {
-  const _HistoryList();
+  const _HistoryList({required this.query});
+
+  final String query;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -301,7 +333,14 @@ class _HistoryList extends ConsumerWidget {
 
     return rawData.when(
       data: (history) {
-        if (history.isEmpty) {
+        final q = query.trim().toLowerCase();
+        final filtered = q.isEmpty
+            ? history
+            : history
+                .where((h) => h.title.toLowerCase().contains(q))
+                .toList(growable: false);
+
+        if (filtered.isEmpty) {
           return Padding(
             padding: const EdgeInsets.only(top: 48),
             child: Center(
@@ -315,7 +354,7 @@ class _HistoryList extends ConsumerWidget {
                     color: theme.colorScheme.textTertiary,
                   ),
                   Text(
-                    '暂无阅读历史',
+                    q.isEmpty ? '暂无阅读历史' : '没有匹配的历史记录',
                     style: TextStyle(
                       fontSize: 14,
                       color: theme.colorScheme.textSecondary,
@@ -328,7 +367,7 @@ class _HistoryList extends ConsumerWidget {
         }
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: history
+          children: filtered
               .map(
                 (h) => ReadingHistoryCard(
                   history: h,
@@ -336,6 +375,26 @@ class _HistoryList extends ConsumerWidget {
                     '阅读页面',
                     pathParameters: {'id': h.comicId},
                   ),
+                  onDelete: () async {
+                    final confirmed =
+                        await showDialog<bool>(
+                          context: context,
+                          builder: (context) =>
+                              _ConfirmDeleteHistoryDialog(title: h.title),
+                        ) ??
+                        false;
+                    if (!confirmed) return;
+                    try {
+                      await ref
+                          .read(readingHistoryRepoProvider)
+                          .deleteByComicId(h.comicId);
+                      if (context.mounted) {
+                        showSuccessSnackBar(context, '已删除记录');
+                      }
+                    } catch (e) {
+                      if (context.mounted) showErrorSnackBar(context, e);
+                    }
+                  },
                 ),
               )
               .toList(),
@@ -359,6 +418,52 @@ class _HistoryList extends ConsumerWidget {
       ),
       skipLoadingOnReload: true,
       skipLoadingOnRefresh: true,
+    );
+  }
+}
+
+class _ConfirmClearHistoryDialog extends StatelessWidget {
+  const _ConfirmClearHistoryDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('确认清空'),
+      content: const Text('将清空全部阅读历史记录。此操作不可撤销。'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('取消'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text('清空'),
+        ),
+      ],
+    );
+  }
+}
+
+class _ConfirmDeleteHistoryDialog extends StatelessWidget {
+  const _ConfirmDeleteHistoryDialog({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('删除记录？'),
+      content: Text('将删除「$title」的阅读历史记录。'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('取消'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text('删除'),
+        ),
+      ],
     );
   }
 }
