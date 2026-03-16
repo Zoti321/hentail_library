@@ -62,7 +62,6 @@ abstract class Comic with _$Comic {
   /// - R18 状态必须一致
   /// - 标题不能为空
   bool canMergeWith(Comic other) {
-    if (isR18 != other.isR18) return false;
     if (title.isEmpty || other.title.isEmpty) return false;
     return true;
   }

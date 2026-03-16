@@ -73,7 +73,14 @@ class ComicCard extends HookConsumerWidget {
                   context: context,
                   builder: (context) => ComicMergeDialog(
                     currentComic: comic,
-                    onConfirm: (ids) {},
+                    onConfirm: (ids) {
+                      final form = ComicArchiveForm(
+                        comicId: comic.id,
+                        chapterIds: ids,
+                      );
+
+                      ref.read(comicRepoProvider).archiveChaptersToComic(form);
+                    },
                   ),
                 );
                 break;
