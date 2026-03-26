@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/widgets/my_toggle_switch.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -62,7 +63,7 @@ class SettingsPage extends ConsumerWidget {
                     ),
                     label: '深色模式',
                     description: data.isDarkMode ? '已启用' : '已禁用',
-                    action: _ToggleSwitch(
+                    action: MyToggleSwitch(
                       checked: data.isDarkMode,
                       onChange: () {
                         ref.read(settingsProvider.notifier).toggleDarkMode();
@@ -137,7 +138,7 @@ class SettingsPage extends ConsumerWidget {
                     ),
                     label: '自动扫描',
                     description: '启动时扫描新章节',
-                    action: const _ToggleSwitch(checked: true),
+                    action: const MyToggleSwitch(checked: true),
                   ),
                   _SettingsRow(
                     icon: data.isR18Mode
@@ -153,7 +154,7 @@ class SettingsPage extends ConsumerWidget {
                           ),
                     label: 'R18 内容',
                     description: data.isR18Mode ? '显示成人内容' : '隐藏成人内容',
-                    action: _ToggleSwitch(
+                    action: MyToggleSwitch(
                       checked: data.isR18Mode,
                       onChange: () =>
                           ref.read(settingsProvider.notifier).toggleR18Mode(),
@@ -395,71 +396,6 @@ class _SettingsRowState extends State<_SettingsRow> {
                   widget.action!,
                 ],
               ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ToggleSwitch extends StatefulWidget {
-  final bool checked;
-  final VoidCallback? onChange;
-
-  const _ToggleSwitch({required this.checked, this.onChange});
-
-  @override
-  State<_ToggleSwitch> createState() => _ToggleSwitchState();
-}
-
-class _ToggleSwitchState extends State<_ToggleSwitch> {
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: widget.onChange,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: 40,
-          height: 20,
-          decoration: BoxDecoration(
-            color: widget.checked
-                ? theme.colorScheme.primary
-                : theme.colorScheme.borderSubtle,
-            border: Border.all(
-              color: widget.checked
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.borderMedium,
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(2),
-            child: AnimatedAlign(
-              duration: const Duration(milliseconds: 200),
-              alignment: widget.checked
-                  ? Alignment.centerRight
-                  : Alignment.centerLeft,
-              child: Container(
-                width: 14,
-                height: 14,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(10),
-                      blurRadius: 2,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
-                ),
-              ),
             ),
           ),
         ),

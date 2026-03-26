@@ -289,8 +289,8 @@ class _TabButton extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
-      splashColor: primaryColor.withAlpha(20),
-      highlightColor: primaryColor.withAlpha(10),
+      splashColor: primaryColor.withOpacity(0.2),
+      highlightColor: primaryColor.withOpacity(0.1),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
         decoration: BoxDecoration(

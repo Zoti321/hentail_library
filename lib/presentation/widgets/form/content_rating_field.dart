@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/presentation/widgets/form/fluent_text_field.dart';
+import 'package:hentai_library/presentation/widgets/my_toggle_switch.dart';
 
 class ContentRatingField extends StatelessWidget {
   final bool isR18;
@@ -40,37 +40,7 @@ class ContentRatingField extends StatelessWidget {
             child: Row(
               spacing: 12,
               children: [
-                AnimatedContainer(
-                  duration: 100.ms,
-                  curve: Curves.easeInOut,
-                  width: 32,
-                  height: 16,
-                  decoration: BoxDecoration(
-                    color: isR18
-                        ? Theme.of(context).colorScheme.error
-                        : Theme.of(context).colorScheme.borderStrong,
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                  child: Stack(
-                    clipBehavior: Clip.antiAlias,
-                    children: [
-                      AnimatedPositioned(
-                        duration: 200.ms,
-                        left: isR18 ? 18 : 2,
-                        top: 2,
-                        bottom: 2,
-                        child: Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                MyToggleSwitch(checked: isR18),
                 Text(
                   isR18 ? "NSFW" : "",
                   style: TextStyle(

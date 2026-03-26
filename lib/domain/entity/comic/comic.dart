@@ -28,9 +28,6 @@ abstract class Comic with _$Comic {
     (previousValue, element) => previousValue + element.pageCount,
   );
 
-  /// 使用新的元数据更新漫画（充血行为之一）
-  ///
-  /// - 只会覆盖非 null 的参数，其他字段保持不变
   Comic withUpdatedMetadata({
     String? title,
     String? description,
@@ -49,26 +46,17 @@ abstract class Comic with _$Comic {
     );
   }
 
-  /// 增加阅读次数（默认 +1），最小为 0
   Comic incrementViews([int delta = 1]) {
     final current = totalViews ?? 0;
     final next = current + delta;
     return copyWith(totalViews: next < 0 ? 0 : next);
   }
 
-  /// 判断是否可以与另一部漫画进行归档/合并
-  ///
-  /// 这里给出一个保守的默认规则：
-  /// - R18 状态必须一致
-  /// - 标题不能为空
   bool canMergeWith(Comic other) {
     if (title.isEmpty || other.title.isEmpty) return false;
     return true;
   }
 
-  /// 将 [other] 的章节合并到当前漫画，去重后按章节 id 排序
-  ///
-  /// 只负责组合内存中的聚合，不做任何持久化操作。
   Comic mergeChaptersFrom(Comic other) {
     final all = <String, Chapter>{
       for (final c in chapters) c.id: c,
