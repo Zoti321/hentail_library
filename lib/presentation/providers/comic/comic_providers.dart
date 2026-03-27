@@ -1,5 +1,4 @@
 import 'package:hentai_library/data/services/comic/comic.dart';
-import 'package:hentai_library/domain/entity/v2/content_rating.dart' as v2;
 import 'package:hentai_library/domain/entity/v2/library_tag.dart' as v2;
 import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/usecases/usecases.dart';
@@ -147,7 +146,7 @@ class UpdateComicMetadataFacadeUseCase {
       comicId,
       title: form.title,
       authors: form.authors,
-      contentRating: form.isR18 ? v2.ContentRating.r18 : v2.ContentRating.safe,
+      contentRating: form.isR18 ? ContentRating.r18 : ContentRating.safe,
       tags: tags,
     );
   }

@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:hentai_library/domain/entity/v2/content_rating.dart';
+import 'package:hentai_library/domain/enums/enums.dart';
 
 import 'database.dart';
 

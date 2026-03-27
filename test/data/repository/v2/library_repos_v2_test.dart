@@ -1,12 +1,13 @@
 import 'package:drift/native.dart';
+import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:test/test.dart';
 import 'package:hentai_library/data/repository/v2/library_comic_repo_impl.dart';
 import 'package:hentai_library/data/repository/v2/library_series_repo_impl.dart';
 import 'package:hentai_library/data/repository/v2/library_tag_repo_impl.dart';
 import 'package:hentai_library/data/resources/local/database/dao.dart';
-import 'package:hentai_library/data/resources/local/database/database.dart' as db;
+import 'package:hentai_library/data/resources/local/database/database.dart'
+    as db;
 import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
-import 'package:hentai_library/domain/entity/v2/content_rating.dart' as entity;
 import 'package:hentai_library/domain/entity/v2/library_comic.dart' as entity;
 import 'package:hentai_library/domain/entity/v2/library_tag.dart' as entity;
 
@@ -38,7 +39,7 @@ void main() {
           resourceType: ResourceType.dir,
           title: 't',
           authors: ['a'],
-          contentRating: entity.ContentRating.safe,
+          contentRating: ContentRating.safe,
           tags: [entity.LibraryTag(name: 'old')],
         ),
       ]);
@@ -79,4 +80,3 @@ void main() {
     });
   });
 }
-

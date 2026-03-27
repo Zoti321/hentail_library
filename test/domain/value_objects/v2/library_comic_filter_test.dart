@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
-import 'package:hentai_library/domain/entity/v2/content_rating.dart';
 import 'package:hentai_library/domain/entity/v2/library_comic.dart';
 import 'package:hentai_library/domain/entity/v2/library_tag.dart';
+import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/value_objects/v2/library_comic_filter.dart';
 import 'package:hentai_library/domain/value_objects/v2/library_tag_pick.dart';
 
@@ -101,11 +101,7 @@ void main() {
       );
       final pa = LibraryTagPick(name: 'a');
       expect(
-        LibraryComicFilter(
-          tagsExclude: {
-            LibraryTagPick(name: 'b'),
-          },
-        ).matches(c),
+        LibraryComicFilter(tagsExclude: {LibraryTagPick(name: 'b')}).matches(c),
         isTrue,
       );
       expect(LibraryComicFilter(tagsExclude: {pa}).matches(c), isFalse);
@@ -121,12 +117,9 @@ void main() {
       final f = LibraryComicFilter(
         resourceTypes: {ResourceType.epub},
         contentRatings: {ContentRating.safe},
-        tagsAll: {
-          LibraryTagPick(name: 'x'),
-        },
+        tagsAll: {LibraryTagPick(name: 'x')},
       );
       expect(f.matches(c), isTrue);
     });
   });
 }
-

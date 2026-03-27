@@ -2,8 +2,8 @@ import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart'
     as db;
 import 'package:hentai_library/domain/entity/v2/library_comic.dart' as entity;
-import 'package:hentai_library/domain/entity/v2/content_rating.dart' as entity;
 import 'package:hentai_library/domain/entity/v2/library_tag.dart' as entity;
+import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/repository/v2/library_comic_repo.dart';
 import 'package:drift/drift.dart';
 
@@ -12,25 +12,22 @@ class LibraryComicRepositoryImpl implements LibraryComicRepository {
 
   LibraryComicRepositoryImpl(this._comicDao);
 
-  Future<List<entity.LibraryComic>> _mapRows(
-    List<db.LibraryComic> rows,
-  ) async {
-    final tagMap =
-        await _comicDao.getTagNamesForComics(rows.map((e) => e.comicId));
-    return rows
-        .map((r) {
-          final tagNames = tagMap[r.comicId] ?? const <String>[];
-          return entity.LibraryComic(
-            comicId: r.comicId,
-            path: r.path,
-            resourceType: r.resourceType,
-            title: r.title,
-            authors: r.authorsJson,
-            contentRating: r.contentRating,
-            tags: tagNames.map((n) => entity.LibraryTag(name: n)).toList(),
-          );
-        })
-        .toList();
+  Future<List<entity.LibraryComic>> _mapRows(List<db.LibraryComic> rows) async {
+    final tagMap = await _comicDao.getTagNamesForComics(
+      rows.map((e) => e.comicId),
+    );
+    return rows.map((r) {
+      final tagNames = tagMap[r.comicId] ?? const <String>[];
+      return entity.LibraryComic(
+        comicId: r.comicId,
+        path: r.path,
+        resourceType: r.resourceType,
+        title: r.title,
+        authors: r.authorsJson,
+        contentRating: r.contentRating,
+        tags: tagNames.map((n) => entity.LibraryTag(name: n)).toList(),
+      );
+    }).toList();
   }
 
   @override
@@ -96,7 +93,7 @@ class LibraryComicRepositoryImpl implements LibraryComicRepository {
     String comicId, {
     String? title,
     List<String>? authors,
-    entity.ContentRating? contentRating,
+    ContentRating? contentRating,
     List<entity.LibraryTag>? tags,
   }) async {
     await _comicDao.updateUserMeta(
@@ -108,7 +105,10 @@ class LibraryComicRepositoryImpl implements LibraryComicRepository {
           : Value(contentRating),
     );
     if (tags != null) {
-      await _comicDao.replaceComicTags(comicId, tags.map((e) => e.name).toList());
+      await _comicDao.replaceComicTags(
+        comicId,
+        tags.map((e) => e.name).toList(),
+      );
     }
   }
 
@@ -118,4 +118,3 @@ class LibraryComicRepositoryImpl implements LibraryComicRepository {
     await upsertMany(scanned);
   }
 }
-

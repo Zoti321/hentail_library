@@ -1,6 +1,6 @@
-import 'package:hentai_library/domain/entity/v2/content_rating.dart';
 import 'package:hentai_library/domain/entity/v2/library_comic.dart';
 import 'package:hentai_library/domain/entity/v2/library_tag.dart';
+import 'package:hentai_library/domain/enums/enums.dart';
 
 /// v2 Comic 仓储：仅定义领域契约，不暴露数据层细节。
 abstract class LibraryComicRepository {
@@ -27,4 +27,3 @@ abstract class LibraryComicRepository {
   /// 可选：封装 diff+写入（后续数据层实现）。
   Future<void> replaceByScan(List<LibraryComic> scanned);
 }
-

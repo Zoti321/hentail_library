@@ -1,7 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
-import 'package:hentai_library/domain/entity/v2/content_rating.dart';
 import 'dart:convert';
+
+import 'package:hentai_library/domain/enums/enums.dart';
 
 // 用户保存的文件系统路径
 class SavedPaths extends Table {

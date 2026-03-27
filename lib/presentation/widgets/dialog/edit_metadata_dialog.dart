@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
-import 'package:hentai_library/domain/entity/v2/content_rating.dart';
 import 'package:hentai_library/domain/entity/v2/library_comic.dart';
 import 'package:hentai_library/domain/entity/v2/library_tag.dart';
+import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/presentation/widgets/form/content_rating_field.dart';
 import 'package:hentai_library/presentation/widgets/form/fluent_text_field.dart';
@@ -75,9 +75,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
 
   void _handleTagRemove(LibraryTag tag) {
     setState(() {
-      _formData = _formData.copyWith(
-        tags: [..._formData.tags]..remove(tag),
-      );
+      _formData = _formData.copyWith(tags: [..._formData.tags]..remove(tag));
     });
   }
 
@@ -240,8 +238,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           items: _formData.tags.map((t) => t.name).toList(),
           onAdd: _handleTagAdd,
           onRemove: (name) {
-            final tag =
-                _formData.tags.firstWhereOrNull((t) => t.name == name);
+            final tag = _formData.tags.firstWhereOrNull((t) => t.name == name);
             if (tag != null) _handleTagRemove(tag);
           },
         ),

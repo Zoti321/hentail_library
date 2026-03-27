@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
-import 'package:hentai_library/domain/entity/v2/content_rating.dart';
 import 'package:hentai_library/domain/entity/v2/library_tag.dart';
+import 'package:hentai_library/domain/enums/enums.dart';
 
 part 'library_comic.freezed.dart';
 
@@ -23,4 +23,3 @@ abstract class LibraryComic with _$LibraryComic {
 
   LibraryComic._();
 }
-
