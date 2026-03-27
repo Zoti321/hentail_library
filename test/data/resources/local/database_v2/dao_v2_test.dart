@@ -4,7 +4,7 @@ import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:test/test.dart';
 import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart';
-import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
+import 'package:hentai_library/data/services/comic/resource_types.dart';
 
 void main() {
   group('v2 dao', () {

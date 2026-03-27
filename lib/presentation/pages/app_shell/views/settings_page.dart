@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/my_toggle_switch.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -14,8 +13,6 @@ class SettingsPage extends ConsumerWidget {
     final theme = Theme.of(context);
 
     final settingsAsync = ref.watch(settingsProvider);
-
-    final cacheSizeAsync = ref.watch(comicCacheSizeProvider);
 
     return settingsAsync.when(
       skipLoadingOnRefresh: true,
@@ -165,47 +162,6 @@ class SettingsPage extends ConsumerWidget {
               ),
 
               _SettingsGroup(
-                title: '存储',
-                children: [
-                  _SettingsRow(
-                    icon: Icon(
-                      LucideIcons.database,
-                      size: 20,
-                      color: theme.colorScheme.iconDefault,
-                    ),
-                    label: '缓存',
-                    description: cacheSizeAsync.when(
-                      data: (data) => '已用 ${data.toReadableSize()}',
-                      error: (error, stackTrace) => "加载失败",
-                      loading: () => "加载中",
-                    ),
-                    action: _ActionButton(
-                      label: '清理',
-                      onTap: () {
-                        ref.read(comicFileCacheServiceProvider).clearAllCache();
-                        ref.invalidate(comicFileCacheServiceProvider);
-                      },
-                    ),
-                  ),
-                  _SettingsRow(
-                    icon: Icon(
-                      LucideIcons.trash2,
-                      size: 20,
-                      color: theme.colorScheme.iconDefault,
-                    ),
-                    label: '清理',
-                    description: '移除已删除文件的缩略图',
-                    action: Icon(
-                      LucideIcons.chevronRight,
-                      size: 16,
-                      color: theme.colorScheme.iconSecondary,
-                    ),
-                    onClick: () {},
-                  ),
-                ],
-              ),
-
-              _SettingsGroup(
                 title: '关于',
                 children: [
                   _SettingsRow(
@@ -320,7 +276,6 @@ class _SettingsRow extends StatefulWidget {
   final String label;
   final String? description;
   final Widget? action;
-  final VoidCallback? onClick;
   final bool isDestructive;
 
   const _SettingsRow({
@@ -328,7 +283,6 @@ class _SettingsRow extends StatefulWidget {
     required this.label,
     this.description,
     this.action,
-    this.onClick,
     this.isDestructive = false,
   });
 
@@ -346,7 +300,6 @@ class _SettingsRowState extends State<_SettingsRow> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
-        onTap: widget.onClick,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           decoration: BoxDecoration(

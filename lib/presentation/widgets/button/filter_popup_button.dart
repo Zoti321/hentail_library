@@ -1,7 +1,7 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/domain/value_objects/v2/library_tag_pick.dart';
+import 'package:hentai_library/domain/value_objects/library_tag_pick.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -207,7 +207,9 @@ class _BuildTagFilterSection extends ConsumerWidget {
             initialExclude: initialExclude,
             scrollController: scrollController,
             onConfirm: (tags, tagsAny, tagsExclude) {
-              ref.read(comicFilterProvider.notifier).updateTagFilter(
+              ref
+                  .read(comicFilterProvider.notifier)
+                  .updateTagFilter(
                     tags: tags,
                     tagsAny: tagsAny,
                     tagsExclude: tagsExclude,
@@ -238,7 +240,11 @@ class _BuildTagFilterSection extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: Row(
             children: [
-              Icon(LucideIcons.tag, size: 16, color: colorScheme.onSurfaceVariant),
+              Icon(
+                LucideIcons.tag,
+                size: 16,
+                color: colorScheme.onSurfaceVariant,
+              ),
               const SizedBox(width: 8),
               Text(
                 "按标签筛选",
@@ -282,14 +288,16 @@ class _TagFilterSheetContent extends ConsumerStatefulWidget {
     Set<LibraryTagPick> tags,
     Set<LibraryTagPick> tagsAny,
     Set<LibraryTagPick> tagsExclude,
-  ) onConfirm;
+  )
+  onConfirm;
 
   @override
   ConsumerState<_TagFilterSheetContent> createState() =>
       _TagFilterSheetContentState();
 }
 
-class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> {
+class _TagFilterSheetContentState
+    extends ConsumerState<_TagFilterSheetContent> {
   late Set<LibraryTagPick> _selectedAnd;
   late Set<LibraryTagPick> _selectedAny;
   late Set<LibraryTagPick> _selectedExclude;
@@ -356,7 +364,11 @@ class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> 
                 const Spacer(),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(LucideIcons.x, size: 20, color: colorScheme.onSurfaceVariant),
+                  icon: Icon(
+                    LucideIcons.x,
+                    size: 20,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                   style: IconButton.styleFrom(
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
@@ -372,7 +384,11 @@ class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> 
               decoration: InputDecoration(
                 hintText: '搜索标签名称',
                 hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
-                prefixIcon: Icon(LucideIcons.search, size: 18, color: colorScheme.onSurfaceVariant),
+                prefixIcon: Icon(
+                  LucideIcons.search,
+                  size: 18,
+                  color: colorScheme.onSurfaceVariant,
+                ),
                 isDense: true,
                 filled: true,
                 fillColor: colorScheme.surfaceContainerHighest,
@@ -380,7 +396,10 @@ class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> 
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: colorScheme.borderSubtle),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
               ),
             ),
           ),
@@ -460,10 +479,7 @@ class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> 
                 ),
               ),
               error: (_, __) => Center(
-                child: Text(
-                  "加载失败",
-                  style: TextStyle(color: colorScheme.error),
-                ),
+                child: Text("加载失败", style: TextStyle(color: colorScheme.error)),
               ),
             ),
           ),
@@ -485,10 +501,10 @@ class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> 
                   Expanded(
                     child: FilledButton(
                       onPressed: () => widget.onConfirm(
-                            _selectedAnd,
-                            _selectedAny,
-                            _selectedExclude,
-                          ),
+                        _selectedAnd,
+                        _selectedAny,
+                        _selectedExclude,
+                      ),
                       style: FilledButton.styleFrom(
                         backgroundColor: colorScheme.primary,
                         foregroundColor: colorScheme.onPrimary,
@@ -530,10 +546,7 @@ class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> 
           const SizedBox(height: 2),
           Text(
             subtitle,
-            style: TextStyle(
-              fontSize: 11,
-              color: colorScheme.onSurfaceVariant,
-            ),
+            style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: 8),
           Wrap(

@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/entity/v2/library_tag.dart';
+import 'package:hentai_library/domain/entity/comic/library_tag.dart';
 
 /// v2 Tag 仓储：独立于 Comic/Series 的“标签字典管理”。
 abstract class LibraryTagRepository {
@@ -10,4 +10,3 @@ abstract class LibraryTagRepository {
 
   Future<void> rename(String oldName, String newName);
 }
-

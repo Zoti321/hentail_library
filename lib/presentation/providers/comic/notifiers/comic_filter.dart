@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
+import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
-import 'package:hentai_library/domain/value_objects/v2/library_comic_filter.dart';
-import 'package:hentai_library/domain/value_objects/v2/library_tag_pick.dart';
+import 'package:hentai_library/domain/value_objects/library_comic_filter.dart';
+import 'package:hentai_library/domain/value_objects/library_tag_pick.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_filter.g.dart';

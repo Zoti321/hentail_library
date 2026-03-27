@@ -7,9 +7,10 @@ import 'package:hentai_library/data/repository/v2/library_tag_repo_impl.dart';
 import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart'
     as db;
-import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
-import 'package:hentai_library/domain/entity/v2/library_comic.dart' as entity;
-import 'package:hentai_library/domain/entity/v2/library_tag.dart' as entity;
+import 'package:hentai_library/data/services/comic/resource_types.dart';
+import 'package:hentai_library/domain/entity/comic/library_comic.dart'
+    as entity;
+import 'package:hentai_library/domain/entity/comic/library_tag.dart' as entity;
 
 void main() {
   group('v2 repos', () {

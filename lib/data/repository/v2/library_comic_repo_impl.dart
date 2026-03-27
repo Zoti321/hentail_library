@@ -1,10 +1,11 @@
 import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart'
     as db;
-import 'package:hentai_library/domain/entity/v2/library_comic.dart' as entity;
-import 'package:hentai_library/domain/entity/v2/library_tag.dart' as entity;
+import 'package:hentai_library/domain/entity/comic/library_comic.dart'
+    as entity;
+import 'package:hentai_library/domain/entity/comic/library_tag.dart' as entity;
 import 'package:hentai_library/domain/enums/enums.dart';
-import 'package:hentai_library/domain/repository/v2/library_comic_repo.dart';
+import 'package:hentai_library/domain/repository/library_comic_repo.dart';
 import 'package:drift/drift.dart';
 
 class LibraryComicRepositoryImpl implements LibraryComicRepository {

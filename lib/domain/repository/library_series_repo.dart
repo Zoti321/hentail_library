@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/entity/v2/library_series.dart';
+import 'package:hentai_library/domain/entity/comic/library_series.dart';
 
 /// v2 Series 仓储：系列独立聚合，维护漫画归属与顺序。
 abstract class LibrarySeriesRepository {
@@ -23,4 +23,3 @@ abstract class LibrarySeriesRepository {
 
   Future<void> removeComic(String comicId);
 }
-

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:hentai_library/data/services/comic/scanner/directory_scan_helper.dart';
-import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
+import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:path/path.dart' as p;
 
 /// 扫描器：递归收集路径并标注 ResourceType。
@@ -23,10 +23,7 @@ class ResourceScanner {
       if (entityType == FileSystemEntityType.notFound) continue;
 
       if (entityType == FileSystemEntityType.directory) {
-        yield* _scanDirectory(
-          Directory(path),
-          isCancelled: isCancelled,
-        );
+        yield* _scanDirectory(Directory(path), isCancelled: isCancelled);
         continue;
       }
 
@@ -80,4 +77,3 @@ class ResourceScanner {
     }
   }
 }
-

@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/domain/entity/v2/series_item.dart';
+import 'package:hentai_library/domain/entity/comic/series_item.dart';
 
 part 'library_series.freezed.dart';
 
@@ -30,4 +30,3 @@ abstract class LibrarySeries with _$LibrarySeries {
     return copyWith(items: items.where((e) => e.comicId != comicId).toList());
   }
 }
-

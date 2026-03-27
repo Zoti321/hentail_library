@@ -1,7 +1,7 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/domain/value_objects/v2/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -169,14 +169,16 @@ class _SortSection extends HookConsumerWidget {
               ),
               child: InkWell(
                 onTap: () {
-                  ref.read(comicSortOptionProvider.notifier).toggleDescenging(
-                        !option.descending,
-                      );
+                  ref
+                      .read(comicSortOptionProvider.notifier)
+                      .toggleDescenging(!option.descending);
                 },
                 borderRadius: BorderRadius.circular(6),
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     spacing: 4,

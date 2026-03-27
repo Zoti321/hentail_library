@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
+import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'dart:convert';
 
 import 'package:hentai_library/domain/enums/enums.dart';

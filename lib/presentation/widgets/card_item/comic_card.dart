@@ -6,7 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/domain/entity/v2/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/library_comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/context_menu.dart';
@@ -189,8 +189,10 @@ class ComicCard extends HookConsumerWidget {
                 top: 8,
                 right: 8,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.black.withAlpha(50),
                     borderRadius: BorderRadius.circular(4),

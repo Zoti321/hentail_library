@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/domain/entity/v2/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/library_comic.dart';
 import 'package:hentai_library/presentation/providers/comic/comics.dart';
 import 'package:hentai_library/presentation/providers/reading_history/reading_history_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

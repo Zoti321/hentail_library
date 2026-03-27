@@ -1,5 +1,5 @@
-import 'package:hentai_library/domain/entity/v2/library_comic.dart';
-import 'package:hentai_library/domain/entity/v2/library_tag.dart';
+import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/library_tag.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
 
 /// v2 Comic 仓储：仅定义领域契约，不暴露数据层细节。

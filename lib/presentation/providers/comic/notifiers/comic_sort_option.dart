@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/value_objects/v2/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_sort_option.g.dart';

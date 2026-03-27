@@ -1,6 +1,6 @@
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
-import 'package:hentai_library/domain/entity/v2/library_comic.dart';
+import 'package:hentai_library/data/services/comic/resource_types.dart';
+import 'package:hentai_library/domain/entity/comic/library_comic.dart';
 import 'package:path/path.dart' as p;
 
 /// 将 v2 ParsedResource 映射为领域 `LibraryComic`。
@@ -35,4 +35,3 @@ class LibraryComicMapper {
     );
   }
 }
-

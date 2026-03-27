@@ -2,13 +2,12 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
-import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
-import 'package:hentai_library/domain/entity/v2/library_comic.dart';
+import 'package:hentai_library/data/services/comic/resource_types.dart';
+import 'package:hentai_library/domain/entity/comic/library_comic.dart';
 import 'package:hentai_library/domain/extensions/library_comic_extensions.dart';
-import 'package:hentai_library/domain/value_objects/v2/library_tag_pick.dart';
+import 'package:hentai_library/domain/value_objects/library_tag_pick.dart';
 import 'package:hentai_library/presentation/providers/comic/notifiers/comic_filter.dart';
 import 'package:hentai_library/presentation/providers/comic/notifiers/comic_sort_option.dart';
-import 'package:hentai_library/presentation/providers/comic/comic_providers.dart';
 import 'package:hentai_library/presentation/providers/comic/notifiers/search_query.dart';
 import 'package:hentai_library/presentation/providers/providers_deps.dart';
 import 'package:path/path.dart' as p;
@@ -140,16 +139,5 @@ Future<List<File>> comicImages(
 Future<String?> comicCoverPath(Ref ref, {required String comicId}) async {
   final images = await ref.watch(comicImagesProvider(comicId: comicId).future);
   if (images.isNotEmpty) return images.first.path;
-
-  final cache = ref.read(comicFileCacheServiceProvider);
-  final coverDirPath = await cache.getCoverCacheDir(comicId);
-  final coverDir = Directory(coverDirPath);
-  if (!await coverDir.exists()) return null;
-  final files = <File>[];
-  await for (final e in coverDir.list()) {
-    if (e is File) files.add(e);
-  }
-  if (files.isEmpty) return null;
-  files.sort((a, b) => p.basename(a.path).compareTo(p.basename(b.path)));
-  return files.first.path;
+  return null;
 }

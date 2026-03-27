@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/domain/entity/v2/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/library_comic.dart';
 
 part 'library_comic_sort_option.freezed.dart';
 
@@ -23,4 +23,3 @@ abstract class LibraryComicSortOption with _$LibraryComicSortOption {
     return descending ? -result : result;
   }
 }
-

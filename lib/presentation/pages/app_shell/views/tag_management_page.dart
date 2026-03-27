@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/domain/entity/v2/library_tag.dart';
+import 'package:hentai_library/domain/entity/comic/library_tag.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -119,20 +119,14 @@ class _Header extends ConsumerWidget {
               const SizedBox(height: 8),
               Text(
                 '查看、添加、重命名以及批量删除分类标签',
-                style: TextStyle(
-                  color: cs.textTertiary,
-                  fontSize: 13,
-                ),
+                style: TextStyle(color: cs.textTertiary, fontSize: 13),
               ),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _MetaChip(
-                    icon: LucideIcons.tags,
-                    label: '标签',
-                  ),
+                  _MetaChip(icon: LucideIcons.tags, label: '标签'),
                   if (selectionCount > 0)
                     _MetaChip(
                       icon: LucideIcons.circleCheckBig,
@@ -163,10 +157,7 @@ class _Header extends ConsumerWidget {
                       ref.read(tagFilterProvider.notifier).setQuery(value),
                   decoration: const InputDecoration(
                     isDense: true,
-                    prefixIcon: Icon(
-                      LucideIcons.search,
-                      size: 16,
-                    ),
+                    prefixIcon: Icon(LucideIcons.search, size: 16),
                     hintText: '搜索标签名称…',
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(
@@ -190,16 +181,17 @@ class _Header extends ConsumerWidget {
             if (selectionCount > 0)
               OutlinedButton.icon(
                 onPressed: () async {
-                  final confirmed = await showDialog<bool>(
+                  final confirmed =
+                      await showDialog<bool>(
                         context: context,
-                        builder: (context) => _ConfirmDeleteDialog(
-                          count: selectionCount,
-                        ),
+                        builder: (context) =>
+                            _ConfirmDeleteDialog(count: selectionCount),
                       ) ??
                       false;
                   if (!confirmed) return;
-                  final tags =
-                      ref.read(tagSelectionProvider).toList(growable: false);
+                  final tags = ref
+                      .read(tagSelectionProvider)
+                      .toList(growable: false);
                   await ref.read(tagActionsProvider).deleteTags(tags);
                 },
                 icon: const Icon(LucideIcons.trash2, size: 16),
@@ -235,17 +227,11 @@ class _TagList extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: cs.surfaceContainerHighest,
-              border: Border(
-                bottom: BorderSide(color: cs.borderSubtle),
-              ),
+              border: Border(bottom: BorderSide(color: cs.borderSubtle)),
             ),
             child: Row(
               children: [
-                Icon(
-                  LucideIcons.tags,
-                  size: 16,
-                  color: cs.onSurfaceVariant,
-                ),
+                Icon(LucideIcons.tags, size: 16, color: cs.onSurfaceVariant),
                 const SizedBox(width: 8),
                 Text(
                   '全部标签',
@@ -262,7 +248,8 @@ class _TagList extends ConsumerWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: tags.length,
-            separatorBuilder: (_, __) => Divider(height: 1, color: cs.borderSubtle),
+            separatorBuilder: (_, __) =>
+                Divider(height: 1, color: cs.borderSubtle),
             itemBuilder: (context, index) {
               final tag = tags[index];
               final isSelected = ref.watch(tagSelectionProvider).contains(tag);
@@ -276,10 +263,7 @@ class _TagList extends ConsumerWidget {
 }
 
 class _TagRow extends ConsumerWidget {
-  const _TagRow({
-    required this.tag,
-    required this.isSelected,
-  });
+  const _TagRow({required this.tag, required this.isSelected});
 
   final LibraryTag tag;
   final bool isSelected;
@@ -290,9 +274,7 @@ class _TagRow extends ConsumerWidget {
     final cs = theme.colorScheme;
 
     return Material(
-      color: isSelected
-          ? cs.primaryContainer.withAlpha(60)
-          : cs.surface,
+      color: isSelected ? cs.primaryContainer.withAlpha(60) : cs.surface,
       child: InkWell(
         onTap: () => ref.read(tagSelectionProvider.notifier).toggle(tag),
         child: Padding(
@@ -390,9 +372,7 @@ class _AddTagDialogState extends ConsumerState<_AddTagDialog> {
             const SizedBox(height: 16),
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: '名称',
-              ),
+              decoration: const InputDecoration(labelText: '名称'),
               autofocus: true,
               onSubmitted: (_) => _handleSave(),
             ),
@@ -457,9 +437,7 @@ class _RenameTagDialogState extends ConsumerState<_RenameTagDialog> {
     }
     setState(() => _saving = true);
     try {
-      await ref
-          .read(tagActionsProvider)
-          .renameTag(widget.tag, newName);
+      await ref.read(tagActionsProvider).renameTag(widget.tag, newName);
       if (mounted) Navigator.of(context).pop();
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -489,9 +467,7 @@ class _RenameTagDialogState extends ConsumerState<_RenameTagDialog> {
             const SizedBox(height: 16),
             TextField(
               controller: _controller,
-              decoration: const InputDecoration(
-                labelText: '新名称',
-              ),
+              decoration: const InputDecoration(labelText: '新名称'),
               autofocus: true,
               onSubmitted: (_) => _handleSave(),
             ),
@@ -589,10 +565,7 @@ class _ErrorCard extends StatelessWidget {
       ),
       child: Text(
         '$error',
-        style: TextStyle(
-          fontSize: 13,
-          color: theme.colorScheme.textTertiary,
-        ),
+        style: TextStyle(fontSize: 13, color: theme.colorScheme.textTertiary),
       ),
     );
   }
@@ -615,11 +588,7 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            LucideIcons.tags,
-            size: 32,
-            color: cs.onSurfaceVariant,
-          ),
+          Icon(LucideIcons.tags, size: 32, color: cs.onSurfaceVariant),
           const SizedBox(height: 12),
           Text(
             '暂无标签',
@@ -632,10 +601,7 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             '你可以从这里添加、重命名或删除标签。',
-            style: TextStyle(
-              fontSize: 13,
-              color: cs.textSecondary,
-            ),
+            style: TextStyle(fontSize: 13, color: cs.textSecondary),
             textAlign: TextAlign.center,
           ),
         ],
@@ -643,4 +609,3 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
-

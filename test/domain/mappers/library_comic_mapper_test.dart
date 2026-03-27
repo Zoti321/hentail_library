@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
+import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:hentai_library/domain/mappers/library_comic_mapper.dart';
 
 void main() {

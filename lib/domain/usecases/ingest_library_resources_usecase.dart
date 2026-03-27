@@ -1,8 +1,8 @@
-import 'package:hentai_library/data/services/comic/v2/resource_parser.dart';
-import 'package:hentai_library/data/services/comic/v2/resource_scanner.dart';
-import 'package:hentai_library/domain/entity/v2/library_comic.dart';
+import 'package:hentai_library/data/services/comic/resource_parser.dart';
+import 'package:hentai_library/data/services/comic/resource_scanner.dart';
+import 'package:hentai_library/domain/entity/comic/library_comic.dart';
 import 'package:hentai_library/domain/mappers/library_comic_mapper.dart';
-import 'package:hentai_library/domain/repository/v2/library_comic_repo.dart';
+import 'package:hentai_library/domain/repository/library_comic_repo.dart';
 
 /// v2 用例壳：从文件系统扫描并解析资源，然后写入 v2 Comic 仓储。
 ///

@@ -1,6 +1,6 @@
 import 'package:hentai_library/data/resources/local/database/dao.dart';
-import 'package:hentai_library/domain/entity/v2/library_tag.dart' as entity;
-import 'package:hentai_library/domain/repository/v2/library_tag_repo.dart';
+import 'package:hentai_library/domain/entity/comic/library_tag.dart' as entity;
+import 'package:hentai_library/domain/repository/library_tag_repo.dart';
 
 class LibraryTagRepositoryImpl implements LibraryTagRepository {
   final LibraryTagDao _dao;
@@ -26,4 +26,3 @@ class LibraryTagRepositoryImpl implements LibraryTagRepository {
   Future<void> rename(String oldName, String newName) =>
       _dao.renameTag(oldName, newName);
 }
-

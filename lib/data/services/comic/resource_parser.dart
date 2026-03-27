@@ -5,7 +5,7 @@ import 'package:archive/archive.dart';
 import 'package:epub_image_extractor/epub_image_extractor.dart';
 import 'package:hentai_library/core/util/comic_file_types.dart';
 import 'package:hentai_library/data/services/comic/scanner/directory_scan_helper.dart';
-import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
+import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:path/path.dart' as p;
 
 /// 解析器：按 ResourceType 校验并提取 ComicMeta。

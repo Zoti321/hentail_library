@@ -1,9 +1,10 @@
 import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart'
     as db;
-import 'package:hentai_library/domain/entity/v2/library_series.dart' as entity;
-import 'package:hentai_library/domain/entity/v2/series_item.dart' as entity;
-import 'package:hentai_library/domain/repository/v2/library_series_repo.dart';
+import 'package:hentai_library/domain/entity/comic/library_series.dart'
+    as entity;
+import 'package:hentai_library/domain/entity/comic/series_item.dart' as entity;
+import 'package:hentai_library/domain/repository/library_series_repo.dart';
 
 class LibrarySeriesRepositoryImpl implements LibrarySeriesRepository {
   final LibrarySeriesDao _dao;
@@ -38,10 +39,8 @@ class LibrarySeriesRepositoryImpl implements LibrarySeriesRepository {
           name: s.name,
           items: items
               .map(
-                (i) => entity.SeriesItem(
-                  comicId: i.comicId,
-                  order: i.sortOrder,
-                ),
+                (i) =>
+                    entity.SeriesItem(comicId: i.comicId, order: i.sortOrder),
               )
               .toList(),
         ),
@@ -59,12 +58,7 @@ class LibrarySeriesRepositoryImpl implements LibrarySeriesRepository {
       seriesId: row.seriesId,
       name: row.name,
       items: items
-          .map(
-            (i) => entity.SeriesItem(
-              comicId: i.comicId,
-              order: i.sortOrder,
-            ),
-          )
+          .map((i) => entity.SeriesItem(comicId: i.comicId, order: i.sortOrder))
           .toList(),
     );
   }
@@ -73,10 +67,7 @@ class LibrarySeriesRepositoryImpl implements LibrarySeriesRepository {
   Future<void> create(String name) async {
     final id = DateTime.now().millisecondsSinceEpoch.toString();
     await _dao.createSeries(
-      db.LibrarySeriesCompanion.insert(
-        seriesId: id,
-        name: name,
-      ),
+      db.LibrarySeriesCompanion.insert(seriesId: id, name: name),
     );
   }
 
@@ -108,4 +99,3 @@ class LibrarySeriesRepositoryImpl implements LibrarySeriesRepository {
     await _dao.removeComic(comicId);
   }
 }
-

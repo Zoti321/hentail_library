@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
-import 'package:hentai_library/domain/entity/v2/library_comic.dart';
-import 'package:hentai_library/domain/entity/v2/library_tag.dart';
+import 'package:hentai_library/data/services/comic/resource_types.dart';
+import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/library_tag.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/extensions/library_comic_extensions.dart';
-import 'package:hentai_library/domain/value_objects/v2/library_comic_filter.dart';
-import 'package:hentai_library/domain/value_objects/v2/library_tag_pick.dart';
-import 'package:hentai_library/domain/value_objects/v2/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/value_objects/library_comic_filter.dart';
+import 'package:hentai_library/domain/value_objects/library_tag_pick.dart';
+import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
 
 void main() {
   group('LibraryComic extensions', () {

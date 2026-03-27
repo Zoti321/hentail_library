@@ -1,6 +1,6 @@
-import 'package:hentai_library/domain/entity/v2/library_comic.dart';
-import 'package:hentai_library/domain/value_objects/v2/library_comic_filter.dart';
-import 'package:hentai_library/domain/value_objects/v2/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/value_objects/library_comic_filter.dart';
+import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
 
 extension LibraryComicSortX on List<LibraryComic> {
   List<LibraryComic> sortedWith(LibraryComicSortOption option) {
@@ -13,4 +13,3 @@ extension LibraryComicFilterX on List<LibraryComic> {
     return where(filter.matches).toList();
   }
 }
-

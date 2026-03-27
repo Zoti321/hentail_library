@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart';
-import 'package:hentai_library/domain/entity/v2/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/library_comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/dialog/edit_metadata_dialog.dart';
@@ -66,10 +66,7 @@ class _DetailContent extends StatelessWidget {
             spacing: 64,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Flexible(
-                flex: 1,
-                child: _LeftColumn(comic: comic),
-              ),
+              Flexible(flex: 1, child: _LeftColumn(comic: comic)),
               Flexible(
                 flex: 2,
                 child: _RightColumn(
@@ -281,7 +278,9 @@ class _LeftColumn extends HookConsumerWidget {
               final path = await ref.read(
                 comicCoverPathProvider(comicId: comic.comicId).future,
               );
-              await ref.read(recordReadingProgressUseCaseProvider).call(
+              await ref
+                  .read(recordReadingProgressUseCaseProvider)
+                  .call(
                     ReadingHistory(
                       comicId: comic.comicId,
                       title: comic.title,
@@ -370,16 +369,8 @@ class _RightColumn extends StatelessWidget {
         ),
         const SizedBox(height: 32),
 
-        _InfoSection(
-          title: "作者: ",
-          icon: LucideIcons.penTool,
-          chips: authors,
-        ),
-        _InfoSection(
-          title: "标签: ",
-          icon: LucideIcons.tag,
-          chips: tags,
-        ),
+        _InfoSection(title: "作者: ", icon: LucideIcons.penTool, chips: authors),
+        _InfoSection(title: "标签: ", icon: LucideIcons.tag, chips: tags),
 
         const SizedBox(height: 24),
         Divider(color: theme.colorScheme.borderSubtle),

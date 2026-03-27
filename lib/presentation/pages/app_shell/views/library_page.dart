@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/l10n/app_strings.dart';
-import 'package:hentai_library/domain/entity/v2/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/library_comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/button/filter_popup_button.dart';

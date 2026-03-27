@@ -2,22 +2,24 @@ import 'package:path/path.dart' as p;
 
 /// 通过规则校验后确定的资源类型（用于后续 diff/入库重构）。
 enum ResourceType {
-  /// 纯图片漫画目录（满足 scanTopLevelForManga 规则）
+  /// 纯图片漫画目录 (满足 scanTopLevelForManga 规则)
   dir,
 
-  /// `.zip` 压缩包
+  /// .zip 压缩包
+  /// 纯图片压缩包
   zip,
 
-  /// `.cbz` 压缩包
+  /// .cbz 压缩包
   cbz,
 
-  /// `.epub` 电子书
+  /// .epub 电子书
+  /// 确认内容是否为漫画
   epub,
 
-  /// `.cbr` 占位（暂不解析）
+  /// .cbr 占位（暂不解析）
   cbr,
 
-  /// `.rar` 占位（暂不解析）
+  /// .rar 占位（暂不解析）
   rar,
 }
 
@@ -41,4 +43,3 @@ ResourceType? resourceTypeFromFilePath(String path) {
     _ => null,
   };
 }
-
