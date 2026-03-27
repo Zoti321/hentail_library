@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
+import 'package:hentai_library/domain/entity/v2/library_comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -15,7 +15,7 @@ class ComicMergeDialog extends StatefulHookConsumerWidget {
     required this.onConfirm,
   });
 
-  final Comic currentComic;
+  final LibraryComic currentComic;
   final Function(List<String>) onConfirm;
 
   @override
@@ -78,7 +78,7 @@ class _ComicMergeDialogState extends ConsumerState<ComicMergeDialog> {
             children: [
               _DialogHeader(),
               _DialogBody(
-                comicId: widget.currentComic.id,
+                comicId: widget.currentComic.comicId,
                 selectedIds: _selectedIds,
                 toggleSelection: _toggleSelection,
               ),
@@ -201,10 +201,10 @@ class _DialogBody extends HookConsumerWidget {
                 itemCount: items.length,
                 itemBuilder: (context, index) {
                   final item = items[index];
-                  final isSelected = selectedIds.contains(item.id);
+                  final isSelected = selectedIds.contains(item.comicId);
 
                   return _MergeComicTile(
-                    key: Key(item.id),
+                    key: Key(item.comicId),
                     toggleSelection: toggleSelection,
                     item: item,
                     isSelected: isSelected,
@@ -280,7 +280,7 @@ class _DialogFooter extends HookConsumerWidget {
   }
 }
 
-class _MergeComicTile extends StatelessWidget {
+class _MergeComicTile extends HookConsumerWidget {
   const _MergeComicTile({
     super.key,
     required this.toggleSelection,
@@ -290,16 +290,23 @@ class _MergeComicTile extends StatelessWidget {
   });
 
   final void Function(String id) toggleSelection;
-  final Comic item;
+  final LibraryComic item;
   final bool isSelected;
   final ThemeData theme;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final coverPath = ref
+        .watch(comicCoverPathProvider(comicId: item.comicId))
+        .maybeWhen(data: (v) => v, orElse: () => null);
+    final pageCount = ref
+        .watch(comicImagesProvider(comicId: item.comicId))
+        .maybeWhen(data: (f) => f.length, orElse: () => 0);
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => toggleSelection(item.id),
+        onTap: () => toggleSelection(item.comicId),
         borderRadius: BorderRadius.circular(8),
         hoverColor: theme.colorScheme.hoverBackground,
         child: AnimatedContainer(
@@ -351,10 +358,12 @@ class _MergeComicTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(4),
-                  image: DecorationImage(
-                    image: FileImage(File(item.coverUrl!)),
-                    fit: BoxFit.cover,
-                  ),
+                  image: coverPath != null
+                      ? DecorationImage(
+                          image: FileImage(File(coverPath)),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
                 ),
               ),
               // 信息文本
@@ -374,7 +383,7 @@ class _MergeComicTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      "${item.totalChapterCount} 章 • ${item.totalPageCount}",
+                      "${item.resourceType.name} • $pageCount 页",
                       style: TextStyle(
                         fontSize: 12,
                         color: theme.colorScheme.textTertiary,

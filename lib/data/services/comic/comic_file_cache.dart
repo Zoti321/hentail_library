@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:talker/talker.dart';
 
 /// 漫画文件缓存服务
 ///
@@ -14,7 +15,10 @@ class ComicFileCacheService {
   static const _coversSubdir = 'covers';
   static const _contentSubdir = 'content';
 
+  final Talker _log;
   Directory? _cacheRoot;
+
+  ComicFileCacheService({Talker? log}) : _log = log ?? LogManager.instance;
 
   /// 获取缓存根目录
   Future<Directory> getCacheRoot() async {
@@ -30,7 +34,7 @@ class ComicFileCacheService {
       _cacheRoot = root;
       return root;
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '获取漫画缓存根目录失败');
+      _log.handle(e, st, '获取漫画缓存根目录失败');
       rethrow;
     }
   }
@@ -47,7 +51,7 @@ class ComicFileCacheService {
       }
       return dir.path;
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '获取封面缓存目录失败: comicId=$comicId');
+      _log.handle(e, st, '获取封面缓存目录失败: comicId=$comicId');
       rethrow;
     }
   }
@@ -64,7 +68,7 @@ class ComicFileCacheService {
       }
       return dir.path;
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '获取内容缓存目录失败: comicId=$comicId');
+      _log.handle(e, st, '获取内容缓存目录失败: comicId=$comicId');
       rethrow;
     }
   }
@@ -84,7 +88,7 @@ class ComicFileCacheService {
       await File(coverPath).writeAsBytes(bytes);
       return coverPath;
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '保存封面缓存失败: comicId=$comicId');
+      _log.handle(e, st, '保存封面缓存失败: comicId=$comicId');
       rethrow;
     }
   }
@@ -107,7 +111,7 @@ class ComicFileCacheService {
         await File(filePath).writeAsBytes(images[i].$1);
       }
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '保存内容缓存失败: comicId=$comicId');
+      _log.handle(e, st, '保存内容缓存失败: comicId=$comicId');
       rethrow;
     }
   }
@@ -129,7 +133,7 @@ class ComicFileCacheService {
       }
       return total;
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '统计缓存占用空间失败');
+      _log.handle(e, st, '统计缓存占用空间失败');
       return total;
     }
   }
@@ -143,7 +147,7 @@ class ComicFileCacheService {
       if (await coverDir.exists()) await coverDir.delete(recursive: true);
       if (await contentDir.exists()) await contentDir.delete(recursive: true);
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '清理漫画缓存失败: comicId=$comicId');
+      _log.handle(e, st, '清理漫画缓存失败: comicId=$comicId');
       rethrow;
     }
   }
@@ -153,11 +157,11 @@ class ComicFileCacheService {
     try {
       if (await root.exists()) {
         await root.delete(recursive: true);
-        LogManager.instance.info('已清理全部漫画缓存');
+        _log.info('已清理全部漫画缓存');
       }
       _cacheRoot = null;
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '清理全部漫画缓存失败');
+      _log.handle(e, st, '清理全部漫画缓存失败');
       rethrow;
     }
   }

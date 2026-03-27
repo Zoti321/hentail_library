@@ -1,10 +1,14 @@
-import 'package:hentai_library/data/repository/comic_repo.dart';
 import 'package:hentai_library/data/services/comic/comic.dart';
-import 'package:hentai_library/domain/repository/comic_repo.dart' as domain;
+import 'package:hentai_library/domain/entity/v2/content_rating.dart' as v2;
+import 'package:hentai_library/domain/entity/v2/library_tag.dart' as v2;
+import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/usecases/usecases.dart';
-import 'package:hentai_library/presentation/providers/core/core_providers.dart';
-import 'package:hentai_library/presentation/providers/directory/directory_providers.dart';
+import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/domain/value_objects/sync_report/scanned_item_report.dart';
+import 'package:hentai_library/domain/value_objects/sync_report/sync_progress.dart';
+import 'package:hentai_library/domain/value_objects/sync_report/sync_report.dart';
 import 'package:hentai_library/presentation/providers/reading_history/reading_history_providers.dart';
+import 'package:hentai_library/presentation/providers/providers_deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_providers.g.dart';
@@ -30,47 +34,11 @@ CoverRepairService coverRepairService(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-ComicSyncService comicSyncService(Ref ref) {
-  return ComicSyncService(
-    ref.read(comicDaoProvider),
-    ref.read(folderParseServiceProvider),
-    ref.read(comicScannerServiceProvider),
-    ref.read(comicFileCacheServiceProvider),
-  );
-}
+SyncComicsUseCase syncComicsUseCase(Ref ref) => SyncComicsUseCase(ref);
 
 @Riverpod(keepAlive: true)
-domain.ComicRepository comicRepo(Ref ref) {
-  return ComicRepositoryImpl(
-    ref.read(comicDaoProvider),
-    ref.read(categoryTagDaoProvider),
-    ref.read(comicSyncServiceProvider),
-    ref.read(comicFileCacheServiceProvider),
-  );
-}
-
-@Riverpod(keepAlive: true)
-SyncComicsUseCase syncComicsUseCase(Ref ref) {
-  return SyncComicsUseCase(
-    ref.read(comicRepoProvider),
-    ref.read(dirRepoProvider),
-  );
-}
-
-@Riverpod(keepAlive: true)
-UpdateComicMetadataUseCase updateComicMetadataUseCase(Ref ref) {
-  return UpdateComicMetadataUseCase(ref.read(comicRepoProvider));
-}
-
-@Riverpod(keepAlive: true)
-ArchiveChaptersUseCase archiveChaptersUseCase(Ref ref) {
-  return ArchiveChaptersUseCase(ref.read(comicRepoProvider));
-}
-
-@Riverpod(keepAlive: true)
-IncrementReadCountUseCase incrementReadCountUseCase(Ref ref) {
-  return IncrementReadCountUseCase(ref.read(comicRepoProvider));
-}
+UpdateComicMetadataFacadeUseCase updateComicMetadataUseCase(Ref ref) =>
+    UpdateComicMetadataFacadeUseCase(ref);
 
 @Riverpod(keepAlive: true)
 RecordReadingProgressUseCase recordReadingProgressUseCase(Ref ref) {
@@ -89,4 +57,98 @@ class ScanInProgressNotifier extends _$ScanInProgressNotifier {
   bool build() => false;
 
   void setInProgress(bool value) => state = value;
+}
+
+class SyncComicsUseCase {
+  final Ref _ref;
+
+  SyncComicsUseCase(this._ref);
+
+  Future<SyncReport?> call({
+    bool Function()? isCancelled,
+    void Function(SyncProgress)? onProgress,
+  }) async {
+    final dirs = await _ref.read(pathRepoProvider).getAllPaths();
+    onProgress?.call(
+      const SyncProgress(
+        phase: SyncPhase.collecting,
+        message: 'v2: collecting roots',
+      ),
+    );
+
+    final scanner = _ref.read(resourceScannerProvider);
+    final parser = _ref.read(resourceParserProvider);
+    final mapper = _ref.read(libraryComicMapperProvider);
+    final repo = _ref.read(libraryComicRepoProvider);
+
+    final candidates = scanner.scanRoots(dirs, isCancelled: isCancelled);
+    final parsed = parser.parseAll(candidates);
+    final items = <ScannedItemReport>[];
+    final comics = <dynamic>[];
+    var count = 0;
+
+    await for (final p in parsed) {
+      if (isCancelled?.call() == true) {
+        return const SyncReport(
+          scannedItems: [],
+          addedCount: 0,
+          removedCount: 0,
+          cancelled: true,
+        );
+      }
+      count++;
+      onProgress?.call(
+        SyncProgress(
+          phase: SyncPhase.scanning,
+          currentPath: p.path,
+          current: count,
+          total: 0,
+          message: 'v2: parsing',
+        ),
+      );
+      comics.add(mapper.fromParsedResource(p));
+      items.add(
+        ScannedItemReport(
+          path: p.path,
+          type: switch (p.type.name) {
+            'dir' => ScannedItemType.folder,
+            'epub' => ScannedItemType.epub,
+            _ => ScannedItemType.archive,
+          },
+          title: p.meta.title,
+        ),
+      );
+    }
+
+    await repo.replaceByScan(List.from(comics));
+    onProgress?.call(
+      const SyncProgress(
+        phase: SyncPhase.applying,
+        message: 'v2: apply changes',
+      ),
+    );
+    return SyncReport(
+      scannedItems: items,
+      addedCount: items.length,
+      removedCount: 0,
+    );
+  }
+}
+
+class UpdateComicMetadataFacadeUseCase {
+  final Ref _ref;
+
+  UpdateComicMetadataFacadeUseCase(this._ref);
+
+  Future<void> call(String comicId, ComicMetadataForm form) async {
+    final useCase = _ref.read(updateLibraryComicMetaUseCaseProvider);
+    final tags = form.tags.map((t) => v2.LibraryTag(name: t.name)).toList();
+    await useCase.call(
+      comicId,
+      title: form.title,
+      authors: form.authors,
+      contentRating: form.isR18 ? v2.ContentRating.r18 : v2.ContentRating.safe,
+      tags: tags,
+    );
+  }
 }

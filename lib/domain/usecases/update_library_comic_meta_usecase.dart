@@ -1,0 +1,27 @@
+import 'package:hentai_library/domain/entity/v2/content_rating.dart';
+import 'package:hentai_library/domain/entity/v2/library_tag.dart';
+import 'package:hentai_library/domain/repository/v2/library_comic_repo.dart';
+
+/// v2 用例壳：用户编辑覆盖解析值。
+class UpdateLibraryComicMetaUseCase {
+  final LibraryComicRepository repo;
+
+  UpdateLibraryComicMetaUseCase(this.repo);
+
+  Future<void> call(
+    String comicId, {
+    String? title,
+    List<String>? authors,
+    ContentRating? contentRating,
+    List<LibraryTag>? tags,
+  }) {
+    return repo.updateUserMeta(
+      comicId,
+      title: title,
+      authors: authors,
+      contentRating: contentRating,
+      tags: tags,
+    );
+  }
+}
+

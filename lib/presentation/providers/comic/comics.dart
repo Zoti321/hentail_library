@@ -2,55 +2,52 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
-import 'package:hentai_library/domain/entity/entities.dart' as entity;
-import 'package:hentai_library/domain/enums/enums.dart';
-import 'package:hentai_library/domain/extensions/extensions.dart';
-import 'package:hentai_library/presentation/providers/comic/comic_providers.dart';
+import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
+import 'package:hentai_library/domain/entity/v2/library_comic.dart';
+import 'package:hentai_library/domain/extensions/library_comic_extensions.dart';
+import 'package:hentai_library/domain/value_objects/v2/library_tag_pick.dart';
 import 'package:hentai_library/presentation/providers/comic/notifiers/comic_filter.dart';
 import 'package:hentai_library/presentation/providers/comic/notifiers/comic_sort_option.dart';
+import 'package:hentai_library/presentation/providers/comic/comic_providers.dart';
 import 'package:hentai_library/presentation/providers/comic/notifiers/search_query.dart';
+import 'package:hentai_library/presentation/providers/providers_deps.dart';
 import 'package:path/path.dart' as p;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comics.g.dart';
 
-// 从数据库获取的原始数据（响应式流，comics/chapters/tags 变更时自动更新）
+// 书库 v2：原始列表（响应式流）
 @Riverpod(keepAlive: true)
-Stream<List<entity.Comic>> rawDataComics(Ref ref) {
-  return ref.watch(comicRepoProvider).watchComicAggregate();
+Stream<List<LibraryComic>> rawDataComics(Ref ref) {
+  return ref.watch(libraryComicRepoProvider).watchAll();
 }
 
-/// 书库中出现的全部标签，按类型分组（作者/系列/登场人物/标签），用于筛选弹窗。
+/// 书库中出现的全部标签（用于筛选弹窗）。
 @Riverpod(keepAlive: true)
-AsyncValue<Map<CategoryTagType, List<entity.CategoryTag>>> libraryTagsByType(
-  Ref ref,
-) {
+AsyncValue<List<LibraryTagPick>> libraryTags(Ref ref) {
   final comicsAsync = ref.watch(rawDataComicsProvider);
   return comicsAsync.when(
     data: (comics) {
-      final map = <CategoryTagType, List<entity.CategoryTag>>{};
+      final tags = <LibraryTagPick>[];
       final seen = <String>{};
       for (final c in comics) {
         for (final t in c.tags) {
-          final key = '${t.name}|${t.type.name}|${t.isR18}';
+          final key = t.name;
           if (seen.contains(key)) continue;
           seen.add(key);
-          map.putIfAbsent(t.type, () => []).add(t);
+          tags.add(LibraryTagPick(name: t.name));
         }
       }
-      for (final list in map.values) {
-        list.sort((a, b) => a.name.compareTo(b.name));
-      }
-      return AsyncValue.data(map);
+      tags.sort((a, b) => a.name.compareTo(b.name));
+      return AsyncValue.data(tags);
     },
     loading: () => const AsyncValue.loading(),
     error: (e, st) => AsyncValue.error(e, st),
   );
 }
 
-// library页面渲染的数据(经过 属性过滤 关键词过滤 排序等操作后的数据)
 @Riverpod()
-AsyncValue<List<entity.Comic>> processLibraryComics(Ref ref) {
+AsyncValue<List<LibraryComic>> processLibraryComics(Ref ref) {
   final rawAsync = ref.watch(rawDataComicsProvider);
   final filter = ref.watch(comicFilterProvider);
   final sortOption = ref.watch(comicSortOptionProvider);
@@ -63,17 +60,16 @@ AsyncValue<List<entity.Comic>> processLibraryComics(Ref ref) {
 }
 
 @Riverpod()
-Future<List<entity.Comic>> filteredMergeComic(
+Future<List<LibraryComic>> filteredMergeComic(
   Ref ref, {
   required String comicId,
 }) async {
   final query = ref.watch(searchMergeProvider);
   final comics = ref
       .watch(rawDataComicsProvider)
-      .maybeWhen(data: (data) => data, orElse: () => <entity.Comic>[]);
+      .maybeWhen(data: (data) => data, orElse: () => <LibraryComic>[]);
 
-  // 排除掉自己
-  final filteredComics = comics.where((e) => e.id != comicId).toList();
+  final filteredComics = comics.where((e) => e.comicId != comicId).toList();
 
   if (query.isEmpty) return filteredComics;
 
@@ -88,10 +84,10 @@ Future<List<entity.Comic>> filteredMergeComic(
 }
 
 @Riverpod()
-entity.Comic? comicById(Ref ref, {required String id}) {
+LibraryComic? comicById(Ref ref, {required String id}) {
   final comicsAsync = ref.watch(rawDataComicsProvider);
   return comicsAsync.maybeWhen(
-    data: (data) => data.firstWhereOrNull((comic) => comic.id == id),
+    data: (data) => data.firstWhereOrNull((comic) => comic.comicId == id),
     orElse: () => null,
   );
 }
@@ -102,15 +98,14 @@ Future<List<File>> comicImages(
   required String comicId,
   String? chapterId,
 }) async {
-  final comic = ref.watch(comicByIdProvider(id: comicId));
-  if (comic == null) return [];
+  final v2Comic = await ref.read(libraryComicRepoProvider).findById(comicId);
+  if (v2Comic == null) return [];
 
-  final targetChapter = chapterId != null
-      ? comic.chapters.firstWhereOrNull((e) => e.id == chapterId)
-      : comic.chapters.first;
+  if (v2Comic.resourceType != ResourceType.dir) {
+    return [];
+  }
 
-  if (targetChapter == null) return [];
-  final targetDir = targetChapter.imageDir;
+  final targetDir = v2Comic.path;
 
   try {
     final dir = Directory(targetDir);
@@ -138,4 +133,23 @@ Future<List<File>> comicImages(
     );
     return [];
   }
+}
+
+/// 展示用封面路径：目录型取首张图；否则尝试封面缓存目录内首文件。
+@Riverpod()
+Future<String?> comicCoverPath(Ref ref, {required String comicId}) async {
+  final images = await ref.watch(comicImagesProvider(comicId: comicId).future);
+  if (images.isNotEmpty) return images.first.path;
+
+  final cache = ref.read(comicFileCacheServiceProvider);
+  final coverDirPath = await cache.getCoverCacheDir(comicId);
+  final coverDir = Directory(coverDirPath);
+  if (!await coverDir.exists()) return null;
+  final files = <File>[];
+  await for (final e in coverDir.list()) {
+    if (e is File) files.add(e);
+  }
+  if (files.isEmpty) return null;
+  files.sort((a, b) => p.basename(a.path).compareTo(p.basename(b.path)));
+  return files.first.path;
 }

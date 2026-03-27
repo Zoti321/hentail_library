@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/domain/entity/v2/library_comic.dart';
 import 'package:hentai_library/presentation/providers/comic/comics.dart';
 import 'package:hentai_library/presentation/providers/reading_history/reading_history_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -11,7 +11,7 @@ part 'reader_view.freezed.dart';
 @freezed
 abstract class ReaderViewState with _$ReaderViewState {
   factory ReaderViewState({
-    required Comic comic,
+    required LibraryComic comic,
     @Default(false) bool isVertical,
     @Default(false) bool showControls,
     @Default(1) int currentIndex,
@@ -20,11 +20,8 @@ abstract class ReaderViewState with _$ReaderViewState {
 
   ReaderViewState._();
 
-  /// 阅读页实际展示的页数（首章图片数）；未设置时用 comic.totalPageCount
-  int get totalPages => totalPagesOverride ?? comic.totalPageCount;
-  Future<String> get images async {
-    return comic.chapters.first.imageDir;
-  }
+  /// 阅读页实际展示的页数；由 [comicImagesProvider] 结果决定。
+  int get totalPages => totalPagesOverride ?? 0;
 }
 
 @riverpod

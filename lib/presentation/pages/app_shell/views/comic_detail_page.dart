@@ -4,8 +4,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/domain/entity/reading_history.dart';
+import 'package:hentai_library/domain/entity/v2/library_comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/dialog/edit_metadata_dialog.dart';
@@ -27,7 +27,7 @@ class ComicDetailPage extends HookConsumerWidget {
       error: (error, _) =>
           _DetailError(onRetry: () => ref.invalidate(rawDataComicsProvider)),
       data: (comics) {
-        final comic = comics.firstWhereOrNull((c) => c.id == comicId);
+        final comic = comics.firstWhereOrNull((c) => c.comicId == comicId);
         if (comic == null) {
           return _DetailEmpty(comicId: comicId);
         }
@@ -40,35 +40,22 @@ class ComicDetailPage extends HookConsumerWidget {
 }
 
 class _DetailContent extends StatelessWidget {
-  final Comic comic;
+  final LibraryComic comic;
 
   const _DetailContent({required this.comic});
 
   @override
   Widget build(BuildContext context) {
-    final authors = comic.tags
-        .where((tag) => tag.type == CategoryTagType.author)
-        .toList();
-    final characters = comic.tags
-        .where((tag) => tag.type == CategoryTagType.character)
-        .toList();
-    final tags = comic.tags
-        .where((tag) => tag.type == CategoryTagType.tag)
-        .toList();
-    final series = comic.tags
-        .where((tag) => tag.type == CategoryTagType.series)
-        .toList();
-
     return SingleChildScrollView(
-      padding: const .symmetric(horizontal: 48, vertical: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
       child: Column(
-        crossAxisAlignment: .stretch,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 32,
         children: [
           Container(
-            padding: .symmetric(vertical: 4),
+            padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
-              mainAxisAlignment: .spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const _BackBtn(),
                 _ComicEditBtn(comic: comic),
@@ -77,25 +64,18 @@ class _DetailContent extends StatelessWidget {
           ),
           Row(
             spacing: 64,
-            crossAxisAlignment: .start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Flexible(
                 flex: 1,
-                child: _LeftColumn(
-                  comic: comic,
-                  pageCount: comic.totalPageCount,
-                ),
+                child: _LeftColumn(comic: comic),
               ),
               Flexible(
                 flex: 2,
                 child: _RightColumn(
                   title: comic.title,
-                  authors: authors,
-                  series: series,
-                  tags: tags,
-                  characters: characters,
-                  date: comic.firstPublishedAt,
-                  description: comic.description,
+                  authors: comic.authors,
+                  tags: comic.tags.map((t) => t.name).toList(),
                 ),
               ),
             ],
@@ -235,21 +215,26 @@ class _DetailEmpty extends StatelessWidget {
 }
 
 class _LeftColumn extends HookConsumerWidget {
-  final Comic comic;
-  final int pageCount;
+  final LibraryComic comic;
 
-  const _LeftColumn({required this.comic, required this.pageCount});
+  const _LeftColumn({required this.comic});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    final coverUrl = comic.coverUrl;
+    final coverPath = ref
+        .watch(comicCoverPathProvider(comicId: comic.comicId))
+        .maybeWhen(data: (v) => v, orElse: () => null);
+    final pageCount = ref
+        .watch(comicImagesProvider(comicId: comic.comicId))
+        .maybeWhen(data: (files) => files.length, orElse: () => 0);
+
     final isCoverHover = useState<bool>(false);
 
     return Column(
-      crossAxisAlignment: .stretch,
-      mainAxisSize: .min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
       children: [
         // 1. 封面 (Cover)
         MouseRegion(
@@ -257,7 +242,7 @@ class _LeftColumn extends HookConsumerWidget {
           onExit: (_) => isCoverHover.value = false,
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: .circular(12),
+              borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -266,17 +251,17 @@ class _LeftColumn extends HookConsumerWidget {
                 ),
               ],
             ),
-            clipBehavior: .antiAlias,
+            clipBehavior: Clip.antiAlias,
             child: AspectRatio(
               aspectRatio: 2 / 3,
               child: Container(
                 color: theme.colorScheme.surfaceContainerHighest,
-                child: coverUrl != null
-                    ? Image.file(File(coverUrl), fit: .cover)
+                child: coverPath != null
+                    ? Image.file(File(coverPath), fit: BoxFit.cover)
                           .animate(target: isCoverHover.value ? 1 : 0)
                           .scale(
-                            begin: Offset(1.0, 1.0),
-                            end: Offset(1.05, 1.05),
+                            begin: const Offset(1.0, 1.0),
+                            end: const Offset(1.05, 1.05),
                             duration: const Duration(milliseconds: 500),
                             curve: Curves.easeOutQuad,
                           )
@@ -293,18 +278,21 @@ class _LeftColumn extends HookConsumerWidget {
           button: true,
           child: ElevatedButton.icon(
             onPressed: () async {
-              await ref.read(incrementReadCountUseCaseProvider).call(comic.id);
-              await ref
-                  .read(recordReadingProgressUseCaseProvider)
-                  .call(
+              final path = await ref.read(
+                comicCoverPathProvider(comicId: comic.comicId).future,
+              );
+              await ref.read(recordReadingProgressUseCaseProvider).call(
                     ReadingHistory(
-                      comicId: comic.id,
+                      comicId: comic.comicId,
                       title: comic.title,
-                      coverUrl: comic.coverUrl,
+                      coverUrl: path,
                       lastReadTime: DateTime.now(),
                     ),
                   );
-              appRouter.pushNamed('阅读页面', pathParameters: {'id': comic.id});
+              appRouter.pushNamed(
+                '阅读页面',
+                pathParameters: {'id': comic.comicId},
+              );
             },
             icon: Icon(LucideIcons.play, size: 16),
             label: Text("开始阅读"),
@@ -322,11 +310,11 @@ class _LeftColumn extends HookConsumerWidget {
 
         // 3. 技术参数
         Container(
-          padding: .all(12),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
             border: Border.all(color: theme.colorScheme.borderSubtle),
-            borderRadius: .circular(8),
+            borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
             spacing: 8,
@@ -339,7 +327,7 @@ class _LeftColumn extends HookConsumerWidget {
               _StatRow(
                 icon: LucideIcons.bookMarked,
                 label: "Format",
-                value: "Folder",
+                value: comic.resourceType.name,
               ),
             ],
           ),
@@ -351,20 +339,12 @@ class _LeftColumn extends HookConsumerWidget {
 
 class _RightColumn extends StatelessWidget {
   final String title;
-  final String? description;
-  final List<CategoryTag> authors;
-  final List<CategoryTag> series;
-  final List<CategoryTag> characters;
-  final List<CategoryTag> tags;
-  final DateTime? date;
+  final List<String> authors;
+  final List<String> tags;
 
   const _RightColumn({
-    this.date,
     required this.title,
-    this.description,
     required this.authors,
-    required this.series,
-    required this.characters,
     required this.tags,
   });
 
@@ -373,33 +353,13 @@ class _RightColumn extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Column(
-      crossAxisAlignment: .start,
-      mainAxisSize: .min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        // 1. 头部信息 (Header)
-        if (date != null)
-          Row(
-            children: [
-              Icon(
-                Icons.access_time,
-                size: 14,
-                color: theme.colorScheme.textTertiary,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                date.toString(),
-                style: TextStyle(
-                  color: theme.colorScheme.textTertiary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
         const SizedBox(height: 12),
         Text(
           title,
-          maxLines: 1,
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 28,
@@ -410,58 +370,19 @@ class _RightColumn extends StatelessWidget {
         ),
         const SizedBox(height: 32),
 
-        // 2. 信息网格
         _InfoSection(
           title: "作者: ",
           icon: LucideIcons.penTool,
-          chips: authors.map((e) => e.name).toList(),
-        ),
-        _InfoSection(
-          title: "系列: ",
-          icon: LucideIcons.library,
-          chips: series.map((e) => e.name).toList(),
-        ),
-        _InfoSection(
-          title: "登场人物: ",
-          icon: LucideIcons.users,
-          chips: characters.map((e) => e.name).toList(),
+          chips: authors,
         ),
         _InfoSection(
           title: "标签: ",
           icon: LucideIcons.tag,
-          chips: tags.map((e) => e.name).toList(),
+          chips: tags,
         ),
 
         const SizedBox(height: 24),
         Divider(color: theme.colorScheme.borderSubtle),
-        const SizedBox(height: 24),
-
-        // 3. 简介
-        Row(
-          children: [
-            Icon(
-              LucideIcons.bookOpen,
-              size: 16,
-              color: theme.colorScheme.textSecondary,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              "简介",
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.textPrimary,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          description ?? '暂无',
-          style: TextStyle(color: theme.colorScheme.textSecondary, height: 1.5),
-          maxLines: 4,
-          overflow: TextOverflow.ellipsis,
-        ),
       ],
     );
   }
@@ -482,7 +403,7 @@ class _StatRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Row(
-      mainAxisAlignment: .spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: [
@@ -525,10 +446,10 @@ class _InfoSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Column(
-      crossAxisAlignment: .start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const .symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           child: Row(
             children: [
               Icon(icon, size: 14, color: theme.colorScheme.textSecondary),
@@ -618,7 +539,7 @@ class _BackBtn extends HookWidget {
 class _ComicEditBtn extends HookConsumerWidget {
   const _ComicEditBtn({required this.comic});
 
-  final Comic comic;
+  final LibraryComic comic;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -642,7 +563,7 @@ class _ComicEditBtn extends HookConsumerWidget {
                   comic: comic,
                   onSave: (data) async {
                     await ref.read(updateComicMetadataUseCaseProvider)(
-                      comic.id,
+                      comic.comicId,
                       data,
                     );
                   },
@@ -651,7 +572,7 @@ class _ComicEditBtn extends HookConsumerWidget {
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              padding: .all(8),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: Colors.transparent,
                 borderRadius: BorderRadius.circular(6),

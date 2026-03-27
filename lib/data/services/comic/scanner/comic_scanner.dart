@@ -6,9 +6,12 @@ import 'package:archive/archive.dart';
 import 'package:epub_image_extractor/epub_image_extractor.dart';
 import 'package:path/path.dart' as p;
 import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/core/util/comic_file_types.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/data/models/scanned_comic_model.dart';
+import 'package:hentai_library/data/services/comic/scanner/directory_scan_helper.dart';
 import 'package:hentai_library/data/services/comic/comic_file_cache.dart';
+import 'package:talker/talker.dart';
 
 // 多策略模式
 // 无论来源是文件夹还是 EPUB，提取后统一处理成 .jpg 文件存入应用的缓存目录。
@@ -56,34 +59,11 @@ abstract class ComicScannerStrategy {
 }
 
 class DirectoryScannerStrategy implements ComicScannerStrategy {
-  static const imageExtensions = {'.jpg', '.jpeg', '.png', '.webp', '.bmp'};
-
-  bool isImage(String path) {
-    return imageExtensions.contains(p.extension(path).toLowerCase());
-  }
-
   Future<bool> isValidDirectory(Directory dir) async {
-    bool hasAtLeastOneImage = false;
-
     try {
-      await for (final entity in dir.list(recursive: false)) {
-        if (entity is Directory) return false;
-
-        if (entity is File) {
-          final ext = p.extension(entity.path).toLowerCase();
-          final fileName = p.basename(entity.path);
-
-          // 忽略隐藏文件 (如 .DS_Store)
-          if (fileName.startsWith('.')) continue;
-
-          if (!imageExtensions.contains(ext)) return false;
-
-          hasAtLeastOneImage = true;
-        }
-      }
-
-      return hasAtLeastOneImage;
-    } catch (e) {
+      final result = await scanTopLevelForManga(dir);
+      return result.isManga;
+    } catch (_) {
       return false;
     }
   }
@@ -102,112 +82,54 @@ class DirectoryScannerStrategy implements ComicScannerStrategy {
   @override
   Future<ComicMetadata> getMetadata(FileSystemEntity entity) async {
     final dir = entity as Directory;
-    final metadata = ComicMetadata();
-
-    metadata.title = p.basename(dir.path);
-
-    // 统计图片文件数量
-    int pageCount = 0;
     try {
-      await for (final fileEntity in dir.list(recursive: false)) {
-        if (fileEntity is File) {
-          final fileName = p.basename(fileEntity.path);
-          // 忽略隐藏文件
-          if (fileName.startsWith('.')) continue;
-
-          if (isImage(fileEntity.path)) {
-            pageCount++;
-          }
-        }
-      }
-    } catch (e) {
-      // 如果统计失败，pageCount 保持为 0
+      final result = await scanTopLevelForManga(dir);
+      return ComicMetadata(
+        title: p.basename(dir.path),
+        pageCount: result.images.isNotEmpty ? result.images.length : null,
+      );
+    } catch (_) {
+      return ComicMetadata(
+        title: p.basename(dir.path),
+        pageCount: null,
+      );
     }
-
-    metadata.pageCount = pageCount > 0 ? pageCount : null;
-
-    return metadata;
   }
 
   @override
   Future<Uint8List?> getCoverBytes(FileSystemEntity entity) async {
     final dir = entity as Directory;
-    final files = <File>[];
-
     try {
-      await for (final fileEntity in dir.list(recursive: false)) {
-        if (fileEntity is File) {
-          final fileName = p.basename(fileEntity.path);
-          // 忽略隐藏文件
-          if (fileName.startsWith('.')) continue;
-
-          if (isImage(fileEntity.path)) {
-            files.add(fileEntity);
-          }
-        }
-      }
-    } catch (e) {
+      final result = await scanTopLevelForManga(dir);
+      final files = orderedImageFilesForCover(result.images);
+      if (files.isEmpty) return null;
+      return await files.first.readAsBytes();
+    } catch (_) {
       return null;
     }
-
-    // 优先选择包含 'cover' 的文件
-    files.sort((a, b) {
-      final aName = p.basename(a.path).toLowerCase();
-      final bName = p.basename(b.path).toLowerCase();
-      if (aName.contains('cover') && !bName.contains('cover')) return -1;
-      if (!aName.contains('cover') && bName.contains('cover')) return 1;
-      return a.path.compareTo(b.path);
-    });
-
-    if (files.isNotEmpty) {
-      return await files.first.readAsBytes();
-    }
-    return null;
   }
 
   @override
   Future<String?> getCoverPath(FileSystemEntity entity) async {
     final dir = entity as Directory;
-    final files = <File>[];
-
     try {
-      await for (final fileEntity in dir.list(recursive: false)) {
-        if (fileEntity is File) {
-          final fileName = p.basename(fileEntity.path);
-          if (fileName.startsWith('.')) continue;
-          if (isImage(fileEntity.path)) files.add(fileEntity);
-        }
-      }
-    } catch (e) {
+      final result = await scanTopLevelForManga(dir);
+      final files = orderedImageFilesForCover(result.images);
+      if (files.isEmpty) return null;
+      return files.first.path;
+    } catch (_) {
       return null;
     }
-
-    files.sort((a, b) {
-      final aName = p.basename(a.path).toLowerCase();
-      final bName = p.basename(b.path).toLowerCase();
-      if (aName.contains('cover') && !bName.contains('cover')) return -1;
-      if (!aName.contains('cover') && bName.contains('cover')) return 1;
-      return a.path.compareTo(b.path);
-    });
-
-    return files.isNotEmpty ? files.first.path : null;
   }
 }
 
 /// ZIP/CBZ 压缩包扫描策略
 class ZipArchiveStrategy implements ComicScannerStrategy {
-  static const _imageExtensions = {'.jpg', '.jpeg', '.png', '.webp', '.bmp'};
-
-  static bool _isImageEntry(String entryName) {
-    final ext = p.extension(entryName).toLowerCase();
-    return _imageExtensions.contains(ext);
-  }
-
   @override
   bool canHandle(FileSystemEntity entity) {
     if (entity is! File) return false;
     final ext = p.extension(entity.path).toLowerCase();
-    return ext == '.cbz' || ext == '.zip';
+    return zipArchiveExtensions.contains(ext);
   }
 
   @override
@@ -215,9 +137,8 @@ class ZipArchiveStrategy implements ComicScannerStrategy {
     if (entity is! File) return false;
     try {
       final bytes = await entity.readAsBytes();
-      final archive = ZipDecoder().decodeBytes(bytes);
-      final hasImage = archive.any((f) => f.isFile && _isImageEntry(f.name));
-      return hasImage;
+      final imageEntries = _decodeZipAndGetSortedImageEntries(bytes);
+      return imageEntries.isNotEmpty;
     } catch (_) {
       return false;
     }
@@ -230,12 +151,9 @@ class ZipArchiveStrategy implements ComicScannerStrategy {
     metadata.title = p.basenameWithoutExtension(file.path);
     try {
       final bytes = await file.readAsBytes();
-      final archive = ZipDecoder().decodeBytes(bytes);
-      final imageEntries = archive
-          .where((f) => f.isFile && _isImageEntry(f.name))
-          .toList();
-      imageEntries.sort((a, b) => a.name.compareTo(b.name));
-      metadata.pageCount = imageEntries.isNotEmpty ? imageEntries.length : null;
+      final imageEntries = _decodeZipAndGetSortedImageEntries(bytes);
+      metadata.pageCount =
+          imageEntries.isNotEmpty ? imageEntries.length : null;
     } catch (_) {
       metadata.pageCount = null;
     }
@@ -247,11 +165,7 @@ class ZipArchiveStrategy implements ComicScannerStrategy {
     final file = entity as File;
     try {
       final bytes = await file.readAsBytes();
-      final archive = ZipDecoder().decodeBytes(bytes);
-      final imageEntries = archive
-          .where((f) => f.isFile && _isImageEntry(f.name))
-          .toList();
-      imageEntries.sort((a, b) => a.name.compareTo(b.name));
+      final imageEntries = _decodeZipAndGetSortedImageEntries(bytes);
       if (imageEntries.isEmpty) return null;
       final first = imageEntries.first;
       final content = first.content as List<int>?;
@@ -267,7 +181,7 @@ class ZipArchiveStrategy implements ComicScannerStrategy {
   Future<String?> getCoverPath(FileSystemEntity entity) async => null;
 }
 
-// RAR/CBR 占位：暂不实现解析，.cbr/.rar 仍由 comic_sync_service 收集并显示为「压缩包」，但无对应策略故扫描时跳过，后续可接入实现。
+// RAR/CBR 占位：暂不实现解析。.cbr/.rar 在扫描管线中可归类为压缩包，但此处无对应策略故跳过，后续可接入实现。
 // class RarArchiveStrategy implements ComicScannerStrategy { ... }
 
 class EpubScannerStrategy implements ComicScannerStrategy {
@@ -339,14 +253,18 @@ class EpubScannerStrategy implements ComicScannerStrategy {
 
 class ComicScannerService {
   final ComicFileCacheService _cacheService;
+  final Talker _log;
   final List<ComicScannerStrategy> _strategies = [
     DirectoryScannerStrategy(),
     EpubScannerStrategy(),
     ZipArchiveStrategy(),
   ];
 
-  ComicScannerService({required ComicFileCacheService cacheService})
-    : _cacheService = cacheService;
+  ComicScannerService({
+    required ComicFileCacheService cacheService,
+    Talker? log,
+  }) : _cacheService = cacheService,
+       _log = log ?? LogManager.instance;
 
   /// 扫描路径并返回与数据库无关的 DTO（不写入数据库）
   /// 用于增量同步时收集扫描结果。失败时返回 null。
@@ -374,7 +292,7 @@ class ComicScannerService {
       }
       return await _scanDirectoryToModel(entity.path);
     } catch (e, stackTrace) {
-      LogManager.instance.handle(
+      _log.handle(
         e,
         stackTrace,
         '[SCAN][ERROR] 路径扫描失败 path=$path',
@@ -432,7 +350,7 @@ class ComicScannerService {
       sourcePath: path,
       chapterNumber: 1,
     );
-    LogManager.instance.debug(
+    _log.debug(
       '[SCAN][EPUB] title=$title pageCount=$pageCount cacheDir=$contentDir',
     );
     return model;
@@ -483,7 +401,7 @@ class ComicScannerService {
       sourcePath: path,
       chapterNumber: 1,
     );
-    LogManager.instance.debug(
+    _log.debug(
       '[SCAN][ZIP] title=$title pageCount=$pageCount cacheDir=$contentDir',
     );
     return model;
@@ -524,7 +442,7 @@ class ComicScannerService {
       sourcePath: path,
       chapterNumber: 1,
     );
-    LogManager.instance.debug(
+    _log.debug(
       '[SCAN][DIR] title=$title pageCount=$pageCount imageDir=$imageDir',
     );
     return model;
@@ -589,20 +507,29 @@ Future<_DirectoryScanResult?> _parseDirectoryInBackground(String path) async {
   }
 }
 
+bool _isZipImageEntryName(String entryName) {
+  final ext = p.extension(entryName).toLowerCase();
+  return comicImageExtensions.contains(ext);
+}
+
+/// 解码 ZIP 并返回“按 entry name 排序后的图片条目”。
+/// 由 `ZipArchiveStrategy` 与后台 isolate 的 `_parseZipInBackground` 共同复用。
+List<ArchiveFile> _decodeZipAndGetSortedImageEntries(Uint8List zipBytes) {
+  final archive = ZipDecoder().decodeBytes(zipBytes);
+  final imageEntries = archive
+      .where((f) => f.isFile && _isZipImageEntryName(f.name))
+      .toList()
+      .cast<ArchiveFile>();
+  imageEntries.sort((a, b) => a.name.compareTo(b.name));
+  return imageEntries;
+}
+
 /// 在后台 isolate 中解析 ZIP/CBZ
 Future<_ZipScanResult?> _parseZipInBackground(String path) async {
-  const imageExtensions = {'.jpg', '.jpeg', '.png', '.webp', '.bmp'};
-  bool isImageEntry(String name) =>
-      imageExtensions.contains(p.extension(name).toLowerCase());
-
   try {
     final file = File(path);
     final bytes = await file.readAsBytes();
-    final archive = ZipDecoder().decodeBytes(bytes);
-    final imageEntries = archive
-        .where((f) => f.isFile && isImageEntry(f.name))
-        .toList();
-    imageEntries.sort((a, b) => a.name.compareTo(b.name));
+    final imageEntries = _decodeZipAndGetSortedImageEntries(bytes);
     if (imageEntries.isEmpty) return null;
 
     final title = p.basenameWithoutExtension(path);

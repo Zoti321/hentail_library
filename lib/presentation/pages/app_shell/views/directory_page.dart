@@ -51,7 +51,8 @@ class _DirectoryPageHeader extends ConsumerStatefulWidget {
   final bool hasData;
 
   @override
-  ConsumerState<_DirectoryPageHeader> createState() => _DirectoryPageHeaderState();
+  ConsumerState<_DirectoryPageHeader> createState() =>
+      _DirectoryPageHeaderState();
 }
 
 class _DirectoryPageHeaderState extends ConsumerState<_DirectoryPageHeader> {
@@ -91,7 +92,10 @@ class _DirectoryPageHeaderState extends ConsumerState<_DirectoryPageHeader> {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _MetaChip(icon: LucideIcons.folder, label: '目录 ${widget.totalCount}'),
+                  _MetaChip(
+                    icon: LucideIcons.folder,
+                    label: '目录 ${widget.totalCount}',
+                  ),
                   if (widget.isSelectionMode)
                     _MetaChip(
                       icon: LucideIcons.circleCheckBig,
@@ -114,9 +118,10 @@ class _DirectoryPageHeaderState extends ConsumerState<_DirectoryPageHeader> {
                   : () async {
                       setState(() => _isAddingDirectory = true);
                       try {
-                        final dir = await FilePicker.platform.getDirectoryPath();
+                        final dir = await FilePicker.platform
+                            .getDirectoryPath();
                         if (dir == null) return;
-                        await ref.read(dirRepoProvider).addDir(dir);
+                        await ref.read(pathRepoProvider).addPath(dir);
                         if (mounted) {
                           showSuccessSnackBar(context, '已添加目录');
                         }
@@ -418,7 +423,7 @@ class _DirectoryTileState extends ConsumerState<_DirectoryTile> {
                       : () async {
                           setState(() => _isRemoving = true);
                           try {
-                            await ref.read(dirRepoProvider).removeDir(dir);
+                            await ref.read(pathRepoProvider).removePath(dir);
                             if (mounted) {
                               showSuccessSnackBar(context, '已移除目录');
                             }
@@ -526,7 +531,9 @@ class _ErrorCardState extends ConsumerState<_ErrorCard> {
                 : () async {
                     setState(() => _isRetrying = true);
                     try {
-                      await ref.read(directoryViewProvider.notifier).refreshDirs();
+                      await ref
+                          .read(directoryViewProvider.notifier)
+                          .refreshDirs();
                     } finally {
                       if (mounted) setState(() => _isRetrying = false);
                     }

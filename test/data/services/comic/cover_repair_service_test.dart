@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:archive/archive.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/data/resources/local/database/dao.dart';
-import 'package:hentai_library/data/resources/local/database/database.dart' as db;
 import 'package:hentai_library/data/services/comic/cover_repair_service.dart';
 import 'package:hentai_library/data/services/comic/scanner/comic_scanner.dart';
 import 'package:mocktail/mocktail.dart';
@@ -31,133 +29,89 @@ void main() {
     } catch (_) {}
   });
 
-  ComicWithChaptersAndTags entryWith({
-    required String comicId,
-    String? coverUrl,
-    required Set<db.Chapter> chapters,
-  }) {
-    final comic = db.Comic(
-      id: 1,
-      comicId: comicId,
-      title: 'Test',
-      coverUrl: coverUrl,
-      isR18: false,
-      totalViews: 0,
-    );
-    return ComicWithChaptersAndTags(
-      comic: comic,
-      chapters: chapters,
-      tags: {},
-    );
-  }
-
-  db.Chapter chapterWith({required String comicId, String? sourcePath}) {
-    return db.Chapter(
-      id: 1,
-      chapterId: 'ch1',
-      comicId: comicId,
-      imageDir: '/img',
-      sourcePath: sourcePath,
-    );
-  }
-
   group('repairSingle', () {
     test('does not call scanPath when cover file exists', () async {
       final coverFile = File(p.join(tempDir.path, 'cover.jpg'));
       await coverFile.writeAsBytes([1, 2, 3]);
-      final entry = entryWith(
+      final candidate = CoverRepairCandidate(
         comicId: 'c1',
         coverUrl: coverFile.path,
-        chapters: {chapterWith(comicId: 'c1', sourcePath: '/any.cbz')},
+        sourcePath: '/any.cbz',
       );
 
-      await repairService.repairSingle(entry);
+      await repairService.repairSingle(candidate);
 
       verifyNever(() => mockScanner.scanPath(any()));
     });
 
     test('does not call scanPath when coverUrl is null', () async {
-      final entry = entryWith(
+      final candidate = CoverRepairCandidate(
         comicId: 'c1',
         coverUrl: null,
-        chapters: {chapterWith(comicId: 'c1', sourcePath: '/any.cbz')},
+        sourcePath: '/any.cbz',
       );
 
-      await repairService.repairSingle(entry);
+      await repairService.repairSingle(candidate);
 
       verifyNever(() => mockScanner.scanPath(any()));
     });
 
     test('does not call scanPath when coverUrl is empty', () async {
-      final entry = entryWith(
+      final candidate = CoverRepairCandidate(
         comicId: 'c1',
         coverUrl: '',
-        chapters: {chapterWith(comicId: 'c1', sourcePath: '/any.cbz')},
+        sourcePath: '/any.cbz',
       );
 
-      await repairService.repairSingle(entry);
-
-      verifyNever(() => mockScanner.scanPath(any()));
-    });
-
-    test('does not call scanPath when chapters is empty', () async {
-      final entry = entryWith(
-        comicId: 'c1',
-        coverUrl: '/nonexistent/cover.jpg',
-        chapters: {},
-      );
-
-      await repairService.repairSingle(entry);
+      await repairService.repairSingle(candidate);
 
       verifyNever(() => mockScanner.scanPath(any()));
     });
 
     test('does not call scanPath when sourcePath is null', () async {
-      final entry = entryWith(
+      final candidate = CoverRepairCandidate(
         comicId: 'c1',
         coverUrl: '/nonexistent/cover.jpg',
-        chapters: {chapterWith(comicId: 'c1', sourcePath: null)},
+        sourcePath: null,
       );
 
-      await repairService.repairSingle(entry);
+      await repairService.repairSingle(candidate);
 
       verifyNever(() => mockScanner.scanPath(any()));
     });
 
     test('does not call scanPath when sourcePath is empty', () async {
-      final entry = entryWith(
+      final candidate = CoverRepairCandidate(
         comicId: 'c1',
         coverUrl: '/nonexistent/cover.jpg',
-        chapters: {chapterWith(comicId: 'c1', sourcePath: '')},
+        sourcePath: '',
       );
 
-      await repairService.repairSingle(entry);
+      await repairService.repairSingle(candidate);
 
       verifyNever(() => mockScanner.scanPath(any()));
     });
 
     test('does not call scanPath when sourcePath extension is not repairable', () async {
-      final entry = entryWith(
+      final candidate = CoverRepairCandidate(
         comicId: 'c1',
         coverUrl: '/nonexistent/cover.jpg',
-        chapters: {chapterWith(comicId: 'c1', sourcePath: '/a/b.txt')},
+        sourcePath: '/a/b.txt',
       );
 
-      await repairService.repairSingle(entry);
+      await repairService.repairSingle(candidate);
 
       verifyNever(() => mockScanner.scanPath(any()));
     });
 
     test('does not call scanPath when sourcePath is .cbz but file does not exist', () async {
-      final entry = entryWith(
+      final candidate = CoverRepairCandidate(
         comicId: 'c1',
         coverUrl: '/nonexistent/cover.jpg',
-        chapters: {
-          chapterWith(comicId: 'c1', sourcePath: p.join(tempDir.path, 'missing.cbz')),
-        },
+        sourcePath: p.join(tempDir.path, 'missing.cbz'),
       );
 
-      await repairService.repairSingle(entry);
+      await repairService.repairSingle(candidate);
 
       verifyNever(() => mockScanner.scanPath(any()));
     });
@@ -172,15 +126,13 @@ void main() {
 
       when(() => mockScanner.scanPath(any())).thenAnswer((_) async => null);
 
-      final entry = entryWith(
+      final candidate = CoverRepairCandidate(
         comicId: 'c1',
         coverUrl: '/nonexistent/cover.jpg',
-        chapters: {
-          chapterWith(comicId: 'c1', sourcePath: cbzFile.path),
-        },
+        sourcePath: cbzFile.path,
       );
 
-      await repairService.repairSingle(entry);
+      await repairService.repairSingle(candidate);
 
       verify(() => mockScanner.scanPath(cbzFile.path)).called(1);
     });

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
+import 'package:hentai_library/domain/value_objects/sync_report/sync_report.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/button/home_refresh_button.dart';
@@ -377,12 +377,12 @@ class HomePage extends ConsumerWidget {
               itemBuilder: (BuildContext context, int index) {
                 final comic = list[index];
                 return ComicCard(
-                  key: Key(comic.id),
+                  key: Key(comic.comicId),
                   comic: comic,
                   size: const Size(double.infinity, double.infinity),
                   onTap: () => appRouter.pushNamed(
                     '漫画详情',
-                    pathParameters: {'id': comic.id},
+                    pathParameters: {'id': comic.comicId},
                   ),
                   onPlay: () {},
                   onRightClick: (_) {},

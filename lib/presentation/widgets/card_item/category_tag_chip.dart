@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class CategoryTagChip extends StatefulWidget {
-  final CategoryTag tag;
+  final String label;
   final VoidCallback onRemove;
 
-  const CategoryTagChip({super.key, required this.tag, required this.onRemove});
+  const CategoryTagChip({
+    super.key,
+    required this.label,
+    required this.onRemove,
+  });
 
   @override
   State<CategoryTagChip> createState() => _CategoryTagChipState();
@@ -34,7 +37,7 @@ class _CategoryTagChipState extends State<CategoryTagChip> {
         children: [
           Flexible(
             child: Text(
-              widget.tag.name,
+              widget.label,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,

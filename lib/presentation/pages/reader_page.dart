@@ -3,7 +3,8 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/domain/entity/entities.dart' as entity;
+import 'package:hentai_library/domain/entity/reading_history.dart' as entity;
+import 'package:hentai_library/domain/entity/reading_session.dart' as entity;
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -73,7 +74,9 @@ void _saveProgress(WidgetRef ref, String comicId) {
   final state = ref.read(readerViewProvider(comicId)).asData?.value;
   if (state == null) return;
   final currentIndex = state.currentIndex;
-  final firstChapter = comic.chapters.isNotEmpty ? comic.chapters.first : null;
+  final coverUrl = ref
+      .read(comicCoverPathProvider(comicId: comicId))
+      .maybeWhen(data: (v) => v, orElse: () => null);
 
   final sessionStart = ref.read(readingSessionStartProvider);
   if (sessionStart != null) {
@@ -100,9 +103,9 @@ void _saveProgress(WidgetRef ref, String comicId) {
         entity.ReadingHistory(
           comicId: comicId,
           title: comic.title,
-          coverUrl: comic.coverUrl,
+          coverUrl: coverUrl,
           lastReadTime: DateTime.now(),
-          chapterId: firstChapter?.id,
+          chapterId: null,
           pageIndex: currentIndex,
         ),
       );

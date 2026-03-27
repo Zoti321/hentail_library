@@ -6,10 +6,5 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'directory_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-DirectoryRepository dirRepo(Ref ref) =>
-    DirectoryRepositoryImpl(ref.read(dirDaoProvider));
-
-@Riverpod()
-Stream<List<String>> dirsStream(Ref ref) {
-  return ref.watch(dirRepoProvider).getDirsStream();
-}
+PathRepository pathRepo(Ref ref) =>
+    PathRepositoryImpl(ref.read(savedPathDaoProvider));

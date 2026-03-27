@@ -1,20 +1,20 @@
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'dart:io';
+
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
+import 'package:hentai_library/domain/entity/v2/library_comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/context_menu.dart';
-import 'package:hentai_library/presentation/widgets/dialog/comic_merge_dialog.dart';
 import 'package:hentai_library/presentation/widgets/dialog/edit_metadata_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ComicCard extends HookConsumerWidget {
-  final Comic comic;
+  final LibraryComic comic;
   final Size size;
   final VoidCallback onTap;
   final VoidCallback onPlay;
@@ -32,6 +32,12 @@ class ComicCard extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isHover = useState<bool>(false);
+    final coverPath = ref
+        .watch(comicCoverPathProvider(comicId: comic.comicId))
+        .maybeWhen(data: (v) => v, orElse: () => null);
+    final pageCount = ref
+        .watch(comicImagesProvider(comicId: comic.comicId))
+        .maybeWhen(data: (files) => files.length, orElse: () => 0);
 
     return GestureDetector(
       onTap: onTap,
@@ -49,10 +55,16 @@ class ComicCard extends HookConsumerWidget {
           onAction: (action) {
             switch (action) {
               case 'read':
-                appRouter.pushNamed("阅读页面", pathParameters: {'id': comic.id});
+                appRouter.pushNamed(
+                  "阅读页面",
+                  pathParameters: {'id': comic.comicId},
+                );
                 break;
               case 'detail':
-                appRouter.pushNamed('漫画详情', pathParameters: {'id': comic.id});
+                appRouter.pushNamed(
+                  '漫画详情',
+                  pathParameters: {'id': comic.comicId},
+                );
                 break;
               case "edit":
                 showDialog(
@@ -61,7 +73,7 @@ class ComicCard extends HookConsumerWidget {
                     comic: comic,
                     onSave: (data) async {
                       await ref.read(updateComicMetadataUseCaseProvider)(
-                        comic.id,
+                        comic.comicId,
                         data,
                       );
                     },
@@ -69,23 +81,10 @@ class ComicCard extends HookConsumerWidget {
                 );
                 break;
               case "merge":
-                showDialog(
-                  context: context,
-                  builder: (context) => ComicMergeDialog(
-                    currentComic: comic,
-                    onConfirm: (ids) {
-                      final form = ComicArchiveForm(
-                        comicId: comic.id,
-                        chapterIds: ids,
-                      );
-
-                      ref.read(comicRepoProvider).archiveChaptersToComic(form);
-                    },
-                  ),
-                );
+                // 章节归档功能已下线。
                 break;
               case "open_folder":
-                openFolder(comic.coverUrl!);
+                if (coverPath != null) openFolder(coverPath);
                 break;
             }
           },
@@ -98,7 +97,7 @@ class ComicCard extends HookConsumerWidget {
         onExit: (_) => isHover.value = false,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const .all(8),
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             color: Colors.white,
@@ -113,14 +112,14 @@ class ComicCard extends HookConsumerWidget {
                 : null,
           ),
           child: Column(
-            crossAxisAlignment: .start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             spacing: 12,
             children: [
               // 封面图容器
-              _buildCover(comic, isHover.value),
+              _buildCover(coverPath, isHover.value),
               // --- 文本信息区域 ---
-              _buildInfoSection(comic, isHover.value, context),
+              _buildInfoSection(isHover.value, context, pageCount),
             ],
           ),
         ),
@@ -128,7 +127,7 @@ class ComicCard extends HookConsumerWidget {
     );
   }
 
-  Widget _buildCover(Comic comic, bool isHover) {
+  Widget _buildCover(String? coverPath, bool isHover) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOut,
@@ -160,18 +159,25 @@ class ComicCard extends HookConsumerWidget {
             fit: StackFit.expand,
             children: [
               // 1. 图片 + 缩放动画
-              ExtendedImage.file(
-                    File(comic.coverUrl!),
-                    cacheWidth: 200,
-                    fit: BoxFit.cover,
-                  )
-                  .animate(target: isHover ? 1 : 0)
-                  .scale(
-                    begin: Offset(1, 1),
-                    end: Offset(1.05, 1.05),
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeOutQuad,
-                  ),
+              if (coverPath != null)
+                ExtendedImage.file(
+                      File(coverPath),
+                      cacheWidth: 200,
+                      fit: BoxFit.cover,
+                    )
+                    .animate(target: isHover ? 1 : 0)
+                    .scale(
+                      begin: Offset(1, 1),
+                      end: Offset(1.05, 1.05),
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeOutQuad,
+                    )
+              else
+                Container(
+                  color: Colors.grey[300],
+                  alignment: Alignment.center,
+                  child: Icon(Icons.broken_image, color: Colors.grey[600]),
+                ),
 
               // 2. 黑色遮罩层 (Hover 时显示)
               Container(color: Colors.black.withAlpha(20))
@@ -183,14 +189,15 @@ class ComicCard extends HookConsumerWidget {
                 top: 8,
                 right: 8,
                 child: Container(
-                  padding: .symmetric(horizontal: 6, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: Colors.black.withAlpha(50),
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(color: Colors.white.withAlpha(10)),
                   ),
                   child: Text(
-                    'Folder',
+                    comic.resourceType.name,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 10,
@@ -206,9 +213,9 @@ class ComicCard extends HookConsumerWidget {
     );
   }
 
-  Column _buildInfoSection(Comic comic, bool isHover, BuildContext context) {
+  Column _buildInfoSection(bool isHover, BuildContext context, int pageCount) {
     return Column(
-      crossAxisAlignment: .start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 6,
       children: [
         // 标题 (带 Hover 变色)
@@ -232,7 +239,7 @@ class ComicCard extends HookConsumerWidget {
         Row(
           children: [
             Text(
-              '${comic.totalPageCount}p',
+              '${pageCount}p',
               style: TextStyle(
                 fontSize: 11,
                 color: Theme.of(context).colorScheme.textTertiary,

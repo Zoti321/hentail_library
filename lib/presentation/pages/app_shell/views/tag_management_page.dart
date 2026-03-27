@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/domain/entity/v2/library_tag.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -11,34 +10,22 @@ class TagManagementPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tagsAsync = ref.watch(tagsByTypeProvider);
+    final tagsAsync = ref.watch(allTagsProvider);
     final selection = ref.watch(tagSelectionProvider);
     final query = ref.watch(tagFilterProvider);
-
-    final totalCount = tagsAsync.maybeWhen(
-      data: (grouped) =>
-          grouped.values.fold<int>(0, (sum, list) => sum + list.length),
-      orElse: () => 0,
-    );
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _Header(
-            totalCount: totalCount,
-            selectionCount: selection.length,
-            query: query,
-          ),
+          _Header(selectionCount: selection.length),
           const SizedBox(height: 20),
           tagsAsync.when(
-            data: (grouped) {
-              final filtered = _applyFilter(grouped, query);
-              if (filtered.isEmpty) {
-                return _EmptyState();
-              }
-              return _TagList(groups: filtered);
+            data: (tags) {
+              final filtered = _applyFilter(tags, query);
+              if (filtered.isEmpty) return _EmptyState();
+              return _TagList(tags: filtered);
             },
             loading: () => const _LoadingCard(),
             error: (e, _) => _ErrorCard(error: e),
@@ -48,22 +35,10 @@ class TagManagementPage extends ConsumerWidget {
     );
   }
 
-  Map<CategoryTagType, List<CategoryTag>> _applyFilter(
-    Map<CategoryTagType, List<CategoryTag>> source,
-    String query,
-  ) {
-    if (query.trim().isEmpty) return source;
+  List<LibraryTag> _applyFilter(List<LibraryTag> source, String query) {
+    if (query.trim().isEmpty) return List<LibraryTag>.from(source);
     final q = query.trim().toLowerCase();
-    final result = <CategoryTagType, List<CategoryTag>>{};
-    for (final entry in source.entries) {
-      final filtered = entry.value
-          .where((t) => t.name.toLowerCase().contains(q))
-          .toList();
-      if (filtered.isNotEmpty) {
-        result[entry.key] = filtered;
-      }
-    }
-    return result;
+    return source.where((t) => t.name.toLowerCase().contains(q)).toList();
   }
 }
 
@@ -117,15 +92,8 @@ class _MetaChip extends StatelessWidget {
 }
 
 class _Header extends ConsumerWidget {
-  const _Header({
-    required this.totalCount,
-    required this.selectionCount,
-    required this.query,
-  });
-
-  final int totalCount;
+  const _Header({required this.selectionCount});
   final int selectionCount;
-  final String query;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -163,7 +131,7 @@ class _Header extends ConsumerWidget {
                 children: [
                   _MetaChip(
                     icon: LucideIcons.tags,
-                    label: '标签 $totalCount',
+                    label: '标签',
                   ),
                   if (selectionCount > 0)
                     _MetaChip(
@@ -245,9 +213,9 @@ class _Header extends ConsumerWidget {
 }
 
 class _TagList extends ConsumerWidget {
-  const _TagList({required this.groups});
+  const _TagList({required this.tags});
 
-  final Map<CategoryTagType, List<CategoryTag>> groups;
+  final List<LibraryTag> tags;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -290,60 +258,19 @@ class _TagList extends ConsumerWidget {
               ],
             ),
           ),
-          ...CategoryTagType.values.map((type) {
-            final list = groups[type] ?? const <CategoryTag>[];
-            if (list.isEmpty) return const SizedBox.shrink();
-            return _TagTypeSection(type: type, tags: list);
-          }),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: tags.length,
+            separatorBuilder: (_, __) => Divider(height: 1, color: cs.borderSubtle),
+            itemBuilder: (context, index) {
+              final tag = tags[index];
+              final isSelected = ref.watch(tagSelectionProvider).contains(tag);
+              return _TagRow(tag: tag, isSelected: isSelected);
+            },
+          ),
         ],
       ),
-    );
-  }
-}
-
-class _TagTypeSection extends ConsumerWidget {
-  const _TagTypeSection({
-    required this.type,
-    required this.tags,
-  });
-
-  final CategoryTagType type;
-  final List<CategoryTag> tags;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final cs = Theme.of(context).colorScheme;
-    final selection = ref.watch(tagSelectionProvider);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-          child: Text(
-            type.displayName,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: cs.onSurfaceVariant,
-            ),
-          ),
-        ),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: tags.length,
-          separatorBuilder: (_, __) => Divider(
-            height: 1,
-            color: cs.borderSubtle,
-          ),
-          itemBuilder: (context, index) {
-            final tag = tags[index];
-            final isSelected = selection.contains(tag);
-            return _TagRow(tag: tag, isSelected: isSelected);
-          },
-        ),
-      ],
     );
   }
 }
@@ -354,7 +281,7 @@ class _TagRow extends ConsumerWidget {
     required this.isSelected,
   });
 
-  final CategoryTag tag;
+  final LibraryTag tag;
   final bool isSelected;
 
   @override
@@ -389,23 +316,6 @@ class _TagRow extends ConsumerWidget {
                         color: cs.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        _TagBadge(
-                          label: tag.type.displayName,
-                          color: cs.surfaceContainerHighest,
-                        ),
-                        if (tag.isR18) ...[
-                          const SizedBox(width: 6),
-                          _TagBadge(
-                            label: 'R18',
-                            color: cs.errorContainer,
-                            textColor: cs.onErrorContainer,
-                          ),
-                        ],
-                      ],
-                    ),
                   ],
                 ),
               ),
@@ -427,38 +337,6 @@ class _TagRow extends ConsumerWidget {
   }
 }
 
-class _TagBadge extends StatelessWidget {
-  const _TagBadge({
-    required this.label,
-    required this.color,
-    this.textColor,
-  });
-
-  final String label;
-  final Color color;
-  final Color? textColor;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: cs.borderSubtle),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 11,
-          color: textColor ?? cs.textSecondary,
-        ),
-      ),
-    );
-  }
-}
-
 class _AddTagDialog extends ConsumerStatefulWidget {
   const _AddTagDialog();
 
@@ -468,8 +346,6 @@ class _AddTagDialog extends ConsumerStatefulWidget {
 
 class _AddTagDialogState extends ConsumerState<_AddTagDialog> {
   final TextEditingController _nameController = TextEditingController();
-  CategoryTagType _type = CategoryTagType.tag;
-  bool _isR18 = false;
   bool _saving = false;
 
   @override
@@ -483,7 +359,7 @@ class _AddTagDialogState extends ConsumerState<_AddTagDialog> {
     if (name.isEmpty) return;
     setState(() => _saving = true);
     try {
-      final tag = CategoryTag(name: name, type: _type, isR18: _isR18);
+      final tag = LibraryTag(name: name);
       await ref.read(tagActionsProvider).addTag(tag);
       if (mounted) Navigator.of(context).pop();
     } finally {
@@ -520,36 +396,6 @@ class _AddTagDialogState extends ConsumerState<_AddTagDialog> {
               autofocus: true,
               onSubmitted: (_) => _handleSave(),
             ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<CategoryTagType>(
-              value: _type,
-              decoration: const InputDecoration(
-                labelText: '类型',
-              ),
-              items: CategoryTagType.values
-                  .map(
-                    (t) => DropdownMenuItem(
-                      value: t,
-                      child: Text(t.displayName),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (value) {
-                if (value == null) return;
-                setState(() => _type = value);
-              },
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Switch(
-                  value: _isR18,
-                  onChanged: (v) => setState(() => _isR18 = v),
-                ),
-                const SizedBox(width: 8),
-                const Text('R18'),
-              ],
-            ),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -581,7 +427,7 @@ class _AddTagDialogState extends ConsumerState<_AddTagDialog> {
 class _RenameTagDialog extends ConsumerStatefulWidget {
   const _RenameTagDialog({required this.tag});
 
-  final CategoryTag tag;
+  final LibraryTag tag;
 
   @override
   ConsumerState<_RenameTagDialog> createState() => _RenameTagDialogState();
@@ -785,7 +631,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '你可以从这里添加作者、系列、角色和通用标签。',
+            '你可以从这里添加、重命名或删除标签。',
             style: TextStyle(
               fontSize: 13,
               color: cs.textSecondary,

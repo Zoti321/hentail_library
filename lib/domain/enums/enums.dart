@@ -1,27 +1,6 @@
 // 漫画排序类型
 enum ComicSortType { title, lastUpdated, firstPublished, totalViews }
 
-// 分类标签类型
-enum CategoryTagType {
-  author,
-  character,
-  tag,
-  series;
-
-  String get displayName {
-    switch (this) {
-      case CategoryTagType.author:
-        return '作者';
-      case CategoryTagType.character:
-        return '登场人物';
-      case CategoryTagType.tag:
-        return '标签';
-      case CategoryTagType.series:
-        return '系列';
-    }
-  }
-}
-
 // 同步进度阶段
 enum SyncPhase { collecting, scanning, applying }
 

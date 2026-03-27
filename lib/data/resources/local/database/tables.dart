@@ -1,76 +1,10 @@
 import 'package:drift/drift.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/data/services/comic/v2/resource_types.dart';
+import 'package:hentai_library/domain/entity/v2/content_rating.dart';
+import 'dart:convert';
 
-// 漫画
-class Comics extends Table {
-  IntColumn get id => integer().autoIncrement()();
-
-  TextColumn get comicId => text().unique()();
-
-  TextColumn get title => text()();
-  TextColumn get description => text().nullable()();
-  TextColumn get coverUrl => text().nullable()();
-  TextColumn get status => text().nullable()();
-
-  DateTimeColumn get firstPublishedAt => dateTime().nullable()();
-  DateTimeColumn get lastUpdatedAt => dateTime().nullable()();
-
-  BoolColumn get isR18 => boolean().withDefault(const Constant(false))();
-
-  IntColumn get totalViews => integer().withDefault(const Constant(0))();
-}
-
-// 章节
-class Chapters extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get chapterId => text().unique()(); // 业务唯一ID
-  TextColumn get comicId => text().references(
-    Comics,
-    #comicId,
-    onDelete: KeyAction.cascade,
-  )(); // 所属漫画ID
-
-  IntColumn get number => integer().nullable()();
-  TextColumn get title => text().nullable()();
-  TextColumn get coverUrl => text().nullable()();
-  IntColumn get pageCount => integer().nullable()();
-
-  TextColumn get imageDir => text().nullable().unique()();
-
-  /// 原始图源路径（EPUB 文件路径或文件夹路径），用于缓存被清理后重新提取
-  TextColumn get sourcePath => text().nullable()();
-}
-
-// 分类标签
-class CategoryTags extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  TextColumn get name => text().unique()();
-  TextColumn get type => textEnum<CategoryTagType>().withDefault(
-    const Constant('tag'),
-  )(); // author,character,tag,series
-  BoolColumn get isR18 => boolean().withDefault(const Constant(false))();
-
-  List<Index> get indexes => [Index('idx_category_tags_name', 'name')];
-}
-
-// 漫画-标签 关联表
-class ComicTags extends Table {
-  @override
-  Set<Column> get primaryKey => {comicId, tagId};
-
-  TextColumn get comicId =>
-      text().references(Comics, #comicId, onDelete: KeyAction.cascade)();
-  IntColumn get tagId =>
-      integer().references(CategoryTags, #id, onDelete: KeyAction.cascade)();
-
-  List<Index> get indexes => [
-    Index('idx_comic_tags_comic', 'comic_id'),
-    Index('idx_comic_tags_tag', 'tag_id'),
-  ];
-}
-
-// 选中的文件目录
-class SelectedDirectories extends Table {
+// 用户保存的文件系统路径
+class SavedPaths extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get rawPath => text().unique()();
 
@@ -83,9 +17,7 @@ class SelectedDirectories extends Table {
 class ReadingHistories extends Table {
   IntColumn get id => integer().autoIncrement()();
 
-  TextColumn get comicId => text()
-      .references(Comics, #comicId, onDelete: KeyAction.cascade)
-      .unique()();
+  TextColumn get comicId => text().unique()();
 
   // 漫画标题/封面等（冗余存储减少关联查询）
   TextColumn get title => text()();
@@ -103,11 +35,83 @@ class ReadingHistories extends Table {
 class ReadingSessions extends Table {
   IntColumn get id => integer().autoIncrement()();
 
-  TextColumn get comicId =>
-      text().references(Comics, #comicId, onDelete: KeyAction.cascade)();
+  TextColumn get comicId => text()();
 
   /// 会话日期（当天 0 点，便于按日聚合）
   DateTimeColumn get date => dateTime()();
 
   IntColumn get durationSeconds => integer()();
+}
+
+class StringListJsonConverter extends TypeConverter<List<String>, String> {
+  const StringListJsonConverter();
+
+  @override
+  List<String> fromSql(String fromDb) {
+    final decoded = jsonDecode(fromDb);
+    if (decoded is! List) return const <String>[];
+    return decoded.whereType<String>().toList();
+  }
+
+  @override
+  String toSql(List<String> value) => jsonEncode(value);
+}
+
+class LibraryComics extends Table {
+  TextColumn get comicId => text()();
+  TextColumn get path => text()();
+  TextColumn get resourceType => textEnum<ResourceType>()();
+  TextColumn get title => text()();
+  TextColumn get authorsJson => text()
+      .map(const StringListJsonConverter())
+      .withDefault(const Constant('[]'))();
+  TextColumn get contentRating =>
+      textEnum<ContentRating>().withDefault(const Constant('unknown'))();
+
+  @override
+  Set<Column> get primaryKey => {comicId};
+}
+
+class LibraryTags extends Table {
+  TextColumn get name => text()();
+
+  @override
+  Set<Column> get primaryKey => {name};
+}
+
+class LibraryComicTags extends Table {
+  TextColumn get comicId => text()();
+  TextColumn get tagName => text()();
+
+  @override
+  Set<Column> get primaryKey => {comicId, tagName};
+
+  @override
+  List<String> get customConstraints => [
+    'FOREIGN KEY(comic_id) REFERENCES library_comics(comic_id) ON DELETE CASCADE',
+    'FOREIGN KEY(tag_name) REFERENCES library_tags(name) ON DELETE CASCADE',
+  ];
+}
+
+class LibrarySeries extends Table {
+  TextColumn get seriesId => text()();
+  TextColumn get name => text()();
+
+  @override
+  Set<Column> get primaryKey => {seriesId};
+}
+
+class LibrarySeriesItems extends Table {
+  TextColumn get seriesId => text()();
+  TextColumn get comicId => text()();
+  IntColumn get sortOrder => integer()();
+
+  @override
+  Set<Column> get primaryKey => {seriesId, comicId};
+
+  @override
+  List<String> get customConstraints => [
+    'UNIQUE(comic_id)',
+    'FOREIGN KEY(series_id) REFERENCES library_series(series_id) ON DELETE CASCADE',
+  ];
 }

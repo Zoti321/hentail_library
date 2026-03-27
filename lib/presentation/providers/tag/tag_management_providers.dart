@@ -1,37 +1,21 @@
-import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
-import 'package:hentai_library/presentation/providers/comic/comic_providers.dart';
+import 'package:hentai_library/domain/entity/v2/library_tag.dart';
+import 'package:hentai_library/presentation/providers/providers_deps.dart';
 
 /// 全部标签列表（用于标签管理页面）
-final allTagsProvider = FutureProvider<List<CategoryTag>>((ref) async {
-  final repo = ref.read(comicRepoProvider);
-  final tags = await repo.listAllTags();
+final allTagsProvider = FutureProvider<List<LibraryTag>>((ref) async {
+  final tags = await ref.watch(libraryTagRepoProvider).listAll();
+  tags.sort((a, b) => a.name.compareTo(b.name));
   return tags;
 });
 
-/// 标签按类型分组，方便 UI 渲染
-final tagsByTypeProvider =
-    FutureProvider<Map<CategoryTagType, List<CategoryTag>>>((ref) async {
-      final tags = await ref.watch(allTagsProvider.future);
-      final grouped = groupBy<CategoryTag, CategoryTagType>(
-        tags,
-        (t) => t.type,
-      );
-      for (final list in grouped.values) {
-        list.sort((a, b) => a.name.compareTo(b.name));
-      }
-      return grouped;
-    });
-
 /// 当前选中的标签集合（用于批量删除）
-class TagSelectionNotifier extends Notifier<Set<CategoryTag>> {
+class TagSelectionNotifier extends Notifier<Set<LibraryTag>> {
   @override
-  Set<CategoryTag> build() => <CategoryTag>{};
+  Set<LibraryTag> build() => <LibraryTag>{};
 
-  void toggle(CategoryTag tag) {
-    final next = Set<CategoryTag>.from(state);
+  void toggle(LibraryTag tag) {
+    final next = Set<LibraryTag>.from(state);
     if (next.contains(tag)) {
       next.remove(tag);
     } else {
@@ -41,16 +25,16 @@ class TagSelectionNotifier extends Notifier<Set<CategoryTag>> {
   }
 
   void clear() {
-    state = <CategoryTag>{};
+    state = <LibraryTag>{};
   }
 
-  void selectAll(Iterable<CategoryTag> tags) {
-    state = Set<CategoryTag>.from(tags);
+  void selectAll(Iterable<LibraryTag> tags) {
+    state = Set<LibraryTag>.from(tags);
   }
 }
 
 final tagSelectionProvider =
-    NotifierProvider<TagSelectionNotifier, Set<CategoryTag>>(
+    NotifierProvider<TagSelectionNotifier, Set<LibraryTag>>(
       TagSelectionNotifier.new,
     );
 
@@ -78,29 +62,25 @@ class TagActions {
 
   final Ref _ref;
 
-  Future<void> addTag(CategoryTag tag) async {
-    final repo = _ref.read(comicRepoProvider);
-    await repo.addTag(tag);
+  Future<void> addTag(LibraryTag tag) async {
+    await _ref.read(libraryTagRepoProvider).add(LibraryTag(name: tag.name));
     _ref.invalidate(allTagsProvider);
-    _ref.invalidate(tagsByTypeProvider);
   }
 
-  Future<void> deleteTags(List<CategoryTag> tags) async {
+  Future<void> deleteTags(List<LibraryTag> tags) async {
     if (tags.isEmpty) return;
-    final repo = _ref.read(comicRepoProvider);
-    await repo.deleteTags(tags);
+    await _ref
+        .read(libraryTagRepoProvider)
+        .deleteByNames(tags.map((e) => e.name).toList());
     _ref.invalidate(allTagsProvider);
-    _ref.invalidate(tagsByTypeProvider);
     _ref.read(tagSelectionProvider.notifier).clear();
   }
 
-  Future<void> renameTag(CategoryTag oldTag, String newName) async {
+  Future<void> renameTag(LibraryTag oldTag, String newName) async {
     final trimmed = newName.trim();
     if (trimmed.isEmpty || trimmed == oldTag.name) return;
-    final repo = _ref.read(comicRepoProvider);
-    await repo.renameTag(oldTag, trimmed);
+    await _ref.read(libraryTagRepoProvider).rename(oldTag.name, trimmed);
     _ref.invalidate(allTagsProvider);
-    _ref.invalidate(tagsByTypeProvider);
   }
 }
 

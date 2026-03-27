@@ -1,12 +1,16 @@
 import 'dart:io';
+
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
+import 'package:hentai_library/domain/entity/v2/library_comic.dart';
+import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ComicTile extends StatefulWidget {
-  final Comic comic;
+class ComicTile extends HookConsumerWidget {
+  final LibraryComic comic;
   final VoidCallback onTap;
   final Function(TapDownDetails) onRightClick;
 
@@ -18,30 +22,30 @@ class ComicTile extends StatefulWidget {
   });
 
   @override
-  State<ComicTile> createState() => _ComicTileState();
-}
-
-class _ComicTileState extends State<ComicTile> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final isHovered = useState(false);
+    final coverPath = ref
+        .watch(comicCoverPathProvider(comicId: comic.comicId))
+        .maybeWhen(data: (v) => v, orElse: () => null);
+    final pageCount = ref
+        .watch(comicImagesProvider(comicId: comic.comicId))
+        .maybeWhen(data: (files) => files.length, orElse: () => 0);
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onEnter: (_) => isHovered.value = true,
+      onExit: (_) => isHovered.value = false,
 
       child: GestureDetector(
-        onTap: widget.onTap,
-        onSecondaryTapDown: widget.onRightClick,
+        onTap: onTap,
+        onSecondaryTapDown: onRightClick,
 
         child: Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.fromLTRB(8, 8, 16, 8),
           decoration: BoxDecoration(
-            color: _isHovered
+            color: isHovered.value
                 ? theme.colorScheme.surfaceContainer
                 : Colors.white,
             borderRadius: BorderRadius.circular(8),
@@ -51,16 +55,18 @@ class _ComicTileState extends State<ComicTile> {
             children: [
               // 封面图片
               ClipRRect(
-                borderRadius: .circular(6),
+                borderRadius: BorderRadius.circular(6),
                 child: Container(
                   width: 56,
                   height: 80,
                   color: Colors.grey[200],
-                  child: ExtendedImage.file(
-                    File(widget.comic.coverUrl!),
-                    fit: BoxFit.cover,
-                    cacheWidth: 240,
-                  ),
+                  child: coverPath != null
+                      ? ExtendedImage.file(
+                          File(coverPath),
+                          fit: BoxFit.cover,
+                          cacheWidth: 240,
+                        )
+                      : Icon(Icons.broken_image, color: Colors.grey[400]),
                 ),
               ),
               const SizedBox(width: 16),
@@ -68,14 +74,14 @@ class _ComicTileState extends State<ComicTile> {
               // --- 文本信息 ---
               Expanded(
                 child: Column(
-                  crossAxisAlignment: .start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // 标题
                     Text(
-                      widget.comic.title,
+                      comic.title,
                       maxLines: 1,
-                      overflow: .ellipsis,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -96,7 +102,7 @@ class _ComicTileState extends State<ComicTile> {
                             border: Border.all(color: Colors.grey[200]!),
                           ),
                           child: Text(
-                            '漫画',
+                            comic.resourceType.name,
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w500,
@@ -106,7 +112,7 @@ class _ComicTileState extends State<ComicTile> {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          '${widget.comic.totalPageCount}p',
+                          '${pageCount}p',
                           style: TextStyle(
                             fontSize: 12,
                             color: theme.colorScheme.textTertiary,
@@ -119,7 +125,7 @@ class _ComicTileState extends State<ComicTile> {
               ),
             ],
           ),
-        ).animate(target: _isHovered ? 1 : 0),
+        ).animate(target: isHovered.value ? 1 : 0),
       ),
     );
   }

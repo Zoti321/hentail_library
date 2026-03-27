@@ -4,10 +4,14 @@ import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/data/models/app_settings.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:talker/talker.dart';
 
 // app 设置项读取储存服务
 class SettingsStorageService {
   static const String _fileName = 'settings.json';
+  final Talker _log;
+
+  SettingsStorageService({Talker? log}) : _log = log ?? LogManager.instance;
 
   Future<File> _getSettingsFile() async {
     final dir = await getApplicationSupportDirectory();
@@ -29,7 +33,7 @@ class SettingsStorageService {
 
       return settings;
     } catch (e, stack) {
-      LogManager.instance.handle(e, stack, '加载设置失败，恢复默认值');
+      _log.handle(e, stack, '加载设置失败，恢复默认值');
       return defaultSettings();
     }
   }
@@ -41,7 +45,7 @@ class SettingsStorageService {
 
       await file.writeAsString(jsonEncode(settings.toJson()), flush: true);
     } catch (e, stack) {
-      LogManager.instance.handle(e, stack, '保存设置失败');
+      _log.handle(e, stack, '保存设置失败');
       // 向上抛出，让调用方（如 SettingsNotifier.updateSettings）通过 AsyncValue.error 感知失败
       rethrow;
     }

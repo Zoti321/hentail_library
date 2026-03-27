@@ -1,23 +1,28 @@
 import 'package:hentai_library/data/models/app_settings.dart';
 import 'package:hentai_library/data/services/settings/settings.dart' as data_settings;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'settings.g.dart';
 
+/// 不使用 codegen provider，避免需要重新运行 build_runner 才可编译。
+final settingsStorageServiceDiProvider =
+    Provider<data_settings.SettingsStorageService>((ref) {
+      return data_settings.SettingsStorageService();
+    });
+
 @Riverpod(keepAlive: true)
 class SettingsNotifier extends _$SettingsNotifier {
-  final _storage = data_settings.SettingsStorageService();
-
   @override
   Future<AppSettings> build() async {
-    return await _storage.loadSettings();
+    return await ref.read(settingsStorageServiceDiProvider).loadSettings();
   }
 
   // 更新整个设置对象
   Future<void> updateSettings(AppSettings newSettings) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await _storage.saveSettings(newSettings);
+      await ref.read(settingsStorageServiceDiProvider).saveSettings(newSettings);
       return newSettings;
     });
   }
@@ -43,6 +48,6 @@ class SettingsNotifier extends _$SettingsNotifier {
 
   // 重置为默认设置
   Future<void> resetToDefaults() async {
-    updateSettings(_storage.defaultSettings());
+    updateSettings(ref.read(settingsStorageServiceDiProvider).defaultSettings());
   }
 }

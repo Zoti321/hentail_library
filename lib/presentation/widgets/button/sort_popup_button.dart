@@ -1,8 +1,7 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
-import 'package:hentai_library/domain/value_objects/comic_sort_option.dart';
+import 'package:hentai_library/domain/value_objects/v2/library_comic_sort_option.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -60,7 +59,7 @@ class _SortMenu extends HookConsumerWidget {
       width: 320,
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: .circular(12),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: theme.colorScheme.borderSubtle),
         boxShadow: [
           BoxShadow(
@@ -71,12 +70,12 @@ class _SortMenu extends HookConsumerWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: .circular(12),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: .all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
-            mainAxisSize: .min,
-            crossAxisAlignment: .start,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 24,
             children: [
               // header
@@ -99,14 +98,17 @@ class _SortMenu extends HookConsumerWidget {
                   Spacer(),
                   Material(
                     color: theme.colorScheme.inputBackgroundDisabled,
-                    borderRadius: .circular(6),
+                    borderRadius: BorderRadius.circular(6),
                     child: InkWell(
                       onTap: () {
                         ref.read(comicSortOptionProvider.notifier).reset();
                       },
-                      borderRadius: .circular(6),
+                      borderRadius: BorderRadius.circular(6),
                       child: Padding(
-                        padding: .symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         child: Text(
                           "重置",
                           style: TextStyle(
@@ -134,18 +136,18 @@ class _SortMenu extends HookConsumerWidget {
 class _SortSection extends HookConsumerWidget {
   const _SortSection({required this.option});
 
-  final ComicSortOption option;
+  final LibraryComicSortOption option;
 
   bool get isAsc => !option.descending;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Column(
-      crossAxisAlignment: .start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 12,
       children: [
         Row(
-          mainAxisAlignment: .spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               '主要规则',
@@ -167,15 +169,16 @@ class _SortSection extends HookConsumerWidget {
               ),
               child: InkWell(
                 onTap: () {
-                  ref
-                      .read(comicSortOptionProvider.notifier)
-                      .toggleDescenging(!option.descending);
+                  ref.read(comicSortOptionProvider.notifier).toggleDescenging(
+                        !option.descending,
+                      );
                 },
                 borderRadius: BorderRadius.circular(6),
                 child: Padding(
-                  padding: .symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Row(
-                    mainAxisSize: .min,
+                    mainAxisSize: MainAxisSize.min,
                     spacing: 4,
                     children: [
                       Icon(
@@ -207,23 +210,9 @@ class _SortSection extends HookConsumerWidget {
           children: [
             Flexible(
               child: _SortOption(
-                key: Key(ComicSortType.title.toString()),
-                type: ComicSortType.title,
+                key: Key(LibraryComicSortField.title.toString()),
+                field: LibraryComicSortField.title,
                 label: "标题",
-              ),
-            ),
-            Flexible(
-              child: _SortOption(
-                key: Key(ComicSortType.firstPublished.toString()),
-                type: ComicSortType.firstPublished,
-                label: "首发日期",
-              ),
-            ),
-            Flexible(
-              child: _SortOption(
-                key: Key(ComicSortType.totalViews.toString()),
-                type: ComicSortType.totalViews,
-                label: "总浏览量",
               ),
             ),
           ],
@@ -234,16 +223,16 @@ class _SortSection extends HookConsumerWidget {
 }
 
 class _SortOption extends HookConsumerWidget {
-  const _SortOption({super.key, required this.type, required this.label});
+  const _SortOption({super.key, required this.field, required this.label});
 
-  final ComicSortType type;
+  final LibraryComicSortField field;
   final String label;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final isSelected = ref.watch(comicSortOptionProvider).field == type;
+    final isSelected = ref.watch(comicSortOptionProvider).field == field;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -267,7 +256,7 @@ class _SortOption extends HookConsumerWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => {
-            ref.read(comicSortOptionProvider.notifier).updateSortType(type),
+            ref.read(comicSortOptionProvider.notifier).updateSortField(field),
           },
           borderRadius: BorderRadius.circular(10),
           child: Padding(

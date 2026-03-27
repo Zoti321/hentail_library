@@ -1,12 +1,15 @@
 import 'dart:ui';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/domain/entity/v2/content_rating.dart';
+import 'package:hentai_library/domain/entity/v2/library_comic.dart';
+import 'package:hentai_library/domain/entity/v2/library_tag.dart';
+import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/presentation/widgets/form/content_rating_field.dart';
-import 'package:hentai_library/presentation/widgets/form/date_picker_field.dart';
 import 'package:hentai_library/presentation/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/presentation/widgets/form/tag_edit_field.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -19,7 +22,7 @@ class EditMetadataDialog extends StatefulHookConsumerWidget {
     required this.onSave,
   });
 
-  final Comic comic;
+  final LibraryComic comic;
   final Future<void> Function(ComicMetadataForm) onSave;
 
   @override
@@ -32,32 +35,49 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   String activeTab = 'details';
   bool _saving = false;
 
-  bool get _isR18 => _formData.tags.any((e) => e.isR18) || _formData.isR18;
-
   @override
   void initState() {
     super.initState();
     _formData = ComicMetadataForm(
       title: widget.comic.title,
-      firstPublishedAt: widget.comic.firstPublishedAt,
-      isR18: widget.comic.isR18,
-      description: widget.comic.description,
-      tags: widget.comic.tags,
+      isR18: widget.comic.contentRating == ContentRating.r18,
+      tags: List<LibraryTag>.from(widget.comic.tags),
+      authors: List<String>.from(widget.comic.authors),
     );
   }
 
-  void _handleTagAdd(CategoryTag tag) {
-    if (tag.name.isEmpty) return;
-    if (!_formData.tags.contains(tag)) {
+  void _handleAuthorAdd(String name) {
+    if (name.isEmpty) return;
+    if (!_formData.authors.contains(name)) {
+      setState(() {
+        _formData = _formData.copyWith(authors: [..._formData.authors, name]);
+      });
+    }
+  }
+
+  void _handleAuthorRemove(String name) {
+    setState(() {
+      _formData = _formData.copyWith(
+        authors: [..._formData.authors]..remove(name),
+      );
+    });
+  }
+
+  void _handleTagAdd(String name) {
+    if (name.isEmpty) return;
+    final tag = LibraryTag(name: name);
+    if (!_formData.tags.any((t) => t.name == tag.name)) {
       setState(() {
         _formData = _formData.copyWith(tags: [..._formData.tags, tag]);
       });
     }
   }
 
-  void _handleTagRemove(CategoryTag tag) {
+  void _handleTagRemove(LibraryTag tag) {
     setState(() {
-      _formData = _formData.copyWith(tags: [..._formData.tags]..remove(tag));
+      _formData = _formData.copyWith(
+        tags: [..._formData.tags]..remove(tag),
+      );
     });
   }
 
@@ -118,7 +138,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
               ],
             ),
             child: Column(
-              crossAxisAlignment: .stretch,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _DialogHeader(borderSubtle: theme.colorScheme.borderSubtle),
 
@@ -135,7 +155,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
                         primaryColor: theme.colorScheme.primary,
                       ),
                       _TabButton(
-                        label: "分类标签",
+                        label: "作者与标签",
                         isActive: activeTab == 'tags',
                         onTap: () => setState(() => activeTab = 'tags'),
                         primaryColor: theme.colorScheme.primary,
@@ -152,7 +172,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
                       vertical: 20,
                     ),
                     child: activeTab == 'details'
-                        ? _buildDetailsTab(theme.colorScheme.primary)
+                        ? _buildDetailsTab()
                         : _buildTagsTab(),
                   ),
                 ),
@@ -171,9 +191,9 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     );
   }
 
-  Widget _buildDetailsTab(Color primaryColor) {
+  Widget _buildDetailsTab() {
     return Column(
-      crossAxisAlignment: .start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 20,
 
       children: [
@@ -184,22 +204,12 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           hintText: '修改漫画标题',
         ),
         Row(
-          crossAxisAlignment: .start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 20,
           children: [
             Expanded(
-              child: FluentDatePicker(
-                labelText: "第一次发布日期",
-                hintText: "选择日期",
-                initialDate: _formData.firstPublishedAt,
-                onChanged: (date) =>
-                    _formData = _formData.copyWith(firstPublishedAt: date),
-              ),
-            ),
-            // 内容分级字段
-            Expanded(
               child: ContentRatingField(
-                isR18: _isR18,
+                isR18: _formData.isR18,
                 onChanged: (value) {
                   _formData = _formData.copyWith(isR18: value);
                   setState(() {});
@@ -208,63 +218,32 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
             ),
           ],
         ),
-        FluentTextField(
-          labelText: "简介",
-          initialValue: _formData.description,
-          maxLines: 6,
-          onChanged: (v) => _formData = _formData.copyWith(description: v),
-          hintText: '输入简介',
-        ),
       ],
     );
   }
 
   Widget _buildTagsTab() {
     return Column(
-      crossAxisAlignment: .start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TagEditorField(
           label: "作者",
           icon: LucideIcons.penTool,
-          tags: _formData.tags
-              .where((e) => e.type == CategoryTagType.author)
-              .toList(),
-          onAdd: (t) => _handleTagAdd(t),
-          onRemove: (t) => _handleTagRemove(t),
-          tagType: CategoryTagType.author,
+          items: _formData.authors,
+          onAdd: _handleAuthorAdd,
+          onRemove: _handleAuthorRemove,
         ),
         const SizedBox(height: 20),
         TagEditorField(
-          label: "登场人物",
-          icon: LucideIcons.users,
-          tags: _formData.tags
-              .where((e) => e.type == CategoryTagType.character)
-              .toList(),
-          onAdd: (t) => _handleTagAdd(t),
-          onRemove: (t) => _handleTagRemove(t),
-          tagType: CategoryTagType.character,
-        ),
-        const SizedBox(height: 20),
-        TagEditorField(
-          label: "系列",
-          icon: LucideIcons.library,
-          tags: _formData.tags
-              .where((e) => e.type == CategoryTagType.series)
-              .toList(),
-          onAdd: (t) => _handleTagAdd(t),
-          onRemove: (t) => _handleTagRemove(t),
-          tagType: CategoryTagType.series,
-        ),
-        const SizedBox(height: 20),
-        TagEditorField(
-          label: "通用标签",
+          label: "标签",
           icon: LucideIcons.tag,
-          tags: _formData.tags
-              .where((e) => e.type == CategoryTagType.tag)
-              .toList(),
-          onAdd: (t) => _handleTagAdd(t),
-          onRemove: (t) => _handleTagRemove(t),
-          tagType: CategoryTagType.tag,
+          items: _formData.tags.map((t) => t.name).toList(),
+          onAdd: _handleTagAdd,
+          onRemove: (name) {
+            final tag =
+                _formData.tags.firstWhereOrNull((t) => t.name == name);
+            if (tag != null) _handleTagRemove(tag);
+          },
         ),
       ],
     );
@@ -329,7 +308,7 @@ class _DialogHeader extends StatelessWidget {
         border: Border(bottom: BorderSide(color: borderSubtle, width: 1)),
       ),
       child: Row(
-        mainAxisAlignment: .spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             "编辑元数据",
@@ -383,7 +362,7 @@ class _DialogFooter extends StatelessWidget {
         border: Border(top: BorderSide(color: borderSubtle, width: 1)),
       ),
       child: Row(
-        mainAxisAlignment: .end,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

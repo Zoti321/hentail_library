@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/domain/repository/dir_repo.dart';
+import 'package:hentai_library/presentation/providers/directory/directory_query_providers.dart';
 import 'package:hentai_library/presentation/providers/directory/directory_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -17,7 +18,7 @@ abstract class DirectoryViewState with _$DirectoryViewState {
 
 @riverpod
 class DirectoryViewNotifier extends _$DirectoryViewNotifier {
-  DirectoryRepository get _dirRepo => ref.read(dirRepoProvider);
+  PathRepository get _pathRepo => ref.read(pathRepoProvider);
 
   @override
   Future<DirectoryViewState> build() async {
@@ -25,7 +26,7 @@ class DirectoryViewNotifier extends _$DirectoryViewNotifier {
     _listenDirsStream();
 
     // 首屏先读取一次，避免首次渲染为空
-    final initialDirs = await _dirRepo.getAllDirs();
+    final initialDirs = await _pathRepo.getAllPaths();
     return DirectoryViewState(dirs: initialDirs);
   }
 
@@ -33,7 +34,7 @@ class DirectoryViewNotifier extends _$DirectoryViewNotifier {
     final previous = _currentOrDefault();
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final dirs = await _dirRepo.getAllDirs();
+      final dirs = await _pathRepo.getAllPaths();
       return _syncDirsAndSelection(previous, dirs);
     });
   }
@@ -85,7 +86,7 @@ class DirectoryViewNotifier extends _$DirectoryViewNotifier {
   }
 
   void _listenDirsStream() {
-    ref.listen(dirsStreamProvider, (_, next) {
+    ref.listen(pathsStreamProvider, (_, next) {
       next.when(
         // 目录流作为目录列表的单一来源
         data: _applyDirsFromStream,

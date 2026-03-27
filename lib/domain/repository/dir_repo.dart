@@ -1,10 +1,9 @@
-abstract class DirectoryRepository {
-  Future<List<String>> getAllDirs();
+abstract class PathRepository {
+  Future<List<String>> getAllPaths();
 
-  Stream<List<String>> getDirsStream();
+  Stream<List<String>> getPathsStream();
 
-  Future<void> addDir(String path);
+  Future<void> addPath(String path);
 
-  Future<void> removeDir(String path);
+  Future<void> removePath(String path);
 }
-

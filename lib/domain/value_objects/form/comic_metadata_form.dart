@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
+import 'package:hentai_library/domain/entity/v2/library_tag.dart';
 
 part 'comic_metadata_form.freezed.dart';
 
@@ -7,9 +7,8 @@ part 'comic_metadata_form.freezed.dart';
 abstract class ComicMetadataForm with _$ComicMetadataForm {
   factory ComicMetadataForm({
     required String title,
-    DateTime? firstPublishedAt,
     @Default(false) bool isR18,
-    String? description,
-    @Default([]) List<CategoryTag> tags,
+    @Default([]) List<LibraryTag> tags,
+    @Default([]) List<String> authors,
   }) = _ComicMetadataForm;
 }

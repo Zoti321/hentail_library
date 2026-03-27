@@ -22,6 +22,14 @@ flutter run
 
 修改了 `*.freezed.dart` / `*.g.dart` 对应的源码（如 entity、provider、database）后，需重新执行上述 `build_runner` 命令以生成最新代码。
 
+## v2 数据库（开发期说明）
+
+项目正在引入 **v2 独立数据库**（与 v1 并行，不做迁移），用于验证新的表结构/DAO/仓储实现。
+
+- **v2 DB 文件名**：`hentai_library_v2.sqlite`
+- **Flutter 运行时位置**：`applicationSupportDirectory`（由 `path_provider` 决定的应用支持目录）
+- **开发期清空数据**：关闭应用后，**手动删除**该文件即可重置 v2 数据（不会影响 v1 数据库）。
+
 ## 支持平台
 
 | 平台    | 支持 |

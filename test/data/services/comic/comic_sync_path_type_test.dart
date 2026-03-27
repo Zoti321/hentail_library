@@ -1,68 +1,68 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/data/services/comic/comic_sync_service.dart';
+import 'package:hentai_library/core/util/comic_file_types.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
 
 void main() {
-  group('ComicSyncService.typeFromPath', () {
+  group('scannedItemTypeFromPath', () {
     test('returns epub for .epub path', () {
       expect(
-        ComicSyncService.typeFromPath('/a/b.epub'),
+        scannedItemTypeFromPath('/a/b.epub'),
         ScannedItemType.epub,
       );
     });
 
     test('returns archive for .cbz path', () {
       expect(
-        ComicSyncService.typeFromPath('/a/b.cbz'),
+        scannedItemTypeFromPath('/a/b.cbz'),
         ScannedItemType.archive,
       );
     });
 
     test('returns archive for .zip path', () {
       expect(
-        ComicSyncService.typeFromPath('/a/b.zip'),
+        scannedItemTypeFromPath('/a/b.zip'),
         ScannedItemType.archive,
       );
     });
 
     test('returns archive for .cbr path', () {
       expect(
-        ComicSyncService.typeFromPath('/a/b.cbr'),
+        scannedItemTypeFromPath('/a/b.cbr'),
         ScannedItemType.archive,
       );
     });
 
     test('returns archive for .rar path', () {
       expect(
-        ComicSyncService.typeFromPath('/a/b.rar'),
+        scannedItemTypeFromPath('/a/b.rar'),
         ScannedItemType.archive,
       );
     });
 
     test('returns folder for path without extension', () {
       expect(
-        ComicSyncService.typeFromPath('/a/b'),
+        scannedItemTypeFromPath('/a/b'),
         ScannedItemType.folder,
       );
     });
 
     test('returns folder for .txt path', () {
       expect(
-        ComicSyncService.typeFromPath('/a/b.txt'),
+        scannedItemTypeFromPath('/a/b.txt'),
         ScannedItemType.folder,
       );
     });
 
     test('returns archive for uppercase .CBZ extension', () {
       expect(
-        ComicSyncService.typeFromPath('/a/b.CBZ'),
+        scannedItemTypeFromPath('/a/b.CBZ'),
         ScannedItemType.archive,
       );
     });
 
     test('returns archive for mixed case .Zip extension', () {
       expect(
-        ComicSyncService.typeFromPath('/a/b.Zip'),
+        scannedItemTypeFromPath('/a/b.Zip'),
         ScannedItemType.archive,
       );
     });

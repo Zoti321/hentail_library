@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/l10n/app_strings.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
+import 'package:hentai_library/domain/entity/v2/library_comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/button/filter_popup_button.dart';
@@ -21,7 +21,7 @@ class LibraryPage extends ConsumerStatefulWidget {
 class _LibraryPageState extends ConsumerState<LibraryPage> {
   bool _isGridView = true;
 
-  AsyncValue<List<Comic>> comics = const AsyncValue.loading();
+  AsyncValue<List<LibraryComic>> comics = const AsyncValue.loading();
 
   @override
   Widget build(BuildContext context) {
@@ -213,11 +213,14 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             final manga = comics[index];
             return Center(
               child: ComicCard(
-                key: Key(manga.id),
+                key: Key(manga.comicId),
                 comic: manga,
                 size: Size(double.infinity, double.infinity),
                 onTap: () {
-                  appRouter.pushNamed('漫画详情', pathParameters: {'id': manga.id});
+                  appRouter.pushNamed(
+                    '漫画详情',
+                    pathParameters: {'id': manga.comicId},
+                  );
                 },
                 onPlay: () {},
                 onRightClick: (val) {},
@@ -250,10 +253,13 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           itemBuilder: (context, index) {
             final manga = comics[index];
             return ComicTile(
-              key: Key(manga.id),
+              key: Key(manga.comicId),
               comic: manga,
               onTap: () {
-                appRouter.pushNamed('漫画详情', pathParameters: {'id': manga.id});
+                appRouter.pushNamed(
+                  '漫画详情',
+                  pathParameters: {'id': manga.comicId},
+                );
               },
               onRightClick: (val) {},
             );

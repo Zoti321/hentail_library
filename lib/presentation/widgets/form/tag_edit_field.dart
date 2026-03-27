@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/presentation/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/presentation/widgets/card_item/category_tag_chip.dart';
 
+/// 字符串标签编辑（作者名、通用标签等）。
 class TagEditorField extends StatefulWidget {
   final String label;
   final IconData icon;
-  final List<CategoryTag> tags;
-  final Function(CategoryTag) onAdd;
-  final Function(CategoryTag) onRemove;
-  final CategoryTagType tagType;
+  final List<String> items;
+  final void Function(String) onAdd;
+  final void Function(String) onRemove;
 
   const TagEditorField({
     super.key,
     required this.label,
     required this.icon,
-    required this.tags,
+    required this.items,
     required this.onAdd,
     required this.onRemove,
-    required this.tagType,
   });
 
   @override
@@ -34,9 +31,7 @@ class TagEditorFieldState extends State<TagEditorField> {
 
   void _submit() {
     if (_controller.text.trim().isNotEmpty) {
-      widget.onAdd(
-        CategoryTag(name: _controller.text.trim(), type: widget.tagType),
-      );
+      widget.onAdd(_controller.text.trim());
       _controller.clear();
       _focusNode.requestFocus();
     }
@@ -68,12 +63,12 @@ class TagEditorFieldState extends State<TagEditorField> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: .start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       spacing: 8,
       children: [
         Row(
-          crossAxisAlignment: .center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
               widget.icon,
@@ -127,7 +122,7 @@ class TagEditorFieldState extends State<TagEditorField> {
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
-                hintText: widget.tags.isEmpty ? "添加标签..." : null,
+                hintText: widget.items.isEmpty ? "添加标签..." : null,
                 hintStyle: TextStyle(
                   fontSize: 13,
                   color: Theme.of(context).colorScheme.textPlaceholder,
@@ -143,17 +138,17 @@ class TagEditorFieldState extends State<TagEditorField> {
             ),
           ),
         ),
-        if (widget.tags.isNotEmpty)
+        if (widget.items.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(left: 4),
             child: Wrap(
               spacing: 6,
               runSpacing: 6,
-              children: widget.tags
+              children: widget.items
                   .map(
-                    (tag) => CategoryTagChip(
-                      tag: tag,
-                      onRemove: () => widget.onRemove(tag),
+                    (name) => CategoryTagChip(
+                      label: name,
+                      onRemove: () => widget.onRemove(name),
                     ),
                   )
                   .toList(),

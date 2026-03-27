@@ -1,10 +1,7 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/domain/entity/comic/category_tag.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/domain/value_objects/v2/library_tag_pick.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -142,8 +139,6 @@ class _FilterMenu extends HookConsumerWidget {
             ],
           ),
           _BuildTagFilterSection(menuController: menuController),
-          _BuildChapterCountSection(),
-          _BuildFileFormateSection(),
 
           Divider(thickness: 1, color: colorScheme.borderSubtle),
           // footer 底部操作栏
@@ -194,9 +189,9 @@ class _BuildTagFilterSection extends ConsumerWidget {
   void _openTagFilterSheet(BuildContext context, WidgetRef ref) {
     menuController.hideMenu();
     final filter = ref.read(comicFilterProvider);
-    final initialAnd = filter.tags?.toSet() ?? <CategoryTag>{};
-    final initialAny = filter.tagsAny?.toSet() ?? <CategoryTag>{};
-    final initialExclude = filter.tagsExclude?.toSet() ?? <CategoryTag>{};
+    final initialAnd = filter.tagsAll?.toSet() ?? <LibraryTagPick>{};
+    final initialAny = filter.tagsAny?.toSet() ?? <LibraryTagPick>{};
+    final initialExclude = filter.tagsExclude?.toSet() ?? <LibraryTagPick>{};
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -229,9 +224,9 @@ class _BuildTagFilterSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final filter = ref.watch(comicFilterProvider);
-    final tags = filter.tags ?? <CategoryTag>{};
-    final tagsAny = filter.tagsAny ?? <CategoryTag>{};
-    final tagsExclude = filter.tagsExclude ?? <CategoryTag>{};
+    final tags = filter.tagsAll ?? <LibraryTagPick>{};
+    final tagsAny = filter.tagsAny ?? <LibraryTagPick>{};
+    final tagsExclude = filter.tagsExclude ?? <LibraryTagPick>{};
     final count = tags.length + tagsAny.length + tagsExclude.length;
 
     return Material(
@@ -279,22 +274,15 @@ class _TagFilterSheetContent extends ConsumerStatefulWidget {
     required this.onConfirm,
   });
 
-  final Set<CategoryTag> initialAnd;
-  final Set<CategoryTag> initialAny;
-  final Set<CategoryTag> initialExclude;
+  final Set<LibraryTagPick> initialAnd;
+  final Set<LibraryTagPick> initialAny;
+  final Set<LibraryTagPick> initialExclude;
   final ScrollController scrollController;
   final void Function(
-    Set<CategoryTag> tags,
-    Set<CategoryTag> tagsAny,
-    Set<CategoryTag> tagsExclude,
+    Set<LibraryTagPick> tags,
+    Set<LibraryTagPick> tagsAny,
+    Set<LibraryTagPick> tagsExclude,
   ) onConfirm;
-
-  static const List<CategoryTagType> _typeOrder = [
-    CategoryTagType.author,
-    CategoryTagType.series,
-    CategoryTagType.character,
-    CategoryTagType.tag,
-  ];
 
   @override
   ConsumerState<_TagFilterSheetContent> createState() =>
@@ -302,20 +290,20 @@ class _TagFilterSheetContent extends ConsumerStatefulWidget {
 }
 
 class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> {
-  late Set<CategoryTag> _selectedAnd;
-  late Set<CategoryTag> _selectedAny;
-  late Set<CategoryTag> _selectedExclude;
+  late Set<LibraryTagPick> _selectedAnd;
+  late Set<LibraryTagPick> _selectedAny;
+  late Set<LibraryTagPick> _selectedExclude;
   String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _selectedAnd = Set<CategoryTag>.from(widget.initialAnd);
-    _selectedAny = Set<CategoryTag>.from(widget.initialAny);
-    _selectedExclude = Set<CategoryTag>.from(widget.initialExclude);
+    _selectedAnd = Set<LibraryTagPick>.from(widget.initialAnd);
+    _selectedAny = Set<LibraryTagPick>.from(widget.initialAny);
+    _selectedExclude = Set<LibraryTagPick>.from(widget.initialExclude);
   }
 
-  List<CategoryTag> _filterByQuery(List<CategoryTag> tags) {
+  List<LibraryTagPick> _filterByQuery(List<LibraryTagPick> tags) {
     if (_searchQuery.trim().isEmpty) return tags;
     final q = _searchQuery.trim().toLowerCase();
     return tags.where((t) => t.name.toLowerCase().contains(q)).toList();
@@ -337,7 +325,7 @@ class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final tagsAsync = ref.watch(libraryTagsByTypeProvider);
+    final tagsAsync = ref.watch(libraryTagsProvider);
 
     return Container(
       decoration: BoxDecoration(
@@ -400,9 +388,9 @@ class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> 
           // 三块区域：同时具有 / 包含其一 / 排除
           Expanded(
             child: tagsAsync.when(
-              data: (tagsByType) {
-                final hasAny = tagsByType.values.any((list) => list.isNotEmpty);
-                if (!hasAny) {
+              data: (allTags) {
+                final visibleTags = _filterByQuery(allTags);
+                if (visibleTags.isEmpty) {
                   return Center(
                     child: Text(
                       "书库暂无标签",
@@ -427,7 +415,7 @@ class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> 
                           }
                         });
                       },
-                      tagsByType,
+                      visibleTags,
                       colorScheme,
                     ),
                     _buildSection(
@@ -443,7 +431,7 @@ class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> 
                           }
                         });
                       },
-                      tagsByType,
+                      visibleTags,
                       colorScheme,
                     ),
                     _buildSection(
@@ -459,7 +447,7 @@ class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> 
                           }
                         });
                       },
-                      tagsByType,
+                      visibleTags,
                       colorScheme,
                     ),
                   ],
@@ -520,9 +508,9 @@ class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> 
   Widget _buildSection(
     String title,
     String subtitle,
-    Set<CategoryTag> selected,
-    ValueChanged<CategoryTag> onToggle,
-    Map<CategoryTagType, List<CategoryTag>> tagsByType,
+    Set<LibraryTagPick> selected,
+    ValueChanged<LibraryTagPick> onToggle,
+    List<LibraryTagPick> tags,
     ColorScheme colorScheme,
   ) {
     return Padding(
@@ -548,292 +536,28 @@ class _TagFilterSheetContentState extends ConsumerState<_TagFilterSheetContent> 
             ),
           ),
           const SizedBox(height: 8),
-          ..._TagFilterSheetContent._typeOrder.map((type) {
-            final list = _filterByQuery(tagsByType[type] ?? []);
-            if (list.isEmpty) return const SizedBox.shrink();
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: _TagTypeBlock(
-                type: type,
-                tags: list,
-                selectedTags: selected,
-                onToggle: onToggle,
-              ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
-}
-
-/// 按类型分组的标签块（Chip 列表），供弹窗与底部面板复用。
-class _TagTypeBlock extends StatelessWidget {
-  const _TagTypeBlock({
-    required this.type,
-    required this.tags,
-    required this.selectedTags,
-    required this.onToggle,
-  });
-
-  final CategoryTagType type;
-  final List<CategoryTag> tags;
-  final Set<CategoryTag> selectedTags;
-  final ValueChanged<CategoryTag> onToggle;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      spacing: 8,
-      children: [
-        Text(
-          type.displayName,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: tags.map((tag) {
-            final selected = selectedTags.contains(tag);
-            return FilterChip(
-              label: Text(
-                tag.name,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: selected
-                      ? colorScheme.onPrimary
-                      : colorScheme.onSurface,
-                ),
-              ),
-              selected: selected,
-              onSelected: (_) => onToggle(tag),
-              selectedColor: colorScheme.primaryContainer,
-              checkmarkColor: colorScheme.primary,
-              side: BorderSide(
-                color: selected
-                    ? colorScheme.primary
-                    : colorScheme.outline.withOpacity(0.5),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-}
-
-class _BuildChapterCountSection extends ConsumerWidget {
-  const _BuildChapterCountSection();
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
-      spacing: 6,
-      crossAxisAlignment: .stretch,
-      mainAxisSize: .min,
-      children: [
-        Text(
-          "# 章节数量",
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: .w500,
-            color: Colors.grey.shade500,
-            letterSpacing: 0.5,
-          ),
-        ),
-        _FilterNumberInput(),
-      ],
-    );
-  }
-}
-
-class _BuildFileFormateSection extends ConsumerWidget {
-  const _BuildFileFormateSection();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
-      spacing: 6,
-      crossAxisAlignment: .stretch,
-      mainAxisSize: .min,
-      children: [
-        Text(
-          "文件格式",
-          style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-        ),
-        ListView(
-          shrinkWrap: true,
-          children: <Widget>[
-            ImageSourceFormatOption(
-              label: "CBZ/CBR",
-              isActive: true,
-              onTap: () {},
-            ),
-            ImageSourceFormatOption(
-              label: "ZIP",
-              isActive: false,
-              onTap: () {},
-            ),
-            ImageSourceFormatOption(
-              label: "EPUB",
-              isActive: true,
-              onTap: () {},
-            ),
-            ImageSourceFormatOption(label: "文件夹", isActive: true, onTap: () {}),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class ImageSourceFormatOption extends HookWidget {
-  const ImageSourceFormatOption({
-    super.key,
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool isActive;
-  final VoidFunction onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    final isHover = useState<bool>(false);
-
-    return MouseRegion(
-      onEnter: (_) => isHover.value = true,
-      onExit: (_) => isHover.value = false,
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const .symmetric(horizontal: 6, vertical: 8),
-          decoration: BoxDecoration(
-            borderRadius: .circular(8),
-            color: isHover.value ? Colors.grey.shade100 : Colors.transparent,
-          ),
-          child: Row(
+          Wrap(
             spacing: 8,
-            children: [
-              Icon(
-                isActive ? LucideIcons.squareCheckBig : LucideIcons.square,
-                color: isActive
-                    ? theme.colorScheme.primary
-                    : Colors.grey.shade400,
-                size: 14,
-              ),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: .normal,
-                    color: isActive
-                        ? theme.colorScheme.primary
-                        : Colors.grey.shade700,
-                  ),
+            runSpacing: 8,
+            children: tags.map((tag) {
+              final isSelected = selected.contains(tag);
+              return FilterChip(
+                label: Text(tag.name),
+                selected: isSelected,
+                onSelected: (_) => onToggle(tag),
+                selectedColor: colorScheme.primaryContainer,
+                checkmarkColor: colorScheme.primary,
+                side: BorderSide(
+                  color: isSelected
+                      ? colorScheme.primary
+                      : colorScheme.outline.withOpacity(0.5),
                 ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FilterNumberInput extends HookWidget {
-  const _FilterNumberInput();
-
-  @override
-  Widget build(BuildContext context) {
-    final useNumber = useState<int>(1);
-
-    return Container(
-      padding: const .all(8),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
-      ),
-      child: Row(
-        mainAxisAlignment: .spaceBetween,
-        children: [
-          Padding(
-            padding: .only(left: 4),
-            child: Text(
-              "最少章节",
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w400,
-                color: Colors.black87,
-              ),
-            ),
-          ),
-          Row(
-            mainAxisSize: .min,
-            spacing: 16,
-            children: [
-              _buildNumberOprationBtn(context, LucideIcons.minus, () {
-                if (useNumber.value > 1) {
-                  useNumber.value--;
-                }
-              }),
-              SizedBox(
-                width: 24,
-                child: Text(
-                  useNumber.value.toString(),
-                  textAlign: .center,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              _buildNumberOprationBtn(context, LucideIcons.plus, () {
-                useNumber.value++;
-              }),
-            ],
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              );
+            }).toList(),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildNumberOprationBtn(
-    BuildContext context,
-    IconData icon,
-    VoidCallback onTap,
-  ) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: 28,
-          height: 28,
-          padding: .all(6),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: .circular(6),
-            border: Border.all(width: 1, color: Colors.grey.shade200),
-          ),
-          child: Icon(icon, size: 12, color: Colors.grey.shade600),
-        ),
       ),
     );
   }

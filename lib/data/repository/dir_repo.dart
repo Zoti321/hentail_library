@@ -4,50 +4,42 @@ import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart';
 import 'package:hentai_library/domain/repository/dir_repo.dart';
 
-class DirectoryRepositoryImpl implements DirectoryRepository {
-  final SelectedDirectoryDao _selectedDirectoryDao;
+class PathRepositoryImpl implements PathRepository {
+  final SavedPathDao _savedPathDao;
 
-  DirectoryRepositoryImpl(this._selectedDirectoryDao);
+  PathRepositoryImpl(this._savedPathDao);
 
   @override
-  Future<List<String>> getAllDirs() async {
-    final queryset = await _selectedDirectoryDao.getAllSelectedDirectories();
+  Future<List<String>> getAllPaths() async {
+    final queryset = await _savedPathDao.getAllSavedPaths();
     return queryset.map((e) => e.rawPath).toList();
   }
 
   @override
-  Stream<List<String>> getDirsStream() {
-    return _selectedDirectoryDao.watchAllSelectedDirectories().map(
+  Stream<List<String>> getPathsStream() {
+    return _savedPathDao.watchAllSavedPaths().map(
       (e) => e.map((e) => e.rawPath).toList(),
     );
   }
 
   @override
-  Future<void> addDir(String path) async {
+  Future<void> addPath(String path) async {
     try {
-      final dir = SelectedDirectoriesCompanion.insert(rawPath: path);
-      await _selectedDirectoryDao.insertSelectedDirectory(dir);
+      final row = SavedPathsCompanion.insert(rawPath: path);
+      await _savedPathDao.insertSavedPath(row);
     } catch (e, st) {
-      LogManager.instance.handle(
-        e,
-        st,
-        '[DIR_REPO] 添加目录失败，path=$path',
-      );
-      throw AppException('添加目录失败', cause: e, stackTrace: st);
+      LogManager.instance.handle(e, st, '[PATH_REPO] 添加路径失败，path=$path');
+      throw AppException('添加路径失败', cause: e, stackTrace: st);
     }
   }
 
   @override
-  Future<void> removeDir(String path) async {
+  Future<void> removePath(String path) async {
     try {
-      await _selectedDirectoryDao.deleteSelectedDirectory(path);
+      await _savedPathDao.deleteSavedPath(path);
     } catch (e, st) {
-      LogManager.instance.handle(
-        e,
-        st,
-        '[DIR_REPO] 移除目录失败，path=$path',
-      );
-      throw AppException('移除目录失败', cause: e, stackTrace: st);
+      LogManager.instance.handle(e, st, '[PATH_REPO] 移除路径失败，path=$path');
+      throw AppException('移除路径失败', cause: e, stackTrace: st);
     }
   }
 }

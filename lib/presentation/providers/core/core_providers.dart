@@ -14,15 +14,7 @@ AppDatabase database(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-ComicDao comicDao(Ref ref) => ComicDao(ref.read(databaseProvider));
-
-@Riverpod(keepAlive: true)
-CategoryTagDao categoryTagDao(Ref ref) =>
-    CategoryTagDao(ref.read(databaseProvider));
-
-@Riverpod(keepAlive: true)
-SelectedDirectoryDao dirDao(Ref ref) =>
-    SelectedDirectoryDao(ref.read(databaseProvider));
+SavedPathDao savedPathDao(Ref ref) => SavedPathDao(ref.read(databaseProvider));
 
 @Riverpod(keepAlive: true)
 ReadingSessionDao readingSessionDao(Ref ref) =>
