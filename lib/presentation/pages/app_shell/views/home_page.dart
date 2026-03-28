@@ -218,9 +218,9 @@ class HomePage extends ConsumerWidget {
           colorScheme: cs,
         ),
         _ShortcutEntry(
-          icon: LucideIcons.folder,
-          label: '文件夹',
-          onTap: () => context.go('/folders'),
+          icon: LucideIcons.folderTree,
+          label: '选中路径',
+          onTap: () => context.go('/paths'),
           colorScheme: cs,
         ),
         _ShortcutEntry(
@@ -473,15 +473,15 @@ class _EmptyRecentComics extends StatelessWidget {
             Icon(LucideIcons.library, size: 40, color: cs.textTertiary),
             const SizedBox(height: 12),
             Text(
-              '暂无漫画，请先添加目录并扫描',
+              '暂无漫画，请先添加路径并扫描',
               style: TextStyle(fontSize: 14, color: cs.textTertiary),
             ),
             const SizedBox(height: 16),
             TextButton.icon(
-              onPressed: () => context.go('/folders'),
+              onPressed: () => context.go('/paths'),
               icon: Icon(LucideIcons.folderPlus, size: 16, color: cs.primary),
               label: Text(
-                '添加目录',
+                '添加路径',
                 style: TextStyle(fontSize: 14, color: cs.primary),
               ),
               style: TextButton.styleFrom(

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:hentai_library/domain/entity/comic/library_comic.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
@@ -11,30 +12,33 @@ import 'package:hentai_library/domain/value_objects/library_tag_pick.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+part 'library_page_notifier.freezed.dart';
 part 'library_page_notifier.g.dart';
 
-class LibraryPageState {
-  LibraryPageState({
-    this.rawList = const [],
-    this.hasReceivedFirstEmit = false,
-    this.streamError,
+@freezed
+abstract class LibraryPageState with _$LibraryPageState {
+  const factory LibraryPageState({
+    @Default(<LibraryComic>[]) List<LibraryComic> rawList,
+    @Default(false) bool hasReceivedFirstEmit,
+    Object? streamError,
     LibraryComicFilter? filter,
     LibraryComicSortOption? sortOption,
-    this.mergeSearchQuery = '',
-    this.isGridView = true,
-  })  : filter = filter ?? LibraryComicFilter(showR18: false),
-        sortOption = sortOption ?? LibraryComicSortOption();
+    @Default('') String mergeSearchQuery,
+    @Default(true) bool isGridView,
+  }) = _LibraryPageState;
 
-  final List<LibraryComic> rawList;
-  final bool hasReceivedFirstEmit;
-  final Object? streamError;
-  final LibraryComicFilter filter;
-  final LibraryComicSortOption sortOption;
-  final String mergeSearchQuery;
-  final bool isGridView;
+  const LibraryPageState._();
 
+  LibraryComicFilter get effectiveFilter =>
+      filter ?? LibraryComicFilter(showR18: false);
+
+  LibraryComicSortOption get effectiveSortOption =>
+      sortOption ?? LibraryComicSortOption();
+}
+
+extension LibraryPageStateDerived on LibraryPageState {
   List<LibraryComic> get displayedComics =>
-      rawList.applyFilter(filter).sortedWith(sortOption);
+      rawList.applyFilter(effectiveFilter).sortedWith(effectiveSortOption);
 
   AsyncValue<List<LibraryComic>> get comicsAsyncValue {
     if (streamError != null) {
@@ -46,7 +50,6 @@ class LibraryPageState {
     return AsyncValue.data(displayedComics);
   }
 
-  /// 未筛选的原始列表（首页「最近添加」等）
   AsyncValue<List<LibraryComic>> get rawComicsAsyncValue {
     if (streamError != null) {
       return AsyncValue.error(streamError!, StackTrace.current);
@@ -71,30 +74,6 @@ class LibraryPageState {
     tags.sort((a, b) => a.name.compareTo(b.name));
     return tags;
   }
-
-  LibraryPageState copyWith({
-    List<LibraryComic>? rawList,
-    bool? hasReceivedFirstEmit,
-    Object? streamError = _sentinel,
-    LibraryComicFilter? filter,
-    LibraryComicSortOption? sortOption,
-    String? mergeSearchQuery,
-    bool? isGridView,
-  }) {
-    return LibraryPageState(
-      rawList: rawList ?? this.rawList,
-      hasReceivedFirstEmit: hasReceivedFirstEmit ?? this.hasReceivedFirstEmit,
-      streamError: identical(streamError, _sentinel)
-          ? this.streamError
-          : streamError,
-      filter: filter ?? this.filter,
-      sortOption: sortOption ?? this.sortOption,
-      mergeSearchQuery: mergeSearchQuery ?? this.mergeSearchQuery,
-      isGridView: isGridView ?? this.isGridView,
-    );
-  }
-
-  static const Object _sentinel = Object();
 }
 
 @Riverpod(keepAlive: true)
@@ -123,7 +102,7 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
       _filterQueryDebounce?.cancel();
       _mergeSearchDebounce?.cancel();
     });
-    return LibraryPageState();
+    return const LibraryPageState();
   }
 
   void refreshStream() {
@@ -146,24 +125,34 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
   void updateFilterQuery(String? query) {
     _filterQueryDebounce?.cancel();
     _filterQueryDebounce = Timer(const Duration(milliseconds: 300), () {
-      state = state.copyWith(filter: state.filter.copyWith(query: query));
+      state = state.copyWith(
+        filter: state.effectiveFilter.copyWith(query: query),
+      );
     });
   }
 
   void toggleR18(bool show) {
-    state = state.copyWith(filter: state.filter.copyWith(showR18: show));
+    state = state.copyWith(
+      filter: state.effectiveFilter.copyWith(showR18: show),
+    );
   }
 
   void updateTags(Set<LibraryTagPick> tags) {
-    state = state.copyWith(filter: state.filter.copyWith(tagsAll: tags));
+    state = state.copyWith(
+      filter: state.effectiveFilter.copyWith(tagsAll: tags),
+    );
   }
 
   void updateTagsAny(Set<LibraryTagPick> tagsAny) {
-    state = state.copyWith(filter: state.filter.copyWith(tagsAny: tagsAny));
+    state = state.copyWith(
+      filter: state.effectiveFilter.copyWith(tagsAny: tagsAny),
+    );
   }
 
   void updateTagsExclude(Set<LibraryTagPick> tagsExclude) {
-    state = state.copyWith(filter: state.filter.copyWith(tagsExclude: tagsExclude));
+    state = state.copyWith(
+      filter: state.effectiveFilter.copyWith(tagsExclude: tagsExclude),
+    );
   }
 
   void updateTagFilter({
@@ -172,7 +161,7 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
     Set<LibraryTagPick>? tagsExclude,
   }) {
     state = state.copyWith(
-      filter: state.filter.copyWith(
+      filter: state.effectiveFilter.copyWith(
         tagsAll: tags,
         tagsAny: tagsAny,
         tagsExclude: tagsExclude,
@@ -182,7 +171,7 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
 
   void updateResourceTypes(Set<ResourceType> types) {
     state = state.copyWith(
-      filter: state.filter.copyWith(
+      filter: state.effectiveFilter.copyWith(
         resourceTypes: types.isEmpty ? null : types,
       ),
     );
@@ -190,7 +179,7 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
 
   void updateContentRatings(Set<ContentRating> ratings) {
     state = state.copyWith(
-      filter: state.filter.copyWith(
+      filter: state.effectiveFilter.copyWith(
         contentRatings: ratings.isEmpty ? null : ratings,
       ),
     );
@@ -202,12 +191,14 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
 
   void toggleSortDescending(bool descending) {
     state = state.copyWith(
-      sortOption: state.sortOption.copyWith(descending: descending),
+      sortOption: state.effectiveSortOption.copyWith(descending: descending),
     );
   }
 
   void updateSortField(LibraryComicSortField field) {
-    state = state.copyWith(sortOption: state.sortOption.copyWith(field: field));
+    state = state.copyWith(
+      sortOption: state.effectiveSortOption.copyWith(field: field),
+    );
   }
 
   void resetSortOption() {

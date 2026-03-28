@@ -33,7 +33,11 @@ class DesktopSidebar extends StatelessWidget {
     final List<NavItemData> menuItems = [
       const NavItemData(id: 'home', label: '首页', icon: LucideIcons.house),
       const NavItemData(id: 'library', label: '漫画库', icon: LucideIcons.library),
-      const NavItemData(id: 'folders', label: '文件夹', icon: LucideIcons.folder),
+      const NavItemData(
+        id: 'selectedPaths',
+        label: '选中路径',
+        icon: LucideIcons.folderTree,
+      ),
       const NavItemData(id: 'tags', label: '标签', icon: LucideIcons.tags),
       const NavItemData(id: 'history', label: '历史', icon: LucideIcons.history),
     ];

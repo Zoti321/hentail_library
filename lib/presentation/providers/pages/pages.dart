@@ -1,4 +1,4 @@
-export 'directory/directory_page_notifier.dart';
+export 'selected_paths/selected_paths_page_notifier.dart';
 export 'history/history_page_notifier.dart';
 export 'library/library_page_notifier.dart';
 export 'reader/reader_page_notifier.dart';

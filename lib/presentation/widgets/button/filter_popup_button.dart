@@ -116,7 +116,9 @@ class _FilterMenu extends HookConsumerWidget {
               Transform.scale(
                 scale: 0.8,
                 child: Switch(
-                  value: ref.watch(libraryPageProvider.select((s) => s.filter.showR18)),
+                  value: ref.watch(
+                    libraryPageProvider.select((s) => s.effectiveFilter.showR18),
+                  ),
                   onChanged: (val) {
                     ref.read(libraryPageProvider.notifier).toggleR18(val);
                   },
@@ -182,7 +184,7 @@ class _BuildTagFilterSection extends ConsumerWidget {
 
   void _openTagFilterSheet(BuildContext context, WidgetRef ref) {
     menuController.hideMenu();
-    final filter = ref.read(libraryPageProvider).filter;
+    final filter = ref.read(libraryPageProvider).effectiveFilter;
     final initialAnd = filter.tagsAll?.toSet() ?? <LibraryTagPick>{};
     final initialAny = filter.tagsAny?.toSet() ?? <LibraryTagPick>{};
     final initialExclude = filter.tagsExclude?.toSet() ?? <LibraryTagPick>{};
@@ -219,7 +221,9 @@ class _BuildTagFilterSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final filter = ref.watch(libraryPageProvider.select((s) => s.filter));
+    final filter = ref.watch(
+      libraryPageProvider.select((s) => s.effectiveFilter),
+    );
     final tags = filter.tagsAll ?? <LibraryTagPick>{};
     final tagsAny = filter.tagsAny ?? <LibraryTagPick>{};
     final tagsExclude = filter.tagsExclude ?? <LibraryTagPick>{};

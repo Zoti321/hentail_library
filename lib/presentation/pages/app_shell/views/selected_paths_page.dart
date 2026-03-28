@@ -1,3 +1,5 @@
+import 'dart:io' show FileSystemEntity, FileSystemEntityType, Platform;
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
@@ -6,28 +8,28 @@ import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class DirectoryPage extends ConsumerWidget {
-  const DirectoryPage({super.key});
+class SelectedPathsPage extends ConsumerWidget {
+  const SelectedPathsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncState = ref.watch(directoryViewProvider);
+    final asyncState = ref.watch(selectedPathsPageProvider);
     final viewState = asyncState.asData?.value;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
-        crossAxisAlignment: .start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _DirectoryPageHeader(
-            totalCount: viewState?.dirs.length ?? 0,
-            selectedCount: viewState?.selectedDirs.length ?? 0,
+          _SelectedPathsPageHeader(
+            totalCount: viewState?.paths.length ?? 0,
+            selectedCount: viewState?.selectedPaths.length ?? 0,
             isSelectionMode: viewState?.isSelectionMode ?? false,
             hasData: viewState != null,
           ),
           const SizedBox(height: 20),
           asyncState.when(
-            data: (state) => _DirectoryCard(viewState: state),
+            data: (state) => _SelectedPathsCard(viewState: state),
             loading: () => const _LoadingCard(),
             error: (error, _) => _ErrorCard(error: error),
           ),
@@ -37,8 +39,8 @@ class DirectoryPage extends ConsumerWidget {
   }
 }
 
-class _DirectoryPageHeader extends ConsumerStatefulWidget {
-  const _DirectoryPageHeader({
+class _SelectedPathsPageHeader extends ConsumerStatefulWidget {
+  const _SelectedPathsPageHeader({
     required this.totalCount,
     required this.selectedCount,
     required this.isSelectionMode,
@@ -51,27 +53,94 @@ class _DirectoryPageHeader extends ConsumerStatefulWidget {
   final bool hasData;
 
   @override
-  ConsumerState<_DirectoryPageHeader> createState() =>
-      _DirectoryPageHeaderState();
+  ConsumerState<_SelectedPathsPageHeader> createState() =>
+      _SelectedPathsPageHeaderState();
 }
 
-class _DirectoryPageHeaderState extends ConsumerState<_DirectoryPageHeader> {
-  bool _isAddingDirectory = false;
+class _SelectedPathsPageHeaderState extends ConsumerState<_SelectedPathsPageHeader> {
+  final MenuController _menuController = MenuController();
+  bool _isPicking = false;
+
+  Future<void> _addFiles() async {
+    setState(() => _isPicking = true);
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        allowMultiple: true,
+        allowCompression: false,
+      );
+      if (result == null || result.files.isEmpty) return;
+      final pathRepo = ref.read(pathRepoProvider);
+      var added = 0;
+      for (final f in result.files) {
+        final p = f.path;
+        if (p == null) continue;
+        await pathRepo.add(p);
+        added++;
+      }
+      if (mounted && added > 0) {
+        showSuccessSnackBar(context, added == 1 ? '已添加 1 个路径' : '已添加 $added 个路径');
+      }
+    } catch (e) {
+      if (mounted) showErrorSnackBar(context, e);
+    } finally {
+      if (mounted) setState(() => _isPicking = false);
+    }
+  }
+
+  Future<void> _addFolder() async {
+    setState(() => _isPicking = true);
+    try {
+      final dir = await FilePicker.platform.getDirectoryPath();
+      if (dir == null) return;
+      await ref.read(pathRepoProvider).add(dir);
+      if (mounted) showSuccessSnackBar(context, '已添加路径');
+    } catch (e) {
+      if (mounted) showErrorSnackBar(context, e);
+    } finally {
+      if (mounted) setState(() => _isPicking = false);
+    }
+  }
+
+  Future<void> _pickMixedMac() async {
+    if (!Platform.isMacOS) return;
+    setState(() => _isPicking = true);
+    try {
+      final paths = await FilePicker.platform.pickFileAndDirectoryPaths(
+        type: FileType.any,
+      );
+      if (paths == null || paths.isEmpty) return;
+      final pathRepo = ref.read(pathRepoProvider);
+      for (final p in paths) {
+        await pathRepo.add(p);
+      }
+      if (mounted) {
+        showSuccessSnackBar(
+          context,
+          paths.length == 1 ? '已添加 1 个路径' : '已添加 ${paths.length} 个路径',
+        );
+      }
+    } catch (e) {
+      if (mounted) showErrorSnackBar(context, e);
+    } finally {
+      if (mounted) setState(() => _isPicking = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final notifier = ref.read(directoryViewProvider.notifier);
+    final notifier = ref.read(selectedPathsPageProvider.notifier);
 
     return Row(
-      crossAxisAlignment: .start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Column(
-            crossAxisAlignment: .start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '文件目录',
+                '选中路径',
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w600,
@@ -81,7 +150,7 @@ class _DirectoryPageHeaderState extends ConsumerState<_DirectoryPageHeader> {
               ),
               const SizedBox(height: 8),
               Text(
-                '管理本地漫画目录，支持批量选择',
+                '管理本地漫画根路径（文件或文件夹），支持批量选择',
                 style: TextStyle(
                   color: theme.colorScheme.textTertiary,
                   fontSize: 13,
@@ -93,8 +162,8 @@ class _DirectoryPageHeaderState extends ConsumerState<_DirectoryPageHeader> {
                 runSpacing: 8,
                 children: [
                   _MetaChip(
-                    icon: LucideIcons.folder,
-                    label: '目录 ${widget.totalCount}',
+                    icon: LucideIcons.link,
+                    label: '路径 ${widget.totalCount}',
                   ),
                   if (widget.isSelectionMode)
                     _MetaChip(
@@ -112,44 +181,70 @@ class _DirectoryPageHeaderState extends ConsumerState<_DirectoryPageHeader> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            FilledButton.icon(
-              onPressed: _isAddingDirectory
-                  ? null
-                  : () async {
-                      setState(() => _isAddingDirectory = true);
-                      try {
-                        final dir = await FilePicker.platform
-                            .getDirectoryPath();
-                        if (dir == null) return;
-                        await ref.read(pathRepoProvider).add(dir);
-                        if (mounted) {
-                          showSuccessSnackBar(context, '已添加目录');
-                        }
-                      } catch (e) {
-                        if (mounted) showErrorSnackBar(context, e);
-                      } finally {
-                        if (mounted) setState(() => _isAddingDirectory = false);
-                      }
-                    },
-              icon: _isAddingDirectory
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(LucideIcons.plus, size: 16),
-              label: Text(_isAddingDirectory ? '添加中…' : '添加目录'),
-              style: FilledButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
+            MenuAnchor(
+              controller: _menuController,
+              menuChildren: [
+                if (Platform.isMacOS)
+                  MenuItemButton(
+                    onPressed: _isPicking
+                        ? null
+                        : () {
+                            _menuController.close();
+                            _pickMixedMac();
+                          },
+                    child: const Text('混合选择…'),
+                  ),
+                MenuItemButton(
+                  onPressed: _isPicking
+                      ? null
+                      : () {
+                          _menuController.close();
+                          _addFiles();
+                        },
+                  child: const Text('添加文件'),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                MenuItemButton(
+                  onPressed: _isPicking
+                      ? null
+                      : () {
+                          _menuController.close();
+                          _addFolder();
+                        },
+                  child: const Text('添加文件夹'),
                 ),
-              ),
+              ],
+              builder: (context, controller, child) {
+                return FilledButton.icon(
+                  onPressed: _isPicking
+                      ? null
+                      : () {
+                          if (controller.isOpen) {
+                            controller.close();
+                          } else {
+                            controller.open();
+                          }
+                        },
+                  icon: _isPicking
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(LucideIcons.plus, size: 16),
+                  label: Text(_isPicking ? '处理中…' : '添加路径'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                );
+              },
             ),
             OutlinedButton.icon(
               onPressed: widget.hasData ? notifier.toggleSelectionMode : null,
@@ -244,15 +339,15 @@ class _MetaChip extends StatelessWidget {
   }
 }
 
-class _DirectoryCard extends StatelessWidget {
-  const _DirectoryCard({required this.viewState});
+class _SelectedPathsCard extends StatelessWidget {
+  const _SelectedPathsCard({required this.viewState});
 
-  final DirectoryViewState viewState;
+  final SelectedPathsPageState viewState;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final dirs = viewState.dirs;
+    final paths = viewState.paths;
 
     return Container(
       decoration: BoxDecoration(
@@ -282,13 +377,13 @@ class _DirectoryCard extends StatelessWidget {
               child: Row(
                 children: [
                   Icon(
-                    LucideIcons.folderOpen,
+                    LucideIcons.folderTree,
                     size: 16,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '本地目录',
+                    '已保存路径',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -297,7 +392,7 @@ class _DirectoryCard extends StatelessWidget {
                   ),
                   const Spacer(),
                   Text(
-                    '共 ${dirs.length} 项',
+                    '共 ${paths.length} 项',
                     style: TextStyle(
                       fontSize: 12,
                       color: theme.colorScheme.textTertiary,
@@ -306,21 +401,21 @@ class _DirectoryCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (dirs.isEmpty)
-              const _EmptyDirectories()
+            if (paths.isEmpty)
+              const _EmptyPaths()
             else
               ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: dirs.length,
+                itemCount: paths.length,
                 separatorBuilder: (_, index) =>
                     Divider(height: 1, color: theme.colorScheme.borderSubtle),
                 itemBuilder: (context, index) {
-                  final dir = dirs[index];
-                  return _DirectoryTile(
-                    dir: dir,
+                  final path = paths[index];
+                  return _PathTile(
+                    path: path,
                     isSelectionMode: viewState.isSelectionMode,
-                    isSelected: viewState.selectedDirs.contains(dir),
+                    isSelected: viewState.selectedPaths.contains(path),
                   );
                 },
               ),
@@ -331,29 +426,37 @@ class _DirectoryCard extends StatelessWidget {
   }
 }
 
-class _DirectoryTile extends ConsumerStatefulWidget {
-  const _DirectoryTile({
-    required this.dir,
+IconData _pathRowIcon(String path) {
+  final t = FileSystemEntity.typeSync(path);
+  if (t == FileSystemEntityType.file) {
+    return LucideIcons.file;
+  }
+  return LucideIcons.folder;
+}
+
+class _PathTile extends ConsumerStatefulWidget {
+  const _PathTile({
+    required this.path,
     required this.isSelectionMode,
     required this.isSelected,
   });
 
-  final String dir;
+  final String path;
   final bool isSelectionMode;
   final bool isSelected;
 
   @override
-  ConsumerState<_DirectoryTile> createState() => _DirectoryTileState();
+  ConsumerState<_PathTile> createState() => _PathTileState();
 }
 
-class _DirectoryTileState extends ConsumerState<_DirectoryTile> {
+class _PathTileState extends ConsumerState<_PathTile> {
   bool _isRemoving = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final notifier = ref.read(directoryViewProvider.notifier);
-    final dir = widget.dir;
+    final notifier = ref.read(selectedPathsPageProvider.notifier);
+    final path = widget.path;
     final isSelectionMode = widget.isSelectionMode;
     final isSelected = widget.isSelected;
 
@@ -369,12 +472,12 @@ class _DirectoryTileState extends ConsumerState<_DirectoryTile> {
       child: InkWell(
         onTap: () {
           if (!isSelectionMode) return;
-          notifier.toggleDirSelection(dir);
+          notifier.togglePathSelection(path);
         },
         onLongPress: () {
           if (isSelectionMode) return;
           notifier.setSelectionMode(true);
-          notifier.toggleDirSelection(dir);
+          notifier.togglePathSelection(path);
         },
         splashColor: theme.colorScheme.buttonRipple,
         highlightColor: theme.colorScheme.buttonPressed,
@@ -396,8 +499,8 @@ class _DirectoryTileState extends ConsumerState<_DirectoryTile> {
                             : theme.colorScheme.onSurfaceVariant,
                       )
                     : Icon(
-                        LucideIcons.folder,
-                        key: const ValueKey<String>('folder'),
+                        _pathRowIcon(path),
+                        key: ValueKey<String>(path),
                         size: 20,
                         color: theme.colorScheme.iconDefault,
                       ),
@@ -405,7 +508,7 @@ class _DirectoryTileState extends ConsumerState<_DirectoryTile> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  dir,
+                  path,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -417,18 +520,18 @@ class _DirectoryTileState extends ConsumerState<_DirectoryTile> {
               ),
               if (!widget.isSelectionMode)
                 IconButton(
-                  tooltip: '移除目录',
+                  tooltip: '移除路径',
                   onPressed: _isRemoving
                       ? null
                       : () async {
                           setState(() => _isRemoving = true);
                           try {
-                            await ref.read(pathRepoProvider).remove(dir);
-                            if (mounted) {
-                              showSuccessSnackBar(context, '已移除目录');
-                            }
+                            await ref.read(pathRepoProvider).remove(path);
+                            if (!context.mounted) return;
+                            showSuccessSnackBar(context, '已移除路径');
                           } catch (e) {
-                            if (mounted) showErrorSnackBar(context, e);
+                            if (!context.mounted) return;
+                            showErrorSnackBar(context, e);
                           } finally {
                             if (mounted) setState(() => _isRemoving = false);
                           }
@@ -509,7 +612,7 @@ class _ErrorCardState extends ConsumerState<_ErrorCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '目录加载失败',
+            '路径加载失败',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -532,8 +635,8 @@ class _ErrorCardState extends ConsumerState<_ErrorCard> {
                     setState(() => _isRetrying = true);
                     try {
                       await ref
-                          .read(directoryViewProvider.notifier)
-                          .refreshDirs();
+                          .read(selectedPathsPageProvider.notifier)
+                          .refreshPaths();
                     } finally {
                       if (mounted) setState(() => _isRetrying = false);
                     }
@@ -563,8 +666,8 @@ class _ErrorCardState extends ConsumerState<_ErrorCard> {
   }
 }
 
-class _EmptyDirectories extends StatelessWidget {
-  const _EmptyDirectories();
+class _EmptyPaths extends StatelessWidget {
+  const _EmptyPaths();
 
   @override
   Widget build(BuildContext context) {
@@ -583,7 +686,7 @@ class _EmptyDirectories extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              '暂无目录，请先添加本地文件夹',
+              '暂无路径，请添加文件或文件夹',
               style: TextStyle(
                 fontSize: 13,
                 color: theme.colorScheme.textTertiary,

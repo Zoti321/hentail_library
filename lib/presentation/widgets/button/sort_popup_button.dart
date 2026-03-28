@@ -54,7 +54,7 @@ class _SortMenu extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     final sortOption = ref.watch(
-      libraryPageProvider.select((s) => s.sortOption),
+      libraryPageProvider.select((s) => s.effectiveSortOption),
     );
 
     return Container(
@@ -237,7 +237,7 @@ class _SortOption extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     final isSelected =
-        ref.watch(libraryPageProvider.select((s) => s.sortOption.field)) ==
+        ref.watch(libraryPageProvider.select((s) => s.effectiveSortOption.field)) ==
         field;
 
     return AnimatedContainer(

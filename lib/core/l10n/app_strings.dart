@@ -4,6 +4,6 @@ abstract class AppStrings {
 
   static const String libraryTitle = '漫画库';
   static const String libraryEmptyTitle = '暂无漫画';
-  static const String libraryEmptyHint = '请先在「本地目录」中添加文件夹并扫描';
+  static const String libraryEmptyHint = '请先在「选中路径」中添加路径并扫描';
   static String comicCount(int n) => '$n 本';
 }
