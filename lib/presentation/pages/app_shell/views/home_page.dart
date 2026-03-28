@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
-import 'package:hentai_library/domain/value_objects/sync_report/sync_report.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/button/home_refresh_button.dart';
@@ -37,14 +36,9 @@ class HomePage extends ConsumerWidget {
       context: context,
       barrierDismissible: false,
       builder: (_) => ScanProgressDialog(
-        onBackgroundComplete: (SyncReport? report) {
+        onBackgroundComplete: () {
           if (!context.mounted) return;
           ref.read(libraryPageProvider.notifier).refreshStream();
-          if (report == null || report.cancelled) return;
-          final msg = report.addedCount == 0 && report.removedCount > 0
-              ? '扫描完成，已移除 ${report.removedCount} 条'
-              : '扫描完成，新增 ${report.addedCount} 条，移除 ${report.removedCount} 条';
-          showSuccessSnackBar(context, msg);
         },
         onScanEnd: () {
           ref.read(scanInProgressProvider.notifier).setInProgress(false);

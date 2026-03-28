@@ -3,11 +3,12 @@ import 'package:hentai_library/domain/enums/enums.dart';
 
 void main() {
   group('ScannedItemType', () {
-    test('has expected values for sync report', () {
-      expect(ScannedItemType.values, contains(ScannedItemType.folder));
+    test('has expected values', () {
+      expect(ScannedItemType.values, contains(ScannedItemType.dir));
+      expect(ScannedItemType.values, contains(ScannedItemType.zip));
       expect(ScannedItemType.values, contains(ScannedItemType.epub));
-      expect(ScannedItemType.values, contains(ScannedItemType.archive));
-      expect(ScannedItemType.values.length, 3);
+      expect(ScannedItemType.values, contains(ScannedItemType.cbz));
+      expect(ScannedItemType.values.length, 4);
     });
   });
 }

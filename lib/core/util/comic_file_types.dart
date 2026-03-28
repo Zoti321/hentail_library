@@ -44,15 +44,18 @@ const zipArchiveExtensions = ComicFileTypes.zipArchiveExtensions;
 const comicArchiveExtensions = ComicFileTypes.comicArchiveExtensions;
 const epubExtensions = ComicFileTypes.epubExtensions;
 
-/// 根据路径扩展名推断同步报告中的扫描项类型。
+/// 根据路径扩展名推断扫描项类型（目录或其它非上述扩展名归为 [ScannedItemType.dir]）。
 ScannedItemType scannedItemTypeFromPath(String path) {
   final lower = path.toLowerCase();
   if (epubExtensions.any((ext) => lower.endsWith(ext))) {
     return ScannedItemType.epub;
   }
-  if (comicArchiveExtensions.any((ext) => lower.endsWith(ext))) {
-    return ScannedItemType.archive;
+  if (lower.endsWith('.cbz')) {
+    return ScannedItemType.cbz;
   }
-  return ScannedItemType.folder;
+  if (lower.endsWith('.zip') || lower.endsWith('.cbr') || lower.endsWith('.rar')) {
+    return ScannedItemType.zip;
+  }
+  return ScannedItemType.dir;
 }
 

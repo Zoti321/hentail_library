@@ -11,59 +11,59 @@ void main() {
       );
     });
 
-    test('returns archive for .cbz path', () {
+    test('returns cbz for .cbz path', () {
       expect(
         scannedItemTypeFromPath('/a/b.cbz'),
-        ScannedItemType.archive,
+        ScannedItemType.cbz,
       );
     });
 
-    test('returns archive for .zip path', () {
+    test('returns zip for .zip path', () {
       expect(
         scannedItemTypeFromPath('/a/b.zip'),
-        ScannedItemType.archive,
+        ScannedItemType.zip,
       );
     });
 
-    test('returns archive for .cbr path', () {
+    test('returns zip for .cbr path', () {
       expect(
         scannedItemTypeFromPath('/a/b.cbr'),
-        ScannedItemType.archive,
+        ScannedItemType.zip,
       );
     });
 
-    test('returns archive for .rar path', () {
+    test('returns zip for .rar path', () {
       expect(
         scannedItemTypeFromPath('/a/b.rar'),
-        ScannedItemType.archive,
+        ScannedItemType.zip,
       );
     });
 
-    test('returns folder for path without extension', () {
+    test('returns dir for path without extension', () {
       expect(
         scannedItemTypeFromPath('/a/b'),
-        ScannedItemType.folder,
+        ScannedItemType.dir,
       );
     });
 
-    test('returns folder for .txt path', () {
+    test('returns dir for .txt path', () {
       expect(
         scannedItemTypeFromPath('/a/b.txt'),
-        ScannedItemType.folder,
+        ScannedItemType.dir,
       );
     });
 
-    test('returns archive for uppercase .CBZ extension', () {
+    test('returns cbz for uppercase .CBZ extension', () {
       expect(
         scannedItemTypeFromPath('/a/b.CBZ'),
-        ScannedItemType.archive,
+        ScannedItemType.cbz,
       );
     });
 
-    test('returns archive for mixed case .Zip extension', () {
+    test('returns zip for mixed case .Zip extension', () {
       expect(
         scannedItemTypeFromPath('/a/b.Zip'),
-        ScannedItemType.archive,
+        ScannedItemType.zip,
       );
     });
   });
