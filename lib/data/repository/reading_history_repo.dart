@@ -53,6 +53,20 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   }
 
   @override
+  Future<void> deleteByComicIds(Iterable<String> comicIds) async {
+    try {
+      await _dao.deleteByComicIds(comicIds);
+    } catch (e, st) {
+      LogManager.instance.handle(
+        e,
+        st,
+        '[READING_HISTORY_REPO] 批量删除阅读历史失败',
+      );
+      throw AppException('批量删除阅读历史失败', cause: e, stackTrace: st);
+    }
+  }
+
+  @override
   Future<void> clearAllHistory() async {
     try {
       await _dao.clearAllHistory();

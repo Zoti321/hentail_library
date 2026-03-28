@@ -41,10 +41,10 @@ class HomePage extends ConsumerWidget {
           if (!context.mounted) return;
           ref.read(libraryPageProvider.notifier).refreshStream();
           if (report == null || report.cancelled) return;
-          showSuccessSnackBar(
-            context,
-            '扫描完成，新增 ${report.addedCount} 条，移除 ${report.removedCount} 条',
-          );
+          final msg = report.addedCount == 0 && report.removedCount > 0
+              ? '扫描完成，已移除 ${report.removedCount} 条'
+              : '扫描完成，新增 ${report.addedCount} 条，移除 ${report.removedCount} 条';
+          showSuccessSnackBar(context, msg);
         },
         onScanEnd: () {
           ref.read(scanInProgressProvider.notifier).setInProgress(false);
@@ -60,9 +60,9 @@ class HomePage extends ConsumerWidget {
 
     return SafeArea(
       child: SingleChildScrollView(
-        padding: .all(24),
+        padding: const EdgeInsets.all(24),
         child: Column(
-          crossAxisAlignment: .start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(context, ref),
             const SizedBox(height: 32),
@@ -85,11 +85,11 @@ class HomePage extends ConsumerWidget {
     final cs = theme.colorScheme;
 
     return Row(
-      mainAxisAlignment: .spaceBetween,
-      crossAxisAlignment: .end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Column(
-          crossAxisAlignment: .start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               '首页',

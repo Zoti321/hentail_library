@@ -98,4 +98,9 @@ class LibrarySeriesRepositoryImpl implements LibrarySeriesRepository {
   Future<void> removeComic(String comicId) async {
     await _dao.removeComic(comicId);
   }
+
+  @override
+  Future<void> removeComicsFromSeries(Iterable<String> comicIds) async {
+    await _dao.removeComicsFromSeries(comicIds);
+  }
 }

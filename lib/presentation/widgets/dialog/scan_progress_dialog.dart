@@ -263,7 +263,9 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
             const SizedBox(height: 12),
             if (report.scannedItems.isEmpty)
               Text(
-                '本次无新增漫画',
+                report.removedCount > 0
+                    ? '因无选中路径，已清空库内漫画及相关记录'
+                    : '本次无新增漫画',
                 style: TextStyle(fontSize: 13, color: cs.textTertiary),
               )
             else

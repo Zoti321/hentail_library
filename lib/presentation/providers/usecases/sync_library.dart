@@ -41,6 +41,9 @@ class SyncComicsUseCase {
     void Function(SyncProgress)? onProgress,
   }) async {
     final dirs = await _ref.read(pathRepoProvider).getAll();
+    final effectiveRoots =
+        dirs.map((p) => p.trim()).where((p) => p.isNotEmpty).toList();
+
     onProgress?.call(
       const SyncProgress(
         phase: SyncPhase.collecting,
@@ -48,12 +51,68 @@ class SyncComicsUseCase {
       ),
     );
 
+    if (effectiveRoots.isEmpty) {
+      if (isCancelled?.call() == true) {
+        return const SyncReport(
+          scannedItems: [],
+          addedCount: 0,
+          removedCount: 0,
+          cancelled: true,
+        );
+      }
+
+      final repo = _ref.read(libraryComicRepoProvider);
+      final existing = await repo.getAll();
+      if (existing.isEmpty) {
+        onProgress?.call(
+          const SyncProgress(
+            phase: SyncPhase.applying,
+            message: 'v2: apply changes',
+          ),
+        );
+        return const SyncReport(
+          scannedItems: [],
+          addedCount: 0,
+          removedCount: 0,
+        );
+      }
+
+      final ids = existing.map((e) => e.comicId).toList();
+      onProgress?.call(
+        SyncProgress(
+          phase: SyncPhase.applying,
+          message: 'v2: no roots, clearing library (${ids.length})',
+        ),
+      );
+
+      final historyRepo = _ref.read(readingHistoryRepoProvider);
+      final seriesRepo = _ref.read(librarySeriesRepoProvider);
+      final sessionRepo = _ref.read(readingSessionRepoProvider);
+
+      await historyRepo.deleteByComicIds(ids);
+      await seriesRepo.removeComicsFromSeries(ids);
+      await sessionRepo.deleteSessionsByComicIds(ids);
+      await repo.deleteByIds(ids);
+
+      onProgress?.call(
+        const SyncProgress(
+          phase: SyncPhase.applying,
+          message: 'v2: apply changes',
+        ),
+      );
+      return SyncReport(
+        scannedItems: const [],
+        addedCount: 0,
+        removedCount: ids.length,
+      );
+    }
+
     final scanner = _ref.read(resourceScannerProvider);
     final parser = _ref.read(resourceParserProvider);
     final mapper = _ref.read(libraryComicMapperProvider);
     final repo = _ref.read(libraryComicRepoProvider);
 
-    final candidates = scanner.scanRoots(dirs, isCancelled: isCancelled);
+    final candidates = scanner.scanRoots(effectiveRoots, isCancelled: isCancelled);
     final parsed = parser.parseAll(candidates);
     final items = <ScannedItemReport>[];
     final comics = <dynamic>[];

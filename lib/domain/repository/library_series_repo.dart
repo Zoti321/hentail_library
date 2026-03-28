@@ -22,4 +22,7 @@ abstract class LibrarySeriesRepository {
   });
 
   Future<void> removeComic(String comicId);
+
+  /// 批量移除系列中的漫画归属（无 FK 指向 comics，清空库时需单独清理）。
+  Future<void> removeComicsFromSeries(Iterable<String> comicIds);
 }

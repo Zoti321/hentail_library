@@ -27,6 +27,7 @@ class LibraryComicDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<int> deleteByIds(List<String> comicIds) {
+    if (comicIds.isEmpty) return Future.value(0);
     return (delete(libraryComics)..where((t) => t.comicId.isIn(comicIds))).go();
   }
 
@@ -147,6 +148,15 @@ class LibrarySeriesDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.comicId.equals(comicId))).go();
   }
 
+  /// 批量移除系列归属（无 FK 指向 library_comics，需在删漫画前调用）。
+  Future<int> removeComicsFromSeries(Iterable<String> comicIds) {
+    final ids = comicIds.toList();
+    if (ids.isEmpty) return Future.value(0);
+    return (delete(
+      librarySeriesItems,
+    )..where((t) => t.comicId.isIn(ids))).go();
+  }
+
   Future<List<LibrarySeriesItem>> getItemsForSeries(String seriesId) {
     return (select(librarySeriesItems)
           ..where((t) => t.seriesId.equals(seriesId))
@@ -254,6 +264,14 @@ class ReadingHistoryDao extends DatabaseAccessor<AppDatabase>
     )..where((t) => t.comicId.equals(comicId))).go();
   }
 
+  Future<int> deleteByComicIds(Iterable<String> comicIds) {
+    final ids = comicIds.toList();
+    if (ids.isEmpty) return Future.value(0);
+    return (delete(
+      readingHistories,
+    )..where((t) => t.comicId.isIn(ids))).go();
+  }
+
   Future<int> clearAllHistory() {
     return delete(readingHistories).go();
   }
@@ -295,5 +313,13 @@ class ReadingSessionDao extends DatabaseAccessor<AppDatabase>
     await (delete(
       readingSessions,
     )..where((t) => t.date.isSmallerThanValue(limitDate))).go();
+  }
+
+  Future<int> deleteSessionsByComicIds(Iterable<String> comicIds) {
+    final ids = comicIds.toList();
+    if (ids.isEmpty) return Future.value(0);
+    return (delete(
+      readingSessions,
+    )..where((t) => t.comicId.isIn(ids))).go();
   }
 }

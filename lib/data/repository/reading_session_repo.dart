@@ -47,4 +47,18 @@ class ReadingSessionRepositoryImpl implements ReadingSessionRepository {
       throw AppException('清理过期阅读会话失败', cause: e, stackTrace: st);
     }
   }
+
+  @override
+  Future<void> deleteSessionsByComicIds(Iterable<String> comicIds) async {
+    try {
+      await _dao.deleteSessionsByComicIds(comicIds);
+    } catch (e, st) {
+      LogManager.instance.handle(
+        e,
+        st,
+        '[READING_SESSION_REPO] 按漫画批量删除阅读会话失败',
+      );
+      throw AppException('删除阅读会话失败', cause: e, stackTrace: st);
+    }
+  }
 }
