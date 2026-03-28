@@ -39,7 +39,7 @@ class HomePage extends ConsumerWidget {
       builder: (_) => ScanProgressDialog(
         onBackgroundComplete: (SyncReport? report) {
           if (!context.mounted) return;
-          ref.invalidate(rawDataComicsProvider);
+          ref.read(libraryPageProvider.notifier).refreshStream();
           if (report == null || report.cancelled) return;
           showSuccessSnackBar(
             context,
@@ -56,8 +56,7 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final comicCount = ref
-        .watch(rawDataComicsProvider)
-        .maybeWhen(data: (data) => data.length, orElse: () => 0);
+        .watch(libraryPageProvider.select((s) => s.rawList.length));
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -112,7 +111,7 @@ class HomePage extends ConsumerWidget {
           children: [
             HomeRefreshButton(
               onPressed: () async {
-                ref.invalidate(rawDataComicsProvider);
+                ref.read(libraryPageProvider.notifier).refreshStream();
               },
             ),
             FilledButton.icon(
@@ -326,7 +325,9 @@ class HomePage extends ConsumerWidget {
   Widget _buildRecentComicsSection(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final comicsAsync = ref.watch(rawDataComicsProvider);
+    final comicsAsync = ref.watch(
+      libraryPageProvider.select((s) => s.rawComicsAsyncValue),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,11 +1,8 @@
-import 'package:hentai_library/data/repository/reading_session_repo.dart';
-import 'package:hentai_library/domain/repository/reading_session_repo.dart'
-    as domain;
-import 'package:hentai_library/domain/usecases/usecases.dart';
-import 'package:hentai_library/presentation/providers/v2/deps/deps.dart';
+import 'package:hentai_library/domain/entity/reading_history.dart' as entity;
+import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'reading_stats_providers.g.dart';
+part 'history_page_notifier.g.dart';
 
 /// 阅读统计结果：热力图数据、总时长、有阅读天数、日均时长
 class ReadingStats {
@@ -24,22 +21,8 @@ class ReadingStats {
 }
 
 @Riverpod(keepAlive: true)
-domain.ReadingSessionRepository readingSessionRepo(Ref ref) {
-  return ReadingSessionRepositoryImpl(ref.read(readingSessionDaoProvider));
-}
-
-@Riverpod(keepAlive: true)
-RecordReadingSessionUseCase recordReadingSessionUseCase(Ref ref) {
-  return RecordReadingSessionUseCase(ref.read(readingSessionRepoProvider));
-}
-
-/// 当前阅读页的会话开始时间（进入阅读页时设置，退出时用于计算时长并清除）
-@Riverpod(keepAlive: true)
-class ReadingSessionStart extends _$ReadingSessionStart {
-  @override
-  DateTime? build() => null;
-
-  void setStartedAt(DateTime? value) => state = value;
+Stream<List<entity.ReadingHistory>> readingHistoryStream(Ref ref) {
+  return ref.watch(readingHistoryRepoProvider).watchAllHistory();
 }
 
 @Riverpod(keepAlive: true)

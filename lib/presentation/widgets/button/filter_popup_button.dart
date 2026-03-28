@@ -50,13 +50,7 @@ class _FilterMenu extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     final resultCount = ref
-        .watch(processLibraryComicsProvider)
-        .when(
-          data: (data) => data.length,
-          error: (_, _) => 0,
-          loading: () => 0,
-          skipLoadingOnRefresh: true,
-        );
+        .watch(libraryPageProvider.select((s) => s.displayedComics.length));
 
     return Container(
       width: 256,
@@ -122,9 +116,9 @@ class _FilterMenu extends HookConsumerWidget {
               Transform.scale(
                 scale: 0.8,
                 child: Switch(
-                  value: ref.watch(comicFilterProvider).showR18,
+                  value: ref.watch(libraryPageProvider.select((s) => s.filter.showR18)),
                   onChanged: (val) {
-                    ref.read(comicFilterProvider.notifier).toggleR18(val);
+                    ref.read(libraryPageProvider.notifier).toggleR18(val);
                   },
                   activeColor: Colors.white,
                   activeTrackColor: Colors.red,
@@ -154,7 +148,7 @@ class _FilterMenu extends HookConsumerWidget {
               ),
               TextButton(
                 onPressed: () {
-                  ref.read(comicFilterProvider.notifier).reset();
+                  ref.read(libraryPageProvider.notifier).resetFilter();
                 },
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
@@ -188,7 +182,7 @@ class _BuildTagFilterSection extends ConsumerWidget {
 
   void _openTagFilterSheet(BuildContext context, WidgetRef ref) {
     menuController.hideMenu();
-    final filter = ref.read(comicFilterProvider);
+    final filter = ref.read(libraryPageProvider).filter;
     final initialAnd = filter.tagsAll?.toSet() ?? <LibraryTagPick>{};
     final initialAny = filter.tagsAny?.toSet() ?? <LibraryTagPick>{};
     final initialExclude = filter.tagsExclude?.toSet() ?? <LibraryTagPick>{};
@@ -208,7 +202,7 @@ class _BuildTagFilterSection extends ConsumerWidget {
             scrollController: scrollController,
             onConfirm: (tags, tagsAny, tagsExclude) {
               ref
-                  .read(comicFilterProvider.notifier)
+                  .read(libraryPageProvider.notifier)
                   .updateTagFilter(
                     tags: tags,
                     tagsAny: tagsAny,
@@ -225,7 +219,7 @@ class _BuildTagFilterSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final filter = ref.watch(comicFilterProvider);
+    final filter = ref.watch(libraryPageProvider.select((s) => s.filter));
     final tags = filter.tagsAll ?? <LibraryTagPick>{};
     final tagsAny = filter.tagsAny ?? <LibraryTagPick>{};
     final tagsExclude = filter.tagsExclude ?? <LibraryTagPick>{};
@@ -333,7 +327,9 @@ class _TagFilterSheetContentState
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final tagsAsync = ref.watch(libraryTagsProvider);
+    final tags = ref.watch(
+      libraryPageProvider.select((s) => s.libraryTagsForFilter),
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -406,9 +402,9 @@ class _TagFilterSheetContentState
           Divider(height: 1, color: colorScheme.borderSubtle),
           // 三块区域：同时具有 / 包含其一 / 排除
           Expanded(
-            child: tagsAsync.when(
-              data: (allTags) {
-                final visibleTags = _filterByQuery(allTags);
+            child: Builder(
+              builder: (context) {
+                final visibleTags = _filterByQuery(tags);
                 if (visibleTags.isEmpty) {
                   return Center(
                     child: Text(
@@ -472,15 +468,6 @@ class _TagFilterSheetContentState
                   ],
                 );
               },
-              loading: () => Center(
-                child: Text(
-                  "加载中…",
-                  style: TextStyle(color: colorScheme.onSurfaceVariant),
-                ),
-              ),
-              error: (_, __) => Center(
-                child: Text("加载失败", style: TextStyle(color: colorScheme.error)),
-              ),
             ),
           ),
           // 底部：清除选择 + 确定

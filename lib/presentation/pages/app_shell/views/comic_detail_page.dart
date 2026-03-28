@@ -20,12 +20,15 @@ class ComicDetailPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final rawData = ref.watch(rawDataComicsProvider);
+    final rawData = ref.watch(
+      libraryPageProvider.select((s) => s.rawComicsAsyncValue),
+    );
 
     return rawData.when(
       loading: () => const _DetailLoading(),
-      error: (error, _) =>
-          _DetailError(onRetry: () => ref.invalidate(rawDataComicsProvider)),
+      error: (error, _) => _DetailError(
+        onRetry: () => ref.read(libraryPageProvider.notifier).refreshStream(),
+      ),
       data: (comics) {
         final comic = comics.firstWhereOrNull((c) => c.comicId == comicId);
         if (comic == null) {

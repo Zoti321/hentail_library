@@ -53,7 +53,9 @@ class _SortMenu extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    final sortOption = ref.watch(comicSortOptionProvider);
+    final sortOption = ref.watch(
+      libraryPageProvider.select((s) => s.sortOption),
+    );
 
     return Container(
       width: 320,
@@ -101,7 +103,7 @@ class _SortMenu extends HookConsumerWidget {
                     borderRadius: BorderRadius.circular(6),
                     child: InkWell(
                       onTap: () {
-                        ref.read(comicSortOptionProvider.notifier).reset();
+                        ref.read(libraryPageProvider.notifier).resetSortOption();
                       },
                       borderRadius: BorderRadius.circular(6),
                       child: Padding(
@@ -170,8 +172,8 @@ class _SortSection extends HookConsumerWidget {
               child: InkWell(
                 onTap: () {
                   ref
-                      .read(comicSortOptionProvider.notifier)
-                      .toggleDescenging(!option.descending);
+                      .read(libraryPageProvider.notifier)
+                      .toggleSortDescending(!option.descending);
                 },
                 borderRadius: BorderRadius.circular(6),
                 child: Padding(
@@ -234,7 +236,9 @@ class _SortOption extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final isSelected = ref.watch(comicSortOptionProvider).field == field;
+    final isSelected =
+        ref.watch(libraryPageProvider.select((s) => s.sortOption.field)) ==
+        field;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -258,7 +262,7 @@ class _SortOption extends HookConsumerWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => {
-            ref.read(comicSortOptionProvider.notifier).updateSortField(field),
+            ref.read(libraryPageProvider.notifier).updateSortField(field),
           },
           borderRadius: BorderRadius.circular(10),
           child: Padding(

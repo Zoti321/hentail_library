@@ -69,10 +69,9 @@ class ReaderPage extends HookConsumerWidget {
 }
 
 void _saveProgress(WidgetRef ref, String comicId) {
-  final comic = ref.read(comicByIdProvider(id: comicId));
-  if (comic == null) return;
   final state = ref.read(readerViewProvider(comicId)).asData?.value;
   if (state == null) return;
+  final comic = state.comic;
   final currentIndex = state.currentIndex;
   final coverUrl = ref
       .read(comicCoverPathProvider(comicId: comicId))

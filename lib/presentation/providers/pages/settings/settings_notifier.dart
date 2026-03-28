@@ -3,7 +3,7 @@ import 'package:hentai_library/data/services/settings/settings.dart' as data_set
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'settings.g.dart';
+part 'settings_notifier.g.dart';
 
 /// 不使用 codegen provider，避免需要重新运行 build_runner 才可编译。
 final settingsStorageServiceDiProvider =
@@ -18,7 +18,6 @@ class SettingsNotifier extends _$SettingsNotifier {
     return await ref.read(settingsStorageServiceDiProvider).loadSettings();
   }
 
-  // 更新整个设置对象
   Future<void> updateSettings(AppSettings newSettings) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
@@ -27,7 +26,6 @@ class SettingsNotifier extends _$SettingsNotifier {
     });
   }
 
-  // 切换深色模式
   Future<void> toggleDarkMode() async {
     state.whenData((data) {
       updateSettings(data.copyWith(isDarkMode: !data.isDarkMode));
@@ -46,7 +44,6 @@ class SettingsNotifier extends _$SettingsNotifier {
     });
   }
 
-  // 重置为默认设置
   Future<void> resetToDefaults() async {
     updateSettings(ref.read(settingsStorageServiceDiProvider).defaultSettings());
   }

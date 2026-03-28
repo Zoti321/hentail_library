@@ -5,10 +5,11 @@ import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dar
 import 'package:hentai_library/domain/value_objects/sync_report/scanned_item_report.dart';
 import 'package:hentai_library/domain/value_objects/sync_report/sync_progress.dart';
 import 'package:hentai_library/domain/value_objects/sync_report/sync_report.dart';
-import 'package:hentai_library/presentation/providers/v2/deps/deps.dart';
+import 'package:hentai_library/presentation/providers/deps/deps.dart';
+import 'package:hentai_library/presentation/providers/usecases/comic_meta.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'comic_providers.g.dart';
+part 'sync_library.g.dart';
 
 @Riverpod(keepAlive: true)
 SyncComicsUseCase syncComicsUseCase(Ref ref) => SyncComicsUseCase(ref);
@@ -22,7 +23,6 @@ RecordReadingProgressUseCase recordReadingProgressUseCase(Ref ref) {
   return RecordReadingProgressUseCase(ref.read(readingHistoryRepoProvider));
 }
 
-/// 扫描漫画库是否进行中。用于单例约束：扫描中不允许再打开新扫描对话框。
 @Riverpod(keepAlive: true)
 class ScanInProgressNotifier extends _$ScanInProgressNotifier {
   @override
@@ -32,9 +32,9 @@ class ScanInProgressNotifier extends _$ScanInProgressNotifier {
 }
 
 class SyncComicsUseCase {
-  final Ref _ref;
-
   SyncComicsUseCase(this._ref);
+
+  final Ref _ref;
 
   Future<SyncReport?> call({
     bool Function()? isCancelled,
@@ -108,9 +108,9 @@ class SyncComicsUseCase {
 }
 
 class UpdateComicMetadataFacadeUseCase {
-  final Ref _ref;
-
   UpdateComicMetadataFacadeUseCase(this._ref);
+
+  final Ref _ref;
 
   Future<void> call(String comicId, ComicMetadataForm form) async {
     final useCase = _ref.read(updateLibraryComicMetaUseCaseProvider);

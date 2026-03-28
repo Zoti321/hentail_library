@@ -1,5 +1,3 @@
-// ==== database/dao/repo/service/usecase/mapper ====
-// database
 import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -13,7 +11,6 @@ AppDatabase database(Ref ref) {
   return db;
 }
 
-// == dao ==
 @Riverpod(keepAlive: true)
 LibraryComicDao libraryComicDao(Ref ref) =>
     LibraryComicDao(ref.read(databaseProvider));

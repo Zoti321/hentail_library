@@ -19,15 +19,16 @@ class LibraryPage extends ConsumerStatefulWidget {
 }
 
 class _LibraryPageState extends ConsumerState<LibraryPage> {
-  bool _isGridView = true;
-
-  AsyncValue<List<LibraryComic>> comics = const AsyncValue.loading();
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    comics = ref.watch(processLibraryComicsProvider);
+    final comics = ref.watch(
+      libraryPageProvider.select((s) => s.comicsAsyncValue),
+    );
+    final isGridView = ref.watch(
+      libraryPageProvider.select((s) => s.isGridView),
+    );
 
     final comicCount = comics.when(
       data: (data) => data.length,
@@ -82,20 +83,20 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   ],
                 ),
                 // Windows 11 风格工具栏
-                _buildToolbar(theme),
+                _buildToolbar(theme, isGridView),
               ],
             ),
           ),
         ),
         SliverPadding(
           padding: .symmetric(horizontal: 24, vertical: 16),
-          sliver: _isGridView ? _buildGridView() : _buildListView(),
+          sliver: isGridView ? _buildGridView(comics) : _buildListView(comics),
         ),
       ],
     );
   }
 
-  Widget _buildToolbar(ThemeData theme) {
+  Widget _buildToolbar(ThemeData theme, bool isGridView) {
     return Container(
       height: 46,
       decoration: BoxDecoration(
@@ -118,7 +119,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             constraints: BoxConstraints(maxWidth: 164),
             child: TextField(
               onChanged: (val) =>
-                  ref.read(comicFilterProvider.notifier).updateQuery(val),
+                  ref.read(libraryPageProvider.notifier).updateFilterQuery(val),
               textAlignVertical: TextAlignVertical.center,
               cursorWidth: 1.0,
               cursorColor: Colors.black87,
@@ -158,7 +159,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             icon: LucideIcons.rotateCw,
             tooltip: "刷新",
             onPressed: () {
-              ref.invalidate(rawDataComicsProvider);
+              ref.read(libraryPageProvider.notifier).refreshStream();
             },
           ),
           const SizedBox(width: 8),
@@ -178,15 +179,19 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             children: [
               _ViewToggleButton(
                 icon: LucideIcons.layoutGrid,
-                isActive: _isGridView,
-                onTap: () => setState(() => _isGridView = true),
+                isActive: isGridView,
+                onTap: () => ref
+                    .read(libraryPageProvider.notifier)
+                    .setGridView(true),
                 activeColor: theme.colorScheme.primary,
               ),
               const SizedBox(width: 4),
               _ViewToggleButton(
                 icon: LucideIcons.list,
-                isActive: !_isGridView,
-                onTap: () => setState(() => _isGridView = false),
+                isActive: !isGridView,
+                onTap: () => ref
+                    .read(libraryPageProvider.notifier)
+                    .setGridView(false),
                 activeColor: theme.colorScheme.primary,
               ),
             ],
@@ -197,7 +202,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   }
 
   // 构建网格视图
-  Widget _buildGridView() {
+  Widget _buildGridView(AsyncValue<List<LibraryComic>> comics) {
     return comics.when(
       data: (comics) {
         if (comics.isEmpty) return _EmptyLibrarySliver();
@@ -243,7 +248,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   }
 
   // 构建列表视图
-  Widget _buildListView() {
+  Widget _buildListView(AsyncValue<List<LibraryComic>> comics) {
     return comics.when(
       data: (comics) {
         if (comics.isEmpty) return _EmptyLibrarySliver();

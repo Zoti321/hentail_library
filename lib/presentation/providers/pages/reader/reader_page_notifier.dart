@@ -1,12 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:hentai_library/domain/entity/comic/library_comic.dart';
-import 'package:hentai_library/presentation/providers/v2/query/comics.dart';
-import 'package:hentai_library/presentation/providers/v2/query/reading_history.dart';
+import 'package:hentai_library/domain/entity/reading_history.dart' as entity;
+import 'package:hentai_library/presentation/providers/deps/deps.dart';
+import 'package:path/path.dart' as p;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'reader_view.g.dart';
-part 'reader_view.freezed.dart';
+part 'reader_page_notifier.freezed.dart';
+part 'reader_page_notifier.g.dart';
 
 @freezed
 abstract class ReaderViewState with _$ReaderViewState {
@@ -20,7 +25,6 @@ abstract class ReaderViewState with _$ReaderViewState {
 
   ReaderViewState._();
 
-  /// 阅读页实际展示的页数；由 [comicImagesProvider] 结果决定。
   int get totalPages => totalPagesOverride ?? 0;
 }
 
@@ -28,7 +32,7 @@ abstract class ReaderViewState with _$ReaderViewState {
 class ReaderViewNotifier extends _$ReaderViewNotifier {
   @override
   Future<ReaderViewState> build(String id) async {
-    final comic = ref.read(comicByIdProvider(id: id));
+    final comic = await ref.read(libraryComicRepoProvider).findById(id);
     if (comic == null) {
       throw StateError('Comic not found: $id');
     }
@@ -119,4 +123,63 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
       toggleShowControls();
     }
   }
+}
+
+@Riverpod()
+Future<List<File>> comicImages(
+  Ref ref, {
+  required String comicId,
+  String? chapterId,
+}) async {
+  final v2Comic = await ref.read(libraryComicRepoProvider).findById(comicId);
+  if (v2Comic == null) return [];
+
+  if (v2Comic.resourceType != ResourceType.dir) {
+    return [];
+  }
+
+  final targetDir = v2Comic.path;
+
+  try {
+    final dir = Directory(targetDir);
+    if (!await dir.exists()) {
+      LogManager.instance.warning("目录不存在: $targetDir");
+      return [];
+    }
+
+    final List<FileSystemEntity> entities = await dir
+        .list(recursive: false)
+        .toList();
+
+    final imageFiles = entities.whereType<File>().where((file) {
+      final ext = p.extension(file.path).toLowerCase();
+      return ['.jpg', '.jpeg', '.png', '.webp', '.gif'].contains(ext);
+    }).toList();
+
+    imageFiles.sort((a, b) => p.basename(a.path).compareTo(p.basename(b.path)));
+    return imageFiles;
+  } catch (e, st) {
+    LogManager.instance.handle(
+      e,
+      st,
+      '加载漫画图片失败: comicId=$comicId, dir=$targetDir',
+    );
+    return [];
+  }
+}
+
+@Riverpod()
+Future<String?> comicCoverPath(Ref ref, {required String comicId}) async {
+  final images = await ref.watch(comicImagesProvider(comicId: comicId).future);
+  if (images.isNotEmpty) return images.first.path;
+  return null;
+}
+
+@Riverpod()
+Future<entity.ReadingHistory?> readingProgress(
+  Ref ref, {
+  required String comicId,
+}) async {
+  final repo = ref.watch(readingHistoryRepoProvider);
+  return repo.getByComicId(comicId);
 }

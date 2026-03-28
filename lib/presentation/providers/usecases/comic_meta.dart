@@ -1,11 +1,10 @@
-// == usecase ==
 import 'package:hentai_library/domain/usecases/assign_library_comic_to_series_usecase.dart';
 import 'package:hentai_library/domain/usecases/ingest_library_resources_usecase.dart';
 import 'package:hentai_library/domain/usecases/update_library_comic_meta_usecase.dart';
+import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'deps.dart';
 
-part 'usecase.g.dart';
+part 'comic_meta.g.dart';
 
 @Riverpod(keepAlive: true)
 IngestLibraryResourcesUseCase ingestLibraryResourcesUseCase(Ref ref) {
