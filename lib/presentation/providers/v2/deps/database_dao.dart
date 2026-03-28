@@ -1,10 +1,10 @@
-import 'package:hentai_library/core/logging/log_manager.dart';
+// ==== database/dao/repo/service/usecase/mapper ====
+// database
 import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:talker/talker.dart';
 
-part 'core_providers.g.dart';
+part 'database_dao.g.dart';
 
 @Riverpod(keepAlive: true)
 AppDatabase database(Ref ref) {
@@ -12,6 +12,19 @@ AppDatabase database(Ref ref) {
   ref.onDispose(() => db.close());
   return db;
 }
+
+// == dao ==
+@Riverpod(keepAlive: true)
+LibraryComicDao libraryComicDao(Ref ref) =>
+    LibraryComicDao(ref.read(databaseProvider));
+
+@Riverpod(keepAlive: true)
+LibrarySeriesDao librarySeriesDao(Ref ref) =>
+    LibrarySeriesDao(ref.read(databaseProvider));
+
+@Riverpod(keepAlive: true)
+LibraryTagDao libraryTagDao(Ref ref) =>
+    LibraryTagDao(ref.read(databaseProvider));
 
 @Riverpod(keepAlive: true)
 SavedPathDao savedPathDao(Ref ref) => SavedPathDao(ref.read(databaseProvider));
@@ -21,14 +34,5 @@ ReadingSessionDao readingSessionDao(Ref ref) =>
     ReadingSessionDao(ref.read(databaseProvider));
 
 @Riverpod(keepAlive: true)
-Talker logManager(Ref ref) {
-  return LogManager.instance;
-}
-
-@Riverpod(keepAlive: true)
-Future<LogFileWriter> logWriter(Ref ref) async {
-  final talker = ref.watch(logManagerProvider);
-  final logWriter = LogFileWriter(talker);
-  await logWriter.init();
-  return logWriter;
-}
+ReadingHistoryDao readingHistoryDao(Ref ref) =>
+    ReadingHistoryDao(ref.read(databaseProvider));

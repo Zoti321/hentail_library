@@ -2,7 +2,7 @@ import 'package:hentai_library/data/repository/reading_session_repo.dart';
 import 'package:hentai_library/domain/repository/reading_session_repo.dart'
     as domain;
 import 'package:hentai_library/domain/usecases/usecases.dart';
-import 'package:hentai_library/presentation/providers/core/core_providers.dart';
+import 'package:hentai_library/presentation/providers/v2/deps/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reading_stats_providers.g.dart';

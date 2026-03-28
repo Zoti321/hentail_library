@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/domain/repository/dir_repo.dart';
-import 'package:hentai_library/presentation/providers/directory/directory_query_providers.dart';
-import 'package:hentai_library/presentation/providers/directory/directory_providers.dart';
+import 'package:hentai_library/presentation/providers/v2/query/selected_paths.dart';
+import 'package:hentai_library/presentation/providers/v2/deps/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'directory_view.freezed.dart';
@@ -26,7 +26,7 @@ class DirectoryViewNotifier extends _$DirectoryViewNotifier {
     _listenDirsStream();
 
     // 首屏先读取一次，避免首次渲染为空
-    final initialDirs = await _pathRepo.getAllPaths();
+    final initialDirs = await _pathRepo.getAll();
     return DirectoryViewState(dirs: initialDirs);
   }
 
@@ -34,7 +34,7 @@ class DirectoryViewNotifier extends _$DirectoryViewNotifier {
     final previous = _currentOrDefault();
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final dirs = await _pathRepo.getAllPaths();
+      final dirs = await _pathRepo.getAll();
       return _syncDirsAndSelection(previous, dirs);
     });
   }

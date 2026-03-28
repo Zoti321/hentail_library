@@ -9,7 +9,7 @@ import 'package:hentai_library/domain/value_objects/library_tag_pick.dart';
 import 'package:hentai_library/presentation/providers/comic/notifiers/comic_filter.dart';
 import 'package:hentai_library/presentation/providers/comic/notifiers/comic_sort_option.dart';
 import 'package:hentai_library/presentation/providers/comic/notifiers/search_query.dart';
-import 'package:hentai_library/presentation/providers/providers_deps.dart';
+import 'package:hentai_library/presentation/providers/v2/deps/deps.dart';
 import 'package:path/path.dart' as p;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

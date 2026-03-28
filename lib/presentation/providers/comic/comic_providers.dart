@@ -5,8 +5,7 @@ import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dar
 import 'package:hentai_library/domain/value_objects/sync_report/scanned_item_report.dart';
 import 'package:hentai_library/domain/value_objects/sync_report/sync_progress.dart';
 import 'package:hentai_library/domain/value_objects/sync_report/sync_report.dart';
-import 'package:hentai_library/presentation/providers/reading_history/reading_history_providers.dart';
-import 'package:hentai_library/presentation/providers/providers_deps.dart';
+import 'package:hentai_library/presentation/providers/v2/deps/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'comic_providers.g.dart';
@@ -41,7 +40,7 @@ class SyncComicsUseCase {
     bool Function()? isCancelled,
     void Function(SyncProgress)? onProgress,
   }) async {
-    final dirs = await _ref.read(pathRepoProvider).getAllPaths();
+    final dirs = await _ref.read(pathRepoProvider).getAll();
     onProgress?.call(
       const SyncProgress(
         phase: SyncPhase.collecting,

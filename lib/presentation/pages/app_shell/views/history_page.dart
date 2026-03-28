@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/presentation/providers/v2/deps/repo_impl.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
@@ -23,10 +24,7 @@ class HistoryPage extends HookConsumerWidget {
         spacing: 16,
         children: [
           const _ReadingStatsSection(),
-          _Header(
-            query: query.value,
-            onQueryChanged: (v) => query.value = v,
-          ),
+          _Header(query: query.value, onQueryChanged: (v) => query.value = v),
           _HistoryList(query: query.value),
         ],
       ),
@@ -274,12 +272,15 @@ class _Header extends ConsumerWidget {
                   final confirmed =
                       await showDialog<bool>(
                         context: context,
-                        builder: (context) => const _ConfirmClearHistoryDialog(),
+                        builder: (context) =>
+                            const _ConfirmClearHistoryDialog(),
                       ) ??
                       false;
                   if (!confirmed) return;
                   try {
-                    await ref.read(readingHistoryRepoProvider).clearAllHistory();
+                    await ref
+                        .read(readingHistoryRepoProvider)
+                        .clearAllHistory();
                     if (context.mounted) {
                       showSuccessSnackBar(context, '已清空阅读历史');
                     }
@@ -337,8 +338,8 @@ class _HistoryList extends ConsumerWidget {
         final filtered = q.isEmpty
             ? history
             : history
-                .where((h) => h.title.toLowerCase().contains(q))
-                .toList(growable: false);
+                  .where((h) => h.title.toLowerCase().contains(q))
+                  .toList(growable: false);
 
         if (filtered.isEmpty) {
           return Padding(

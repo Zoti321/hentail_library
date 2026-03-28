@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/entity/comic/library_comic.dart';
-import 'package:hentai_library/presentation/providers/comic/comics.dart';
-import 'package:hentai_library/presentation/providers/reading_history/reading_history_providers.dart';
+import 'package:hentai_library/presentation/providers/v2/query/comics.dart';
+import 'package:hentai_library/presentation/providers/v2/query/reading_history.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 

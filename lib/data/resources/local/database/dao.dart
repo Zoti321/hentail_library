@@ -5,116 +5,6 @@ import 'database.dart';
 
 part 'dao.g.dart';
 
-@DriftAccessor(tables: [SavedPaths])
-class SavedPathDao extends DatabaseAccessor<AppDatabase>
-    with _$SavedPathDaoMixin {
-  SavedPathDao(super.db);
-
-  Future<List<SavedPath>> getAllSavedPaths() => select(savedPaths).get();
-
-  Stream<List<SavedPath>> watchAllSavedPaths() =>
-      select(savedPaths).watch().distinct();
-
-  Future<int> insertSavedPath(SavedPathsCompanion companion) {
-    return into(savedPaths).insert(
-      companion,
-      mode: InsertMode.insertOrIgnore,
-      onConflict: DoNothing(),
-    );
-  }
-
-  Future<int> deleteSavedPath(String path) {
-    return (delete(savedPaths)..where((t) => t.rawPath.equals(path))).go();
-  }
-}
-
-@DriftAccessor(tables: [ReadingHistories])
-class ReadingHistoryDao extends DatabaseAccessor<AppDatabase>
-    with _$ReadingHistoryDaoMixin {
-  ReadingHistoryDao(super.db);
-
-  Future<void> recordReading(ReadingHistoriesCompanion companion) async {
-    await into(readingHistories).insert(
-      companion,
-      onConflict: DoUpdate(
-        (old) => ReadingHistoriesCompanion.custom(
-          lastReadTime: Variable(companion.lastReadTime.value),
-          title: Variable(companion.title.value),
-          coverUrl: Variable(companion.coverUrl.value),
-          chapterId: companion.chapterId.present
-              ? Variable(companion.chapterId.value)
-              : null,
-          pageIndex: companion.pageIndex.present
-              ? Variable(companion.pageIndex.value)
-              : null,
-        ),
-        target: [readingHistories.comicId],
-      ),
-    );
-  }
-
-  Future<ReadingHistory?> getReadingHistoryByComicId(String comicId) {
-    return (select(
-      readingHistories,
-    )..where((t) => t.comicId.equals(comicId))).getSingleOrNull();
-  }
-
-  Stream<List<ReadingHistory>> watchAllHistory() {
-    return (select(
-      readingHistories,
-    )..orderBy([(t) => OrderingTerm.desc(t.lastReadTime)])).watch();
-  }
-
-  Future<int> deleteByComicId(String comicId) {
-    return (delete(
-      readingHistories,
-    )..where((t) => t.comicId.equals(comicId))).go();
-  }
-
-  Future<int> clearAllHistory() {
-    return delete(readingHistories).go();
-  }
-
-  Future<void> clearExpiredHistory() async {
-    final limitDate = DateTime.now().subtract(const Duration(days: 365));
-    await (delete(
-      readingHistories,
-    )..where((t) => t.lastReadTime.isSmallerThanValue(limitDate))).go();
-  }
-}
-
-@DriftAccessor(tables: [ReadingSessions])
-class ReadingSessionDao extends DatabaseAccessor<AppDatabase>
-    with _$ReadingSessionDaoMixin {
-  ReadingSessionDao(super.db);
-
-  Future<void> insertSession(ReadingSessionsCompanion companion) async {
-    await into(readingSessions).insert(companion);
-  }
-
-  Future<List<ReadingSession>> getSessionsByDateRange(
-    DateTime start,
-    DateTime end,
-  ) {
-    return (select(readingSessions)
-          ..where(
-            (t) =>
-                t.date.isBiggerOrEqualValue(start) &
-                t.date.isSmallerOrEqualValue(end),
-          )
-          ..orderBy([(t) => OrderingTerm.desc(t.date)]))
-        .get();
-  }
-
-  /// 删除一年前的阅读会话，仅保留最近一年数据。
-  Future<void> clearExpiredSessions() async {
-    final limitDate = DateTime.now().subtract(const Duration(days: 365));
-    await (delete(
-      readingSessions,
-    )..where((t) => t.date.isSmallerThanValue(limitDate))).go();
-  }
-}
-
 @DriftAccessor(tables: [LibraryComics, LibraryComicTags])
 class LibraryComicDao extends DatabaseAccessor<AppDatabase>
     with _$LibraryComicDaoMixin {
@@ -296,5 +186,114 @@ class LibraryTagDao extends DatabaseAccessor<AppDatabase>
 
       await (delete(libraryTags)..where((t) => t.name.equals(oldName))).go();
     });
+  }
+}
+
+@DriftAccessor(tables: [SavedPaths])
+class SavedPathDao extends DatabaseAccessor<AppDatabase>
+    with _$SavedPathDaoMixin {
+  SavedPathDao(super.db);
+
+  Future<List<SavedPath>> getAll() => select(savedPaths).get();
+
+  Stream<List<SavedPath>> watchAll() => select(savedPaths).watch().distinct();
+
+  Future<int> insert(SavedPathsCompanion companion) {
+    return into(savedPaths).insert(
+      companion,
+      mode: InsertMode.insertOrIgnore,
+      onConflict: DoNothing(),
+    );
+  }
+
+  Future<int> deleteRow(String path) {
+    return (delete(savedPaths)..where((t) => t.rawPath.equals(path))).go();
+  }
+}
+
+@DriftAccessor(tables: [ReadingHistories])
+class ReadingHistoryDao extends DatabaseAccessor<AppDatabase>
+    with _$ReadingHistoryDaoMixin {
+  ReadingHistoryDao(super.db);
+
+  Future<void> recordReading(ReadingHistoriesCompanion companion) async {
+    await into(readingHistories).insert(
+      companion,
+      onConflict: DoUpdate(
+        (old) => ReadingHistoriesCompanion.custom(
+          lastReadTime: Variable(companion.lastReadTime.value),
+          title: Variable(companion.title.value),
+          coverUrl: Variable(companion.coverUrl.value),
+          chapterId: companion.chapterId.present
+              ? Variable(companion.chapterId.value)
+              : null,
+          pageIndex: companion.pageIndex.present
+              ? Variable(companion.pageIndex.value)
+              : null,
+        ),
+        target: [readingHistories.comicId],
+      ),
+    );
+  }
+
+  Future<ReadingHistory?> getReadingHistoryByComicId(String comicId) {
+    return (select(
+      readingHistories,
+    )..where((t) => t.comicId.equals(comicId))).getSingleOrNull();
+  }
+
+  Stream<List<ReadingHistory>> watchAllHistory() {
+    return (select(
+      readingHistories,
+    )..orderBy([(t) => OrderingTerm.desc(t.lastReadTime)])).watch();
+  }
+
+  Future<int> deleteByComicId(String comicId) {
+    return (delete(
+      readingHistories,
+    )..where((t) => t.comicId.equals(comicId))).go();
+  }
+
+  Future<int> clearAllHistory() {
+    return delete(readingHistories).go();
+  }
+
+  Future<void> clearExpiredHistory() async {
+    final limitDate = DateTime.now().subtract(const Duration(days: 365));
+    await (delete(
+      readingHistories,
+    )..where((t) => t.lastReadTime.isSmallerThanValue(limitDate))).go();
+  }
+}
+
+@DriftAccessor(tables: [ReadingSessions])
+class ReadingSessionDao extends DatabaseAccessor<AppDatabase>
+    with _$ReadingSessionDaoMixin {
+  ReadingSessionDao(super.db);
+
+  Future<void> insertSession(ReadingSessionsCompanion companion) async {
+    await into(readingSessions).insert(companion);
+  }
+
+  Future<List<ReadingSession>> getSessionsByDateRange(
+    DateTime start,
+    DateTime end,
+  ) {
+    return (select(readingSessions)
+          ..where(
+            (t) =>
+                t.date.isBiggerOrEqualValue(start) &
+                t.date.isSmallerOrEqualValue(end),
+          )
+          ..orderBy([(t) => OrderingTerm.desc(t.date)]))
+        .get();
+  }
+
+  /// 删除一年前的阅读会话，仅保留最近一年数据。
+  Future<void> clearExpiredSessions() async {
+    final limitDate = DateTime.now().subtract(const Duration(days: 365));
+    await (delete(
+      readingSessions,
+    )..where((t) => t.date.isSmallerThanValue(limitDate))).go();
   }
 }

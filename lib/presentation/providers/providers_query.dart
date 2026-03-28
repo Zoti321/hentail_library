@@ -1,11 +1,11 @@
 // === comic query ===
-export 'comic/comics.dart';
+export 'v2/query/comics.dart';
 
 // === directory query ===
-export 'directory/directory_query_providers.dart';
+export 'v2/query/selected_paths.dart';
 
 // === reading query ===
-export 'reading_history/reading_history_providers.dart';
+export 'v2/query/reading_history.dart';
 export 'reading_stats/reading_stats_providers.dart';
 
 // === tag query ===

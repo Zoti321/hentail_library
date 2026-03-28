@@ -1,9 +1,9 @@
 abstract class PathRepository {
-  Future<List<String>> getAllPaths();
+  Future<List<String>> getAll();
 
-  Stream<List<String>> getPathsStream();
+  Stream<List<String>> watch();
 
-  Future<void> addPath(String path);
+  Future<void> add(String path);
 
-  Future<void> removePath(String path);
+  Future<void> remove(String path);
 }
