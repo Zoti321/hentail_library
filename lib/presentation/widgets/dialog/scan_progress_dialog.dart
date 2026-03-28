@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/widgets/terminal_spinner.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// 扫描漫画库对话框：同步中、完成/已取消/错误；不展示进度明细与条目报告。
+/// 扫描漫画库对话框：同步进度、完成/已取消/错误。
 class ScanProgressDialog extends ConsumerStatefulWidget {
   const ScanProgressDialog({
     super.key,
@@ -33,6 +34,8 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
   String? _error;
   bool _isRunning = true;
 
+  SyncLibraryProgress? _progress;
+
   Future<void>? _syncFuture;
 
   void _startSync() {
@@ -40,6 +43,10 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
     _started = true;
     _syncFuture = ref.read(syncComicsUseCaseProvider).call(
           isCancelled: () => _isCancelled.value,
+          onProgress: (p) {
+            if (!mounted) return;
+            setState(() => _progress = p);
+          },
         );
     _syncFuture!.then((_) {
       if (mounted) {
@@ -109,7 +116,7 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
                 _buildHeader(theme),
                 if (_error != null)
                   _buildError(theme)
-                else if (!_isRunning)
+                else if (!_isRunning || _progress?.phase == SyncLibraryPhase.done)
                   _buildDone(theme)
                 else
                   _buildRunning(theme),
@@ -148,36 +155,132 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
 
   Widget _buildRunning(ThemeData theme) {
     final cs = theme.colorScheme;
+    final p = _progress;
+
+    if (p == null) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TerminalSpinner(color: cs.primary),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                '准备中…',
+                style: TextStyle(fontSize: 14, color: cs.textSecondary),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '同步中…',
-            style: TextStyle(
-              fontSize: 14,
-              color: cs.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              backgroundColor: cs.surfaceContainerHighest,
-              valueColor: AlwaysStoppedAnimation<Color>(cs.primary),
-              minHeight: 6,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TerminalSpinner(color: cs.primary),
+              const SizedBox(width: 12),
+              Expanded(child: _buildRunningBody(theme, p)),
+            ],
           ),
         ],
       ),
     );
   }
 
+  Widget _buildRunningBody(ThemeData theme, SyncLibraryProgress p) {
+    final cs = theme.colorScheme;
+    final secondary = TextStyle(fontSize: 14, color: cs.textSecondary);
+
+    switch (p.route) {
+      case SyncLibraryRoute.noRootsNoop:
+        return Text('同步中…', style: secondary);
+      case SyncLibraryRoute.noRootsCleared:
+        return Text(
+          p.phase == SyncLibraryPhase.writingDb ? '正在写入…' : '正在清空漫画库…',
+          style: secondary,
+        );
+      case SyncLibraryRoute.withRoots:
+        return _buildWithRootsRunning(theme, p, secondary);
+    }
+  }
+
+  Widget _buildWithRootsRunning(
+    ThemeData theme,
+    SyncLibraryProgress p,
+    TextStyle secondary,
+  ) {
+    final cs = theme.colorScheme;
+
+    if (p.phase == SyncLibraryPhase.writingDb) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('正在写入数据库…', style: secondary),
+          const SizedBox(height: 8),
+          Text(
+            '已识别 ${p.acceptedTotal} 本 · (dir: ${p.counts.dir}, zip: ${p.counts.zip}, '
+            'cbz: ${p.counts.cbz}, epub: ${p.counts.epub})',
+            style: TextStyle(fontSize: 13, color: cs.textSecondary),
+          ),
+        ],
+      );
+    }
+
+    final path = p.currentPath;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          path == null || path.isEmpty ? '准备中…' : path,
+          style: secondary,
+          maxLines: 4,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '已识别 ${p.acceptedTotal} 本 · (dir: ${p.counts.dir}, zip: ${p.counts.zip}, '
+          'cbz: ${p.counts.cbz}, epub: ${p.counts.epub})',
+          style: TextStyle(fontSize: 13, color: cs.textSecondary),
+        ),
+      ],
+    );
+  }
+
   Widget _buildDone(ThemeData theme) {
     final cs = theme.colorScheme;
-    final label = _isCancelled.value ? '已取消扫描' : '同步完成';
+    if (_isCancelled.value) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+        child: Text(
+          '已取消扫描',
+          style: TextStyle(fontSize: 14, color: cs.textSecondary),
+        ),
+      );
+    }
+
+    final p = _progress;
+    final String label;
+    if (p != null) {
+      switch (p.route) {
+        case SyncLibraryRoute.noRootsNoop:
+          label = '未配置有效路径，库中无漫画，同步已完成。';
+        case SyncLibraryRoute.noRootsCleared:
+          label = '已清空现有漫画数据。';
+        case SyncLibraryRoute.withRoots:
+          label = '同步完成';
+      }
+    } else {
+      label = '同步完成';
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
       child: Text(
@@ -208,7 +311,8 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
 
   Widget _buildFooter(ThemeData theme) {
     final cs = theme.colorScheme;
-    final showClose = _error != null || !_isRunning;
+    final syncDone = _progress?.phase == SyncLibraryPhase.done;
+    final showClose = _error != null || !_isRunning || syncDone;
     final showError = _error != null;
 
     return Container(
