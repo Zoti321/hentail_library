@@ -123,21 +123,18 @@ class SyncComicsUseCase {
       return;
     }
 
-    final scanner = _ref.read(resourceScannerProvider);
-    final parser = _ref.read(resourceParserProvider);
+    final scanParse = _ref.read(comicScanParseServiceProvider);
     final mapper = _ref.read(libraryComicMapperProvider);
     final repo = _ref.read(libraryComicRepoProvider);
-
-    final candidates = scanner.scanRoots(
-      effectiveRoots,
-      isCancelled: isCancelled,
-    );
 
     var counts = emptyLibrarySyncCounts();
     var acceptedTotal = 0;
     final comics = <LibraryComic>[];
 
-    await for (final c in candidates) {
+    await for (final p in scanParse.scanAndParseRoots(
+      effectiveRoots,
+      isCancelled: isCancelled,
+    )) {
       if (isCancelled?.call() == true) {
         return;
       }
@@ -145,7 +142,7 @@ class SyncComicsUseCase {
       emit((
         phase: SyncLibraryPhase.scanning,
         route: SyncLibraryRoute.withRoots,
-        currentPath: c.path,
+        currentPath: p.path,
         acceptedTotal: acceptedTotal,
         counts: counts,
         removedCount: null,
@@ -153,22 +150,19 @@ class SyncComicsUseCase {
         keptCount: null,
       ));
 
-      final p = await parser.parse(c);
-      if (p != null) {
-        counts = _bump(counts, p.type);
-        acceptedTotal++;
-        comics.add(mapper.fromParsedResource(p));
-        emit((
-          phase: SyncLibraryPhase.scanning,
-          route: SyncLibraryRoute.withRoots,
-          currentPath: c.path,
-          acceptedTotal: acceptedTotal,
-          counts: counts,
-          removedCount: null,
-          addedCount: null,
-          keptCount: null,
-        ));
-      }
+      counts = _bump(counts, p.type);
+      acceptedTotal++;
+      comics.add(mapper.fromParsedResource(p));
+      emit((
+        phase: SyncLibraryPhase.scanning,
+        route: SyncLibraryRoute.withRoots,
+        currentPath: p.path,
+        acceptedTotal: acceptedTotal,
+        counts: counts,
+        removedCount: null,
+        addedCount: null,
+        keptCount: null,
+      ));
     }
 
     if (isCancelled?.call() == true) {

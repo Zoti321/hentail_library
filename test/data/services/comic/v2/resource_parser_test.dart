@@ -2,16 +2,19 @@ import 'dart:io';
 
 import 'package:archive/archive.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/data/services/comic/comic_scan_parse_service.dart';
 import 'package:hentai_library/data/services/comic/resource_parser.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:path/path.dart' as p;
 
 void main() {
-  group('ResourceParser.parse', () {
+  group('comic/parser ResourceParser', () {
     late Directory tempDir;
+    late ParseContext ctx;
 
     setUp(() async {
       tempDir = await Directory.systemTemp.createTemp('resource_parser_test_');
+      ctx = defaultComicParseContext();
     });
 
     tearDown(() async {
@@ -34,38 +37,29 @@ void main() {
       return file.path;
     }
 
-    test(
-      'parses dir candidate when it is a pure image manga directory',
-      () async {
-        final mangaDir = Directory(p.join(tempDir.path, 'mangaA'));
-        await mangaDir.create(recursive: true);
-        await File(p.join(mangaDir.path, '1.jpg')).writeAsBytes([1, 2, 3]);
+    test('DirResourceParser parses pure image manga directory', () async {
+      final mangaDir = Directory(p.join(tempDir.path, 'mangaA'));
+      await mangaDir.create(recursive: true);
+      await File(p.join(mangaDir.path, '1.jpg')).writeAsBytes([1, 2, 3]);
 
-        final parser = ResourceParser();
-        final parsed = await parser.parse((
-          path: mangaDir.path,
-          type: ResourceType.dir,
-        ));
+      final parser = DirResourceParser();
+      final parsed = await parser.parse(mangaDir, ctx);
 
-        expect(parsed, isNotNull);
-        expect(parsed!.type, ResourceType.dir);
-        expect(parsed.path, mangaDir.path);
-        expect(parsed.meta.title, 'mangaA');
-        expect(parsed.meta.authors, isEmpty);
-      },
-    );
+      expect(parsed, isNotNull);
+      expect(parsed!.type, ResourceType.dir);
+      expect(parsed.path, mangaDir.path);
+      expect(parsed.meta.title, 'mangaA');
+      expect(parsed.meta.authors, isEmpty);
+    });
 
-    test('parses zip candidate and returns title from filename', () async {
+    test('PureImageZipParser returns title from filename', () async {
       final zipPath = await createMinimalZip(
         fileName: 'x.zip',
         entryName: '1.jpg',
       );
 
-      final parser = ResourceParser();
-      final parsed = await parser.parse((
-        path: zipPath,
-        type: ResourceType.zip,
-      ));
+      final parser = PureImageZipParser();
+      final parsed = await parser.parse(File(zipPath), ctx);
 
       expect(parsed, isNotNull);
       expect(parsed!.type, ResourceType.zip);
@@ -73,17 +67,14 @@ void main() {
       expect(parsed.meta.authors, isEmpty);
     });
 
-    test('parses cbz candidate and returns title from filename', () async {
+    test('PureImageCbzParser returns title from filename', () async {
       final cbzPath = await createMinimalZip(
         fileName: 'y.cbz',
         entryName: '1.jpg',
       );
 
-      final parser = ResourceParser();
-      final parsed = await parser.parse((
-        path: cbzPath,
-        type: ResourceType.cbz,
-      ));
+      final parser = PureImageCbzParser();
+      final parsed = await parser.parse(File(cbzPath), ctx);
 
       expect(parsed, isNotNull);
       expect(parsed!.type, ResourceType.cbz);
@@ -91,30 +82,27 @@ void main() {
       expect(parsed.meta.authors, isEmpty);
     });
 
-    test('returns null for cbr/rar placeholders', () async {
+    test('cbr/rar files yield no parsed resource (no parser)', () async {
       final cbr = File(p.join(tempDir.path, 'a.cbr'))..writeAsBytesSync([0]);
       final rar = File(p.join(tempDir.path, 'b.rar'))..writeAsBytesSync([0]);
 
-      final parser = ResourceParser();
-      expect(
-        await parser.parse((path: cbr.path, type: ResourceType.cbr)),
-        isNull,
+      final service = ComicScanParseService(
+        parsers: defaultComicResourceParsers(),
+        parseContext: ctx,
       );
-      expect(
-        await parser.parse((path: rar.path, type: ResourceType.rar)),
-        isNull,
-      );
+      final out = await service.scanAndParseRoots([
+        cbr.path,
+        rar.path,
+      ]).toList();
+      expect(out, isEmpty);
     });
 
-    test('returns null for invalid epub file', () async {
+    test('ComicEpubParser returns null for invalid epub file', () async {
       final epub = File(p.join(tempDir.path, 'bad.epub'))
         ..writeAsBytesSync([0, 1, 2]);
 
-      final parser = ResourceParser();
-      final parsed = await parser.parse((
-        path: epub.path,
-        type: ResourceType.epub,
-      ));
+      final parser = ComicEpubParser();
+      final parsed = await parser.parse(epub, ctx);
       expect(parsed, isNull);
     });
   });

@@ -2,11 +2,11 @@ import 'package:path/path.dart' as p;
 
 /// 通过规则校验后确定的资源类型（用于后续 diff/入库重构）。
 enum ResourceType {
-  /// 纯图片漫画目录 (满足 scanTopLevelForManga 规则)
+  /// 纯图片目录
   dir,
 
   /// .zip 压缩包
-  /// 纯图片压缩包
+  /// 内容为纯图片
   zip,
 
   /// .cbz 压缩包

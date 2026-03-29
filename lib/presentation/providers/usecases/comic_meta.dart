@@ -12,8 +12,7 @@ part 'comic_meta.g.dart';
 @Riverpod(keepAlive: true)
 IngestLibraryResourcesUseCase ingestLibraryResourcesUseCase(Ref ref) {
   return IngestLibraryResourcesUseCase(
-    scanner: ref.read(resourceScannerProvider),
-    parser: ref.read(resourceParserProvider),
+    scanParseService: ref.read(comicScanParseServiceProvider),
     mapper: ref.read(libraryComicMapperProvider),
     comicRepo: ref.read(libraryComicRepoProvider),
   );
