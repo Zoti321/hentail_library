@@ -160,11 +160,7 @@ class ComicCard extends HookConsumerWidget {
             children: [
               // 1. 图片 + 缩放动画
               if (coverPath != null)
-                ExtendedImage.file(
-                      File(coverPath),
-                      cacheWidth: 200,
-                      fit: BoxFit.cover,
-                    )
+                ExtendedImage.file(File(coverPath), fit: BoxFit.cover)
                     .animate(target: isHover ? 1 : 0)
                     .scale(
                       begin: Offset(1, 1),
@@ -180,34 +176,9 @@ class ComicCard extends HookConsumerWidget {
                 ),
 
               // 2. 黑色遮罩层 (Hover 时显示)
-              Container(color: Colors.black.withAlpha(20))
+              Container(color: Colors.black.withOpacity(0.2))
                   .animate(target: isHover ? 1 : 0)
                   .fade(begin: 0.0, end: 1.0, duration: 200.ms),
-
-              // 3. 格式标签 (右上角)
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withAlpha(50),
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: Colors.white.withAlpha(10)),
-                  ),
-                  child: Text(
-                    comic.resourceType.name,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),

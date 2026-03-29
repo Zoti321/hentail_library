@@ -41,33 +41,37 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
   void _startSync() {
     if (_started) return;
     _started = true;
-    _syncFuture = ref.read(syncComicsUseCaseProvider).call(
+    _syncFuture = ref
+        .read(syncComicsUseCaseProvider)
+        .call(
           isCancelled: () => _isCancelled.value,
           onProgress: (p) {
             if (!mounted) return;
             setState(() => _progress = p);
           },
         );
-    _syncFuture!.then((_) {
-      if (mounted) {
-        setState(() {
-          _isRunning = false;
+    _syncFuture!
+        .then((_) {
+          if (mounted) {
+            setState(() {
+              _isRunning = false;
+            });
+          }
+          if (_runInBackground) {
+            widget.onBackgroundComplete?.call();
+          }
+          widget.onScanEnd?.call();
+        })
+        .catchError((e, _) {
+          if (mounted) {
+            setState(() {
+              _error = e is AppException ? e.message : e.toString();
+              _isRunning = false;
+            });
+          }
+          if (_runInBackground) widget.onBackgroundComplete?.call();
+          widget.onScanEnd?.call();
         });
-      }
-      if (_runInBackground) {
-        widget.onBackgroundComplete?.call();
-      }
-      widget.onScanEnd?.call();
-    }).catchError((e, _) {
-      if (mounted) {
-        setState(() {
-          _error = e is AppException ? e.message : e.toString();
-          _isRunning = false;
-        });
-      }
-      if (_runInBackground) widget.onBackgroundComplete?.call();
-      widget.onScanEnd?.call();
-    });
   }
 
   @override
@@ -116,7 +120,8 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
                 _buildHeader(theme),
                 if (_error != null)
                   _buildError(theme)
-                else if (!_isRunning || _progress?.phase == SyncLibraryPhase.done)
+                else if (!_isRunning ||
+                    _progress?.phase == SyncLibraryPhase.done)
                   _buildDone(theme)
                 else
                   _buildRunning(theme),
@@ -330,7 +335,10 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
               style: FilledButton.styleFrom(
                 backgroundColor: cs.primary,
                 foregroundColor: cs.onPrimary,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -345,7 +353,10 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
               },
               style: TextButton.styleFrom(
                 foregroundColor: cs.textSecondary,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -360,7 +371,10 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
               style: FilledButton.styleFrom(
                 backgroundColor: cs.primary,
                 foregroundColor: cs.onPrimary,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
