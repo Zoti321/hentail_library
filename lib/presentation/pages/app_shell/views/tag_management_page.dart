@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/domain/entity/comic/library_tag.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class TagManagementPage extends ConsumerWidget {
@@ -145,27 +146,11 @@ class _Header extends ConsumerWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             SizedBox(
-              width: 240,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: cs.surface,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: cs.borderSubtle),
-                ),
-                child: TextField(
-                  onChanged: (value) =>
-                      ref.read(tagFilterProvider.notifier).setQuery(value),
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    prefixIcon: Icon(LucideIcons.search, size: 16),
-                    hintText: '搜索标签名称…',
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 8,
-                    ),
-                  ),
-                ),
+              width: MediaQuery.of(context).size.width * 0.2,
+              child: CustomTextField(
+                hintText: '搜索标签名称…',
+                onChanged: (value) =>
+                    ref.read(tagFilterProvider.notifier).setQuery(value),
               ),
             ),
             FilledButton.icon(

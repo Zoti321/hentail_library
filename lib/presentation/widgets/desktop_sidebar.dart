@@ -39,6 +39,7 @@ class DesktopSidebar extends StatelessWidget {
         icon: LucideIcons.folderTree,
       ),
       const NavItemData(id: 'tags', label: '标签', icon: LucideIcons.tags),
+      const NavItemData(id: 'series', label: '系列', icon: LucideIcons.layers),
       const NavItemData(id: 'history', label: '历史', icon: LucideIcons.history),
     ];
     final List<NavItemData> systemItems = [

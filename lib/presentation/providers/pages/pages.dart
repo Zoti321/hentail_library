@@ -5,3 +5,4 @@ export 'reader/reader_page_notifier.dart';
 export 'reader/reading_session_notifier.dart';
 export 'settings/settings_notifier.dart';
 export 'tag_management/tag_management_notifier.dart';
+export 'series_management/series_management_notifier.dart';

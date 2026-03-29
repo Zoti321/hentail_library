@@ -7,6 +7,7 @@ import 'package:hentai_library/domain/entity/reading_history.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/card_item/reading_history_card.dart';
+import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HistoryPage extends HookConsumerWidget {
@@ -464,118 +465,6 @@ class _ConfirmDeleteHistoryDialog extends StatelessWidget {
           child: const Text('删除'),
         ),
       ],
-    );
-  }
-}
-
-class CustomTextField extends HookWidget {
-  const CustomTextField({super.key, this.onChanged, this.hintText = ""});
-
-  final ValueChanged<String>? onChanged;
-  final String hintText;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final TextEditingController controller = useTextEditingController();
-    final FocusNode focusNode = useFocusNode();
-    final isFocused = useState(false);
-
-    useEffect(() {
-      void listener() => isFocused.value = focusNode.hasFocus;
-
-      focusNode.addListener(listener);
-      return () => focusNode.removeListener(listener);
-    }, [focusNode]);
-
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isFocused.value
-              ? colorScheme.primary
-              : colorScheme.borderMedium,
-          width: 0.8,
-        ),
-        boxShadow: isFocused.value
-            ? [
-                BoxShadow(
-                  color: colorScheme.primary.withOpacity(0.4),
-                  blurRadius: 0,
-                  spreadRadius: 1,
-                ),
-              ]
-            : [],
-      ),
-      child: Row(
-        children: [
-          // 左侧搜索图标
-          Padding(
-            padding: const EdgeInsets.only(left: 12, right: 8),
-            child: Icon(
-              LucideIcons.search,
-              size: 16,
-              color: isFocused.value
-                  ? colorScheme.primary
-                  : colorScheme.textPlaceholder,
-            ),
-          ),
-
-          // 输入框主体
-          Expanded(
-            child: TextField(
-              controller: controller,
-              focusNode: focusNode,
-              onChanged: onChanged,
-              style: TextStyle(fontSize: 13, color: colorScheme.textPrimary),
-              cursorColor: colorScheme.onSurface,
-              cursorWidth: 0.8,
-              cursorHeight: 16,
-              decoration: InputDecoration(
-                isDense: true,
-                hintText: hintText,
-                hintStyle: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w300,
-                  color: colorScheme.textPlaceholder,
-                ),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-              ),
-            ),
-          ),
-
-          // 右侧清除按钮 (仅当有内容时显示)
-          ValueListenableBuilder<TextEditingValue>(
-            valueListenable: controller,
-            builder: (context, value, child) {
-              if (value.text.isEmpty) return const SizedBox(width: 12);
-
-              return MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: () {
-                    controller.clear();
-                    onChanged?.call('');
-                  },
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Icon(
-                      LucideIcons.circleX,
-                      size: 14,
-                      color: colorScheme.textPlaceholder,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
     );
   }
 }
