@@ -5,13 +5,28 @@ import 'package:hentai_library/domain/entity/comic/library_comic.dart'
     as entity;
 import 'package:hentai_library/domain/entity/comic/library_tag.dart' as entity;
 import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/domain/library/library_comic_scan_diff.dart';
 import 'package:hentai_library/domain/repository/library_comic_repo.dart';
+import 'package:hentai_library/domain/repository/library_series_repo.dart';
+import 'package:hentai_library/domain/repository/reading_history_repo.dart';
+import 'package:hentai_library/domain/repository/reading_session_repo.dart';
+import 'package:hentai_library/domain/usecases/purge_library_comics_side_effects.dart';
 import 'package:drift/drift.dart';
 
 class LibraryComicRepositoryImpl implements LibraryComicRepository {
-  final LibraryComicDao _comicDao;
+  LibraryComicRepositoryImpl(
+    this._comicDao, {
+    required ReadingHistoryRepository readingHistory,
+    required LibrarySeriesRepository librarySeries,
+    required ReadingSessionRepository readingSessions,
+  }) : _readingHistory = readingHistory,
+       _librarySeries = librarySeries,
+       _readingSessions = readingSessions;
 
-  LibraryComicRepositoryImpl(this._comicDao);
+  final LibraryComicDao _comicDao;
+  final ReadingHistoryRepository _readingHistory;
+  final LibrarySeriesRepository _librarySeries;
+  final ReadingSessionRepository _readingSessions;
 
   Future<List<entity.LibraryComic>> _mapRows(List<db.LibraryComic> rows) async {
     final tagMap = await _comicDao.getTagNamesForComics(
@@ -114,8 +129,49 @@ class LibraryComicRepositoryImpl implements LibraryComicRepository {
   }
 
   @override
-  Future<void> replaceByScan(List<entity.LibraryComic> scanned) async {
-    // 简单实现：直接 upsertMany；后续再做真正 diff
-    await upsertMany(scanned);
+  Future<LibraryComicReplaceByScanResult> replaceByScan(
+    List<entity.LibraryComic> scanned,
+  ) async {
+    final unique = dedupeScannedByComicId(scanned);
+    final scannedIds = unique.keys.toSet();
+
+    final existing = await getAll();
+    final existingById = {for (final c in existing) c.comicId: c};
+    final existingIds = existingById.keys.toSet();
+
+    final idDiff = computeLibraryComicScanIdDiff(
+      existingIds: existingIds,
+      scannedIds: scannedIds,
+    );
+
+    if (idDiff.removedIds.isNotEmpty) {
+      await purgeLibraryComicsFromApp(
+        libraryComics: this,
+        readingHistory: _readingHistory,
+        librarySeries: _librarySeries,
+        readingSessions: _readingSessions,
+        comicIds: idDiff.removedIds,
+      );
+    }
+
+    final toUpsert = <entity.LibraryComic>[];
+    for (final e in unique.entries) {
+      final id = e.key;
+      final row = e.value;
+      if (idDiff.addedIds.contains(id)) {
+        toUpsert.add(row);
+      } else {
+        final prior = existingById[id]!;
+        toUpsert.add(mergeKeptScanWithExisting(row, prior));
+      }
+    }
+
+    await upsertMany(toUpsert);
+
+    return (
+      removedCount: idDiff.removedIds.length,
+      addedCount: idDiff.addedIds.length,
+      keptCount: idDiff.keptIds.length,
+    );
   }
 }

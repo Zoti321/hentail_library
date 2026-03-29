@@ -1,5 +1,6 @@
 import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/usecases/purge_library_comics_side_effects.dart';
 import 'package:hentai_library/domain/usecases/usecases.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:hentai_library/presentation/providers/usecases/sync_library_progress.dart';
@@ -66,6 +67,9 @@ class SyncComicsUseCase {
           currentPath: null,
           acceptedTotal: 0,
           counts: emptyLibrarySyncCounts(),
+          removedCount: null,
+          addedCount: null,
+          keptCount: null,
         ));
         return;
       }
@@ -78,15 +82,14 @@ class SyncComicsUseCase {
         currentPath: null,
         acceptedTotal: 0,
         counts: emptyLibrarySyncCounts(),
+        removedCount: null,
+        addedCount: null,
+        keptCount: null,
       ));
 
       final historyRepo = _ref.read(readingHistoryRepoProvider);
       final seriesRepo = _ref.read(librarySeriesRepoProvider);
       final sessionRepo = _ref.read(readingSessionRepoProvider);
-
-      await historyRepo.deleteByComicIds(ids);
-      await seriesRepo.removeComicsFromSeries(ids);
-      await sessionRepo.deleteSessionsByComicIds(ids);
 
       emit((
         phase: SyncLibraryPhase.writingDb,
@@ -94,9 +97,18 @@ class SyncComicsUseCase {
         currentPath: null,
         acceptedTotal: 0,
         counts: emptyLibrarySyncCounts(),
+        removedCount: null,
+        addedCount: null,
+        keptCount: null,
       ));
 
-      await repo.deleteByIds(ids);
+      await purgeLibraryComicsFromApp(
+        libraryComics: repo,
+        readingHistory: historyRepo,
+        librarySeries: seriesRepo,
+        readingSessions: sessionRepo,
+        comicIds: ids,
+      );
 
       emit((
         phase: SyncLibraryPhase.done,
@@ -104,6 +116,9 @@ class SyncComicsUseCase {
         currentPath: null,
         acceptedTotal: 0,
         counts: emptyLibrarySyncCounts(),
+        removedCount: ids.length,
+        addedCount: 0,
+        keptCount: 0,
       ));
       return;
     }
@@ -133,6 +148,9 @@ class SyncComicsUseCase {
         currentPath: c.path,
         acceptedTotal: acceptedTotal,
         counts: counts,
+        removedCount: null,
+        addedCount: null,
+        keptCount: null,
       ));
 
       final p = await parser.parse(c);
@@ -146,6 +164,9 @@ class SyncComicsUseCase {
           currentPath: c.path,
           acceptedTotal: acceptedTotal,
           counts: counts,
+          removedCount: null,
+          addedCount: null,
+          keptCount: null,
         ));
       }
     }
@@ -160,9 +181,12 @@ class SyncComicsUseCase {
       currentPath: null,
       acceptedTotal: acceptedTotal,
       counts: counts,
+      removedCount: null,
+      addedCount: null,
+      keptCount: null,
     ));
 
-    await repo.replaceByScan(List<LibraryComic>.from(comics));
+    final apply = await repo.replaceByScan(List<LibraryComic>.from(comics));
 
     emit((
       phase: SyncLibraryPhase.done,
@@ -170,6 +194,9 @@ class SyncComicsUseCase {
       currentPath: null,
       acceptedTotal: acceptedTotal,
       counts: counts,
+      removedCount: apply.removedCount,
+      addedCount: apply.addedCount,
+      keptCount: apply.keptCount,
     ));
   }
 }

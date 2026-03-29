@@ -4,6 +4,8 @@ import 'package:test/test.dart';
 import 'package:hentai_library/data/repository/library_comic_repo_impl.dart';
 import 'package:hentai_library/data/repository/library_series_repo_impl.dart';
 import 'package:hentai_library/data/repository/library_tag_repo_impl.dart';
+import 'package:hentai_library/data/repository/reading_history_repo.dart';
+import 'package:hentai_library/data/repository/reading_session_repo.dart';
 import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart'
     as db;
@@ -21,8 +23,13 @@ void main() {
 
     setUp(() {
       dbInstance = db.AppDatabase(NativeDatabase.memory());
-      comicRepo = LibraryComicRepositoryImpl(LibraryComicDao(dbInstance));
       seriesRepo = LibrarySeriesRepositoryImpl(LibrarySeriesDao(dbInstance));
+      comicRepo = LibraryComicRepositoryImpl(
+        LibraryComicDao(dbInstance),
+        readingHistory: ReadingHistoryRepositoryImpl(ReadingHistoryDao(dbInstance)),
+        librarySeries: seriesRepo,
+        readingSessions: ReadingSessionRepositoryImpl(ReadingSessionDao(dbInstance)),
+      );
       tagRepo = LibraryTagRepositoryImpl(LibraryTagDao(dbInstance));
     });
 

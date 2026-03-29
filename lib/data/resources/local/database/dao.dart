@@ -14,6 +14,12 @@ class LibraryComicDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<LibraryComic>> getAllComics() => select(libraryComics).get();
 
+  /// 仅 comicId 列，用于大库 diff 等场景（不加载 tags）。
+  Future<List<String>> getAllComicIds() async {
+    final rows = await select(libraryComics).get();
+    return rows.map((r) => r.comicId).toList();
+  }
+
   Future<LibraryComic?> findById(String comicId) {
     return (select(
       libraryComics,

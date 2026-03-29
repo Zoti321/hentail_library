@@ -28,6 +28,11 @@ typedef SyncLibraryProgress = ({
   String? currentPath,
   int acceptedTotal,
   LibrarySyncCounts counts,
+
+  /// diff 应用统计；扫描中或未产生时为 null。
+  int? removedCount,
+  int? addedCount,
+  int? keptCount,
 });
 
 LibrarySyncCounts emptyLibrarySyncCounts() =>

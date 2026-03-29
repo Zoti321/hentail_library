@@ -228,7 +228,7 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('正在写入数据库…', style: secondary),
+          Text('正在应用扫描结果到数据库…', style: secondary),
           const SizedBox(height: 8),
           Text(
             '已识别 ${p.acceptedTotal} 本 · (dir: ${p.counts.dir}, zip: ${p.counts.zip}, '
@@ -280,7 +280,14 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
         case SyncLibraryRoute.noRootsCleared:
           label = '已清空现有漫画数据。';
         case SyncLibraryRoute.withRoots:
-          label = '同步完成';
+          final r = p.removedCount;
+          final a = p.addedCount;
+          final k = p.keptCount;
+          if (r != null && a != null && k != null) {
+            label = '同步完成 · 移除 $r · 新增 $a · 保留 $k';
+          } else {
+            label = '同步完成';
+          }
       }
     } else {
       label = '同步完成';

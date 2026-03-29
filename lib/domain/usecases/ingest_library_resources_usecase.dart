@@ -33,6 +33,6 @@ class IngestLibraryResourcesUseCase {
       comics.add(mapper.fromParsedResource(r));
     }
 
-    await comicRepo.upsertMany(comics);
+    await comicRepo.replaceByScan(comics);
   }
 }
