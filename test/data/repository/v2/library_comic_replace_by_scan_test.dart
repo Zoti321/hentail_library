@@ -4,9 +4,10 @@ import 'package:hentai_library/data/repository/library_series_repo_impl.dart';
 import 'package:hentai_library/data/repository/reading_history_repo.dart';
 import 'package:hentai_library/data/repository/reading_session_repo.dart';
 import 'package:hentai_library/data/resources/local/database/dao.dart';
-import 'package:hentai_library/data/resources/local/database/database.dart' as db;
+import 'package:hentai_library/data/resources/local/database/database.dart'
+    as db;
 import 'package:hentai_library/data/services/comic/resource_types.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -16,12 +17,18 @@ void main() {
 
     setUp(() {
       dbInstance = db.AppDatabase(NativeDatabase.memory());
-      final seriesRepo = LibrarySeriesRepositoryImpl(LibrarySeriesDao(dbInstance));
+      final seriesRepo = LibrarySeriesRepositoryImpl(
+        LibrarySeriesDao(dbInstance),
+      );
       comicRepo = LibraryComicRepositoryImpl(
         LibraryComicDao(dbInstance),
-        readingHistory: ReadingHistoryRepositoryImpl(ReadingHistoryDao(dbInstance)),
+        readingHistory: ReadingHistoryRepositoryImpl(
+          ReadingHistoryDao(dbInstance),
+        ),
         librarySeries: seriesRepo,
-        readingSessions: ReadingSessionRepositoryImpl(ReadingSessionDao(dbInstance)),
+        readingSessions: ReadingSessionRepositoryImpl(
+          ReadingSessionDao(dbInstance),
+        ),
       );
     });
 
@@ -31,7 +38,7 @@ void main() {
 
     test('删除扫描未包含的条目', () async {
       await comicRepo.upsertMany([
-        LibraryComic(
+        Comic(
           comicId: 'gone',
           path: r'X:\gone',
           resourceType: ResourceType.dir,
@@ -40,7 +47,7 @@ void main() {
       ]);
 
       final r = await comicRepo.replaceByScan([
-        LibraryComic(
+        Comic(
           comicId: 'stay',
           path: r'Y:\stay',
           resourceType: ResourceType.dir,
@@ -58,7 +65,7 @@ void main() {
 
     test('kept 合并保留用户标题', () async {
       await comicRepo.upsertMany([
-        LibraryComic(
+        Comic(
           comicId: 'k1',
           path: r'C:\old',
           resourceType: ResourceType.dir,
@@ -67,7 +74,7 @@ void main() {
       ]);
 
       final r = await comicRepo.replaceByScan([
-        LibraryComic(
+        Comic(
           comicId: 'k1',
           path: r'C:\new',
           resourceType: ResourceType.zip,
@@ -88,13 +95,13 @@ void main() {
 
     test('getAllComicIds 与列表长度一致', () async {
       await comicRepo.upsertMany([
-        LibraryComic(
+        Comic(
           comicId: 'a',
           path: r'P:\a',
           resourceType: ResourceType.dir,
           title: 'a',
         ),
-        LibraryComic(
+        Comic(
           comicId: 'b',
           path: r'P:\b',
           resourceType: ResourceType.dir,

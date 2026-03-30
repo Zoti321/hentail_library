@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/extensions/library_comic_extensions.dart';
 import 'package:hentai_library/domain/value_objects/library_comic_filter.dart';
@@ -18,7 +18,7 @@ part 'library_page_notifier.g.dart';
 @freezed
 abstract class LibraryPageState with _$LibraryPageState {
   const factory LibraryPageState({
-    @Default(<LibraryComic>[]) List<LibraryComic> rawList,
+    @Default(<Comic>[]) List<Comic> rawList,
     @Default(false) bool hasReceivedFirstEmit,
     Object? streamError,
     LibraryComicFilter? filter,
@@ -37,10 +37,10 @@ abstract class LibraryPageState with _$LibraryPageState {
 }
 
 extension LibraryPageStateDerived on LibraryPageState {
-  List<LibraryComic> get displayedComics =>
+  List<Comic> get displayedComics =>
       rawList.applyFilter(effectiveFilter).sortedWith(effectiveSortOption);
 
-  AsyncValue<List<LibraryComic>> get comicsAsyncValue {
+  AsyncValue<List<Comic>> get comicsAsyncValue {
     if (streamError != null) {
       return AsyncValue.error(streamError!, StackTrace.current);
     }
@@ -50,7 +50,7 @@ extension LibraryPageStateDerived on LibraryPageState {
     return AsyncValue.data(displayedComics);
   }
 
-  AsyncValue<List<LibraryComic>> get rawComicsAsyncValue {
+  AsyncValue<List<Comic>> get rawComicsAsyncValue {
     if (streamError != null) {
       return AsyncValue.error(streamError!, StackTrace.current);
     }
@@ -78,7 +78,7 @@ extension LibraryPageStateDerived on LibraryPageState {
 
 @Riverpod(keepAlive: true)
 class LibraryPageNotifier extends _$LibraryPageNotifier {
-  StreamSubscription<List<LibraryComic>>? _sub;
+  StreamSubscription<List<Comic>>? _sub;
   Timer? _filterQueryDebounce;
   Timer? _mergeSearchDebounce;
 
@@ -216,13 +216,13 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
     state = state.copyWith(isGridView: value);
   }
 
-  LibraryComic? comicById(String id) {
+  Comic? comicById(String id) {
     return state.rawList.firstWhereOrNull((c) => c.comicId == id);
   }
 }
 
 @riverpod
-Future<List<LibraryComic>> filteredMergeComics(
+Future<List<Comic>> filteredMergeComics(
   Ref ref, {
   required String comicId,
 }) async {

@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
 
 part 'library_comic_sort_option.freezed.dart';
 
@@ -14,7 +14,7 @@ abstract class LibraryComicSortOption with _$LibraryComicSortOption {
 
   const LibraryComicSortOption._();
 
-  int compare(LibraryComic a, LibraryComic b) {
+  int compare(Comic a, Comic b) {
     int result;
     switch (field) {
       case LibraryComicSortField.title:

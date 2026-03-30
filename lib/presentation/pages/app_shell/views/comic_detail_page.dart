@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/dialog/edit_metadata_dialog.dart';
@@ -43,7 +43,7 @@ class ComicDetailPage extends HookConsumerWidget {
 }
 
 class _DetailContent extends StatelessWidget {
-  final LibraryComic comic;
+  final Comic comic;
 
   const _DetailContent({required this.comic});
 
@@ -215,7 +215,7 @@ class _DetailEmpty extends StatelessWidget {
 }
 
 class _LeftColumn extends HookConsumerWidget {
-  final LibraryComic comic;
+  final Comic comic;
 
   const _LeftColumn({required this.comic});
 
@@ -278,16 +278,12 @@ class _LeftColumn extends HookConsumerWidget {
           button: true,
           child: ElevatedButton.icon(
             onPressed: () async {
-              final path = await ref.read(
-                comicCoverPathProvider(comicId: comic.comicId).future,
-              );
               await ref
                   .read(recordReadingProgressUseCaseProvider)
                   .call(
                     ReadingHistory(
                       comicId: comic.comicId,
                       title: comic.title,
-                      coverUrl: path,
                       lastReadTime: DateTime.now(),
                     ),
                   );
@@ -533,7 +529,7 @@ class _BackBtn extends HookWidget {
 class _ComicEditBtn extends HookConsumerWidget {
   const _ComicEditBtn({required this.comic});
 
-  final LibraryComic comic;
+  final Comic comic;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

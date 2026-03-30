@@ -10,9 +10,8 @@ import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart'
     as db;
 import 'package:hentai_library/data/services/comic/resource_types.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart'
-    as entity;
-import 'package:hentai_library/domain/entity/comic/library_tag.dart' as entity;
+import 'package:hentai_library/domain/entity/comic/comic.dart' as entity;
+import 'package:hentai_library/domain/entity/comic/tag.dart' as entity;
 
 void main() {
   group('v2 repos', () {
@@ -26,9 +25,13 @@ void main() {
       seriesRepo = LibrarySeriesRepositoryImpl(LibrarySeriesDao(dbInstance));
       comicRepo = LibraryComicRepositoryImpl(
         LibraryComicDao(dbInstance),
-        readingHistory: ReadingHistoryRepositoryImpl(ReadingHistoryDao(dbInstance)),
+        readingHistory: ReadingHistoryRepositoryImpl(
+          ReadingHistoryDao(dbInstance),
+        ),
         librarySeries: seriesRepo,
-        readingSessions: ReadingSessionRepositoryImpl(ReadingSessionDao(dbInstance)),
+        readingSessions: ReadingSessionRepositoryImpl(
+          ReadingSessionDao(dbInstance),
+        ),
       );
       tagRepo = LibraryTagRepositoryImpl(LibraryTagDao(dbInstance));
     });
@@ -38,17 +41,17 @@ void main() {
     });
 
     test('LibraryTagRepository.rename 会级联更新 comic tags', () async {
-      await tagRepo.add(entity.LibraryTag(name: 'old'));
+      await tagRepo.add(entity.Tag(name: 'old'));
 
       await comicRepo.upsertMany([
-        entity.LibraryComic(
+        entity.Comic(
           comicId: 'c1',
           path: r'X:\a\b',
           resourceType: ResourceType.dir,
           title: 't',
           authors: ['a'],
           contentRating: ContentRating.safe,
-          tags: [entity.LibraryTag(name: 'old')],
+          tags: [entity.Tag(name: 'old')],
         ),
       ]);
 

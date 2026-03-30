@@ -1,7 +1,7 @@
 import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart'
     as db;
-import 'package:hentai_library/domain/entity/comic/library_series.dart'
+import 'package:hentai_library/domain/entity/comic/series.dart'
     as entity;
 import 'package:hentai_library/domain/entity/comic/series_item.dart' as entity;
 import 'package:hentai_library/domain/repository/library_series_repo.dart';
@@ -12,12 +12,12 @@ class LibrarySeriesRepositoryImpl implements LibrarySeriesRepository {
   LibrarySeriesRepositoryImpl(this._dao);
 
   @override
-  Stream<List<entity.LibrarySeries>> watchAll() {
+  Stream<List<entity.Series>> watchAll() {
     return _dao.watchAllSeries().asyncMap((rows) async {
       // 目前只映射 series 基本信息；items 由 findById/getAll 单独查询。
       return rows
           .map(
-            (r) => entity.LibrarySeries(
+            (r) => entity.Series(
               seriesId: r.seriesId,
               name: r.name,
               items: const [],
@@ -28,13 +28,13 @@ class LibrarySeriesRepositoryImpl implements LibrarySeriesRepository {
   }
 
   @override
-  Future<List<entity.LibrarySeries>> getAll() async {
+  Future<List<entity.Series>> getAll() async {
     final seriesRows = await _dao.getAllSeries();
-    final result = <entity.LibrarySeries>[];
+    final result = <entity.Series>[];
     for (final s in seriesRows) {
       final items = await _dao.getItemsForSeries(s.seriesId);
       result.add(
-        entity.LibrarySeries(
+        entity.Series(
           seriesId: s.seriesId,
           name: s.name,
           items: items
@@ -50,11 +50,11 @@ class LibrarySeriesRepositoryImpl implements LibrarySeriesRepository {
   }
 
   @override
-  Future<entity.LibrarySeries?> findById(String seriesId) async {
+  Future<entity.Series?> findById(String seriesId) async {
     final row = await _dao.findById(seriesId);
     if (row == null) return null;
     final items = await _dao.getItemsForSeries(seriesId);
-    return entity.LibrarySeries(
+    return entity.Series(
       seriesId: row.seriesId,
       name: row.name,
       items: items

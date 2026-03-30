@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/value_objects/library_tag_pick.dart';
 
@@ -20,7 +20,7 @@ abstract class LibraryComicFilter with _$LibraryComicFilter {
 
   LibraryComicFilter._();
 
-  bool matches(LibraryComic comic) {
+  bool matches(Comic comic) {
     if (query != null && query!.trim().isNotEmpty) {
       final q = query!.toLowerCase();
       final inTitle = comic.title.toLowerCase().contains(q);

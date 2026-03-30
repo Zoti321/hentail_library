@@ -1,9 +1,9 @@
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:path/path.dart' as p;
 
-/// 将 v2 ParsedResource 映射为领域 `LibraryComic`。
+/// 将 v2 ParsedResource 映射为领域 `Comic`。
 class LibraryComicMapper {
   /// 规范化路径用于生成稳定的（path-based）comicId。
   ///
@@ -25,8 +25,8 @@ class LibraryComicMapper {
     return generateComicId(normalized);
   }
 
-  LibraryComic fromParsedResource(ParsedResource r) {
-    return LibraryComic(
+  Comic fromParsedResource(ParsedResource r) {
+    return Comic(
       comicId: comicIdFromPath(r.path),
       path: r.path,
       resourceType: r.type,

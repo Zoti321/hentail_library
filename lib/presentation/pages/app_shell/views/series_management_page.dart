@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
-import 'package:hentai_library/domain/entity/comic/library_series.dart';
+import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -38,8 +38,8 @@ class SeriesManagementPage extends ConsumerWidget {
     );
   }
 
-  List<LibrarySeries> _applyFilter(List<LibrarySeries> source, String query) {
-    if (query.trim().isEmpty) return List<LibrarySeries>.from(source);
+  List<Series> _applyFilter(List<Series> source, String query) {
+    if (query.trim().isEmpty) return List<Series>.from(source);
     final q = query.trim().toLowerCase();
     return source.where((s) => s.name.toLowerCase().contains(q)).toList();
   }
@@ -159,7 +159,7 @@ class _EmptyState extends StatelessWidget {
 class _SeriesList extends StatelessWidget {
   const _SeriesList({required this.series});
 
-  final List<LibrarySeries> series;
+  final List<Series> series;
 
   @override
   Widget build(BuildContext context) {
@@ -216,7 +216,7 @@ class _SeriesList extends StatelessWidget {
 class _SeriesRow extends ConsumerWidget {
   const _SeriesRow({required this.series});
 
-  final LibrarySeries series;
+  final Series series;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -383,7 +383,7 @@ class _AddSeriesDialogState extends ConsumerState<_AddSeriesDialog> {
 class _RenameSeriesDialog extends ConsumerStatefulWidget {
   const _RenameSeriesDialog({required this.series});
 
-  final LibrarySeries series;
+  final Series series;
 
   @override
   ConsumerState<_RenameSeriesDialog> createState() =>
@@ -485,7 +485,7 @@ class _RenameSeriesDialogState extends ConsumerState<_RenameSeriesDialog> {
 class _ConfirmDeleteSeriesDialog extends StatelessWidget {
   const _ConfirmDeleteSeriesDialog({required this.series});
 
-  final LibrarySeries series;
+  final Series series;
 
   @override
   Widget build(BuildContext context) {

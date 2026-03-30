@@ -6,7 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/context_menu.dart';
@@ -14,7 +14,7 @@ import 'package:hentai_library/presentation/widgets/dialog/edit_metadata_dialog.
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ComicCard extends HookConsumerWidget {
-  final LibraryComic comic;
+  final Comic comic;
   final Size size;
   final VoidCallback onTap;
   final VoidCallback onPlay;

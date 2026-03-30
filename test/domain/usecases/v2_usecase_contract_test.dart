@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/domain/entity/comic/library_tag.dart';
+import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/repository/library_comic_repo.dart';
 import 'package:hentai_library/domain/repository/library_series_repo.dart';
@@ -35,7 +35,7 @@ void main() {
           title: 'T',
           authors: ['A'],
           contentRating: ContentRating.safe,
-          tags: [LibraryTag(name: 'tag1')],
+          tags: [Tag(name: 'tag1')],
         );
 
         verify(
@@ -44,7 +44,7 @@ void main() {
             title: 'T',
             authors: ['A'],
             contentRating: ContentRating.safe,
-            tags: [LibraryTag(name: 'tag1')],
+            tags: [Tag(name: 'tag1')],
           ),
         ).called(1);
       },

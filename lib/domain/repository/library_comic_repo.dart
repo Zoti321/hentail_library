@@ -1,5 +1,5 @@
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
-import 'package:hentai_library/domain/entity/comic/library_tag.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
 
 /// [replaceByScan] 应用结果统计（供 UI 进度等）。
@@ -11,14 +11,14 @@ typedef LibraryComicReplaceByScanResult = ({
 
 /// v2 Comic 仓储：仅定义领域契约，不暴露数据层细节。
 abstract class LibraryComicRepository {
-  Stream<List<LibraryComic>> watchAll();
+  Stream<List<Comic>> watchAll();
 
-  Future<List<LibraryComic>> getAll();
+  Future<List<Comic>> getAll();
 
-  Future<LibraryComic?> findById(String comicId);
+  Future<Comic?> findById(String comicId);
 
   /// 用于扫描导入（写入/更新）。
-  Future<void> upsertMany(List<LibraryComic> comics);
+  Future<void> upsertMany(List<Comic> comics);
 
   Future<void> deleteByIds(List<String> comicIds);
 
@@ -28,9 +28,9 @@ abstract class LibraryComicRepository {
     String? title,
     List<String>? authors,
     ContentRating? contentRating,
-    List<LibraryTag>? tags,
+    List<Tag>? tags,
   });
 
   /// 扫描 diff：删除库中本次未出现的条目并清理关联；新增与保留条目写入（保留合并用户元数据）。
-  Future<LibraryComicReplaceByScanResult> replaceByScan(List<LibraryComic> scanned);
+  Future<LibraryComicReplaceByScanResult> replaceByScan(List<Comic> scanned);
 }

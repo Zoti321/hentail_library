@@ -1,18 +1,18 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
-import 'package:hentai_library/domain/entity/comic/library_tag.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/value_objects/library_comic_filter.dart';
 import 'package:hentai_library/domain/value_objects/library_tag_pick.dart';
 
 void main() {
-  LibraryComic comic({
+  Comic comic({
     required ResourceType type,
     required ContentRating rating,
-    required List<LibraryTag> tags,
+    required List<Tag> tags,
   }) {
-    return LibraryComic(
+    return Comic(
       comicId: 'c1',
       path: '/x',
       resourceType: type,
@@ -57,8 +57,8 @@ void main() {
     });
 
     test('filters by tagsAll (AND)', () {
-      final t1 = LibraryTag(name: 'a');
-      final t2 = LibraryTag(name: 'b');
+      final t1 = Tag(name: 'a');
+      final t2 = Tag(name: 'b');
       final c = comic(
         type: ResourceType.dir,
         rating: ContentRating.unknown,
@@ -80,7 +80,7 @@ void main() {
     });
 
     test('filters by tagsAny (OR)', () {
-      final t1 = LibraryTag(name: 'a');
+      final t1 = Tag(name: 'a');
       final c = comic(
         type: ResourceType.dir,
         rating: ContentRating.unknown,
@@ -93,7 +93,7 @@ void main() {
     });
 
     test('filters by tagsExclude (NOT)', () {
-      final t1 = LibraryTag(name: 'a');
+      final t1 = Tag(name: 'a');
       final c = comic(
         type: ResourceType.dir,
         rating: ContentRating.unknown,
@@ -108,7 +108,7 @@ void main() {
     });
 
     test('combines filters (resourceType + rating + tags)', () {
-      final t = LibraryTag(name: 'x');
+      final t = Tag(name: 'x');
       final c = comic(
         type: ResourceType.epub,
         rating: ContentRating.safe,

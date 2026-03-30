@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
-import 'package:hentai_library/domain/entity/comic/library_tag.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/presentation/widgets/form/content_rating_field.dart';
@@ -22,7 +22,7 @@ class EditMetadataDialog extends StatefulHookConsumerWidget {
     required this.onSave,
   });
 
-  final LibraryComic comic;
+  final Comic comic;
   final Future<void> Function(ComicMetadataForm) onSave;
 
   @override
@@ -41,7 +41,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     _formData = ComicMetadataForm(
       title: widget.comic.title,
       isR18: widget.comic.contentRating == ContentRating.r18,
-      tags: List<LibraryTag>.from(widget.comic.tags),
+      tags: List<Tag>.from(widget.comic.tags),
       authors: List<String>.from(widget.comic.authors),
     );
   }
@@ -65,15 +65,16 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
 
   void _handleTagAdd(String name) {
     if (name.isEmpty) return;
-    final tag = LibraryTag(name: name);
-    if (!_formData.tags.any((t) => t.name == tag.name)) {
+    final tag = Tag(name: name);
+    final tags = _formData.tags.whereType<Tag>();
+    if (!tags.any((t) => t.name == tag.name)) {
       setState(() {
-        _formData = _formData.copyWith(tags: [..._formData.tags, tag]);
+        _formData = _formData.copyWith(tags: [...tags, tag]);
       });
     }
   }
 
-  void _handleTagRemove(LibraryTag tag) {
+  void _handleTagRemove(Tag tag) {
     setState(() {
       _formData = _formData.copyWith(tags: [..._formData.tags]..remove(tag));
     });
@@ -235,10 +236,12 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
         TagEditorField(
           label: "标签",
           icon: LucideIcons.tag,
-          items: _formData.tags.map((t) => t.name).toList(),
+          items: _formData.tags.whereType<Tag>().map((t) => t.name).toList(),
           onAdd: _handleTagAdd,
           onRemove: (name) {
-            final tag = _formData.tags.firstWhereOrNull((t) => t.name == name);
+            final tag = _formData.tags
+                .whereType<Tag>()
+                .firstWhereOrNull((t) => t.name == name);
             if (tag != null) _handleTagRemove(tag);
           },
         ),

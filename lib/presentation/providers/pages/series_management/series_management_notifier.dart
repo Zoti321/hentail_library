@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/entity/comic/library_series.dart';
+import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 
 /// 全部系列（含各系列下的漫画归属，用于显示数量）。
-final allSeriesProvider = FutureProvider<List<LibrarySeries>>((ref) async {
+final allSeriesProvider = FutureProvider<List<Series>>((ref) async {
   final list = await ref.watch(librarySeriesRepoProvider).getAll();
   list.sort((a, b) => a.name.compareTo(b.name));
   return list;

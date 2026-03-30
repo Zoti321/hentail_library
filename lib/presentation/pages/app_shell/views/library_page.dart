@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/l10n/app_strings.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/button/filter_popup_button.dart';
@@ -180,18 +180,16 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               _ViewToggleButton(
                 icon: LucideIcons.layoutGrid,
                 isActive: isGridView,
-                onTap: () => ref
-                    .read(libraryPageProvider.notifier)
-                    .setGridView(true),
+                onTap: () =>
+                    ref.read(libraryPageProvider.notifier).setGridView(true),
                 activeColor: theme.colorScheme.primary,
               ),
               const SizedBox(width: 4),
               _ViewToggleButton(
                 icon: LucideIcons.list,
                 isActive: !isGridView,
-                onTap: () => ref
-                    .read(libraryPageProvider.notifier)
-                    .setGridView(false),
+                onTap: () =>
+                    ref.read(libraryPageProvider.notifier).setGridView(false),
                 activeColor: theme.colorScheme.primary,
               ),
             ],
@@ -202,7 +200,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   }
 
   // 构建网格视图
-  Widget _buildGridView(AsyncValue<List<LibraryComic>> comics) {
+  Widget _buildGridView(AsyncValue<List<Comic>> comics) {
     return comics.when(
       data: (comics) {
         if (comics.isEmpty) return _EmptyLibrarySliver();
@@ -248,7 +246,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   }
 
   // 构建列表视图
-  Widget _buildListView(AsyncValue<List<LibraryComic>> comics) {
+  Widget _buildListView(AsyncValue<List<Comic>> comics) {
     return comics.when(
       data: (comics) {
         if (comics.isEmpty) return _EmptyLibrarySliver();

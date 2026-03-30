@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
 
 part 'library_tag_pick.freezed.dart';
 
@@ -10,7 +10,7 @@ abstract class LibraryTagPick with _$LibraryTagPick {
 
   const LibraryTagPick._();
 
-  bool matchesComic(LibraryComic comic) {
+  bool matchesComic(Comic comic) {
     return comic.tags.any((t) => t.name == name);
   }
 }

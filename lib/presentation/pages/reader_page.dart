@@ -23,7 +23,9 @@ class ReaderPage extends HookConsumerWidget {
 
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(readingSessionStartProvider.notifier).setStartedAt(DateTime.now());
+        ref
+            .read(readingSessionStartProvider.notifier)
+            .setStartedAt(DateTime.now());
       });
       return null;
     }, [comicId]);
@@ -73,18 +75,16 @@ void _saveProgress(WidgetRef ref, String comicId) {
   if (state == null) return;
   final comic = state.comic;
   final currentIndex = state.currentIndex;
-  final coverUrl = ref
-      .read(comicCoverPathProvider(comicId: comicId))
-      .maybeWhen(data: (v) => v, orElse: () => null);
 
   final sessionStart = ref.read(readingSessionStartProvider);
   if (sessionStart != null) {
-    final durationSeconds =
-        DateTime.now().difference(sessionStart).inSeconds;
+    final durationSeconds = DateTime.now().difference(sessionStart).inSeconds;
     if (durationSeconds > 0) {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-      ref.read(recordReadingSessionUseCaseProvider).call(
+      ref
+          .read(recordReadingSessionUseCaseProvider)
+          .call(
             entity.ReadingSession(
               comicId: comicId,
               date: today,
@@ -102,9 +102,7 @@ void _saveProgress(WidgetRef ref, String comicId) {
         entity.ReadingHistory(
           comicId: comicId,
           title: comic.title,
-          coverUrl: coverUrl,
           lastReadTime: DateTime.now(),
-          chapterId: null,
           pageIndex: currentIndex,
         ),
       );

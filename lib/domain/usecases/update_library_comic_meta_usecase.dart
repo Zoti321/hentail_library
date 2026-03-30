@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/entity/comic/library_tag.dart';
+import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/repository/library_comic_repo.dart';
 
@@ -13,7 +13,7 @@ class UpdateLibraryComicMetaUseCase {
     String? title,
     List<String>? authors,
     ContentRating? contentRating,
-    List<LibraryTag>? tags,
+    List<Tag>? tags,
   }) {
     return repo.updateUserMeta(
       comicId,

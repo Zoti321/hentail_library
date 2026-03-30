@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
 
 void main() {
-  LibraryComic c(String title) => LibraryComic(
+  Comic c(String title) => Comic(
     comicId: title,
     path: '/$title',
     resourceType: ResourceType.dir,

@@ -1,5 +1,5 @@
 import 'package:hentai_library/data/services/comic/resource_types.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/usecases/purge_library_comics_side_effects.dart';
 import 'package:hentai_library/domain/usecases/usecases.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
@@ -31,10 +31,30 @@ class SyncComicsUseCase {
 
   LibrarySyncCounts _bump(LibrarySyncCounts c, ResourceType t) {
     return switch (t) {
-      ResourceType.dir => (dir: c.dir + 1, zip: c.zip, cbz: c.cbz, epub: c.epub),
-      ResourceType.zip => (dir: c.dir, zip: c.zip + 1, cbz: c.cbz, epub: c.epub),
-      ResourceType.cbz => (dir: c.dir, zip: c.zip, cbz: c.cbz + 1, epub: c.epub),
-      ResourceType.epub => (dir: c.dir, zip: c.zip, cbz: c.cbz, epub: c.epub + 1),
+      ResourceType.dir => (
+        dir: c.dir + 1,
+        zip: c.zip,
+        cbz: c.cbz,
+        epub: c.epub,
+      ),
+      ResourceType.zip => (
+        dir: c.dir,
+        zip: c.zip + 1,
+        cbz: c.cbz,
+        epub: c.epub,
+      ),
+      ResourceType.cbz => (
+        dir: c.dir,
+        zip: c.zip,
+        cbz: c.cbz + 1,
+        epub: c.epub,
+      ),
+      ResourceType.epub => (
+        dir: c.dir,
+        zip: c.zip,
+        cbz: c.cbz,
+        epub: c.epub + 1,
+      ),
       ResourceType.cbr => c,
       ResourceType.rar => c,
     };
@@ -129,7 +149,7 @@ class SyncComicsUseCase {
 
     var counts = emptyLibrarySyncCounts();
     var acceptedTotal = 0;
-    final comics = <LibraryComic>[];
+    final comics = <Comic>[];
 
     await for (final p in scanParse.scanAndParseRoots(
       effectiveRoots,
@@ -180,7 +200,7 @@ class SyncComicsUseCase {
       keptCount: null,
     ));
 
-    final apply = await repo.replaceByScan(List<LibraryComic>.from(comics));
+    final apply = await repo.replaceByScan(List<Comic>.from(comics));
 
     emit((
       phase: SyncLibraryPhase.done,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/domain/entity/comic/library_tag.dart';
+import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -36,8 +36,8 @@ class TagManagementPage extends ConsumerWidget {
     );
   }
 
-  List<LibraryTag> _applyFilter(List<LibraryTag> source, String query) {
-    if (query.trim().isEmpty) return List<LibraryTag>.from(source);
+  List<Tag> _applyFilter(List<Tag> source, String query) {
+    if (query.trim().isEmpty) return List<Tag>.from(source);
     final q = query.trim().toLowerCase();
     return source.where((t) => t.name.toLowerCase().contains(q)).toList();
   }
@@ -192,7 +192,7 @@ class _Header extends ConsumerWidget {
 class _TagList extends ConsumerWidget {
   const _TagList({required this.tags});
 
-  final List<LibraryTag> tags;
+  final List<Tag> tags;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -250,7 +250,7 @@ class _TagList extends ConsumerWidget {
 class _TagRow extends ConsumerWidget {
   const _TagRow({required this.tag, required this.isSelected});
 
-  final LibraryTag tag;
+  final Tag tag;
   final bool isSelected;
 
   @override
@@ -326,7 +326,7 @@ class _AddTagDialogState extends ConsumerState<_AddTagDialog> {
     if (name.isEmpty) return;
     setState(() => _saving = true);
     try {
-      final tag = LibraryTag(name: name);
+      final tag = Tag(name: name);
       await ref.read(tagActionsProvider).addTag(tag);
       if (mounted) Navigator.of(context).pop();
     } finally {
@@ -392,7 +392,7 @@ class _AddTagDialogState extends ConsumerState<_AddTagDialog> {
 class _RenameTagDialog extends ConsumerStatefulWidget {
   const _RenameTagDialog({required this.tag});
 
-  final LibraryTag tag;
+  final Tag tag;
 
   @override
   ConsumerState<_RenameTagDialog> createState() => _RenameTagDialogState();

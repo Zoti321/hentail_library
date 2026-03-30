@@ -8,9 +8,7 @@ extension ReadingHistoryRowToEntity on ReadingHistory {
     return entity.ReadingHistory(
       comicId: comicId,
       title: title,
-      coverUrl: coverUrl,
       lastReadTime: lastReadTime,
-      chapterId: chapterId,
       pageIndex: pageIndex,
     );
   }
@@ -21,9 +19,7 @@ extension ReadingHistoryEntityToCompanion on entity.ReadingHistory {
     return ReadingHistoriesCompanion.insert(
       comicId: comicId,
       title: title,
-      coverUrl: Value.absentIfNull(coverUrl),
       lastReadTime: lastReadTime,
-      chapterId: Value.absentIfNull(chapterId),
       pageIndex: Value.absentIfNull(pageIndex),
     );
   }
@@ -49,4 +45,3 @@ extension ReadingSessionEntityToCompanion on entity.ReadingSession {
     );
   }
 }
-

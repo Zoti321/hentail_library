@@ -1,5 +1,5 @@
 import 'package:hentai_library/data/services/comic/comic_scan_parse_service.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/mappers/library_comic_mapper.dart';
 import 'package:hentai_library/domain/repository/library_comic_repo.dart';
 
@@ -21,7 +21,7 @@ class IngestLibraryResourcesUseCase {
     Iterable<String> roots, {
     bool Function()? isCancelled,
   }) async {
-    final comics = <LibraryComic>[];
+    final comics = <Comic>[];
     await for (final r in scanParseService.scanAndParseRoots(
       roots,
       isCancelled: isCancelled,

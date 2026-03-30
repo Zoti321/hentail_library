@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
-import 'package:hentai_library/domain/entity/comic/library_comic.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart' as entity;
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:path/path.dart' as p;
@@ -16,7 +16,7 @@ part 'reader_page_notifier.g.dart';
 @freezed
 abstract class ReaderViewState with _$ReaderViewState {
   factory ReaderViewState({
-    required LibraryComic comic,
+    required Comic comic,
     @Default(false) bool isVertical,
     @Default(false) bool showControls,
     @Default(1) int currentIndex,

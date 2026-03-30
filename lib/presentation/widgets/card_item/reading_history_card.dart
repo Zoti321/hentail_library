@@ -48,7 +48,7 @@ class _ReadingHistoryCardState extends State<ReadingHistoryCard> {
           ),
           child: Row(
             children: [
-              _buildCover(cs, h.coverUrl),
+              _buildCover(cs, ""),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -96,11 +96,7 @@ class _ReadingHistoryCardState extends State<ReadingHistoryCard> {
                   ],
                 ),
               ),
-              Icon(
-                LucideIcons.chevronRight,
-                size: 18,
-                color: cs.textTertiary,
-              ),
+              Icon(LucideIcons.chevronRight, size: 18, color: cs.textTertiary),
               if (widget.onDelete != null) ...[
                 const SizedBox(width: 8),
                 Tooltip(
@@ -132,7 +128,8 @@ class _ReadingHistoryCardState extends State<ReadingHistoryCard> {
         width: width,
         height: height,
         color: cs.surfaceContainerHighest,
-        child: coverUrl != null &&
+        child:
+            coverUrl != null &&
                 coverUrl.isNotEmpty &&
                 File(coverUrl).existsSync()
             ? ExtendedImage.file(
