@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart' as entity;
 import 'package:hentai_library/domain/entity/reading_session.dart' as entity;
 import 'package:hentai_library/presentation/providers/providers.dart';
@@ -18,7 +18,7 @@ class ReaderPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
+    final theme = buildAppTheme(Brightness.dark);
     final viewAsync = ref.watch(readerViewProvider(comicId));
 
     useEffect(() {
@@ -30,40 +30,43 @@ class ReaderPage extends HookConsumerWidget {
       return null;
     }, [comicId]);
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        _saveProgress(ref, comicId);
-        Navigator.of(context).pop();
-      },
-      child: Scaffold(
-        backgroundColor: theme.colorScheme.readerBackground,
-        body: viewAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, st) => Center(child: Text('$e')),
-          data: (state) {
-            if (state.totalPages == 0) {
-              return const Center(child: Text('暂无图片'));
-            }
-            final initialPage = state.currentIndex - 1;
-            return Stack(
-              children: [
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTapUp: (details) => ref
-                      .read(readerViewProvider(comicId).notifier)
-                      .handleTap(details, context),
-                  child: _ReaderContent(
-                    comicId: comicId,
-                    initialPage: initialPage,
+    return Theme(
+      data: theme,
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          _saveProgress(ref, comicId);
+          Navigator.of(context).pop();
+        },
+        child: Scaffold(
+          backgroundColor: theme.colorScheme.readerBackground,
+          body: viewAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, st) => Center(child: Text('$e')),
+            data: (state) {
+              if (state.totalPages == 0) {
+                return const Center(child: Text('暂无图片'));
+              }
+              final initialPage = state.currentIndex - 1;
+              return Stack(
+                children: [
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTapUp: (details) => ref
+                        .read(readerViewProvider(comicId).notifier)
+                        .handleTap(details, context),
+                    child: _ReaderContent(
+                      comicId: comicId,
+                      initialPage: initialPage,
+                    ),
                   ),
-                ),
-                _TopBar(comicId: comicId),
-                _BottomBar(comicId: comicId),
-              ],
-            );
-          },
+                  _TopBar(comicId: comicId),
+                  _BottomBar(comicId: comicId),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -166,7 +169,7 @@ class _ReaderContent extends HookConsumerWidget {
                           child: Icon(
                             LucideIcons.bookImage,
                             size: 24,
-                            color: Colors.grey,
+                            color: Theme.of(context).colorScheme.readerTextMuted,
                           ),
                         );
                 },
@@ -188,7 +191,7 @@ class _ReaderContent extends HookConsumerWidget {
                           child: Icon(
                             LucideIcons.bookImage,
                             size: 24,
-                            color: Colors.grey,
+                            color: Theme.of(context).colorScheme.readerTextMuted,
                           ),
                         );
                 },
@@ -205,6 +208,7 @@ class _TopBar extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
     final state = ref.watch(readerViewProvider(comicId)).requireValue;
     final showControls = state.showControls;
     final isVertival = state.isVertical;
@@ -229,9 +233,9 @@ class _TopBar extends HookConsumerWidget {
                 constraints: const BoxConstraints(maxWidth: 500),
                 padding: const .all(6),
                 decoration: BoxDecoration(
-                  color: Colors.black.withAlpha(128),
+                  color: cs.readerPanelBackground,
                   borderRadius: BorderRadius.circular(100),
-                  border: Border.all(width: 1, color: Colors.white),
+                  border: Border.all(width: 1, color: cs.readerPanelBorder),
                 ),
                 child: DragToMoveArea(
                   child: Row(
@@ -246,7 +250,7 @@ class _TopBar extends HookConsumerWidget {
                         icon: Icon(
                           LucideIcons.arrowLeft,
                           size: 16,
-                          color: Colors.white,
+                          color: cs.readerTextIconPrimary,
                         ),
                       ),
                       Flexible(
@@ -255,7 +259,7 @@ class _TopBar extends HookConsumerWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: cs.readerTextIconPrimary,
                             letterSpacing: 1.2,
                           ),
                           maxLines: 1,
@@ -266,9 +270,9 @@ class _TopBar extends HookConsumerWidget {
                       Container(
                         padding: const .all(4),
                         decoration: BoxDecoration(
-                          color: Colors.black.withAlpha(40),
+                          color: cs.readerPanelSubtle,
                           borderRadius: BorderRadius.circular(100),
-                          border: Border.all(color: Colors.white.withAlpha(5)),
+                          border: Border.all(color: cs.readerPanelSubtleBorder),
                         ),
                         child: Row(
                           spacing: 2,
@@ -302,7 +306,7 @@ class _TopBar extends HookConsumerWidget {
                       Icon(
                         LucideIcons.settings2,
                         size: 16,
-                        color: Colors.white,
+                        color: cs.readerTextIconPrimary,
                       ),
                       const SizedBox(width: 2),
                     ],
@@ -324,6 +328,7 @@ class _BottomBar extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
     final state = ref.watch(readerViewProvider(comicId)).requireValue;
     final showControls = state.showControls;
     final currentIndex = state.currentIndex;
@@ -349,9 +354,9 @@ class _BottomBar extends HookConsumerWidget {
                 constraints: const BoxConstraints(maxWidth: 672),
                 padding: const .all(16),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
+                  color: cs.floatingUiBackground,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white, width: 1),
+                  border: Border.all(color: cs.readerPanelBorder, width: 1),
                 ),
                 child: Column(
                   spacing: 12,
@@ -368,7 +373,7 @@ class _BottomBar extends HookConsumerWidget {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color: Colors.white.withOpacity(0.6),
+                              color: cs.readerTextSecondary,
                             ),
                           ),
                           Text(
@@ -377,7 +382,7 @@ class _BottomBar extends HookConsumerWidget {
                               fontFamily: 'RobotoMono',
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color: Colors.white.withOpacity(0.9),
+                              color: cs.readerTextIconPrimary,
                             ),
                           ),
                         ],
@@ -394,7 +399,7 @@ class _BottomBar extends HookConsumerWidget {
                           },
                           icon: Icon(
                             LucideIcons.chevronLeft,
-                            color: Colors.white,
+                            color: cs.readerTextIconPrimary,
                           ),
                         ),
 
@@ -404,16 +409,14 @@ class _BottomBar extends HookConsumerWidget {
                             child: SliderTheme(
                               data: SliderThemeData(
                                 trackHeight: 4,
-                                activeTrackColor: Colors.white.withOpacity(0.8),
-                                inactiveTrackColor: Colors.white.withOpacity(
-                                  0.2,
-                                ),
-                                thumbColor: Colors.white,
+                                activeTrackColor: cs.sliderActive,
+                                inactiveTrackColor: cs.sliderInactive,
+                                thumbColor: cs.activeButtonBg,
                                 thumbShape: const RoundSliderThumbShape(
                                   enabledThumbRadius: 8,
                                   elevation: 4,
                                 ),
-                                overlayColor: Colors.white.withOpacity(0.1),
+                                overlayColor: cs.readerSliderOverlay,
                                 overlayShape: const RoundSliderOverlayShape(
                                   overlayRadius: 16,
                                 ),
@@ -443,7 +446,7 @@ class _BottomBar extends HookConsumerWidget {
                           },
                           icon: Icon(
                             LucideIcons.chevronRight,
-                            color: Colors.white,
+                            color: cs.readerTextIconPrimary,
                           ),
                         ),
                       ],
@@ -476,6 +479,7 @@ class _ReadModeToggleBtn extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -484,7 +488,7 @@ class _ReadModeToggleBtn extends HookConsumerWidget {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: isActive ? Colors.white : Colors.transparent,
+            color: isActive ? cs.activeButtonBg : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -494,14 +498,14 @@ class _ReadModeToggleBtn extends HookConsumerWidget {
               Icon(
                 icon,
                 size: 14,
-                color: isActive ? Colors.black : Colors.white,
+                color: isActive ? cs.readerTextOnWhite : cs.readerTextIconPrimary,
               ),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: isActive ? Colors.black : Colors.white,
+                  color: isActive ? cs.readerTextOnWhite : cs.readerTextIconPrimary,
                 ),
               ),
             ],

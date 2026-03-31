@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';

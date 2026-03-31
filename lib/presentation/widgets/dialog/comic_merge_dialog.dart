@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -39,33 +39,35 @@ class _ComicMergeDialogState extends ConsumerState<ComicMergeDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final tokens = context.tokens;
 
     return Dialog(
-      backgroundColor: Colors.white,
+      backgroundColor: cs.surface,
       surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(tokens.radius.lg)),
       elevation: 0,
       insetPadding: const .all(16),
       child: ClipRRect(
-        borderRadius: .circular(16),
+        borderRadius: BorderRadius.circular(tokens.radius.lg + 4),
         child: Container(
           constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * 0.45,
             maxHeight: MediaQuery.of(context).size.height * 0.8,
           ),
           decoration: BoxDecoration(
-            color: Colors.white.withAlpha(245),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: theme.colorScheme.borderSubtle, width: 1),
+            color: cs.cardHover,
+            borderRadius: BorderRadius.circular(tokens.radius.lg + 4),
+            border: Border.all(color: cs.borderSubtle, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: cs.cardShadowHover,
                 blurRadius: 24,
                 offset: const Offset(0, 8),
                 spreadRadius: 0,
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: cs.cardShadow,
                 blurRadius: 8,
                 offset: const Offset(0, 2),
                 spreadRadius: 0,
@@ -100,12 +102,13 @@ class _DialogHeader extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return Container(
       padding: const .symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey.withAlpha(20))),
-        color: Colors.grey.withAlpha(2),
+        border: Border(bottom: BorderSide(color: cs.borderSubtle)),
+        color: cs.surfaceContainerHighest,
       ),
       child: Column(
         crossAxisAlignment: .start,
@@ -114,12 +117,12 @@ class _DialogHeader extends HookConsumerWidget {
           Row(
             mainAxisAlignment: .spaceBetween,
             children: [
-              const Text(
+              Text(
                 "从库中添加章节",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: cs.textPrimary,
                   fontFamily: 'Segoe UI',
                 ),
               ),
@@ -127,7 +130,7 @@ class _DialogHeader extends HookConsumerWidget {
                 cursor: SystemMouseCursors.click,
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
-                  child: Icon(LucideIcons.x, color: Colors.grey[500], size: 20),
+                  child: Icon(LucideIcons.x, color: cs.iconSecondary, size: 20),
                 ),
               ),
             ],
@@ -139,23 +142,23 @@ class _DialogHeader extends HookConsumerWidget {
             style: const TextStyle(fontSize: 14),
             decoration: InputDecoration(
               hintText: "搜索库...",
-              hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-              prefixIcon: Icon(Icons.search, size: 20, color: Colors.grey[400]),
+              hintStyle: TextStyle(color: cs.textPlaceholder, fontSize: 14),
+              prefixIcon: Icon(Icons.search, size: 20, color: cs.iconSecondary),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 0,
               ),
               isDense: true,
               filled: true,
-              fillColor: Colors.white,
+              fillColor: cs.inputBackground,
               hoverColor: Colors.transparent,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderSide: BorderSide(color: cs.borderSubtle),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.grey[300]!),
+                borderSide: BorderSide(color: cs.borderSubtle),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -183,6 +186,7 @@ class _DialogBody extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     final items = ref.watch(filteredMergeComicsProvider(comicId: comicId));
 
@@ -192,7 +196,7 @@ class _DialogBody extends HookConsumerWidget {
             ? Center(
                 child: Text(
                   "未找到匹配的漫画",
-                  style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                  style: TextStyle(color: cs.textSecondary, fontSize: 14),
                 ),
               )
             : ListView.separated(
@@ -229,13 +233,14 @@ class _DialogFooter extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final cs = theme.colorScheme;
     final hasConfirmed = useState(false);
 
     return Container(
       padding: const .all(16),
       decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey.withAlpha(20))),
-        color: Colors.grey.withAlpha(2),
+        border: Border(top: BorderSide(color: cs.borderSubtle)),
+        color: cs.surfaceContainerHighest,
       ),
       child: Row(
         mainAxisAlignment: .end,

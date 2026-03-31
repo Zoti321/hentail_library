@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 
 class FluentTextField extends StatefulWidget {
   final String? initialValue;
@@ -39,6 +39,7 @@ class FluentTextFieldState extends State<FluentTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = context.tokens;
     final isTextarea = widget.maxLines > 1;
 
     return Column(
@@ -47,16 +48,16 @@ class FluentTextFieldState extends State<FluentTextField> {
       children: [
         if (widget.labelText != null) ...[
           FormLabel(widget.labelText!),
-          const SizedBox(height: 6),
+          SizedBox(height: tokens.spacing.sm - 2),
         ],
         Focus(
           onFocusChange: (hasFocus) => setState(() => _isFocused = hasFocus),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            padding: const .symmetric(vertical: 4),
+            padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.inputBackground,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(tokens.radius.md),
               border: Border.all(
                 color: _isFocused
                     ? Theme.of(context).colorScheme.inputBorderActive
@@ -80,7 +81,7 @@ class FluentTextFieldState extends State<FluentTextField> {
               onChanged: widget.onChanged,
               maxLines: widget.maxLines,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: tokens.text.bodyMd,
                 color: Theme.of(context).colorScheme.textPrimary,
                 height: 1.4,
               ),
@@ -88,11 +89,17 @@ class FluentTextFieldState extends State<FluentTextField> {
                 hintText: widget.hintText,
                 hintStyle: TextStyle(
                   color: Theme.of(context).colorScheme.textPlaceholder,
-                  fontSize: 14,
+                  fontSize: tokens.text.bodyMd,
                 ),
                 contentPadding: isTextarea
-                    ? const EdgeInsets.symmetric(horizontal: 12, vertical: 10)
-                    : const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ? EdgeInsets.symmetric(
+                        horizontal: tokens.spacing.md,
+                        vertical: tokens.spacing.sm + 2,
+                      )
+                    : EdgeInsets.symmetric(
+                        horizontal: tokens.spacing.md,
+                        vertical: tokens.spacing.sm,
+                      ),
                 border: InputBorder.none,
                 isDense: true,
                 filled: false,
@@ -112,10 +119,11 @@ class FormLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = context.tokens;
     return Text(
       text.toUpperCase(),
       style: TextStyle(
-        fontSize: 12,
+        fontSize: tokens.text.labelXs,
         fontWeight: FontWeight.w700,
         color: Theme.of(context).colorScheme.textTertiary,
       ),

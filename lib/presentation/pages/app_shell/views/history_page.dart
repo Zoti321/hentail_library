@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
@@ -260,6 +260,7 @@ class _Header extends ConsumerWidget {
   }
 
   Widget _buildClearBtn(BuildContext context, WidgetRef ref, bool enabled) {
+    final cs = Theme.of(context).colorScheme;
     return Tooltip(
       message: '清空阅读历史',
       child: Semantics(
@@ -296,13 +297,13 @@ class _Header extends ConsumerWidget {
           style: ButtonStyle(
             foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
               if (states.contains(MaterialState.hovered)) {
-                return Colors.red.shade700;
+                return cs.error;
               }
-              return Colors.red.shade600;
+              return cs.warning;
             }),
             backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
               if (states.contains(MaterialState.hovered)) {
-                return Colors.red.shade50;
+                return cs.error.withAlpha(24);
               }
               return Colors.transparent;
             }),
@@ -313,7 +314,7 @@ class _Header extends ConsumerWidget {
               const .symmetric(horizontal: 12, vertical: 8),
             ),
             overlayColor: MaterialStateProperty.all(
-              Colors.red.withOpacity(0.08),
+              cs.error.withAlpha(20),
             ),
           ),
         ),

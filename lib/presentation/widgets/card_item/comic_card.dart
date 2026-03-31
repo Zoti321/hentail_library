@@ -4,7 +4,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
@@ -31,6 +31,8 @@ class ComicCard extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+    final tokens = context.tokens;
     final isHover = useState<bool>(false);
     final coverPath = ref
         .watch(comicCoverPathProvider(comicId: comic.comicId))
@@ -94,14 +96,15 @@ class ComicCard extends HookConsumerWidget {
         onExit: (_) => isHover.value = false,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.all(8),
+          padding: EdgeInsets.all(tokens.spacing.sm),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.white,
+            borderRadius: BorderRadius.circular(tokens.radius.lg),
+            color: cs.surface,
+            border: Border.all(color: cs.borderSubtle),
             boxShadow: isHover.value
                 ? [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: cs.cardShadowHover,
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -114,7 +117,7 @@ class ComicCard extends HookConsumerWidget {
             spacing: 12,
             children: [
               // 封面图容器
-              _buildCover(coverPath, isHover.value),
+              _buildCover(context, coverPath, isHover.value),
               // --- 文本信息区域 ---
               _buildInfoSection(isHover.value, context, comic.pageCount ?? 0),
             ],
@@ -124,32 +127,33 @@ class ComicCard extends HookConsumerWidget {
     );
   }
 
-  Widget _buildCover(String? coverPath, bool isHover) {
+  Widget _buildCover(BuildContext context, String? coverPath, bool isHover) {
+    final cs = Theme.of(context).colorScheme;
+    final tokens = context.tokens;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOut,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.grey[200], // 占位背景
+        borderRadius: BorderRadius.circular(tokens.radius.md),
+        color: cs.imagePlaceholder,
         boxShadow: isHover
             ? [
                 BoxShadow(
-                  color: Colors.black.withAlpha(15),
+                  color: cs.cardShadowHover,
                   blurRadius: 20,
                   offset: const Offset(0, 0),
                 ),
               ]
             : [
-                // shadow-sm
                 BoxShadow(
-                  color: Colors.black.withAlpha(5),
+                  color: cs.cardShadow,
                   blurRadius: 2,
                   offset: const Offset(0, 1),
                 ),
               ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(tokens.radius.md),
         child: AspectRatio(
           aspectRatio: 2 / 3,
           child: Stack(
@@ -167,13 +171,13 @@ class ComicCard extends HookConsumerWidget {
                     )
               else
                 Container(
-                  color: Colors.grey[300],
+                  color: cs.imageFallback,
                   alignment: Alignment.center,
-                  child: Icon(Icons.broken_image, color: Colors.grey[600]),
+                  child: Icon(Icons.broken_image, color: cs.iconSecondary),
                 ),
 
               // 2. 黑色遮罩层 (Hover 时显示)
-              Container(color: Colors.black.withOpacity(0.2))
+              Container(color: cs.overlayScrim)
                   .animate(target: isHover ? 1 : 0)
                   .fade(begin: 0.0, end: 1.0, duration: 200.ms),
             ],
@@ -184,6 +188,7 @@ class ComicCard extends HookConsumerWidget {
   }
 
   Column _buildInfoSection(bool isHover, BuildContext context, int pageCount) {
+    final tokens = context.tokens;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 6,
@@ -192,7 +197,7 @@ class ComicCard extends HookConsumerWidget {
         AnimatedDefaultTextStyle(
           duration: const Duration(milliseconds: 200),
           style: TextStyle(
-            fontSize: 14,
+            fontSize: tokens.text.bodyMd,
             fontWeight: FontWeight.w600,
             height: 1.25,
             color: isHover
@@ -211,7 +216,7 @@ class ComicCard extends HookConsumerWidget {
             Text(
               '${pageCount}p',
               style: TextStyle(
-                fontSize: 11,
+                fontSize: tokens.text.labelXs - 1,
                 color: Theme.of(context).colorScheme.textTertiary,
               ),
             ),

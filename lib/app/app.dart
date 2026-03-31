@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/config/app_theme.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 
@@ -24,14 +23,8 @@ class MyApp extends StatelessWidget {
             locale: const Locale('zh', 'CN'),
             title: 'hentai library',
             debugShowCheckedModeBanner: false,
-            theme: buildAppTheme(
-              appFluentLightScheme.primary,
-              Brightness.light,
-            ),
-            darkTheme: buildAppTheme(
-              appFluentDarkScheme.primary,
-              Brightness.dark,
-            ),
+            theme: buildAppTheme(Brightness.light),
+            darkTheme: buildAppTheme(Brightness.dark),
             themeMode: themeMode,
             routerConfig: appRouter,
           );

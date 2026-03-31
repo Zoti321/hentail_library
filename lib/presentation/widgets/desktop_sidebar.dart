@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -29,6 +29,7 @@ class DesktopSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     final List<NavItemData> menuItems = [
       const NavItemData(id: 'home', label: '首页', icon: LucideIcons.house),
@@ -54,8 +55,8 @@ class DesktopSidebar extends StatelessWidget {
       width: 256,
       height: double.infinity,
       decoration: BoxDecoration(
-        color: theme.colorScheme.sidebarBackground,
-        border: Border(right: BorderSide(color: Colors.grey.withOpacity(0.2))),
+        color: cs.sidebarBackground,
+        border: Border(right: BorderSide(color: cs.borderSubtle)),
       ),
       padding: .fromLTRB(8, 0, 8, 16),
       child: Column(
@@ -76,17 +77,17 @@ class DesktopSidebar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: cs.cardShadowHover,
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),
                       ],
                     ),
                     alignment: Alignment.center,
-                    child: const Text(
+                    child: Text(
                       'H',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: cs.onPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
@@ -176,7 +177,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
     // 选中状态样式（悬停色无主题等价，保留原值以保证零视觉变更）
     final Color backgroundColor = widget.isActive
         ? theme.colorScheme.surface
-        : (_isHovered ? Colors.grey.withOpacity(0.1) : Colors.transparent);
+        : (_isHovered ? theme.colorScheme.hoverBackground : Colors.transparent);
 
     final Color textColor = widget.isActive
         ? theme.colorScheme.textPrimary

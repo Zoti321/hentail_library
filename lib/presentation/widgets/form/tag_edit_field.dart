@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/presentation/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/presentation/widgets/card_item/category_tag_chip.dart';
 

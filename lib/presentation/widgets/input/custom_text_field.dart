@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// 与历史页工具栏一致的搜索框：聚焦高亮、左侧搜索图标、右侧清除。

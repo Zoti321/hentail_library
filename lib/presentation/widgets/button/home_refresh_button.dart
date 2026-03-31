@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 
 class HomeRefreshButton extends StatefulWidget {
   final VoidCallback onPressed;
@@ -71,6 +71,7 @@ class _HomeRefreshButtonState extends State<HomeRefreshButton>
 
   @override
   Widget build(BuildContext context) {
+    final tokens = context.tokens;
     final Color borderColor = Theme.of(context).colorScheme.borderSubtle;
     final Color iconColor = Theme.of(context).colorScheme.iconDefault;
 
@@ -91,11 +92,11 @@ class _HomeRefreshButtonState extends State<HomeRefreshButton>
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: Colors.white, // bg-white
-              borderRadius: BorderRadius.circular(6), // rounded-md
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(tokens.radius.sm),
               border: Border.all(
                 color: borderColor,
-              ), // border border-border-subtle
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withAlpha(5), // shadow-sm

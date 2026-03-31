@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/button/home_refresh_button.dart';
 import 'package:hentai_library/presentation/widgets/dialog/scan_progress_dialog.dart';
@@ -28,6 +28,7 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tokens = context.tokens;
     final comicCount = ref
         .watch(libraryPageProvider.select((s) => s.rawList.length));
 
@@ -41,16 +42,16 @@ class HomePage extends ConsumerWidget {
 
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(tokens.spacing.lg + 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(context, ref),
-            const SizedBox(height: 32),
+            SizedBox(height: tokens.spacing.xl + 12),
             _buildHeroWidgets(context, ref, comicCount),
-            const SizedBox(height: 24),
+            SizedBox(height: tokens.spacing.lg + 8),
             _buildShortcutEntries(context, ref),
-            const SizedBox(height: 80),
+            SizedBox(height: tokens.spacing.xl * 4),
           ],
         ),
       ),
@@ -59,6 +60,7 @@ class HomePage extends ConsumerWidget {
 
   Widget _buildHeader(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final tokens = context.tokens;
     final cs = theme.colorScheme;
 
     return Row(
@@ -72,14 +74,14 @@ class HomePage extends ConsumerWidget {
               '首页',
               style: TextStyle(
                 color: cs.textPrimary,
-                fontSize: 24,
+                fontSize: tokens.text.titleLg + 2,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: tokens.spacing.xs),
             Text(
               '下午好，读者',
-              style: TextStyle(color: cs.textTertiary, fontSize: 14),
+              style: TextStyle(color: cs.textTertiary, fontSize: tokens.text.bodyMd),
             ),
           ],
         ),
@@ -103,7 +105,7 @@ class HomePage extends ConsumerWidget {
                   vertical: 10,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(tokens.radius.lg - 2),
                 ),
               ),
             ),
@@ -119,15 +121,16 @@ class HomePage extends ConsumerWidget {
     int comicCount,
   ) {
     final theme = Theme.of(context);
+    final tokens = context.tokens;
     final cs = theme.colorScheme;
 
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(tokens.spacing.lg + 8),
           decoration: BoxDecoration(
             color: cs.surface,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(tokens.radius.lg + 2),
             border: Border.all(color: cs.borderSubtle),
             boxShadow: [
               BoxShadow(
@@ -147,30 +150,30 @@ class HomePage extends ConsumerWidget {
                   Text(
                     '漫画库',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: tokens.text.labelXs,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 1.2,
                       color: cs.textTertiary,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: tokens.spacing.sm),
                   Text(
                     '$comicCount',
                     style: TextStyle(
-                      fontSize: 26,
+                      fontSize: tokens.text.titleLg + 4,
                       fontWeight: FontWeight.w600,
                       color: cs.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: tokens.spacing.sm - 2),
                   Text(
                     '共 $comicCount 本',
-                    style: TextStyle(fontSize: 13, color: cs.textSecondary),
+                    style: TextStyle(fontSize: tokens.text.bodySm, color: cs.textSecondary),
                   ),
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.all(tokens.spacing.sm),
                 child: Icon(LucideIcons.bookImage, size: 32, color: cs.primary),
               ),
             ],
@@ -181,30 +184,34 @@ class HomePage extends ConsumerWidget {
   }
 
   Widget _buildShortcutEntries(BuildContext context, WidgetRef ref) {
+    final tokens = context.tokens;
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
     return Wrap(
-      spacing: 12,
-      runSpacing: 12,
+      spacing: tokens.spacing.md,
+      runSpacing: tokens.spacing.md,
       children: [
         _ShortcutEntry(
           icon: LucideIcons.library,
           label: '漫画库',
           onTap: () => context.go('/local'),
           colorScheme: cs,
+          tokens: tokens,
         ),
         _ShortcutEntry(
           icon: LucideIcons.folderTree,
           label: '选中路径',
           onTap: () => context.go('/paths'),
           colorScheme: cs,
+          tokens: tokens,
         ),
         _ShortcutEntry(
           icon: LucideIcons.scanSearch,
           label: '扫描漫画库',
           onTap: () => _onTapScanLibrary(context, ref),
           colorScheme: cs,
+          tokens: tokens,
         ),
       ],
     );
@@ -217,25 +224,30 @@ class _ShortcutEntry extends StatelessWidget {
     required this.label,
     required this.onTap,
     required this.colorScheme,
+    required this.tokens,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
   final ColorScheme colorScheme;
+  final AppThemeTokens tokens;
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: colorScheme.surface,
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(tokens.radius.lg - 2),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(tokens.radius.lg - 2),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: EdgeInsets.symmetric(
+            horizontal: tokens.spacing.lg,
+            vertical: tokens.spacing.md,
+          ),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(tokens.radius.lg - 2),
             border: Border.all(color: colorScheme.borderSubtle),
           ),
           child: Row(
@@ -246,7 +258,7 @@ class _ShortcutEntry extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: tokens.text.bodyMd,
                   fontWeight: FontWeight.w500,
                   color: colorScheme.textPrimary,
                 ),

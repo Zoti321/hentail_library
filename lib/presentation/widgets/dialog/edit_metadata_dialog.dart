@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
@@ -123,13 +123,13 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(10),
+                  color: theme.colorScheme.cardShadowHover,
                   blurRadius: 24,
                   offset: const Offset(0, 8),
                   spreadRadius: 0,
                 ),
                 BoxShadow(
-                  color: Colors.black.withAlpha(5),
+                  color: theme.colorScheme.cardShadow,
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                   spreadRadius: 0,

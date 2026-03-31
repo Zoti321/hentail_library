@@ -1,6 +1,6 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/my_toggle_switch.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -18,6 +18,7 @@ class _FilterPopupButtonState extends ConsumerState<FilterPopupButton> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return CustomPopupMenu(
       controller: controller,
       barrierColor: Colors.transparent,
@@ -32,7 +33,7 @@ class _FilterPopupButtonState extends ConsumerState<FilterPopupButton> {
           borderRadius: BorderRadius.circular(6),
           child: Container(
             padding: const EdgeInsets.all(6),
-            child: Icon(LucideIcons.funnel, size: 16, color: Colors.grey[600]),
+            child: Icon(LucideIcons.funnel, size: 16, color: cs.iconDefault),
           ),
         ),
       ),
@@ -48,6 +49,7 @@ class _FilterMenu extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final tokens = context.tokens;
 
     final resultCount = ref.watch(
       libraryPageProvider.select((s) => s.displayedComics.length),
@@ -57,12 +59,12 @@ class _FilterMenu extends HookConsumerWidget {
       width: 256,
       padding: const .all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: .circular(12),
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(tokens.radius.lg),
+        border: Border.all(color: colorScheme.borderSubtle),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: colorScheme.cardShadowHover,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -77,12 +79,12 @@ class _FilterMenu extends HookConsumerWidget {
           Row(
             mainAxisAlignment: .spaceBetween,
             children: [
-              const Text(
+              Text(
                 "高级筛选",
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: colorScheme.textPrimary,
                 ),
               ),
               IconButton(
@@ -94,7 +96,7 @@ class _FilterMenu extends HookConsumerWidget {
                 icon: Icon(LucideIcons.x, size: 14),
                 style: IconButton.styleFrom(
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  foregroundColor: Colors.grey.shade400,
+                  foregroundColor: colorScheme.iconSecondary,
                 ),
               ),
             ],
@@ -104,13 +106,13 @@ class _FilterMenu extends HookConsumerWidget {
           Row(
             spacing: 8,
             children: [
-              Icon(LucideIcons.funnel, size: 16, color: Colors.grey.shade400),
+              Icon(LucideIcons.funnel, size: 16, color: colorScheme.iconSecondary),
               Text(
                 "显示 R18 内容",
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: .w400,
-                  color: Colors.black87,
+                  color: colorScheme.textPrimary,
                 ),
               ),
               Spacer(),

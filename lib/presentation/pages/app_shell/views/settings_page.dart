@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/my_toggle_switch.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -147,7 +147,7 @@ class SettingsPage extends ConsumerWidget {
                         : Icon(
                             LucideIcons.shieldOff,
                             size: 20,
-                            color: Colors.red.shade500,
+                            color: theme.colorScheme.warning,
                           ),
                     label: '健全模式',
                     description: data.isHealthyMode ? '已启用（隐藏 R18）' : '已禁用（显示 R18）',
@@ -201,7 +201,7 @@ class SettingsPage extends ConsumerWidget {
       error: (error, stackTrace) => Center(
         child: Text(
           error.toString(),
-          style: const TextStyle(color: Colors.red),
+          style: TextStyle(color: theme.colorScheme.error),
         ),
       ),
     );
@@ -323,7 +323,7 @@ class _SettingsRowState extends State<_SettingsRow> {
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: widget.isDestructive
-                              ? Colors.red.shade600
+                              ? Theme.of(context).colorScheme.error
                               : Theme.of(context).colorScheme.textPrimary,
                         ),
                         maxLines: 1,

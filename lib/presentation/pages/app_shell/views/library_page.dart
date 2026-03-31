@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/l10n/app_strings.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
@@ -43,6 +43,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final tokens = context.tokens;
 
     final comics = ref.watch(
       libraryPageProvider.select((s) => s.comicsAsyncValue),
@@ -73,7 +74,12 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       slivers: <Widget>[
         SliverToBoxAdapter(
           child: Container(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+            padding: EdgeInsets.fromLTRB(
+              tokens.spacing.lg + 8,
+              tokens.spacing.lg + 8,
+              tokens.spacing.lg + 8,
+              tokens.spacing.lg,
+            ),
             child: Row(
               mainAxisAlignment: .spaceBetween,
               spacing: 36,
@@ -98,23 +104,23 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.grey[300]!),
+                        color: theme.colorScheme.subtleTagBackground,
+                        borderRadius: BorderRadius.circular(tokens.radius.pill),
+                        border: Border.all(color: theme.colorScheme.borderSubtle),
                       ),
                       child: Text(
                         AppStrings.comicCount(comicCount),
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
-                          color: Colors.grey[600],
+                          color: theme.colorScheme.textSecondary,
                         ),
                       ),
                     ),
                   ],
                 ),
                 // Windows 11 风格工具栏
-                _buildToolbar(theme, isGridView),
+                _buildToolbar(context, theme, isGridView),
               ],
             ),
           ),
@@ -127,16 +133,17 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     );
   }
 
-  Widget _buildToolbar(ThemeData theme, bool isGridView) {
+  Widget _buildToolbar(BuildContext context, ThemeData theme, bool isGridView) {
+    final tokens = context.tokens;
     return Container(
       height: 46,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(tokens.radius.lg - 2),
         border: Border.all(color: theme.colorScheme.borderSubtle),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(4),
+            color: theme.colorScheme.cardShadow,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -154,14 +161,14 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   ref.read(libraryPageProvider.notifier).updateFilterQuery(val),
               textAlignVertical: TextAlignVertical.center,
               cursorWidth: 1.0,
-              cursorColor: Colors.black87,
+              cursorColor: theme.colorScheme.textPrimary,
               cursorHeight: 14.5,
               decoration: InputDecoration(
                 isDense: true,
-                prefixIcon: const Icon(
+                prefixIcon: Icon(
                   LucideIcons.search,
                   size: 18,
-                  color: Colors.grey,
+                  color: theme.colorScheme.iconSecondary,
                 ),
                 prefixIconConstraints: const BoxConstraints(
                   minWidth: 36,
@@ -169,7 +176,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 ),
                 hintText: "搜索...",
                 hintStyle: TextStyle(
-                  color: Colors.grey[400],
+                  color: theme.colorScheme.textPlaceholder,
                   fontSize: 14,
                   fontWeight: .w400,
                 ),
@@ -183,7 +190,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           Container(
             width: 1,
             height: 20,
-            color: Colors.grey[300],
+            color: theme.colorScheme.borderSubtle,
             margin: const EdgeInsets.symmetric(horizontal: 12),
           ),
           // 功能按钮组 (Refresh, Filter, Sort)
@@ -202,7 +209,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           Container(
             width: 1,
             height: 20,
-            color: Colors.grey[300],
+            color: theme.colorScheme.borderSubtle,
             margin: const EdgeInsets.symmetric(horizontal: 12),
           ),
 
@@ -379,7 +386,11 @@ class _ToolbarIconButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(6),
           child: Container(
             padding: const EdgeInsets.all(6),
-            child: Icon(icon, size: 16, color: Colors.grey[600]),
+            child: Icon(
+              icon,
+              size: 16,
+              color: Theme.of(context).colorScheme.iconDefault,
+            ),
           ),
         ),
       ),
@@ -410,13 +421,17 @@ class _ViewToggleButton extends StatelessWidget {
           duration: const Duration(milliseconds: 0),
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: isActive ? Colors.grey[100] : Colors.transparent,
+            color: isActive
+                ? Theme.of(context).colorScheme.subtleTagBackground
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Icon(
             icon,
             size: 16,
-            color: isActive ? activeColor : Colors.grey[500],
+            color: isActive
+                ? activeColor
+                : Theme.of(context).colorScheme.iconSecondary,
           ),
         ),
       ),

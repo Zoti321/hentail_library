@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class CategoryTagChip extends StatefulWidget {

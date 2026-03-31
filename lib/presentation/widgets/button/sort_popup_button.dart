@@ -1,6 +1,6 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/config/app_fluent_color_scheme.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -20,6 +20,7 @@ class _SortPopupButtonState extends ConsumerState<SortPopupButton> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final tokens = context.tokens;
     return CustomPopupMenu(
       controller: _controller,
       barrierColor: Colors.transparent,
@@ -31,7 +32,7 @@ class _SortPopupButtonState extends ConsumerState<SortPopupButton> {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => _controller.showMenu(),
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(tokens.radius.sm),
           child: Container(
             padding: const EdgeInsets.all(6),
             child: Icon(
@@ -52,6 +53,7 @@ class _SortMenu extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final tokens = context.tokens;
 
     final sortOption = ref.watch(
       libraryPageProvider.select((s) => s.effectiveSortOption),
@@ -61,18 +63,18 @@ class _SortMenu extends HookConsumerWidget {
       width: 320,
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(tokens.radius.lg),
         border: Border.all(color: theme.colorScheme.borderSubtle),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: theme.colorScheme.cardShadowHover,
             blurRadius: 6,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(tokens.radius.lg),
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -116,7 +118,7 @@ class _SortMenu extends HookConsumerWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: Colors.grey.shade500,
+                            color: theme.colorScheme.textSecondary,
                           ),
                         ),
                       ),
@@ -144,6 +146,7 @@ class _SortSection extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 12,
@@ -156,16 +159,20 @@ class _SortSection extends HookConsumerWidget {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey.shade600,
+                color: colorScheme.textSecondary,
                 letterSpacing: 0.5,
               ),
             ),
             Material(
-              color: isAsc ? Colors.blue.shade50 : Colors.orange.shade50,
+              color: isAsc
+                  ? colorScheme.primaryContainer
+                  : colorScheme.warning.withAlpha(24),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
                 side: BorderSide(
-                  color: isAsc ? Colors.blue.shade100 : Colors.orange.shade100,
+                  color: isAsc
+                      ? colorScheme.primary.withAlpha(70)
+                      : colorScheme.warning.withAlpha(90),
                   width: 1,
                 ),
               ),
@@ -189,8 +196,8 @@ class _SortSection extends HookConsumerWidget {
                         isAsc ? Icons.arrow_upward : Icons.arrow_downward,
                         size: 12,
                         color: isAsc
-                            ? Colors.blue.shade600
-                            : Colors.orange.shade600,
+                            ? colorScheme.primary
+                            : colorScheme.warning,
                       ),
                       Text(
                         isAsc ? "升序" : "降序",
@@ -198,8 +205,8 @@ class _SortSection extends HookConsumerWidget {
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: isAsc
-                              ? Colors.blue.shade600
-                              : Colors.orange.shade600,
+                              ? colorScheme.primary
+                              : colorScheme.warning,
                         ),
                       ),
                     ],
