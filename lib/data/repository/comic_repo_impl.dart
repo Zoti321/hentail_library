@@ -4,7 +4,7 @@ import 'package:hentai_library/data/resources/local/database/database.dart'
 import 'package:hentai_library/domain/entity/comic/comic.dart' as entity;
 import 'package:hentai_library/domain/entity/comic/tag.dart' as entity;
 import 'package:hentai_library/domain/util/enums.dart';
-import 'package:hentai_library/domain/library/library_comic_scan_diff.dart';
+import 'package:hentai_library/domain/util/comic_scan_diff.dart';
 import 'package:hentai_library/domain/repository/comic_repo.dart';
 import 'package:hentai_library/domain/repository/series_repo.dart';
 import 'package:hentai_library/domain/repository/reading_history_repo.dart';
@@ -141,7 +141,7 @@ class ComicRepositoryImpl implements ComicRepository {
     final existingById = {for (final c in existing) c.comicId: c};
     final existingIds = existingById.keys.toSet();
 
-    final idDiff = computeLibraryComicScanIdDiff(
+    final idDiff = computeComicScanIdDiff(
       existingIds: existingIds,
       scannedIds: scannedIds,
     );

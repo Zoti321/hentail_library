@@ -1,6 +1,5 @@
 import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/library/library_comic_scan_diff.dart';
-import 'package:hentai_library/data/services/comic/resource_types.dart';
+import 'package:hentai_library/domain/util/comic_scan_diff.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:test/test.dart';
@@ -27,20 +26,14 @@ void main() {
     });
 
     test('computeLibraryComicScanIdDiff 空扫描清空全部', () {
-      final d = computeLibraryComicScanIdDiff(
-        existingIds: {'a', 'b'},
-        scannedIds: {},
-      );
+      final d = computeComicScanIdDiff(existingIds: {'a', 'b'}, scannedIds: {});
       expect(d.removedIds, {'a', 'b'});
       expect(d.addedIds, isEmpty);
       expect(d.keptIds, isEmpty);
     });
 
     test('computeLibraryComicScanIdDiff 全新增', () {
-      final d = computeLibraryComicScanIdDiff(
-        existingIds: {},
-        scannedIds: {'x', 'y'},
-      );
+      final d = computeComicScanIdDiff(existingIds: {}, scannedIds: {'x', 'y'});
       expect(d.removedIds, isEmpty);
       expect(d.addedIds, {'x', 'y'});
       expect(d.keptIds, isEmpty);

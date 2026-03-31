@@ -4,18 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/button/home_refresh_button.dart';
-import 'package:hentai_library/presentation/widgets/card_item/comic_card.dart';
-import 'package:hentai_library/presentation/widgets/card_item/reading_history_card.dart';
 import 'package:hentai_library/presentation/widgets/dialog/scan_progress_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
-
-  static const int _continueReadingLimit = 5;
-  static const int _recentComicsLimit = 6;
 
   /// 单例扫描约束：扫描进行中不打开新对话框，并提示用户。
   static void _openScanDialogIfAllowed(BuildContext context, WidgetRef ref) {
@@ -63,10 +57,6 @@ class HomePage extends ConsumerWidget {
             _buildHeroWidgets(context, ref, comicCount),
             const SizedBox(height: 24),
             _buildShortcutEntries(context, ref),
-            const SizedBox(height: 40),
-            _buildContinueReadingSection(context, ref),
-            const SizedBox(height: 40),
-            _buildRecentComicsSection(context, ref),
             const SizedBox(height: 80),
           ],
         ),
@@ -218,275 +208,12 @@ class HomePage extends ConsumerWidget {
           colorScheme: cs,
         ),
         _ShortcutEntry(
-          icon: LucideIcons.history,
-          label: '阅读历史',
-          onTap: () => context.go('/history'),
-          colorScheme: cs,
-        ),
-        _ShortcutEntry(
           icon: LucideIcons.scanSearch,
           label: '扫描漫画库',
           onTap: () => _openScanDialogIfAllowed(context, ref),
           colorScheme: cs,
         ),
       ],
-    );
-  }
-
-  Widget _buildContinueReadingSection(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    final historyAsync = ref.watch(readingHistoryStreamProvider);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '继续阅读',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: cs.textPrimary,
-              ),
-            ),
-            TextButton(
-              onPressed: () => context.go('/history'),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '查看全部',
-                    style: TextStyle(fontSize: 14, color: cs.primary),
-                  ),
-                  Icon(LucideIcons.chevronRight, size: 16, color: cs.primary),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        historyAsync.when(
-          data: (history) {
-            final list = history.take(_continueReadingLimit).toList();
-            if (list.isEmpty) {
-              return _EmptyContinueReading(theme: theme);
-            }
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: list
-                  .map(
-                    (h) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: ReadingHistoryCard(
-                        history: h,
-                        onTap: () => appRouter.pushNamed(
-                          '阅读页面',
-                          pathParameters: {'id': h.comicId},
-                        ),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            );
-          },
-          loading: () => const Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
-          ),
-          error: (err, _) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Text(
-              '加载失败',
-              style: TextStyle(fontSize: 14, color: cs.textSecondary),
-            ),
-          ),
-          skipLoadingOnReload: true,
-          skipLoadingOnRefresh: true,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRecentComicsSection(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    final comicsAsync = ref.watch(
-      libraryPageProvider.select((s) => s.rawComicsAsyncValue),
-    );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '最近添加',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: cs.textPrimary,
-              ),
-            ),
-            TextButton(
-              onPressed: () => context.go('/local'),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '查看全部',
-                    style: TextStyle(fontSize: 14, color: cs.primary),
-                  ),
-                  Icon(LucideIcons.chevronRight, size: 16, color: cs.primary),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        comicsAsync.when(
-          data: (comics) {
-            final list = comics.take(_recentComicsLimit).toList();
-            if (list.isEmpty) {
-              return _EmptyRecentComics(theme: theme);
-            }
-            return GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 200,
-                mainAxisExtent: 356,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: list.length,
-              itemBuilder: (BuildContext context, int index) {
-                final comic = list[index];
-                return ComicCard(
-                  key: Key(comic.comicId),
-                  comic: comic,
-                  size: const Size(double.infinity, double.infinity),
-                  onTap: () => appRouter.pushNamed(
-                    '漫画详情',
-                    pathParameters: {'id': comic.comicId},
-                  ),
-                  onPlay: () {},
-                  onRightClick: (_) {},
-                );
-              },
-            );
-          },
-          loading: () => const Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
-          ),
-          error: (err, _) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Text(
-              '加载失败',
-              style: TextStyle(fontSize: 14, color: cs.textSecondary),
-            ),
-          ),
-          skipLoadingOnReload: true,
-        ),
-      ],
-    );
-  }
-}
-
-class _EmptyContinueReading extends StatelessWidget {
-  const _EmptyContinueReading({required this.theme});
-
-  final ThemeData theme;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = theme.colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(LucideIcons.bookOpen, size: 40, color: cs.textTertiary),
-            const SizedBox(height: 12),
-            Text(
-              '暂无阅读记录',
-              style: TextStyle(fontSize: 14, color: cs.textTertiary),
-            ),
-            const SizedBox(height: 16),
-            TextButton.icon(
-              onPressed: () => context.go('/history'),
-              icon: Icon(LucideIcons.history, size: 16, color: cs.primary),
-              label: Text(
-                '查看阅读历史',
-                style: TextStyle(fontSize: 14, color: cs.primary),
-              ),
-              style: TextButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _EmptyRecentComics extends StatelessWidget {
-  const _EmptyRecentComics({required this.theme});
-
-  final ThemeData theme;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = theme.colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(LucideIcons.library, size: 40, color: cs.textTertiary),
-            const SizedBox(height: 12),
-            Text(
-              '暂无漫画，请先添加路径并扫描',
-              style: TextStyle(fontSize: 14, color: cs.textTertiary),
-            ),
-            const SizedBox(height: 16),
-            TextButton.icon(
-              onPressed: () => context.go('/paths'),
-              icon: Icon(LucideIcons.folderPlus, size: 16, color: cs.primary),
-              label: Text(
-                '添加路径',
-                style: TextStyle(fontSize: 14, color: cs.primary),
-              ),
-              style: TextButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

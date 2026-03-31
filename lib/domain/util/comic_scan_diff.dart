@@ -1,7 +1,7 @@
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 
 /// 扫描结果与库内现有 [comicId] 集合的差分（仅 ID 层面）。
-typedef LibraryComicScanIdDiff = ({
+typedef ComicScanIdDiff = ({
   Set<String> removedIds,
   Set<String> addedIds,
   Set<String> keptIds,
@@ -17,7 +17,7 @@ Map<String, Comic> dedupeScannedByComicId(List<Comic> scanned) {
 }
 
 /// 基于现有 ID 集合与本次扫描 ID 集合计算 removed / added / kept。
-LibraryComicScanIdDiff computeLibraryComicScanIdDiff({
+ComicScanIdDiff computeComicScanIdDiff({
   required Set<String> existingIds,
   required Set<String> scannedIds,
 }) {
