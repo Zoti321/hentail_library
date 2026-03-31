@@ -10,7 +10,7 @@ abstract class AppSettings with _$AppSettings {
   factory AppSettings({
     @Default(currentSettingsVersion) int version,
     @Default(false) bool isDarkMode,
-    @Default(false) bool isR18Mode,
+    @Default(false) bool isHealthyMode,
     @Default(false) bool autoScan,
   }) = _AppSettings;
 

@@ -53,5 +53,5 @@ class SettingsStorageService {
 
   // 默认设置
   AppSettings defaultSettings() =>
-      AppSettings(isDarkMode: false, isR18Mode: false, autoScan: false);
+      AppSettings(isDarkMode: false, isHealthyMode: false, autoScan: false);
 }

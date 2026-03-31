@@ -9,7 +9,7 @@ part 'library_comic_filter.freezed.dart';
 abstract class LibraryComicFilter with _$LibraryComicFilter {
   factory LibraryComicFilter({
     String? query,
-    @Default(false) bool showR18,
+    @Default(true) bool showR18,
     Set<ResourceType>? resourceTypes,
     Set<ContentRating>? contentRatings,
     Set<LibraryTagPick>? tagsAll,

@@ -32,9 +32,9 @@ class SettingsNotifier extends _$SettingsNotifier {
     });
   }
 
-  Future<void> toggleR18Mode() async {
+  Future<void> toggleHealthyMode() async {
     state.whenData((data) {
-      updateSettings(data.copyWith(isR18Mode: !data.isR18Mode));
+      updateSettings(data.copyWith(isHealthyMode: !data.isHealthyMode));
     });
   }
 

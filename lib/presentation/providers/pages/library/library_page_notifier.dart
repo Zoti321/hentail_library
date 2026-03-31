@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hentai_library/data/models/app_settings.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/util/comic_query.dart';
@@ -9,6 +10,7 @@ import 'package:hentai_library/domain/value_objects/library_comic_filter.dart';
 import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/value_objects/library_tag_pick.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
+import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_page_notifier.freezed.dart';
@@ -29,7 +31,7 @@ abstract class LibraryPageState with _$LibraryPageState {
   const LibraryPageState._();
 
   LibraryComicFilter get effectiveFilter =>
-      filter ?? LibraryComicFilter(showR18: false);
+      filter ?? LibraryComicFilter(showR18: true);
 
   LibraryComicSortOption get effectiveSortOption =>
       sortOption ?? LibraryComicSortOption();
@@ -85,6 +87,16 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
 
   @override
   LibraryPageState build() {
+    ref.listen<AsyncValue<AppSettings>>(settingsProvider, (prev, next) {
+      next.whenData((settings) {
+        final showR18 = !settings.isHealthyMode;
+        if (state.effectiveFilter.showR18 == showR18) return;
+        state = state.copyWith(
+          filter: state.effectiveFilter.copyWith(showR18: showR18),
+        );
+      });
+    });
+
     final repo = ref.read(libraryComicRepoProvider);
     _sub = repo.watchAll().listen(
       (list) {
@@ -132,9 +144,11 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
     });
   }
 
-  void toggleR18(bool show) {
+  void toggleR18() {
     state = state.copyWith(
-      filter: state.effectiveFilter.copyWith(showR18: show),
+      filter: state.effectiveFilter.copyWith(
+        showR18: !state.effectiveFilter.showR18,
+      ),
     );
   }
 
@@ -187,7 +201,7 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
   }
 
   void resetFilter() {
-    state = state.copyWith(filter: LibraryComicFilter(showR18: false));
+    state = state.copyWith(filter: LibraryComicFilter(showR18: true));
   }
 
   void toggleSortDescending(bool descending) {

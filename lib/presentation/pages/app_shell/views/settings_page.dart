@@ -138,25 +138,25 @@ class SettingsPage extends ConsumerWidget {
                     action: const MyToggleSwitch(checked: true),
                   ),
                   _SettingsRow(
-                    icon: data.isR18Mode
+                    icon: data.isHealthyMode
                         ? Icon(
-                            LucideIcons.shieldAlert,
-                            size: 20,
-                            color: Colors.red.shade500,
-                          )
-                        : Icon(
-                            LucideIcons.lock,
+                            LucideIcons.shield,
                             size: 20,
                             color: theme.colorScheme.iconDefault,
+                          )
+                        : Icon(
+                            LucideIcons.shieldOff,
+                            size: 20,
+                            color: Colors.red.shade500,
                           ),
-                    label: 'R18 内容',
-                    description: data.isR18Mode ? '显示成人内容' : '隐藏成人内容',
+                    label: '健全模式',
+                    description: data.isHealthyMode ? '已启用（隐藏 R18）' : '已禁用（显示 R18）',
                     action: MyToggleSwitch(
-                      checked: data.isR18Mode,
+                      checked: data.isHealthyMode,
                       onChange: () =>
-                          ref.read(settingsProvider.notifier).toggleR18Mode(),
+                          ref.read(settingsProvider.notifier).toggleHealthyMode(),
                     ),
-                    isDestructive: data.isR18Mode,
+                    isDestructive: !data.isHealthyMode,
                   ),
                 ],
               ),

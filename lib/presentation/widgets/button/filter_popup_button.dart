@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/domain/value_objects/library_tag_pick.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/widgets/my_toggle_switch.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -49,8 +50,9 @@ class _FilterMenu extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final resultCount = ref
-        .watch(libraryPageProvider.select((s) => s.displayedComics.length));
+    final resultCount = ref.watch(
+      libraryPageProvider.select((s) => s.displayedComics.length),
+    );
 
     return Container(
       width: 256,
@@ -113,24 +115,12 @@ class _FilterMenu extends HookConsumerWidget {
                 ),
               ),
               Spacer(),
-              Transform.scale(
-                scale: 0.8,
-                child: Switch(
-                  value: ref.watch(
-                    libraryPageProvider.select((s) => s.effectiveFilter.showR18),
-                  ),
-                  onChanged: (val) {
-                    ref.read(libraryPageProvider.notifier).toggleR18(val);
-                  },
-                  activeColor: Colors.white,
-                  activeTrackColor: Colors.red,
-                  inactiveThumbColor: Colors.white,
-                  inactiveTrackColor: Colors.grey.shade300,
-                  overlayColor: MaterialStateProperty.all(Colors.transparent),
-                  trackOutlineColor: MaterialStateProperty.all(
-                    Colors.transparent,
-                  ),
+              MyToggleSwitch(
+                checked: ref.watch(
+                  libraryPageProvider.select((s) => s.effectiveFilter.showR18),
                 ),
+                onChange: () =>
+                    ref.read(libraryPageProvider.notifier).toggleR18(),
               ),
             ],
           ),
