@@ -70,7 +70,7 @@ class DirResourceParser implements ResourceParser {
     return (
       type: type,
       path: dir.path,
-      meta: (title: title, authors: <String>[]),
+      meta: (title: title, authors: <String>[], pageCount: files.length),
     );
   }
 }
@@ -105,7 +105,11 @@ Future<ParsedResource?> parsePureImageZipArchive(
   return (
     path: file.path,
     type: resourceType,
-    meta: (title: p.basenameWithoutExtension(file.path), authors: <String>[]),
+    meta: (
+      title: p.basenameWithoutExtension(file.path),
+      authors: <String>[],
+      pageCount: null,
+    ),
   );
 }
 
@@ -158,6 +162,7 @@ class ComicEpubParser implements ResourceParser {
     try {
       final parser = EpubParser();
       final md = await parser.extractMetadata(file);
+      final pageCount = (await parser.extract(file)).images.length;
 
       final titleRaw = md.title.trim();
       final title = titleRaw.isEmpty
@@ -165,7 +170,7 @@ class ComicEpubParser implements ResourceParser {
           : titleRaw;
       final authors = md.creators.where((e) => e.trim().isNotEmpty).toList();
 
-      final meta = (title: title, authors: authors);
+      final meta = (title: title, authors: authors, pageCount: pageCount);
       return (path: file.path, type: ResourceType.epub, meta: meta);
     } catch (_) {
       return null;

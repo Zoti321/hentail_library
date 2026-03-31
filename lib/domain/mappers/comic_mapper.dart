@@ -21,7 +21,6 @@ class ComicMapper {
 
   String comicIdFromPath(String path) {
     final normalized = normalizePath(path);
-    // 复用现有 sha1 生成工具：输入放到 title 参数位（仅作 hash）。
     return generateComicId(normalized);
   }
 
@@ -32,6 +31,7 @@ class ComicMapper {
       resourceType: r.type,
       title: r.meta.title,
       authors: r.meta.authors,
+      pageCount: r.meta.pageCount,
     );
   }
 }

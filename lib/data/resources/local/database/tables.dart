@@ -67,6 +67,7 @@ class LibraryComics extends Table {
       .withDefault(const Constant('[]'))();
   TextColumn get contentRating =>
       textEnum<ContentRating>().withDefault(const Constant('unknown'))();
+  IntColumn get pageCount => integer().nullable()();
 
   @override
   Set<Column> get primaryKey => {comicId};

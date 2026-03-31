@@ -1,13 +1,15 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart';
+import 'package:hentai_library/presentation/providers/pages/reader/reader_page_notifier.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// 阅读历史卡片：展示单条 [ReadingHistory]，风格与 [ComicTile] 一致，横向封面 + 标题 + 阅读时间/进度。
-class ReadingHistoryCard extends StatefulWidget {
+class ReadingHistoryCard extends ConsumerStatefulWidget {
   final ReadingHistory history;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
@@ -20,10 +22,10 @@ class ReadingHistoryCard extends StatefulWidget {
   });
 
   @override
-  State<ReadingHistoryCard> createState() => _ReadingHistoryCardState();
+  ConsumerState<ReadingHistoryCard> createState() => _ReadingHistoryCardState();
 }
 
-class _ReadingHistoryCardState extends State<ReadingHistoryCard> {
+class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
   bool _isHovered = false;
 
   @override
@@ -31,6 +33,10 @@ class _ReadingHistoryCardState extends State<ReadingHistoryCard> {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final h = widget.history;
+
+    final coverUrl = ref
+        .watch(comicCoverPathProvider(comicId: h.comicId))
+        .maybeWhen(data: (v) => v, orElse: () => null);
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -48,7 +54,7 @@ class _ReadingHistoryCardState extends State<ReadingHistoryCard> {
           ),
           child: Row(
             children: [
-              _buildCover(cs, ""),
+              _buildCover(cs, coverUrl),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(

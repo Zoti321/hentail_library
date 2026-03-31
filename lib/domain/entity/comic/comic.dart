@@ -14,6 +14,7 @@ abstract class Comic with _$Comic {
     @Default(<String>[]) List<String> authors,
     @Default(ContentRating.unknown) ContentRating contentRating,
     @Default(<Tag>[]) List<Tag> tags,
+    int? pageCount,
   }) = _Comic;
 
   Comic._();

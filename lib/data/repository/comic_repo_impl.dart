@@ -44,6 +44,7 @@ class ComicRepositoryImpl implements ComicRepository {
         authors: r.authorsJson,
         contentRating: r.contentRating,
         tags: tagNames.map((n) => entity.Tag(name: n)).toList(),
+        pageCount: r.pageCount,
       );
     }).toList();
   }
@@ -86,6 +87,7 @@ class ComicRepositoryImpl implements ComicRepository {
             title: c.title,
             authorsJson: Value(c.authors),
             contentRating: Value(c.contentRating),
+            pageCount: Value(c.pageCount),
           ),
         )
         .toList();

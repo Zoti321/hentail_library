@@ -35,9 +35,6 @@ class ComicCard extends HookConsumerWidget {
     final coverPath = ref
         .watch(comicCoverPathProvider(comicId: comic.comicId))
         .maybeWhen(data: (v) => v, orElse: () => null);
-    final pageCount = ref
-        .watch(comicImagesProvider(comicId: comic.comicId))
-        .maybeWhen(data: (files) => files.length, orElse: () => 0);
 
     return GestureDetector(
       onTap: onTap,
@@ -119,7 +116,7 @@ class ComicCard extends HookConsumerWidget {
               // 封面图容器
               _buildCover(coverPath, isHover.value),
               // --- 文本信息区域 ---
-              _buildInfoSection(isHover.value, context, pageCount),
+              _buildInfoSection(isHover.value, context, comic.pageCount ?? 0),
             ],
           ),
         ),
