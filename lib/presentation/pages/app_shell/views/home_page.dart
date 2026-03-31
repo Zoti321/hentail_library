@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/button/home_refresh_button.dart';
 import 'package:hentai_library/presentation/widgets/dialog/scan_progress_dialog.dart';
@@ -11,33 +10,19 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
-  /// 单例扫描约束：扫描进行中不打开新对话框，并提示用户。
-  static void _openScanDialogIfAllowed(BuildContext context, WidgetRef ref) {
-    if (ref.read(scanInProgressProvider)) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('扫描进行中，请勿重复操作'),
-            behavior: SnackBarBehavior.floating,
-            margin: snackBarMargin(context),
-          ),
-        );
-      }
-      return;
+  void _onTapScanLibrary(BuildContext context, WidgetRef ref) {
+    final running = ref.read(
+      scanLibraryControllerProvider.select((s) => s.running),
+    );
+    if (!running) {
+      // 点击即启动任务，对话框只订阅状态。
+      ref.read(scanLibraryControllerProvider.notifier).start();
     }
-    ref.read(scanInProgressProvider.notifier).setInProgress(true);
+
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => ScanProgressDialog(
-        onBackgroundComplete: () {
-          if (!context.mounted) return;
-          ref.read(libraryPageProvider.notifier).refreshStream();
-        },
-        onScanEnd: () {
-          ref.read(scanInProgressProvider.notifier).setInProgress(false);
-        },
-      ),
+      builder: (_) => const ScanProgressDialog(),
     );
   }
 
@@ -45,6 +30,14 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final comicCount = ref
         .watch(libraryPageProvider.select((s) => s.rawList.length));
+
+    ref.listen(scanLibraryControllerProvider, (prev, next) {
+      final wasRunning = prev?.running ?? false;
+      if (!wasRunning || next.running) return;
+      if (next.cancelled) return;
+      if (next.error != null) return;
+      ref.read(libraryPageProvider.notifier).refreshStream();
+    });
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -99,7 +92,7 @@ class HomePage extends ConsumerWidget {
               },
             ),
             FilledButton.icon(
-              onPressed: () => _openScanDialogIfAllowed(context, ref),
+              onPressed: () => _onTapScanLibrary(context, ref),
               icon: const Icon(LucideIcons.scanSearch, size: 18),
               label: const Text('扫描漫画库'),
               style: FilledButton.styleFrom(
@@ -210,7 +203,7 @@ class HomePage extends ConsumerWidget {
         _ShortcutEntry(
           icon: LucideIcons.scanSearch,
           label: '扫描漫画库',
-          onTap: () => _openScanDialogIfAllowed(context, ref),
+          onTap: () => _onTapScanLibrary(context, ref),
           colorScheme: cs,
         ),
       ],

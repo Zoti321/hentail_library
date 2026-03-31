@@ -16,14 +16,6 @@ RecordReadingProgressUseCase recordReadingProgressUseCase(Ref ref) {
   return RecordReadingProgressUseCase(ref.read(readingHistoryRepoProvider));
 }
 
-@Riverpod(keepAlive: true)
-class ScanInProgressNotifier extends _$ScanInProgressNotifier {
-  @override
-  bool build() => false;
-
-  void setInProgress(bool value) => state = value;
-}
-
 class SyncComicsUseCase {
   SyncComicsUseCase(this._ref);
 

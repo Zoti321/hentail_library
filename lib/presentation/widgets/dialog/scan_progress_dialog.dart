@@ -2,90 +2,22 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/app_fluent_color_scheme.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/terminal_spinner.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// 扫描漫画库对话框：同步进度、完成/已取消/错误。
-class ScanProgressDialog extends ConsumerStatefulWidget {
+class ScanProgressDialog extends ConsumerWidget {
   const ScanProgressDialog({
     super.key,
-    this.onBackgroundComplete,
-    this.onScanEnd,
   });
 
-  /// 用户点击「后台扫描」后，同步在后台完成时回调（例如刷新列表）。
-  final VoidCallback? onBackgroundComplete;
-
-  /// 同步任务结束时回调（成功、失败或取消）。用于单例约束：仅在此后允许再次打开扫描。
-  final VoidCallback? onScanEnd;
-
   @override
-  ConsumerState<ScanProgressDialog> createState() => _ScanProgressDialogState();
-}
-
-class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
-  final ValueNotifier<bool> _isCancelled = ValueNotifier(false);
-  bool _runInBackground = false;
-  bool _started = false;
-
-  String? _error;
-  bool _isRunning = true;
-
-  SyncLibraryProgress? _progress;
-
-  Future<void>? _syncFuture;
-
-  void _startSync() {
-    if (_started) return;
-    _started = true;
-    _syncFuture = ref
-        .read(syncComicsUseCaseProvider)
-        .call(
-          isCancelled: () => _isCancelled.value,
-          onProgress: (p) {
-            if (!mounted) return;
-            setState(() => _progress = p);
-          },
-        );
-    _syncFuture!
-        .then((_) {
-          if (mounted) {
-            setState(() {
-              _isRunning = false;
-            });
-          }
-          if (_runInBackground) {
-            widget.onBackgroundComplete?.call();
-          }
-          widget.onScanEnd?.call();
-        })
-        .catchError((e, _) {
-          if (mounted) {
-            setState(() {
-              _error = e is AppException ? e.message : e.toString();
-              _isRunning = false;
-            });
-          }
-          if (_runInBackground) widget.onBackgroundComplete?.call();
-          widget.onScanEnd?.call();
-        });
-  }
-
-  @override
-  void dispose() {
-    _isCancelled.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) => _startSync());
-
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final state = ref.watch(scanLibraryControllerProvider);
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -118,14 +50,14 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildHeader(theme),
-                if (_error != null)
-                  _buildError(theme)
-                else if (!_isRunning ||
-                    _progress?.phase == SyncLibraryPhase.done)
-                  _buildDone(theme)
+                if (state.error != null)
+                  _buildError(theme, state.error!)
+                else if (!state.running ||
+                    state.progress?.phase == SyncLibraryPhase.done)
+                  _buildDone(theme, state.cancelled, state.progress)
                 else
-                  _buildRunning(theme),
-                _buildFooter(theme),
+                  _buildRunning(theme, state.progress),
+                _buildFooter(context, ref, theme, state),
               ],
             ),
           ),
@@ -158,9 +90,9 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
     );
   }
 
-  Widget _buildRunning(ThemeData theme) {
+  Widget _buildRunning(ThemeData theme, SyncLibraryProgress? progress) {
     final cs = theme.colorScheme;
-    final p = _progress;
+    final p = progress;
 
     if (p == null) {
       return Padding(
@@ -259,9 +191,13 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
     );
   }
 
-  Widget _buildDone(ThemeData theme) {
+  Widget _buildDone(
+    ThemeData theme,
+    bool cancelled,
+    SyncLibraryProgress? progress,
+  ) {
     final cs = theme.colorScheme;
-    if (_isCancelled.value) {
+    if (cancelled) {
       return Padding(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
         child: Text(
@@ -271,7 +207,7 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
       );
     }
 
-    final p = _progress;
+    final p = progress;
     final String label;
     if (p != null) {
       switch (p.route) {
@@ -302,7 +238,7 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
     );
   }
 
-  Widget _buildError(ThemeData theme) {
+  Widget _buildError(ThemeData theme, String error) {
     final cs = theme.colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
@@ -312,7 +248,7 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              _error!,
+              error,
               style: TextStyle(fontSize: 13, color: cs.textSecondary),
             ),
           ),
@@ -321,11 +257,16 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
     );
   }
 
-  Widget _buildFooter(ThemeData theme) {
+  Widget _buildFooter(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeData theme,
+    ScanLibraryState state,
+  ) {
     final cs = theme.colorScheme;
-    final syncDone = _progress?.phase == SyncLibraryPhase.done;
-    final showClose = _error != null || !_isRunning || syncDone;
-    final showError = _error != null;
+    final syncDone = state.progress?.phase == SyncLibraryPhase.done;
+    final showClose = state.error != null || !state.running || syncDone;
+    final showError = state.error != null;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -355,7 +296,7 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
           else ...[
             TextButton(
               onPressed: () {
-                _isCancelled.value = true;
+                ref.read(scanLibraryControllerProvider.notifier).cancel();
                 if (context.mounted) Navigator.of(context).pop();
               },
               style: TextButton.styleFrom(
@@ -372,7 +313,9 @@ class _ScanProgressDialogState extends ConsumerState<ScanProgressDialog> {
             ),
             FilledButton(
               onPressed: () {
-                _runInBackground = true;
+                ref
+                    .read(scanLibraryControllerProvider.notifier)
+                    .setRunInBackground(true);
                 if (context.mounted) Navigator.of(context).pop();
               },
               style: FilledButton.styleFrom(
