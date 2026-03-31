@@ -3,8 +3,8 @@ import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:path/path.dart' as p;
 
-/// 将 v2 ParsedResource 映射为领域 `Comic`。
-class LibraryComicMapper {
+///  ParsedResource 映射为领域 `Comic`。
+class ComicMapper {
   /// 规范化路径用于生成稳定的（path-based）comicId。
   ///
   /// 约定：

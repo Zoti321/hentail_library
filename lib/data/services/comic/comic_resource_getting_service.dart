@@ -1,39 +1,45 @@
 import 'dart:io';
 
-import 'package:hentai_library/core/util/comic_file_types.dart';
+import 'package:hentai_library/data/services/comic/comic_resource_content_handler.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
-import 'package:path/path.dart' as p;
 
 /// 按 [ResourceType] 从磁盘路径解析漫画封面与正文资源。
 ///
-/// 当前仅实现 [ResourceType.dir]；其余类型方法体会抛出 [UnsupportedError]。
+/// 具体行为由 [ComicResourceContentHandler] 注册表决定（与 [ResourceParser] 链式策略对齐）。
 class ComicResourceGettingService {
-  /// 返回目录漫画封面文件：优先 basename（不含扩展名）不区分大小写为 `cover` 的图片，否则为按名排序后的第一张。
-  Future<File> getComicCover(String path, ResourceType type) async {
-    await _validatePathMatchesType(path, type);
-    return switch (type) {
-      ResourceType.dir => _getDirCover(Directory(path)),
-      ResourceType.zip ||
-      ResourceType.cbz ||
-      ResourceType.epub ||
-      ResourceType.cbr ||
-      ResourceType.rar =>
-        throw UnsupportedError('getComicCover 尚未支持 ResourceType.$type'),
-    };
+  ComicResourceGettingService({List<ComicResourceContentHandler>? handlers})
+      : _handlers = _indexByType(
+          handlers ?? defaultComicResourceContentHandlers(),
+        );
+
+  final Map<ResourceType, ComicResourceContentHandler> _handlers;
+
+  static Map<ResourceType, ComicResourceContentHandler> _indexByType(
+    List<ComicResourceContentHandler> handlers,
+  ) {
+    final m = <ResourceType, ComicResourceContentHandler>{};
+    for (final h in handlers) {
+      m[h.type] = h;
+    }
+    if (m.length != ResourceType.values.length) {
+      throw ArgumentError(
+        'handlers 必须为每个 ResourceType 提供恰好一个处理器（当前 ${m.length}，'
+        '期望 ${ResourceType.values.length}）',
+      );
+    }
+    return Map<ResourceType, ComicResourceContentHandler>.unmodifiable(m);
   }
 
-  /// 返回目录漫画正文图片列表（非递归、按 basename 排序）。
+  /// 返回漫画封面文件（语义见各 [ComicResourceContentHandler]）。
+  Future<File> getComicCover(String path, ResourceType type) async {
+    await _validatePathMatchesType(path, type);
+    return _handlers[type]!.getCover(path.trim());
+  }
+
+  /// 返回正文图片列表（语义见各 [ComicResourceContentHandler]）。
   Future<List<File>> getComicContent(String path, ResourceType type) async {
     await _validatePathMatchesType(path, type);
-    return switch (type) {
-      ResourceType.dir => _listDirComicImageFiles(Directory(path)),
-      ResourceType.zip ||
-      ResourceType.cbz ||
-      ResourceType.epub ||
-      ResourceType.cbr ||
-      ResourceType.rar =>
-        throw UnsupportedError('getComicContent 尚未支持 ResourceType.$type'),
-    };
+    return _handlers[type]!.getContent(path.trim());
   }
 
   Future<void> _validatePathMatchesType(String rawPath, ResourceType type) async {
@@ -58,7 +64,10 @@ class ComicResourceGettingService {
     }
   }
 
-  static ResourceType? _inferResourceType(String path, FileSystemEntityType entityType) {
+  static ResourceType? _inferResourceType(
+    String path,
+    FileSystemEntityType entityType,
+  ) {
     if (entityType == FileSystemEntityType.directory) {
       return ResourceType.dir;
     }
@@ -66,37 +75,5 @@ class ComicResourceGettingService {
       return resourceTypeFromFilePath(path);
     }
     return null;
-  }
-
-  Future<List<File>> _listDirComicImageFiles(Directory dir) async {
-    if (!await dir.exists()) {
-      throw ArgumentError('目录不存在: ${dir.path}');
-    }
-
-    final entities = await dir
-        .list(recursive: false, followLinks: false)
-        .toList();
-
-    final imageFiles = entities.whereType<File>().where((file) {
-      final ext = p.extension(file.path).toLowerCase();
-      return ComicFileTypes.comicImageExtensions.contains(ext);
-    }).toList();
-
-    imageFiles.sort((a, b) => p.basename(a.path).compareTo(p.basename(b.path)));
-    return imageFiles;
-  }
-
-  Future<File> _getDirCover(Directory dir) async {
-    final files = await _listDirComicImageFiles(dir);
-    if (files.isEmpty) {
-      throw StateError('目录内无漫画图片: ${dir.path}');
-    }
-
-    for (final f in files) {
-      if (p.basenameWithoutExtension(f.path).toLowerCase() == 'cover') {
-        return f;
-      }
-    }
-    return files.first;
   }
 }

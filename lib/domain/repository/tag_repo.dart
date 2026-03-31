@@ -1,7 +1,7 @@
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 
-/// v2 Tag 仓储：独立于 Comic/Series 的“标签字典管理”。
-abstract class LibraryTagRepository {
+/// Tag 仓储：独立于 Comic/Series 的“标签字典管理”。
+abstract class TagRepository {
   Future<List<Tag>> listAll();
 
   Future<void> add(Tag tag);

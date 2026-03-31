@@ -1,7 +1,7 @@
-import 'package:hentai_library/domain/repository/library_series_repo.dart';
+import 'package:hentai_library/domain/repository/series_repo.dart';
 
 class AssignLibraryComicToSeriesUseCase {
-  final LibrarySeriesRepository repo;
+  final SeriesRepository repo;
 
   AssignLibraryComicToSeriesUseCase(this.repo);
 

@@ -1,7 +1,7 @@
 import 'package:hentai_library/domain/entity/comic/series.dart';
 
-/// v2 Series 仓储：系列独立聚合，维护漫画归属与顺序。
-abstract class LibrarySeriesRepository {
+/// Series 仓储：系列独立聚合，维护漫画归属与顺序。
+abstract class SeriesRepository {
   Stream<List<Series>> watchAll();
 
   Future<List<Series>> getAll();

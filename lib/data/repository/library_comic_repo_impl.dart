@@ -5,18 +5,21 @@ import 'package:hentai_library/domain/entity/comic/comic.dart' as entity;
 import 'package:hentai_library/domain/entity/comic/tag.dart' as entity;
 import 'package:hentai_library/domain/enums/enums.dart';
 import 'package:hentai_library/domain/library/library_comic_scan_diff.dart';
-import 'package:hentai_library/domain/repository/library_comic_repo.dart';
-import 'package:hentai_library/domain/repository/library_series_repo.dart';
+import 'package:hentai_library/domain/repository/comic_repo.dart';
+import 'package:hentai_library/domain/repository/series_repo.dart';
 import 'package:hentai_library/domain/repository/reading_history_repo.dart';
 import 'package:hentai_library/domain/repository/reading_session_repo.dart';
 import 'package:hentai_library/domain/usecases/purge_library_comics_side_effects.dart';
 import 'package:drift/drift.dart';
 
-class LibraryComicRepositoryImpl implements LibraryComicRepository {
+/// 漫画主表与标签的持久化；**跨聚合**（阅读历史、系列、阅读会话）的删除/替换流程请放在
+/// [domain/usecases]（例如 [purgeLibraryComicsFromApp]、[replaceByScan] 内已编排的 purge），
+/// 避免在本类中继续堆叠多仓储协调逻辑。
+class LibraryComicRepositoryImpl implements ComicRepository {
   LibraryComicRepositoryImpl(
     this._comicDao, {
     required ReadingHistoryRepository readingHistory,
-    required LibrarySeriesRepository librarySeries,
+    required SeriesRepository librarySeries,
     required ReadingSessionRepository readingSessions,
   }) : _readingHistory = readingHistory,
        _librarySeries = librarySeries,
@@ -24,7 +27,7 @@ class LibraryComicRepositoryImpl implements LibraryComicRepository {
 
   final LibraryComicDao _comicDao;
   final ReadingHistoryRepository _readingHistory;
-  final LibrarySeriesRepository _librarySeries;
+  final SeriesRepository _librarySeries;
   final ReadingSessionRepository _readingSessions;
 
   Future<List<entity.Comic>> _mapRows(List<db.LibraryComic> rows) async {
@@ -128,7 +131,7 @@ class LibraryComicRepositoryImpl implements LibraryComicRepository {
   }
 
   @override
-  Future<LibraryComicReplaceByScanResult> replaceByScan(
+  Future<ComicReplaceByScanResult> replaceByScan(
     List<entity.Comic> scanned,
   ) async {
     final unique = dedupeScannedByComicId(scanned);

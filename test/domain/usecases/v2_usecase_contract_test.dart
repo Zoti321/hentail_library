@@ -1,17 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/enums/enums.dart';
-import 'package:hentai_library/domain/repository/library_comic_repo.dart';
-import 'package:hentai_library/domain/repository/library_series_repo.dart';
+import 'package:hentai_library/domain/repository/comic_repo.dart';
+import 'package:hentai_library/domain/repository/series_repo.dart';
 import 'package:hentai_library/domain/usecases/assign_library_comic_to_series_usecase.dart';
 import 'package:hentai_library/domain/usecases/update_library_comic_meta_usecase.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockLibraryComicRepository extends Mock
-    implements LibraryComicRepository {}
+class MockLibraryComicRepository extends Mock implements ComicRepository {}
 
-class MockLibrarySeriesRepository extends Mock
-    implements LibrarySeriesRepository {}
+class MockLibrarySeriesRepository extends Mock implements SeriesRepository {}
 
 void main() {
   group('v2 usecase contracts', () {

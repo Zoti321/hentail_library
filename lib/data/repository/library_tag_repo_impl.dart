@@ -1,8 +1,8 @@
 import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart' as entity;
-import 'package:hentai_library/domain/repository/library_tag_repo.dart';
+import 'package:hentai_library/domain/repository/tag_repo.dart';
 
-class LibraryTagRepositoryImpl implements LibraryTagRepository {
+class LibraryTagRepositoryImpl implements TagRepository {
   final LibraryTagDao _dao;
 
   LibraryTagRepositoryImpl(this._dao);

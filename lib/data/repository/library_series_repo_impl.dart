@@ -1,12 +1,11 @@
 import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart'
     as db;
-import 'package:hentai_library/domain/entity/comic/series.dart'
-    as entity;
+import 'package:hentai_library/domain/entity/comic/series.dart' as entity;
 import 'package:hentai_library/domain/entity/comic/series_item.dart' as entity;
-import 'package:hentai_library/domain/repository/library_series_repo.dart';
+import 'package:hentai_library/domain/repository/series_repo.dart';
 
-class LibrarySeriesRepositoryImpl implements LibrarySeriesRepository {
+class LibrarySeriesRepositoryImpl implements SeriesRepository {
   final LibrarySeriesDao _dao;
 
   LibrarySeriesRepositoryImpl(this._dao);

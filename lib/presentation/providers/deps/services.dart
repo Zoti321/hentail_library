@@ -1,3 +1,4 @@
+import 'package:hentai_library/data/services/comic/comic_resource_content_handler.dart';
 import 'package:hentai_library/data/services/comic/comic_resource_getting_service.dart';
 import 'package:hentai_library/data/services/comic/comic_scan_parse_service.dart';
 import 'package:hentai_library/data/services/comic/resource_parser.dart';
@@ -19,5 +20,11 @@ ComicScanParseService comicScanParseService(Ref ref) => ComicScanParseService(
 );
 
 @Riverpod(keepAlive: true)
+List<ComicResourceContentHandler> comicResourceContentHandlers(Ref ref) =>
+    defaultComicResourceContentHandlers();
+
+@Riverpod(keepAlive: true)
 ComicResourceGettingService comicResourceGettingService(Ref ref) =>
-    ComicResourceGettingService();
+    ComicResourceGettingService(
+      handlers: ref.read(comicResourceContentHandlersProvider),
+    );

@@ -5,9 +5,9 @@ import 'package:hentai_library/data/repository/path_repo.dart';
 import 'package:hentai_library/data/repository/reading_history_repo.dart';
 import 'package:hentai_library/data/repository/reading_session_repo.dart';
 import 'package:hentai_library/domain/repository/dir_repo.dart';
-import 'package:hentai_library/domain/repository/library_comic_repo.dart';
-import 'package:hentai_library/domain/repository/library_series_repo.dart';
-import 'package:hentai_library/domain/repository/library_tag_repo.dart';
+import 'package:hentai_library/domain/repository/comic_repo.dart';
+import 'package:hentai_library/domain/repository/series_repo.dart';
+import 'package:hentai_library/domain/repository/tag_repo.dart';
 import 'package:hentai_library/domain/repository/reading_history_repo.dart';
 import 'package:hentai_library/domain/repository/reading_session_repo.dart'
     as domain;
@@ -17,20 +17,19 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'repos.g.dart';
 
 @Riverpod(keepAlive: true)
-LibraryComicRepository libraryComicRepo(Ref ref) =>
-    LibraryComicRepositoryImpl(
-      ref.read(libraryComicDaoProvider),
-      readingHistory: ref.read(readingHistoryRepoProvider),
-      librarySeries: ref.read(librarySeriesRepoProvider),
-      readingSessions: ref.read(readingSessionRepoProvider),
-    );
+ComicRepository libraryComicRepo(Ref ref) => LibraryComicRepositoryImpl(
+  ref.read(libraryComicDaoProvider),
+  readingHistory: ref.read(readingHistoryRepoProvider),
+  librarySeries: ref.read(librarySeriesRepoProvider),
+  readingSessions: ref.read(readingSessionRepoProvider),
+);
 
 @Riverpod(keepAlive: true)
-LibrarySeriesRepository librarySeriesRepo(Ref ref) =>
+SeriesRepository librarySeriesRepo(Ref ref) =>
     LibrarySeriesRepositoryImpl(ref.read(librarySeriesDaoProvider));
 
 @Riverpod(keepAlive: true)
-LibraryTagRepository libraryTagRepo(Ref ref) =>
+TagRepository libraryTagRepo(Ref ref) =>
     LibraryTagRepositoryImpl(ref.read(libraryTagDaoProvider));
 
 @Riverpod(keepAlive: true)
