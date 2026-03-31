@@ -65,6 +65,9 @@ extension LibraryPageStateDerived on LibraryPageState {
 
 @Riverpod(keepAlive: true)
 class LibraryPageNotifier extends _$LibraryPageNotifier {
+  static const _filterDebounceDuration = Duration(milliseconds: 300);
+  static const _mergeSearchDebounceDuration = Duration(milliseconds: 500);
+
   StreamSubscription<List<Comic>>? _sub;
   Timer? _filterQueryDebounce;
   Timer? _mergeSearchDebounce;
@@ -81,29 +84,18 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
       });
     });
 
-    final repo = ref.read(libraryComicRepoProvider);
-    _sub = repo.watchAll().listen(
-      (list) {
-        state = state.copyWith(
-          rawList: list,
-          hasReceivedFirstEmit: true,
-          streamError: null,
-        );
-      },
-      onError: (Object e, StackTrace st) {
-        state = state.copyWith(streamError: e, hasReceivedFirstEmit: true);
-      },
-    );
+    _subscribeLibraryStream();
+
     ref.onDispose(() {
       _sub?.cancel();
       _filterQueryDebounce?.cancel();
       _mergeSearchDebounce?.cancel();
     });
+
     return const LibraryPageState();
   }
 
-  void refreshStream() {
-    _sub?.cancel();
+  void _subscribeLibraryStream() {
     final repo = ref.read(libraryComicRepoProvider);
     _sub = repo.watchAll().listen(
       (list) {
@@ -119,9 +111,24 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
     );
   }
 
-  void updateFilterQuery(String? query) {
+  void refreshStream() {
+    _sub?.cancel();
+    _subscribeLibraryStream();
+  }
+
+  void _debounceFilter(void Function() action) {
     _filterQueryDebounce?.cancel();
-    _filterQueryDebounce = Timer(const Duration(milliseconds: 300), () {
+    _filterQueryDebounce = Timer(_filterDebounceDuration, action);
+  }
+
+  void _debounceMergeSearch(void Function() action) {
+    _mergeSearchDebounce?.cancel();
+    _mergeSearchDebounce = Timer(_mergeSearchDebounceDuration, action);
+  }
+
+  // Filter APIs
+  void updateFilterQuery(String? query) {
+    _debounceFilter(() {
       state = state.copyWith(
         filter: state.effectiveFilter.copyWith(query: query),
       );
@@ -156,6 +163,7 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
     state = state.copyWith(filter: LibraryComicFilter(showR18: true));
   }
 
+  // Sort APIs
   void toggleSortDescending(bool descending) {
     state = state.copyWith(
       sortOption: state.effectiveSortOption.copyWith(descending: descending),
@@ -173,8 +181,7 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
   }
 
   void updateMergeSearch(String value) {
-    _mergeSearchDebounce?.cancel();
-    _mergeSearchDebounce = Timer(const Duration(milliseconds: 300), () {
+    _debounceMergeSearch(() {
       state = state.copyWith(mergeSearchQuery: value);
     });
   }
@@ -197,11 +204,6 @@ Future<List<Comic>> filteredMergeComics(
   final query = page.mergeSearchQuery;
   final comics = page.rawList.where((e) => e.comicId != comicId).toList();
   if (query.isEmpty) return comics;
-
-  var didDispose = false;
-  ref.onDispose(() => didDispose = true);
-  await Future.delayed(const Duration(milliseconds: 500));
-  if (didDispose) throw Exception('Cancelled');
 
   return comics
       .where((e) => e.title.toLowerCase().contains(query.toLowerCase()))

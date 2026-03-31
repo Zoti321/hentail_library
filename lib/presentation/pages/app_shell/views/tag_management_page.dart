@@ -162,6 +162,11 @@ class _Header extends ConsumerWidget {
               },
               icon: const Icon(LucideIcons.plus, size: 16),
               label: const Text('添加标签'),
+              style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
             if (selectionCount > 0)
               OutlinedButton.icon(
@@ -203,45 +208,50 @@ class _TagList extends ConsumerWidget {
       margin: const EdgeInsets.only(top: 16),
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: cs.borderSubtle),
       ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: cs.surfaceContainerHighest,
-              border: Border(bottom: BorderSide(color: cs.borderSubtle)),
-            ),
-            child: Row(
-              children: [
-                Icon(LucideIcons.tags, size: 16, color: cs.onSurfaceVariant),
-                const SizedBox(width: 8),
-                Text(
-                  '全部标签',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: cs.textSecondary,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerHighest,
+                border: Border(bottom: BorderSide(color: cs.borderSubtle)),
+              ),
+              child: Row(
+                children: [
+                  Icon(LucideIcons.tags, size: 16, color: cs.onSurfaceVariant),
+                  const SizedBox(width: 8),
+                  Text(
+                    '全部标签',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: cs.textSecondary,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: tags.length,
-            separatorBuilder: (_, __) =>
-                Divider(height: 1, color: cs.borderSubtle),
-            itemBuilder: (context, index) {
-              final tag = tags[index];
-              final isSelected = ref.watch(tagSelectionProvider).contains(tag);
-              return _TagRow(tag: tag, isSelected: isSelected);
-            },
-          ),
-        ],
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: tags.length,
+              separatorBuilder: (_, __) =>
+                  Divider(height: 1, color: cs.borderSubtle),
+              itemBuilder: (context, index) {
+                final tag = tags[index];
+                final isSelected = ref
+                    .watch(tagSelectionProvider)
+                    .contains(tag);
+                return _TagRow(tag: tag, isSelected: isSelected);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
