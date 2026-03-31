@@ -27,22 +27,24 @@ class _AppShellState extends ConsumerState<AppShell> with TrayListener {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
+      body: Column(
         children: [
-          DesktopSidebar(
-            activeId: _activeTab,
-            onDestinationSelected: (id) {
-              setState(() {
-                _activeTab = id;
-              });
-              _onDestinationTap(id, context);
-            },
-          ),
+          const AppTitleBar(),
           Expanded(
-            child: Column(
+            child: Row(
               children: [
-                const AppTitleBar(),
-                Expanded(child: widget.routeChild),
+                DesktopSidebar(
+                  activeId: _activeTab,
+                  onDestinationSelected: (id) {
+                    setState(() {
+                      _activeTab = id;
+                    });
+                    _onDestinationTap(id, context);
+                  },
+                ),
+                Expanded(
+                  child: widget.routeChild,
+                ),
               ],
             ),
           ),
