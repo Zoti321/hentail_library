@@ -19,6 +19,27 @@ class LibraryPage extends ConsumerStatefulWidget {
 }
 
 class _LibraryPageState extends ConsumerState<LibraryPage> {
+  late final TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final query = ref.read(libraryPageProvider).effectiveFilter.query ?? '';
+      if (_searchController.text != query) {
+        _searchController.text = query;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -29,6 +50,16 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     final isGridView = ref.watch(
       libraryPageProvider.select((s) => s.isGridView),
     );
+    final filterQuery = ref.watch(
+      libraryPageProvider.select((s) => s.effectiveFilter.query ?? ''),
+    );
+
+    if (_searchController.text != filterQuery) {
+      _searchController.value = _searchController.value.copyWith(
+        text: filterQuery,
+        selection: TextSelection.collapsed(offset: filterQuery.length),
+      );
+    }
 
     final comicCount = comics.when(
       data: (data) => data.length,
@@ -118,6 +149,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           Container(
             constraints: BoxConstraints(maxWidth: 164),
             child: TextField(
+              controller: _searchController,
               onChanged: (val) =>
                   ref.read(libraryPageProvider.notifier).updateFilterQuery(val),
               textAlignVertical: TextAlignVertical.center,
