@@ -8,7 +8,6 @@ import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/util/comic_query.dart';
 import 'package:hentai_library/domain/value_objects/library_comic_filter.dart';
 import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
-import 'package:hentai_library/domain/value_objects/library_tag_pick.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -61,21 +60,6 @@ extension LibraryPageStateDerived on LibraryPageState {
       return const AsyncValue.loading();
     }
     return AsyncValue.data(rawList);
-  }
-
-  List<LibraryTagPick> get libraryTagsForFilter {
-    final tags = <LibraryTagPick>[];
-    final seen = <String>{};
-    for (final c in rawList) {
-      for (final t in c.tags) {
-        final key = t.name;
-        if (seen.contains(key)) continue;
-        seen.add(key);
-        tags.add(LibraryTagPick(name: t.name));
-      }
-    }
-    tags.sort((a, b) => a.name.compareTo(b.name));
-    return tags;
   }
 }
 
@@ -148,38 +132,6 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
     state = state.copyWith(
       filter: state.effectiveFilter.copyWith(
         showR18: !state.effectiveFilter.showR18,
-      ),
-    );
-  }
-
-  void updateTags(Set<LibraryTagPick> tags) {
-    state = state.copyWith(
-      filter: state.effectiveFilter.copyWith(tagsAll: tags),
-    );
-  }
-
-  void updateTagsAny(Set<LibraryTagPick> tagsAny) {
-    state = state.copyWith(
-      filter: state.effectiveFilter.copyWith(tagsAny: tagsAny),
-    );
-  }
-
-  void updateTagsExclude(Set<LibraryTagPick> tagsExclude) {
-    state = state.copyWith(
-      filter: state.effectiveFilter.copyWith(tagsExclude: tagsExclude),
-    );
-  }
-
-  void updateTagFilter({
-    Set<LibraryTagPick>? tags,
-    Set<LibraryTagPick>? tagsAny,
-    Set<LibraryTagPick>? tagsExclude,
-  }) {
-    state = state.copyWith(
-      filter: state.effectiveFilter.copyWith(
-        tagsAll: tags,
-        tagsAny: tagsAny,
-        tagsExclude: tagsExclude,
       ),
     );
   }
