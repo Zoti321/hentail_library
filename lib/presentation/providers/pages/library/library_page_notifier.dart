@@ -2,9 +2,8 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/library/library_comic_query.dart';
 import 'package:hentai_library/domain/value_objects/library_comic_filter.dart';
 import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
@@ -38,9 +37,9 @@ abstract class LibraryPageState with _$LibraryPageState {
 
 extension LibraryPageStateDerived on LibraryPageState {
   List<Comic> get displayedComics => LibraryComicQuery(
-        filter: effectiveFilter,
-        sortOption: effectiveSortOption,
-      ).apply(rawList);
+    filter: effectiveFilter,
+    sortOption: effectiveSortOption,
+  ).apply(rawList);
 
   AsyncValue<List<Comic>> get comicsAsyncValue {
     if (streamError != null) {

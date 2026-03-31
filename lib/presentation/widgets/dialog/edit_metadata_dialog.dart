@@ -7,7 +7,7 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/presentation/widgets/form/content_rating_field.dart';
 import 'package:hentai_library/presentation/widgets/form/fluent_text_field.dart';
@@ -239,9 +239,9 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           items: _formData.tags.whereType<Tag>().map((t) => t.name).toList(),
           onAdd: _handleTagAdd,
           onRemove: (name) {
-            final tag = _formData.tags
-                .whereType<Tag>()
-                .firstWhereOrNull((t) => t.name == name);
+            final tag = _formData.tags.whereType<Tag>().firstWhereOrNull(
+              (t) => t.name == name,
+            );
             if (tag != null) _handleTagRemove(tag);
           },
         ),

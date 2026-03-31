@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 
 void main() {
   group('ScannedItemType', () {

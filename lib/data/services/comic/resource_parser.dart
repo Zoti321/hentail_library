@@ -4,21 +4,21 @@ import 'package:archive/archive.dart';
 import 'package:epub_image_extractor/epub_image_extractor.dart';
 import 'package:hentai_library/core/util/comic_file_types.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 import 'package:path/path.dart' as p;
 
 typedef ParseContext = ({Set<String> imageExts});
 
-ParseContext defaultComicParseContext() => (
-      imageExts: Set<String>.from(ComicFileTypes.comicImageExtensions),
-    );
+ParseContext defaultComicParseContext() =>
+    (imageExts: Set<String>.from(ComicFileTypes.comicImageExtensions));
 
 /// 与 [`ComicFileTypes.comicImageExtensions`] 对齐的默认解析器列表（文件匹配顺序：epub → cbz → zip）。
 List<ResourceParser> defaultComicResourceParsers() => [
-      DirResourceParser(),
-      ComicEpubParser(),
-      PureImageCbzParser(),
-      PureImageZipParser(),
-    ];
+  DirResourceParser(),
+  ComicEpubParser(),
+  PureImageCbzParser(),
+  PureImageZipParser(),
+];
 
 abstract class ResourceParser {
   ResourceType get type;
@@ -119,10 +119,7 @@ class PureImageZipParser implements ResourceParser {
   }
 
   @override
-  Future<ParsedResource?> parse(
-    FileSystemEntity entity,
-    ParseContext context,
-  ) {
+  Future<ParsedResource?> parse(FileSystemEntity entity, ParseContext context) {
     return parsePureImageZipArchive(entity as File, type, context);
   }
 }
@@ -137,10 +134,7 @@ class PureImageCbzParser implements ResourceParser {
   }
 
   @override
-  Future<ParsedResource?> parse(
-    FileSystemEntity entity,
-    ParseContext context,
-  ) {
+  Future<ParsedResource?> parse(FileSystemEntity entity, ParseContext context) {
     return parsePureImageZipArchive(entity as File, type, context);
   }
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:hentai_library/data/services/comic/resource_parser.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 import 'package:path/path.dart' as p;
 
 /// 统一扫描与解析：路径校验 → 文件/目录分流 → 目录先判定漫画文件夹否则非递归下钻。

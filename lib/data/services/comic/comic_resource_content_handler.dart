@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:hentai_library/core/util/comic_file_types.dart';
-import 'package:hentai_library/data/services/comic/resource_types.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 import 'package:path/path.dart' as p;
 
 /// 按 [ResourceType] 从磁盘路径读取封面与正文（与 [ResourceParser] 扫描策略对称，便于按类型独立扩展）。
@@ -64,7 +64,8 @@ class DirComicResourceContentHandler implements ComicResourceContentHandler {
 }
 
 /// 占位：尚未实现对应类型的封面/正文读取时注册此实现，避免在 [ComicResourceGettingService] 内写巨型 switch。
-class UnsupportedComicResourceContentHandler implements ComicResourceContentHandler {
+class UnsupportedComicResourceContentHandler
+    implements ComicResourceContentHandler {
   UnsupportedComicResourceContentHandler(this.type);
 
   @override
@@ -83,7 +84,7 @@ class UnsupportedComicResourceContentHandler implements ComicResourceContentHand
 
 /// 与 [defaultComicResourceParsers] 类似：集中注册各类型处理器，便于测试与替换实现。
 List<ComicResourceContentHandler> defaultComicResourceContentHandlers() => [
-      DirComicResourceContentHandler(),
-      for (final t in ResourceType.values)
-        if (t != ResourceType.dir) UnsupportedComicResourceContentHandler(t),
-    ];
+  DirComicResourceContentHandler(),
+  for (final t in ResourceType.values)
+    if (t != ResourceType.dir) UnsupportedComicResourceContentHandler(t),
+];

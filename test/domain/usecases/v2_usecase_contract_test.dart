@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/repository/comic_repo.dart';
 import 'package:hentai_library/domain/repository/series_repo.dart';
 import 'package:hentai_library/domain/usecases/assign_library_comic_to_series_usecase.dart';

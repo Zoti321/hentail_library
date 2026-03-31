@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 
 /// 统一的漫画/来源文件类型与扩展名常量。
 ///
@@ -18,10 +18,7 @@ class ComicFileTypes {
   };
 
   /// ZIP 扫描可解析集合（ComicScannerStrategy：用于 `.cbz/.zip`）。
-  static const Set<String> zipArchiveExtensions = {
-    '.cbz',
-    '.zip',
-  };
+  static const Set<String> zipArchiveExtensions = {'.cbz', '.zip'};
 
   /// 视为压缩包归档的扩展名集合（用于同步报告类型推断、封面修复路径判断等）。
   /// 注意：ZIP 类扫描策略目前仅实现 `.cbz/.zip`；`.cbr/.rar` 常归类为压缩包但扫描时跳过。
@@ -33,9 +30,7 @@ class ComicFileTypes {
   };
 
   /// EPUB 扩展名集合。
-  static const Set<String> epubExtensions = {
-    '.epub',
-  };
+  static const Set<String> epubExtensions = {'.epub'};
 }
 
 // 导出一组更简短的别名，便于在其它文件中使用。
@@ -45,17 +40,18 @@ const comicArchiveExtensions = ComicFileTypes.comicArchiveExtensions;
 const epubExtensions = ComicFileTypes.epubExtensions;
 
 /// 根据路径扩展名推断扫描项类型（目录或其它非上述扩展名归为 [ScannedItemType.dir]）。
-ScannedItemType scannedItemTypeFromPath(String path) {
+ResourceType scannedItemTypeFromPath(String path) {
   final lower = path.toLowerCase();
   if (epubExtensions.any((ext) => lower.endsWith(ext))) {
-    return ScannedItemType.epub;
+    return ResourceType.epub;
   }
   if (lower.endsWith('.cbz')) {
-    return ScannedItemType.cbz;
+    return ResourceType.cbz;
   }
-  if (lower.endsWith('.zip') || lower.endsWith('.cbr') || lower.endsWith('.rar')) {
-    return ScannedItemType.zip;
+  if (lower.endsWith('.zip') ||
+      lower.endsWith('.cbr') ||
+      lower.endsWith('.rar')) {
+    return ResourceType.zip;
   }
-  return ScannedItemType.dir;
+  return ResourceType.dir;
 }
-

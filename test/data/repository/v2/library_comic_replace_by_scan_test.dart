@@ -1,6 +1,6 @@
 import 'package:drift/native.dart';
-import 'package:hentai_library/data/repository/library_comic_repo_impl.dart';
-import 'package:hentai_library/data/repository/library_series_repo_impl.dart';
+import 'package:hentai_library/data/repository/comic_repo_impl.dart';
+import 'package:hentai_library/data/repository/series_repo_impl.dart';
 import 'package:hentai_library/data/repository/reading_history_repo.dart';
 import 'package:hentai_library/data/repository/reading_session_repo.dart';
 import 'package:hentai_library/data/resources/local/database/dao.dart';
@@ -8,19 +8,18 @@ import 'package:hentai_library/data/resources/local/database/database.dart'
     as db;
 import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('LibraryComicRepositoryImpl.replaceByScan', () {
     late db.AppDatabase dbInstance;
-    late LibraryComicRepositoryImpl comicRepo;
+    late ComicRepositoryImpl comicRepo;
 
     setUp(() {
       dbInstance = db.AppDatabase(NativeDatabase.memory());
-      final seriesRepo = LibrarySeriesRepositoryImpl(
-        LibrarySeriesDao(dbInstance),
-      );
-      comicRepo = LibraryComicRepositoryImpl(
+      final seriesRepo = SeriesRepositoryImpl(LibrarySeriesDao(dbInstance));
+      comicRepo = ComicRepositoryImpl(
         LibraryComicDao(dbInstance),
         readingHistory: ReadingHistoryRepositoryImpl(
           ReadingHistoryDao(dbInstance),

@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 
 import 'database.dart';
 
@@ -158,9 +158,7 @@ class LibrarySeriesDao extends DatabaseAccessor<AppDatabase>
   Future<int> removeComicsFromSeries(Iterable<String> comicIds) {
     final ids = comicIds.toList();
     if (ids.isEmpty) return Future.value(0);
-    return (delete(
-      librarySeriesItems,
-    )..where((t) => t.comicId.isIn(ids))).go();
+    return (delete(librarySeriesItems)..where((t) => t.comicId.isIn(ids))).go();
   }
 
   Future<List<LibrarySeriesItem>> getItemsForSeries(String seriesId) {
@@ -273,9 +271,7 @@ class ReadingHistoryDao extends DatabaseAccessor<AppDatabase>
   Future<int> deleteByComicIds(Iterable<String> comicIds) {
     final ids = comicIds.toList();
     if (ids.isEmpty) return Future.value(0);
-    return (delete(
-      readingHistories,
-    )..where((t) => t.comicId.isIn(ids))).go();
+    return (delete(readingHistories)..where((t) => t.comicId.isIn(ids))).go();
   }
 
   Future<int> clearAllHistory() {
@@ -324,8 +320,6 @@ class ReadingSessionDao extends DatabaseAccessor<AppDatabase>
   Future<int> deleteSessionsByComicIds(Iterable<String> comicIds) {
     final ids = comicIds.toList();
     if (ids.isEmpty) return Future.value(0);
-    return (delete(
-      readingSessions,
-    )..where((t) => t.comicId.isIn(ids))).go();
+    return (delete(readingSessions)..where((t) => t.comicId.isIn(ids))).go();
   }
 }

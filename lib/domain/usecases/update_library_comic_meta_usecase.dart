@@ -1,5 +1,5 @@
 import 'package:hentai_library/domain/entity/comic/tag.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/repository/comic_repo.dart';
 
 /// v2 用例壳：用户编辑覆盖解析值。

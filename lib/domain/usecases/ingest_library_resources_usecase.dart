@@ -3,7 +3,7 @@ import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/mappers/comic_mapper.dart';
 import 'package:hentai_library/domain/repository/comic_repo.dart';
 
-/// v2 用例壳：从文件系统扫描并解析资源，然后写入 v2 Comic 仓储。
+/// 用例壳：从文件系统扫描并解析资源，然后写入  Comic 仓储。
 ///
 /// 注意：当前仅作为接口层组织者，不接入 DAO/DB；仓储实现后续再补。
 class IngestLibraryResourcesUseCase {

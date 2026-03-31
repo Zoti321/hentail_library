@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/enums/enums.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/value_objects/library_tag_pick.dart';
 
 part 'library_comic_filter.freezed.dart';

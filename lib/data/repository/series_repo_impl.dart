@@ -5,10 +5,10 @@ import 'package:hentai_library/domain/entity/comic/series.dart' as entity;
 import 'package:hentai_library/domain/entity/comic/series_item.dart' as entity;
 import 'package:hentai_library/domain/repository/series_repo.dart';
 
-class LibrarySeriesRepositoryImpl implements SeriesRepository {
+class SeriesRepositoryImpl implements SeriesRepository {
   final LibrarySeriesDao _dao;
 
-  LibrarySeriesRepositoryImpl(this._dao);
+  SeriesRepositoryImpl(this._dao);
 
   @override
   Stream<List<entity.Series>> watchAll() {

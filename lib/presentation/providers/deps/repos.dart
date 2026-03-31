@@ -1,6 +1,6 @@
-import 'package:hentai_library/data/repository/library_comic_repo_impl.dart';
-import 'package:hentai_library/data/repository/library_series_repo_impl.dart';
-import 'package:hentai_library/data/repository/library_tag_repo_impl.dart';
+import 'package:hentai_library/data/repository/comic_repo_impl.dart';
+import 'package:hentai_library/data/repository/series_repo_impl.dart';
+import 'package:hentai_library/data/repository/tag_repo_impl.dart';
 import 'package:hentai_library/data/repository/path_repo.dart';
 import 'package:hentai_library/data/repository/reading_history_repo.dart';
 import 'package:hentai_library/data/repository/reading_session_repo.dart';
@@ -17,7 +17,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'repos.g.dart';
 
 @Riverpod(keepAlive: true)
-ComicRepository libraryComicRepo(Ref ref) => LibraryComicRepositoryImpl(
+ComicRepository libraryComicRepo(Ref ref) => ComicRepositoryImpl(
   ref.read(libraryComicDaoProvider),
   readingHistory: ref.read(readingHistoryRepoProvider),
   librarySeries: ref.read(librarySeriesRepoProvider),
@@ -26,11 +26,11 @@ ComicRepository libraryComicRepo(Ref ref) => LibraryComicRepositoryImpl(
 
 @Riverpod(keepAlive: true)
 SeriesRepository librarySeriesRepo(Ref ref) =>
-    LibrarySeriesRepositoryImpl(ref.read(librarySeriesDaoProvider));
+    SeriesRepositoryImpl(ref.read(librarySeriesDaoProvider));
 
 @Riverpod(keepAlive: true)
 TagRepository libraryTagRepo(Ref ref) =>
-    LibraryTagRepositoryImpl(ref.read(libraryTagDaoProvider));
+    TagRepositoryImpl(ref.read(libraryTagDaoProvider));
 
 @Riverpod(keepAlive: true)
 PathRepository pathRepo(Ref ref) =>

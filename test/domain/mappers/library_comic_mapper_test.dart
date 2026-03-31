@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:hentai_library/domain/mappers/comic_mapper.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 
 void main() {
   group('LibraryComicMapper', () {

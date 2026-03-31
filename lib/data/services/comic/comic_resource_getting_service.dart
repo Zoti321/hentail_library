@@ -2,15 +2,16 @@ import 'dart:io';
 
 import 'package:hentai_library/data/services/comic/comic_resource_content_handler.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 
 /// 按 [ResourceType] 从磁盘路径解析漫画封面与正文资源。
 ///
 /// 具体行为由 [ComicResourceContentHandler] 注册表决定（与 [ResourceParser] 链式策略对齐）。
 class ComicResourceGettingService {
   ComicResourceGettingService({List<ComicResourceContentHandler>? handlers})
-      : _handlers = _indexByType(
-          handlers ?? defaultComicResourceContentHandlers(),
-        );
+    : _handlers = _indexByType(
+        handlers ?? defaultComicResourceContentHandlers(),
+      );
 
   final Map<ResourceType, ComicResourceContentHandler> _handlers;
 
@@ -42,7 +43,10 @@ class ComicResourceGettingService {
     return _handlers[type]!.getContent(path.trim());
   }
 
-  Future<void> _validatePathMatchesType(String rawPath, ResourceType type) async {
+  Future<void> _validatePathMatchesType(
+    String rawPath,
+    ResourceType type,
+  ) async {
     final path = rawPath.trim();
     if (path.isEmpty) {
       throw ArgumentError('path 不能为空');
@@ -58,9 +62,7 @@ class ComicResourceGettingService {
       throw ArgumentError('路径不是有效的漫画资源（扩展名无法识别）: $path');
     }
     if (inferred != type) {
-      throw ArgumentError(
-        'path 与 ResourceType 不一致: 路径推断为 $inferred，入参为 $type',
-      );
+      throw ArgumentError('path 与 ResourceType 不一致: 路径推断为 $inferred，入参为 $type');
     }
   }
 

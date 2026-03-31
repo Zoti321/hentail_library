@@ -1,7 +1,7 @@
-import 'package:hentai_library/data/services/comic/resource_types.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/usecases/purge_library_comics_side_effects.dart';
 import 'package:hentai_library/domain/usecases/usecases.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:hentai_library/presentation/providers/usecases/sync_library_progress.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

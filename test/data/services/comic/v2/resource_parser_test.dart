@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/data/services/comic/comic_scan_parse_service.dart';
 import 'package:hentai_library/data/services/comic/resource_parser.dart';
 import 'package:hentai_library/data/services/comic/resource_types.dart';
+import 'package:hentai_library/domain/util/enums.dart';
 import 'package:path/path.dart' as p;
 
 void main() {
