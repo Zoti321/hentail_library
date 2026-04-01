@@ -20,11 +20,18 @@ class LibraryPage extends ConsumerStatefulWidget {
 
 class _LibraryPageState extends ConsumerState<LibraryPage> {
   late final TextEditingController _searchController;
+  late final FocusNode _searchFocusNode;
+  bool _searchFocused = false;
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+    _searchFocusNode = FocusNode();
+    _searchFocusNode.addListener(() {
+      if (!mounted) return;
+      setState(() => _searchFocused = _searchFocusNode.hasFocus);
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final query = ref.read(libraryPageProvider).effectiveFilter.query ?? '';
@@ -37,6 +44,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   @override
   void dispose() {
     _searchController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -80,9 +88,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               tokens.spacing.lg + 8,
               tokens.spacing.lg,
             ),
-            child: Row(
-              mainAxisAlignment: .spaceBetween,
-              spacing: 36,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 标题行
                 Row(
@@ -119,8 +126,35 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     ),
                   ],
                 ),
-                // Windows 11 风格工具栏
-                _buildToolbar(context, theme, isGridView),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minWidth: 240,
+                        maxWidth: 420,
+                      ),
+                      child: _LibrarySearchField(
+                        controller: _searchController,
+                        focusNode: _searchFocusNode,
+                        isFocused: _searchFocused,
+                        hintText: '搜索…',
+                        onChanged: (val) => ref
+                            .read(libraryPageProvider.notifier)
+                            .updateFilterQuery(val),
+                        onClear: () {
+                          _searchController.clear();
+                          ref
+                              .read(libraryPageProvider.notifier)
+                              .updateFilterQuery('');
+                        },
+                      ),
+                    ),
+                    const Spacer(),
+                    // 右侧工具栏（刷新 / 筛选 / 排序 / 视图切换）
+                    _buildToolbar(context, theme, isGridView),
+                  ],
+                ),
               ],
             ),
           ),
@@ -134,12 +168,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   }
 
   Widget _buildToolbar(BuildContext context, ThemeData theme, bool isGridView) {
-    final tokens = context.tokens;
     return Container(
-      height: 46,
+      height: 40,
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(tokens.radius.lg - 2),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: theme.colorScheme.borderSubtle),
         boxShadow: [
           BoxShadow(
@@ -149,50 +182,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           ),
         ],
       ),
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(3),
       child: Row(
         children: [
-          // 搜索框
-          Container(
-            constraints: BoxConstraints(maxWidth: 164),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (val) =>
-                  ref.read(libraryPageProvider.notifier).updateFilterQuery(val),
-              textAlignVertical: TextAlignVertical.center,
-              cursorWidth: 1.0,
-              cursorColor: theme.colorScheme.textPrimary,
-              cursorHeight: 14.5,
-              decoration: InputDecoration(
-                isDense: true,
-                prefixIcon: Icon(
-                  LucideIcons.search,
-                  size: 18,
-                  color: theme.colorScheme.iconSecondary,
-                ),
-                prefixIconConstraints: const BoxConstraints(
-                  minWidth: 36,
-                  minHeight: 36,
-                ),
-                hintText: "搜索...",
-                hintStyle: TextStyle(
-                  color: theme.colorScheme.textPlaceholder,
-                  fontSize: 14,
-                  fontWeight: .w400,
-                ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 0),
-              ),
-              style: const TextStyle(fontSize: 14),
-            ),
-          ),
-          // 垂直分割线
-          Container(
-            width: 1,
-            height: 20,
-            color: theme.colorScheme.borderSubtle,
-            margin: const EdgeInsets.symmetric(horizontal: 12),
-          ),
           // 功能按钮组 (Refresh, Filter, Sort)
           _ToolbarIconButton(
             icon: LucideIcons.rotateCw,
@@ -242,7 +234,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   Widget _buildGridView(AsyncValue<List<Comic>> comics) {
     return comics.when(
       data: (comics) {
-        if (comics.isEmpty) return _EmptyLibrarySliver();
+        final q = _searchController.text.trim();
+        if (comics.isEmpty) return _EmptyLibrarySliver(query: q);
         return SliverGrid.builder(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 200,
@@ -288,7 +281,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   Widget _buildListView(AsyncValue<List<Comic>> comics) {
     return comics.when(
       data: (comics) {
-        if (comics.isEmpty) return _EmptyLibrarySliver();
+        final q = _searchController.text.trim();
+        if (comics.isEmpty) return _EmptyLibrarySliver(query: q);
         return SliverList.separated(
           itemCount: comics.length,
           separatorBuilder: (ctx, i) => const SizedBox(height: 8),
@@ -324,9 +318,20 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 }
 
 class _EmptyLibrarySliver extends StatelessWidget {
+  const _EmptyLibrarySliver({this.query = ''});
+
+  final String query;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final q = query.trim();
+    final isSearching = q.isNotEmpty;
+    final title =
+        isSearching ? AppStrings.libraryNoMatchTitle : AppStrings.libraryEmptyTitle;
+    final hint = isSearching
+        ? AppStrings.libraryNoMatchHint(q)
+        : AppStrings.libraryEmptyHint;
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.only(top: 80),
@@ -341,7 +346,7 @@ class _EmptyLibrarySliver extends StatelessWidget {
                 color: theme.colorScheme.textTertiary,
               ),
               Text(
-                AppStrings.libraryEmptyTitle,
+                title,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -349,7 +354,7 @@ class _EmptyLibrarySliver extends StatelessWidget {
                 ),
               ),
               Text(
-                AppStrings.libraryEmptyHint,
+                hint,
                 style: TextStyle(
                   fontSize: 13,
                   color: theme.colorScheme.textSecondary,
@@ -434,6 +439,106 @@ class _ViewToggleButton extends StatelessWidget {
                 : Theme.of(context).colorScheme.iconSecondary,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _LibrarySearchField extends StatelessWidget {
+  const _LibrarySearchField({
+    required this.controller,
+    required this.focusNode,
+    required this.isFocused,
+    required this.hintText,
+    required this.onChanged,
+    required this.onClear,
+  });
+
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool isFocused;
+  final String hintText;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isFocused ? cs.primary : cs.borderMedium,
+          width: 0.8,
+        ),
+        boxShadow: isFocused
+            ? [
+                BoxShadow(
+                  color: cs.primary.withOpacity(0.4),
+                  blurRadius: 0,
+                  spreadRadius: 1,
+                ),
+              ]
+            : [],
+      ),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 8),
+            child: Icon(
+              LucideIcons.search,
+              size: 16,
+              color: isFocused ? cs.primary : cs.textPlaceholder,
+            ),
+          ),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              focusNode: focusNode,
+              onChanged: onChanged,
+              style: TextStyle(fontSize: 13, color: cs.textPrimary),
+              cursorColor: cs.onSurface,
+              cursorWidth: 0.8,
+              cursorHeight: 16,
+              decoration: InputDecoration(
+                isDense: true,
+                hintText: hintText,
+                hintStyle: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w300,
+                  color: cs.textPlaceholder,
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: controller,
+            builder: (context, value, child) {
+              if (value.text.isEmpty) return const SizedBox(width: 12);
+              return MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: onClear,
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Icon(
+                      LucideIcons.circleX,
+                      size: 14,
+                      color: cs.textPlaceholder,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
