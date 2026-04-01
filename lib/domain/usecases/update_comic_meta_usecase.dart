@@ -2,11 +2,11 @@ import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/repository/comic_repo.dart';
 
-/// v2 用例壳：用户编辑覆盖解析值。
-class UpdateLibraryComicMetaUseCase {
+/// 用例壳：用户编辑覆盖解析值。
+class UpdateComicMetaUseCase {
   final ComicRepository repo;
 
-  UpdateLibraryComicMetaUseCase(this.repo);
+  UpdateComicMetaUseCase(this.repo);
 
   Future<void> call(
     String comicId, {

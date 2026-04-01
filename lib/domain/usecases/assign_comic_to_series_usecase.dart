@@ -1,9 +1,9 @@
 import 'package:hentai_library/domain/repository/series_repo.dart';
 
-class AssignLibraryComicToSeriesUseCase {
+class AssignComicToSeriesUseCase {
   final SeriesRepository repo;
 
-  AssignLibraryComicToSeriesUseCase(this.repo);
+  AssignComicToSeriesUseCase(this.repo);
 
   Future<void> call({
     required String comicId,

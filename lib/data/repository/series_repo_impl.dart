@@ -82,6 +82,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
     );
   }
 
+  /// 从系列中移除单个漫画
   @override
   Future<void> removeComic(String comicId) async {
     await _dao.removeComic(comicId);

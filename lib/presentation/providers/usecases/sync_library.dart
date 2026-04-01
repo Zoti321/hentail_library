@@ -1,5 +1,5 @@
 import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/usecases/purge_library_comics_side_effects.dart';
+import 'package:hentai_library/domain/usecases/purge_comics_side_effects.dart';
 import 'package:hentai_library/domain/usecases/usecases.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
@@ -114,7 +114,7 @@ class SyncComicsUseCase {
         keptCount: null,
       ));
 
-      await purgeLibraryComicsFromApp(
+      await purgeComicsFromApp(
         libraryComics: repo,
         readingHistory: historyRepo,
         librarySeries: seriesRepo,

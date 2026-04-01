@@ -1,8 +1,8 @@
 import 'package:hentai_library/domain/entity/comic/tag.dart' as v2;
 import 'package:hentai_library/domain/util/enums.dart';
-import 'package:hentai_library/domain/usecases/assign_library_comic_to_series_usecase.dart';
+import 'package:hentai_library/domain/usecases/assign_comic_to_series_usecase.dart';
 import 'package:hentai_library/domain/usecases/ingest_library_resources_usecase.dart';
-import 'package:hentai_library/domain/usecases/update_library_comic_meta_usecase.dart';
+import 'package:hentai_library/domain/usecases/update_comic_meta_usecase.dart';
 import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -19,18 +19,18 @@ IngestLibraryResourcesUseCase ingestLibraryResourcesUseCase(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-UpdateLibraryComicMetaUseCase updateLibraryComicMetaUseCase(Ref ref) {
-  return UpdateLibraryComicMetaUseCase(ref.read(libraryComicRepoProvider));
+UpdateComicMetaUseCase updateLibraryComicMetaUseCase(Ref ref) {
+  return UpdateComicMetaUseCase(ref.read(libraryComicRepoProvider));
 }
 
-/// UI 表单（[ComicMetadataForm]）与领域 [UpdateLibraryComicMetaUseCase] 之间的桥接。
+/// UI 表单（[ComicMetadataForm]）与领域 [UpdateComicMetaUseCase] 之间的桥接。
 @Riverpod(keepAlive: true)
 UpdateComicMetadataFacadeUseCase updateComicMetadataUseCase(Ref ref) =>
     UpdateComicMetadataFacadeUseCase(ref);
 
 @Riverpod(keepAlive: true)
-AssignLibraryComicToSeriesUseCase assignLibraryComicToSeriesUseCase(Ref ref) {
-  return AssignLibraryComicToSeriesUseCase(ref.read(librarySeriesRepoProvider));
+AssignComicToSeriesUseCase assignLibraryComicToSeriesUseCase(Ref ref) {
+  return AssignComicToSeriesUseCase(ref.read(librarySeriesRepoProvider));
 }
 
 class UpdateComicMetadataFacadeUseCase {
