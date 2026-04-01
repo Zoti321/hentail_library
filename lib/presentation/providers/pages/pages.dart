@@ -6,3 +6,4 @@ export 'reader/reading_session_notifier.dart';
 export 'settings/settings_notifier.dart';
 export 'tag_management/tag_management_notifier.dart';
 export 'series_management/series_management_notifier.dart';
+export 'series_management/series_add_comics_dialog_notifier.dart';
