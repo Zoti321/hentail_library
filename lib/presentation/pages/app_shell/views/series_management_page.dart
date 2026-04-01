@@ -4,6 +4,8 @@ import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/widgets/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -338,54 +340,41 @@ class _AddSeriesDialogState extends ConsumerState<_AddSeriesDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '添加系列',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: cs.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: '名称'),
-              autofocus: true,
-              onSubmitted: (_) => _handleSave(),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: _saving ? null : () => Navigator.of(context).pop(),
-                  child: const Text('取消'),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: _saving ? null : _handleSave,
-                  child: _saving
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('保存'),
-                ),
-              ],
-            ),
-          ],
-        ),
+    return FluentDialogShell(
+      title: '添加系列',
+      content: FluentTextField(
+        initialValue: _nameController.text,
+        labelText: '名称',
+        hintText: '输入系列名称…',
+        onChanged: (value) => _nameController.text = value,
       ),
+      actions: [
+        TextButton(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(),
+          style: TextButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text('取消'),
+        ),
+        const SizedBox(width: 8),
+        FilledButton(
+          onPressed: _saving ? null : _handleSave,
+          style: FilledButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: _saving
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('保存'),
+        ),
+      ],
     );
   }
 }
@@ -440,54 +429,41 @@ class _RenameSeriesDialogState extends ConsumerState<_RenameSeriesDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '重命名系列',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: cs.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _controller,
-              decoration: const InputDecoration(labelText: '新名称'),
-              autofocus: true,
-              onSubmitted: (_) => _handleSave(),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: _saving ? null : () => Navigator.of(context).pop(),
-                  child: const Text('取消'),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: _saving ? null : _handleSave,
-                  child: _saving
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('保存'),
-                ),
-              ],
-            ),
-          ],
-        ),
+    return FluentDialogShell(
+      title: '重命名系列',
+      content: FluentTextField(
+        initialValue: _controller.text,
+        labelText: '新名称',
+        hintText: '输入新的系列名称…',
+        onChanged: (value) => _controller.text = value,
       ),
+      actions: [
+        TextButton(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(),
+          style: TextButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text('取消'),
+        ),
+        const SizedBox(width: 8),
+        FilledButton(
+          onPressed: _saving ? null : _handleSave,
+          style: FilledButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: _saving
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('保存'),
+        ),
+      ],
     );
   }
 }
@@ -500,18 +476,31 @@ class _ConfirmDeleteSeriesDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final count = series.items.length;
-    final extra = count > 0 ? '该系列包含 $count 本漫画，将移除系列归属，漫画仍保留在库中。' : '删除后无法恢复。';
+    final extra = count > 0
+        ? '该系列包含 $count 本漫画，将移除系列归属，漫画仍保留在库中。'
+        : '删除后无法恢复。';
 
-    return AlertDialog(
-      title: const Text('确认删除'),
+    return FluentDialogShell(
+      title: '确认删除',
       content: Text('确定删除系列「${series.name}」？$extra'),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
+          style: TextButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
           child: const Text('取消'),
         ),
+        const SizedBox(width: 8),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
+          style: FilledButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
           child: const Text('删除'),
         ),
       ],

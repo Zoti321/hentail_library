@@ -21,6 +21,7 @@ class HomePage extends ConsumerWidget {
 
     showDialog<void>(
       context: context,
+      barrierColor: Colors.transparent,
       barrierDismissible: false,
       builder: (_) => const ScanProgressDialog(),
     );
