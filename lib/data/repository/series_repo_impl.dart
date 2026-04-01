@@ -15,13 +15,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
     return _dao.watchAllSeries().asyncMap((rows) async {
       // 目前只映射 series 基本信息；items 由 findById/getAll 单独查询。
       return rows
-          .map(
-            (r) => entity.Series(
-              seriesId: r.seriesId,
-              name: r.name,
-              items: const [],
-            ),
-          )
+          .map((r) => entity.Series(name: r.name, items: const []))
           .toList();
     });
   }
@@ -31,10 +25,9 @@ class SeriesRepositoryImpl implements SeriesRepository {
     final seriesRows = await _dao.getAllSeries();
     final result = <entity.Series>[];
     for (final s in seriesRows) {
-      final items = await _dao.getItemsForSeries(s.seriesId);
+      final items = await _dao.getItemsForSeries(s.name);
       result.add(
         entity.Series(
-          seriesId: s.seriesId,
           name: s.name,
           items: items
               .map(
@@ -49,12 +42,11 @@ class SeriesRepositoryImpl implements SeriesRepository {
   }
 
   @override
-  Future<entity.Series?> findById(String seriesId) async {
-    final row = await _dao.findById(seriesId);
+  Future<entity.Series?> findByName(String name) async {
+    final row = await _dao.findByName(name);
     if (row == null) return null;
-    final items = await _dao.getItemsForSeries(seriesId);
+    final items = await _dao.getItemsForSeries(name);
     return entity.Series(
-      seriesId: row.seriesId,
       name: row.name,
       items: items
           .map((i) => entity.SeriesItem(comicId: i.comicId, order: i.sortOrder))
@@ -64,15 +56,12 @@ class SeriesRepositoryImpl implements SeriesRepository {
 
   @override
   Future<void> create(String name) async {
-    final id = DateTime.now().millisecondsSinceEpoch.toString();
-    await _dao.createSeries(
-      db.LibrarySeriesCompanion.insert(seriesId: id, name: name),
-    );
+    await _dao.createSeries(db.LibrarySeriesCompanion.insert(name: name));
   }
 
   @override
-  Future<void> rename(String seriesId, String name) async {
-    await _dao.renameSeries(seriesId, name);
+  Future<void> rename({required String name, required String newName}) async {
+    await _dao.renameSeries(name: name, newName: newName);
   }
 
   @override
@@ -83,12 +72,12 @@ class SeriesRepositoryImpl implements SeriesRepository {
   @override
   Future<void> assignComicExclusive({
     required String comicId,
-    required String targetSeriesId,
+    required String targetSeriesName,
     required int order,
   }) async {
     await _dao.assignComicExclusive(
       comicId: comicId,
-      targetSeriesId: targetSeriesId,
+      targetSeriesName: targetSeriesName,
       sortOrder: order,
     );
   }

@@ -105,10 +105,10 @@ class LibrarySeriesDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<LibrarySery>> getAllSeries() => select(librarySeries).get();
 
-  Future<LibrarySery?> findById(String seriesId) {
+  Future<LibrarySery?> findByName(String name) {
     return (select(
       librarySeries,
-    )..where((t) => t.seriesId.equals(seriesId))).getSingleOrNull();
+    )..where((t) => t.name.equals(name))).getSingleOrNull();
   }
 
   Future<void> createSeries(LibrarySeriesCompanion companion) async {
@@ -117,20 +117,21 @@ class LibrarySeriesDao extends DatabaseAccessor<AppDatabase>
     ).insert(companion, mode: InsertMode.insertOrIgnore);
   }
 
-  Future<int> renameSeries(String seriesId, String name) {
-    return (update(librarySeries)..where((t) => t.seriesId.equals(seriesId)))
-        .write(LibrarySeriesCompanion(name: Value(name)));
+  Future<int> renameSeries({required String name, required String newName}) {
+    return (update(librarySeries)..where((t) => t.name.equals(name))).write(
+      LibrarySeriesCompanion(name: Value(newName)),
+    );
   }
 
-  Future<int> deleteSeries(String seriesId) {
+  Future<int> deleteSeries(String seriesName) {
     return (delete(
       librarySeries,
-    )..where((t) => t.seriesId.equals(seriesId))).go();
+    )..where((t) => t.name.equals(seriesName))).go();
   }
 
   Future<void> assignComicExclusive({
     required String comicId,
-    required String targetSeriesId,
+    required String targetSeriesName,
     required int sortOrder,
   }) async {
     await transaction(() async {
@@ -140,7 +141,7 @@ class LibrarySeriesDao extends DatabaseAccessor<AppDatabase>
 
       await into(librarySeriesItems).insertOnConflictUpdate(
         LibrarySeriesItemsCompanion.insert(
-          seriesId: targetSeriesId,
+          seriesName: targetSeriesName,
           comicId: comicId,
           sortOrder: sortOrder,
         ),
@@ -161,9 +162,9 @@ class LibrarySeriesDao extends DatabaseAccessor<AppDatabase>
     return (delete(librarySeriesItems)..where((t) => t.comicId.isIn(ids))).go();
   }
 
-  Future<List<LibrarySeriesItem>> getItemsForSeries(String seriesId) {
+  Future<List<LibrarySeriesItem>> getItemsForSeries(String seriesName) {
     return (select(librarySeriesItems)
-          ..where((t) => t.seriesId.equals(seriesId))
+          ..where((t) => t.seriesName.equals(seriesName))
           ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
         .get();
   }

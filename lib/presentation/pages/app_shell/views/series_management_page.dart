@@ -288,7 +288,7 @@ class _SeriesRow extends ConsumerWidget {
                     false;
                 if (!confirmed || !context.mounted) return;
                 try {
-                  await ref.read(seriesActionsProvider).delete(series.seriesId);
+                  await ref.read(seriesActionsProvider).delete(series.name);
                   if (context.mounted) {
                     showSuccessSnackBar(context, '已删除系列');
                   }
@@ -413,9 +413,7 @@ class _RenameSeriesDialogState extends ConsumerState<_RenameSeriesDialog> {
     }
     setState(() => _saving = true);
     try {
-      await ref
-          .read(seriesActionsProvider)
-          .rename(widget.series.seriesId, newName);
+      await ref.read(seriesActionsProvider).rename(widget.series.name, newName);
       if (mounted) {
         Navigator.of(context).pop();
         showSuccessSnackBar(context, '已重命名');
@@ -476,9 +474,7 @@ class _ConfirmDeleteSeriesDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final count = series.items.length;
-    final extra = count > 0
-        ? '该系列包含 $count 本漫画，将移除系列归属，漫画仍保留在库中。'
-        : '删除后无法恢复。';
+    final extra = count > 0 ? '该系列包含 $count 本漫画，将移除系列归属，漫画仍保留在库中。' : '删除后无法恢复。';
 
     return FluentDialogShell(
       title: '确认删除',

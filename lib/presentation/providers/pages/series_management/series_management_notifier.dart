@@ -23,8 +23,9 @@ class SeriesFilterNotifier extends Notifier<String> {
   }
 }
 
-final seriesFilterProvider =
-    NotifierProvider<SeriesFilterNotifier, String>(SeriesFilterNotifier.new);
+final seriesFilterProvider = NotifierProvider<SeriesFilterNotifier, String>(
+  SeriesFilterNotifier.new,
+);
 
 class SeriesActions {
   SeriesActions(this._ref);
@@ -38,10 +39,12 @@ class SeriesActions {
     _ref.invalidate(allSeriesProvider);
   }
 
-  Future<void> rename(String seriesId, String newName) async {
+  Future<void> rename(String name, String newName) async {
     final trimmed = newName.trim();
     if (trimmed.isEmpty) return;
-    await _ref.read(librarySeriesRepoProvider).rename(seriesId, trimmed);
+    await _ref
+        .read(librarySeriesRepoProvider)
+        .rename(name: name, newName: trimmed);
     _ref.invalidate(allSeriesProvider);
   }
 

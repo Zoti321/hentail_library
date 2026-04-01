@@ -7,12 +7,12 @@ class AssignLibraryComicToSeriesUseCase {
 
   Future<void> call({
     required String comicId,
-    required String targetSeriesId,
+    required String targetSeriesName,
     required int order,
   }) {
     return repo.assignComicExclusive(
       comicId: comicId,
-      targetSeriesId: targetSeriesId,
+      targetSeriesName: targetSeriesName,
       order: order,
     );
   }

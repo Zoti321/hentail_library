@@ -95,24 +95,23 @@ class LibraryComicTags extends Table {
 }
 
 class LibrarySeries extends Table {
-  TextColumn get seriesId => text()();
-  TextColumn get name => text()();
+  TextColumn get name => text().unique()();
 
   @override
-  Set<Column> get primaryKey => {seriesId};
+  Set<Column> get primaryKey => {name};
 }
 
 class LibrarySeriesItems extends Table {
-  TextColumn get seriesId => text()();
+  TextColumn get seriesName => text()();
   TextColumn get comicId => text()();
   IntColumn get sortOrder => integer()();
 
   @override
-  Set<Column> get primaryKey => {seriesId, comicId};
+  Set<Column> get primaryKey => {seriesName, comicId};
 
   @override
   List<String> get customConstraints => [
     'UNIQUE(comic_id)',
-    'FOREIGN KEY(series_id) REFERENCES library_series(series_id) ON DELETE CASCADE',
+    'FOREIGN KEY(series_name) REFERENCES library_series(name) ON DELETE CASCADE',
   ];
 }

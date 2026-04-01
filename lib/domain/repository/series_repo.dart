@@ -6,18 +6,18 @@ abstract class SeriesRepository {
 
   Future<List<Series>> getAll();
 
-  Future<Series?> findById(String seriesId);
+  Future<Series?> findByName(String name);
 
   Future<void> create(String name);
 
-  Future<void> rename(String seriesId, String name);
+  Future<void> rename({required String name, required String newName});
 
-  Future<void> delete(String seriesId);
+  Future<void> delete(String name);
 
   /// 排他归属：保证同一 comicId 只能属于一个系列。
   Future<void> assignComicExclusive({
     required String comicId,
-    required String targetSeriesId,
+    required String targetSeriesName,
     required int order,
   });
 

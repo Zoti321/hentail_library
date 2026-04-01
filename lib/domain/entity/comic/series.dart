@@ -3,11 +3,10 @@ import 'package:hentai_library/domain/entity/comic/series_item.dart';
 
 part 'series.freezed.dart';
 
-/// v2：系列聚合（独立于 Comic，本质上维护归属与顺序）。
+/// 系列聚合（独立于 Comic，本质上维护归属与顺序）。
 @freezed
 abstract class Series with _$Series {
   factory Series({
-    required String seriesId,
     required String name,
     @Default(<SeriesItem>[]) List<SeriesItem> items,
   }) = _Series;
@@ -30,4 +29,3 @@ abstract class Series with _$Series {
     return copyWith(items: items.where((e) => e.comicId != comicId).toList());
   }
 }
-
