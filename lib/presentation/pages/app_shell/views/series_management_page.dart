@@ -239,12 +239,22 @@ class _SeriesRow extends ConsumerWidget {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final count = series.items.length;
+    final iconButtonStyle = IconButton.styleFrom(
+      minimumSize: const Size(28, 28),
+      fixedSize: const Size(28, 28),
+      padding: EdgeInsets.zero,
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
+      overlayColor: cs.primary.withAlpha(14),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    );
 
     return Material(
       color: cs.surface,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         child: Row(
+          spacing: 12,
           children: [
             Expanded(
               child: Column(
@@ -268,6 +278,7 @@ class _SeriesRow extends ConsumerWidget {
             ),
             IconButton(
               tooltip: '添加漫画',
+              style: iconButtonStyle,
               icon: const Icon(LucideIcons.plus, size: 16),
               onPressed: () async {
                 await showDialog<void>(
@@ -280,6 +291,7 @@ class _SeriesRow extends ConsumerWidget {
             ),
             IconButton(
               tooltip: '重命名',
+              style: iconButtonStyle,
               icon: const Icon(LucideIcons.squarePen, size: 16),
               onPressed: () async {
                 await showDialog<void>(
@@ -290,6 +302,7 @@ class _SeriesRow extends ConsumerWidget {
             ),
             IconButton(
               tooltip: '删除',
+              style: iconButtonStyle,
               icon: Icon(LucideIcons.trash2, size: 16, color: cs.error),
               onPressed: () async {
                 final confirmed =
@@ -530,9 +543,15 @@ class _ComicSelectableTile extends StatelessWidget {
                     tooltip: isSelected ? '取消选中' : '选中',
                     onPressed: enabled ? onToggle : null,
                     style: IconButton.styleFrom(
+                      minimumSize: const Size(28, 28),
+                      fixedSize: const Size(28, 28),
+                      padding: EdgeInsets.zero,
                       splashFactory: NoSplash.splashFactory,
                       overlayColor: cs.primary.withAlpha(14),
                       highlightColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     icon: Icon(
                       isSelected
