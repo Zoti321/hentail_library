@@ -29,8 +29,9 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tokens = context.tokens;
-    final comicCount = ref
-        .watch(libraryPageProvider.select((s) => s.rawList.length));
+    final comicCount = ref.watch(
+      libraryPageProvider.select((s) => s.rawList.length),
+    );
 
     ref.listen(scanLibraryControllerProvider, (prev, next) {
       final wasRunning = prev?.running ?? false;
@@ -81,7 +82,10 @@ class HomePage extends ConsumerWidget {
             SizedBox(height: tokens.spacing.xs),
             Text(
               '下午好，读者',
-              style: TextStyle(color: cs.textTertiary, fontSize: tokens.text.bodyMd),
+              style: TextStyle(
+                color: cs.textTertiary,
+                fontSize: tokens.text.bodyMd,
+              ),
             ),
           ],
         ),
@@ -168,7 +172,10 @@ class HomePage extends ConsumerWidget {
                   SizedBox(height: tokens.spacing.sm - 2),
                   Text(
                     '共 $comicCount 本',
-                    style: TextStyle(fontSize: tokens.text.bodySm, color: cs.textSecondary),
+                    style: TextStyle(
+                      fontSize: tokens.text.bodySm,
+                      color: cs.textSecondary,
+                    ),
                   ),
                 ],
               ),

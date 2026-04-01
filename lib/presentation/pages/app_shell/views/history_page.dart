@@ -313,9 +313,7 @@ class _Header extends ConsumerWidget {
             padding: WidgetStateProperty.all(
               const .symmetric(horizontal: 12, vertical: 8),
             ),
-            overlayColor: MaterialStateProperty.all(
-              cs.error.withAlpha(20),
-            ),
+            overlayColor: MaterialStateProperty.all(cs.error.withAlpha(20)),
           ),
         ),
       ),

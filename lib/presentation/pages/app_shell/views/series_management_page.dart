@@ -95,11 +95,17 @@ class _Header extends ConsumerWidget {
               onPressed: () async {
                 await showDialog<void>(
                   context: context,
+                  barrierColor: Colors.transparent,
                   builder: (context) => const _AddSeriesDialog(),
                 );
               },
               icon: const Icon(LucideIcons.plus, size: 16),
               label: const Text('添加系列'),
+              style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ],
         ),
@@ -170,44 +176,51 @@ class _SeriesList extends StatelessWidget {
       margin: const EdgeInsets.only(top: 16),
       decoration: BoxDecoration(
         color: cs.surface,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: cs.borderSubtle),
       ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: cs.surfaceContainerHighest,
-              border: Border(bottom: BorderSide(color: cs.borderSubtle)),
-            ),
-            child: Row(
-              children: [
-                Icon(LucideIcons.layers, size: 16, color: cs.onSurfaceVariant),
-                const SizedBox(width: 8),
-                Text(
-                  '全部系列',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: cs.textSecondary,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerHighest,
+                border: Border(bottom: BorderSide(color: cs.borderSubtle)),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    LucideIcons.layers,
+                    size: 16,
+                    color: cs.onSurfaceVariant,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Text(
+                    '全部系列',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: cs.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: series.length,
-            separatorBuilder: (context, _) =>
-                Divider(height: 1, color: cs.borderSubtle),
-            itemBuilder: (context, index) {
-              final s = series[index];
-              return _SeriesRow(series: s);
-            },
-          ),
-        ],
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: series.length,
+              separatorBuilder: (context, _) =>
+                  Divider(height: 1, color: cs.borderSubtle),
+              itemBuilder: (context, index) {
+                final s = series[index];
+                return _SeriesRow(series: s);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -245,10 +258,7 @@ class _SeriesRow extends ConsumerWidget {
                   const SizedBox(height: 2),
                   Text(
                     '包含 $count 本',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: cs.textTertiary,
-                    ),
+                    style: TextStyle(fontSize: 12, color: cs.textTertiary),
                   ),
                 ],
               ),
@@ -490,9 +500,7 @@ class _ConfirmDeleteSeriesDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final count = series.items.length;
-    final extra = count > 0
-        ? '该系列包含 $count 本漫画，将移除系列归属，漫画仍保留在库中。'
-        : '删除后无法恢复。';
+    final extra = count > 0 ? '该系列包含 $count 本漫画，将移除系列归属，漫画仍保留在库中。' : '删除后无法恢复。';
 
     return AlertDialog(
       title: const Text('确认删除'),

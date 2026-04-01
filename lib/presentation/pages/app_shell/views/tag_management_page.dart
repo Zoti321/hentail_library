@@ -157,6 +157,7 @@ class _Header extends ConsumerWidget {
               onPressed: () async {
                 await showDialog<void>(
                   context: context,
+                  barrierColor: Colors.transparent,
                   builder: (context) => const _AddTagDialog(),
                 );
               },
@@ -174,6 +175,7 @@ class _Header extends ConsumerWidget {
                   final confirmed =
                       await showDialog<bool>(
                         context: context,
+                        barrierColor: Colors.transparent,
                         builder: (context) =>
                             _ConfirmDeleteDialog(count: selectionCount),
                       ) ??
