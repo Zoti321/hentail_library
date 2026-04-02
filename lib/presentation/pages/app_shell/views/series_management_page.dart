@@ -10,8 +10,6 @@ import 'package:hentai_library/presentation/widgets/form/fluent_text_field.dart'
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import 'series_management/series_management_states.dart';
-
 class SeriesManagementPage extends ConsumerWidget {
   const SeriesManagementPage({super.key});
 
@@ -31,12 +29,12 @@ class SeriesManagementPage extends ConsumerWidget {
             data: (series) {
               final filtered = _applyFilter(series, query);
               if (filtered.isEmpty) {
-                return const SeriesManagementEmptyState();
+                return const _SeriesManagementEmptyState();
               }
               return _SeriesList(series: filtered);
             },
-            loading: () => const SeriesManagementLoadingState(),
-            error: (e, _) => SeriesManagementErrorState(error: e),
+            loading: () => const _SeriesManagementLoadingState(),
+            error: (e, _) => _SeriesManagementErrorState(error: e),
           ),
         ],
       ),
@@ -721,6 +719,54 @@ class _ConfirmDeleteSeriesDialog extends StatelessWidget {
           child: const Text('删除'),
         ),
       ],
+    );
+  }
+}
+
+class _SeriesManagementLoadingState extends StatelessWidget {
+  const _SeriesManagementLoadingState();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 48),
+      child: Center(child: CircularProgressIndicator()),
+    );
+  }
+}
+
+class _SeriesManagementErrorState extends StatelessWidget {
+  const _SeriesManagementErrorState({required this.error});
+
+  final Object error;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Text(
+        '加载失败：$error',
+        style: TextStyle(color: cs.error, fontSize: 14),
+      ),
+    );
+  }
+}
+
+class _SeriesManagementEmptyState extends StatelessWidget {
+  const _SeriesManagementEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 48),
+      child: Center(
+        child: Text(
+          '暂无系列',
+          style: TextStyle(fontSize: 14, color: cs.textTertiary),
+        ),
+      ),
     );
   }
 }

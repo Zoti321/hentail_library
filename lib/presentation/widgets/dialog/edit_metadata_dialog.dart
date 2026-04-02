@@ -31,59 +31,39 @@ class EditMetadataDialog extends StatefulHookConsumerWidget {
 }
 
 class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
-  late ComicMetadataForm _formData;
-  String activeTab = 'details';
+  late final _EditMetadataFormController _controller;
   bool _saving = false;
 
   @override
   void initState() {
     super.initState();
-    _formData = ComicMetadataForm(
+    final initialForm = ComicMetadataForm(
       title: widget.comic.title,
       isR18: widget.comic.contentRating == ContentRating.r18,
       tags: List<Tag>.from(widget.comic.tags),
       authors: List<String>.from(widget.comic.authors),
     );
+    _controller = _EditMetadataFormController(initialForm: initialForm)
+      ..addListener(_handleFormChanged);
   }
 
-  void _handleAuthorAdd(String name) {
-    if (name.isEmpty) return;
-    if (!_formData.authors.contains(name)) {
-      setState(() {
-        _formData = _formData.copyWith(authors: [..._formData.authors, name]);
-      });
-    }
+  void _handleFormChanged() {
+    if (!mounted) return;
+    setState(() {});
   }
 
-  void _handleAuthorRemove(String name) {
-    setState(() {
-      _formData = _formData.copyWith(
-        authors: [..._formData.authors]..remove(name),
-      );
-    });
-  }
-
-  void _handleTagAdd(String name) {
-    if (name.isEmpty) return;
-    final tag = Tag(name: name);
-    final tags = _formData.tags.whereType<Tag>();
-    if (!tags.any((t) => t.name == tag.name)) {
-      setState(() {
-        _formData = _formData.copyWith(tags: [...tags, tag]);
-      });
-    }
-  }
-
-  void _handleTagRemove(Tag tag) {
-    setState(() {
-      _formData = _formData.copyWith(tags: [..._formData.tags]..remove(tag));
-    });
+  @override
+  void dispose() {
+    _controller
+      ..removeListener(_handleFormChanged)
+      ..dispose();
+    super.dispose();
   }
 
   Future<void> _handleSave() async {
     setState(() => _saving = true);
     try {
-      await widget.onSave(_formData);
+      await widget.onSave(_controller.form);
       if (mounted) {
         showSuccessSnackBar(context, '已保存');
         Navigator.of(context).pop();
@@ -139,44 +119,50 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _DialogHeader(borderSubtle: theme.colorScheme.borderSubtle),
-
-                // Tabs 标签
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    spacing: 24,
-                    children: [
-                      _TabButton(
-                        label: "常规信息",
-                        isActive: activeTab == 'details',
-                        onTap: () => setState(() => activeTab = 'details'),
-                        primaryColor: theme.colorScheme.primary,
-                      ),
-                      _TabButton(
-                        label: "作者与标签",
-                        isActive: activeTab == 'tags',
-                        onTap: () => setState(() => activeTab = 'tags'),
-                        primaryColor: theme.colorScheme.primary,
-                      ),
-                    ],
-                  ),
+                _EditMetadataDialogHeader(
+                  borderSubtle: theme.colorScheme.borderSubtle,
                 ),
-
-                // 对话框 body
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
                       vertical: 20,
                     ),
-                    child: activeTab == 'details'
-                        ? _buildDetailsTab()
-                        : _buildTagsTab(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 20,
+                      children: [
+                        _EditMetadataTitleSection(
+                          title: _controller.form.title,
+                          onChanged: _controller.updateTitle,
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 20,
+                          children: [
+                            Expanded(
+                              child: _EditMetadataContentRatingSection(
+                                isR18: _controller.form.isR18,
+                                onChanged: _controller.updateIsR18,
+                              ),
+                            ),
+                          ],
+                        ),
+                        _EditMetadataAuthorsSection(
+                          authors: _controller.form.authors,
+                          onAdd: _controller.addAuthor,
+                          onRemove: _controller.removeAuthor,
+                        ),
+                        _EditMetadataTagsSection(
+                          tags: _controller.form.tags,
+                          onAdd: _controller.addTagByName,
+                          onRemove: _controller.removeTagByName,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-
-                _DialogFooter(
+                _EditMetadataDialogFooter(
                   borderSubtle: theme.colorScheme.borderSubtle,
                   primaryColor: theme.colorScheme.primary,
                   saving: _saving,
@@ -189,113 +175,65 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       ),
     );
   }
+}
 
-  Widget _buildDetailsTab() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 20,
+class _EditMetadataFormController extends ChangeNotifier {
+  _EditMetadataFormController({required ComicMetadataForm initialForm})
+      : _form = initialForm;
 
-      children: [
-        FluentTextField(
-          labelText: "漫画标题",
-          initialValue: _formData.title,
-          onChanged: (v) => _formData = _formData.copyWith(title: v),
-          hintText: '修改漫画标题',
-        ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 20,
-          children: [
-            Expanded(
-              child: ContentRatingField(
-                isR18: _formData.isR18,
-                onChanged: (value) {
-                  _formData = _formData.copyWith(isR18: value);
-                  setState(() {});
-                },
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
+  ComicMetadataForm _form;
+
+  ComicMetadataForm get form => _form;
+
+  void updateTitle(String value) {
+    _form = _form.copyWith(title: value);
+    notifyListeners();
   }
 
-  Widget _buildTagsTab() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TagEditorField(
-          label: "作者",
-          icon: LucideIcons.penTool,
-          items: _formData.authors,
-          onAdd: _handleAuthorAdd,
-          onRemove: _handleAuthorRemove,
-        ),
-        const SizedBox(height: 20),
-        TagEditorField(
-          label: "标签",
-          icon: LucideIcons.tag,
-          items: _formData.tags.whereType<Tag>().map((t) => t.name).toList(),
-          onAdd: _handleTagAdd,
-          onRemove: (name) {
-            final tag = _formData.tags.whereType<Tag>().firstWhereOrNull(
-              (t) => t.name == name,
-            );
-            if (tag != null) _handleTagRemove(tag);
-          },
-        ),
-      ],
-    );
+  void updateIsR18(bool value) {
+    _form = _form.copyWith(isR18: value);
+    notifyListeners();
+  }
+
+  void addAuthor(String name) {
+    final String trimmed = name.trim();
+    if (trimmed.isEmpty) return;
+    if (_form.authors.contains(trimmed)) return;
+    _form = _form.copyWith(authors: [..._form.authors, trimmed]);
+    notifyListeners();
+  }
+
+  void removeAuthor(String name) {
+    _form = _form.copyWith(authors: [..._form.authors]..remove(name));
+    notifyListeners();
+  }
+
+  void addTagByName(String name) {
+    final String trimmed = name.trim();
+    if (trimmed.isEmpty) return;
+    final Tag tag = Tag(name: trimmed);
+    final List<Tag> tags = _form.tags;
+    if (tags.any((t) => t.name == tag.name)) return;
+    _form = _form.copyWith(tags: [...tags, tag]);
+    notifyListeners();
+  }
+
+  void removeTagByName(String name) {
+    final Tag? tag = _form.tags.firstWhereOrNull((t) => t.name == name);
+    if (tag == null) return;
+    removeTag(tag);
+  }
+
+  void removeTag(Tag tag) {
+    _form = _form.copyWith(tags: [..._form.tags]..remove(tag));
+    notifyListeners();
   }
 }
 
-class _TabButton extends StatelessWidget {
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
-  final Color primaryColor;
-
-  const _TabButton({
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-    required this.primaryColor,
+class _EditMetadataDialogHeader extends StatelessWidget {
+  const _EditMetadataDialogHeader({
+    required this.borderSubtle,
   });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return InkWell(
-      onTap: onTap,
-      splashColor: primaryColor.withOpacity(0.2),
-      highlightColor: primaryColor.withOpacity(0.1),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isActive ? primaryColor : Colors.transparent,
-              width: 2.5,
-            ),
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: isActive ? primaryColor : colorScheme.textTertiary,
-            letterSpacing: -0.1,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DialogHeader extends StatelessWidget {
-  const _DialogHeader({required this.borderSubtle});
 
   final Color borderSubtle;
 
@@ -311,7 +249,7 @@ class _DialogHeader extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "编辑元数据",
+            '编辑元数据',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -340,8 +278,8 @@ class _DialogHeader extends StatelessWidget {
   }
 }
 
-class _DialogFooter extends StatelessWidget {
-  const _DialogFooter({
+class _EditMetadataDialogFooter extends StatelessWidget {
+  const _EditMetadataDialogFooter({
     required this.borderSubtle,
     required this.primaryColor,
     required this.saving,
@@ -370,7 +308,7 @@ class _DialogFooter extends StatelessWidget {
               foregroundColor: colorScheme.textSecondary,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             ),
-            child: const Text("取消"),
+            child: const Text('取消'),
           ),
           const SizedBox(width: 12),
           ElevatedButton(
@@ -401,10 +339,91 @@ class _DialogFooter extends StatelessWidget {
                       const Text('保存中…'),
                     ],
                   )
-                : const Text("保存更改"),
+                : const Text('保存更改'),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _EditMetadataTitleSection extends StatelessWidget {
+  const _EditMetadataTitleSection({
+    required this.title,
+    required this.onChanged,
+  });
+
+  final String title;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return FluentTextField(
+      labelText: '漫画标题',
+      initialValue: title,
+      onChanged: onChanged,
+      hintText: '修改漫画标题',
+    );
+  }
+}
+
+class _EditMetadataContentRatingSection extends StatelessWidget {
+  const _EditMetadataContentRatingSection({
+    required this.isR18,
+    required this.onChanged,
+  });
+
+  final bool isR18;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return ContentRatingField(isR18: isR18, onChanged: onChanged);
+  }
+}
+
+class _EditMetadataAuthorsSection extends StatelessWidget {
+  const _EditMetadataAuthorsSection({
+    required this.authors,
+    required this.onAdd,
+    required this.onRemove,
+  });
+
+  final List<String> authors;
+  final ValueChanged<String> onAdd;
+  final ValueChanged<String> onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    return TagEditorField(
+      label: '作者',
+      icon: LucideIcons.penTool,
+      items: authors,
+      onAdd: onAdd,
+      onRemove: onRemove,
+    );
+  }
+}
+
+class _EditMetadataTagsSection extends StatelessWidget {
+  const _EditMetadataTagsSection({
+    required this.tags,
+    required this.onAdd,
+    required this.onRemove,
+  });
+
+  final List<Tag> tags;
+  final ValueChanged<String> onAdd;
+  final ValueChanged<String> onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    return TagEditorField(
+      label: '标签',
+      icon: LucideIcons.tag,
+      items: tags.map((t) => t.name).toList(),
+      onAdd: onAdd,
+      onRemove: onRemove,
     );
   }
 }

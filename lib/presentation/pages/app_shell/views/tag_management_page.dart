@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-
-import 'tag_management/tag_list/tag_list.dart';
-import 'tag_management/tag_management_header.dart';
-import 'tag_management/tag_management_states.dart';
-import 'tag_management/tag_management_styles.dart';
+import 'package:hentai_library/presentation/widgets/common/status/status_card_shell.dart';
+import 'package:hentai_library/presentation/widgets/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/widgets/form/fluent_text_field.dart';
+import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class TagManagementPage extends ConsumerWidget {
   const TagManagementPage({super.key});
@@ -18,20 +19,20 @@ class TagManagementPage extends ConsumerWidget {
     final query = ref.watch(tagFilterProvider);
 
     return SingleChildScrollView(
-      padding: TagManagementStyles.pagePadding,
+      padding: _TagStyles.pagePadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TagManagementHeader(selectionCount: selection.length),
+          _TagManagementHeader(selectionCount: selection.length),
           const SizedBox(height: 20),
           tagsAsync.when(
             data: (tags) {
               final filtered = _applyFilter(tags, query);
-              if (filtered.isEmpty) return const TagManagementEmptyState();
-              return TagList(tags: filtered);
+              if (filtered.isEmpty) return const _TagManagementEmptyState();
+              return _TagList(tags: filtered);
             },
-            loading: () => const TagManagementLoadingCard(),
-            error: (e, _) => TagManagementErrorCard(error: e),
+            loading: () => const _TagManagementLoadingCard(),
+            error: (e, _) => _TagManagementErrorCard(error: e),
           ),
         ],
       ),
@@ -42,5 +43,634 @@ class TagManagementPage extends ConsumerWidget {
     if (query.trim().isEmpty) return List<Tag>.from(source);
     final q = query.trim().toLowerCase();
     return source.where((t) => t.name.toLowerCase().contains(q)).toList();
+  }
+}
+
+class _TagStyles {
+  const _TagStyles._();
+
+  static const EdgeInsets pagePadding = EdgeInsets.all(24);
+
+  static const double titleFontSize = 26;
+  static const double subtitleFontSize = 13;
+
+  static const double metaChipIconSize = 14;
+  static const double metaChipFontSize = 12;
+  static const double metaChipRadius = 8;
+  static const EdgeInsets metaChipPadding = EdgeInsets.symmetric(
+    horizontal: 12,
+    vertical: 6,
+  );
+
+  static const double listRadius = 12;
+  static const EdgeInsets listHeaderPadding = EdgeInsets.symmetric(
+    horizontal: 16,
+    vertical: 12,
+  );
+  static const EdgeInsets rowPadding = EdgeInsets.symmetric(
+    horizontal: 16,
+    vertical: 10,
+  );
+  static const double listHeaderIconSize = 16;
+  static const double listHeaderFontSize = 13;
+
+  static const double iconButtonRadius = 8;
+  static const Size iconButtonSize = Size(28, 28);
+
+  static const double statusCardRadius = 14;
+  static const EdgeInsets statusErrorPadding = EdgeInsets.all(20);
+  static const EdgeInsets statusLoadingPadding =
+      EdgeInsets.symmetric(vertical: 42);
+  static const EdgeInsets statusEmptyPadding =
+      EdgeInsets.symmetric(vertical: 48);
+}
+
+class _TagManagementLoadingCard extends StatelessWidget {
+  const _TagManagementLoadingCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return StatusCardShell(
+      padding: _TagStyles.statusLoadingPadding,
+      borderRadius: _TagStyles.statusCardRadius,
+      child: Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2.2,
+          color: theme.colorScheme.primary,
+        ),
+      ),
+    );
+  }
+}
+
+class _TagManagementErrorCard extends StatelessWidget {
+  const _TagManagementErrorCard({required this.error});
+
+  final Object error;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return StatusCardShell(
+      padding: _TagStyles.statusErrorPadding,
+      borderRadius: _TagStyles.statusCardRadius,
+      child: Text(
+        '$error',
+        style: TextStyle(
+          fontSize: _TagStyles.subtitleFontSize,
+          color: theme.colorScheme.textTertiary,
+        ),
+      ),
+    );
+  }
+}
+
+class _TagManagementEmptyState extends StatelessWidget {
+  const _TagManagementEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    return StatusCardShell(
+      padding: _TagStyles.statusEmptyPadding,
+      borderRadius: _TagStyles.statusCardRadius,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            LucideIcons.tags,
+            size: 32,
+            color: cs.onSurfaceVariant,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '暂无标签',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: cs.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '你可以从这里添加、重命名或删除标签。',
+            style: TextStyle(
+              fontSize: _TagStyles.subtitleFontSize,
+              color: cs.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TagManagementHeader extends ConsumerWidget {
+  const _TagManagementHeader({required this.selectionCount});
+
+  final int selectionCount;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '标签管理',
+                style: TextStyle(
+                  fontSize: _TagStyles.titleFontSize,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.4,
+                  color: cs.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '查看、添加、重命名以及批量删除分类标签',
+                style: TextStyle(
+                  color: cs.textTertiary,
+                  fontSize: _TagStyles.subtitleFontSize,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  const _MetaChip(icon: LucideIcons.tags, label: '标签'),
+                  if (selectionCount > 0)
+                    _MetaChip(
+                      icon: LucideIcons.circleCheckBig,
+                      label: '已选 $selectionCount',
+                      highlighted: true,
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.2,
+              child: CustomTextField(
+                hintText: '搜索标签名称…',
+                onChanged: (value) =>
+                    ref.read(tagFilterProvider.notifier).setQuery(value),
+              ),
+            ),
+            FilledButton.icon(
+              onPressed: () async {
+                await showDialog<void>(
+                  context: context,
+                  barrierColor: Colors.transparent,
+                  builder: (context) => _TagNameEditorDialog(
+                    title: '添加标签',
+                    labelText: '名称',
+                    hintText: '输入标签名称…',
+                    initialValue: '',
+                    onSubmit: (value) async {
+                      await ref
+                          .read(tagActionsProvider)
+                          .addTag(Tag(name: value));
+                    },
+                  ),
+                );
+              },
+              icon: const Icon(LucideIcons.plus, size: 16),
+              label: const Text('添加标签'),
+              style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+            if (selectionCount > 0)
+              OutlinedButton.icon(
+                onPressed: () async {
+                  final confirmed =
+                      await showDialog<bool>(
+                        context: context,
+                        barrierColor: Colors.transparent,
+                        builder: (context) =>
+                            _TagConfirmDeleteDialog(count: selectionCount),
+                      ) ??
+                      false;
+                  if (!confirmed) return;
+                  final tags = ref
+                      .read(tagSelectionProvider)
+                      .toList(growable: false);
+                  await ref.read(tagActionsProvider).deleteTags(tags);
+                },
+                icon: const Icon(LucideIcons.trash2, size: 16),
+                label: Text('删除已选（$selectionCount）'),
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _MetaChip extends StatelessWidget {
+  const _MetaChip({
+    required this.icon,
+    required this.label,
+    this.highlighted = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool highlighted;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final iconColor = highlighted
+        ? theme.colorScheme.primary
+        : theme.colorScheme.onSurfaceVariant;
+    final bgColor = highlighted
+        ? theme.colorScheme.primaryContainer.withAlpha(130)
+        : theme.colorScheme.surfaceContainerHighest;
+
+    return Container(
+      padding: _TagStyles.metaChipPadding,
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(_TagStyles.metaChipRadius),
+        border: Border.all(color: theme.colorScheme.borderSubtle),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: _TagStyles.metaChipIconSize,
+            color: iconColor,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: _TagStyles.metaChipFontSize,
+              fontWeight: FontWeight.w600,
+              color: highlighted
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TagList extends ConsumerWidget {
+  const _TagList({required this.tags});
+
+  final List<Tag> tags;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return _TagListCard(
+      child: Column(
+        children: [
+          const _TagListHeader(),
+          _TagListView(tags: tags),
+        ],
+      ),
+    );
+  }
+}
+
+class _TagListCard extends StatelessWidget {
+  const _TagListCard({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      margin: const EdgeInsets.only(top: 16),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(_TagStyles.listRadius),
+        border: Border.all(color: cs.borderSubtle),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(_TagStyles.listRadius),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _TagListHeader extends StatelessWidget {
+  const _TagListHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Container(
+      padding: _TagStyles.listHeaderPadding,
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerHighest,
+        border: Border(bottom: BorderSide(color: cs.borderSubtle)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            LucideIcons.tags,
+            size: _TagStyles.listHeaderIconSize,
+            color: cs.onSurfaceVariant,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '全部标签',
+            style: TextStyle(
+              fontSize: _TagStyles.listHeaderFontSize,
+              fontWeight: FontWeight.w600,
+              color: cs.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TagListView extends ConsumerWidget {
+  const _TagListView({required this.tags});
+
+  final List<Tag> tags;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: tags.length,
+      separatorBuilder: (_, _) => Divider(height: 1, color: cs.borderSubtle),
+      itemBuilder: (context, index) {
+        final tag = tags[index];
+        final isSelected = ref.watch(tagSelectionProvider).contains(tag);
+        return _TagRow(tag: tag, isSelected: isSelected);
+      },
+    );
+  }
+}
+
+class _TagRow extends ConsumerWidget {
+  const _TagRow({required this.tag, required this.isSelected});
+
+  final Tag tag;
+  final bool isSelected;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final iconButtonStyle = IconButton.styleFrom(
+      minimumSize: _TagStyles.iconButtonSize,
+      fixedSize: _TagStyles.iconButtonSize,
+      padding: EdgeInsets.zero,
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
+      overlayColor: cs.primary.withAlpha(14),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(_TagStyles.iconButtonRadius),
+      ),
+    );
+
+    return _TagRowInteractionShell(
+      child: InkWell(
+        onTap: () => ref.read(tagSelectionProvider.notifier).toggle(tag),
+        child: Padding(
+          padding: _TagStyles.rowPadding,
+          child: Row(
+            spacing: 12,
+            children: [
+              IconButton(
+                tooltip: isSelected ? '取消选中' : '选中',
+                onPressed: () =>
+                    ref.read(tagSelectionProvider.notifier).toggle(tag),
+                style: iconButtonStyle,
+                icon: Icon(
+                  isSelected
+                      ? LucideIcons.squareCheckBig
+                      : LucideIcons.square,
+                  size: 16,
+                  color: isSelected ? cs.primary : cs.textTertiary,
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  tag.name,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: cs.textPrimary,
+                  ),
+                ),
+              ),
+              IconButton(
+                tooltip: '重命名',
+                style: iconButtonStyle,
+                icon: const Icon(LucideIcons.squarePen, size: 16),
+                onPressed: () async {
+                  await showDialog<void>(
+                    context: context,
+                    builder: (context) => _TagNameEditorDialog(
+                      title: '重命名标签',
+                      labelText: '新名称',
+                      hintText: '输入新的标签名称…',
+                      initialValue: tag.name,
+                      shouldCloseOnUnchanged: true,
+                      onSubmit: (value) async {
+                        await ref.read(tagActionsProvider).renameTag(tag, value);
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TagRowInteractionShell extends StatelessWidget {
+  const _TagRowInteractionShell({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    return Theme(
+      data: theme.copyWith(
+        splashFactory: NoSplash.splashFactory,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: cs.primary.withAlpha(10),
+      ),
+      child: Material(
+        color: cs.surface,
+        child: child,
+      ),
+    );
+  }
+}
+
+class _TagNameEditorDialog extends ConsumerStatefulWidget {
+  const _TagNameEditorDialog({
+    required this.title,
+    required this.labelText,
+    required this.hintText,
+    required this.initialValue,
+    required this.onSubmit,
+    this.shouldCloseOnUnchanged = false,
+  });
+
+  final String title;
+  final String labelText;
+  final String hintText;
+  final String initialValue;
+  final Future<void> Function(String value) onSubmit;
+  final bool shouldCloseOnUnchanged;
+
+  @override
+  ConsumerState<_TagNameEditorDialog> createState() =>
+      _TagNameEditorDialogState();
+}
+
+class _TagNameEditorDialogState extends ConsumerState<_TagNameEditorDialog> {
+  late final TextEditingController _controller;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialValue);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleSave() async {
+    final value = _controller.text.trim();
+    if (value.isEmpty) return;
+    if (widget.shouldCloseOnUnchanged && value == widget.initialValue.trim()) {
+      if (mounted) Navigator.of(context).pop();
+      return;
+    }
+    setState(() => _saving = true);
+    try {
+      await widget.onSubmit(value);
+      if (mounted) Navigator.of(context).pop();
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FluentDialogShell(
+      title: widget.title,
+      content: FluentTextField(
+        initialValue: _controller.text,
+        labelText: widget.labelText,
+        hintText: widget.hintText,
+        onChanged: (value) => _controller.text = value,
+      ),
+      actions: [
+        TextButton(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(),
+          style: TextButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text('取消'),
+        ),
+        const SizedBox(width: 8),
+        FilledButton(
+          onPressed: _saving ? null : _handleSave,
+          style: FilledButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: _saving
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('保存'),
+        ),
+      ],
+    );
+  }
+}
+
+class _TagConfirmDeleteDialog extends StatelessWidget {
+  const _TagConfirmDeleteDialog({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return FluentDialogShell(
+      title: '确认删除',
+      content: Text('将删除 $count 个标签，并同时从所有漫画中移除这些标签。此操作不可撤销。'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          style: TextButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text('取消'),
+        ),
+        const SizedBox(width: 8),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          style: FilledButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text('删除'),
+        ),
+      ],
+    );
   }
 }

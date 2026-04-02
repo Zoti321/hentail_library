@@ -14,9 +14,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import 'comic_detail/comic_detail_shell.dart';
-import 'comic_detail/comic_detail_status_view.dart';
-
 const double _kDetailLayoutMaxWidth = 1200;
 const double _kDetailNarrowBreakpoint = 720;
 const double _kLeftColumnMaxWidth = 300;
@@ -34,14 +31,14 @@ class ComicDetailPage extends HookConsumerWidget {
     );
 
     return rawData.when(
-      loading: () => const ComicDetailLoadingView(),
-      error: (error, _) => ComicDetailErrorView(
+      loading: () => const _ComicDetailLoadingView(),
+      error: (error, _) => _ComicDetailErrorView(
         onRetry: () => ref.read(libraryPageProvider.notifier).refreshStream(),
       ),
       data: (comics) {
         final comic = comics.firstWhereOrNull((c) => c.comicId == comicId);
         if (comic == null) {
-          return ComicDetailEmptyView(comicId: comicId);
+          return _ComicDetailEmptyView(comicId: comicId);
         }
         return _DetailContent(comic: comic);
       },
@@ -64,9 +61,9 @@ class _DetailContent extends StatelessWidget {
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           final bool isNarrow = constraints.maxWidth < _kDetailNarrowBreakpoint;
-          return ComicDetailShell(
+          return _ComicDetailShell(
             isNarrow: isNarrow,
-            child: ComicDetailCard(
+            child: _ComicDetailCard(
               maxWidth: _kDetailLayoutMaxWidth,
               child: Padding(
                 padding: const EdgeInsets.all(20),
@@ -547,6 +544,175 @@ class _BackBtn extends HookWidget {
                   .tint(duration: 200.ms, color: theme.colorScheme.primary),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ComicDetailShell extends StatelessWidget {
+  const _ComicDetailShell({
+    required this.isNarrow,
+    required this.child,
+  });
+
+  final bool isNarrow;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(
+        horizontal: isNarrow ? 16 : 24,
+        vertical: 24,
+      ),
+      child: Center(
+        child: child,
+      ),
+    );
+  }
+}
+
+class _ComicDetailCard extends StatelessWidget {
+  const _ComicDetailCard({
+    required this.maxWidth,
+    required this.child,
+  });
+
+  final double maxWidth;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: Material(
+        color: cs.surface,
+        elevation: 14,
+        shadowColor: Colors.black.withOpacity(0.18),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: cs.outline.withAlpha(70)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: child,
+      ),
+    );
+  }
+}
+
+class _ComicDetailLoadingView extends StatelessWidget {
+  const _ComicDetailLoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    return const _ComicDetailStatusView(
+      leading: CircularProgressIndicator(),
+      label: '加载中…',
+    );
+  }
+}
+
+class _ComicDetailEmptyView extends StatelessWidget {
+  const _ComicDetailEmptyView({required this.comicId});
+
+  final String comicId;
+
+  @override
+  Widget build(BuildContext context) {
+    return _ComicDetailStatusView(
+      leading: Icon(
+        LucideIcons.bookOpen,
+        size: 48,
+        color: Theme.of(context).colorScheme.textTertiary,
+      ),
+      label: '漫画不存在或已移除',
+      action: TextButton.icon(
+        onPressed: () => Navigator.of(context).pop(),
+        icon: const Icon(LucideIcons.arrowLeft, size: 16),
+        label: const Text('返回'),
+      ),
+    );
+  }
+}
+
+class _ComicDetailErrorView extends StatefulWidget {
+  const _ComicDetailErrorView({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  State<_ComicDetailErrorView> createState() => _ComicDetailErrorViewState();
+}
+
+class _ComicDetailErrorViewState extends State<_ComicDetailErrorView> {
+  bool _retrying = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return _ComicDetailStatusView(
+      leading: Icon(
+        LucideIcons.circleAlert,
+        size: 48,
+        color: theme.colorScheme.textTertiary,
+      ),
+      label: '加载失败，请重试',
+      action: TextButton.icon(
+        onPressed: _retrying
+            ? null
+            : () {
+                setState(() => _retrying = true);
+                widget.onRetry();
+              },
+        icon: _retrying
+            ? SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: theme.colorScheme.primary,
+                ),
+              )
+            : const Icon(LucideIcons.refreshCw, size: 16),
+        label: Text(_retrying ? '重试中…' : '重试'),
+      ),
+    );
+  }
+}
+
+class _ComicDetailStatusView extends StatelessWidget {
+  const _ComicDetailStatusView({
+    required this.leading,
+    required this.label,
+    this.action,
+  });
+
+  final Widget leading;
+  final String label;
+  final Widget? action;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 16,
+          children: [
+            leading,
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.textSecondary,
+              ),
+            ),
+            if (action != null) action!,
+          ],
         ),
       ),
     );
