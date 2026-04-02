@@ -14,6 +14,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
+import 'comic_detail/comic_detail_shell.dart';
+import 'comic_detail/comic_detail_status_view.dart';
+
 const double _kDetailLayoutMaxWidth = 1200;
 const double _kDetailNarrowBreakpoint = 720;
 const double _kLeftColumnMaxWidth = 300;
@@ -31,14 +34,14 @@ class ComicDetailPage extends HookConsumerWidget {
     );
 
     return rawData.when(
-      loading: () => const _DetailLoading(),
-      error: (error, _) => _DetailError(
+      loading: () => const ComicDetailLoadingView(),
+      error: (error, _) => ComicDetailErrorView(
         onRetry: () => ref.read(libraryPageProvider.notifier).refreshStream(),
       ),
       data: (comics) {
         final comic = comics.firstWhereOrNull((c) => c.comicId == comicId);
         if (comic == null) {
-          return _DetailEmpty(comicId: comicId);
+          return ComicDetailEmptyView(comicId: comicId);
         }
         return _DetailContent(comic: comic);
       },
@@ -61,67 +64,63 @@ class _DetailContent extends StatelessWidget {
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           final bool isNarrow = constraints.maxWidth < _kDetailNarrowBreakpoint;
-          return SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: isNarrow ? 16 : 24,
-              vertical: 24,
-            ),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: _kDetailLayoutMaxWidth,
-                ),
-                child: Material(
-                  color: cs.surface,
-                  elevation: 14,
-                  shadowColor: Colors.black.withOpacity(0.18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: cs.outline.withAlpha(70)),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _DetailHeader(comic: comic),
-                        const SizedBox(height: 20),
-                        if (isNarrow) ...[
-                          Align(
-                            alignment: Alignment.center,
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(
-                                maxWidth: _kLeftColumnMaxWidth,
-                              ),
-                              child: _LeftColumn(comic: comic),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          _RightColumn(comic: comic),
-                        ] else
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ConstrainedBox(
-                                constraints: const BoxConstraints(
-                                  maxWidth: _kLeftColumnMaxWidth,
-                                ),
-                                child: _LeftColumn(comic: comic),
-                              ),
-                              const SizedBox(width: 32),
-                              Expanded(child: _RightColumn(comic: comic)),
-                            ],
-                          ),
-                      ],
-                    ),
-                  ),
+          return ComicDetailShell(
+            isNarrow: isNarrow,
+            child: ComicDetailCard(
+              maxWidth: _kDetailLayoutMaxWidth,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _DetailHeader(comic: comic),
+                    const SizedBox(height: 20),
+                    _DetailResponsiveBody(isNarrow: isNarrow, comic: comic),
+                  ],
                 ),
               ),
             ),
           );
         },
       ),
+    );
+  }
+}
+
+class _DetailResponsiveBody extends StatelessWidget {
+  const _DetailResponsiveBody({required this.isNarrow, required this.comic});
+
+  final bool isNarrow;
+  final Comic comic;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isNarrow) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: _kLeftColumnMaxWidth),
+              child: _LeftColumn(comic: comic),
+            ),
+          ),
+          const SizedBox(height: 24),
+          _RightColumn(comic: comic),
+        ],
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: _kLeftColumnMaxWidth),
+          child: _LeftColumn(comic: comic),
+        ),
+        const SizedBox(width: 32),
+        Expanded(child: _RightColumn(comic: comic)),
+      ],
     );
   }
 }
@@ -163,133 +162,6 @@ class _DetailHeader extends StatelessWidget {
   }
 }
 
-class _DetailLoading extends StatelessWidget {
-  const _DetailLoading();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 16,
-          children: [
-            const CircularProgressIndicator(),
-            Text(
-              '加载中…',
-              style: TextStyle(
-                fontSize: 14,
-                color: Theme.of(context).colorScheme.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DetailError extends StatefulWidget {
-  final VoidCallback onRetry;
-
-  const _DetailError({required this.onRetry});
-
-  @override
-  State<_DetailError> createState() => _DetailErrorState();
-}
-
-class _DetailErrorState extends State<_DetailError> {
-  bool _retrying = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 16,
-          children: [
-            Icon(
-              LucideIcons.circleAlert,
-              size: 48,
-              color: theme.colorScheme.textTertiary,
-            ),
-            Text(
-              '加载失败，请重试',
-              style: TextStyle(
-                fontSize: 14,
-                color: theme.colorScheme.textSecondary,
-              ),
-            ),
-            TextButton.icon(
-              onPressed: _retrying
-                  ? null
-                  : () {
-                      setState(() => _retrying = true);
-                      widget.onRetry();
-                    },
-              icon: _retrying
-                  ? SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: theme.colorScheme.primary,
-                      ),
-                    )
-                  : const Icon(LucideIcons.refreshCw, size: 16),
-              label: Text(_retrying ? '重试中…' : '重试'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DetailEmpty extends StatelessWidget {
-  final String comicId;
-
-  const _DetailEmpty({required this.comicId});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: 16,
-          children: [
-            Icon(
-              LucideIcons.bookOpen,
-              size: 48,
-              color: theme.colorScheme.textTertiary,
-            ),
-            Text(
-              '漫画不存在或已移除',
-              style: TextStyle(
-                fontSize: 14,
-                color: theme.colorScheme.textSecondary,
-              ),
-            ),
-            TextButton.icon(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(LucideIcons.arrowLeft, size: 16),
-              label: const Text('返回'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _LeftColumn extends HookConsumerWidget {
   final Comic comic;

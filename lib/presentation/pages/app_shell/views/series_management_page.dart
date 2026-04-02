@@ -10,6 +10,8 @@ import 'package:hentai_library/presentation/widgets/form/fluent_text_field.dart'
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import 'series_management/series_management_states.dart';
+
 class SeriesManagementPage extends ConsumerWidget {
   const SeriesManagementPage({super.key});
 
@@ -29,12 +31,12 @@ class SeriesManagementPage extends ConsumerWidget {
             data: (series) {
               final filtered = _applyFilter(series, query);
               if (filtered.isEmpty) {
-                return const _EmptyState();
+                return const SeriesManagementEmptyState();
               }
               return _SeriesList(series: filtered);
             },
-            loading: () => const _LoadingCard(),
-            error: (e, _) => _ErrorCard(error: e),
+            loading: () => const SeriesManagementLoadingState(),
+            error: (e, _) => SeriesManagementErrorState(error: e),
           ),
         ],
       ),
@@ -113,54 +115,6 @@ class _Header extends ConsumerWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-class _LoadingCard extends StatelessWidget {
-  const _LoadingCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 48),
-      child: Center(child: CircularProgressIndicator()),
-    );
-  }
-}
-
-class _ErrorCard extends StatelessWidget {
-  const _ErrorCard({required this.error});
-
-  final Object error;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      child: Text(
-        '加载失败：$error',
-        style: TextStyle(color: cs.error, fontSize: 14),
-      ),
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState();
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 48),
-      child: Center(
-        child: Text(
-          '暂无系列',
-          style: TextStyle(fontSize: 14, color: cs.textTertiary),
-        ),
-      ),
     );
   }
 }

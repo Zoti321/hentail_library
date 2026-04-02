@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/widgets/common/status/status_card_shell.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -565,15 +566,9 @@ class _LoadingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    return Container(
-      width: double.infinity,
+    return StatusCardShell(
       padding: const EdgeInsets.symmetric(vertical: 42),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: theme.colorScheme.borderSubtle),
-      ),
+      borderRadius: 14,
       child: Center(
         child: CircularProgressIndicator(
           strokeWidth: 2.2,
@@ -599,15 +594,9 @@ class _ErrorCardState extends ConsumerState<_ErrorCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    return Container(
-      width: double.infinity,
+    return StatusCardShell(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: theme.colorScheme.borderSubtle),
-      ),
+      borderRadius: 14,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
