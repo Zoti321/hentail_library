@@ -55,3 +55,4 @@ app.*.map.json
 *.sql
 
 development.md
+.cursor

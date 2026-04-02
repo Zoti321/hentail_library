@@ -296,6 +296,7 @@ class _SeriesRow extends ConsumerWidget {
               onPressed: () async {
                 await showDialog<void>(
                   context: context,
+                  barrierColor: Colors.transparent,
                   builder: (context) => _RenameSeriesDialog(series: series),
                 );
               },

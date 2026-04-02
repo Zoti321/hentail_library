@@ -190,6 +190,11 @@ class _Header extends ConsumerWidget {
                 },
                 icon: const Icon(LucideIcons.trash2, size: 16),
                 label: Text('删除已选（$selectionCount）'),
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
               ),
           ],
         ),
@@ -244,7 +249,7 @@ class _TagList extends ConsumerWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: tags.length,
-              separatorBuilder: (_, __) =>
+              separatorBuilder: (_, _) =>
                   Divider(height: 1, color: cs.borderSubtle),
               itemBuilder: (context, index) {
                 final tag = tags[index];
@@ -271,46 +276,68 @@ class _TagRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final iconButtonStyle = IconButton.styleFrom(
+      minimumSize: const Size(28, 28),
+      fixedSize: const Size(28, 28),
+      padding: EdgeInsets.zero,
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
+      overlayColor: cs.primary.withAlpha(14),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    );
 
-    return Material(
-      color: isSelected ? cs.primaryContainer.withAlpha(60) : cs.surface,
-      child: InkWell(
-        onTap: () => ref.read(tagSelectionProvider.notifier).toggle(tag),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          child: Row(
-            children: [
-              Checkbox(
-                value: isSelected,
-                onChanged: (_) =>
-                    ref.read(tagSelectionProvider.notifier).toggle(tag),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      tag.name,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: cs.textPrimary,
-                      ),
-                    ),
-                  ],
+    return Theme(
+      data: theme.copyWith(
+        splashFactory: NoSplash.splashFactory,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: cs.primary.withAlpha(10),
+      ),
+      child: Material(
+        color: cs.surface,
+        child: InkWell(
+          onTap: () => ref.read(tagSelectionProvider.notifier).toggle(tag),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              spacing: 12,
+              children: [
+                IconButton(
+                  tooltip: isSelected ? '取消选中' : '选中',
+                  onPressed: () =>
+                      ref.read(tagSelectionProvider.notifier).toggle(tag),
+                  style: iconButtonStyle,
+                  icon: Icon(
+                    isSelected
+                        ? LucideIcons.squareCheckBig
+                        : LucideIcons.square,
+                    size: 16,
+                    color: isSelected ? cs.primary : cs.textTertiary,
+                  ),
                 ),
-              ),
-              IconButton(
-                tooltip: '重命名',
-                icon: const Icon(LucideIcons.squarePen, size: 16),
-                onPressed: () async {
-                  await showDialog<void>(
-                    context: context,
-                    builder: (context) => _RenameTagDialog(tag: tag),
-                  );
-                },
-              ),
-            ],
+                Expanded(
+                  child: Text(
+                    tag.name,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: cs.textPrimary,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  tooltip: '重命名',
+                  style: iconButtonStyle,
+                  icon: const Icon(LucideIcons.squarePen, size: 16),
+                  onPressed: () async {
+                    await showDialog<void>(
+                      context: context,
+                      builder: (context) => _RenameTagDialog(tag: tag),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -479,9 +506,7 @@ class _ConfirmDeleteDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return FluentDialogShell(
       title: '确认删除',
-      content: Text(
-        '将删除 $count 个标签，并同时从所有漫画中移除这些标签。此操作不可撤销。',
-      ),
+      content: Text('将删除 $count 个标签，并同时从所有漫画中移除这些标签。此操作不可撤销。'),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
