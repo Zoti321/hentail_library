@@ -4,8 +4,8 @@ import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/common/status/status_card_shell.dart';
-import 'package:hentai_library/presentation/widgets/dialog/fluent_dialog_shell.dart';
-import 'package:hentai_library/presentation/widgets/form/fluent_text_field.dart';
+import 'package:hentai_library/presentation/widgets/dialog/tag_confirm_delete_dialog.dart';
+import 'package:hentai_library/presentation/widgets/dialog/tag_name_editor_dialog.dart';
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -237,7 +237,7 @@ class _TagManagementHeader extends ConsumerWidget {
                 await showDialog<void>(
                   context: context,
                   barrierColor: Colors.transparent,
-                  builder: (context) => _TagNameEditorDialog(
+                  builder: (context) => TagNameEditorDialog(
                     title: '添加标签',
                     labelText: '名称',
                     hintText: '输入标签名称…',
@@ -266,7 +266,7 @@ class _TagManagementHeader extends ConsumerWidget {
                         context: context,
                         barrierColor: Colors.transparent,
                         builder: (context) =>
-                            _TagConfirmDeleteDialog(count: selectionCount),
+                            TagConfirmDeleteDialog(count: selectionCount),
                       ) ??
                       false;
                   if (!confirmed) return;
@@ -500,7 +500,7 @@ class _TagRow extends ConsumerWidget {
                 onPressed: () async {
                   await showDialog<void>(
                     context: context,
-                    builder: (context) => _TagNameEditorDialog(
+                    builder: (context) => TagNameEditorDialog(
                       title: '重命名标签',
                       labelText: '新名称',
                       hintText: '输入新的标签名称…',
@@ -541,140 +541,6 @@ class _TagRowInteractionShell extends StatelessWidget {
         color: cs.surface,
         child: child,
       ),
-    );
-  }
-}
-
-class _TagNameEditorDialog extends ConsumerStatefulWidget {
-  const _TagNameEditorDialog({
-    required this.title,
-    required this.labelText,
-    required this.hintText,
-    required this.initialValue,
-    required this.onSubmit,
-    this.shouldCloseOnUnchanged = false,
-  });
-
-  final String title;
-  final String labelText;
-  final String hintText;
-  final String initialValue;
-  final Future<void> Function(String value) onSubmit;
-  final bool shouldCloseOnUnchanged;
-
-  @override
-  ConsumerState<_TagNameEditorDialog> createState() =>
-      _TagNameEditorDialogState();
-}
-
-class _TagNameEditorDialogState extends ConsumerState<_TagNameEditorDialog> {
-  late final TextEditingController _controller;
-  bool _saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(text: widget.initialValue);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  Future<void> _handleSave() async {
-    final value = _controller.text.trim();
-    if (value.isEmpty) return;
-    if (widget.shouldCloseOnUnchanged && value == widget.initialValue.trim()) {
-      if (mounted) Navigator.of(context).pop();
-      return;
-    }
-    setState(() => _saving = true);
-    try {
-      await widget.onSubmit(value);
-      if (mounted) Navigator.of(context).pop();
-    } finally {
-      if (mounted) setState(() => _saving = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FluentDialogShell(
-      title: widget.title,
-      content: FluentTextField(
-        initialValue: _controller.text,
-        labelText: widget.labelText,
-        hintText: widget.hintText,
-        onChanged: (value) => _controller.text = value,
-        onSubmitted: (_) async {
-          if (_saving) return;
-          await _handleSave();
-        },
-      ),
-      actions: [
-        TextButton(
-          onPressed: _saving ? null : () => Navigator.of(context).pop(),
-          style: TextButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: const Text('取消'),
-        ),
-        const SizedBox(width: 8),
-        FilledButton(
-          onPressed: _saving ? null : _handleSave,
-          style: FilledButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: _saving
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Text('保存'),
-        ),
-      ],
-    );
-  }
-}
-
-class _TagConfirmDeleteDialog extends StatelessWidget {
-  const _TagConfirmDeleteDialog({required this.count});
-
-  final int count;
-
-  @override
-  Widget build(BuildContext context) {
-    return FluentDialogShell(
-      title: '确认删除',
-      content: Text('将删除 $count 个标签，并同时从所有漫画中移除这些标签。此操作不可撤销。'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          style: TextButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: const Text('取消'),
-        ),
-        const SizedBox(width: 8),
-        FilledButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          style: FilledButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: const Text('删除'),
-        ),
-      ],
     );
   }
 }
