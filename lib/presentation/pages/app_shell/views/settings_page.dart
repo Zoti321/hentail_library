@@ -41,19 +41,6 @@ class SettingsPage extends ConsumerWidget {
                 children: [
                   _SettingsRow(
                     icon: Icon(
-                      LucideIcons.paintBucket,
-                      size: 20,
-                      color: theme.colorScheme.iconDefault,
-                    ),
-                    label: '主题风格',
-                    description: 'Fluent 蓝',
-                    action: _ThemeButton(
-                      currentTheme: 'fluent',
-                      onToggle: () {},
-                    ),
-                  ),
-                  _SettingsRow(
-                    icon: Icon(
                       LucideIcons.moon,
                       size: 20,
                       color: theme.colorScheme.iconDefault,
@@ -93,20 +80,6 @@ class SettingsPage extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  _SettingsRow(
-                    icon: Icon(
-                      LucideIcons.layoutTemplate,
-                      size: 20,
-                      color: theme.colorScheme.iconDefault,
-                    ),
-                    label: '布局密度',
-                    description: '紧凑',
-                    action: Icon(
-                      LucideIcons.chevronRight,
-                      size: 16,
-                      color: theme.colorScheme.iconSecondary,
-                    ),
-                  ),
                 ],
               ),
 
@@ -120,7 +93,7 @@ class SettingsPage extends ConsumerWidget {
                       color: theme.colorScheme.iconDefault,
                     ),
                     label: '库位置',
-                    description: '管理扫描文件夹',
+                    description: '管理扫描路径',
                     action: Icon(
                       LucideIcons.chevronRight,
                       size: 16,
@@ -134,7 +107,7 @@ class SettingsPage extends ConsumerWidget {
                       color: theme.colorScheme.iconDefault,
                     ),
                     label: '自动扫描',
-                    description: '启动时扫描新章节',
+                    description: '启动时扫描选中路径',
                     action: const MyToggleSwitch(checked: true),
                   ),
                   _SettingsRow(
@@ -150,11 +123,14 @@ class SettingsPage extends ConsumerWidget {
                             color: theme.colorScheme.warning,
                           ),
                     label: '健全模式',
-                    description: data.isHealthyMode ? '已启用（隐藏 R18）' : '已禁用（显示 R18）',
+                    description: data.isHealthyMode
+                        ? '已启用（隐藏 R18）'
+                        : '已禁用（显示 R18）',
                     action: MyToggleSwitch(
                       checked: data.isHealthyMode,
-                      onChange: () =>
-                          ref.read(settingsProvider.notifier).toggleHealthyMode(),
+                      onChange: () => ref
+                          .read(settingsProvider.notifier)
+                          .toggleHealthyMode(),
                     ),
                     isDestructive: !data.isHealthyMode,
                   ),

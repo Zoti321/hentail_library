@@ -3,14 +3,11 @@ import 'package:hentai_library/data/repository/series_repo_impl.dart';
 import 'package:hentai_library/data/repository/tag_repo_impl.dart';
 import 'package:hentai_library/data/repository/path_repo.dart';
 import 'package:hentai_library/data/repository/reading_history_repo.dart';
-import 'package:hentai_library/data/repository/reading_session_repo.dart';
 import 'package:hentai_library/domain/repository/dir_repo.dart';
 import 'package:hentai_library/domain/repository/comic_repo.dart';
 import 'package:hentai_library/domain/repository/series_repo.dart';
 import 'package:hentai_library/domain/repository/tag_repo.dart';
 import 'package:hentai_library/domain/repository/reading_history_repo.dart';
-import 'package:hentai_library/domain/repository/reading_session_repo.dart'
-    as domain;
 import 'package:hentai_library/presentation/providers/deps/database_dao.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -21,7 +18,6 @@ ComicRepository libraryComicRepo(Ref ref) => ComicRepositoryImpl(
   ref.read(libraryComicDaoProvider),
   readingHistory: ref.read(readingHistoryRepoProvider),
   librarySeries: ref.read(librarySeriesRepoProvider),
-  readingSessions: ref.read(readingSessionRepoProvider),
 );
 
 @Riverpod(keepAlive: true)
@@ -40,7 +36,3 @@ PathRepository pathRepo(Ref ref) =>
 ReadingHistoryRepository readingHistoryRepo(Ref ref) =>
     ReadingHistoryRepositoryImpl(ref.read(readingHistoryDaoProvider));
 
-@Riverpod(keepAlive: true)
-domain.ReadingSessionRepository readingSessionRepo(Ref ref) {
-  return ReadingSessionRepositoryImpl(ref.read(readingSessionDaoProvider));
-}

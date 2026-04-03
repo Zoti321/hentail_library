@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart' as entity;
-import 'package:hentai_library/domain/entity/reading_session.dart' as entity;
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -20,15 +19,6 @@ class ReaderPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = buildAppTheme(Brightness.dark);
     final viewAsync = ref.watch(readerViewProvider(comicId));
-
-    useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref
-            .read(readingSessionStartProvider.notifier)
-            .setStartedAt(DateTime.now());
-      });
-      return null;
-    }, [comicId]);
 
     return Theme(
       data: theme,
@@ -78,26 +68,6 @@ void _saveProgress(WidgetRef ref, String comicId) {
   if (state == null) return;
   final comic = state.comic;
   final currentIndex = state.currentIndex;
-
-  final sessionStart = ref.read(readingSessionStartProvider);
-  if (sessionStart != null) {
-    final durationSeconds = DateTime.now().difference(sessionStart).inSeconds;
-    if (durationSeconds > 0) {
-      final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
-      ref
-          .read(recordReadingSessionUseCaseProvider)
-          .call(
-            entity.ReadingSession(
-              comicId: comicId,
-              date: today,
-              durationSeconds: durationSeconds,
-            ),
-          );
-    }
-    ref.read(readingSessionStartProvider.notifier).setStartedAt(null);
-    ref.invalidate(readingStatsProvider);
-  }
 
   ref
       .read(recordReadingProgressUseCaseProvider)

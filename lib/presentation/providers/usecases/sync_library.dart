@@ -101,7 +101,6 @@ class SyncComicsUseCase {
 
       final historyRepo = _ref.read(readingHistoryRepoProvider);
       final seriesRepo = _ref.read(librarySeriesRepoProvider);
-      final sessionRepo = _ref.read(readingSessionRepoProvider);
 
       emit((
         phase: SyncLibraryPhase.writingDb,
@@ -118,7 +117,6 @@ class SyncComicsUseCase {
         libraryComics: repo,
         readingHistory: historyRepo,
         librarySeries: seriesRepo,
-        readingSessions: sessionRepo,
         comicIds: ids,
       );
 

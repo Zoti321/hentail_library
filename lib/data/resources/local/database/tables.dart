@@ -30,19 +30,6 @@ class ReadingHistories extends Table {
   IntColumn get pageIndex => integer().nullable()();
 }
 
-// 阅读会话（用于统计每日阅读时长）
-@TableIndex(name: 'idx_session_date', columns: {#date})
-class ReadingSessions extends Table {
-  IntColumn get id => integer().autoIncrement()();
-
-  TextColumn get comicId => text()();
-
-  /// 会话日期（当天 0 点，便于按日聚合）
-  DateTimeColumn get date => dateTime()();
-
-  IntColumn get durationSeconds => integer()();
-}
-
 class StringListJsonConverter extends TypeConverter<List<String>, String> {
   const StringListJsonConverter();
 

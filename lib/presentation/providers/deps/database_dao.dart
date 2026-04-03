@@ -27,9 +27,5 @@ LibraryTagDao libraryTagDao(Ref ref) =>
 SavedPathDao savedPathDao(Ref ref) => SavedPathDao(ref.read(databaseProvider));
 
 @Riverpod(keepAlive: true)
-ReadingSessionDao readingSessionDao(Ref ref) =>
-    ReadingSessionDao(ref.read(databaseProvider));
-
-@Riverpod(keepAlive: true)
 ReadingHistoryDao readingHistoryDao(Ref ref) =>
     ReadingHistoryDao(ref.read(databaseProvider));

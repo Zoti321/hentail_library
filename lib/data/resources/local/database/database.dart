@@ -13,7 +13,6 @@ part 'database.g.dart';
   tables: [
     SavedPaths,
     ReadingHistories,
-    ReadingSessions,
     LibraryComics,
     LibraryTags,
     LibraryComicTags,
@@ -25,13 +24,17 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? excutor]) : super(excutor ?? _openConnection());
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) => m.createAll(),
     beforeOpen: (details) => customStatement('PRAGMA foreign_keys = ON'),
-    onUpgrade: (m, from, to) async {},
+    onUpgrade: (m, from, to) async {
+      if (from < 8) {
+        await customStatement('DROP TABLE IF EXISTS reading_sessions');
+      }
+    },
   );
 
   static QueryExecutor _openConnection() {

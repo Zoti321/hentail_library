@@ -23,166 +23,10 @@ class HistoryPage extends HookConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 16,
         children: [
-          const _ReadingStatsSection(),
           _Header(query: query.value, onQueryChanged: (v) => query.value = v),
           _HistoryList(query: query.value),
         ],
       ),
-    );
-  }
-}
-
-class _ReadingStatsSection extends ConsumerWidget {
-  const _ReadingStatsSection();
-
-  static String _formatDuration(int totalSeconds) {
-    if (totalSeconds <= 0) return '0 分钟';
-    final d = Duration(seconds: totalSeconds);
-    if (d.inHours > 0) {
-      return '${d.inHours} 小时 ${d.inMinutes.remainder(60)} 分钟';
-    }
-    return '${d.inMinutes} 分钟';
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final statsAsync = ref.watch(readingStatsProvider);
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.colorScheme.borderMedium, width: 0.8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 16,
-        children: [
-          Row(
-            spacing: 4,
-            children: [
-              Icon(
-                LucideIcons.chartBar,
-                size: 20,
-                color: theme.colorScheme.primary,
-              ),
-              Text(
-                '阅读统计',
-                style: TextStyle(
-                  color: theme.colorScheme.textPrimary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          statsAsync.when(
-            data: (stats) {
-              final colorScheme = theme.colorScheme;
-              return Wrap(
-                spacing: 24,
-                runSpacing: 8,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: colorScheme.borderSubtle,
-                        width: 1,
-                      ),
-                    ),
-                    child: _StatChip(
-                      label: '累计阅读',
-                      value: _formatDuration(stats.totalSeconds),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: colorScheme.borderSubtle,
-                        width: 1,
-                      ),
-                    ),
-                    child: _StatChip(
-                      label: '每日平均',
-                      value: stats.daysWithReading > 0
-                          ? _formatDuration(stats.averageSecondsPerDay)
-                          : '0 分钟',
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: colorScheme.borderSubtle,
-                        width: 1,
-                      ),
-                    ),
-                    child: _StatChip(
-                      label: '有阅读天数',
-                      value: '${stats.daysWithReading} 天',
-                    ),
-                  ),
-                ],
-              );
-            },
-            loading: () => const SizedBox(
-              height: 120,
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            error: (err, _) => Text(
-              '加载统计失败',
-              style: TextStyle(
-                fontSize: 14,
-                color: theme.colorScheme.textSecondary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatChip extends StatelessWidget {
-  const _StatChip({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: theme.colorScheme.textSecondary,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: theme.colorScheme.textPrimary,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -208,11 +52,11 @@ class _Header extends ConsumerWidget {
     );
 
     return Container(
-      padding: const .all(2),
+      padding: const EdgeInsets.all(2),
       child: Row(
         children: [
           Column(
-            crossAxisAlignment: .start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 6,
             children: [
               Row(
@@ -228,7 +72,7 @@ class _Header extends ConsumerWidget {
                     style: TextStyle(
                       color: theme.colorScheme.textPrimary,
                       fontSize: 24,
-                      fontWeight: .w600,
+                      fontWeight: FontWeight.w600,
                       letterSpacing: 1.1,
                     ),
                   ),
@@ -238,7 +82,7 @@ class _Header extends ConsumerWidget {
                 "${history.length} 条记录 • 最长保留 30 天",
                 style: TextStyle(
                   fontSize: 14,
-                  fontWeight: .w200,
+                  fontWeight: FontWeight.w200,
                   color: theme.colorScheme.textSecondary,
                 ),
               ),
@@ -311,7 +155,7 @@ class _Header extends ConsumerWidget {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             padding: WidgetStateProperty.all(
-              const .symmetric(horizontal: 12, vertical: 8),
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
             overlayColor: MaterialStateProperty.all(cs.error.withAlpha(20)),
           ),
