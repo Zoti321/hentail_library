@@ -1,5 +1,6 @@
 import 'dart:io' show FileSystemEntity, FileSystemEntityType, Platform;
 
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
@@ -58,8 +59,10 @@ class _SelectedPathsPageHeader extends ConsumerStatefulWidget {
       _SelectedPathsPageHeaderState();
 }
 
-class _SelectedPathsPageHeaderState extends ConsumerState<_SelectedPathsPageHeader> {
-  final MenuController _menuController = MenuController();
+class _SelectedPathsPageHeaderState
+    extends ConsumerState<_SelectedPathsPageHeader> {
+  final CustomPopupMenuController _addPathMenuController =
+      CustomPopupMenuController();
   bool _isPicking = false;
 
   Future<void> _addFiles() async {
@@ -80,7 +83,10 @@ class _SelectedPathsPageHeaderState extends ConsumerState<_SelectedPathsPageHead
         added++;
       }
       if (mounted && added > 0) {
-        showSuccessSnackBar(context, added == 1 ? '已添加 1 个路径' : '已添加 $added 个路径');
+        showSuccessSnackBar(
+          context,
+          added == 1 ? '已添加 1 个路径' : '已添加 $added 个路径',
+        );
       }
     } catch (e) {
       if (mounted) showErrorSnackBar(context, e);
@@ -182,70 +188,51 @@ class _SelectedPathsPageHeaderState extends ConsumerState<_SelectedPathsPageHead
           spacing: 8,
           runSpacing: 8,
           children: [
-            MenuAnchor(
-              controller: _menuController,
-              menuChildren: [
-                if (Platform.isMacOS)
-                  MenuItemButton(
-                    onPressed: _isPicking
-                        ? null
-                        : () {
-                            _menuController.close();
-                            _pickMixedMac();
-                          },
-                    child: const Text('混合选择…'),
+            CustomPopupMenu(
+              controller: _addPathMenuController,
+              barrierColor: Colors.transparent,
+              pressType: PressType.singleClick,
+              showArrow: false,
+              verticalMargin: -26,
+              menuBuilder: () => _AddPathMenuPanel(
+                isPicking: _isPicking,
+                onPickMixed: () {
+                  _addPathMenuController.hideMenu();
+                  _pickMixedMac();
+                },
+                onAddFiles: () {
+                  _addPathMenuController.hideMenu();
+                  _addFiles();
+                },
+                onAddFolder: () {
+                  _addPathMenuController.hideMenu();
+                  _addFolder();
+                },
+              ),
+              child: FilledButton.icon(
+                onPressed: _isPicking
+                    ? null
+                    : () => _addPathMenuController.toggleMenu(),
+                icon: _isPicking
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(LucideIcons.plus, size: 16),
+                label: Text(_isPicking ? '处理中…' : '添加路径'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
                   ),
-                MenuItemButton(
-                  onPressed: _isPicking
-                      ? null
-                      : () {
-                          _menuController.close();
-                          _addFiles();
-                        },
-                  child: const Text('添加文件'),
-                ),
-                MenuItemButton(
-                  onPressed: _isPicking
-                      ? null
-                      : () {
-                          _menuController.close();
-                          _addFolder();
-                        },
-                  child: const Text('添加文件夹'),
-                ),
-              ],
-              builder: (context, controller, child) {
-                return FilledButton.icon(
-                  onPressed: _isPicking
-                      ? null
-                      : () {
-                          if (controller.isOpen) {
-                            controller.close();
-                          } else {
-                            controller.open();
-                          }
-                        },
-                  icon: _isPicking
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(LucideIcons.plus, size: 16),
-                  label: Text(_isPicking ? '处理中…' : '添加路径'),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: theme.colorScheme.onPrimary,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 10,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                );
-              },
+                ),
+              ),
             ),
             OutlinedButton.icon(
               onPressed: widget.hasData ? notifier.toggleSelectionMode : null,
@@ -287,6 +274,146 @@ class _SelectedPathsPageHeaderState extends ConsumerState<_SelectedPathsPageHead
           ],
         ),
       ],
+    );
+  }
+}
+
+class _AddPathMenuPanel extends StatelessWidget {
+  const _AddPathMenuPanel({
+    required this.isPicking,
+    required this.onPickMixed,
+    required this.onAddFiles,
+    required this.onAddFolder,
+  });
+
+  final bool isPicking;
+  final VoidCallback onPickMixed;
+  final VoidCallback onAddFiles;
+  final VoidCallback onAddFolder;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    return Container(
+      width: 260,
+      padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(tokens.radius.lg),
+        border: Border.all(color: cs.borderSubtle),
+        boxShadow: [
+          BoxShadow(
+            color: cs.cardShadowHover,
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(tokens.radius.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (Platform.isMacOS) ...[
+              _AddPathMenuItem(
+                icon: LucideIcons.layers,
+                title: '混合选择…',
+                subtitle: '文件与文件夹',
+                enabled: !isPicking,
+                onPressed: onPickMixed,
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spacing.sm),
+                child: Divider(height: 1, color: cs.borderSubtle),
+              ),
+            ],
+            _AddPathMenuItem(
+              icon: LucideIcons.fileStack,
+              title: '添加文件',
+              subtitle: '可多选',
+              enabled: !isPicking,
+              onPressed: onAddFiles,
+            ),
+            _AddPathMenuItem(
+              icon: LucideIcons.folderOpen,
+              title: '添加文件夹',
+              subtitle: '选择目录',
+              enabled: !isPicking,
+              onPressed: onAddFolder,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AddPathMenuItem extends StatelessWidget {
+  const _AddPathMenuItem({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.enabled,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool enabled;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: enabled ? onPressed : null,
+        hoverColor: cs.primary.withAlpha(10),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: tokens.spacing.md,
+            vertical: tokens.spacing.sm,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: enabled ? cs.primary : cs.textTertiary,
+              ),
+              SizedBox(width: tokens.spacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: tokens.text.bodySm,
+                        fontWeight: FontWeight.w600,
+                        color: enabled ? cs.textPrimary : cs.textDisabled,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: tokens.text.labelXs,
+                        color: cs.textTertiary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

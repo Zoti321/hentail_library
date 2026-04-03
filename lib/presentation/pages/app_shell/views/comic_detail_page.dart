@@ -152,10 +152,9 @@ class _DetailHeader extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
                 child: Tooltip(
                   message: comic.title,
-                  child: Text(
+                  child: SelectableText(
                     comic.title,
                     maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: tokens.text.titleLg,
