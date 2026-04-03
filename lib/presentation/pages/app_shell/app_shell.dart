@@ -42,9 +42,7 @@ class _AppShellState extends ConsumerState<AppShell> with TrayListener {
                     _onDestinationTap(id, context);
                   },
                 ),
-                Expanded(
-                  child: widget.routeChild,
-                ),
+                Expanded(child: widget.routeChild),
               ],
             ),
           ),

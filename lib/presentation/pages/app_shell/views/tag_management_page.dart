@@ -608,6 +608,10 @@ class _TagNameEditorDialogState extends ConsumerState<_TagNameEditorDialog> {
         labelText: widget.labelText,
         hintText: widget.hintText,
         onChanged: (value) => _controller.text = value,
+        onSubmitted: (_) async {
+          if (_saving) return;
+          await _handleSave();
+        },
       ),
       actions: [
         TextButton(

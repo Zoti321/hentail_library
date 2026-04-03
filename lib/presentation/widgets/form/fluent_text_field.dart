@@ -4,6 +4,7 @@ import 'package:hentai_library/config/theme.dart';
 class FluentTextField extends StatefulWidget {
   final String? initialValue;
   final Function(String) onChanged;
+  final ValueChanged<String>? onSubmitted;
   final int maxLines;
   final String? hintText;
   final String? labelText;
@@ -12,6 +13,7 @@ class FluentTextField extends StatefulWidget {
     super.key,
     this.initialValue,
     required this.onChanged,
+    this.onSubmitted,
     this.maxLines = 1,
     this.hintText,
     this.labelText,
@@ -43,7 +45,7 @@ class FluentTextFieldState extends State<FluentTextField> {
     final isTextarea = widget.maxLines > 1;
 
     return Column(
-      crossAxisAlignment: .start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         if (widget.labelText != null) ...[
@@ -79,6 +81,9 @@ class FluentTextFieldState extends State<FluentTextField> {
             child: TextField(
               controller: _controller,
               onChanged: widget.onChanged,
+              onSubmitted: widget.onSubmitted,
+              textInputAction:
+                  widget.maxLines > 1 ? TextInputAction.newline : TextInputAction.done,
               maxLines: widget.maxLines,
               style: TextStyle(
                 fontSize: tokens.text.bodyMd,

@@ -44,7 +44,7 @@ class HomePage extends ConsumerWidget {
 
     return SafeArea(
       child: SingleChildScrollView(
-        padding: EdgeInsets.all(tokens.spacing.lg + 8),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -76,8 +76,9 @@ class HomePage extends ConsumerWidget {
               '首页',
               style: TextStyle(
                 color: cs.textPrimary,
-                fontSize: tokens.text.titleLg + 2,
+                fontSize: 26,
                 fontWeight: FontWeight.w600,
+                letterSpacing: -0.4,
               ),
             ),
             SizedBox(height: tokens.spacing.xs),
@@ -85,7 +86,7 @@ class HomePage extends ConsumerWidget {
               '下午好，读者',
               style: TextStyle(
                 color: cs.textTertiary,
-                fontSize: tokens.text.bodyMd,
+                fontSize: 13,
               ),
             ),
           ],
@@ -110,7 +111,7 @@ class HomePage extends ConsumerWidget {
                   vertical: 10,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(tokens.radius.lg - 2),
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
             ),
@@ -135,15 +136,8 @@ class HomePage extends ConsumerWidget {
           padding: EdgeInsets.all(tokens.spacing.lg + 8),
           decoration: BoxDecoration(
             color: cs.surface,
-            borderRadius: BorderRadius.circular(tokens.radius.lg + 2),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(color: cs.borderSubtle),
-            boxShadow: [
-              BoxShadow(
-                color: cs.cardShadow,
-                blurRadius: 10,
-                offset: const Offset(0, 3),
-              ),
-            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -245,17 +239,17 @@ class _ShortcutEntry extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: colorScheme.surface,
-      borderRadius: BorderRadius.circular(tokens.radius.lg - 2),
+      borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(tokens.radius.lg - 2),
+        borderRadius: BorderRadius.circular(8),
         child: Container(
           padding: EdgeInsets.symmetric(
             horizontal: tokens.spacing.lg,
             vertical: tokens.spacing.md,
           ),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(tokens.radius.lg - 2),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: colorScheme.borderSubtle),
           ),
           child: Row(

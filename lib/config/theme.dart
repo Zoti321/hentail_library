@@ -365,6 +365,12 @@ extension WinTheme on ColorScheme {
       : const Color.fromRGBO(230, 230, 232, 1);
   Color get sidebarBackground =>
       brightness == Brightness.dark ? const Color(0xFF202020) : const Color(0xFFF5F5F5);
+
+  /// 侧栏导航项悬停：与 [sidebarBackground] 对比足够明显，避免沿用全局 [hoverBackground] 在浅色下几乎无差。
+  Color get sidebarItemHoverBackground =>
+      brightness == Brightness.dark
+          ? const Color(0xFF343434)
+          : const Color(0xFFE4E4E7);
 }
 
 extension ReaderPageTheme on ColorScheme {

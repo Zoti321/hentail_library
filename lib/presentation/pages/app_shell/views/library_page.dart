@@ -93,38 +93,59 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               children: [
                 // 标题行
                 Row(
-                  crossAxisAlignment: .center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       AppStrings.libraryTitle,
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: 26,
                         fontWeight: FontWeight.w600,
                         color: theme.colorScheme.textPrimary,
-                        letterSpacing: -0.5,
+                        letterSpacing: -0.4,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
+                        horizontal: 12,
+                        vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.subtleTagBackground,
-                        borderRadius: BorderRadius.circular(tokens.radius.pill),
-                        border: Border.all(color: theme.colorScheme.borderSubtle),
-                      ),
-                      child: Text(
-                        AppStrings.comicCount(comicCount),
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.textSecondary,
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: theme.colorScheme.borderSubtle,
                         ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            LucideIcons.library,
+                            size: 14,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            AppStrings.comicCount(comicCount),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '浏览、搜索与筛选本地漫画',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: theme.colorScheme.textTertiary,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -160,7 +181,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           ),
         ),
         SliverPadding(
-          padding: .symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           sliver: isGridView ? _buildGridView(comics) : _buildListView(comics),
         ),
       ],
@@ -174,13 +195,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: theme.colorScheme.borderSubtle),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.cardShadow,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       padding: const EdgeInsets.all(3),
       child: Row(

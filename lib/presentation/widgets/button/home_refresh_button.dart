@@ -71,7 +71,6 @@ class _HomeRefreshButtonState extends State<HomeRefreshButton>
 
   @override
   Widget build(BuildContext context) {
-    final tokens = context.tokens;
     final Color borderColor = Theme.of(context).colorScheme.borderSubtle;
     final Color iconColor = Theme.of(context).colorScheme.iconDefault;
 
@@ -92,18 +91,11 @@ class _HomeRefreshButtonState extends State<HomeRefreshButton>
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(tokens.radius.sm),
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: borderColor,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(5), // shadow-sm
-                  blurRadius: 2,
-                  offset: const Offset(0, 1),
-                ),
-              ],
             ),
             child: Center(
               child: RotationTransition(

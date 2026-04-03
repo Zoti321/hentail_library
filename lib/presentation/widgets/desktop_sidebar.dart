@@ -58,15 +58,15 @@ class DesktopSidebar extends StatelessWidget {
         color: cs.sidebarBackground,
         border: Border(right: BorderSide(color: cs.borderSubtle)),
       ),
-      padding: .fromLTRB(8, 0, 8, 16),
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
       child: Column(
-        crossAxisAlignment: .start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           DragToMoveArea(child: SizedBox(height: 32, width: double.infinity)),
           // 1. app title /logo
           DragToMoveArea(
             child: Padding(
-              padding: .symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
                   Container(
@@ -75,13 +75,6 @@ class DesktopSidebar extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary,
                       borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: cs.cardShadowHover,
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
                     ),
                     alignment: Alignment.center,
                     child: Text(
@@ -168,31 +161,32 @@ class _SidebarButton extends StatefulWidget {
 }
 
 class _SidebarButtonState extends State<_SidebarButton> {
+  static const Duration _kItemAnimDuration = Duration(milliseconds: 220);
+  static const Curve _kItemAnimCurve = Curves.easeOutCubic;
+
   bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
-    // 选中状态样式（悬停色无主题等价，保留原值以保证零视觉变更）
+    // 勿用 Colors.transparent：与实色做 Color.lerp 会先经过发灰的半透明中间态。
+    final Color idleBackground = cs.sidebarBackground;
     final Color backgroundColor = widget.isActive
-        ? theme.colorScheme.surface
-        : (_isHovered ? theme.colorScheme.hoverBackground : Colors.transparent);
+        ? cs.surfaceContainerHighest
+        : (_isHovered ? cs.sidebarItemHoverBackground : idleBackground);
 
     final Color textColor = widget.isActive
-        ? theme.colorScheme.textPrimary
-        : (_isHovered
-              ? theme.colorScheme.textPrimary
-              : theme.colorScheme.textSecondary);
+        ? cs.textPrimary
+        : (_isHovered ? cs.textPrimary : cs.textSecondary);
 
     final Color iconColor = widget.isActive
-        ? theme.colorScheme.primary
-        : (_isHovered
-              ? theme.colorScheme.textPrimary
-              : theme.colorScheme.textSecondary);
+        ? cs.primary
+        : (_isHovered ? cs.textPrimary : cs.textSecondary);
 
     return Container(
-      margin: .symmetric(vertical: 4),
+      margin: const EdgeInsets.symmetric(vertical: 4),
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),
@@ -200,51 +194,74 @@ class _SidebarButtonState extends State<_SidebarButton> {
         child: GestureDetector(
           onTap: widget.onTap,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 0),
+            duration: _kItemAnimDuration,
+            curve: _kItemAnimCurve,
             decoration: BoxDecoration(
               color: backgroundColor,
               borderRadius: BorderRadius.circular(8),
-              border: BoxBorder.all(
+              border: Border.all(
                 width: 0.8,
-                color: widget.isActive
-                    ? theme.colorScheme.borderSubtle
-                    : Colors.transparent,
+                color: widget.isActive ? cs.borderSubtle : idleBackground,
               ),
             ),
             child: Stack(
+              clipBehavior: Clip.none,
               children: [
                 Padding(
-                  padding: .symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   child: Row(
                     children: [
-                      Icon(widget.item.icon, size: 20, color: iconColor),
+                      AnimatedTheme(
+                        duration: _kItemAnimDuration,
+                        curve: _kItemAnimCurve,
+                        data: theme.copyWith(
+                          iconTheme: IconThemeData(color: iconColor, size: 20),
+                        ),
+                        child: Icon(widget.item.icon),
+                      ),
                       const SizedBox(width: 12),
-                      Text(
-                        widget.item.label,
-                        style: TextStyle(
+                      AnimatedDefaultTextStyle(
+                        duration: _kItemAnimDuration,
+                        curve: _kItemAnimCurve,
+                        style: theme.textTheme.bodyMedium!.copyWith(
                           color: textColor,
                           fontSize: 14,
                           fontWeight: widget.isActive
                               ? FontWeight.w600
                               : FontWeight.w400,
                         ),
+                        child: Text(widget.item.label),
                       ),
                     ],
                   ),
                 ),
-                if (widget.isActive)
-                  Positioned(
-                    left: 4,
-                    top: 12,
-                    bottom: 12,
-                    child: Container(
-                      width: 4,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary,
-                        borderRadius: BorderRadius.circular(2),
+                Positioned(
+                  left: 4,
+                  top: 12,
+                  bottom: 12,
+                  child: AnimatedOpacity(
+                    duration: _kItemAnimDuration,
+                    curve: _kItemAnimCurve,
+                    opacity: widget.isActive ? 1 : 0,
+                    child: AnimatedSlide(
+                      duration: _kItemAnimDuration,
+                      curve: _kItemAnimCurve,
+                      offset: widget.isActive
+                          ? Offset.zero
+                          : const Offset(-0.35, 0),
+                      child: Container(
+                        width: 4,
+                        decoration: BoxDecoration(
+                          color: cs.primary,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                     ),
                   ),
+                ),
               ],
             ),
           ),
