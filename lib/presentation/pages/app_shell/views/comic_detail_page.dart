@@ -26,24 +26,28 @@ class ComicDetailPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
     final rawData = ref.watch(
       libraryPageProvider.select((s) => s.rawComicsAsyncValue),
     );
 
-    return rawData.when(
-      loading: () => const _ComicDetailLoadingView(),
-      error: (error, _) => _ComicDetailErrorView(
-        onRetry: () => ref.read(libraryPageProvider.notifier).refreshStream(),
+    return ColoredBox(
+      color: cs.winBackground,
+      child: rawData.when(
+        loading: () => const _ComicDetailLoadingView(),
+        error: (error, _) => _ComicDetailErrorView(
+          onRetry: () => ref.read(libraryPageProvider.notifier).refreshStream(),
+        ),
+        data: (comics) {
+          final comic = comics.firstWhereOrNull((c) => c.comicId == comicId);
+          if (comic == null) {
+            return _ComicDetailEmptyView(comicId: comicId);
+          }
+          return _DetailContent(comic: comic);
+        },
+        skipLoadingOnReload: true,
+        skipLoadingOnRefresh: true,
       ),
-      data: (comics) {
-        final comic = comics.firstWhereOrNull((c) => c.comicId == comicId);
-        if (comic == null) {
-          return _ComicDetailEmptyView(comicId: comicId);
-        }
-        return _DetailContent(comic: comic);
-      },
-      skipLoadingOnReload: true,
-      skipLoadingOnRefresh: true,
     );
   }
 }
@@ -55,31 +59,35 @@ class _DetailContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return ColoredBox(
-      color: cs.surface,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final bool isNarrow = constraints.maxWidth < _kDetailNarrowBreakpoint;
-          return _ComicDetailShell(
-            isNarrow: isNarrow,
-            child: _ComicDetailCard(
-              maxWidth: _kDetailLayoutMaxWidth,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _DetailHeader(comic: comic),
-                    const SizedBox(height: 20),
-                    _DetailResponsiveBody(isNarrow: isNarrow, comic: comic),
-                  ],
-                ),
+    final AppThemeTokens tokens = context.tokens;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final bool isNarrow = constraints.maxWidth < _kDetailNarrowBreakpoint;
+        return _ComicDetailShell(
+          isNarrow: isNarrow,
+          child: _ComicDetailCard(
+            maxWidth: _kDetailLayoutMaxWidth,
+            child: Padding(
+              padding: EdgeInsets.all(tokens.spacing.xl),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _DetailHeader(comic: comic),
+                  SizedBox(height: tokens.spacing.xl),
+                  _DetailResponsiveBody(isNarrow: isNarrow, comic: comic)
+                      .animate()
+                      .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
+                      .slideY(
+                        begin: 0.03,
+                        duration: 260.ms,
+                        curve: Curves.easeOutCubic,
+                      ),
+                ],
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -92,6 +100,7 @@ class _DetailResponsiveBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
     if (isNarrow) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -103,7 +112,7 @@ class _DetailResponsiveBody extends StatelessWidget {
               child: _LeftColumn(comic: comic),
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: tokens.spacing.lg + 8),
           _RightColumn(comic: comic),
         ],
       );
@@ -115,7 +124,7 @@ class _DetailResponsiveBody extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: _kLeftColumnMaxWidth),
           child: _LeftColumn(comic: comic),
         ),
-        const SizedBox(width: 32),
+        SizedBox(width: tokens.spacing.lg + 16),
         Expanded(child: _RightColumn(comic: comic)),
       ],
     );
@@ -130,35 +139,43 @@ class _DetailHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final AppThemeTokens tokens = context.tokens;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const _BackBtn(),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Tooltip(
-              message: comic.title,
-              child: Text(
-                comic.title,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  height: 1.25,
-                  color: cs.textPrimary,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const _BackBtn(),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
+                child: Tooltip(
+                  message: comic.title,
+                  child: Text(
+                    comic.title,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: tokens.text.titleLg,
+                      fontWeight: FontWeight.w700,
+                      height: 1.25,
+                      letterSpacing: -0.4,
+                      color: cs.textPrimary,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
+        SizedBox(height: tokens.spacing.md),
+        Divider(height: 1, color: cs.outline.withAlpha(100)),
       ],
     );
   }
 }
-
 
 class _LeftColumn extends HookConsumerWidget {
   final Comic comic;
@@ -168,6 +185,8 @@ class _LeftColumn extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final AppThemeTokens tokens = context.tokens;
 
     final String? coverPath = ref
         .watch(comicCoverPathProvider(comicId: comic.comicId))
@@ -182,14 +201,18 @@ class _LeftColumn extends HookConsumerWidget {
         MouseRegion(
           onEnter: (_) => isCoverHover.value = true,
           onExit: (_) => isCoverHover.value = false,
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
+              borderRadius: BorderRadius.circular(tokens.radius.lg),
+              border: Border.all(color: cs.borderSubtle),
+              boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  color: isCoverHover.value
+                      ? cs.cardShadowHover
+                      : cs.cardShadow,
+                  blurRadius: isCoverHover.value ? 6 : 4,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -197,7 +220,7 @@ class _LeftColumn extends HookConsumerWidget {
             child: AspectRatio(
               aspectRatio: 2 / 3,
               child: Container(
-                color: theme.colorScheme.surfaceContainerHighest,
+                color: cs.surfaceContainerHighest,
                 child: coverPath != null
                     ? Image.file(File(coverPath), fit: BoxFit.cover)
                           .animate(target: isCoverHover.value ? 1 : 0)
@@ -207,12 +230,16 @@ class _LeftColumn extends HookConsumerWidget {
                             duration: const Duration(milliseconds: 500),
                             curve: Curves.easeOutQuad,
                           )
-                    : const Icon(Icons.broken_image, size: 36),
+                    : Icon(
+                        LucideIcons.imageOff,
+                        size: 36,
+                        color: cs.imageFallback,
+                      ),
               ),
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: tokens.spacing.md),
       ],
     );
   }
@@ -241,10 +268,12 @@ class _RightColumn extends HookConsumerWidget {
         : '$pageCount 页';
     final String formatLabel = comic.resourceType.name.toUpperCase();
     final String? ratingLabel = _resolveContentRatingLabel(comic.contentRating);
-    final List<String> statLines = <String>[
-      '页数: $pageLabel',
-      '资源格式: $formatLabel',
-      if (ratingLabel != null) '分级: $ratingLabel',
+    final AppThemeTokens tokens = context.tokens;
+    final List<Widget> statChildren = <Widget>[
+      _StatRow(icon: LucideIcons.files, label: '页数', value: pageLabel),
+      _StatRow(icon: LucideIcons.package, label: '资源格式', value: formatLabel),
+      if (ratingLabel != null)
+        _StatRow(icon: LucideIcons.shield, label: '分级', value: ratingLabel),
     ];
 
     return Column(
@@ -260,48 +289,44 @@ class _RightColumn extends HookConsumerWidget {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: tokens.text.bodySm,
                 fontWeight: FontWeight.w500,
                 color: cs.textPrimary,
               ),
             ),
           ),
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: tokens.spacing.sm + 6),
         _MetadataLabeledRow(
           label: '标签',
           child: _TagsExpandableSection(tags: tags),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: tokens.spacing.lg),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          padding: EdgeInsets.symmetric(
+            horizontal: tokens.spacing.md,
+            vertical: tokens.spacing.md,
+          ),
           decoration: BoxDecoration(
             color: cs.surfaceContainerHighest.withAlpha(120),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(tokens.radius.md + 2),
             border: Border.all(color: cs.borderSubtle.withAlpha(180)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              for (int i = 0; i < statLines.length; i++)
+              for (int i = 0; i < statChildren.length; i++)
                 Padding(
                   padding: EdgeInsets.only(
-                    bottom: i < statLines.length - 1 ? 6 : 0,
+                    bottom: i < statChildren.length - 1 ? tokens.spacing.sm : 0,
                   ),
-                  child: Text(
-                    statLines[i],
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: cs.textSecondary,
-                      height: 1.35,
-                    ),
-                  ),
+                  child: statChildren[i],
                 ),
             ],
           ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: tokens.spacing.xl),
         _DetailPrimaryActions(comic: comic),
       ],
     );
@@ -319,6 +344,54 @@ String? _resolveContentRatingLabel(ContentRating rating) {
   }
 }
 
+class _StatRow extends StatelessWidget {
+  const _StatRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  static const double _kStatLabelWidth = 72;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 17, color: cs.iconSecondary),
+        SizedBox(width: tokens.spacing.sm),
+        SizedBox(
+          width: _kStatLabelWidth,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: tokens.text.labelXs,
+              color: cs.textTertiary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: tokens.text.bodySm,
+              color: cs.textSecondary,
+              height: 1.35,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _MetadataLabeledRow extends StatelessWidget {
   const _MetadataLabeledRow({required this.label, required this.child});
 
@@ -328,18 +401,19 @@ class _MetadataLabeledRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: tokens.text.labelXs,
             color: cs.textSecondary,
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: tokens.spacing.sm - 2),
         child,
       ],
     );
@@ -355,10 +429,11 @@ class _TagsExpandableSection extends HookWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final expanded = useState<bool>(false);
+    final AppThemeTokens tokens = context.tokens;
     if (tags.isEmpty) {
       return Text(
         '暂无标签',
-        style: TextStyle(fontSize: 12, color: cs.textTertiary),
+        style: TextStyle(fontSize: tokens.text.labelXs, color: cs.textTertiary),
       );
     }
     final bool needsToggle = tags.length > _kTagsCollapsedMaxCount;
@@ -369,12 +444,12 @@ class _TagsExpandableSection extends HookWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: tokens.spacing.sm,
+          runSpacing: tokens.spacing.sm,
           children: shown.map((String e) => _TagChip(text: e)).toList(),
         ),
         if (needsToggle) ...[
-          const SizedBox(height: 8),
+          SizedBox(height: tokens.spacing.sm),
           TextButton(
             onPressed: () => expanded.value = !expanded.value,
             style: TextButton.styleFrom(
@@ -390,27 +465,38 @@ class _TagsExpandableSection extends HookWidget {
   }
 }
 
-ButtonStyle _detailPrimaryActionStyle(ThemeData theme) {
+ButtonStyle _detailPrimaryActionStyle(ThemeData theme, AppThemeTokens tokens) {
   final ColorScheme cs = theme.colorScheme;
   return ElevatedButton.styleFrom(
     backgroundColor: cs.primary,
     foregroundColor: cs.onPrimary,
     elevation: 1,
-    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    padding: EdgeInsets.symmetric(
+      horizontal: tokens.spacing.xl,
+      vertical: tokens.spacing.sm + 6,
+    ),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(tokens.radius.md),
+    ),
   );
 }
 
-ButtonStyle _detailSecondaryActionStyle(ThemeData theme) {
+ButtonStyle _detailSecondaryActionStyle(
+  ThemeData theme,
+  AppThemeTokens tokens,
+) {
   final ColorScheme cs = theme.colorScheme;
   return ElevatedButton.styleFrom(
     backgroundColor: cs.surfaceContainerHighest,
     foregroundColor: cs.primary,
     elevation: 0,
     shadowColor: Colors.transparent,
-    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+    padding: EdgeInsets.symmetric(
+      horizontal: tokens.spacing.xl,
+      vertical: tokens.spacing.sm + 6,
+    ),
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(tokens.radius.md),
       side: BorderSide(color: cs.outline.withAlpha(140)),
     ),
   );
@@ -424,13 +510,17 @@ class _DetailPrimaryActions extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
-    final ButtonStyle primaryStyle = _detailPrimaryActionStyle(theme);
-    final ButtonStyle secondaryStyle = _detailSecondaryActionStyle(theme);
+    final AppThemeTokens tokens = context.tokens;
+    final ButtonStyle primaryStyle = _detailPrimaryActionStyle(theme, tokens);
+    final ButtonStyle secondaryStyle = _detailSecondaryActionStyle(
+      theme,
+      tokens,
+    );
     return Align(
       alignment: Alignment.centerLeft,
       child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
+        spacing: tokens.spacing.sm,
+        runSpacing: tokens.spacing.sm,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Semantics(
@@ -495,11 +585,15 @@ class _TagChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: EdgeInsets.symmetric(
+        horizontal: tokens.spacing.sm + 2,
+        vertical: tokens.spacing.sm - 2,
+      ),
       decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest.withAlpha(95),
-        borderRadius: BorderRadius.circular(8),
+        color: cs.subtleTagBackground,
+        borderRadius: BorderRadius.circular(tokens.radius.md),
         border: Border.all(color: cs.borderSubtle),
       ),
       child: Text(
@@ -507,7 +601,7 @@ class _TagChip extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          fontSize: 12,
+          fontSize: tokens.text.labelXs,
           color: cs.textPrimary,
           fontWeight: FontWeight.w500,
         ),
@@ -523,6 +617,7 @@ class _BackBtn extends HookWidget {
   Widget build(BuildContext context) {
     final useBackBtnHover = useState<bool>(false);
     final ThemeData theme = Theme.of(context);
+    final AppThemeTokens tokens = context.tokens;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -534,7 +629,7 @@ class _BackBtn extends HookWidget {
         child: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Row(
-            spacing: 6,
+            spacing: tokens.spacing.sm - 2,
             children: [
               Icon(LucideIcons.arrowLeft, size: 18)
                   .animate(target: useBackBtnHover.value ? 1 : 0)
@@ -551,52 +646,60 @@ class _BackBtn extends HookWidget {
 }
 
 class _ComicDetailShell extends StatelessWidget {
-  const _ComicDetailShell({
-    required this.isNarrow,
-    required this.child,
-  });
+  const _ComicDetailShell({required this.isNarrow, required this.child});
 
   final bool isNarrow;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(
-        horizontal: isNarrow ? 16 : 24,
-        vertical: 24,
+        horizontal: isNarrow ? tokens.spacing.lg : tokens.spacing.lg + 8,
+        vertical: tokens.spacing.lg + 8,
       ),
-      child: Center(
-        child: child,
-      ),
+      child: Center(child: child),
     );
   }
 }
 
 class _ComicDetailCard extends StatelessWidget {
-  const _ComicDetailCard({
-    required this.maxWidth,
-    required this.child,
-  });
+  const _ComicDetailCard({required this.maxWidth, required this.child});
 
   final double maxWidth;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final BorderRadius radius = BorderRadius.circular(tokens.radius.lg);
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth),
-      child: Material(
-        color: cs.surface,
-        elevation: 14,
-        shadowColor: Colors.black.withOpacity(0.18),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: cs.outline.withAlpha(70)),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: radius,
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: cs.cardShadow,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        clipBehavior: Clip.antiAlias,
-        child: child,
+        child: ClipRRect(
+          borderRadius: radius,
+          child: ColoredBox(
+            color: cs.surface,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(color: cs.borderSubtle),
+              ),
+              child: child,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -607,8 +710,13 @@ class _ComicDetailLoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _ComicDetailStatusView(
-      leading: CircularProgressIndicator(),
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return _ComicDetailStatusView(
+      leading: SizedBox(
+        width: 32,
+        height: 32,
+        child: CircularProgressIndicator(strokeWidth: 2.5, color: cs.primary),
+      ),
       label: '加载中…',
     );
   }
@@ -695,20 +803,21 @@ class _ComicDetailStatusView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 48),
+        padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl * 2 + 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          spacing: 16,
+          spacing: tokens.spacing.lg,
           children: [
             leading,
             Text(
               label,
               style: TextStyle(
-                fontSize: 14,
-                color: theme.colorScheme.textSecondary,
+                fontSize: tokens.text.bodyMd,
+                color: cs.textSecondary,
               ),
             ),
             if (action != null) action!,

@@ -12,6 +12,7 @@ import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dar
 import 'package:hentai_library/presentation/widgets/form/content_rating_field.dart';
 import 'package:hentai_library/presentation/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/presentation/widgets/form/tag_edit_field.dart';
+import 'package:hentai_library/presentation/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -179,7 +180,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
 
 class _EditMetadataFormController extends ChangeNotifier {
   _EditMetadataFormController({required ComicMetadataForm initialForm})
-      : _form = initialForm;
+    : _form = initialForm;
 
   ComicMetadataForm _form;
 
@@ -231,9 +232,7 @@ class _EditMetadataFormController extends ChangeNotifier {
 }
 
 class _EditMetadataDialogHeader extends StatelessWidget {
-  const _EditMetadataDialogHeader({
-    required this.borderSubtle,
-  });
+  const _EditMetadataDialogHeader({required this.borderSubtle});
 
   final Color borderSubtle;
 
@@ -418,10 +417,10 @@ class _EditMetadataTagsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TagEditorField(
+    return TagLibraryMultiSelectField(
       label: '标签',
       icon: LucideIcons.tag,
-      items: tags.map((t) => t.name).toList(),
+      selectedNames: tags.map((Tag t) => t.name).toList(),
       onAdd: onAdd,
       onRemove: onRemove,
     );
