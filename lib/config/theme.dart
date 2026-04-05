@@ -180,8 +180,10 @@ ThemeData buildAppTheme(Brightness brightness) {
     appBarTheme: _buildAppBarThemeData(colorScheme),
     navigationRailTheme: _buildNavRailThemeData(colorScheme),
     scrollbarTheme: ScrollbarThemeData(
-      thumbVisibility: WidgetStateProperty.all(true),
-      thickness: WidgetStateProperty.all(6),
+      thumbVisibility: WidgetStateProperty.all(false),
+      thickness: WidgetStateProperty.all(4),
+      mainAxisMargin: 10,
+      crossAxisMargin: 3,
       radius: const Radius.circular(999),
       thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
         final base = colorScheme.onSurfaceVariant;
@@ -375,15 +377,23 @@ extension WinTheme on ColorScheme {
           ? const Color(0xFF343434)
           : const Color(0xFFE8E8EC);
 
-  /// 侧栏导航项选中：中性灰底，与 [sidebarBackground]、[sidebarItemHoverBackground] 区分明显。
-  Color get sidebarItemActiveBackground => brightness == Brightness.dark
-      ? const Color(0xFF3E3E40)
-      : const Color(0xFFD6D8DD);
+  /// 侧栏选中项：亮色表面，与 [sidebarBackground] 区分；层次靠 [sidebarItemActiveBorder] 与阴影。
+  Color get sidebarItemActiveBackground =>
+      brightness == Brightness.dark ? const Color(0xFF323234) : Colors.white;
 
-  /// 侧栏选中项左侧指示条（非主色）。
-  Color get sidebarItemActiveIndicator => brightness == Brightness.dark
-      ? const Color(0xFF9CA3AF)
-      : const Color(0xFF52525B);
+  /// 侧栏选中项描边。
+  Color get sidebarItemActiveBorder => brightness == Brightness.dark
+      ? const Color(0xFF4A4A4C)
+      : const Color(0xFFE4E7EC);
+
+  /// 侧栏选中项阴影（与 [cardShadow] 同量级略加强，便于叠在侧栏底上）。
+  Color get sidebarItemActiveShadowColor =>
+      brightness == Brightness.dark
+          ? Colors.black.withAlpha(56)
+          : Colors.black.withAlpha(12);
+
+  /// 侧栏选中项左侧指示条，与 [ColorScheme.primary] 一致。
+  Color get sidebarItemActiveIndicator => primary;
 }
 
 extension ReaderPageTheme on ColorScheme {

@@ -84,10 +84,7 @@ class HomePage extends ConsumerWidget {
             SizedBox(height: tokens.spacing.xs),
             Text(
               '下午好，读者',
-              style: TextStyle(
-                color: cs.textTertiary,
-                fontSize: 13,
-              ),
+              style: TextStyle(color: cs.textTertiary, fontSize: 13),
             ),
           ],
         ),

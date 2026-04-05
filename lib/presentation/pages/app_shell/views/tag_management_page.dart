@@ -79,10 +79,12 @@ class _TagStyles {
 
   static const double statusCardRadius = 14;
   static const EdgeInsets statusErrorPadding = EdgeInsets.all(20);
-  static const EdgeInsets statusLoadingPadding =
-      EdgeInsets.symmetric(vertical: 42);
-  static const EdgeInsets statusEmptyPadding =
-      EdgeInsets.symmetric(vertical: 48);
+  static const EdgeInsets statusLoadingPadding = EdgeInsets.symmetric(
+    vertical: 42,
+  );
+  static const EdgeInsets statusEmptyPadding = EdgeInsets.symmetric(
+    vertical: 48,
+  );
 }
 
 class _TagManagementLoadingCard extends StatelessWidget {
@@ -139,11 +141,7 @@ class _TagManagementEmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            LucideIcons.tags,
-            size: 32,
-            color: cs.onSurfaceVariant,
-          ),
+          Icon(LucideIcons.tags, size: 32, color: cs.onSurfaceVariant),
           const SizedBox(height: 12),
           Text(
             '暂无标签',
@@ -321,11 +319,7 @@ class _MetaChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: _TagStyles.metaChipIconSize,
-            color: iconColor,
-          ),
+          Icon(icon, size: _TagStyles.metaChipIconSize, color: iconColor),
           const SizedBox(width: 6),
           Text(
             label,
@@ -476,9 +470,7 @@ class _TagRow extends ConsumerWidget {
                     ref.read(tagSelectionProvider.notifier).toggle(tag),
                 style: iconButtonStyle,
                 icon: Icon(
-                  isSelected
-                      ? LucideIcons.squareCheckBig
-                      : LucideIcons.square,
+                  isSelected ? LucideIcons.squareCheckBig : LucideIcons.square,
                   size: 16,
                   color: isSelected ? cs.primary : cs.textTertiary,
                 ),
@@ -507,7 +499,9 @@ class _TagRow extends ConsumerWidget {
                       initialValue: tag.name,
                       shouldCloseOnUnchanged: true,
                       onSubmit: (value) async {
-                        await ref.read(tagActionsProvider).renameTag(tag, value);
+                        await ref
+                            .read(tagActionsProvider)
+                            .renameTag(tag, value);
                       },
                     ),
                   );
@@ -537,10 +531,7 @@ class _TagRowInteractionShell extends StatelessWidget {
         highlightColor: Colors.transparent,
         hoverColor: cs.primary.withAlpha(10),
       ),
-      child: Material(
-        color: cs.surface,
-        child: child,
-      ),
+      child: Material(color: cs.surface, child: child),
     );
   }
 }

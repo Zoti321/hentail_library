@@ -186,8 +186,19 @@ class _SidebarButtonState extends State<_SidebarButton> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 width: widget.isActive ? 1 : 0.8,
-                color: widget.isActive ? cs.borderMedium : idleBackground,
+                color: widget.isActive
+                    ? cs.sidebarItemActiveBorder
+                    : idleBackground,
               ),
+              boxShadow: widget.isActive
+                  ? <BoxShadow>[
+                      BoxShadow(
+                        color: cs.sidebarItemActiveShadowColor,
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : null,
             ),
             child: Stack(
               clipBehavior: Clip.none,

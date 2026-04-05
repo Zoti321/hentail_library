@@ -341,8 +341,9 @@ class _EmptyLibrarySliver extends StatelessWidget {
     final theme = Theme.of(context);
     final q = query.trim();
     final isSearching = q.isNotEmpty;
-    final title =
-        isSearching ? AppStrings.libraryNoMatchTitle : AppStrings.libraryEmptyTitle;
+    final title = isSearching
+        ? AppStrings.libraryNoMatchTitle
+        : AppStrings.libraryEmptyTitle;
     final hint = isSearching
         ? AppStrings.libraryNoMatchHint(q)
         : AppStrings.libraryEmptyHint;
