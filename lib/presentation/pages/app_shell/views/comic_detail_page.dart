@@ -15,6 +15,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 const double _kDetailLayoutMaxWidth = 1200;
+const double _kDetailTitleLetterSpacing = 0.4;
 const double _kDetailNarrowBreakpoint = 720;
 const double _kLeftColumnMaxWidth = 300;
 const int _kTagsCollapsedMaxCount = 8;
@@ -150,18 +151,22 @@ class _DetailHeader extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
-                child: Tooltip(
-                  message: comic.title,
-                  child: SelectableText(
-                    comic.title,
-                    maxLines: 3,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: tokens.text.titleLg,
-                      fontWeight: FontWeight.w700,
-                      height: 1.25,
-                      letterSpacing: -0.4,
-                      color: cs.textPrimary,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Tooltip(
+                    message: comic.title,
+
+                    child: SelectableText(
+                      comic.title,
+                      maxLines: 1,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: tokens.text.titleLg,
+                        fontWeight: FontWeight.w700,
+                        height: 1.25,
+                        letterSpacing: _kDetailTitleLetterSpacing,
+                        color: cs.textPrimary,
+                      ),
                     ),
                   ),
                 ),

@@ -13,6 +13,26 @@ abstract class Series with _$Series {
 
   Series._();
 
+  /// Item used for series cover: largest [SeriesItem.order]; ties break by
+  /// lexicographically smaller [SeriesItem.comicId].
+  SeriesItem? get coverItem {
+    final List<SeriesItem> list = items;
+    if (list.isEmpty) {
+      return null;
+    }
+    SeriesItem best = list.first;
+    for (int i = 1; i < list.length; i++) {
+      final SeriesItem item = list[i];
+      if (item.order > best.order) {
+        best = item;
+      } else if (item.order == best.order &&
+          item.comicId.compareTo(best.comicId) < 0) {
+        best = item;
+      }
+    }
+    return best;
+  }
+
   bool containsComic(String comicId) => items.any((e) => e.comicId == comicId);
 
   /// 将漫画加入系列（若已存在则更新其顺序）。
