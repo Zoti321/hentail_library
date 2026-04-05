@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
@@ -22,17 +24,30 @@ class AddComicsToSeriesDialog extends ConsumerStatefulWidget {
 class _AddComicsToSeriesDialogState
     extends ConsumerState<AddComicsToSeriesDialog> {
   late final ScrollController _listScrollController;
+  late final TextEditingController _searchController;
+
+  /// Cached in [initState] so [dispose] can reset the notifier without using [ref]
+  /// after unmount (Riverpod forbids [Ref] in/after [State.dispose]).
+  late final SeriesAddComicsDialogNotifier _addComicsNotifier;
 
   @override
   void initState() {
     super.initState();
+    _addComicsNotifier = ref.read(seriesAddComicsDialogProvider.notifier);
     _listScrollController = ScrollController();
+    _searchController = TextEditingController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _addComicsNotifier.reset();
+    });
   }
 
   @override
   void dispose() {
+    _searchController.dispose();
     _listScrollController.dispose();
     super.dispose();
+    scheduleMicrotask(_addComicsNotifier.reset);
   }
 
   Future<void> _handleSubmit() async {
@@ -75,7 +90,11 @@ class _AddComicsToSeriesDialogState
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          CustomTextField(hintText: '搜索漫画', onChanged: notifier.setQuery),
+          CustomTextField(
+            hintText: '搜索漫画',
+            controller: _searchController,
+            onChanged: notifier.setQuery,
+          ),
           const SizedBox(height: 12),
           SizedBox(
             height: listHeight,

@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/l10n/app_strings.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/button/filter_popup_button.dart';
 import 'package:hentai_library/presentation/widgets/button/sort_popup_button.dart';
 import 'package:hentai_library/presentation/widgets/card_item/comic_card.dart';
 import 'package:hentai_library/presentation/widgets/card_item/comic_tile.dart';
+import 'package:hentai_library/presentation/widgets/card_item/series_card.dart';
+import 'package:hentai_library/presentation/widgets/card_item/series_tile.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
@@ -75,6 +78,13 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       loading: () => 0,
       skipLoadingOnReload: true,
     );
+
+    final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
+    final List<Series> seriesToShow = seriesAsync.maybeWhen(
+      data: (List<Series> list) => _filterSeriesForLibrary(list, filterQuery),
+      orElse: () => <Series>[],
+    );
+    final bool hasSeriesSection = seriesToShow.isNotEmpty;
 
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -174,12 +184,102 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             ),
           ),
         ),
+        ..._buildSeriesSectionSlivers(
+          context: context,
+          isGridView: isGridView,
+          series: seriesToShow,
+        ),
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 2),
-          sliver: isGridView ? _buildGridView(comics) : _buildListView(comics),
+          sliver: isGridView
+              ? _buildGridView(comics, hasSeriesSection: hasSeriesSection)
+              : _buildListView(comics, hasSeriesSection: hasSeriesSection),
         ),
       ],
     );
+  }
+
+  List<Series> _filterSeriesForLibrary(List<Series> all, String query) {
+    final String q = query.trim().toLowerCase();
+    final List<Series> out = <Series>[];
+    for (final Series s in all) {
+      if (s.items.isEmpty) {
+        continue;
+      }
+      if (q.isEmpty || s.name.toLowerCase().contains(q)) {
+        out.add(s);
+      }
+    }
+    return out;
+  }
+
+  List<Widget> _buildSeriesSectionSlivers({
+    required BuildContext context,
+    required bool isGridView,
+    required List<Series> series,
+  }) {
+    if (series.isEmpty) {
+      return <Widget>[];
+    }
+    final ThemeData theme = Theme.of(context);
+    return <Widget>[
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(48, 0, 48, 8),
+          child: Text(
+            '系列',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.textSecondary,
+            ),
+          ),
+        ),
+      ),
+      SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 48),
+        sliver: isGridView
+            ? SliverGrid.builder(
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 200,
+                  mainAxisExtent: 356,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                ),
+                itemCount: series.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final Series s = series[index];
+                  return Center(
+                    child: SeriesCard(
+                      key: Key('library-series-${s.name}'),
+                      series: s,
+                      size: const Size(double.infinity, double.infinity),
+                      onTap: () {
+                        appRouter.pushNamed('系列管理');
+                      },
+                    ),
+                  );
+                },
+              )
+            : SliverList.separated(
+                itemCount: series.length,
+                separatorBuilder: (BuildContext context, int index) =>
+                    const SizedBox(height: 8),
+                itemBuilder: (BuildContext context, int index) {
+                  final Series s = series[index];
+                  return SeriesTile(
+                    key: Key('library-series-${s.name}'),
+                    series: s,
+                    onTap: () {
+                      appRouter.pushNamed('系列管理');
+                    },
+                    onSecondaryTapDown: (_) {},
+                  );
+                },
+              ),
+      ),
+      const SliverToBoxAdapter(child: SizedBox(height: 16)),
+    ];
   }
 
   Widget _buildToolbar(BuildContext context, ThemeData theme, bool isGridView) {
@@ -239,11 +339,19 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   }
 
   // 构建网格视图
-  Widget _buildGridView(AsyncValue<List<Comic>> comics) {
+  Widget _buildGridView(
+    AsyncValue<List<Comic>> comics, {
+    required bool hasSeriesSection,
+  }) {
     return comics.when(
-      data: (comics) {
-        final q = _searchController.text.trim();
-        if (comics.isEmpty) return _EmptyLibrarySliver(query: q);
+      data: (List<Comic> comics) {
+        final String q = _searchController.text.trim();
+        if (comics.isEmpty) {
+          if (hasSeriesSection) {
+            return _NoMatchingComicsSliver(query: q);
+          }
+          return _EmptyLibrarySliver(query: q);
+        }
         return SliverGrid.builder(
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 200,
@@ -286,11 +394,19 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   }
 
   // 构建列表视图
-  Widget _buildListView(AsyncValue<List<Comic>> comics) {
+  Widget _buildListView(
+    AsyncValue<List<Comic>> comics, {
+    required bool hasSeriesSection,
+  }) {
     return comics.when(
-      data: (comics) {
-        final q = _searchController.text.trim();
-        if (comics.isEmpty) return _EmptyLibrarySliver(query: q);
+      data: (List<Comic> comics) {
+        final String q = _searchController.text.trim();
+        if (comics.isEmpty) {
+          if (hasSeriesSection) {
+            return _NoMatchingComicsSliver(query: q);
+          }
+          return _EmptyLibrarySliver(query: q);
+        }
         return SliverList.separated(
           itemCount: comics.length,
           separatorBuilder: (ctx, i) => const SizedBox(height: 8),
@@ -321,6 +437,36 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         child: const Center(child: CircularProgressIndicator()),
       ),
       skipLoadingOnReload: true,
+    );
+  }
+}
+
+class _NoMatchingComicsSliver extends StatelessWidget {
+  const _NoMatchingComicsSliver({this.query = ''});
+
+  final String query;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final String q = query.trim();
+    final bool hasQuery = q.isNotEmpty;
+    final String message =
+        hasQuery ? '无匹配漫画（可尝试调整搜索或筛选）' : '暂无漫画';
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 24, bottom: 48),
+        child: Center(
+          child: Text(
+            message,
+            style: TextStyle(
+              fontSize: 13,
+              color: theme.colorScheme.textTertiary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
     );
   }
 }

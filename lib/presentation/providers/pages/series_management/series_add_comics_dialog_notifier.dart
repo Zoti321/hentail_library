@@ -52,6 +52,14 @@ class SeriesAddComicsDialogNotifier extends Notifier<SeriesAddComicsDialogState>
   @override
   SeriesAddComicsDialogState build() => const SeriesAddComicsDialogState();
 
+  /// Clears search [SeriesAddComicsDialogState.query], selection, and submitting;
+  /// recomputes [SeriesAddComicsDialogState.visibleComics] from [_allComics].
+  /// Call when opening or closing the add-comics dialog so global state does not leak.
+  void reset() {
+    state = const SeriesAddComicsDialogState();
+    _recomputeVisibleAndSelection();
+  }
+
   void updateSource({
     required List<Comic> comics,
     required Set<String> existingComicIds,
@@ -108,7 +116,12 @@ class SeriesAddComicsDialogNotifier extends Notifier<SeriesAddComicsDialogState>
         nextOrder += 1;
       }
       ref.invalidate(allSeriesProvider);
-      state = state.copyWith(submitting: false, selectedComicIdsInOrder: []);
+      state = state.copyWith(
+        submitting: false,
+        selectedComicIdsInOrder: const <String>[],
+        query: '',
+      );
+      _recomputeVisibleAndSelection();
       return selected.length;
     } catch (_) {
       state = state.copyWith(submitting: false);

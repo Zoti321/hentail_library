@@ -5,16 +5,26 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// 与历史页工具栏一致的搜索框：聚焦高亮、左侧搜索图标、右侧清除。
 class CustomTextField extends HookWidget {
-  const CustomTextField({super.key, this.onChanged, this.hintText = ''});
+  const CustomTextField({
+    super.key,
+    this.onChanged,
+    this.hintText = '',
+    this.controller,
+  });
 
   final ValueChanged<String>? onChanged;
   final String hintText;
+
+  /// When set, this controller is used instead of an internal one (e.g. dialog reset).
+  final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final TextEditingController controller = useTextEditingController();
+    final TextEditingController internalController = useTextEditingController();
+    final TextEditingController effectiveController =
+        controller ?? internalController;
     final FocusNode focusNode = useFocusNode();
     final isFocused = useState(false);
 
@@ -60,7 +70,7 @@ class CustomTextField extends HookWidget {
           ),
           Expanded(
             child: TextField(
-              controller: controller,
+              controller: effectiveController,
               focusNode: focusNode,
               onChanged: onChanged,
               style: TextStyle(fontSize: 13, color: colorScheme.textPrimary),
@@ -81,7 +91,7 @@ class CustomTextField extends HookWidget {
             ),
           ),
           ValueListenableBuilder<TextEditingValue>(
-            valueListenable: controller,
+            valueListenable: effectiveController,
             builder: (context, value, child) {
               if (value.text.isEmpty) return const SizedBox(width: 12);
 
@@ -89,7 +99,7 @@ class CustomTextField extends HookWidget {
                 cursor: SystemMouseCursors.click,
                 child: GestureDetector(
                   onTap: () {
-                    controller.clear();
+                    effectiveController.clear();
                     onChanged?.call('');
                   },
                   behavior: HitTestBehavior.opaque,

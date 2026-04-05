@@ -7,6 +7,7 @@ import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/dialog/add_comics_to_series_dialog.dart';
 import 'package:hentai_library/presentation/widgets/dialog/add_series_dialog.dart';
 import 'package:hentai_library/presentation/widgets/dialog/rename_series_dialog.dart';
+import 'package:hentai_library/presentation/widgets/dialog/reorder_series_items_dialog.dart';
 import 'package:hentai_library/presentation/widgets/dialog/series_confirm_delete_dialog.dart';
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -238,6 +239,29 @@ class _SeriesRow extends ConsumerWidget {
                   context: context,
                   barrierColor: Colors.transparent,
                   builder: (context) => AddComicsToSeriesDialog(series: series),
+                );
+              },
+            ),
+            IconButton(
+              tooltip: '调整顺序',
+              style: iconButtonStyle,
+              icon: const Icon(LucideIcons.arrowUpDown, size: 16),
+              onPressed: () {
+                if (series.items.length < 2) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('至少需要 2 本漫画才能调整顺序'),
+                      behavior: SnackBarBehavior.floating,
+                      margin: snackBarMargin(context),
+                    ),
+                  );
+                  return;
+                }
+                showDialog<void>(
+                  context: context,
+                  barrierColor: Colors.transparent,
+                  builder: (BuildContext context) =>
+                      ReorderSeriesItemsDialog(series: series),
                 );
               },
             ),

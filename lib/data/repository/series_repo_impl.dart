@@ -92,4 +92,20 @@ class SeriesRepositoryImpl implements SeriesRepository {
   Future<void> removeComicsFromSeries(Iterable<String> comicIds) async {
     await _dao.removeComicsFromSeries(comicIds);
   }
+
+  @override
+  Future<void> setSeriesItemsOrder(
+    String seriesName,
+    List<entity.SeriesItem> orderedItems,
+  ) async {
+    await _dao.transaction(() async {
+      for (int i = 0; i < orderedItems.length; i++) {
+        await _dao.updateSeriesItemSortOrder(
+          seriesName: seriesName,
+          comicId: orderedItems[i].comicId,
+          sortOrder: i,
+        );
+      }
+    });
+  }
 }

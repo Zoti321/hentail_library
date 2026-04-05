@@ -168,6 +168,20 @@ class LibrarySeriesDao extends DatabaseAccessor<AppDatabase>
           ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
         .get();
   }
+
+  /// 仅更新同系列内条目的 [LibrarySeriesItems.sortOrder]（不移动系列归属）。
+  Future<int> updateSeriesItemSortOrder({
+    required String seriesName,
+    required String comicId,
+    required int sortOrder,
+  }) {
+    return (update(librarySeriesItems)
+          ..where(
+            (LibrarySeriesItems t) =>
+                t.seriesName.equals(seriesName) & t.comicId.equals(comicId),
+          ))
+        .write(LibrarySeriesItemsCompanion(sortOrder: Value(sortOrder)));
+  }
 }
 
 @DriftAccessor(tables: [LibraryTags, LibraryComicTags])
