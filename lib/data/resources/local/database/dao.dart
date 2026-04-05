@@ -117,6 +117,7 @@ class LibrarySeriesDao extends DatabaseAccessor<AppDatabase>
     ).insert(companion, mode: InsertMode.insertOrIgnore);
   }
 
+  /// 依赖 [LibrarySeriesItems] 外键 `ON UPDATE CASCADE`，子表 `series_name` 随父表改名。
   Future<int> renameSeries({required String name, required String newName}) {
     return (update(librarySeries)..where((t) => t.name.equals(name))).write(
       LibrarySeriesCompanion(name: Value(newName)),
@@ -175,11 +176,10 @@ class LibrarySeriesDao extends DatabaseAccessor<AppDatabase>
     required String comicId,
     required int sortOrder,
   }) {
-    return (update(librarySeriesItems)
-          ..where(
-            (LibrarySeriesItems t) =>
-                t.seriesName.equals(seriesName) & t.comicId.equals(comicId),
-          ))
+    return (update(librarySeriesItems)..where(
+          (LibrarySeriesItems t) =>
+              t.seriesName.equals(seriesName) & t.comicId.equals(comicId),
+        ))
         .write(LibrarySeriesItemsCompanion(sortOrder: Value(sortOrder)));
   }
 }

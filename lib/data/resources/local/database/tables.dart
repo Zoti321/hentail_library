@@ -99,6 +99,6 @@ class LibrarySeriesItems extends Table {
   @override
   List<String> get customConstraints => [
     'UNIQUE(comic_id)',
-    'FOREIGN KEY(series_name) REFERENCES library_series(name) ON DELETE CASCADE',
+    'FOREIGN KEY(series_name) REFERENCES library_series(name) ON DELETE CASCADE ON UPDATE CASCADE',
   ];
 }
