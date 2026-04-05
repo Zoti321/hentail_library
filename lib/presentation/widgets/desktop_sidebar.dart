@@ -17,6 +17,9 @@ class NavItemData {
 }
 
 class DesktopSidebar extends StatelessWidget {
+  /// Matches [Container] width; keep in sync with title bar content offset.
+  static const double kWidth = 256;
+
   final String activeId;
   final ValueChanged<String> onDestinationSelected;
 
@@ -52,7 +55,7 @@ class DesktopSidebar extends StatelessWidget {
     ];
 
     return Container(
-      width: 256,
+      width: kWidth,
       height: double.infinity,
       decoration: BoxDecoration(
         color: cs.sidebarBackground,
@@ -105,7 +108,6 @@ class DesktopSidebar extends StatelessWidget {
           ),
           const SizedBox(height: 32),
           // 2. menu section
-          _buildSectionHeader(context, '菜单'),
           ...menuItems.map(
             (item) => _SidebarButton(
               item: item,
@@ -115,7 +117,6 @@ class DesktopSidebar extends StatelessWidget {
           ),
           const Spacer(),
           // 3. System Section
-          _buildSectionHeader(context, '系统'),
           ...systemItems.map(
             (item) => _SidebarButton(
               item: item,
@@ -124,22 +125,6 @@ class DesktopSidebar extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(BuildContext context, String title) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: theme.colorScheme.textSecondary,
-          letterSpacing: 0.8,
-        ),
       ),
     );
   }
@@ -174,7 +159,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
     // 勿用 Colors.transparent：与实色做 Color.lerp 会先经过发灰的半透明中间态。
     final Color idleBackground = cs.sidebarBackground;
     final Color backgroundColor = widget.isActive
-        ? cs.surfaceContainerHighest
+        ? cs.sidebarItemActiveBackground
         : (_isHovered ? cs.sidebarItemHoverBackground : idleBackground);
 
     final Color textColor = widget.isActive
@@ -182,7 +167,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
         : (_isHovered ? cs.textPrimary : cs.textSecondary);
 
     final Color iconColor = widget.isActive
-        ? cs.primary
+        ? cs.textPrimary
         : (_isHovered ? cs.textPrimary : cs.textSecondary);
 
     return Container(
@@ -200,8 +185,8 @@ class _SidebarButtonState extends State<_SidebarButton> {
               color: backgroundColor,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                width: 0.8,
-                color: widget.isActive ? cs.borderSubtle : idleBackground,
+                width: widget.isActive ? 1 : 0.8,
+                color: widget.isActive ? cs.borderMedium : idleBackground,
               ),
             ),
             child: Stack(
@@ -218,11 +203,11 @@ class _SidebarButtonState extends State<_SidebarButton> {
                         duration: _kItemAnimDuration,
                         curve: _kItemAnimCurve,
                         data: theme.copyWith(
-                          iconTheme: IconThemeData(color: iconColor, size: 20),
+                          iconTheme: IconThemeData(color: iconColor, size: 18),
                         ),
                         child: Icon(widget.item.icon),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
                       AnimatedDefaultTextStyle(
                         duration: _kItemAnimDuration,
                         curve: _kItemAnimCurve,
@@ -255,7 +240,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
                       child: Container(
                         width: 4,
                         decoration: BoxDecoration(
-                          color: cs.primary,
+                          color: cs.sidebarItemActiveIndicator,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),

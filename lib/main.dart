@@ -25,7 +25,7 @@ void main() async {
 
     await Window.initialize();
     await Window.setEffect(
-      effect: WindowEffect.acrylic,
+      effect: WindowEffect.solid,
       color: Colors.white,
       dark: false,
     );

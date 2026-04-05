@@ -170,6 +170,9 @@ ThemeData buildAppTheme(Brightness brightness) {
   return ThemeData(
     useMaterial3: true,
     colorScheme: colorScheme,
+    scaffoldBackgroundColor: colorScheme.surface,
+    canvasColor: colorScheme.surface,
+    dividerColor: colorScheme.outlineVariant,
     splashFactory: NoSplash.splashFactory,
     highlightColor: Colors.transparent,
     visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -234,23 +237,23 @@ ColorScheme appFluentLightScheme = ColorScheme(
   onError: Colors.white,
   surface: Colors.white,
   onSurface: const Color(0xFF111827),
-  surfaceContainer: const Color(0xFFF3F3F3),
-  outline: const Color(0xFFE5E7EB),
-  outlineVariant: const Color(0xFFD1D5DB),
-  surfaceContainerHighest: const Color(0xFFF9FAFB),
+  surfaceContainer: const Color(0xFFF7F7F8),
+  outline: const Color(0xFFEDEFF2),
+  outlineVariant: const Color(0xFFD8DCE0),
+  surfaceContainerHighest: const Color(0xFFFCFCFD),
   onSurfaceVariant: const Color(0xFF6B7280),
-  primaryContainer: const Color(0xFFE5E7EB).withAlpha(30),
+  primaryContainer: const Color(0xFFECEEF2).withAlpha(40),
   onPrimaryContainer: const Color(0xFF005FB8),
-  secondaryContainer: const Color(0xFFE5E7EB),
+  secondaryContainer: const Color(0xFFF0F2F5),
   onSecondaryContainer: const Color(0xFF374151),
   tertiary: const Color(0xFF6B7280),
   onTertiary: Colors.white,
-  tertiaryContainer: const Color(0xFFE5E7EB),
+  tertiaryContainer: const Color(0xFFF0F2F5),
   onTertiaryContainer: const Color(0xFF4B5563),
   inverseSurface: const Color(0xFF2563EB),
   inversePrimary: const Color(0xFFEF4444),
-  surfaceTint: const Color(0xFF1e1e1e),
-  shadow: Colors.black.withAlpha(4),
+  surfaceTint: const Color(0xFF005FB8),
+  shadow: Colors.black.withAlpha(6),
 );
 
 ColorScheme appFluentDarkScheme = ColorScheme(
@@ -287,7 +290,7 @@ ColorScheme appFluentColorScheme(Brightness brightness) =>
 
 extension AppColorSchemeExtension on ColorScheme {
   Color get hoverBackground =>
-      brightness == Brightness.dark ? const Color(0xFF363636) : const Color(0xFFF9FAFB);
+      brightness == Brightness.dark ? const Color(0xFF363636) : const Color(0xFFFCFCFD);
 
   Color get textPrimary =>
       brightness == Brightness.dark ? const Color(0xFFE5E5E5) : const Color(0xFF111827);
@@ -298,7 +301,7 @@ extension AppColorSchemeExtension on ColorScheme {
   Color get textPlaceholder =>
       brightness == Brightness.dark ? const Color(0xFF707070) : const Color(0xFF9CA3AF);
   Color get textDisabled =>
-      brightness == Brightness.dark ? const Color(0xFF525252) : const Color(0xFFD1D5DB);
+      brightness == Brightness.dark ? const Color(0xFF525252) : const Color(0xFFD8DCE0);
 
   Color get primaryHover =>
       brightness == Brightness.dark ? const Color(0xFF8FC4FF) : const Color(0xFF004585);
@@ -311,13 +314,13 @@ extension AppColorSchemeExtension on ColorScheme {
       ? const Color(0xFF2D2D2D).withAlpha(245)
       : Colors.white.withAlpha(245);
   Color get cardShadow =>
-      brightness == Brightness.dark ? Colors.black.withAlpha(60) : Colors.black.withAlpha(4);
+      brightness == Brightness.dark ? Colors.black.withAlpha(60) : Colors.black.withAlpha(6);
   Color get cardShadowHover =>
-      brightness == Brightness.dark ? Colors.black.withAlpha(90) : Colors.black.withAlpha(26);
+      brightness == Brightness.dark ? Colors.black.withAlpha(90) : Colors.black.withAlpha(32);
   Color get imagePlaceholder =>
-      brightness == Brightness.dark ? const Color(0xFF3A3A3A) : const Color(0xFFE5E7EB);
+      brightness == Brightness.dark ? const Color(0xFF3A3A3A) : const Color(0xFFECEEF1);
   Color get imageFallback =>
-      brightness == Brightness.dark ? const Color(0xFF4A4A4A) : const Color(0xFFD1D5DB);
+      brightness == Brightness.dark ? const Color(0xFF4A4A4A) : const Color(0xFFDDE1E6);
   Color get overlayScrim =>
       brightness == Brightness.dark ? Colors.black.withAlpha(110) : Colors.black.withAlpha(50);
 
@@ -329,48 +332,58 @@ extension AppColorSchemeExtension on ColorScheme {
       brightness == Brightness.dark ? const Color(0xFF6EB3FF) : const Color(0xFF005FB8);
 
   Color get borderSubtle =>
-      brightness == Brightness.dark ? const Color(0xFF404040) : const Color(0xFFE5E7EB);
+      brightness == Brightness.dark ? const Color(0xFF404040) : const Color(0xFFEDEFF2);
   Color get borderMedium =>
-      brightness == Brightness.dark ? const Color(0xFF525252) : const Color(0xFFD1D5DB);
+      brightness == Brightness.dark ? const Color(0xFF525252) : const Color(0xFFD8DCE0);
   Color get borderStrong =>
-      brightness == Brightness.dark ? const Color(0xFF707070) : const Color(0xFF9CA3AF);
+      brightness == Brightness.dark ? const Color(0xFF707070) : const Color(0xFFA8ADB4);
 
   Color get success => const Color(0xFF4CAF50);
   Color get warning => const Color(0xFFEF4444);
   Color get info => const Color(0xFF2563EB);
 
   Color get inputBorder =>
-      brightness == Brightness.dark ? const Color(0xFF404040) : const Color(0xFFE5E7EB);
+      brightness == Brightness.dark ? const Color(0xFF404040) : const Color(0xFFEDEFF2);
   Color get inputBorderActive =>
       brightness == Brightness.dark ? const Color(0xFF6EB3FF) : const Color(0xFF005FB8);
   Color get inputBackground =>
       brightness == Brightness.dark ? const Color(0xFF2D2D2D) : Colors.white;
   Color get inputBackgroundDisabled =>
-      brightness == Brightness.dark ? const Color(0xFF252525) : const Color(0xFFF3F4F6);
+      brightness == Brightness.dark ? const Color(0xFF252525) : const Color(0xFFF6F7F8);
   Color get subtleTagBackground =>
-      brightness == Brightness.dark ? const Color(0xFF252525) : const Color(0xFFF3F4F6);
+      brightness == Brightness.dark ? const Color(0xFF252525) : const Color(0xFFF6F7F8);
 }
 
 extension WinTheme on ColorScheme {
   Color get winBackground =>
-      brightness == Brightness.dark ? const Color(0xFF1A1A1A) : const Color(0xFFEAEAEA);
+      brightness == Brightness.dark ? const Color(0xFF1A1A1A) : const Color(0xFFF5F5F6);
   Color get winForeground =>
       brightness == Brightness.dark ? const Color(0xFFE5E5E5) : const Color(0xFF1A1A1A);
   Color get winBorder =>
-      brightness == Brightness.dark ? const Color(0xFF404040) : const Color(0xFFCCCCCC);
+      brightness == Brightness.dark ? const Color(0xFF404040) : const Color(0xFFD6D9DD);
   Color get winShadow =>
-      brightness == Brightness.dark ? const Color(0xFF303030) : const Color(0xFFAAAAAA);
+      brightness == Brightness.dark ? const Color(0xFF303030) : const Color(0xFFB8BCC2);
   Color get winSurface => brightness == Brightness.dark
       ? const Color.fromRGBO(45, 45, 47, 1)
-      : const Color.fromRGBO(230, 230, 232, 1);
+      : const Color.fromRGBO(245, 245, 247, 1);
   Color get sidebarBackground =>
-      brightness == Brightness.dark ? const Color(0xFF202020) : const Color(0xFFF5F5F5);
+      brightness == Brightness.dark ? const Color(0xFF202020) : const Color(0xFFFAFAFA);
 
   /// 侧栏导航项悬停：与 [sidebarBackground] 对比足够明显，避免沿用全局 [hoverBackground] 在浅色下几乎无差。
   Color get sidebarItemHoverBackground =>
       brightness == Brightness.dark
           ? const Color(0xFF343434)
-          : const Color(0xFFE4E4E7);
+          : const Color(0xFFE8E8EC);
+
+  /// 侧栏导航项选中：中性灰底，与 [sidebarBackground]、[sidebarItemHoverBackground] 区分明显。
+  Color get sidebarItemActiveBackground => brightness == Brightness.dark
+      ? const Color(0xFF3E3E40)
+      : const Color(0xFFD6D8DD);
+
+  /// 侧栏选中项左侧指示条（非主色）。
+  Color get sidebarItemActiveIndicator => brightness == Brightness.dark
+      ? const Color(0xFF9CA3AF)
+      : const Color(0xFF52525B);
 }
 
 extension ReaderPageTheme on ColorScheme {

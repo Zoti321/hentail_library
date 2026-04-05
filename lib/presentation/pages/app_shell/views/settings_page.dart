@@ -84,7 +84,7 @@ class SettingsPage extends ConsumerWidget {
               ),
 
               _SettingsGroup(
-                title: '书库',
+                title: '漫画库',
                 children: [
                   _SettingsRow(
                     icon: Icon(
