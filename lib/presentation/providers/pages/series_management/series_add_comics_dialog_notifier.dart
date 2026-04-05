@@ -1,5 +1,3 @@
-import 'dart:math' show max;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
@@ -16,13 +14,12 @@ class SeriesAddComicsSubmitSummary {
 
   final int addedCount;
   final bool orderChanged;
-  /// 选中为空并提交时，从系列中批量移出的本数（清空系列内全部漫画）。
+
+  /// 本次提交从系列中移出的本数（含清空全部与部分取消勾选）。
   final int removedFromSeriesCount;
 
   bool get hasAnyChange =>
-      addedCount > 0 ||
-      orderChanged ||
-      removedFromSeriesCount > 0;
+      addedCount > 0 || orderChanged || removedFromSeriesCount > 0;
 }
 
 class SeriesAddComicsDialogState {
@@ -66,9 +63,11 @@ class SeriesAddComicsDialogState {
   }
 }
 
-class SeriesAddComicsDialogNotifier extends Notifier<SeriesAddComicsDialogState> {
+class SeriesAddComicsDialogNotifier
+    extends Notifier<SeriesAddComicsDialogState> {
   List<Comic> _allComics = const <Comic>[];
   Set<String> _existingComicIds = const <String>{};
+
   /// 系列内顺序（与 [SeriesItem.order] 一致），用于首次把已在系列的可见条目置为「选中」UI。
   List<String> _existingComicIdsInSeriesOrder = const <String>[];
   bool _needsSeedSelectedExisting = true;
@@ -103,8 +102,9 @@ class SeriesAddComicsDialogNotifier extends Notifier<SeriesAddComicsDialogState>
       _needsSeedSelectedExisting = true;
     }
     _allComics = comics;
-    _existingComicIdsInSeriesOrder =
-        List<String>.from(existingComicIdsInSeriesOrder);
+    _existingComicIdsInSeriesOrder = List<String>.from(
+      existingComicIdsInSeriesOrder,
+    );
     _existingComicIds = existingSet;
     _recomputeVisibleAndSelection();
   }
@@ -154,74 +154,66 @@ class SeriesAddComicsDialogNotifier extends Notifier<SeriesAddComicsDialogState>
           query: '',
         );
         _recomputeVisibleAndSelection();
-        return SeriesAddComicsSubmitSummary(
-          removedFromSeriesCount: e.length,
-        );
+        return SeriesAddComicsSubmitSummary(removedFromSeriesCount: e.length);
       } catch (_) {
         state = state.copyWith(submitting: false);
         rethrow;
       }
     }
-    final List<String> eEff = List<String>.from(e);
-    final List<String> s =
-        sel.where((String id) => eEff.contains(id)).toList();
-    final Set<String> sSet = s.toSet();
-    final List<String> rest =
-        eEff.where((String id) => !sSet.contains(id)).toList();
-    final List<String> newOrderIds = <String>[...s, ...rest];
+    final Set<String> selSet = sel.toSet();
+    final Set<String> eSet = e.toSet();
+    final List<String> toRemove = e
+        .where((String id) => !selSet.contains(id))
+        .toList();
     final List<String> toAdd = <String>[];
     final Set<String> seenAdd = <String>{};
     for (final String id in sel) {
-      if (!e.contains(id) && seenAdd.add(id)) {
+      if (!eSet.contains(id) && seenAdd.add(id)) {
         toAdd.add(id);
       }
     }
+    final Set<String> toAddSet = toAdd.toSet();
+    final List<String> eKept = e
+        .where((String id) => selSet.contains(id))
+        .toList();
+    final List<String> selKept = sel
+        .where((String id) => eSet.contains(id))
+        .toList();
+    final bool orderChanged = !listEquals(eKept, selKept);
     final int addedCount = toAdd.length;
-    final bool orderChanged =
-        eEff.isNotEmpty && !listEquals(newOrderIds, eEff);
-    final bool hasAnyChange = addedCount > 0 || orderChanged;
+    final int removedCount = toRemove.length;
+    final bool hasAnyChange =
+        removedCount > 0 || addedCount > 0 || orderChanged;
     if (!hasAnyChange) {
       return const SeriesAddComicsSubmitSummary();
     }
     state = state.copyWith(submitting: true);
     try {
       final repo = ref.read(librarySeriesRepoProvider);
-      final bool needSetOrder =
-          eEff.isNotEmpty && !listEquals(newOrderIds, eEff);
-      if (needSetOrder) {
-        final List<SeriesItem> orderedItems = newOrderIds
+      if (toRemove.isNotEmpty) {
+        await repo.removeComicsFromSeries(toRemove);
+      }
+      for (int i = 0; i < sel.length; i++) {
+        final String id = sel[i];
+        if (toAddSet.contains(id)) {
+          await repo.assignComicExclusive(
+            comicId: id,
+            targetSeriesName: seriesName,
+            order: i,
+          );
+        }
+      }
+      await repo.setSeriesItemsOrder(
+        seriesName,
+        sel
             .asMap()
             .entries
             .map(
-              (MapEntry<int, String> entry) => SeriesItem(
-                comicId: entry.value,
-                order: entry.key,
-              ),
+              (MapEntry<int, String> entry) =>
+                  SeriesItem(comicId: entry.value, order: entry.key),
             )
-            .toList();
-        await repo.setSeriesItemsOrder(seriesName, orderedItems);
-      }
-      final int nextOrderStart;
-      if (needSetOrder) {
-        nextOrderStart = newOrderIds.length;
-      } else if (eEff.isEmpty && toAdd.isNotEmpty) {
-        nextOrderStart = 0;
-      } else if (toAdd.isEmpty) {
-        nextOrderStart = 0;
-      } else {
-        nextOrderStart = sorted.isEmpty
-            ? 0
-            : sorted.map((SeriesItem it) => it.order).reduce(max) + 1;
-      }
-      var nextOrder = nextOrderStart;
-      for (final String comicId in toAdd) {
-        await repo.assignComicExclusive(
-          comicId: comicId,
-          targetSeriesName: seriesName,
-          order: nextOrder,
-        );
-        nextOrder += 1;
-      }
+            .toList(),
+      );
       ref.invalidate(allSeriesProvider);
       state = state.copyWith(
         submitting: false,
@@ -232,6 +224,7 @@ class SeriesAddComicsDialogNotifier extends Notifier<SeriesAddComicsDialogState>
       return SeriesAddComicsSubmitSummary(
         addedCount: addedCount,
         orderChanged: orderChanged,
+        removedFromSeriesCount: removedCount,
       );
     } catch (_) {
       state = state.copyWith(submitting: false);
@@ -274,8 +267,9 @@ class SeriesAddComicsDialogNotifier extends Notifier<SeriesAddComicsDialogState>
       }).toList(),
     );
     final Set<String> visibleIds = visible.map((Comic e) => e.comicId).toSet();
-    final Set<String> allComicIds =
-        _allComics.map((Comic e) => e.comicId).toSet();
+    final Set<String> allComicIds = _allComics
+        .map((Comic e) => e.comicId)
+        .toSet();
     final Set<String> selectable = visibleIds;
     List<String> keepSelected = state.selectedComicIdsInOrder
         .where((String id) => allComicIds.contains(id))

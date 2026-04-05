@@ -1,3 +1,5 @@
+import 'dart:ui' show clampDouble;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
@@ -22,6 +24,7 @@ class _ReorderSeriesItemsDialogState
     extends ConsumerState<ReorderSeriesItemsDialog> {
   late List<SeriesItem> _items;
   bool _saving = false;
+  final GlobalKey _dialogCardKey = GlobalKey();
 
   @override
   void initState() {
@@ -66,6 +69,7 @@ class _ReorderSeriesItemsDialogState
       480.0,
     );
     return FluentDialogShell(
+      cardSurfaceKey: _dialogCardKey,
       title: '调整「${widget.series.name}」内顺序',
       width: 520,
       content: Column(
@@ -85,6 +89,23 @@ class _ReorderSeriesItemsDialogState
               clipBehavior: Clip.antiAlias,
               child: ReorderableListView.builder(
                 buildDefaultDragHandles: false,
+                dragBoundaryProvider: (BuildContext context) {
+                  final BuildContext? cardContext =
+                      _dialogCardKey.currentContext;
+                  if (cardContext == null) {
+                    return null;
+                  }
+                  final RenderBox? box =
+                      cardContext.findRenderObject() as RenderBox?;
+                  if (box == null || !box.hasSize) {
+                    return null;
+                  }
+                  final Rect boundary = Rect.fromPoints(
+                    box.localToGlobal(Offset.zero),
+                    box.localToGlobal(Offset(box.size.width, box.size.height)),
+                  );
+                  return _GlobalRectDragBoundary(boundary);
+                },
                 itemCount: _items.length,
                 onReorder: (int oldIndex, int newIndex) {
                   setState(() {
@@ -125,10 +146,7 @@ class _ReorderSeriesItemsDialogState
                       ),
                       subtitle: Text(
                         '${index + 1} / ${_items.length}',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: cs.textTertiary,
-                        ),
+                        style: TextStyle(fontSize: 11, color: cs.textTertiary),
                       ),
                     ),
                   );
@@ -166,5 +184,41 @@ class _ReorderSeriesItemsDialogState
         ),
       ],
     );
+  }
+}
+
+/// Drag clamp to a fixed global [Rect] (here: dialog card), not route overlay.
+class _GlobalRectDragBoundary extends DragBoundaryDelegate<Rect> {
+  _GlobalRectDragBoundary(this._boundary);
+
+  final Rect _boundary;
+
+  @override
+  bool isWithinBoundary(Rect draggedObject) {
+    return _boundary.contains(draggedObject.topLeft) &&
+        _boundary.contains(draggedObject.bottomRight);
+  }
+
+  @override
+  Rect nearestPositionWithinBoundary(Rect draggedObject) {
+    if (_boundary.right - draggedObject.width < _boundary.left ||
+        _boundary.bottom - draggedObject.height < _boundary.top) {
+      throw FlutterError(
+        'The rect is larger than the boundary. '
+        'The rect width must be less than the boundary width, and the rect '
+        'height must be less than the boundary height.',
+      );
+    }
+    final double left = clampDouble(
+      draggedObject.left,
+      _boundary.left,
+      _boundary.right - draggedObject.width,
+    );
+    final double top = clampDouble(
+      draggedObject.top,
+      _boundary.top,
+      _boundary.bottom - draggedObject.height,
+    );
+    return Rect.fromLTWH(left, top, draggedObject.width, draggedObject.height);
   }
 }

@@ -8,12 +8,15 @@ class FluentDialogShell extends StatelessWidget {
     required this.content,
     required this.actions,
     this.width = 420,
+    this.cardSurfaceKey,
   });
 
   final String title;
   final Widget content;
   final List<Widget> actions;
   final double width;
+
+  final Key? cardSurfaceKey;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +35,7 @@ class FluentDialogShell extends StatelessWidget {
       elevation: 0,
       insetPadding: const EdgeInsets.all(24),
       child: ClipRRect(
+        key: cardSurfaceKey,
         borderRadius: BorderRadius.circular(8),
         child: Container(
           width: width,
@@ -104,4 +108,3 @@ class FluentDialogShell extends StatelessWidget {
     );
   }
 }
-
