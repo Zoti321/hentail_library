@@ -17,160 +17,156 @@ class SettingsPage extends ConsumerWidget {
     return settingsAsync.when(
       skipLoadingOnRefresh: true,
       skipLoadingOnReload: true,
-      data: (data) => ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 800),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 16),
-          child: Column(
-            crossAxisAlignment: .start,
-            spacing: 24,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(bottom: 12),
-                child: Text(
-                  '设置',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.textPrimary,
-                  ),
+      data: (data) => SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 16),
+        child: Column(
+          crossAxisAlignment: .start,
+          spacing: 24,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: Text(
+                '设置',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.textPrimary,
                 ),
               ),
-              _SettingsGroup(
-                title: '个性化',
-                children: [
-                  _SettingsRow(
-                    icon: Icon(
-                      LucideIcons.moon,
-                      size: 20,
-                      color: theme.colorScheme.iconDefault,
-                    ),
-                    label: '深色模式',
-                    description: data.isDarkMode ? '已启用' : '已禁用',
-                    action: MyToggleSwitch(
-                      checked: data.isDarkMode,
-                      onChange: () {
-                        ref.read(settingsProvider.notifier).toggleDarkMode();
-                      },
-                    ),
+            ),
+            _SettingsGroup(
+              title: '个性化',
+              children: [
+                _SettingsRow(
+                  icon: Icon(
+                    LucideIcons.moon,
+                    size: 20,
+                    color: theme.colorScheme.iconDefault,
                   ),
-                  _SettingsRow(
-                    icon: Icon(
-                      LucideIcons.palette,
-                      size: 20,
-                      color: theme.colorScheme.iconDefault,
-                    ),
-                    label: '应用主题',
-                    description: '跟随系统',
-                    action: Row(
-                      children: [
-                        Text(
-                          '浅色',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: theme.colorScheme.textTertiary,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          LucideIcons.chevronRight,
-                          size: 16,
-                          color: theme.colorScheme.iconSecondary,
-                        ),
-                      ],
-                    ),
+                  label: '深色模式',
+                  description: data.isDarkMode ? '已启用' : '已禁用',
+                  action: MyToggleSwitch(
+                    checked: data.isDarkMode,
+                    onChange: () {
+                      ref.read(settingsProvider.notifier).toggleDarkMode();
+                    },
                   ),
-                ],
-              ),
-
-              _SettingsGroup(
-                title: '漫画库',
-                children: [
-                  _SettingsRow(
-                    icon: Icon(
-                      LucideIcons.folderSearch,
-                      size: 20,
-                      color: theme.colorScheme.iconDefault,
-                    ),
-                    label: '库位置',
-                    description: '管理扫描路径',
-                    action: Icon(
-                      LucideIcons.chevronRight,
-                      size: 16,
-                      color: theme.colorScheme.iconSecondary,
-                    ),
+                ),
+                _SettingsRow(
+                  icon: Icon(
+                    LucideIcons.palette,
+                    size: 20,
+                    color: theme.colorScheme.iconDefault,
                   ),
-                  _SettingsRow(
-                    icon: Icon(
-                      LucideIcons.refreshCw,
-                      size: 20,
-                      color: theme.colorScheme.iconDefault,
-                    ),
-                    label: '自动扫描',
-                    description: '启动时扫描选中路径',
-                    action: const MyToggleSwitch(checked: true),
-                  ),
-                  _SettingsRow(
-                    icon: data.isHealthyMode
-                        ? Icon(
-                            LucideIcons.shield,
-                            size: 20,
-                            color: theme.colorScheme.iconDefault,
-                          )
-                        : Icon(
-                            LucideIcons.shieldOff,
-                            size: 20,
-                            color: theme.colorScheme.warning,
-                          ),
-                    label: '健全模式',
-                    description: data.isHealthyMode
-                        ? '已启用（隐藏 R18）'
-                        : '已禁用（显示 R18）',
-                    action: MyToggleSwitch(
-                      checked: data.isHealthyMode,
-                      onChange: () => ref
-                          .read(settingsProvider.notifier)
-                          .toggleHealthyMode(),
-                    ),
-                    isDestructive: !data.isHealthyMode,
-                  ),
-                ],
-              ),
-
-              _SettingsGroup(
-                title: '关于',
-                children: [
-                  _SettingsRow(
-                    icon: Icon(
-                      LucideIcons.info,
-                      size: 20,
-                      color: theme.colorScheme.iconDefault,
-                    ),
-                    label: '版本',
-                    description: 'v2.1.0 (动态主题)',
-                    action: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.inputBackgroundDisabled,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        '检查更新',
+                  label: '应用主题',
+                  description: '跟随系统',
+                  action: Row(
+                    children: [
+                      Text(
+                        '浅色',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 14,
                           color: theme.colorScheme.textTertiary,
-                          fontFamily: 'monospace',
                         ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        LucideIcons.chevronRight,
+                        size: 16,
+                        color: theme.colorScheme.iconSecondary,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            _SettingsGroup(
+              title: '漫画库',
+              children: [
+                _SettingsRow(
+                  icon: Icon(
+                    LucideIcons.folderSearch,
+                    size: 20,
+                    color: theme.colorScheme.iconDefault,
+                  ),
+                  label: '库位置',
+                  description: '管理扫描路径',
+                  action: Icon(
+                    LucideIcons.chevronRight,
+                    size: 16,
+                    color: theme.colorScheme.iconSecondary,
+                  ),
+                ),
+                _SettingsRow(
+                  icon: Icon(
+                    LucideIcons.refreshCw,
+                    size: 20,
+                    color: theme.colorScheme.iconDefault,
+                  ),
+                  label: '自动扫描',
+                  description: '启动时扫描选中路径',
+                  action: const MyToggleSwitch(checked: true),
+                ),
+                _SettingsRow(
+                  icon: data.isHealthyMode
+                      ? Icon(
+                          LucideIcons.shield,
+                          size: 20,
+                          color: theme.colorScheme.iconDefault,
+                        )
+                      : Icon(
+                          LucideIcons.shieldOff,
+                          size: 20,
+                          color: theme.colorScheme.warning,
+                        ),
+                  label: '健全模式',
+                  description: data.isHealthyMode
+                      ? '已启用（隐藏 R18）'
+                      : '已禁用（显示 R18）',
+                  action: MyToggleSwitch(
+                    checked: data.isHealthyMode,
+                    onChange: () =>
+                        ref.read(settingsProvider.notifier).toggleHealthyMode(),
+                  ),
+                  isDestructive: !data.isHealthyMode,
+                ),
+              ],
+            ),
+
+            _SettingsGroup(
+              title: '关于',
+              children: [
+                _SettingsRow(
+                  icon: Icon(
+                    LucideIcons.info,
+                    size: 20,
+                    color: theme.colorScheme.iconDefault,
+                  ),
+                  label: '版本',
+                  description: 'v2.1.0 (动态主题)',
+                  action: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.inputBackgroundDisabled,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '检查更新',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: theme.colorScheme.textTertiary,
+                        fontFamily: 'monospace',
                       ),
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
       loading: () => const Center(child: CircularProgressIndicator()),

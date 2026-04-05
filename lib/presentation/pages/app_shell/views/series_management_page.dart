@@ -20,7 +20,7 @@ class SeriesManagementPage extends ConsumerWidget {
     final query = ref.watch(seriesFilterProvider);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

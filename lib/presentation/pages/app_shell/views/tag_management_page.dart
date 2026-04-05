@@ -49,7 +49,10 @@ class TagManagementPage extends ConsumerWidget {
 class _TagStyles {
   const _TagStyles._();
 
-  static const EdgeInsets pagePadding = EdgeInsets.all(24);
+  static const EdgeInsets pagePadding = EdgeInsets.symmetric(
+    horizontal: 48,
+    vertical: 24,
+  );
 
   static const double titleFontSize = 26;
   static const double subtitleFontSize = 13;

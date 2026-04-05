@@ -51,7 +51,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final tokens = context.tokens;
 
     final comics = ref.watch(
       libraryPageProvider.select((s) => s.comicsAsyncValue),
@@ -82,12 +81,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       slivers: <Widget>[
         SliverToBoxAdapter(
           child: Container(
-            padding: EdgeInsets.fromLTRB(
-              tokens.spacing.lg + 8,
-              tokens.spacing.lg + 8,
-              tokens.spacing.lg + 8,
-              tokens.spacing.lg,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 48, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -181,7 +175,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           ),
         ),
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 2),
           sliver: isGridView ? _buildGridView(comics) : _buildListView(comics),
         ),
       ],
