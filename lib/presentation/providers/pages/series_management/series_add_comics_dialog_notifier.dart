@@ -78,6 +78,9 @@ class SeriesAddComicsDialogNotifier extends Notifier<SeriesAddComicsDialogState>
 
   void reset() {
     _needsSeedSelectedExisting = true;
+    _allComics = const <Comic>[];
+    _existingComicIds = const <String>{};
+    _existingComicIdsInSeriesOrder = const <String>[];
     state = const SeriesAddComicsDialogState();
     _recomputeVisibleAndSelection();
   }
@@ -96,6 +99,9 @@ class SeriesAddComicsDialogNotifier extends Notifier<SeriesAddComicsDialogState>
       existingComicIdsInSeriesOrder,
     );
     if (sameComics && sameExisting) return;
+    if (!sameExisting) {
+      _needsSeedSelectedExisting = true;
+    }
     _allComics = comics;
     _existingComicIdsInSeriesOrder =
         List<String>.from(existingComicIdsInSeriesOrder);
@@ -268,14 +274,16 @@ class SeriesAddComicsDialogNotifier extends Notifier<SeriesAddComicsDialogState>
       }).toList(),
     );
     final Set<String> visibleIds = visible.map((Comic e) => e.comicId).toSet();
+    final Set<String> allComicIds =
+        _allComics.map((Comic e) => e.comicId).toSet();
     final Set<String> selectable = visibleIds;
     List<String> keepSelected = state.selectedComicIdsInOrder
-        .where((String id) => visibleIds.contains(id))
+        .where((String id) => allComicIds.contains(id))
         .toList();
     if (_needsSeedSelectedExisting && visible.isNotEmpty) {
       _needsSeedSelectedExisting = false;
       keepSelected = _existingComicIdsInSeriesOrder
-          .where((String id) => visibleIds.contains(id))
+          .where((String id) => allComicIds.contains(id))
           .toList();
     }
     final SeriesAddComicsDialogState next = state.copyWith(

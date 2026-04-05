@@ -238,7 +238,10 @@ class _SeriesRow extends ConsumerWidget {
                 await showDialog<void>(
                   context: context,
                   barrierColor: Colors.transparent,
-                  builder: (context) => AddComicsToSeriesDialog(series: series),
+                  builder: (context) => AddComicsToSeriesDialog(
+                    key: ValueKey<String>(series.name),
+                    series: series,
+                  ),
                 );
               },
             ),

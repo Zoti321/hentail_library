@@ -27,8 +27,6 @@ class _AddComicsToSeriesDialogState
   late final ScrollController _listScrollController;
   late final TextEditingController _searchController;
 
-  /// Cached in [initState] so [dispose] can reset the notifier without using [ref]
-  /// after unmount (Riverpod forbids [Ref] in/after [State.dispose]).
   late final SeriesAddComicsDialogNotifier _addComicsNotifier;
 
   @override
@@ -38,8 +36,17 @@ class _AddComicsToSeriesDialogState
     _listScrollController = ScrollController();
     _searchController = TextEditingController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
+      final LibraryPageState libraryPage = ref.read(libraryPageProvider);
       _addComicsNotifier.reset();
+      _addComicsNotifier.updateSource(
+        comics: libraryPage.rawList,
+        existingComicIdsInSeriesOrder: _existingComicIdsInSeriesOrder(
+          widget.series,
+        ),
+      );
     });
   }
 
@@ -97,14 +104,21 @@ class _AddComicsToSeriesDialogState
     final cs = Theme.of(context).colorScheme;
     final libraryPage = ref.watch(libraryPageProvider);
     final notifier = ref.read(seriesAddComicsDialogProvider.notifier);
-    final List<String> existingInSeriesOrder =
-        _existingComicIdsInSeriesOrder(widget.series);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      notifier.updateSource(
-        comics: libraryPage.rawList,
-        existingComicIdsInSeriesOrder: existingInSeriesOrder,
-      );
+    ref.listen(libraryPageProvider, (
+      LibraryPageState? previous,
+      LibraryPageState next,
+    ) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        notifier.updateSource(
+          comics: next.rawList,
+          existingComicIdsInSeriesOrder: _existingComicIdsInSeriesOrder(
+            widget.series,
+          ),
+        );
+      });
     });
     final dialogState = ref.watch(seriesAddComicsDialogProvider);
     final listHeight = (MediaQuery.of(context).size.height * 0.45).clamp(
@@ -193,9 +207,7 @@ class _AddComicsToSeriesDialogState
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text(
-                  '确认 (${dialogState.selectedComicIdsInOrder.length})',
-                ),
+              : Text('确认 (${dialogState.selectedComicIdsInOrder.length})'),
         ),
       ],
     );
@@ -290,9 +302,7 @@ class _ComicSelectableTile extends StatelessWidget {
                 ),
               ),
               icon: Icon(
-                isSelected
-                    ? LucideIcons.squareCheckBig
-                    : LucideIcons.square,
+                isSelected ? LucideIcons.squareCheckBig : LucideIcons.square,
                 size: 16,
                 color: enabled
                     ? (isSelected ? cs.primary : cs.textTertiary)
