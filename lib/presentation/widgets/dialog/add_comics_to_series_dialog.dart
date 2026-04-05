@@ -6,6 +6,7 @@ import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
+import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/dialog/fluent_dialog_shell.dart';
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
@@ -50,16 +51,42 @@ class _AddComicsToSeriesDialogState
     scheduleMicrotask(_addComicsNotifier.reset);
   }
 
+  String _buildSuccessMessage(SeriesAddComicsSubmitSummary summary) {
+    final List<String> parts = <String>[];
+    if (summary.removedFromSeriesCount > 0) {
+      parts.add('已移出系列 ${summary.removedFromSeriesCount} 本');
+    }
+    if (summary.orderChanged) {
+      parts.add('已调整顺序');
+    }
+    if (summary.addedCount > 0) {
+      parts.add('添加 ${summary.addedCount} 本');
+    }
+    if (parts.isEmpty) {
+      return '已更新系列';
+    }
+    return parts.join('，');
+  }
+
   Future<void> _handleSubmit() async {
     final notifier = ref.read(seriesAddComicsDialogProvider.notifier);
     try {
-      final added = await notifier.submit(
+      final SeriesAddComicsSubmitSummary? summary = await notifier.submit(
         seriesName: widget.series.name,
-        existingOrders: widget.series.items.map((e) => e.order).toList(),
+        existingItems: widget.series.items,
       );
-      if (!mounted || added <= 0) return;
+      if (!mounted) {
+        return;
+      }
+      if (summary == null) {
+        return;
+      }
+      if (!summary.hasAnyChange) {
+        Navigator.of(context).pop();
+        return;
+      }
       Navigator.of(context).pop();
-      showSuccessSnackBar(context, '已添加 $added 本漫画');
+      showSuccessSnackBar(context, _buildSuccessMessage(summary));
     } catch (e) {
       if (mounted) showErrorSnackBar(context, e);
     }
@@ -70,12 +97,13 @@ class _AddComicsToSeriesDialogState
     final cs = Theme.of(context).colorScheme;
     final libraryPage = ref.watch(libraryPageProvider);
     final notifier = ref.read(seriesAddComicsDialogProvider.notifier);
-    final existingComicIds = widget.series.items.map((e) => e.comicId).toSet();
-    Future<void>(() {
+    final List<String> existingInSeriesOrder =
+        _existingComicIdsInSeriesOrder(widget.series);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       notifier.updateSource(
         comics: libraryPage.rawList,
-        existingComicIds: existingComicIds,
+        existingComicIdsInSeriesOrder: existingInSeriesOrder,
       );
     });
     final dialogState = ref.watch(seriesAddComicsDialogProvider);
@@ -85,11 +113,17 @@ class _AddComicsToSeriesDialogState
     );
 
     return FluentDialogShell(
-      title: '向「${widget.series.name}」添加漫画',
+      title: '管理「${widget.series.name}」中的漫画',
       width: 520,
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text(
+            '已在系列中的漫画打开对话框时与「已选中」相同；点击可取消选中。勾选顺序决定排序。'
+            '若全部取消选中后确认，将从系列中移出当前全部漫画。',
+            style: TextStyle(fontSize: 12, color: cs.textTertiary),
+          ),
+          const SizedBox(height: 10),
           CustomTextField(
             hintText: '搜索漫画',
             controller: _searchController,
@@ -159,11 +193,20 @@ class _AddComicsToSeriesDialogState
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text('确认添加 (${dialogState.selectedComicIdsInOrder.length})'),
+              : Text(
+                  '确认 (${dialogState.selectedComicIdsInOrder.length})',
+                ),
         ),
       ],
     );
   }
+}
+
+/// 与 [SeriesItem.order] 升序一致的 comicId 列表（与 notifier 中 seed 顺序一致）。
+List<String> _existingComicIdsInSeriesOrder(Series series) {
+  final List<SeriesItem> sorted = List<SeriesItem>.from(series.items)
+    ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
+  return sorted.map((SeriesItem e) => e.comicId).toList();
 }
 
 class _ComicSelectableTile extends StatelessWidget {
@@ -183,8 +226,7 @@ class _ComicSelectableTile extends StatelessWidget {
     final id = comic.comicId;
     final orderIndex = state.selectedComicIdsInOrder.indexOf(id);
     final isSelected = orderIndex >= 0;
-    final inSeries = state.existingComicIds.contains(id);
-    final enabled = !inSeries && !state.submitting;
+    final enabled = !state.submitting;
 
     return Theme(
       data: Theme.of(context).copyWith(
@@ -211,58 +253,54 @@ class _ComicSelectableTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: cs.textTertiary, fontSize: 12),
               ),
-        trailing: inSeries
-            ? Text(
-                '已在系列中',
-                style: TextStyle(color: cs.textTertiary, fontSize: 12),
-              )
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (isSelected)
-                    Container(
-                      width: 16,
-                      height: 16,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: cs.primary.withAlpha(20),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        '${orderIndex + 1}',
-                        style: TextStyle(
-                          color: cs.primary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  IconButton(
-                    tooltip: isSelected ? '取消选中' : '选中',
-                    onPressed: enabled ? onToggle : null,
-                    style: IconButton.styleFrom(
-                      minimumSize: const Size(28, 28),
-                      fixedSize: const Size(28, 28),
-                      padding: EdgeInsets.zero,
-                      splashFactory: NoSplash.splashFactory,
-                      overlayColor: cs.primary.withAlpha(14),
-                      highlightColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    icon: Icon(
-                      isSelected
-                          ? LucideIcons.squareCheckBig
-                          : LucideIcons.square,
-                      size: 16,
-                      color: enabled
-                          ? (isSelected ? cs.primary : cs.textTertiary)
-                          : cs.textDisabled,
-                    ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isSelected)
+              Container(
+                width: 16,
+                height: 16,
+                alignment: Alignment.center,
+                margin: const EdgeInsets.only(right: 4),
+                decoration: BoxDecoration(
+                  color: cs.primary.withAlpha(20),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  '${orderIndex + 1}',
+                  style: TextStyle(
+                    color: cs.primary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
                   ),
-                ],
+                ),
               ),
+            IconButton(
+              tooltip: isSelected ? '取消选中' : '选中',
+              onPressed: enabled ? onToggle : null,
+              style: IconButton.styleFrom(
+                minimumSize: const Size(28, 28),
+                fixedSize: const Size(28, 28),
+                padding: EdgeInsets.zero,
+                splashFactory: NoSplash.splashFactory,
+                overlayColor: cs.primary.withAlpha(14),
+                highlightColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              icon: Icon(
+                isSelected
+                    ? LucideIcons.squareCheckBig
+                    : LucideIcons.square,
+                size: 16,
+                color: enabled
+                    ? (isSelected ? cs.primary : cs.textTertiary)
+                    : cs.textDisabled,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
