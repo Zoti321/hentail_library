@@ -1,5 +1,7 @@
 import 'dart:ui';
+
 import 'package:extended_image/extended_image.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/theme.dart';
@@ -119,6 +121,9 @@ class _ReaderContent extends HookConsumerWidget {
         .asData
         ?.value;
 
+    final ObjectRef<DateTime?> lastWheelAt = useRef<DateTime?>(null);
+    const int wheelThrottleMs = 200;
+
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(
@@ -144,27 +149,54 @@ class _ReaderContent extends HookConsumerWidget {
                         );
                 },
               )
-            : PageView.builder(
-                controller: pageController,
-                physics: const BouncingScrollPhysics(),
-                onPageChanged: (index) => ref
-                    .read(readerViewProvider(comicId).notifier)
-                    .setIndex(index + 1),
-                itemCount: images?.length ?? 0,
-                itemBuilder: (context, index) {
-                  final file = images?[index];
-
-                  return file != null
-                      ? Image.file(file, fit: BoxFit.contain)
-                      : Container(
-                          padding: const .all(24),
-                          child: Icon(
-                            LucideIcons.bookImage,
-                            size: 24,
-                            color: Theme.of(context).colorScheme.readerTextMuted,
-                          ),
-                        );
+            : Listener(
+                onPointerSignal: (PointerSignalEvent event) {
+                  if (event is! PointerScrollEvent) {
+                    return;
+                  }
+                  final double dy = event.scrollDelta.dy;
+                  if (dy == 0) {
+                    return;
+                  }
+                  final DateTime now = DateTime.now();
+                  final DateTime? last = lastWheelAt.value;
+                  if (last != null &&
+                      now.difference(last).inMilliseconds < wheelThrottleMs) {
+                    return;
+                  }
+                  lastWheelAt.value = now;
+                  final ReaderViewNotifier notifier =
+                      ref.read(readerViewProvider(comicId).notifier);
+                  if (dy > 0) {
+                    notifier.nextPage();
+                  } else {
+                    notifier.prevPage();
+                  }
                 },
+                child: PageView.builder(
+                  controller: pageController,
+                  physics: const BouncingScrollPhysics(),
+                  onPageChanged: (int index) => ref
+                      .read(readerViewProvider(comicId).notifier)
+                      .setIndex(index + 1),
+                  itemCount: images?.length ?? 0,
+                  itemBuilder: (BuildContext context, int index) {
+                    final file = images?[index];
+
+                    return file != null
+                        ? Image.file(file, fit: BoxFit.contain)
+                        : Container(
+                            padding: const .all(24),
+                            child: Icon(
+                              LucideIcons.bookImage,
+                              size: 24,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .readerTextMuted,
+                            ),
+                          );
+                  },
+                ),
               ),
       ),
     );

@@ -70,8 +70,9 @@ final appRouter = GoRouter(
           path: '/series/:name',
           name: '系列详情',
           builder: (context, state) {
-            final String rawName = state.pathParameters['name']!;
-            final String seriesName = Uri.decodeComponent(rawName);
+            // go_router 已对路径段做百分号解码；再调用 Uri.decodeComponent
+            // 会在系列名含字面量「%」或非法转义时抛出 Illegal percent encoding。
+            final String seriesName = state.pathParameters['name']!;
             return SeriesDetailPage(seriesName: seriesName);
           },
         ),
