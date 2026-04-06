@@ -13,8 +13,6 @@ abstract class Series with _$Series {
 
   Series._();
 
-  /// Item used for series cover: largest [SeriesItem.order]; ties break by
-  /// lexicographically smaller [SeriesItem.comicId].
   SeriesItem? get coverItem {
     final List<SeriesItem> list = items;
     if (list.isEmpty) {

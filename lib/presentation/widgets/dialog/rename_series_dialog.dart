@@ -32,17 +32,17 @@ class _RenameSeriesDialogState extends ConsumerState<RenameSeriesDialog> {
   }
 
   Future<void> _handleSave() async {
-    final newName = _controller.text.trim();
+    final String newName = _controller.text.trim();
     if (newName.isEmpty || newName == widget.series.name) {
-      if (mounted) Navigator.of(context).pop();
+      if (mounted) Navigator.of(context).pop<String?>();
       return;
     }
     setState(() => _saving = true);
     try {
       await ref.read(seriesActionsProvider).rename(widget.series.name, newName);
       if (mounted) {
-        Navigator.of(context).pop();
         showSuccessSnackBar(context, '已重命名');
+        Navigator.of(context).pop<String>(newName);
       }
     } catch (e) {
       if (mounted) showErrorSnackBar(context, e);
@@ -67,7 +67,7 @@ class _RenameSeriesDialogState extends ConsumerState<RenameSeriesDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: _saving ? null : () => Navigator.of(context).pop(),
+          onPressed: _saving ? null : () => Navigator.of(context).pop<String?>(),
           style: TextButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),

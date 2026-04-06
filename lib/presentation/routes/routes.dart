@@ -7,6 +7,7 @@ import 'package:hentai_library/presentation/pages/app_shell/views/history_page.d
 import 'package:hentai_library/presentation/pages/app_shell/views/home_page.dart';
 import 'package:hentai_library/presentation/pages/app_shell/views/library_page.dart';
 import 'package:hentai_library/presentation/pages/app_shell/views/settings_page.dart';
+import 'package:hentai_library/presentation/pages/app_shell/views/series_detail_page.dart';
 import 'package:hentai_library/presentation/pages/app_shell/views/series_management_page.dart';
 import 'package:hentai_library/presentation/pages/app_shell/views/tag_management_page.dart';
 import 'package:hentai_library/presentation/pages/reader_page.dart';
@@ -64,6 +65,15 @@ final appRouter = GoRouter(
           path: '/series',
           name: '系列管理',
           builder: (context, state) => const SeriesManagementPage(),
+        ),
+        GoRoute(
+          path: '/series/:name',
+          name: '系列详情',
+          builder: (context, state) {
+            final String rawName = state.pathParameters['name']!;
+            final String seriesName = Uri.decodeComponent(rawName);
+            return SeriesDetailPage(seriesName: seriesName);
+          },
         ),
       ],
     ),

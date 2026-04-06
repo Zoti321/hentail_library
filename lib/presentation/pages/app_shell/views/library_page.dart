@@ -255,7 +255,10 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                       series: s,
                       size: const Size(double.infinity, double.infinity),
                       onTap: () {
-                        appRouter.pushNamed('系列管理');
+                        appRouter.pushNamed(
+                          '系列详情',
+                          pathParameters: <String, String>{'name': s.name},
+                        );
                       },
                     ),
                   );
@@ -271,7 +274,10 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     key: Key('library-series-${s.name}'),
                     series: s,
                     onTap: () {
-                      appRouter.pushNamed('系列管理');
+                      appRouter.pushNamed(
+                        '系列详情',
+                        pathParameters: <String, String>{'name': s.name},
+                      );
                     },
                     onSecondaryTapDown: (_) {},
                   );
