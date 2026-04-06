@@ -136,6 +136,30 @@ class _SeriesDetailBody extends ConsumerWidget {
             runSpacing: 8,
             children: <Widget>[
               FilledButton.icon(
+                onPressed: () {
+                  if (sortedItems.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('系列内暂无漫画'),
+                        behavior: SnackBarBehavior.floating,
+                        margin: snackBarMargin(context),
+                      ),
+                    );
+                    return;
+                  }
+                  appRouter.pushNamed(
+                    '阅读页面',
+                    pathParameters: <String, String>{
+                      'id': sortedItems.first.comicId,
+                    },
+                    queryParameters: <String, String>{'series': series.name},
+                  );
+                },
+                icon: const Icon(LucideIcons.bookOpen, size: 16),
+                label: const Text('阅读系列'),
+                style: toolbarButtonStyle,
+              ),
+              FilledButton.icon(
                 onPressed: () async {
                   await showDialog<void>(
                     context: context,

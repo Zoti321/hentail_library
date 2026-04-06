@@ -81,7 +81,12 @@ final appRouter = GoRouter(
           name: '阅读页面',
           builder: (context, state) {
             final comicId = Uri.decodeComponent(state.pathParameters['id']!);
-            return ReaderPage(comicId: comicId);
+            final String? seriesQuery = state.uri.queryParameters['series'];
+            final String? seriesName =
+                seriesQuery != null && seriesQuery.isNotEmpty
+                ? seriesQuery
+                : null;
+            return ReaderPage(comicId: comicId, seriesName: seriesName);
           },
         ),
       ],

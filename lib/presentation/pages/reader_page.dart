@@ -4,21 +4,71 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hentai_library/config/theme.dart';
+import 'package:hentai_library/domain/entity/comic/series.dart';
+import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart' as entity;
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+/// Resolved series context for reader navigation (prev/next + drawer).
+class SeriesReaderNavData {
+  const SeriesReaderNavData({
+    required this.seriesName,
+    required this.sortedItems,
+    required this.currentIndex,
+  });
+  final String seriesName;
+  final List<SeriesItem> sortedItems;
+  final int currentIndex;
+}
+
+SeriesReaderNavData? buildSeriesReaderNavData(Series? series, String comicId) {
+  if (series == null || !series.containsComic(comicId)) {
+    return null;
+  }
+  final List<SeriesItem> sorted = List<SeriesItem>.from(series.items)
+    ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
+  final int idx = sorted.indexWhere((SeriesItem e) => e.comicId == comicId);
+  if (idx < 0) {
+    return null;
+  }
+  return SeriesReaderNavData(
+    seriesName: series.name,
+    sortedItems: sorted,
+    currentIndex: idx,
+  );
+}
+
 class ReaderPage extends HookConsumerWidget {
   final String comicId;
+  final String? seriesName;
 
-  const ReaderPage({super.key, required this.comicId});
+  const ReaderPage({
+    super.key,
+    required this.comicId,
+    this.seriesName,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = buildAppTheme(Brightness.dark);
     final viewAsync = ref.watch(readerViewProvider(comicId));
+    final GlobalKey<ScaffoldState> scaffoldKey = useMemoized(
+      GlobalKey<ScaffoldState>.new,
+      <Object?>[],
+    );
+    final String? seriesQuery = seriesName;
+    final SeriesReaderNavData? seriesNav = seriesQuery != null &&
+            seriesQuery.isNotEmpty
+        ? ref.watch(seriesByNameForReaderProvider(seriesQuery)).when(
+              data: (Series? s) => buildSeriesReaderNavData(s, comicId),
+              loading: () => null,
+              error: (Object _, StackTrace _) => null,
+            )
+        : null;
 
     return Theme(
       data: theme,
@@ -30,7 +80,25 @@ class ReaderPage extends HookConsumerWidget {
           Navigator.of(context).pop();
         },
         child: Scaffold(
+          key: scaffoldKey,
           backgroundColor: theme.colorScheme.readerBackground,
+          endDrawer: seriesNav != null
+              ? _SeriesReaderDrawer(
+                  nav: seriesNav,
+                  comicId: comicId,
+                  onSelectComic: (String targetComicId) {
+                    _saveProgress(ref, comicId);
+                    Navigator.of(context).pop();
+                    context.goNamed(
+                      '阅读页面',
+                      pathParameters: <String, String>{'id': targetComicId},
+                      queryParameters: <String, String>{
+                        'series': seriesNav.seriesName,
+                      },
+                    );
+                  },
+                )
+              : null,
           body: viewAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, st) => Center(child: Text('$e')),
@@ -51,7 +119,11 @@ class ReaderPage extends HookConsumerWidget {
                       initialPage: initialPage,
                     ),
                   ),
-                  _TopBar(comicId: comicId),
+                  _TopBar(
+                    comicId: comicId,
+                    seriesNav: seriesNav,
+                    scaffoldKey: scaffoldKey,
+                  ),
                   _BottomBar(comicId: comicId),
                 ],
               );
@@ -138,7 +210,7 @@ class _ReaderContent extends HookConsumerWidget {
                   return file != null
                       ? Image.file(file, fit: BoxFit.contain)
                       : Container(
-                          padding: const .all(24),
+                          padding: const EdgeInsets.all(24),
                           child: Icon(
                             LucideIcons.bookImage,
                             size: 24,
@@ -184,7 +256,7 @@ class _ReaderContent extends HookConsumerWidget {
                     return file != null
                         ? Image.file(file, fit: BoxFit.contain)
                         : Container(
-                            padding: const .all(24),
+                            padding: const EdgeInsets.all(24),
                             child: Icon(
                               LucideIcons.bookImage,
                               size: 24,
@@ -202,9 +274,15 @@ class _ReaderContent extends HookConsumerWidget {
 }
 
 class _TopBar extends HookConsumerWidget {
-  const _TopBar({required this.comicId});
+  const _TopBar({
+    required this.comicId,
+    required this.seriesNav,
+    required this.scaffoldKey,
+  });
 
   final String comicId;
+  final SeriesReaderNavData? seriesNav;
+  final GlobalKey<ScaffoldState> scaffoldKey;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -214,6 +292,20 @@ class _TopBar extends HookConsumerWidget {
     final isVertival = state.isVertical;
 
     final topPadding = MediaQuery.of(context).padding.top + 24;
+    final SeriesReaderNavData? nav = seriesNav;
+
+    void goToSeriesComic(int delta) {
+      if (nav == null) return;
+      final int next = nav.currentIndex + delta;
+      if (next < 0 || next >= nav.sortedItems.length) return;
+      final String targetId = nav.sortedItems[next].comicId;
+      _saveProgress(ref, comicId);
+      context.goNamed(
+        '阅读页面',
+        pathParameters: <String, String>{'id': targetId},
+        queryParameters: <String, String>{'series': nav.seriesName},
+      );
+    }
 
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 300),
@@ -230,8 +322,10 @@ class _TopBar extends HookConsumerWidget {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
               child: Container(
-                constraints: const BoxConstraints(maxWidth: 500),
-                padding: const .all(6),
+                constraints: BoxConstraints(
+                  maxWidth: nav != null ? 720 : 500,
+                ),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: cs.readerPanelBackground,
                   borderRadius: BorderRadius.circular(100),
@@ -239,7 +333,7 @@ class _TopBar extends HookConsumerWidget {
                 ),
                 child: Row(
                   spacing: 12,
-                  mainAxisSize: .min,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
                       onPressed: () {
@@ -252,6 +346,21 @@ class _TopBar extends HookConsumerWidget {
                         color: cs.readerTextIconPrimary,
                       ),
                     ),
+                    if (nav != null) ...[
+                      IconButton(
+                        tooltip: '上一部',
+                        onPressed: nav.currentIndex > 0
+                            ? () => goToSeriesComic(-1)
+                            : null,
+                        icon: Icon(
+                          LucideIcons.chevronsLeft,
+                          size: 18,
+                          color: nav.currentIndex > 0
+                              ? cs.readerTextIconPrimary
+                              : cs.readerTextMuted,
+                        ),
+                      ),
+                    ],
                     Flexible(
                       child: Text(
                         state.comic.title,
@@ -265,9 +374,35 @@ class _TopBar extends HookConsumerWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    if (nav != null) ...[
+                      IconButton(
+                        tooltip: '下一部',
+                        onPressed: nav.currentIndex < nav.sortedItems.length - 1
+                            ? () => goToSeriesComic(1)
+                            : null,
+                        icon: Icon(
+                          LucideIcons.chevronsRight,
+                          size: 18,
+                          color: nav.currentIndex < nav.sortedItems.length - 1
+                              ? cs.readerTextIconPrimary
+                              : cs.readerTextMuted,
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: '系列列表',
+                        onPressed: () {
+                          scaffoldKey.currentState?.openEndDrawer();
+                        },
+                        icon: Icon(
+                          LucideIcons.list,
+                          size: 18,
+                          color: cs.readerTextIconPrimary,
+                        ),
+                      ),
+                    ],
                     // 阅读模式切换按钮组
                     Container(
-                      padding: const .all(4),
+                      padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         color: cs.readerPanelSubtle,
                         borderRadius: BorderRadius.circular(100),
@@ -275,7 +410,7 @@ class _TopBar extends HookConsumerWidget {
                       ),
                       child: Row(
                         spacing: 2,
-                        mainAxisSize: .min,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           _ReadModeToggleBtn(
                             icon: LucideIcons.bookOpen,
@@ -319,6 +454,108 @@ class _TopBar extends HookConsumerWidget {
   }
 }
 
+class _SeriesReaderDrawer extends ConsumerWidget {
+  const _SeriesReaderDrawer({
+    required this.nav,
+    required this.comicId,
+    required this.onSelectComic,
+  });
+
+  final SeriesReaderNavData nav;
+  final String comicId;
+  final void Function(String targetComicId) onSelectComic;
+
+  static String _titleForComic(WidgetRef ref, String id) {
+    final String? title =
+        ref.read(libraryPageProvider.notifier).comicById(id)?.title;
+    if (title != null && title.isNotEmpty) {
+      return title;
+    }
+    return id.length > 12 ? '${id.substring(0, 12)}…' : id;
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return Drawer(
+      backgroundColor: cs.readerBackground,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '系列：${nav.seriesName}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: cs.readerTextIconPrimary,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(
+                      LucideIcons.x,
+                      color: cs.readerTextIconPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 1, color: cs.readerPanelBorder),
+            Expanded(
+              child: ListView.builder(
+                itemCount: nav.sortedItems.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final SeriesItem item = nav.sortedItems[index];
+                  final bool isCurrent = item.comicId == comicId;
+                  final String title = _titleForComic(ref, item.comicId);
+                  return ListTile(
+                    selected: isCurrent,
+                    selectedTileColor: cs.readerPanelSubtle,
+                    title: Text(
+                      title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: cs.readerTextIconPrimary,
+                        fontWeight:
+                            isCurrent ? FontWeight.w600 : FontWeight.w400,
+                      ),
+                    ),
+                    leading: SizedBox(
+                      width: 32,
+                      child: Text(
+                        '${item.order}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: cs.readerTextSecondary,
+                        ),
+                      ),
+                    ),
+                    onTap: isCurrent
+                        ? null
+                        : () => onSelectComic(item.comicId),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _BottomBar extends HookConsumerWidget {
   const _BottomBar({required this.comicId});
 
@@ -350,7 +587,7 @@ class _BottomBar extends HookConsumerWidget {
               filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
               child: Container(
                 constraints: const BoxConstraints(maxWidth: 672),
-                padding: const .all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: cs.floatingUiBackground,
                   borderRadius: BorderRadius.circular(16),
@@ -358,7 +595,7 @@ class _BottomBar extends HookConsumerWidget {
                 ),
                 child: Column(
                   spacing: 12,
-                  mainAxisSize: .min,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     // 阅读进度 信息
                     Padding(
@@ -491,7 +728,7 @@ class _ReadModeToggleBtn extends HookConsumerWidget {
           ),
           child: Row(
             spacing: 6,
-            mainAxisSize: .min,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 icon,
