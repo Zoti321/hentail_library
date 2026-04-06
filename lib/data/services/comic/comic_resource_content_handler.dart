@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:hentai_library/core/util/comic_file_types.dart';
+import 'package:hentai_library/core/util/filename_natural_compare.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:path/path.dart' as p;
 
@@ -8,10 +9,10 @@ import 'package:path/path.dart' as p;
 abstract class ComicResourceContentHandler {
   ResourceType get type;
 
-  /// 封面：目录漫画优先 basename（不含扩展名）不区分大小写为 `cover` 的图片，否则为按名排序后的第一张。
+  /// 封面：目录漫画优先 basename（不含扩展名）不区分大小写为 `cover` 的图片，否则为按自然排序后的第一张。
   Future<File> getCover(String validatedPath);
 
-  /// 正文图片列表（语义依类型而定，如目录为非递归、按 basename 排序）。
+  /// 正文图片列表（语义依类型而定，如目录为非递归、按 basename 自然排序，数字段按数值比较）。
   Future<List<File>> getContent(String validatedPath);
 }
 
@@ -44,7 +45,12 @@ class DirComicResourceContentHandler implements ComicResourceContentHandler {
       return ComicFileTypes.comicImageExtensions.contains(ext);
     }).toList();
 
-    imageFiles.sort((a, b) => p.basename(a.path).compareTo(p.basename(b.path)));
+    imageFiles.sort(
+      (File a, File b) => compareFilenameNatural(
+        p.basename(a.path),
+        p.basename(b.path),
+      ),
+    );
     return imageFiles;
   }
 
