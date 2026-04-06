@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
@@ -68,10 +69,7 @@ class _SeriesDetailErrorBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            '加载失败：$error',
-            style: TextStyle(color: cs.error, fontSize: 14),
-          ),
+          Text('加载失败：$error', style: TextStyle(color: cs.error, fontSize: 14)),
           const SizedBox(height: 16),
           TextButton(
             onPressed: () => context.go('/local'),
@@ -116,168 +114,360 @@ class _SeriesDetailBody extends ConsumerWidget {
 
   final Series series;
 
+  static const double _narrowBreakpoint = 720;
+  static const double _kSeriesDetailMaxWidth = 1200;
+
+  /// 与 [ComicDetailPage] 左栏 `_kLeftColumnMaxWidth`、封面 `AspectRatio(2/3)` 一致。
+  static const double _kSeriesCoverMaxWidth = 300;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
       ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
-    final ButtonStyle toolbarButtonStyle = FilledButton.styleFrom(
+    final ButtonStyle primarySeriesToolbarStyle = FilledButton.styleFrom(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          _SeriesDetailHeader(series: series),
-          const SizedBox(height: 20),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: <Widget>[
-              FilledButton.icon(
-                onPressed: () {
-                  if (sortedItems.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('系列内暂无漫画'),
-                        behavior: SnackBarBehavior.floating,
-                        margin: snackBarMargin(context),
-                      ),
-                    );
-                    return;
-                  }
-                  appRouter.pushNamed(
-                    '阅读页面',
-                    pathParameters: <String, String>{
-                      'id': sortedItems.first.comicId,
-                    },
-                    queryParameters: <String, String>{'series': series.name},
-                  );
-                },
-                icon: const Icon(LucideIcons.bookOpen, size: 16),
-                label: const Text('阅读系列'),
-                style: toolbarButtonStyle,
-              ),
-              FilledButton.icon(
-                onPressed: () async {
-                  await showDialog<void>(
-                    context: context,
-                    barrierColor: Colors.transparent,
-                    builder: (BuildContext context) => AddComicsToSeriesDialog(
-                      key: ValueKey<String>(series.name),
-                      series: series,
-                    ),
-                  );
-                },
-                icon: const Icon(LucideIcons.plus, size: 16),
-                label: const Text('添加漫画'),
-                style: toolbarButtonStyle,
-              ),
-              FilledButton.icon(
-                onPressed: () {
-                  if (series.items.length < 2) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('至少需要 2 本漫画才能调整顺序'),
-                        behavior: SnackBarBehavior.floating,
-                        margin: snackBarMargin(context),
-                      ),
-                    );
-                    return;
-                  }
-                  showDialog<void>(
-                    context: context,
-                    barrierColor: Colors.transparent,
-                    builder: (BuildContext context) =>
-                        ReorderSeriesItemsDialog(series: series),
-                  );
-                },
-                icon: const Icon(LucideIcons.arrowUpDown, size: 16),
-                label: const Text('调整顺序'),
-                style: toolbarButtonStyle,
-              ),
-              FilledButton.icon(
-                onPressed: () async {
-                  final String? newName = await showDialog<String>(
-                    context: context,
-                    barrierColor: Colors.transparent,
-                    builder: (BuildContext context) =>
-                        RenameSeriesDialog(series: series),
-                  );
-                  if (newName != null && context.mounted) {
-                    context.goNamed(
-                      '系列详情',
-                      pathParameters: <String, String>{'name': newName},
-                    );
-                  }
-                },
-                icon: const Icon(LucideIcons.squarePen, size: 16),
-                label: const Text('重命名'),
-                style: toolbarButtonStyle,
-              ),
-            ],
+    final ButtonStyle secondarySeriesToolbarStyle = OutlinedButton.styleFrom(
+      foregroundColor: cs.onSurface,
+      side: BorderSide(color: cs.borderSubtle),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    );
+    final int count = series.items.length;
+    final Widget titleBlock = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text(
+          series.name,
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.4,
+            color: cs.textPrimary,
           ),
-          const SizedBox(height: 20),
-          Container(
-            decoration: BoxDecoration(
-              color: cs.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: cs.borderSubtle),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: cs.surfaceContainerHighest,
-                      border: Border(
-                        bottom: BorderSide(color: cs.borderSubtle),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          '包含 $count 本',
+          style: TextStyle(color: cs.textTertiary, fontSize: 12),
+        ),
+      ],
+    );
+    final Widget actions = Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: <Widget>[
+        FilledButton.icon(
+          onPressed: () {
+            if (sortedItems.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('系列内暂无漫画'),
+                  behavior: SnackBarBehavior.floating,
+                  margin: snackBarMargin(context),
+                ),
+              );
+              return;
+            }
+            appRouter.pushNamed(
+              '阅读页面',
+              pathParameters: <String, String>{'id': sortedItems.first.comicId},
+              queryParameters: <String, String>{'series': series.name},
+            );
+          },
+          icon: const Icon(LucideIcons.bookOpen, size: 16),
+          label: const Text('阅读系列'),
+          style: primarySeriesToolbarStyle,
+        ),
+        OutlinedButton.icon(
+          onPressed: () async {
+            await showDialog<void>(
+              context: context,
+              barrierColor: Colors.transparent,
+              builder: (BuildContext context) => AddComicsToSeriesDialog(
+                key: ValueKey<String>(series.name),
+                series: series,
+              ),
+            );
+          },
+          icon: const Icon(LucideIcons.plus, size: 16),
+          label: const Text('添加漫画'),
+          style: secondarySeriesToolbarStyle,
+        ),
+        OutlinedButton.icon(
+          onPressed: () {
+            if (series.items.length < 2) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('至少需要 2 本漫画才能调整顺序'),
+                  behavior: SnackBarBehavior.floating,
+                  margin: snackBarMargin(context),
+                ),
+              );
+              return;
+            }
+            showDialog<void>(
+              context: context,
+              barrierColor: Colors.transparent,
+              builder: (BuildContext context) =>
+                  ReorderSeriesItemsDialog(series: series),
+            );
+          },
+          icon: const Icon(LucideIcons.arrowUpDown, size: 16),
+          label: const Text('调整顺序'),
+          style: secondarySeriesToolbarStyle,
+        ),
+        OutlinedButton.icon(
+          onPressed: () async {
+            final String? newName = await showDialog<String>(
+              context: context,
+              barrierColor: Colors.transparent,
+              builder: (BuildContext context) =>
+                  RenameSeriesDialog(series: series),
+            );
+            if (newName != null && context.mounted) {
+              context.goNamed(
+                '系列详情',
+                pathParameters: <String, String>{'name': newName},
+              );
+            }
+          },
+          icon: const Icon(LucideIcons.squarePen, size: 16),
+          label: const Text('重命名'),
+          style: secondarySeriesToolbarStyle,
+        ),
+      ],
+    );
+    final Widget listSection = Expanded(
+      child: _SeriesComicListSection(
+        sortedItems: sortedItems,
+        seriesName: series.name,
+      ),
+    );
+    final Widget rightColumn = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 16,
+      children: <Widget>[titleBlock, actions, listSection],
+    );
+    return ColoredBox(
+      color: cs.winBackground,
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: tokens.spacing.lg + 8,
+            vertical: tokens.spacing.lg + 8,
+          ),
+          child: _SeriesDetailCard(
+            maxWidth: _kSeriesDetailMaxWidth,
+            child: Padding(
+              padding: EdgeInsets.all(tokens.spacing.xl),
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  final bool narrow = constraints.maxWidth < _narrowBreakpoint;
+                  final Widget narrowCover = Align(
+                    alignment: Alignment.center,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: _kSeriesCoverMaxWidth,
+                      ),
+                      child: AspectRatio(
+                        aspectRatio: 2 / 3,
+                        child: _SeriesCoverBlock(series: series),
                       ),
                     ),
-                    child: Row(
+                  );
+                  if (narrow) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        Icon(
-                          LucideIcons.bookOpen,
-                          size: 16,
-                          color: cs.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          '系列内漫画',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: cs.textSecondary,
+                        narrowCover,
+                        const SizedBox(height: 16),
+                        Expanded(child: rightColumn),
+                      ],
+                    );
+                  }
+                  final double availH = constraints.maxHeight.isFinite
+                      ? constraints.maxHeight
+                      : MediaQuery.sizeOf(context).height;
+                  final double wideMaxMain = math.min(availH * 0.68, 640);
+                  return SizedBox(
+                    height: wideMaxMain,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            maxWidth: _kSeriesCoverMaxWidth,
+                          ),
+                          child: AspectRatio(
+                            aspectRatio: 2 / 3,
+                            child: _SeriesCoverBlock(series: series),
                           ),
                         ),
+                        SizedBox(width: tokens.spacing.lg + 16),
+                        Expanded(child: rightColumn),
                       ],
                     ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 与 [ComicDetailPage] 的 `_ComicDetailCard` 相同的卡片阴影与表面层次。
+class _SeriesDetailCard extends StatelessWidget {
+  const _SeriesDetailCard({required this.maxWidth, required this.child});
+
+  final double maxWidth;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final BorderRadius radius = BorderRadius.circular(tokens.radius.lg);
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: radius,
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: cs.cardShadow,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: radius,
+          child: ColoredBox(
+            color: cs.surface,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(color: cs.borderSubtle),
+              ),
+              child: child,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SeriesCoverBlock extends ConsumerWidget {
+  const _SeriesCoverBlock({required this.series});
+
+  final Series series;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final SeriesItem? coverItem = series.coverItem;
+    final String? coverComicId = coverItem?.comicId;
+    final String? coverPath = coverComicId != null
+        ? ref
+              .watch(comicCoverPathProvider(comicId: coverComicId))
+              .maybeWhen(data: (String? v) => v, orElse: () => null)
+        : null;
+    final Widget content = Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: cs.imagePlaceholder,
+      child: coverPath != null
+          ? ExtendedImage.file(
+              File(coverPath),
+              fit: BoxFit.cover,
+              cacheWidth: 720,
+            )
+          : Icon(Icons.broken_image, color: cs.iconSecondary, size: 40),
+    );
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(tokens.radius.lg),
+      child: SizedBox.expand(child: content),
+    );
+  }
+}
+
+class _SeriesComicListSection extends StatelessWidget {
+  const _SeriesComicListSection({
+    required this.sortedItems,
+    required this.seriesName,
+  });
+
+  final List<SeriesItem> sortedItems;
+  final String seriesName;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: cs.borderSubtle),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerHighest,
+                border: Border(bottom: BorderSide(color: cs.borderSubtle)),
+              ),
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    LucideIcons.bookOpen,
+                    size: 14,
+                    color: cs.onSurfaceVariant,
                   ),
-                  if (sortedItems.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 32,
-                      ),
-                      child: Text(
-                        '暂无漫画，点击「添加漫画」加入',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: cs.textTertiary,
+                  const SizedBox(width: 6),
+                  Text(
+                    '系列内漫画',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: cs.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: sortedItems.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 32,
+                        ),
+                        child: Text(
+                          '暂无漫画，点击「添加漫画」加入',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: cs.textTertiary,
+                          ),
                         ),
                       ),
                     )
-                  else
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
+                  : ListView.separated(
+                      padding: EdgeInsets.zero,
                       itemCount: sortedItems.length,
                       separatorBuilder: (BuildContext context, int _) =>
                           Divider(height: 1, color: cs.borderSubtle),
@@ -286,79 +476,14 @@ class _SeriesDetailBody extends ConsumerWidget {
                         return _SeriesComicRow(
                           item: item,
                           sequenceNumber: index + 1,
+                          seriesName: seriesName,
                         );
                       },
                     ),
-                ],
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    );
-  }
-}
-
-class _SeriesDetailHeader extends ConsumerWidget {
-  const _SeriesDetailHeader({required this.series});
-
-  final Series series;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final SeriesItem? coverItem = series.coverItem;
-    final String? coverComicId = coverItem?.comicId;
-    final String? coverPath = coverComicId != null
-        ? ref
-            .watch(comicCoverPathProvider(comicId: coverComicId))
-            .maybeWhen(data: (String? v) => v, orElse: () => null)
-        : null;
-    final int count = series.items.length;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            width: 96,
-            height: 136,
-            color: cs.imagePlaceholder,
-            child: coverPath != null
-                ? ExtendedImage.file(
-                    File(coverPath),
-                    fit: BoxFit.cover,
-                    cacheWidth: 320,
-                  )
-                : Icon(
-                    Icons.broken_image,
-                    color: cs.iconSecondary,
-                  ),
-          ),
-        ),
-        const SizedBox(width: 24),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                series.name,
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.4,
-                  color: cs.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '包含 $count 本',
-                style: TextStyle(color: cs.textTertiary, fontSize: 13),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
@@ -367,14 +492,18 @@ class _SeriesComicRow extends ConsumerWidget {
   const _SeriesComicRow({
     required this.item,
     required this.sequenceNumber,
+    required this.seriesName,
   });
 
   final SeriesItem item;
   final int sequenceNumber;
+  final String seriesName;
 
   static String _titleForComic(WidgetRef ref, String comicId) {
-    final String? title =
-        ref.read(libraryPageProvider.notifier).comicById(comicId)?.title;
+    final String? title = ref
+        .read(libraryPageProvider.notifier)
+        .comicById(comicId)
+        ?.title;
     if (title != null && title.isNotEmpty) {
       return title;
     }
@@ -394,55 +523,58 @@ class _SeriesComicRow extends ConsumerWidget {
       child: InkWell(
         onTap: () {
           appRouter.pushNamed(
-            '漫画详情',
+            '阅读页面',
             pathParameters: <String, String>{'id': item.comicId},
+            queryParameters: <String, String>{'series': seriesName},
           );
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           child: Row(
             children: <Widget>[
               SizedBox(
-                width: 40,
+                width: 26,
                 child: Text(
                   '$sequenceNumber',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: cs.textSecondary,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 6),
               ClipRRect(
                 borderRadius: BorderRadius.circular(tokens.radius.sm),
                 child: Container(
-                  width: 56,
-                  height: 80,
+                  width: 36,
+                  height: 50,
                   color: cs.imagePlaceholder,
                   child: coverPath != null
                       ? ExtendedImage.file(
                           File(coverPath),
                           fit: BoxFit.cover,
-                          cacheWidth: 240,
+                          cacheWidth: 160,
                         )
                       : Icon(
                           Icons.broken_image,
                           color: cs.iconSecondary,
+                          size: 18,
                         ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   title,
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: cs.textPrimary,
+                    height: 1.25,
                   ),
                 ),
               ),
