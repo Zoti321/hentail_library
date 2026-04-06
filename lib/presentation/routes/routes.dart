@@ -76,15 +76,15 @@ final appRouter = GoRouter(
             return SeriesDetailPage(seriesName: seriesName);
           },
         ),
+        GoRoute(
+          path: '/reader/:id',
+          name: '阅读页面',
+          builder: (context, state) {
+            final comicId = Uri.decodeComponent(state.pathParameters['id']!);
+            return ReaderPage(comicId: comicId);
+          },
+        ),
       ],
-    ),
-    GoRoute(
-      path: '/reader/:id',
-      name: '阅读页面',
-      builder: (context, state) {
-        final comicId = Uri.decodeComponent(state.pathParameters['id']!);
-        return ReaderPage(comicId: comicId);
-      },
     ),
   ],
 );

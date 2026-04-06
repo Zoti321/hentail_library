@@ -10,8 +10,6 @@ import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import 'package:window_manager/window_manager.dart';
-
 class ReaderPage extends HookConsumerWidget {
   final String comicId;
 
@@ -239,80 +237,78 @@ class _TopBar extends HookConsumerWidget {
                   borderRadius: BorderRadius.circular(100),
                   border: Border.all(width: 1, color: cs.readerPanelBorder),
                 ),
-                child: DragToMoveArea(
-                  child: Row(
-                    spacing: 12,
-                    mainAxisSize: .min,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          _saveProgress(ref, comicId);
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(
-                          LucideIcons.arrowLeft,
-                          size: 16,
-                          color: cs.readerTextIconPrimary,
-                        ),
-                      ),
-                      Flexible(
-                        child: Text(
-                          state.comic.title,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: cs.readerTextIconPrimary,
-                            letterSpacing: 1.2,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      // 阅读模式切换按钮组
-                      Container(
-                        padding: const .all(4),
-                        decoration: BoxDecoration(
-                          color: cs.readerPanelSubtle,
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(color: cs.readerPanelSubtleBorder),
-                        ),
-                        child: Row(
-                          spacing: 2,
-                          mainAxisSize: .min,
-                          children: [
-                            _ReadModeToggleBtn(
-                              icon: LucideIcons.bookOpen,
-                              label: "翻页",
-                              isVertical: false,
-                              isActive: !isVertival,
-                              onTap: () {
-                                ref
-                                    .read(readerViewProvider(comicId).notifier)
-                                    .setIsVertical(false);
-                              },
-                            ),
-                            _ReadModeToggleBtn(
-                              icon: LucideIcons.arrowUpDown,
-                              label: '条漫',
-                              isVertical: true,
-                              isActive: isVertival,
-                              onTap: () {
-                                ref
-                                    .read(readerViewProvider(comicId).notifier)
-                                    .setIsVertical(true);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      Icon(
-                        LucideIcons.settings2,
+                child: Row(
+                  spacing: 12,
+                  mainAxisSize: .min,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        _saveProgress(ref, comicId);
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(
+                        LucideIcons.arrowLeft,
                         size: 16,
                         color: cs.readerTextIconPrimary,
                       ),
-                      const SizedBox(width: 2),
-                    ],
-                  ),
+                    ),
+                    Flexible(
+                      child: Text(
+                        state.comic.title,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: cs.readerTextIconPrimary,
+                          letterSpacing: 1.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    // 阅读模式切换按钮组
+                    Container(
+                      padding: const .all(4),
+                      decoration: BoxDecoration(
+                        color: cs.readerPanelSubtle,
+                        borderRadius: BorderRadius.circular(100),
+                        border: Border.all(color: cs.readerPanelSubtleBorder),
+                      ),
+                      child: Row(
+                        spacing: 2,
+                        mainAxisSize: .min,
+                        children: [
+                          _ReadModeToggleBtn(
+                            icon: LucideIcons.bookOpen,
+                            label: "翻页",
+                            isVertical: false,
+                            isActive: !isVertival,
+                            onTap: () {
+                              ref
+                                  .read(readerViewProvider(comicId).notifier)
+                                  .setIsVertical(false);
+                            },
+                          ),
+                          _ReadModeToggleBtn(
+                            icon: LucideIcons.arrowUpDown,
+                            label: '条漫',
+                            isVertical: true,
+                            isActive: isVertival,
+                            onTap: () {
+                              ref
+                                  .read(readerViewProvider(comicId).notifier)
+                                  .setIsVertical(true);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      LucideIcons.settings2,
+                      size: 16,
+                      color: cs.readerTextIconPrimary,
+                    ),
+                    const SizedBox(width: 2),
+                  ],
                 ),
               ),
             ),

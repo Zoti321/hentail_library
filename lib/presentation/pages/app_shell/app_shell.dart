@@ -26,25 +26,29 @@ class _AppShellState extends ConsumerState<AppShell> with TrayListener {
 
   @override
   Widget build(BuildContext context) {
+    final String path = GoRouterState.of(context).uri.path;
+    final bool isReaderRoute = path.startsWith('/reader/');
     return Scaffold(
       body: Column(
         children: [
           const AppTitleBar(),
           Expanded(
-            child: Row(
-              children: [
-                DesktopSidebar(
-                  activeId: _activeTab,
-                  onDestinationSelected: (id) {
-                    setState(() {
-                      _activeTab = id;
-                    });
-                    _onDestinationTap(id, context);
-                  },
-                ),
-                Expanded(child: widget.routeChild),
-              ],
-            ),
+            child: isReaderRoute
+                ? widget.routeChild
+                : Row(
+                    children: [
+                      DesktopSidebar(
+                        activeId: _activeTab,
+                        onDestinationSelected: (id) {
+                          setState(() {
+                            _activeTab = id;
+                          });
+                          _onDestinationTap(id, context);
+                        },
+                      ),
+                      Expanded(child: widget.routeChild),
+                    ],
+                  ),
           ),
         ],
       ),
