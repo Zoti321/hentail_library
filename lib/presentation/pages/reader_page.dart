@@ -560,7 +560,7 @@ class _SeriesReaderDrawer extends ConsumerWidget {
                     leading: SizedBox(
                       width: 32,
                       child: Text(
-                        '${item.order}',
+                        '${index + 1}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12,

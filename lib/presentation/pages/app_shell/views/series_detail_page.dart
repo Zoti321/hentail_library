@@ -283,7 +283,10 @@ class _SeriesDetailBody extends ConsumerWidget {
                           Divider(height: 1, color: cs.borderSubtle),
                       itemBuilder: (BuildContext context, int index) {
                         final SeriesItem item = sortedItems[index];
-                        return _SeriesComicRow(item: item);
+                        return _SeriesComicRow(
+                          item: item,
+                          sequenceNumber: index + 1,
+                        );
                       },
                     ),
                 ],
@@ -361,9 +364,13 @@ class _SeriesDetailHeader extends ConsumerWidget {
 }
 
 class _SeriesComicRow extends ConsumerWidget {
-  const _SeriesComicRow({required this.item});
+  const _SeriesComicRow({
+    required this.item,
+    required this.sequenceNumber,
+  });
 
   final SeriesItem item;
+  final int sequenceNumber;
 
   static String _titleForComic(WidgetRef ref, String comicId) {
     final String? title =
@@ -398,7 +405,7 @@ class _SeriesComicRow extends ConsumerWidget {
               SizedBox(
                 width: 40,
                 child: Text(
-                  '${item.order}',
+                  '$sequenceNumber',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 13,
