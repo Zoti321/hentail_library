@@ -72,12 +72,11 @@ class ReaderPage extends HookConsumerWidget {
 
     return Theme(
       data: theme,
-      child: PopScope(
+        child: PopScope(
         canPop: false,
-        onPopInvokedWithResult: (didPop, result) {
+        onPopInvokedWithResult: (bool didPop, dynamic result) {
           if (didPop) return;
-          _saveProgress(ref, comicId);
-          Navigator.of(context).pop();
+          _exitReaderPage(context, ref, comicId, seriesQuery);
         },
         child: Scaffold(
           key: scaffoldKey,
@@ -88,8 +87,8 @@ class ReaderPage extends HookConsumerWidget {
                   comicId: comicId,
                   onSelectComic: (String targetComicId) {
                     _saveProgress(ref, comicId);
-                    Navigator.of(context).pop();
-                    context.goNamed(
+                    scaffoldKey.currentState?.closeEndDrawer();
+                    context.pushReplacementNamed(
                       '阅读页面',
                       pathParameters: <String, String>{'id': targetComicId},
                       queryParameters: <String, String>{
@@ -123,6 +122,7 @@ class ReaderPage extends HookConsumerWidget {
                     comicId: comicId,
                     seriesNav: seriesNav,
                     scaffoldKey: scaffoldKey,
+                    seriesQuery: seriesQuery,
                   ),
                   _BottomBar(comicId: comicId),
                 ],
@@ -151,6 +151,31 @@ void _saveProgress(WidgetRef ref, String comicId) {
           pageIndex: currentIndex,
         ),
       );
+}
+
+void _exitReaderPage(
+  BuildContext context,
+  WidgetRef ref,
+  String comicId,
+  String? seriesQuery,
+) {
+  _saveProgress(ref, comicId);
+  final GoRouter router = GoRouter.of(context);
+  if (router.canPop()) {
+    router.pop();
+    return;
+  }
+  final String? seriesName = seriesQuery != null && seriesQuery.isNotEmpty
+      ? seriesQuery
+      : null;
+  if (seriesName != null) {
+    router.goNamed(
+      '系列详情',
+      pathParameters: <String, String>{'name': seriesName},
+    );
+    return;
+  }
+  router.go('/home');
 }
 
 class _ReaderContent extends HookConsumerWidget {
@@ -278,11 +303,13 @@ class _TopBar extends HookConsumerWidget {
     required this.comicId,
     required this.seriesNav,
     required this.scaffoldKey,
+    required this.seriesQuery,
   });
 
   final String comicId;
   final SeriesReaderNavData? seriesNav;
   final GlobalKey<ScaffoldState> scaffoldKey;
+  final String? seriesQuery;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -300,7 +327,7 @@ class _TopBar extends HookConsumerWidget {
       if (next < 0 || next >= nav.sortedItems.length) return;
       final String targetId = nav.sortedItems[next].comicId;
       _saveProgress(ref, comicId);
-      context.goNamed(
+      context.pushReplacementNamed(
         '阅读页面',
         pathParameters: <String, String>{'id': targetId},
         queryParameters: <String, String>{'series': nav.seriesName},
@@ -337,8 +364,7 @@ class _TopBar extends HookConsumerWidget {
                   children: [
                     IconButton(
                       onPressed: () {
-                        _saveProgress(ref, comicId);
-                        Navigator.pop(context);
+                        _exitReaderPage(context, ref, comicId, seriesQuery);
                       },
                       icon: Icon(
                         LucideIcons.arrowLeft,
