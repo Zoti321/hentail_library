@@ -5,60 +5,59 @@ import 'database.dart';
 
 part 'dao.g.dart';
 
-@DriftAccessor(tables: [LibraryComics, LibraryComicTags])
-class LibraryComicDao extends DatabaseAccessor<AppDatabase>
-    with _$LibraryComicDaoMixin {
-  LibraryComicDao(super.db);
+@DriftAccessor(tables: [Comics, ComicTags])
+class ComicDao extends DatabaseAccessor<AppDatabase> with _$ComicDaoMixin {
+  ComicDao(super.db);
 
-  Stream<List<LibraryComic>> watchAllComics() => select(libraryComics).watch();
+  Stream<List<DbComic>> watchAllComics() => select(comics).watch();
 
-  Future<List<LibraryComic>> getAllComics() => select(libraryComics).get();
+  Future<List<DbComic>> getAllComics() => select(comics).get();
 
   /// 仅 comicId 列，用于大库 diff 等场景（不加载 tags）。
   Future<List<String>> getAllComicIds() async {
-    final rows = await select(libraryComics).get();
+    final rows = await select(comics).get();
     return rows.map((r) => r.comicId).toList();
   }
 
-  Future<LibraryComic?> findById(String comicId) {
+  Future<DbComic?> findById(String comicId) {
     return (select(
-      libraryComics,
+      comics,
     )..where((t) => t.comicId.equals(comicId))).getSingleOrNull();
   }
 
-  Future<void> upsertMany(List<LibraryComicsCompanion> companions) async {
+  Future<void> upsertMany(List<ComicsCompanion> companions) async {
     await batch((b) {
-      b.insertAllOnConflictUpdate(libraryComics, companions);
+      b.insertAllOnConflictUpdate(comics, companions);
     });
   }
 
   Future<int> deleteByIds(List<String> comicIds) {
     if (comicIds.isEmpty) return Future.value(0);
-    return (delete(libraryComics)..where((t) => t.comicId.isIn(comicIds))).go();
+    return (delete(comics)..where((t) => t.comicId.isIn(comicIds))).go();
   }
 
   Future<void> replaceComicTags(String comicId, List<String> tagNames) async {
     await transaction(() async {
       await (delete(
-        libraryComicTags,
+        comicTags,
       )..where((t) => t.comicId.equals(comicId))).go();
       if (tagNames.isEmpty) return;
       final rows = tagNames
           .toSet()
           .map(
-            (name) => LibraryComicTagsCompanion.insert(
+            (name) => ComicTagsCompanion.insert(
               comicId: comicId,
               tagName: name,
             ),
           )
           .toList();
-      await batch((b) => b.insertAll(libraryComicTags, rows));
+      await batch((b) => b.insertAll(comicTags, rows));
     });
   }
 
   Future<List<String>> getTagNamesForComic(String comicId) async {
     final rows = await (select(
-      libraryComicTags,
+      comicTags,
     )..where((t) => t.comicId.equals(comicId))).get();
     return rows.map((e) => e.tagName).toList();
   }
@@ -69,7 +68,7 @@ class LibraryComicDao extends DatabaseAccessor<AppDatabase>
     final ids = comicIds.toList();
     if (ids.isEmpty) return {};
     final rows = await (select(
-      libraryComicTags,
+      comicTags,
     )..where((t) => t.comicId.isIn(ids))).get();
     final map = <String, List<String>>{};
     for (final r in rows) {
@@ -85,9 +84,9 @@ class LibraryComicDao extends DatabaseAccessor<AppDatabase>
     Value<ContentRating>? contentRating,
   }) {
     return (update(
-      libraryComics,
+      comics,
     )..where((t) => t.comicId.equals(comicId))).write(
-      LibraryComicsCompanion(
+      ComicsCompanion(
         title: title ?? const Value.absent(),
         authorsJson: authors ?? const Value.absent(),
         contentRating: contentRating ?? const Value.absent(),
@@ -96,37 +95,36 @@ class LibraryComicDao extends DatabaseAccessor<AppDatabase>
   }
 }
 
-@DriftAccessor(tables: [LibrarySeries, LibrarySeriesItems])
-class LibrarySeriesDao extends DatabaseAccessor<AppDatabase>
-    with _$LibrarySeriesDaoMixin {
-  LibrarySeriesDao(super.db);
+@DriftAccessor(tables: [SeriesTable, SeriesItems])
+class SeriesDao extends DatabaseAccessor<AppDatabase> with _$SeriesDaoMixin {
+  SeriesDao(super.db);
 
-  Stream<List<LibrarySery>> watchAllSeries() => select(librarySeries).watch();
+  Stream<List<DbSeries>> watchAllSeries() => select(seriesTable).watch();
 
-  Future<List<LibrarySery>> getAllSeries() => select(librarySeries).get();
+  Future<List<DbSeries>> getAllSeries() => select(seriesTable).get();
 
-  Future<LibrarySery?> findByName(String name) {
+  Future<DbSeries?> findByName(String name) {
     return (select(
-      librarySeries,
+      seriesTable,
     )..where((t) => t.name.equals(name))).getSingleOrNull();
   }
 
-  Future<void> createSeries(LibrarySeriesCompanion companion) async {
+  Future<void> createSeries(SeriesTableCompanion companion) async {
     await into(
-      librarySeries,
+      seriesTable,
     ).insert(companion, mode: InsertMode.insertOrIgnore);
   }
 
-  /// 依赖 [LibrarySeriesItems] 外键 `ON UPDATE CASCADE`，子表 `series_name` 随父表改名。
+  /// 依赖 [SeriesItems] 外键 `ON UPDATE CASCADE`，子表 `series_name` 随父表改名。
   Future<int> renameSeries({required String name, required String newName}) {
-    return (update(librarySeries)..where((t) => t.name.equals(name))).write(
-      LibrarySeriesCompanion(name: Value(newName)),
+    return (update(seriesTable)..where((t) => t.name.equals(name))).write(
+      SeriesTableCompanion(name: Value(newName)),
     );
   }
 
   Future<int> deleteSeries(String seriesName) {
     return (delete(
-      librarySeries,
+      seriesTable,
     )..where((t) => t.name.equals(seriesName))).go();
   }
 
@@ -137,11 +135,11 @@ class LibrarySeriesDao extends DatabaseAccessor<AppDatabase>
   }) async {
     await transaction(() async {
       await (delete(
-        librarySeriesItems,
+        seriesItems,
       )..where((t) => t.comicId.equals(comicId))).go();
 
-      await into(librarySeriesItems).insertOnConflictUpdate(
-        LibrarySeriesItemsCompanion.insert(
+      await into(seriesItems).insertOnConflictUpdate(
+        SeriesItemsCompanion.insert(
           seriesName: targetSeriesName,
           comicId: comicId,
           sortOrder: sortOrder,
@@ -152,7 +150,7 @@ class LibrarySeriesDao extends DatabaseAccessor<AppDatabase>
 
   Future<int> removeComic(String comicId) {
     return (delete(
-      librarySeriesItems,
+      seriesItems,
     )..where((t) => t.comicId.equals(comicId))).go();
   }
 
@@ -160,60 +158,59 @@ class LibrarySeriesDao extends DatabaseAccessor<AppDatabase>
   Future<int> removeComicsFromSeries(Iterable<String> comicIds) {
     final ids = comicIds.toList();
     if (ids.isEmpty) return Future.value(0);
-    return (delete(librarySeriesItems)..where((t) => t.comicId.isIn(ids))).go();
+    return (delete(seriesItems)..where((t) => t.comicId.isIn(ids))).go();
   }
 
-  Future<List<LibrarySeriesItem>> getItemsForSeries(String seriesName) {
-    return (select(librarySeriesItems)
+  Future<List<DbSeriesItem>> getItemsForSeries(String seriesName) {
+    return (select(seriesItems)
           ..where((t) => t.seriesName.equals(seriesName))
           ..orderBy([(t) => OrderingTerm.asc(t.sortOrder)]))
         .get();
   }
 
-  /// 仅更新同系列内条目的 [LibrarySeriesItems.sortOrder]（不移动系列归属）。
+  /// 仅更新同系列内条目的 [SeriesItems.sortOrder]（不移动系列归属）。
   Future<int> updateSeriesItemSortOrder({
     required String seriesName,
     required String comicId,
     required int sortOrder,
   }) {
-    return (update(librarySeriesItems)..where(
-          (LibrarySeriesItems t) =>
+    return (update(seriesItems)..where(
+          (SeriesItems t) =>
               t.seriesName.equals(seriesName) & t.comicId.equals(comicId),
         ))
-        .write(LibrarySeriesItemsCompanion(sortOrder: Value(sortOrder)));
+        .write(SeriesItemsCompanion(sortOrder: Value(sortOrder)));
   }
 }
 
-@DriftAccessor(tables: [LibraryTags, LibraryComicTags])
-class LibraryTagDao extends DatabaseAccessor<AppDatabase>
-    with _$LibraryTagDaoMixin {
-  LibraryTagDao(super.db);
+@DriftAccessor(tables: [Tags, ComicTags])
+class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
+  TagDao(super.db);
 
-  Future<List<LibraryTag>> listAll() => select(libraryTags).get();
+  Future<List<DbTag>> listAll() => select(tags).get();
 
   Future<void> addTag(String name) async {
-    await into(libraryTags).insert(
-      LibraryTagsCompanion.insert(name: name),
+    await into(tags).insert(
+      TagsCompanion.insert(name: name),
       mode: InsertMode.insertOrIgnore,
     );
   }
 
   Future<int> deleteByNames(List<String> names) {
     if (names.isEmpty) return Future.value(0);
-    return (delete(libraryTags)..where((t) => t.name.isIn(names))).go();
+    return (delete(tags)..where((t) => t.name.isIn(names))).go();
   }
 
   Future<void> renameTag(String oldName, String newName) async {
     await transaction(() async {
-      await into(libraryTags).insert(
-        LibraryTagsCompanion.insert(name: newName),
+      await into(tags).insert(
+        TagsCompanion.insert(name: newName),
         mode: InsertMode.insertOrIgnore,
       );
 
-      await (update(libraryComicTags)..where((t) => t.tagName.equals(oldName)))
-          .write(LibraryComicTagsCompanion(tagName: Value(newName)));
+      await (update(comicTags)..where((t) => t.tagName.equals(oldName)))
+          .write(ComicTagsCompanion(tagName: Value(newName)));
 
-      await (delete(libraryTags)..where((t) => t.name.equals(oldName))).go();
+      await (delete(tags)..where((t) => t.name.equals(oldName))).go();
     });
   }
 }
@@ -240,59 +237,61 @@ class SavedPathDao extends DatabaseAccessor<AppDatabase>
   }
 }
 
-@DriftAccessor(tables: [ReadingHistories])
+@DriftAccessor(tables: [ComicReadingHistories])
 class ReadingHistoryDao extends DatabaseAccessor<AppDatabase>
     with _$ReadingHistoryDaoMixin {
   ReadingHistoryDao(super.db);
 
-  Future<void> recordReading(ReadingHistoriesCompanion companion) async {
-    await into(readingHistories).insert(
+  Future<void> recordReading(ComicReadingHistoriesCompanion companion) async {
+    await into(comicReadingHistories).insert(
       companion,
       onConflict: DoUpdate(
-        (old) => ReadingHistoriesCompanion.custom(
+        (old) => ComicReadingHistoriesCompanion.custom(
           lastReadTime: Variable(companion.lastReadTime.value),
           title: Variable(companion.title.value),
           pageIndex: companion.pageIndex.present
               ? Variable(companion.pageIndex.value)
               : null,
         ),
-        target: [readingHistories.comicId],
+        target: [comicReadingHistories.comicId],
       ),
     );
   }
 
-  Future<ReadingHistory?> getReadingHistoryByComicId(String comicId) {
+  Future<ComicReadingHistoryRow?> getReadingHistoryByComicId(String comicId) {
     return (select(
-      readingHistories,
+      comicReadingHistories,
     )..where((t) => t.comicId.equals(comicId))).getSingleOrNull();
   }
 
-  Stream<List<ReadingHistory>> watchAllHistory() {
+  Stream<List<ComicReadingHistoryRow>> watchAllHistory() {
     return (select(
-      readingHistories,
+      comicReadingHistories,
     )..orderBy([(t) => OrderingTerm.desc(t.lastReadTime)])).watch();
   }
 
   Future<int> deleteByComicId(String comicId) {
     return (delete(
-      readingHistories,
+      comicReadingHistories,
     )..where((t) => t.comicId.equals(comicId))).go();
   }
 
   Future<int> deleteByComicIds(Iterable<String> comicIds) {
     final ids = comicIds.toList();
     if (ids.isEmpty) return Future.value(0);
-    return (delete(readingHistories)..where((t) => t.comicId.isIn(ids))).go();
+    return (delete(comicReadingHistories)
+          ..where((t) => t.comicId.isIn(ids)))
+        .go();
   }
 
   Future<int> clearAllHistory() {
-    return delete(readingHistories).go();
+    return delete(comicReadingHistories).go();
   }
 
   Future<void> clearExpiredHistory() async {
     final limitDate = DateTime.now().subtract(const Duration(days: 365));
     await (delete(
-      readingHistories,
+      comicReadingHistories,
     )..where((t) => t.lastReadTime.isSmallerThanValue(limitDate))).go();
   }
 }

@@ -9,6 +9,7 @@ import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/entity/series_reading_history.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/dialog/add_comics_to_series_dialog.dart';
@@ -162,7 +163,7 @@ class _SeriesDetailBody extends ConsumerWidget {
       runSpacing: 8,
       children: <Widget>[
         FilledButton.icon(
-          onPressed: () {
+          onPressed: () async {
             if (sortedItems.isEmpty) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -173,9 +174,22 @@ class _SeriesDetailBody extends ConsumerWidget {
               );
               return;
             }
+            final SeriesReadingHistory? seriesProgress = await ref
+                .read(readingHistoryRepoProvider)
+                .getSeriesReadingBySeriesName(series.name);
+            String comicIdToOpen = sortedItems.first.comicId;
+            if (seriesProgress != null) {
+              final String lastId = seriesProgress.lastReadComicId;
+              final bool lastStillInSeries = sortedItems.any(
+                (SeriesItem e) => e.comicId == lastId,
+              );
+              if (lastStillInSeries) {
+                comicIdToOpen = lastId;
+              }
+            }
             appRouter.pushNamed(
               '阅读页面',
-              pathParameters: <String, String>{'id': sortedItems.first.comicId},
+              pathParameters: <String, String>{'id': comicIdToOpen},
               queryParameters: <String, String>{'series': series.name},
             );
           },

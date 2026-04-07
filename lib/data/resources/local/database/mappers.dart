@@ -3,7 +3,7 @@ import 'package:hentai_library/domain/entity/entities.dart' as entity;
 import 'package:drift/drift.dart';
 
 // 阅读历史 Row <-> Entity 映射
-extension ReadingHistoryRowToEntity on ReadingHistory {
+extension ReadingHistoryRowToEntity on ComicReadingHistoryRow {
   entity.ReadingHistory toEntity() {
     return entity.ReadingHistory(
       comicId: comicId,
@@ -15,8 +15,8 @@ extension ReadingHistoryRowToEntity on ReadingHistory {
 }
 
 extension ReadingHistoryEntityToCompanion on entity.ReadingHistory {
-  ReadingHistoriesCompanion toCompanion() {
-    return ReadingHistoriesCompanion.insert(
+  ComicReadingHistoriesCompanion toCompanion() {
+    return ComicReadingHistoriesCompanion.insert(
       comicId: comicId,
       title: title,
       lastReadTime: lastReadTime,

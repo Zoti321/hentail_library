@@ -3,6 +3,87 @@ import 'dart:convert';
 
 import 'package:hentai_library/domain/util/enums.dart';
 
+class StringListJsonConverter extends TypeConverter<List<String>, String> {
+  const StringListJsonConverter();
+
+  @override
+  List<String> fromSql(String fromDb) {
+    final decoded = jsonDecode(fromDb);
+    if (decoded is! List) return const <String>[];
+    return decoded.whereType<String>().toList();
+  }
+
+  @override
+  String toSql(List<String> value) => jsonEncode(value);
+}
+
+@DataClassName('DbComic')
+class Comics extends Table {
+  TextColumn get comicId => text()();
+  TextColumn get path => text()();
+  TextColumn get resourceType => textEnum<ResourceType>()();
+  TextColumn get title => text()();
+  TextColumn get authorsJson => text()
+      .map(const StringListJsonConverter())
+      .withDefault(const Constant('[]'))();
+  TextColumn get contentRating =>
+      textEnum<ContentRating>().withDefault(const Constant('unknown'))();
+  IntColumn get pageCount => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {comicId};
+}
+
+@DataClassName('DbTag')
+class Tags extends Table {
+  TextColumn get name => text()();
+
+  @override
+  Set<Column> get primaryKey => {name};
+}
+
+@DataClassName('DbComicTag')
+class ComicTags extends Table {
+  TextColumn get comicId => text()();
+  TextColumn get tagName => text()();
+
+  @override
+  Set<Column> get primaryKey => {comicId, tagName};
+
+  @override
+  List<String> get customConstraints => [
+    'FOREIGN KEY(comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE',
+    'FOREIGN KEY(tag_name) REFERENCES tags(name) ON DELETE CASCADE',
+  ];
+}
+
+@DataClassName('DbSeries')
+class SeriesTable extends Table {
+  @override
+  String get tableName => 'series';
+
+  TextColumn get name => text().unique()();
+
+  @override
+  Set<Column> get primaryKey => {name};
+}
+
+@DataClassName('DbSeriesItem')
+class SeriesItems extends Table {
+  TextColumn get seriesName => text()();
+  TextColumn get comicId => text()();
+  IntColumn get sortOrder => integer()();
+
+  @override
+  Set<Column> get primaryKey => {seriesName, comicId};
+
+  @override
+  List<String> get customConstraints => [
+    'UNIQUE(comic_id)',
+    'FOREIGN KEY(series_name) REFERENCES series(name) ON DELETE CASCADE ON UPDATE CASCADE',
+  ];
+}
+
 // 用户保存的文件系统路径
 class SavedPaths extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -13,8 +94,9 @@ class SavedPaths extends Table {
 }
 
 /// 单本漫画阅读历史（与 [Comic] 标识对齐：comicId、title + 进度）。
+@DataClassName('ComicReadingHistoryRow')
 @TableIndex(name: 'idx_read_time', columns: {#lastReadTime})
-class ReadingHistories extends Table {
+class ComicReadingHistories extends Table {
   TextColumn get comicId => text()();
   TextColumn get title => text()();
   DateTimeColumn get lastReadTime => dateTime()();
@@ -38,79 +120,6 @@ class SeriesReadingHistories extends Table {
 
   @override
   List<String> get customConstraints => [
-    'FOREIGN KEY(series_name) REFERENCES library_series(name) ON DELETE CASCADE ON UPDATE CASCADE',
-  ];
-}
-
-class StringListJsonConverter extends TypeConverter<List<String>, String> {
-  const StringListJsonConverter();
-
-  @override
-  List<String> fromSql(String fromDb) {
-    final decoded = jsonDecode(fromDb);
-    if (decoded is! List) return const <String>[];
-    return decoded.whereType<String>().toList();
-  }
-
-  @override
-  String toSql(List<String> value) => jsonEncode(value);
-}
-
-class LibraryComics extends Table {
-  TextColumn get comicId => text()();
-  TextColumn get path => text()();
-  TextColumn get resourceType => textEnum<ResourceType>()();
-  TextColumn get title => text()();
-  TextColumn get authorsJson => text()
-      .map(const StringListJsonConverter())
-      .withDefault(const Constant('[]'))();
-  TextColumn get contentRating =>
-      textEnum<ContentRating>().withDefault(const Constant('unknown'))();
-  IntColumn get pageCount => integer().nullable()();
-
-  @override
-  Set<Column> get primaryKey => {comicId};
-}
-
-class LibraryTags extends Table {
-  TextColumn get name => text()();
-
-  @override
-  Set<Column> get primaryKey => {name};
-}
-
-class LibraryComicTags extends Table {
-  TextColumn get comicId => text()();
-  TextColumn get tagName => text()();
-
-  @override
-  Set<Column> get primaryKey => {comicId, tagName};
-
-  @override
-  List<String> get customConstraints => [
-    'FOREIGN KEY(comic_id) REFERENCES library_comics(comic_id) ON DELETE CASCADE',
-    'FOREIGN KEY(tag_name) REFERENCES library_tags(name) ON DELETE CASCADE',
-  ];
-}
-
-class LibrarySeries extends Table {
-  TextColumn get name => text().unique()();
-
-  @override
-  Set<Column> get primaryKey => {name};
-}
-
-class LibrarySeriesItems extends Table {
-  TextColumn get seriesName => text()();
-  TextColumn get comicId => text()();
-  IntColumn get sortOrder => integer()();
-
-  @override
-  Set<Column> get primaryKey => {seriesName, comicId};
-
-  @override
-  List<String> get customConstraints => [
-    'UNIQUE(comic_id)',
-    'FOREIGN KEY(series_name) REFERENCES library_series(name) ON DELETE CASCADE ON UPDATE CASCADE',
+    'FOREIGN KEY(series_name) REFERENCES series(name) ON DELETE CASCADE ON UPDATE CASCADE',
   ];
 }

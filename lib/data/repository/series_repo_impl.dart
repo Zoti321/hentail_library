@@ -6,7 +6,7 @@ import 'package:hentai_library/domain/entity/comic/series_item.dart' as entity;
 import 'package:hentai_library/domain/repository/series_repo.dart';
 
 class SeriesRepositoryImpl implements SeriesRepository {
-  final LibrarySeriesDao _dao;
+  final SeriesDao _dao;
 
   SeriesRepositoryImpl(this._dao);
 
@@ -56,7 +56,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
 
   @override
   Future<void> create(String name) async {
-    await _dao.createSeries(db.LibrarySeriesCompanion.insert(name: name));
+    await _dao.createSeries(db.SeriesTableCompanion.insert(name: name));
   }
 
   @override

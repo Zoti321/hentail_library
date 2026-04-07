@@ -12,16 +12,13 @@ AppDatabase database(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-LibraryComicDao libraryComicDao(Ref ref) =>
-    LibraryComicDao(ref.read(databaseProvider));
+ComicDao comicDao(Ref ref) => ComicDao(ref.read(databaseProvider));
 
 @Riverpod(keepAlive: true)
-LibrarySeriesDao librarySeriesDao(Ref ref) =>
-    LibrarySeriesDao(ref.read(databaseProvider));
+SeriesDao seriesDao(Ref ref) => SeriesDao(ref.read(databaseProvider));
 
 @Riverpod(keepAlive: true)
-LibraryTagDao libraryTagDao(Ref ref) =>
-    LibraryTagDao(ref.read(databaseProvider));
+TagDao tagDao(Ref ref) => TagDao(ref.read(databaseProvider));
 
 @Riverpod(keepAlive: true)
 SavedPathDao savedPathDao(Ref ref) => SavedPathDao(ref.read(databaseProvider));

@@ -22,11 +22,11 @@ class ComicRepositoryImpl implements ComicRepository {
   }) : _readingHistory = readingHistory,
        _librarySeries = librarySeries;
 
-  final LibraryComicDao _comicDao;
+  final ComicDao _comicDao;
   final ReadingHistoryRepository _readingHistory;
   final SeriesRepository _librarySeries;
 
-  Future<List<entity.Comic>> _mapRows(List<db.LibraryComic> rows) async {
+  Future<List<entity.Comic>> _mapRows(List<db.DbComic> rows) async {
     final tagMap = await _comicDao.getTagNamesForComics(
       rows.map((e) => e.comicId),
     );
@@ -76,7 +76,7 @@ class ComicRepositoryImpl implements ComicRepository {
   Future<void> upsertMany(List<entity.Comic> comics) async {
     final companions = comics
         .map(
-          (c) => db.LibraryComicsCompanion.insert(
+          (c) => db.ComicsCompanion.insert(
             comicId: c.comicId,
             path: c.path,
             resourceType: c.resourceType,

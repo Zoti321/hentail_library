@@ -3,7 +3,7 @@ import 'package:hentai_library/domain/entity/comic/tag.dart' as entity;
 import 'package:hentai_library/domain/repository/tag_repo.dart';
 
 class TagRepositoryImpl implements TagRepository {
-  final LibraryTagDao _dao;
+  final TagDao _dao;
 
   TagRepositoryImpl(this._dao);
 
