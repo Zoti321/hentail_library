@@ -10,6 +10,7 @@ import 'package:hentai_library/presentation/widgets/dialog/add_series_dialog.dar
 import 'package:hentai_library/presentation/widgets/dialog/rename_series_dialog.dart';
 import 'package:hentai_library/presentation/widgets/dialog/reorder_series_items_dialog.dart';
 import 'package:hentai_library/presentation/widgets/dialog/series_confirm_delete_dialog.dart';
+import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -253,18 +254,8 @@ class _SeriesRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+    final cs = Theme.of(context).colorScheme;
     final count = series.items.length;
-    final iconButtonStyle = IconButton.styleFrom(
-      minimumSize: const Size(28, 28),
-      fixedSize: const Size(28, 28),
-      padding: EdgeInsets.zero,
-      splashFactory: NoSplash.splashFactory,
-      highlightColor: Colors.transparent,
-      overlayColor: cs.primary.withAlpha(14),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    );
 
     return Material(
       color: cs.surface,
@@ -293,10 +284,13 @@ class _SeriesRow extends ConsumerWidget {
                 ],
               ),
             ),
-            IconButton(
+            GhostButton.icon(
               tooltip: '添加漫画',
-              style: iconButtonStyle,
-              icon: const Icon(LucideIcons.plus, size: 16),
+              semanticLabel: '添加漫画',
+              icon: LucideIcons.plus,
+              size: 28,
+              delayTooltipThreeSeconds: true,
+              overlayColor: cs.primary.withAlpha(14),
               onPressed: () async {
                 await showDialog<void>(
                   context: context,
@@ -308,10 +302,13 @@ class _SeriesRow extends ConsumerWidget {
                 );
               },
             ),
-            IconButton(
+            GhostButton.icon(
               tooltip: '调整顺序',
-              style: iconButtonStyle,
-              icon: const Icon(LucideIcons.arrowUpDown, size: 16),
+              semanticLabel: '调整顺序',
+              icon: LucideIcons.arrowUpDown,
+              size: 28,
+              delayTooltipThreeSeconds: true,
+              overlayColor: cs.primary.withAlpha(14),
               onPressed: () {
                 if (series.items.length < 2) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -331,10 +328,13 @@ class _SeriesRow extends ConsumerWidget {
                 );
               },
             ),
-            IconButton(
+            GhostButton.icon(
               tooltip: '重命名',
-              style: iconButtonStyle,
-              icon: const Icon(LucideIcons.squarePen, size: 16),
+              semanticLabel: '重命名',
+              icon: LucideIcons.squarePen,
+              size: 28,
+              delayTooltipThreeSeconds: true,
+              overlayColor: cs.primary.withAlpha(14),
               onPressed: () async {
                 await showDialog<void>(
                   context: context,
@@ -343,10 +343,14 @@ class _SeriesRow extends ConsumerWidget {
                 );
               },
             ),
-            IconButton(
+            GhostButton.icon(
               tooltip: '删除',
-              style: iconButtonStyle,
-              icon: Icon(LucideIcons.trash2, size: 16, color: cs.error),
+              semanticLabel: '删除',
+              icon: LucideIcons.trash2,
+              size: 28,
+              foregroundColor: cs.error,
+              delayTooltipThreeSeconds: true,
+              overlayColor: cs.primary.withAlpha(14),
               onPressed: () async {
                 final confirmed =
                     await showDialog<bool>(

@@ -15,6 +15,7 @@ class GhostButton extends StatelessWidget {
     this.foregroundColor,
     this.hoverColor,
     this.overlayColor,
+    this.delayTooltipThreeSeconds = true,
   }) : text = null,
        padding = EdgeInsets.zero,
        _variant = _GhostButtonVariant.icon;
@@ -31,6 +32,7 @@ class GhostButton extends StatelessWidget {
     this.foregroundColor,
     this.hoverColor,
     this.overlayColor,
+    this.delayTooltipThreeSeconds = true,
   }) : size = 32,
        _variant = _GhostButtonVariant.iconText;
 
@@ -46,6 +48,7 @@ class GhostButton extends StatelessWidget {
   final Color? foregroundColor;
   final Color? hoverColor;
   final Color? overlayColor;
+  final bool delayTooltipThreeSeconds;
   final _GhostButtonVariant _variant;
 
   @override
@@ -114,7 +117,13 @@ class GhostButton extends StatelessWidget {
           );
     final Widget withTooltip = effectiveTooltip.isEmpty
         ? button
-        : Tooltip(message: effectiveTooltip, child: button);
+        : Tooltip(
+            message: effectiveTooltip,
+            waitDuration: delayTooltipThreeSeconds
+                ? const Duration(seconds: 3)
+                : null,
+            child: button,
+          );
     return Semantics(
       button: true,
       enabled: isEnabled,

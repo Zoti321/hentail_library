@@ -12,7 +12,7 @@ import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/entity/series_reading_history.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
-import 'package:hentai_library/presentation/widgets/button/ghost_icon_button.dart';
+import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/widgets/dialog/add_comics_to_series_dialog.dart';
 import 'package:hentai_library/presentation/widgets/dialog/rename_series_dialog.dart';
 import 'package:hentai_library/presentation/widgets/dialog/reorder_series_items_dialog.dart';
