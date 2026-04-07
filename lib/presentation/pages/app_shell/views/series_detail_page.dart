@@ -192,7 +192,7 @@ class _SeriesDetailBody extends ConsumerWidget {
           label: const Text('阅读系列'),
           style: primarySeriesToolbarStyle,
         ),
-        GhostIconButton(
+        GhostButton.icon(
           tooltip: '添加漫画',
           semanticLabel: '添加漫画',
           icon: LucideIcons.plus,
@@ -207,7 +207,7 @@ class _SeriesDetailBody extends ConsumerWidget {
             );
           },
         ),
-        GhostIconButton(
+        GhostButton.icon(
           tooltip: '调整顺序',
           semanticLabel: '调整顺序',
           icon: LucideIcons.arrowUpDown,
@@ -230,7 +230,7 @@ class _SeriesDetailBody extends ConsumerWidget {
             );
           },
         ),
-        GhostIconButton(
+        GhostButton.icon(
           tooltip: '重命名',
           semanticLabel: '重命名',
           icon: LucideIcons.squarePen,

@@ -6,6 +6,7 @@ import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
+import 'package:hentai_library/presentation/widgets/button/ghost_icon_button.dart';
 import 'package:hentai_library/presentation/widgets/card_item/reading_history_card.dart';
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -18,7 +19,7 @@ class HistoryPage extends HookConsumerWidget {
     final query = useState<String>('');
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 16,
@@ -29,6 +30,12 @@ class HistoryPage extends HookConsumerWidget {
       ),
     );
   }
+}
+
+class _HistoryStyles {
+  const _HistoryStyles._();
+  static const double titleFontSize = 26;
+  static const double subtitleFontSize = 13;
 }
 
 class _Header extends ConsumerWidget {
@@ -59,31 +66,21 @@ class _Header extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 6,
             children: [
-              Row(
-                spacing: 4,
-                children: [
-                  Icon(
-                    LucideIcons.history,
-                    size: 24,
-                    color: theme.colorScheme.primary,
-                  ),
-                  Text(
-                    "阅读历史",
-                    style: TextStyle(
-                      color: theme.colorScheme.textPrimary,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                ],
+              Text(
+                "阅读历史",
+                style: TextStyle(
+                  color: theme.colorScheme.textPrimary,
+                  fontSize: _HistoryStyles.titleFontSize,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.4,
+                ),
               ),
               Text(
                 "${history.length} 条记录 • 最长保留 30 天",
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w200,
-                  color: theme.colorScheme.textSecondary,
+                  fontSize: _HistoryStyles.subtitleFontSize,
+                  fontWeight: FontWeight.w400,
+                  color: theme.colorScheme.textTertiary,
                 ),
               ),
             ],
@@ -105,62 +102,33 @@ class _Header extends ConsumerWidget {
 
   Widget _buildClearBtn(BuildContext context, WidgetRef ref, bool enabled) {
     final cs = Theme.of(context).colorScheme;
-    return Tooltip(
-      message: '清空阅读历史',
-      child: Semantics(
-        label: '清空阅读历史',
-        button: true,
-        child: TextButton.icon(
-          onPressed: !enabled
-              ? null
-              : () async {
-                  final confirmed =
-                      await showDialog<bool>(
-                        context: context,
-                        builder: (context) =>
-                            const _ConfirmClearHistoryDialog(),
-                      ) ??
-                      false;
-                  if (!confirmed) return;
-                  try {
-                    await ref
-                        .read(readingHistoryRepoProvider)
-                        .clearAllHistory();
-                    if (context.mounted) {
-                      showSuccessSnackBar(context, '已清空阅读历史');
-                    }
-                  } catch (e) {
-                    if (context.mounted) showErrorSnackBar(context, e);
-                  }
-                },
-          icon: Icon(LucideIcons.trash2, size: 16),
-          label: const Text(
-            '清空',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
-          style: ButtonStyle(
-            foregroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-              if (states.contains(MaterialState.hovered)) {
-                return cs.error;
+    return GhostButton.iconText(
+      icon: LucideIcons.trash2,
+      text: '清空',
+      tooltip: '清空阅读历史',
+      semanticLabel: '清空阅读历史',
+      onPressed: !enabled
+          ? null
+          : () async {
+              final confirmed =
+                  await showDialog<bool>(
+                    context: context,
+                    builder: (context) => const _ConfirmClearHistoryDialog(),
+                  ) ??
+                  false;
+              if (!confirmed) return;
+              try {
+                await ref.read(readingHistoryRepoProvider).clearAllHistory();
+                if (context.mounted) {
+                  showSuccessSnackBar(context, '已清空阅读历史');
+                }
+              } catch (e) {
+                if (context.mounted) showErrorSnackBar(context, e);
               }
-              return cs.warning;
-            }),
-            backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-              if (states.contains(MaterialState.hovered)) {
-                return cs.error.withAlpha(24);
-              }
-              return Colors.transparent;
-            }),
-            shape: WidgetStateProperty.all(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            padding: WidgetStateProperty.all(
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            ),
-            overlayColor: MaterialStateProperty.all(cs.error.withAlpha(20)),
-          ),
-        ),
-      ),
+            },
+      foregroundColor: cs.warning,
+      hoverColor: cs.error.withAlpha(24),
+      overlayColor: cs.error.withAlpha(20),
     );
   }
 }
