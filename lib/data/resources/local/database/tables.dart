@@ -12,22 +12,34 @@ class SavedPaths extends Table {
   TextColumn get securityBookmark => text().nullable()();
 }
 
-// 阅读历史
+/// 单本漫画阅读历史（与 [Comic] 标识对齐：comicId、title + 进度）。
 @TableIndex(name: 'idx_read_time', columns: {#lastReadTime})
 class ReadingHistories extends Table {
-  IntColumn get id => integer().autoIncrement()();
-
-  TextColumn get comicId => text().unique()();
-
-  // 漫画标题/封面等（冗余存储减少关联查询）
+  TextColumn get comicId => text()();
   TextColumn get title => text()();
-  TextColumn get coverUrl => text().nullable()();
-
   DateTimeColumn get lastReadTime => dateTime()();
-
-  // 阅读进度：章节 id、1-based 页码（nullable 兼容旧数据）
-  TextColumn get chapterId => text().nullable()();
   IntColumn get pageIndex => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {comicId};
+}
+
+/// 系列维度阅读历史（与 [Series.name] 对齐 + 最后打开的漫画与页码）。
+@DataClassName('SeriesReadingHistoryRow')
+@TableIndex(name: 'idx_series_read_time', columns: {#lastReadTime})
+class SeriesReadingHistories extends Table {
+  TextColumn get seriesName => text()();
+  TextColumn get lastReadComicId => text()();
+  DateTimeColumn get lastReadTime => dateTime()();
+  IntColumn get pageIndex => integer().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {seriesName};
+
+  @override
+  List<String> get customConstraints => [
+    'FOREIGN KEY(series_name) REFERENCES library_series(name) ON DELETE CASCADE ON UPDATE CASCADE',
+  ];
 }
 
 class StringListJsonConverter extends TypeConverter<List<String>, String> {

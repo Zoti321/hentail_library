@@ -29,3 +29,7 @@ SavedPathDao savedPathDao(Ref ref) => SavedPathDao(ref.read(databaseProvider));
 @Riverpod(keepAlive: true)
 ReadingHistoryDao readingHistoryDao(Ref ref) =>
     ReadingHistoryDao(ref.read(databaseProvider));
+
+@Riverpod(keepAlive: true)
+SeriesReadingHistoryDao seriesReadingHistoryDao(Ref ref) =>
+    SeriesReadingHistoryDao(ref.read(databaseProvider));

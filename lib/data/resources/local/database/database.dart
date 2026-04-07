@@ -18,13 +18,14 @@ part 'database.g.dart';
     LibraryComicTags,
     LibrarySeries,
     LibrarySeriesItems,
+    SeriesReadingHistories,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? excutor]) : super(excutor ?? _openConnection());
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -51,6 +52,42 @@ CREATE TABLE library_series_items_new (
         await customStatement('DROP TABLE library_series_items;');
         await customStatement(
           'ALTER TABLE library_series_items_new RENAME TO library_series_items;',
+        );
+      }
+      if (from < 10) {
+        await customStatement('DROP INDEX IF EXISTS idx_read_time;');
+        await customStatement('''
+CREATE TABLE reading_histories_new (
+  comic_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  last_read_time INTEGER NOT NULL,
+  page_index INTEGER,
+  PRIMARY KEY (comic_id)
+);
+''');
+        await customStatement('''
+INSERT INTO reading_histories_new (comic_id, title, last_read_time, page_index)
+SELECT comic_id, title, last_read_time, page_index FROM reading_histories;
+''');
+        await customStatement('DROP TABLE reading_histories;');
+        await customStatement(
+          'ALTER TABLE reading_histories_new RENAME TO reading_histories;',
+        );
+        await customStatement(
+          'CREATE INDEX idx_read_time ON reading_histories (last_read_time);',
+        );
+        await customStatement('''
+CREATE TABLE series_reading_histories (
+  series_name TEXT NOT NULL,
+  last_read_comic_id TEXT NOT NULL,
+  last_read_time INTEGER NOT NULL,
+  page_index INTEGER,
+  PRIMARY KEY (series_name),
+  FOREIGN KEY(series_name) REFERENCES library_series(name) ON DELETE CASCADE ON UPDATE CASCADE
+);
+''');
+        await customStatement(
+          'CREATE INDEX idx_series_read_time ON series_reading_histories (last_read_time);',
         );
       }
     },

@@ -34,5 +34,8 @@ PathRepository pathRepo(Ref ref) =>
 
 @Riverpod(keepAlive: true)
 ReadingHistoryRepository readingHistoryRepo(Ref ref) =>
-    ReadingHistoryRepositoryImpl(ref.read(readingHistoryDaoProvider));
+    ReadingHistoryRepositoryImpl(
+      ref.read(readingHistoryDaoProvider),
+      ref.read(seriesReadingHistoryDaoProvider),
+    );
 

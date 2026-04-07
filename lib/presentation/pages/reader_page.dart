@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
-import 'package:hentai_library/domain/entity/reading_history.dart' as entity;
+import 'package:hentai_library/domain/entity/entities.dart' as entity;
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -86,7 +86,11 @@ class ReaderPage extends HookConsumerWidget {
                   nav: seriesNav,
                   comicId: comicId,
                   onSelectComic: (String targetComicId) {
-                    _saveProgress(ref, comicId);
+                    _saveProgress(
+                      ref,
+                      comicId,
+                      seriesName: seriesNav.seriesName,
+                    );
                     scaffoldKey.currentState?.closeEndDrawer();
                     context.pushReplacementNamed(
                       '阅读页面',
@@ -135,22 +139,34 @@ class ReaderPage extends HookConsumerWidget {
   }
 }
 
-void _saveProgress(WidgetRef ref, String comicId) {
+void _saveProgress(
+  WidgetRef ref,
+  String comicId, {
+  String? seriesName,
+}) {
   final state = ref.read(readerViewProvider(comicId)).asData?.value;
   if (state == null) return;
   final comic = state.comic;
   final currentIndex = state.currentIndex;
-
-  ref
-      .read(recordReadingProgressUseCaseProvider)
-      .call(
-        entity.ReadingHistory(
-          comicId: comicId,
-          title: comic.title,
-          lastReadTime: DateTime.now(),
+  final DateTime now = DateTime.now();
+  final entity.SeriesReadingHistory? series =
+      seriesName != null && seriesName.isNotEmpty
+      ? entity.SeriesReadingHistory(
+          seriesName: seriesName,
+          lastReadComicId: comicId,
+          lastReadTime: now,
           pageIndex: currentIndex,
-        ),
-      );
+        )
+      : null;
+  ref.read(recordReadingProgressUseCaseProvider).call(
+    entity.ReadingHistory(
+      comicId: comicId,
+      title: comic.title,
+      lastReadTime: now,
+      pageIndex: currentIndex,
+    ),
+    series: series,
+  );
 }
 
 void _exitReaderPage(
@@ -159,7 +175,7 @@ void _exitReaderPage(
   String comicId,
   String? seriesQuery,
 ) {
-  _saveProgress(ref, comicId);
+  _saveProgress(ref, comicId, seriesName: seriesQuery);
   final GoRouter router = GoRouter.of(context);
   if (router.canPop()) {
     router.pop();
@@ -326,7 +342,7 @@ class _TopBar extends HookConsumerWidget {
       final int next = nav.currentIndex + delta;
       if (next < 0 || next >= nav.sortedItems.length) return;
       final String targetId = nav.sortedItems[next].comicId;
-      _saveProgress(ref, comicId);
+      _saveProgress(ref, comicId, seriesName: nav.seriesName);
       context.pushReplacementNamed(
         '阅读页面',
         pathParameters: <String, String>{'id': targetId},
