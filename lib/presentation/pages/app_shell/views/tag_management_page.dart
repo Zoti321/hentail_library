@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
@@ -14,27 +15,49 @@ class TagManagementPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    Future<void> openAddTagDialog() async {
+      await showDialog<void>(
+        context: context,
+        barrierColor: Colors.transparent,
+        builder: (context) => TagNameEditorDialog(
+          title: '添加标签',
+          labelText: '名称',
+          hintText: '输入标签名称…',
+          initialValue: '',
+          onSubmit: (value) async {
+            await ref.read(tagActionsProvider).addTag(Tag(name: value));
+          },
+        ),
+      );
+    }
+
     final tagsAsync = ref.watch(allTagsProvider);
     final selection = ref.watch(tagSelectionProvider);
     final query = ref.watch(tagFilterProvider);
 
-    return SingleChildScrollView(
-      padding: _TagStyles.pagePadding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _TagManagementHeader(selectionCount: selection.length),
-          const SizedBox(height: 20),
-          tagsAsync.when(
-            data: (tags) {
-              final filtered = _applyFilter(tags, query);
-              if (filtered.isEmpty) return const _TagManagementEmptyState();
-              return _TagList(tags: filtered);
-            },
-            loading: () => const _TagManagementLoadingCard(),
-            error: (e, _) => _TagManagementErrorCard(error: e),
-          ),
-        ],
+    return _AddShortcutScope(
+      onAdd: openAddTagDialog,
+      child: SingleChildScrollView(
+        padding: _TagStyles.pagePadding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _TagManagementHeader(
+              selectionCount: selection.length,
+              onAddTag: openAddTagDialog,
+            ),
+            const SizedBox(height: 20),
+            tagsAsync.when(
+              data: (tags) {
+                final filtered = _applyFilter(tags, query);
+                if (filtered.isEmpty) return const _TagManagementEmptyState();
+                return _TagList(tags: filtered);
+              },
+              loading: () => const _TagManagementLoadingCard(),
+              error: (e, _) => _TagManagementErrorCard(error: e),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -170,13 +193,18 @@ class _TagManagementEmptyState extends StatelessWidget {
 }
 
 class _TagManagementHeader extends ConsumerWidget {
-  const _TagManagementHeader({required this.selectionCount});
+  const _TagManagementHeader({
+    required this.selectionCount,
+    required this.onAddTag,
+  });
 
   final int selectionCount;
+  final Future<void> Function() onAddTag;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
+    final String shortcutLabel = _shortcutLabel(context);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,29 +261,16 @@ class _TagManagementHeader extends ConsumerWidget {
                     ref.read(tagFilterProvider.notifier).setQuery(value),
               ),
             ),
-            FilledButton.icon(
-              onPressed: () async {
-                await showDialog<void>(
-                  context: context,
-                  barrierColor: Colors.transparent,
-                  builder: (context) => TagNameEditorDialog(
-                    title: '添加标签',
-                    labelText: '名称',
-                    hintText: '输入标签名称…',
-                    initialValue: '',
-                    onSubmit: (value) async {
-                      await ref
-                          .read(tagActionsProvider)
-                          .addTag(Tag(name: value));
-                    },
+            Tooltip(
+              message: '添加标签 ($shortcutLabel)',
+              child: FilledButton.icon(
+                onPressed: onAddTag,
+                icon: const Icon(LucideIcons.plus, size: 16),
+                label: Text('添加标签 ($shortcutLabel)'),
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                );
-              },
-              icon: const Icon(LucideIcons.plus, size: 16),
-              label: const Text('添加标签'),
-              style: FilledButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
             ),
@@ -289,6 +304,57 @@ class _TagManagementHeader extends ConsumerWidget {
       ],
     );
   }
+}
+
+class _AddIntent extends Intent {
+  const _AddIntent();
+}
+
+class _AddShortcutScope extends StatelessWidget {
+  const _AddShortcutScope({required this.child, required this.onAdd});
+
+  final Widget child;
+  final Future<void> Function() onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    return Shortcuts(
+      shortcuts: const <ShortcutActivator, Intent>{
+        SingleActivator(LogicalKeyboardKey.keyN, control: true): _AddIntent(),
+        SingleActivator(LogicalKeyboardKey.keyN, meta: true): _AddIntent(),
+      },
+      child: Actions(
+        actions: <Type, Action<Intent>>{
+          _AddIntent: CallbackAction<_AddIntent>(
+            onInvoke: (_AddIntent intent) {
+              if (_isTextInputFocused()) {
+                return null;
+              }
+              onAdd();
+              return null;
+            },
+          ),
+        },
+        child: Focus(autofocus: true, child: child),
+      ),
+    );
+  }
+
+  bool _isTextInputFocused() {
+    final FocusNode? node = FocusManager.instance.primaryFocus;
+    final BuildContext? context = node?.context;
+    if (context == null) {
+      return false;
+    }
+    return context.widget is EditableText;
+  }
+}
+
+String _shortcutLabel(BuildContext context) {
+  final TargetPlatform platform = Theme.of(context).platform;
+  final bool isApple =
+      platform == TargetPlatform.macOS || platform == TargetPlatform.iOS;
+  return isApple ? '⌘N' : 'Ctrl+N';
 }
 
 class _MetaChip extends StatelessWidget {

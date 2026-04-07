@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
@@ -17,28 +18,39 @@ class SeriesManagementPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    Future<void> openAddSeriesDialog() async {
+      await showDialog<void>(
+        context: context,
+        barrierColor: Colors.transparent,
+        builder: (context) => const AddSeriesDialog(),
+      );
+    }
+
     final seriesAsync = ref.watch(allSeriesProvider);
     final query = ref.watch(seriesFilterProvider);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const _Header(),
-          const SizedBox(height: 20),
-          seriesAsync.when(
-            data: (series) {
-              final filtered = _applyFilter(series, query);
-              if (filtered.isEmpty) {
-                return const _SeriesManagementEmptyState();
-              }
-              return _SeriesList(series: filtered);
-            },
-            loading: () => const _SeriesManagementLoadingState(),
-            error: (e, _) => _SeriesManagementErrorState(error: e),
-          ),
-        ],
+    return _AddShortcutScope(
+      onAdd: openAddSeriesDialog,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _Header(onAddSeries: openAddSeriesDialog),
+            const SizedBox(height: 20),
+            seriesAsync.when(
+              data: (series) {
+                final filtered = _applyFilter(series, query);
+                if (filtered.isEmpty) {
+                  return const _SeriesManagementEmptyState();
+                }
+                return _SeriesList(series: filtered);
+              },
+              loading: () => const _SeriesManagementLoadingState(),
+              error: (e, _) => _SeriesManagementErrorState(error: e),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -51,12 +63,15 @@ class SeriesManagementPage extends ConsumerWidget {
 }
 
 class _Header extends ConsumerWidget {
-  const _Header();
+  const _Header({required this.onAddSeries});
+
+  final Future<void> Function() onAddSeries;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final String shortcutLabel = _shortcutLabel(context);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,19 +111,16 @@ class _Header extends ConsumerWidget {
                     ref.read(seriesFilterProvider.notifier).setQuery(value),
               ),
             ),
-            FilledButton.icon(
-              onPressed: () async {
-                await showDialog<void>(
-                  context: context,
-                  barrierColor: Colors.transparent,
-                  builder: (context) => const AddSeriesDialog(),
-                );
-              },
-              icon: const Icon(LucideIcons.plus, size: 16),
-              label: const Text('添加系列'),
-              style: FilledButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            Tooltip(
+              message: '添加系列 ($shortcutLabel)',
+              child: FilledButton.icon(
+                onPressed: onAddSeries,
+                icon: const Icon(LucideIcons.plus, size: 16),
+                label: Text('添加系列 ($shortcutLabel)'),
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
             ),
@@ -117,6 +129,57 @@ class _Header extends ConsumerWidget {
       ],
     );
   }
+}
+
+class _AddIntent extends Intent {
+  const _AddIntent();
+}
+
+class _AddShortcutScope extends StatelessWidget {
+  const _AddShortcutScope({required this.child, required this.onAdd});
+
+  final Widget child;
+  final Future<void> Function() onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    return Shortcuts(
+      shortcuts: const <ShortcutActivator, Intent>{
+        SingleActivator(LogicalKeyboardKey.keyN, control: true): _AddIntent(),
+        SingleActivator(LogicalKeyboardKey.keyN, meta: true): _AddIntent(),
+      },
+      child: Actions(
+        actions: <Type, Action<Intent>>{
+          _AddIntent: CallbackAction<_AddIntent>(
+            onInvoke: (_AddIntent intent) {
+              if (_isTextInputFocused()) {
+                return null;
+              }
+              onAdd();
+              return null;
+            },
+          ),
+        },
+        child: Focus(autofocus: true, child: child),
+      ),
+    );
+  }
+
+  bool _isTextInputFocused() {
+    final FocusNode? node = FocusManager.instance.primaryFocus;
+    final BuildContext? context = node?.context;
+    if (context == null) {
+      return false;
+    }
+    return context.widget is EditableText;
+  }
+}
+
+String _shortcutLabel(BuildContext context) {
+  final TargetPlatform platform = Theme.of(context).platform;
+  final bool isApple =
+      platform == TargetPlatform.macOS || platform == TargetPlatform.iOS;
+  return isApple ? '⌘N' : 'Ctrl+N';
 }
 
 class _SeriesList extends StatelessWidget {

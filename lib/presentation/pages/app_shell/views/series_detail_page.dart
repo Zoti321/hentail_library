@@ -12,6 +12,7 @@ import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/entity/series_reading_history.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
+import 'package:hentai_library/presentation/widgets/button/ghost_icon_button.dart';
 import 'package:hentai_library/presentation/widgets/dialog/add_comics_to_series_dialog.dart';
 import 'package:hentai_library/presentation/widgets/dialog/rename_series_dialog.dart';
 import 'package:hentai_library/presentation/widgets/dialog/reorder_series_items_dialog.dart';
@@ -131,12 +132,6 @@ class _SeriesDetailBody extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
-    final ButtonStyle secondarySeriesToolbarStyle = OutlinedButton.styleFrom(
-      foregroundColor: cs.onSurface,
-      side: BorderSide(color: cs.borderSubtle),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    );
     final int count = series.items.length;
     final Widget titleBlock = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,7 +192,10 @@ class _SeriesDetailBody extends ConsumerWidget {
           label: const Text('阅读系列'),
           style: primarySeriesToolbarStyle,
         ),
-        OutlinedButton.icon(
+        GhostIconButton(
+          tooltip: '添加漫画',
+          semanticLabel: '添加漫画',
+          icon: LucideIcons.plus,
           onPressed: () async {
             await showDialog<void>(
               context: context,
@@ -208,11 +206,11 @@ class _SeriesDetailBody extends ConsumerWidget {
               ),
             );
           },
-          icon: const Icon(LucideIcons.plus, size: 16),
-          label: const Text('添加漫画'),
-          style: secondarySeriesToolbarStyle,
         ),
-        OutlinedButton.icon(
+        GhostIconButton(
+          tooltip: '调整顺序',
+          semanticLabel: '调整顺序',
+          icon: LucideIcons.arrowUpDown,
           onPressed: () {
             if (series.items.length < 2) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -231,11 +229,11 @@ class _SeriesDetailBody extends ConsumerWidget {
                   ReorderSeriesItemsDialog(series: series),
             );
           },
-          icon: const Icon(LucideIcons.arrowUpDown, size: 16),
-          label: const Text('调整顺序'),
-          style: secondarySeriesToolbarStyle,
         ),
-        OutlinedButton.icon(
+        GhostIconButton(
+          tooltip: '重命名',
+          semanticLabel: '重命名',
+          icon: LucideIcons.squarePen,
           onPressed: () async {
             final String? newName = await showDialog<String>(
               context: context,
@@ -250,9 +248,6 @@ class _SeriesDetailBody extends ConsumerWidget {
               );
             }
           },
-          icon: const Icon(LucideIcons.squarePen, size: 16),
-          label: const Text('重命名'),
-          style: secondarySeriesToolbarStyle,
         ),
       ],
     );

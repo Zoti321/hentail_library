@@ -80,6 +80,13 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     );
 
     final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
+    final int seriesCount = seriesAsync.when(
+      data: (List<Series> list) =>
+          list.where((Series series) => series.items.isNotEmpty).length,
+      error: (Object err, StackTrace stack) => 0,
+      loading: () => 0,
+      skipLoadingOnReload: true,
+    );
     final List<Series> seriesToShow = seriesAsync.maybeWhen(
       data: (List<Series> list) => _filterSeriesForLibrary(list, filterQuery),
       orElse: () => <Series>[],
@@ -132,6 +139,39 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                           const SizedBox(width: 6),
                           Text(
                             AppStrings.comicCount(comicCount),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: theme.colorScheme.borderSubtle,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            LucideIcons.bookMarked,
+                            size: 14,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '$seriesCount 个系列',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -221,11 +261,13 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     if (series.isEmpty) {
       return <Widget>[];
     }
+
     final ThemeData theme = Theme.of(context);
+
     return <Widget>[
       SliverToBoxAdapter(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(48, 0, 48, 8),
+          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 4),
           child: Text(
             '系列',
             style: TextStyle(
@@ -457,8 +499,7 @@ class _NoMatchingComicsSliver extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final String q = query.trim();
     final bool hasQuery = q.isNotEmpty;
-    final String message =
-        hasQuery ? '无匹配漫画（可尝试调整搜索或筛选）' : '暂无漫画';
+    final String message = hasQuery ? '无匹配漫画（可尝试调整搜索或筛选）' : '暂无漫画';
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.only(top: 24, bottom: 48),
