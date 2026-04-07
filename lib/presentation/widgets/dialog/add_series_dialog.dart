@@ -47,6 +47,7 @@ class _AddSeriesDialogState extends ConsumerState<AddSeriesDialog> {
         initialValue: _nameController.text,
         labelText: '名称',
         hintText: '输入系列名称…',
+        autofocus: true,
         onChanged: (value) => _nameController.text = value,
         onSubmitted: (_) async {
           if (_saving) return;

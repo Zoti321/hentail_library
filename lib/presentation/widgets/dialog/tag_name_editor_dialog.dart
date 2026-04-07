@@ -66,6 +66,7 @@ class _TagNameEditorDialogState extends ConsumerState<TagNameEditorDialog> {
         initialValue: _controller.text,
         labelText: widget.labelText,
         hintText: widget.hintText,
+        autofocus: true,
         onChanged: (value) => _controller.text = value,
         onSubmitted: (_) async {
           if (_saving) return;

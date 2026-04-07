@@ -8,6 +8,7 @@ class FluentTextField extends StatefulWidget {
   final int maxLines;
   final String? hintText;
   final String? labelText;
+  final bool autofocus;
 
   const FluentTextField({
     super.key,
@@ -17,6 +18,7 @@ class FluentTextField extends StatefulWidget {
     this.maxLines = 1,
     this.hintText,
     this.labelText,
+    this.autofocus = false,
   });
 
   @override
@@ -80,6 +82,7 @@ class FluentTextFieldState extends State<FluentTextField> {
             ),
             child: TextField(
               controller: _controller,
+              autofocus: widget.autofocus,
               onChanged: widget.onChanged,
               onSubmitted: widget.onSubmitted,
               textInputAction:
