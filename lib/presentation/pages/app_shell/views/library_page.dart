@@ -427,7 +427,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   );
                 },
                 onPlay: () {},
-                onRightClick: (val) {},
               ),
             );
           },
@@ -474,7 +473,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   pathParameters: {'id': manga.comicId},
                 );
               },
-              onRightClick: (val) {},
             );
           },
         );

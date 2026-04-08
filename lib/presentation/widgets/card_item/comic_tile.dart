@@ -5,20 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/theme.dart';
+import 'package:hentai_library/core/util/snackbar_util.dart';
+import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/domain/usecases/purge_comics_side_effects.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/routes/routes.dart';
+import 'package:hentai_library/presentation/widgets/context_menu.dart';
+import 'package:hentai_library/presentation/widgets/dialog/edit_metadata_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ComicTile extends HookConsumerWidget {
   final Comic comic;
   final VoidCallback onTap;
-  final Function(TapDownDetails) onRightClick;
 
   const ComicTile({
     super.key,
     required this.comic,
     required this.onTap,
-    required this.onRightClick,
   });
 
   @override
@@ -40,7 +44,91 @@ class ComicTile extends HookConsumerWidget {
 
       child: GestureDetector(
         onTap: onTap,
-        onSecondaryTapDown: onRightClick,
+        onSecondaryTapUp: (TapUpDetails details) {
+          final RenderBox overlay =
+              Overlay.of(context).context.findRenderObject() as RenderBox;
+          final Offset relativePosition = overlay.globalToLocal(
+            details.globalPosition,
+          );
+          FluentContextMenu.show(
+            context,
+            position: relativePosition,
+            mangaTitle: comic.title,
+            onAction: (ComicContextAction action) {
+              switch (action) {
+                case ComicContextAction.read:
+                  appRouter.pushNamed(
+                    '阅读页面',
+                    pathParameters: {'id': comic.comicId},
+                  );
+                  break;
+                case ComicContextAction.detail:
+                  appRouter.pushNamed(
+                    '漫画详情',
+                    pathParameters: {'id': comic.comicId},
+                  );
+                  break;
+                case ComicContextAction.edit:
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => EditMetadataDialog(
+                      comic: comic,
+                      onSave: (data) async {
+                        await ref.read(updateComicMetadataUseCaseProvider)(
+                          comic.comicId,
+                          data,
+                        );
+                      },
+                    ),
+                  );
+                  break;
+                case ComicContextAction.openFolder:
+                  if (coverPath != null) {
+                    openFolder(coverPath);
+                  }
+                  break;
+                case ComicContextAction.delete:
+                  showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text('删除漫画？'),
+                      content: Text('将删除「${comic.title}」。此操作不可撤销。'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text('取消'),
+                        ),
+                        FilledButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          child: const Text('删除'),
+                        ),
+                      ],
+                    ),
+                  ).then((bool? confirmed) async {
+                    if (confirmed != true || !context.mounted) {
+                      return;
+                    }
+                    try {
+                      await purgeComicsFromApp(
+                        libraryComics: ref.read(libraryComicRepoProvider),
+                        readingHistory: ref.read(readingHistoryRepoProvider),
+                        librarySeries: ref.read(librarySeriesRepoProvider),
+                        comicIds: <String>[comic.comicId],
+                      );
+                      if (context.mounted) {
+                        showSuccessSnackBar(context, '已删除漫画');
+                      }
+                    } catch (err) {
+                      if (context.mounted) {
+                        showErrorSnackBar(context, err);
+                      }
+                    }
+                  });
+                  break;
+              }
+            },
+          );
+        },
 
         child: Container(
           margin: EdgeInsets.only(bottom: tokens.spacing.md),

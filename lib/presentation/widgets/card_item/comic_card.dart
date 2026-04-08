@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/theme.dart';
+import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/domain/usecases/purge_comics_side_effects.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/context_menu.dart';
@@ -18,7 +20,6 @@ class ComicCard extends HookConsumerWidget {
   final Size size;
   final VoidCallback onTap;
   final VoidCallback onPlay;
-  final Function(TapDownDetails) onRightClick;
 
   const ComicCard({
     super.key,
@@ -26,7 +27,6 @@ class ComicCard extends HookConsumerWidget {
     required this.size,
     required this.onTap,
     required this.onPlay,
-    required this.onRightClick,
   });
 
   @override
@@ -53,19 +53,19 @@ class ComicCard extends HookConsumerWidget {
           mangaTitle: comic.title,
           onAction: (action) {
             switch (action) {
-              case 'read':
+              case ComicContextAction.read:
                 appRouter.pushNamed(
                   "阅读页面",
                   pathParameters: {'id': comic.comicId},
                 );
                 break;
-              case 'detail':
+              case ComicContextAction.detail:
                 appRouter.pushNamed(
                   '漫画详情',
                   pathParameters: {'id': comic.comicId},
                 );
                 break;
-              case "edit":
+              case ComicContextAction.edit:
                 showDialog(
                   context: context,
                   builder: (context) => EditMetadataDialog(
@@ -79,11 +79,46 @@ class ComicCard extends HookConsumerWidget {
                   ),
                 );
                 break;
-              case "merge":
-                // 章节归档功能已下线。
-                break;
-              case "open_folder":
+              case ComicContextAction.openFolder:
                 if (coverPath != null) openFolder(coverPath);
+                break;
+              case ComicContextAction.delete:
+                showDialog<bool>(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: const Text('删除漫画？'),
+                    content: Text('将删除「${comic.title}」。此操作不可撤销。'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('取消'),
+                      ),
+                      FilledButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('删除'),
+                      ),
+                    ],
+                  ),
+                ).then((bool? confirmed) async {
+                  if (confirmed != true || !context.mounted) {
+                    return;
+                  }
+                  try {
+                    await purgeComicsFromApp(
+                      libraryComics: ref.read(libraryComicRepoProvider),
+                      readingHistory: ref.read(readingHistoryRepoProvider),
+                      librarySeries: ref.read(librarySeriesRepoProvider),
+                      comicIds: <String>[comic.comicId],
+                    );
+                    if (context.mounted) {
+                      showSuccessSnackBar(context, '已删除漫画');
+                    }
+                  } catch (err) {
+                    if (context.mounted) {
+                      showErrorSnackBar(context, err);
+                    }
+                  }
+                });
                 break;
             }
           },
@@ -214,7 +249,7 @@ class ComicCard extends HookConsumerWidget {
         Row(
           children: [
             Text(
-              '${pageCount}p',
+              '$pageCount页',
               style: TextStyle(
                 fontSize: tokens.text.labelXs - 1,
                 color: Theme.of(context).colorScheme.textTertiary,
