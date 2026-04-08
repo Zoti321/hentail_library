@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -28,20 +29,18 @@ class _SortPopupButtonState extends ConsumerState<SortPopupButton> {
       showArrow: false,
       verticalMargin: -16,
       menuBuilder: () => _SortMenu(),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _controller.showMenu(),
-          borderRadius: BorderRadius.circular(tokens.radius.sm),
-          child: Container(
-            padding: const EdgeInsets.all(6),
-            child: Icon(
-              LucideIcons.arrowDownWideNarrow,
-              size: 16,
-              color: theme.colorScheme.iconDefault,
-            ),
-          ),
-        ),
+      child: GhostButton.icon(
+        icon: LucideIcons.arrowDownWideNarrow,
+        tooltip: '排序',
+        semanticLabel: '打开排序',
+        iconSize: 16,
+        size: 28,
+        borderRadius: tokens.radius.sm,
+        foregroundColor: theme.colorScheme.iconDefault,
+        hoverColor: theme.hoverColor,
+        overlayColor: theme.hoverColor,
+        delayTooltipThreeSeconds: true,
+        onPressed: () => _controller.showMenu(),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/widgets/my_toggle_switch.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -19,6 +20,7 @@ class _FilterPopupButtonState extends ConsumerState<FilterPopupButton> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+
     return CustomPopupMenu(
       controller: controller,
       barrierColor: Colors.transparent,
@@ -26,16 +28,18 @@ class _FilterPopupButtonState extends ConsumerState<FilterPopupButton> {
       showArrow: false,
       verticalMargin: -16,
       menuBuilder: () => _FilterMenu(menuController: controller),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => controller.toggleMenu(),
-          borderRadius: BorderRadius.circular(6),
-          child: Container(
-            padding: const EdgeInsets.all(6),
-            child: Icon(LucideIcons.funnel, size: 16, color: cs.iconDefault),
-          ),
-        ),
+      child: GhostButton.icon(
+        icon: LucideIcons.funnel,
+        tooltip: '筛选',
+        semanticLabel: '打开筛选',
+        iconSize: 16,
+        size: 28,
+        borderRadius: 6,
+        foregroundColor: cs.iconDefault,
+        hoverColor: Theme.of(context).hoverColor,
+        overlayColor: Theme.of(context).hoverColor,
+        delayTooltipThreeSeconds: true,
+        onPressed: () => controller.toggleMenu(),
       ),
     );
   }
@@ -106,7 +110,11 @@ class _FilterMenu extends HookConsumerWidget {
           Row(
             spacing: 8,
             children: [
-              Icon(LucideIcons.funnel, size: 16, color: colorScheme.iconSecondary),
+              Icon(
+                LucideIcons.funnel,
+                size: 16,
+                color: colorScheme.iconSecondary,
+              ),
               Text(
                 "显示 R18 内容",
                 style: TextStyle(

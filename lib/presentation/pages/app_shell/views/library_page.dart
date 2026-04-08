@@ -7,11 +7,13 @@ import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/button/filter_popup_button.dart';
+import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/widgets/button/sort_popup_button.dart';
 import 'package:hentai_library/presentation/widgets/card_item/comic_card.dart';
 import 'package:hentai_library/presentation/widgets/card_item/comic_tile.dart';
 import 'package:hentai_library/presentation/widgets/card_item/series_card.dart';
 import 'package:hentai_library/presentation/widgets/card_item/series_tile.dart';
+import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
@@ -23,18 +25,11 @@ class LibraryPage extends ConsumerStatefulWidget {
 
 class _LibraryPageState extends ConsumerState<LibraryPage> {
   late final TextEditingController _searchController;
-  late final FocusNode _searchFocusNode;
-  bool _searchFocused = false;
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
-    _searchFocusNode = FocusNode();
-    _searchFocusNode.addListener(() {
-      if (!mounted) return;
-      setState(() => _searchFocused = _searchFocusNode.hasFocus);
-    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final query = ref.read(libraryPageProvider).effectiveFilter.query ?? '';
@@ -47,7 +42,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   @override
   void dispose() {
     _searchController.dispose();
-    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -72,11 +66,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       );
     }
 
-    final comicCount = comics.when(
-      data: (data) => data.length,
-      error: (err, stack) => 0,
-      loading: () => 0,
-      skipLoadingOnReload: true,
+    final int comicCount = ref.watch(
+      libraryPageProvider.select((s) => s.rawList.length),
     );
 
     final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
@@ -199,20 +190,12 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                         minWidth: 240,
                         maxWidth: 420,
                       ),
-                      child: _LibrarySearchField(
+                      child: CustomTextField(
                         controller: _searchController,
-                        focusNode: _searchFocusNode,
-                        isFocused: _searchFocused,
                         hintText: '搜索…',
                         onChanged: (val) => ref
                             .read(libraryPageProvider.notifier)
                             .updateFilterQuery(val),
-                        onClear: () {
-                          _searchController.clear();
-                          ref
-                              .read(libraryPageProvider.notifier)
-                              .updateFilterQuery('');
-                        },
                       ),
                     ),
                     const Spacer(),
@@ -331,20 +314,29 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   }
 
   Widget _buildToolbar(BuildContext context, ThemeData theme, bool isGridView) {
+    final ColorScheme cs = theme.colorScheme;
     return Container(
       height: 40,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: theme.colorScheme.borderSubtle),
+        border: Border.all(color: cs.borderSubtle),
       ),
       padding: const EdgeInsets.all(3),
       child: Row(
         children: [
           // 功能按钮组 (Refresh, Filter, Sort)
-          _ToolbarIconButton(
+          GhostButton.icon(
             icon: LucideIcons.rotateCw,
-            tooltip: "刷新",
+            tooltip: '刷新',
+            semanticLabel: '刷新',
+            iconSize: 16,
+            size: 28,
+            borderRadius: 6,
+            foregroundColor: cs.iconDefault,
+            hoverColor: theme.hoverColor,
+            overlayColor: theme.hoverColor,
+            delayTooltipThreeSeconds: true,
             onPressed: () {
               ref.read(libraryPageProvider.notifier).refreshStream();
             },
@@ -354,12 +346,15 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           const SizedBox(width: 8),
           SortPopupButton(),
           // 垂直分割线
-          Container(
-            width: 1,
-            height: 20,
-            color: theme.colorScheme.borderSubtle,
-            margin: const EdgeInsets.symmetric(horizontal: 12),
+          const SizedBox(width: 12),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: cs.borderSubtle,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: const SizedBox(width: 1, height: 22),
           ),
+          const SizedBox(width: 12),
 
           // 视图切换 (Grid/List)
           Row(
@@ -571,40 +566,6 @@ class _EmptyLibrarySliver extends StatelessWidget {
   }
 }
 
-class _ToolbarIconButton extends StatelessWidget {
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback onPressed;
-
-  const _ToolbarIconButton({
-    required this.icon,
-    required this.tooltip,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(6),
-          child: Container(
-            padding: const EdgeInsets.all(6),
-            child: Icon(
-              icon,
-              size: 16,
-              color: Theme.of(context).colorScheme.iconDefault,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _ViewToggleButton extends StatelessWidget {
   final IconData icon;
   final bool isActive;
@@ -620,25 +581,30 @@ class _ViewToggleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 0),
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        hoverColor: theme.hoverColor,
+        splashFactory: NoSplash.splashFactory,
+        child: Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: isActive
-                ? Theme.of(context).colorScheme.subtleTagBackground
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(6),
+            color: isActive ? cs.subtleTagBackground : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isActive ? cs.borderSubtle : Colors.transparent,
+            ),
           ),
           child: Icon(
             icon,
             size: 16,
-            color: isActive
-                ? activeColor
-                : Theme.of(context).colorScheme.iconSecondary,
+            color: isActive ? activeColor : cs.iconSecondary,
           ),
         ),
       ),
@@ -646,102 +612,3 @@ class _ViewToggleButton extends StatelessWidget {
   }
 }
 
-class _LibrarySearchField extends StatelessWidget {
-  const _LibrarySearchField({
-    required this.controller,
-    required this.focusNode,
-    required this.isFocused,
-    required this.hintText,
-    required this.onChanged,
-    required this.onClear,
-  });
-
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool isFocused;
-  final String hintText;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onClear;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isFocused ? cs.primary : cs.borderMedium,
-          width: 0.8,
-        ),
-        boxShadow: isFocused
-            ? [
-                BoxShadow(
-                  color: cs.primary.withOpacity(0.4),
-                  blurRadius: 0,
-                  spreadRadius: 1,
-                ),
-              ]
-            : [],
-      ),
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 12, right: 8),
-            child: Icon(
-              LucideIcons.search,
-              size: 16,
-              color: isFocused ? cs.primary : cs.textPlaceholder,
-            ),
-          ),
-          Expanded(
-            child: TextField(
-              controller: controller,
-              focusNode: focusNode,
-              onChanged: onChanged,
-              style: TextStyle(fontSize: 13, color: cs.textPrimary),
-              cursorColor: cs.onSurface,
-              cursorWidth: 0.8,
-              cursorHeight: 16,
-              decoration: InputDecoration(
-                isDense: true,
-                hintText: hintText,
-                hintStyle: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w300,
-                  color: cs.textPlaceholder,
-                ),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-              ),
-            ),
-          ),
-          ValueListenableBuilder<TextEditingValue>(
-            valueListenable: controller,
-            builder: (context, value, child) {
-              if (value.text.isEmpty) return const SizedBox(width: 12);
-              return MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: onClear,
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Icon(
-                      LucideIcons.circleX,
-                      size: 14,
-                      color: cs.textPlaceholder,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}

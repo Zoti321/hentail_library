@@ -7,6 +7,7 @@ import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/common/status/status_card_shell.dart';
 import 'package:hentai_library/presentation/widgets/dialog/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/presentation/widgets/dialog/tag_name_editor_dialog.dart';
+import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -554,10 +555,15 @@ class _TagRow extends ConsumerWidget {
                   ),
                 ),
               ),
-              IconButton(
+              GhostButton.icon(
+                icon: LucideIcons.squarePen,
+                iconSize: 16,
+                size: _TagStyles.iconButtonSize.width,
+                borderRadius: _TagStyles.iconButtonRadius,
                 tooltip: '重命名',
-                style: iconButtonStyle,
-                icon: const Icon(LucideIcons.squarePen, size: 16),
+                delayTooltipThreeSeconds: true,
+                hoverColor: cs.primary.withAlpha(10),
+                overlayColor: cs.primary.withAlpha(14),
                 onPressed: () async {
                   await showDialog<void>(
                     context: context,
