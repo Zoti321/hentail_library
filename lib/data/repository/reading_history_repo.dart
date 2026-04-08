@@ -70,6 +70,20 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   }
 
   @override
+  Future<void> deleteSeriesReadingBySeriesName(String seriesName) async {
+    try {
+      await _seriesDao.deleteBySeriesName(seriesName);
+    } catch (e, st) {
+      LogManager.instance.handle(
+        e,
+        st,
+        '[READING_HISTORY_REPO] 删除系列阅读历史失败，seriesName=$seriesName',
+      );
+      throw AppException('删除系列阅读历史失败', cause: e, stackTrace: st);
+    }
+  }
+
+  @override
   Future<void> deleteByComicId(String comicId) async {
     try {
       await _dao.deleteByComicId(comicId);

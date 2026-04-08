@@ -3,9 +3,10 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
-import 'package:hentai_library/domain/entity/reading_history.dart';
+import 'package:hentai_library/domain/entity/entities.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
+import 'package:hentai_library/presentation/ui_dto/history_grid_item_dto.dart';
 import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/widgets/card_item/reading_history_card.dart';
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
@@ -47,16 +48,15 @@ class _Header extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-
-    final rawData = ref.watch(readingHistoryStreamProvider);
-
-    final history = rawData.when(
+    final comicHistory = ref.watch(readingHistoryStreamProvider).maybeWhen(
       data: (data) => data,
-      loading: () => <ReadingHistory>[],
-      error: (error, _) => <ReadingHistory>[],
-      skipLoadingOnReload: true,
-      skipLoadingOnRefresh: true,
+      orElse: () => <ReadingHistory>[],
     );
+    final seriesHistory = ref.watch(seriesReadingHistoryStreamProvider).maybeWhen(
+      data: (data) => data,
+      orElse: () => const <SeriesReadingHistory>[],
+    );
+    final int totalCount = comicHistory.length + seriesHistory.length;
 
     return Container(
       padding: const EdgeInsets.all(2),
@@ -76,7 +76,7 @@ class _Header extends ConsumerWidget {
                 ),
               ),
               Text(
-                "${history.length} 条记录 • 最长保留 30 天",
+                "$totalCount 条记录 • 最长保留 30 天",
                 style: TextStyle(
                   fontSize: _HistoryStyles.subtitleFontSize,
                   fontWeight: FontWeight.w400,
@@ -94,7 +94,7 @@ class _Header extends ConsumerWidget {
             ),
           ),
           const SizedBox(width: 12),
-          _buildClearBtn(context, ref, history.isNotEmpty),
+          _buildClearBtn(context, ref, totalCount > 0),
         ],
       ),
     );
@@ -141,82 +141,19 @@ class _HistoryList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final rawData = ref.watch(readingHistoryStreamProvider);
+    final comicsAsync = ref.watch(readingHistoryStreamProvider);
+    final seriesAsync = ref.watch(seriesReadingHistoryStreamProvider);
+    final allSeriesAsync = ref.watch(allSeriesProvider);
+    final merged = ref.watch(mergedHistoryGridItemsProvider);
 
-    return rawData.when(
-      data: (history) {
-        final q = query.trim().toLowerCase();
-        final filtered = q.isEmpty
-            ? history
-            : history
-                  .where((h) => h.title.toLowerCase().contains(q))
-                  .toList(growable: false);
-
-        if (filtered.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 48),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 8,
-                children: [
-                  Icon(
-                    LucideIcons.bookOpen,
-                    size: 48,
-                    color: theme.colorScheme.textTertiary,
-                  ),
-                  Text(
-                    q.isEmpty ? '暂无阅读历史' : '没有匹配的历史记录',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: theme.colorScheme.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: filtered
-              .map(
-                (h) => ReadingHistoryCard(
-                  history: h,
-                  onTap: () => appRouter.pushNamed(
-                    '阅读页面',
-                    pathParameters: {'id': h.comicId},
-                  ),
-                  onDelete: () async {
-                    final confirmed =
-                        await showDialog<bool>(
-                          context: context,
-                          builder: (context) =>
-                              _ConfirmDeleteHistoryDialog(title: h.title),
-                        ) ??
-                        false;
-                    if (!confirmed) return;
-                    try {
-                      await ref
-                          .read(readingHistoryRepoProvider)
-                          .deleteByComicId(h.comicId);
-                      if (context.mounted) {
-                        showSuccessSnackBar(context, '已删除记录');
-                      }
-                    } catch (e) {
-                      if (context.mounted) showErrorSnackBar(context, e);
-                    }
-                  },
-                ),
-              )
-              .toList(),
-        );
-      },
-      loading: () => const Padding(
+    if (comicsAsync.isLoading || seriesAsync.isLoading || allSeriesAsync.isLoading) {
+      return const Padding(
         padding: EdgeInsets.only(top: 48),
         child: Center(child: CircularProgressIndicator()),
-      ),
-      error: (err, _) => Padding(
+      );
+    }
+    if (comicsAsync.hasError || seriesAsync.hasError || allSeriesAsync.hasError) {
+      return Padding(
         padding: const EdgeInsets.only(top: 48),
         child: Center(
           child: Text(
@@ -227,10 +164,151 @@ class _HistoryList extends ConsumerWidget {
             ),
           ),
         ),
-      ),
-      skipLoadingOnReload: true,
-      skipLoadingOnRefresh: true,
+      );
+    }
+
+    final q = query.trim().toLowerCase();
+    final filtered = q.isEmpty
+        ? merged
+        : merged
+              .where((h) => h.title.toLowerCase().contains(q))
+              .toList(growable: false);
+
+    if (filtered.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.only(top: 48),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 8,
+            children: [
+              Icon(
+                LucideIcons.bookOpen,
+                size: 48,
+                color: theme.colorScheme.textTertiary,
+              ),
+              Text(
+                q.isEmpty ? '暂无阅读历史' : '没有匹配的历史记录',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: theme.colorScheme.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double width = constraints.maxWidth;
+        int crossAxisCount = 2;
+        if (width >= 1600) {
+          crossAxisCount = 5;
+        } else if (width >= 1300) {
+          crossAxisCount = 4;
+        } else if (width >= 980) {
+          crossAxisCount = 3;
+        }
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: filtered.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            mainAxisExtent: 138,
+          ),
+          itemBuilder: (BuildContext context, int index) {
+            final item = filtered[index];
+            if (item is ComicHistoryGridItemDto) {
+              return ReadingHistoryCard.comic(
+                comicId: item.comicId,
+                title: item.title,
+                lastReadTime: item.lastReadTime,
+                pageIndex: item.pageIndex,
+                onTap: () => appRouter.pushNamed(
+                  '阅读页面',
+                  pathParameters: {'id': item.comicId},
+                ),
+                onDelete: () => _handleDeleteComicHistory(
+                  context: context,
+                  ref: ref,
+                  title: item.title,
+                  comicId: item.comicId,
+                ),
+              );
+            }
+            final seriesItem = item as SeriesHistoryGridItemDto;
+            return ReadingHistoryCard.series(
+              seriesName: seriesItem.seriesName,
+              lastReadComicId: seriesItem.lastReadComicId,
+              lastReadTime: seriesItem.lastReadTime,
+              pageIndex: seriesItem.pageIndex,
+              lastReadComicOrder: seriesItem.lastReadComicOrder,
+              onTap: () => appRouter.pushNamed(
+                '阅读页面',
+                pathParameters: {'id': seriesItem.lastReadComicId},
+              ),
+              onDelete: () => _handleDeleteSeriesHistory(
+                context: context,
+                ref: ref,
+                seriesName: seriesItem.seriesName,
+              ),
+            );
+          },
+        );
+      },
     );
+  }
+
+  Future<void> _handleDeleteComicHistory({
+    required BuildContext context,
+    required WidgetRef ref,
+    required String title,
+    required String comicId,
+  }) async {
+    final confirmed =
+        await showDialog<bool>(
+          context: context,
+          builder: (context) => _ConfirmDeleteHistoryDialog(title: title),
+        ) ??
+        false;
+    if (!confirmed) return;
+    try {
+      await ref.read(readingHistoryRepoProvider).deleteByComicId(comicId);
+      if (context.mounted) {
+        showSuccessSnackBar(context, '已删除记录');
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context, e);
+    }
+  }
+
+  Future<void> _handleDeleteSeriesHistory({
+    required BuildContext context,
+    required WidgetRef ref,
+    required String seriesName,
+  }) async {
+    final confirmed =
+        await showDialog<bool>(
+          context: context,
+          builder: (context) => _ConfirmDeleteHistoryDialog(title: seriesName),
+        ) ??
+        false;
+    if (!confirmed) return;
+    try {
+      await ref
+          .read(readingHistoryRepoProvider)
+          .deleteSeriesReadingBySeriesName(seriesName);
+      if (context.mounted) {
+        showSuccessSnackBar(context, '已删除记录');
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context, e);
+    }
   }
 }
 

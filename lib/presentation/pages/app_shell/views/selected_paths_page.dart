@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/widgets/common/status/status_card_shell.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -585,98 +586,110 @@ class _PathTileState extends ConsumerState<_PathTile> {
     final isSelectionMode = widget.isSelectionMode;
     final isSelected = widget.isSelected;
 
-    final textColor = isSelected
-        ? theme.colorScheme.primary
-        : theme.colorScheme.onSurface;
+    final textColor = isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface;
     final bgColor = isSelected
         ? theme.colorScheme.primaryContainer.withAlpha(90)
         : theme.colorScheme.surface;
 
-    return Material(
-      color: bgColor,
-      child: InkWell(
-        onTap: () {
-          if (!isSelectionMode) return;
-          notifier.togglePathSelection(path);
-        },
-        onLongPress: () {
-          if (isSelectionMode) return;
-          notifier.setSelectionMode(true);
-          notifier.togglePathSelection(path);
-        },
-        splashColor: theme.colorScheme.buttonRipple,
-        highlightColor: theme.colorScheme.buttonPressed,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 160),
-                child: isSelectionMode
-                    ? Icon(
-                        isSelected
-                            ? LucideIcons.circleCheckBig
-                            : LucideIcons.circle,
-                        key: ValueKey<bool>(isSelected),
-                        size: 18,
-                        color: isSelected
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurfaceVariant,
-                      )
-                    : Icon(
-                        _pathRowIcon(path),
-                        key: ValueKey<String>(path),
-                        size: 20,
-                        color: theme.colorScheme.iconDefault,
-                      ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  path,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: textColor,
-                  ),
-                ),
-              ),
-              if (!widget.isSelectionMode)
-                IconButton(
-                  tooltip: '移除路径',
-                  onPressed: _isRemoving
-                      ? null
-                      : () async {
-                          setState(() => _isRemoving = true);
-                          try {
-                            await ref.read(pathRepoProvider).remove(path);
-                            if (!context.mounted) return;
-                            showSuccessSnackBar(context, '已移除路径');
-                          } catch (e) {
-                            if (!context.mounted) return;
-                            showErrorSnackBar(context, e);
-                          } finally {
-                            if (mounted) setState(() => _isRemoving = false);
-                          }
-                        },
-                  icon: _isRemoving
-                      ? SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: theme.colorScheme.primary,
-                          ),
+    return Theme(
+      data: theme.copyWith(
+        splashFactory: NoSplash.splashFactory,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: theme.colorScheme.primary.withAlpha(10),
+      ),
+      child: Material(
+        color: bgColor,
+        child: InkWell(
+          onTap: () {
+            if (!isSelectionMode) return;
+            notifier.togglePathSelection(path);
+          },
+          onLongPress: () {
+            if (isSelectionMode) return;
+            notifier.setSelectionMode(true);
+            notifier.togglePathSelection(path);
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 160),
+                  child: isSelectionMode
+                      ? Icon(
+                          isSelected
+                              ? LucideIcons.squareCheckBig
+                              : LucideIcons.square,
+                          key: ValueKey<bool>(isSelected),
+                          size: 16,
+                          color: isSelected
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.textTertiary,
                         )
                       : Icon(
-                          LucideIcons.trash2,
-                          size: 16,
+                          _pathRowIcon(path),
+                          key: ValueKey<String>(path),
+                          size: 20,
                           color: theme.colorScheme.iconDefault,
                         ),
                 ),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    path,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+                if (!widget.isSelectionMode)
+                  _isRemoving
+                      ? SizedBox(
+                          width: 28,
+                          height: 28,
+                          child: Center(
+                            child: SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        )
+                      : GhostButton.icon(
+                          icon: LucideIcons.trash2,
+                          tooltip: '移除路径',
+                          semanticLabel: '移除路径',
+                          iconSize: 16,
+                          size: 28,
+                          borderRadius: 8,
+                          foregroundColor: theme.colorScheme.iconDefault,
+                          hoverColor: theme.colorScheme.primary.withAlpha(10),
+                          overlayColor: theme.colorScheme.primary.withAlpha(14),
+                          delayTooltipThreeSeconds: true,
+                          onPressed: () async {
+                            setState(() => _isRemoving = true);
+                            try {
+                              await ref.read(pathRepoProvider).remove(path);
+                              if (!context.mounted) return;
+                              showSuccessSnackBar(context, '已移除路径');
+                            } catch (e) {
+                              if (!context.mounted) return;
+                              showErrorSnackBar(context, e);
+                            } finally {
+                              if (mounted) setState(() => _isRemoving = false);
+                            }
+                          },
+                        ),
+              ],
+            ),
           ),
         ),
       ),

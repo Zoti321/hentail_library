@@ -14,6 +14,8 @@ abstract class ReadingHistoryRepository {
 
   Stream<List<SeriesReadingHistory>> watchAllSeriesReading();
 
+  Future<void> deleteSeriesReadingBySeriesName(String seriesName);
+
   Future<void> deleteByComicId(String comicId);
 
   /// 批量删除阅读历史（如清空漫画库时）。
