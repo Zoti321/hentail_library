@@ -61,7 +61,6 @@ class _FilterMenu extends HookConsumerWidget {
 
     return Container(
       width: 256,
-      padding: const .all(16),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(tokens.radius.lg),
@@ -74,100 +73,115 @@ class _FilterMenu extends HookConsumerWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: .start,
-        mainAxisSize: .min,
-        spacing: 16,
-        children: [
-          // header 菜单标题栏
-          Row(
-            mainAxisAlignment: .spaceBetween,
-            children: [
-              Text(
-                "高级筛选",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.textPrimary,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(tokens.radius.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
+                border: Border(
+                  bottom: BorderSide(color: colorScheme.borderSubtle),
                 ),
               ),
-              IconButton(
-                onPressed: () {
-                  menuController.hideMenu();
-                },
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                icon: Icon(LucideIcons.x, size: 14),
-                style: IconButton.styleFrom(
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  foregroundColor: colorScheme.iconSecondary,
-                ),
-              ),
-            ],
-          ),
-
-          // body
-          Row(
-            spacing: 8,
-            children: [
-              Icon(
-                LucideIcons.funnel,
-                size: 16,
-                color: colorScheme.iconSecondary,
-              ),
-              Text(
-                "显示 R18 内容",
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: .w400,
-                  color: colorScheme.textPrimary,
-                ),
-              ),
-              Spacer(),
-              MyToggleSwitch(
-                checked: ref.watch(
-                  libraryPageProvider.select((s) => s.effectiveFilter.showR18),
-                ),
-                onChange: () =>
-                    ref.read(libraryPageProvider.notifier).toggleR18(),
-              ),
-            ],
-          ),
-          Divider(thickness: 1, color: colorScheme.borderSubtle),
-          // footer 底部操作栏
-          Row(
-            mainAxisAlignment: .spaceBetween,
-            children: [
-              Text(
-                "$resultCount 个结果",
-                style: TextStyle(
-                  fontSize: 12,
-                  color: colorScheme.onSurfaceVariant,
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  ref.read(libraryPageProvider.notifier).resetFilter();
-                },
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '高级筛选',
+                    style: TextStyle(
+                      fontSize: tokens.text.bodySm,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.textPrimary,
+                    ),
                   ),
-                  minimumSize: const Size(0, 32),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  foregroundColor: colorScheme.primary,
-                  disabledForegroundColor: colorScheme.primary.withOpacity(0.5),
-                  textStyle: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                  GhostButton.icon(
+                    icon: LucideIcons.x,
+                    tooltip: '关闭',
+                    semanticLabel: '关闭筛选面板',
+                    iconSize: 14,
+                    size: 26,
+                    borderRadius: 7,
+                    foregroundColor: colorScheme.iconSecondary,
+                    hoverColor: colorScheme.primary.withAlpha(10),
+                    overlayColor: colorScheme.primary.withAlpha(14),
+                    delayTooltipThreeSeconds: false,
+                    onPressed: menuController.hideMenu,
                   ),
-                ),
-                child: const Text("重置所有"),
+                ],
               ),
-            ],
-          ),
-        ],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+              child: Row(
+                children: [
+                  Icon(
+                    LucideIcons.funnel,
+                    size: 15,
+                    color: colorScheme.iconSecondary,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '显示 R18 内容',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: colorScheme.textPrimary,
+                    ),
+                  ),
+                  const Spacer(),
+                  MyToggleSwitch(
+                    checked: ref.watch(
+                      libraryPageProvider.select((s) => s.effectiveFilter.showR18),
+                    ),
+                    onChange: () =>
+                        ref.read(libraryPageProvider.notifier).toggleR18(),
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 1, thickness: 1, color: colorScheme.borderSubtle),
+            Container(
+              padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
+              color: colorScheme.surfaceContainerHighest,
+              child: Row(
+                children: [
+                  Text(
+                    '$resultCount 个结果',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: colorScheme.textSecondary,
+                    ),
+                  ),
+                  const Spacer(),
+                  GhostButton.iconText(
+                    icon: LucideIcons.rotateCcw,
+                    text: '重置',
+                    tooltip: '重置所有筛选',
+                    semanticLabel: '重置所有筛选',
+                    iconSize: 14,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    borderRadius: 7,
+                    foregroundColor: colorScheme.primary,
+                    hoverColor: colorScheme.primary.withAlpha(10),
+                    overlayColor: colorScheme.primary.withAlpha(14),
+                    delayTooltipThreeSeconds: false,
+                    onPressed: () {
+                      ref.read(libraryPageProvider.notifier).resetFilter();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

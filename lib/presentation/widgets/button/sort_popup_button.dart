@@ -28,7 +28,7 @@ class _SortPopupButtonState extends ConsumerState<SortPopupButton> {
       pressType: PressType.singleClick,
       showArrow: false,
       verticalMargin: -16,
-      menuBuilder: () => _SortMenu(),
+      menuBuilder: () => _SortMenu(menuController: _controller),
       child: GhostButton.icon(
         icon: LucideIcons.arrowDownWideNarrow,
         tooltip: '排序',
@@ -47,7 +47,9 @@ class _SortPopupButtonState extends ConsumerState<SortPopupButton> {
 }
 
 class _SortMenu extends HookConsumerWidget {
-  const _SortMenu();
+  const _SortMenu({required this.menuController});
+
+  final CustomPopupMenuController menuController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -74,62 +76,85 @@ class _SortMenu extends HookConsumerWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(tokens.radius.lg),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 24,
-            children: [
-              // header
-              Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest,
+                border: Border(
+                  bottom: BorderSide(color: theme.colorScheme.borderSubtle),
+                ),
+              ),
+              child: Row(
                 children: [
                   Icon(
                     Icons.swap_vert,
-                    size: 18,
+                    size: 16,
                     color: theme.colorScheme.primary,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    "排序与视图",
+                    '排序与视图',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: theme.colorScheme.textPrimary,
                     ),
                   ),
-                  Spacer(),
-                  Material(
-                    color: theme.colorScheme.inputBackgroundDisabled,
-                    borderRadius: BorderRadius.circular(6),
-                    child: InkWell(
-                      onTap: () {
-                        ref.read(libraryPageProvider.notifier).resetSortOption();
-                      },
-                      borderRadius: BorderRadius.circular(6),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        child: Text(
-                          "重置",
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: theme.colorScheme.textSecondary,
-                          ),
-                        ),
-                      ),
-                    ),
+                  const Spacer(),
+                  GhostButton.icon(
+                    icon: LucideIcons.x,
+                    tooltip: '关闭',
+                    semanticLabel: '关闭排序面板',
+                    iconSize: 14,
+                    size: 26,
+                    borderRadius: 7,
+                    foregroundColor: theme.colorScheme.iconSecondary,
+                    hoverColor: theme.colorScheme.primary.withAlpha(10),
+                    overlayColor: theme.colorScheme.primary.withAlpha(14),
+                    delayTooltipThreeSeconds: false,
+                    onPressed: menuController.hideMenu,
                   ),
                 ],
               ),
-
-              // body
-              _SortSection(option: sortOption),
-            ],
-          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+              child: _SortSection(option: sortOption),
+            ),
+            Divider(height: 1, thickness: 1, color: theme.colorScheme.borderSubtle),
+            Container(
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+              color: theme.colorScheme.surfaceContainerHighest,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GhostButton.iconText(
+                    icon: LucideIcons.rotateCcw,
+                    text: '重置',
+                    tooltip: '重置排序',
+                    semanticLabel: '重置排序',
+                    iconSize: 14,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    borderRadius: 7,
+                    foregroundColor: theme.colorScheme.primary,
+                    hoverColor: theme.colorScheme.primary.withAlpha(10),
+                    overlayColor: theme.colorScheme.primary.withAlpha(14),
+                    delayTooltipThreeSeconds: false,
+                    onPressed: () {
+                      ref.read(libraryPageProvider.notifier).resetSortOption();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
