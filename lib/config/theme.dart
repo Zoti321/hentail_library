@@ -166,6 +166,9 @@ ThemeData buildAppTheme(Brightness brightness) {
   final tokens = brightness == Brightness.dark
       ? AppThemeTokens.dark()
       : AppThemeTokens.light();
+  final RoundedRectangleBorder buttonShape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(tokens.radius.md),
+  );
 
   return ThemeData(
     useMaterial3: true,
@@ -197,6 +200,12 @@ ThemeData buildAppTheme(Brightness brightness) {
       }),
       trackColor: WidgetStateProperty.all(Colors.transparent),
       trackBorderColor: WidgetStateProperty.all(Colors.transparent),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(shape: buttonShape),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(shape: buttonShape),
     ),
     inputDecorationTheme: const InputDecorationTheme(hintMaxLines: 1),
     pageTransitionsTheme: const PageTransitionsTheme(

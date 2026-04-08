@@ -130,7 +130,6 @@ class _SeriesDetailBody extends ConsumerWidget {
       ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
     final ButtonStyle primarySeriesToolbarStyle = FilledButton.styleFrom(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
     final int count = series.items.length;
     final Widget titleBlock = Column(

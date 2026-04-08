@@ -229,7 +229,7 @@ class _SelectedPathsPageHeaderState
                     vertical: 10,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
               ),
@@ -250,9 +250,6 @@ class _SelectedPathsPageHeaderState
                   horizontal: 14,
                   vertical: 10,
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
               ),
             ),
             if (widget.isSelectionMode && widget.selectedCount > 0)
@@ -267,7 +264,7 @@ class _SelectedPathsPageHeaderState
                     vertical: 10,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
               ),
