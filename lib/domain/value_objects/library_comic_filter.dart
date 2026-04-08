@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/domain/value_objects/library_display_target.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/value_objects/library_tag_pick.dart';
 
@@ -10,6 +11,7 @@ abstract class LibraryComicFilter with _$LibraryComicFilter {
   factory LibraryComicFilter({
     String? query,
     @Default(true) bool showR18,
+    @Default(LibraryDisplayTarget.all) LibraryDisplayTarget displayTarget,
     Set<ResourceType>? resourceTypes,
     Set<ContentRating>? contentRatings,
     Set<LibraryTagPick>? tagsAll,

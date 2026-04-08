@@ -4,6 +4,7 @@ import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/l10n/app_strings.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
+import 'package:hentai_library/domain/value_objects/library_display_target.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/button/filter_popup_button.dart';
@@ -58,6 +59,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     final filterQuery = ref.watch(
       libraryPageProvider.select((s) => s.effectiveFilter.query ?? ''),
     );
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryPageProvider.select((s) => s.effectiveFilter.displayTarget),
+    );
 
     if (_searchController.text != filterQuery) {
       _searchController.value = _searchController.value.copyWith(
@@ -82,7 +86,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       data: (List<Series> list) => _filterSeriesForLibrary(list, filterQuery),
       orElse: () => <Series>[],
     );
-    final bool hasSeriesSection = seriesToShow.isNotEmpty;
+    final bool showSeriesSection = displayTarget != LibraryDisplayTarget.comics;
+    final bool showComicsSection = displayTarget != LibraryDisplayTarget.series;
+    final bool hasSeriesSection = showSeriesSection && seriesToShow.isNotEmpty;
 
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -207,17 +213,21 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             ),
           ),
         ),
-        ..._buildSeriesSectionSlivers(
-          context: context,
-          isGridView: isGridView,
-          series: seriesToShow,
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 2),
-          sliver: isGridView
-              ? _buildGridView(comics, hasSeriesSection: hasSeriesSection)
-              : _buildListView(comics, hasSeriesSection: hasSeriesSection),
-        ),
+        if (showSeriesSection)
+          ..._buildSeriesSectionSlivers(
+            context: context,
+            isGridView: isGridView,
+            series: seriesToShow,
+          ),
+        if (showSeriesSection && !showComicsSection && seriesToShow.isEmpty)
+          _NoMatchingSeriesSliver(query: filterQuery),
+        if (showComicsSection)
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 2),
+            sliver: isGridView
+                ? _buildGridView(comics, hasSeriesSection: hasSeriesSection)
+                : _buildListView(comics, hasSeriesSection: hasSeriesSection),
+          ),
       ],
     );
   }
@@ -495,6 +505,35 @@ class _NoMatchingComicsSliver extends StatelessWidget {
     final String q = query.trim();
     final bool hasQuery = q.isNotEmpty;
     final String message = hasQuery ? '无匹配漫画（可尝试调整搜索或筛选）' : '暂无漫画';
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 24, bottom: 48),
+        child: Center(
+          child: Text(
+            message,
+            style: TextStyle(
+              fontSize: 13,
+              color: theme.colorScheme.textTertiary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NoMatchingSeriesSliver extends StatelessWidget {
+  const _NoMatchingSeriesSliver({this.query = ''});
+
+  final String query;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final String q = query.trim();
+    final bool hasQuery = q.isNotEmpty;
+    final String message = hasQuery ? '无匹配系列' : '暂无系列';
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.only(top: 24, bottom: 48),

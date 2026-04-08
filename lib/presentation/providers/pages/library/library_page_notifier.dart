@@ -7,6 +7,7 @@ import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/util/comic_query.dart';
 import 'package:hentai_library/domain/value_objects/library_comic_filter.dart';
+import 'package:hentai_library/domain/value_objects/library_display_target.dart';
 import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
@@ -156,6 +157,12 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
       filter: state.effectiveFilter.copyWith(
         contentRatings: ratings.isEmpty ? null : ratings,
       ),
+    );
+  }
+
+  void updateDisplayTarget(LibraryDisplayTarget target) {
+    state = state.copyWith(
+      filter: state.effectiveFilter.copyWith(displayTarget: target),
     );
   }
 

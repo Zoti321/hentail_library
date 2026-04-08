@@ -1,6 +1,8 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/config/theme.dart';
+import 'package:hentai_library/domain/value_objects/library_display_target.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/widgets/my_toggle_switch.dart';
@@ -55,9 +57,25 @@ class _FilterMenu extends HookConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final tokens = context.tokens;
 
-    final resultCount = ref.watch(
+    final int displayedComicCount = ref.watch(
       libraryPageProvider.select((s) => s.displayedComics.length),
     );
+    final String filterQuery = ref.watch(
+      libraryPageProvider.select((s) => s.effectiveFilter.query ?? ''),
+    );
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryPageProvider.select((s) => s.effectiveFilter.displayTarget),
+    );
+    final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
+    final int displayedSeriesCount = seriesAsync.maybeWhen(
+      data: (List<Series> list) => _countFilteredSeries(list, filterQuery),
+      orElse: () => 0,
+    );
+    final int resultCount = switch (displayTarget) {
+      LibraryDisplayTarget.all => displayedComicCount + displayedSeriesCount,
+      LibraryDisplayTarget.comics => displayedComicCount,
+      LibraryDisplayTarget.series => displayedSeriesCount,
+    };
 
     return Container(
       width: 256,
@@ -116,29 +134,75 @@ class _FilterMenu extends HookConsumerWidget {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    LucideIcons.funnel,
-                    size: 15,
-                    color: colorScheme.iconSecondary,
+                  Row(
+                    children: [
+                      Icon(
+                        LucideIcons.funnel,
+                        size: 15,
+                        color: colorScheme.iconSecondary,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '显示 R18 内容',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: colorScheme.textPrimary,
+                        ),
+                      ),
+                      const Spacer(),
+                      MyToggleSwitch(
+                        checked: ref.watch(
+                          libraryPageProvider.select(
+                            (s) => s.effectiveFilter.showR18,
+                          ),
+                        ),
+                        onChange: () =>
+                            ref.read(libraryPageProvider.notifier).toggleR18(),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(height: 10),
                   Text(
-                    '显示 R18 内容',
+                    '显示目标',
                     style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: colorScheme.textPrimary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.textSecondary,
                     ),
                   ),
-                  const Spacer(),
-                  MyToggleSwitch(
-                    checked: ref.watch(
-                      libraryPageProvider.select((s) => s.effectiveFilter.showR18),
-                    ),
-                    onChange: () =>
-                        ref.read(libraryPageProvider.notifier).toggleR18(),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      _DisplayTargetChip(
+                        label: '全部',
+                        isSelected: displayTarget == LibraryDisplayTarget.all,
+                        onTap: () => ref
+                            .read(libraryPageProvider.notifier)
+                            .updateDisplayTarget(LibraryDisplayTarget.all),
+                      ),
+                      const SizedBox(width: 6),
+                      _DisplayTargetChip(
+                        label: '漫画',
+                        isSelected:
+                            displayTarget == LibraryDisplayTarget.comics,
+                        onTap: () => ref
+                            .read(libraryPageProvider.notifier)
+                            .updateDisplayTarget(LibraryDisplayTarget.comics),
+                      ),
+                      const SizedBox(width: 6),
+                      _DisplayTargetChip(
+                        label: '系列',
+                        isSelected:
+                            displayTarget == LibraryDisplayTarget.series,
+                        onTap: () => ref
+                            .read(libraryPageProvider.notifier)
+                            .updateDisplayTarget(LibraryDisplayTarget.series),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -185,4 +249,64 @@ class _FilterMenu extends HookConsumerWidget {
       ),
     );
   }
+}
+
+class _DisplayTargetChip extends StatelessWidget {
+  const _DisplayTargetChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return Expanded(
+      child: Material(
+        color: isSelected ? cs.primary : cs.surface,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isSelected ? cs.primary : cs.borderSubtle,
+              ),
+            ),
+            child: Center(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: isSelected ? cs.onPrimary : cs.textSecondary,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+int _countFilteredSeries(List<Series> list, String query) {
+  final String q = query.trim().toLowerCase();
+  int count = 0;
+  for (final Series series in list) {
+    if (series.items.isEmpty) {
+      continue;
+    }
+    if (q.isEmpty || series.name.toLowerCase().contains(q)) {
+      count++;
+    }
+  }
+  return count;
 }
