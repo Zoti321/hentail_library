@@ -183,8 +183,11 @@ class _SeriesDetailBody extends ConsumerWidget {
             }
             appRouter.pushNamed(
               '阅读页面',
-              pathParameters: <String, String>{'id': comicIdToOpen},
-              queryParameters: <String, String>{'series': series.name},
+              queryParameters: <String, String>{
+                'read_type': 'series',
+                'comic_id': comicIdToOpen,
+                'series_name': series.name,
+              },
             );
           },
           icon: const Icon(LucideIcons.bookOpen, size: 16),
@@ -532,8 +535,11 @@ class _SeriesComicRow extends ConsumerWidget {
         onTap: () {
           appRouter.pushNamed(
             '阅读页面',
-            pathParameters: <String, String>{'id': item.comicId},
-            queryParameters: <String, String>{'series': seriesName},
+            queryParameters: <String, String>{
+              'read_type': 'series',
+              'comic_id': item.comicId,
+              'series_name': seriesName,
+            },
           );
         },
         child: Padding(

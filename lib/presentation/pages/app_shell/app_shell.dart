@@ -27,7 +27,7 @@ class _AppShellState extends ConsumerState<AppShell> with TrayListener {
   @override
   Widget build(BuildContext context) {
     final String path = GoRouterState.of(context).uri.path;
-    final bool isReaderRoute = path.startsWith('/reader/');
+    final bool isReaderRoute = path.startsWith('/reader');
     return Scaffold(
       body: Column(
         children: [

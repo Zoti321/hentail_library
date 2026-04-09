@@ -56,7 +56,10 @@ class ComicCard extends HookConsumerWidget {
               case ComicContextAction.read:
                 appRouter.pushNamed(
                   "阅读页面",
-                  pathParameters: {'id': comic.comicId},
+                  queryParameters: {
+                    'read_type': 'comic',
+                    'comic_id': comic.comicId,
+                  },
                 );
                 break;
               case ComicContextAction.detail:

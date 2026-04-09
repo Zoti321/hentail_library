@@ -77,16 +77,28 @@ final appRouter = GoRouter(
           },
         ),
         GoRoute(
-          path: '/reader/:id',
+          path: '/reader',
           name: '阅读页面',
           builder: (context, state) {
-            final comicId = Uri.decodeComponent(state.pathParameters['id']!);
-            final String? seriesQuery = state.uri.queryParameters['series'];
-            final String? seriesName =
-                seriesQuery != null && seriesQuery.isNotEmpty
-                ? seriesQuery
+            final String? comicIdQuery = state.uri.queryParameters['comic_id'];
+            final String comicId = comicIdQuery != null && comicIdQuery.isNotEmpty
+                ? comicIdQuery
+                : '';
+            final String? readType = state.uri.queryParameters['read_type'];
+            final String normalizedReadType = readType == 'series'
+                ? 'series'
+                : 'comic';
+            final String? seriesNameQuery = state.uri.queryParameters['series_name'];
+            final String? seriesName = normalizedReadType == 'series' &&
+                    seriesNameQuery != null &&
+                    seriesNameQuery.isNotEmpty
+                ? seriesNameQuery
                 : null;
-            return ReaderPage(comicId: comicId, seriesName: seriesName);
+            return ReaderPage(
+              comicId: comicId,
+              readType: normalizedReadType,
+              seriesName: seriesName,
+            );
           },
         ),
       ],

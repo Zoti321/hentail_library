@@ -543,7 +543,10 @@ class _DetailPrimaryActions extends HookConsumerWidget {
                     );
                 appRouter.pushNamed(
                   '阅读页面',
-                  pathParameters: {'id': comic.comicId},
+                  queryParameters: {
+                    'read_type': 'comic',
+                    'comic_id': comic.comicId,
+                  },
                 );
               },
               icon: Icon(LucideIcons.play, size: 16),

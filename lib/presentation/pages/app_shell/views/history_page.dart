@@ -233,7 +233,10 @@ class _HistoryList extends ConsumerWidget {
                 pageIndex: item.pageIndex,
                 onTap: () => appRouter.pushNamed(
                   '阅读页面',
-                  pathParameters: {'id': item.comicId},
+                  queryParameters: {
+                    'read_type': 'comic',
+                    'comic_id': item.comicId,
+                  },
                 ),
                 onDelete: () => _handleDeleteComicHistory(
                   context: context,
@@ -251,7 +254,11 @@ class _HistoryList extends ConsumerWidget {
               lastReadComicOrder: seriesItem.lastReadComicOrder,
               onTap: () => appRouter.pushNamed(
                 '阅读页面',
-                pathParameters: {'id': seriesItem.lastReadComicId},
+                queryParameters: {
+                  'read_type': 'series',
+                  'comic_id': seriesItem.lastReadComicId,
+                  'series_name': seriesItem.seriesName,
+                },
               ),
               onDelete: () => _handleDeleteSeriesHistory(
                 context: context,

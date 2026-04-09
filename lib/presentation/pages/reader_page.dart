@@ -25,6 +25,45 @@ class SeriesReaderNavData {
   final int currentIndex;
 }
 
+enum ReaderReadType {
+  comic,
+  series,
+}
+
+class ReaderRouteContext {
+  const ReaderRouteContext({
+    required this.comicId,
+    required this.readType,
+    this.seriesName,
+  });
+
+  final String comicId;
+  final ReaderReadType readType;
+  final String? seriesName;
+
+  bool get isSeriesMode => readType == ReaderReadType.series;
+
+  static ReaderRouteContext normalize({
+    required String comicId,
+    required String readType,
+    String? seriesName,
+  }) {
+    final ReaderReadType parsedType = readType == 'series'
+        ? ReaderReadType.series
+        : ReaderReadType.comic;
+    final String normalizedComicId = comicId.trim();
+    final String? normalizedSeriesName =
+        seriesName != null && seriesName.isNotEmpty ? seriesName : null;
+    final bool isValidSeries =
+        parsedType == ReaderReadType.series && normalizedSeriesName != null;
+    return ReaderRouteContext(
+      comicId: normalizedComicId,
+      readType: isValidSeries ? ReaderReadType.series : ReaderReadType.comic,
+      seriesName: isValidSeries ? normalizedSeriesName : null,
+    );
+  }
+}
+
 SeriesReaderNavData? buildSeriesReaderNavData(Series? series, String comicId) {
   if (series == null || !series.containsComic(comicId)) {
     return null;
@@ -44,25 +83,45 @@ SeriesReaderNavData? buildSeriesReaderNavData(Series? series, String comicId) {
 
 class ReaderPage extends HookConsumerWidget {
   final String comicId;
+  final String readType;
   final String? seriesName;
 
-  const ReaderPage({super.key, required this.comicId, this.seriesName});
+  const ReaderPage({
+    super.key,
+    required this.comicId,
+    required this.readType,
+    this.seriesName,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final ReaderRouteContext routeContext = ReaderRouteContext.normalize(
+      comicId: comicId,
+      readType: readType,
+      seriesName: seriesName,
+    );
+    if (routeContext.comicId.isEmpty) {
+      return Theme(
+        data: buildAppTheme(Brightness.dark),
+        child: const Scaffold(
+          body: Center(child: Text('阅读参数错误：缺少 comic_id')),
+        ),
+      );
+    }
     final theme = buildAppTheme(Brightness.dark);
-    final viewAsync = ref.watch(readerViewProvider(comicId));
+    final viewAsync = ref.watch(readerViewProvider(routeContext.comicId));
     final GlobalKey<ScaffoldState> scaffoldKey = useMemoized(
       GlobalKey<ScaffoldState>.new,
       <Object?>[],
     );
-    final String? seriesQuery = seriesName;
+    final String? seriesQuery = routeContext.seriesName;
     final SeriesReaderNavData? seriesNav =
-        seriesQuery != null && seriesQuery.isNotEmpty
+        routeContext.isSeriesMode
         ? ref
-              .watch(seriesByNameForReaderProvider(seriesQuery))
+              .watch(seriesByNameForReaderProvider(seriesQuery!))
               .when(
-                data: (Series? s) => buildSeriesReaderNavData(s, comicId),
+                data: (Series? s) =>
+                    buildSeriesReaderNavData(s, routeContext.comicId),
                 loading: () => null,
                 error: (Object _, StackTrace _) => null,
               )
@@ -74,7 +133,7 @@ class ReaderPage extends HookConsumerWidget {
         canPop: false,
         onPopInvokedWithResult: (bool didPop, dynamic result) {
           if (didPop) return;
-          _exitReaderPage(context, ref, comicId, seriesQuery);
+          _exitReaderPage(context, ref, routeContext);
         },
         child: Scaffold(
           key: scaffoldKey,
@@ -82,19 +141,20 @@ class ReaderPage extends HookConsumerWidget {
           endDrawer: seriesNav != null
               ? _SeriesReaderDrawer(
                   nav: seriesNav,
-                  comicId: comicId,
+                  comicId: routeContext.comicId,
                   onSelectComic: (String targetComicId) {
                     _saveProgress(
                       ref,
-                      comicId,
-                      seriesName: seriesNav.seriesName,
+                      routeContext.comicId,
+                      routeContext: routeContext,
                     );
                     scaffoldKey.currentState?.closeEndDrawer();
                     context.pushReplacementNamed(
                       '阅读页面',
-                      pathParameters: <String, String>{'id': targetComicId},
                       queryParameters: <String, String>{
-                        'series': seriesNav.seriesName,
+                        'read_type': 'series',
+                        'comic_id': targetComicId,
+                        'series_name': seriesNav.seriesName,
                       },
                     );
                   },
@@ -113,20 +173,20 @@ class ReaderPage extends HookConsumerWidget {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTapUp: (details) => ref
-                        .read(readerViewProvider(comicId).notifier)
+                        .read(readerViewProvider(routeContext.comicId).notifier)
                         .handleTap(details, context),
                     child: _ReaderContent(
-                      comicId: comicId,
+                      comicId: routeContext.comicId,
                       initialPage: initialPage,
                     ),
                   ),
                   _TopBar(
-                    comicId: comicId,
+                    comicId: routeContext.comicId,
                     seriesNav: seriesNav,
                     scaffoldKey: scaffoldKey,
-                    seriesQuery: seriesQuery,
+                    routeContext: routeContext,
                   ),
-                  _BottomBar(comicId: comicId),
+                  _BottomBar(comicId: routeContext.comicId),
                 ],
               );
             },
@@ -137,12 +197,19 @@ class ReaderPage extends HookConsumerWidget {
   }
 }
 
-void _saveProgress(WidgetRef ref, String comicId, {String? seriesName}) {
+void _saveProgress(
+  WidgetRef ref,
+  String comicId, {
+  required ReaderRouteContext routeContext,
+}) {
   final state = ref.read(readerViewProvider(comicId)).asData?.value;
   if (state == null) return;
   final comic = state.comic;
   final currentIndex = state.currentIndex;
   final DateTime now = DateTime.now();
+  final String? seriesName = routeContext.isSeriesMode
+      ? routeContext.seriesName
+      : null;
   final entity.SeriesReadingHistory? series =
       seriesName != null && seriesName.isNotEmpty
       ? entity.SeriesReadingHistory(
@@ -168,17 +235,16 @@ void _saveProgress(WidgetRef ref, String comicId, {String? seriesName}) {
 void _exitReaderPage(
   BuildContext context,
   WidgetRef ref,
-  String comicId,
-  String? seriesQuery,
+  ReaderRouteContext routeContext,
 ) {
-  _saveProgress(ref, comicId, seriesName: seriesQuery);
+  _saveProgress(ref, routeContext.comicId, routeContext: routeContext);
   final GoRouter router = GoRouter.of(context);
   if (router.canPop()) {
     router.pop();
     return;
   }
-  final String? seriesName = seriesQuery != null && seriesQuery.isNotEmpty
-      ? seriesQuery
+  final String? seriesName = routeContext.isSeriesMode
+      ? routeContext.seriesName
       : null;
   if (seriesName != null) {
     router.goNamed(
@@ -318,13 +384,13 @@ class _TopBar extends HookConsumerWidget {
     required this.comicId,
     required this.seriesNav,
     required this.scaffoldKey,
-    required this.seriesQuery,
+    required this.routeContext,
   });
 
   final String comicId;
   final SeriesReaderNavData? seriesNav;
   final GlobalKey<ScaffoldState> scaffoldKey;
-  final String? seriesQuery;
+  final ReaderRouteContext routeContext;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -341,11 +407,14 @@ class _TopBar extends HookConsumerWidget {
       final int next = nav.currentIndex + delta;
       if (next < 0 || next >= nav.sortedItems.length) return;
       final String targetId = nav.sortedItems[next].comicId;
-      _saveProgress(ref, comicId, seriesName: nav.seriesName);
+      _saveProgress(ref, comicId, routeContext: routeContext);
       context.pushReplacementNamed(
         '阅读页面',
-        pathParameters: <String, String>{'id': targetId},
-        queryParameters: <String, String>{'series': nav.seriesName},
+        queryParameters: <String, String>{
+          'read_type': 'series',
+          'comic_id': targetId,
+          'series_name': nav.seriesName,
+        },
       );
     }
 
@@ -377,7 +446,7 @@ class _TopBar extends HookConsumerWidget {
                   children: [
                     IconButton(
                       onPressed: () {
-                        _exitReaderPage(context, ref, comicId, seriesQuery);
+                        _exitReaderPage(context, ref, routeContext);
                       },
                       icon: Icon(
                         LucideIcons.arrowLeft,
