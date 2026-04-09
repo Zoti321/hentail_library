@@ -13,7 +13,6 @@ import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Resolved series context for reader navigation (prev/next + drawer).
 class SeriesReaderNavData {
   const SeriesReaderNavData({
     required this.seriesName,
