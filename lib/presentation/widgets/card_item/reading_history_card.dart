@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
+import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/providers/pages/reader/reader_page_notifier.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -167,16 +168,18 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
               ),
               if (widget.onDelete != null) ...[
                 const SizedBox(width: 6),
-                Tooltip(
-                  message: '删除记录',
-                  child: IconButton(
-                    onPressed: widget.onDelete,
-                    icon: Icon(
-                      LucideIcons.trash2,
-                      size: 18,
-                      color: cs.textTertiary,
-                    ),
-                  ),
+                GhostButton.icon(
+                  icon: LucideIcons.trash2,
+                  tooltip: '删除记录',
+                  semanticLabel: '删除记录',
+                  onPressed: widget.onDelete,
+                  iconSize: 18,
+                  size: 32,
+                  borderRadius: 8,
+                  foregroundColor: cs.textTertiary,
+                  hoverColor: theme.hoverColor,
+                  overlayColor: theme.hoverColor.withAlpha(110),
+                  delayTooltipThreeSeconds: true,
                 ),
               ],
             ],
@@ -282,15 +285,16 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
     }
     final int? order = widget._lastReadComicOrder;
     final int? pageIndex = widget._pageIndex;
-    if (order == null || order <= 0) {
+    if (order != null && order >= 0) {
+      final int displayOrder = order + 1;
       if (pageIndex == null || pageIndex <= 0) {
-        return '';
+        return '第 $displayOrder 话';
       }
-      return '第 $pageIndex 页';
+      return '第 $displayOrder 话 · 第 $pageIndex 页';
     }
     if (pageIndex == null || pageIndex <= 0) {
-      return '第 $order 话';
+      return '';
     }
-    return '第 $order 话 · 第 $pageIndex 页';
+    return '第 $pageIndex 页';
   }
 }

@@ -9,6 +9,7 @@ import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/ui_dto/history_grid_item_dto.dart';
 import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/widgets/card_item/reading_history_card.dart';
+import 'package:hentai_library/presentation/widgets/dialog/clear_reading_history_confirm_dialog.dart';
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -113,7 +114,8 @@ class _Header extends ConsumerWidget {
               final confirmed =
                   await showDialog<bool>(
                     context: context,
-                    builder: (context) => const _ConfirmClearHistoryDialog(),
+                    builder: (BuildContext context) =>
+                        const ClearReadingHistoryConfirmDialog(),
                   ) ??
                   false;
               if (!confirmed) return;
@@ -236,7 +238,6 @@ class _HistoryList extends ConsumerWidget {
                 onDelete: () => _handleDeleteComicHistory(
                   context: context,
                   ref: ref,
-                  title: item.title,
                   comicId: item.comicId,
                 ),
               );
@@ -267,16 +268,8 @@ class _HistoryList extends ConsumerWidget {
   Future<void> _handleDeleteComicHistory({
     required BuildContext context,
     required WidgetRef ref,
-    required String title,
     required String comicId,
   }) async {
-    final confirmed =
-        await showDialog<bool>(
-          context: context,
-          builder: (context) => _ConfirmDeleteHistoryDialog(title: title),
-        ) ??
-        false;
-    if (!confirmed) return;
     try {
       await ref.read(readingHistoryRepoProvider).deleteByComicId(comicId);
       if (context.mounted) {
@@ -292,13 +285,6 @@ class _HistoryList extends ConsumerWidget {
     required WidgetRef ref,
     required String seriesName,
   }) async {
-    final confirmed =
-        await showDialog<bool>(
-          context: context,
-          builder: (context) => _ConfirmDeleteHistoryDialog(title: seriesName),
-        ) ??
-        false;
-    if (!confirmed) return;
     try {
       await ref
           .read(readingHistoryRepoProvider)
@@ -309,51 +295,5 @@ class _HistoryList extends ConsumerWidget {
     } catch (e) {
       if (context.mounted) showErrorSnackBar(context, e);
     }
-  }
-}
-
-class _ConfirmClearHistoryDialog extends StatelessWidget {
-  const _ConfirmClearHistoryDialog();
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('确认清空'),
-      content: const Text('将清空全部阅读历史记录。此操作不可撤销。'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('取消'),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          child: const Text('清空'),
-        ),
-      ],
-    );
-  }
-}
-
-class _ConfirmDeleteHistoryDialog extends StatelessWidget {
-  const _ConfirmDeleteHistoryDialog({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('删除记录？'),
-      content: Text('将删除「$title」的阅读历史记录。'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('取消'),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          child: const Text('删除'),
-        ),
-      ],
-    );
   }
 }

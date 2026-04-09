@@ -46,11 +46,7 @@ class ReaderPage extends HookConsumerWidget {
   final String comicId;
   final String? seriesName;
 
-  const ReaderPage({
-    super.key,
-    required this.comicId,
-    this.seriesName,
-  });
+  const ReaderPage({super.key, required this.comicId, this.seriesName});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -61,18 +57,20 @@ class ReaderPage extends HookConsumerWidget {
       <Object?>[],
     );
     final String? seriesQuery = seriesName;
-    final SeriesReaderNavData? seriesNav = seriesQuery != null &&
-            seriesQuery.isNotEmpty
-        ? ref.watch(seriesByNameForReaderProvider(seriesQuery)).when(
-              data: (Series? s) => buildSeriesReaderNavData(s, comicId),
-              loading: () => null,
-              error: (Object _, StackTrace _) => null,
-            )
+    final SeriesReaderNavData? seriesNav =
+        seriesQuery != null && seriesQuery.isNotEmpty
+        ? ref
+              .watch(seriesByNameForReaderProvider(seriesQuery))
+              .when(
+                data: (Series? s) => buildSeriesReaderNavData(s, comicId),
+                loading: () => null,
+                error: (Object _, StackTrace _) => null,
+              )
         : null;
 
     return Theme(
       data: theme,
-        child: PopScope(
+      child: PopScope(
         canPop: false,
         onPopInvokedWithResult: (bool didPop, dynamic result) {
           if (didPop) return;
@@ -139,11 +137,7 @@ class ReaderPage extends HookConsumerWidget {
   }
 }
 
-void _saveProgress(
-  WidgetRef ref,
-  String comicId, {
-  String? seriesName,
-}) {
+void _saveProgress(WidgetRef ref, String comicId, {String? seriesName}) {
   final state = ref.read(readerViewProvider(comicId)).asData?.value;
   if (state == null) return;
   final comic = state.comic;
@@ -158,15 +152,17 @@ void _saveProgress(
           pageIndex: currentIndex,
         )
       : null;
-  ref.read(recordReadingProgressUseCaseProvider).call(
-    entity.ReadingHistory(
-      comicId: comicId,
-      title: comic.title,
-      lastReadTime: now,
-      pageIndex: currentIndex,
-    ),
-    series: series,
-  );
+  ref
+      .read(recordReadingProgressUseCaseProvider)
+      .call(
+        entity.ReadingHistory(
+          comicId: comicId,
+          title: comic.title,
+          lastReadTime: now,
+          pageIndex: currentIndex,
+        ),
+        series: series,
+      );
 }
 
 void _exitReaderPage(
@@ -255,7 +251,9 @@ class _ReaderContent extends HookConsumerWidget {
                           child: Icon(
                             LucideIcons.bookImage,
                             size: 24,
-                            color: Theme.of(context).colorScheme.readerTextMuted,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.readerTextMuted,
                           ),
                         );
                 },
@@ -276,8 +274,9 @@ class _ReaderContent extends HookConsumerWidget {
                     return;
                   }
                   lastWheelAt.value = now;
-                  final ReaderViewNotifier notifier =
-                      ref.read(readerViewProvider(comicId).notifier);
+                  final ReaderViewNotifier notifier = ref.read(
+                    readerViewProvider(comicId).notifier,
+                  );
                   if (dy > 0) {
                     notifier.nextPage();
                   } else {
@@ -301,9 +300,9 @@ class _ReaderContent extends HookConsumerWidget {
                             child: Icon(
                               LucideIcons.bookImage,
                               size: 24,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .readerTextMuted,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.readerTextMuted,
                             ),
                           );
                   },
@@ -365,9 +364,7 @@ class _TopBar extends HookConsumerWidget {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
               child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: nav != null ? 720 : 500,
-                ),
+                constraints: BoxConstraints(maxWidth: nav != null ? 720 : 500),
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: cs.readerPanelBackground,
@@ -508,8 +505,10 @@ class _SeriesReaderDrawer extends ConsumerWidget {
   final void Function(String targetComicId) onSelectComic;
 
   static String _titleForComic(WidgetRef ref, String id) {
-    final String? title =
-        ref.read(libraryPageProvider.notifier).comicById(id)?.title;
+    final String? title = ref
+        .read(libraryPageProvider.notifier)
+        .comicById(id)
+        ?.title;
     if (title != null && title.isNotEmpty) {
       return title;
     }
@@ -543,10 +542,7 @@ class _SeriesReaderDrawer extends ConsumerWidget {
                   ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(
-                      LucideIcons.x,
-                      color: cs.readerTextIconPrimary,
-                    ),
+                    icon: Icon(LucideIcons.x, color: cs.readerTextIconPrimary),
                   ),
                 ],
               ),
@@ -569,8 +565,9 @@ class _SeriesReaderDrawer extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 13,
                         color: cs.readerTextIconPrimary,
-                        fontWeight:
-                            isCurrent ? FontWeight.w600 : FontWeight.w400,
+                        fontWeight: isCurrent
+                            ? FontWeight.w600
+                            : FontWeight.w400,
                       ),
                     ),
                     leading: SizedBox(
@@ -584,9 +581,7 @@ class _SeriesReaderDrawer extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    onTap: isCurrent
-                        ? null
-                        : () => onSelectComic(item.comicId),
+                    onTap: isCurrent ? null : () => onSelectComic(item.comicId),
                   );
                 },
               ),
@@ -775,14 +770,18 @@ class _ReadModeToggleBtn extends HookConsumerWidget {
               Icon(
                 icon,
                 size: 14,
-                color: isActive ? cs.readerTextOnWhite : cs.readerTextIconPrimary,
+                color: isActive
+                    ? cs.readerTextOnWhite
+                    : cs.readerTextIconPrimary,
               ),
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: isActive ? cs.readerTextOnWhite : cs.readerTextIconPrimary,
+                  color: isActive
+                      ? cs.readerTextOnWhite
+                      : cs.readerTextIconPrimary,
                 ),
               ),
             ],
