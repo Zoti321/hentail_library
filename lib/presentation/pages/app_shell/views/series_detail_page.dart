@@ -11,6 +11,7 @@ import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/entity/series_reading_history.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/routes/reader_route_args.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/widgets/dialog/add_comics_to_series_dialog.dart';
@@ -182,12 +183,12 @@ class _SeriesDetailBody extends ConsumerWidget {
               }
             }
             appRouter.pushNamed(
-              '阅读页面',
-              queryParameters: <String, String>{
-                'read_type': 'series',
-                'comic_id': comicIdToOpen,
-                'series_name': series.name,
-              },
+              ReaderRouteArgs.readerRouteName,
+              queryParameters: ReaderRouteArgs(
+                comicId: comicIdToOpen,
+                readType: ReaderRouteArgs.readTypeSeries,
+                seriesName: series.name,
+              ).toQueryParameters(),
             );
           },
           icon: const Icon(LucideIcons.bookOpen, size: 16),

@@ -5,6 +5,7 @@ import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/domain/entity/entities.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/routes/reader_route_args.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/ui_dto/history_grid_item_dto.dart';
 import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
@@ -49,14 +50,15 @@ class _Header extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final comicHistory = ref.watch(readingHistoryStreamProvider).maybeWhen(
-      data: (data) => data,
-      orElse: () => <ReadingHistory>[],
-    );
-    final seriesHistory = ref.watch(seriesReadingHistoryStreamProvider).maybeWhen(
-      data: (data) => data,
-      orElse: () => const <SeriesReadingHistory>[],
-    );
+    final comicHistory = ref
+        .watch(readingHistoryStreamProvider)
+        .maybeWhen(data: (data) => data, orElse: () => <ReadingHistory>[]);
+    final seriesHistory = ref
+        .watch(seriesReadingHistoryStreamProvider)
+        .maybeWhen(
+          data: (data) => data,
+          orElse: () => const <SeriesReadingHistory>[],
+        );
     final int totalCount = comicHistory.length + seriesHistory.length;
 
     return Container(
@@ -148,13 +150,17 @@ class _HistoryList extends ConsumerWidget {
     final allSeriesAsync = ref.watch(allSeriesProvider);
     final merged = ref.watch(mergedHistoryGridItemsProvider);
 
-    if (comicsAsync.isLoading || seriesAsync.isLoading || allSeriesAsync.isLoading) {
+    if (comicsAsync.isLoading ||
+        seriesAsync.isLoading ||
+        allSeriesAsync.isLoading) {
       return const Padding(
         padding: EdgeInsets.only(top: 48),
         child: Center(child: CircularProgressIndicator()),
       );
     }
-    if (comicsAsync.hasError || seriesAsync.hasError || allSeriesAsync.hasError) {
+    if (comicsAsync.hasError ||
+        seriesAsync.hasError ||
+        allSeriesAsync.hasError) {
       return Padding(
         padding: const EdgeInsets.only(top: 48),
         child: Center(
@@ -253,12 +259,12 @@ class _HistoryList extends ConsumerWidget {
               pageIndex: seriesItem.pageIndex,
               lastReadComicOrder: seriesItem.lastReadComicOrder,
               onTap: () => appRouter.pushNamed(
-                '阅读页面',
-                queryParameters: {
-                  'read_type': 'series',
-                  'comic_id': seriesItem.lastReadComicId,
-                  'series_name': seriesItem.seriesName,
-                },
+                ReaderRouteArgs.readerRouteName,
+                queryParameters: ReaderRouteArgs(
+                  comicId: seriesItem.lastReadComicId,
+                  readType: ReaderRouteArgs.readTypeSeries,
+                  seriesName: seriesItem.seriesName,
+                ).toQueryParameters(),
               ),
               onDelete: () => _handleDeleteSeriesHistory(
                 context: context,

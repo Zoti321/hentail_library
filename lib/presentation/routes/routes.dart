@@ -11,6 +11,7 @@ import 'package:hentai_library/presentation/pages/app_shell/views/series_detail_
 import 'package:hentai_library/presentation/pages/app_shell/views/series_management_page.dart';
 import 'package:hentai_library/presentation/pages/app_shell/views/tag_management_page.dart';
 import 'package:hentai_library/presentation/pages/reader_page.dart';
+import 'package:hentai_library/presentation/routes/reader_route_args.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -78,26 +79,15 @@ final appRouter = GoRouter(
         ),
         GoRoute(
           path: '/reader',
-          name: '阅读页面',
+          name: ReaderRouteArgs.readerRouteName,
           builder: (context, state) {
-            final String? comicIdQuery = state.uri.queryParameters['comic_id'];
-            final String comicId = comicIdQuery != null && comicIdQuery.isNotEmpty
-                ? comicIdQuery
-                : '';
-            final String? readType = state.uri.queryParameters['read_type'];
-            final String normalizedReadType = readType == 'series'
-                ? 'series'
-                : 'comic';
-            final String? seriesNameQuery = state.uri.queryParameters['series_name'];
-            final String? seriesName = normalizedReadType == 'series' &&
-                    seriesNameQuery != null &&
-                    seriesNameQuery.isNotEmpty
-                ? seriesNameQuery
-                : null;
+            final ReaderRouteArgs args = ReaderRouteArgs.fromQuery(
+              state.uri.queryParameters,
+            );
             return ReaderPage(
-              comicId: comicId,
-              readType: normalizedReadType,
-              seriesName: seriesName,
+              comicId: args.comicId,
+              readType: args.readType,
+              seriesName: args.seriesName,
             );
           },
         ),

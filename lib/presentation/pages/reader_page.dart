@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:extended_image/extended_image.dart';
@@ -10,6 +11,7 @@ import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/entity/entities.dart' as entity;
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/routes/reader_route_args.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -24,10 +26,7 @@ class SeriesReaderNavData {
   final int currentIndex;
 }
 
-enum ReaderReadType {
-  comic,
-  series,
-}
+enum ReaderReadType { comic, series }
 
 class ReaderRouteContext {
   const ReaderRouteContext({
@@ -102,9 +101,7 @@ class ReaderPage extends HookConsumerWidget {
     if (routeContext.comicId.isEmpty) {
       return Theme(
         data: buildAppTheme(Brightness.dark),
-        child: const Scaffold(
-          body: Center(child: Text('阅读参数错误：缺少 comic_id')),
-        ),
+        child: const Scaffold(body: Center(child: Text('阅读参数错误：缺少 comic_id'))),
       );
     }
     final theme = buildAppTheme(Brightness.dark);
@@ -114,8 +111,7 @@ class ReaderPage extends HookConsumerWidget {
       <Object?>[],
     );
     final String? seriesQuery = routeContext.seriesName;
-    final SeriesReaderNavData? seriesNav =
-        routeContext.isSeriesMode
+    final SeriesReaderNavData? seriesNav = routeContext.isSeriesMode
         ? ref
               .watch(seriesByNameForReaderProvider(seriesQuery!))
               .when(
@@ -125,14 +121,20 @@ class ReaderPage extends HookConsumerWidget {
                 error: (Object _, StackTrace _) => null,
               )
         : null;
+    final AsyncValue<entity.SeriesReadingHistory?>? seriesProgressAsync =
+        routeContext.isSeriesMode && seriesQuery != null
+        ? ref.watch(seriesReadingProgressForReaderProvider(seriesQuery))
+        : null;
+    final int? preferredPageIndex =
+        seriesProgressAsync?.asData?.value?.pageIndex;
 
     return Theme(
       data: theme,
       child: PopScope(
         canPop: false,
-        onPopInvokedWithResult: (bool didPop, dynamic result) {
+        onPopInvokedWithResult: (bool didPop, dynamic result) async {
           if (didPop) return;
-          _exitReaderPage(context, ref, routeContext);
+          await _exitReaderPage(context, ref, routeContext);
         },
         child: Scaffold(
           key: scaffoldKey,
@@ -141,20 +143,21 @@ class ReaderPage extends HookConsumerWidget {
               ? _SeriesReaderDrawer(
                   nav: seriesNav,
                   comicId: routeContext.comicId,
-                  onSelectComic: (String targetComicId) {
-                    _saveProgress(
+                  onSelectComic: (String targetComicId) async {
+                    await _saveProgress(
                       ref,
                       routeContext.comicId,
                       routeContext: routeContext,
                     );
+                    if (!context.mounted) return;
                     scaffoldKey.currentState?.closeEndDrawer();
                     context.pushReplacementNamed(
-                      '阅读页面',
-                      queryParameters: <String, String>{
-                        'read_type': 'series',
-                        'comic_id': targetComicId,
-                        'series_name': seriesNav.seriesName,
-                      },
+                      ReaderRouteArgs.readerRouteName,
+                      queryParameters: ReaderRouteArgs(
+                        comicId: targetComicId,
+                        readType: ReaderRouteArgs.readTypeSeries,
+                        seriesName: seriesNav.seriesName,
+                      ).toQueryParameters(),
                     );
                   },
                 )
@@ -171,12 +174,25 @@ class ReaderPage extends HookConsumerWidget {
                 children: [
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
-                    onTapUp: (details) => ref
-                        .read(readerViewProvider(routeContext.comicId).notifier)
-                        .handleTap(details, context),
+                    onTapUp: (TapUpDetails details) {
+                      final double width = MediaQuery.sizeOf(context).width;
+                      final double x = details.globalPosition.dx;
+                      final ReaderTapZone zone = x < width * 0.3
+                          ? ReaderTapZone.left
+                          : x > width * 0.7
+                          ? ReaderTapZone.right
+                          : ReaderTapZone.center;
+                      ref
+                          .read(
+                            readerViewProvider(routeContext.comicId).notifier,
+                          )
+                          .handleTapZone(zone);
+                    },
                     child: _ReaderContent(
+                      key: ValueKey<String>(routeContext.comicId),
                       comicId: routeContext.comicId,
                       initialPage: initialPage,
+                      preferredPageIndex: preferredPageIndex,
                     ),
                   ),
                   _TopBar(
@@ -196,11 +212,36 @@ class ReaderPage extends HookConsumerWidget {
   }
 }
 
-void _saveProgress(
+final Map<String, Future<void>> _savingProgressByComic =
+    <String, Future<void>>{};
+Future<void> _saveProgress(
   WidgetRef ref,
   String comicId, {
   required ReaderRouteContext routeContext,
-}) {
+}) async {
+  final Future<void>? inFlightSave = _savingProgressByComic[comicId];
+  if (inFlightSave != null) {
+    await inFlightSave;
+    return;
+  }
+  final Future<void> saveTask = _executeSaveProgress(
+    ref,
+    comicId,
+    routeContext: routeContext,
+  );
+  _savingProgressByComic[comicId] = saveTask;
+  try {
+    await saveTask;
+  } finally {
+    _savingProgressByComic.remove(comicId);
+  }
+}
+
+Future<void> _executeSaveProgress(
+  WidgetRef ref,
+  String comicId, {
+  required ReaderRouteContext routeContext,
+}) async {
   final state = ref.read(readerViewProvider(comicId)).asData?.value;
   if (state == null) return;
   final comic = state.comic;
@@ -218,7 +259,7 @@ void _saveProgress(
           pageIndex: currentIndex,
         )
       : null;
-  ref
+  await ref
       .read(recordReadingProgressUseCaseProvider)
       .call(
         entity.ReadingHistory(
@@ -231,12 +272,13 @@ void _saveProgress(
       );
 }
 
-void _exitReaderPage(
+Future<void> _exitReaderPage(
   BuildContext context,
   WidgetRef ref,
   ReaderRouteContext routeContext,
-) {
-  _saveProgress(ref, routeContext.comicId, routeContext: routeContext);
+) async {
+  await _saveProgress(ref, routeContext.comicId, routeContext: routeContext);
+  if (!context.mounted) return;
   final GoRouter router = GoRouter.of(context);
   if (router.canPop()) {
     router.pop();
@@ -256,50 +298,101 @@ void _exitReaderPage(
 }
 
 class _ReaderContent extends HookConsumerWidget {
-  const _ReaderContent({required this.comicId, required this.initialPage});
+  const _ReaderContent({
+    super.key,
+    required this.comicId,
+    required this.initialPage,
+    required this.preferredPageIndex,
+  });
 
   final String comicId;
   final int initialPage;
+  final int? preferredPageIndex;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stateAsync = ref.watch(readerViewProvider(comicId));
-    final state = stateAsync.requireValue;
-    final isVertical = state.isVertical;
-    final scale = isVertical ? 0.8 : 0.6;
-
-    final ScrollController scrollController = ScrollController();
-
-    final PageController pageController = useMemoized(
-      () => PageController(initialPage: initialPage),
-      [initialPage],
+    final bool isVertical = ref.watch(
+      readerViewProvider(comicId).select(
+        (AsyncValue<ReaderViewState> value) =>
+            value.asData?.value.isVertical ?? false,
+      ),
     );
-    ref.listen<AsyncValue<ReaderViewState>>(readerViewProvider(comicId), (
-      previous,
-      next,
-    ) {
-      next.whenData((s) {
-        if (pageController.hasClients) {
-          final targetPage = s.currentIndex - 1;
-          if (pageController.page?.round() != targetPage) {
-            pageController.jumpToPage(targetPage);
-          }
-        }
-      });
-    });
-
+    final int currentIndex = ref.watch(
+      readerViewProvider(comicId).select(
+        (AsyncValue<ReaderViewState> value) =>
+            value.asData?.value.currentIndex ?? 1,
+      ),
+    );
+    final int totalPages = ref.watch(
+      readerViewProvider(comicId).select(
+        (AsyncValue<ReaderViewState> value) =>
+            value.asData?.value.totalPages ?? 1,
+      ),
+    );
+    final double contentScale = isVertical ? 1.0 : 1.0;
+    final ScrollController scrollController = useScrollController();
+    final PageController pageController = usePageController(
+      initialPage: initialPage,
+    );
+    final ObjectRef<bool> isProgrammaticScroll = useRef<bool>(false);
+    final ObjectRef<bool> hasAppliedPreferredPage = useRef<bool>(false);
     final images = ref
         .watch(comicImagesProvider(comicId: comicId))
         .asData
         ?.value;
-
     final ObjectRef<DateTime?> lastWheelAt = useRef<DateTime?>(null);
     const int wheelThrottleMs = 200;
-
+    final Size viewportSize = MediaQuery.sizeOf(context);
+    final double devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
+    final int cacheWidth = (viewportSize.width * devicePixelRatio).round();
+    useEffect(() {
+      hasAppliedPreferredPage.value = false;
+      return null;
+    }, <Object?>[comicId, preferredPageIndex]);
+    useEffect(() {
+      final int? preferred = preferredPageIndex;
+      if (preferred == null || hasAppliedPreferredPage.value) {
+        return null;
+      }
+      final int safeTotalPages = totalPages > 0 ? totalPages : 1;
+      final int safeIndex = preferred.clamp(1, safeTotalPages);
+      hasAppliedPreferredPage.value = true;
+      if (currentIndex != safeIndex) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) {
+            return;
+          }
+          ref.read(readerViewProvider(comicId).notifier).setIndex(safeIndex);
+        });
+      }
+      return null;
+    }, <Object?>[comicId, preferredPageIndex, totalPages, currentIndex]);
+    useEffect(() {
+      if (isVertical || !pageController.hasClients) {
+        return null;
+      }
+      final int targetPage = currentIndex - 1;
+      final int currentPage =
+          pageController.page?.round() ?? pageController.initialPage;
+      if (currentPage == targetPage) {
+        return null;
+      }
+      isProgrammaticScroll.value = true;
+      pageController
+          .animateToPage(
+            targetPage,
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+          )
+          .whenComplete(() {
+            isProgrammaticScroll.value = false;
+          });
+      return null;
+    }, <Object?>[isVertical, currentIndex, pageController]);
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * scale,
+          maxWidth: MediaQuery.of(context).size.width * contentScale,
         ),
         child: isVertical
             ? ListView.builder(
@@ -308,19 +401,7 @@ class _ReaderContent extends HookConsumerWidget {
                 itemCount: images?.length ?? 0,
                 itemBuilder: (context, index) {
                   final file = images?[index];
-
-                  return file != null
-                      ? Image.file(file, fit: BoxFit.contain)
-                      : Container(
-                          padding: const EdgeInsets.all(24),
-                          child: Icon(
-                            LucideIcons.bookImage,
-                            size: 24,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.readerTextMuted,
-                          ),
-                        );
+                  return _ReaderImageItem(file: file, cacheWidth: cacheWidth);
                 },
               )
             : Listener(
@@ -351,28 +432,56 @@ class _ReaderContent extends HookConsumerWidget {
                 child: PageView.builder(
                   controller: pageController,
                   physics: const BouncingScrollPhysics(),
-                  onPageChanged: (int index) => ref
-                      .read(readerViewProvider(comicId).notifier)
-                      .setIndex(index + 1),
+                  onPageChanged: (int index) {
+                    if (isProgrammaticScroll.value) {
+                      return;
+                    }
+                    ref
+                        .read(readerViewProvider(comicId).notifier)
+                        .setIndex(index + 1);
+                  },
                   itemCount: images?.length ?? 0,
                   itemBuilder: (BuildContext context, int index) {
                     final file = images?[index];
-
-                    return file != null
-                        ? Image.file(file, fit: BoxFit.contain)
-                        : Container(
-                            padding: const EdgeInsets.all(24),
-                            child: Icon(
-                              LucideIcons.bookImage,
-                              size: 24,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.readerTextMuted,
-                            ),
-                          );
+                    return _ReaderImageItem(file: file, cacheWidth: cacheWidth);
                   },
                 ),
               ),
+      ),
+    );
+  }
+}
+
+class _ReaderImageItem extends StatelessWidget {
+  const _ReaderImageItem({required this.file, required this.cacheWidth});
+  final File? file;
+  final int cacheWidth;
+  @override
+  Widget build(BuildContext context) {
+    final File? imageFile = file;
+    if (imageFile != null) {
+      return Image.file(
+        imageFile,
+        fit: BoxFit.contain,
+        cacheWidth: cacheWidth,
+        cacheHeight: null,
+        filterQuality: FilterQuality.medium,
+        errorBuilder:
+            (BuildContext context, Object error, StackTrace? stackTrace) {
+              return _buildReaderImagePlaceholder(context);
+            },
+      );
+    }
+    return _buildReaderImagePlaceholder(context);
+  }
+
+  Widget _buildReaderImagePlaceholder(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      child: Icon(
+        LucideIcons.bookImage,
+        size: 24,
+        color: Theme.of(context).colorScheme.readerTextMuted,
       ),
     );
   }
@@ -394,26 +503,42 @@ class _TopBar extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
-    final state = ref.watch(readerViewProvider(comicId)).requireValue;
-    final showControls = state.showControls;
-    final isVertival = state.isVertical;
+    final bool showControls = ref.watch(
+      readerViewProvider(comicId).select(
+        (AsyncValue<ReaderViewState> value) =>
+            value.asData?.value.showControls ?? false,
+      ),
+    );
+    final bool isVertical = ref.watch(
+      readerViewProvider(comicId).select(
+        (AsyncValue<ReaderViewState> value) =>
+            value.asData?.value.isVertical ?? false,
+      ),
+    );
+    final String title = ref.watch(
+      readerViewProvider(comicId).select(
+        (AsyncValue<ReaderViewState> value) =>
+            value.asData?.value.comic.title ?? '',
+      ),
+    );
 
     final topPadding = MediaQuery.of(context).padding.top + 24;
     final SeriesReaderNavData? nav = seriesNav;
 
-    void goToSeriesComic(int delta) {
+    Future<void> goToSeriesComic(int delta) async {
       if (nav == null) return;
       final int next = nav.currentIndex + delta;
       if (next < 0 || next >= nav.sortedItems.length) return;
       final String targetId = nav.sortedItems[next].comicId;
-      _saveProgress(ref, comicId, routeContext: routeContext);
+      await _saveProgress(ref, comicId, routeContext: routeContext);
+      if (!context.mounted) return;
       context.pushReplacementNamed(
-        '阅读页面',
-        queryParameters: <String, String>{
-          'read_type': 'series',
-          'comic_id': targetId,
-          'series_name': nav.seriesName,
-        },
+        ReaderRouteArgs.readerRouteName,
+        queryParameters: ReaderRouteArgs(
+          comicId: targetId,
+          readType: ReaderRouteArgs.readTypeSeries,
+          seriesName: nav.seriesName,
+        ).toQueryParameters(),
       );
     }
 
@@ -444,8 +569,9 @@ class _TopBar extends HookConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      onPressed: () {
-                        _exitReaderPage(context, ref, routeContext);
+                      tooltip: '返回',
+                      onPressed: () async {
+                        await _exitReaderPage(context, ref, routeContext);
                       },
                       icon: Icon(
                         LucideIcons.arrowLeft,
@@ -470,7 +596,7 @@ class _TopBar extends HookConsumerWidget {
                     ],
                     Flexible(
                       child: Text(
-                        state.comic.title,
+                        title,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -523,7 +649,7 @@ class _TopBar extends HookConsumerWidget {
                             icon: LucideIcons.bookOpen,
                             label: "翻页",
                             isVertical: false,
-                            isActive: !isVertival,
+                            isActive: !isVertical,
                             onTap: () {
                               ref
                                   .read(readerViewProvider(comicId).notifier)
@@ -534,7 +660,7 @@ class _TopBar extends HookConsumerWidget {
                             icon: LucideIcons.arrowUpDown,
                             label: '条漫',
                             isVertical: true,
-                            isActive: isVertival,
+                            isActive: isVertical,
                             onTap: () {
                               ref
                                   .read(readerViewProvider(comicId).notifier)
@@ -609,6 +735,7 @@ class _SeriesReaderDrawer extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
+                    tooltip: '关闭',
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(LucideIcons.x, color: cs.readerTextIconPrimary),
                   ),
@@ -669,10 +796,24 @@ class _BottomBar extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
-    final state = ref.watch(readerViewProvider(comicId)).requireValue;
-    final showControls = state.showControls;
-    final currentIndex = state.currentIndex;
-    final totalPages = state.totalPages;
+    final bool showControls = ref.watch(
+      readerViewProvider(comicId).select(
+        (AsyncValue<ReaderViewState> value) =>
+            value.asData?.value.showControls ?? false,
+      ),
+    );
+    final int currentIndex = ref.watch(
+      readerViewProvider(comicId).select(
+        (AsyncValue<ReaderViewState> value) =>
+            value.asData?.value.currentIndex ?? 1,
+      ),
+    );
+    final int totalPages = ref.watch(
+      readerViewProvider(comicId).select(
+        (AsyncValue<ReaderViewState> value) =>
+            value.asData?.value.totalPages ?? 1,
+      ),
+    );
 
     final bottomPadding = MediaQuery.of(context).padding.bottom + 32;
 
@@ -706,16 +847,9 @@ class _BottomBar extends HookConsumerWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Row(
-                        mainAxisAlignment: .spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            '',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: cs.readerTextSecondary,
-                            ),
-                          ),
+                          const SizedBox.shrink(),
                           Text(
                             '$currentIndex / $totalPages',
                             style: TextStyle(
@@ -732,6 +866,7 @@ class _BottomBar extends HookConsumerWidget {
                       spacing: 8,
                       children: [
                         IconButton(
+                          tooltip: '上一页',
                           onPressed: () {
                             ref
                                 .read(readerViewProvider(comicId).notifier)
@@ -779,6 +914,7 @@ class _BottomBar extends HookConsumerWidget {
                         ),
 
                         IconButton(
+                          tooltip: '下一页',
                           onPressed: () {
                             ref
                                 .read(readerViewProvider(comicId).notifier)
@@ -802,7 +938,7 @@ class _BottomBar extends HookConsumerWidget {
   }
 }
 
-class _ReadModeToggleBtn extends HookConsumerWidget {
+class _ReadModeToggleBtn extends ConsumerWidget {
   const _ReadModeToggleBtn({
     required this.icon,
     required this.label,
@@ -822,37 +958,43 @@ class _ReadModeToggleBtn extends HookConsumerWidget {
     final cs = Theme.of(context).colorScheme;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: isActive ? cs.activeButtonBg : Colors.transparent,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            spacing: 6,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 14,
-                color: isActive
-                    ? cs.readerTextOnWhite
-                    : cs.readerTextIconPrimary,
-              ),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
+      child: Semantics(
+        selected: isActive,
+        button: true,
+        label: label,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: isActive ? cs.activeButtonBg : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              spacing: 6,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  size: 14,
                   color: isActive
                       ? cs.readerTextOnWhite
                       : cs.readerTextIconPrimary,
                 ),
-              ),
-            ],
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: isActive
+                        ? cs.readerTextOnWhite
+                        : cs.readerTextIconPrimary,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

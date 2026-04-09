@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart' as entity;
@@ -10,6 +9,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'reader_page_notifier.freezed.dart';
 part 'reader_page_notifier.g.dart';
+
+enum ReaderTapZone { left, center, right }
 
 @freezed
 abstract class ReaderViewState with _$ReaderViewState {
@@ -89,7 +90,7 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
     _updateDataState((s) => s.copyWith(totalPagesOverride: value));
   }
 
-  void handleTap(TapUpDetails details, BuildContext context) {
+  void handleTapZone(ReaderTapZone zone) {
     final current = state.asData?.value;
     if (current == null) return;
     if (current.showControls) {
@@ -99,7 +100,7 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
     if (current.isVertical) {
       _handleVerticalTap();
     } else {
-      _handleHorizontalTap(details, context);
+      _handleHorizontalTap(zone);
     }
   }
 
@@ -107,15 +108,10 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
     toggleShowControls();
   }
 
-  void _handleHorizontalTap(TapUpDetails details, BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final x = details.globalPosition.dx;
-    final isLeftZone = x < width * 0.3;
-    final isRightZone = x > width * 0.7;
-
-    if (isLeftZone) {
+  void _handleHorizontalTap(ReaderTapZone zone) {
+    if (zone == ReaderTapZone.left) {
       prevPage();
-    } else if (isRightZone) {
+    } else if (zone == ReaderTapZone.right) {
       nextPage();
     } else {
       toggleShowControls();
