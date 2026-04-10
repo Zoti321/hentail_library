@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/app_title_bar.dart';
 import 'package:hentai_library/presentation/widgets/desktop_sidebar.dart';
 import 'package:tray_manager/tray_manager.dart';
@@ -28,10 +29,12 @@ class _AppShellState extends ConsumerState<AppShell> with TrayListener {
   Widget build(BuildContext context) {
     final String path = GoRouterState.of(context).uri.path;
     final bool isReaderRoute = path.startsWith('/reader');
+    final bool readerFullscreen = ref.watch(readerWindowFullscreenProvider);
+    final bool showTitleBar = !isReaderRoute || !readerFullscreen;
     return Scaffold(
       body: Column(
         children: [
-          const AppTitleBar(),
+          if (showTitleBar) const AppTitleBar() else const SizedBox.shrink(),
           Expanded(
             child: isReaderRoute
                 ? widget.routeChild

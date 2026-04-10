@@ -6,6 +6,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
@@ -277,6 +278,7 @@ Future<void> _exitReaderPage(
   WidgetRef ref,
   ReaderRouteContext routeContext,
 ) async {
+  await ref.read(readerWindowFullscreenProvider.notifier).exitFullscreenIfNeeded();
   await _saveProgress(ref, routeContext.comicId, routeContext: routeContext);
   if (!context.mounted) return;
   final GoRouter router = GoRouter.of(context);
@@ -521,6 +523,7 @@ class _TopBar extends HookConsumerWidget {
             value.asData?.value.comic.title ?? '',
       ),
     );
+    final bool readerWindowFullscreen = ref.watch(readerWindowFullscreenProvider);
 
     final topPadding = MediaQuery.of(context).padding.top + 24;
     final SeriesReaderNavData? nav = seriesNav;
@@ -670,6 +673,23 @@ class _TopBar extends HookConsumerWidget {
                         ],
                       ),
                     ),
+                    if (isDesktop) ...[
+                      IconButton(
+                        tooltip: readerWindowFullscreen ? '退出全屏' : '全屏',
+                        onPressed: () async {
+                          await ref
+                              .read(readerWindowFullscreenProvider.notifier)
+                              .setFullscreen(!readerWindowFullscreen);
+                        },
+                        icon: Icon(
+                          readerWindowFullscreen
+                              ? LucideIcons.minimize2
+                              : LucideIcons.maximize2,
+                          size: 16,
+                          color: cs.readerTextIconPrimary,
+                        ),
+                      ),
+                    ],
                     Icon(
                       LucideIcons.settings2,
                       size: 16,

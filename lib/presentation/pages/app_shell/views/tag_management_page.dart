@@ -514,17 +514,6 @@ class _TagRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final iconButtonStyle = IconButton.styleFrom(
-      minimumSize: _TagStyles.iconButtonSize,
-      fixedSize: _TagStyles.iconButtonSize,
-      padding: EdgeInsets.zero,
-      splashFactory: NoSplash.splashFactory,
-      highlightColor: Colors.transparent,
-      overlayColor: cs.primary.withAlpha(14),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(_TagStyles.iconButtonRadius),
-      ),
-    );
 
     return _TagRowInteractionShell(
       child: InkWell(
@@ -534,17 +523,22 @@ class _TagRow extends ConsumerWidget {
           child: Row(
             spacing: 12,
             children: [
-              IconButton(
+              GhostButton.icon(
+                icon: isSelected
+                    ? LucideIcons.squareCheckBig
+                    : LucideIcons.square,
+                iconSize: 16,
+                size: _TagStyles.iconButtonSize.width,
                 tooltip: isSelected ? '取消选中' : '选中',
+                foregroundColor: isSelected ? cs.primary : cs.textTertiary,
+                hoverColor: theme.colorScheme.primary.withAlpha(10),
+                overlayColor: theme.colorScheme.primary.withAlpha(14),
+                borderRadius: 8,
+                delayTooltipThreeSeconds: true,
                 onPressed: () =>
                     ref.read(tagSelectionProvider.notifier).toggle(tag),
-                style: iconButtonStyle,
-                icon: Icon(
-                  isSelected ? LucideIcons.squareCheckBig : LucideIcons.square,
-                  size: 16,
-                  color: isSelected ? cs.primary : cs.textTertiary,
-                ),
               ),
+
               Expanded(
                 child: Text(
                   tag.name,
