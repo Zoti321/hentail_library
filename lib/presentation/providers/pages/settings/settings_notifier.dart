@@ -1,4 +1,5 @@
-import 'package:hentai_library/domain/entity/entities.dart' show AppSetting;
+import 'package:hentai_library/domain/entity/entities.dart'
+    show AppSetting, AppThemePreference;
 import 'package:hentai_library/presentation/providers/deps/repos.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -19,10 +20,10 @@ class SettingsNotifier extends _$SettingsNotifier {
     });
   }
 
-  Future<void> toggleDarkMode() async {
+  Future<void> setThemePreference(AppThemePreference value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
-    await updateSettings(current.copyWith(isDarkMode: !current.isDarkMode));
+    await updateSettings(current.copyWith(themePreference: value));
   }
 
   Future<void> toggleHealthyMode() async {

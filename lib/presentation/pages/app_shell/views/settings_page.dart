@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
+import 'package:hentai_library/domain/entity/app_theme_preference.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/widgets/dialog/app_theme_preference_dialog.dart';
 import 'package:hentai_library/presentation/widgets/my_toggle_switch.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -39,43 +41,28 @@ class SettingsPage extends ConsumerWidget {
               children: [
                 _SettingsRow(
                   icon: Icon(
-                    LucideIcons.moon,
-                    size: 20,
-                    color: theme.colorScheme.iconDefault,
-                  ),
-                  label: '深色模式',
-                  description: data.isDarkMode ? '已启用' : '已禁用',
-                  action: MyToggleSwitch(
-                    checked: data.isDarkMode,
-                    onChange: () {
-                      ref.read(settingsProvider.notifier).toggleDarkMode();
-                    },
-                  ),
-                ),
-                _SettingsRow(
-                  icon: Icon(
                     LucideIcons.palette,
                     size: 20,
                     color: theme.colorScheme.iconDefault,
                   ),
                   label: '应用主题',
-                  description: '跟随系统',
-                  action: Row(
-                    children: [
-                      Text(
-                        '浅色',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: theme.colorScheme.textTertiary,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        LucideIcons.chevronRight,
-                        size: 16,
-                        color: theme.colorScheme.iconSecondary,
-                      ),
-                    ],
+                  description: data.themePreference.labelZh,
+                  onRowTap: () async {
+                    final AppThemePreference? picked =
+                        await showDialog<AppThemePreference>(
+                      context: context,
+                      builder: (BuildContext ctx) =>
+                          AppThemePreferenceDialog(current: data.themePreference),
+                    );
+                    if (!context.mounted || picked == null) return;
+                    await ref
+                        .read(settingsProvider.notifier)
+                        .setThemePreference(picked);
+                  },
+                  action: Icon(
+                    LucideIcons.chevronRight,
+                    size: 16,
+                    color: theme.colorScheme.iconSecondary,
                   ),
                 ),
               ],
@@ -256,6 +243,7 @@ class _SettingsRow extends StatefulWidget {
   final String? description;
   final Widget? action;
   final bool isDestructive;
+  final VoidCallback? onRowTap;
 
   const _SettingsRow({
     required this.icon,
@@ -263,6 +251,7 @@ class _SettingsRow extends StatefulWidget {
     this.description,
     this.action,
     this.isDestructive = false,
+    this.onRowTap,
   });
 
   @override
@@ -275,10 +264,14 @@ class _SettingsRowState extends State<_SettingsRow> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      cursor: SystemMouseCursors.click,
+      cursor: widget.onRowTap != null
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
+        onTap: widget.onRowTap,
+        behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           decoration: BoxDecoration(
