@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/data/models/app_settings.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/util/comic_query.dart';
@@ -12,6 +11,8 @@ import 'package:hentai_library/domain/value_objects/library_comic_sort_option.da
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../../domain/entity/entities.dart' show AppSetting;
 
 part 'library_page_notifier.freezed.dart';
 part 'library_page_notifier.g.dart';
@@ -75,7 +76,7 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
 
   @override
   LibraryPageState build() {
-    ref.listen<AsyncValue<AppSettings>>(settingsProvider, (prev, next) {
+    ref.listen<AsyncValue<AppSetting>>(settingsProvider, (prev, next) {
       next.whenData((settings) {
         final showR18 = !settings.isHealthyMode;
         if (state.effectiveFilter.showR18 == showR18) return;
@@ -97,7 +98,7 @@ class LibraryPageNotifier extends _$LibraryPageNotifier {
   }
 
   void _subscribeLibraryStream() {
-    final repo = ref.read(libraryComicRepoProvider);
+    final repo = ref.read(comicRepoProvider);
     _sub = repo.watchAll().listen(
       (list) {
         state = state.copyWith(

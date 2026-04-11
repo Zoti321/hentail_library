@@ -249,8 +249,7 @@ class _SelectedPathsPageHeaderState
                         }
                         final List<String> orderedSelected = pageState.paths
                             .where(
-                              (String p) =>
-                                  pageState.selectedPaths.contains(p),
+                              (String p) => pageState.selectedPaths.contains(p),
                             )
                             .toList();
                         final bool confirmed =
@@ -596,10 +595,7 @@ IconData _pathRowIcon(String path) {
 }
 
 class _PathTile extends ConsumerStatefulWidget {
-  const _PathTile({
-    required this.path,
-    required this.isSelected,
-  });
+  const _PathTile({required this.path, required this.isSelected});
 
   final String path;
   final bool isSelected;
@@ -618,7 +614,9 @@ class _PathTileState extends ConsumerState<_PathTile> {
     final path = widget.path;
     final isSelected = widget.isSelected;
 
-    final textColor = isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface;
+    final textColor = isSelected
+        ? theme.colorScheme.primary
+        : theme.colorScheme.onSurface;
     final bgColor = isSelected
         ? theme.colorScheme.primaryContainer.withAlpha(90)
         : theme.colorScheme.surface;
@@ -633,23 +631,19 @@ class _PathTileState extends ConsumerState<_PathTile> {
       child: Material(
         color: bgColor,
         child: InkWell(
-          onTap: _isRemoving
-              ? null
-              : () => notifier.togglePathSelection(path),
+          onTap: _isRemoving ? null : () => notifier.togglePathSelection(path),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
                 Icon(
-                  isSelected
-                      ? LucideIcons.squareCheckBig
-                      : LucideIcons.square,
+                  isSelected ? LucideIcons.squareCheckBig : LucideIcons.square,
                   size: 16,
                   color: isSelected
                       ? theme.colorScheme.primary
                       : theme.colorScheme.textTertiary,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 16),
                 Icon(
                   _pathRowIcon(path),
                   size: 20,

@@ -17,6 +17,41 @@ import 'package:hentai_library/presentation/widgets/card_item/series_tile.dart';
 import 'package:hentai_library/presentation/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+const double _kLibraryGridMaxCrossAxisExtent = 200;
+const double _kLibraryGridCrossAxisSpacing = 16;
+const double _kLibraryGridMainAxisSpacing = 16;
+
+/// Vertical cell size for library comic/series grids, aligned with [ComicCard] and [SeriesCard]:
+/// `padding` 2× [AppSpacingTokens.sm], cover [AspectRatio] 2:3 on inner width, `Column.spacing` 12
+/// before the info block, title line (`bodyMd` × 1.25) + spacing 6 + meta line (`labelXs` − 1),
+/// plus slack for hover shadow and rounding (historically fixed `mainAxisExtent: 356`).
+double _libraryGridMainAxisExtentFromTokens(AppThemeTokens tokens) {
+  final double pad = tokens.spacing.sm;
+  final double innerWidth = _kLibraryGridMaxCrossAxisExtent - 2 * pad;
+  final double coverHeight = innerWidth * 3 / 2;
+  const double coverToInfoGap = 12;
+  final double titleLineHeight = tokens.text.bodyMd * 1.25;
+  const double infoColumnSpacing = 6;
+  final double metaLineHeight = tokens.text.labelXs - 1;
+  return (2 * pad +
+          coverHeight +
+          coverToInfoGap +
+          titleLineHeight +
+          infoColumnSpacing +
+          metaLineHeight)
+          .ceil() +
+      16;
+}
+
+SliverGridDelegate _libraryGridDelegate(AppThemeTokens tokens) {
+  return SliverGridDelegateWithMaxCrossAxisExtent(
+    maxCrossAxisExtent: _kLibraryGridMaxCrossAxisExtent,
+    mainAxisExtent: _libraryGridMainAxisExtentFromTokens(tokens),
+    crossAxisSpacing: _kLibraryGridCrossAxisSpacing,
+    mainAxisSpacing: _kLibraryGridMainAxisSpacing,
+  );
+}
+
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
 
@@ -275,12 +310,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         padding: const EdgeInsets.symmetric(horizontal: 48),
         sliver: isGridView
             ? SliverGrid.builder(
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 200,
-                  mainAxisExtent: 356,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
+                gridDelegate: _libraryGridDelegate(context.tokens),
                 itemCount: series.length,
                 itemBuilder: (BuildContext context, int index) {
                   final Series s = series[index];
@@ -406,20 +436,15 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           return _EmptyLibrarySliver(query: q);
         }
         return SliverGrid.builder(
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 200,
-            mainAxisExtent: 356,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-          ),
+          gridDelegate: _libraryGridDelegate(context.tokens),
           itemCount: comics.length,
-          itemBuilder: (context, index) {
+          itemBuilder: (BuildContext context, int index) {
             final manga = comics[index];
             return Center(
               child: ComicCard(
                 key: Key(manga.comicId),
                 comic: manga,
-                size: Size(double.infinity, double.infinity),
+                size: const Size(double.infinity, double.infinity),
                 onTap: () {
                   appRouter.pushNamed(
                     '漫画详情',

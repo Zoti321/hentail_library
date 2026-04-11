@@ -108,7 +108,7 @@ class ComicCard extends HookConsumerWidget {
                   }
                   try {
                     await purgeComicsFromApp(
-                      libraryComics: ref.read(libraryComicRepoProvider),
+                      libraryComics: ref.read(comicRepoProvider),
                       readingHistory: ref.read(readingHistoryRepoProvider),
                       librarySeries: ref.read(librarySeriesRepoProvider),
                       comicIds: <String>[comic.comicId],

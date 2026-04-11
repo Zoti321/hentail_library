@@ -70,7 +70,7 @@ class SyncComicsUseCase {
         return;
       }
 
-      final repo = _ref.read(libraryComicRepoProvider);
+      final repo = _ref.read(comicRepoProvider);
       final existing = await repo.getAll();
       if (existing.isEmpty) {
         emit((
@@ -135,7 +135,7 @@ class SyncComicsUseCase {
 
     final scanParse = _ref.read(comicScanParseServiceProvider);
     final mapper = _ref.read(libraryComicMapperProvider);
-    final repo = _ref.read(libraryComicRepoProvider);
+    final repo = _ref.read(comicRepoProvider);
 
     var counts = emptyLibrarySyncCounts();
     var acceptedTotal = 0;

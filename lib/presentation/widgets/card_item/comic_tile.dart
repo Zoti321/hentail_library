@@ -19,11 +19,7 @@ class ComicTile extends HookConsumerWidget {
   final Comic comic;
   final VoidCallback onTap;
 
-  const ComicTile({
-    super.key,
-    required this.comic,
-    required this.onTap,
-  });
+  const ComicTile({super.key, required this.comic, required this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -113,7 +109,7 @@ class ComicTile extends HookConsumerWidget {
                     }
                     try {
                       await purgeComicsFromApp(
-                        libraryComics: ref.read(libraryComicRepoProvider),
+                        libraryComics: ref.read(comicRepoProvider),
                         readingHistory: ref.read(readingHistoryRepoProvider),
                         librarySeries: ref.read(librarySeriesRepoProvider),
                         comicIds: <String>[comic.comicId],
@@ -163,7 +159,10 @@ class ComicTile extends HookConsumerWidget {
                           fit: BoxFit.cover,
                           cacheWidth: 240,
                         )
-                      : Icon(Icons.broken_image, color: theme.colorScheme.iconSecondary),
+                      : Icon(
+                          Icons.broken_image,
+                          color: theme.colorScheme.iconSecondary,
+                        ),
                 ),
               ),
               SizedBox(width: tokens.spacing.lg),
@@ -195,8 +194,12 @@ class ComicTile extends HookConsumerWidget {
                           ),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.subtleTagBackground,
-                            borderRadius: BorderRadius.circular(tokens.radius.xs),
-                            border: Border.all(color: theme.colorScheme.borderSubtle),
+                            borderRadius: BorderRadius.circular(
+                              tokens.radius.xs,
+                            ),
+                            border: Border.all(
+                              color: theme.colorScheme.borderSubtle,
+                            ),
                           ),
                           child: Text(
                             comic.resourceType.name,

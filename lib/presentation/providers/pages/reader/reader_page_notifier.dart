@@ -31,7 +31,7 @@ abstract class ReaderViewState with _$ReaderViewState {
 class ReaderViewNotifier extends _$ReaderViewNotifier {
   @override
   Future<ReaderViewState> build(String id) async {
-    final comic = await ref.read(libraryComicRepoProvider).findById(id);
+    final comic = await ref.read(comicRepoProvider).findById(id);
     if (comic == null) {
       throw StateError('Comic not found: $id');
     }
@@ -125,7 +125,7 @@ Future<List<File>> comicImages(
   required String comicId,
   String? chapterId,
 }) async {
-  final v2Comic = await ref.read(libraryComicRepoProvider).findById(comicId);
+  final v2Comic = await ref.read(comicRepoProvider).findById(comicId);
   if (v2Comic == null) return [];
 
   final service = ref.read(comicResourceGettingServiceProvider);
@@ -143,7 +143,7 @@ Future<List<File>> comicImages(
 
 @Riverpod()
 Future<String?> comicCoverPath(Ref ref, {required String comicId}) async {
-  final v2Comic = await ref.read(libraryComicRepoProvider).findById(comicId);
+  final v2Comic = await ref.read(comicRepoProvider).findById(comicId);
   if (v2Comic == null) return null;
 
   final service = ref.read(comicResourceGettingServiceProvider);

@@ -1,28 +1,23 @@
-import 'package:hentai_library/data/models/app_settings.dart';
-import 'package:hentai_library/data/services/settings/settings.dart' as data_settings;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/data/repository/app_setting_repo_impl.dart';
+import 'package:hentai_library/presentation/providers/deps/repos.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'settings_notifier.g.dart';
+import '../../../../domain/entity/entities.dart' show AppSetting;
 
-/// 不使用 codegen provider，避免需要重新运行 build_runner 才可编译。
-final settingsStorageServiceDiProvider =
-    Provider<data_settings.SettingsStorageService>((ref) {
-      return data_settings.SettingsStorageService();
-    });
+part 'settings_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
 class SettingsNotifier extends _$SettingsNotifier {
   @override
-  Future<AppSettings> build() async {
-    return await ref.read(settingsStorageServiceDiProvider).loadSettings();
+  Future<AppSetting> build() async {
+    return await ref.read(appSettingRepoProvider).load();
   }
 
-  Future<void> updateSettings(AppSettings newSettings) async {
+  Future<void> updateSettings(AppSetting newSetting) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      await ref.read(settingsStorageServiceDiProvider).saveSettings(newSettings);
-      return newSettings;
+      await ref.read(appSettingRepoProvider).save(newSetting);
+      return newSetting;
     });
   }
 
@@ -45,6 +40,6 @@ class SettingsNotifier extends _$SettingsNotifier {
   }
 
   Future<void> resetToDefaults() async {
-    updateSettings(ref.read(settingsStorageServiceDiProvider).defaultSettings());
+    updateSettings(AppSettingRepoImpl.defaultSettings());
   }
 }

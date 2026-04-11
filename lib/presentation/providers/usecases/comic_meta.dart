@@ -14,13 +14,13 @@ IngestLibraryResourcesUseCase ingestLibraryResourcesUseCase(Ref ref) {
   return IngestLibraryResourcesUseCase(
     scanParseService: ref.read(comicScanParseServiceProvider),
     mapper: ref.read(libraryComicMapperProvider),
-    comicRepo: ref.read(libraryComicRepoProvider),
+    comicRepo: ref.read(comicRepoProvider),
   );
 }
 
 @Riverpod(keepAlive: true)
 UpdateComicMetaUseCase updateLibraryComicMetaUseCase(Ref ref) {
-  return UpdateComicMetaUseCase(ref.read(libraryComicRepoProvider));
+  return UpdateComicMetaUseCase(ref.read(comicRepoProvider));
 }
 
 /// UI 表单（[ComicMetadataForm]）与领域 [UpdateComicMetaUseCase] 之间的桥接。
