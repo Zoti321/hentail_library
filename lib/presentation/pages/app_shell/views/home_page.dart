@@ -34,14 +34,6 @@ class HomePage extends ConsumerWidget {
       libraryPageProvider.select((s) => s.rawList.length),
     );
 
-    ref.listen(scanLibraryControllerProvider, (prev, next) {
-      final wasRunning = prev?.running ?? false;
-      if (!wasRunning || next.running) return;
-      if (next.cancelled) return;
-      if (next.error != null) return;
-      ref.read(libraryPageProvider.notifier).refreshStream();
-    });
-
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
