@@ -1,8 +1,6 @@
-import 'package:hentai_library/data/repository/app_setting_repo_impl.dart';
+import 'package:hentai_library/domain/entity/entities.dart' show AppSetting;
 import 'package:hentai_library/presentation/providers/deps/repos.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '../../../../domain/entity/entities.dart' show AppSetting;
 
 part 'settings_notifier.g.dart';
 
@@ -10,7 +8,7 @@ part 'settings_notifier.g.dart';
 class SettingsNotifier extends _$SettingsNotifier {
   @override
   Future<AppSetting> build() async {
-    return await ref.read(appSettingRepoProvider).load();
+    return ref.read(appSettingRepoProvider).load();
   }
 
   Future<void> updateSettings(AppSetting newSetting) async {
@@ -22,24 +20,26 @@ class SettingsNotifier extends _$SettingsNotifier {
   }
 
   Future<void> toggleDarkMode() async {
-    state.whenData((data) {
-      updateSettings(data.copyWith(isDarkMode: !data.isDarkMode));
-    });
+    final AppSetting? current = state.asData?.value;
+    if (current == null) return;
+    await updateSettings(current.copyWith(isDarkMode: !current.isDarkMode));
   }
 
   Future<void> toggleHealthyMode() async {
-    state.whenData((data) {
-      updateSettings(data.copyWith(isHealthyMode: !data.isHealthyMode));
-    });
+    final AppSetting? current = state.asData?.value;
+    if (current == null) return;
+    await updateSettings(
+      current.copyWith(isHealthyMode: !current.isHealthyMode),
+    );
   }
 
   Future<void> setAutoScan(bool value) async {
-    state.whenData((data) {
-      updateSettings(data.copyWith(autoScan: value));
-    });
+    final AppSetting? current = state.asData?.value;
+    if (current == null) return;
+    await updateSettings(current.copyWith(autoScan: value));
   }
 
   Future<void> resetToDefaults() async {
-    updateSettings(AppSettingRepoImpl.defaultSettings());
+    await updateSettings(AppSetting());
   }
 }

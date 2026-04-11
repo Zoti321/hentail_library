@@ -105,8 +105,15 @@ class SettingsPage extends ConsumerWidget {
                     color: theme.colorScheme.iconDefault,
                   ),
                   label: '自动扫描',
-                  description: '启动时扫描选中路径',
-                  action: const MyToggleSwitch(checked: true),
+                  description: data.autoScan
+                      ? '已启用（启动时扫描选中路径）'
+                      : '已禁用',
+                  action: MyToggleSwitch(
+                    checked: data.autoScan,
+                    onChange: () => ref
+                        .read(settingsProvider.notifier)
+                        .setAutoScan(!data.autoScan),
+                  ),
                 ),
                 _SettingsRow(
                   icon: data.isHealthyMode

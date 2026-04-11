@@ -12,7 +12,7 @@ import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../domain/entity/entities.dart' show AppSetting;
+import 'package:hentai_library/domain/entity/entities.dart' show AppSetting;
 
 part 'library_page_notifier.freezed.dart';
 part 'library_page_notifier.g.dart';

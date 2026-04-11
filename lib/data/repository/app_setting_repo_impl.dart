@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/domain/repository/app_setting_repo.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -21,10 +22,15 @@ class AppSettingRepoImpl implements AppSettingRepository {
 
       final jsonStr = await file.readAsString();
       final json = jsonDecode(jsonStr) as Map<String, dynamic>;
-      final settings = AppSetting.fromJson(json);
+      final AppSetting settings = AppSetting.fromJson(json);
 
       return settings;
-    } catch (e) {
+    } catch (e, st) {
+      LogManager.instance.handle(
+        e,
+        st,
+        '[APP_SETTING_REPO] 加载设置失败，已回退默认值',
+      );
       return defaultSettings();
     }
   }
@@ -35,8 +41,8 @@ class AppSettingRepoImpl implements AppSettingRepository {
       final file = await _getSettingsFile();
 
       await file.writeAsString(jsonEncode(setting.toJson()), flush: true);
-    } catch (e) {
-      // 向上抛出，让调用方（如 SettingsNotifier.updateSettings）通过 AsyncValue.error 感知失败
+    } catch (e, st) {
+      LogManager.instance.handle(e, st, '[APP_SETTING_REPO] 保存设置失败');
       rethrow;
     }
   }
@@ -46,10 +52,5 @@ class AppSettingRepoImpl implements AppSettingRepository {
     return File(p.join(dir.path, _fileName));
   }
 
-  static AppSetting defaultSettings() => AppSetting(
-    version: 1,
-    isDarkMode: false,
-    isHealthyMode: false,
-    autoScan: false,
-  );
+  static AppSetting defaultSettings() => AppSetting();
 }
