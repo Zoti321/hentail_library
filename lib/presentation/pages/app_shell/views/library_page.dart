@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/l10n/app_strings.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
@@ -107,6 +108,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
     final int comicCount = ref.watch(
       libraryPageProvider.select((s) => s.rawList.length),
+    );
+    final bool isComicTableEmpty = ref.watch(
+      libraryPageProvider.select(
+        (s) => s.hasReceivedFirstEmit && s.rawList.isEmpty,
+      ),
     );
 
     final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
@@ -260,8 +266,16 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 2),
             sliver: isGridView
-                ? _buildGridView(comics, hasSeriesSection: hasSeriesSection)
-                : _buildListView(comics, hasSeriesSection: hasSeriesSection),
+                ? _buildGridView(
+                    comics,
+                    hasSeriesSection: hasSeriesSection,
+                    isComicTableEmpty: isComicTableEmpty,
+                  )
+                : _buildListView(
+                    comics,
+                    hasSeriesSection: hasSeriesSection,
+                    isComicTableEmpty: isComicTableEmpty,
+                  ),
           ),
       ],
     );
@@ -425,15 +439,22 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   Widget _buildGridView(
     AsyncValue<List<Comic>> comics, {
     required bool hasSeriesSection,
+    required bool isComicTableEmpty,
   }) {
     return comics.when(
       data: (List<Comic> comics) {
         final String q = _searchController.text.trim();
         if (comics.isEmpty) {
           if (hasSeriesSection) {
-            return _NoMatchingComicsSliver(query: q);
+            return _NoMatchingComicsSliver(
+              query: q,
+              showManagePathsEntry: isComicTableEmpty,
+            );
           }
-          return _EmptyLibrarySliver(query: q);
+          return _EmptyLibrarySliver(
+            query: q,
+            showManagePathsEntry: isComicTableEmpty,
+          );
         }
         return SliverGrid.builder(
           gridDelegate: _libraryGridDelegate(context.tokens),
@@ -474,15 +495,22 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   Widget _buildListView(
     AsyncValue<List<Comic>> comics, {
     required bool hasSeriesSection,
+    required bool isComicTableEmpty,
   }) {
     return comics.when(
       data: (List<Comic> comics) {
         final String q = _searchController.text.trim();
         if (comics.isEmpty) {
           if (hasSeriesSection) {
-            return _NoMatchingComicsSliver(query: q);
+            return _NoMatchingComicsSliver(
+              query: q,
+              showManagePathsEntry: isComicTableEmpty,
+            );
           }
-          return _EmptyLibrarySliver(query: q);
+          return _EmptyLibrarySliver(
+            query: q,
+            showManagePathsEntry: isComicTableEmpty,
+          );
         }
         return SliverList.separated(
           itemCount: comics.length,
@@ -518,9 +546,13 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 }
 
 class _NoMatchingComicsSliver extends StatelessWidget {
-  const _NoMatchingComicsSliver({this.query = ''});
+  const _NoMatchingComicsSliver({
+    this.query = '',
+    this.showManagePathsEntry = false,
+  });
 
   final String query;
+  final bool showManagePathsEntry;
 
   @override
   Widget build(BuildContext context) {
@@ -532,13 +564,40 @@ class _NoMatchingComicsSliver extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(top: 24, bottom: 48),
         child: Center(
-          child: Text(
-            message,
-            style: TextStyle(
-              fontSize: 13,
-              color: theme.colorScheme.textTertiary,
-            ),
-            textAlign: TextAlign.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 16,
+            children: [
+              Text(
+                message,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: theme.colorScheme.textTertiary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              if (showManagePathsEntry)
+                OutlinedButton.icon(
+                  onPressed: () => context.go('/paths'),
+                  icon: Icon(
+                    LucideIcons.folderTree,
+                    size: 16,
+                    color: theme.colorScheme.primary,
+                  ),
+                  label: const Text('管理扫描路径'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: theme.colorScheme.primary,
+                    side: BorderSide(color: theme.colorScheme.borderSubtle),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -576,9 +635,13 @@ class _NoMatchingSeriesSliver extends StatelessWidget {
 }
 
 class _EmptyLibrarySliver extends StatelessWidget {
-  const _EmptyLibrarySliver({this.query = ''});
+  const _EmptyLibrarySliver({
+    this.query = '',
+    this.showManagePathsEntry = false,
+  });
 
   final String query;
+  final bool showManagePathsEntry;
 
   @override
   Widget build(BuildContext context) {
@@ -620,6 +683,30 @@ class _EmptyLibrarySliver extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
+              if (showManagePathsEntry)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: OutlinedButton.icon(
+                    onPressed: () => context.go('/paths'),
+                    icon: Icon(
+                      LucideIcons.folderTree,
+                      size: 16,
+                      color: theme.colorScheme.primary,
+                    ),
+                    label: const Text('管理扫描路径'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: theme.colorScheme.primary,
+                      side: BorderSide(color: theme.colorScheme.borderSubtle),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

@@ -1,6 +1,7 @@
 import 'package:hentai_library/domain/entity/comic/tag.dart' as v2;
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/usecases/assign_comic_to_series_usecase.dart';
+import 'package:hentai_library/domain/usecases/infer_series_from_comic_titles_usecase.dart';
 import 'package:hentai_library/domain/usecases/ingest_library_resources_usecase.dart';
 import 'package:hentai_library/domain/usecases/update_comic_meta_usecase.dart';
 import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dart';
@@ -31,6 +32,15 @@ UpdateComicMetadataFacadeUseCase updateComicMetadataUseCase(Ref ref) =>
 @Riverpod(keepAlive: true)
 AssignComicToSeriesUseCase assignLibraryComicToSeriesUseCase(Ref ref) {
   return AssignComicToSeriesUseCase(ref.read(librarySeriesRepoProvider));
+}
+
+@Riverpod(keepAlive: true)
+InferSeriesFromComicTitlesUseCase inferSeriesFromComicTitlesUseCase(Ref ref) {
+  return InferSeriesFromComicTitlesUseCase(
+    comicRepository: ref.read(comicRepoProvider),
+    seriesRepository: ref.read(librarySeriesRepoProvider),
+    inferenceService: ref.read(comicSeriesInferenceFromTitlesServiceProvider),
+  );
 }
 
 class UpdateComicMetadataFacadeUseCase {

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
+import 'package:hentai_library/domain/usecases/infer_series_from_comic_titles_usecase.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/dialog/add_comics_to_series_dialog.dart';
 import 'package:hentai_library/presentation/widgets/dialog/add_series_dialog.dart';
@@ -63,13 +64,56 @@ class SeriesManagementPage extends ConsumerWidget {
   }
 }
 
-class _Header extends ConsumerWidget {
+class _Header extends ConsumerStatefulWidget {
   const _Header({required this.onAddSeries});
 
   final Future<void> Function() onAddSeries;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_Header> createState() => _HeaderState();
+}
+
+class _HeaderState extends ConsumerState<_Header> {
+  bool _isInferring = false;
+
+  Future<void> _inferSeries() async {
+    if (_isInferring) {
+      return;
+    }
+    setState(() {
+      _isInferring = true;
+    });
+    try {
+      final InferSeriesFromComicTitlesUseCase useCase =
+          ref.read(inferSeriesFromComicTitlesUseCaseProvider);
+      final InferSeriesFromComicTitlesResult result = await useCase.call();
+      ref.invalidate(allSeriesProvider);
+      if (!mounted) {
+        return;
+      }
+      final String newPart = result.newSeriesCreated > 0
+          ? '，新建 ${result.newSeriesCreated} 个系列名'
+          : '';
+      showSuccessSnackBar(
+        context,
+        '已推断 ${result.groupsApplied} 组系列，归属 ${result.comicsAssigned} 本漫画$newPart。',
+      );
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+      showErrorSnackBar(context, e);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isInferring = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final String shortcutLabel = _shortcutLabel(context);
@@ -115,10 +159,32 @@ class _Header extends ConsumerWidget {
             Tooltip(
               message: '添加系列 ($shortcutLabel)',
               child: FilledButton.icon(
-                onPressed: onAddSeries,
+                onPressed: widget.onAddSeries,
                 icon: const Icon(LucideIcons.plus, size: 16),
                 label: Text('添加系列 ($shortcutLabel)'),
                 style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+            Tooltip(
+              message: '按标题末尾卷号自动分组未归属漫画',
+              child: OutlinedButton.icon(
+                onPressed: _isInferring ? null : _inferSeries,
+                icon: _isInferring
+                    ? SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: cs.primary,
+                        ),
+                      )
+                    : const Icon(LucideIcons.wandSparkles, size: 16),
+                label: const Text('自动推断系列'),
+                style: OutlinedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

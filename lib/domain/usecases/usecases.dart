@@ -1,4 +1,5 @@
 export 'record_reading_progress_usecase.dart';
+export 'infer_series_from_comic_titles_usecase.dart';
 export 'assign_comic_to_series_usecase.dart';
 export 'purge_comics_side_effects.dart';
 export 'ingest_library_resources_usecase.dart';

@@ -2,6 +2,7 @@ import 'package:hentai_library/data/services/comic/comic_resource_content_handle
 import 'package:hentai_library/data/services/comic/comic_resource_getting_service.dart';
 import 'package:hentai_library/data/services/comic/comic_scan_parse_service.dart';
 import 'package:hentai_library/data/services/comic/resource_parser.dart';
+import 'package:hentai_library/data/services/series/comic_series_inference_from_titles_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'services.g.dart';
@@ -28,3 +29,8 @@ ComicResourceGettingService comicResourceGettingService(Ref ref) =>
     ComicResourceGettingService(
       handlers: ref.read(comicResourceContentHandlersProvider),
     );
+
+@Riverpod(keepAlive: true)
+ComicSeriesInferenceFromTitlesService comicSeriesInferenceFromTitlesService(
+  Ref ref,
+) => const ComicSeriesInferenceFromTitlesService();
