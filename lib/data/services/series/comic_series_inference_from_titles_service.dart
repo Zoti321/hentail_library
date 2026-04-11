@@ -40,7 +40,7 @@ final class ComicSeriesInferenceFromTitlesService {
     final Map<String, List<InferredVolumeEntry>> byBase =
         <String, List<InferredVolumeEntry>>{};
     for (final ComicTitleInput c in comics) {
-      final ({String seriesName, int volumeIndex})? parsed =
+      final MappedSeriesVolume? parsed =
           _titleMapping.mapComicTitleToSeriesVolume(c.title);
       if (parsed == null) {
         continue;
