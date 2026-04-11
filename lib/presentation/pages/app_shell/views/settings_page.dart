@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/domain/entity/app_theme_preference.dart';
+import 'package:hentai_library/domain/entity/app_setting.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/dialog/app_theme_preference_dialog.dart';
 import 'package:hentai_library/presentation/widgets/my_toggle_switch.dart';
@@ -50,10 +50,12 @@ class SettingsPage extends ConsumerWidget {
                   onRowTap: () async {
                     final AppThemePreference? picked =
                         await showDialog<AppThemePreference>(
-                      context: context,
-                      builder: (BuildContext ctx) =>
-                          AppThemePreferenceDialog(current: data.themePreference),
-                    );
+                          context: context,
+                          builder: (BuildContext ctx) =>
+                              AppThemePreferenceDialog(
+                                current: data.themePreference,
+                              ),
+                        );
                     if (!context.mounted || picked == null) return;
                     await ref
                         .read(settingsProvider.notifier)
@@ -92,9 +94,7 @@ class SettingsPage extends ConsumerWidget {
                     color: theme.colorScheme.iconDefault,
                   ),
                   label: '自动扫描',
-                  description: data.autoScan
-                      ? '已启用（启动时扫描选中路径）'
-                      : '已禁用',
+                  description: data.autoScan ? '已启用（启动时扫描选中路径）' : '已禁用',
                   action: MyToggleSwitch(
                     checked: data.autoScan,
                     onChange: () => ref

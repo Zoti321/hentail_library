@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/domain/entity/app_theme_preference.dart';
 
 part 'app_setting.freezed.dart';
 part 'app_setting.g.dart';
@@ -15,4 +14,28 @@ abstract class AppSetting with _$AppSetting {
 
   factory AppSetting.fromJson(Map<String, dynamic> json) =>
       _$AppSettingFromJson(json);
+}
+
+/// 应用外观：浅色 / 深色 / 跟随系统。
+@JsonEnum(alwaysCreate: true)
+enum AppThemePreference {
+  @JsonValue('system')
+  system,
+  @JsonValue('light')
+  light,
+  @JsonValue('dark')
+  dark,
+}
+
+extension AppThemePreferenceX on AppThemePreference {
+  String get labelZh {
+    switch (this) {
+      case AppThemePreference.system:
+        return '跟随系统';
+      case AppThemePreference.light:
+        return '浅色';
+      case AppThemePreference.dark:
+        return '深色';
+    }
+  }
 }

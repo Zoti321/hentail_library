@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/domain/entity/app_theme_preference.dart';
+import 'package:hentai_library/domain/entity/app_setting.dart';
 import 'package:hentai_library/presentation/widgets/dialog/fluent_dialog_shell.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
