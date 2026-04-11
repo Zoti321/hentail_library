@@ -12,7 +12,6 @@ part 'selected_paths_page_notifier.g.dart';
 abstract class SelectedPathsPageState with _$SelectedPathsPageState {
   const factory SelectedPathsPageState({
     @Default(<String>[]) List<String> paths,
-    @Default(false) bool isSelectionMode,
     @Default(<String>{}) Set<String> selectedPaths,
   }) = _SelectedPathsPageState;
 }
@@ -45,46 +44,34 @@ class SelectedPathsPageNotifier extends _$SelectedPathsPageNotifier {
     });
   }
 
-  void setSelectionMode(bool enabled) {
-    _updateDataState((current) {
-      if (!enabled) {
-        return current.copyWith(
-          isSelectionMode: false,
-          selectedPaths: const <String>{},
-        );
-      }
-      return current.copyWith(isSelectionMode: true);
-    });
-  }
-
-  void toggleSelectionMode() {
-    final current = state.asData?.value;
-    if (current == null) return;
-    setSelectionMode(!current.isSelectionMode);
-  }
-
   void togglePathSelection(String path) {
     _updateDataState((current) {
-      if (!current.isSelectionMode) {
-        return current;
-      }
-
       if (!current.paths.contains(path)) {
         return current;
       }
-
-      final nextSelected = <String>{...current.selectedPaths};
+      final Set<String> nextSelected = <String>{...current.selectedPaths};
       if (!nextSelected.add(path)) {
         nextSelected.remove(path);
       }
-
       return current.copyWith(selectedPaths: nextSelected);
     });
   }
 
-  void clearSelection() {
+  /// 按列表顺序移除当前选中路径，成功后清空选择。
+  Future<void> removeSelectedPaths() async {
+    final SelectedPathsPageState? current = state.asData?.value;
+    if (current == null || current.selectedPaths.isEmpty) {
+      return;
+    }
+    final List<String> ordered = current.paths
+        .where((String p) => current.selectedPaths.contains(p))
+        .toList();
+    for (final String p in ordered) {
+      await _pathRepo.remove(p);
+    }
     _updateDataState(
-      (current) => current.copyWith(selectedPaths: const <String>{}),
+      (SelectedPathsPageState c) =>
+          c.copyWith(selectedPaths: const <String>{}),
     );
   }
 

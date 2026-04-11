@@ -9,6 +9,7 @@ import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
+import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/widgets/dialog/edit_metadata_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -485,27 +486,6 @@ ButtonStyle _detailPrimaryActionStyle(ThemeData theme, AppThemeTokens tokens) {
   );
 }
 
-ButtonStyle _detailSecondaryActionStyle(
-  ThemeData theme,
-  AppThemeTokens tokens,
-) {
-  final ColorScheme cs = theme.colorScheme;
-  return ElevatedButton.styleFrom(
-    backgroundColor: cs.surfaceContainerHighest,
-    foregroundColor: cs.primary,
-    elevation: 0,
-    shadowColor: Colors.transparent,
-    padding: EdgeInsets.symmetric(
-      horizontal: tokens.spacing.xl,
-      vertical: tokens.spacing.sm + 6,
-    ),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(tokens.radius.md),
-      side: BorderSide(color: cs.outline.withAlpha(140)),
-    ),
-  );
-}
-
 class _DetailPrimaryActions extends HookConsumerWidget {
   const _DetailPrimaryActions({required this.comic});
 
@@ -516,14 +496,11 @@ class _DetailPrimaryActions extends HookConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final ButtonStyle primaryStyle = _detailPrimaryActionStyle(theme, tokens);
-    final ButtonStyle secondaryStyle = _detailSecondaryActionStyle(
-      theme,
-      tokens,
-    );
+
     return Align(
       alignment: Alignment.centerLeft,
       child: Wrap(
-        spacing: tokens.spacing.sm,
+        spacing: tokens.spacing.md,
         runSpacing: tokens.spacing.sm,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
@@ -557,11 +534,14 @@ class _DetailPrimaryActions extends HookConsumerWidget {
           Semantics(
             label: '编辑元数据',
             button: true,
-            child: ElevatedButton.icon(
+            child: GhostButton.icon(
+              icon: LucideIcons.pencil,
+              tooltip: '编辑元数据',
+              semanticLabel: '编辑元数据',
+              size: 32,
               onPressed: () {
                 showDialog(
                   context: context,
-                  barrierColor: Colors.transparent,
                   builder: (BuildContext context) => EditMetadataDialog(
                     comic: comic,
                     onSave: (data) async {
@@ -573,9 +553,6 @@ class _DetailPrimaryActions extends HookConsumerWidget {
                   ),
                 );
               },
-              icon: Icon(LucideIcons.pencil, size: 16),
-              label: const Text('编辑元数据'),
-              style: secondaryStyle,
             ),
           ),
         ],

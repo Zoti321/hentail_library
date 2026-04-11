@@ -7,6 +7,8 @@ import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
+import 'package:hentai_library/presentation/widgets/dialog/remove_saved_path_confirm_dialog.dart';
+import 'package:hentai_library/presentation/widgets/dialog/remove_saved_paths_batch_confirm_dialog.dart';
 import 'package:hentai_library/presentation/widgets/common/status/status_card_shell.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -27,7 +29,6 @@ class SelectedPathsPage extends ConsumerWidget {
           _SelectedPathsPageHeader(
             totalCount: viewState?.paths.length ?? 0,
             selectedCount: viewState?.selectedPaths.length ?? 0,
-            isSelectionMode: viewState?.isSelectionMode ?? false,
             hasData: viewState != null,
           ),
           const SizedBox(height: 20),
@@ -46,13 +47,11 @@ class _SelectedPathsPageHeader extends ConsumerStatefulWidget {
   const _SelectedPathsPageHeader({
     required this.totalCount,
     required this.selectedCount,
-    required this.isSelectionMode,
     required this.hasData,
   });
 
   final int totalCount;
   final int selectedCount;
-  final bool isSelectionMode;
   final bool hasData;
 
   @override
@@ -65,6 +64,7 @@ class _SelectedPathsPageHeaderState
   final CustomPopupMenuController _addPathMenuController =
       CustomPopupMenuController();
   bool _isPicking = false;
+  bool _isBatchRemoving = false;
 
   Future<void> _addFiles() async {
     setState(() => _isPicking = true);
@@ -138,7 +138,6 @@ class _SelectedPathsPageHeaderState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final notifier = ref.read(selectedPathsPageProvider.notifier);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,7 +172,7 @@ class _SelectedPathsPageHeaderState
                     icon: LucideIcons.link,
                     label: '路径 ${widget.totalCount}',
                   ),
-                  if (widget.isSelectionMode)
+                  if (widget.selectedCount > 0)
                     _MetaChip(
                       icon: LucideIcons.circleCheckBig,
                       label: '已选 ${widget.selectedCount}',
@@ -235,29 +234,66 @@ class _SelectedPathsPageHeaderState
                 ),
               ),
             ),
-            OutlinedButton.icon(
-              onPressed: widget.hasData ? notifier.toggleSelectionMode : null,
-              icon: Icon(
-                widget.isSelectionMode
-                    ? LucideIcons.squareX
-                    : LucideIcons.squareCheckBig,
-                size: 16,
-              ),
-              label: Text(widget.isSelectionMode ? '退出选择' : '选择模式'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: theme.colorScheme.onSurface,
-                side: BorderSide(color: theme.colorScheme.borderSubtle),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
-                ),
-              ),
-            ),
-            if (widget.isSelectionMode && widget.selectedCount > 0)
+            if (widget.hasData && widget.selectedCount > 0)
               TextButton.icon(
-                onPressed: notifier.clearSelection,
-                icon: const Icon(LucideIcons.eraser, size: 16),
-                label: const Text('清空选择'),
+                onPressed: _isBatchRemoving
+                    ? null
+                    : () async {
+                        final SelectedPathsPageState? pageState = ref
+                            .read(selectedPathsPageProvider)
+                            .asData
+                            ?.value;
+                        if (pageState == null ||
+                            pageState.selectedPaths.isEmpty) {
+                          return;
+                        }
+                        final List<String> orderedSelected = pageState.paths
+                            .where(
+                              (String p) =>
+                                  pageState.selectedPaths.contains(p),
+                            )
+                            .toList();
+                        final bool confirmed =
+                            await showDialog<bool>(
+                              context: context,
+                              builder: (BuildContext dialogContext) =>
+                                  RemoveSavedPathsBatchConfirmDialog(
+                                    paths: orderedSelected,
+                                  ),
+                            ) ??
+                            false;
+                        if (!context.mounted || !confirmed) return;
+                        setState(() => _isBatchRemoving = true);
+                        try {
+                          await ref
+                              .read(selectedPathsPageProvider.notifier)
+                              .removeSelectedPaths();
+                          if (!context.mounted) return;
+                          final int n = orderedSelected.length;
+                          showSuccessSnackBar(
+                            context,
+                            n == 1 ? '已移除 1 条路径' : '已移除 $n 条路径',
+                          );
+                        } catch (e) {
+                          if (!context.mounted) return;
+                          showErrorSnackBar(context, e);
+                        } finally {
+                          if (mounted) {
+                            setState(() => _isBatchRemoving = false);
+                          }
+                        }
+                      },
+                icon: _isBatchRemoving
+                    ? SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: theme.colorScheme.primary,
+                        ),
+                      )
+                    : const Icon(LucideIcons.trash2, size: 16),
+                label: Text(_isBatchRemoving ? '移除中…' : '清空选择'),
                 style: TextButton.styleFrom(
                   foregroundColor: theme.colorScheme.onSurface,
                   padding: const EdgeInsets.symmetric(
@@ -540,7 +576,6 @@ class _SelectedPathsCard extends StatelessWidget {
                   final path = paths[index];
                   return _PathTile(
                     path: path,
-                    isSelectionMode: viewState.isSelectionMode,
                     isSelected: viewState.selectedPaths.contains(path),
                   );
                 },
@@ -563,12 +598,10 @@ IconData _pathRowIcon(String path) {
 class _PathTile extends ConsumerStatefulWidget {
   const _PathTile({
     required this.path,
-    required this.isSelectionMode,
     required this.isSelected,
   });
 
   final String path;
-  final bool isSelectionMode;
   final bool isSelected;
 
   @override
@@ -583,7 +616,6 @@ class _PathTileState extends ConsumerState<_PathTile> {
     final theme = Theme.of(context);
     final notifier = ref.read(selectedPathsPageProvider.notifier);
     final path = widget.path;
-    final isSelectionMode = widget.isSelectionMode;
     final isSelected = widget.isSelected;
 
     final textColor = isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface;
@@ -601,38 +633,27 @@ class _PathTileState extends ConsumerState<_PathTile> {
       child: Material(
         color: bgColor,
         child: InkWell(
-          onTap: () {
-            if (!isSelectionMode) return;
-            notifier.togglePathSelection(path);
-          },
-          onLongPress: () {
-            if (isSelectionMode) return;
-            notifier.setSelectionMode(true);
-            notifier.togglePathSelection(path);
-          },
+          onTap: _isRemoving
+              ? null
+              : () => notifier.togglePathSelection(path),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 160),
-                  child: isSelectionMode
-                      ? Icon(
-                          isSelected
-                              ? LucideIcons.squareCheckBig
-                              : LucideIcons.square,
-                          key: ValueKey<bool>(isSelected),
-                          size: 16,
-                          color: isSelected
-                              ? theme.colorScheme.primary
-                              : theme.colorScheme.textTertiary,
-                        )
-                      : Icon(
-                          _pathRowIcon(path),
-                          key: ValueKey<String>(path),
-                          size: 20,
-                          color: theme.colorScheme.iconDefault,
-                        ),
+                Icon(
+                  isSelected
+                      ? LucideIcons.squareCheckBig
+                      : LucideIcons.square,
+                  size: 16,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.textTertiary,
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  _pathRowIcon(path),
+                  size: 20,
+                  color: theme.colorScheme.iconDefault,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -647,47 +668,54 @@ class _PathTileState extends ConsumerState<_PathTile> {
                     ),
                   ),
                 ),
-                if (!widget.isSelectionMode)
-                  _isRemoving
-                      ? SizedBox(
-                          width: 28,
-                          height: 28,
-                          child: Center(
-                            child: SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: theme.colorScheme.primary,
-                              ),
+                _isRemoving
+                    ? SizedBox(
+                        width: 28,
+                        height: 28,
+                        child: Center(
+                          child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: theme.colorScheme.primary,
                             ),
                           ),
-                        )
-                      : GhostButton.icon(
-                          icon: LucideIcons.trash2,
-                          tooltip: '移除路径',
-                          semanticLabel: '移除路径',
-                          iconSize: 16,
-                          size: 28,
-                          borderRadius: 8,
-                          foregroundColor: theme.colorScheme.iconDefault,
-                          hoverColor: theme.colorScheme.primary.withAlpha(10),
-                          overlayColor: theme.colorScheme.primary.withAlpha(14),
-                          delayTooltipThreeSeconds: true,
-                          onPressed: () async {
-                            setState(() => _isRemoving = true);
-                            try {
-                              await ref.read(pathRepoProvider).remove(path);
-                              if (!context.mounted) return;
-                              showSuccessSnackBar(context, '已移除路径');
-                            } catch (e) {
-                              if (!context.mounted) return;
-                              showErrorSnackBar(context, e);
-                            } finally {
-                              if (mounted) setState(() => _isRemoving = false);
-                            }
-                          },
                         ),
+                      )
+                    : GhostButton.icon(
+                        icon: LucideIcons.trash2,
+                        tooltip: '移除路径',
+                        semanticLabel: '移除路径',
+                        iconSize: 16,
+                        size: 28,
+                        borderRadius: 8,
+                        foregroundColor: theme.colorScheme.iconDefault,
+                        hoverColor: theme.colorScheme.primary.withAlpha(10),
+                        overlayColor: theme.colorScheme.primary.withAlpha(14),
+                        delayTooltipThreeSeconds: true,
+                        onPressed: () async {
+                          final bool confirmed =
+                              await showDialog<bool>(
+                                context: context,
+                                builder: (BuildContext dialogContext) =>
+                                    RemoveSavedPathConfirmDialog(path: path),
+                              ) ??
+                              false;
+                          if (!context.mounted || !confirmed) return;
+                          setState(() => _isRemoving = true);
+                          try {
+                            await ref.read(pathRepoProvider).remove(path);
+                            if (!context.mounted) return;
+                            showSuccessSnackBar(context, '已移除路径');
+                          } catch (e) {
+                            if (!context.mounted) return;
+                            showErrorSnackBar(context, e);
+                          } finally {
+                            if (mounted) setState(() => _isRemoving = false);
+                          }
+                        },
+                      ),
               ],
             ),
           ),
