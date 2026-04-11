@@ -16,8 +16,6 @@ class AppShell extends ConsumerStatefulWidget {
 }
 
 class _AppShellState extends ConsumerState<AppShell> with TrayListener {
-  String _activeTab = 'home';
-
   @override
   void initState() {
     trayManager.addListener(this);
@@ -28,6 +26,7 @@ class _AppShellState extends ConsumerState<AppShell> with TrayListener {
   @override
   Widget build(BuildContext context) {
     final String path = GoRouterState.of(context).uri.path;
+    final String sidebarActiveId = _sidebarActiveIdForPath(path);
     final bool isReaderRoute = path.startsWith('/reader');
     final bool readerFullscreen = ref.watch(readerWindowFullscreenProvider);
     final bool showTitleBar = !isReaderRoute || !readerFullscreen;
@@ -41,13 +40,9 @@ class _AppShellState extends ConsumerState<AppShell> with TrayListener {
                 : Row(
                     children: [
                       DesktopSidebar(
-                        activeId: _activeTab,
-                        onDestinationSelected: (id) {
-                          setState(() {
-                            _activeTab = id;
-                          });
-                          _onDestinationTap(id, context);
-                        },
+                        activeId: sidebarActiveId,
+                        onDestinationSelected: (String id) =>
+                            _onDestinationTap(id, context),
                       ),
                       Expanded(child: widget.routeChild),
                     ],
@@ -66,9 +61,6 @@ class _AppShellState extends ConsumerState<AppShell> with TrayListener {
       case 'library':
         context.go('/local');
         break;
-      case 'selectedPaths':
-        context.go('/paths');
-        break;
       case 'tags':
         context.go('/tags');
         break;
@@ -77,9 +69,38 @@ class _AppShellState extends ConsumerState<AppShell> with TrayListener {
         break;
       case 'history':
         context.go('/history');
+        break;
       case 'settings':
         context.go('/settings');
         break;
+    }
+  }
+
+  /// 与 [DesktopSidebar] 菜单 id 对应；`/paths` 无对应项时用空字符串（不高亮）。
+  static String _sidebarActiveIdForPath(String path) {
+    switch (path) {
+      case '/home':
+        return 'home';
+      case '/local':
+        return 'library';
+      case '/paths':
+        return '';
+      case '/tags':
+        return 'tags';
+      case '/series':
+        return 'series';
+      case '/history':
+        return 'history';
+      case '/settings':
+        return 'settings';
+      default:
+        if (path.startsWith('/comic/')) {
+          return 'library';
+        }
+        if (path.startsWith('/series/')) {
+          return 'series';
+        }
+        return 'home';
     }
   }
 

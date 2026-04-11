@@ -191,13 +191,6 @@ class HomePage extends ConsumerWidget {
           tokens: tokens,
         ),
         _ShortcutEntry(
-          icon: LucideIcons.folderTree,
-          label: '选中路径',
-          onTap: () => context.go('/paths'),
-          colorScheme: cs,
-          tokens: tokens,
-        ),
-        _ShortcutEntry(
           icon: LucideIcons.scanSearch,
           label: '扫描漫画库',
           onTap: () => _onTapScanLibrary(context, ref),
