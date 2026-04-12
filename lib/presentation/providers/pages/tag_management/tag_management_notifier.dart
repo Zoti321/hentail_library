@@ -28,6 +28,13 @@ class TagSelectionNotifier extends Notifier<Set<Tag>> {
     state = <Tag>{};
   }
 
+  void remove(Tag tag) {
+    if (!state.contains(tag)) {
+      return;
+    }
+    state = Set<Tag>.from(state)..remove(tag);
+  }
+
   void selectAll(Iterable<Tag> tags) {
     state = Set<Tag>.from(tags);
   }
@@ -74,6 +81,13 @@ class TagActions {
         .deleteByNames(tags.map((e) => e.name).toList());
     _ref.invalidate(allTagsProvider);
     _ref.read(tagSelectionProvider.notifier).clear();
+  }
+
+  /// 删除单个标签；若该标签在批量选中集合中，仅从集合中移除该项。
+  Future<void> deleteTag(Tag tag) async {
+    await _ref.read(libraryTagRepoProvider).deleteByNames(<String>[tag.name]);
+    _ref.invalidate(allTagsProvider);
+    _ref.read(tagSelectionProvider.notifier).remove(tag);
   }
 
   Future<void> renameTag(Tag oldTag, String newName) async {

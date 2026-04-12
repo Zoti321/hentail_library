@@ -31,8 +31,8 @@ class SeriesCard extends HookConsumerWidget {
     final String? coverComicId = coverItem?.comicId;
     final String? coverPath = coverComicId != null
         ? ref
-            .watch(comicCoverPathProvider(comicId: coverComicId))
-            .maybeWhen(data: (String? v) => v, orElse: () => null)
+              .watch(comicCoverPathProvider(comicId: coverComicId))
+              .maybeWhen(data: (String? v) => v, orElse: () => null)
         : null;
     final int count = series.items.length;
     final Widget content = GestureDetector(
@@ -151,28 +151,28 @@ class _SeriesCardCover extends StatelessWidget {
                   .animate(target: isHover ? 1 : 0)
                   .fade(begin: 0.0, end: 1.0, duration: 200.ms),
               Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(
-                    series.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: tokens.text.bodySm,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                      height: 1.2,
-                      shadows: <Shadow>[
-                        Shadow(
-                          color: Colors.black.withValues(alpha: 0.85),
-                          blurRadius: 8,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Text(
+                        series.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: tokens.text.bodySm,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          height: 1.2,
+                          shadows: <Shadow>[
+                            Shadow(
+                              color: Colors.black.withValues(alpha: 0.85),
+                              blurRadius: 8,
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              )
+                  )
                   .animate(target: isHover ? 1 : 0)
                   .fade(begin: 0.0, end: 1.0, duration: 200.ms),
             ],

@@ -8,6 +8,7 @@ import 'package:hentai_library/presentation/ui/desktop/widgets/common/status/sta
 import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/tag_name_editor_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/input/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -574,6 +575,40 @@ class _TagRow extends ConsumerWidget {
                       },
                     ),
                   );
+                },
+              ),
+              GhostButton.icon(
+                tooltip: '删除',
+                semanticLabel: '删除',
+                icon: LucideIcons.trash2,
+                iconSize: 16,
+                size: _TagStyles.iconButtonSize.width,
+                borderRadius: _TagStyles.iconButtonRadius,
+                foregroundColor: cs.error,
+                delayTooltipThreeSeconds: true,
+                overlayColor: cs.primary.withAlpha(14),
+                onPressed: () async {
+                  final bool confirmed =
+                      await showDialog<bool>(
+                        context: context,
+                        barrierColor: Colors.transparent,
+                        builder: (BuildContext dialogContext) =>
+                            const TagConfirmDeleteDialog(count: 1),
+                      ) ??
+                      false;
+                  if (!confirmed || !context.mounted) {
+                    return;
+                  }
+                  try {
+                    await ref.read(tagActionsProvider).deleteTag(tag);
+                    if (context.mounted) {
+                      showSuccessToast(context, '已删除标签');
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      showErrorToast(context, e);
+                    }
+                  }
                 },
               ),
             ],
