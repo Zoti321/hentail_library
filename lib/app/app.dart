@@ -4,16 +4,14 @@ import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/app_theme_mode.dart';
 import 'package:hentai_library/domain/entity/entities.dart' show AppSetting;
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/routes/routes.dart';
+import 'package:hentai_library/presentation/ui/desktop/routes/routes.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const ProviderScope(
-      child: _AppRoot(),
-    );
+    return const ProviderScope(child: _AppRoot());
   }
 }
 

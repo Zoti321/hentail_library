@@ -4,7 +4,7 @@ import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/entity/series_reading_history.dart'
     as series_entity;
 import 'package:hentai_library/presentation/providers/pages/series_management/series_management_notifier.dart';
-import 'package:hentai_library/presentation/ui_dto/history_grid_item_dto.dart';
+import 'package:hentai_library/presentation/dto/history_grid_item_dto.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -26,7 +26,10 @@ Stream<List<series_entity.SeriesReadingHistory>> seriesReadingHistoryStream(
 List<HistoryGridItemDto> mergedHistoryGridItems(Ref ref) {
   final List<entity.ReadingHistory> comics = ref
       .watch(readingHistoryStreamProvider)
-      .maybeWhen(data: (data) => data, orElse: () => const <entity.ReadingHistory>[]);
+      .maybeWhen(
+        data: (data) => data,
+        orElse: () => const <entity.ReadingHistory>[],
+      );
   final List<series_entity.SeriesReadingHistory> seriesHistory = ref
       .watch(seriesReadingHistoryStreamProvider)
       .maybeWhen(
