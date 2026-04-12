@@ -15,6 +15,7 @@ import 'package:hentai_library/presentation/routes/reader_route_args.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/widgets/dialog/add_comics_to_series_dialog.dart';
+import 'package:hentai_library/presentation/widgets/navigation/library_return_breadcrumb.dart';
 import 'package:hentai_library/presentation/widgets/dialog/rename_series_dialog.dart';
 import 'package:hentai_library/presentation/widgets/dialog/reorder_series_items_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -74,10 +75,7 @@ class _SeriesDetailErrorBody extends StatelessWidget {
         children: <Widget>[
           Text('加载失败：$error', style: TextStyle(color: cs.error, fontSize: 14)),
           const SizedBox(height: 16),
-          TextButton(
-            onPressed: () => context.go('/local'),
-            child: const Text('返回本地漫画'),
-          ),
+          const LibraryReturnBreadcrumb(),
         ],
       ),
     );
@@ -102,10 +100,7 @@ class _SeriesNotFoundBody extends StatelessWidget {
             style: TextStyle(fontSize: 14, color: cs.textTertiary),
           ),
           const SizedBox(height: 16),
-          TextButton(
-            onPressed: () => context.go('/local'),
-            child: const Text('返回本地漫画'),
-          ),
+          const LibraryReturnBreadcrumb(),
         ],
       ),
     );
@@ -127,12 +122,14 @@ class _SeriesDetailBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
-      ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
     final ButtonStyle primarySeriesToolbarStyle = FilledButton.styleFrom(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     );
+
+    final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
+      ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
     final int count = series.items.length;
+
     final Widget titleBlock = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -153,6 +150,7 @@ class _SeriesDetailBody extends ConsumerWidget {
         ),
       ],
     );
+
     final Widget actions = Wrap(
       spacing: 8,
       runSpacing: 8,
@@ -254,12 +252,14 @@ class _SeriesDetailBody extends ConsumerWidget {
         ),
       ],
     );
+
     final Widget listSection = Expanded(
       child: _SeriesComicListSection(
         sortedItems: sortedItems,
         seriesName: series.name,
       ),
     );
+
     final Widget rightColumn = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 16,
@@ -274,61 +274,77 @@ class _SeriesDetailBody extends ConsumerWidget {
             horizontal: tokens.spacing.lg + 8,
             vertical: tokens.spacing.lg + 8,
           ),
-          child: _SeriesDetailCard(
-            maxWidth: _kSeriesDetailMaxWidth,
-            child: Padding(
-              padding: EdgeInsets.all(tokens.spacing.xl),
-              child: LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) {
-                  final bool narrow = constraints.maxWidth < _narrowBreakpoint;
-                  final Widget narrowCover = Align(
-                    alignment: Alignment.center,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        maxWidth: _kSeriesCoverMaxWidth,
-                      ),
-                      child: AspectRatio(
-                        aspectRatio: 2 / 3,
-                        child: _SeriesCoverBlock(series: series),
-                      ),
-                    ),
-                  );
-                  if (narrow) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        narrowCover,
-                        const SizedBox(height: 16),
-                        Expanded(child: rightColumn),
-                      ],
-                    );
-                  }
-                  final double availH = constraints.maxHeight.isFinite
-                      ? constraints.maxHeight
-                      : MediaQuery.sizeOf(context).height;
-                  final double wideMaxMain = math.min(availH * 0.68, 640);
-                  return SizedBox(
-                    height: wideMaxMain,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(
-                            maxWidth: _kSeriesCoverMaxWidth,
-                          ),
-                          child: AspectRatio(
-                            aspectRatio: 2 / 3,
-                            child: _SeriesCoverBlock(series: series),
-                          ),
-                        ),
-                        SizedBox(width: tokens.spacing.lg + 16),
-                        Expanded(child: rightColumn),
-                      ],
-                    ),
-                  );
-                },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              LibraryReturnBreadcrumb(
+                trailingLabel: series.name,
+                trailingTooltip: series.name,
               ),
-            ),
+              SizedBox(height: tokens.spacing.md + 4),
+              _SeriesDetailCard(
+                maxWidth: _kSeriesDetailMaxWidth,
+                child: Padding(
+                  padding: EdgeInsets.all(tokens.spacing.xl),
+                  child: LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                          final bool narrow =
+                              constraints.maxWidth < _narrowBreakpoint;
+                          final Widget narrowCover = Align(
+                            alignment: Alignment.center,
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(
+                                maxWidth: _kSeriesCoverMaxWidth,
+                              ),
+                              child: AspectRatio(
+                                aspectRatio: 2 / 3,
+                                child: _SeriesCoverBlock(series: series),
+                              ),
+                            ),
+                          );
+                          if (narrow) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: <Widget>[
+                                narrowCover,
+                                const SizedBox(height: 16),
+                                Expanded(child: rightColumn),
+                              ],
+                            );
+                          }
+                          final double availH = constraints.maxHeight.isFinite
+                              ? constraints.maxHeight
+                              : MediaQuery.sizeOf(context).height;
+                          final double wideMaxMain = math.min(
+                            availH * 0.68,
+                            640,
+                          );
+                          return SizedBox(
+                            height: wideMaxMain,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    maxWidth: _kSeriesCoverMaxWidth,
+                                  ),
+                                  child: AspectRatio(
+                                    aspectRatio: 2 / 3,
+                                    child: _SeriesCoverBlock(series: series),
+                                  ),
+                                ),
+                                SizedBox(width: tokens.spacing.lg + 16),
+                                Expanded(child: rightColumn),
+                              ],
+                            ),
+                          );
+                        },
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -500,6 +516,66 @@ class _SeriesComicListSection extends StatelessWidget {
   }
 }
 
+/// 标题仅占用文字宽度；完整标题通过小图标 Tooltip 展示，避免整行可触发区过大。
+class _SeriesComicTitleWithTooltip extends StatelessWidget {
+  const _SeriesComicTitleWithTooltip({
+    required this.title,
+    required this.textStyle,
+  });
+
+  final String title;
+  final TextStyle textStyle;
+
+  static const double _kTooltipIconSlot = 22;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final TextDirection direction = Directionality.of(context);
+        final TextPainter probe = TextPainter(
+          text: TextSpan(text: title, style: textStyle),
+          maxLines: 1,
+          textDirection: direction,
+        )..layout(maxWidth: constraints.maxWidth);
+        final bool isTruncated = probe.didExceedMaxLines;
+        if (!isTruncated) {
+          return Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: textStyle,
+          );
+        }
+        return Row(
+          children: <Widget>[
+            SizedBox(
+              width: math.max(0, constraints.maxWidth - _kTooltipIconSlot),
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textStyle,
+              ),
+            ),
+            Tooltip(
+              message: title,
+              waitDuration: const Duration(milliseconds: 400),
+              showDuration: const Duration(seconds: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 2),
+                child: Icon(LucideIcons.info, size: 14, color: cs.textTertiary),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
 class _SeriesComicRow extends ConsumerWidget {
   const _SeriesComicRow({
     required this.item,
@@ -581,11 +657,9 @@ class _SeriesComicRow extends ConsumerWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                child: _SeriesComicTitleWithTooltip(
+                  title: title,
+                  textStyle: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: cs.textPrimary,

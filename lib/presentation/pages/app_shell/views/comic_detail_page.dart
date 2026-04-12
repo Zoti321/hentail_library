@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
@@ -10,13 +12,13 @@ import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/routes/routes.dart';
 import 'package:hentai_library/presentation/widgets/button/ghost_button.dart';
+import 'package:hentai_library/presentation/widgets/navigation/library_return_breadcrumb.dart';
 import 'package:hentai_library/presentation/widgets/dialog/edit_metadata_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 const double _kDetailLayoutMaxWidth = 1200;
-const double _kDetailTitleLetterSpacing = 0.4;
 const double _kDetailNarrowBreakpoint = 720;
 const double _kLeftColumnMaxWidth = 300;
 const int _kTagsCollapsedMaxCount = 8;
@@ -67,26 +69,27 @@ class _DetailContent extends StatelessWidget {
         final bool isNarrow = constraints.maxWidth < _kDetailNarrowBreakpoint;
         return _ComicDetailShell(
           isNarrow: isNarrow,
-          child: _ComicDetailCard(
-            maxWidth: _kDetailLayoutMaxWidth,
-            child: Padding(
-              padding: EdgeInsets.all(tokens.spacing.xl),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _DetailHeader(comic: comic),
-                  SizedBox(height: tokens.spacing.xl),
-                  _DetailResponsiveBody(isNarrow: isNarrow, comic: comic)
-                      .animate()
-                      .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
-                      .slideY(
-                        begin: 0.03,
-                        duration: 260.ms,
-                        curve: Curves.easeOutCubic,
-                      ),
-                ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              LibraryReturnBreadcrumb(
+                trailingLabel: comic.title,
+                trailingTooltip: comic.title,
               ),
-            ),
+              SizedBox(height: tokens.spacing.md + 4),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: _ComicDetailCard(
+                    maxWidth: _kDetailLayoutMaxWidth,
+                    child: Padding(
+                      padding: EdgeInsets.all(tokens.spacing.xl),
+                      child: _ComicDetailCardInner(comic: comic),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -94,164 +97,150 @@ class _DetailContent extends StatelessWidget {
   }
 }
 
-class _DetailResponsiveBody extends StatelessWidget {
-  const _DetailResponsiveBody({required this.isNarrow, required this.comic});
+class _ComicDetailCardInner extends HookConsumerWidget {
+  const _ComicDetailCardInner({required this.comic});
 
-  final bool isNarrow;
   final Comic comic;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppThemeTokens tokens = context.tokens;
-    if (isNarrow) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Align(
-            alignment: Alignment.center,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _kLeftColumnMaxWidth),
-              child: _LeftColumn(comic: comic),
-            ),
-          ),
-          SizedBox(height: tokens.spacing.lg + 8),
-          _RightColumn(comic: comic),
-        ],
-      );
-    }
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: _kLeftColumnMaxWidth),
-          child: _LeftColumn(comic: comic),
-        ),
-        SizedBox(width: tokens.spacing.lg + 16),
-        Expanded(child: _RightColumn(comic: comic)),
-      ],
-    );
-  }
-}
-
-class _DetailHeader extends StatelessWidget {
-  final Comic comic;
-
-  const _DetailHeader({required this.comic});
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final AppThemeTokens tokens = context.tokens;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const _BackBtn(),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Tooltip(
-                    message: comic.title,
-
-                    child: SelectableText(
-                      comic.title,
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: tokens.text.titleLg,
-                        fontWeight: FontWeight.w700,
-                        height: 1.25,
-                        letterSpacing: _kDetailTitleLetterSpacing,
-                        color: cs.textPrimary,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: tokens.spacing.md),
-        Divider(height: 1, color: cs.outline.withAlpha(100)),
-      ],
-    );
-  }
-}
-
-class _LeftColumn extends HookConsumerWidget {
-  final Comic comic;
-
-  const _LeftColumn({required this.comic});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
+    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
 
-    final String? coverPath = ref
-        .watch(comicCoverPathProvider(comicId: comic.comicId))
-        .maybeWhen(data: (String? v) => v, orElse: () => null);
-
-    final isCoverHover = useState<bool>(false);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    final Widget titleBlock = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      children: [
-        MouseRegion(
-          onEnter: (_) => isCoverHover.value = true,
-          onExit: (_) => isCoverHover.value = false,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(tokens.radius.lg),
-              border: Border.all(color: cs.borderSubtle),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: isCoverHover.value
-                      ? cs.cardShadowHover
-                      : cs.cardShadow,
-                  blurRadius: isCoverHover.value ? 6 : 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: AspectRatio(
-              aspectRatio: 2 / 3,
-              child: Container(
-                color: cs.surfaceContainerHighest,
-                child: coverPath != null
-                    ? Image.file(File(coverPath), fit: BoxFit.cover)
-                          .animate(target: isCoverHover.value ? 1 : 0)
-                          .scale(
-                            begin: const Offset(1.0, 1.0),
-                            end: const Offset(1.05, 1.05),
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeOutQuad,
-                          )
-                    : Icon(
-                        LucideIcons.imageOff,
-                        size: 36,
-                        color: cs.imageFallback,
-                      ),
-              ),
+      children: <Widget>[
+        Tooltip(
+          message: comic.title,
+          waitDuration: const Duration(milliseconds: 2000),
+          child: SelectableText(
+            comic.title,
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.4,
+              color: cs.textPrimary,
             ),
           ),
         ),
-        SizedBox(height: tokens.spacing.md),
+        const SizedBox(height: 6),
       ],
+    );
+    final Widget cover = _ComicDetailCoverOnly(comic: comic);
+    final Widget narrowCover = Align(
+      alignment: Alignment.center,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: _kLeftColumnMaxWidth),
+        child: AspectRatio(aspectRatio: 2 / 3, child: cover),
+      ),
+    );
+    final Widget rightColumn = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 16,
+      children: <Widget>[
+        titleBlock,
+        _ComicDetailMetadataSection(comic: comic),
+        _DetailPrimaryActions(comic: comic),
+      ],
+    );
+
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final bool narrow = constraints.maxWidth < _kDetailNarrowBreakpoint;
+        final Widget layout = narrow
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  narrowCover,
+                  const SizedBox(height: 16),
+                  Expanded(child: rightColumn),
+                ],
+              )
+            : SizedBox(
+                height: math.min(
+                  constraints.maxHeight.isFinite
+                      ? constraints.maxHeight
+                      : MediaQuery.sizeOf(context).height * 0.68,
+                  640,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: _kLeftColumnMaxWidth,
+                      ),
+                      child: AspectRatio(aspectRatio: 2 / 3, child: cover),
+                    ),
+                    SizedBox(width: tokens.spacing.lg + 16),
+                    Expanded(child: rightColumn),
+                  ],
+                ),
+              );
+        return layout
+            .animate()
+            .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
+            .slideY(begin: 0.03, duration: 260.ms, curve: Curves.easeOutCubic);
+      },
     );
   }
 }
 
-class _RightColumn extends HookConsumerWidget {
-  const _RightColumn({required this.comic});
+class _ComicDetailCoverOnly extends HookConsumerWidget {
+  const _ComicDetailCoverOnly({required this.comic});
+
+  final Comic comic;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final String? coverPath = ref
+        .watch(comicCoverPathProvider(comicId: comic.comicId))
+        .maybeWhen(data: (String? v) => v, orElse: () => null);
+    final isCoverHover = useState<bool>(false);
+    return MouseRegion(
+      onEnter: (_) => isCoverHover.value = true,
+      onExit: (_) => isCoverHover.value = false,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(tokens.radius.lg),
+          border: Border.all(color: cs.borderSubtle),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: isCoverHover.value ? cs.cardShadowHover : cs.cardShadow,
+              blurRadius: isCoverHover.value ? 6 : 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: AspectRatio(
+          aspectRatio: 2 / 3,
+          child: ColoredBox(
+            color: cs.surfaceContainerHighest,
+            child: coverPath != null
+                ? Image.file(File(coverPath), fit: BoxFit.cover)
+                      .animate(target: isCoverHover.value ? 1 : 0)
+                      .scale(
+                        begin: const Offset(1, 1),
+                        end: const Offset(1.05, 1.05),
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOutQuad,
+                      )
+                : Icon(LucideIcons.imageOff, size: 36, color: cs.imageFallback),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ComicDetailMetadataSection extends HookConsumerWidget {
+  const _ComicDetailMetadataSection({required this.comic});
 
   final Comic comic;
 
@@ -280,11 +269,10 @@ class _RightColumn extends HookConsumerWidget {
       if (ratingLabel != null)
         _StatRow(icon: LucideIcons.shield, label: '分级', value: ratingLabel),
     ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      children: [
+      children: <Widget>[
         _MetadataLabeledRow(
           label: '作者',
           child: Tooltip(
@@ -331,21 +319,8 @@ class _RightColumn extends HookConsumerWidget {
             ],
           ),
         ),
-        SizedBox(height: tokens.spacing.xl),
-        _DetailPrimaryActions(comic: comic),
       ],
     );
-  }
-}
-
-String? _resolveContentRatingLabel(ContentRating rating) {
-  switch (rating) {
-    case ContentRating.unknown:
-      return null;
-    case ContentRating.safe:
-      return '全年龄';
-    case ContentRating.r18:
-      return 'R18';
   }
 }
 
@@ -470,22 +445,6 @@ class _TagsExpandableSection extends HookWidget {
   }
 }
 
-ButtonStyle _detailPrimaryActionStyle(ThemeData theme, AppThemeTokens tokens) {
-  final ColorScheme cs = theme.colorScheme;
-  return ElevatedButton.styleFrom(
-    backgroundColor: cs.primary,
-    foregroundColor: cs.onPrimary,
-    elevation: 1,
-    padding: EdgeInsets.symmetric(
-      horizontal: tokens.spacing.xl,
-      vertical: tokens.spacing.sm + 6,
-    ),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(tokens.radius.md),
-    ),
-  );
-}
-
 class _DetailPrimaryActions extends HookConsumerWidget {
   const _DetailPrimaryActions({required this.comic});
 
@@ -497,66 +456,63 @@ class _DetailPrimaryActions extends HookConsumerWidget {
     final AppThemeTokens tokens = context.tokens;
     final ButtonStyle primaryStyle = _detailPrimaryActionStyle(theme, tokens);
 
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Wrap(
-        spacing: tokens.spacing.md,
-        runSpacing: tokens.spacing.sm,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          Semantics(
-            label: '开始阅读',
-            button: true,
-            child: ElevatedButton.icon(
-              onPressed: () async {
-                await ref
-                    .read(recordReadingProgressUseCaseProvider)
-                    .call(
-                      ReadingHistory(
-                        comicId: comic.comicId,
-                        title: comic.title,
-                        lastReadTime: DateTime.now(),
-                      ),
+    return Wrap(
+      spacing: tokens.spacing.md,
+      runSpacing: tokens.spacing.sm,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Semantics(
+          label: '开始阅读',
+          button: true,
+          child: ElevatedButton.icon(
+            onPressed: () async {
+              await ref
+                  .read(recordReadingProgressUseCaseProvider)
+                  .call(
+                    ReadingHistory(
+                      comicId: comic.comicId,
+                      title: comic.title,
+                      lastReadTime: DateTime.now(),
+                    ),
+                  );
+              appRouter.pushNamed(
+                '阅读页面',
+                queryParameters: {
+                  'read_type': 'comic',
+                  'comic_id': comic.comicId,
+                },
+              );
+            },
+            icon: Icon(LucideIcons.play, size: 16),
+            label: const Text('开始阅读'),
+            style: primaryStyle,
+          ),
+        ),
+        Semantics(
+          label: '编辑元数据',
+          button: true,
+          child: GhostButton.icon(
+            icon: LucideIcons.pencil,
+            tooltip: '编辑元数据',
+            semanticLabel: '编辑元数据',
+            size: 32,
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => EditMetadataDialog(
+                  comic: comic,
+                  onSave: (data) async {
+                    await ref.read(updateComicMetadataUseCaseProvider)(
+                      comic.comicId,
+                      data,
                     );
-                appRouter.pushNamed(
-                  '阅读页面',
-                  queryParameters: {
-                    'read_type': 'comic',
-                    'comic_id': comic.comicId,
                   },
-                );
-              },
-              icon: Icon(LucideIcons.play, size: 16),
-              label: const Text('开始阅读'),
-              style: primaryStyle,
-            ),
+                ),
+              );
+            },
           ),
-          Semantics(
-            label: '编辑元数据',
-            button: true,
-            child: GhostButton.icon(
-              icon: LucideIcons.pencil,
-              tooltip: '编辑元数据',
-              semanticLabel: '编辑元数据',
-              size: 32,
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) => EditMetadataDialog(
-                    comic: comic,
-                    onSave: (data) async {
-                      await ref.read(updateComicMetadataUseCaseProvider)(
-                        comic.comicId,
-                        data,
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -594,41 +550,6 @@ class _TagChip extends StatelessWidget {
   }
 }
 
-class _BackBtn extends HookWidget {
-  const _BackBtn();
-
-  @override
-  Widget build(BuildContext context) {
-    final useBackBtnHover = useState<bool>(false);
-    final ThemeData theme = Theme.of(context);
-    final AppThemeTokens tokens = context.tokens;
-
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => useBackBtnHover.value = true,
-      onExit: (_) => useBackBtnHover.value = false,
-      child: Semantics(
-        label: '返回漫画库',
-        button: true,
-        child: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Row(
-            spacing: tokens.spacing.sm - 2,
-            children: [
-              Icon(LucideIcons.arrowLeft, size: 18)
-                  .animate(target: useBackBtnHover.value ? 1 : 0)
-                  .tint(duration: 200.ms, color: theme.colorScheme.primary),
-              Text("回到漫画库")
-                  .animate(target: useBackBtnHover.value ? 1 : 0)
-                  .tint(duration: 200.ms, color: theme.colorScheme.primary),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _ComicDetailShell extends StatelessWidget {
   const _ComicDetailShell({required this.isNarrow, required this.child});
 
@@ -638,12 +559,15 @@ class _ComicDetailShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(
-        horizontal: isNarrow ? tokens.spacing.lg : tokens.spacing.lg + 8,
-        vertical: tokens.spacing.lg + 8,
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: isNarrow ? tokens.spacing.lg : tokens.spacing.lg + 8,
+          vertical: tokens.spacing.lg + 8,
+        ),
+        child: child,
       ),
-      child: Center(child: child),
     );
   }
 }
@@ -661,26 +585,28 @@ class _ComicDetailCard extends StatelessWidget {
     final BorderRadius radius = BorderRadius.circular(tokens.radius.lg);
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: radius,
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: cs.cardShadow,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: radius,
-          child: ColoredBox(
-            color: cs.surface,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border.all(color: cs.borderSubtle),
+      child: SizedBox.expand(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: radius,
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: cs.cardShadow,
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
-              child: child,
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: radius,
+            child: ColoredBox(
+              color: cs.surface,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border.all(color: cs.borderSubtle),
+                ),
+                child: child,
+              ),
             ),
           ),
         ),
@@ -713,17 +639,32 @@ class _ComicDetailEmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _ComicDetailStatusView(
-      leading: Icon(
-        LucideIcons.bookOpen,
-        size: 48,
-        color: Theme.of(context).colorScheme.textTertiary,
+    final AppThemeTokens tokens = context.tokens;
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: tokens.spacing.lg + 8,
+        vertical: tokens.spacing.lg + 8,
       ),
-      label: '漫画不存在或已移除',
-      action: TextButton.icon(
-        onPressed: () => Navigator.of(context).pop(),
-        icon: const Icon(LucideIcons.arrowLeft, size: 16),
-        label: const Text('返回'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          const LibraryReturnBreadcrumb(),
+          Expanded(
+            child: _ComicDetailStatusView(
+              leading: Icon(
+                LucideIcons.bookOpen,
+                size: 48,
+                color: Theme.of(context).colorScheme.textTertiary,
+              ),
+              label: '漫画不存在或已移除',
+              action: TextButton.icon(
+                onPressed: () => context.go('/local'),
+                icon: const Icon(LucideIcons.library, size: 16),
+                label: const Text('前往漫画库'),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -743,32 +684,47 @@ class _ComicDetailErrorViewState extends State<_ComicDetailErrorView> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return _ComicDetailStatusView(
-      leading: Icon(
-        LucideIcons.circleAlert,
-        size: 48,
-        color: theme.colorScheme.textTertiary,
+    final ThemeData theme = Theme.of(context);
+    final AppThemeTokens tokens = context.tokens;
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: tokens.spacing.lg + 8,
+        vertical: tokens.spacing.lg + 8,
       ),
-      label: '加载失败，请重试',
-      action: TextButton.icon(
-        onPressed: _retrying
-            ? null
-            : () {
-                setState(() => _retrying = true);
-                widget.onRetry();
-              },
-        icon: _retrying
-            ? SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: theme.colorScheme.primary,
-                ),
-              )
-            : const Icon(LucideIcons.refreshCw, size: 16),
-        label: Text(_retrying ? '重试中…' : '重试'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          const LibraryReturnBreadcrumb(),
+          Expanded(
+            child: _ComicDetailStatusView(
+              leading: Icon(
+                LucideIcons.circleAlert,
+                size: 48,
+                color: theme.colorScheme.textTertiary,
+              ),
+              label: '加载失败，请重试',
+              action: TextButton.icon(
+                onPressed: _retrying
+                    ? null
+                    : () {
+                        setState(() => _retrying = true);
+                        widget.onRetry();
+                      },
+                icon: _retrying
+                    ? SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: theme.colorScheme.primary,
+                        ),
+                      )
+                    : const Icon(LucideIcons.refreshCw, size: 16),
+                label: Text(_retrying ? '重试中…' : '重试'),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -810,4 +766,31 @@ class _ComicDetailStatusView extends StatelessWidget {
       ),
     );
   }
+}
+
+String? _resolveContentRatingLabel(ContentRating rating) {
+  switch (rating) {
+    case ContentRating.unknown:
+      return null;
+    case ContentRating.safe:
+      return '全年龄';
+    case ContentRating.r18:
+      return 'R18';
+  }
+}
+
+ButtonStyle _detailPrimaryActionStyle(ThemeData theme, AppThemeTokens tokens) {
+  final ColorScheme cs = theme.colorScheme;
+  return ElevatedButton.styleFrom(
+    backgroundColor: cs.primary,
+    foregroundColor: cs.onPrimary,
+    elevation: 1,
+    padding: EdgeInsets.symmetric(
+      horizontal: tokens.spacing.xl,
+      vertical: tokens.spacing.sm + 6,
+    ),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(tokens.radius.md),
+    ),
+  );
 }

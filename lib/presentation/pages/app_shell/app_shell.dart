@@ -98,7 +98,7 @@ class _AppShellState extends ConsumerState<AppShell> with TrayListener {
           return 'library';
         }
         if (path.startsWith('/series/')) {
-          return 'series';
+          return 'library';
         }
         return 'home';
     }

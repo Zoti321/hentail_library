@@ -122,6 +122,7 @@ class GhostButton extends StatelessWidget {
             waitDuration: delayTooltipThreeSeconds
                 ? const Duration(seconds: 3)
                 : null,
+            showDuration: const Duration(seconds: 2),
             child: button,
           );
     return Semantics(
