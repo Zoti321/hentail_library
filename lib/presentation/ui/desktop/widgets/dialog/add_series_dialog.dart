@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/util/snackbar_util.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/fluent_dialog_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/fluent_text_field.dart';
 
 class AddSeriesDialog extends ConsumerStatefulWidget {
-  const AddSeriesDialog({super.key});
+  const AddSeriesDialog({super.key, this.onCreated});
+
+  /// 在系列创建成功并 [Navigator.pop] 之后调用；请使用对话框外（如系列页）的 [BuildContext] 展示 Toast。
+  final VoidCallback? onCreated;
 
   @override
   ConsumerState<AddSeriesDialog> createState() => _AddSeriesDialogState();
@@ -30,10 +33,12 @@ class _AddSeriesDialogState extends ConsumerState<AddSeriesDialog> {
       await ref.read(seriesActionsProvider).create(name);
       if (mounted) {
         Navigator.of(context).pop();
-        showSuccessSnackBar(context, '已添加系列');
+        widget.onCreated?.call();
       }
     } catch (e) {
-      if (mounted) showErrorSnackBar(context, e);
+      if (mounted) {
+        showErrorToast(context, e);
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }

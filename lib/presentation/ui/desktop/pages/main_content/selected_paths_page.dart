@@ -4,7 +4,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/core/util/snackbar_util.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/remove_saved_path_confirm_dialog.dart';
@@ -84,13 +84,13 @@ class _SelectedPathsPageHeaderState
         added++;
       }
       if (mounted && added > 0) {
-        showSuccessSnackBar(
+        showSuccessToast(
           context,
           added == 1 ? '已添加 1 个路径' : '已添加 $added 个路径',
         );
       }
     } catch (e) {
-      if (mounted) showErrorSnackBar(context, e);
+      if (mounted) showErrorToast(context, e);
     } finally {
       if (mounted) setState(() => _isPicking = false);
     }
@@ -102,9 +102,9 @@ class _SelectedPathsPageHeaderState
       final dir = await FilePicker.platform.getDirectoryPath();
       if (dir == null) return;
       await ref.read(pathRepoProvider).add(dir);
-      if (mounted) showSuccessSnackBar(context, '已添加路径');
+      if (mounted) showSuccessToast(context, '已添加路径');
     } catch (e) {
-      if (mounted) showErrorSnackBar(context, e);
+      if (mounted) showErrorToast(context, e);
     } finally {
       if (mounted) setState(() => _isPicking = false);
     }
@@ -123,13 +123,13 @@ class _SelectedPathsPageHeaderState
         await pathRepo.add(p);
       }
       if (mounted) {
-        showSuccessSnackBar(
+        showSuccessToast(
           context,
           paths.length == 1 ? '已添加 1 个路径' : '已添加 ${paths.length} 个路径',
         );
       }
     } catch (e) {
-      if (mounted) showErrorSnackBar(context, e);
+      if (mounted) showErrorToast(context, e);
     } finally {
       if (mounted) setState(() => _isPicking = false);
     }
@@ -269,13 +269,13 @@ class _SelectedPathsPageHeaderState
                               .removeSelectedPaths();
                           if (!context.mounted) return;
                           final int n = orderedSelected.length;
-                          showSuccessSnackBar(
+                          showSuccessToast(
                             context,
                             n == 1 ? '已移除 1 条路径' : '已移除 $n 条路径',
                           );
                         } catch (e) {
                           if (!context.mounted) return;
-                          showErrorSnackBar(context, e);
+                          showErrorToast(context, e);
                         } finally {
                           if (mounted) {
                             setState(() => _isBatchRemoving = false);
@@ -701,10 +701,10 @@ class _PathTileState extends ConsumerState<_PathTile> {
                           try {
                             await ref.read(pathRepoProvider).remove(path);
                             if (!context.mounted) return;
-                            showSuccessSnackBar(context, '已移除路径');
+                            showSuccessToast(context, '已移除路径');
                           } catch (e) {
                             if (!context.mounted) return;
-                            showErrorSnackBar(context, e);
+                            showErrorToast(context, e);
                           } finally {
                             if (mounted) setState(() => _isRemoving = false);
                           }

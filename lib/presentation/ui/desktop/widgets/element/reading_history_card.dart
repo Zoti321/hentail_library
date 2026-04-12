@@ -66,9 +66,6 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final bool isSeries = widget._kind == _ReadingHistoryCardKind.series;
-    final Color tintedBackground = isSeries
-        ? cs.primary.withAlpha(_isHovered ? 24 : 12)
-        : cs.surface;
     final Color kindColor = isSeries ? cs.primary : cs.secondary;
     final String kindLabel = isSeries ? '系列' : '漫画';
     final String coverComicId = widget._kind == _ReadingHistoryCardKind.comic
@@ -78,6 +75,20 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
     final coverUrl = ref
         .watch(comicCoverPathProvider(comicId: coverComicId))
         .maybeWhen(data: (v) => v, orElse: () => null);
+
+    final Color cardBackground =
+        _isHovered ? cs.surfaceContainer : cs.surface;
+    final Color cardBorderColor =
+        _isHovered ? cs.borderStrong : cs.borderSubtle;
+    final List<BoxShadow> cardShadows = _isHovered && !isSeries
+        ? <BoxShadow>[
+            BoxShadow(
+              color: cs.shadow.withAlpha(28),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ]
+        : const <BoxShadow>[];
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -90,25 +101,13 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
           curve: Curves.easeOutCubic,
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
           decoration: BoxDecoration(
-            color: isSeries
-                ? tintedBackground
-                : (_isHovered ? cs.surfaceContainer : cs.surface),
+            color: cardBackground,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: _isHovered
-                  ? (isSeries ? cs.primary.withAlpha(140) : cs.borderStrong)
-                  : (isSeries ? cs.primary.withAlpha(80) : cs.borderSubtle),
+              color: cardBorderColor,
               width: 1,
             ),
-            boxShadow: _isHovered
-                ? [
-                    BoxShadow(
-                      color: cs.shadow.withAlpha(28),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : const <BoxShadow>[],
+            boxShadow: cardShadows,
           ),
           child: Row(
             children: [
@@ -235,31 +234,37 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
   }
 
   Widget _buildCover(ColorScheme cs, String? coverUrl) {
-    const width = 56.0;
-    const height = 80.0;
+    const double coverWidth = 74;
+    const double coverHeight = 102;
+    const double coverOuterInset = 3;
+    final int cacheWidth = (coverWidth * 3).round();
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: width,
-        height: height,
-        color: cs.surfaceContainerHighest,
-        child:
-            coverUrl != null &&
-                coverUrl.isNotEmpty &&
-                File(coverUrl).existsSync()
-            ? ExtendedImage.file(
-                File(coverUrl),
-                fit: BoxFit.cover,
-                cacheWidth: 168,
-              )
-            : Center(
-                child: Icon(
-                  LucideIcons.bookOpen,
-                  size: 24,
-                  color: cs.textTertiary,
-                ),
-              ),
+    final Widget image = coverUrl != null &&
+            coverUrl.isNotEmpty &&
+            File(coverUrl).existsSync()
+        ? ExtendedImage.file(
+            File(coverUrl),
+            fit: BoxFit.cover,
+            cacheWidth: cacheWidth,
+          )
+        : Center(
+            child: Icon(
+              LucideIcons.bookOpen,
+              size: 28,
+              color: cs.textTertiary,
+            ),
+          );
+
+    return Padding(
+      padding: const EdgeInsets.all(coverOuterInset),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          width: coverWidth,
+          height: coverHeight,
+          color: cs.surfaceContainerHighest,
+          child: image,
+        ),
       ),
     );
   }

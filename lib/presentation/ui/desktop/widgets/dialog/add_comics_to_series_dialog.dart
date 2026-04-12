@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/core/util/snackbar_util.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
@@ -92,10 +92,12 @@ class _AddComicsToSeriesDialogState
         Navigator.of(context).pop();
         return;
       }
+      showSuccessToast(context, _buildSuccessMessage(summary));
       Navigator.of(context).pop();
-      showSuccessSnackBar(context, _buildSuccessMessage(summary));
     } catch (e) {
-      if (mounted) showErrorSnackBar(context, e);
+      if (mounted) {
+        showErrorToast(context, e);
+      }
     }
   }
 

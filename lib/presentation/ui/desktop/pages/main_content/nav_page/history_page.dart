@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/core/util/snackbar_util.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
 import 'package:hentai_library/domain/entity/entities.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/routes/reader_route_args.dart';
@@ -124,10 +124,10 @@ class _Header extends ConsumerWidget {
               try {
                 await ref.read(readingHistoryRepoProvider).clearAllHistory();
                 if (context.mounted) {
-                  showSuccessSnackBar(context, '已清空阅读历史');
+                  showSuccessToast(context, '已清空阅读历史');
                 }
               } catch (e) {
-                if (context.mounted) showErrorSnackBar(context, e);
+                if (context.mounted) showErrorToast(context, e);
               }
             },
       foregroundColor: cs.warning,
@@ -286,10 +286,10 @@ class _HistoryList extends ConsumerWidget {
     try {
       await ref.read(readingHistoryRepoProvider).deleteByComicId(comicId);
       if (context.mounted) {
-        showSuccessSnackBar(context, '已删除记录');
+        showSuccessToast(context, '已删除记录');
       }
     } catch (e) {
-      if (context.mounted) showErrorSnackBar(context, e);
+      if (context.mounted) showErrorToast(context, e);
     }
   }
 
@@ -303,10 +303,10 @@ class _HistoryList extends ConsumerWidget {
           .read(readingHistoryRepoProvider)
           .deleteSeriesReadingBySeriesName(seriesName);
       if (context.mounted) {
-        showSuccessSnackBar(context, '已删除记录');
+        showSuccessToast(context, '已删除记录');
       }
     } catch (e) {
-      if (context.mounted) showErrorSnackBar(context, e);
+      if (context.mounted) showErrorToast(context, e);
     }
   }
 }

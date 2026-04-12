@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/core/util/snackbar_util.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/fluent_dialog_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/fluent_text_field.dart';
 
@@ -41,11 +41,12 @@ class _RenameSeriesDialogState extends ConsumerState<RenameSeriesDialog> {
     try {
       await ref.read(seriesActionsProvider).rename(widget.series.name, newName);
       if (mounted) {
-        showSuccessSnackBar(context, '已重命名');
         Navigator.of(context).pop<String>(newName);
       }
     } catch (e) {
-      if (mounted) showErrorSnackBar(context, e);
+      if (mounted) {
+        showErrorToast(context, e);
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }

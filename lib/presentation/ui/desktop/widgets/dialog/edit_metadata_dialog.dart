@@ -3,8 +3,7 @@ import 'dart:ui';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/core/util/snackbar_util.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/util/enums.dart';
@@ -66,12 +65,12 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     try {
       await widget.onSave(_controller.form);
       if (mounted) {
-        showSuccessSnackBar(context, '已保存');
+        showSuccessToast(context, '已保存');
         Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {
-        showErrorSnackBar(context, e is AppException ? e : e.toString());
+        showErrorToast(context, e);
       }
     } finally {
       if (mounted) setState(() => _saving = false);

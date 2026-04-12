@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/core/util/snackbar_util.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/usecases/purge_comics_side_effects.dart';
@@ -114,11 +114,11 @@ class ComicCard extends HookConsumerWidget {
                       comicIds: <String>[comic.comicId],
                     );
                     if (context.mounted) {
-                      showSuccessSnackBar(context, '已删除漫画');
+                      showSuccessToast(context, '已删除漫画');
                     }
                   } catch (err) {
                     if (context.mounted) {
-                      showErrorSnackBar(context, err);
+                      showErrorToast(context, err);
                     }
                   }
                 });

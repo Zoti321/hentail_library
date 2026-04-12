@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/core/util/snackbar_util.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/usecases/infer_series_from_comic_titles_usecase.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
@@ -24,7 +24,11 @@ class SeriesManagementPage extends ConsumerWidget {
       await showDialog<void>(
         context: context,
         barrierColor: Colors.transparent,
-        builder: (context) => const AddSeriesDialog(),
+        builder: (BuildContext dialogContext) => AddSeriesDialog(
+          onCreated: () {
+            showSuccessToast(context, '系列创建成功');
+          },
+        ),
       );
     }
 
@@ -95,7 +99,7 @@ class _HeaderState extends ConsumerState<_Header> {
       final String newPart = result.newSeriesCreated > 0
           ? '，新建 ${result.newSeriesCreated} 个系列名'
           : '';
-      showSuccessSnackBar(
+      showSuccessToast(
         context,
         '已推断 ${result.groupsApplied} 组系列，归属 ${result.comicsAssigned} 本漫画$newPart。',
       );
@@ -103,7 +107,7 @@ class _HeaderState extends ConsumerState<_Header> {
       if (!mounted) {
         return;
       }
-      showErrorSnackBar(context, e);
+      showErrorToast(context, e);
     } finally {
       if (mounted) {
         setState(() {
@@ -378,13 +382,7 @@ class _SeriesRow extends ConsumerWidget {
               overlayColor: cs.primary.withAlpha(14),
               onPressed: () {
                 if (series.items.length < 2) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('至少需要 2 本漫画才能调整顺序'),
-                      behavior: SnackBarBehavior.floating,
-                      margin: snackBarMargin(context),
-                    ),
-                  );
+                  showInfoToast(context, '至少需要 2 本漫画才能调整顺序');
                   return;
                 }
                 showDialog<void>(
@@ -403,11 +401,15 @@ class _SeriesRow extends ConsumerWidget {
               delayTooltipThreeSeconds: true,
               overlayColor: cs.primary.withAlpha(14),
               onPressed: () async {
-                await showDialog<void>(
+                final String? newName = await showDialog<String>(
                   context: context,
                   barrierColor: Colors.transparent,
-                  builder: (context) => RenameSeriesDialog(series: series),
+                  builder: (BuildContext dialogContext) =>
+                      RenameSeriesDialog(series: series),
                 );
+                if (newName != null && context.mounted) {
+                  showSuccessToast(context, '已重命名');
+                }
               },
             ),
             GhostButton.icon(
@@ -430,10 +432,12 @@ class _SeriesRow extends ConsumerWidget {
                 try {
                   await ref.read(seriesActionsProvider).delete(series.name);
                   if (context.mounted) {
-                    showSuccessSnackBar(context, '已删除系列');
+                    showSuccessToast(context, '已删除系列');
                   }
                 } catch (e) {
-                  if (context.mounted) showErrorSnackBar(context, e);
+                  if (context.mounted) {
+                    showErrorToast(context, e);
+                  }
                 }
               },
             ),

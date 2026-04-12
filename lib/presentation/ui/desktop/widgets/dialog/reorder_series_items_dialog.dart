@@ -3,7 +3,7 @@ import 'dart:ui' show clampDouble;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/core/util/snackbar_util.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
@@ -52,11 +52,13 @@ class _ReorderSeriesItemsDialogState
           .setSeriesItemsOrder(widget.series.name, _items);
       ref.invalidate(allSeriesProvider);
       if (mounted) {
+        showSuccessToast(context, '已更新顺序');
         Navigator.of(context).pop();
-        showSuccessSnackBar(context, '已更新顺序');
       }
     } catch (e) {
-      if (mounted) showErrorSnackBar(context, e);
+      if (mounted) {
+        showErrorToast(context, e);
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }

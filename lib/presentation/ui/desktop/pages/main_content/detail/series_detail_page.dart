@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/core/util/snackbar_util.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/entity/series_reading_history.dart';
@@ -158,13 +158,7 @@ class _SeriesDetailBody extends ConsumerWidget {
         FilledButton.icon(
           onPressed: () async {
             if (sortedItems.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('系列内暂无漫画'),
-                  behavior: SnackBarBehavior.floating,
-                  margin: snackBarMargin(context),
-                ),
-              );
+              showInfoToast(context, '系列内暂无漫画');
               return;
             }
             final SeriesReadingHistory? seriesProgress = await ref
@@ -214,13 +208,7 @@ class _SeriesDetailBody extends ConsumerWidget {
           icon: LucideIcons.arrowUpDown,
           onPressed: () {
             if (series.items.length < 2) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('至少需要 2 本漫画才能调整顺序'),
-                  behavior: SnackBarBehavior.floating,
-                  margin: snackBarMargin(context),
-                ),
-              );
+              showInfoToast(context, '至少需要 2 本漫画才能调整顺序');
               return;
             }
             showDialog<void>(
@@ -243,6 +231,7 @@ class _SeriesDetailBody extends ConsumerWidget {
                   RenameSeriesDialog(series: series),
             );
             if (newName != null && context.mounted) {
+              showSuccessToast(context, '已重命名');
               context.goNamed(
                 '系列详情',
                 pathParameters: <String, String>{'name': newName},
