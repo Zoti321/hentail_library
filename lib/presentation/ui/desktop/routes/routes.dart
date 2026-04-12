@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/app_shell.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/comic_detail_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/selected_paths_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/history_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/home_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/library_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/settings_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/series_detail_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/series_management_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/tag_management_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_page/history_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_page/home_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_page/library_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_page/settings_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/series_detail_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_page/series_management_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_page/tag_management_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/routes/reader_route_args.dart';
 
