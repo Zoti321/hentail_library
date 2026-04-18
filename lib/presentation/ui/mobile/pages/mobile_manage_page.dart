@@ -22,7 +22,7 @@ class MobileManagePage extends StatelessWidget {
               title: const Text('作者管理'),
               subtitle: const Text('浏览、添加、重命名或删除作者'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.go('/authors'),
+              onTap: () => context.go('/metadata?tab=authors'),
             ),
             const Divider(height: 1),
             const Expanded(

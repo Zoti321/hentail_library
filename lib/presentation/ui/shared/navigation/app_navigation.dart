@@ -7,9 +7,7 @@ abstract final class AppNavigation {
   static const String navIdHome = 'home';
   static const String navIdLibrary = 'library';
   static const String navIdManage = 'manage';
-  static const String navIdTags = 'tags';
-  static const String navIdAuthors = 'authors';
-  static const String navIdSeries = 'series';
+  static const String navIdMetadata = 'metadata';
   static const String navIdHistory = 'history';
   static const String navIdSettings = 'settings';
   static const String navIdMore = 'more';
@@ -17,8 +15,7 @@ abstract final class AppNavigation {
   static List<NavItemData> get desktopMainNavItems => <NavItemData>[
     const (id: navIdHome, label: '首页', icon: LucideIcons.house),
     const (id: navIdLibrary, label: '漫画库', icon: LucideIcons.library),
-    const (id: navIdTags, label: '标签', icon: LucideIcons.tags),
-    const (id: navIdSeries, label: '系列', icon: LucideIcons.layers),
+    const (id: navIdMetadata, label: '资料', icon: LucideIcons.layers),
     const (id: navIdHistory, label: '历史', icon: LucideIcons.history),
   ];
 
@@ -35,12 +32,11 @@ abstract final class AppNavigation {
         return navIdLibrary;
       case '/paths':
         return '';
+      case '/metadata':
       case '/tags':
-        return navIdTags;
       case '/authors':
-        return navIdAuthors;
       case '/series':
-        return navIdSeries;
+        return navIdMetadata;
       case '/history':
         return navIdHistory;
       case '/settings':
@@ -69,6 +65,7 @@ abstract final class AppNavigation {
     }
     if (path == '/manage' ||
         path == '/paths' ||
+        path == '/metadata' ||
         path == '/tags' ||
         path == '/authors' ||
         path == '/series' ||
@@ -92,14 +89,8 @@ abstract final class AppNavigation {
       case navIdManage:
         context.go('/manage');
         break;
-      case navIdTags:
-        context.go('/tags');
-        break;
-      case navIdAuthors:
-        context.go('/authors');
-        break;
-      case navIdSeries:
-        context.go('/series');
+      case navIdMetadata:
+        context.go('/metadata');
         break;
       case navIdHistory:
         context.go('/history');

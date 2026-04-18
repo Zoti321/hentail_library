@@ -1,8 +1,6 @@
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/series_management_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/author_management_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/tag_management_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/metadata_management_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/selected_paths_page.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
@@ -31,19 +29,19 @@ List<RouteBase> buildSharedContentRoutes({
       builder: (context, state) => const SelectedPathsPage(),
     ),
     GoRoute(
+      path: '/metadata',
+      name: '资料管理',
+      builder: (context, state) => const MetadataManagementPage(),
+    ),
+    GoRoute(
       path: '/tags',
-      name: '标签管理',
-      builder: (context, state) => const TagManagementPage(),
+      redirect: (BuildContext context, GoRouterState state) =>
+          '/metadata?tab=tags',
     ),
     GoRoute(
       path: '/authors',
-      name: '作者管理',
-      builder: (context, state) => const AuthorManagementPage(),
-    ),
-    GoRoute(
-      path: '/series',
-      name: '系列管理',
-      builder: (context, state) => const SeriesManagementPage(),
+      redirect: (BuildContext context, GoRouterState state) =>
+          '/metadata?tab=authors',
     ),
     GoRoute(
       path: '/series/:name',
@@ -52,6 +50,11 @@ List<RouteBase> buildSharedContentRoutes({
         final String seriesName = state.pathParameters['name']!;
         return seriesDetailBuilder(context, seriesName);
       },
+    ),
+    GoRoute(
+      path: '/series',
+      redirect: (BuildContext context, GoRouterState state) =>
+          '/metadata?tab=series',
     ),
     GoRoute(
       path: '/reader',
