@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/entity/comic/tag.dart' as v2;
+import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/usecases/assign_comic_to_series_usecase.dart';
 import 'package:hentai_library/domain/usecases/infer_series_from_comic_titles_usecase.dart';
@@ -50,7 +50,7 @@ class UpdateComicMetadataFacadeUseCase {
 
   Future<void> call(String comicId, ComicMetadataForm form) async {
     final useCase = _ref.read(updateLibraryComicMetaUseCaseProvider);
-    final tags = form.tags.map((t) => v2.Tag(name: t.name)).toList();
+    final tags = form.tags.map((t) => Tag(name: t.name)).toList();
     await useCase.call(
       comicId,
       title: form.title,

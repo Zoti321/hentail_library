@@ -31,7 +31,9 @@ abstract class LibraryComicFilter with _$LibraryComicFilter {
     if (query != null && query!.trim().isNotEmpty) {
       final q = query!.toLowerCase();
       final inTitle = comic.title.toLowerCase().contains(q);
-      final inAuthors = comic.authors.any((a) => a.toLowerCase().contains(q));
+      final inAuthors = comic.authors.any(
+        (a) => a.name.toLowerCase().contains(q),
+      );
       if (!inTitle && !inAuthors) return false;
     }
 

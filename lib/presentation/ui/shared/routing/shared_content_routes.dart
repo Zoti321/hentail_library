@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/series_management_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/author_management_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/tag_management_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/selected_paths_page.dart';
@@ -33,6 +34,11 @@ List<RouteBase> buildSharedContentRoutes({
       path: '/tags',
       name: '标签管理',
       builder: (context, state) => const TagManagementPage(),
+    ),
+    GoRoute(
+      path: '/authors',
+      name: '作者管理',
+      builder: (context, state) => const AuthorManagementPage(),
     ),
     GoRoute(
       path: '/series',

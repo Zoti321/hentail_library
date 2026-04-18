@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/domain/entity/comic/author.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart';
@@ -96,7 +97,7 @@ class _MobileComicDetailBody extends ConsumerWidget {
         );
     final String authorsText = comic.authors.isEmpty
         ? '未知'
-        : comic.authors.join(' / ');
+        : comic.authors.map((a) => a.name).join(' / ');
     final String pageText = computedPageCount == null || computedPageCount == 0
         ? '未知'
         : '$computedPageCount 页';
@@ -302,7 +303,7 @@ class _EditMetadataSheetState extends ConsumerState<_EditMetadataSheet> {
     super.initState();
     _titleController = TextEditingController(text: widget.comic.title);
     _authorsController = TextEditingController(
-      text: widget.comic.authors.join(', '),
+      text: widget.comic.authors.map((a) => a.name).join(', '),
     );
     _selectedTagNames.addAll(widget.comic.tags.map((Tag item) => item.name));
     _isR18 = widget.comic.contentRating == ContentRating.r18;
@@ -438,10 +439,11 @@ class _EditMetadataSheetState extends ConsumerState<_EditMetadataSheet> {
     }
     setState(() => _saving = true);
     try {
-      final List<String> authors = _authorsController.text
+      final List<Author> authors = _authorsController.text
           .split(',')
           .map((String item) => item.trim())
           .where((String item) => item.isNotEmpty)
+          .map((String item) => Author(name: item))
           .toList();
       final List<Tag> selectedTags = _selectedTagNames
           .map((String name) => Tag(name: name))

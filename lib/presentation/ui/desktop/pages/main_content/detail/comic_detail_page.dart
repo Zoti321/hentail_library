@@ -260,7 +260,7 @@ class _ComicDetailMetadataSection extends HookConsumerWidget {
     final List<String> tags = comic.tags.map((t) => t.name).toList();
     final String authorsText = comic.authors.isEmpty
         ? '未知'
-        : comic.authors.join(' / ');
+        : comic.authors.map((a) => a.name).join(' / ');
     final String pageLabel = pageCount == null || pageCount == 0
         ? '未知'
         : '$pageCount 页';

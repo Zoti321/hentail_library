@@ -262,7 +262,8 @@ class SeriesAddComicsDialogNotifier
       _allComics.where((Comic comic) {
         if (q.isEmpty) return true;
         final String title = comic.title.toLowerCase();
-        final String author = comic.authors.join(' ').toLowerCase();
+        final String author =
+            comic.authors.map((a) => a.name).join(' ').toLowerCase();
         return title.contains(q) || author.contains(q);
       }).toList(),
     );

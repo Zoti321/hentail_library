@@ -16,6 +16,8 @@ part 'database.g.dart';
     Comics,
     Tags,
     ComicTags,
+    Authors,
+    ComicAuthors,
     SeriesTable,
     SeriesItems,
     SeriesReadingHistories,
@@ -25,7 +27,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? excutor]) : super(excutor ?? _openConnection());
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -54,6 +56,27 @@ class AppDatabase extends _$AppDatabase {
         await customStatement('DROP TABLE series_items;');
         await customStatement(
           'ALTER TABLE series_items_new RENAME TO series_items;',
+        );
+        await customStatement('PRAGMA foreign_keys = ON');
+      }
+      if (from < 12) {
+        await customStatement('PRAGMA foreign_keys = OFF');
+        await customStatement('''
+          CREATE TABLE authors (
+            name TEXT NOT NULL PRIMARY KEY
+          );
+        ''');
+        await customStatement('''
+          CREATE TABLE comic_authors (
+            comic_id TEXT NOT NULL,
+            author_name TEXT NOT NULL,
+            PRIMARY KEY (comic_id, author_name),
+            FOREIGN KEY (comic_id) REFERENCES comics (comic_id) ON DELETE CASCADE,
+            FOREIGN KEY (author_name) REFERENCES authors (name) ON DELETE CASCADE
+          );
+        ''');
+        await customStatement(
+          'ALTER TABLE comics DROP COLUMN authors_json;',
         );
         await customStatement('PRAGMA foreign_keys = ON');
       }

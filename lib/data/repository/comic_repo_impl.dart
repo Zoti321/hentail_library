@@ -1,8 +1,9 @@
 import 'package:hentai_library/data/resources/local/database/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart'
     as db;
-import 'package:hentai_library/domain/entity/comic/comic.dart' as entity;
-import 'package:hentai_library/domain/entity/comic/tag.dart' as entity;
+import 'package:hentai_library/domain/entity/comic/author.dart';
+import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/util/comic_scan_diff.dart';
 import 'package:hentai_library/domain/repository/comic_repo.dart';
@@ -26,54 +27,56 @@ class ComicRepositoryImpl implements ComicRepository {
   final ReadingHistoryRepository _readingHistory;
   final SeriesRepository _librarySeries;
 
-  Future<List<entity.Comic>> _mapRows(List<db.DbComic> rows) async {
-    final tagMap = await _comicDao.getTagNamesForComics(
-      rows.map((e) => e.comicId),
-    );
+  Future<List<Comic>> _mapRows(List<db.DbComic> rows) async {
+    final ids = rows.map((e) => e.comicId);
+    final tagMap = await _comicDao.getTagNamesForComics(ids);
+    final authorMap = await _comicDao.getAuthorNamesForComics(ids);
     return rows.map((r) {
       final tagNames = tagMap[r.comicId] ?? const <String>[];
-      return entity.Comic(
+      final authorNames = authorMap[r.comicId] ?? const <String>[];
+      return Comic(
         comicId: r.comicId,
         path: r.path,
         resourceType: r.resourceType,
         title: r.title,
-        authors: r.authorsJson,
+        authors: authorNames.map((n) => Author(name: n)).toList(),
         contentRating: r.contentRating,
-        tags: tagNames.map((n) => entity.Tag(name: n)).toList(),
+        tags: tagNames.map((n) => Tag(name: n)).toList(),
         pageCount: r.pageCount,
       );
     }).toList();
   }
 
   @override
-  Stream<List<entity.Comic>> watchAll() {
+  Stream<List<Comic>> watchAll() {
     return _comicDao.watchAllComics().asyncMap(_mapRows);
   }
 
   @override
-  Future<List<entity.Comic>> getAll() async {
+  Future<List<Comic>> getAll() async {
     final rows = await _comicDao.getAllComics();
     return _mapRows(rows);
   }
 
   @override
-  Future<entity.Comic?> findById(String comicId) async {
+  Future<Comic?> findById(String comicId) async {
     final row = await _comicDao.findById(comicId);
     if (row == null) return null;
     final tagNames = await _comicDao.getTagNamesForComic(comicId);
-    return entity.Comic(
+    final authorNames = await _comicDao.getAuthorNamesForComic(comicId);
+    return Comic(
       comicId: row.comicId,
       path: row.path,
       resourceType: row.resourceType,
       title: row.title,
-      authors: row.authorsJson,
+      authors: authorNames.map((n) => Author(name: n)).toList(),
       contentRating: row.contentRating,
-      tags: tagNames.map((n) => entity.Tag(name: n)).toList(),
+      tags: tagNames.map((n) => Tag(name: n)).toList(),
     );
   }
 
   @override
-  Future<void> upsertMany(List<entity.Comic> comics) async {
+  Future<void> upsertMany(List<Comic> comics) async {
     final companions = comics
         .map(
           (c) => db.ComicsCompanion.insert(
@@ -81,7 +84,6 @@ class ComicRepositoryImpl implements ComicRepository {
             path: c.path,
             resourceType: c.resourceType,
             title: c.title,
-            authorsJson: Value(c.authors),
             contentRating: Value(c.contentRating),
             pageCount: Value(c.pageCount),
           ),
@@ -90,8 +92,11 @@ class ComicRepositoryImpl implements ComicRepository {
 
     await _comicDao.upsertMany(companions);
 
-    // tags 单独写（每个 comic 替换其 tags）
     for (final c in comics) {
+      await _comicDao.replaceComicAuthors(
+        c.comicId,
+        c.authors.map((a) => a.name).toList(),
+      );
       await _comicDao.replaceComicTags(
         c.comicId,
         c.tags.map((t) => t.name).toList(),
@@ -108,18 +113,23 @@ class ComicRepositoryImpl implements ComicRepository {
   Future<void> updateUserMeta(
     String comicId, {
     String? title,
-    List<String>? authors,
+    List<Author>? authors,
     ContentRating? contentRating,
-    List<entity.Tag>? tags,
+    List<Tag>? tags,
   }) async {
     await _comicDao.updateUserMeta(
       comicId,
       title: Value.absentIfNull(title),
-      authors: authors == null ? const Value.absent() : Value(authors),
       contentRating: contentRating == null
           ? const Value.absent()
           : Value(contentRating),
     );
+    if (authors != null) {
+      await _comicDao.replaceComicAuthors(
+        comicId,
+        authors.map((e) => e.name).toList(),
+      );
+    }
     if (tags != null) {
       await _comicDao.replaceComicTags(
         comicId,
@@ -130,7 +140,7 @@ class ComicRepositoryImpl implements ComicRepository {
 
   @override
   Future<ComicReplaceByScanResult> replaceByScan(
-    List<entity.Comic> scanned,
+    List<Comic> scanned,
   ) async {
     final unique = dedupeScannedByComicId(scanned);
     final scannedIds = unique.keys.toSet();
@@ -153,7 +163,7 @@ class ComicRepositoryImpl implements ComicRepository {
       );
     }
 
-    final toUpsert = <entity.Comic>[];
+    final toUpsert = <Comic>[];
     for (final e in unique.entries) {
       final id = e.key;
       final row = e.value;

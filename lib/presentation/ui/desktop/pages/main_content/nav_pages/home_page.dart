@@ -547,6 +547,13 @@ class HomePage extends ConsumerWidget {
               tokens: tokens,
             ),
             _ShortcutTile(
+              icon: LucideIcons.penLine,
+              label: '作者管理',
+              onTap: () => context.go('/authors'),
+              colorScheme: cs,
+              tokens: tokens,
+            ),
+            _ShortcutTile(
               icon: LucideIcons.layers2,
               label: '系列管理',
               onTap: () => context.go('/series'),

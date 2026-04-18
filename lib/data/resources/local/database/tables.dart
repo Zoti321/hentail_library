@@ -1,21 +1,6 @@
 import 'package:drift/drift.dart';
-import 'dart:convert';
 
 import 'package:hentai_library/domain/util/enums.dart';
-
-class StringListJsonConverter extends TypeConverter<List<String>, String> {
-  const StringListJsonConverter();
-
-  @override
-  List<String> fromSql(String fromDb) {
-    final decoded = jsonDecode(fromDb);
-    if (decoded is! List) return const <String>[];
-    return decoded.whereType<String>().toList();
-  }
-
-  @override
-  String toSql(List<String> value) => jsonEncode(value);
-}
 
 @DataClassName('DbComic')
 class Comics extends Table {
@@ -23,9 +8,6 @@ class Comics extends Table {
   TextColumn get path => text()();
   TextColumn get resourceType => textEnum<ResourceType>()();
   TextColumn get title => text()();
-  TextColumn get authorsJson => text()
-      .map(const StringListJsonConverter())
-      .withDefault(const Constant('[]'))();
   TextColumn get contentRating =>
       textEnum<ContentRating>().withDefault(const Constant('unknown'))();
   IntColumn get pageCount => integer().nullable()();
@@ -54,6 +36,29 @@ class ComicTags extends Table {
   List<String> get customConstraints => [
     'FOREIGN KEY(comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE',
     'FOREIGN KEY(tag_name) REFERENCES tags(name) ON DELETE CASCADE',
+  ];
+}
+
+@DataClassName('DbAuthor')
+class Authors extends Table {
+  TextColumn get name => text()();
+
+  @override
+  Set<Column> get primaryKey => {name};
+}
+
+@DataClassName('DbComicAuthor')
+class ComicAuthors extends Table {
+  TextColumn get comicId => text()();
+  TextColumn get authorName => text()();
+
+  @override
+  Set<Column> get primaryKey => {comicId, authorName};
+
+  @override
+  List<String> get customConstraints => [
+    'FOREIGN KEY(comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE',
+    'FOREIGN KEY(author_name) REFERENCES authors(name) ON DELETE CASCADE',
   ];
 }
 

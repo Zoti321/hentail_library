@@ -21,6 +21,9 @@ SeriesDao seriesDao(Ref ref) => SeriesDao(ref.read(databaseProvider));
 TagDao tagDao(Ref ref) => TagDao(ref.read(databaseProvider));
 
 @Riverpod(keepAlive: true)
+AuthorDao authorDao(Ref ref) => AuthorDao(ref.read(databaseProvider));
+
+@Riverpod(keepAlive: true)
 SavedPathDao savedPathDao(Ref ref) => SavedPathDao(ref.read(databaseProvider));
 
 @Riverpod(keepAlive: true)

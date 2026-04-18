@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
+import 'package:hentai_library/domain/entity/comic/author.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/util/enums.dart';
@@ -41,7 +42,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       title: widget.comic.title,
       isR18: widget.comic.contentRating == ContentRating.r18,
       tags: List<Tag>.from(widget.comic.tags),
-      authors: List<String>.from(widget.comic.authors),
+      authors: List<Author>.from(widget.comic.authors),
     );
     _controller = _EditMetadataFormController(initialForm: initialForm)
       ..addListener(_handleFormChanged);
@@ -198,13 +199,15 @@ class _EditMetadataFormController extends ChangeNotifier {
   void addAuthor(String name) {
     final String trimmed = name.trim();
     if (trimmed.isEmpty) return;
-    if (_form.authors.contains(trimmed)) return;
-    _form = _form.copyWith(authors: [..._form.authors, trimmed]);
+    if (_form.authors.any((Author a) => a.name == trimmed)) return;
+    _form = _form.copyWith(authors: [..._form.authors, Author(name: trimmed)]);
     notifyListeners();
   }
 
   void removeAuthor(String name) {
-    _form = _form.copyWith(authors: [..._form.authors]..remove(name));
+    _form = _form.copyWith(
+      authors: _form.authors.where((Author a) => a.name != name).toList(),
+    );
     notifyListeners();
   }
 
@@ -387,7 +390,7 @@ class _EditMetadataAuthorsSection extends StatelessWidget {
     required this.onRemove,
   });
 
-  final List<String> authors;
+  final List<Author> authors;
   final ValueChanged<String> onAdd;
   final ValueChanged<String> onRemove;
 
@@ -396,7 +399,7 @@ class _EditMetadataAuthorsSection extends StatelessWidget {
     return TagEditorField(
       label: '作者',
       icon: LucideIcons.penTool,
-      items: authors,
+      items: authors.map((Author a) => a.name).toList(),
       onAdd: onAdd,
       onRemove: onRemove,
     );

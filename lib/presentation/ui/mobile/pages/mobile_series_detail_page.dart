@@ -532,7 +532,9 @@ class _SeriesManageItemsSheetState extends ConsumerState<_SeriesManageItemsSheet
                                   : (comic.authors.isEmpty
                                         ? null
                                         : Text(
-                                            comic.authors.join(' / '),
+                                            comic.authors
+                                                .map((a) => a.name)
+                                                .join(' / '),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           )),

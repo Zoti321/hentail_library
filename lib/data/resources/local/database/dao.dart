@@ -5,7 +5,7 @@ import 'database.dart';
 
 part 'dao.g.dart';
 
-@DriftAccessor(tables: [Comics, ComicTags])
+@DriftAccessor(tables: [Comics, ComicTags, Authors, ComicAuthors])
 class ComicDao extends DatabaseAccessor<AppDatabase> with _$ComicDaoMixin {
   ComicDao(super.db);
 
@@ -51,6 +51,36 @@ class ComicDao extends DatabaseAccessor<AppDatabase> with _$ComicDaoMixin {
     });
   }
 
+  Future<void> replaceComicAuthors(
+    String comicId,
+    List<String> authorNames,
+  ) async {
+    await transaction(() async {
+      await (delete(comicAuthors)..where((t) => t.comicId.equals(comicId)))
+          .go();
+      final uniqueNames = authorNames.toSet().toList();
+      if (uniqueNames.isEmpty) return;
+      await batch((b) {
+        for (final String name in uniqueNames) {
+          b.insert(
+            authors,
+            AuthorsCompanion.insert(name: name),
+            mode: InsertMode.insertOrIgnore,
+          );
+        }
+      });
+      final rows = uniqueNames
+          .map(
+            (name) => ComicAuthorsCompanion.insert(
+              comicId: comicId,
+              authorName: name,
+            ),
+          )
+          .toList();
+      await batch((b) => b.insertAll(comicAuthors, rows));
+    });
+  }
+
   Future<List<String>> getTagNamesForComic(String comicId) async {
     final rows = await (select(
       comicTags,
@@ -73,16 +103,36 @@ class ComicDao extends DatabaseAccessor<AppDatabase> with _$ComicDaoMixin {
     return map;
   }
 
+  Future<List<String>> getAuthorNamesForComic(String comicId) async {
+    final rows = await (select(
+      comicAuthors,
+    )..where((t) => t.comicId.equals(comicId))).get();
+    return rows.map((e) => e.authorName).toList();
+  }
+
+  Future<Map<String, List<String>>> getAuthorNamesForComics(
+    Iterable<String> comicIds,
+  ) async {
+    final ids = comicIds.toList();
+    if (ids.isEmpty) return {};
+    final rows = await (select(
+      comicAuthors,
+    )..where((t) => t.comicId.isIn(ids))).get();
+    final map = <String, List<String>>{};
+    for (final r in rows) {
+      (map[r.comicId] ??= <String>[]).add(r.authorName);
+    }
+    return map;
+  }
+
   Future<int> updateUserMeta(
     String comicId, {
     Value<String>? title,
-    Value<List<String>>? authors,
     Value<ContentRating>? contentRating,
   }) {
     return (update(comics)..where((t) => t.comicId.equals(comicId))).write(
       ComicsCompanion(
         title: title ?? const Value.absent(),
-        authorsJson: authors ?? const Value.absent(),
         contentRating: contentRating ?? const Value.absent(),
       ),
     );
@@ -216,6 +266,42 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
       );
 
       await (delete(tags)..where((t) => t.name.equals(oldName))).go();
+    });
+  }
+}
+
+@DriftAccessor(tables: [Authors, ComicAuthors])
+class AuthorDao extends DatabaseAccessor<AppDatabase> with _$AuthorDaoMixin {
+  AuthorDao(super.db);
+
+  Future<List<DbAuthor>> listAll() => select(authors).get();
+
+  Stream<List<DbAuthor>> watchAll() {
+    return (select(authors)..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
+  }
+
+  Future<void> addAuthor(String name) async {
+    await into(
+      authors,
+    ).insert(AuthorsCompanion.insert(name: name), mode: InsertMode.insertOrIgnore);
+  }
+
+  Future<int> deleteByNames(List<String> names) {
+    if (names.isEmpty) return Future.value(0);
+    return (delete(authors)..where((t) => t.name.isIn(names))).go();
+  }
+
+  Future<void> renameAuthor(String oldName, String newName) async {
+    await transaction(() async {
+      await into(authors).insert(
+        AuthorsCompanion.insert(name: newName),
+        mode: InsertMode.insertOrIgnore,
+      );
+
+      await (update(comicAuthors)..where((t) => t.authorName.equals(oldName)))
+          .write(ComicAuthorsCompanion(authorName: Value(newName)));
+
+      await (delete(authors)..where((t) => t.name.equals(oldName))).go();
     });
   }
 }

@@ -11,14 +11,28 @@ class MobileManagePage extends StatelessWidget {
   const MobileManagePage({super.key});
   @override
   Widget build(BuildContext context) {
-    return const DefaultTabController(
+    return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: _ManageAppBar(),
-        body: TabBarView(
+        appBar: const _ManageAppBar(),
+        body: Column(
           children: <Widget>[
-            _ManageTagsTab(),
-            _ManageSeriesTab(),
+            ListTile(
+              leading: const Icon(Icons.draw_outlined),
+              title: const Text('作者管理'),
+              subtitle: const Text('浏览、添加、重命名或删除作者'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go('/authors'),
+            ),
+            const Divider(height: 1),
+            const Expanded(
+              child: TabBarView(
+                children: <Widget>[
+                  _ManageTagsTab(),
+                  _ManageSeriesTab(),
+                ],
+              ),
+            ),
           ],
         ),
       ),

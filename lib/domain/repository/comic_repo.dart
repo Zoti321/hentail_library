@@ -1,3 +1,4 @@
+import 'package:hentai_library/domain/entity/comic/author.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/util/enums.dart';
@@ -26,7 +27,7 @@ abstract class ComicRepository {
   Future<void> updateUserMeta(
     String comicId, {
     String? title,
-    List<String>? authors,
+    List<Author>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
   });

@@ -262,7 +262,7 @@ class _ComicSelectableTile extends StatelessWidget {
         subtitle: comic.authors.isEmpty
             ? null
             : Text(
-                comic.authors.join(' / '),
+                comic.authors.map((a) => a.name).join(' / '),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(color: cs.textTertiary, fontSize: 12),

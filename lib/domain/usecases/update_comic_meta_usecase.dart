@@ -1,3 +1,4 @@
+import 'package:hentai_library/domain/entity/comic/author.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/repository/comic_repo.dart';
@@ -11,7 +12,7 @@ class UpdateComicMetaUseCase {
   Future<void> call(
     String comicId, {
     String? title,
-    List<String>? authors,
+    List<Author>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
   }) {

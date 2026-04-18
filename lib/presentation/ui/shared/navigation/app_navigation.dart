@@ -8,6 +8,7 @@ abstract final class AppNavigation {
   static const String navIdLibrary = 'library';
   static const String navIdManage = 'manage';
   static const String navIdTags = 'tags';
+  static const String navIdAuthors = 'authors';
   static const String navIdSeries = 'series';
   static const String navIdHistory = 'history';
   static const String navIdSettings = 'settings';
@@ -36,6 +37,8 @@ abstract final class AppNavigation {
         return '';
       case '/tags':
         return navIdTags;
+      case '/authors':
+        return navIdAuthors;
       case '/series':
         return navIdSeries;
       case '/history':
@@ -67,6 +70,7 @@ abstract final class AppNavigation {
     if (path == '/manage' ||
         path == '/paths' ||
         path == '/tags' ||
+        path == '/authors' ||
         path == '/series' ||
         path.startsWith('/series/')) {
       return navIdManage;
@@ -90,6 +94,9 @@ abstract final class AppNavigation {
         break;
       case navIdTags:
         context.go('/tags');
+        break;
+      case navIdAuthors:
+        context.go('/authors');
         break;
       case navIdSeries:
         context.go('/series');
