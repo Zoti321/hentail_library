@@ -41,6 +41,8 @@ class TagManagementPanel extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _TagManagementHeader(onAddTag: openAddTagDialog),
+          const SizedBox(height: 12),
+          const _TagBulkDeleteBar(),
           const SizedBox(height: 20),
           tagsAsync.when(
             data: (tags) {
@@ -73,14 +75,6 @@ class _TagStyles {
 
   static const double titleFontSize = 26;
   static const double subtitleFontSize = 13;
-
-  static const double metaChipIconSize = 14;
-  static const double metaChipFontSize = 12;
-  static const double metaChipRadius = 8;
-  static const EdgeInsets metaChipPadding = EdgeInsets.symmetric(
-    horizontal: 12,
-    vertical: 6,
-  );
 
   static const double listRadius = 12;
   static const EdgeInsets listHeaderPadding = EdgeInsets.symmetric(
@@ -193,10 +187,7 @@ class _TagManagementHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final int selectionCount = ref.watch(
-      tagSelectionProvider.select((Set<Tag> s) => s.length),
-    );
-    final cs = Theme.of(context).colorScheme;
+    final ColorScheme cs = Theme.of(context).colorScheme;
     final String shortcutLabel = _shortcutLabel(context);
 
     return Row(
@@ -223,20 +214,6 @@ class _TagManagementHeader extends ConsumerWidget {
                   fontSize: _TagStyles.subtitleFontSize,
                 ),
               ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  const _MetaChip(icon: LucideIcons.tags, label: '标签'),
-                  if (selectionCount > 0)
-                    _MetaChip(
-                      icon: LucideIcons.circleCheckBig,
-                      label: '已选 $selectionCount',
-                      highlighted: true,
-                    ),
-                ],
-              ),
             ],
           ),
         ),
@@ -250,7 +227,7 @@ class _TagManagementHeader extends ConsumerWidget {
               width: MediaQuery.of(context).size.width * 0.2,
               child: CustomTextField(
                 hintText: '搜索标签名称…',
-                onChanged: (value) =>
+                onChanged: (String value) =>
                     ref.read(tagFilterProvider.notifier).setQuery(value),
               ),
             ),
@@ -264,37 +241,55 @@ class _TagManagementHeader extends ConsumerWidget {
                 ),
               ),
             ),
-            if (selectionCount > 0)
-              TextButton.icon(
-                onPressed: () async {
-                  final confirmed =
-                      await showDialog<bool>(
-                        context: context,
-                        barrierColor: Colors.transparent,
-                        builder: (context) =>
-                            TagConfirmDeleteDialog(count: selectionCount),
-                      ) ??
-                      false;
-                  if (!confirmed) return;
-                  final tags = ref
-                      .read(tagSelectionProvider)
-                      .toList(growable: false);
-                  await ref.read(tagActionsProvider).deleteTags(tags);
-                },
-                icon: const Icon(LucideIcons.trash2, size: 16),
-                label: Text('删除已选'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: cs.onSurface,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+class _TagBulkDeleteBar extends ConsumerWidget {
+  const _TagBulkDeleteBar();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final int selectionCount = ref.watch(
+      tagSelectionProvider.select((Set<Tag> s) => s.length),
+    );
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return Row(
+      children: [
+        GhostButton.icon(
+          tooltip: '删除已选',
+          semanticLabel: '删除已选',
+          icon: LucideIcons.trash2,
+          size: 28,
+          onPressed: () async {
+            if (selectionCount == 0) {
+              showInfoToast(
+                context,
+                '此操作将删除已选中的标签，请先勾选列表中的标签。',
+              );
+              return;
+            }
+            final bool confirmed =
+                await showDialog<bool>(
+                  context: context,
+                  barrierColor: Colors.transparent,
+                  builder: (BuildContext dialogContext) =>
+                      TagConfirmDeleteDialog(count: selectionCount),
+                ) ??
+                false;
+            if (!confirmed) {
+              return;
+            }
+            final List<Tag> tags = ref
+                .read(tagSelectionProvider)
+                .toList(growable: false);
+            await ref.read(tagActionsProvider).deleteTags(tags);
+          },
+          delayTooltipThreeSeconds: true,
+          overlayColor: cs.primary.withAlpha(14),
         ),
       ],
     );
@@ -308,55 +303,6 @@ String _shortcutLabel(BuildContext context) {
   return isApple ? '⌘N' : 'Ctrl+N';
 }
 
-class _MetaChip extends StatelessWidget {
-  const _MetaChip({
-    required this.icon,
-    required this.label,
-    this.highlighted = false,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool highlighted;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final iconColor = highlighted
-        ? theme.colorScheme.primary
-        : theme.colorScheme.onSurfaceVariant;
-    final bgColor = highlighted
-        ? theme.colorScheme.primaryContainer.withAlpha(130)
-        : theme.colorScheme.surfaceContainerHighest;
-
-    return Container(
-      padding: _TagStyles.metaChipPadding,
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(_TagStyles.metaChipRadius),
-        border: Border.all(color: theme.colorScheme.borderSubtle),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: _TagStyles.metaChipIconSize, color: iconColor),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: _TagStyles.metaChipFontSize,
-              fontWeight: FontWeight.w600,
-              color: highlighted
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _TagList extends StatelessWidget {
   const _TagList({required this.tags});
 
@@ -367,7 +313,7 @@ class _TagList extends StatelessWidget {
     return _TagListCard(
       child: Column(
         children: [
-          const _TagListHeader(),
+          _TagListHeader(totalCount: tags.length),
           _TagListView(tags: tags),
         ],
       ),
@@ -384,7 +330,6 @@ class _TagListCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Container(
-      margin: const EdgeInsets.only(top: 16),
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(_TagStyles.listRadius),
@@ -398,12 +343,17 @@ class _TagListCard extends StatelessWidget {
   }
 }
 
-class _TagListHeader extends StatelessWidget {
-  const _TagListHeader();
+class _TagListHeader extends ConsumerWidget {
+  const _TagListHeader({required this.totalCount});
+
+  final int totalCount;
 
   @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final int selectionCount = ref.watch(
+      tagSelectionProvider.select((Set<Tag> s) => s.length),
+    );
     return Container(
       padding: _TagStyles.listHeaderPadding,
       decoration: BoxDecoration(
@@ -426,6 +376,25 @@ class _TagListHeader extends StatelessWidget {
               color: cs.textSecondary,
             ),
           ),
+          const SizedBox(width: 12),
+          Text(
+            '共 $totalCount 条',
+            style: TextStyle(
+              fontSize: _TagStyles.listHeaderFontSize,
+              color: cs.textTertiary,
+            ),
+          ),
+          if (selectionCount > 0) ...[
+            const SizedBox(width: 12),
+            Text(
+              '已选 $selectionCount',
+              style: TextStyle(
+                fontSize: _TagStyles.listHeaderFontSize,
+                fontWeight: FontWeight.w600,
+                color: cs.primary,
+              ),
+            ),
+          ],
         ],
       ),
     );

@@ -26,7 +26,9 @@ class AuthorManagementPanel extends ConsumerWidget {
           hintText: '输入作者名称…',
           initialValue: '',
           onSubmit: (value) async {
-            await ref.read(authorActionsProvider).addAuthor(Author(name: value));
+            await ref
+                .read(authorActionsProvider)
+                .addAuthor(Author(name: value));
           },
         ),
       );
@@ -41,6 +43,8 @@ class AuthorManagementPanel extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _AuthorManagementHeader(onAddAuthor: openAddAuthorDialog),
+          const SizedBox(height: 12),
+          const _AuthorBulkDeleteBar(),
           const SizedBox(height: 20),
           authorsAsync.when(
             data: (authors) {
@@ -73,14 +77,6 @@ class _AuthorStyles {
 
   static const double titleFontSize = 26;
   static const double subtitleFontSize = 13;
-
-  static const double metaChipIconSize = 14;
-  static const double metaChipFontSize = 12;
-  static const double metaChipRadius = 8;
-  static const EdgeInsets metaChipPadding = EdgeInsets.symmetric(
-    horizontal: 12,
-    vertical: 6,
-  );
 
   static const double listRadius = 12;
   static const EdgeInsets listHeaderPadding = EdgeInsets.symmetric(
@@ -193,10 +189,7 @@ class _AuthorManagementHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final int selectionCount = ref.watch(
-      authorSelectionProvider.select((Set<Author> s) => s.length),
-    );
-    final cs = Theme.of(context).colorScheme;
+    final ColorScheme cs = Theme.of(context).colorScheme;
     final String shortcutLabel = _shortcutLabel(context);
 
     return Row(
@@ -223,20 +216,6 @@ class _AuthorManagementHeader extends ConsumerWidget {
                   fontSize: _AuthorStyles.subtitleFontSize,
                 ),
               ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  const _MetaChip(icon: LucideIcons.penLine, label: '作者'),
-                  if (selectionCount > 0)
-                    _MetaChip(
-                      icon: LucideIcons.circleCheckBig,
-                      label: '已选 $selectionCount',
-                      highlighted: true,
-                    ),
-                ],
-              ),
             ],
           ),
         ),
@@ -250,7 +229,7 @@ class _AuthorManagementHeader extends ConsumerWidget {
               width: MediaQuery.of(context).size.width * 0.2,
               child: CustomTextField(
                 hintText: '搜索作者名称…',
-                onChanged: (value) =>
+                onChanged: (String value) =>
                     ref.read(authorFilterProvider.notifier).setQuery(value),
               ),
             ),
@@ -264,37 +243,52 @@ class _AuthorManagementHeader extends ConsumerWidget {
                 ),
               ),
             ),
-            if (selectionCount > 0)
-              TextButton.icon(
-                onPressed: () async {
-                  final confirmed =
-                      await showDialog<bool>(
-                        context: context,
-                        barrierColor: Colors.transparent,
-                        builder: (context) =>
-                            TagConfirmDeleteDialog(count: selectionCount),
-                      ) ??
-                      false;
-                  if (!confirmed) return;
-                  final authors = ref
-                      .read(authorSelectionProvider)
-                      .toList(growable: false);
-                  await ref.read(authorActionsProvider).deleteAuthors(authors);
-                },
-                icon: const Icon(LucideIcons.trash2, size: 16),
-                label: Text('删除已选'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: cs.onSurface,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+class _AuthorBulkDeleteBar extends ConsumerWidget {
+  const _AuthorBulkDeleteBar();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final int selectionCount = ref.watch(
+      authorSelectionProvider.select((Set<Author> s) => s.length),
+    );
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return Row(
+      children: [
+        GhostButton.icon(
+          tooltip: '删除已选',
+          semanticLabel: '删除已选',
+          icon: LucideIcons.trash2,
+          size: 28,
+          onPressed: () async {
+            if (selectionCount == 0) {
+              showInfoToast(context, '此操作将删除已选中的作者，请先勾选列表中的作者。');
+              return;
+            }
+            final bool confirmed =
+                await showDialog<bool>(
+                  context: context,
+                  barrierColor: Colors.transparent,
+                  builder: (BuildContext dialogContext) =>
+                      TagConfirmDeleteDialog(count: selectionCount),
+                ) ??
+                false;
+            if (!confirmed) {
+              return;
+            }
+            final List<Author> authors = ref
+                .read(authorSelectionProvider)
+                .toList(growable: false);
+            await ref.read(authorActionsProvider).deleteAuthors(authors);
+          },
+          delayTooltipThreeSeconds: true,
+          overlayColor: cs.primary.withAlpha(14),
         ),
       ],
     );
@@ -308,55 +302,6 @@ String _shortcutLabel(BuildContext context) {
   return isApple ? '⌘N' : 'Ctrl+N';
 }
 
-class _MetaChip extends StatelessWidget {
-  const _MetaChip({
-    required this.icon,
-    required this.label,
-    this.highlighted = false,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool highlighted;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final iconColor = highlighted
-        ? theme.colorScheme.primary
-        : theme.colorScheme.onSurfaceVariant;
-    final bgColor = highlighted
-        ? theme.colorScheme.primaryContainer.withAlpha(130)
-        : theme.colorScheme.surfaceContainerHighest;
-
-    return Container(
-      padding: _AuthorStyles.metaChipPadding,
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(_AuthorStyles.metaChipRadius),
-        border: Border.all(color: theme.colorScheme.borderSubtle),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: _AuthorStyles.metaChipIconSize, color: iconColor),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: _AuthorStyles.metaChipFontSize,
-              fontWeight: FontWeight.w600,
-              color: highlighted
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _AuthorList extends StatelessWidget {
   const _AuthorList({required this.authors});
 
@@ -367,7 +312,7 @@ class _AuthorList extends StatelessWidget {
     return _AuthorListCard(
       child: Column(
         children: [
-          const _AuthorListHeader(),
+          _AuthorListHeader(totalCount: authors.length),
           _AuthorListView(authors: authors),
         ],
       ),
@@ -384,7 +329,6 @@ class _AuthorListCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     return Container(
-      margin: const EdgeInsets.only(top: 16),
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(_AuthorStyles.listRadius),
@@ -398,12 +342,17 @@ class _AuthorListCard extends StatelessWidget {
   }
 }
 
-class _AuthorListHeader extends StatelessWidget {
-  const _AuthorListHeader();
+class _AuthorListHeader extends ConsumerWidget {
+  const _AuthorListHeader({required this.totalCount});
+
+  final int totalCount;
 
   @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final int selectionCount = ref.watch(
+      authorSelectionProvider.select((Set<Author> s) => s.length),
+    );
     return Container(
       padding: _AuthorStyles.listHeaderPadding,
       decoration: BoxDecoration(
@@ -426,6 +375,25 @@ class _AuthorListHeader extends StatelessWidget {
               color: cs.textSecondary,
             ),
           ),
+          const SizedBox(width: 12),
+          Text(
+            '共 $totalCount 条',
+            style: TextStyle(
+              fontSize: _AuthorStyles.listHeaderFontSize,
+              color: cs.textTertiary,
+            ),
+          ),
+          if (selectionCount > 0) ...[
+            const SizedBox(width: 12),
+            Text(
+              '已选 $selectionCount',
+              style: TextStyle(
+                fontSize: _AuthorStyles.listHeaderFontSize,
+                fontWeight: FontWeight.w600,
+                color: cs.primary,
+              ),
+            ),
+          ],
         ],
       ),
     );
