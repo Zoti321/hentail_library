@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/data/services/comic/cache/archive_cover_cache.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_accessor.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_session_manager.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/isolate_archive_cover_loader.dart';
@@ -352,11 +353,36 @@ Future<ComicCoverDisplayData?> comicCoverDisplay(
       resourceType == ResourceType.zip ||
       resourceType == ResourceType.cbz) {
     try {
-      final Uint8List? bytes = await loadArchiveCoverBytesOffMainUi(
-        path: v2Comic.path,
-        type: resourceType,
-      );
+      final String sourceNorm = normalizeArchiveCoverSourcePath(v2Comic.path);
+      final bool useDiskCache = ref.read(archiveCoverDiskCacheEnabledProvider);
+      final ArchiveCoverCache coverCache = ref.read(archiveCoverCacheProvider);
+      if (useDiskCache) {
+        final String? cachedPath = await coverCache.tryReadValidPath(
+          comicId: comicId,
+          sourcePathNormalized: sourceNorm,
+        );
+        if (cachedPath != null) {
+          return ComicCoverDisplayData.file(cachedPath);
+        }
+      }
+      final ArchiveCoverDecodeResult decoded =
+          await loadArchiveCoverDecodeResultOffMainUi(
+            path: v2Comic.path,
+            type: resourceType,
+          );
+      final Uint8List? bytes = decoded.bytes;
       if (bytes != null && bytes.isNotEmpty) {
+        if (useDiskCache) {
+          final String? writtenPath = await coverCache.write(
+            comicId: comicId,
+            sourcePathNormalized: sourceNorm,
+            bytes: bytes,
+            fileExtension: decoded.fileExtension,
+          );
+          if (writtenPath != null) {
+            return ComicCoverDisplayData.file(writtenPath);
+          }
+        }
         return ComicCoverDisplayData.bytes(bytes);
       }
       return null;

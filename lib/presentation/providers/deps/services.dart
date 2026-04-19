@@ -1,4 +1,8 @@
+import 'package:hentai_library/data/services/comic/cache/archive_cover_cache.dart';
+import 'package:hentai_library/data/services/comic/cache/archive_cover_disk_cache.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_opener.dart';
+import 'package:hentai_library/domain/entity/app_setting.dart';
+import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_session_manager.dart';
 import 'package:hentai_library/data/services/comic/scan/comic_scan_parse_service.dart';
 import 'package:hentai_library/data/services/comic/scan/resource_parser.dart';
@@ -34,3 +38,23 @@ ComicReadResourceSessionManager comicReadResourceSessionManager(Ref ref) =>
     ComicReadResourceSessionManager(
       opener: ref.read(comicReadResourceOpenerProvider),
     );
+
+/// 是否启用归档封面磁盘缓存（与 [AppSetting.archiveCoverDiskCacheEnabled] 一致）。
+@Riverpod(keepAlive: true)
+bool archiveCoverDiskCacheEnabled(Ref ref) {
+  final AsyncValue<AppSetting> async = ref.watch(settingsProvider);
+  return async.maybeWhen(
+    data: (AppSetting s) => s.archiveCoverDiskCacheEnabled,
+    orElse: () => true,
+  );
+}
+
+@Riverpod(keepAlive: true)
+ArchiveCoverCache archiveCoverCache(Ref ref) => ArchiveCoverDiskCache();
+
+/// 归档封面在应用缓存目录中的占用（字节）。
+@Riverpod(keepAlive: true)
+Future<int> archiveCoverCacheDiskUsageBytes(Ref ref) async {
+  final ArchiveCoverCache cache = ref.watch(archiveCoverCacheProvider);
+  return cache.totalBytesInCache();
+}

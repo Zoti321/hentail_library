@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/config/theme.dart';
+import 'package:hentai_library/core/util/format_byte_size.dart';
 import 'package:hentai_library/domain/entity/app_setting.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
@@ -13,11 +16,7 @@ const int _readerAutoPlayIntervalMin = 1;
 const int _readerAutoPlayIntervalMax = 60;
 const double _kAppThemeMenuWidth = 224;
 
-enum _SettingsShell {
-  loading,
-  content,
-  fatalError,
-}
+enum _SettingsShell { loading, content, fatalError }
 
 _SettingsShell _settingsShell(AsyncValue<AppSetting> value) {
   if (value.hasError && !value.hasValue) {
@@ -39,7 +38,9 @@ class SettingsPage extends ConsumerWidget {
       settingsProvider.select(_settingsShell),
     );
     return switch (shell) {
-      _SettingsShell.loading => const Center(child: CircularProgressIndicator()),
+      _SettingsShell.loading => const Center(
+        child: CircularProgressIndicator(),
+      ),
       _SettingsShell.content => const _SettingsLoadedView(),
       _SettingsShell.fatalError => Center(
         child: Text(
@@ -88,6 +89,13 @@ class _SettingsLoadedView extends StatelessWidget {
             ],
           ),
           _SettingsGroup(
+            title: '缓存',
+            children: const <Widget>[
+              _ArchiveCoverDiskCacheRow(),
+              _ArchiveCoverCacheUsageRow(),
+            ],
+          ),
+          _SettingsGroup(
             title: '阅读',
             children: const <Widget>[_ReaderAutoPlayIntervalRow()],
           ),
@@ -131,11 +139,7 @@ class _ThemePreferenceRowState extends ConsumerState<_ThemePreferenceRow> {
     final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     return _SettingsRow(
-      icon: Icon(
-        LucideIcons.palette,
-        size: 20,
-        color: cs.iconDefault,
-      ),
+      icon: Icon(LucideIcons.palette, size: 20, color: cs.iconDefault),
       label: '应用主题',
       description: '可跟随系统或固定浅色、深色；当前：${pref.labelZh}',
       onRowTap: () => _menuController.showMenu(),
@@ -145,10 +149,8 @@ class _ThemePreferenceRowState extends ConsumerState<_ThemePreferenceRow> {
         pressType: PressType.singleClick,
         showArrow: false,
         verticalMargin: 4,
-        menuBuilder: () => _AppThemePreferenceMenuPanel(
-          current: pref,
-          onSelect: _applyTheme,
-        ),
+        menuBuilder: () =>
+            _AppThemePreferenceMenuPanel(current: pref, onSelect: _applyTheme),
         child: GhostButton.iconText(
           icon: LucideIcons.chevronsUpDown,
           text: pref.labelZh,
@@ -205,9 +207,7 @@ class _AppThemePreferenceMenuPanel extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
                 color: cs.surfaceContainerHighest,
-                border: Border(
-                  bottom: BorderSide(color: cs.borderSubtle),
-                ),
+                border: Border(bottom: BorderSide(color: cs.borderSubtle)),
               ),
               child: Text(
                 '应用主题',
@@ -244,8 +244,9 @@ class _AppThemePreferenceMenuPanel extends StatelessWidget {
                                     ? LucideIcons.circleCheckBig
                                     : LucideIcons.circle,
                                 size: 18,
-                                color:
-                                    isSelected ? cs.primary : cs.textTertiary,
+                                color: isSelected
+                                    ? cs.primary
+                                    : cs.textTertiary,
                               ),
                               SizedBox(width: tokens.spacing.sm),
                               Expanded(
@@ -305,8 +306,7 @@ class _AutoScanRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool autoScan = ref.watch(
       settingsProvider.select(
-        (AsyncValue<AppSetting> async) =>
-            async.asData?.value.autoScan ?? false,
+        (AsyncValue<AppSetting> async) => async.asData?.value.autoScan ?? false,
       ),
     );
     final ThemeData theme = Theme.of(context);
@@ -346,14 +346,109 @@ class _LibraryHideComicsInSeriesRow extends ConsumerWidget {
         color: theme.colorScheme.iconDefault,
       ),
       label: '漫画库隐藏系列内漫画',
-      description: hide
-          ? '已启用（漫画分区不显示已归入系列的漫画）'
-          : '已禁用（漫画分区显示全部漫画）',
+      description: hide ? '已启用（漫画分区不显示已归入系列的漫画）' : '已禁用（漫画分区显示全部漫画）',
       action: MyToggleSwitch(
         checked: hide,
         onChange: () => ref
             .read(settingsProvider.notifier)
             .setLibraryHideComicsInSeries(!hide),
+      ),
+    );
+  }
+}
+
+class _ArchiveCoverDiskCacheRow extends ConsumerWidget {
+  const _ArchiveCoverDiskCacheRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool enabled = ref.watch(
+      settingsProvider.select(
+        (AsyncValue<AppSetting> async) =>
+            async.asData?.value.archiveCoverDiskCacheEnabled ?? true,
+      ),
+    );
+    final ThemeData theme = Theme.of(context);
+    return _SettingsRow(
+      icon: Icon(
+        LucideIcons.image,
+        size: 20,
+        color: theme.colorScheme.iconDefault,
+      ),
+      label: '归档封面磁盘缓存',
+      description: enabled
+          ? '已启用（列表封面解码结果写入应用缓存，减轻重复解压）'
+          : '已禁用（每次列表展示时重新解码，不读不写缓存文件）',
+      action: MyToggleSwitch(
+        checked: enabled,
+        onChange: () => ref
+            .read(settingsProvider.notifier)
+            .setArchiveCoverDiskCacheEnabled(!enabled),
+      ),
+    );
+  }
+}
+
+class _ArchiveCoverCacheUsageRow extends ConsumerStatefulWidget {
+  const _ArchiveCoverCacheUsageRow();
+
+  @override
+  ConsumerState<_ArchiveCoverCacheUsageRow> createState() =>
+      _ArchiveCoverCacheUsageRowState();
+}
+
+class _ArchiveCoverCacheUsageRowState
+    extends ConsumerState<_ArchiveCoverCacheUsageRow> {
+  bool _isClearing = false;
+
+  Future<void> _clearCache() async {
+    if (_isClearing) {
+      return;
+    }
+    setState(() => _isClearing = true);
+    try {
+      await ref.read(archiveCoverCacheProvider).clearAll();
+      ref.invalidate(archiveCoverCacheDiskUsageBytesProvider);
+    } finally {
+      if (mounted) {
+        setState(() => _isClearing = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AsyncValue<int> usage = ref.watch(
+      archiveCoverCacheDiskUsageBytesProvider,
+    );
+    final ThemeData theme = Theme.of(context);
+    final AppThemeTokens tokens = context.tokens;
+    final String description = usage.when(
+      data: (int bytes) => '应用缓存目录内归档封面图片；当前占用 ${formatByteSizeBin1024(bytes)}',
+      loading: () => '应用缓存目录内归档封面图片；正在计算占用…',
+      error: (Object _, StackTrace _) => '应用缓存目录内归档封面图片；无法读取占用',
+    );
+    return _SettingsRow(
+      icon: Icon(
+        LucideIcons.hardDrive,
+        size: 20,
+        color: theme.colorScheme.iconDefault,
+      ),
+      label: '缓存占用',
+      description: description,
+      action: GhostButton.iconText(
+        icon: LucideIcons.trash2,
+        text: _isClearing ? '清理中…' : '清理',
+        tooltip: '',
+        semanticLabel: '清除归档封面磁盘缓存',
+        onPressed: _isClearing ? null : () => unawaited(_clearCache()),
+        iconSize: 15,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        borderRadius: tokens.radius.md,
+        foregroundColor: theme.colorScheme.textSecondary,
+        hoverColor: theme.colorScheme.hoverBackground,
+        overlayColor: theme.colorScheme.primary.withAlpha(14),
+        delayTooltipThreeSeconds: false,
       ),
     );
   }
@@ -387,8 +482,7 @@ class _HealthyModeRow extends ConsumerWidget {
       description: healthy ? '已启用（隐藏 R18）' : '已禁用（显示 R18）',
       action: MyToggleSwitch(
         checked: healthy,
-        onChange: () =>
-            ref.read(settingsProvider.notifier).toggleHealthyMode(),
+        onChange: () => ref.read(settingsProvider.notifier).toggleHealthyMode(),
       ),
       isDestructive: !healthy,
     );
@@ -419,14 +513,14 @@ class _ReaderAutoPlayIntervalRow extends ConsumerWidget {
         min: _readerAutoPlayIntervalMin,
         max: _readerAutoPlayIntervalMax,
         onDecrease: () {
-          ref.read(settingsProvider.notifier).setReaderAutoPlayIntervalSeconds(
-                seconds - 1,
-              );
+          ref
+              .read(settingsProvider.notifier)
+              .setReaderAutoPlayIntervalSeconds(seconds - 1);
         },
         onIncrease: () {
-          ref.read(settingsProvider.notifier).setReaderAutoPlayIntervalSeconds(
-                seconds + 1,
-              );
+          ref
+              .read(settingsProvider.notifier)
+              .setReaderAutoPlayIntervalSeconds(seconds + 1);
         },
       ),
     );
@@ -448,10 +542,7 @@ class _AboutVersionRow extends StatelessWidget {
       label: '版本',
       description: 'v1.0.0',
       action: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 8,
-          vertical: 4,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           color: theme.colorScheme.inputBackgroundDisabled,
           borderRadius: BorderRadius.circular(4),

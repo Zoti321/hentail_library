@@ -16,6 +16,8 @@ abstract class AppSetting with _$AppSetting {
     @Default(5) int readerAutoPlayIntervalSeconds,
     /// 漫画库「漫画」分区不显示已归入任意系列的漫画。
     @Default(false) bool libraryHideComicsInSeries,
+    /// 是否将 epub/zip/cbz 列表封面解码结果写入应用缓存目录（关闭后不读写，已落盘文件保留）。
+    @Default(true) bool archiveCoverDiskCacheEnabled,
   }) = _AppSetting;
 
   factory AppSetting.fromJson(Map<String, dynamic> json) =>

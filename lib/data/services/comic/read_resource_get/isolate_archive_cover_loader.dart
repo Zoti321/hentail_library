@@ -9,68 +9,88 @@ import 'package:hentai_library/core/util/filename_natural_compare.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:path/path.dart' as p;
 
+/// Isolate 解码结果：封面字节与用于磁盘文件名的扩展名（带点，如 `.jpg`；未知时为 `.bin`）。
+typedef ArchiveCoverDecodeResult = ({Uint8List? bytes, String fileExtension});
+
 /// 在独立 isolate 中解码 epub/zip/cbz 封面字节，避免阻塞 UI 线程。
 ///
-/// 目录漫画返回 null（应在主 isolate 用 [File] 路径加载）。
-Future<Uint8List?> loadArchiveCoverBytesOffMainUi({
+/// 目录漫画返回 bytes: null（应在主 isolate 用 [File] 路径加载）。
+Future<ArchiveCoverDecodeResult> loadArchiveCoverDecodeResultOffMainUi({
   required String path,
   required ResourceType type,
 }) async {
   if (type == ResourceType.dir ||
       type == ResourceType.cbr ||
       type == ResourceType.rar) {
-    return null;
+    return (bytes: null, fileExtension: '.bin');
   }
   if (type != ResourceType.epub &&
       type != ResourceType.zip &&
       type != ResourceType.cbz) {
-    return null;
+    return (bytes: null, fileExtension: '.bin');
   }
   final String normalized = path.trim().replaceAll('\\', '/');
   return Isolate.run(() => _decodeArchiveCoverInWorker(normalized, type));
 }
 
-Future<Uint8List?> _decodeArchiveCoverInWorker(
+/// 兼容旧调用：仅返回字节。
+Future<Uint8List?> loadArchiveCoverBytesOffMainUi({
+  required String path,
+  required ResourceType type,
+}) async {
+  final ArchiveCoverDecodeResult r = await loadArchiveCoverDecodeResultOffMainUi(
+    path: path,
+    type: type,
+  );
+  return r.bytes;
+}
+
+Future<ArchiveCoverDecodeResult> _decodeArchiveCoverInWorker(
   String normalizedPath,
   ResourceType type,
 ) async {
   switch (type) {
     case ResourceType.epub:
-      return _loadEpubCoverBytes(normalizedPath);
+      return _loadEpubCoverDecodeResult(normalizedPath);
     case ResourceType.zip:
     case ResourceType.cbz:
-      return _loadZipCoverBytes(normalizedPath);
+      return _loadZipCoverDecodeResult(normalizedPath);
     default:
-      return null;
+      return (bytes: null, fileExtension: '.bin');
   }
 }
 
-Future<Uint8List?> _loadEpubCoverBytes(String path) async {
+Future<ArchiveCoverDecodeResult> _loadEpubCoverDecodeResult(String path) async {
   final File file = File(path);
   if (!await file.exists()) {
-    return null;
+    return (bytes: null, fileExtension: '.bin');
   }
   try {
     final EpubParser parser = EpubParser();
     final EpubExtractionResult result = await parser.extract(file);
     if (result.images.isEmpty) {
-      return null;
+      return (bytes: null, fileExtension: '.bin');
     }
+    ImageInfo? coverMatch;
     for (final ImageInfo info in result.images) {
       if (p.basename(info.path).toLowerCase().contains('cover')) {
-        return parser.getImageData(result, info);
+        coverMatch = info;
+        break;
       }
     }
-    return parser.getImageData(result, result.images.first);
+    final ImageInfo chosen = coverMatch ?? result.images.first;
+    final Uint8List? data = parser.getImageData(result, chosen);
+    final String ext = _normalizeDotExtension(p.extension(chosen.path));
+    return (bytes: data, fileExtension: ext);
   } catch (_) {
-    return null;
+    return (bytes: null, fileExtension: '.bin');
   }
 }
 
-Future<Uint8List?> _loadZipCoverBytes(String path) async {
+Future<ArchiveCoverDecodeResult> _loadZipCoverDecodeResult(String path) async {
   final File file = File(path);
   if (!await file.exists()) {
-    return null;
+    return (bytes: null, fileExtension: '.bin');
   }
   try {
     final Uint8List raw = await file.readAsBytes();
@@ -89,7 +109,7 @@ Future<Uint8List?> _loadZipCoverBytes(String path) async {
       imageEntries.add(f);
     }
     if (imageEntries.isEmpty) {
-      return null;
+      return (bytes: null, fileExtension: '.bin');
     }
     imageEntries.sort((ArchiveFile a, ArchiveFile b) {
       final String nameA = a.name.replaceAll(r'\', '/');
@@ -106,10 +126,20 @@ Future<Uint8List?> _loadZipCoverBytes(String path) async {
     }
     final Object content = chosen.content;
     if (content is! List<int>) {
-      return null;
+      return (bytes: null, fileExtension: '.bin');
     }
-    return Uint8List.fromList(content);
+    final String nameNorm = chosen.name.replaceAll(r'\', '/');
+    final String ext = _normalizeDotExtension(p.extension(nameNorm));
+    return (bytes: Uint8List.fromList(content), fileExtension: ext);
   } catch (_) {
-    return null;
+    return (bytes: null, fileExtension: '.bin');
   }
+}
+
+String _normalizeDotExtension(String ext) {
+  final String lower = ext.toLowerCase();
+  if (lower.isEmpty) {
+    return '.bin';
+  }
+  return lower.startsWith('.') ? lower : '.$lower';
 }
