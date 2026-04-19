@@ -184,32 +184,32 @@ class HomePage extends ConsumerWidget {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = theme.colorScheme;
     final Color accent = cs.primary;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(_kHeroStatCardRadius),
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: <Color>[
-              Color.alphaBlend(accent.withAlpha(22), cs.surface),
-              Color.alphaBlend(accent.withAlpha(8), cs.surface),
-              cs.surface,
-            ],
-            stops: const <double>[0, 0.45, 1],
-          ),
-          border: Border.all(
-            color: Color.alphaBlend(accent.withAlpha(50), cs.borderSubtle),
-          ),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: cs.shadow.withAlpha(48),
-              blurRadius: 24,
-              offset: const Offset(0, 10),
-            ),
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Color.alphaBlend(accent.withAlpha(22), cs.surface),
+            Color.alphaBlend(accent.withAlpha(8), cs.surface),
+            cs.surface,
           ],
+          stops: const <double>[0, 0.45, 1],
         ),
+        border: Border.all(
+          color: Color.alphaBlend(accent.withAlpha(50), cs.borderSubtle),
+        ),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: cs.shadow.withAlpha(48),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(_kHeroStatCardRadius),
         child: Stack(
           children: <Widget>[
             Positioned(
