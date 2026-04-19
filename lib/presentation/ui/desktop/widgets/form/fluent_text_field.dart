@@ -9,6 +9,8 @@ class FluentTextField extends StatefulWidget {
   final String? hintText;
   final String? labelText;
   final bool autofocus;
+  /// When true, reduces vertical padding for single-line fields (dialog forms).
+  final bool isDense;
 
   const FluentTextField({
     super.key,
@@ -19,6 +21,7 @@ class FluentTextField extends StatefulWidget {
     this.hintText,
     this.labelText,
     this.autofocus = false,
+    this.isDense = false,
   });
 
   @override
@@ -45,6 +48,7 @@ class FluentTextFieldState extends State<FluentTextField> {
   Widget build(BuildContext context) {
     final tokens = context.tokens;
     final isTextarea = widget.maxLines > 1;
+    final bool useDense = widget.isDense && !isTextarea;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,13 +56,15 @@ class FluentTextFieldState extends State<FluentTextField> {
       children: [
         if (widget.labelText != null) ...[
           FormLabel(widget.labelText!),
-          SizedBox(height: tokens.spacing.sm - 2),
+          SizedBox(height: useDense ? tokens.spacing.xs : tokens.spacing.sm - 2),
         ],
         Focus(
           onFocusChange: (hasFocus) => setState(() => _isFocused = hasFocus),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs),
+            padding: EdgeInsets.symmetric(
+              vertical: useDense ? 0 : tokens.spacing.xs,
+            ),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.inputBackground,
               borderRadius: BorderRadius.circular(tokens.radius.md),
@@ -102,11 +108,13 @@ class FluentTextFieldState extends State<FluentTextField> {
                 contentPadding: isTextarea
                     ? EdgeInsets.symmetric(
                         horizontal: tokens.spacing.md,
-                        vertical: tokens.spacing.sm + 2,
+                        vertical: useDense
+                            ? tokens.spacing.sm
+                            : tokens.spacing.sm + 2,
                       )
                     : EdgeInsets.symmetric(
                         horizontal: tokens.spacing.md,
-                        vertical: tokens.spacing.sm,
+                        vertical: useDense ? tokens.spacing.xs : tokens.spacing.sm,
                       ),
                 border: InputBorder.none,
                 isDense: true,

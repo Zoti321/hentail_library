@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +13,12 @@ import 'package:hentai_library/presentation/ui/desktop/widgets/form/author_libra
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/foundation/my_toggle_switch.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+/// [FluentDialogShell] 标题区、内容区底边距与底栏的近似高度，用于限制中间滚动区。
+const double _kEditMetadataShellChromeReserve = 168;
 
 class EditMetadataDialog extends StatefulHookConsumerWidget {
   const EditMetadataDialog({
@@ -80,93 +84,87 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      insetPadding: const EdgeInsets.all(24),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: Container(
-            width: 680,
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.88,
-            ),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.cardHover,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: theme.colorScheme.borderSubtle,
-                width: 1,
+    return FluentDialogShell(
+      title: '编辑元数据',
+      width: 580,
+      content: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: math.max(
+            260,
+            MediaQuery.sizeOf(context).height * 0.88 -
+                _kEditMetadataShellChromeReserve,
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.spacing.lg,
+            children: [
+              _EditMetadataTitleSection(
+                title: _controller.form.title,
+                onChanged: _controller.updateTitle,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: theme.colorScheme.cardShadowHover,
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
-                  spreadRadius: 0,
-                ),
-                BoxShadow(
-                  color: theme.colorScheme.cardShadow,
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                  spreadRadius: 0,
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _EditMetadataDialogHeader(
-                  borderSubtle: theme.colorScheme.borderSubtle,
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: tokens.spacing.xl,
-                      vertical: tokens.spacing.lg + 4,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: tokens.spacing.lg + 4,
-                      children: [
-                        _EditMetadataTitleSection(
-                          title: _controller.form.title,
-                          onChanged: _controller.updateTitle,
-                        ),
-                        _EditMetadataContentRatingSection(
-                          isR18: _controller.form.isR18,
-                          onChanged: _controller.updateIsR18,
-                        ),
-                        _EditMetadataAuthorsSection(
-                          authors: _controller.form.authors,
-                          onAdd: _controller.addAuthor,
-                          onRemove: _controller.removeAuthor,
-                        ),
-                        _EditMetadataTagsSection(
-                          tags: _controller.form.tags,
-                          onAdd: _controller.addTagByName,
-                          onRemove: _controller.removeTagByName,
-                        ),
-                      ],
+              _EditMetadataContentRatingSection(
+                isR18: _controller.form.isR18,
+                onChanged: _controller.updateIsR18,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: _EditMetadataAuthorsSection(
+                      authors: _controller.form.authors,
+                      onAdd: _controller.addAuthor,
+                      onRemove: _controller.removeAuthor,
                     ),
                   ),
-                ),
-                _EditMetadataDialogFooter(
-                  borderSubtle: theme.colorScheme.borderSubtle,
-                  primaryColor: theme.colorScheme.primary,
-                  saving: _saving,
-                  onSave: _handleSave,
-                ),
-              ],
-            ),
+                  SizedBox(width: tokens.spacing.lg),
+                  Expanded(
+                    child: _EditMetadataTagsSection(
+                      tags: _controller.form.tags,
+                      onAdd: _controller.addTagByName,
+                      onRemove: _controller.removeTagByName,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(),
+          style: TextButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text('取消'),
+        ),
+        const SizedBox(width: 8),
+        FilledButton(
+          onPressed: _saving ? null : _handleSave,
+          style: FilledButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: _saving
+              ? SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: cs.onPrimary,
+                  ),
+                )
+              : const Text('保存更改'),
+        ),
+      ],
     );
   }
 }
@@ -231,121 +229,6 @@ class _EditMetadataFormController extends ChangeNotifier {
   }
 }
 
-class _EditMetadataDialogHeader extends StatelessWidget {
-  const _EditMetadataDialogHeader({required this.borderSubtle});
-
-  final Color borderSubtle;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: borderSubtle, width: 1)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            '编辑元数据',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: colorScheme.textPrimary,
-              letterSpacing: -0.3,
-            ),
-          ),
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => Navigator.of(context).pop(),
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                child: Icon(
-                  LucideIcons.x,
-                  size: 20,
-                  color: colorScheme.textTertiary,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EditMetadataDialogFooter extends StatelessWidget {
-  const _EditMetadataDialogFooter({
-    required this.borderSubtle,
-    required this.primaryColor,
-    required this.saving,
-    required this.onSave,
-  });
-
-  final Color borderSubtle;
-  final Color primaryColor;
-  final bool saving;
-  final VoidCallback onSave;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: borderSubtle, width: 1)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            style: TextButton.styleFrom(
-              foregroundColor: colorScheme.textSecondary,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            ),
-            child: const Text('取消'),
-          ),
-          const SizedBox(width: 12),
-          ElevatedButton(
-            onPressed: saving ? null : onSave,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: colorScheme.onPrimary,
-              elevation: 0,
-              shadowColor: Colors.transparent,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: saving
-                ? Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: colorScheme.onPrimary,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text('保存中…'),
-                    ],
-                  )
-                : const Text('保存更改'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _EditMetadataTitleSection extends StatelessWidget {
   const _EditMetadataTitleSection({
     required this.title,
@@ -379,26 +262,97 @@ class _EditMetadataContentRatingSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final Color accent = isR18 ? cs.error : cs.primary;
+    final Color cardBg = isR18
+        ? cs.error.withValues(alpha: 0.06)
+        : cs.primary.withValues(alpha: 0.05);
+    final Color borderColor = isR18
+        ? cs.error.withValues(alpha: 0.28)
+        : cs.borderSubtle;
+    final Color iconBg = isR18
+        ? cs.error.withValues(alpha: 0.14)
+        : cs.primary.withValues(alpha: 0.12);
+    final String headline = isR18 ? 'R18（成人内容）' : '全年龄';
+    final String subtitle = isR18
+        ? '含成人向或限制级描写'
+        : '不含成人向限制级内容';
+    final IconData iconData =
+        isR18 ? LucideIcons.circleAlert : LucideIcons.shield;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: tokens.spacing.sm,
       children: [
         const FormLabel('内容分级'),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Text(
-                isR18 ? 'R18（成人内容）' : '全年龄',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: isR18 ? cs.error : cs.textSecondary,
-                ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(tokens.radius.md),
+            border: Border.all(color: borderColor, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               ),
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: tokens.spacing.md,
+              vertical: tokens.spacing.sm + 2,
             ),
-            MyToggleSwitch(checked: isR18, onChange: () => onChanged(!isR18)),
-          ],
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: iconBg,
+                    borderRadius: BorderRadius.circular(tokens.radius.sm),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(
+                      iconData,
+                      size: 20,
+                      color: accent,
+                    ),
+                  ),
+                ),
+                SizedBox(width: tokens.spacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        headline,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isR18 ? cs.error : cs.textPrimary,
+                          height: 1.25,
+                        ),
+                      ),
+                      SizedBox(height: tokens.spacing.xs),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 12,
+                          height: 1.3,
+                          color: cs.textTertiary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: tokens.spacing.sm),
+                MyToggleSwitch(
+                  checked: isR18,
+                  onChange: () => onChanged(!isR18),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );
