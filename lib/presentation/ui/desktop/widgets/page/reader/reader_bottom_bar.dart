@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ReaderBottomBar extends StatefulWidget {
@@ -411,10 +411,11 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
     const double minBrightnessPercent = 20;
     const double maxBrightnessPercent = 100;
     const int brightnessDivisions = 16;
-    double localBrightness = (1 - widget.readerDimLevel).clamp(
-      minBrightnessPercent / 100,
-      maxBrightnessPercent / 100,
-    ) *
+    double localBrightness =
+        (1 - widget.readerDimLevel).clamp(
+          minBrightnessPercent / 100,
+          maxBrightnessPercent / 100,
+        ) *
         100;
     return Container(
       width: 52,
@@ -477,7 +478,8 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                           final double nextBrightness = double.parse(
                             value.toStringAsFixed(2),
                           );
-                          final double nextDimLevel = 1 - (nextBrightness / 100);
+                          final double nextDimLevel =
+                              1 - (nextBrightness / 100);
                           setMenuState(() {
                             localBrightness = nextBrightness;
                           });

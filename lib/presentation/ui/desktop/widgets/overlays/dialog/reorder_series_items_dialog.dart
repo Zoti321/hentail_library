@@ -3,11 +3,11 @@ import 'dart:ui' show clampDouble;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ReorderSeriesItemsDialog extends ConsumerStatefulWidget {

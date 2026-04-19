@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/domain/entity/comic/series.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
 
-/// 清空全部阅读历史的确认对话框（与标签/系列删除确认对话框同一套 Fluent 壳层）。
-class ClearReadingHistoryConfirmDialog extends StatelessWidget {
-  const ClearReadingHistoryConfirmDialog({super.key});
+class SeriesConfirmDeleteDialog extends StatelessWidget {
+  const SeriesConfirmDeleteDialog({super.key, required this.series});
+
+  final Series series;
 
   @override
   Widget build(BuildContext context) {
+    final count = series.items.length;
+    final extra = count > 0 ? '该系列包含 $count 本漫画，将移除系列归属，漫画仍保留在库中。' : '删除后无法恢复。';
+
     return FluentDialogShell(
-      title: '确认清空',
-      content: const Text('将清空全部阅读历史记录。此操作不可撤销。'),
+      title: '确认删除',
+      content: Text('确定删除系列「${series.name}」？$extra'),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
@@ -28,7 +33,7 @@ class ClearReadingHistoryConfirmDialog extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          child: const Text('清空'),
+          child: const Text('删除'),
         ),
       ],
     );

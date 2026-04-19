@@ -1,28 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/entity/comic/series.dart';
-import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/fluent_text_field.dart';
 
-class RenameSeriesDialog extends ConsumerStatefulWidget {
-  const RenameSeriesDialog({super.key, required this.series});
+class TagNameEditorDialog extends ConsumerStatefulWidget {
+  const TagNameEditorDialog({
+    super.key,
+    required this.title,
+    required this.labelText,
+    required this.hintText,
+    required this.initialValue,
+    required this.onSubmit,
+    this.shouldCloseOnUnchanged = false,
+  });
 
-  final Series series;
+  final String title;
+  final String labelText;
+  final String hintText;
+  final String initialValue;
+  final Future<void> Function(String value) onSubmit;
+  final bool shouldCloseOnUnchanged;
 
   @override
-  ConsumerState<RenameSeriesDialog> createState() => _RenameSeriesDialogState();
+  ConsumerState<TagNameEditorDialog> createState() =>
+      _TagNameEditorDialogState();
 }
 
-class _RenameSeriesDialogState extends ConsumerState<RenameSeriesDialog> {
+class _TagNameEditorDialogState extends ConsumerState<TagNameEditorDialog> {
   late final TextEditingController _controller;
   bool _saving = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.series.name);
+    _controller = TextEditingController(text: widget.initialValue);
   }
 
   @override
@@ -32,21 +43,16 @@ class _RenameSeriesDialogState extends ConsumerState<RenameSeriesDialog> {
   }
 
   Future<void> _handleSave() async {
-    final String newName = _controller.text.trim();
-    if (newName.isEmpty || newName == widget.series.name) {
-      if (mounted) Navigator.of(context).pop<String?>();
+    final value = _controller.text.trim();
+    if (value.isEmpty) return;
+    if (widget.shouldCloseOnUnchanged && value == widget.initialValue.trim()) {
+      if (mounted) Navigator.of(context).pop();
       return;
     }
     setState(() => _saving = true);
     try {
-      await ref.read(seriesActionsProvider).rename(widget.series.name, newName);
-      if (mounted) {
-        Navigator.of(context).pop<String>(newName);
-      }
-    } catch (e) {
-      if (mounted) {
-        showErrorToast(context, e);
-      }
+      await widget.onSubmit(value);
+      if (mounted) Navigator.of(context).pop();
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -55,11 +61,12 @@ class _RenameSeriesDialogState extends ConsumerState<RenameSeriesDialog> {
   @override
   Widget build(BuildContext context) {
     return FluentDialogShell(
-      title: '重命名系列',
+      title: widget.title,
       content: FluentTextField(
         initialValue: _controller.text,
-        labelText: '新名称',
-        hintText: '输入新的系列名称…',
+        labelText: widget.labelText,
+        hintText: widget.hintText,
+        autofocus: true,
         onChanged: (value) => _controller.text = value,
         onSubmitted: (_) async {
           if (_saving) return;
@@ -68,9 +75,7 @@ class _RenameSeriesDialogState extends ConsumerState<RenameSeriesDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: _saving
-              ? null
-              : () => Navigator.of(context).pop<String?>(),
+          onPressed: _saving ? null : () => Navigator.of(context).pop(),
           style: TextButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),

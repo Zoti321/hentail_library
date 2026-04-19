@@ -8,9 +8,9 @@ import 'package:hentai_library/presentation/dto/history_grid_item_dto.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/scan_progress_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/element/reading_history_card.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/scan_progress_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/element/card/reading_history_card.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double _kHomeContentMaxWidth = 1280;

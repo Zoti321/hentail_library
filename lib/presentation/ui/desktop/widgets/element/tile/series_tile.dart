@@ -6,7 +6,7 @@ import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/presentation/models/comic_cover_display_data.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/image/app_comic_image.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/element/image/app_comic_image.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SeriesTile extends HookConsumerWidget {
@@ -32,8 +32,11 @@ class SeriesTile extends HookConsumerWidget {
     final String? coverComicId = coverItem?.comicId;
     final ComicCoverDisplayData? coverData = coverComicId != null
         ? ref
-            .watch(comicCoverDisplayProvider(comicId: coverComicId))
-            .maybeWhen(data: (ComicCoverDisplayData? v) => v, orElse: () => null)
+              .watch(comicCoverDisplayProvider(comicId: coverComicId))
+              .maybeWhen(
+                data: (ComicCoverDisplayData? v) => v,
+                orElse: () => null,
+              )
         : null;
     final int count = series.items.length;
     final int coverCacheWidth = AppComicImage.resolveCacheWidth(

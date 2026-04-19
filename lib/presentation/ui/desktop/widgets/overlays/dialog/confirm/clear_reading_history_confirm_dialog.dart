@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
 
-class TagConfirmDeleteDialog extends StatelessWidget {
-  const TagConfirmDeleteDialog({super.key, required this.count});
-
-  final int count;
+/// 清空全部阅读历史的确认对话框（与标签/系列删除确认对话框同一套 Fluent 壳层）。
+class ClearReadingHistoryConfirmDialog extends StatelessWidget {
+  const ClearReadingHistoryConfirmDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
     return FluentDialogShell(
-      title: '确认删除',
-      content: Text('将删除 $count 个标签，并同时从所有漫画中移除这些标签。此操作不可撤销。'),
+      title: '确认清空',
+      content: const Text('将清空全部阅读历史记录。此操作不可撤销。'),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
@@ -29,7 +28,7 @@ class TagConfirmDeleteDialog extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          child: const Text('删除'),
+          child: const Text('清空'),
         ),
       ],
     );

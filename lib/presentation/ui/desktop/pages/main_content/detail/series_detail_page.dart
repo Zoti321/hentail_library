@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/entity/series_reading_history.dart';
@@ -15,11 +15,11 @@ import 'package:hentai_library/presentation/models/comic_cover_display_data.dart
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/add_comics_to_series_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/add_comics_to_series_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/navigation/library_return_breadcrumb.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/rename_series_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/reorder_series_items_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/rename_series_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/reorder_series_items_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SeriesDetailPage extends ConsumerWidget {
@@ -399,7 +399,10 @@ class _SeriesCoverBlock extends ConsumerWidget {
     final ComicCoverDisplayData? coverDisplay = coverComicId != null
         ? ref
               .watch(comicCoverDisplayProvider(comicId: coverComicId))
-              .maybeWhen(data: (ComicCoverDisplayData? v) => v, orElse: () => null)
+              .maybeWhen(
+                data: (ComicCoverDisplayData? v) => v,
+                orElse: () => null,
+              )
         : null;
     final Widget content = Container(
       width: double.infinity,

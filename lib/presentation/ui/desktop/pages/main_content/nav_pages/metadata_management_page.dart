@@ -9,10 +9,10 @@ import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/panels/author_management_panel.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/panels/series_management_panel.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/panels/tag_management_panel.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/capsule_tab_bar.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/add_series_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/tag_name_editor_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/capsule_tab_bar.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/add_series_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class MetadataManagementPage extends ConsumerStatefulWidget {
@@ -27,17 +27,22 @@ class _MetadataAddIntent extends Intent {
   const _MetadataAddIntent();
 }
 
-class _MetadataManagementPageState extends ConsumerState<MetadataManagementPage> {
+class _MetadataManagementPageState
+    extends ConsumerState<MetadataManagementPage> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final String? tabParam = GoRouterState.of(context).uri.queryParameters['tab'];
+    final String? tabParam = GoRouterState.of(
+      context,
+    ).uri.queryParameters['tab'];
     final int selectedIndex = _tabIndexFromQuery(tabParam);
 
     return Shortcuts(
       shortcuts: const <ShortcutActivator, Intent>{
-        SingleActivator(LogicalKeyboardKey.keyN, control: true): _MetadataAddIntent(),
-        SingleActivator(LogicalKeyboardKey.keyN, meta: true): _MetadataAddIntent(),
+        SingleActivator(LogicalKeyboardKey.keyN, control: true):
+            _MetadataAddIntent(),
+        SingleActivator(LogicalKeyboardKey.keyN, meta: true):
+            _MetadataAddIntent(),
       },
       child: Actions(
         actions: <Type, Action<Intent>>{
@@ -57,7 +62,10 @@ class _MetadataManagementPageState extends ConsumerState<MetadataManagementPage>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 48,
+                  vertical: 16,
+                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[

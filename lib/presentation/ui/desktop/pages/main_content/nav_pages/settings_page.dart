@@ -8,8 +8,8 @@ import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/core/util/format_byte_size.dart';
 import 'package:hentai_library/domain/entity/app_setting.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/input/my_toggle_switch.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/foundation/my_toggle_switch.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const int _readerAutoPlayIntervalMin = 1;

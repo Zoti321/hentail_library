@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/usecases/purge_comics_side_effects.dart';
@@ -10,9 +10,9 @@ import 'package:hentai_library/presentation/models/comic_cover_display_data.dart
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/context_menu.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/edit_metadata_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/image/app_comic_image.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/context_menu.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/element/image/app_comic_image.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ComicCard extends HookConsumerWidget {
@@ -208,26 +208,28 @@ class ComicCard extends HookConsumerWidget {
             children: [
               // 1. 图片 + 缩放动画
               AppComicImage(
-                filePath: coverData?.filePath,
-                memoryBytes: coverData?.memoryBytes,
-                fit: BoxFit.cover,
-                cacheWidth: coverCacheWidth,
-                placeholder: Container(
-                  color: cs.imageFallback,
-                  alignment: Alignment.center,
-                  child: Icon(Icons.broken_image, color: cs.iconSecondary),
-                ),
-                errorPlaceholder: Container(
-                  color: cs.imageFallback,
-                  alignment: Alignment.center,
-                  child: Icon(Icons.broken_image, color: cs.iconSecondary),
-                ),
-              ).animate(target: isHover ? 1 : 0).scale(
-                begin: const Offset(1, 1),
-                end: const Offset(1.05, 1.05),
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeOutQuad,
-              ),
+                    filePath: coverData?.filePath,
+                    memoryBytes: coverData?.memoryBytes,
+                    fit: BoxFit.cover,
+                    cacheWidth: coverCacheWidth,
+                    placeholder: Container(
+                      color: cs.imageFallback,
+                      alignment: Alignment.center,
+                      child: Icon(Icons.broken_image, color: cs.iconSecondary),
+                    ),
+                    errorPlaceholder: Container(
+                      color: cs.imageFallback,
+                      alignment: Alignment.center,
+                      child: Icon(Icons.broken_image, color: cs.iconSecondary),
+                    ),
+                  )
+                  .animate(target: isHover ? 1 : 0)
+                  .scale(
+                    begin: const Offset(1, 1),
+                    end: const Offset(1.05, 1.05),
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeOutQuad,
+                  ),
 
               // 2. 黑色遮罩层 (Hover 时显示)
               Container(color: cs.overlayScrim)

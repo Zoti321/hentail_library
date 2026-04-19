@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/presentation/models/comic_cover_display_data.dart';
 import 'package:hentai_library/presentation/providers/pages/reader/reader_page_notifier.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/image/app_comic_image.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/element/image/app_comic_image.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ReadingHistoryCard extends ConsumerStatefulWidget {
@@ -75,10 +75,10 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
         .watch(comicCoverDisplayProvider(comicId: coverComicId))
         .maybeWhen(data: (ComicCoverDisplayData? v) => v, orElse: () => null);
 
-    final Color cardBackground =
-        _isHovered ? cs.surfaceContainer : cs.surface;
-    final Color cardBorderColor =
-        _isHovered ? cs.borderStrong : cs.borderSubtle;
+    final Color cardBackground = _isHovered ? cs.surfaceContainer : cs.surface;
+    final Color cardBorderColor = _isHovered
+        ? cs.borderStrong
+        : cs.borderSubtle;
     final List<BoxShadow> cardShadows = _isHovered && !isSeries
         ? <BoxShadow>[
             BoxShadow(
@@ -102,10 +102,7 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
           decoration: BoxDecoration(
             color: cardBackground,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: cardBorderColor,
-              width: 1,
-            ),
+            border: Border.all(color: cardBorderColor, width: 1),
             boxShadow: cardShadows,
           ),
           child: Row(
@@ -246,18 +243,10 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
       fit: BoxFit.cover,
       cacheWidth: cacheWidth,
       placeholder: Center(
-        child: Icon(
-          LucideIcons.bookOpen,
-          size: 28,
-          color: cs.textTertiary,
-        ),
+        child: Icon(LucideIcons.bookOpen, size: 28, color: cs.textTertiary),
       ),
       errorPlaceholder: Center(
-        child: Icon(
-          LucideIcons.bookOpen,
-          size: 28,
-          color: cs.textTertiary,
-        ),
+        child: Icon(LucideIcons.bookOpen, size: 28, color: cs.textTertiary),
       ),
     );
 

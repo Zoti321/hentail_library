@@ -4,8 +4,8 @@ import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/value_objects/library_display_target.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/input/my_toggle_switch.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/foundation/my_toggle_switch.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

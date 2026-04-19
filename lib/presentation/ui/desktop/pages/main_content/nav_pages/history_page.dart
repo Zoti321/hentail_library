@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
 import 'package:hentai_library/presentation/dto/history_grid_item_dto.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/element/reading_history_card.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/clear_reading_history_confirm_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/input/custom_text_field.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/element/card/reading_history_card.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/clear_reading_history_confirm_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// 根节点不持有搜索 state：搜索写入 [historySearchQueryProvider]，仅列表区 watch，
@@ -24,10 +24,7 @@ class HistoryPage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 16,
-        children: const [
-          _Header(),
-          _HistoryList(),
-        ],
+        children: const [_Header(), _HistoryList()],
       ),
     );
   }
@@ -139,9 +136,7 @@ class _HistoryList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final bool isLoading = ref.watch(
-      historyFeedViewProvider.select(
-        (HistoryFeedViewData d) => d.isLoading,
-      ),
+      historyFeedViewProvider.select((HistoryFeedViewData d) => d.isLoading),
     );
     if (isLoading) {
       return const Padding(
@@ -150,9 +145,7 @@ class _HistoryList extends ConsumerWidget {
       );
     }
     final bool hasError = ref.watch(
-      historyFeedViewProvider.select(
-        (HistoryFeedViewData d) => d.hasError,
-      ),
+      historyFeedViewProvider.select((HistoryFeedViewData d) => d.hasError),
     );
     if (hasError) {
       return Padding(
@@ -169,9 +162,7 @@ class _HistoryList extends ConsumerWidget {
       );
     }
     final List<HistoryGridItemDto> merged = ref.watch(
-      historyFeedViewProvider.select(
-        (HistoryFeedViewData d) => d.mergedItems,
-      ),
+      historyFeedViewProvider.select((HistoryFeedViewData d) => d.mergedItems),
     );
     final String query = ref.watch(historySearchQueryProvider);
 
@@ -179,8 +170,10 @@ class _HistoryList extends ConsumerWidget {
     final List<HistoryGridItemDto> filtered = q.isEmpty
         ? merged
         : merged
-            .where((HistoryGridItemDto h) => h.title.toLowerCase().contains(q))
-            .toList(growable: false);
+              .where(
+                (HistoryGridItemDto h) => h.title.toLowerCase().contains(q),
+              )
+              .toList(growable: false);
 
     if (filtered.isEmpty) {
       return Padding(
@@ -251,7 +244,8 @@ class _HistoryList extends ConsumerWidget {
                 ),
               );
             }
-            final SeriesHistoryGridItemDto seriesItem = item as SeriesHistoryGridItemDto;
+            final SeriesHistoryGridItemDto seriesItem =
+                item as SeriesHistoryGridItemDto;
             return ReadingHistoryCard.series(
               seriesName: seriesItem.seriesName,
               lastReadComicId: seriesItem.lastReadComicId,

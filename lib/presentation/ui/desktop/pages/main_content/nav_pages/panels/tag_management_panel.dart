@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/common/status/status_card_shell.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/tag_confirm_delete_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/tag_name_editor_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/input/custom_text_field.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/status_card_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/tag_name_editor_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class TagManagementPanel extends ConsumerWidget {
@@ -266,10 +266,7 @@ class _TagBulkDeleteBar extends ConsumerWidget {
           size: 28,
           onPressed: () async {
             if (selectionCount == 0) {
-              showInfoToast(
-                context,
-                '此操作将删除已选中的标签，请先勾选列表中的标签。',
-              );
+              showInfoToast(context, '此操作将删除已选中的标签，请先勾选列表中的标签。');
               return;
             }
             final bool confirmed =

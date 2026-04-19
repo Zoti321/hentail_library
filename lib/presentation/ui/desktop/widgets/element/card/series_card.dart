@@ -6,7 +6,7 @@ import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/presentation/models/comic_cover_display_data.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/image/app_comic_image.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/element/image/app_comic_image.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SeriesCard extends HookConsumerWidget {
@@ -31,7 +31,10 @@ class SeriesCard extends HookConsumerWidget {
     final ComicCoverDisplayData? coverData = coverComicId != null
         ? ref
               .watch(comicCoverDisplayProvider(comicId: coverComicId))
-              .maybeWhen(data: (ComicCoverDisplayData? v) => v, orElse: () => null)
+              .maybeWhen(
+                data: (ComicCoverDisplayData? v) => v,
+                orElse: () => null,
+              )
         : null;
     final int count = series.items.length;
     final Widget content = GestureDetector(
@@ -136,26 +139,28 @@ class _SeriesCardCover extends StatelessWidget {
             fit: StackFit.expand,
             children: <Widget>[
               AppComicImage(
-                filePath: coverData?.filePath,
-                memoryBytes: coverData?.memoryBytes,
-                fit: BoxFit.cover,
-                cacheWidth: coverCacheWidth,
-                placeholder: Container(
-                  color: cs.imageFallback,
-                  alignment: Alignment.center,
-                  child: Icon(Icons.broken_image, color: cs.iconSecondary),
-                ),
-                errorPlaceholder: Container(
-                  color: cs.imageFallback,
-                  alignment: Alignment.center,
-                  child: Icon(Icons.broken_image, color: cs.iconSecondary),
-                ),
-              ).animate(target: isHover ? 1 : 0).scale(
-                begin: const Offset(1, 1),
-                end: const Offset(1.05, 1.05),
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeOutQuad,
-              ),
+                    filePath: coverData?.filePath,
+                    memoryBytes: coverData?.memoryBytes,
+                    fit: BoxFit.cover,
+                    cacheWidth: coverCacheWidth,
+                    placeholder: Container(
+                      color: cs.imageFallback,
+                      alignment: Alignment.center,
+                      child: Icon(Icons.broken_image, color: cs.iconSecondary),
+                    ),
+                    errorPlaceholder: Container(
+                      color: cs.imageFallback,
+                      alignment: Alignment.center,
+                      child: Icon(Icons.broken_image, color: cs.iconSecondary),
+                    ),
+                  )
+                  .animate(target: isHover ? 1 : 0)
+                  .scale(
+                    begin: const Offset(1, 1),
+                    end: const Offset(1.05, 1.05),
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeOutQuad,
+                  ),
               Container(color: cs.overlayScrim)
                   .animate(target: isHover ? 1 : 0)
                   .fade(begin: 0.0, end: 1.0, duration: 200.ms),

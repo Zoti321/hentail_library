@@ -3,16 +3,16 @@ import 'dart:ui';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/domain/entity/comic/author.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/form/content_rating_field.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/form/author_library_multi_select_field.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/fluent_text_field.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/form/tag_edit_field.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/tag_library_multi_select_field.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/foundation/my_toggle_switch.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -81,6 +81,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final AppThemeTokens tokens = context.tokens;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -125,29 +126,21 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
                 ),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 20,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: tokens.spacing.xl,
+                      vertical: tokens.spacing.lg + 4,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 20,
+                      spacing: tokens.spacing.lg + 4,
                       children: [
                         _EditMetadataTitleSection(
                           title: _controller.form.title,
                           onChanged: _controller.updateTitle,
                         ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 20,
-                          children: [
-                            Expanded(
-                              child: _EditMetadataContentRatingSection(
-                                isR18: _controller.form.isR18,
-                                onChanged: _controller.updateIsR18,
-                              ),
-                            ),
-                          ],
+                        _EditMetadataContentRatingSection(
+                          isR18: _controller.form.isR18,
+                          onChanged: _controller.updateIsR18,
                         ),
                         _EditMetadataAuthorsSection(
                           authors: _controller.form.authors,
@@ -200,7 +193,12 @@ class _EditMetadataFormController extends ChangeNotifier {
     final String trimmed = name.trim();
     if (trimmed.isEmpty) return;
     if (_form.authors.any((Author a) => a.name == trimmed)) return;
-    _form = _form.copyWith(authors: [..._form.authors, Author(name: trimmed)]);
+    _form = _form.copyWith(
+      authors: [
+        ..._form.authors,
+        Author(name: trimmed),
+      ],
+    );
     notifyListeners();
   }
 
@@ -379,7 +377,31 @@ class _EditMetadataContentRatingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ContentRatingField(isR18: isR18, onChanged: onChanged);
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: tokens.spacing.sm,
+      children: [
+        const FormLabel('内容分级'),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Text(
+                isR18 ? 'R18（成人内容）' : '全年龄',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: isR18 ? cs.error : cs.textSecondary,
+                ),
+              ),
+            ),
+            MyToggleSwitch(checked: isR18, onChange: () => onChanged(!isR18)),
+          ],
+        ),
+      ],
+    );
   }
 }
 
@@ -396,10 +418,10 @@ class _EditMetadataAuthorsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TagEditorField(
+    return AuthorLibraryMultiSelectField(
       label: '作者',
       icon: LucideIcons.penTool,
-      items: authors.map((Author a) => a.name).toList(),
+      selectedNames: authors.map((Author a) => a.name).toList(),
       onAdd: onAdd,
       onRemove: onRemove,
     );

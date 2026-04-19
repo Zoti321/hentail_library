@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/usecases/infer_series_from_comic_titles_usecase.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/add_comics_to_series_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/add_series_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/rename_series_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/reorder_series_items_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/series_confirm_delete_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/input/custom_text_field.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/add_comics_to_series_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/add_series_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/rename_series_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/reorder_series_items_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/series_confirm_delete_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// 系列管理：根节点不 watch 列表与筛选，避免搜索时重建头部与工具栏。

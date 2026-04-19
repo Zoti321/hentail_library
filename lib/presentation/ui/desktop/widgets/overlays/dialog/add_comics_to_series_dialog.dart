@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/fluent_dialog_shell.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/input/custom_text_field.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AddComicsToSeriesDialog extends ConsumerStatefulWidget {

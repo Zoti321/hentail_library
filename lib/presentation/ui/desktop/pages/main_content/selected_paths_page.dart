@@ -4,12 +4,12 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/custom_toast.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/remove_saved_path_confirm_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/remove_saved_paths_batch_confirm_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/common/status/status_card_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/remove_saved_path_confirm_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/remove_saved_paths_batch_confirm_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/status_card_shell.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -37,8 +37,9 @@ class _SelectedPathsAsyncBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<SelectedPathsPageState> asyncState =
-        ref.watch(selectedPathsPageProvider);
+    final AsyncValue<SelectedPathsPageState> asyncState = ref.watch(
+      selectedPathsPageProvider,
+    );
     return asyncState.when(
       data: (_) => const _SelectedPathsCard(),
       loading: () => const _LoadingCard(),
@@ -80,10 +81,7 @@ class _SelectedPathsPageHeaderState
         added++;
       }
       if (mounted && added > 0) {
-        showSuccessToast(
-          context,
-          added == 1 ? '已添加 1 个路径' : '已添加 $added 个路径',
-        );
+        showSuccessToast(context, added == 1 ? '已添加 1 个路径' : '已添加 $added 个路径');
       }
     } catch (e) {
       if (mounted) showErrorToast(context, e);
@@ -135,13 +133,12 @@ class _SelectedPathsPageHeaderState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final (int totalCount, int selectedCount, bool hasData) = ref.watch(
-      selectedPathsPageProvider.select((AsyncValue<SelectedPathsPageState> async) {
+      selectedPathsPageProvider.select((
+        AsyncValue<SelectedPathsPageState> async,
+      ) {
         return async.maybeWhen(
-          data: (SelectedPathsPageState s) => (
-            s.paths.length,
-            s.selectedPaths.length,
-            true,
-          ),
+          data: (SelectedPathsPageState s) =>
+              (s.paths.length, s.selectedPaths.length, true),
           orElse: () => (0, 0, false),
         );
       }),
@@ -176,10 +173,7 @@ class _SelectedPathsPageHeaderState
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _MetaChip(
-                    icon: LucideIcons.link,
-                    label: '路径 $totalCount',
-                  ),
+                  _MetaChip(icon: LucideIcons.link, label: '路径 $totalCount'),
                   if (selectedCount > 0)
                     _MetaChip(
                       icon: LucideIcons.circleCheckBig,

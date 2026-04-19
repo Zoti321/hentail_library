@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
 
 /// 从已保存路径列表中移除单条路径前的确认对话框。
 class RemoveSavedPathConfirmDialog extends StatelessWidget {
