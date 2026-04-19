@@ -187,6 +187,7 @@ class HomePage extends ConsumerWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(_kHeroStatCardRadius),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

@@ -148,15 +148,15 @@ class _ThemePreferenceRowState extends ConsumerState<_ThemePreferenceRow> {
         barrierColor: Colors.transparent,
         pressType: PressType.singleClick,
         showArrow: false,
-        verticalMargin: 4,
+        verticalMargin: -24,
         menuBuilder: () =>
             _AppThemePreferenceMenuPanel(current: pref, onSelect: _applyTheme),
         child: GhostButton.iconText(
           icon: LucideIcons.chevronsUpDown,
           text: pref.labelZh,
-          tooltip: '选择应用主题',
+          tooltip: '',
           semanticLabel: '选择应用主题',
-          iconSize: 15,
+          iconSize: 14,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           borderRadius: tokens.radius.md,
           foregroundColor: cs.textSecondary,
