@@ -31,11 +31,17 @@ class SettingsNotifier extends _$SettingsNotifier {
   }
 
   Future<void> updateSettings(AppSetting newSetting) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
+    final AppSetting? rollback = state.asData?.value;
+    state = AsyncData<AppSetting>(newSetting);
+    try {
       await ref.read(appSettingRepoProvider).save(newSetting);
-      return newSetting;
-    });
+    } catch (error, stackTrace) {
+      if (rollback != null) {
+        state = AsyncData<AppSetting>(rollback);
+      } else {
+        state = AsyncError<AppSetting>(error, stackTrace);
+      }
+    }
   }
 
   Future<void> setThemePreference(AppThemePreference value) async {

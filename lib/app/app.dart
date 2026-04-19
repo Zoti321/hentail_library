@@ -29,10 +29,16 @@ class _AppRootState extends ConsumerState<_AppRoot> {
   Widget build(BuildContext context) {
     ref.watch(appStartupCoordinatorProvider);
 
-    final AsyncValue<AppSetting> settingsAsync = ref.watch(settingsProvider);
-    final ThemeMode themeMode = settingsAsync.maybeWhen(
-      data: (AppSetting data) => themeModeFromPreference(data.themePreference),
-      orElse: () => ThemeMode.system,
+    final ThemeMode themeMode = ref.watch(
+      settingsProvider.select(
+        (AsyncValue<AppSetting> async) {
+          final AsyncData<AppSetting>? data = async.asData;
+          if (data == null) {
+            return ThemeMode.system;
+          }
+          return themeModeFromPreference(data.value.themePreference);
+        },
+      ),
     );
 
     return MaterialApp.router(

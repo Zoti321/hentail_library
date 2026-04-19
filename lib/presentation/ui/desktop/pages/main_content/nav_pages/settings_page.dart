@@ -1,3 +1,4 @@
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,12 +6,28 @@ import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/app_setting.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/button/ghost_button.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/dialog/app_theme_preference_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/input/my_toggle_switch.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const int _readerAutoPlayIntervalMin = 1;
 const int _readerAutoPlayIntervalMax = 60;
+const double _kAppThemeMenuWidth = 224;
+
+enum _SettingsShell {
+  loading,
+  content,
+  fatalError,
+}
+
+_SettingsShell _settingsShell(AsyncValue<AppSetting> value) {
+  if (value.hasError && !value.hasValue) {
+    return _SettingsShell.fatalError;
+  }
+  if (!value.hasValue) {
+    return _SettingsShell.loading;
+  }
+  return _SettingsShell.content;
+}
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -18,19 +35,19 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
-    final AsyncValue<AppSetting> settingsAsync = ref.watch(settingsProvider);
-    return settingsAsync.when(
-      skipLoadingOnRefresh: true,
-      skipLoadingOnReload: true,
-      data: (_) => const _SettingsLoadedView(),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (Object error, StackTrace _) => Center(
+    final _SettingsShell shell = ref.watch(
+      settingsProvider.select(_settingsShell),
+    );
+    return switch (shell) {
+      _SettingsShell.loading => const Center(child: CircularProgressIndicator()),
+      _SettingsShell.content => const _SettingsLoadedView(),
+      _SettingsShell.fatalError => Center(
         child: Text(
-          error.toString(),
+          ref.watch(settingsProvider).error.toString(),
           style: TextStyle(color: theme.colorScheme.error),
         ),
       ),
-    );
+    };
   }
 }
 
@@ -84,11 +101,24 @@ class _SettingsLoadedView extends StatelessWidget {
   }
 }
 
-class _ThemePreferenceRow extends ConsumerWidget {
+class _ThemePreferenceRow extends ConsumerStatefulWidget {
   const _ThemePreferenceRow();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_ThemePreferenceRow> createState() =>
+      _ThemePreferenceRowState();
+}
+
+class _ThemePreferenceRowState extends ConsumerState<_ThemePreferenceRow> {
+  final CustomPopupMenuController _menuController = CustomPopupMenuController();
+
+  Future<void> _applyTheme(AppThemePreference value) async {
+    _menuController.hideMenu();
+    await ref.read(settingsProvider.notifier).setThemePreference(value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final AppThemePreference? pref = ref.watch(
       settingsProvider.select(
         (AsyncValue<AppSetting> async) => async.asData?.value.themePreference,
@@ -98,30 +128,147 @@ class _ThemePreferenceRow extends ConsumerWidget {
       return const SizedBox.shrink();
     }
     final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final AppThemeTokens tokens = context.tokens;
     return _SettingsRow(
       icon: Icon(
         LucideIcons.palette,
         size: 20,
-        color: theme.colorScheme.iconDefault,
+        color: cs.iconDefault,
       ),
       label: '应用主题',
-      description: pref.labelZh,
-      onRowTap: () async {
-        final AppThemePreference? picked =
-            await showDialog<AppThemePreference>(
-          context: context,
-          builder: (BuildContext ctx) =>
-              AppThemePreferenceDialog(current: pref),
-        );
-        if (!context.mounted || picked == null) {
-          return;
-        }
-        await ref.read(settingsProvider.notifier).setThemePreference(picked);
-      },
-      action: Icon(
-        LucideIcons.chevronRight,
-        size: 16,
-        color: theme.colorScheme.iconSecondary,
+      description: '可跟随系统或固定浅色、深色；当前：${pref.labelZh}',
+      onRowTap: () => _menuController.showMenu(),
+      action: CustomPopupMenu(
+        controller: _menuController,
+        barrierColor: Colors.transparent,
+        pressType: PressType.singleClick,
+        showArrow: false,
+        verticalMargin: 4,
+        menuBuilder: () => _AppThemePreferenceMenuPanel(
+          current: pref,
+          onSelect: _applyTheme,
+        ),
+        child: GhostButton.iconText(
+          icon: LucideIcons.chevronsUpDown,
+          text: pref.labelZh,
+          tooltip: '选择应用主题',
+          semanticLabel: '选择应用主题',
+          iconSize: 15,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          borderRadius: tokens.radius.md,
+          foregroundColor: cs.textSecondary,
+          hoverColor: cs.hoverBackground,
+          overlayColor: cs.primary.withAlpha(14),
+          delayTooltipThreeSeconds: false,
+          onPressed: () => _menuController.toggleMenu(),
+        ),
+      ),
+    );
+  }
+}
+
+class _AppThemePreferenceMenuPanel extends StatelessWidget {
+  const _AppThemePreferenceMenuPanel({
+    required this.current,
+    required this.onSelect,
+  });
+
+  final AppThemePreference current;
+  final Future<void> Function(AppThemePreference value) onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    return Container(
+      width: _kAppThemeMenuWidth,
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(tokens.radius.lg),
+        border: Border.all(color: cs.borderSubtle),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: cs.cardShadowHover,
+            blurRadius: 6,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(tokens.radius.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerHighest,
+                border: Border(
+                  bottom: BorderSide(color: cs.borderSubtle),
+                ),
+              ),
+              child: Text(
+                '应用主题',
+                style: TextStyle(
+                  fontSize: tokens.text.bodySm,
+                  fontWeight: FontWeight.w600,
+                  color: cs.textPrimary,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(6, 6, 6, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: AppThemePreference.values.map((AppThemePreference p) {
+                  final bool isSelected = p == current;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => onSelect(p),
+                        borderRadius: BorderRadius.circular(tokens.radius.md),
+                        hoverColor: cs.primary.withAlpha(12),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: tokens.spacing.sm,
+                            vertical: tokens.spacing.sm,
+                          ),
+                          child: Row(
+                            children: <Widget>[
+                              Icon(
+                                isSelected
+                                    ? LucideIcons.circleCheckBig
+                                    : LucideIcons.circle,
+                                size: 18,
+                                color:
+                                    isSelected ? cs.primary : cs.textTertiary,
+                              ),
+                              SizedBox(width: tokens.spacing.sm),
+                              Expanded(
+                                child: Text(
+                                  p.labelZh,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: cs.textPrimary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

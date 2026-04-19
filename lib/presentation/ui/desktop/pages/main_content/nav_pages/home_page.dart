@@ -17,6 +17,8 @@ const double _kHomeContentMaxWidth = 1280;
 const double _kHomeStatsStackBreakpointWidth = 720;
 const double _kContinueReadingItemWidth = 304;
 const double _kContinueReadingStripHeight = 138;
+const double _kHeroStatCardRadius = 16;
+const Duration _kHeroStatCardHoverDuration = Duration(milliseconds: 200);
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -181,102 +183,170 @@ class HomePage extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = theme.colorScheme;
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(tokens.spacing.lg + 12),
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cs.borderSubtle),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(LucideIcons.folderOpen, size: 40, color: cs.primary),
-              SizedBox(width: tokens.spacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '尚未导入漫画',
-                      style: TextStyle(
-                        fontSize: tokens.text.titleMd,
-                        fontWeight: FontWeight.w600,
-                        color: cs.textPrimary,
-                      ),
-                    ),
-                    SizedBox(height: tokens.spacing.sm),
-                    Text(
-                      '请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。',
-                      style: TextStyle(
-                        fontSize: tokens.text.bodySm,
-                        color: cs.textSecondary,
-                        height: 1.45,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+    final Color accent = cs.primary;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(_kHeroStatCardRadius),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: <Color>[
+              Color.alphaBlend(accent.withAlpha(22), cs.surface),
+              Color.alphaBlend(accent.withAlpha(8), cs.surface),
+              cs.surface,
             ],
+            stops: const <double>[0, 0.45, 1],
           ),
-          SizedBox(height: tokens.spacing.lg),
-          Wrap(
-            spacing: tokens.spacing.sm,
-            runSpacing: tokens.spacing.sm,
-            children: [
-              FilledButton.icon(
-                onPressed: () => _onTapScanLibrary(context, ref),
-                icon: const Icon(LucideIcons.scanSearch, size: 18),
-                label: const Text('扫描漫画库'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: cs.primary,
-                  foregroundColor: cs.onPrimary,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              OutlinedButton.icon(
-                onPressed: () => context.go('/paths'),
-                icon: const Icon(LucideIcons.folderTree, size: 18),
-                label: const Text('选中路径'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: cs.textPrimary,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              OutlinedButton.icon(
-                onPressed: () => context.go('/settings'),
-                icon: const Icon(LucideIcons.settings, size: 18),
-                label: const Text('设置'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: cs.textPrimary,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ],
+          border: Border.all(
+            color: Color.alphaBlend(accent.withAlpha(50), cs.borderSubtle),
           ),
-        ],
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: cs.shadow.withAlpha(48),
+              blurRadius: 24,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: <Widget>[
+            Positioned(
+              right: -20,
+              top: -28,
+              child: Icon(
+                LucideIcons.libraryBig,
+                size: 140,
+                color: accent.withAlpha(14),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(tokens.spacing.lg + 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: <Color>[
+                              accent.withAlpha(36),
+                              accent.withAlpha(14),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: accent.withAlpha(55)),
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                              color: accent.withAlpha(28),
+                              blurRadius: 16,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Icon(
+                            LucideIcons.folderOpen,
+                            size: 32,
+                            color: accent,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: tokens.spacing.md + 4),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              '尚未导入漫画',
+                              style: TextStyle(
+                                fontSize: tokens.text.titleMd,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.3,
+                                color: cs.textPrimary,
+                              ),
+                            ),
+                            SizedBox(height: tokens.spacing.sm),
+                            Text(
+                              '请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。',
+                              style: TextStyle(
+                                fontSize: tokens.text.bodySm,
+                                color: cs.textSecondary,
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: tokens.spacing.lg + 4),
+                  Wrap(
+                    spacing: tokens.spacing.sm,
+                    runSpacing: tokens.spacing.sm,
+                    children: <Widget>[
+                      FilledButton.icon(
+                        onPressed: () => _onTapScanLibrary(context, ref),
+                        icon: const Icon(LucideIcons.scanSearch, size: 18),
+                        label: const Text('扫描漫画库'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: cs.primary,
+                          foregroundColor: cs.onPrimary,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 11,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 0,
+                        ),
+                      ),
+                      OutlinedButton.icon(
+                        onPressed: () => context.go('/paths'),
+                        icon: const Icon(LucideIcons.folderTree, size: 18),
+                        label: const Text('选中路径'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: cs.textPrimary,
+                          side: BorderSide(color: cs.borderSubtle),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 11,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      OutlinedButton.icon(
+                        onPressed: () => context.go('/settings'),
+                        icon: const Icon(LucideIcons.settings, size: 18),
+                        label: const Text('设置'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: cs.textPrimary,
+                          side: BorderSide(color: cs.borderSubtle),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 11,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -293,6 +363,11 @@ class HomePage extends ConsumerWidget {
     final int tagCount = ref
         .watch(allTagsProvider)
         .maybeWhen(data: (List<Tag> list) => list.length, orElse: () => 0);
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final Color accentLibrary = cs.primary;
+    final Color accentSeries = cs.secondary;
+    final Color accentTags = Color.lerp(cs.primary, cs.secondary, 0.45)!;
+    final Color accentHistory = cs.inversePrimary;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool stack =
@@ -301,28 +376,31 @@ class HomePage extends ConsumerWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: context.tokens.spacing.md,
-            children: [
+            children: <Widget>[
               _StatSummaryCard(
                 label: '漫画库',
                 valueText: '$comicCount',
                 caption: '共 $comicCount 本',
                 icon: LucideIcons.bookImage,
+                accentColor: accentLibrary,
               ),
               _StatSummaryCard(
                 label: '阅读记录',
                 valueText: '$historyCount',
                 caption: historyCount == 0 ? '暂无历史' : '$historyCount 条',
                 icon: LucideIcons.history,
+                accentColor: accentHistory,
               ),
               Row(
                 spacing: context.tokens.spacing.md,
-                children: [
+                children: <Widget>[
                   Expanded(
                     child: _StatSummaryCard(
                       label: '系列',
                       valueText: '$seriesCount',
                       caption: '$seriesCount 个',
                       icon: LucideIcons.library,
+                      accentColor: accentSeries,
                     ),
                   ),
                   Expanded(
@@ -331,6 +409,7 @@ class HomePage extends ConsumerWidget {
                       valueText: '$tagCount',
                       caption: '$tagCount 个',
                       icon: LucideIcons.tags,
+                      accentColor: accentTags,
                     ),
                   ),
                 ],
@@ -347,6 +426,7 @@ class HomePage extends ConsumerWidget {
                 valueText: '$comicCount',
                 caption: '共 $comicCount 本',
                 icon: LucideIcons.bookImage,
+                accentColor: accentLibrary,
               ),
             ),
             Expanded(
@@ -355,6 +435,7 @@ class HomePage extends ConsumerWidget {
                 valueText: '$seriesCount',
                 caption: '$seriesCount 个系列',
                 icon: LucideIcons.library,
+                accentColor: accentSeries,
               ),
             ),
             Expanded(
@@ -363,6 +444,7 @@ class HomePage extends ConsumerWidget {
                 valueText: '$tagCount',
                 caption: '$tagCount 个标签',
                 icon: LucideIcons.tags,
+                accentColor: accentTags,
               ),
             ),
             Expanded(
@@ -371,6 +453,7 @@ class HomePage extends ConsumerWidget {
                 valueText: '$historyCount',
                 caption: historyCount == 0 ? '暂无历史' : '$historyCount 条',
                 icon: LucideIcons.history,
+                accentColor: accentHistory,
               ),
             ),
           ],
@@ -574,73 +657,154 @@ class HomePage extends ConsumerWidget {
   }
 }
 
-class _StatSummaryCard extends StatelessWidget {
+class _StatSummaryCard extends StatefulWidget {
   const _StatSummaryCard({
     required this.label,
     required this.valueText,
     required this.caption,
     required this.icon,
+    required this.accentColor,
   });
 
   final String label;
   final String valueText;
   final String caption;
   final IconData icon;
+  final Color accentColor;
+
+  @override
+  State<_StatSummaryCard> createState() => _StatSummaryCardState();
+}
+
+class _StatSummaryCardState extends State<_StatSummaryCard> {
+  bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = theme.colorScheme;
-    return Container(
-      padding: EdgeInsets.all(tokens.spacing.lg + 8),
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cs.borderSubtle),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: tokens.text.labelXs,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.2,
-                    color: cs.textTertiary,
-                  ),
-                ),
-                SizedBox(height: tokens.spacing.sm),
-                Text(
-                  valueText,
-                  style: TextStyle(
-                    fontSize: tokens.text.titleLg + 4,
-                    fontWeight: FontWeight.w600,
-                    color: cs.textPrimary,
-                  ),
-                ),
-                SizedBox(height: tokens.spacing.sm - 2),
-                Text(
-                  caption,
-                  style: TextStyle(
-                    fontSize: tokens.text.bodySm,
-                    color: cs.textSecondary,
-                  ),
-                ),
-              ],
+    final Color accent = widget.accentColor;
+    final Curve curve = Curves.easeOutCubic;
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: _kHeroStatCardHoverDuration,
+        curve: curve,
+        transformAlignment: Alignment.bottomCenter,
+        transform: Matrix4.identity()..translate(0.0, _isHovered ? -3.0 : 0.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(_kHeroStatCardRadius),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: <Color>[
+              Color.alphaBlend(accent.withAlpha(26), cs.surface),
+              Color.alphaBlend(accent.withAlpha(8), cs.surface),
+              cs.surface,
+            ],
+            stops: const <double>[0, 0.38, 1],
+          ),
+          border: Border.all(
+            color: Color.alphaBlend(accent.withAlpha(52), cs.borderSubtle),
+          ),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: cs.shadow.withAlpha(36),
+              blurRadius: 14,
+              offset: Offset(0, 6),
             ),
+            BoxShadow(
+              color: accent.withAlpha(14),
+              blurRadius: 0,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(_kHeroStatCardRadius),
+          child: Stack(
+            children: <Widget>[
+              Positioned(
+                right: -8,
+                bottom: -12,
+                child: Icon(widget.icon, size: 88, color: accent.withAlpha(16)),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  tokens.spacing.lg + 4,
+                  tokens.spacing.lg + 6,
+                  tokens.spacing.lg + 4,
+                  tokens.spacing.lg + 4,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            widget.label,
+                            style: TextStyle(
+                              fontSize: tokens.text.labelXs,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                              color: Color.alphaBlend(
+                                accent.withAlpha(200),
+                                cs.textTertiary,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: tokens.spacing.sm + 2),
+                          Text(
+                            widget.valueText,
+                            style: TextStyle(
+                              fontSize: tokens.text.titleLg + 6,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.8,
+                              height: 1.05,
+                              color: cs.textPrimary,
+                            ),
+                          ),
+                          SizedBox(height: tokens.spacing.sm - 1),
+                          Text(
+                            widget.caption,
+                            style: TextStyle(
+                              fontSize: tokens.text.bodySm,
+                              color: cs.textSecondary,
+                              height: 1.35,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    AnimatedContainer(
+                      duration: _kHeroStatCardHoverDuration,
+                      curve: curve,
+                      padding: const EdgeInsets.all(11),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: <Color>[
+                            accent.withAlpha(30),
+                            accent.withAlpha(14),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: accent.withAlpha(58)),
+                        boxShadow: const <BoxShadow>[],
+                      ),
+                      child: Icon(widget.icon, size: 28, color: accent),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          Padding(
-            padding: EdgeInsets.all(tokens.spacing.sm),
-            child: Icon(icon, size: 32, color: cs.primary),
-          ),
-        ],
+        ),
       ),
     );
   }

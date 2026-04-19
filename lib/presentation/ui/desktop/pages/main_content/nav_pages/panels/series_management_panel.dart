@@ -362,6 +362,11 @@ class _SeriesListCard extends StatelessWidget {
                       color: cs.textSecondary,
                     ),
                   ),
+                  const SizedBox(width: 12),
+                  Text(
+                    '共 ${series.length} 条',
+                    style: TextStyle(fontSize: 13, color: cs.textTertiary),
+                  ),
                 ],
               ),
             ),

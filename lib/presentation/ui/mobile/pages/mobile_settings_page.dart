@@ -12,6 +12,8 @@ class MobileSettingsPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('设置')),
       body: settingsAsync.when(
+        skipLoadingOnRefresh: true,
+        skipLoadingOnReload: true,
         data: (AppSetting settings) {
           return ListView(
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
