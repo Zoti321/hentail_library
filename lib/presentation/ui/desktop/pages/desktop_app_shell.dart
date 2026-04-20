@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/domain/entity/entities.dart' show AppSetting;
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/app_title_bar.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/navigation/desktop_sidebar.dart';
@@ -40,6 +41,12 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
     final String path = GoRouterState.of(context).uri.path;
     final String sidebarActiveId = AppNavigation.activeNavIdForPath(path);
     final bool isReaderRoute = path.startsWith('/reader');
+    final bool isSidebarExpanded = ref.watch(
+      settingsProvider.select(
+        (AsyncValue<AppSetting> asyncValue) =>
+            asyncValue.asData?.value.desktopSidebarExpanded ?? true,
+      ),
+    );
     return Scaffold(
       body: Column(
         children: <Widget>[
@@ -51,6 +58,12 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
                     children: <Widget>[
                       DesktopSidebar(
                         activeId: sidebarActiveId,
+                        isExpanded: isSidebarExpanded,
+                        onToggleExpanded: () {
+                          ref
+                              .read(settingsProvider.notifier)
+                              .setDesktopSidebarExpanded(!isSidebarExpanded);
+                        },
                         onDestinationSelected: _onSidebarDestinationSelected,
                       ),
                       Expanded(child: widget.routeChild),
