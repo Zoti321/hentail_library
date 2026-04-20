@@ -8,32 +8,11 @@ import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final ImageQualityPolicy imageQualityPolicy = configureImageQualityPolicy();
-  final ImageCache imageCache = PaintingBinding.instance.imageCache;
-  imageCache.maximumSize = imageQualityPolicy.imageCacheMaxEntries;
-  imageCache.maximumSizeBytes = imageQualityPolicy.imageCacheMaxBytes;
+
+  _initImageQualityPolicy();
 
   if (isDesktop) {
-    await WindowManager.instance.ensureInitialized();
-
-    windowManager.waitUntilReadyToShow().then((_) async {
-      await windowManager.setTitleBarStyle(
-        TitleBarStyle.hidden,
-        windowButtonVisibility: true,
-      );
-      await windowManager.setMinimumSize(Size(1280, 720));
-      await windowManager.center();
-      await windowManager.show();
-      await windowManager.setPreventClose(true);
-      await windowManager.setSkipTaskbar(false);
-    });
-
-    await Window.initialize();
-    await Window.setEffect(
-      effect: WindowEffect.solid,
-      color: Colors.white,
-      dark: false,
-    );
+    await _initWindow();
   }
 
   LogManager.init();
@@ -45,4 +24,34 @@ void main() async {
   }
 
   runApp(const MyApp());
+}
+
+void _initImageQualityPolicy() {
+  final ImageQualityPolicy imageQualityPolicy = configureImageQualityPolicy();
+  final ImageCache imageCache = PaintingBinding.instance.imageCache;
+  imageCache.maximumSize = imageQualityPolicy.imageCacheMaxEntries;
+  imageCache.maximumSizeBytes = imageQualityPolicy.imageCacheMaxBytes;
+}
+
+Future<void> _initWindow() async {
+  await WindowManager.instance.ensureInitialized();
+
+  windowManager.waitUntilReadyToShow().then((_) async {
+    await windowManager.setTitleBarStyle(
+      TitleBarStyle.hidden,
+      windowButtonVisibility: true,
+    );
+    await windowManager.setMinimumSize(Size(1280, 720));
+    await windowManager.center();
+    await windowManager.show();
+    await windowManager.setPreventClose(true);
+    await windowManager.setSkipTaskbar(false);
+  });
+
+  await Window.initialize();
+  await Window.setEffect(
+    effect: WindowEffect.solid,
+    color: Colors.white,
+    dark: false,
+  );
 }

@@ -13,15 +13,20 @@ class HomePageHeroSection extends ConsumerWidget {
     super.key,
     required this.comicCount,
     required this.onScan,
+    required this.enableHeavyStats,
   });
 
   final int comicCount;
   final VoidCallback onScan;
+  final bool enableHeavyStats;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (comicCount == 0) {
       return _EmptyLibraryHero(onScan: onScan);
+    }
+    if (!enableHeavyStats) {
+      return _StatsCardsPlaceholder(comicCount: comicCount);
     }
     return _StatsCards(comicCount: comicCount);
   }
@@ -309,6 +314,116 @@ class _StatsCards extends ConsumerWidget {
                 label: '阅读记录',
                 valueText: '$historyCount',
                 caption: historyCount == 0 ? '暂无历史' : '$historyCount 条',
+                icon: LucideIcons.history,
+                accentColor: accentHistory,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _StatsCardsPlaceholder extends StatelessWidget {
+  const _StatsCardsPlaceholder({required this.comicCount});
+
+  final int comicCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final Color accentLibrary = colorScheme.primary;
+    final Color accentSeries = colorScheme.secondary;
+    final Color accentTags = Color.lerp(
+      colorScheme.primary,
+      colorScheme.secondary,
+      0.45,
+    )!;
+    final Color accentHistory = colorScheme.inversePrimary;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final bool stack = constraints.maxWidth < homeStatsStackBreakpointWidth;
+        if (stack) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: context.tokens.spacing.md,
+            children: <Widget>[
+              _StatSummaryCard(
+                label: '漫画库',
+                valueText: '$comicCount',
+                caption: '共 $comicCount 本',
+                icon: LucideIcons.bookImage,
+                accentColor: accentLibrary,
+              ),
+              _StatSummaryCard(
+                label: '阅读记录',
+                valueText: '--',
+                caption: '加载中…',
+                icon: LucideIcons.history,
+                accentColor: accentHistory,
+              ),
+              Row(
+                spacing: context.tokens.spacing.md,
+                children: <Widget>[
+                  Expanded(
+                    child: _StatSummaryCard(
+                      label: '系列',
+                      valueText: '--',
+                      caption: '加载中…',
+                      icon: LucideIcons.library,
+                      accentColor: accentSeries,
+                    ),
+                  ),
+                  Expanded(
+                    child: _StatSummaryCard(
+                      label: '标签',
+                      valueText: '--',
+                      caption: '加载中…',
+                      icon: LucideIcons.tags,
+                      accentColor: accentTags,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        }
+        return Row(
+          spacing: context.tokens.spacing.md,
+          children: <Widget>[
+            Expanded(
+              child: _StatSummaryCard(
+                label: '漫画库',
+                valueText: '$comicCount',
+                caption: '共 $comicCount 本',
+                icon: LucideIcons.bookImage,
+                accentColor: accentLibrary,
+              ),
+            ),
+            Expanded(
+              child: _StatSummaryCard(
+                label: '系列',
+                valueText: '--',
+                caption: '加载中…',
+                icon: LucideIcons.library,
+                accentColor: accentSeries,
+              ),
+            ),
+            Expanded(
+              child: _StatSummaryCard(
+                label: '标签',
+                valueText: '--',
+                caption: '加载中…',
+                icon: LucideIcons.tags,
+                accentColor: accentTags,
+              ),
+            ),
+            Expanded(
+              child: _StatSummaryCard(
+                label: '阅读记录',
+                valueText: '--',
+                caption: '加载中…',
                 icon: LucideIcons.history,
                 accentColor: accentHistory,
               ),

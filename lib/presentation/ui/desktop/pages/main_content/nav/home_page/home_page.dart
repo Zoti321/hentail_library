@@ -5,8 +5,26 @@ import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/home_page/widgets/widgets.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/scan_progress_dialog.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
+
+  @override
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  bool deferredSectionsReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => deferredSectionsReady = true);
+    });
+  }
 
   void onTapScanLibrary(BuildContext context, WidgetRef ref) {
     final bool running = ref.read(
@@ -49,7 +67,7 @@ class HomePage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final int comicCount = ref.watch(
       libraryPageProvider.select((LibraryPageState state) {
@@ -81,9 +99,15 @@ class HomePage extends ConsumerWidget {
                     onScan: onScan,
                   ),
                   SizedBox(height: tokens.spacing.xl + 12),
-                  HomePageHeroSection(comicCount: comicCount, onScan: onScan),
+                  HomePageHeroSection(
+                    comicCount: comicCount,
+                    onScan: onScan,
+                    enableHeavyStats: deferredSectionsReady,
+                  ),
                   SizedBox(height: tokens.spacing.lg + 8),
-                  const HomePageContinueReadingSection(),
+                  HomePageContinueReadingSection(
+                    enabled: deferredSectionsReady,
+                  ),
                   SizedBox(height: tokens.spacing.xl + 8),
                   HomePageShortcutEntries(onScan: onScan),
                   SizedBox(height: tokens.spacing.xl * 4),

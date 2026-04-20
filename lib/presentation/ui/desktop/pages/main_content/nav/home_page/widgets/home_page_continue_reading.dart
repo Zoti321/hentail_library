@@ -11,13 +11,40 @@ import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomePageContinueReadingSection extends ConsumerWidget {
-  const HomePageContinueReadingSection({super.key});
+  const HomePageContinueReadingSection({
+    super.key,
+    required this.enabled,
+  });
+
+  final bool enabled;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme colorScheme = theme.colorScheme;
+    if (!enabled) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            '继续阅读',
+            style: TextStyle(
+              fontSize: tokens.text.titleSm,
+              fontWeight: FontWeight.w600,
+              color: colorScheme.textPrimary,
+            ),
+          ),
+          SizedBox(height: tokens.spacing.sm),
+          SizedBox(
+            height: continueReadingStripHeight + 8,
+            child: const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+        ],
+      );
+    }
     final bool loading = ref.watch(
       historyFeedViewProvider.select(
         (HistoryFeedViewData value) => value.isLoading,
