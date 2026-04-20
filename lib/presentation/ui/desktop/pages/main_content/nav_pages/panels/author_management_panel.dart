@@ -103,85 +103,6 @@ class _AuthorStyles {
   );
 }
 
-class _AuthorManagementLoadingCard extends StatelessWidget {
-  const _AuthorManagementLoadingCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return StatusCardShell(
-      padding: _AuthorStyles.statusLoadingPadding,
-      borderRadius: _AuthorStyles.statusCardRadius,
-      child: Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 2.2,
-          color: theme.colorScheme.primary,
-        ),
-      ),
-    );
-  }
-}
-
-class _AuthorManagementErrorCard extends StatelessWidget {
-  const _AuthorManagementErrorCard({required this.error});
-
-  final Object error;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return StatusCardShell(
-      padding: _AuthorStyles.statusErrorPadding,
-      borderRadius: _AuthorStyles.statusCardRadius,
-      child: Text(
-        '$error',
-        style: TextStyle(
-          fontSize: _AuthorStyles.subtitleFontSize,
-          color: theme.colorScheme.textTertiary,
-        ),
-      ),
-    );
-  }
-}
-
-class _AuthorManagementEmptyState extends StatelessWidget {
-  const _AuthorManagementEmptyState();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    return StatusCardShell(
-      padding: _AuthorStyles.statusEmptyPadding,
-      borderRadius: _AuthorStyles.statusCardRadius,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(LucideIcons.penLine, size: 32, color: cs.onSurfaceVariant),
-          const SizedBox(height: 12),
-          Text(
-            '暂无作者',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: cs.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '你可以从这里添加、重命名或删除作者。',
-            style: TextStyle(
-              fontSize: _AuthorStyles.subtitleFontSize,
-              color: cs.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _AuthorManagementHeader extends ConsumerWidget {
   const _AuthorManagementHeader({required this.onAddAuthor});
 
@@ -555,6 +476,85 @@ class _AuthorRowInteractionShell extends StatelessWidget {
         hoverColor: cs.primary.withAlpha(10),
       ),
       child: Material(color: cs.surface, child: child),
+    );
+  }
+}
+
+class _AuthorManagementLoadingCard extends StatelessWidget {
+  const _AuthorManagementLoadingCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return StatusCardShell(
+      padding: _AuthorStyles.statusLoadingPadding,
+      borderRadius: _AuthorStyles.statusCardRadius,
+      child: Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2.2,
+          color: theme.colorScheme.primary,
+        ),
+      ),
+    );
+  }
+}
+
+class _AuthorManagementErrorCard extends StatelessWidget {
+  const _AuthorManagementErrorCard({required this.error});
+
+  final Object error;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return StatusCardShell(
+      padding: _AuthorStyles.statusErrorPadding,
+      borderRadius: _AuthorStyles.statusCardRadius,
+      child: Text(
+        '$error',
+        style: TextStyle(
+          fontSize: _AuthorStyles.subtitleFontSize,
+          color: theme.colorScheme.textTertiary,
+        ),
+      ),
+    );
+  }
+}
+
+class _AuthorManagementEmptyState extends StatelessWidget {
+  const _AuthorManagementEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    return StatusCardShell(
+      padding: _AuthorStyles.statusEmptyPadding,
+      borderRadius: _AuthorStyles.statusCardRadius,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(LucideIcons.penLine, size: 32, color: cs.onSurfaceVariant),
+          const SizedBox(height: 12),
+          Text(
+            '暂无作者',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: cs.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '你可以从这里添加、重命名或删除作者。',
+            style: TextStyle(
+              fontSize: _AuthorStyles.subtitleFontSize,
+              color: cs.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

@@ -29,6 +29,8 @@ class _MetadataAddIntent extends Intent {
 
 class _MetadataManagementPageState
     extends ConsumerState<MetadataManagementPage> {
+  final Set<int> _visitedTabIndexes = <int>{};
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
@@ -36,6 +38,7 @@ class _MetadataManagementPageState
       context,
     ).uri.queryParameters['tab'];
     final int selectedIndex = _tabIndexFromQuery(tabParam);
+    _visitedTabIndexes.add(selectedIndex);
 
     return Shortcuts(
       shortcuts: const <ShortcutActivator, Intent>{
@@ -90,22 +93,28 @@ class _MetadataManagementPageState
                   ],
                 ),
               ),
-              Expanded(
-                child: IndexedStack(
-                  index: selectedIndex,
-                  sizing: StackFit.expand,
-                  children: const <Widget>[
-                    AuthorManagementPanel(),
-                    TagManagementPanel(),
-                    SeriesManagementPanel(),
-                  ],
-                ),
-              ),
+              Expanded(child: _buildSelectedTabPanel(selectedIndex)),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildSelectedTabPanel(int selectedIndex) {
+    if (!_visitedTabIndexes.contains(selectedIndex)) {
+      return const SizedBox.shrink();
+    }
+    switch (selectedIndex) {
+      case 0:
+        return const AuthorManagementPanel();
+      case 1:
+        return const TagManagementPanel();
+      case 2:
+        return const SeriesManagementPanel();
+      default:
+        return const TagManagementPanel();
+    }
   }
 
   Future<void> _invokeAddForTab(BuildContext context, int tabIndex) async {

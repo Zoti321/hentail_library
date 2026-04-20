@@ -14,7 +14,6 @@ import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_but
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// 系列管理：根节点不 watch 列表与筛选，避免搜索时重建头部与工具栏。
 class SeriesManagementPanel extends StatelessWidget {
   const SeriesManagementPanel({super.key});
 
@@ -46,14 +45,6 @@ class SeriesManagementPanel extends StatelessWidget {
       ),
     );
   }
-}
-
-List<Series> _filterSeriesByQuery(List<Series> source, String query) {
-  if (query.trim().isEmpty) {
-    return List<Series>.from(source);
-  }
-  final String q = query.trim().toLowerCase();
-  return source.where((Series s) => s.name.toLowerCase().contains(q)).toList();
 }
 
 class _FilteredSeriesSection extends ConsumerWidget {
@@ -142,14 +133,6 @@ class _Header extends ConsumerWidget {
   }
 }
 
-String _shortcutLabel(BuildContext context) {
-  final TargetPlatform platform = Theme.of(context).platform;
-  final bool isApple =
-      platform == TargetPlatform.macOS || platform == TargetPlatform.iOS;
-  return isApple ? '⌘N' : 'Ctrl+N';
-}
-
-/// 副标题下方、系列列表卡片上方的快捷操作（左对齐）。
 class _SeriesManagementToolbar extends ConsumerStatefulWidget {
   const _SeriesManagementToolbar();
 
@@ -563,4 +546,19 @@ class _SeriesManagementEmptyState extends StatelessWidget {
       ),
     );
   }
+}
+
+List<Series> _filterSeriesByQuery(List<Series> source, String query) {
+  if (query.trim().isEmpty) {
+    return List<Series>.from(source);
+  }
+  final String q = query.trim().toLowerCase();
+  return source.where((Series s) => s.name.toLowerCase().contains(q)).toList();
+}
+
+String _shortcutLabel(BuildContext context) {
+  final TargetPlatform platform = Theme.of(context).platform;
+  final bool isApple =
+      platform == TargetPlatform.macOS || platform == TargetPlatform.iOS;
+  return isApple ? '⌘N' : 'Ctrl+N';
 }

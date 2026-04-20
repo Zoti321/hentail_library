@@ -375,10 +375,10 @@ class _ArchiveCoverDiskCacheRow extends ConsumerWidget {
         size: 20,
         color: theme.colorScheme.iconDefault,
       ),
-      label: '归档封面磁盘缓存',
+      label: '封面磁盘缓存',
       description: enabled
-          ? '已启用（列表封面解码结果写入应用缓存，减轻重复解压）'
-          : '已禁用（每次列表展示时重新解码，不读不写缓存文件）',
+          ? '已启用(epub/zip/cbz等资源漫画封面写入应用缓存，减轻重复解压)'
+          : '已禁用(每次列表展示时重新解码，不读不写缓存文件)',
       action: MyToggleSwitch(
         checked: enabled,
         onChange: () => ref
@@ -424,9 +424,9 @@ class _ArchiveCoverCacheUsageRowState
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final String description = usage.when(
-      data: (int bytes) => '应用缓存目录内归档封面图片；当前占用 ${formatByteSizeBin1024(bytes)}',
-      loading: () => '应用缓存目录内归档封面图片；正在计算占用…',
-      error: (Object _, StackTrace _) => '应用缓存目录内归档封面图片；无法读取占用',
+      data: (int bytes) => '应用缓存目录内封面图片；当前占用 ${formatByteSizeBin1024(bytes)}',
+      loading: () => '应用缓存目录内封面图片；正在计算占用…',
+      error: (Object _, StackTrace _) => '应用缓存目录内封面图片；无法读取占用',
     );
     return _SettingsRow(
       icon: Icon(
@@ -440,7 +440,7 @@ class _ArchiveCoverCacheUsageRowState
         icon: LucideIcons.trash2,
         text: _isClearing ? '清理中…' : '清理',
         tooltip: '',
-        semanticLabel: '清除归档封面磁盘缓存',
+        semanticLabel: '清除封面磁盘缓存',
         onPressed: _isClearing ? null : () => unawaited(_clearCache()),
         iconSize: 15,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),

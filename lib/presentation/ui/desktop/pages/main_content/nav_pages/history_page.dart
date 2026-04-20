@@ -19,13 +19,18 @@ class HistoryPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 16,
-        children: const [_Header(), _HistoryList()],
-      ),
+    return CustomScrollView(
+      slivers: const <Widget>[
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+          sliver: SliverToBoxAdapter(child: _Header()),
+        ),
+        SliverToBoxAdapter(child: SizedBox(height: 16)),
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 48),
+          sliver: _HistoryListSliver(),
+        ),
+      ],
     );
   }
 }
@@ -129,8 +134,8 @@ class _Header extends ConsumerWidget {
   }
 }
 
-class _HistoryList extends ConsumerWidget {
-  const _HistoryList();
+class _HistoryListSliver extends ConsumerWidget {
+  const _HistoryListSliver();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -139,23 +144,27 @@ class _HistoryList extends ConsumerWidget {
       historyFeedViewProvider.select((HistoryFeedViewData d) => d.isLoading),
     );
     if (isLoading) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 48),
-        child: Center(child: CircularProgressIndicator()),
+      return const SliverToBoxAdapter(
+        child: Padding(
+          padding: EdgeInsets.only(top: 48),
+          child: Center(child: CircularProgressIndicator()),
+        ),
       );
     }
     final bool hasError = ref.watch(
       historyFeedViewProvider.select((HistoryFeedViewData d) => d.hasError),
     );
     if (hasError) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 48),
-        child: Center(
-          child: Text(
-            '加载失败',
-            style: TextStyle(
-              fontSize: 14,
-              color: theme.colorScheme.textSecondary,
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 48),
+          child: Center(
+            child: Text(
+              '加载失败',
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.colorScheme.textSecondary,
+              ),
             ),
           ),
         ),
@@ -176,53 +185,48 @@ class _HistoryList extends ConsumerWidget {
               .toList(growable: false);
 
     if (filtered.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 48),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 8,
-            children: [
-              Icon(
-                LucideIcons.bookOpen,
-                size: 48,
-                color: theme.colorScheme.textTertiary,
-              ),
-              Text(
-                q.isEmpty ? '暂无阅读历史' : '没有匹配的历史记录',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: theme.colorScheme.textSecondary,
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 48),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              spacing: 8,
+              children: [
+                Icon(
+                  LucideIcons.bookOpen,
+                  size: 48,
+                  color: theme.colorScheme.textTertiary,
                 ),
-              ),
-            ],
+                Text(
+                  q.isEmpty ? '暂无阅读历史' : '没有匹配的历史记录',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: theme.colorScheme.textSecondary,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
     }
 
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final double width = constraints.maxWidth;
-        int crossAxisCount = 2;
-        if (width >= 1600) {
-          crossAxisCount = 5;
-        } else if (width >= 1300) {
-          crossAxisCount = 4;
-        } else if (width >= 980) {
-          crossAxisCount = 3;
-        }
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: filtered.length,
+    return SliverLayoutBuilder(
+      builder: (BuildContext context, constraints) {
+        final double width = constraints.crossAxisExtent;
+        final int crossAxisCount = _resolveCrossAxisCount(width);
+        return SliverGrid(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
             mainAxisExtent: 138,
           ),
-          itemBuilder: (BuildContext context, int index) {
+          delegate: SliverChildBuilderDelegate((
+            BuildContext context,
+            int index,
+          ) {
             final HistoryGridItemDto item = filtered[index];
             if (item is ComicHistoryGridItemDto) {
               return ReadingHistoryCard.comic(
@@ -266,10 +270,23 @@ class _HistoryList extends ConsumerWidget {
                 seriesName: seriesItem.seriesName,
               ),
             );
-          },
+          }, childCount: filtered.length),
         );
       },
     );
+  }
+
+  int _resolveCrossAxisCount(double width) {
+    if (width >= 1600) {
+      return 5;
+    }
+    if (width >= 1300) {
+      return 4;
+    }
+    if (width >= 980) {
+      return 3;
+    }
+    return 2;
   }
 
   Future<void> _handleDeleteComicHistory({
