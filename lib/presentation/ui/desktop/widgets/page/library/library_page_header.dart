@@ -1,5 +1,14 @@
 part of 'library_page_widgets.dart';
 
+TextStyle _buildLibraryPageTitleStyle(ColorScheme colorScheme) {
+  return TextStyle(
+    fontSize: 26,
+    fontWeight: FontWeight.w600,
+    color: colorScheme.textPrimary,
+    letterSpacing: -0.4,
+  );
+}
+
 class LibraryPageHeader extends ConsumerWidget {
   const LibraryPageHeader({super.key});
 
@@ -16,12 +25,7 @@ class LibraryPageHeader extends ConsumerWidget {
       children: [
         Text(
           AppStrings.libraryTitle,
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w600,
-            color: theme.colorScheme.textPrimary,
-            letterSpacing: -0.4,
-          ),
+          style: _buildLibraryPageTitleStyle(theme.colorScheme),
         ),
         const SizedBox(width: 12),
         Container(

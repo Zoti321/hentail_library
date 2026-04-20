@@ -6,6 +6,7 @@ import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/status_card_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/tag_name_editor_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/panels/metadata_panel_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';
@@ -307,34 +308,13 @@ class _TagList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _TagListCard(
+    return MetadataPanelListCard(
+      radius: _TagStyles.listRadius,
       child: Column(
         children: [
           _TagListHeader(totalCount: tags.length),
           _TagListView(tags: tags),
         ],
-      ),
-    );
-  }
-}
-
-class _TagListCard extends StatelessWidget {
-  const _TagListCard({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(_TagStyles.listRadius),
-        border: Border.all(color: cs.borderSubtle),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(_TagStyles.listRadius),
-        child: child,
       ),
     );
   }
@@ -433,7 +413,9 @@ class _TagRow extends ConsumerWidget {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
-    return _TagRowInteractionShell(
+    return MetadataPanelRowInteractionShell(
+      hoverColor: cs.primary.withAlpha(10),
+      materialColor: cs.surface,
       child: InkWell(
         onTap: () => ref.read(tagSelectionProvider.notifier).toggle(tag),
         child: Padding(
@@ -532,27 +514,6 @@ class _TagRow extends ConsumerWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _TagRowInteractionShell extends StatelessWidget {
-  const _TagRowInteractionShell({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    return Theme(
-      data: theme.copyWith(
-        splashFactory: NoSplash.splashFactory,
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        hoverColor: cs.primary.withAlpha(10),
-      ),
-      child: Material(color: cs.surface, child: child),
     );
   }
 }

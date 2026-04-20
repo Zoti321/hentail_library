@@ -4,6 +4,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
+import 'package:hentai_library/domain/repository/dir_repo.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
@@ -13,13 +14,27 @@ import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/status_car
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+const EdgeInsets _kSelectedPathsPagePadding = EdgeInsets.symmetric(
+  horizontal: 48,
+  vertical: 24,
+);
+
+TextStyle _buildSelectedPathsPageTitleStyle(ColorScheme colorScheme) {
+  return TextStyle(
+    fontSize: 26,
+    fontWeight: FontWeight.w600,
+    letterSpacing: -0.4,
+    color: colorScheme.textPrimary,
+  );
+}
+
 class SelectedPathsPage extends StatelessWidget {
   const SelectedPathsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
+      padding: _kSelectedPathsPagePadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
@@ -66,22 +81,25 @@ class _SelectedPathsPageHeaderState
   Future<void> _addFiles() async {
     setState(() => _isPicking = true);
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.any,
         allowMultiple: true,
         allowCompression: false,
       );
       if (result == null || result.files.isEmpty) return;
-      final pathRepo = ref.read(pathRepoProvider);
-      var added = 0;
-      for (final f in result.files) {
-        final p = f.path;
-        if (p == null) continue;
-        await pathRepo.add(p);
-        added++;
+      final PathRepository pathRepo = ref.read(pathRepoProvider);
+      int addedCount = 0;
+      for (final PlatformFile file in result.files) {
+        final String? path = file.path;
+        if (path == null) continue;
+        await pathRepo.add(path);
+        addedCount++;
       }
-      if (mounted && added > 0) {
-        showSuccessToast(context, added == 1 ? '已添加 1 个路径' : '已添加 $added 个路径');
+      if (mounted && addedCount > 0) {
+        showSuccessToast(
+          context,
+          addedCount == 1 ? '已添加 1 个路径' : '已添加 $addedCount 个路径',
+        );
       }
     } catch (e) {
       if (mounted) showErrorToast(context, e);
@@ -93,9 +111,9 @@ class _SelectedPathsPageHeaderState
   Future<void> _addFolder() async {
     setState(() => _isPicking = true);
     try {
-      final dir = await FilePicker.platform.getDirectoryPath();
-      if (dir == null) return;
-      await ref.read(pathRepoProvider).add(dir);
+      final String? directoryPath = await FilePicker.platform.getDirectoryPath();
+      if (directoryPath == null) return;
+      await ref.read(pathRepoProvider).add(directoryPath);
       if (mounted) showSuccessToast(context, '已添加路径');
     } catch (e) {
       if (mounted) showErrorToast(context, e);
@@ -108,13 +126,14 @@ class _SelectedPathsPageHeaderState
     if (!Platform.isMacOS) return;
     setState(() => _isPicking = true);
     try {
-      final paths = await FilePicker.platform.pickFileAndDirectoryPaths(
+      final List<String>? paths = await FilePicker.platform
+          .pickFileAndDirectoryPaths(
         type: FileType.any,
       );
       if (paths == null || paths.isEmpty) return;
-      final pathRepo = ref.read(pathRepoProvider);
-      for (final p in paths) {
-        await pathRepo.add(p);
+      final PathRepository pathRepo = ref.read(pathRepoProvider);
+      for (final String path in paths) {
+        await pathRepo.add(path);
       }
       if (mounted) {
         showSuccessToast(
@@ -129,9 +148,47 @@ class _SelectedPathsPageHeaderState
     }
   }
 
+  Future<void> _handleRemoveSelectedPaths(BuildContext context) async {
+    final SelectedPathsPageState? pageState = ref
+        .read(selectedPathsPageProvider)
+        .asData
+        ?.value;
+    if (pageState == null || pageState.selectedPaths.isEmpty) {
+      return;
+    }
+    final List<String> orderedSelected = pageState.paths
+        .where((String path) => pageState.selectedPaths.contains(path))
+        .toList();
+    final bool confirmed =
+        await showDialog<bool>(
+          context: context,
+          builder: (BuildContext dialogContext) =>
+              RemoveSavedPathsBatchConfirmDialog(paths: orderedSelected),
+        ) ??
+        false;
+    if (!context.mounted || !confirmed) return;
+    setState(() => _isBatchRemoving = true);
+    try {
+      await ref.read(selectedPathsPageProvider.notifier).removeSelectedPaths();
+      if (!context.mounted) return;
+      final int removedCount = orderedSelected.length;
+      showSuccessToast(
+        context,
+        removedCount == 1 ? '已移除 1 条路径' : '已移除 $removedCount 条路径',
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      showErrorToast(context, e);
+    } finally {
+      if (mounted) {
+        setState(() => _isBatchRemoving = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
     final (int totalCount, int selectedCount, bool hasData) = ref.watch(
       selectedPathsPageProvider.select((
         AsyncValue<SelectedPathsPageState> async,
@@ -148,166 +205,165 @@ class _SelectedPathsPageHeaderState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '选中路径',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.4,
-                  color: theme.colorScheme.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '管理本地漫画根路径（文件或文件夹），支持批量选择',
-                style: TextStyle(
-                  color: theme.colorScheme.textTertiary,
-                  fontSize: 13,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _MetaChip(icon: LucideIcons.link, label: '路径 $totalCount'),
-                  if (selectedCount > 0)
-                    _MetaChip(
-                      icon: LucideIcons.circleCheckBig,
-                      label: '已选 $selectedCount',
-                      highlighted: true,
-                    ),
-                ],
-              ),
-            ],
+          child: _SelectedPathsHeaderSummary(
+            totalCount: totalCount,
+            selectedCount: selectedCount,
+            colorScheme: theme.colorScheme,
           ),
         ),
         const SizedBox(width: 12),
+        _SelectedPathsHeaderActions(
+          theme: theme,
+          addPathMenuController: _addPathMenuController,
+          isPicking: _isPicking,
+          hasData: hasData,
+          selectedCount: selectedCount,
+          isBatchRemoving: _isBatchRemoving,
+          onPickMixed: _pickMixedMac,
+          onAddFiles: _addFiles,
+          onAddFolder: _addFolder,
+          onRemoveSelected: () => _handleRemoveSelectedPaths(context),
+        ),
+      ],
+    );
+  }
+}
+
+class _SelectedPathsHeaderSummary extends StatelessWidget {
+  const _SelectedPathsHeaderSummary({
+    required this.totalCount,
+    required this.selectedCount,
+    required this.colorScheme,
+  });
+
+  final int totalCount;
+  final int selectedCount;
+  final ColorScheme colorScheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text('选中路径', style: _buildSelectedPathsPageTitleStyle(colorScheme)),
+        const SizedBox(height: 8),
+        Text(
+          '管理本地漫画根路径（文件或文件夹），支持批量选择',
+          style: TextStyle(color: colorScheme.textTertiary, fontSize: 13),
+        ),
+        const SizedBox(height: 10),
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: [
-            CustomPopupMenu(
-              controller: _addPathMenuController,
-              barrierColor: Colors.transparent,
-              pressType: PressType.singleClick,
-              showArrow: false,
-              verticalMargin: -26,
-              menuBuilder: () => _AddPathMenuPanel(
-                isPicking: _isPicking,
-                onPickMixed: () {
-                  _addPathMenuController.hideMenu();
-                  _pickMixedMac();
-                },
-                onAddFiles: () {
-                  _addPathMenuController.hideMenu();
-                  _addFiles();
-                },
-                onAddFolder: () {
-                  _addPathMenuController.hideMenu();
-                  _addFolder();
-                },
-              ),
-              child: FilledButton.icon(
-                onPressed: _isPicking
-                    ? null
-                    : () => _addPathMenuController.toggleMenu(),
-                icon: _isPicking
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(LucideIcons.plus, size: 16),
-                label: Text(_isPicking ? '处理中…' : '添加路径'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: theme.colorScheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ),
-            if (hasData && selectedCount > 0)
-              TextButton.icon(
-                onPressed: _isBatchRemoving
-                    ? null
-                    : () async {
-                        final SelectedPathsPageState? pageState = ref
-                            .read(selectedPathsPageProvider)
-                            .asData
-                            ?.value;
-                        if (pageState == null ||
-                            pageState.selectedPaths.isEmpty) {
-                          return;
-                        }
-                        final List<String> orderedSelected = pageState.paths
-                            .where(
-                              (String p) => pageState.selectedPaths.contains(p),
-                            )
-                            .toList();
-                        final bool confirmed =
-                            await showDialog<bool>(
-                              context: context,
-                              builder: (BuildContext dialogContext) =>
-                                  RemoveSavedPathsBatchConfirmDialog(
-                                    paths: orderedSelected,
-                                  ),
-                            ) ??
-                            false;
-                        if (!context.mounted || !confirmed) return;
-                        setState(() => _isBatchRemoving = true);
-                        try {
-                          await ref
-                              .read(selectedPathsPageProvider.notifier)
-                              .removeSelectedPaths();
-                          if (!context.mounted) return;
-                          final int n = orderedSelected.length;
-                          showSuccessToast(
-                            context,
-                            n == 1 ? '已移除 1 条路径' : '已移除 $n 条路径',
-                          );
-                        } catch (e) {
-                          if (!context.mounted) return;
-                          showErrorToast(context, e);
-                        } finally {
-                          if (mounted) {
-                            setState(() => _isBatchRemoving = false);
-                          }
-                        }
-                      },
-                icon: _isBatchRemoving
-                    ? SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: theme.colorScheme.primary,
-                        ),
-                      )
-                    : const Icon(LucideIcons.trash2, size: 16),
-                label: Text(_isBatchRemoving ? '移除中…' : '清空选择'),
-                style: TextButton.styleFrom(
-                  foregroundColor: theme.colorScheme.onSurface,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+          children: <Widget>[
+            _MetaChip(icon: LucideIcons.link, label: '路径 $totalCount'),
+            if (selectedCount > 0)
+              _MetaChip(
+                icon: LucideIcons.circleCheckBig,
+                label: '已选 $selectedCount',
+                highlighted: true,
               ),
           ],
         ),
+      ],
+    );
+  }
+}
+
+class _SelectedPathsHeaderActions extends StatelessWidget {
+  const _SelectedPathsHeaderActions({
+    required this.theme,
+    required this.addPathMenuController,
+    required this.isPicking,
+    required this.hasData,
+    required this.selectedCount,
+    required this.isBatchRemoving,
+    required this.onPickMixed,
+    required this.onAddFiles,
+    required this.onAddFolder,
+    required this.onRemoveSelected,
+  });
+
+  final ThemeData theme;
+  final CustomPopupMenuController addPathMenuController;
+  final bool isPicking;
+  final bool hasData;
+  final int selectedCount;
+  final bool isBatchRemoving;
+  final VoidCallback onPickMixed;
+  final VoidCallback onAddFiles;
+  final VoidCallback onAddFolder;
+  final Future<void> Function() onRemoveSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: <Widget>[
+        CustomPopupMenu(
+          controller: addPathMenuController,
+          barrierColor: Colors.transparent,
+          pressType: PressType.singleClick,
+          showArrow: false,
+          verticalMargin: -26,
+          menuBuilder: () => _AddPathMenuPanel(
+            isPicking: isPicking,
+            onPickMixed: () {
+              addPathMenuController.hideMenu();
+              onPickMixed();
+            },
+            onAddFiles: () {
+              addPathMenuController.hideMenu();
+              onAddFiles();
+            },
+            onAddFolder: () {
+              addPathMenuController.hideMenu();
+              onAddFolder();
+            },
+          ),
+          child: FilledButton.icon(
+            onPressed: isPicking ? null : () => addPathMenuController.toggleMenu(),
+            icon: isPicking
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(LucideIcons.plus, size: 16),
+            label: Text(isPicking ? '处理中…' : '添加路径'),
+            style: FilledButton.styleFrom(
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ),
+        if (hasData && selectedCount > 0)
+          TextButton.icon(
+            onPressed: isBatchRemoving ? null : () => onRemoveSelected(),
+            icon: isBatchRemoving
+                ? SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: theme.colorScheme.primary,
+                    ),
+                  )
+                : const Icon(LucideIcons.trash2, size: 16),
+            label: Text(isBatchRemoving ? '移除中…' : '清空选择'),
+            style: TextButton.styleFrom(
+              foregroundColor: theme.colorScheme.onSurface,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -466,18 +522,18 @@ class _MetaChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final iconColor = highlighted
+    final ThemeData theme = Theme.of(context);
+    final Color iconColor = highlighted
         ? theme.colorScheme.primary
         : theme.colorScheme.onSurfaceVariant;
-    final bgColor = highlighted
+    final Color backgroundColor = highlighted
         ? theme.colorScheme.primaryContainer.withAlpha(130)
         : theme.colorScheme.surfaceContainerHighest;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: theme.colorScheme.borderSubtle),
       ),
@@ -610,8 +666,10 @@ class _PathTileState extends ConsumerState<_PathTile> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final notifier = ref.read(selectedPathsPageProvider.notifier);
+    final ThemeData theme = Theme.of(context);
+    final SelectedPathsPageNotifier notifier = ref.read(
+      selectedPathsPageProvider.notifier,
+    );
     final String path = widget.path;
     final bool isSelected = ref.watch(
       selectedPathsPageProvider.select(
@@ -620,10 +678,10 @@ class _PathTileState extends ConsumerState<_PathTile> {
       ),
     );
 
-    final textColor = isSelected
+    final Color textColor = isSelected
         ? theme.colorScheme.primary
         : theme.colorScheme.onSurface;
-    final bgColor = isSelected
+    final Color backgroundColor = isSelected
         ? theme.colorScheme.primaryContainer.withAlpha(90)
         : theme.colorScheme.surface;
 
@@ -635,7 +693,7 @@ class _PathTileState extends ConsumerState<_PathTile> {
         hoverColor: theme.colorScheme.primary.withAlpha(10),
       ),
       child: Material(
-        color: bgColor,
+        color: backgroundColor,
         child: InkWell(
           onTap: _isRemoving ? null : () => notifier.togglePathSelection(path),
           child: Padding(
@@ -730,7 +788,7 @@ class _LoadingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
     return StatusCardShell(
       padding: const EdgeInsets.symmetric(vertical: 42),
       borderRadius: 14,
@@ -758,7 +816,7 @@ class _ErrorCardState extends ConsumerState<_ErrorCard> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
     return StatusCardShell(
       padding: const EdgeInsets.all(20),
       borderRadius: 14,

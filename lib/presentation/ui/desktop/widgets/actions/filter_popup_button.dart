@@ -5,6 +5,7 @@ import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/value_objects/library_display_target.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/foundation/my_toggle_switch.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -55,8 +56,6 @@ class _FilterMenu extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final tokens = context.tokens;
-
     final int displayedComicCount = ref.watch(
       libraryDisplayedComicCountProvider,
     );
@@ -77,175 +76,153 @@ class _FilterMenu extends HookConsumerWidget {
       LibraryDisplayTarget.series => displayedSeriesCount,
     };
 
-    return Container(
+    return PopupMenuPanelShell(
       width: 256,
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(tokens.radius.lg),
-        border: Border.all(color: colorScheme.borderSubtle),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.cardShadowHover,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+      blurRadius: 4,
+      shadowOffset: const Offset(0, 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest,
+              border: Border(bottom: BorderSide(color: colorScheme.borderSubtle)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '高级筛选',
+                  style: TextStyle(
+                    fontSize: context.tokens.text.bodySm,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.textPrimary,
+                  ),
+                ),
+                GhostButton.icon(
+                  icon: LucideIcons.x,
+                  tooltip: '关闭',
+                  semanticLabel: '关闭筛选面板',
+                  iconSize: 14,
+                  size: 26,
+                  borderRadius: 7,
+                  foregroundColor: colorScheme.iconSecondary,
+                  hoverColor: colorScheme.primary.withAlpha(10),
+                  overlayColor: colorScheme.primary.withAlpha(14),
+                  delayTooltipThreeSeconds: false,
+                  onPressed: menuController.hideMenu,
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      LucideIcons.funnel,
+                      size: 15,
+                      color: colorScheme.iconSecondary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '显示 R18 内容',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: colorScheme.textPrimary,
+                      ),
+                    ),
+                    const Spacer(),
+                    MyToggleSwitch(
+                      checked: ref.watch(
+                        libraryPageProvider.select((s) => s.effectiveFilter.showR18),
+                      ),
+                      onChange: () =>
+                          ref.read(libraryPageProvider.notifier).toggleR18(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  '显示目标',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    _DisplayTargetChip(
+                      label: '全部',
+                      isSelected: displayTarget == LibraryDisplayTarget.all,
+                      onTap: () => ref
+                          .read(libraryPageProvider.notifier)
+                          .updateDisplayTarget(LibraryDisplayTarget.all),
+                    ),
+                    const SizedBox(width: 6),
+                    _DisplayTargetChip(
+                      label: '漫画',
+                      isSelected: displayTarget == LibraryDisplayTarget.comics,
+                      onTap: () => ref
+                          .read(libraryPageProvider.notifier)
+                          .updateDisplayTarget(LibraryDisplayTarget.comics),
+                    ),
+                    const SizedBox(width: 6),
+                    _DisplayTargetChip(
+                      label: '系列',
+                      isSelected: displayTarget == LibraryDisplayTarget.series,
+                      onTap: () => ref
+                          .read(libraryPageProvider.notifier)
+                          .updateDisplayTarget(LibraryDisplayTarget.series),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Divider(height: 1, thickness: 1, color: colorScheme.borderSubtle),
+          Container(
+            padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
+            color: colorScheme.surfaceContainerHighest,
+            child: Row(
+              children: [
+                Text(
+                  '$resultCount 个结果',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: colorScheme.textSecondary,
+                  ),
+                ),
+                const Spacer(),
+                GhostButton.iconText(
+                  icon: LucideIcons.rotateCcw,
+                  text: '重置',
+                  tooltip: '重置所有筛选',
+                  semanticLabel: '重置所有筛选',
+                  iconSize: 14,
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  borderRadius: 7,
+                  foregroundColor: colorScheme.primary,
+                  hoverColor: colorScheme.primary.withAlpha(10),
+                  overlayColor: colorScheme.primary.withAlpha(14),
+                  delayTooltipThreeSeconds: false,
+                  onPressed: () {
+                    ref.read(libraryPageProvider.notifier).resetFilter();
+                  },
+                ),
+              ],
+            ),
           ),
         ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(tokens.radius.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                border: Border(
-                  bottom: BorderSide(color: colorScheme.borderSubtle),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '高级筛选',
-                    style: TextStyle(
-                      fontSize: tokens.text.bodySm,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.textPrimary,
-                    ),
-                  ),
-                  GhostButton.icon(
-                    icon: LucideIcons.x,
-                    tooltip: '关闭',
-                    semanticLabel: '关闭筛选面板',
-                    iconSize: 14,
-                    size: 26,
-                    borderRadius: 7,
-                    foregroundColor: colorScheme.iconSecondary,
-                    hoverColor: colorScheme.primary.withAlpha(10),
-                    overlayColor: colorScheme.primary.withAlpha(14),
-                    delayTooltipThreeSeconds: false,
-                    onPressed: menuController.hideMenu,
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        LucideIcons.funnel,
-                        size: 15,
-                        color: colorScheme.iconSecondary,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '显示 R18 内容',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: colorScheme.textPrimary,
-                        ),
-                      ),
-                      const Spacer(),
-                      MyToggleSwitch(
-                        checked: ref.watch(
-                          libraryPageProvider.select(
-                            (s) => s.effectiveFilter.showR18,
-                          ),
-                        ),
-                        onChange: () =>
-                            ref.read(libraryPageProvider.notifier).toggleR18(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    '显示目标',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      _DisplayTargetChip(
-                        label: '全部',
-                        isSelected: displayTarget == LibraryDisplayTarget.all,
-                        onTap: () => ref
-                            .read(libraryPageProvider.notifier)
-                            .updateDisplayTarget(LibraryDisplayTarget.all),
-                      ),
-                      const SizedBox(width: 6),
-                      _DisplayTargetChip(
-                        label: '漫画',
-                        isSelected:
-                            displayTarget == LibraryDisplayTarget.comics,
-                        onTap: () => ref
-                            .read(libraryPageProvider.notifier)
-                            .updateDisplayTarget(LibraryDisplayTarget.comics),
-                      ),
-                      const SizedBox(width: 6),
-                      _DisplayTargetChip(
-                        label: '系列',
-                        isSelected:
-                            displayTarget == LibraryDisplayTarget.series,
-                        onTap: () => ref
-                            .read(libraryPageProvider.notifier)
-                            .updateDisplayTarget(LibraryDisplayTarget.series),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Divider(height: 1, thickness: 1, color: colorScheme.borderSubtle),
-            Container(
-              padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
-              color: colorScheme.surfaceContainerHighest,
-              child: Row(
-                children: [
-                  Text(
-                    '$resultCount 个结果',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: colorScheme.textSecondary,
-                    ),
-                  ),
-                  const Spacer(),
-                  GhostButton.iconText(
-                    icon: LucideIcons.rotateCcw,
-                    text: '重置',
-                    tooltip: '重置所有筛选',
-                    semanticLabel: '重置所有筛选',
-                    iconSize: 14,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    borderRadius: 7,
-                    foregroundColor: colorScheme.primary,
-                    hoverColor: colorScheme.primary.withAlpha(10),
-                    overlayColor: colorScheme.primary.withAlpha(14),
-                    delayTooltipThreeSeconds: false,
-                    onPressed: () {
-                      ref.read(libraryPageProvider.notifier).resetFilter();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

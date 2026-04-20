@@ -15,6 +15,18 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 const int _readerAutoPlayIntervalMin = 1;
 const int _readerAutoPlayIntervalMax = 60;
 const double _kAppThemeMenuWidth = 224;
+const EdgeInsets _kSettingsPagePadding = EdgeInsets.symmetric(
+  horizontal: 48,
+  vertical: 16,
+);
+
+TextStyle _buildSettingsPageTitleStyle(ColorScheme colorScheme) {
+  return TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.w600,
+    color: colorScheme.textPrimary,
+  );
+}
 
 enum _SettingsShell { loading, content, fatalError }
 
@@ -59,7 +71,7 @@ class _SettingsLoadedView extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+      padding: _kSettingsPagePadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 24,
@@ -68,11 +80,7 @@ class _SettingsLoadedView extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 12),
             child: Text(
               '设置',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.textPrimary,
-              ),
+              style: _buildSettingsPageTitleStyle(theme.colorScheme),
             ),
           ),
           _SettingsGroup(
@@ -649,6 +657,7 @@ class _SettingsRowState extends State<_SettingsRow> {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return MouseRegion(
       cursor: widget.onRowTap != null
           ? SystemMouseCursors.click
@@ -662,8 +671,8 @@ class _SettingsRowState extends State<_SettingsRow> {
           duration: const Duration(milliseconds: 150),
           decoration: BoxDecoration(
             color: _isHovered
-                ? Theme.of(context).colorScheme.hoverBackground
-                : Theme.of(context).colorScheme.surface,
+                ? colorScheme.hoverBackground
+                : colorScheme.surface,
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -681,8 +690,8 @@ class _SettingsRowState extends State<_SettingsRow> {
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: widget.isDestructive
-                              ? Theme.of(context).colorScheme.error
-                              : Theme.of(context).colorScheme.textPrimary,
+                              ? colorScheme.error
+                              : colorScheme.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -693,7 +702,7 @@ class _SettingsRowState extends State<_SettingsRow> {
                           widget.description!,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Theme.of(context).colorScheme.textTertiary,
+                            color: colorScheme.textTertiary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -788,6 +797,7 @@ class _ActionButtonState extends State<_ActionButton> {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered = true),
@@ -799,8 +809,8 @@ class _ActionButtonState extends State<_ActionButton> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: _isHovered
-                ? Theme.of(context).colorScheme.borderSubtle
-                : Theme.of(context).colorScheme.inputBackgroundDisabled,
+                ? colorScheme.borderSubtle
+                : colorScheme.inputBackgroundDisabled,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
@@ -808,7 +818,7 @@ class _ActionButtonState extends State<_ActionButton> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.textSecondary,
+              color: colorScheme.textSecondary,
             ),
           ),
         ),
@@ -832,6 +842,7 @@ class _ThemeButtonState extends State<_ThemeButton> {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _isHovered = true),
@@ -845,8 +856,8 @@ class _ThemeButtonState extends State<_ThemeButton> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: _isHovered
-                    ? Theme.of(context).colorScheme.borderSubtle
-                    : Theme.of(context).colorScheme.inputBackgroundDisabled,
+                    ? colorScheme.borderSubtle
+                    : colorScheme.inputBackgroundDisabled,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
@@ -854,7 +865,7 @@ class _ThemeButtonState extends State<_ThemeButton> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.textSecondary,
+                  color: colorScheme.textSecondary,
                 ),
               ),
             ),

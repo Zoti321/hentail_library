@@ -4,6 +4,7 @@ import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -54,112 +55,94 @@ class _SortMenu extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final tokens = context.tokens;
 
     final sortOption = ref.watch(
       libraryPageProvider.select((s) => s.effectiveSortOption),
     );
 
-    return Container(
+    return PopupMenuPanelShell(
       width: 320,
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(tokens.radius.lg),
-        border: Border.all(color: theme.colorScheme.borderSubtle),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.cardShadowHover,
-            blurRadius: 6,
-            offset: const Offset(0, 4),
+      blurRadius: 6,
+      shadowOffset: const Offset(0, 4),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest,
+              border: Border(
+                bottom: BorderSide(color: theme.colorScheme.borderSubtle),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.swap_vert,
+                  size: 16,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '排序与视图',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.textPrimary,
+                  ),
+                ),
+                const Spacer(),
+                GhostButton.icon(
+                  icon: LucideIcons.x,
+                  tooltip: '关闭',
+                  semanticLabel: '关闭排序面板',
+                  iconSize: 14,
+                  size: 26,
+                  borderRadius: 7,
+                  foregroundColor: theme.colorScheme.iconSecondary,
+                  hoverColor: theme.colorScheme.primary.withAlpha(10),
+                  overlayColor: theme.colorScheme.primary.withAlpha(14),
+                  delayTooltipThreeSeconds: false,
+                  onPressed: menuController.hideMenu,
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+            child: _SortSection(option: sortOption),
+          ),
+          Divider(height: 1, thickness: 1, color: theme.colorScheme.borderSubtle),
+          Container(
+            padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+            color: theme.colorScheme.surfaceContainerHighest,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GhostButton.iconText(
+                  icon: LucideIcons.rotateCcw,
+                  text: '重置',
+                  tooltip: '重置排序',
+                  semanticLabel: '重置排序',
+                  iconSize: 14,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  borderRadius: 7,
+                  foregroundColor: theme.colorScheme.primary,
+                  hoverColor: theme.colorScheme.primary.withAlpha(10),
+                  overlayColor: theme.colorScheme.primary.withAlpha(14),
+                  delayTooltipThreeSeconds: false,
+                  onPressed: () {
+                    ref.read(libraryPageProvider.notifier).resetSortOption();
+                  },
+                ),
+              ],
+            ),
           ),
         ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(tokens.radius.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                border: Border(
-                  bottom: BorderSide(color: theme.colorScheme.borderSubtle),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.swap_vert,
-                    size: 16,
-                    color: theme.colorScheme.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '排序与视图',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.textPrimary,
-                    ),
-                  ),
-                  const Spacer(),
-                  GhostButton.icon(
-                    icon: LucideIcons.x,
-                    tooltip: '关闭',
-                    semanticLabel: '关闭排序面板',
-                    iconSize: 14,
-                    size: 26,
-                    borderRadius: 7,
-                    foregroundColor: theme.colorScheme.iconSecondary,
-                    hoverColor: theme.colorScheme.primary.withAlpha(10),
-                    overlayColor: theme.colorScheme.primary.withAlpha(14),
-                    delayTooltipThreeSeconds: false,
-                    onPressed: menuController.hideMenu,
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-              child: _SortSection(option: sortOption),
-            ),
-            Divider(
-              height: 1,
-              thickness: 1,
-              color: theme.colorScheme.borderSubtle,
-            ),
-            Container(
-              padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-              color: theme.colorScheme.surfaceContainerHighest,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  GhostButton.iconText(
-                    icon: LucideIcons.rotateCcw,
-                    text: '重置',
-                    tooltip: '重置排序',
-                    semanticLabel: '重置排序',
-                    iconSize: 14,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    borderRadius: 7,
-                    foregroundColor: theme.colorScheme.primary,
-                    hoverColor: theme.colorScheme.primary.withAlpha(10),
-                    overlayColor: theme.colorScheme.primary.withAlpha(14),
-                    delayTooltipThreeSeconds: false,
-                    onPressed: () {
-                      ref.read(libraryPageProvider.notifier).resetSortOption();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

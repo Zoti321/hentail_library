@@ -80,10 +80,25 @@ class ReaderPage extends HookConsumerWidget {
             value.asData?.value.readerAutoPlayIntervalSeconds ?? 5,
       ),
     );
-    final ReaderViewState? readerState = ref
-        .watch(readerViewProvider(routeContext.comicId))
-        .asData
-        ?.value;
+    final ({
+      int currentIndex,
+      int totalPages,
+      bool isVertical,
+    })? autoPlayState = ref.watch(
+      readerViewProvider(routeContext.comicId).select(
+        (AsyncValue<ReaderViewState> asyncState) {
+          final ReaderViewState? readerState = asyncState.asData?.value;
+          if (readerState == null) {
+            return null;
+          }
+          return (
+            currentIndex: readerState.currentIndex,
+            totalPages: readerState.totalPages,
+            isVertical: readerState.isVertical,
+          );
+        },
+      ),
+    );
     final GlobalKey<ScaffoldState> scaffoldKey = useMemoized(
       GlobalKey<ScaffoldState>.new,
       <Object?>[],
@@ -119,9 +134,9 @@ class ReaderPage extends HookConsumerWidget {
         final bool canStartAutoPlay =
             readerAutoPlayEnabled &&
             !readerIsVertical &&
-            readerState != null &&
-            readerState.totalPages > 0 &&
-            readerState.currentIndex < readerState.totalPages;
+            autoPlayState != null &&
+            autoPlayState.totalPages > 0 &&
+            autoPlayState.currentIndex < autoPlayState.totalPages;
         if (!canStartAutoPlay) {
           return null;
         }
@@ -155,8 +170,9 @@ class ReaderPage extends HookConsumerWidget {
         readerAutoPlayEnabled,
         readerAutoPlayIntervalSeconds,
         readerIsVertical,
-        readerState?.currentIndex,
-        readerState?.totalPages,
+        autoPlayState?.currentIndex,
+        autoPlayState?.totalPages,
+        autoPlayState?.isVertical,
         routeContext.comicId,
         notifier,
         ref,

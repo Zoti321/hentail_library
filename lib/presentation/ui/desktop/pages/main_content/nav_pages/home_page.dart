@@ -19,6 +19,19 @@ const double _kContinueReadingItemWidth = 304;
 const double _kContinueReadingStripHeight = 138;
 const double _kHeroStatCardRadius = 16;
 const Duration _kHeroStatCardHoverDuration = Duration(milliseconds: 200);
+const EdgeInsets _kHomePagePadding = EdgeInsets.symmetric(
+  horizontal: 48,
+  vertical: 16,
+);
+
+TextStyle _buildDesktopPageTitleStyle(ColorScheme colorScheme) {
+  return TextStyle(
+    color: colorScheme.textPrimary,
+    fontSize: 26,
+    fontWeight: FontWeight.w600,
+    letterSpacing: -0.4,
+  );
+}
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -51,7 +64,7 @@ class HomePage extends ConsumerWidget {
           _kHomeContentMaxWidth,
         );
         return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+          padding: _kHomePagePadding,
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
@@ -103,64 +116,23 @@ class HomePage extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = theme.colorScheme;
+    final String greetingText = '${_greetingPhraseForNow()}，读者';
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '首页',
-              style: TextStyle(
-                color: cs.textPrimary,
-                fontSize: 26,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.4,
-              ),
-            ),
-            SizedBox(height: tokens.spacing.xs),
-            Text(
-              '${_greetingPhraseForNow()}，读者',
-              style: TextStyle(color: cs.textTertiary, fontSize: 13),
-            ),
-          ],
+        _HomeHeaderTextBlock(
+          title: '首页',
+          greetingText: greetingText,
+          colorScheme: cs,
+          tokens: tokens,
         ),
-        Row(
-          spacing: 8,
-          children: [
-            GhostButton.icon(
-              icon: LucideIcons.refreshCw,
-              tooltip: '',
-              semanticLabel: '刷新漫画库列表',
-              iconSize: 16,
-              size: 24,
-              borderRadius: 10,
-              foregroundColor: cs.iconDefault,
-              hoverColor: cs.surfaceContainerHighest,
-              overlayColor: cs.primary.withAlpha(32),
-              delayTooltipThreeSeconds: false,
-              onPressed: () {
-                ref.read(libraryPageProvider.notifier).refreshStream();
-              },
-            ),
-            FilledButton.icon(
-              onPressed: () => _onTapScanLibrary(context, ref),
-              icon: const Icon(LucideIcons.scanSearch, size: 18),
-              label: const Text('扫描漫画库'),
-              style: FilledButton.styleFrom(
-                backgroundColor: cs.primary,
-                foregroundColor: cs.onPrimary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ],
+        _HomeHeaderActionBlock(
+          colorScheme: cs,
+          onRefresh: () {
+            ref.read(libraryPageProvider.notifier).refreshStream();
+          },
+          onScan: () => _onTapScanLibrary(context, ref),
         ),
       ],
     );
@@ -182,6 +154,13 @@ class HomePage extends ConsumerWidget {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = theme.colorScheme;
     final Color accent = cs.primary;
+    final BorderSide actionBorderSide = BorderSide(color: cs.borderSubtle);
+    final ButtonStyle outlinedActionStyle = OutlinedButton.styleFrom(
+      foregroundColor: cs.textPrimary,
+      side: actionBorderSide,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    );
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -311,33 +290,13 @@ class HomePage extends ConsumerWidget {
                         onPressed: () => context.go('/paths'),
                         icon: const Icon(LucideIcons.folderTree, size: 18),
                         label: const Text('选中路径'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: cs.textPrimary,
-                          side: BorderSide(color: cs.borderSubtle),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 11,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
+                        style: outlinedActionStyle,
                       ),
                       OutlinedButton.icon(
                         onPressed: () => context.go('/settings'),
                         icon: const Icon(LucideIcons.settings, size: 18),
                         label: const Text('设置'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: cs.textPrimary,
-                          side: BorderSide(color: cs.borderSubtle),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 11,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
+                        style: outlinedActionStyle,
                       ),
                     ],
                   ),
@@ -465,13 +424,21 @@ class HomePage extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = theme.colorScheme;
-    final HistoryFeedViewData historyFeedView = ref.watch(
-      historyFeedViewProvider,
+    final bool loading = ref.watch(
+      historyFeedViewProvider.select(
+        (HistoryFeedViewData value) => value.isLoading,
+      ),
     );
-    final bool loading = historyFeedView.isLoading;
-    final bool hasError = historyFeedView.hasError;
-    final List<HistoryGridItemDto> visible =
-        historyFeedView.continueReadingItems;
+    final bool hasError = ref.watch(
+      historyFeedViewProvider.select(
+        (HistoryFeedViewData value) => value.hasError,
+      ),
+    );
+    final List<HistoryGridItemDto> visible = ref.watch(
+      historyFeedViewProvider.select(
+        (HistoryFeedViewData value) => value.continueReadingItems,
+      ),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -712,7 +679,7 @@ class _StatSummaryCardState extends State<_StatSummaryCard> {
             BoxShadow(
               color: cs.shadow.withAlpha(36),
               blurRadius: 14,
-              offset: Offset(0, 6),
+              offset: const Offset(0, 6),
             ),
             BoxShadow(
               color: accent.withAlpha(14),
@@ -835,7 +802,7 @@ class _ShortcutTileState extends State<_ShortcutTile> {
   Widget build(BuildContext context) {
     final ColorScheme cs = widget.colorScheme;
     final AppThemeTokens tokens = widget.tokens;
-    final Duration duration = const Duration(milliseconds: 180);
+    const Duration duration = Duration(milliseconds: 180);
     final Curve curve = Curves.easeOutCubic;
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -911,6 +878,82 @@ class _ShortcutTileState extends State<_ShortcutTile> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _HomeHeaderTextBlock extends StatelessWidget {
+  const _HomeHeaderTextBlock({
+    required this.title,
+    required this.greetingText,
+    required this.colorScheme,
+    required this.tokens,
+  });
+
+  final String title;
+  final String greetingText;
+  final ColorScheme colorScheme;
+  final AppThemeTokens tokens;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(title, style: _buildDesktopPageTitleStyle(colorScheme)),
+        SizedBox(height: tokens.spacing.xs),
+        Text(
+          greetingText,
+          style: TextStyle(color: colorScheme.textTertiary, fontSize: 13),
+        ),
+      ],
+    );
+  }
+}
+
+class _HomeHeaderActionBlock extends StatelessWidget {
+  const _HomeHeaderActionBlock({
+    required this.colorScheme,
+    required this.onRefresh,
+    required this.onScan,
+  });
+
+  final ColorScheme colorScheme;
+  final VoidCallback onRefresh;
+  final VoidCallback onScan;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      spacing: 8,
+      children: <Widget>[
+        GhostButton.icon(
+          icon: LucideIcons.refreshCw,
+          tooltip: '',
+          semanticLabel: '刷新漫画库列表',
+          iconSize: 16,
+          size: 24,
+          borderRadius: 10,
+          foregroundColor: colorScheme.iconDefault,
+          hoverColor: colorScheme.surfaceContainerHighest,
+          overlayColor: colorScheme.primary.withAlpha(32),
+          delayTooltipThreeSeconds: false,
+          onPressed: onRefresh,
+        ),
+        FilledButton.icon(
+          onPressed: onScan,
+          icon: const Icon(LucideIcons.scanSearch, size: 18),
+          label: const Text('扫描漫画库'),
+          style: FilledButton.styleFrom(
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
