@@ -10,7 +10,7 @@ import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/entity/series_reading_history.dart';
 import 'package:hentai_library/presentation/providers/aggregates/series_aggregate_notifier.dart';
 import 'package:hentai_library/presentation/providers/deps/repos.dart';
-import 'package:hentai_library/presentation/models/comic_cover_display_data.dart';
+import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/presentation/providers/pages/library/library_page_notifier.dart';
 import 'package:hentai_library/presentation/providers/pages/reader/reader_page_notifier.dart';
 import 'package:hentai_library/presentation/providers/pages/series_management/series_add_comics_dialog_notifier.dart';
@@ -41,9 +41,8 @@ class MobileSeriesDetailPage extends ConsumerWidget {
         }
         return _MobileSeriesDetailBody(series: target);
       },
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (Object error, StackTrace stackTrace) => Scaffold(
         appBar: AppBar(title: const Text('系列详情')),
         body: Center(child: Text('加载失败：$error')),
@@ -65,7 +64,10 @@ class _MobileSeriesDetailBody extends ConsumerWidget {
         ? null
         : ref
               .watch(comicCoverDisplayProvider(comicId: coverComicId))
-              .maybeWhen(data: (ComicCoverDisplayData? value) => value, orElse: () => null);
+              .maybeWhen(
+                data: (ComicCoverDisplayData? value) => value,
+                orElse: () => null,
+              );
     return Scaffold(
       appBar: AppBar(
         title: Text(series.name),
@@ -101,8 +103,12 @@ class _MobileSeriesDetailBody extends ConsumerWidget {
                         width: 100,
                         height: 150,
                         placeholder: ColoredBox(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                          child: const Icon(Icons.collections_bookmark_outlined),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerHighest,
+                          child: const Icon(
+                            Icons.collections_bookmark_outlined,
+                          ),
                         ),
                       ),
                     ),
@@ -135,11 +141,8 @@ class _MobileSeriesDetailBody extends ConsumerWidget {
                           runSpacing: 8,
                           children: <Widget>[
                             OutlinedButton.icon(
-                              onPressed: () => _openManageItemsSheet(
-                                context,
-                                ref,
-                                series,
-                              ),
+                              onPressed: () =>
+                                  _openManageItemsSheet(context, ref, series),
                               icon: const Icon(Icons.playlist_add_outlined),
                               label: const Text('管理条目'),
                             ),
@@ -147,11 +150,11 @@ class _MobileSeriesDetailBody extends ConsumerWidget {
                               onPressed: sortedItems.length < 2
                                   ? null
                                   : () => _openReorderSheet(
-                                        context,
-                                        ref,
-                                        series,
-                                        sortedItems,
-                                      ),
+                                      context,
+                                      ref,
+                                      series,
+                                      sortedItems,
+                                    ),
                               icon: const Icon(Icons.reorder),
                               label: const Text('调整顺序'),
                             ),
@@ -170,10 +173,8 @@ class _MobileSeriesDetailBody extends ConsumerWidget {
                 : ListView.separated(
                     padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                     itemCount: sortedItems.length,
-                    separatorBuilder: (
-                      BuildContext context,
-                      int index,
-                    ) => const SizedBox(height: 8),
+                    separatorBuilder: (BuildContext context, int index) =>
+                        const SizedBox(height: 8),
                     itemBuilder: (BuildContext context, int index) {
                       final SeriesItem item = sortedItems[index];
                       return _SeriesComicTile(
@@ -253,9 +254,8 @@ class _MobileSeriesDetailBody extends ConsumerWidget {
               child: const Text('取消'),
             ),
             FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop(
-                controller.text.trim(),
-              ),
+              onPressed: () =>
+                  Navigator.of(dialogContext).pop(controller.text.trim()),
               child: const Text('保存'),
             ),
           ],
@@ -381,7 +381,10 @@ class _SeriesComicTile extends ConsumerWidget {
     final String title = _resolveComicTitle(ref, item.comicId);
     final ComicCoverDisplayData? coverData = ref
         .watch(comicCoverDisplayProvider(comicId: item.comicId))
-        .maybeWhen(data: (ComicCoverDisplayData? value) => value, orElse: () => null);
+        .maybeWhen(
+          data: (ComicCoverDisplayData? value) => value,
+          orElse: () => null,
+        );
     return Card(
       child: ListTile(
         leading: ClipRRect(
@@ -400,11 +403,7 @@ class _SeriesComicTile extends ConsumerWidget {
             ),
           ),
         ),
-        title: Text(
-          title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
+        title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text('序号 ${index + 1}'),
         trailing: const Icon(Icons.chevron_right),
         onTap: () {
@@ -431,7 +430,8 @@ class _SeriesManageItemsSheet extends ConsumerStatefulWidget {
       _SeriesManageItemsSheetState();
 }
 
-class _SeriesManageItemsSheetState extends ConsumerState<_SeriesManageItemsSheet> {
+class _SeriesManageItemsSheetState
+    extends ConsumerState<_SeriesManageItemsSheet> {
   late final TextEditingController _queryController;
   late final SeriesAddComicsDialogNotifier _notifier;
 
@@ -461,7 +461,10 @@ class _SeriesManageItemsSheetState extends ConsumerState<_SeriesManageItemsSheet
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(libraryPageProvider, (LibraryPageState? prev, LibraryPageState next) {
+    ref.listen(libraryPageProvider, (
+      LibraryPageState? prev,
+      LibraryPageState next,
+    ) {
       _notifier.updateSource(
         comics: next.rawList,
         existingComicIdsInSeriesOrder: _existingComicIdsInSeriesOrder(
@@ -503,17 +506,14 @@ class _SeriesManageItemsSheetState extends ConsumerState<_SeriesManageItemsSheet
                     : ListView.separated(
                         padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                         itemCount: state.visibleComics.length,
-                        separatorBuilder: (
-                          BuildContext context,
-                          int index,
-                        ) => const SizedBox(height: 8),
+                        separatorBuilder: (BuildContext context, int index) =>
+                            const SizedBox(height: 8),
                         itemBuilder: (BuildContext context, int index) {
                           final Comic comic = state.visibleComics[index];
                           final bool selected = state.selectedComicIdsInOrder
                               .contains(comic.comicId);
-                          final int order = state.selectedComicIdsInOrder.indexOf(
-                            comic.comicId,
-                          );
+                          final int order = state.selectedComicIdsInOrder
+                              .indexOf(comic.comicId);
                           return Card(
                             child: CheckboxListTile(
                               value: selected,
@@ -563,9 +563,13 @@ class _SeriesManageItemsSheetState extends ConsumerState<_SeriesManageItemsSheet
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
-                            : Text('确认 (${state.selectedComicIdsInOrder.length})'),
+                            : Text(
+                                '确认 (${state.selectedComicIdsInOrder.length})',
+                              ),
                       ),
                     ),
                   ],
@@ -592,7 +596,9 @@ class _SeriesManageItemsSheetState extends ConsumerState<_SeriesManageItemsSheet
         return;
       }
       final String message = _buildSummaryText(summary);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
       Navigator.of(context).pop();
     } catch (error) {
       if (!mounted) {
@@ -632,7 +638,8 @@ class _SeriesReorderSheet extends ConsumerStatefulWidget {
   final List<SeriesItem> sortedItems;
 
   @override
-  ConsumerState<_SeriesReorderSheet> createState() => _SeriesReorderSheetState();
+  ConsumerState<_SeriesReorderSheet> createState() =>
+      _SeriesReorderSheetState();
 }
 
 class _SeriesReorderSheetState extends ConsumerState<_SeriesReorderSheet> {
@@ -653,10 +660,7 @@ class _SeriesReorderSheetState extends ConsumerState<_SeriesReorderSheet> {
         child: Column(
           children: <Widget>[
             const SizedBox(height: 12),
-            Text(
-              '调整顺序',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text('调整顺序', style: Theme.of(context).textTheme.titleMedium),
             Expanded(
               child: ReorderableListView.builder(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
@@ -695,7 +699,9 @@ class _SeriesReorderSheetState extends ConsumerState<_SeriesReorderSheet> {
                 children: <Widget>[
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: _saving ? null : () => Navigator.of(context).pop(),
+                      onPressed: _saving
+                          ? null
+                          : () => Navigator.of(context).pop(),
                       child: const Text('取消'),
                     ),
                   ),
@@ -759,7 +765,9 @@ class _SeriesReorderSheetState extends ConsumerState<_SeriesReorderSheet> {
 }
 
 String _resolveComicTitle(WidgetRef ref, String comicId) {
-  final Comic? comic = ref.read(libraryPageProvider.notifier).comicById(comicId);
+  final Comic? comic = ref
+      .read(libraryPageProvider.notifier)
+      .comicById(comicId);
   if (comic != null && comic.title.isNotEmpty) {
     return comic.title;
   }
@@ -792,11 +800,7 @@ Widget _mobileSeriesCoverImage(
       height: height,
       fit: BoxFit.cover,
       errorBuilder:
-          (
-            BuildContext context,
-            Object error,
-            StackTrace? stackTrace,
-          ) {
+          (BuildContext context, Object error, StackTrace? stackTrace) {
             return placeholder;
           },
     );
@@ -809,11 +813,7 @@ Widget _mobileSeriesCoverImage(
       height: height,
       fit: BoxFit.cover,
       errorBuilder:
-          (
-            BuildContext context,
-            Object error,
-            StackTrace? stackTrace,
-          ) {
+          (BuildContext context, Object error, StackTrace? stackTrace) {
             return placeholder;
           },
     );

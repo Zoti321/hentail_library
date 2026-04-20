@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/series_detail_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/history_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/home_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/library_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/settings_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/history_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/home_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/library_page/library_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/settings_page.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/shared_content_routes.dart';
 import 'package:hentai_library/presentation/ui/shared/shell/adaptive_app_shell.dart';
 
@@ -46,14 +46,10 @@ final GoRouter desktopRouter = GoRouter(
               const SettingsPage(),
         ),
         ...buildSharedContentRoutes(
-          comicDetailBuilder: (
-            BuildContext context,
-            String comicId,
-          ) => ComicDetailPage(comicId: comicId),
-          seriesDetailBuilder: (
-            BuildContext context,
-            String seriesName,
-          ) => SeriesDetailPage(seriesName: seriesName),
+          comicDetailBuilder: (BuildContext context, String comicId) =>
+              ComicDetailPage(comicId: comicId),
+          seriesDetailBuilder: (BuildContext context, String seriesName) =>
+              SeriesDetailPage(seriesName: seriesName),
         ),
       ],
     ),

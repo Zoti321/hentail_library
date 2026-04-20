@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/reader_page.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/page/reader/reader_route_context.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/widgets/reader_route_context.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 void main() {

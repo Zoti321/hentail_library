@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/page/library/library.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/library_page/widgets/widgets.dart';
 
 class LibraryPage extends StatelessWidget {
   const LibraryPage({super.key});

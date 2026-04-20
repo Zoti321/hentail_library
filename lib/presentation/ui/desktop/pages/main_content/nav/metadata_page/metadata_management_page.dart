@@ -6,9 +6,9 @@ import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/comic/author.dart';
 import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/panels/author_management_panel.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/panels/series_management_panel.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/panels/tag_management_panel.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/metadata_page/widgets/author_management_panel.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/metadata_page/widgets/series_management_panel.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/metadata_page/widgets/tag_management_panel.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/add_series_dialog.dart';
@@ -136,7 +136,6 @@ class _MetadataManagementPageState
   Future<void> _openAddTagDialog(BuildContext context) async {
     await showDialog<void>(
       context: context,
-      barrierColor: Colors.transparent,
       builder: (BuildContext dialogContext) => TagNameEditorDialog(
         title: '添加标签',
         labelText: '名称',
@@ -152,7 +151,6 @@ class _MetadataManagementPageState
   Future<void> _openAddAuthorDialog(BuildContext context) async {
     await showDialog<void>(
       context: context,
-      barrierColor: Colors.transparent,
       builder: (BuildContext dialogContext) => TagNameEditorDialog(
         title: '添加作者',
         labelText: '名称',
@@ -168,7 +166,6 @@ class _MetadataManagementPageState
   Future<void> _openAddSeriesDialog(BuildContext context) async {
     await showDialog<void>(
       context: context,
-      barrierColor: Colors.transparent,
       builder: (BuildContext dialogContext) => AddSeriesDialog(
         onCreated: () {
           showSuccessToast(context, '系列创建成功');

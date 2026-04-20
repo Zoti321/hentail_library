@@ -9,7 +9,7 @@ import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_
 import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_session_manager.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/isolate_archive_cover_loader.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/reader_image.dart';
-import 'package:hentai_library/presentation/models/comic_cover_display_data.dart';
+import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/entities.dart' as entity;
 import 'package:hentai_library/presentation/providers/aggregates/reading_aggregate_notifier.dart';
@@ -19,7 +19,7 @@ import 'package:hentai_library/presentation/providers/pages/reader/reader_window
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/presentation/providers/pages/reader/series_reader_provider.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/page/reader/reader_route_context.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/widgets/reader_route_context.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader_page_notifier.freezed.dart';
@@ -300,8 +300,9 @@ Future<List<ReaderPageImageData>> comicImages(
   final v2Comic = await ref.read(comicRepoProvider).findById(comicId);
   if (v2Comic == null) return [];
 
-  final ComicReadResourceSessionManager sessions =
-      ref.read(comicReadResourceSessionManagerProvider);
+  final ComicReadResourceSessionManager sessions = ref.read(
+    comicReadResourceSessionManagerProvider,
+  );
   try {
     final accessor = await sessions.acquire(
       comicId: comicId,
@@ -324,9 +325,7 @@ Future<List<ReaderPageImageData>> comicImages(
     }
     final List<ReaderPageImageData> result = <ReaderPageImageData>[];
     for (int i = 0; i < total; i++) {
-      result.add(
-        ReaderArchivePageImageData(comicId: comicId, pageIndex: i),
-      );
+      result.add(ReaderArchivePageImageData(comicId: comicId, pageIndex: i));
     }
     return List<ReaderPageImageData>.unmodifiable(result);
   } catch (e, st) {
@@ -395,8 +394,9 @@ Future<ComicCoverDisplayData?> comicCoverDisplay(
       return null;
     }
   }
-  final ComicReadResourceSessionManager sessions =
-      ref.read(comicReadResourceSessionManagerProvider);
+  final ComicReadResourceSessionManager sessions = ref.read(
+    comicReadResourceSessionManagerProvider,
+  );
   try {
     final ComicReadResourceAccessor accessor = await sessions.acquire(
       comicId: comicId,
@@ -434,8 +434,9 @@ Future<Uint8List?> comicReaderPageBytes(
   if (v2Comic.resourceType == ResourceType.dir) {
     return null;
   }
-  final ComicReadResourceSessionManager sessions =
-      ref.read(comicReadResourceSessionManagerProvider);
+  final ComicReadResourceSessionManager sessions = ref.read(
+    comicReadResourceSessionManagerProvider,
+  );
   try {
     final ComicReadResourceAccessor accessor = await sessions.acquire(
       comicId: comicId,

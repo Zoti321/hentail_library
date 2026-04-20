@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/presentation/models/comic_cover_display_data.dart';
+import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -47,7 +47,9 @@ class _ComicMergeDialogState extends ConsumerState<ComicMergeDialog> {
     return Dialog(
       backgroundColor: cs.surface,
       surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(tokens.radius.lg)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(tokens.radius.lg),
+      ),
       elevation: 0,
       insetPadding: const .all(16),
       child: ClipRRect(
@@ -412,10 +414,7 @@ DecorationImage? _mergeDialogCoverDecoration(ComicCoverDisplayData? data) {
   }
   final String? path = data.filePath;
   if (path != null) {
-    return DecorationImage(
-      image: FileImage(File(path)),
-      fit: BoxFit.cover,
-    );
+    return DecorationImage(image: FileImage(File(path)), fit: BoxFit.cover);
   }
   return null;
 }

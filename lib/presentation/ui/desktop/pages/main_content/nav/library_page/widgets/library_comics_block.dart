@@ -6,19 +6,27 @@ class LibraryComicsBlock extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryPageProvider.select((LibraryPageState s) => s.effectiveFilter.displayTarget),
+      libraryPageProvider.select(
+        (LibraryPageState s) => s.effectiveFilter.displayTarget,
+      ),
     );
     final bool showComicsSection = displayTarget != LibraryDisplayTarget.series;
     if (!showComicsSection) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
-    final AsyncValue<List<Comic>> comics = ref.watch(libraryDisplayedComicsProvider);
-    final LibrarySeriesViewData seriesData = ref.watch(librarySeriesViewDataProvider);
+    final AsyncValue<List<Comic>> comics = ref.watch(
+      libraryDisplayedComicsProvider,
+    );
+    final LibrarySeriesViewData seriesData = ref.watch(
+      librarySeriesViewDataProvider,
+    );
     final bool showSeriesSection = displayTarget != LibraryDisplayTarget.comics;
     final bool hasSeriesSection =
         showSeriesSection && seriesData.filteredSeries.isNotEmpty;
     final String filterQuery = ref.watch(
-      libraryPageProvider.select((LibraryPageState s) => s.effectiveFilter.query ?? ''),
+      libraryPageProvider.select(
+        (LibraryPageState s) => s.effectiveFilter.query ?? '',
+      ),
     );
     final bool isComicTableEmpty = ref.watch(
       libraryPageProvider.select(
@@ -77,7 +85,8 @@ class _LibraryComicsGridSliver extends StatefulWidget {
   final String effectiveQuery;
 
   @override
-  State<_LibraryComicsGridSliver> createState() => _LibraryComicsGridSliverState();
+  State<_LibraryComicsGridSliver> createState() =>
+      _LibraryComicsGridSliverState();
 }
 
 class _LibraryComicsGridSliverState extends State<_LibraryComicsGridSliver> {
@@ -177,7 +186,8 @@ class _LibraryComicsListSliver extends StatelessWidget {
         }
         return SliverList.separated(
           itemCount: comics.length,
-          separatorBuilder: (BuildContext ctx, int i) => const SizedBox(height: 8),
+          separatorBuilder: (BuildContext ctx, int i) =>
+              const SizedBox(height: 8),
           itemBuilder: (BuildContext context, int index) {
             final Comic manga = comics[index];
             return ComicTile(

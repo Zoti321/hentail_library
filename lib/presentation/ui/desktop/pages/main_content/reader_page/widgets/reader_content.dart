@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/page/reader/reader_content_switcher.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/widgets/reader_content_switcher.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ReaderContent extends ConsumerWidget {

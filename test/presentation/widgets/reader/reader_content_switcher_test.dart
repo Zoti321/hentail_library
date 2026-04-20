@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/page/reader/reader_content_switcher.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/widgets/reader_content_switcher.dart';
 
 void main() {
   testWidgets('ReaderContentSwitcher renders vertical child in vertical mode', (

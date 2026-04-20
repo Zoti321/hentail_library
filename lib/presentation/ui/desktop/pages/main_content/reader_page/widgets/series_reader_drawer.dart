@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/config/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/page/reader/reader_route_context.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/widgets/reader_route_context.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SeriesReaderDrawer extends StatelessWidget {

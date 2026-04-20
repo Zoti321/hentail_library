@@ -5,11 +5,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/config/theme.dart';
 import 'package:hentai_library/domain/entity/entities.dart' show AppSetting;
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/page/reader/reader_bottom_bar.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/page/reader/reader_content.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/page/reader/reader_route_context.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/page/reader/reader_top_bar.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/page/reader/series_reader_drawer.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/widgets/reader_bottom_bar.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/widgets/reader_content.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/widgets/reader_top_bar.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/widgets/series_reader_drawer.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ReaderPage extends HookConsumerWidget {
@@ -80,25 +80,22 @@ class ReaderPage extends HookConsumerWidget {
             value.asData?.value.readerAutoPlayIntervalSeconds ?? 5,
       ),
     );
-    final ({
-      int currentIndex,
-      int totalPages,
-      bool isVertical,
-    })? autoPlayState = ref.watch(
-      readerViewProvider(routeContext.comicId).select(
-        (AsyncValue<ReaderViewState> asyncState) {
-          final ReaderViewState? readerState = asyncState.asData?.value;
-          if (readerState == null) {
-            return null;
-          }
-          return (
-            currentIndex: readerState.currentIndex,
-            totalPages: readerState.totalPages,
-            isVertical: readerState.isVertical,
-          );
-        },
-      ),
-    );
+    final ({int currentIndex, int totalPages, bool isVertical})? autoPlayState =
+        ref.watch(
+          readerViewProvider(routeContext.comicId).select((
+            AsyncValue<ReaderViewState> asyncState,
+          ) {
+            final ReaderViewState? readerState = asyncState.asData?.value;
+            if (readerState == null) {
+              return null;
+            }
+            return (
+              currentIndex: readerState.currentIndex,
+              totalPages: readerState.totalPages,
+              isVertical: readerState.isVertical,
+            );
+          }),
+        );
     final GlobalKey<ScaffoldState> scaffoldKey = useMemoized(
       GlobalKey<ScaffoldState>.new,
       <Object?>[],

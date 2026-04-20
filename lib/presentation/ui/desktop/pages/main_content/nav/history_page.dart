@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/config/theme.dart';
+import 'package:hentai_library/presentation/ui/desktop/theme_token/token.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
@@ -12,8 +13,6 @@ import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/c
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// 根节点不持有搜索 state：搜索写入 [historySearchQueryProvider]，仅列表区 watch，
-/// 避免输入时重建标题栏。列表内对 [historyFeedViewProvider] 使用 `select` 缩小刷新面。
 class HistoryPage extends ConsumerWidget {
   const HistoryPage({super.key});
 
@@ -22,7 +21,7 @@ class HistoryPage extends ConsumerWidget {
     return CustomScrollView(
       slivers: const <Widget>[
         SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+          padding: mainContentPadding,
           sliver: SliverToBoxAdapter(child: _Header()),
         ),
         SliverToBoxAdapter(child: SizedBox(height: 16)),
@@ -33,12 +32,6 @@ class HistoryPage extends ConsumerWidget {
       ],
     );
   }
-}
-
-class _HistoryStyles {
-  const _HistoryStyles._();
-  static const double titleFontSize = 26;
-  static const double subtitleFontSize = 13;
 }
 
 class _Header extends ConsumerWidget {
@@ -65,7 +58,7 @@ class _Header extends ConsumerWidget {
                 "阅读历史",
                 style: TextStyle(
                   color: theme.colorScheme.textPrimary,
-                  fontSize: _HistoryStyles.titleFontSize,
+                  fontSize: titleFontSize,
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.4,
                 ),
@@ -73,7 +66,7 @@ class _Header extends ConsumerWidget {
               Text(
                 "$totalCount 条记录 • 最长保留 30 天",
                 style: TextStyle(
-                  fontSize: _HistoryStyles.subtitleFontSize,
+                  fontSize: subtitleFontSize,
                   fontWeight: FontWeight.w400,
                   color: theme.colorScheme.textTertiary,
                 ),

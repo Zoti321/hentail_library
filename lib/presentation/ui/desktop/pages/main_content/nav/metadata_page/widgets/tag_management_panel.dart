@@ -6,7 +6,7 @@ import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/status_card_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/tag_name_editor_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav_pages/panels/metadata_panel_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/metadata_page/widgets/metadata_panel_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';

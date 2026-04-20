@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/page/reader/reader_paged_content.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/page/reader/reader_vertical_content.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/widgets/reader_paged_content.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/widgets/reader_vertical_content.dart';
 
 class ReaderContentSwitcher extends StatelessWidget {
   const ReaderContentSwitcher({

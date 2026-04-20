@@ -11,7 +11,7 @@ import 'package:hentai_library/domain/entity/comic/tag.dart';
 import 'package:hentai_library/domain/entity/reading_history.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dart';
-import 'package:hentai_library/presentation/models/comic_cover_display_data.dart';
+import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/presentation/providers/pages/library/library_page_notifier.dart';
 import 'package:hentai_library/presentation/providers/pages/reader/reader_page_notifier.dart';
 import 'package:hentai_library/presentation/providers/pages/tag_management/tag_management_notifier.dart';
@@ -88,7 +88,10 @@ class _MobileComicDetailBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ComicCoverDisplayData? coverData = ref
         .watch(comicCoverDisplayProvider(comicId: comic.comicId))
-        .maybeWhen(data: (ComicCoverDisplayData? value) => value, orElse: () => null);
+        .maybeWhen(
+          data: (ComicCoverDisplayData? value) => value,
+          orElse: () => null,
+        );
     final int? computedPageCount = ref
         .watch(comicImagesProvider(comicId: comic.comicId))
         .maybeWhen(
@@ -225,11 +228,7 @@ class _MobileComicDetailBody extends ConsumerWidget {
         memory,
         fit: BoxFit.cover,
         errorBuilder:
-            (
-              BuildContext context,
-              Object error,
-              StackTrace? stackTrace,
-            ) {
+            (BuildContext context, Object error, StackTrace? stackTrace) {
               return placeholder;
             },
       );
@@ -242,11 +241,7 @@ class _MobileComicDetailBody extends ConsumerWidget {
       File(path),
       fit: BoxFit.cover,
       errorBuilder:
-          (
-            BuildContext context,
-            Object error,
-            StackTrace? stackTrace,
-          ) {
+          (BuildContext context, Object error, StackTrace? stackTrace) {
             return placeholder;
           },
     );
