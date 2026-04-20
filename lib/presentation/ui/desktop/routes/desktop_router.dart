@@ -3,9 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/series_detail_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/history_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/home_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/home_page/home_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/library_page/library_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/settings_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/settings_page/settings_page.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/shared_content_routes.dart';
 import 'package:hentai_library/presentation/ui/shared/shell/adaptive_app_shell.dart';
 
