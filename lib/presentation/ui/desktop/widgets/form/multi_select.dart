@@ -11,6 +11,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 const double _kMultiSelectMenuPanelWidth = 288;
 const double _kMultiSelectMenuMaxHeightCap = 320;
 const double _kMultiSelectMenuScreenHeightFraction = 0.45;
+/// 为顶部搜索区预留高度，用于从面板总高中划出列表 [ConstrainedBox] 的 `maxHeight`。
+const double _kMultiSelectSearchReserveHeight = 96;
 
 /// 漫画元数据「全库关联」多选：作者 / 标签等场景复用；差异在 [MultiSelectCopy] 与数据源。
 class MultiSelectCopy {
@@ -37,6 +39,9 @@ class _MultiSelectDropdownListStyles {
 
   static const double iconButtonRadius = 7;
   static const Size iconButtonSize = Size(26, 26);
+
+  /// 与 [_MultiSelectDropdownRow] 单行一致：上下 padding + 左侧图标区高度。
+  static double get listRowHeight => rowPadding.vertical + iconButtonSize.height;
 }
 
 /// 图书馆实体多选：一行「标签 + 下拉」，触发条展示已选数量；浮层内为搜索区 + 虚拟化列表。
@@ -142,9 +147,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                         children: [
                           Expanded(
                             child: Text(
-                              n == 0
-                                  ? widget.copy.selectPrompt
-                                  : '已选 $n 个',
+                              n == 0 ? widget.copy.selectPrompt : '已选 $n 个',
                               style: TextStyle(
                                 fontSize: tokens.text.bodySm,
                                 color: n == 0
@@ -264,10 +267,7 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              TextButton(
-                onPressed: onRetry,
-                child: const Text('重试'),
-              ),
+              TextButton(onPressed: onRetry, child: const Text('重试')),
             ],
           ),
         ),
@@ -285,7 +285,10 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
 }
 
 class _MultiSelectMenuSizedShell extends StatelessWidget {
-  const _MultiSelectMenuSizedShell({required this.maxHeight, required this.child});
+  const _MultiSelectMenuSizedShell({
+    required this.maxHeight,
+    required this.child,
+  });
 
   final double maxHeight;
   final Widget child;
@@ -339,7 +342,8 @@ class _MultiSelectMenuWithFilter<T> extends StatefulWidget {
       _MultiSelectMenuWithFilterState<T>();
 }
 
-class _MultiSelectMenuWithFilterState<T> extends State<_MultiSelectMenuWithFilter<T>> {
+class _MultiSelectMenuWithFilterState<T>
+    extends State<_MultiSelectMenuWithFilter<T>> {
   final TextEditingController _filterController = TextEditingController();
 
   late Set<String> _selected;
@@ -379,17 +383,16 @@ class _MultiSelectMenuWithFilterState<T> extends State<_MultiSelectMenuWithFilte
       screenH * _kMultiSelectMenuScreenHeightFraction,
     );
     final String query = _filterController.text.trim().toLowerCase();
-    final List<T> filtered = widget.items
-        .where(
-          (T item) {
-            final String name = widget.resolveName(item);
-            return query.isEmpty || name.toLowerCase().contains(query);
-          },
-        )
-        .toList();
+    final List<T> filtered = widget.items.where((T item) {
+      final String name = widget.resolveName(item);
+      return query.isEmpty || name.toLowerCase().contains(query);
+    }).toList();
+    final double listMaxHeight = math.max(
+      64,
+      maxPanelHeight - _kMultiSelectSearchReserveHeight,
+    );
     return SizedBox(
       width: _kMultiSelectMenuPanelWidth,
-      height: maxPanelHeight,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: cs.surface,
@@ -407,13 +410,14 @@ class _MultiSelectMenuWithFilterState<T> extends State<_MultiSelectMenuWithFilte
           borderRadius: BorderRadius.circular(tokens.radius.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
                 padding: EdgeInsets.fromLTRB(
                   tokens.spacing.sm,
-                  tokens.spacing.sm + 2,
+                  tokens.spacing.md + 2,
                   tokens.spacing.sm,
-                  tokens.spacing.md,
+                  tokens.spacing.sm,
                 ),
                 child: _MultiSelectSearchField(
                   controller: _filterController,
@@ -421,7 +425,8 @@ class _MultiSelectMenuWithFilterState<T> extends State<_MultiSelectMenuWithFilte
                   onQueryChanged: (_) => setState(() {}),
                 ),
               ),
-              Expanded(
+              ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: listMaxHeight),
                 child: _MultiSelectVirtualizedList<T>(
                   filteredItems: filtered,
                   allItemsEmpty: widget.items.isEmpty,
@@ -455,52 +460,57 @@ class _MultiSelectSearchField extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
-    return TextField(
-      controller: controller,
-      onChanged: onQueryChanged,
-      style: TextStyle(
-        fontSize: tokens.text.bodySm,
-        height: 1.3,
-        color: cs.textPrimary,
-      ),
-      decoration: InputDecoration(
-        isDense: true,
-        hintText: filterHint,
-        hintStyle: TextStyle(
+    final double rowH = _MultiSelectDropdownListStyles.listRowHeight;
+    const double borderWidth = 1;
+    final double innerH = rowH - borderWidth * 2;
+    final double textLineH = tokens.text.bodySm * 1.3;
+    final double vPad = (innerH - textLineH) / 2;
+    return SizedBox(
+      height: rowH,
+      child: TextField(
+        controller: controller,
+        onChanged: onQueryChanged,
+        textAlignVertical: TextAlignVertical.center,
+        style: TextStyle(
           fontSize: tokens.text.bodySm,
           height: 1.3,
-          color: cs.textPlaceholder,
+          color: cs.textPrimary,
         ),
-        prefixIcon: Padding(
-          padding: EdgeInsets.only(left: tokens.spacing.xs),
-          child: Icon(
-            LucideIcons.search,
-            size: 14,
-            color: cs.iconSecondary,
+        decoration: InputDecoration(
+          isDense: true,
+          hintText: filterHint,
+          hintStyle: TextStyle(
+            fontSize: tokens.text.bodySm,
+            height: 1.3,
+            color: cs.textPlaceholder,
           ),
-        ),
-        prefixIconConstraints: const BoxConstraints(
-          minWidth: 30,
-          minHeight: 30,
-          maxHeight: 30,
-        ),
-        contentPadding: EdgeInsets.fromLTRB(
-          0,
-          tokens.spacing.xs + 2,
-          tokens.spacing.sm + 2,
-          tokens.spacing.xs + 2,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(tokens.radius.sm),
-          borderSide: BorderSide(color: cs.borderSubtle),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(tokens.radius.sm),
-          borderSide: BorderSide(color: cs.borderSubtle),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(tokens.radius.sm),
-          borderSide: BorderSide(color: cs.primary, width: 1.25),
+          prefixIcon: Padding(
+            padding: EdgeInsets.only(left: tokens.spacing.xs),
+            child: Icon(LucideIcons.search, size: 14, color: cs.iconSecondary),
+          ),
+          prefixIconConstraints: BoxConstraints(
+            minWidth: 30,
+            minHeight: _MultiSelectDropdownListStyles.iconButtonSize.height,
+            maxHeight: _MultiSelectDropdownListStyles.iconButtonSize.height,
+          ),
+          contentPadding: EdgeInsets.fromLTRB(
+            0,
+            vPad,
+            tokens.spacing.sm + 2,
+            vPad,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(tokens.radius.md),
+            borderSide: BorderSide(color: cs.borderSubtle, width: borderWidth),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(tokens.radius.md),
+            borderSide: BorderSide(color: cs.borderSubtle, width: borderWidth),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(tokens.radius.md),
+            borderSide: BorderSide(color: cs.primary, width: borderWidth),
+          ),
         ),
       ),
     );
@@ -535,7 +545,7 @@ class _MultiSelectVirtualizedList<T> extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: tokens.spacing.lg,
-            vertical: tokens.spacing.md + 2,
+            vertical: 0,
           ),
           child: Text(
             allItemsEmpty
@@ -553,6 +563,7 @@ class _MultiSelectVirtualizedList<T> extends StatelessWidget {
     final int rowCount = filteredItems.length;
     final int itemCount = rowCount * 2 - 1;
     return ListView.builder(
+      shrinkWrap: true,
       physics: const ClampingScrollPhysics(),
       padding: EdgeInsets.only(
         top: tokens.spacing.sm,

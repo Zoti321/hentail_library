@@ -44,37 +44,35 @@ class HomePage extends ConsumerWidget {
     final int comicCount = ref.watch(
       libraryPageProvider.select((s) => s.rawList.length),
     );
-    return SafeArea(
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final double maxW = constraints.maxWidth.clamp(
-            0,
-            _kHomeContentMaxWidth,
-          );
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: maxW),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(context, ref),
-                    SizedBox(height: tokens.spacing.xl + 12),
-                    _buildHeroSection(context, ref, comicCount),
-                    SizedBox(height: tokens.spacing.lg + 8),
-                    _buildContinueReadingSection(context, ref),
-                    SizedBox(height: tokens.spacing.xl + 8),
-                    _buildShortcutEntries(context, ref),
-                    SizedBox(height: tokens.spacing.xl * 4),
-                  ],
-                ),
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double maxW = constraints.maxWidth.clamp(
+          0,
+          _kHomeContentMaxWidth,
+        );
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxW),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(context, ref),
+                  SizedBox(height: tokens.spacing.xl + 12),
+                  _buildHeroSection(context, ref, comicCount),
+                  SizedBox(height: tokens.spacing.lg + 8),
+                  _buildContinueReadingSection(context, ref),
+                  SizedBox(height: tokens.spacing.xl + 8),
+                  _buildShortcutEntries(context, ref),
+                  SizedBox(height: tokens.spacing.xl * 4),
+                ],
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -133,10 +131,10 @@ class HomePage extends ConsumerWidget {
           children: [
             GhostButton.icon(
               icon: LucideIcons.refreshCw,
-              tooltip: '刷新漫画库列表',
+              tooltip: '',
               semanticLabel: '刷新漫画库列表',
-              iconSize: 18,
-              size: 36,
+              iconSize: 16,
+              size: 24,
               borderRadius: 10,
               foregroundColor: cs.iconDefault,
               hoverColor: cs.surfaceContainerHighest,
