@@ -4,18 +4,10 @@
 
 ## 屏幕截图
 
-<table>
- <tr>
-    <td><img alt="" src="static/screenshot/image_1.png"></td>
-    <td><img alt="" src="static/screenshot/image_2.png"></td>
-    <td><img alt="" src="static/screenshot/image_3.png"></td>
-  <tr>
-  <tr>
-    <td><img alt="" src="static/screenshot/image_4.png"></td>
-    <td><img alt="" src="static/screenshot/image_5.png"></td>
-    <td><img alt="" src="static/screenshot/image_6.png"></td>
-  <tr>
-</table>
+![alt](static/screenshot/image_1.png)
+![alt](static/screenshot/image_2.png)
+![alt](static/screenshot/image_3.png)
+![alt](static/screenshot/image_4.png)
 
 ## 核心功能
 
