@@ -10,6 +10,7 @@ import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/a
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/rename_series_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/reorder_series_items_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/series_confirm_delete_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/routes/desktop_router.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -483,14 +484,17 @@ class _SeriesRow extends ConsumerWidget {
                 }
                 try {
                   await ref.read(seriesActionsProvider).delete(series.name);
-                  if (context.mounted) {
-                    showSuccessToast(context, '已删除系列');
-                  }
                 } catch (e) {
-                  if (context.mounted) {
-                    showErrorToast(context, e);
-                  }
+                  _showDesktopSeriesFeedbackToast(
+                    message: null,
+                    error: e,
+                  );
+                  return;
                 }
+                _showDesktopSeriesFeedbackToast(
+                  message: '已删除系列',
+                  error: null,
+                );
               },
             ),
           ],
@@ -546,6 +550,25 @@ class _SeriesManagementEmptyState extends StatelessWidget {
       ),
     );
   }
+}
+
+/// 删除系列后列表行会立即卸挂载；在下一帧用根导航 [Context] 显示 Toast，
+/// 避免行内 [Context] 与 Tooltip / Overlay 竞态触发 `_overlay != null` 断言。
+void _showDesktopSeriesFeedbackToast({
+  required String? message,
+  required Object? error,
+}) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    final BuildContext? rootCtx = desktopRootNavigatorKey.currentContext;
+    if (rootCtx == null || !rootCtx.mounted) {
+      return;
+    }
+    if (message != null) {
+      showSuccessToast(rootCtx, message);
+    } else if (error != null) {
+      showErrorToast(rootCtx, error);
+    }
+  });
 }
 
 List<Series> _filterSeriesByQuery(List<Series> source, String query) {

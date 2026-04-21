@@ -1,4 +1,4 @@
-import 'package:hentai_library/data/services/series/comic_series_inference_from_titles_service.dart';
+import 'package:hentai_library/data/services/series/auto_series_infer_service.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/repository/comic_repo.dart';
@@ -21,14 +21,14 @@ class InferSeriesFromComicTitlesUseCase {
   InferSeriesFromComicTitlesUseCase({
     required ComicRepository comicRepository,
     required SeriesRepository seriesRepository,
-    required ComicSeriesInferenceFromTitlesService inferenceService,
-  })  : _comicRepository = comicRepository,
-        _seriesRepository = seriesRepository,
-        _inferenceService = inferenceService;
+    required AutoSeriesInferService inferenceService,
+  }) : _comicRepository = comicRepository,
+       _seriesRepository = seriesRepository,
+       _inferenceService = inferenceService;
 
   final ComicRepository _comicRepository;
   final SeriesRepository _seriesRepository;
-  final ComicSeriesInferenceFromTitlesService _inferenceService;
+  final AutoSeriesInferService _inferenceService;
 
   Future<InferSeriesFromComicTitlesResult> call() async {
     final List<Series> allSeries = await _seriesRepository.getAll();
@@ -44,7 +44,7 @@ class InferSeriesFromComicTitlesUseCase {
       if (assignedComicIds.contains(c.comicId)) {
         continue;
       }
-      candidates.add(ComicTitleInput(comicId: c.comicId, title: c.title));
+      candidates.add((comicId: c.comicId, title: c.title));
     }
     final List<InferredSeriesGroup> groups = _inferenceService.inferGroups(
       candidates,

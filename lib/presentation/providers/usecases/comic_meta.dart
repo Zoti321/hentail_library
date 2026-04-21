@@ -39,7 +39,7 @@ InferSeriesFromComicTitlesUseCase inferSeriesFromComicTitlesUseCase(Ref ref) {
   return InferSeriesFromComicTitlesUseCase(
     comicRepository: ref.read(comicRepoProvider),
     seriesRepository: ref.read(librarySeriesRepoProvider),
-    inferenceService: ref.read(comicSeriesInferenceFromTitlesServiceProvider),
+    inferenceService: ref.read(autoSeriesInferServiceProvider),
   );
 }
 
