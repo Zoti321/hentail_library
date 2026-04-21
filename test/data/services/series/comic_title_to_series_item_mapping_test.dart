@@ -10,7 +10,7 @@ void main() {
         mapping.mapComicTitleToSeriesVolume('标题A 3');
     expect(actual, isNotNull);
     expect(actual!.seriesName, '标题A');
-    expect(actual.volumeIndex, 3);
+    expect(actual.volumeSortKey, 3);
   });
 
   test('mapComicTitleToSeriesVolume returns null for invalid patterns', () {
@@ -25,10 +25,10 @@ void main() {
         mapping.mapComicTitleToSeriesVolume('标题A 后篇');
     expect(zen, isNotNull);
     expect(zen!.seriesName, '标题A');
-    expect(zen.volumeIndex, 1);
+    expect(zen.volumeSortKey, 1);
     expect(kou, isNotNull);
     expect(kou!.seriesName, '标题A');
-    expect(kou.volumeIndex, 2);
+    expect(kou.volumeSortKey, 2);
   });
 
   test('digit suffix takes precedence over substring false positives', () {
@@ -36,7 +36,7 @@ void main() {
         mapping.mapComicTitleToSeriesVolume('X 前篇 1');
     expect(actual, isNotNull);
     expect(actual!.seriesName, 'X 前篇');
-    expect(actual.volumeIndex, 1);
+    expect(actual.volumeSortKey, 1);
   });
 
   test('contiguous base plus index without whitespace', () {
@@ -44,7 +44,7 @@ void main() {
         mapping.mapComicTitleToSeriesVolume('标题A12');
     expect(actual, isNotNull);
     expect(actual!.seriesName, '标题A');
-    expect(actual.volumeIndex, 12);
+    expect(actual.volumeSortKey, 12);
   });
 
   test('rejects base whose last two chars are both digits', () {
@@ -57,7 +57,7 @@ void main() {
       mapping.mapComicTitleToSeriesVolume('标题A 12')?.seriesName,
       '标题A',
     );
-    expect(mapping.mapComicTitleToSeriesVolume('标题A 12')?.volumeIndex, 12);
+    expect(mapping.mapComicTitleToSeriesVolume('标题A 12')?.volumeSortKey, 12);
   });
 
   test('strips leading Comic Market (C###) tags from series base', () {
@@ -65,7 +65,7 @@ void main() {
         mapping.mapComicTitleToSeriesVolume('(C78) 标题A 3');
     expect(actual, isNotNull);
     expect(actual!.seriesName, '标题A');
-    expect(actual.volumeIndex, 3);
+    expect(actual.volumeSortKey, 3);
   });
 
   test('strips multiple leading (C###) tags', () {
@@ -73,7 +73,7 @@ void main() {
         mapping.mapComicTitleToSeriesVolume('(C78)(C79) 标题A 2');
     expect(actual, isNotNull);
     expect(actual!.seriesName, '标题A');
-    expect(actual.volumeIndex, 2);
+    expect(actual.volumeSortKey, 2);
   });
 
   test('Comic Market tag examples map without C### in series name', () {
@@ -92,7 +92,7 @@ void main() {
         mapping.mapComicTitleToSeriesVolume('A (C78) B 1');
     expect(actual, isNotNull);
     expect(actual!.seriesName, 'A (C78) B');
-    expect(actual.volumeIndex, 1);
+    expect(actual.volumeSortKey, 1);
   });
 
   test('title with only Comic Market tag maps to null', () {

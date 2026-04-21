@@ -18,7 +18,7 @@ void main() {
       'b',
       'c',
     ]);
-    expect(actual.first.entries.map((e) => e.volumeIndex).toList(), <int>[
+    expect(actual.first.entries.map((e) => e.volumeSortKey).toList(), <int>[
       1,
       2,
       3,
@@ -90,9 +90,47 @@ void main() {
       'z',
       'k',
     ]);
-    expect(actual.first.entries.map((e) => e.volumeIndex).toList(), <int>[
+    expect(actual.first.entries.map((e) => e.volumeSortKey).toList(), <int>[
       1,
       2,
     ]);
+  });
+
+  test('infers 狩娘性交II alpha beta ntr and extra ordering', () {
+    final InferredSeriesFromTitlesResult? actual = service.inferSeriesFromTitles(
+      <String>[
+        '狩娘性交II 番外編',
+        '狩娘性交II β',
+        '狩娘性交II α わたし…犯されて性癖に目覚めました',
+        '狩娘性交II NTR編',
+      ],
+    );
+    expect(actual, isNotNull);
+    expect(actual!.seriesName, '狩娘性交II');
+    expect(actual.indexByTitle, <String, int>{
+      '狩娘性交II α わたし…犯されて性癖に目覚めました': 1,
+      '狩娘性交II β': 2,
+      '狩娘性交II NTR編': 3,
+      '狩娘性交II 番外編': 4,
+    });
+  });
+
+  test('infers わたし series with soushuuhen as volume 4', () {
+    final InferredSeriesFromTitlesResult? actual = service.inferSeriesFromTitles(
+      <String>[
+        'わたし…変えられちゃいました',
+        'わたし…変えられちゃいました。 2',
+        'わたし…変えられちゃいました。 3',
+        'わたし...変えられちゃいました。 ―アラサーOLがヤリチン大学生達のチ○ポにドハマリするまで― 総集編',
+      ],
+    );
+    expect(actual, isNotNull);
+    expect(actual!.seriesName, 'わたし…変えられちゃいました');
+    expect(actual.indexByTitle, <String, int>{
+      'わたし…変えられちゃいました': 1,
+      'わたし…変えられちゃいました。 2': 2,
+      'わたし…変えられちゃいました。 3': 3,
+      'わたし...変えられちゃいました。 ―アラサーOLがヤリチン大学生達のチ○ポにドハマリするまで― 総集編': 4,
+    });
   });
 }
