@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-enum ComicContextAction { read, detail, edit, showInExplorer, delete }
+enum SeriesContextAction { read, reorder, addComics, rename, delete }
 
-class FluentContextMenu {
+class SeriesContextMenu {
   static void show(
     BuildContext context, {
     required Offset position,
-    required String mangaTitle,
-    required ValueChanged<ComicContextAction> onAction,
+    required String seriesName,
+    required ValueChanged<SeriesContextAction> onAction,
   }) {
     final OverlayState overlay = Overlay.of(context);
     late OverlayEntry entry;
@@ -17,7 +17,7 @@ class FluentContextMenu {
     double left = position.dx;
     double top = position.dy;
     const double width = 236;
-    const double height = 320;
+    const double height = 286;
     if (left + width > screenSize.width) {
       left = screenSize.width - width - 10;
     }
@@ -26,7 +26,7 @@ class FluentContextMenu {
     }
     entry = OverlayEntry(
       builder: (BuildContext context) => Stack(
-        children: [
+        children: <Widget>[
           Positioned.fill(
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
@@ -40,7 +40,7 @@ class FluentContextMenu {
             child: Material(
               color: Colors.transparent,
               child: _MenuContent(
-                title: mangaTitle,
+                title: seriesName,
                 onClose: () => entry.remove(),
                 onAction: onAction,
               ),
@@ -62,9 +62,9 @@ class _MenuContent extends StatelessWidget {
 
   final String title;
   final VoidCallback onClose;
-  final ValueChanged<ComicContextAction> onAction;
+  final ValueChanged<SeriesContextAction> onAction;
 
-  void _handle(ComicContextAction action) {
+  void handleAction(SeriesContextAction action) {
     onAction(action);
     onClose();
   }
@@ -80,7 +80,7 @@ class _MenuContent extends StatelessWidget {
         color: cs.winSurface,
         borderRadius: BorderRadius.circular(panelRadius),
         border: Border.all(color: cs.borderMedium),
-        boxShadow: [
+        boxShadow: <BoxShadow>[
           BoxShadow(
             color: cs.cardShadow,
             blurRadius: 8,
@@ -93,7 +93,7 @@ class _MenuContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
-          children: [
+          children: <Widget>[
             Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(
@@ -105,9 +105,9 @@ class _MenuContent extends StatelessWidget {
                 border: Border(bottom: BorderSide(color: cs.borderSubtle)),
               ),
               child: Row(
-                children: [
+                children: <Widget>[
                   Icon(
-                    LucideIcons.panelRightOpen,
+                    LucideIcons.libraryBig,
                     size: 14,
                     color: cs.iconSecondary,
                   ),
@@ -131,26 +131,26 @@ class _MenuContent extends StatelessWidget {
             _MenuGroupLabel(label: '快速操作', color: cs.textSecondary),
             _FluentMenuItem(
               icon: LucideIcons.bookOpen,
-              label: '阅读',
+              label: '阅读系列',
               shortcut: 'Enter',
-              onTap: () => _handle(ComicContextAction.read),
+              onTap: () => handleAction(SeriesContextAction.read),
             ),
             _FluentMenuItem(
-              icon: LucideIcons.info,
-              label: '查看详情',
-              onTap: () => _handle(ComicContextAction.detail),
+              icon: LucideIcons.arrowUpDown,
+              label: '调整顺序',
+              onTap: () => handleAction(SeriesContextAction.reorder),
+            ),
+            _FluentMenuItem(
+              icon: LucideIcons.plus,
+              label: '添加漫画',
+              onTap: () => handleAction(SeriesContextAction.addComics),
             ),
             Divider(height: 10, thickness: 1, color: cs.borderSubtle),
             _MenuGroupLabel(label: '管理', color: cs.textSecondary),
             _FluentMenuItem(
               icon: LucideIcons.squarePen,
-              label: '编辑元数据',
-              onTap: () => _handle(ComicContextAction.edit),
-            ),
-            _FluentMenuItem(
-              icon: LucideIcons.externalLink,
-              label: '在文件资源管理器中显示',
-              onTap: () => _handle(ComicContextAction.showInExplorer),
+              label: '重命名',
+              onTap: () => handleAction(SeriesContextAction.rename),
             ),
             Divider(height: 10, thickness: 1, color: cs.borderSubtle),
             _MenuGroupLabel(label: '危险操作', color: cs.warning),
@@ -159,7 +159,7 @@ class _MenuContent extends StatelessWidget {
               label: '删除',
               shortcut: 'Del',
               isDestructive: true,
-              onTap: () => _handle(ComicContextAction.delete),
+              onTap: () => handleAction(SeriesContextAction.delete),
             ),
             SizedBox(height: tokens.spacing.xs + 2),
           ],
@@ -237,7 +237,7 @@ class _FluentMenuItem extends StatelessWidget {
               vertical: tokens.spacing.sm,
             ),
             child: Row(
-              children: [
+              children: <Widget>[
                 Icon(
                   icon,
                   size: 16,

@@ -11,7 +11,7 @@ import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/context_menu.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/comic_context_menu.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/edit_metadata_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/element/image/app_comic_image.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -50,7 +50,7 @@ class ComicTile extends HookConsumerWidget {
           final Offset relativePosition = overlay.globalToLocal(
             details.globalPosition,
           );
-          FluentContextMenu.show(
+          ComicContextMenu.show(
             context,
             position: relativePosition,
             mangaTitle: comic.title,

@@ -5,9 +5,12 @@ import 'package:hentai_library/theme/theme.dart';
 import 'package:hentai_library/core/l10n/app_strings.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
+import 'package:hentai_library/domain/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/entity/series_reading_history.dart';
 import 'package:hentai_library/domain/value_objects/library_display_target.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
+import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/filter_popup_button.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/sort_popup_button.dart';
@@ -15,7 +18,13 @@ import 'package:hentai_library/presentation/ui/desktop/widgets/element/card/comi
 import 'package:hentai_library/presentation/ui/desktop/widgets/element/tile/comic_tile.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/element/card/series_card.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/element/tile/series_tile.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/add_comics_to_series_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/series_confirm_delete_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/rename_series_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/reorder_series_items_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/series_context_menu.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 part 'library_grid_delegate.dart';

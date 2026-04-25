@@ -13,12 +13,14 @@ class SeriesCard extends HookConsumerWidget {
   final Series series;
   final Size size;
   final VoidCallback? onTap;
+  final void Function(TapDownDetails details)? onSecondaryTapDown;
 
   const SeriesCard({
     super.key,
     required this.series,
     required this.size,
     this.onTap,
+    this.onSecondaryTapDown,
   });
 
   @override
@@ -39,6 +41,7 @@ class SeriesCard extends HookConsumerWidget {
     final int count = series.items.length;
     final Widget content = GestureDetector(
       onTap: onTap,
+      onSecondaryTapDown: onSecondaryTapDown,
       child: MouseRegion(
         cursor: onTap != null
             ? SystemMouseCursors.click
