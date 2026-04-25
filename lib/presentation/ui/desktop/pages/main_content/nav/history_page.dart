@@ -19,6 +19,7 @@ class HistoryPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return CustomScrollView(
+      cacheExtent: 1200,
       slivers: const <Widget>[
         SliverPadding(
           padding: mainContentPadding,
@@ -201,17 +202,15 @@ class _HistoryListSliver extends ConsumerWidget {
       builder: (BuildContext context, constraints) {
         final double width = constraints.crossAxisExtent;
         final int crossAxisCount = _resolveCrossAxisCount(width);
-        return SliverGrid(
+        return SliverGrid.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
             mainAxisExtent: 138,
           ),
-          delegate: SliverChildBuilderDelegate((
-            BuildContext context,
-            int index,
-          ) {
+          itemCount: merged.length,
+          itemBuilder: (BuildContext context, int index) {
             final HistoryGridItemDto item = merged[index];
             if (item is ComicHistoryGridItemDto) {
               return ReadingHistoryCard.comic(
@@ -255,7 +254,7 @@ class _HistoryListSliver extends ConsumerWidget {
                 seriesName: seriesItem.seriesName,
               ),
             );
-          }, childCount: merged.length),
+          },
         );
       },
     );

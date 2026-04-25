@@ -636,7 +636,7 @@ class _MultiSelectDropdownRow extends StatelessWidget {
               spacing: 10,
               children: [
                 IconButton(
-                  tooltip: isSelected ? '取消选择' : '选择',
+                  tooltip: '',
                   onPressed: onToggle,
                   style: iconButtonStyle,
                   icon: Icon(

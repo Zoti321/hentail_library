@@ -5,6 +5,7 @@ import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/providers/pages/reader/reader_page_notifier.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/element/content_rating_chip.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/element/tag_chip.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page/widgets/comic_detail_constants.dart';
@@ -233,7 +234,7 @@ class _TagsExpandableSection extends HookWidget {
         Wrap(
           spacing: tokens.spacing.sm + 2,
           runSpacing: tokens.spacing.sm + 2,
-          children: shown.map((String e) => _TagChip(text: e)).toList(),
+          children: shown.map((String e) => TagChip(text: e)).toList(),
         ),
         if (needsToggle) ...<Widget>[
           SizedBox(height: tokens.spacing.sm + 2),
@@ -263,52 +264,5 @@ class _TagsExpandableSection extends HookWidget {
         ],
       ],
     );
-  }
-}
-
-class _TagChip extends StatelessWidget {
-  const _TagChip({required this.text});
-  final String text;
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final AppThemeTokens tokens = context.tokens;
-    final BorderRadius radius = BorderRadius.circular(tokens.radius.pill);
-    const Color kChipBackground = Color(0xFFFFFFFF);
-    final Widget chip = DecoratedBox(
-      decoration: BoxDecoration(
-        color: kChipBackground,
-        borderRadius: radius,
-        border: Border.all(color: cs.borderSubtle, width: 1),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-        child: Center(
-          widthFactor: 1,
-          heightFactor: 1,
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: tokens.text.labelXs,
-              height: 1.2,
-              letterSpacing: 0.1,
-              color: cs.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ),
-    );
-    return Semantics(label: text, child: chip);
   }
 }
