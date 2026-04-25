@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page/comic_detail_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/series_detail_page/series_detail_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/history_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/home_page/home_page.dart';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-enum ComicContextAction { read, detail, edit, showInExplorer, delete }
+enum ComicContextAction { read, edit, showInExplorer, delete }
 
 class ComicContextMenu {
   static void show(
@@ -17,7 +17,7 @@ class ComicContextMenu {
     double left = position.dx;
     double top = position.dy;
     const double width = 236;
-    const double height = 320;
+    const double height = 280;
     if (left + width > screenSize.width) {
       left = screenSize.width - width - 10;
     }
@@ -134,11 +134,6 @@ class _MenuContent extends StatelessWidget {
               label: '阅读',
               shortcut: 'Enter',
               onTap: () => _handle(ComicContextAction.read),
-            ),
-            _FluentMenuItem(
-              icon: LucideIcons.info,
-              label: '查看详情',
-              onTap: () => _handle(ComicContextAction.detail),
             ),
             Divider(height: 10, thickness: 1, color: cs.borderSubtle),
             _MenuGroupLabel(label: '管理', color: cs.textSecondary),

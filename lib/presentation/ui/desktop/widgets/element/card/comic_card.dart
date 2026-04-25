@@ -63,12 +63,6 @@ class ComicCard extends HookConsumerWidget {
                   ).toQueryParameters(),
                 );
                 break;
-              case ComicContextAction.detail:
-                appRouter.pushNamed(
-                  '漫画详情',
-                  pathParameters: {'id': comic.comicId},
-                );
-                break;
               case ComicContextAction.edit:
                 showDialog(
                   context: context,
