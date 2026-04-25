@@ -8,7 +8,8 @@ import 'package:hentai_library/presentation/ui/desktop/widgets/element/content_r
 import 'package:hentai_library/presentation/ui/desktop/widgets/element/tag_chip.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page/widgets/comic_detail_constants.dart';
+
+const int kComicDetailTagsCollapsedMaxCount = 8;
 
 class ComicDetailMetadataSection extends HookConsumerWidget {
   const ComicDetailMetadataSection({super.key, required this.comic});

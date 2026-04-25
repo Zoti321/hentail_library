@@ -3,8 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hentai_library/theme/theme.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/navigation/library_return_breadcrumb.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/responsive_layout/detail_page_layout.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page/widgets/comic_detail_constants.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page/widgets/comic_detail_card.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page/widgets/comic_detail_cover.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page/widgets/comic_detail_metadata_section.dart';
@@ -16,42 +16,18 @@ class ComicDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final Size mediaSize = MediaQuery.sizeOf(context);
-        final double parentWidth = constraints.maxWidth.isFinite
-            ? constraints.maxWidth
-            : mediaSize.width;
-        final double parentHeight = constraints.maxHeight.isFinite
-            ? constraints.maxHeight
-            : mediaSize.height;
-        final ComicDetailPanelSize panel = computeComicDetailPanelSize(
-          parentWidth: parentWidth,
-          parentHeight: parentHeight,
-        );
-        return Align(
-          alignment: Alignment.topCenter,
-          child: SizedBox(
-            width: panel.panelWidth,
-            height: panel.panelHeight,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                LibraryReturnBreadcrumb(
-                  trailingLabel: comic.title,
-                  trailingTooltip: comic.title,
-                ),
-                SizedBox(height: tokens.spacing.md + 4),
-                Expanded(
-                  child: ComicDetailCard(
-                    maxWidth: panel.targetWidth,
-                    padding: EdgeInsets.all(tokens.spacing.xl),
-                    child: _ComicDetailCardBody(comic: comic),
-                  ),
-                ),
-              ],
-            ),
-          ),
+
+    return DetailResponsiveLayout(
+      header: LibraryReturnBreadcrumb(
+        trailingLabel: comic.title,
+        trailingTooltip: comic.title,
+      ),
+      headerSpacing: tokens.spacing.md + 4,
+      bodyBuilder: (BuildContext context, DetailPanelSize panel) {
+        return ComicDetailCard(
+          maxWidth: panel.targetWidth,
+          padding: EdgeInsets.all(tokens.spacing.xl),
+          child: _ComicDetailCardBody(comic: comic),
         );
       },
     );
@@ -100,17 +76,11 @@ class _ComicDetailCardBody extends ConsumerWidget {
     final Widget layout = Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Flexible(
-          flex: 2,
-          child: Center(child: cover),
-        ),
+        Flexible(flex: 2, child: Center(child: cover)),
         SizedBox(width: tokens.spacing.lg + 16),
         Flexible(
           flex: 3,
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: rightColumn,
-          ),
+          child: Align(alignment: Alignment.topLeft, child: rightColumn),
         ),
       ],
     );

@@ -1,9 +1,8 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/responsive_layout/detail_page_layout.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/navigation/library_return_breadcrumb.dart';
 import 'actions.dart';
 import 'series_comic_items_card.dart';
@@ -16,13 +15,6 @@ class SeriesDetail extends ConsumerWidget {
 
   final Series series;
 
-  static const double _kContentWidthRatio = 0.8;
-  static const double _kContentHeightRatio = 0.8;
-  static const double _kContentMinWidth = 980;
-  static const double _kContentMaxWidth = 1320;
-  static const double _kContentMinHeight = 560;
-  static const double _kContentMaxHeight = 920;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
@@ -32,76 +24,37 @@ class SeriesDetail extends ConsumerWidget {
       ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
     final int count = series.items.length;
 
-    return Container(
-      color: cs.winBackground,
-      padding: .symmetric(
-        horizontal: tokens.spacing.lg + 8,
-        vertical: tokens.spacing.lg + 8,
+    return DetailResponsiveLayout(
+      header: LibraryReturnBreadcrumb(
+        trailingLabel: series.name,
+        trailingTooltip: series.name,
       ),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final Size mediaSize = MediaQuery.sizeOf(context);
-          final double parentWidth = constraints.maxWidth.isFinite
-              ? constraints.maxWidth
-              : mediaSize.width;
-          final double parentHeight = constraints.maxHeight.isFinite
-              ? constraints.maxHeight
-              : mediaSize.height;
-          final double targetWidth = (parentWidth * _kContentWidthRatio).clamp(
-            _kContentMinWidth,
-            _kContentMaxWidth,
-          );
-          final double targetHeight = (parentHeight * _kContentHeightRatio)
-              .clamp(_kContentMinHeight, _kContentMaxHeight);
-          final double panelWidth = math.min(parentWidth, targetWidth);
-          final double panelHeight = math.min(parentHeight, targetHeight);
-
-          return Align(
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-              width: panelWidth,
-              height: panelHeight,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  LibraryReturnBreadcrumb(
-                    trailingLabel: series.name,
-                    trailingTooltip: series.name,
-                  ),
-                  SizedBox(height: tokens.spacing.md + 4),
-                  Expanded(
-                    child: SeriesDetailCard(
-                      maxWidth: targetWidth,
-                      padding: EdgeInsets.all(tokens.spacing.xl),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Flexible(
-                            flex: 2,
-                            child: Center(
-                              child: AdaptiveSeriesCover(series: series),
-                            ),
-                          ),
-                          SizedBox(width: tokens.spacing.lg + 16),
-                          Flexible(
-                            flex: 3,
-                            child: _buildRightColumn(
-                              tokens: tokens,
-                              colorScheme: cs,
-                              sortedItems: sortedItems,
-                              count: count,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+      headerSpacing: tokens.spacing.md + 4,
+      bodyBuilder: (BuildContext context, DetailPanelSize panel) {
+        return SeriesDetailCard(
+          maxWidth: panel.targetWidth,
+          padding: EdgeInsets.all(tokens.spacing.xl),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Flexible(
+                flex: 2,
+                child: Center(child: AdaptiveSeriesCover(series: series)),
               ),
-            ),
-          );
-        },
-      ),
+              SizedBox(width: tokens.spacing.lg + 16),
+              Flexible(
+                flex: 3,
+                child: _buildRightColumn(
+                  tokens: tokens,
+                  colorScheme: cs,
+                  sortedItems: sortedItems,
+                  count: count,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

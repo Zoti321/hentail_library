@@ -24,6 +24,7 @@ class ComicDetailPage extends ConsumerWidget {
         horizontal: tokens.spacing.lg + 8,
         vertical: tokens.spacing.lg + 8,
       ),
+
       child: rawData.when(
         data: (List<Comic> comics) {
           final Comic? found = comics.firstWhereOrNull(

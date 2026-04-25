@@ -12,6 +12,13 @@ class TagChip extends StatelessWidget {
     final AppThemeTokens tokens = context.tokens;
     final BorderRadius radius = BorderRadius.circular(tokens.radius.pill);
     const Color chipBackground = Color(0xFFFFFFFF);
+    final TextStyle textStyle = TextStyle(
+      fontSize: tokens.text.labelXs,
+      height: 1.2,
+      letterSpacing: 0.1,
+      color: cs.textSecondary,
+      fontWeight: FontWeight.w600,
+    );
 
     return Semantics(
       label: text,
@@ -30,24 +37,48 @@ class TagChip extends StatelessWidget {
             ),
           ],
         ),
-        child: Center(
-          widthFactor: 1,
-          heightFactor: 1,
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: tokens.text.labelXs,
-              height: 1.2,
-              letterSpacing: 0.1,
-              color: cs.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final bool isTruncated = _isTextTruncated(
+              context: context,
+              maxWidth: constraints.maxWidth,
+              textStyle: textStyle,
+            );
+            Widget textWidget = Center(
+              widthFactor: 1,
+              heightFactor: 1,
+              child: Text(
+                text,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textStyle,
+              ),
+            );
+            if (isTruncated) {
+              textWidget = Tooltip(
+                message: text,
+                waitDuration: const Duration(milliseconds: 1200),
+                child: textWidget,
+              );
+            }
+            return textWidget;
+          },
         ),
       ),
     );
+  }
+
+  bool _isTextTruncated({
+    required BuildContext context,
+    required double maxWidth,
+    required TextStyle textStyle,
+  }) {
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(text: text, style: textStyle),
+      maxLines: 1,
+      textDirection: Directionality.of(context),
+    )..layout(maxWidth: maxWidth);
+    return textPainter.didExceedMaxLines;
   }
 }
