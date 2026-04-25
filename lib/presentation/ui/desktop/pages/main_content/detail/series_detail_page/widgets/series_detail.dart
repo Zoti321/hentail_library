@@ -68,9 +68,7 @@ class SeriesDetail extends ConsumerWidget {
                     trailingLabel: series.name,
                     trailingTooltip: series.name,
                   ),
-
                   SizedBox(height: tokens.spacing.md + 4),
-
                   Expanded(
                     child: SeriesDetailCard(
                       maxWidth: targetWidth,
@@ -146,10 +144,7 @@ class SeriesDetail extends ConsumerWidget {
       children: <Widget>[
         _buildTitleBlock(colorScheme: colorScheme, count: count),
         SeriesDetailActions(series: series, sortedItems: sortedItems),
-        ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: 320),
-          // height: listViewportHeight,
-          // width: double.infinity,
+        Flexible(
           child: SeriesComicItemsCard(
             colorScheme: colorScheme,
             listCardRadius: tokens.radius.lg,

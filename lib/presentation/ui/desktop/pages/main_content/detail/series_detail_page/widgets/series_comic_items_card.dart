@@ -53,7 +53,7 @@ class SeriesComicItemsCard extends StatelessWidget {
             // 滚动区域列表
             Flexible(
               child: ListView.separated(
-                // physics: const ClampingScrollPhysics(),
+                physics: const ClampingScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: itemCount,
                 separatorBuilder: (BuildContext context, int index) {
