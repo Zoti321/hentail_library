@@ -16,37 +16,46 @@ class ComicDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-
-    return Container(
-      alignment: Alignment.topCenter,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final double contentMaxWidth = computeComicDetailContentMaxWidth(
-            constraints.maxWidth,
-          );
-          return ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: contentMaxWidth),
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final Size mediaSize = MediaQuery.sizeOf(context);
+        final double parentWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : mediaSize.width;
+        final double parentHeight = constraints.maxHeight.isFinite
+            ? constraints.maxHeight
+            : mediaSize.height;
+        final ComicDetailPanelSize panel = computeComicDetailPanelSize(
+          parentWidth: parentWidth,
+          parentHeight: parentHeight,
+        );
+        return Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: panel.panelHeight),
+            child: SizedBox(
+            width: panel.panelWidth,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 LibraryReturnBreadcrumb(
                   trailingLabel: comic.title,
                   trailingTooltip: comic.title,
                 ),
                 SizedBox(height: tokens.spacing.md + 4),
-                ComicDetailCard(
-                  maxWidth: contentMaxWidth,
-                  child: Padding(
+                Expanded(
+                  child: ComicDetailCard(
+                    maxWidth: panel.targetWidth,
                     padding: EdgeInsets.all(tokens.spacing.xl),
                     child: _ComicDetailCardBody(comic: comic),
                   ),
                 ),
               ],
             ),
-          );
-        },
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -58,7 +67,6 @@ class _ComicDetailCardBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
-
     final Widget titleBlock = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -83,6 +91,7 @@ class _ComicDetailCardBody extends ConsumerWidget {
     final Widget cover = ComicDetailCover(comic: comic);
     final Widget rightColumn = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       spacing: 16,
       children: <Widget>[
         titleBlock,
@@ -90,16 +99,21 @@ class _ComicDetailCardBody extends ConsumerWidget {
         ComicDetailPrimaryActions(comic: comic),
       ],
     );
-
     final Widget layout = Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Flexible(
           flex: 2,
-          child: cover,
+          child: Center(child: cover),
         ),
         SizedBox(width: tokens.spacing.lg + 16),
-        Flexible(flex: 3, child: rightColumn),
+        Flexible(
+          flex: 3,
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: rightColumn,
+          ),
+        ),
       ],
     );
     return layout

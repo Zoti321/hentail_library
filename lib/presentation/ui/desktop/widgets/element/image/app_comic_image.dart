@@ -36,14 +36,15 @@ class AppComicImage extends StatelessWidget {
     final double devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
     final ImageQualityPolicy policy = ImageQualityPolicy.current;
     final int effectiveMaxWidth = maxWidth ?? policy.coverDecodeMaxWidth;
-    final int rawWidth =
-        (logicalWidth * devicePixelRatio * policy.decodeScale).round();
+    final int rawWidth = (logicalWidth * devicePixelRatio * policy.decodeScale)
+        .round();
     return rawWidth.clamp(minWidth, effectiveMaxWidth);
   }
 
   @override
   Widget build(BuildContext context) {
     final Uint8List? bytes = memoryBytes;
+
     if (bytes != null && bytes.isNotEmpty) {
       final Widget fallback = _buildErrorPlaceholder();
       return ExtendedImage.memory(
@@ -63,6 +64,7 @@ class AppComicImage extends StatelessWidget {
         },
       );
     }
+
     final String? resolvedPath = filePath;
     if (resolvedPath == null || resolvedPath.trim().isEmpty) {
       return _buildPlaceholder();

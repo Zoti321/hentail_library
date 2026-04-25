@@ -2,23 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/theme/theme.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/providers/pages/reader/reader_page_notifier.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/element/content_rating_chip.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page/widgets/comic_detail_constants.dart';
-
-String? resolveContentRatingLabelForComicDetail(ContentRating rating) {
-  switch (rating) {
-    case ContentRating.unknown:
-      return null;
-    case ContentRating.safe:
-      return '全年龄';
-    case ContentRating.r18:
-      return 'R18';
-  }
-}
 
 class ComicDetailMetadataSection extends HookConsumerWidget {
   const ComicDetailMetadataSection({super.key, required this.comic});
@@ -40,15 +29,15 @@ class ComicDetailMetadataSection extends HookConsumerWidget {
         ? '未知'
         : '$pageCount 页';
     final String formatLabel = comic.resourceType.name.toUpperCase();
-    final String? ratingLabel = resolveContentRatingLabelForComicDetail(
-      comic.contentRating,
-    );
     final AppThemeTokens tokens = context.tokens;
     final List<Widget> statChildren = <Widget>[
       _StatRow(icon: LucideIcons.files, label: '页数', value: pageLabel),
       _StatRow(icon: LucideIcons.package, label: '资源格式', value: formatLabel),
-      if (ratingLabel != null)
-        _StatRow(icon: LucideIcons.shield, label: '分级', value: ratingLabel),
+      _StatWidgetRow(
+        icon: LucideIcons.shield,
+        label: '分级',
+        child: ContentRatingChip(rating: comic.contentRating),
+      ),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,6 +132,50 @@ class _StatRow extends StatelessWidget {
               color: cs.textSecondary,
               height: 1.35,
             ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatWidgetRow extends StatelessWidget {
+  const _StatWidgetRow({
+    required this.icon,
+    required this.label,
+    required this.child,
+  });
+
+  final IconData icon;
+  final String label;
+  final Widget child;
+
+  static const double kStatLabelWidth = 72;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Icon(icon, size: 17, color: cs.iconSecondary),
+        SizedBox(width: tokens.spacing.sm),
+        SizedBox(
+          width: kStatLabelWidth,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: tokens.text.labelXs,
+              color: cs.textTertiary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: child,
           ),
         ),
       ],
