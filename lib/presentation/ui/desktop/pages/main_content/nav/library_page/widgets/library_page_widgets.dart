@@ -24,7 +24,7 @@ import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/a
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/series_confirm_delete_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/rename_series_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/reorder_series_items_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/series_context_menu.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/context_menu/series_context_menu.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 part 'library_grid_delegate.dart';
