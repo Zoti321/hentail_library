@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/theme/theme.dart';
@@ -87,7 +88,7 @@ class HomePageContinueReadingSection extends ConsumerWidget {
   }
 }
 
-class _ContinueReadingBody extends StatelessWidget {
+class _ContinueReadingBody extends StatefulWidget {
   const _ContinueReadingBody({
     required this.loading,
     required this.hasError,
@@ -103,22 +104,76 @@ class _ContinueReadingBody extends StatelessWidget {
   final ColorScheme colorScheme;
 
   @override
+  State<_ContinueReadingBody> createState() => _ContinueReadingBodyState();
+}
+
+class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
+  late final ScrollController continueReadingScrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    continueReadingScrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    continueReadingScrollController.dispose();
+    super.dispose();
+  }
+
+  void handlePointerSignal(PointerSignalEvent event) {
+    if (event is! PointerScrollEvent) {
+      return;
+    }
+    if (!continueReadingScrollController.hasClients) {
+      return;
+    }
+    final double currentOffset = continueReadingScrollController.offset;
+    final double minOffset =
+        continueReadingScrollController.position.minScrollExtent;
+    final double maxOffset =
+        continueReadingScrollController.position.maxScrollExtent;
+    final bool isScrollingForward = event.scrollDelta.dy > 0;
+    final bool isAtLeadingEdge = currentOffset <= minOffset;
+    final bool isAtTrailingEdge = currentOffset >= maxOffset;
+    if ((isScrollingForward && isAtTrailingEdge) ||
+        (!isScrollingForward && isAtLeadingEdge)) {
+      return;
+    }
+    GestureBinding.instance.pointerSignalResolver.register(event, (
+      PointerSignalEvent resolvedEvent,
+    ) {
+      final PointerScrollEvent pointerScrollEvent =
+          resolvedEvent as PointerScrollEvent;
+      final double nextOffset =
+          (continueReadingScrollController.offset +
+                  pointerScrollEvent.scrollDelta.dy)
+              .clamp(minOffset, maxOffset);
+      if (nextOffset == continueReadingScrollController.offset) {
+        return;
+      }
+      continueReadingScrollController.jumpTo(nextOffset);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (loading) {
+    if (widget.loading) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (hasError) {
+    if (widget.hasError) {
       return Center(
         child: Text(
           '加载失败',
           style: TextStyle(
-            fontSize: tokens.text.bodySm,
-            color: colorScheme.textSecondary,
+            fontSize: widget.tokens.text.bodySm,
+            color: widget.colorScheme.textSecondary,
           ),
         ),
       );
     }
-    if (visible.isEmpty) {
+    if (widget.visible.isEmpty) {
       return Center(
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -126,14 +181,14 @@ class _ContinueReadingBody extends StatelessWidget {
             Icon(
               LucideIcons.bookOpen,
               size: 20,
-              color: colorScheme.textTertiary,
+              color: widget.colorScheme.textTertiary,
             ),
-            SizedBox(width: tokens.spacing.sm),
+            SizedBox(width: widget.tokens.spacing.sm),
             Text(
               '暂无阅读记录，',
               style: TextStyle(
-                fontSize: tokens.text.bodySm,
-                color: colorScheme.textSecondary,
+                fontSize: widget.tokens.text.bodySm,
+                color: widget.colorScheme.textSecondary,
               ),
             ),
             TextButton(
@@ -149,50 +204,54 @@ class _ContinueReadingBody extends StatelessWidget {
         ),
       );
     }
-    return ListView.separated(
-      scrollDirection: Axis.horizontal,
-      itemCount: visible.length,
-      separatorBuilder: (BuildContext context, int index) =>
-          SizedBox(width: tokens.spacing.md),
-      itemBuilder: (BuildContext context, int index) {
-        final HistoryGridItemDto item = visible[index];
-        return SizedBox(
-          width: continueReadingItemWidth,
-          height: continueReadingStripHeight,
-          child: item.map(
-            comic: (ComicHistoryGridItemDto comicItem) =>
-                ReadingHistoryCard.comic(
-                  comicId: comicItem.comicId,
-                  title: comicItem.title,
-                  lastReadTime: comicItem.lastReadTime,
-                  pageIndex: comicItem.pageIndex,
-                  onTap: () => appRouter.pushNamed(
-                    ReaderRouteArgs.readerRouteName,
-                    queryParameters: ReaderRouteArgs(
-                      comicId: comicItem.comicId,
-                      readType: ReaderRouteArgs.readTypeComic,
-                    ).toQueryParameters(),
+    return Listener(
+      onPointerSignal: handlePointerSignal,
+      child: ListView.separated(
+        controller: continueReadingScrollController,
+        scrollDirection: Axis.horizontal,
+        itemCount: widget.visible.length,
+        separatorBuilder: (BuildContext context, int index) =>
+            SizedBox(width: widget.tokens.spacing.md),
+        itemBuilder: (BuildContext context, int index) {
+          final HistoryGridItemDto item = widget.visible[index];
+          return SizedBox(
+            width: continueReadingItemWidth,
+            height: continueReadingStripHeight,
+            child: item.map(
+              comic: (ComicHistoryGridItemDto comicItem) =>
+                  ReadingHistoryCard.comic(
+                    comicId: comicItem.comicId,
+                    title: comicItem.title,
+                    lastReadTime: comicItem.lastReadTime,
+                    pageIndex: comicItem.pageIndex,
+                    onTap: () => appRouter.pushNamed(
+                      ReaderRouteArgs.readerRouteName,
+                      queryParameters: ReaderRouteArgs(
+                        comicId: comicItem.comicId,
+                        readType: ReaderRouteArgs.readTypeComic,
+                      ).toQueryParameters(),
+                    ),
                   ),
-                ),
-            series: (SeriesHistoryGridItemDto seriesItem) =>
-                ReadingHistoryCard.series(
-                  seriesName: seriesItem.seriesName,
-                  lastReadComicId: seriesItem.lastReadComicId,
-                  lastReadTime: seriesItem.lastReadTime,
-                  pageIndex: seriesItem.pageIndex,
-                  lastReadComicOrder: seriesItem.lastReadComicOrder,
-                  onTap: () => appRouter.pushNamed(
-                    ReaderRouteArgs.readerRouteName,
-                    queryParameters: ReaderRouteArgs(
-                      comicId: seriesItem.lastReadComicId,
-                      readType: ReaderRouteArgs.readTypeSeries,
-                      seriesName: seriesItem.seriesName,
-                    ).toQueryParameters(),
+              series: (SeriesHistoryGridItemDto seriesItem) =>
+                  ReadingHistoryCard.series(
+                    seriesName: seriesItem.seriesName,
+                    lastReadComicId: seriesItem.lastReadComicId,
+                    lastReadTime: seriesItem.lastReadTime,
+                    pageIndex: seriesItem.pageIndex,
+                    lastReadComicOrder: seriesItem.lastReadComicOrder,
+                    onTap: () => appRouter.pushNamed(
+                      ReaderRouteArgs.readerRouteName,
+                      queryParameters: ReaderRouteArgs(
+                        comicId: seriesItem.lastReadComicId,
+                        readType: ReaderRouteArgs.readTypeSeries,
+                        seriesName: seriesItem.seriesName,
+                      ).toQueryParameters(),
+                    ),
                   ),
-                ),
-          ),
-        );
-      },
+            ),
+          );
+        },
+      ),
     );
   }
 }
