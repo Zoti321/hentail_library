@@ -31,10 +31,9 @@ class ComicDetail extends StatelessWidget {
         );
         return Align(
           alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: panel.panelHeight),
-            child: SizedBox(
+          child: SizedBox(
             width: panel.panelWidth,
+            height: panel.panelHeight,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
@@ -51,7 +50,6 @@ class ComicDetail extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
             ),
           ),
         );
