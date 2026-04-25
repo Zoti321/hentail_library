@@ -23,14 +23,13 @@ class ComicDetailMetadataSection extends HookConsumerWidget {
           orElse: () => comic.pageCount,
         );
     final List<String> tags = comic.tags.map((t) => t.name).toList();
-    final String authorsText = comic.authors.isEmpty
-        ? '未知'
-        : comic.authors.map((a) => a.name).join(' / ');
+    final List<String> authors = comic.authors.map((a) => a.name).toList();
     final String pageLabel = pageCount == null || pageCount == 0
         ? '未知'
         : '$pageCount 页';
     final String formatLabel = comic.resourceType.name.toUpperCase();
     final AppThemeTokens tokens = context.tokens;
+
     final List<Widget> statChildren = <Widget>[
       _StatRow(icon: LucideIcons.files, label: '页数', value: pageLabel),
       _StatRow(icon: LucideIcons.package, label: '资源格式', value: formatLabel),
@@ -40,25 +39,14 @@ class ComicDetailMetadataSection extends HookConsumerWidget {
         child: ContentRatingChip(rating: comic.contentRating),
       ),
     ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         _MetadataLabeledRow(
           label: '作者',
-          child: Tooltip(
-            message: authorsText,
-            child: Text(
-              authorsText,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: tokens.text.bodySm,
-                fontWeight: FontWeight.w500,
-                color: cs.textPrimary,
-              ),
-            ),
-          ),
+          child: _MetaTagSection(items: authors, emptyText: '暂无作者'),
         ),
         SizedBox(height: tokens.spacing.sm + 6),
         _MetadataLabeledRow(
@@ -174,10 +162,7 @@ class _StatWidgetRow extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: child,
-          ),
+          child: Align(alignment: Alignment.centerLeft, child: child),
         ),
       ],
     );
@@ -243,7 +228,7 @@ class _TagsExpandableSection extends HookWidget {
             style: TextButton.styleFrom(
               padding: EdgeInsets.symmetric(
                 horizontal: tokens.spacing.sm,
-                vertical: tokens.spacing.xs,
+                vertical: tokens.spacing.md,
               ),
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -263,6 +248,30 @@ class _TagsExpandableSection extends HookWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _MetaTagSection extends StatelessWidget {
+  const _MetaTagSection({required this.items, required this.emptyText});
+
+  final List<String> items;
+  final String emptyText;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    if (items.isEmpty) {
+      return Text(
+        emptyText,
+        style: TextStyle(fontSize: tokens.text.labelXs, color: cs.textTertiary),
+      );
+    }
+    return Wrap(
+      spacing: tokens.spacing.sm + 2,
+      runSpacing: tokens.spacing.sm + 2,
+      children: items.map((String item) => TagChip(text: item)).toList(),
     );
   }
 }

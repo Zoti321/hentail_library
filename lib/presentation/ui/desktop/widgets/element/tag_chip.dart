@@ -17,7 +17,7 @@ class TagChip extends StatelessWidget {
       label: text,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        constraints: BoxConstraints(maxWidth: 96),
+        constraints: BoxConstraints(maxWidth: 128),
         decoration: BoxDecoration(
           color: chipBackground,
           borderRadius: radius,
