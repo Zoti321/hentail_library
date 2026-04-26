@@ -32,4 +32,7 @@ abstract class SeriesRepository {
 
   /// 按 [orderedItems] 顺序将 [seriesName] 下各条目的顺序写为 0..length-1。
   Future<void> setSeriesItemsOrder(String seriesName, List<SeriesItem> orderedItems);
+
+  /// 关键词搜索（数据库命中），由上层决定是否再应用额外业务过滤。
+  Future<List<Series>> searchByKeyword(String keyword);
 }

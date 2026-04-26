@@ -15,8 +15,7 @@ class _LibrarySearchToolbarRowState
   @override
   void initState() {
     super.initState();
-    final String initial = ref.read(libraryFilterQueryProvider);
-    _controller = TextEditingController(text: initial);
+    _controller = TextEditingController();
   }
 
   @override
@@ -27,17 +26,6 @@ class _LibrarySearchToolbarRowState
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<String>(libraryFilterQueryProvider, (
-      String? previous,
-      String next,
-    ) {
-      if (_controller.text != next) {
-        _controller.value = _controller.value.copyWith(
-          text: next,
-          selection: TextSelection.collapsed(offset: next.length),
-        );
-      }
-    });
     return Row(
       children: [
         ConstrainedBox(
@@ -47,15 +35,23 @@ class _LibrarySearchToolbarRowState
           child: CustomTextField(
             controller: _controller,
             hintText: '搜索…',
-            onChanged: (String val) => ref
-                .read(libraryQueryIntentProvider.notifier)
-                .setFilterQuery(val),
+            onSubmitted: _handleSubmitSearch,
           ),
         ),
         const Spacer(),
         const _LibraryToolbar(),
       ],
     );
+  }
+
+  void _handleSubmitSearch(String value) {
+    final String query = value.trim();
+    if (query.isEmpty) {
+      showInfoToast(context, '关键词不能为空');
+      return;
+    }
+    final String encodedQuery = Uri.encodeQueryComponent(query);
+    appRouter.go('/searched?q=$encodedQuery');
   }
 }
 

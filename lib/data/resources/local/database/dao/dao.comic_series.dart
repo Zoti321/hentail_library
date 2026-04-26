@@ -37,6 +37,14 @@ class ComicDao extends DatabaseAccessor<AppDatabase> with _$ComicDaoMixin {
     )..where((t) => t.comicId.equals(comicId))).getSingleOrNull();
   }
 
+  Future<List<DbComic>> getComicsByIds(Iterable<String> comicIds) {
+    final List<String> ids = comicIds.toList();
+    if (ids.isEmpty) {
+      return Future<List<DbComic>>.value(<DbComic>[]);
+    }
+    return (select(comics)..where((Comics t) => t.comicId.isIn(ids))).get();
+  }
+
   Future<void> upsertMany(List<ComicsCompanion> companions) async {
     await batch((b) {
       b.insertAllOnConflictUpdate(comics, companions);
@@ -179,6 +187,16 @@ class SeriesDao extends DatabaseAccessor<AppDatabase> with _$SeriesDaoMixin {
     return (select(
       seriesTable,
     )..where((t) => t.name.equals(name))).getSingleOrNull();
+  }
+
+  Future<List<DbSeries>> getSeriesByNames(Iterable<String> names) {
+    final List<String> targetNames = names.toList();
+    if (targetNames.isEmpty) {
+      return Future<List<DbSeries>>.value(<DbSeries>[]);
+    }
+    return (select(
+      seriesTable,
+    )..where((SeriesTable t) => t.name.isIn(targetNames))).get();
   }
 
   Future<void> createSeries(SeriesTableCompanion companion) async {

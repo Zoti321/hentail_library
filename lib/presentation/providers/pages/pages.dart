@@ -6,6 +6,7 @@ export 'library/library_page_series_providers.dart';
 export 'library/library_query_intent.dart';
 export 'library/library_query_intent_notifier.dart';
 export 'library/library_page_view_model_providers.dart';
+export 'library/library_search_page_providers.dart';
 export 'library/library_series_query.dart';
 export 'reader/reader_page_notifier.dart';
 export 'reader/reader_window_fullscreen.dart';

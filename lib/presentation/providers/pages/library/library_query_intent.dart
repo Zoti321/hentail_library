@@ -21,7 +21,7 @@ class LibraryQueryIntent {
   LibraryComicFilter buildBaseFilter({required bool showR18}) {
     return LibraryComicFilter(
       showR18: showR18,
-      query: keyword,
+      query: null,
       displayTarget: displayTarget,
     );
   }

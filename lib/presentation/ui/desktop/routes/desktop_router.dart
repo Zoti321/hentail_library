@@ -6,6 +6,7 @@ import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/hi
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/home_page/home_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/library_page/library_page.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/settings_page/settings_page.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/searched_page.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/shared_content_routes.dart';
 import 'package:hentai_library/presentation/ui/shared/shell/adaptive_app_shell.dart';
 
@@ -38,6 +39,14 @@ final GoRouter desktopRouter = GoRouter(
           name: '历史记录',
           builder: (BuildContext context, GoRouterState state) =>
               const HistoryPage(),
+        ),
+        GoRoute(
+          path: '/searched',
+          name: '搜索结果',
+          builder: (BuildContext context, GoRouterState state) {
+            final String query = state.uri.queryParameters['q'] ?? '';
+            return SearchedPage(query: query);
+          },
         ),
         GoRoute(
           path: '/settings',

@@ -20,13 +20,14 @@ part 'repos.g.dart';
 @Riverpod(keepAlive: true)
 ComicRepository comicRepo(Ref ref) => ComicRepositoryImpl(
   ref.read(comicDaoProvider),
+  ref.read(searchDaoProvider),
   readingHistory: ref.read(readingHistoryRepoProvider),
   librarySeries: ref.read(librarySeriesRepoProvider),
 );
 
 @Riverpod(keepAlive: true)
 SeriesRepository librarySeriesRepo(Ref ref) =>
-    SeriesRepositoryImpl(ref.read(seriesDaoProvider));
+    SeriesRepositoryImpl(ref.read(seriesDaoProvider), ref.read(searchDaoProvider));
 
 @Riverpod(keepAlive: true)
 TagRepository libraryTagRepo(Ref ref) =>

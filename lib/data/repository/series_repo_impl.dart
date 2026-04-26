@@ -7,8 +7,9 @@ import 'package:hentai_library/domain/repository/series_repo.dart';
 
 class SeriesRepositoryImpl implements SeriesRepository {
   final SeriesDao _dao;
+  final SearchDao _searchDao;
 
-  SeriesRepositoryImpl(this._dao);
+  SeriesRepositoryImpl(this._dao, this._searchDao);
 
   @override
   Stream<List<entity.Series>> watchAll() {
@@ -115,5 +116,43 @@ class SeriesRepositoryImpl implements SeriesRepository {
         );
       }
     });
+  }
+
+  @override
+  Future<List<entity.Series>> searchByKeyword(String keyword) async {
+    final List<String> seriesNames = await _searchDao.searchSeriesNamesByKeyword(
+      keyword,
+    );
+    if (seriesNames.isEmpty) {
+      return <entity.Series>[];
+    }
+    final List<db.DbSeries> seriesRows = await _dao.getSeriesByNames(seriesNames);
+    final List<db.DbSeriesItem> allItems = await _dao.getAllSeriesItemsOrdered();
+    final Map<String, List<entity.SeriesItem>> groupedItemsBySeries =
+        <String, List<entity.SeriesItem>>{};
+    for (final db.DbSeriesItem item in allItems) {
+      final List<entity.SeriesItem> grouped = groupedItemsBySeries.putIfAbsent(
+        item.seriesName,
+        () => <entity.SeriesItem>[],
+      );
+      grouped.add(
+        entity.SeriesItem(comicId: item.comicId, order: item.sortOrder),
+      );
+    }
+    final Map<String, entity.Series> mapped = <String, entity.Series>{
+      for (final db.DbSeries series in seriesRows)
+        series.name: entity.Series(
+          name: series.name,
+          items: groupedItemsBySeries[series.name] ?? const <entity.SeriesItem>[],
+        ),
+    };
+    final List<entity.Series> ordered = <entity.Series>[];
+    for (final String name in seriesNames) {
+      final entity.Series? series = mapped[name];
+      if (series != null) {
+        ordered.add(series);
+      }
+    }
+    return ordered;
   }
 }

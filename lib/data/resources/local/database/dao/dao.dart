@@ -10,3 +10,4 @@ part 'dao.tag_author.dart';
 part 'dao.saved_paths.dart';
 part 'dao.reading_history.dart';
 part 'dao.home_page.dart';
+part 'dao.search.dart';

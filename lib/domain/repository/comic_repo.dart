@@ -34,4 +34,7 @@ abstract class ComicRepository {
 
   /// 扫描 diff：删除库中本次未出现的条目并清理关联；新增与保留条目写入（保留合并用户元数据）。
   Future<ComicReplaceByScanResult> replaceByScan(List<Comic> scanned);
+
+  /// 关键词搜索（数据库命中），由上层决定是否再应用额外业务过滤。
+  Future<List<Comic>> searchByKeyword(String keyword);
 }

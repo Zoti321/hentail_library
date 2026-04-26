@@ -39,11 +39,6 @@ final Provider<LibrarySeriesViewData> librarySeriesViewDataProvider =
       final LibraryQueryIntent intent = ref.watch(
         libraryQueryIntentProvider,
       );
-      final String query = ref.watch(
-        libraryQueryIntentProvider.select(
-          (LibraryQueryIntent s) => s.keyword,
-        ),
-      );
       final Map<String, Comic> comicsById = <String, Comic>{};
       for (final Comic comic in rawComics) {
         comicsById[comic.comicId] = comic;
@@ -52,7 +47,7 @@ final Provider<LibrarySeriesViewData> librarySeriesViewDataProvider =
         data: (List<Series> list) {
           final LibrarySeriesQueryResult result = LibrarySeriesQuery(
             showR18: showR18,
-            query: query,
+            query: '',
             sortOption: intent.sortOption,
             comicsById: comicsById,
           ).apply(list);
@@ -85,3 +80,4 @@ final Provider<int> libraryDisplayedSeriesCountProvider = Provider<int>((
   );
   return viewData.filteredSeries.length;
 });
+

@@ -17,13 +17,15 @@ import 'package:drift/drift.dart';
 /// 避免在本类中继续堆叠多仓储协调逻辑。
 class ComicRepositoryImpl implements ComicRepository {
   ComicRepositoryImpl(
-    this._comicDao, {
+    this._comicDao,
+    this._searchDao, {
     required ReadingHistoryRepository readingHistory,
     required SeriesRepository librarySeries,
   }) : _readingHistory = readingHistory,
        _librarySeries = librarySeries;
 
   final ComicDao _comicDao;
+  final SearchDao _searchDao;
   final ReadingHistoryRepository _readingHistory;
   final SeriesRepository _librarySeries;
 
@@ -180,5 +182,26 @@ class ComicRepositoryImpl implements ComicRepository {
       addedCount: idDiff.addedIds.length,
       keptCount: idDiff.keptIds.length,
     );
+  }
+
+  @override
+  Future<List<Comic>> searchByKeyword(String keyword) async {
+    final List<String> comicIds = await _searchDao.searchComicIdsByKeyword(keyword);
+    if (comicIds.isEmpty) {
+      return <Comic>[];
+    }
+    final List<db.DbComic> rows = await _comicDao.getComicsByIds(comicIds);
+    final List<Comic> mapped = await _mapRows(rows);
+    final Map<String, Comic> comicsById = <String, Comic>{
+      for (final Comic comic in mapped) comic.comicId: comic,
+    };
+    final List<Comic> ordered = <Comic>[];
+    for (final String comicId in comicIds) {
+      final Comic? comic = comicsById[comicId];
+      if (comic != null) {
+        ordered.add(comic);
+      }
+    }
+    return ordered;
   }
 }

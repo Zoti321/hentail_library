@@ -8,11 +8,13 @@ class CustomTextField extends HookWidget {
   const CustomTextField({
     super.key,
     this.onChanged,
+    this.onSubmitted,
     this.hintText = '',
     this.controller,
   });
 
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
   final String hintText;
 
   /// When set, this controller is used instead of an internal one (e.g. dialog reset).
@@ -73,6 +75,7 @@ class CustomTextField extends HookWidget {
               controller: effectiveController,
               focusNode: focusNode,
               onChanged: onChanged,
+              onSubmitted: onSubmitted,
               style: TextStyle(fontSize: 13, color: colorScheme.textPrimary),
               cursorColor: colorScheme.onSurface,
               cursorWidth: 0.8,

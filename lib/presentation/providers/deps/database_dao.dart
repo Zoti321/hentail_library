@@ -36,3 +36,6 @@ SeriesReadingHistoryDao seriesReadingHistoryDao(Ref ref) =>
 
 @Riverpod(keepAlive: true)
 HomePageDao homePageDao(Ref ref) => HomePageDao(ref.read(databaseProvider));
+
+@Riverpod(keepAlive: true)
+SearchDao searchDao(Ref ref) => SearchDao(ref.read(databaseProvider));
