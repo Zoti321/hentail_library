@@ -9,6 +9,7 @@ import 'package:hentai_library/presentation/providers/pages/library/library_page
 import 'package:hentai_library/presentation/providers/pages/library/library_page_series_providers.dart';
 import 'package:hentai_library/presentation/providers/pages/library/library_query_intent.dart';
 import 'package:hentai_library/presentation/providers/pages/library/library_query_intent_notifier.dart';
+import 'package:hentai_library/presentation/providers/pages/library/library_search_query_parser.dart';
 import 'package:hentai_library/presentation/providers/pages/library/library_series_query.dart';
 import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
 import 'package:hentai_library/presentation/providers/deps/repos.dart';
@@ -19,9 +20,18 @@ final librarySearchPageComicsProvider =
       if (trimmed.isEmpty) {
         return <Comic>[];
       }
-      final List<Comic> matched = await ref.read(comicRepoProvider).searchByKeyword(
+      final TagSearchExpression? tagExpression = parsePureTagSearchExpression(
         trimmed,
       );
+      final List<Comic> matched = tagExpression == null
+          ? await ref.read(comicRepoProvider).searchByKeyword(trimmed)
+          : await ref
+                .read(comicRepoProvider)
+                .searchByTagExpression(
+                  mustInclude: tagExpression.mustInclude,
+                  optionalOr: tagExpression.optionalOr,
+                  mustExclude: tagExpression.mustExclude,
+                );
       final LibraryQueryIntent intent = ref.read(libraryQueryIntentProvider);
       final bool showR18 = !ref.read(
         settingsProvider.select(
@@ -76,9 +86,18 @@ final librarySearchPageSeriesViewDataProvider =
           filteredSeries: <Series>[],
         );
       }
-      final List<Series> matched = await ref
-          .read(librarySeriesRepoProvider)
-          .searchByKeyword(trimmed);
+      final TagSearchExpression? tagExpression = parsePureTagSearchExpression(
+        trimmed,
+      );
+      final List<Series> matched = tagExpression == null
+          ? await ref.read(librarySeriesRepoProvider).searchByKeyword(trimmed)
+          : await ref
+                .read(librarySeriesRepoProvider)
+                .searchByTagExpression(
+                  mustInclude: tagExpression.mustInclude,
+                  optionalOr: tagExpression.optionalOr,
+                  mustExclude: tagExpression.mustExclude,
+                );
       final List<Comic> rawComics = await ref.read(comicRepoProvider).getAll();
       final bool showR18 = !ref.read(
         settingsProvider.select(

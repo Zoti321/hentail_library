@@ -35,4 +35,11 @@ abstract class SeriesRepository {
 
   /// 关键词搜索（数据库命中），由上层决定是否再应用额外业务过滤。
   Future<List<Series>> searchByKeyword(String keyword);
+
+  /// 标签表达式搜索（数据库命中），由上层决定是否再应用额外业务过滤。
+  Future<List<Series>> searchByTagExpression({
+    required Set<String> mustInclude,
+    required Set<String> optionalOr,
+    required Set<String> mustExclude,
+  });
 }

@@ -204,4 +204,33 @@ class ComicRepositoryImpl implements ComicRepository {
     }
     return ordered;
   }
+
+  @override
+  Future<List<Comic>> searchByTagExpression({
+    required Set<String> mustInclude,
+    required Set<String> optionalOr,
+    required Set<String> mustExclude,
+  }) async {
+    final List<String> comicIds = await _searchDao.searchComicIdsByTagExpression(
+      mustInclude: mustInclude,
+      optionalOr: optionalOr,
+      mustExclude: mustExclude,
+    );
+    if (comicIds.isEmpty) {
+      return <Comic>[];
+    }
+    final List<db.DbComic> rows = await _comicDao.getComicsByIds(comicIds);
+    final List<Comic> mapped = await _mapRows(rows);
+    final Map<String, Comic> comicsById = <String, Comic>{
+      for (final Comic comic in mapped) comic.comicId: comic,
+    };
+    final List<Comic> ordered = <Comic>[];
+    for (final String comicId in comicIds) {
+      final Comic? comic = comicsById[comicId];
+      if (comic != null) {
+        ordered.add(comic);
+      }
+    }
+    return ordered;
+  }
 }
