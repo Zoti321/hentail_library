@@ -22,29 +22,15 @@ class LibrarySeriesBlock extends ConsumerWidget {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
     final bool isGridView = vm.isGridView;
-    return SliverMainAxisGroup(
-      slivers: <Widget>[
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 4),
-            child: Text(
-              '系列',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.textSecondary,
-              ),
-            ),
-          ),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 48),
-          sliver: isGridView
-              ? _LibrarySeriesGridSliver(series: seriesToShow)
-              : _LibrarySeriesListSliver(series: seriesToShow),
-        ),
-        const SliverToBoxAdapter(child: SizedBox(height: 16)),
-      ],
+    return LibrarySectionSliver(
+      title: '系列',
+      contentPadding: const EdgeInsets.symmetric(horizontal: 48),
+      bottomSpacing: 16,
+      contentSliver: LibraryAdaptiveItemsSliver(
+        isGridView: isGridView,
+        gridSliver: _LibrarySeriesGridSliver(series: seriesToShow),
+        listSliver: _LibrarySeriesListSliver(series: seriesToShow),
+      ),
     );
   }
 }

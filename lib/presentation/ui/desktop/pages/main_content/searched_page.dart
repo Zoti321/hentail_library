@@ -5,6 +5,7 @@ import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/library_page/widgets/widgets.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/responsive_layout/library_blocks_layout.dart';
 
 class SearchedPage extends ConsumerWidget {
   const SearchedPage({super.key, required this.query});
@@ -45,6 +46,7 @@ class SearchedPage extends ConsumerWidget {
       hasReceivedFirstEmit: true,
       isComicTableEmpty: searchedResultCount == 0,
     );
+
     return CustomScrollView(
       slivers: <Widget>[
         SliverToBoxAdapter(
@@ -81,7 +83,9 @@ class SearchedPage extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: theme.colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: theme.colorScheme.borderSubtle),
+                        border: Border.all(
+                          color: theme.colorScheme.borderSubtle,
+                        ),
                       ),
                       child: Text(
                         '$searchedResultCount 个结果',
@@ -103,20 +107,17 @@ class SearchedPage extends ConsumerWidget {
             hasScrollBody: false,
             child: Center(child: Text('请输入关键词后按回车搜索')),
           )
-        else
-          ...<Widget>[
-            ProviderScope(
-              overrides: [
-                libraryPageViewModelProvider.overrideWithValue(searchedViewModel),
-              ],
-              child: const SliverMainAxisGroup(
-                slivers: <Widget>[
-                  LibrarySeriesBlock(),
-                  LibraryComicsBlock(),
-                ],
-              ),
+        else ...<Widget>[
+          ProviderScope(
+            overrides: [
+              libraryPageViewModelProvider.overrideWithValue(searchedViewModel),
+            ],
+            child: const LibraryBlocksSliverGroup(
+              seriesBlock: LibrarySeriesBlock(),
+              comicsBlock: LibraryComicsBlock(),
             ),
-          ],
+          ),
+        ],
       ],
     );
   }

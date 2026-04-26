@@ -19,38 +19,23 @@ class LibraryComicsBlock extends ConsumerWidget {
     final String filterQuery = vm.filterQuery;
     final bool isComicTableEmpty = vm.isComicTableEmpty;
     final bool isGridView = vm.isGridView;
-    return SliverMainAxisGroup(
-      slivers: <Widget>[
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 4),
-            child: Text(
-              '漫画',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.textSecondary,
-              ),
-            ),
-          ),
+    return LibrarySectionSliver(
+      title: '漫画',
+      contentSliver: LibraryAdaptiveItemsSliver(
+        isGridView: isGridView,
+        gridSliver: _LibraryComicsGridSliver(
+          comics: comics,
+          hasSeriesSection: hasSeriesSection,
+          isComicTableEmpty: isComicTableEmpty,
+          effectiveQuery: filterQuery,
         ),
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 2),
-          sliver: isGridView
-              ? _LibraryComicsGridSliver(
-                  comics: comics,
-                  hasSeriesSection: hasSeriesSection,
-                  isComicTableEmpty: isComicTableEmpty,
-                  effectiveQuery: filterQuery,
-                )
-              : _LibraryComicsListSliver(
-                  comics: comics,
-                  hasSeriesSection: hasSeriesSection,
-                  isComicTableEmpty: isComicTableEmpty,
-                  effectiveQuery: filterQuery,
-                ),
+        listSliver: _LibraryComicsListSliver(
+          comics: comics,
+          hasSeriesSection: hasSeriesSection,
+          isComicTableEmpty: isComicTableEmpty,
+          effectiveQuery: filterQuery,
         ),
-      ],
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/library_page/widgets/widgets.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/responsive_layout/library_blocks_layout.dart';
 
 class LibraryPage extends StatelessWidget {
   const LibraryPage({super.key});
@@ -24,8 +25,10 @@ class LibraryPage extends StatelessWidget {
             ),
           ),
         ),
-        const LibrarySeriesBlock(),
-        const LibraryComicsBlock(),
+        const LibraryBlocksSliverGroup(
+          seriesBlock: LibrarySeriesBlock(),
+          comicsBlock: LibraryComicsBlock(),
+        ),
       ],
     );
   }
