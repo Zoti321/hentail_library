@@ -4,10 +4,12 @@ class LibrarySearchToolbarRow extends ConsumerStatefulWidget {
   const LibrarySearchToolbarRow({super.key});
 
   @override
-  ConsumerState<LibrarySearchToolbarRow> createState() => _LibrarySearchToolbarRowState();
+  ConsumerState<LibrarySearchToolbarRow> createState() =>
+      _LibrarySearchToolbarRowState();
 }
 
-class _LibrarySearchToolbarRowState extends ConsumerState<LibrarySearchToolbarRow> {
+class _LibrarySearchToolbarRowState
+    extends ConsumerState<LibrarySearchToolbarRow> {
   late final TextEditingController _controller;
 
   @override
@@ -25,26 +27,29 @@ class _LibrarySearchToolbarRowState extends ConsumerState<LibrarySearchToolbarRo
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<String>(
-      libraryFilterQueryProvider,
-      (String? previous, String next) {
-        if (_controller.text != next) {
-          _controller.value = _controller.value.copyWith(
-            text: next,
-            selection: TextSelection.collapsed(offset: next.length),
-          );
-        }
-      },
-    );
+    ref.listen<String>(libraryFilterQueryProvider, (
+      String? previous,
+      String next,
+    ) {
+      if (_controller.text != next) {
+        _controller.value = _controller.value.copyWith(
+          text: next,
+          selection: TextSelection.collapsed(offset: next.length),
+        );
+      }
+    });
     return Row(
       children: [
         ConstrainedBox(
-          constraints: const BoxConstraints(minWidth: 240, maxWidth: 420),
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.25,
+          ),
           child: CustomTextField(
             controller: _controller,
             hintText: '搜索…',
-            onChanged: (String val) =>
-                ref.read(libraryQueryIntentProvider.notifier).setFilterQuery(val),
+            onChanged: (String val) => ref
+                .read(libraryQueryIntentProvider.notifier)
+                .setFilterQuery(val),
           ),
         ),
         const Spacer(),
@@ -61,9 +66,7 @@ class _LibraryToolbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
-    final bool isGridView = ref.watch(
-      libraryIsGridViewProvider,
-    );
+    final bool isGridView = ref.watch(libraryIsGridViewProvider);
     return Container(
       height: 40,
       decoration: BoxDecoration(
@@ -107,14 +110,18 @@ class _LibraryToolbar extends ConsumerWidget {
               _ViewToggleButton(
                 icon: LucideIcons.layoutGrid,
                 isActive: isGridView,
-                onTap: () => ref.read(libraryQueryIntentProvider.notifier).setIsGridView(true),
+                onTap: () => ref
+                    .read(libraryQueryIntentProvider.notifier)
+                    .setIsGridView(true),
                 activeColor: theme.colorScheme.primary,
               ),
               const SizedBox(width: 4),
               _ViewToggleButton(
                 icon: LucideIcons.list,
                 isActive: !isGridView,
-                onTap: () => ref.read(libraryQueryIntentProvider.notifier).setIsGridView(false),
+                onTap: () => ref
+                    .read(libraryQueryIntentProvider.notifier)
+                    .setIsGridView(false),
                 activeColor: theme.colorScheme.primary,
               ),
             ],
