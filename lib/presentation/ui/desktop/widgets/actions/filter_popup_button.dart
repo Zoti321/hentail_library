@@ -58,7 +58,7 @@ class _FilterMenu extends HookConsumerWidget {
       libraryDisplayedComicCountProvider,
     );
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryPageProvider.select((s) => s.effectiveFilter.displayTarget),
+      libraryDisplayTargetProvider,
     );
     final int displayedSeriesCount = ref.watch(
       librarySeriesViewDataProvider.select(
@@ -116,24 +116,24 @@ class _FilterMenu extends HookConsumerWidget {
                       label: '全部',
                       isSelected: displayTarget == LibraryDisplayTarget.all,
                       onTap: () => ref
-                          .read(libraryPageProvider.notifier)
-                          .updateDisplayTarget(LibraryDisplayTarget.all),
+                          .read(libraryQueryIntentProvider.notifier)
+                          .setDisplayTarget(LibraryDisplayTarget.all),
                     ),
                     const SizedBox(width: 6),
                     _DisplayTargetChip(
                       label: '漫画',
                       isSelected: displayTarget == LibraryDisplayTarget.comics,
                       onTap: () => ref
-                          .read(libraryPageProvider.notifier)
-                          .updateDisplayTarget(LibraryDisplayTarget.comics),
+                          .read(libraryQueryIntentProvider.notifier)
+                          .setDisplayTarget(LibraryDisplayTarget.comics),
                     ),
                     const SizedBox(width: 6),
                     _DisplayTargetChip(
                       label: '系列',
                       isSelected: displayTarget == LibraryDisplayTarget.series,
                       onTap: () => ref
-                          .read(libraryPageProvider.notifier)
-                          .updateDisplayTarget(LibraryDisplayTarget.series),
+                          .read(libraryQueryIntentProvider.notifier)
+                          .setDisplayTarget(LibraryDisplayTarget.series),
                     ),
                   ],
                 ),
@@ -171,7 +171,7 @@ class _FilterMenu extends HookConsumerWidget {
                   overlayColor: colorScheme.primary.withAlpha(14),
                   delayTooltipThreeSeconds: false,
                   onPressed: () {
-                    ref.read(libraryPageProvider.notifier).resetFilter();
+                    ref.read(libraryQueryIntentProvider.notifier).resetFilter();
                   },
                 ),
               ],

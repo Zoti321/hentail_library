@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/presentation/providers/pages/library/library_page_notifier.dart';
-import 'package:hentai_library/presentation/providers/usecases/scan_library_controller.dart';
-import 'package:hentai_library/presentation/providers/usecases/sync_library_progress.dart';
+import 'package:hentai_library/presentation/providers/providers.dart';
 
 class MobileLibraryPage extends ConsumerStatefulWidget {
   const MobileLibraryPage({super.key});
@@ -47,7 +45,7 @@ class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
                 border: OutlineInputBorder(),
               ),
               onChanged: (String value) {
-                ref.read(libraryPageProvider.notifier).updateFilterQuery(value);
+                ref.read(libraryQueryIntentProvider.notifier).setFilterQuery(value);
               },
             ),
           ),
@@ -64,7 +62,7 @@ class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
                 }
                 return RefreshIndicator(
                   onRefresh: () async {
-                    ref.read(libraryPageProvider.notifier).refreshStream();
+                    ref.read(libraryRefreshActionProvider).call();
                   },
                   child: ListView.separated(
                     physics: const AlwaysScrollableScrollPhysics(),

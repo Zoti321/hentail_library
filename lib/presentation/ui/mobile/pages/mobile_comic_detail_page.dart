@@ -12,7 +12,7 @@ import 'package:hentai_library/domain/entity/reading_history.dart';
 import 'package:hentai_library/domain/util/enums.dart';
 import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
-import 'package:hentai_library/presentation/providers/pages/library/library_page_notifier.dart';
+import 'package:hentai_library/presentation/providers/pages/library/library_page_comics_providers.dart';
 import 'package:hentai_library/presentation/providers/pages/reader/reader_page_notifier.dart';
 import 'package:hentai_library/presentation/providers/pages/tag_management/tag_management_notifier.dart';
 import 'package:hentai_library/presentation/providers/usecases/comic_meta.dart';
@@ -25,11 +25,7 @@ class MobileComicDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<Comic>> rawData = ref.watch(
-      libraryPageProvider.select(
-        (LibraryPageState state) => state.rawComicsAsyncValue,
-      ),
-    );
+    final AsyncValue<List<Comic>> rawData = ref.watch(libraryRawComicsAsyncProvider);
     return rawData.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -42,8 +38,7 @@ class MobileComicDetailPage extends ConsumerWidget {
               Text('加载失败：$error'),
               const SizedBox(height: 12),
               FilledButton(
-                onPressed: () =>
-                    ref.read(libraryPageProvider.notifier).refreshStream(),
+                onPressed: ref.read(libraryRefreshActionProvider),
                 child: const Text('重试'),
               ),
             ],

@@ -57,7 +57,7 @@ class _SortMenu extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     final sortOption = ref.watch(
-      libraryPageProvider.select((s) => s.effectiveSortOption),
+      libraryQueryIntentProvider.select((s) => s.sortOption),
     );
 
     return PopupMenuPanelShell(
@@ -126,7 +126,7 @@ class _SortMenu extends HookConsumerWidget {
                   overlayColor: theme.colorScheme.primary.withAlpha(14),
                   delayTooltipThreeSeconds: false,
                   onPressed: () {
-                    ref.read(libraryPageProvider.notifier).resetSortOption();
+                    ref.read(libraryQueryIntentProvider.notifier).resetSortOption();
                   },
                 ),
               ],
@@ -180,8 +180,8 @@ class _SortSection extends HookConsumerWidget {
               child: InkWell(
                 onTap: () {
                   ref
-                      .read(libraryPageProvider.notifier)
-                      .toggleSortDescending(!option.descending);
+                      .read(libraryQueryIntentProvider.notifier)
+                      .setSortDescending(!option.descending);
                 },
                 borderRadius: BorderRadius.circular(6),
                 child: Padding(
@@ -246,7 +246,7 @@ class _SortOption extends HookConsumerWidget {
 
     final isSelected =
         ref.watch(
-          libraryPageProvider.select((s) => s.effectiveSortOption.field),
+          libraryQueryIntentProvider.select((s) => s.sortOption.field),
         ) ==
         field;
 
@@ -272,7 +272,7 @@ class _SortOption extends HookConsumerWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => {
-            ref.read(libraryPageProvider.notifier).updateSortField(field),
+            ref.read(libraryQueryIntentProvider.notifier).setSortField(field),
           },
           borderRadius: BorderRadius.circular(10),
           child: Padding(

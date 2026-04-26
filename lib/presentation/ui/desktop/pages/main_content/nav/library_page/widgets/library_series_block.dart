@@ -5,16 +5,13 @@ class LibrarySeriesBlock extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryPageProvider.select((LibraryPageState s) => s.effectiveFilter.displayTarget),
-    );
+    final LibraryPageViewModel vm = ref.watch(libraryPageViewModelProvider);
+    final LibraryDisplayTarget displayTarget = vm.displayTarget;
     final bool showSeriesSection = displayTarget != LibraryDisplayTarget.comics;
     final bool showComicsSection = displayTarget != LibraryDisplayTarget.series;
-    final LibrarySeriesViewData seriesData = ref.watch(librarySeriesViewDataProvider);
+    final LibrarySeriesViewData seriesData = vm.seriesViewData;
     final List<Series> seriesToShow = seriesData.filteredSeries;
-    final String filterQuery = ref.watch(
-      libraryPageProvider.select((LibraryPageState s) => s.effectiveFilter.query ?? ''),
-    );
+    final String filterQuery = vm.filterQuery;
     if (!showSeriesSection) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
@@ -24,9 +21,7 @@ class LibrarySeriesBlock extends ConsumerWidget {
       }
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
-    final bool isGridView = ref.watch(
-      libraryPageProvider.select((LibraryPageState s) => s.isGridView),
-    );
+    final bool isGridView = vm.isGridView;
     return SliverMainAxisGroup(
       slivers: <Widget>[
         SliverToBoxAdapter(

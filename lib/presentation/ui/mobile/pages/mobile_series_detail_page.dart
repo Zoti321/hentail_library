@@ -9,9 +9,10 @@ import 'package:hentai_library/domain/entity/comic/series.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/entity/series_reading_history.dart';
 import 'package:hentai_library/presentation/providers/aggregates/series_aggregate_notifier.dart';
+import 'package:hentai_library/presentation/providers/aggregates/comic_aggregate_notifier.dart';
 import 'package:hentai_library/presentation/providers/deps/repos.dart';
 import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
-import 'package:hentai_library/presentation/providers/pages/library/library_page_notifier.dart';
+import 'package:hentai_library/presentation/providers/pages/library/library_page_comics_providers.dart';
 import 'package:hentai_library/presentation/providers/pages/reader/reader_page_notifier.dart';
 import 'package:hentai_library/presentation/providers/pages/series_management/series_add_comics_dialog_notifier.dart';
 import 'package:hentai_library/presentation/providers/pages/series_management/series_management_notifier.dart';
@@ -441,7 +442,7 @@ class _SeriesManageItemsSheetState
     _queryController = TextEditingController();
     _notifier = ref.read(seriesAddComicsDialogProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final LibraryPageState libraryPage = ref.read(libraryPageProvider);
+      final ComicAggregateState libraryPage = ref.read(comicAggregateProvider);
       _notifier.reset();
       _notifier.updateSource(
         comics: libraryPage.rawList,
@@ -461,9 +462,9 @@ class _SeriesManageItemsSheetState
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(libraryPageProvider, (
-      LibraryPageState? prev,
-      LibraryPageState next,
+    ref.listen(comicAggregateProvider, (
+      ComicAggregateState? prev,
+      ComicAggregateState next,
     ) {
       _notifier.updateSource(
         comics: next.rawList,
@@ -765,9 +766,7 @@ class _SeriesReorderSheetState extends ConsumerState<_SeriesReorderSheet> {
 }
 
 String _resolveComicTitle(WidgetRef ref, String comicId) {
-  final Comic? comic = ref
-      .read(libraryPageProvider.notifier)
-      .comicById(comicId);
+  final Comic? comic = ref.read(libraryComicByIdProvider(comicId));
   if (comic != null && comic.title.isNotEmpty) {
     return comic.title;
   }

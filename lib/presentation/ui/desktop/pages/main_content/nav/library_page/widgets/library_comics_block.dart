@@ -5,37 +5,20 @@ class LibraryComicsBlock extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryPageProvider.select(
-        (LibraryPageState s) => s.effectiveFilter.displayTarget,
-      ),
-    );
+    final LibraryPageViewModel vm = ref.watch(libraryPageViewModelProvider);
+    final LibraryDisplayTarget displayTarget = vm.displayTarget;
     final bool showComicsSection = displayTarget != LibraryDisplayTarget.series;
     if (!showComicsSection) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
-    final AsyncValue<List<Comic>> comics = ref.watch(
-      libraryDisplayedComicsProvider,
-    );
-    final LibrarySeriesViewData seriesData = ref.watch(
-      librarySeriesViewDataProvider,
-    );
+    final AsyncValue<List<Comic>> comics = vm.comicsAsync;
+    final LibrarySeriesViewData seriesData = vm.seriesViewData;
     final bool showSeriesSection = displayTarget != LibraryDisplayTarget.comics;
     final bool hasSeriesSection =
         showSeriesSection && seriesData.filteredSeries.isNotEmpty;
-    final String filterQuery = ref.watch(
-      libraryPageProvider.select(
-        (LibraryPageState s) => s.effectiveFilter.query ?? '',
-      ),
-    );
-    final bool isComicTableEmpty = ref.watch(
-      libraryPageProvider.select(
-        (LibraryPageState s) => s.hasReceivedFirstEmit && s.rawList.isEmpty,
-      ),
-    );
-    final bool isGridView = ref.watch(
-      libraryPageProvider.select((LibraryPageState s) => s.isGridView),
-    );
+    final String filterQuery = vm.filterQuery;
+    final bool isComicTableEmpty = vm.isComicTableEmpty;
+    final bool isGridView = vm.isGridView;
     return SliverMainAxisGroup(
       slivers: <Widget>[
         SliverToBoxAdapter(

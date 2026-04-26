@@ -13,7 +13,7 @@ class _LibrarySearchToolbarRowState extends ConsumerState<LibrarySearchToolbarRo
   @override
   void initState() {
     super.initState();
-    final String initial = ref.read(libraryPageProvider).effectiveFilter.query ?? '';
+    final String initial = ref.read(libraryFilterQueryProvider);
     _controller = TextEditingController(text: initial);
   }
 
@@ -26,7 +26,7 @@ class _LibrarySearchToolbarRowState extends ConsumerState<LibrarySearchToolbarRo
   @override
   Widget build(BuildContext context) {
     ref.listen<String>(
-      libraryPageProvider.select((LibraryPageState s) => s.effectiveFilter.query ?? ''),
+      libraryFilterQueryProvider,
       (String? previous, String next) {
         if (_controller.text != next) {
           _controller.value = _controller.value.copyWith(
@@ -44,7 +44,7 @@ class _LibrarySearchToolbarRowState extends ConsumerState<LibrarySearchToolbarRo
             controller: _controller,
             hintText: '搜索…',
             onChanged: (String val) =>
-                ref.read(libraryPageProvider.notifier).updateFilterQuery(val),
+                ref.read(libraryQueryIntentProvider.notifier).setFilterQuery(val),
           ),
         ),
         const Spacer(),
@@ -62,7 +62,7 @@ class _LibraryToolbar extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final bool isGridView = ref.watch(
-      libraryPageProvider.select((LibraryPageState s) => s.isGridView),
+      libraryIsGridViewProvider,
     );
     return Container(
       height: 40,
@@ -86,7 +86,7 @@ class _LibraryToolbar extends ConsumerWidget {
             overlayColor: theme.hoverColor,
             delayTooltipThreeSeconds: true,
             onPressed: () {
-              ref.read(libraryPageProvider.notifier).refreshStream();
+              ref.read(libraryRefreshActionProvider).call();
             },
           ),
           const SizedBox(width: 8),
@@ -107,14 +107,14 @@ class _LibraryToolbar extends ConsumerWidget {
               _ViewToggleButton(
                 icon: LucideIcons.layoutGrid,
                 isActive: isGridView,
-                onTap: () => ref.read(libraryPageProvider.notifier).setGridView(true),
+                onTap: () => ref.read(libraryQueryIntentProvider.notifier).setIsGridView(true),
                 activeColor: theme.colorScheme.primary,
               ),
               const SizedBox(width: 4),
               _ViewToggleButton(
                 icon: LucideIcons.list,
                 isActive: !isGridView,
-                onTap: () => ref.read(libraryPageProvider.notifier).setGridView(false),
+                onTap: () => ref.read(libraryQueryIntentProvider.notifier).setIsGridView(false),
                 activeColor: theme.colorScheme.primary,
               ),
             ],

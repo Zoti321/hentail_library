@@ -142,7 +142,7 @@ class _DialogHeader extends HookConsumerWidget {
           // 搜索框
           TextField(
             onChanged: (value) =>
-                ref.read(libraryPageProvider.notifier).updateMergeSearch(value),
+                ref.read(libraryQueryIntentProvider.notifier).setMergeSearchQuery(value),
             style: const TextStyle(fontSize: 14),
             decoration: InputDecoration(
               hintText: "搜索库...",
@@ -192,7 +192,7 @@ class _DialogBody extends HookConsumerWidget {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
-    final items = ref.watch(filteredMergeComicsProvider(comicId: comicId));
+    final items = ref.watch(filteredMergeComicsProvider(comicId));
 
     return items.when(
       data: (items) => Expanded(

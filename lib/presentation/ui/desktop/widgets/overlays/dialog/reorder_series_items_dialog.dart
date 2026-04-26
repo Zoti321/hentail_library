@@ -34,10 +34,7 @@ class _ReorderSeriesItemsDialogState
   }
 
   String _labelForComic(String comicId) {
-    final title = ref
-        .read(libraryPageProvider.notifier)
-        .comicById(comicId)
-        ?.title;
+    final String? title = ref.read(libraryComicByIdProvider(comicId))?.title;
     if (title != null && title.isNotEmpty) {
       return title;
     }

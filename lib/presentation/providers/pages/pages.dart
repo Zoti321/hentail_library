@@ -1,7 +1,12 @@
 export 'selected_paths/selected_paths_page_notifier.dart';
 export 'home/home_page_dashboard_notifier.dart';
 export 'history/history_page_notifier.dart';
-export 'library/library_page_notifier.dart';
+export 'library/library_page_comics_providers.dart';
+export 'library/library_page_series_providers.dart';
+export 'library/library_query_intent.dart';
+export 'library/library_query_intent_notifier.dart';
+export 'library/library_page_view_model_providers.dart';
+export 'library/library_series_query.dart';
 export 'reader/reader_page_notifier.dart';
 export 'reader/reader_window_fullscreen.dart';
 export 'reader/series_reader_provider.dart';

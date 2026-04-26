@@ -39,7 +39,7 @@ class _AddComicsToSeriesDialogState
       if (!mounted) {
         return;
       }
-      final LibraryPageState libraryPage = ref.read(libraryPageProvider);
+      final ComicAggregateState libraryPage = ref.read(comicAggregateProvider);
       _addComicsNotifier.reset();
       _addComicsNotifier.updateSource(
         comics: libraryPage.rawList,
@@ -104,11 +104,11 @@ class _AddComicsToSeriesDialogState
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final libraryPage = ref.watch(libraryPageProvider);
+    final ComicAggregateState libraryPage = ref.watch(comicAggregateProvider);
     final notifier = ref.read(seriesAddComicsDialogProvider.notifier);
-    ref.listen(libraryPageProvider, (
-      LibraryPageState? previous,
-      LibraryPageState next,
+    ref.listen(comicAggregateProvider, (
+      ComicAggregateState? previous,
+      ComicAggregateState next,
     ) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) {

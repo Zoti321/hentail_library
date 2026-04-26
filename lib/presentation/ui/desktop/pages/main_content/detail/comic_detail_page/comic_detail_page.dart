@@ -14,9 +14,7 @@ class ComicDetailPage extends ConsumerWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final tokens = context.tokens;
 
-    final AsyncValue<List<Comic>> rawData = ref.watch(
-      libraryPageProvider.select((s) => s.rawComicsAsyncValue),
-    );
+    final AsyncValue<List<Comic>> rawData = ref.watch(libraryRawComicsAsyncProvider);
 
     return Container(
       color: cs.winBackground,
@@ -39,7 +37,7 @@ class ComicDetailPage extends ConsumerWidget {
 
         loading: () => const ComicDetailLoading(),
         error: (Object error, StackTrace stackTrace) => ComicDetailError(
-          onRetry: () => ref.read(libraryPageProvider.notifier).refreshStream(),
+          onRetry: ref.read(libraryRefreshActionProvider),
         ),
         skipLoadingOnReload: true,
         skipLoadingOnRefresh: true,
