@@ -52,7 +52,7 @@ class HomePageShortcutEntries extends StatelessWidget {
             _ShortcutTile(
               icon: LucideIcons.folderTree,
               label: '选中路径',
-              onTap: () => context.go('/paths'),
+              onTap: () => context.push('/paths'),
               colorScheme: colorScheme,
               tokens: tokens,
             ),

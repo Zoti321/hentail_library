@@ -7,8 +7,8 @@ import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/se
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/settings_page/widgets/settings_reader_rows.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/settings_page/widgets/settings_theme_row.dart';
 
-class SettingsLoadedView extends StatelessWidget {
-  const SettingsLoadedView({super.key});
+class SettingsView extends StatelessWidget {
+  const SettingsView({super.key});
 
   @override
   Widget build(BuildContext context) {

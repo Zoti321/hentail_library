@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
 import 'package:hentai_library/theme/theme.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:window_manager/window_manager.dart';
 
 class AppTitleBar extends StatefulWidget {
@@ -34,14 +37,13 @@ class _AppTitleBarState extends State<AppTitleBar> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final borderColor = theme.colorScheme.borderSubtle;
+    final cs = Theme.of(context).colorScheme;
 
     return Container(
       height: 36,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        border: Border(bottom: BorderSide(color: borderColor, width: 1)),
+        color: cs.surface,
+        border: Border(bottom: BorderSide(color: cs.borderSubtle, width: 1)),
       ),
       child: Row(
         children: [
@@ -50,7 +52,20 @@ class _AppTitleBarState extends State<AppTitleBar> with WindowListener {
               child: Row(
                 children: [
                   const SizedBox(width: 16),
-                  Text('', style: theme.textTheme.titleSmall),
+                  GhostButton.icon(
+                    icon: LucideIcons.arrowLeft,
+                    semanticLabel: "返回",
+                    size: 24,
+                    borderRadius: 4,
+                    tooltip: '',
+                    overlayColor: cs.primary.withAlpha(14),
+                    onPressed: () {
+                      if (appRouter.canPop()) {
+                        appRouter.pop();
+                      }
+                      return;
+                    },
+                  ),
                 ],
               ),
             ),

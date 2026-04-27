@@ -51,7 +51,7 @@ class _LibrarySearchToolbarRowState
       return;
     }
     final String encodedQuery = Uri.encodeQueryComponent(query);
-    appRouter.go('/searched?q=$encodedQuery');
+    appRouter.push('/searched?q=$encodedQuery');
   }
 }
 

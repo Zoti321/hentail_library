@@ -22,7 +22,7 @@ class LibraryLocationRow extends StatelessWidget {
       ),
       label: '库位置',
       description: '管理扫描路径',
-      onRowTap: () => context.go('/paths'),
+      onRowTap: () => context.push('/paths'),
       action: Icon(
         LucideIcons.chevronRight,
         size: 16,

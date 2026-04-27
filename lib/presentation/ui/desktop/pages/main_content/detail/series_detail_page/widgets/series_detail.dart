@@ -66,13 +66,18 @@ class SeriesDetail extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Text(
-          series.name,
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.4,
-            color: colorScheme.textPrimary,
+        Tooltip(
+          message: series.name,
+          waitDuration: const Duration(milliseconds: 2000),
+          child: SelectableText(
+            series.name,
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.4,
+              color: colorScheme.textPrimary,
+            ),
           ),
         ),
         const SizedBox(height: 6),

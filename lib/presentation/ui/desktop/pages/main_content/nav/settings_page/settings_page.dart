@@ -12,16 +12,14 @@ class SettingsPage extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final AsyncValue<AppSetting> settingsAsync = ref.watch(settingsProvider);
     return settingsAsync.when(
-      data: (_) => const SettingsLoadedView(),
+      data: (_) => const SettingsView(),
+
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (Object error, StackTrace _) {
-        return settingsAsync.maybeWhen(
-          data: (_) => const SettingsLoadedView(),
-          orElse: () => Center(
-            child: Text(
-              error.toString(),
-              style: TextStyle(color: theme.colorScheme.error),
-            ),
+        return Center(
+          child: Text(
+            error.toString(),
+            style: TextStyle(color: theme.colorScheme.error),
           ),
         );
       },
