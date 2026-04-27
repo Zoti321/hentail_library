@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:hentai_library/core/logging/log_manager.dart';
-import 'package:hentai_library/domain/repository/app_setting_repo.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-import '../../domain/entity/entities.dart';
+import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/domain/repository/app_setting_repo.dart';
+
+import '../../domain/entity/entities.dart' show AppSetting;
 
 class AppSettingRepoImpl implements AppSettingRepository {
   static const String _fileName = 'settings.json';
@@ -26,11 +26,7 @@ class AppSettingRepoImpl implements AppSettingRepository {
 
       return settings;
     } catch (e, st) {
-      LogManager.instance.handle(
-        e,
-        st,
-        '[APP_SETTING_REPO] 加载设置失败，已回退默认值',
-      );
+      LogManager.instance.handle(e, st, '[APP_SETTING_REPO] 加载设置失败，已回退默认值');
       return defaultSettings();
     }
   }

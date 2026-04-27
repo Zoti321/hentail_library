@@ -94,14 +94,6 @@ class SelectedPathsListCard extends ConsumerWidget {
   }
 }
 
-IconData _resolvePathTypeIcon(String path) {
-  final FileSystemEntityType pathType = FileSystemEntity.typeSync(path);
-  if (pathType == FileSystemEntityType.file) {
-    return LucideIcons.file;
-  }
-  return LucideIcons.folder;
-}
-
 class _PathTile extends ConsumerStatefulWidget {
   const _PathTile({required this.path});
 
@@ -272,4 +264,12 @@ class _EmptyPaths extends StatelessWidget {
       ),
     );
   }
+}
+
+IconData _resolvePathTypeIcon(String path) {
+  final FileSystemEntityType pathType = FileSystemEntity.typeSync(path);
+  if (pathType == FileSystemEntityType.file) {
+    return LucideIcons.file;
+  }
+  return LucideIcons.folder;
 }

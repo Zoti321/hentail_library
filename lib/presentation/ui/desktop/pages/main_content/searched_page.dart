@@ -10,10 +10,12 @@ import 'package:hentai_library/presentation/ui/desktop/widgets/responsive_layout
 class SearchedPage extends ConsumerWidget {
   const SearchedPage({super.key, required this.query});
   final String query;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final String trimmedQuery = query.trim();
+
     final AsyncValue<List<Comic>> searchedComics = ref.watch(
       librarySearchPageComicsProvider(trimmedQuery),
     );
@@ -49,6 +51,7 @@ class SearchedPage extends ConsumerWidget {
 
     return CustomScrollView(
       slivers: <Widget>[
+        // header
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(48, 20, 48, 12),

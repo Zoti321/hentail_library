@@ -171,6 +171,7 @@ class _SelectedPathsPageHeaderState
         );
       }),
     );
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -231,7 +232,6 @@ class _SelectedPathsHeaderSummary extends StatelessWidget {
               _MetaChip(
                 icon: LucideIcons.circleCheckBig,
                 label: '已选 $selectedCount',
-                highlighted: true,
               ),
           ],
         ),
@@ -484,25 +484,17 @@ class _AddPathMenuItem extends StatelessWidget {
 }
 
 class _MetaChip extends StatelessWidget {
-  const _MetaChip({
-    required this.icon,
-    required this.label,
-    this.highlighted = false,
-  });
+  const _MetaChip({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
-  final bool highlighted;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final Color iconColor = highlighted
-        ? theme.colorScheme.primary
-        : theme.colorScheme.onSurfaceVariant;
-    final Color backgroundColor = highlighted
-        ? theme.colorScheme.primaryContainer.withAlpha(130)
-        : theme.colorScheme.surfaceContainerHighest;
+    final Color iconColor = theme.colorScheme.onSurfaceVariant;
+    final Color backgroundColor = theme.colorScheme.surfaceContainerHighest;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -520,9 +512,7 @@ class _MetaChip extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: highlighted
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.textSecondary,
+              color: theme.colorScheme.textSecondary,
             ),
           ),
         ],

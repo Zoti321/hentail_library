@@ -17,10 +17,10 @@ class SelectedPathsPage extends ConsumerWidget {
     return SingleChildScrollView(
       padding: mainContentPadding,
       child: Column(
+        spacing: 20,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          SelectedPathsPageHeader(),
-          SizedBox(height: 20),
+          const SelectedPathsPageHeader(),
           asyncState.when(
             data: (_) => const SelectedPathsListCard(),
             loading: () => const SelectedPathsLoadingCard(),

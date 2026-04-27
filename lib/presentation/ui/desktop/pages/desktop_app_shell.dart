@@ -16,21 +16,6 @@ class DesktopAppShell extends ConsumerStatefulWidget {
       _DesktopAppShellState();
 }
 
-class _ShellTitleBar extends ConsumerWidget {
-  final bool isReaderRoute;
-
-  const _ShellTitleBar({required this.isReaderRoute});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (!isReaderRoute) {
-      return const AppTitleBar();
-    }
-    final bool readerFullscreen = ref.watch(readerWindowFullscreenProvider);
-    return readerFullscreen ? const SizedBox.shrink() : const AppTitleBar();
-  }
-}
-
 class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
   void _onSidebarDestinationSelected(String id) {
     AppNavigation.goToNavId(context, id);
@@ -48,6 +33,7 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
             asyncValue.asData?.value.desktopSidebarExpanded ?? true,
       ),
     );
+
     return Scaffold(
       body: Column(
         children: <Widget>[
@@ -74,5 +60,21 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
         ],
       ),
     );
+  }
+}
+
+class _ShellTitleBar extends ConsumerWidget {
+  final bool isReaderRoute;
+
+  const _ShellTitleBar({required this.isReaderRoute});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!isReaderRoute) {
+      return const AppTitleBar();
+    }
+
+    final bool readerFullscreen = ref.watch(readerWindowFullscreenProvider);
+    return readerFullscreen ? const SizedBox.shrink() : const AppTitleBar();
   }
 }
