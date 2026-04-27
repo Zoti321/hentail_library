@@ -6,9 +6,10 @@ import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/element/image/adaptive_cover.dart';
 import 'package:hentai_library/theme/theme.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class AdaptiveSeriesCover extends ConsumerWidget {
-  const AdaptiveSeriesCover({super.key, required this.series});
+class SeriesDetailCover extends ConsumerWidget {
+  const SeriesDetailCover({super.key, required this.series});
 
   final Series series;
 
@@ -27,17 +28,14 @@ class AdaptiveSeriesCover extends ConsumerWidget {
 
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
+
     return AdaptiveCover(
       coverDisplay: coverDisplay,
       fallbackAspectRatio: 2 / 3,
       backgroundColor: cs.imagePlaceholder,
       placeholder: const SizedBox.expand(),
       errorPlaceholder: Center(
-        child: Icon(
-          Icons.broken_image,
-          color: cs.iconSecondary,
-          size: 40,
-        ),
+        child: Icon(LucideIcons.imageOff, color: cs.iconSecondary, size: 40),
       ),
       clipBorderRadius: BorderRadius.circular(tokens.radius.lg),
     );

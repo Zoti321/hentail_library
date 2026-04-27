@@ -4,7 +4,6 @@ import 'package:hentai_library/theme/theme.dart';
 import 'package:hentai_library/domain/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/navigation/library_return_breadcrumb.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/responsive_layout/detail_page_layout.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page/widgets/comic_detail_card.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page/widgets/comic_detail_cover.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page/widgets/comic_detail_metadata_section.dart';
@@ -13,8 +12,10 @@ import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail
 class ComicDetail extends StatelessWidget {
   const ComicDetail({super.key, required this.comic});
   final Comic comic;
+
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
 
     return DetailResponsiveLayout(
@@ -27,20 +28,20 @@ class ComicDetail extends StatelessWidget {
         return ComicDetailCard(
           maxWidth: panel.targetWidth,
           padding: EdgeInsets.all(tokens.spacing.xl),
-          child: _ComicDetailCardBody(comic: comic),
+          child: _buildCardContent(tokens, cs)
+              .animate()
+              .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
+              .slideY(
+                begin: 0.03,
+                duration: 260.ms,
+                curve: Curves.easeOutCubic,
+              ),
         );
       },
     );
   }
-}
 
-class _ComicDetailCardBody extends ConsumerWidget {
-  const _ComicDetailCardBody({required this.comic});
-  final Comic comic;
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final AppThemeTokens tokens = context.tokens;
+  Widget _buildCardContent(AppThemeTokens tokens, ColorScheme cs) {
     final Widget titleBlock = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -62,31 +63,32 @@ class _ComicDetailCardBody extends ConsumerWidget {
         const SizedBox(height: 6),
       ],
     );
-    final Widget cover = ComicDetailCover(comic: comic);
-    final Widget rightColumn = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      spacing: 16,
-      children: <Widget>[
-        titleBlock,
-        ComicDetailMetadataSection(comic: comic),
-        ComicDetailPrimaryActions(comic: comic),
-      ],
-    );
-    final Widget layout = Row(
+
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Flexible(flex: 2, child: Center(child: cover)),
+        Flexible(
+          flex: 2,
+          child: Center(child: ComicDetailCover(comic: comic)),
+        ),
         SizedBox(width: tokens.spacing.lg + 16),
         Flexible(
           flex: 3,
-          child: Align(alignment: Alignment.topLeft, child: rightColumn),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              spacing: 16,
+              children: <Widget>[
+                titleBlock,
+                ComicDetailMetadataSection(comic: comic),
+                ComicDetailPrimaryActions(comic: comic),
+              ],
+            ),
+          ),
         ),
       ],
     );
-    return layout
-        .animate()
-        .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
-        .slideY(begin: 0.03, duration: 260.ms, curve: Curves.easeOutCubic);
   }
 }

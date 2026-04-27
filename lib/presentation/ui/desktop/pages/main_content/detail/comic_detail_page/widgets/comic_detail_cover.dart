@@ -19,31 +19,16 @@ class ComicDetailCover extends ConsumerWidget {
     final ComicCoverDisplayData? coverData = ref
         .watch(comicCoverDisplayProvider(comicId: comic.comicId))
         .maybeWhen(data: (ComicCoverDisplayData? v) => v, orElse: () => null);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(tokens.radius.lg),
-        border: Border.all(color: cs.borderSubtle),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: cs.cardShadow,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+
+    return AdaptiveCover(
+      coverDisplay: coverData,
+      fallbackAspectRatio: 2 / 3,
+      backgroundColor: cs.imagePlaceholder,
+      placeholder: const SizedBox.expand(),
+      errorPlaceholder: Center(
+        child: Icon(LucideIcons.imageOff, color: cs.iconSecondary, size: 40),
       ),
-      child: AdaptiveCover(
-        coverDisplay: coverData,
-        fallbackAspectRatio: 2 / 3,
-        backgroundColor: cs.surfaceContainerHighest,
-        maxCacheWidth: 1600,
-        placeholder: const SizedBox.expand(),
-        errorPlaceholder: Icon(
-          LucideIcons.imageOff,
-          size: 36,
-          color: cs.imageFallback,
-        ),
-        clipBorderRadius: BorderRadius.circular(tokens.radius.lg),
-      ),
+      clipBorderRadius: BorderRadius.circular(tokens.radius.lg),
     );
   }
 }
