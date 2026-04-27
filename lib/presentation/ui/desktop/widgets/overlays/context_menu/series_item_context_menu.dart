@@ -3,7 +3,7 @@ import 'package:hentai_library/theme/theme.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/context_menu/common.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-enum SeriesItemContextAction { goToDetail }
+enum SeriesItemContextAction { goToDetail, showInExplorer }
 
 class SeriesItemContextMenu {
   static void show(
@@ -17,11 +17,8 @@ class SeriesItemContextMenu {
       position: position,
       width: 236,
       height: 150,
-      builder: (VoidCallback onClose) => _MenuContent(
-        title: comicTitle,
-        onClose: onClose,
-        onAction: onAction,
-      ),
+      builder: (VoidCallback onClose) =>
+          _MenuContent(title: comicTitle, onClose: onClose, onAction: onAction),
     );
   }
 }
@@ -49,17 +46,22 @@ class _MenuContent extends StatelessWidget {
       title: title,
       leadingIcon: LucideIcons.panelRightOpen,
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            SizedBox(height: tokens.spacing.xs + 2),
-            _FluentMenuItem(
-              icon: LucideIcons.info,
-              label: '跳转到详情页',
-              onTap: () => handleAction(SeriesItemContextAction.goToDetail),
-            ),
-            SizedBox(height: tokens.spacing.xs + 2),
-          ],
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          SizedBox(height: tokens.spacing.xs + 2),
+          _FluentMenuItem(
+            icon: LucideIcons.info,
+            label: '跳转到详情页',
+            onTap: () => handleAction(SeriesItemContextAction.goToDetail),
+          ),
+          _FluentMenuItem(
+            icon: LucideIcons.externalLink,
+            label: '在文件资源管理器中显示',
+            onTap: () => handleAction(SeriesItemContextAction.showInExplorer),
+          ),
+          SizedBox(height: tokens.spacing.xs + 2),
+        ],
       ),
     );
   }

@@ -32,6 +32,8 @@ abstract final class AppNavigation {
         return navIdLibrary;
       case '/paths':
         return '';
+      case '/searched':
+        return '';
       case '/metadata':
       case '/tags':
       case '/authors':

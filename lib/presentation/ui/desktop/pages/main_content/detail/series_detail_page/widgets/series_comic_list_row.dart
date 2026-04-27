@@ -2,10 +2,13 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/entity/comic/series_item.dart';
 import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/element/image/app_comic_image.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/context_menu/series_item_context_menu.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
@@ -55,6 +58,7 @@ class SeriesItemComicTile extends ConsumerWidget {
           final Offset relativePosition = overlay.globalToLocal(
             details.globalPosition,
           );
+
           SeriesItemContextMenu.show(
             context,
             position: relativePosition,
@@ -66,6 +70,36 @@ class SeriesItemComicTile extends ConsumerWidget {
                     '漫画详情',
                     pathParameters: <String, String>{'id': item.comicId},
                   );
+                case SeriesItemContextAction.showInExplorer:
+                  final path = ref
+                      .read(libraryComicByIdProvider(item.comicId))
+                      ?.path;
+                  if (path == null) {
+                    showErrorToast(context, AppException('找不到该漫画的文件路径'));
+                    return;
+                  }
+
+                  showInFileExplorer(path).catchError((
+                    Object error,
+                    StackTrace stackTrace,
+                  ) {
+                    debugPrint('showInFileExplorer failed for "$path": $error');
+                    if (!context.mounted) {
+                      return;
+                    }
+                    if (error is AppException) {
+                      showErrorToast(context, error);
+                      return;
+                    }
+                    showErrorToast(
+                      context,
+                      AppException(
+                        '无法在文件资源管理器中显示该项目',
+                        cause: error,
+                        stackTrace: stackTrace,
+                      ),
+                    );
+                  });
                   break;
               }
             },

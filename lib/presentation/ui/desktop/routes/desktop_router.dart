@@ -54,6 +54,7 @@ final GoRouter desktopRouter = GoRouter(
           builder: (BuildContext context, GoRouterState state) =>
               const SettingsPage(),
         ),
+
         ...buildSharedContentRoutes(
           comicDetailBuilder: (BuildContext context, String comicId) =>
               ComicDetailPage(comicId: comicId),

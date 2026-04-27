@@ -32,8 +32,7 @@ class ReaderRouteArgs {
         : null;
     final bool isValidSeries =
         normalizedReadType == readTypeSeries && normalizedSeriesName != null;
-    final bool keepControlsOpen =
-        queryParameters[keepControlsOpenKey] == '1';
+    final bool keepControlsOpen = queryParameters[keepControlsOpenKey] == '1';
     return ReaderRouteArgs(
       comicId: comicId,
       readType: isValidSeries ? readTypeSeries : readTypeComic,
@@ -41,6 +40,7 @@ class ReaderRouteArgs {
       keepControlsOpen: keepControlsOpen,
     );
   }
+
   Map<String, String> toQueryParameters() {
     final Map<String, String> queryParameters = <String, String>{
       readTypeKey: readType,

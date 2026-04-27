@@ -40,6 +40,7 @@ class _DesktopAppShellState extends ConsumerState<DesktopAppShell> {
   Widget build(BuildContext context) {
     final String path = GoRouterState.of(context).uri.path;
     final String sidebarActiveId = AppNavigation.activeNavIdForPath(path);
+
     final bool isReaderRoute = path.startsWith('/reader');
     final bool isSidebarExpanded = ref.watch(
       settingsProvider.select(
