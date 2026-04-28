@@ -35,36 +35,61 @@ class AuthorManagementPanel extends ConsumerWidget {
     }
 
     final authorsAsync = ref.watch(allAuthorsProvider);
-    final String query = ref.watch(authorFilterProvider);
+    final List<Author> filteredAuthors = ref.watch(filteredAuthorsProvider);
     final AppThemeTokens tokens = context.tokens;
-
-    return SingleChildScrollView(
-      padding: tokens.layout.contentAreaPadding,
+    final EdgeInsets contentPadding = tokens.layout.contentAreaPadding.copyWith(
+      bottom: tokens.layout.contentVerticalPadding + 24,
+    );
+    return Padding(
+      padding: contentPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: <Widget>[
           _AuthorManagementHeader(onAddAuthor: openAddAuthorDialog),
           const SizedBox(height: 12),
           const _AuthorBulkDeleteBar(),
           const SizedBox(height: 20),
-          authorsAsync.when(
-            data: (authors) {
-              final filtered = _applyFilter(authors, query);
-              if (filtered.isEmpty) return const _AuthorManagementEmptyState();
-              return _AuthorList(authors: filtered);
-            },
-            loading: () => const _AuthorManagementLoadingCard(),
-            error: (e, _) => _AuthorManagementErrorCard(error: e),
+          Expanded(
+            child: authorsAsync.when(
+              data: (_) {
+                if (filteredAuthors.isEmpty) {
+                  return const _AuthorManagementEmptyState();
+                }
+                return LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    final double maxCardHeight = (constraints.maxHeight *
+                            _AuthorStyles.listHeightFactor)
+                        .clamp(
+                          _AuthorStyles.listMinHeight,
+                          _AuthorStyles.listMaxHeight,
+                        )
+                        .toDouble();
+                    final double estimatedHeight =
+                        _AuthorStyles.listHeaderHeight +
+                        (filteredAuthors.length *
+                            _AuthorStyles.listEstimatedRowHeight);
+                    final double cardHeight = estimatedHeight
+                        .clamp(_AuthorStyles.listMinHeight, maxCardHeight)
+                        .toDouble();
+                    return Align(
+                      alignment: Alignment.topCenter,
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: cardHeight,
+                        child: _AuthorListCard(authors: filteredAuthors),
+                      ),
+                    );
+                  },
+                );
+              },
+              loading: () => const _AuthorManagementLoadingCard(),
+              error: (Object e, StackTrace _) =>
+                  _AuthorManagementErrorCard(error: e),
+            ),
           ),
         ],
       ),
     );
-  }
-
-  List<Author> _applyFilter(List<Author> source, String query) {
-    if (query.trim().isEmpty) return List<Author>.from(source);
-    final q = query.trim().toLowerCase();
-    return source.where((a) => a.name.toLowerCase().contains(q)).toList();
   }
 }
 
@@ -97,6 +122,11 @@ class _AuthorStyles {
   static const EdgeInsets statusEmptyPadding = EdgeInsets.symmetric(
     vertical: 48,
   );
+  static const double listMinHeight = 240;
+  static const double listMaxHeight = 640;
+  static const double listHeightFactor = 0.78;
+  static const double listEstimatedRowHeight = 52;
+  static const double listHeaderHeight = 52;
 }
 
 class _AuthorManagementHeader extends ConsumerWidget {
@@ -218,19 +248,39 @@ String _shortcutLabel(BuildContext context) {
   return isApple ? '⌘N' : 'Ctrl+N';
 }
 
-class _AuthorList extends StatelessWidget {
-  const _AuthorList({required this.authors});
+class _AuthorListCard extends StatelessWidget {
+  const _AuthorListCard({required this.authors});
 
   final List<Author> authors;
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
     return MetadataPanelListCard(
       radius: _AuthorStyles.listRadius,
       child: Column(
-        children: [
+        children: <Widget>[
           _AuthorListHeader(totalCount: authors.length),
-          _AuthorListView(authors: authors),
+          Expanded(
+            child: ListView.separated(
+              itemCount: authors.length,
+              itemBuilder: (BuildContext context, int index) {
+                final Author author = authors[index];
+                return Consumer(
+                  builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                    final bool isSelected = ref.watch(
+                      authorSelectionProvider.select(
+                        (Set<Author> selected) => selected.contains(author),
+                      ),
+                    );
+                    return _AuthorRow(author: author, isSelected: isSelected);
+                  },
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) =>
+                  Divider(height: 1, color: cs.borderSubtle),
+            ),
+          ),
         ],
       ),
     );
@@ -291,30 +341,6 @@ class _AuthorListHeader extends ConsumerWidget {
           ],
         ],
       ),
-    );
-  }
-}
-
-class _AuthorListView extends ConsumerWidget {
-  const _AuthorListView({required this.authors});
-
-  final List<Author> authors;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final cs = Theme.of(context).colorScheme;
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: authors.length,
-      separatorBuilder: (_, _) => Divider(height: 1, color: cs.borderSubtle),
-      itemBuilder: (context, index) {
-        final Author author = authors[index];
-        final bool isSelected = ref.watch(
-          authorSelectionProvider.select((Set<Author> s) => s.contains(author)),
-        );
-        return _AuthorRow(author: author, isSelected: isSelected);
-      },
     );
   }
 }

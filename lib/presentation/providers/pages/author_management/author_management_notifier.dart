@@ -61,6 +61,21 @@ final authorFilterProvider = NotifierProvider<AuthorFilterNotifier, String>(
   AuthorFilterNotifier.new,
 );
 
+final filteredAuthorsProvider = Provider<List<Author>>((ref) {
+  final AsyncValue<List<Author>> asyncAuthors = ref.watch(allAuthorsProvider);
+  final String query = ref.watch(authorFilterProvider).trim().toLowerCase();
+  final List<Author> authors = asyncAuthors.maybeWhen(
+    data: (List<Author> value) => value,
+    orElse: () => const <Author>[],
+  );
+  if (query.isEmpty) {
+    return authors;
+  }
+  return authors
+      .where((Author item) => item.name.toLowerCase().contains(query))
+      .toList();
+});
+
 /// 作者管理操作封装（新增、删除、重命名）
 class AuthorActions {
   AuthorActions(this._ref);

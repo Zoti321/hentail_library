@@ -32,16 +32,19 @@ class SeriesManagementPanel extends StatelessWidget {
       );
     }
 
-    return SingleChildScrollView(
-      padding: tokens.layout.contentAreaPadding,
+    final EdgeInsets contentPadding = tokens.layout.contentAreaPadding.copyWith(
+      bottom: tokens.layout.contentVerticalPadding + 24,
+    );
+    return Padding(
+      padding: contentPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: <Widget>[
           _Header(onAddSeries: openAddSeriesDialog),
           const SizedBox(height: 12),
           const _SeriesManagementToolbar(),
           const SizedBox(height: 20),
-          const _FilteredSeriesSection(),
+          const Expanded(child: _FilteredSeriesSection()),
         ],
       ),
     );
@@ -53,20 +56,47 @@ class _FilteredSeriesSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
-    final String query = ref.watch(seriesFilterProvider);
+    final AsyncValue<List<Series>> seriesAsync = ref.watch(filteredSeriesProvider);
     return seriesAsync.when(
       data: (List<Series> series) {
-        final List<Series> filtered = _filterSeriesByQuery(series, query);
-        if (filtered.isEmpty) {
+        if (series.isEmpty) {
           return const _SeriesManagementEmptyState();
         }
-        return _SeriesListCard(series: filtered);
+        return LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double maxCardHeight = (constraints.maxHeight *
+                    _SeriesStyles.listHeightFactor)
+                .clamp(_SeriesStyles.listMinHeight, _SeriesStyles.listMaxHeight)
+                .toDouble();
+            final double estimatedHeight = _SeriesStyles.listHeaderHeight +
+                (series.length * _SeriesStyles.listEstimatedRowHeight);
+            final double cardHeight = estimatedHeight
+                .clamp(_SeriesStyles.listMinHeight, maxCardHeight)
+                .toDouble();
+            return Align(
+              alignment: Alignment.topCenter,
+              child: SizedBox(
+                width: double.infinity,
+                height: cardHeight,
+                child: _SeriesListCard(series: series),
+              ),
+            );
+          },
+        );
       },
       loading: () => const _SeriesManagementLoadingState(),
       error: (Object e, StackTrace _) => _SeriesManagementErrorState(error: e),
     );
   }
+}
+
+class _SeriesStyles {
+  const _SeriesStyles._();
+  static const double listMinHeight = 240;
+  static const double listMaxHeight = 640;
+  static const double listHeightFactor = 0.78;
+  static const double listEstimatedRowHeight = 56;
+  static const double listHeaderHeight = 52;
 }
 
 class _Header extends ConsumerWidget {
@@ -320,53 +350,52 @@ class _SeriesListCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: cs.borderSubtle),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: cs.surfaceContainerHighest,
-                border: Border(bottom: BorderSide(color: cs.borderSubtle)),
-              ),
-              child: Row(
-                children: <Widget>[
-                  Icon(
-                    LucideIcons.layers,
-                    size: 16,
-                    color: cs.onSurfaceVariant,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '全部系列',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: cs.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    '共 ${series.length} 条',
-                    style: TextStyle(fontSize: 13, color: cs.textTertiary),
-                  ),
-                ],
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: cs.surfaceContainerHighest,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
               ),
             ),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
+            child: Row(
+              children: <Widget>[
+                Icon(
+                  LucideIcons.layers,
+                  size: 16,
+                  color: cs.onSurfaceVariant,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '全部系列',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: cs.textSecondary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  '共 ${series.length} 条',
+                  style: TextStyle(fontSize: 13, color: cs.textTertiary),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView.separated(
               itemCount: series.length,
-              separatorBuilder: (BuildContext context, int _) =>
-                  Divider(height: 1, color: cs.borderSubtle),
               itemBuilder: (BuildContext context, int index) {
-                final Series s = series[index];
-                return _SeriesRow(series: s);
+                return _SeriesRow(series: series[index]);
               },
+              separatorBuilder: (BuildContext context, int index) =>
+                  Divider(height: 1, color: cs.borderSubtle),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -563,14 +592,6 @@ void _showDesktopSeriesFeedbackToast({
       showErrorToast(rootCtx, error);
     }
   });
-}
-
-List<Series> _filterSeriesByQuery(List<Series> source, String query) {
-  if (query.trim().isEmpty) {
-    return List<Series>.from(source);
-  }
-  final String q = query.trim().toLowerCase();
-  return source.where((Series s) => s.name.toLowerCase().contains(q)).toList();
 }
 
 String _shortcutLabel(BuildContext context) {

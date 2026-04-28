@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/model/entity/comic/series.dart';
 import 'package:hentai_library/presentation/providers/aggregates/series_aggregate_notifier.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 
@@ -19,6 +20,19 @@ class SeriesFilterNotifier extends Notifier<String> {
 final seriesFilterProvider = NotifierProvider<SeriesFilterNotifier, String>(
   SeriesFilterNotifier.new,
 );
+
+final filteredSeriesProvider = Provider<AsyncValue<List<Series>>>((ref) {
+  final AsyncValue<List<Series>> asyncSeries = ref.watch(allSeriesProvider);
+  final String query = ref.watch(seriesFilterProvider).trim().toLowerCase();
+  return asyncSeries.whenData((List<Series> list) {
+    if (query.isEmpty) {
+      return list;
+    }
+    return list
+        .where((Series item) => item.name.toLowerCase().contains(query))
+        .toList();
+  });
+});
 
 class SeriesActions {
   SeriesActions(this._ref);

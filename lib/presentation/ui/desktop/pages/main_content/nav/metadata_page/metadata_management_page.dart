@@ -37,6 +37,7 @@ class _MetadataManagementPageState
     extends ConsumerState<MetadataManagementPage> {
   final Set<int> _visitedTabIndexes = <int>{};
   bool _isExecutingMetadataIo = false;
+  int? _selectedTabIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +46,8 @@ class _MetadataManagementPageState
     final String? tabParam = GoRouterState.of(
       context,
     ).uri.queryParameters['tab'];
-    final int selectedIndex = _tabIndexFromQuery(tabParam);
+    final int selectedIndex = _selectedTabIndex ?? _tabIndexFromQuery(tabParam);
+    _selectedTabIndex ??= selectedIndex;
     _visitedTabIndexes.add(selectedIndex);
 
     return Shortcuts(
@@ -85,7 +87,12 @@ class _MetadataManagementPageState
                       ],
                       selectedIndex: selectedIndex,
                       onSelected: (int index) {
-                        context.go('/metadata?tab=${_tabQueryForIndex(index)}');
+                        if (_selectedTabIndex == index) {
+                          return;
+                        }
+                        setState(() {
+                          _selectedTabIndex = index;
+                        });
                       },
                     ),
                     const SizedBox(width: 24),
@@ -335,15 +342,3 @@ int _tabIndexFromQuery(String? tab) {
   }
 }
 
-String _tabQueryForIndex(int index) {
-  switch (index) {
-    case 0:
-      return 'authors';
-    case 1:
-      return 'tags';
-    case 2:
-      return 'series';
-    default:
-      return 'tags';
-  }
-}

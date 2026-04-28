@@ -62,6 +62,21 @@ final tagFilterProvider = NotifierProvider<TagFilterNotifier, String>(
   TagFilterNotifier.new,
 );
 
+final filteredTagsProvider = Provider<List<Tag>>((ref) {
+  final AsyncValue<List<Tag>> asyncTags = ref.watch(allTagsProvider);
+  final String query = ref.watch(tagFilterProvider).trim().toLowerCase();
+  final List<Tag> tags = asyncTags.maybeWhen(
+    data: (List<Tag> value) => value,
+    orElse: () => const <Tag>[],
+  );
+  if (query.isEmpty) {
+    return tags;
+  }
+  return tags
+      .where((Tag item) => item.name.toLowerCase().contains(query))
+      .toList();
+});
+
 /// 标签管理操作封装（新增、删除、重命名）
 class TagActions {
   TagActions(this._ref);

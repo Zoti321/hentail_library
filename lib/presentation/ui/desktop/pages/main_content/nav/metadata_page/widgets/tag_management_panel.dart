@@ -33,36 +33,57 @@ class TagManagementPanel extends ConsumerWidget {
     }
 
     final tagsAsync = ref.watch(allTagsProvider);
-    final String query = ref.watch(tagFilterProvider);
+    final List<Tag> filteredTags = ref.watch(filteredTagsProvider);
     final AppThemeTokens tokens = context.tokens;
-
-    return SingleChildScrollView(
-      padding: tokens.layout.contentAreaPadding,
+    final EdgeInsets contentPadding = tokens.layout.contentAreaPadding.copyWith(
+      bottom: tokens.layout.contentVerticalPadding + 24,
+    );
+    return Padding(
+      padding: contentPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: <Widget>[
           _TagManagementHeader(onAddTag: openAddTagDialog),
           const SizedBox(height: 12),
           const _TagBulkDeleteBar(),
           const SizedBox(height: 20),
-          tagsAsync.when(
-            data: (tags) {
-              final filtered = _applyFilter(tags, query);
-              if (filtered.isEmpty) return const _TagManagementEmptyState();
-              return _TagList(tags: filtered);
-            },
-            loading: () => const _TagManagementLoadingCard(),
-            error: (e, _) => _TagManagementErrorCard(error: e),
+          Expanded(
+            child: tagsAsync.when(
+              data: (_) {
+                if (filteredTags.isEmpty) {
+                  return const _TagManagementEmptyState();
+                }
+                return LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    final double maxCardHeight = (constraints.maxHeight *
+                            _TagStyles.listHeightFactor)
+                        .clamp(_TagStyles.listMinHeight, _TagStyles.listMaxHeight)
+                        .toDouble();
+                    final double estimatedHeight =
+                        _TagStyles.listHeaderHeight +
+                        (filteredTags.length * _TagStyles.listEstimatedRowHeight);
+                    final double cardHeight = estimatedHeight
+                        .clamp(_TagStyles.listMinHeight, maxCardHeight)
+                        .toDouble();
+                    return Align(
+                      alignment: Alignment.topCenter,
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: cardHeight,
+                        child: _TagListCard(tags: filteredTags),
+                      ),
+                    );
+                  },
+                );
+              },
+              loading: () => const _TagManagementLoadingCard(),
+              error: (Object e, StackTrace _) =>
+                  _TagManagementErrorCard(error: e),
+            ),
           ),
         ],
       ),
     );
-  }
-
-  List<Tag> _applyFilter(List<Tag> source, String query) {
-    if (query.trim().isEmpty) return List<Tag>.from(source);
-    final q = query.trim().toLowerCase();
-    return source.where((t) => t.name.toLowerCase().contains(q)).toList();
   }
 }
 
@@ -95,6 +116,11 @@ class _TagStyles {
   static const EdgeInsets statusEmptyPadding = EdgeInsets.symmetric(
     vertical: 48,
   );
+  static const double listMinHeight = 240;
+  static const double listMaxHeight = 640;
+  static const double listHeightFactor = 0.78;
+  static const double listEstimatedRowHeight = 52;
+  static const double listHeaderHeight = 52;
 }
 
 class _TagManagementLoadingCard extends StatelessWidget {
@@ -295,19 +321,39 @@ String _shortcutLabel(BuildContext context) {
   return isApple ? '⌘N' : 'Ctrl+N';
 }
 
-class _TagList extends StatelessWidget {
-  const _TagList({required this.tags});
+class _TagListCard extends StatelessWidget {
+  const _TagListCard({required this.tags});
 
   final List<Tag> tags;
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
     return MetadataPanelListCard(
       radius: _TagStyles.listRadius,
       child: Column(
-        children: [
+        children: <Widget>[
           _TagListHeader(totalCount: tags.length),
-          _TagListView(tags: tags),
+          Expanded(
+            child: ListView.separated(
+              itemCount: tags.length,
+              itemBuilder: (BuildContext context, int index) {
+                final Tag tag = tags[index];
+                return Consumer(
+                  builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                    final bool isSelected = ref.watch(
+                      tagSelectionProvider.select(
+                        (Set<Tag> selected) => selected.contains(tag),
+                      ),
+                    );
+                    return _TagRow(tag: tag, isSelected: isSelected);
+                  },
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) =>
+                  Divider(height: 1, color: cs.borderSubtle),
+            ),
+          ),
         ],
       ),
     );
@@ -368,30 +414,6 @@ class _TagListHeader extends ConsumerWidget {
           ],
         ],
       ),
-    );
-  }
-}
-
-class _TagListView extends ConsumerWidget {
-  const _TagListView({required this.tags});
-
-  final List<Tag> tags;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final cs = Theme.of(context).colorScheme;
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: tags.length,
-      separatorBuilder: (_, _) => Divider(height: 1, color: cs.borderSubtle),
-      itemBuilder: (context, index) {
-        final Tag tag = tags[index];
-        final bool isSelected = ref.watch(
-          tagSelectionProvider.select((Set<Tag> s) => s.contains(tag)),
-        );
-        return _TagRow(tag: tag, isSelected: isSelected);
-      },
     );
   }
 }
