@@ -19,10 +19,18 @@ class AddPathPopoverButton extends ConsumerStatefulWidget {
 }
 
 class _AddPathPopoverButtonState extends ConsumerState<AddPathPopoverButton> {
+  static const double menuVerticalMargin = -26;
+  static const double buttonIconSize = 16;
+  static const double buttonHeight = 16;
+  static const double buttonWidth = 16;
+
   final CustomPopupMenuController menuController = CustomPopupMenuController();
   bool isPicking = false;
 
   Future<void> executePickingTask(Future<void> Function() task) async {
+    if (isPicking) {
+      return;
+    }
     setState(() => isPicking = true);
     try {
       await task();
@@ -38,7 +46,7 @@ class _AddPathPopoverButtonState extends ConsumerState<AddPathPopoverButton> {
     }
   }
 
-  Future<void> savePickedPaths(List<String> paths) async {
+  Future<int> savePickedPaths(List<String> paths) async {
     final PathRepository pathRepository = ref.read(pathRepoProvider);
     int addedCount = 0;
     for (final String path in paths) {
@@ -48,6 +56,10 @@ class _AddPathPopoverButtonState extends ConsumerState<AddPathPopoverButton> {
       await pathRepository.add(path);
       addedCount++;
     }
+    return addedCount;
+  }
+
+  void showAddResultToast(int addedCount) {
     if (!mounted || addedCount == 0) {
       return;
     }
@@ -57,47 +69,62 @@ class _AddPathPopoverButtonState extends ConsumerState<AddPathPopoverButton> {
     );
   }
 
-  Future<void> addFiles() async {
+  Future<void> pickAndSavePaths(Future<List<String>> Function() picker) async {
     await executePickingTask(() async {
-      final FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.any,
-        allowMultiple: true,
-        allowCompression: false,
-      );
-      if (result == null || result.files.isEmpty) {
+      final List<String> paths = await picker();
+      if (paths.isEmpty) {
         return;
       }
-      final List<String> paths = result.files
-          .map((PlatformFile file) => file.path)
-          .whereType<String>()
-          .toList();
-      await savePickedPaths(paths);
+      final int addedCount = await savePickedPaths(paths);
+      showAddResultToast(addedCount);
     });
+  }
+
+  Future<List<String>> pickFilePaths() async {
+    final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.any,
+      allowMultiple: true,
+      allowCompression: false,
+    );
+    if (result == null || result.files.isEmpty) {
+      return const <String>[];
+    }
+    return result.files
+        .map((PlatformFile file) => file.path)
+        .whereType<String>()
+        .toList();
+  }
+
+  Future<List<String>> pickFolderPaths() async {
+    final String? directoryPath = await FilePicker.platform.getDirectoryPath();
+    if (directoryPath == null || directoryPath.isEmpty) {
+      return const <String>[];
+    }
+    return <String>[directoryPath];
+  }
+
+  Future<List<String>> pickMixedPathsMac() async {
+    if (!Platform.isMacOS) {
+      return const <String>[];
+    }
+    final List<String>? paths = await FilePicker.platform
+        .pickFileAndDirectoryPaths(type: FileType.any);
+    if (paths == null || paths.isEmpty) {
+      return const <String>[];
+    }
+    return paths;
+  }
+
+  Future<void> addFiles() async {
+    await pickAndSavePaths(pickFilePaths);
   }
 
   Future<void> addFolder() async {
-    await executePickingTask(() async {
-      final String? directoryPath = await FilePicker.platform
-          .getDirectoryPath();
-      if (directoryPath == null) {
-        return;
-      }
-      await savePickedPaths(<String>[directoryPath]);
-    });
+    await pickAndSavePaths(pickFolderPaths);
   }
 
   Future<void> pickMixedMac() async {
-    if (!Platform.isMacOS) {
-      return;
-    }
-    await executePickingTask(() async {
-      final List<String>? paths = await FilePicker.platform
-          .pickFileAndDirectoryPaths(type: FileType.any);
-      if (paths == null || paths.isEmpty) {
-        return;
-      }
-      await savePickedPaths(paths);
-    });
+    await pickAndSavePaths(pickMixedPathsMac);
   }
 
   @override
@@ -108,7 +135,7 @@ class _AddPathPopoverButtonState extends ConsumerState<AddPathPopoverButton> {
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,
       showArrow: false,
-      verticalMargin: -26,
+      verticalMargin: menuVerticalMargin,
       menuBuilder: () => _AddPathMenuPanel(
         isPicking: isPicking,
         onPickMixed: () {
@@ -128,11 +155,11 @@ class _AddPathPopoverButtonState extends ConsumerState<AddPathPopoverButton> {
         onPressed: isPicking ? null : () => menuController.toggleMenu(),
         icon: isPicking
             ? const SizedBox(
-                width: 16,
-                height: 16,
+                width: buttonWidth,
+                height: buttonHeight,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
-            : const Icon(LucideIcons.plus, size: 16),
+            : const Icon(LucideIcons.plus, size: buttonIconSize),
         label: Text(isPicking ? '处理中…' : '添加路径'),
         style: FilledButton.styleFrom(
           backgroundColor: theme.colorScheme.primary,

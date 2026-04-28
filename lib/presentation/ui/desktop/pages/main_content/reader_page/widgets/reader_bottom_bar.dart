@@ -312,8 +312,9 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
 
   Widget _buildIntervalMenu() {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final bool canDecrease = widget.readerAutoPlayIntervalSeconds > 1;
-    final bool canIncrease = widget.readerAutoPlayIntervalSeconds < 60;
+    int localInterval = _buildClampedInterval(
+      widget.readerAutoPlayIntervalSeconds,
+    );
     return Container(
       width: 232,
       decoration: BoxDecoration(
@@ -330,77 +331,96 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '自动播放间隔',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: cs.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '与设置页保持一致，范围 1-60 秒',
-              style: TextStyle(fontSize: 11, color: cs.textTertiary),
-            ),
-            const SizedBox(height: 10),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              decoration: BoxDecoration(
-                color: cs.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: cs.borderSubtle),
-              ),
-              child: Row(
-                children: [
-                  GhostButton.icon(
-                    icon: LucideIcons.minus,
-                    size: 24,
-                    tooltip: '',
-                    semanticLabel: '减少自动播放间隔',
-                    onPressed: canDecrease
-                        ? () => _updateIntervalByStep(-1)
-                        : null,
-                    iconSize: 14,
-                    borderRadius: 8,
-                    foregroundColor: cs.textPrimary,
-                    hoverColor: cs.readerPanelSubtle,
-                    overlayColor: cs.readerPanelSubtle,
+        child: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setMenuState) {
+            final bool canDecrease = localInterval > 1;
+            final bool canIncrease = localInterval < 60;
+            void updateLocalIntervalByStep(int step) {
+              final int nextValue = _buildClampedInterval(localInterval + step);
+              if (nextValue == localInterval) {
+                return;
+              }
+              setMenuState(() {
+                localInterval = nextValue;
+              });
+              widget.onReaderAutoPlayIntervalSecondsChanged(nextValue);
+            }
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '自动播放间隔',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: cs.textPrimary,
                   ),
-                  Expanded(
-                    child: Text(
-                      '${widget.readerAutoPlayIntervalSeconds} s',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: cs.textPrimary,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '与设置页保持一致，范围 1-60 秒',
+                  style: TextStyle(fontSize: 11, color: cs.textTertiary),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: cs.borderSubtle),
+                  ),
+                  child: Row(
+                    children: [
+                      GhostButton.icon(
+                        icon: LucideIcons.minus,
+                        size: 24,
+                        tooltip: '',
+                        semanticLabel: '减少自动播放间隔',
+                        onPressed: canDecrease
+                            ? () => updateLocalIntervalByStep(-1)
+                            : null,
+                        iconSize: 14,
+                        borderRadius: 8,
+                        foregroundColor: cs.textPrimary,
+                        hoverColor: cs.readerPanelSubtle,
+                        overlayColor: cs.readerPanelSubtle,
                       ),
-                    ),
+                      Expanded(
+                        child: Text(
+                          '$localInterval s',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: cs.textPrimary,
+                          ),
+                        ),
+                      ),
+                      GhostButton.icon(
+                        icon: LucideIcons.plus,
+                        size: 24,
+                        tooltip: '',
+                        semanticLabel: '增加自动播放间隔',
+                        onPressed: canIncrease
+                            ? () => updateLocalIntervalByStep(1)
+                            : null,
+                        iconSize: 14,
+                        borderRadius: 8,
+                        foregroundColor: cs.textPrimary,
+                        hoverColor: cs.readerPanelSubtle,
+                        overlayColor: cs.readerPanelSubtle,
+                      ),
+                    ],
                   ),
-                  GhostButton.icon(
-                    icon: LucideIcons.plus,
-                    size: 24,
-                    tooltip: '',
-                    semanticLabel: '增加自动播放间隔',
-                    onPressed: canIncrease
-                        ? () => _updateIntervalByStep(1)
-                        : null,
-                    iconSize: 14,
-                    borderRadius: 8,
-                    foregroundColor: cs.textPrimary,
-                    hoverColor: cs.readerPanelSubtle,
-                    overlayColor: cs.readerPanelSubtle,
-                  ),
-                ],
-              ),
-            ),
-          ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -497,11 +517,7 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
     );
   }
 
-  void _updateIntervalByStep(int step) {
-    final int nextValue = (widget.readerAutoPlayIntervalSeconds + step).clamp(
-      1,
-      60,
-    );
-    widget.onReaderAutoPlayIntervalSecondsChanged(nextValue);
+  int _buildClampedInterval(int value) {
+    return value.clamp(1, 60);
   }
 }
