@@ -6,6 +6,7 @@ import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/status_card_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/rename_tag_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/metadata_page/widgets/metadata_panel_height.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/metadata_page/widgets/metadata_panel_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
@@ -57,20 +58,12 @@ class AuthorManagementPanel extends ConsumerWidget {
                 }
                 return LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
-                    final double maxCardHeight = (constraints.maxHeight *
-                            _AuthorStyles.listHeightFactor)
-                        .clamp(
-                          _AuthorStyles.listMinHeight,
-                          _AuthorStyles.listMaxHeight,
-                        )
-                        .toDouble();
-                    final double estimatedHeight =
-                        _AuthorStyles.listHeaderHeight +
-                        (filteredAuthors.length *
-                            _AuthorStyles.listEstimatedRowHeight);
-                    final double cardHeight = estimatedHeight
-                        .clamp(_AuthorStyles.listMinHeight, maxCardHeight)
-                        .toDouble();
+                    final double cardHeight =
+                        MetadataPanelHeightCalculator.calculateCardHeight(
+                          constraints: constraints,
+                          itemCount: filteredAuthors.length,
+                          config: _AuthorStyles.listHeightConfig,
+                        );
                     return Align(
                       alignment: Alignment.topCenter,
                       child: SizedBox(
@@ -122,11 +115,8 @@ class _AuthorStyles {
   static const EdgeInsets statusEmptyPadding = EdgeInsets.symmetric(
     vertical: 48,
   );
-  static const double listMinHeight = 240;
-  static const double listMaxHeight = 640;
-  static const double listHeightFactor = 0.78;
-  static const double listEstimatedRowHeight = 52;
-  static const double listHeaderHeight = 52;
+  static const MetadataPanelHeightConfig listHeightConfig =
+      MetadataPanelHeightCalculator.defaultConfig;
 }
 
 class _AuthorManagementHeader extends ConsumerWidget {

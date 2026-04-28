@@ -6,6 +6,7 @@ import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/status_card_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/rename_tag_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/metadata_page/widgets/metadata_panel_height.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/metadata_page/widgets/metadata_panel_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
@@ -55,16 +56,12 @@ class TagManagementPanel extends ConsumerWidget {
                 }
                 return LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
-                    final double maxCardHeight = (constraints.maxHeight *
-                            _TagStyles.listHeightFactor)
-                        .clamp(_TagStyles.listMinHeight, _TagStyles.listMaxHeight)
-                        .toDouble();
-                    final double estimatedHeight =
-                        _TagStyles.listHeaderHeight +
-                        (filteredTags.length * _TagStyles.listEstimatedRowHeight);
-                    final double cardHeight = estimatedHeight
-                        .clamp(_TagStyles.listMinHeight, maxCardHeight)
-                        .toDouble();
+                    final double cardHeight =
+                        MetadataPanelHeightCalculator.calculateCardHeight(
+                          constraints: constraints,
+                          itemCount: filteredTags.length,
+                          config: _TagStyles.listHeightConfig,
+                        );
                     return Align(
                       alignment: Alignment.topCenter,
                       child: SizedBox(
@@ -116,11 +113,8 @@ class _TagStyles {
   static const EdgeInsets statusEmptyPadding = EdgeInsets.symmetric(
     vertical: 48,
   );
-  static const double listMinHeight = 240;
-  static const double listMaxHeight = 640;
-  static const double listHeightFactor = 0.78;
-  static const double listEstimatedRowHeight = 52;
-  static const double listHeaderHeight = 52;
+  static const MetadataPanelHeightConfig listHeightConfig =
+      MetadataPanelHeightCalculator.defaultConfig;
 }
 
 class _TagManagementLoadingCard extends StatelessWidget {

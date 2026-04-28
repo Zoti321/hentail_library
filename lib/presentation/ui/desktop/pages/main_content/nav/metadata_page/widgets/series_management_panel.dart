@@ -13,6 +13,7 @@ import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/c
 import 'package:hentai_library/presentation/ui/desktop/routes/desktop_router.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';
+import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/metadata_page/widgets/metadata_panel_height.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SeriesManagementPanel extends StatelessWidget {
@@ -64,15 +65,12 @@ class _FilteredSeriesSection extends ConsumerWidget {
         }
         return LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-            final double maxCardHeight = (constraints.maxHeight *
-                    _SeriesStyles.listHeightFactor)
-                .clamp(_SeriesStyles.listMinHeight, _SeriesStyles.listMaxHeight)
-                .toDouble();
-            final double estimatedHeight = _SeriesStyles.listHeaderHeight +
-                (series.length * _SeriesStyles.listEstimatedRowHeight);
-            final double cardHeight = estimatedHeight
-                .clamp(_SeriesStyles.listMinHeight, maxCardHeight)
-                .toDouble();
+            final double cardHeight =
+                MetadataPanelHeightCalculator.calculateCardHeight(
+                  constraints: constraints,
+                  itemCount: series.length,
+                  config: _SeriesStyles.listHeightConfig,
+                );
             return Align(
               alignment: Alignment.topCenter,
               child: SizedBox(
@@ -92,11 +90,14 @@ class _FilteredSeriesSection extends ConsumerWidget {
 
 class _SeriesStyles {
   const _SeriesStyles._();
-  static const double listMinHeight = 240;
-  static const double listMaxHeight = 640;
-  static const double listHeightFactor = 0.78;
-  static const double listEstimatedRowHeight = 56;
-  static const double listHeaderHeight = 52;
+  static const MetadataPanelHeightConfig listHeightConfig =
+      MetadataPanelHeightConfig(
+        minHeight: 240,
+        maxHeight: 640,
+        heightFactor: 0.78,
+        headerHeight: 52,
+        estimatedRowHeight: 56,
+      );
 }
 
 class _Header extends ConsumerWidget {
