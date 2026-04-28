@@ -3,13 +3,13 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:hentai_library/core/util/filename_natural_compare.dart';
-import 'package:hentai_library/services/comic/read_resource_get/comic_read_image_mime.dart';
-import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_accessor.dart';
-import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_exception.dart';
-import 'package:hentai_library/services/comic/read_resource_get/reader_image.dart';
+import 'package:hentai_library/services/comic/read_resource_get/core/comic_read_resource_accessor.dart';
+import 'package:hentai_library/services/comic/read_resource_get/core/comic_read_resource_exception.dart';
+import 'package:hentai_library/services/comic/read_resource_get/core/reader_image.dart';
+import 'package:hentai_library/services/comic/read_resource_get/internal/utils/comic_read_image_mime.dart';
 import 'package:path/path.dart' as p;
 
-/// ZIP/CBZ 纯图片包：封面与正文均为 [ReaderBytesImage]（内存字节，不落盘）。
+/// 压缩包访问器：用于 zip/cbz 漫画资源读取。
 class ZipComicReadResourceAccessor implements ComicReadResourceAccessor {
   ZipComicReadResourceAccessor({
     required File archiveFile,
@@ -20,13 +20,11 @@ class ZipComicReadResourceAccessor implements ComicReadResourceAccessor {
   final File _archiveFile;
   final Set<String> _imageExtensions;
   List<ArchiveFile>? _orderedImageEntries;
+  static const String _prepareRequiredMessage = '先调用 prepare()';
 
   @override
   int get pageCount {
-    final List<ArchiveFile>? entries = _orderedImageEntries;
-    if (entries == null) {
-      throw StateError('先调用 prepare()');
-    }
+    final List<ArchiveFile> entries = _requirePreparedEntries();
     return entries.length;
   }
 
@@ -82,7 +80,7 @@ class ZipComicReadResourceAccessor implements ComicReadResourceAccessor {
 
   @override
   Future<ReaderImage> getCoverImage() async {
-    final List<ArchiveFile> entries = _requireEntries();
+    final List<ArchiveFile> entries = _requirePreparedEntries();
     for (final ArchiveFile f in entries) {
       final String name = f.name.replaceAll(r'\', '/');
       if (p.basenameWithoutExtension(name).toLowerCase() == 'cover') {
@@ -94,7 +92,7 @@ class ZipComicReadResourceAccessor implements ComicReadResourceAccessor {
 
   @override
   Future<ReaderImage> getPageImage(int pageIndex) async {
-    final List<ArchiveFile> entries = _requireEntries();
+    final List<ArchiveFile> entries = _requirePreparedEntries();
     if (pageIndex < 0 || pageIndex >= entries.length) {
       throw ComicReadResourceInvalidContentException(
         message: '页索引越界: index=$pageIndex count=${entries.length}',
@@ -104,10 +102,10 @@ class ZipComicReadResourceAccessor implements ComicReadResourceAccessor {
     return _bytesImageForEntry(f, f.name);
   }
 
-  List<ArchiveFile> _requireEntries() {
+  List<ArchiveFile> _requirePreparedEntries() {
     final List<ArchiveFile>? entries = _orderedImageEntries;
     if (entries == null) {
-      throw StateError('先调用 prepare()');
+      throw StateError(_prepareRequiredMessage);
     }
     return entries;
   }
@@ -124,3 +122,4 @@ class ZipComicReadResourceAccessor implements ComicReadResourceAccessor {
     return ReaderBytesImage(bytes, mimeType: mime);
   }
 }
+

@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/services/comic/cache/archive_cover_cache.dart';
-import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_accessor.dart';
-import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_session_manager.dart';
-import 'package:hentai_library/services/comic/read_resource_get/isolate_archive_cover_loader.dart';
-import 'package:hentai_library/services/comic/read_resource_get/reader_image.dart';
+import 'package:hentai_library/services/comic/read_resource_get/api/read_resource_get_service.dart';
+import 'package:hentai_library/services/comic/read_resource_get/core/comic_read_resource_accessor.dart';
+import 'package:hentai_library/services/comic/read_resource_get/core/reader_image.dart';
+import 'package:hentai_library/services/comic/read_resource_get/isolate/archive_cover_loader.dart';
 import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/model/models.dart' as entity;
@@ -300,11 +300,11 @@ Future<List<ReaderPageImageData>> comicImages(
   final v2Comic = await ref.read(comicRepoProvider).findById(comicId);
   if (v2Comic == null) return [];
 
-  final ComicReadResourceSessionManager sessions = ref.read(
-    comicReadResourceSessionManagerProvider,
+  final ReadResourceGetService readResourceService = ref.read(
+    readResourceGetServiceProvider,
   );
   try {
-    final accessor = await sessions.acquire(
+    final accessor = await readResourceService.acquire(
       comicId: comicId,
       path: v2Comic.path,
       type: v2Comic.resourceType,
@@ -394,11 +394,11 @@ Future<ComicCoverDisplayData?> comicCoverDisplay(
       return null;
     }
   }
-  final ComicReadResourceSessionManager sessions = ref.read(
-    comicReadResourceSessionManagerProvider,
+  final ReadResourceGetService readResourceService = ref.read(
+    readResourceGetServiceProvider,
   );
   try {
-    final ComicReadResourceAccessor accessor = await sessions.acquire(
+    final ComicReadResourceAccessor accessor = await readResourceService.acquire(
       comicId: comicId,
       path: v2Comic.path,
       type: resourceType,
@@ -434,11 +434,11 @@ Future<Uint8List?> comicReaderPageBytes(
   if (v2Comic.resourceType == ResourceType.dir) {
     return null;
   }
-  final ComicReadResourceSessionManager sessions = ref.read(
-    comicReadResourceSessionManagerProvider,
+  final ReadResourceGetService readResourceService = ref.read(
+    readResourceGetServiceProvider,
   );
   try {
-    final ComicReadResourceAccessor accessor = await sessions.acquire(
+    final ComicReadResourceAccessor accessor = await readResourceService.acquire(
       comicId: comicId,
       path: v2Comic.path,
       type: v2Comic.resourceType,

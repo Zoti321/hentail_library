@@ -119,7 +119,7 @@ class SyncComicsUseCase {
         comicIds: ids,
       );
       await seriesRepo.removeOrphanSeriesItems();
-      await _ref.read(comicReadResourceSessionManagerProvider).clear();
+      await _ref.read(readResourceGetServiceProvider).clear();
 
       emit((
         phase: SyncLibraryPhase.done,
@@ -193,7 +193,7 @@ class SyncComicsUseCase {
 
     final apply = await repo.replaceByScan(List<Comic>.from(comics));
     await _ref.read(librarySeriesRepoProvider).removeOrphanSeriesItems();
-    await _ref.read(comicReadResourceSessionManagerProvider).clear();
+    await _ref.read(readResourceGetServiceProvider).clear();
 
     emit((
       phase: SyncLibraryPhase.done,

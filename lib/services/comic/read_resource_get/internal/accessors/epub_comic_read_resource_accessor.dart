@@ -2,13 +2,13 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:epub_image_extractor/epub_image_extractor.dart';
-import 'package:hentai_library/services/comic/read_resource_get/comic_read_image_mime.dart';
-import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_accessor.dart';
-import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_exception.dart';
-import 'package:hentai_library/services/comic/read_resource_get/reader_image.dart';
+import 'package:hentai_library/services/comic/read_resource_get/core/comic_read_resource_accessor.dart';
+import 'package:hentai_library/services/comic/read_resource_get/core/comic_read_resource_exception.dart';
+import 'package:hentai_library/services/comic/read_resource_get/core/reader_image.dart';
+import 'package:hentai_library/services/comic/read_resource_get/internal/utils/comic_read_image_mime.dart';
 import 'package:path/path.dart' as p;
 
-/// EPUB：按包内阅读顺序提取图片；封面与正文均为 [ReaderBytesImage]。
+/// EPUB 访问器：按书内阅读顺序提取图片。
 class EpubComicReadResourceAccessor implements ComicReadResourceAccessor {
   EpubComicReadResourceAccessor({required File epubFile, EpubParser? parser})
     : _epubFile = epubFile,
@@ -17,13 +17,11 @@ class EpubComicReadResourceAccessor implements ComicReadResourceAccessor {
   final File _epubFile;
   final EpubParser _parser;
   EpubExtractionResult? _result;
+  static const String _prepareRequiredMessage = '先调用 prepare()';
 
   @override
   int get pageCount {
-    final EpubExtractionResult? r = _result;
-    if (r == null) {
-      throw StateError('先调用 prepare()');
-    }
+    final EpubExtractionResult r = _requirePreparedResult();
     return r.images.length;
   }
 
@@ -59,7 +57,7 @@ class EpubComicReadResourceAccessor implements ComicReadResourceAccessor {
 
   @override
   Future<ReaderImage> getCoverImage() async {
-    final EpubExtractionResult result = _requireResult();
+    final EpubExtractionResult result = _requirePreparedResult();
     for (final ImageInfo info in result.images) {
       if (p.basename(info.path).toLowerCase().contains('cover')) {
         return _bytesForImage(result, info);
@@ -70,7 +68,7 @@ class EpubComicReadResourceAccessor implements ComicReadResourceAccessor {
 
   @override
   Future<ReaderImage> getPageImage(int pageIndex) async {
-    final EpubExtractionResult result = _requireResult();
+    final EpubExtractionResult result = _requirePreparedResult();
     if (pageIndex < 0 || pageIndex >= result.images.length) {
       throw ComicReadResourceInvalidContentException(
         message: '页索引越界: index=$pageIndex count=${result.images.length}',
@@ -79,10 +77,10 @@ class EpubComicReadResourceAccessor implements ComicReadResourceAccessor {
     return _bytesForImage(result, result.images[pageIndex]);
   }
 
-  EpubExtractionResult _requireResult() {
+  EpubExtractionResult _requirePreparedResult() {
     final EpubExtractionResult? r = _result;
     if (r == null) {
-      throw StateError('先调用 prepare()');
+      throw StateError(_prepareRequiredMessage);
     }
     return r;
   }
@@ -100,3 +98,4 @@ class EpubComicReadResourceAccessor implements ComicReadResourceAccessor {
     return ReaderBytesImage(data, mimeType: mime);
   }
 }
+

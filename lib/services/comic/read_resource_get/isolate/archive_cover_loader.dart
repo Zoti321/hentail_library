@@ -9,12 +9,10 @@ import 'package:hentai_library/core/util/filename_natural_compare.dart';
 import 'package:hentai_library/model/enums.dart';
 import 'package:path/path.dart' as p;
 
-/// Isolate 解码结果：封面字节与用于磁盘文件名的扩展名（带点，如 `.jpg`；未知时为 `.bin`）。
+/// 隔离线程封面解码结果：用于归档封面缓存写入与展示。
 typedef ArchiveCoverDecodeResult = ({Uint8List? bytes, String fileExtension});
 
-/// 在独立 isolate 中解码 epub/zip/cbz 封面字节，避免阻塞 UI 线程。
-///
-/// 目录漫画返回 bytes: null（应在主 isolate 用 [File] 路径加载）。
+/// 在 isolate 中解码 zip/cbz/epub 封面，避免阻塞主 UI 线程。
 Future<ArchiveCoverDecodeResult> loadArchiveCoverDecodeResultOffMainUi({
   required String path,
   required ResourceType type,
@@ -33,7 +31,7 @@ Future<ArchiveCoverDecodeResult> loadArchiveCoverDecodeResultOffMainUi({
   return Isolate.run(() => _decodeArchiveCoverInWorker(normalized, type));
 }
 
-/// 兼容旧调用：仅返回字节。
+/// 兼容旧调用签名：仅返回封面字节。
 Future<Uint8List?> loadArchiveCoverBytesOffMainUi({
   required String path,
   required ResourceType type,
@@ -141,3 +139,4 @@ String _normalizeDotExtension(String ext) {
   }
   return lower.startsWith('.') ? lower : '.$lower';
 }
+

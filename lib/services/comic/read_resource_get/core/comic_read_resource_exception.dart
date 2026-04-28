@@ -1,6 +1,6 @@
 import 'package:hentai_library/model/enums.dart';
 
-/// 漫画阅读资源访问相关异常基类。
+/// 阅读资源访问异常基类。
 class ComicReadResourceException implements Exception {
   ComicReadResourceException(this.message, {this.cause});
 
@@ -36,7 +36,7 @@ class ComicReadResourceKindMismatchException
   final String detail;
 }
 
-/// 当前未实现的资源类型（如 cbr/rar）。
+/// 当前未实现的资源类型（例如 cbr/rar）。
 class ComicReadResourceUnsupportedTypeException
     extends ComicReadResourceException {
   ComicReadResourceUnsupportedTypeException({required this.type})
@@ -45,7 +45,7 @@ class ComicReadResourceUnsupportedTypeException
   final ResourceType type;
 }
 
-/// 容器内无可用图片或索引越界等业务错误。
+/// 资源内容异常（例如无图片、索引越界、解码失败）。
 class ComicReadResourceInvalidContentException
     extends ComicReadResourceException {
   ComicReadResourceInvalidContentException({
@@ -53,3 +53,4 @@ class ComicReadResourceInvalidContentException
     Object? cause,
   }) : super(message, cause: cause);
 }
+

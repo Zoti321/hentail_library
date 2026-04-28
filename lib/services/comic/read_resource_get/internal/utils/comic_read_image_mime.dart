@@ -1,6 +1,6 @@
 import 'package:path/path.dart' as p;
 
-/// 根据文件路径或文件名推断漫画图片 MIME（未知则返回 null）。
+/// 根据文件路径或文件名推断漫画图片 MIME（未知返回 null）。
 String? inferComicImageMimeType(String filePathOrName) {
   final String ext = p.extension(filePathOrName).toLowerCase();
   return switch (ext) {
@@ -13,3 +13,4 @@ String? inferComicImageMimeType(String filePathOrName) {
     _ => null,
   };
 }
+

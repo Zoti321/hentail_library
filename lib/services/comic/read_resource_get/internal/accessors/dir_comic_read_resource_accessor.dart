@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:hentai_library/core/util/filename_natural_compare.dart';
-import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_accessor.dart';
-import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_exception.dart';
-import 'package:hentai_library/services/comic/read_resource_get/reader_image.dart';
+import 'package:hentai_library/services/comic/read_resource_get/core/comic_read_resource_accessor.dart';
+import 'package:hentai_library/services/comic/read_resource_get/core/comic_read_resource_exception.dart';
+import 'package:hentai_library/services/comic/read_resource_get/core/reader_image.dart';
 import 'package:path/path.dart' as p;
 
-/// 纯图片目录：封面与正文均为 [ReaderFileImage]。
+/// 目录访问器：用于读取纯图片目录漫画资源。
 class DirComicReadResourceAccessor implements ComicReadResourceAccessor {
   DirComicReadResourceAccessor({
     required Directory directory,
@@ -17,13 +17,11 @@ class DirComicReadResourceAccessor implements ComicReadResourceAccessor {
   final Directory _directory;
   final Set<String> _imageExtensions;
   List<File>? _orderedFiles;
+  static const String _prepareRequiredMessage = '先调用 prepare()';
 
   @override
   int get pageCount {
-    final List<File>? files = _orderedFiles;
-    if (files == null) {
-      throw StateError('先调用 prepare()');
-    }
+    final List<File> files = _requirePreparedFiles();
     return files.length;
   }
 
@@ -42,7 +40,7 @@ class DirComicReadResourceAccessor implements ComicReadResourceAccessor {
 
   @override
   Future<ReaderImage> getCoverImage() async {
-    final List<File> files = _requireFiles();
+    final List<File> files = _requirePreparedFiles();
     if (files.isEmpty) {
       throw ComicReadResourceInvalidContentException(
         message: '目录内无漫画图片: ${_directory.path}',
@@ -58,7 +56,7 @@ class DirComicReadResourceAccessor implements ComicReadResourceAccessor {
 
   @override
   Future<ReaderImage> getPageImage(int pageIndex) async {
-    final List<File> files = _requireFiles();
+    final List<File> files = _requirePreparedFiles();
     if (pageIndex < 0 || pageIndex >= files.length) {
       throw ComicReadResourceInvalidContentException(
         message: '页索引越界: index=$pageIndex count=${files.length}',
@@ -67,10 +65,10 @@ class DirComicReadResourceAccessor implements ComicReadResourceAccessor {
     return ReaderFileImage(files[pageIndex]);
   }
 
-  List<File> _requireFiles() {
+  List<File> _requirePreparedFiles() {
     final List<File>? files = _orderedFiles;
     if (files == null) {
-      throw StateError('先调用 prepare()');
+      throw StateError(_prepareRequiredMessage);
     }
     return files;
   }
@@ -94,3 +92,4 @@ class DirComicReadResourceAccessor implements ComicReadResourceAccessor {
     _orderedFiles = List<File>.unmodifiable(imageFiles);
   }
 }
+

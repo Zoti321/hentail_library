@@ -1,8 +1,9 @@
 import 'dart:collection';
 
-import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_accessor.dart';
-import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_opener.dart';
 import 'package:hentai_library/model/enums.dart';
+import 'package:hentai_library/services/comic/read_resource_get/core/comic_read_resource_accessor.dart';
+import 'package:hentai_library/services/comic/read_resource_get/internal/open/comic_read_resource_opener.dart';
+import 'package:hentai_library/services/comic/read_resource_get/internal/utils/comic_read_path_normalizer.dart';
 
 class _CachedSession {
   _CachedSession({required this.normalizedPath, required this.accessor});
@@ -11,20 +12,20 @@ class _CachedSession {
   final ComicReadResourceAccessor accessor;
 }
 
-/// 按 comicId 缓存 [ComicReadResourceAccessor]，避免归档类重复整包解码。
+/// 会话管理器：按 comicId 维护 accessor LRU 缓存，降低重复解码成本。
 class ComicReadResourceSessionManager {
-  ComicReadResourceSessionManager({required ComicReadResourceOpener opener})
-    : _opener = opener;
+  ComicReadResourceSessionManager({
+    required ComicReadResourceOpener opener,
+    required ComicReadPathNormalizer pathNormalizer,
+  }) : _opener = opener,
+       _pathNormalizer = pathNormalizer;
 
   final ComicReadResourceOpener _opener;
+  final ComicReadPathNormalizer _pathNormalizer;
   final LinkedHashMap<String, _CachedSession> _cache =
       LinkedHashMap<String, _CachedSession>();
 
   static const int _maxSessions = 4;
-
-  String _normalizePath(String path) {
-    return path.trim().replaceAll('\\', '/');
-  }
 
   Future<ComicReadResourceAccessor> acquire({
     required String comicId,
@@ -32,7 +33,7 @@ class ComicReadResourceSessionManager {
     required ResourceType type,
   }) async {
     final String key = comicId;
-    final String normalizedPath = _normalizePath(path);
+    final String normalizedPath = _pathNormalizer.normalizePath(path);
     final _CachedSession? existing = _cache.remove(key);
     if (existing != null) {
       if (existing.normalizedPath == normalizedPath) {
@@ -64,3 +65,4 @@ class ComicReadResourceSessionManager {
     _cache.clear();
   }
 }
+
