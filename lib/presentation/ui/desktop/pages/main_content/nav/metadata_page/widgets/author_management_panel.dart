@@ -350,12 +350,11 @@ class _AuthorRow extends ConsumerWidget {
                     : LucideIcons.square,
                 iconSize: 16,
                 size: _AuthorStyles.iconButtonSize.width,
-                tooltip: isSelected ? '取消选中' : '选中',
+                tooltip: '',
                 foregroundColor: isSelected ? cs.primary : cs.textTertiary,
                 hoverColor: theme.colorScheme.primary.withAlpha(10),
                 overlayColor: theme.colorScheme.primary.withAlpha(14),
                 borderRadius: 8,
-                delayTooltipThreeSeconds: true,
                 onPressed: () =>
                     ref.read(authorSelectionProvider.notifier).toggle(author),
               ),
