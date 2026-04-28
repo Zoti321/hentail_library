@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
+import 'package:hentai_library/core/util/path_normalizer.dart';
+
 /// 与 Isolate 解码侧一致的源路径规范化（用于 meta 比对）。
 String normalizeArchiveCoverSourcePath(String raw) {
-  return raw.trim().replaceAll('\\', '/');
+  return const PathNormalizer().normalizeForKey(raw);
 }
 
 /// 归档漫画封面磁盘缓存（仅列表/卡片 [comicCoverDisplay]，不用于阅读正文）。

@@ -6,6 +6,7 @@ import 'package:archive/archive.dart';
 import 'package:epub_image_extractor/epub_image_extractor.dart';
 import 'package:hentai_library/core/util/comic_file_types.dart';
 import 'package:hentai_library/core/util/filename_natural_compare.dart';
+import 'package:hentai_library/core/util/path_normalizer.dart';
 import 'package:hentai_library/model/enums.dart';
 import 'package:path/path.dart' as p;
 
@@ -27,7 +28,7 @@ Future<ArchiveCoverDecodeResult> loadArchiveCoverDecodeResultOffMainUi({
       type != ResourceType.cbz) {
     return (bytes: null, fileExtension: '.bin');
   }
-  final String normalized = path.trim().replaceAll('\\', '/');
+  final String normalized = const PathNormalizer().normalizeForKey(path);
   return Isolate.run(() => _decodeArchiveCoverInWorker(normalized, type));
 }
 

@@ -1,8 +1,8 @@
 import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/core/util/path_normalizer.dart';
 import 'package:hentai_library/services/comic/scan/comic_scan_parse_service.dart';
 import 'package:hentai_library/model/entity/comic/author.dart';
 import 'package:hentai_library/model/entity/comic/comic.dart';
-import 'package:path/path.dart' as p;
 
 /// ParsedResource 映射为领域 `Comic`。
 class ComicMapper {
@@ -14,12 +14,7 @@ class ComicMapper {
   /// - 统一分隔符
   /// - 去掉末尾分隔符
   String normalizePath(String rawPath) {
-    String normalized = p.normalize(rawPath);
-    normalized = normalized.replaceAll('\\', '/');
-    while (normalized.endsWith('/')) {
-      normalized = normalized.substring(0, normalized.length - 1);
-    }
-    return normalized;
+    return const PathNormalizer().normalizeForKey(rawPath);
   }
 
   String comicIdFromPath(String path) {
