@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:hentai_library/data/services/comic/cache/archive_cover_cache.dart';
+import 'package:hentai_library/services/comic/cache/archive_cover_cache.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -67,15 +67,15 @@ class ArchiveCoverDiskCache implements ArchiveCoverCache {
         return null;
       }
       final FileStat st = await source.stat();
-      if (st.modified.millisecondsSinceEpoch != metaMs ||
-          st.size != metaSize) {
+      if (st.modified.millisecondsSinceEpoch != metaMs || st.size != metaSize) {
         await _deleteComicFiles(root, safeId);
         return null;
       }
-      final String dotExt =
-          metaExt != null && metaExt.isNotEmpty
-              ? (metaExt.startsWith('.') ? metaExt.toLowerCase() : '.${metaExt.toLowerCase()}')
-              : '.bin';
+      final String dotExt = metaExt != null && metaExt.isNotEmpty
+          ? (metaExt.startsWith('.')
+                ? metaExt.toLowerCase()
+                : '.${metaExt.toLowerCase()}')
+          : '.bin';
       final File imageFile = File(p.join(root.path, '$safeId$dotExt'));
       if (!await imageFile.exists()) {
         await _deleteComicFiles(root, safeId);

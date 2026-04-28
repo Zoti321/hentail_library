@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/model/entity/comic/series.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/series_detail_page/widgets/widgets.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 
 class SeriesDetailPage extends ConsumerWidget {
   const SeriesDetailPage({super.key, required this.seriesName});

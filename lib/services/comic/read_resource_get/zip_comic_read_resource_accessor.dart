@@ -3,10 +3,10 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:hentai_library/core/util/filename_natural_compare.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_image_mime.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_accessor.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_exception.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/reader_image.dart';
+import 'package:hentai_library/services/comic/read_resource_get/comic_read_image_mime.dart';
+import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_accessor.dart';
+import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_exception.dart';
+import 'package:hentai_library/services/comic/read_resource_get/reader_image.dart';
 import 'package:path/path.dart' as p;
 
 /// ZIP/CBZ 纯图片包：封面与正文均为 [ReaderBytesImage]（内存字节，不落盘）。

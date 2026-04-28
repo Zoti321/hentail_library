@@ -1,6 +1,6 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
-import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
+import 'package:hentai_library/database/dao/dao.dart';
 import 'package:hentai_library/model/models.dart' as entity;
 import 'package:hentai_library/module/mapping/mapping.dart';
 
@@ -172,4 +172,3 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
     }
   }
 }
-

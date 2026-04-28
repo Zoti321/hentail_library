@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/data/services/series/auto_series_infer_service.dart';
+import 'package:hentai_library/services/series/auto_series_infer_service.dart';
 
 void main() {
   const AutoSeriesInferService service = AutoSeriesInferService();
@@ -97,14 +97,13 @@ void main() {
   });
 
   test('infers 狩娘性交II alpha beta ntr and extra ordering', () {
-    final InferredSeriesFromTitlesResult? actual = service.inferSeriesFromTitles(
-      <String>[
-        '狩娘性交II 番外編',
-        '狩娘性交II β',
-        '狩娘性交II α わたし…犯されて性癖に目覚めました',
-        '狩娘性交II NTR編',
-      ],
-    );
+    final InferredSeriesFromTitlesResult? actual = service
+        .inferSeriesFromTitles(<String>[
+          '狩娘性交II 番外編',
+          '狩娘性交II β',
+          '狩娘性交II α わたし…犯されて性癖に目覚めました',
+          '狩娘性交II NTR編',
+        ]);
     expect(actual, isNotNull);
     expect(actual!.seriesName, '狩娘性交II');
     expect(actual.indexByTitle, <String, int>{
@@ -116,14 +115,13 @@ void main() {
   });
 
   test('infers わたし series with soushuuhen as volume 4', () {
-    final InferredSeriesFromTitlesResult? actual = service.inferSeriesFromTitles(
-      <String>[
-        'わたし…変えられちゃいました',
-        'わたし…変えられちゃいました。 2',
-        'わたし…変えられちゃいました。 3',
-        'わたし...変えられちゃいました。 ―アラサーOLがヤリチン大学生達のチ○ポにドハマリするまで― 総集編',
-      ],
-    );
+    final InferredSeriesFromTitlesResult? actual = service
+        .inferSeriesFromTitles(<String>[
+          'わたし…変えられちゃいました',
+          'わたし…変えられちゃいました。 2',
+          'わたし…変えられちゃいました。 3',
+          'わたし...変えられちゃいました。 ―アラサーOLがヤリチン大学生達のチ○ポにドハマリするまで― 総集編',
+        ]);
     expect(actual, isNotNull);
     expect(actual!.seriesName, 'わたし…変えられちゃいました');
     expect(actual.indexByTitle, <String, int>{
@@ -135,14 +133,13 @@ void main() {
   });
 
   test('infers bracket series with 卷 suffix titles', () {
-    final InferredSeriesFromTitlesResult? actual = service.inferSeriesFromTitles(
-      <String>[
-        '[Kmoe][Fate／StayNight]卷04',
-        '[Kmoe][Fate／StayNight]卷03',
-        '[Kmoe][Fate／StayNight]卷02',
-        '[Kmoe][Fate／StayNight]卷01',
-      ],
-    );
+    final InferredSeriesFromTitlesResult? actual = service
+        .inferSeriesFromTitles(<String>[
+          '[Kmoe][Fate／StayNight]卷04',
+          '[Kmoe][Fate／StayNight]卷03',
+          '[Kmoe][Fate／StayNight]卷02',
+          '[Kmoe][Fate／StayNight]卷01',
+        ]);
     expect(actual, isNotNull);
     expect(actual!.seriesName, 'Fate／StayNight');
     expect(actual.indexByTitle, <String, int>{

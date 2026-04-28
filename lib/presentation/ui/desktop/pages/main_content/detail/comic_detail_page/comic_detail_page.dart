@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page/widgets/widgets.dart';

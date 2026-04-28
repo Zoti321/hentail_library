@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
 
 /// 批量移除已保存路径前的确认对话框。

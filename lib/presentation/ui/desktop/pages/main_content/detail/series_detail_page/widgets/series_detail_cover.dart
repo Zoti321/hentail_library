@@ -5,7 +5,7 @@ import 'package:hentai_library/model/entity/comic/series_item.dart';
 import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/element/image/adaptive_cover.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SeriesDetailCover extends ConsumerWidget {

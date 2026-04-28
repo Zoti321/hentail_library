@@ -7,7 +7,7 @@ import 'actions.dart';
 import 'series_comic_items_card.dart';
 import 'series_detail_card.dart';
 import 'series_detail_cover.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 
 class SeriesDetail extends StatelessWidget {
   const SeriesDetail({super.key, required this.series});

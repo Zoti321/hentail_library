@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
-import 'package:hentai_library/data/resources/local/database/database.dart' as db;
-import 'package:hentai_library/domain/usecases/purge_comics_side_effects.dart';
+import 'package:hentai_library/database/dao/dao.dart';
+import 'package:hentai_library/database/database.dart' as db;
+import 'package:hentai_library/usecases/purge_comics_side_effects.dart';
 import 'package:hentai_library/model/entity/comic/author.dart';
 import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/model/entity/comic/tag.dart';
@@ -16,7 +16,6 @@ typedef ComicReplaceByScanResult = ({
   int keptCount,
 });
 
-/// v2 Comic 仓储：仅定义领域契约，不暴露数据层细节。
 abstract class ComicRepository {
   Stream<List<Comic>> watchAll();
 
@@ -125,17 +124,16 @@ class ComicRepositoryImpl implements ComicRepository {
 
   @override
   Future<void> upsertMany(List<Comic> comics) async {
-    final companions =
-        comics.map((c) {
-          return db.ComicsCompanion.insert(
-            comicId: c.comicId,
-            path: c.path,
-            resourceType: c.resourceType,
-            title: c.title,
-            contentRating: Value(c.contentRating),
-            pageCount: Value(c.pageCount),
-          );
-        }).toList();
+    final companions = comics.map((c) {
+      return db.ComicsCompanion.insert(
+        comicId: c.comicId,
+        path: c.path,
+        resourceType: c.resourceType,
+        title: c.title,
+        contentRating: Value(c.contentRating),
+        pageCount: Value(c.pageCount),
+      );
+    }).toList();
 
     await _comicDao.upsertMany(companions);
 
@@ -167,10 +165,9 @@ class ComicRepositoryImpl implements ComicRepository {
     await _comicDao.updateUserMeta(
       comicId,
       title: Value.absentIfNull(title),
-      contentRating:
-          contentRating == null
-              ? const Value.absent()
-              : Value(contentRating),
+      contentRating: contentRating == null
+          ? const Value.absent()
+          : Value(contentRating),
     );
     if (authors != null) {
       await _comicDao.replaceComicAuthors(
@@ -259,11 +256,12 @@ class ComicRepositoryImpl implements ComicRepository {
     required Set<String> optionalOr,
     required Set<String> mustExclude,
   }) async {
-    final List<String> comicIds = await _searchDao.searchComicIdsByTagExpression(
-      mustInclude: mustInclude,
-      optionalOr: optionalOr,
-      mustExclude: mustExclude,
-    );
+    final List<String> comicIds = await _searchDao
+        .searchComicIdsByTagExpression(
+          mustInclude: mustInclude,
+          optionalOr: optionalOr,
+          mustExclude: mustExclude,
+        );
     if (comicIds.isEmpty) {
       return <Comic>[];
     }
@@ -308,4 +306,3 @@ class ComicRepositoryImpl implements ComicRepository {
     );
   }
 }
-

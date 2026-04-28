@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/repository/path_repository.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AddPathPopoverButton extends ConsumerStatefulWidget {

@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:hentai_library/core/util/filename_natural_compare.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_accessor.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_exception.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/reader_image.dart';
+import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_accessor.dart';
+import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_exception.dart';
+import 'package:hentai_library/services/comic/read_resource_get/reader_image.dart';
 import 'package:path/path.dart' as p;
 
 /// 纯图片目录：封面与正文均为 [ReaderFileImage]。

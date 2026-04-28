@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// 面包屑式返回 [漫画库]（`/local`），可选展示当前页副标题。

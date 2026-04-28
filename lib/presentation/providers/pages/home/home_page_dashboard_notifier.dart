@@ -1,5 +1,5 @@
-import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
-import 'package:hentai_library/data/resources/local/database/dao/home_page_dao_types.dart';
+import 'package:hentai_library/database/dao/dao.dart';
+import 'package:hentai_library/database/dao/home_page_dao_types.dart';
 import 'package:hentai_library/presentation/dto/history_grid_item_dto.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';

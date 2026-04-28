@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/context_menu/common.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -17,11 +17,8 @@ class SeriesContextMenu {
       position: position,
       width: 236,
       height: 286,
-      builder: (VoidCallback onClose) => _MenuContent(
-        title: seriesName,
-        onClose: onClose,
-        onAction: onAction,
-      ),
+      builder: (VoidCallback onClose) =>
+          _MenuContent(title: seriesName, onClose: onClose, onAction: onAction),
     );
   }
 }
@@ -50,42 +47,42 @@ class _MenuContent extends StatelessWidget {
       title: title,
       leadingIcon: LucideIcons.libraryBig,
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            SizedBox(height: tokens.spacing.xs + 2),
-            _FluentMenuItem(
-              icon: LucideIcons.bookOpen,
-              label: '阅读系列',
-              shortcut: 'Enter',
-              onTap: () => handleAction(SeriesContextAction.read),
-            ),
-            _FluentMenuItem(
-              icon: LucideIcons.arrowUpDown,
-              label: '调整顺序',
-              onTap: () => handleAction(SeriesContextAction.reorder),
-            ),
-            _FluentMenuItem(
-              icon: LucideIcons.plus,
-              label: '添加漫画',
-              onTap: () => handleAction(SeriesContextAction.addComics),
-            ),
-            Divider(height: 14, thickness: 1.4, color: cs.borderMedium),
-            _FluentMenuItem(
-              icon: LucideIcons.squarePen,
-              label: '重命名',
-              onTap: () => handleAction(SeriesContextAction.rename),
-            ),
-            Divider(height: 14, thickness: 1.4, color: cs.borderMedium),
-            _FluentMenuItem(
-              icon: LucideIcons.trash2,
-              label: '删除',
-              shortcut: 'Del',
-              isDestructive: true,
-              onTap: () => handleAction(SeriesContextAction.delete),
-            ),
-            SizedBox(height: tokens.spacing.xs + 2),
-          ],
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          SizedBox(height: tokens.spacing.xs + 2),
+          _FluentMenuItem(
+            icon: LucideIcons.bookOpen,
+            label: '阅读系列',
+            shortcut: 'Enter',
+            onTap: () => handleAction(SeriesContextAction.read),
+          ),
+          _FluentMenuItem(
+            icon: LucideIcons.arrowUpDown,
+            label: '调整顺序',
+            onTap: () => handleAction(SeriesContextAction.reorder),
+          ),
+          _FluentMenuItem(
+            icon: LucideIcons.plus,
+            label: '添加漫画',
+            onTap: () => handleAction(SeriesContextAction.addComics),
+          ),
+          Divider(height: 14, thickness: 1.4, color: cs.borderMedium),
+          _FluentMenuItem(
+            icon: LucideIcons.squarePen,
+            label: '重命名',
+            onTap: () => handleAction(SeriesContextAction.rename),
+          ),
+          Divider(height: 14, thickness: 1.4, color: cs.borderMedium),
+          _FluentMenuItem(
+            icon: LucideIcons.trash2,
+            label: '删除',
+            shortcut: 'Del',
+            isDestructive: true,
+            onTap: () => handleAction(SeriesContextAction.delete),
+          ),
+          SizedBox(height: tokens.spacing.xs + 2),
+        ],
       ),
     );
   }

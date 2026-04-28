@@ -1,4 +1,4 @@
-import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
+import 'package:hentai_library/database/dao/dao.dart';
 import 'package:hentai_library/model/entity/comic/tag.dart';
 
 /// Tag 仓储：独立于 Comic/Series 的“标签字典管理”。
@@ -36,4 +36,3 @@ class TagRepositoryImpl implements TagRepository {
   Future<void> rename(String oldName, String newName) =>
       _dao.renameTag(oldName, newName);
 }
-

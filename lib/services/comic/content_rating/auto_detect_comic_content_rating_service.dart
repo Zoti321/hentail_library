@@ -1,4 +1,4 @@
-import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
+import 'package:hentai_library/database/dao/dao.dart';
 import 'package:hentai_library/model/enums.dart';
 
 typedef AutoDetectComicContentRatingResult = ({

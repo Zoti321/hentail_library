@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:hentai_library/data/resources/local/database/database.dart';
+import 'package:hentai_library/database/database.dart';
 import 'package:hentai_library/model/models.dart' as entity;
 
 class SeriesReadingHistoryDbMapper {
@@ -27,4 +27,3 @@ extension SeriesReadingHistoryEntityToCompanion on entity.SeriesReadingHistory {
     );
   }
 }
-

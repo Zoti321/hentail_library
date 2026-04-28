@@ -1,9 +1,9 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
-import 'package:hentai_library/data/resources/local/database/database.dart';
-import 'package:hentai_library/data/resources/local/database/dao/home_page_dao_types.dart';
+import 'package:hentai_library/database/dao/dao.dart';
+import 'package:hentai_library/database/database.dart';
+import 'package:hentai_library/database/dao/home_page_dao_types.dart';
 import 'package:hentai_library/model/enums.dart'
     show ContentRating, ResourceType;
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/selected_paths_page/widgets/path_tile.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 import 'package:hentai_library/core/util/format_byte_size.dart';
 import 'package:hentai_library/model/app_setting.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';

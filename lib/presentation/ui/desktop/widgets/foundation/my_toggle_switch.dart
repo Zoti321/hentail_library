@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 
 class MyToggleSwitch extends StatefulWidget {
   const MyToggleSwitch({super.key, required this.checked, this.onChange});

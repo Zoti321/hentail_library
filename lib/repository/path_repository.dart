@@ -1,7 +1,7 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
-import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
-import 'package:hentai_library/data/resources/local/database/database.dart';
+import 'package:hentai_library/database/dao/dao.dart';
+import 'package:hentai_library/database/database.dart';
 
 abstract class PathRepository {
   Future<List<String>> getAll();
@@ -52,4 +52,3 @@ class PathRepositoryImpl implements PathRepository {
     }
   }
 }
-

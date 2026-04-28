@@ -1,5 +1,5 @@
-import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
-import 'package:hentai_library/data/resources/local/database/database.dart' as db;
+import 'package:hentai_library/database/dao/dao.dart';
+import 'package:hentai_library/database/database.dart' as db;
 import 'package:hentai_library/model/entity/comic/series.dart';
 import 'package:hentai_library/model/entity/comic/series_item.dart';
 
@@ -66,7 +66,8 @@ class SeriesRepositoryImpl implements SeriesRepository {
   @override
   Future<List<Series>> getAll() async {
     final List<db.DbSeries> seriesRows = await _dao.getAllSeries();
-    final List<db.DbSeriesItem> allItems = await _dao.getAllSeriesItemsOrdered();
+    final List<db.DbSeriesItem> allItems = await _dao
+        .getAllSeriesItemsOrdered();
     final Map<String, List<SeriesItem>> groupedItemsBySeries =
         <String, List<SeriesItem>>{};
     for (final db.DbSeriesItem item in allItems) {
@@ -91,10 +92,9 @@ class SeriesRepositoryImpl implements SeriesRepository {
     final items = await _dao.getItemsForSeries(name);
     return Series(
       name: row.name,
-      items:
-          items
-              .map((i) => SeriesItem(comicId: i.comicId, order: i.sortOrder))
-              .toList(),
+      items: items
+          .map((i) => SeriesItem(comicId: i.comicId, order: i.sortOrder))
+          .toList(),
     );
   }
 
@@ -160,14 +160,16 @@ class SeriesRepositoryImpl implements SeriesRepository {
 
   @override
   Future<List<Series>> searchByKeyword(String keyword) async {
-    final List<String> seriesNames = await _searchDao.searchSeriesNamesByKeyword(
-      keyword,
-    );
+    final List<String> seriesNames = await _searchDao
+        .searchSeriesNamesByKeyword(keyword);
     if (seriesNames.isEmpty) {
       return <Series>[];
     }
-    final List<db.DbSeries> seriesRows = await _dao.getSeriesByNames(seriesNames);
-    final List<db.DbSeriesItem> allItems = await _dao.getAllSeriesItemsOrdered();
+    final List<db.DbSeries> seriesRows = await _dao.getSeriesByNames(
+      seriesNames,
+    );
+    final List<db.DbSeriesItem> allItems = await _dao
+        .getAllSeriesItemsOrdered();
     final Map<String, List<SeriesItem>> groupedItemsBySeries =
         <String, List<SeriesItem>>{};
     for (final db.DbSeriesItem item in allItems) {
@@ -209,8 +211,11 @@ class SeriesRepositoryImpl implements SeriesRepository {
     if (seriesNames.isEmpty) {
       return <Series>[];
     }
-    final List<db.DbSeries> seriesRows = await _dao.getSeriesByNames(seriesNames);
-    final List<db.DbSeriesItem> allItems = await _dao.getAllSeriesItemsOrdered();
+    final List<db.DbSeries> seriesRows = await _dao.getSeriesByNames(
+      seriesNames,
+    );
+    final List<db.DbSeriesItem> allItems = await _dao
+        .getAllSeriesItemsOrdered();
     final Map<String, List<SeriesItem>> groupedItemsBySeries =
         <String, List<SeriesItem>>{};
     for (final db.DbSeriesItem item in allItems) {
@@ -237,4 +242,3 @@ class SeriesRepositoryImpl implements SeriesRepository {
     return ordered;
   }
 }
-

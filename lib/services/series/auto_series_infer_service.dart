@@ -1,4 +1,4 @@
-import 'package:hentai_library/data/services/series/comic_title_to_series_item_mapping.dart';
+import 'package:hentai_library/services/series/comic_title_to_series_item_mapping.dart';
 
 export 'comic_title_to_series_item_mapping.dart';
 
@@ -46,9 +46,12 @@ final class _SeriesBatchInferenceResolver {
     final Map<String, String> clusterKeyToDisplay = <String, String>{};
     for (int i = 0; i < list.length; i++) {
       final ComicTitleInput c = list[i];
-      final String normalized = SeriesTitleClustering.normalizeTitleText(c.title);
-      final MappedSeriesVolume? p =
-          _titleMapping.mapComicTitleToSeriesVolume(normalized);
+      final String normalized = SeriesTitleClustering.normalizeTitleText(
+        c.title,
+      );
+      final MappedSeriesVolume? p = _titleMapping.mapComicTitleToSeriesVolume(
+        normalized,
+      );
       if (p != null) {
         final String key = SeriesTitleClustering.clusterKeyFromSeriesName(
           p.seriesName,
@@ -68,14 +71,15 @@ final class _SeriesBatchInferenceResolver {
         continue;
       }
       final ComicTitleInput c = list[i];
-      final String stripped = ComicTitleToSeriesItemMapping.stripComiketPrefixes(
-        c.title.trim(),
+      final String stripped =
+          ComicTitleToSeriesItemMapping.stripComiketPrefixes(c.title.trim());
+      final bool isSoushuuhen = SeriesTitleClustering.endsWithSoushuuhen(
+        stripped,
       );
-      final bool isSoushuuhen =
-          SeriesTitleClustering.endsWithSoushuuhen(stripped);
       if (isSoushuuhen) {
-        final String key =
-            SeriesTitleClustering.clusterKeyFromFullTitle(c.title);
+        final String key = SeriesTitleClustering.clusterKeyFromFullTitle(
+          c.title,
+        );
         final String? display = clusterKeyToDisplay[key];
         if (display != null) {
           slots[i] = (
@@ -93,8 +97,7 @@ final class _SeriesBatchInferenceResolver {
         continue;
       }
       final ComicTitleInput c = list[i];
-      final String key =
-          SeriesTitleClustering.clusterKeyFromFullTitle(c.title);
+      final String key = SeriesTitleClustering.clusterKeyFromFullTitle(c.title);
       final String? display = clusterKeyToDisplay[key];
       if (display == null) {
         continue;
@@ -167,9 +170,8 @@ final class InferredSeriesGrouper {
     ComicTitleToSeriesItemMapping titleMapping, {
     int minComicsPerGroup = 2,
   }) {
-    final _SeriesBatchInferenceResolver resolver = _SeriesBatchInferenceResolver(
-      titleMapping: titleMapping,
-    );
+    final _SeriesBatchInferenceResolver resolver =
+        _SeriesBatchInferenceResolver(titleMapping: titleMapping);
     final List<_ResolvedLine> resolved = resolver.resolve(comics);
     final Map<String, List<InferredVolumeEntry>> byBase =
         <String, List<InferredVolumeEntry>>{};
@@ -179,9 +181,7 @@ final class InferredSeriesGrouper {
         line.clusterKey,
         () => <InferredVolumeEntry>[],
       );
-      bucket.add(
-        (comicId: line.comicId, volumeSortKey: line.volumeSortKey),
-      );
+      bucket.add((comicId: line.comicId, volumeSortKey: line.volumeSortKey));
       baseToDisplay[line.clusterKey] = line.seriesDisplayName;
     }
     final List<InferredSeriesGroup> out = <InferredSeriesGroup>[];
@@ -271,18 +271,18 @@ final class AutoSeriesInferService {
       final double d = e.volumeSortKey.toDouble();
       return d != d.floorToDouble();
     });
-    final List<InferredVolumeEntry> sorted = List<InferredVolumeEntry>.of(
-      g.entries,
-    )..sort((InferredVolumeEntry a, InferredVolumeEntry b) {
-        final int byVol = InferredSeriesGrouper.compareVolumeSortKey(
-          a.volumeSortKey,
-          b.volumeSortKey,
-        );
-        if (byVol != 0) {
-          return byVol;
-        }
-        return a.comicId.compareTo(b.comicId);
-      });
+    final List<InferredVolumeEntry> sorted =
+        List<InferredVolumeEntry>.of(g.entries)
+          ..sort((InferredVolumeEntry a, InferredVolumeEntry b) {
+            final int byVol = InferredSeriesGrouper.compareVolumeSortKey(
+              a.volumeSortKey,
+              b.volumeSortKey,
+            );
+            if (byVol != 0) {
+              return byVol;
+            }
+            return a.comicId.compareTo(b.comicId);
+          });
     final Map<String, int> indexByTitle = <String, int>{};
     if (useDenseRank) {
       int rank = 1;

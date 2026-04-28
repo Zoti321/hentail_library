@@ -2,9 +2,9 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_exception.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_opener.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/reader_image.dart';
+import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_exception.dart';
+import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_opener.dart';
+import 'package:hentai_library/services/comic/read_resource_get/reader_image.dart';
 import 'package:hentai_library/model/enums.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';

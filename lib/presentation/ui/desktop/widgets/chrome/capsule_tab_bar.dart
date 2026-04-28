@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 
 /// 单项：胶囊 Tab 内的一段文字，可选图标。
 class CapsuleTabItem {

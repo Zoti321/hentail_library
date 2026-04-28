@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/context_menu/common.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -17,11 +17,8 @@ class ComicContextMenu {
       position: position,
       width: 236,
       height: 280,
-      builder: (VoidCallback onClose) => _MenuContent(
-        title: mangaTitle,
-        onClose: onClose,
-        onAction: onAction,
-      ),
+      builder: (VoidCallback onClose) =>
+          _MenuContent(title: mangaTitle, onClose: onClose, onAction: onAction),
     );
   }
 }
@@ -50,37 +47,37 @@ class _MenuContent extends StatelessWidget {
       title: title,
       leadingIcon: LucideIcons.panelRightOpen,
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(height: tokens.spacing.xs + 2),
-            _FluentMenuItem(
-              icon: LucideIcons.bookOpen,
-              label: '阅读',
-              shortcut: 'Enter',
-              onTap: () => _handle(ComicContextAction.read),
-            ),
-            Divider(height: 14, thickness: 1.4, color: cs.borderMedium),
-            _FluentMenuItem(
-              icon: LucideIcons.squarePen,
-              label: '编辑元数据',
-              onTap: () => _handle(ComicContextAction.edit),
-            ),
-            _FluentMenuItem(
-              icon: LucideIcons.externalLink,
-              label: '在文件资源管理器中显示',
-              onTap: () => _handle(ComicContextAction.showInExplorer),
-            ),
-            Divider(height: 14, thickness: 1.4, color: cs.borderMedium),
-            _FluentMenuItem(
-              icon: LucideIcons.trash2,
-              label: '删除',
-              shortcut: 'Del',
-              isDestructive: true,
-              onTap: () => _handle(ComicContextAction.delete),
-            ),
-            SizedBox(height: tokens.spacing.xs + 2),
-          ],
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: tokens.spacing.xs + 2),
+          _FluentMenuItem(
+            icon: LucideIcons.bookOpen,
+            label: '阅读',
+            shortcut: 'Enter',
+            onTap: () => _handle(ComicContextAction.read),
+          ),
+          Divider(height: 14, thickness: 1.4, color: cs.borderMedium),
+          _FluentMenuItem(
+            icon: LucideIcons.squarePen,
+            label: '编辑元数据',
+            onTap: () => _handle(ComicContextAction.edit),
+          ),
+          _FluentMenuItem(
+            icon: LucideIcons.externalLink,
+            label: '在文件资源管理器中显示',
+            onTap: () => _handle(ComicContextAction.showInExplorer),
+          ),
+          Divider(height: 14, thickness: 1.4, color: cs.borderMedium),
+          _FluentMenuItem(
+            icon: LucideIcons.trash2,
+            label: '删除',
+            shortcut: 'Del',
+            isDestructive: true,
+            onTap: () => _handle(ComicContextAction.delete),
+          ),
+          SizedBox(height: tokens.spacing.xs + 2),
+        ],
       ),
     );
   }

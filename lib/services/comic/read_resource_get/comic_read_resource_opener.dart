@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:hentai_library/core/util/comic_file_types.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_accessor.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_exception.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/dir_comic_read_resource_accessor.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/epub_comic_read_resource_accessor.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/zip_comic_read_resource_accessor.dart';
-import 'package:hentai_library/data/services/comic/scan/resource_types.dart';
+import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_accessor.dart';
+import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_exception.dart';
+import 'package:hentai_library/services/comic/read_resource_get/dir_comic_read_resource_accessor.dart';
+import 'package:hentai_library/services/comic/read_resource_get/epub_comic_read_resource_accessor.dart';
+import 'package:hentai_library/services/comic/read_resource_get/zip_comic_read_resource_accessor.dart';
+import 'package:hentai_library/services/comic/scan/resource_types.dart';
 import 'package:hentai_library/model/enums.dart';
 
 /// 按 [ResourceType] 打开漫画资源并完成 [ComicReadResourceAccessor.prepare]。

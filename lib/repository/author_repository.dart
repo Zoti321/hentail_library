@@ -1,4 +1,4 @@
-import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
+import 'package:hentai_library/database/dao/dao.dart';
 import 'package:hentai_library/model/entity/comic/author.dart';
 
 /// Author 仓储：独立于 Comic 的「作者字典管理」。
@@ -44,4 +44,3 @@ class AuthorRepositoryImpl implements AuthorRepository {
   Future<void> rename(String oldName, String newName) =>
       _dao.renameAuthor(oldName, newName);
 }
-

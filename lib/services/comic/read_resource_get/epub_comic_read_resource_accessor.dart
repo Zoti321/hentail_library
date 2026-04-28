@@ -2,19 +2,17 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:epub_image_extractor/epub_image_extractor.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_image_mime.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_accessor.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_exception.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/reader_image.dart';
+import 'package:hentai_library/services/comic/read_resource_get/comic_read_image_mime.dart';
+import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_accessor.dart';
+import 'package:hentai_library/services/comic/read_resource_get/comic_read_resource_exception.dart';
+import 'package:hentai_library/services/comic/read_resource_get/reader_image.dart';
 import 'package:path/path.dart' as p;
 
 /// EPUB：按包内阅读顺序提取图片；封面与正文均为 [ReaderBytesImage]。
 class EpubComicReadResourceAccessor implements ComicReadResourceAccessor {
-  EpubComicReadResourceAccessor({
-    required File epubFile,
-    EpubParser? parser,
-  }) : _epubFile = epubFile,
-       _parser = parser ?? EpubParser();
+  EpubComicReadResourceAccessor({required File epubFile, EpubParser? parser})
+    : _epubFile = epubFile,
+      _parser = parser ?? EpubParser();
 
   final File _epubFile;
   final EpubParser _parser;

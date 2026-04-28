@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/theme/theme.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 
 /// 复用系列/漫画区块共同的 section 外壳（标题、内边距、尾部间距）。
 class LibrarySectionSliver extends StatelessWidget {
@@ -7,8 +7,14 @@ class LibrarySectionSliver extends StatelessWidget {
     super.key,
     required this.title,
     required this.contentSliver,
-    this.headerPadding = const EdgeInsets.symmetric(horizontal: 48, vertical: 4),
-    this.contentPadding = const EdgeInsets.symmetric(horizontal: 48, vertical: 2),
+    this.headerPadding = const EdgeInsets.symmetric(
+      horizontal: 48,
+      vertical: 4,
+    ),
+    this.contentPadding = const EdgeInsets.symmetric(
+      horizontal: 48,
+      vertical: 2,
+    ),
     this.bottomSpacing,
   });
 
@@ -35,10 +41,7 @@ class LibrarySectionSliver extends StatelessWidget {
             ),
           ),
         ),
-        SliverPadding(
-          padding: contentPadding,
-          sliver: contentSliver,
-        ),
+        SliverPadding(padding: contentPadding, sliver: contentSliver),
         if (bottomSpacing != null)
           SliverToBoxAdapter(child: SizedBox(height: bottomSpacing)),
       ],
