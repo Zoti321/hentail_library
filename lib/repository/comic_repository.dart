@@ -1,15 +1,56 @@
+import 'package:drift/drift.dart';
 import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
-import 'package:hentai_library/data/resources/local/database/database.dart'
-    as db;
+import 'package:hentai_library/data/resources/local/database/database.dart' as db;
+import 'package:hentai_library/domain/usecases/purge_comics_side_effects.dart';
 import 'package:hentai_library/model/entity/comic/author.dart';
 import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/model/entity/comic/tag.dart';
 import 'package:hentai_library/model/enums.dart';
-import 'package:hentai_library/domain/repository/comic_repo.dart';
-import 'package:hentai_library/domain/repository/series_repo.dart';
-import 'package:hentai_library/domain/repository/reading_history_repo.dart';
-import 'package:hentai_library/domain/usecases/purge_comics_side_effects.dart';
-import 'package:drift/drift.dart';
+import 'package:hentai_library/repository/reading_history_repository.dart';
+import 'package:hentai_library/repository/series_repository.dart';
+
+/// [replaceByScan] 应用结果统计（供 UI 进度等）。
+typedef ComicReplaceByScanResult = ({
+  int removedCount,
+  int addedCount,
+  int keptCount,
+});
+
+/// v2 Comic 仓储：仅定义领域契约，不暴露数据层细节。
+abstract class ComicRepository {
+  Stream<List<Comic>> watchAll();
+
+  Future<List<Comic>> getAll();
+
+  Future<Comic?> findById(String comicId);
+
+  /// 用于扫描导入（写入/更新）。
+  Future<void> upsertMany(List<Comic> comics);
+
+  Future<void> deleteByIds(List<String> comicIds);
+
+  /// 用户编辑覆盖解析值：title/authors/contentRating/tags 等。
+  Future<void> updateUserMeta(
+    String comicId, {
+    String? title,
+    List<Author>? authors,
+    ContentRating? contentRating,
+    List<Tag>? tags,
+  });
+
+  /// 扫描 diff：删除库中本次未出现的条目并清理关联；新增与保留条目写入（保留合并用户元数据）。
+  Future<ComicReplaceByScanResult> replaceByScan(List<Comic> scanned);
+
+  /// 关键词搜索（数据库命中），由上层决定是否再应用额外业务过滤。
+  Future<List<Comic>> searchByKeyword(String keyword);
+
+  /// 标签表达式搜索（数据库命中），由上层决定是否再应用额外业务过滤。
+  Future<List<Comic>> searchByTagExpression({
+    required Set<String> mustInclude,
+    required Set<String> optionalOr,
+    required Set<String> mustExclude,
+  });
+}
 
 typedef _ComicScanIdDiff = ({
   Set<String> removedIds,
@@ -84,18 +125,17 @@ class ComicRepositoryImpl implements ComicRepository {
 
   @override
   Future<void> upsertMany(List<Comic> comics) async {
-    final companions = comics
-        .map(
-          (c) => db.ComicsCompanion.insert(
+    final companions =
+        comics.map((c) {
+          return db.ComicsCompanion.insert(
             comicId: c.comicId,
             path: c.path,
             resourceType: c.resourceType,
             title: c.title,
             contentRating: Value(c.contentRating),
             pageCount: Value(c.pageCount),
-          ),
-        )
-        .toList();
+          );
+        }).toList();
 
     await _comicDao.upsertMany(companions);
 
@@ -127,9 +167,10 @@ class ComicRepositoryImpl implements ComicRepository {
     await _comicDao.updateUserMeta(
       comicId,
       title: Value.absentIfNull(title),
-      contentRating: contentRating == null
-          ? const Value.absent()
-          : Value(contentRating),
+      contentRating:
+          contentRating == null
+              ? const Value.absent()
+              : Value(contentRating),
     );
     if (authors != null) {
       await _comicDao.replaceComicAuthors(
@@ -218,12 +259,11 @@ class ComicRepositoryImpl implements ComicRepository {
     required Set<String> optionalOr,
     required Set<String> mustExclude,
   }) async {
-    final List<String> comicIds = await _searchDao
-        .searchComicIdsByTagExpression(
-          mustInclude: mustInclude,
-          optionalOr: optionalOr,
-          mustExclude: mustExclude,
-        );
+    final List<String> comicIds = await _searchDao.searchComicIdsByTagExpression(
+      mustInclude: mustInclude,
+      optionalOr: optionalOr,
+      mustExclude: mustExclude,
+    );
     if (comicIds.isEmpty) {
       return <Comic>[];
     }
@@ -268,3 +308,4 @@ class ComicRepositoryImpl implements ComicRepository {
     );
   }
 }
+

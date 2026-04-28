@@ -1,18 +1,11 @@
-import 'package:hentai_library/data/repository/app_setting_repo_impl.dart';
-import 'package:hentai_library/data/repository/comic_repo_impl.dart';
-import 'package:hentai_library/data/repository/series_repo_impl.dart';
-import 'package:hentai_library/data/repository/author_repo_impl.dart';
-import 'package:hentai_library/data/repository/tag_repo_impl.dart';
-import 'package:hentai_library/data/repository/path_repo_impl.dart';
-import 'package:hentai_library/data/repository/reading_history_repo_impl.dart';
-import 'package:hentai_library/domain/repository/app_setting_repo.dart';
-import 'package:hentai_library/domain/repository/dir_repo.dart';
-import 'package:hentai_library/domain/repository/author_repo.dart';
-import 'package:hentai_library/domain/repository/comic_repo.dart';
-import 'package:hentai_library/domain/repository/series_repo.dart';
-import 'package:hentai_library/domain/repository/tag_repo.dart';
-import 'package:hentai_library/domain/repository/reading_history_repo.dart';
 import 'package:hentai_library/presentation/providers/deps/database_dao.dart';
+import 'package:hentai_library/repository/app_setting_repository.dart';
+import 'package:hentai_library/repository/author_repository.dart';
+import 'package:hentai_library/repository/comic_repository.dart';
+import 'package:hentai_library/repository/path_repository.dart';
+import 'package:hentai_library/repository/reading_history_repository.dart';
+import 'package:hentai_library/repository/series_repository.dart';
+import 'package:hentai_library/repository/tag_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'repos.g.dart';
@@ -26,8 +19,10 @@ ComicRepository comicRepo(Ref ref) => ComicRepositoryImpl(
 );
 
 @Riverpod(keepAlive: true)
-SeriesRepository librarySeriesRepo(Ref ref) =>
-    SeriesRepositoryImpl(ref.read(seriesDaoProvider), ref.read(searchDaoProvider));
+SeriesRepository librarySeriesRepo(Ref ref) => SeriesRepositoryImpl(
+  ref.read(seriesDaoProvider),
+  ref.read(searchDaoProvider),
+);
 
 @Riverpod(keepAlive: true)
 TagRepository libraryTagRepo(Ref ref) =>
@@ -49,4 +44,4 @@ ReadingHistoryRepository readingHistoryRepo(Ref ref) =>
     );
 
 @Riverpod(keepAlive: true)
-AppSettingRepository appSettingRepo(Ref ref) => AppSettingRepoImpl();
+AppSettingRepository appSettingRepo(Ref ref) => AppSettingRepositoryImpl();

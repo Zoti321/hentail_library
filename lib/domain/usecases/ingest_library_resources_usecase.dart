@@ -1,7 +1,7 @@
 import 'package:hentai_library/data/services/comic/scan/comic_scan_parse_service.dart';
 import 'package:hentai_library/model/entity/comic/comic.dart';
-import 'package:hentai_library/domain/mappers/comic_mapper.dart';
-import 'package:hentai_library/domain/repository/comic_repo.dart';
+import 'package:hentai_library/module/mapping/mapping.dart';
+import 'package:hentai_library/repository/comic_repository.dart';
 
 /// 用例壳：从文件系统扫描并解析资源，然后写入  Comic 仓储。
 ///

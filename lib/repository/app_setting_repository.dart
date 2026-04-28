@@ -1,14 +1,18 @@
 import 'dart:convert';
 import 'dart:io';
+
+import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/model/models.dart' show AppSetting;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-import 'package:hentai_library/core/logging/log_manager.dart';
-import 'package:hentai_library/domain/repository/app_setting_repo.dart';
+abstract class AppSettingRepository {
+  Future<AppSetting> load();
 
-import '../../model/models.dart' show AppSetting;
+  Future<void> save(AppSetting setting);
+}
 
-class AppSettingRepoImpl implements AppSettingRepository {
+class AppSettingRepositoryImpl implements AppSettingRepository {
   static const String _fileName = 'settings.json';
 
   @override
@@ -50,3 +54,4 @@ class AppSettingRepoImpl implements AppSettingRepository {
 
   static AppSetting defaultSettings() => AppSetting();
 }
+

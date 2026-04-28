@@ -2,7 +2,16 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart';
-import 'package:hentai_library/domain/repository/dir_repo.dart';
+
+abstract class PathRepository {
+  Future<List<String>> getAll();
+
+  Stream<List<String>> watch();
+
+  Future<void> add(String path);
+
+  Future<void> remove(String path);
+}
 
 class PathRepositoryImpl implements PathRepository {
   final SavedPathDao _savedPathDao;
@@ -43,3 +52,4 @@ class PathRepositoryImpl implements PathRepository {
     }
   }
 }
+

@@ -1,7 +1,7 @@
 import 'package:hentai_library/model/entity/comic/author.dart';
 import 'package:hentai_library/model/entity/comic/tag.dart';
 import 'package:hentai_library/model/enums.dart';
-import 'package:hentai_library/domain/repository/comic_repo.dart';
+import 'package:hentai_library/repository/comic_repository.dart';
 
 /// 用例壳：用户编辑覆盖解析值。
 class UpdateComicMetaUseCase {
