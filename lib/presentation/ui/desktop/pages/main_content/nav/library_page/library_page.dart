@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/library_page/widgets/widgets.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/responsive_layout/library_blocks_layout.dart';
 
@@ -7,20 +8,21 @@ class LibraryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: <Widget>[
-        const SliverToBoxAdapter(
+        SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+            padding: tokens.layout.contentAreaPadding,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                LibraryPageHeader(),
-                SizedBox(height: 8),
-                LibraryPageSubtitle(),
-                SizedBox(height: 12),
-                LibrarySearchToolbarRow(),
+                const LibraryPageHeader(),
+                const SizedBox(height: 8),
+                const LibraryPageSubtitle(),
+                const SizedBox(height: 12),
+                const LibrarySearchToolbarRow(),
               ],
             ),
           ),

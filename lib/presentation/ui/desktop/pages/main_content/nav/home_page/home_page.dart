@@ -137,7 +137,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           homeContentMaxWidth,
         );
         return SingleChildScrollView(
-          padding: homePagePadding,
+          padding: tokens.layout.contentAreaPadding,
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(

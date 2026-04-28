@@ -13,11 +13,11 @@ import 'package:hentai_library/presentation/ui/desktop/widgets/form/author_libra
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/foundation/my_toggle_switch.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// [FluentDialogShell] 标题区、内容区底边距与底栏的近似高度，用于限制中间滚动区。
+/// [HentaiDialog] 标题区、内容区底边距与底栏的近似高度，用于限制中间滚动区。
 const double _kEditMetadataShellChromeReserve = 168;
 
 class EditMetadataDialog extends StatefulHookConsumerWidget {
@@ -87,7 +87,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
 
-    return FluentDialogShell(
+    return HentaiDialog(
       title: '编辑元数据',
       width: 580,
       content: ConstrainedBox(

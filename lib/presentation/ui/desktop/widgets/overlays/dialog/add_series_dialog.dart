@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/fluent_text_field.dart';
 
 class AddSeriesDialog extends ConsumerStatefulWidget {
@@ -46,7 +46,7 @@ class _AddSeriesDialogState extends ConsumerState<AddSeriesDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return FluentDialogShell(
+    return HentaiDialog(
       title: '添加系列',
       content: FluentTextField(
         initialValue: _nameController.text,

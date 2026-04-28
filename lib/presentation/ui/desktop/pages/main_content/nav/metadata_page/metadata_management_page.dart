@@ -12,7 +12,7 @@ import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/me
 import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/add_series_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/tag_name_editor_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/rename_tag_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class MetadataManagementPage extends ConsumerStatefulWidget {
@@ -33,6 +33,7 @@ class _MetadataManagementPageState
 
   @override
   Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final String? tabParam = GoRouterState.of(
       context,
@@ -65,10 +66,7 @@ class _MetadataManagementPageState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 48,
-                  vertical: 16,
-                ),
+                padding: tokens.layout.contentAreaPadding,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/settings_page/widgets/settings_about_rows.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/settings_page/widgets/settings_cache_rows.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/settings_page/widgets/settings_library_rows.dart';
@@ -13,8 +14,9 @@ class SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final AppThemeTokens tokens = context.tokens;
     return SingleChildScrollView(
-      padding: settingsPagePadding,
+      padding: tokens.layout.contentAreaPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 24,

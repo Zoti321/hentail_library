@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/model/entity/comic/series.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/fluent_text_field.dart';
 
 class RenameSeriesDialog extends ConsumerStatefulWidget {
@@ -54,7 +54,7 @@ class _RenameSeriesDialogState extends ConsumerState<RenameSeriesDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return FluentDialogShell(
+    return HentaiDialog(
       title: '重命名系列',
       content: FluentTextField(
         initialValue: _controller.text,

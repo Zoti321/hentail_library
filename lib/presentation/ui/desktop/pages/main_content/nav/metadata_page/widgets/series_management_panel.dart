@@ -20,6 +20,7 @@ class SeriesManagementPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
     Future<void> openAddSeriesDialog() async {
       await showDialog<void>(
         context: context,
@@ -32,7 +33,7 @@ class SeriesManagementPanel extends StatelessWidget {
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+      padding: tokens.layout.contentAreaPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

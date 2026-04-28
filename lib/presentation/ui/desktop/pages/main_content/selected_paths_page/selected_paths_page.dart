@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/presentation/theme/theme.dart';
 import 'package:hentai_library/presentation/providers/pages/selected_paths/selected_paths_page_notifier.dart';
-import 'package:hentai_library/presentation/ui/desktop/theme_token/token.dart';
 
 import 'widgets/widgets.dart';
 
@@ -10,12 +10,13 @@ class SelectedPathsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppThemeTokens tokens = context.tokens;
     final AsyncValue<SelectedPathsPageState> asyncState = ref.watch(
       selectedPathsPageProvider,
     );
 
     return SingleChildScrollView(
-      padding: mainContentPadding,
+      padding: tokens.layout.contentAreaPadding,
       child: Column(
         spacing: 20,
         crossAxisAlignment: CrossAxisAlignment.start,

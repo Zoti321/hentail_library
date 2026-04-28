@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/model/entity/comic/series.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/hentai_dialog.dart';
 
 class SeriesConfirmDeleteDialog extends StatelessWidget {
   const SeriesConfirmDeleteDialog({super.key, required this.series});
@@ -12,7 +12,7 @@ class SeriesConfirmDeleteDialog extends StatelessWidget {
     final count = series.items.length;
     final extra = count > 0 ? '该系列包含 $count 本漫画，将移除系列归属，漫画仍保留在库中。' : '删除后无法恢复。';
 
-    return FluentDialogShell(
+    return HentaiDialog(
       title: '确认删除',
       content: Text('确定删除系列「${series.name}」？$extra'),
       actions: [

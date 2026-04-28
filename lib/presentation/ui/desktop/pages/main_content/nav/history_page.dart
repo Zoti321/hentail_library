@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/presentation/theme/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/theme_token/token.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
@@ -18,17 +17,20 @@ class HistoryPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppThemeTokens tokens = context.tokens;
     return CustomScrollView(
       cacheExtent: 1200,
-      slivers: const <Widget>[
+      slivers: <Widget>[
         SliverPadding(
-          padding: mainContentPadding,
-          sliver: SliverToBoxAdapter(child: _Header()),
+          padding: tokens.layout.contentAreaPadding,
+          sliver: const SliverToBoxAdapter(child: _Header()),
         ),
-        SliverToBoxAdapter(child: SizedBox(height: 16)),
+        const SliverToBoxAdapter(child: SizedBox(height: 16)),
         SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 48),
-          sliver: _HistoryListSliver(),
+          padding: EdgeInsets.symmetric(
+            horizontal: tokens.layout.contentHorizontalPadding,
+          ),
+          sliver: const _HistoryListSliver(),
         ),
       ],
     );
@@ -41,6 +43,7 @@ class _Header extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final AppThemeTokens tokens = context.tokens;
     final int totalCount = ref.watch(
       historyFeedViewProvider.select(
         (HistoryFeedViewData value) => value.totalCount,
@@ -59,7 +62,7 @@ class _Header extends ConsumerWidget {
                 "阅读历史",
                 style: TextStyle(
                   color: theme.colorScheme.textPrimary,
-                  fontSize: titleFontSize,
+                  fontSize: tokens.text.titleLg + 4,
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.4,
                 ),
@@ -67,7 +70,7 @@ class _Header extends ConsumerWidget {
               Text(
                 "$totalCount 条记录 • 最长保留 30 天",
                 style: TextStyle(
-                  fontSize: subtitleFontSize,
+                  fontSize: tokens.text.bodySm,
                   fontWeight: FontWeight.w400,
                   color: theme.colorScheme.textTertiary,
                 ),

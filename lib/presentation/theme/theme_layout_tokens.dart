@@ -5,11 +5,13 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
   final AppTextTokens text;
   final AppRadiusTokens radius;
   final AppSpacingTokens spacing;
+  final AppLayoutTokens layout;
 
   const AppThemeTokens({
     required this.text,
     required this.radius,
     required this.spacing,
+    required this.layout,
   });
 
   factory AppThemeTokens.light() => const AppThemeTokens(
@@ -24,6 +26,10 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
     ),
     radius: AppRadiusTokens(xs: 4, sm: 6, md: 8, lg: 12, pill: 999),
     spacing: AppSpacingTokens(xs: 4, sm: 8, md: 12, lg: 16, xl: 20),
+    layout: AppLayoutTokens(
+      contentHorizontalPadding: 48,
+      contentVerticalPadding: 16,
+    ),
   );
 
   factory AppThemeTokens.dark() => AppThemeTokens.light();
@@ -33,11 +39,13 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
     AppTextTokens? text,
     AppRadiusTokens? radius,
     AppSpacingTokens? spacing,
+    AppLayoutTokens? layout,
   }) {
     return AppThemeTokens(
       text: text ?? this.text,
       radius: radius ?? this.radius,
       spacing: spacing ?? this.spacing,
+      layout: layout ?? this.layout,
     );
   }
 
@@ -53,6 +61,38 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
       text: text.lerp(other.text, t),
       radius: radius.lerp(other.radius, t),
       spacing: spacing.lerp(other.spacing, t),
+      layout: layout.lerp(other.layout, t),
+    );
+  }
+}
+
+@immutable
+class AppLayoutTokens {
+  final double contentHorizontalPadding;
+  final double contentVerticalPadding;
+
+  const AppLayoutTokens({
+    required this.contentHorizontalPadding,
+    required this.contentVerticalPadding,
+  });
+
+  EdgeInsets get contentAreaPadding => EdgeInsets.symmetric(
+    horizontal: contentHorizontalPadding,
+    vertical: contentVerticalPadding,
+  );
+
+  AppLayoutTokens lerp(AppLayoutTokens other, double t) {
+    return AppLayoutTokens(
+      contentHorizontalPadding: _lerpDouble(
+        contentHorizontalPadding,
+        other.contentHorizontalPadding,
+        t,
+      ),
+      contentVerticalPadding: _lerpDouble(
+        contentVerticalPadding,
+        other.contentVerticalPadding,
+        t,
+      ),
     );
   }
 }

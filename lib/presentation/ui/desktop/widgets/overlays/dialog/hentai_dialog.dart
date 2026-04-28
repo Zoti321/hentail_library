@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/presentation/theme/theme.dart';
 
-class FluentDialogShell extends StatelessWidget {
-  const FluentDialogShell({
+class HentaiDialog extends StatelessWidget {
+  const HentaiDialog({
     super.key,
     required this.title,
     required this.content,

@@ -8,7 +8,7 @@ import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/model/entity/comic/series.dart';
 import 'package:hentai_library/model/entity/comic/series_item.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -128,7 +128,7 @@ class _AddComicsToSeriesDialogState
       420.0,
     );
 
-    return FluentDialogShell(
+    return HentaiDialog(
       title: '管理「${widget.series.name}」中的漫画',
       width: 520,
       content: Column(

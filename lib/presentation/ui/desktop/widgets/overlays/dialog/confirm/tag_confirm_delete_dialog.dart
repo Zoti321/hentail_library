@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/hentai_dialog.dart';
 
 class TagConfirmDeleteDialog extends StatelessWidget {
   const TagConfirmDeleteDialog({super.key, required this.count});
@@ -8,7 +8,7 @@ class TagConfirmDeleteDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FluentDialogShell(
+    return HentaiDialog(
       title: '确认删除',
       content: Text('将删除 $count 个标签，并同时从所有漫画中移除这些标签。此操作不可撤销。'),
       actions: [

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/fluent_text_field.dart';
 
 class TagNameEditorDialog extends ConsumerStatefulWidget {
@@ -60,7 +60,7 @@ class _TagNameEditorDialogState extends ConsumerState<TagNameEditorDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return FluentDialogShell(
+    return HentaiDialog(
       title: widget.title,
       content: FluentTextField(
         initialValue: _controller.text,

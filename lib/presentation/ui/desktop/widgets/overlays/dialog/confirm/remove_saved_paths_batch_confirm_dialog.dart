@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/presentation/theme/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/hentai_dialog.dart';
 
 /// 批量移除已保存路径前的确认对话框。
 class RemoveSavedPathsBatchConfirmDialog extends StatelessWidget {
@@ -16,7 +16,7 @@ class RemoveSavedPathsBatchConfirmDialog extends StatelessWidget {
         ? paths
         : paths.sublist(0, previewMax);
     final bool hasMore = paths.length > previewMax;
-    return FluentDialogShell(
+    return HentaiDialog(
       title: '确认移除',
       content: Column(
         mainAxisSize: MainAxisSize.min,

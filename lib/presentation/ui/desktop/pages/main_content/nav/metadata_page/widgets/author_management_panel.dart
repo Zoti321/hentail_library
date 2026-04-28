@@ -5,7 +5,7 @@ import 'package:hentai_library/model/entity/comic/author.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/status_card_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/tag_name_editor_dialog.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/rename_tag_dialog.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/metadata_page/widgets/metadata_panel_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
@@ -36,9 +36,10 @@ class AuthorManagementPanel extends ConsumerWidget {
 
     final authorsAsync = ref.watch(allAuthorsProvider);
     final String query = ref.watch(authorFilterProvider);
+    final AppThemeTokens tokens = context.tokens;
 
     return SingleChildScrollView(
-      padding: _AuthorStyles.pagePadding,
+      padding: tokens.layout.contentAreaPadding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -69,11 +70,6 @@ class AuthorManagementPanel extends ConsumerWidget {
 
 class _AuthorStyles {
   const _AuthorStyles._();
-
-  static const EdgeInsets pagePadding = EdgeInsets.symmetric(
-    horizontal: 48,
-    vertical: 16,
-  );
 
   static const double titleFontSize = 26;
   static const double subtitleFontSize = 13;

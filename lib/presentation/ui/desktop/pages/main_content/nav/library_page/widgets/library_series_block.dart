@@ -5,6 +5,7 @@ class LibrarySeriesBlock extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppThemeTokens tokens = context.tokens;
     final LibraryPageViewModel vm = ref.watch(libraryPageViewModelProvider);
     final LibraryDisplayTarget displayTarget = vm.displayTarget;
     final bool showSeriesSection = displayTarget != LibraryDisplayTarget.comics;
@@ -24,7 +25,9 @@ class LibrarySeriesBlock extends ConsumerWidget {
     final bool isGridView = vm.isGridView;
     return LibrarySectionSliver(
       title: '系列',
-      contentPadding: const EdgeInsets.symmetric(horizontal: 48),
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: tokens.layout.contentHorizontalPadding,
+      ),
       bottomSpacing: 16,
       contentSliver: LibraryAdaptiveItemsSliver(
         isGridView: isGridView,

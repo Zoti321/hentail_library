@@ -7,7 +7,7 @@ import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_t
 import 'package:hentai_library/model/entity/comic/series.dart';
 import 'package:hentai_library/model/entity/comic/series_item.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/fluent_dialog_shell.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ReorderSeriesItemsDialog extends ConsumerStatefulWidget {
@@ -68,7 +68,7 @@ class _ReorderSeriesItemsDialogState
       280.0,
       480.0,
     );
-    return FluentDialogShell(
+    return HentaiDialog(
       cardSurfaceKey: _dialogCardKey,
       title: '调整「${widget.series.name}」内顺序',
       width: 520,
