@@ -31,6 +31,7 @@ class AutoDetectComicContentRatingService {
     if (comicIdAndPaths.isEmpty) {
       return (totalComics: 0, matchedComics: 0, updatedComics: 0);
     }
+
     final Set<String> matchedComicIds = <String>{};
     for (final ({String comicId, String path}) item in comicIdAndPaths) {
       if (_isR18Path(item.path)) {

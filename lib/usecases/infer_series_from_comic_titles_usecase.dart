@@ -31,6 +31,7 @@ class InferSeriesFromComicTitlesUseCase {
   final AutoSeriesInferService _inferenceService;
 
   Future<InferSeriesFromComicTitlesResult> call() async {
+    // 1. 获取所有系列，统计已分配的 Comic ID。
     final List<Series> allSeries = await _seriesRepository.getAll();
     final Set<String> assignedComicIds = <String>{};
     for (final Series s in allSeries) {
@@ -46,6 +47,7 @@ class InferSeriesFromComicTitlesUseCase {
       }
       candidates.add((comicId: c.comicId, title: c.title));
     }
+
     final List<InferredSeriesGroup> groups = _inferenceService.inferGroups(
       candidates,
     );

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:epub_image_extractor/epub_image_extractor.dart';
 import 'package:hentai_library/core/util/comic_file_types.dart';
-import 'package:hentai_library/services/comic/scan/resource_types.dart';
+import 'package:hentai_library/services/comic/scan/comic_scan_parse_service.dart';
 import 'package:hentai_library/model/enums.dart';
 import 'package:path/path.dart' as p;
 
@@ -43,74 +43,36 @@ class DirResourceParser implements ResourceParser {
     FileSystemEntity entity,
     ParseContext context,
   ) async {
-    final dir = entity as Directory;
+    final Directory dir = entity as Directory;
     if (!await dir.exists()) return null;
 
-    final files = <File>[];
-    var hasSubdir = false;
-
-    await for (final entity in dir.list(recursive: true)) {
-      if (entity is Directory) {
-        hasSubdir = true;
-        break;
-      } else if (entity is File) {
-        files.add(entity);
+    final List<File> files = <File>[];
+    await for (final FileSystemEntity child in dir.list(
+      recursive: false,
+      followLinks: false,
+    )) {
+      if (child is Directory) {
+        return null;
+      }
+      if (child is File) {
+        files.add(child);
       }
     }
+    if (files.isEmpty) return null;
 
-    if (hasSubdir || files.isEmpty) return null;
-
-    final allImages = files.every((f) {
-      final ext = p.extension(f.path).toLowerCase();
+    final bool allImages = files.every((File file) {
+      final String ext = p.extension(file.path).toLowerCase();
       return context.imageExts.contains(ext);
     });
     if (!allImages) return null;
 
-    final title = p.basename(dir.path);
+    final String title = p.basename(dir.path);
     return (
       type: type,
       path: dir.path,
       meta: (title: title, authors: <String>[], pageCount: files.length),
     );
   }
-}
-
-Future<ParsedResource?> parsePureImageZipArchive(
-  File file,
-  ResourceType resourceType,
-  ParseContext context,
-) async {
-  final bytes = await file.readAsBytes();
-  Archive archive;
-  try {
-    archive = ZipDecoder().decodeBytes(bytes);
-  } catch (_) {
-    return null;
-  }
-
-  var hasImage = false;
-  for (final f in archive.files) {
-    final name = f.name.replaceAll(r'\', '/');
-    if (!f.isFile || name.endsWith('/')) continue;
-
-    final ext = p.extension(name).toLowerCase();
-    if (context.imageExts.contains(ext)) {
-      hasImage = true;
-      break;
-    }
-  }
-
-  if (!hasImage) return null;
-
-  return (
-    path: file.path,
-    type: resourceType,
-    meta: (
-      title: p.basenameWithoutExtension(file.path),
-      authors: <String>[],
-      pageCount: null,
-    ),
-  );
 }
 
 class PureImageZipParser implements ResourceParser {
@@ -176,4 +138,42 @@ class ComicEpubParser implements ResourceParser {
       return null;
     }
   }
+}
+
+Future<ParsedResource?> parsePureImageZipArchive(
+  File file,
+  ResourceType resourceType,
+  ParseContext context,
+) async {
+  final bytes = await file.readAsBytes();
+  Archive archive;
+  try {
+    archive = ZipDecoder().decodeBytes(bytes);
+  } catch (_) {
+    return null;
+  }
+
+  var hasImage = false;
+  for (final f in archive.files) {
+    final name = f.name.replaceAll(r'\', '/');
+    if (!f.isFile || name.endsWith('/')) continue;
+
+    final ext = p.extension(name).toLowerCase();
+    if (context.imageExts.contains(ext)) {
+      hasImage = true;
+      break;
+    }
+  }
+
+  if (!hasImage) return null;
+
+  return (
+    path: file.path,
+    type: resourceType,
+    meta: (
+      title: p.basenameWithoutExtension(file.path),
+      authors: <String>[],
+      pageCount: null,
+    ),
+  );
 }

@@ -1,3 +1,5 @@
+import 'package:path/path.dart' as p;
+
 /// 内容分级（用户自定义为主）。
 enum ContentRating { unknown, safe, r18 }
 
@@ -22,6 +24,19 @@ enum ResourceType {
 
   /// .rar 占位（暂不解析）
   rar,
+  ;
+
+  static ResourceType? fromFilePath(String path) {
+    final String ext = p.extension(path).toLowerCase();
+    return switch (ext) {
+      '.zip' => ResourceType.zip,
+      '.cbz' => ResourceType.cbz,
+      '.epub' => ResourceType.epub,
+      '.cbr' => ResourceType.cbr,
+      '.rar' => ResourceType.rar,
+      _ => null,
+    };
+  }
 }
 
 enum LibraryDisplayTarget { all, comics, series }
