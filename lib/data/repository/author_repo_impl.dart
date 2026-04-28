@@ -1,5 +1,5 @@
 import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
-import 'package:hentai_library/domain/entity/comic/author.dart' as entity;
+import 'package:hentai_library/model/entity/comic/author.dart' as entity;
 import 'package:hentai_library/domain/repository/author_repo.dart';
 
 class AuthorRepositoryImpl implements AuthorRepository {

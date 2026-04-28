@@ -1,7 +1,7 @@
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/data/services/comic/scan/resource_types.dart';
-import 'package:hentai_library/domain/entity/comic/author.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/model/entity/comic/author.dart';
+import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:path/path.dart' as p;
 
 ///  ParsedResource 映射为领域 `Comic`。

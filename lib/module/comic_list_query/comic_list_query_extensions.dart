@@ -1,7 +1,7 @@
-import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/util/comic_query.dart';
-import 'package:hentai_library/domain/value_objects/library_comic_filter.dart';
-import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
+import 'package:hentai_library/model/entity/comic/comic.dart';
+import 'package:hentai_library/module/comic_list_query/comic_query.dart';
+import 'package:hentai_library/module/comic_list_query/library_comic_filter.dart';
+import 'package:hentai_library/module/comic_list_query/library_comic_sort_option.dart';
 
 extension ComicSortX on List<Comic> {
   List<Comic> sortedWith(LibraryComicSortOption option) {

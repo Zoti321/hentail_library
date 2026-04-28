@@ -1,5 +1,6 @@
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/domain/mappers/comic_mapper.dart';
+import 'package:hentai_library/module/comic_list_query/comic_list_query.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:talker/talker.dart';
 
@@ -7,6 +8,11 @@ part 'tools.g.dart';
 
 @Riverpod(keepAlive: true)
 ComicMapper libraryComicMapper(Ref ref) => ComicMapper();
+
+@Riverpod(keepAlive: true)
+ComicListQueryModule comicListQueryModule(Ref ref) {
+  return const DefaultComicListQueryModule();
+}
 
 @Riverpod(keepAlive: true)
 Talker logManager(Ref ref) {

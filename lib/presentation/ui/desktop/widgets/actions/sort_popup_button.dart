@@ -1,7 +1,7 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/theme/theme.dart';
-import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
+import 'package:hentai_library/module/comic_list_query/comic_list_query.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/popup_menu_panel_shell.dart';
@@ -126,7 +126,9 @@ class _SortMenu extends HookConsumerWidget {
                   overlayColor: theme.colorScheme.primary.withAlpha(14),
                   delayTooltipThreeSeconds: false,
                   onPressed: () {
-                    ref.read(libraryQueryIntentProvider.notifier).resetSortOption();
+                    ref
+                        .read(libraryQueryIntentProvider.notifier)
+                        .resetSortOption();
                   },
                 ),
               ],

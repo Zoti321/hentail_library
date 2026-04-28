@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/theme/theme.dart';
-import 'package:hentai_library/domain/entity/reading_history.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/model/entity/reading_history.dart';
+import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
@@ -50,13 +50,15 @@ class ComicDetailPrimaryActions extends HookConsumerWidget {
           button: true,
           child: ElevatedButton.icon(
             onPressed: () async {
-              await ref.read(recordReadingProgressUseCaseProvider).call(
-                ReadingHistory(
-                  comicId: comic.comicId,
-                  title: comic.title,
-                  lastReadTime: DateTime.now(),
-                ),
-              );
+              await ref
+                  .read(recordReadingProgressUseCaseProvider)
+                  .call(
+                    ReadingHistory(
+                      comicId: comic.comicId,
+                      title: comic.title,
+                      lastReadTime: DateTime.now(),
+                    ),
+                  );
               appRouter.pushNamed(
                 ReaderRouteArgs.readerRouteName,
                 queryParameters: ReaderRouteArgs(

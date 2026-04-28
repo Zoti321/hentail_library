@@ -1,14 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/entity/comic/series.dart';
-import 'package:hentai_library/domain/entity/comic/series_item.dart';
-import 'package:hentai_library/domain/util/comic_query.dart';
-import 'package:hentai_library/domain/value_objects/library_comic_filter.dart';
-import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
-import 'package:hentai_library/domain/entity/entities.dart' show AppSetting;
+import 'package:hentai_library/model/entity/comic/comic.dart';
+import 'package:hentai_library/model/entity/comic/series.dart';
+import 'package:hentai_library/model/entity/comic/series_item.dart';
+import 'package:hentai_library/model/models.dart' show AppSetting;
+import 'package:hentai_library/module/comic_list_query/comic_list_query.dart';
 import 'package:hentai_library/presentation/providers/aggregates/comic_aggregate_notifier.dart';
 import 'package:hentai_library/presentation/providers/aggregates/series_aggregate_notifier.dart';
+import 'package:hentai_library/presentation/providers/deps/tools.dart';
 import 'package:hentai_library/presentation/providers/pages/library/library_query_intent.dart';
 import 'package:hentai_library/presentation/providers/pages/library/library_query_intent_notifier.dart';
 import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
@@ -40,6 +39,7 @@ class _LibraryComicsStreamInput {
         hasReceivedFirstEmit == other.hasReceivedFirstEmit &&
         streamError == other.streamError;
   }
+
   @override
   int get hashCode => Object.hash(
     rawList,
@@ -50,42 +50,45 @@ class _LibraryComicsStreamInput {
   );
 }
 
-final libraryComicByIdProvider = Provider.family<Comic?, String>(
-  (Ref ref, String comicId) {
-    final List<Comic> comics = ref.watch(
-      comicAggregateProvider.select((ComicAggregateState s) => s.rawList),
-    );
-    for (final Comic comic in comics) {
-      if (comic.comicId == comicId) {
-        return comic;
-      }
+final libraryComicByIdProvider = Provider.family<Comic?, String>((
+  Ref ref,
+  String comicId,
+) {
+  final List<Comic> comics = ref.watch(
+    comicAggregateProvider.select((ComicAggregateState s) => s.rawList),
+  );
+  for (final Comic comic in comics) {
+    if (comic.comicId == comicId) {
+      return comic;
     }
-    return null;
-  },
-);
+  }
+  return null;
+});
 
 /// 合并弹窗专用查询：基于当前关键字对“可合并漫画”做过滤。
-final filteredMergeComicsProvider =
-    FutureProvider.family<List<Comic>, String>((Ref ref, String comicId) async {
-      final List<Comic> comics = ref.watch(
-        comicAggregateProvider.select((ComicAggregateState s) => s.rawList),
-      );
-      final String query = ref.watch(
-        libraryQueryIntentProvider.select(
-          (LibraryQueryIntent s) => s.mergeSearchQuery,
-        ),
-      );
-      final List<Comic> filtered = comics
-          .where((Comic e) => e.comicId != comicId)
-          .toList();
-      if (query.isEmpty) {
-        return filtered;
-      }
-      final String lowerQuery = query.toLowerCase();
-      return filtered
-          .where((Comic e) => e.title.toLowerCase().contains(lowerQuery))
-          .toList();
-    });
+final filteredMergeComicsProvider = FutureProvider.family<List<Comic>, String>((
+  Ref ref,
+  String comicId,
+) async {
+  final List<Comic> comics = ref.watch(
+    comicAggregateProvider.select((ComicAggregateState s) => s.rawList),
+  );
+  final String query = ref.watch(
+    libraryQueryIntentProvider.select(
+      (LibraryQueryIntent s) => s.mergeSearchQuery,
+    ),
+  );
+  final List<Comic> filtered = comics
+      .where((Comic e) => e.comicId != comicId)
+      .toList();
+  if (query.isEmpty) {
+    return filtered;
+  }
+  final String lowerQuery = query.toLowerCase();
+  return filtered
+      .where((Comic e) => e.title.toLowerCase().contains(lowerQuery))
+      .toList();
+});
 
 final Provider<Set<String>> libraryComicIdsInAnySeriesProvider =
     Provider<Set<String>>((Ref ref) {
@@ -107,10 +110,10 @@ final Provider<Set<String>> libraryComicIdsInAnySeriesProvider =
 /// 漫画主列表投影：这里统一处理 loading/error/data 以及业务过滤和排序。
 final Provider<AsyncValue<List<Comic>>> libraryDisplayedComicsProvider =
     Provider<AsyncValue<List<Comic>>>((Ref ref) {
-      final ComicAggregateState aggregateState = ref.watch(comicAggregateProvider);
-      final LibraryQueryIntent intent = ref.watch(
-        libraryQueryIntentProvider,
+      final ComicAggregateState aggregateState = ref.watch(
+        comicAggregateProvider,
       );
+      final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
       final bool showR18 = !ref.watch(
         settingsProvider.select(
           (AsyncValue<AppSetting> async) =>
@@ -145,27 +148,30 @@ final Provider<AsyncValue<List<Comic>>> libraryDisplayedComicsProvider =
             : null,
       );
       return AsyncValue.data(
-        ComicQuery(
+        ref.read(comicListQueryModuleProvider).apply(
+          comics: input.rawList,
           filter: filter,
           sortOption: input.sortOption,
-        ).apply(input.rawList),
+        ),
       );
     });
 
 /// 原始漫画流投影：供详情页、对话框等场景复用。
-final Provider<AsyncValue<List<Comic>>> libraryRawComicsAsyncProvider =
-    Provider<AsyncValue<List<Comic>>>((Ref ref) {
-      final ComicAggregateState aggregateState = ref.watch(comicAggregateProvider);
-      if (aggregateState.streamError != null) {
-        return AsyncValue.error(aggregateState.streamError!, StackTrace.current);
-      }
-      if (!aggregateState.hasReceivedFirstEmit) {
-        return const AsyncValue.loading();
-      }
-      return AsyncValue.data(aggregateState.rawList);
-    });
+final Provider<AsyncValue<List<Comic>>>
+libraryRawComicsAsyncProvider = Provider<AsyncValue<List<Comic>>>((Ref ref) {
+  final ComicAggregateState aggregateState = ref.watch(comicAggregateProvider);
+  if (aggregateState.streamError != null) {
+    return AsyncValue.error(aggregateState.streamError!, StackTrace.current);
+  }
+  if (!aggregateState.hasReceivedFirstEmit) {
+    return const AsyncValue.loading();
+  }
+  return AsyncValue.data(aggregateState.rawList);
+});
 
-final Provider<int> libraryDisplayedComicCountProvider = Provider<int>((Ref ref) {
+final Provider<int> libraryDisplayedComicCountProvider = Provider<int>((
+  Ref ref,
+) {
   final AsyncValue<List<Comic>> displayedAsync = ref.watch(
     libraryDisplayedComicsProvider,
   );
@@ -175,9 +181,13 @@ final Provider<int> libraryDisplayedComicCountProvider = Provider<int>((Ref ref)
   );
 });
 
-final Provider<bool> libraryHasReceivedFirstEmitProvider = Provider<bool>((Ref ref) {
+final Provider<bool> libraryHasReceivedFirstEmitProvider = Provider<bool>((
+  Ref ref,
+) {
   return ref.watch(
-    comicAggregateProvider.select((ComicAggregateState s) => s.hasReceivedFirstEmit),
+    comicAggregateProvider.select(
+      (ComicAggregateState s) => s.hasReceivedFirstEmit,
+    ),
   );
 });
 

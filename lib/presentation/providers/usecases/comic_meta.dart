@@ -1,10 +1,10 @@
-import 'package:hentai_library/domain/entity/comic/tag.dart';
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/entity/comic/tag.dart';
+import 'package:hentai_library/model/enums.dart';
 import 'package:hentai_library/domain/usecases/assign_comic_to_series_usecase.dart';
 import 'package:hentai_library/domain/usecases/infer_series_from_comic_titles_usecase.dart';
 import 'package:hentai_library/domain/usecases/ingest_library_resources_usecase.dart';
 import 'package:hentai_library/domain/usecases/update_comic_meta_usecase.dart';
-import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/model/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

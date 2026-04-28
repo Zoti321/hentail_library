@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_accessor.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_opener.dart';
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/enums.dart';
 
 class _CachedSession {
   _CachedSession({required this.normalizedPath, required this.accessor});

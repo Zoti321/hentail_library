@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/value_objects/library_display_target.dart';
+import 'package:hentai_library/model/entity/comic/comic.dart';
+import 'package:hentai_library/model/enums.dart';
 import 'package:hentai_library/presentation/providers/pages/library/library_page_comics_providers.dart';
 import 'package:hentai_library/presentation/providers/pages/library/library_page_series_providers.dart';
 import 'package:hentai_library/presentation/providers/pages/library/library_query_intent.dart';
@@ -47,9 +47,7 @@ final libraryFilterQueryProvider = Provider<String>((Ref ref) {
 
 final libraryIsGridViewProvider = Provider<bool>((Ref ref) {
   return ref.watch(
-    libraryQueryIntentProvider.select(
-      (LibraryQueryIntent s) => s.isGridView,
-    ),
+    libraryQueryIntentProvider.select((LibraryQueryIntent s) => s.isGridView),
   );
 });
 
@@ -62,12 +60,19 @@ final libraryPageViewModelProvider = Provider<LibraryPageViewModel>((Ref ref) {
     librarySeriesViewDataProvider,
   );
   final int displayedComicCount = ref.watch(libraryDisplayedComicCountProvider);
-  final int displayedSeriesCount = ref.watch(libraryDisplayedSeriesCountProvider);
+  final int displayedSeriesCount = ref.watch(
+    libraryDisplayedSeriesCountProvider,
+  );
   final bool isGridView = ref.watch(libraryIsGridViewProvider);
-  final LibraryDisplayTarget displayTarget = ref.watch(libraryDisplayTargetProvider);
+  final LibraryDisplayTarget displayTarget = ref.watch(
+    libraryDisplayTargetProvider,
+  );
   final String filterQuery = ref.watch(libraryFilterQueryProvider);
-  final bool hasReceivedFirstEmit = ref.watch(libraryHasReceivedFirstEmitProvider);
-  final bool isComicTableEmpty = hasReceivedFirstEmit && displayedComicCount == 0;
+  final bool hasReceivedFirstEmit = ref.watch(
+    libraryHasReceivedFirstEmitProvider,
+  );
+  final bool isComicTableEmpty =
+      hasReceivedFirstEmit && displayedComicCount == 0;
   return LibraryPageViewModel(
     comicsAsync: comicsAsync,
     seriesViewData: seriesViewData,

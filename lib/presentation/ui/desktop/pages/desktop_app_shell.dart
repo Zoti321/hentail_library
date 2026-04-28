@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/domain/entity/entities.dart' show AppSetting;
+import 'package:hentai_library/model/models.dart' show AppSetting;
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/app_title_bar.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/navigation/desktop_sidebar.dart';

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:hentai_library/domain/entity/entities.dart'
+import 'package:hentai_library/model/models.dart'
     show AppSetting, AppThemePreference;
 import 'package:hentai_library/presentation/providers/deps/repos.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

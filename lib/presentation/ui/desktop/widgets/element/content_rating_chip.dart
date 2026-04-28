@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/enums.dart';
 import 'package:hentai_library/theme/theme.dart';
 
 class ContentRatingChip extends StatelessWidget {

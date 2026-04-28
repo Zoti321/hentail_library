@@ -7,12 +7,14 @@ import 'package:hentai_library/data/services/comic/read_resource_get/dir_comic_r
 import 'package:hentai_library/data/services/comic/read_resource_get/epub_comic_read_resource_accessor.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/zip_comic_read_resource_accessor.dart';
 import 'package:hentai_library/data/services/comic/scan/resource_types.dart';
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/enums.dart';
 
 /// 按 [ResourceType] 打开漫画资源并完成 [ComicReadResourceAccessor.prepare]。
 class ComicReadResourceOpener {
   ComicReadResourceOpener({Set<String>? imageExtensions})
-    : _imageExtensions = imageExtensions ?? Set<String>.from(ComicFileTypes.comicImageExtensions);
+    : _imageExtensions =
+          imageExtensions ??
+          Set<String>.from(ComicFileTypes.comicImageExtensions);
 
   final Set<String> _imageExtensions;
 
@@ -29,8 +31,10 @@ class ComicReadResourceOpener {
         detail: 'path 为空',
       );
     }
-    final FileSystemEntityType entityType =
-        await FileSystemEntity.type(normalized, followLinks: false);
+    final FileSystemEntityType entityType = await FileSystemEntity.type(
+      normalized,
+      followLinks: false,
+    );
     if (entityType == FileSystemEntityType.notFound) {
       throw ComicReadResourceNotFoundException(path: normalized);
     }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/domain/entity/comic/author.dart';
+import 'package:hentai_library/model/entity/comic/author.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/form/multi_select.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -28,6 +28,7 @@ class AuthorLibraryMultiSelectField extends ConsumerWidget {
   final List<String> selectedNames;
   final ValueChanged<String> onAdd;
   final ValueChanged<String> onRemove;
+
   /// When true, shortens the dropdown trigger bar (e.g. metadata dialog).
   final bool compactTrigger;
 

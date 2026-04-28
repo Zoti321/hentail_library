@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/theme/theme.dart';
 import 'package:hentai_library/core/util/app_theme_mode.dart';
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/domain/entity/entities.dart' show AppSetting;
+import 'package:hentai_library/model/models.dart' show AppSetting;
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/mobile/theme/mobile_material_theme.dart';
 import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';

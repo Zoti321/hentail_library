@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/domain/entity/comic/series.dart';
-import 'package:hentai_library/domain/entity/comic/tag.dart';
+import 'package:hentai_library/model/entity/comic/series.dart';
+import 'package:hentai_library/model/entity/comic/tag.dart';
 import 'package:hentai_library/presentation/providers/aggregates/series_aggregate_notifier.dart';
 import 'package:hentai_library/presentation/providers/pages/series_management/series_management_notifier.dart';
 import 'package:hentai_library/presentation/providers/pages/tag_management/tag_management_notifier.dart';
@@ -27,10 +27,7 @@ class MobileManagePage extends StatelessWidget {
             const Divider(height: 1),
             const Expanded(
               child: TabBarView(
-                children: <Widget>[
-                  _ManageTagsTab(),
-                  _ManageSeriesTab(),
-                ],
+                children: <Widget>[_ManageTagsTab(), _ManageSeriesTab()],
               ),
             ),
           ],
@@ -105,10 +102,8 @@ class _ManageTagsTab extends ConsumerWidget {
               return ListView.separated(
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                 itemCount: filtered.length,
-                separatorBuilder: (
-                  BuildContext context,
-                  int index,
-                ) => const SizedBox(height: 8),
+                separatorBuilder: (BuildContext context, int index) =>
+                    const SizedBox(height: 8),
                 itemBuilder: (BuildContext context, int index) {
                   final Tag tag = filtered[index];
                   return Card(
@@ -175,7 +170,11 @@ class _ManageTagsTab extends ConsumerWidget {
     }
   }
 
-  Future<void> _onRenameTag(BuildContext context, WidgetRef ref, Tag tag) async {
+  Future<void> _onRenameTag(
+    BuildContext context,
+    WidgetRef ref,
+    Tag tag,
+  ) async {
     final String? input = await _showNameDialog(
       context,
       title: '重命名标签',
@@ -202,7 +201,11 @@ class _ManageTagsTab extends ConsumerWidget {
     }
   }
 
-  Future<void> _onDeleteTag(BuildContext context, WidgetRef ref, Tag tag) async {
+  Future<void> _onDeleteTag(
+    BuildContext context,
+    WidgetRef ref,
+    Tag tag,
+  ) async {
     final bool confirmed = await _showDeleteConfirmDialog(
       context,
       message: '确认删除标签「${tag.name}」吗？',
@@ -267,7 +270,9 @@ class _ManageSeriesTab extends ConsumerWidget {
             data: (List<Series> seriesList) {
               final String lowered = query.trim().toLowerCase();
               final List<Series> filtered = seriesList
-                  .where((Series item) => item.name.toLowerCase().contains(lowered))
+                  .where(
+                    (Series item) => item.name.toLowerCase().contains(lowered),
+                  )
                   .toList();
               if (filtered.isEmpty) {
                 return const _ManageEmptyView(message: '暂无系列');
@@ -275,10 +280,8 @@ class _ManageSeriesTab extends ConsumerWidget {
               return ListView.separated(
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                 itemCount: filtered.length,
-                separatorBuilder: (
-                  BuildContext context,
-                  int index,
-                ) => const SizedBox(height: 8),
+                separatorBuilder: (BuildContext context, int index) =>
+                    const SizedBox(height: 8),
                 itemBuilder: (BuildContext context, int index) {
                   final Series series = filtered[index];
                   return Card(
@@ -418,10 +421,7 @@ class _ManageEmptyView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text(
-        message,
-        style: Theme.of(context).textTheme.bodyLarge,
-      ),
+      child: Text(message, style: Theme.of(context).textTheme.bodyLarge),
     );
   }
 }

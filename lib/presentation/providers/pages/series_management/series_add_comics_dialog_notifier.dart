@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/entity/comic/series_item.dart';
+import 'package:hentai_library/model/entity/comic/comic.dart';
+import 'package:hentai_library/model/entity/comic/series_item.dart';
 import 'package:hentai_library/presentation/providers/aggregates/series_aggregate_notifier.dart';
 import 'package:hentai_library/presentation/providers/deps/repos.dart';
 
@@ -262,8 +262,10 @@ class SeriesAddComicsDialogNotifier
       _allComics.where((Comic comic) {
         if (q.isEmpty) return true;
         final String title = comic.title.toLowerCase();
-        final String author =
-            comic.authors.map((a) => a.name).join(' ').toLowerCase();
+        final String author = comic.authors
+            .map((a) => a.name)
+            .join(' ')
+            .toLowerCase();
         return title.contains(q) || author.contains(q);
       }).toList(),
     );

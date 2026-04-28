@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/domain/entity/comic/author.dart';
-import 'package:hentai_library/domain/entity/comic/tag.dart';
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/entity/comic/author.dart';
+import 'package:hentai_library/model/entity/comic/tag.dart';
+import 'package:hentai_library/model/enums.dart';
 
 part 'comic.freezed.dart';
 
@@ -12,6 +12,7 @@ abstract class Comic with _$Comic {
     required String path,
     required ResourceType resourceType,
     required String title,
+
     @Default(<Author>[]) List<Author> authors,
     @Default(ContentRating.unknown) ContentRating contentRating,
     @Default(<Tag>[]) List<Tag> tags,

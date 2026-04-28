@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/enums.dart';
 
 import '../database.dart';
 import 'home_page_dao_types.dart';

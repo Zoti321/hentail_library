@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/enums.dart';
 
 @DataClassName('DbComic')
 class Comics extends Table {

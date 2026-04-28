@@ -1,7 +1,7 @@
-import 'package:hentai_library/domain/entity/comic/author.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/entity/comic/tag.dart';
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/entity/comic/author.dart';
+import 'package:hentai_library/model/entity/comic/comic.dart';
+import 'package:hentai_library/model/entity/comic/tag.dart';
+import 'package:hentai_library/model/enums.dart';
 
 /// [replaceByScan] 应用结果统计（供 UI 进度等）。
 typedef ComicReplaceByScanResult = ({

@@ -1,7 +1,3 @@
-/// Compares two file name strings using natural (alphanumeric) order.
-///
-/// Contiguous ASCII digit runs are parsed as integers and compared numerically;
-/// other runs are compared with [String.compareTo] (Unicode code unit order).
 int compareFilenameNatural(String a, String b) {
   final List<Object> ta = _tokenizeNatural(a);
   final List<Object> tb = _tokenizeNatural(b);

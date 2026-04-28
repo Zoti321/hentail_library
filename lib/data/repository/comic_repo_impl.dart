@@ -1,16 +1,21 @@
 import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart'
     as db;
-import 'package:hentai_library/domain/entity/comic/author.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/entity/comic/tag.dart';
-import 'package:hentai_library/domain/util/enums.dart';
-import 'package:hentai_library/domain/util/comic_scan_diff.dart';
+import 'package:hentai_library/model/entity/comic/author.dart';
+import 'package:hentai_library/model/entity/comic/comic.dart';
+import 'package:hentai_library/model/entity/comic/tag.dart';
+import 'package:hentai_library/model/enums.dart';
 import 'package:hentai_library/domain/repository/comic_repo.dart';
 import 'package:hentai_library/domain/repository/series_repo.dart';
 import 'package:hentai_library/domain/repository/reading_history_repo.dart';
 import 'package:hentai_library/domain/usecases/purge_comics_side_effects.dart';
 import 'package:drift/drift.dart';
+
+typedef _ComicScanIdDiff = ({
+  Set<String> removedIds,
+  Set<String> addedIds,
+  Set<String> keptIds,
+});
 
 /// 漫画主表与标签的持久化；**跨聚合**（阅读历史、系列）的删除/替换流程请放在
 /// [domain/usecases]（例如 [purgeComicsFromApp]、[replaceByScan] 内已编排的 purge），
@@ -142,14 +147,14 @@ class ComicRepositoryImpl implements ComicRepository {
 
   @override
   Future<ComicReplaceByScanResult> replaceByScan(List<Comic> scanned) async {
-    final unique = dedupeScannedByComicId(scanned);
+    final unique = _dedupeScannedByComicId(scanned);
     final scannedIds = unique.keys.toSet();
 
     final existing = await getAll();
     final existingById = {for (final c in existing) c.comicId: c};
     final existingIds = existingById.keys.toSet();
 
-    final idDiff = computeComicScanIdDiff(
+    final idDiff = _computeComicScanIdDiff(
       existingIds: existingIds,
       scannedIds: scannedIds,
     );
@@ -171,7 +176,7 @@ class ComicRepositoryImpl implements ComicRepository {
         toUpsert.add(row);
       } else {
         final prior = existingById[id]!;
-        toUpsert.add(mergeKeptScanWithExisting(row, prior));
+        toUpsert.add(_mergeKeptScanWithExisting(row, prior));
       }
     }
 
@@ -186,7 +191,9 @@ class ComicRepositoryImpl implements ComicRepository {
 
   @override
   Future<List<Comic>> searchByKeyword(String keyword) async {
-    final List<String> comicIds = await _searchDao.searchComicIdsByKeyword(keyword);
+    final List<String> comicIds = await _searchDao.searchComicIdsByKeyword(
+      keyword,
+    );
     if (comicIds.isEmpty) {
       return <Comic>[];
     }
@@ -211,11 +218,12 @@ class ComicRepositoryImpl implements ComicRepository {
     required Set<String> optionalOr,
     required Set<String> mustExclude,
   }) async {
-    final List<String> comicIds = await _searchDao.searchComicIdsByTagExpression(
-      mustInclude: mustInclude,
-      optionalOr: optionalOr,
-      mustExclude: mustExclude,
-    );
+    final List<String> comicIds = await _searchDao
+        .searchComicIdsByTagExpression(
+          mustInclude: mustInclude,
+          optionalOr: optionalOr,
+          mustExclude: mustExclude,
+        );
     if (comicIds.isEmpty) {
       return <Comic>[];
     }
@@ -232,5 +240,31 @@ class ComicRepositoryImpl implements ComicRepository {
       }
     }
     return ordered;
+  }
+
+  Map<String, Comic> _dedupeScannedByComicId(List<Comic> scanned) {
+    final map = <String, Comic>{};
+    for (final Comic comic in scanned) {
+      map[comic.comicId] = comic;
+    }
+    return map;
+  }
+
+  _ComicScanIdDiff _computeComicScanIdDiff({
+    required Set<String> existingIds,
+    required Set<String> scannedIds,
+  }) {
+    return (
+      removedIds: existingIds.difference(scannedIds),
+      addedIds: scannedIds.difference(existingIds),
+      keptIds: existingIds.intersection(scannedIds),
+    );
+  }
+
+  Comic _mergeKeptScanWithExisting(Comic scanned, Comic existing) {
+    return existing.copyWith(
+      path: scanned.path,
+      resourceType: scanned.resourceType,
+    );
   }
 }

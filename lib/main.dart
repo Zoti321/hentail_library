@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
-import 'package:hentai_library/app/app.dart';
+import 'package:hentai_library/presentation/app.dart';
 import 'package:hentai_library/core/image/image_quality_policy.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/core/util/utils.dart';

@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/entity/comic/author.dart';
+import 'package:hentai_library/model/entity/comic/author.dart';
 
 /// Author 仓储：独立于 Comic 的「作者字典管理」。
 abstract class AuthorRepository {

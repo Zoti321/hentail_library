@@ -1,5 +1,5 @@
 import 'package:hentai_library/data/services/comic/scan/comic_scan_parse_service.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/domain/mappers/comic_mapper.dart';
 import 'package:hentai_library/domain/repository/comic_repo.dart';
 

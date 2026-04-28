@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/entity/reading_history.dart' as entity;
-import 'package:hentai_library/domain/entity/comic/series.dart';
-import 'package:hentai_library/domain/entity/comic/series_item.dart';
-import 'package:hentai_library/domain/entity/series_reading_history.dart'
+import 'package:hentai_library/model/entity/comic/comic.dart';
+import 'package:hentai_library/model/entity/reading_history.dart' as entity;
+import 'package:hentai_library/model/entity/comic/series.dart';
+import 'package:hentai_library/model/entity/comic/series_item.dart';
+import 'package:hentai_library/model/entity/series_reading_history.dart'
     as series_entity;
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/enums.dart';
 import 'package:hentai_library/presentation/providers/aggregates/comic_aggregate_notifier.dart';
 import 'package:hentai_library/presentation/providers/aggregates/series_aggregate_notifier.dart';
 import 'package:hentai_library/presentation/dto/history_grid_item_dto.dart';
@@ -72,23 +72,18 @@ List<HistoryGridItemDto> mergedHistoryGridItems(Ref ref) {
       .maybeWhen(data: (data) => data, orElse: () => const <Series>[]);
   if (isHealthy) {
     comics = comics
-        .where(
-          (entity.ReadingHistory h) {
-            return comicsById[h.comicId]?.contentRating !=
-                ContentRating.r18;
-          },
-        )
+        .where((entity.ReadingHistory h) {
+          return comicsById[h.comicId]?.contentRating != ContentRating.r18;
+        })
         .toList(growable: false);
     seriesHistory = seriesHistory
-        .where(
-          (series_entity.SeriesReadingHistory h) {
-            final Series? s = _findSeriesByName(allSeries, h.seriesName);
-            if (s == null) {
-              return true;
-            }
-            return !s.hasR18Comic(comicsById: comicsById);
-          },
-        )
+        .where((series_entity.SeriesReadingHistory h) {
+          final Series? s = _findSeriesByName(allSeries, h.seriesName);
+          if (s == null) {
+            return true;
+          }
+          return !s.hasR18Comic(comicsById: comicsById);
+        })
         .toList(growable: false);
   }
   final Map<String, int> seriesOrderMap = _buildSeriesOrderMap(allSeries);
@@ -191,18 +186,18 @@ final historySearchQueryProvider =
 
 final Provider<List<HistoryGridItemDto>> historyVisibleGridItemsProvider =
     Provider<List<HistoryGridItemDto>>((Ref ref) {
-  final List<HistoryGridItemDto> mergedItems = ref.watch(
-    mergedHistoryGridItemsProvider,
-  );
-  final String query = ref.watch(historySearchQueryProvider);
-  final String normalizedQuery = query.trim().toLowerCase();
-  if (normalizedQuery.isEmpty) {
-    return mergedItems;
-  }
-  return mergedItems
-      .where(
-        (HistoryGridItemDto item) =>
-            item.title.toLowerCase().contains(normalizedQuery),
-      )
-      .toList(growable: false);
-});
+      final List<HistoryGridItemDto> mergedItems = ref.watch(
+        mergedHistoryGridItemsProvider,
+      );
+      final String query = ref.watch(historySearchQueryProvider);
+      final String normalizedQuery = query.trim().toLowerCase();
+      if (normalizedQuery.isEmpty) {
+        return mergedItems;
+      }
+      return mergedItems
+          .where(
+            (HistoryGridItemDto item) =>
+                item.title.toLowerCase().contains(normalizedQuery),
+          )
+          .toList(growable: false);
+    });

@@ -10,10 +10,10 @@ import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_
 import 'package:hentai_library/data/services/comic/read_resource_get/isolate_archive_cover_loader.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/reader_image.dart';
 import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/entity/entities.dart' as entity;
+import 'package:hentai_library/model/entity/comic/comic.dart';
+import 'package:hentai_library/model/models.dart' as entity;
 import 'package:hentai_library/presentation/providers/aggregates/reading_aggregate_notifier.dart';
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/enums.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:hentai_library/presentation/providers/pages/reader/reader_window_fullscreen.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';

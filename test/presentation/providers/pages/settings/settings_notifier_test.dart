@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
+import 'package:hentai_library/model/models.dart';
 import 'package:hentai_library/domain/repository/app_setting_repo.dart';
 import 'package:hentai_library/presentation/providers/deps/repos.dart';
 import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
@@ -22,13 +22,10 @@ class _InMemoryAppSettingRepository implements AppSettingRepository {
 
 void main() {
   test('setReaderDimLevel clamps upper bound to 0.8', () async {
-    final _InMemoryAppSettingRepository repository = _InMemoryAppSettingRepository(
-      AppSetting(readerDimLevel: 0.2),
-    );
+    final _InMemoryAppSettingRepository repository =
+        _InMemoryAppSettingRepository(AppSetting(readerDimLevel: 0.2));
     final ProviderContainer container = ProviderContainer(
-      overrides: [
-        appSettingRepoProvider.overrideWithValue(repository),
-      ],
+      overrides: [appSettingRepoProvider.overrideWithValue(repository)],
     );
     addTearDown(container.dispose);
     await container.read(settingsProvider.future);
@@ -39,13 +36,10 @@ void main() {
   });
 
   test('setReaderDimLevel clamps lower bound to 0.0', () async {
-    final _InMemoryAppSettingRepository repository = _InMemoryAppSettingRepository(
-      AppSetting(readerDimLevel: 0.3),
-    );
+    final _InMemoryAppSettingRepository repository =
+        _InMemoryAppSettingRepository(AppSetting(readerDimLevel: 0.3));
     final ProviderContainer container = ProviderContainer(
-      overrides: [
-        appSettingRepoProvider.overrideWithValue(repository),
-      ],
+      overrides: [appSettingRepoProvider.overrideWithValue(repository)],
     );
     addTearDown(container.dispose);
     await container.read(settingsProvider.future);
@@ -56,13 +50,10 @@ void main() {
   });
 
   test('setReaderIsVertical updates global reader mode preference', () async {
-    final _InMemoryAppSettingRepository repository = _InMemoryAppSettingRepository(
-      AppSetting(readerIsVertical: false),
-    );
+    final _InMemoryAppSettingRepository repository =
+        _InMemoryAppSettingRepository(AppSetting(readerIsVertical: false));
     final ProviderContainer container = ProviderContainer(
-      overrides: [
-        appSettingRepoProvider.overrideWithValue(repository),
-      ],
+      overrides: [appSettingRepoProvider.overrideWithValue(repository)],
     );
     addTearDown(container.dispose);
     await container.read(settingsProvider.future);
@@ -72,29 +63,27 @@ void main() {
   });
 
   test('setReaderAutoPlayEnabled updates global autoplay preference', () async {
-    final _InMemoryAppSettingRepository repository = _InMemoryAppSettingRepository(
-      AppSetting(readerAutoPlayEnabled: false),
-    );
+    final _InMemoryAppSettingRepository repository =
+        _InMemoryAppSettingRepository(AppSetting(readerAutoPlayEnabled: false));
     final ProviderContainer container = ProviderContainer(
-      overrides: [
-        appSettingRepoProvider.overrideWithValue(repository),
-      ],
+      overrides: [appSettingRepoProvider.overrideWithValue(repository)],
     );
     addTearDown(container.dispose);
     await container.read(settingsProvider.future);
-    await container.read(settingsProvider.notifier).setReaderAutoPlayEnabled(true);
+    await container
+        .read(settingsProvider.notifier)
+        .setReaderAutoPlayEnabled(true);
     final AppSetting actual = container.read(settingsProvider).asData!.value;
     expect(actual.readerAutoPlayEnabled, isTrue);
   });
 
   test('setReaderAutoPlayIntervalSeconds clamps upper bound to 60', () async {
-    final _InMemoryAppSettingRepository repository = _InMemoryAppSettingRepository(
-      AppSetting(readerAutoPlayIntervalSeconds: 5),
-    );
+    final _InMemoryAppSettingRepository repository =
+        _InMemoryAppSettingRepository(
+          AppSetting(readerAutoPlayIntervalSeconds: 5),
+        );
     final ProviderContainer container = ProviderContainer(
-      overrides: [
-        appSettingRepoProvider.overrideWithValue(repository),
-      ],
+      overrides: [appSettingRepoProvider.overrideWithValue(repository)],
     );
     addTearDown(container.dispose);
     await container.read(settingsProvider.future);
@@ -106,13 +95,12 @@ void main() {
   });
 
   test('setReaderAutoPlayIntervalSeconds clamps lower bound to 1', () async {
-    final _InMemoryAppSettingRepository repository = _InMemoryAppSettingRepository(
-      AppSetting(readerAutoPlayIntervalSeconds: 5),
-    );
+    final _InMemoryAppSettingRepository repository =
+        _InMemoryAppSettingRepository(
+          AppSetting(readerAutoPlayIntervalSeconds: 5),
+        );
     final ProviderContainer container = ProviderContainer(
-      overrides: [
-        appSettingRepoProvider.overrideWithValue(repository),
-      ],
+      overrides: [appSettingRepoProvider.overrideWithValue(repository)],
     );
     addTearDown(container.dispose);
     await container.read(settingsProvider.future);

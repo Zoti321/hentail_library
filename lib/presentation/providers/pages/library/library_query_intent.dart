@@ -1,6 +1,5 @@
-import 'package:hentai_library/domain/value_objects/library_comic_filter.dart';
-import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
-import 'package:hentai_library/domain/value_objects/library_display_target.dart';
+import 'package:hentai_library/model/enums.dart';
+import 'package:hentai_library/module/comic_list_query/comic_list_query.dart';
 
 /// Intent 层：只表达“用户想看什么”，不处理数据源订阅与派生计算。
 class LibraryQueryIntent {

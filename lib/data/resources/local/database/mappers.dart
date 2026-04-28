@@ -1,5 +1,5 @@
 import 'package:hentai_library/data/resources/local/database/database.dart';
-import 'package:hentai_library/domain/entity/entities.dart' as entity;
+import 'package:hentai_library/model/models.dart' as entity;
 import 'package:drift/drift.dart';
 
 // 阅读历史 Row <-> Entity 映射

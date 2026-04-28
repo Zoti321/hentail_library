@@ -5,7 +5,7 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/theme/theme.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/domain/usecases/purge_comics_side_effects.dart';
 import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';

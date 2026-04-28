@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/theme/theme.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -141,8 +141,9 @@ class _DialogHeader extends HookConsumerWidget {
           ),
           // 搜索框
           TextField(
-            onChanged: (value) =>
-                ref.read(libraryQueryIntentProvider.notifier).setMergeSearchQuery(value),
+            onChanged: (value) => ref
+                .read(libraryQueryIntentProvider.notifier)
+                .setMergeSearchQuery(value),
             style: const TextStyle(fontSize: 14),
             decoration: InputDecoration(
               hintText: "搜索库...",

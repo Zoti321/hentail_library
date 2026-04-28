@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/theme/theme.dart';
-import 'package:hentai_library/domain/entity/comic/tag.dart';
+import 'package:hentai_library/model/entity/comic/tag.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/chrome/status_card_shell.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';

@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/enums.dart';
 import 'package:path/path.dart' as p;
 
 /// 从资源中提取的元数据。

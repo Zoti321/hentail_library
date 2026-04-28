@@ -1,5 +1,5 @@
-import 'package:hentai_library/domain/entity/comic/series.dart';
-import 'package:hentai_library/domain/entity/comic/series_item.dart';
+import 'package:hentai_library/model/entity/comic/series.dart';
+import 'package:hentai_library/model/entity/comic/series_item.dart';
 
 class ReaderComicListItem {
   const ReaderComicListItem({
@@ -96,9 +96,11 @@ ReaderNavContextData buildReaderNavContextData({
   required int? preferredPageIndex,
   String? seriesName,
 }) {
-  final List<ReaderComicListItem> sortedItems = List<ReaderComicListItem>.from(
-    items,
-  )..sort((ReaderComicListItem a, ReaderComicListItem b) => a.order.compareTo(b.order));
+  final List<ReaderComicListItem> sortedItems =
+      List<ReaderComicListItem>.from(items)..sort(
+        (ReaderComicListItem a, ReaderComicListItem b) =>
+            a.order.compareTo(b.order),
+      );
   final int currentIndex = sortedItems.indexWhere(
     (ReaderComicListItem item) => item.comicId == currentComicId,
   );

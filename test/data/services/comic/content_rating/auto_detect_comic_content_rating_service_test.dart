@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
 import 'package:hentai_library/data/resources/local/database/database.dart';
 import 'package:hentai_library/data/services/comic/content_rating/auto_detect_comic_content_rating_service.dart';
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/enums.dart';
 
 void main() {
   group('AutoDetectComicContentRatingService', () {

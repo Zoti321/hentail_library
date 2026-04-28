@@ -1,5 +1,5 @@
-import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/entity/entities.dart' as entity;
+import 'package:hentai_library/model/entity/comic/comic.dart';
+import 'package:hentai_library/model/models.dart' as entity;
 import 'package:hentai_library/presentation/providers/usecases/sync_library.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

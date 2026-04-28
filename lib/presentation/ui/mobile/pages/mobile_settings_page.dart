@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/util/format_byte_size.dart';
-import 'package:hentai_library/domain/entity/app_setting.dart';
+import 'package:hentai_library/model/app_setting.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 
 class MobileSettingsPage extends ConsumerWidget {
@@ -16,8 +16,9 @@ class MobileSettingsPage extends ConsumerWidget {
         skipLoadingOnRefresh: true,
         skipLoadingOnReload: true,
         data: (AppSetting settings) {
-          final AsyncValue<int> archiveCoverUsage =
-              ref.watch(archiveCoverCacheDiskUsageBytesProvider);
+          final AsyncValue<int> archiveCoverUsage = ref.watch(
+            archiveCoverCacheDiskUsageBytesProvider,
+          );
           return ListView(
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
             children: <Widget>[
@@ -48,7 +49,9 @@ class MobileSettingsPage extends ConsumerWidget {
                         if (value == null) {
                           return;
                         }
-                        ref.read(settingsProvider.notifier).setThemePreference(value);
+                        ref
+                            .read(settingsProvider.notifier)
+                            .setThemePreference(value);
                       },
                     ),
                   ),
@@ -87,7 +90,9 @@ class MobileSettingsPage extends ConsumerWidget {
                   ),
                   SwitchListTile(
                     title: const Text('健全模式'),
-                    subtitle: Text(settings.isHealthyMode ? '隐藏 R18' : '显示 R18'),
+                    subtitle: Text(
+                      settings.isHealthyMode ? '隐藏 R18' : '显示 R18',
+                    ),
                     value: settings.isHealthyMode,
                     onChanged: (_) {
                       ref.read(settingsProvider.notifier).toggleHealthyMode();
@@ -117,12 +122,10 @@ class MobileSettingsPage extends ConsumerWidget {
                     leading: const Icon(Icons.storage_outlined),
                     title: const Text('归档封面缓存占用'),
                     subtitle: archiveCoverUsage.when(
-                      data: (int bytes) => Text(
-                        '应用缓存目录；当前 ${formatByteSizeBin1024(bytes)}',
-                      ),
+                      data: (int bytes) =>
+                          Text('应用缓存目录；当前 ${formatByteSizeBin1024(bytes)}'),
                       loading: () => const Text('正在计算占用…'),
-                      error: (Object _, StackTrace _) =>
-                          const Text('无法读取占用'),
+                      error: (Object _, StackTrace _) => const Text('无法读取占用'),
                     ),
                     trailing: TextButton(
                       onPressed: () async {
@@ -142,7 +145,9 @@ class MobileSettingsPage extends ConsumerWidget {
                     title: const Text('竖向阅读'),
                     value: settings.readerIsVertical,
                     onChanged: (bool value) {
-                      ref.read(settingsProvider.notifier).setReaderIsVertical(value);
+                      ref
+                          .read(settingsProvider.notifier)
+                          .setReaderIsVertical(value);
                     },
                   ),
                   SwitchListTile(
@@ -156,7 +161,9 @@ class MobileSettingsPage extends ConsumerWidget {
                   ),
                   ListTile(
                     title: const Text('自动播放间隔（秒）'),
-                    subtitle: Text('${settings.readerAutoPlayIntervalSeconds} 秒'),
+                    subtitle: Text(
+                      '${settings.readerAutoPlayIntervalSeconds} 秒',
+                    ),
                     trailing: SizedBox(
                       width: 120,
                       child: Row(

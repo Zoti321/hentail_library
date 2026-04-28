@@ -1,6 +1,6 @@
-import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/value_objects/library_comic_filter.dart';
-import 'package:hentai_library/domain/value_objects/library_comic_sort_option.dart';
+import 'package:hentai_library/model/entity/comic/comic.dart';
+import 'package:hentai_library/module/comic_list_query/library_comic_filter.dart';
+import 'package:hentai_library/module/comic_list_query/library_comic_sort_option.dart';
 
 /// 漫画库列表的筛选 + 排序（内存侧单一入口，避免 UI/扩展方法间重复组合条件）。
 ///

@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/entity/comic/series.dart';
-import 'package:hentai_library/domain/entity/entities.dart' show AppSetting;
+import 'package:hentai_library/model/entity/comic/comic.dart';
+import 'package:hentai_library/model/entity/comic/series.dart';
+import 'package:hentai_library/model/models.dart' show AppSetting;
 import 'package:hentai_library/presentation/providers/aggregates/comic_aggregate_notifier.dart';
 import 'package:hentai_library/presentation/providers/aggregates/series_aggregate_notifier.dart';
 import 'package:hentai_library/presentation/providers/pages/library/library_query_intent.dart';
@@ -36,9 +36,7 @@ final Provider<LibrarySeriesViewData> librarySeriesViewDataProvider =
       final List<Comic> rawComics = ref.watch(
         comicAggregateProvider.select((ComicAggregateState s) => s.rawList),
       );
-      final LibraryQueryIntent intent = ref.watch(
-        libraryQueryIntentProvider,
-      );
+      final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
       final Map<String, Comic> comicsById = <String, Comic>{};
       for (final Comic comic in rawComics) {
         comicsById[comic.comicId] = comic;
@@ -80,4 +78,3 @@ final Provider<int> libraryDisplayedSeriesCountProvider = Provider<int>((
   );
   return viewData.filteredSeries.length;
 });
-

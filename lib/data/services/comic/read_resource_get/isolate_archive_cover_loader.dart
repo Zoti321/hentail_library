@@ -6,7 +6,7 @@ import 'package:archive/archive.dart';
 import 'package:epub_image_extractor/epub_image_extractor.dart';
 import 'package:hentai_library/core/util/comic_file_types.dart';
 import 'package:hentai_library/core/util/filename_natural_compare.dart';
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/enums.dart';
 import 'package:path/path.dart' as p;
 
 /// Isolate 解码结果：封面字节与用于磁盘文件名的扩展名（带点，如 `.jpg`；未知时为 `.bin`）。
@@ -38,10 +38,8 @@ Future<Uint8List?> loadArchiveCoverBytesOffMainUi({
   required String path,
   required ResourceType type,
 }) async {
-  final ArchiveCoverDecodeResult r = await loadArchiveCoverDecodeResultOffMainUi(
-    path: path,
-    type: type,
-  );
+  final ArchiveCoverDecodeResult r =
+      await loadArchiveCoverDecodeResultOffMainUi(path: path, type: type);
   return r.bytes;
 }
 

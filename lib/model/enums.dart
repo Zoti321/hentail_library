@@ -23,3 +23,5 @@ enum ResourceType {
   /// .rar 占位（暂不解析）
   rar,
 }
+
+enum LibraryDisplayTarget { all, comics, series }

@@ -1,4 +1,4 @@
-import 'package:hentai_library/domain/entity/comic/series.dart';
+import 'package:hentai_library/model/entity/comic/series.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

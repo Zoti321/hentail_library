@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/domain/entity/comic/series_item.dart';
+import 'package:hentai_library/model/entity/comic/series_item.dart';
 import 'package:hentai_library/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'series_comic_list_row.dart';

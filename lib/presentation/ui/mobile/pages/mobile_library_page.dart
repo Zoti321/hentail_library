@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
+import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 
 class MobileLibraryPage extends ConsumerStatefulWidget {
@@ -45,7 +45,9 @@ class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
                 border: OutlineInputBorder(),
               ),
               onChanged: (String value) {
-                ref.read(libraryQueryIntentProvider.notifier).setFilterQuery(value);
+                ref
+                    .read(libraryQueryIntentProvider.notifier)
+                    .setFilterQuery(value);
               },
             ),
           ),
@@ -68,10 +70,8 @@ class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                     itemCount: comics.length,
-                    separatorBuilder: (
-                      BuildContext context,
-                      int index,
-                    ) => const SizedBox(height: 8),
+                    separatorBuilder: (BuildContext context, int index) =>
+                        const SizedBox(height: 8),
                     itemBuilder: (BuildContext context, int index) {
                       final Comic comic = comics[index];
                       return Card(
@@ -129,7 +129,8 @@ class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
       if (!mounted) {
         return;
       }
-      final String message = ref.read(scanLibraryControllerProvider).error ?? '扫描失败';
+      final String message =
+          ref.read(scanLibraryControllerProvider).error ?? '扫描失败';
       messenger.showSnackBar(SnackBar(content: Text(message)));
     }
   }

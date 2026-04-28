@@ -1,5 +1,5 @@
 import 'package:hentai_library/data/resources/local/database/dao/dao.dart';
-import 'package:hentai_library/domain/entity/comic/tag.dart' as entity;
+import 'package:hentai_library/model/entity/comic/tag.dart' as entity;
 import 'package:hentai_library/domain/repository/tag_repo.dart';
 
 class TagRepositoryImpl implements TagRepository {

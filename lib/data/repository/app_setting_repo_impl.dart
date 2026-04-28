@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/domain/repository/app_setting_repo.dart';
 
-import '../../domain/entity/entities.dart' show AppSetting;
+import '../../model/models.dart' show AppSetting;
 
 class AppSettingRepoImpl implements AppSettingRepository {
   static const String _fileName = 'settings.json';

@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/entity/comic/tag.dart';
+import 'package:hentai_library/model/entity/comic/tag.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 
 /// 全部标签列表（用于标签管理页面）
@@ -40,10 +40,9 @@ class TagSelectionNotifier extends Notifier<Set<Tag>> {
   }
 }
 
-final tagSelectionProvider =
-    NotifierProvider<TagSelectionNotifier, Set<Tag>>(
-      TagSelectionNotifier.new,
-    );
+final tagSelectionProvider = NotifierProvider<TagSelectionNotifier, Set<Tag>>(
+  TagSelectionNotifier.new,
+);
 
 /// 标签搜索关键词
 class TagFilterNotifier extends Notifier<String> {

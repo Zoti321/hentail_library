@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/domain/entity/entities.dart';
+import 'package:hentai_library/model/models.dart';
 
 void main() {
   test('AppSetting uses default readerDimLevel when json key missing', () {

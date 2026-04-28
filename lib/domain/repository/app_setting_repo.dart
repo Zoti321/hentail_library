@@ -1,4 +1,4 @@
-import '../entity/entities.dart' show AppSetting;
+import '../../model/models.dart' show AppSetting;
 
 abstract class AppSettingRepository {
   Future<AppSetting> load();

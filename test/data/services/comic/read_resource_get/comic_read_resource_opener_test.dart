@@ -5,14 +5,16 @@ import 'package:archive/archive.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_exception.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/comic_read_resource_opener.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/reader_image.dart';
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/enums.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
 void main() {
   group('ComicReadResourceOpener', () {
     test('目录资源返回 ReaderFileImage 且页序正确', () async {
-      final Directory temp = await Directory.systemTemp.createTemp('comic_read_dir_');
+      final Directory temp = await Directory.systemTemp.createTemp(
+        'comic_read_dir_',
+      );
       addTearDown(() async {
         if (await temp.exists()) {
           await temp.delete(recursive: true);
@@ -39,7 +41,9 @@ void main() {
     });
 
     test('ZIP 资源返回 ReaderBytesImage', () async {
-      final Directory temp = await Directory.systemTemp.createTemp('comic_read_zip_');
+      final Directory temp = await Directory.systemTemp.createTemp(
+        'comic_read_zip_',
+      );
       addTearDown(() async {
         if (await temp.exists()) {
           await temp.delete(recursive: true);
@@ -63,14 +67,19 @@ void main() {
       expect(accessor.pageCount, 2);
       final ReaderImage p0 = await accessor.getPageImage(0);
       expect(p0, isA<ReaderBytesImage>());
-      expect((p0 as ReaderBytesImage).bytes, Uint8List.fromList(<int>[7, 8, 9]));
+      expect(
+        (p0 as ReaderBytesImage).bytes,
+        Uint8List.fromList(<int>[7, 8, 9]),
+      );
       final ReaderImage cover = await accessor.getCoverImage();
       expect(cover, isA<ReaderBytesImage>());
       await accessor.dispose();
     });
 
     test('cbr 类型抛出不支持', () async {
-      final Directory temp = await Directory.systemTemp.createTemp('comic_read_cbr_');
+      final Directory temp = await Directory.systemTemp.createTemp(
+        'comic_read_cbr_',
+      );
       final File file = File(p.join(temp.path, 'sample.cbr'));
       await file.writeAsBytes(<int>[1]);
       addTearDown(() async {

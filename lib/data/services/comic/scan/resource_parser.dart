@@ -4,7 +4,7 @@ import 'package:archive/archive.dart';
 import 'package:epub_image_extractor/epub_image_extractor.dart';
 import 'package:hentai_library/core/util/comic_file_types.dart';
 import 'package:hentai_library/data/services/comic/scan/resource_types.dart';
-import 'package:hentai_library/domain/util/enums.dart';
+import 'package:hentai_library/model/enums.dart';
 import 'package:path/path.dart' as p;
 
 typedef ParseContext = ({Set<String> imageExts});

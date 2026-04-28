@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/entity/comic/author.dart';
+import 'package:hentai_library/model/entity/comic/author.dart';
 import 'package:hentai_library/presentation/providers/deps/deps.dart';
 
 /// 全部作者列表（用于作者管理页面）；监听 Drift `authors` 表变化。
@@ -80,7 +80,9 @@ class AuthorActions {
   }
 
   Future<void> deleteAuthor(Author author) async {
-    await _ref.read(libraryAuthorRepoProvider).deleteByNames(<String>[author.name]);
+    await _ref.read(libraryAuthorRepoProvider).deleteByNames(<String>[
+      author.name,
+    ]);
     _ref.read(authorSelectionProvider.notifier).remove(author);
   }
 

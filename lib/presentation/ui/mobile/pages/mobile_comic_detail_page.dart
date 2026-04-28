@@ -5,12 +5,12 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/domain/entity/comic/author.dart';
-import 'package:hentai_library/domain/entity/comic/comic.dart';
-import 'package:hentai_library/domain/entity/comic/tag.dart';
-import 'package:hentai_library/domain/entity/reading_history.dart';
-import 'package:hentai_library/domain/util/enums.dart';
-import 'package:hentai_library/domain/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/model/entity/comic/author.dart';
+import 'package:hentai_library/model/entity/comic/comic.dart';
+import 'package:hentai_library/model/entity/comic/tag.dart';
+import 'package:hentai_library/model/entity/reading_history.dart';
+import 'package:hentai_library/model/enums.dart';
+import 'package:hentai_library/model/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/presentation/providers/pages/library/library_page_comics_providers.dart';
 import 'package:hentai_library/presentation/providers/pages/reader/reader_page_notifier.dart';
@@ -25,7 +25,9 @@ class MobileComicDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<Comic>> rawData = ref.watch(libraryRawComicsAsyncProvider);
+    final AsyncValue<List<Comic>> rawData = ref.watch(
+      libraryRawComicsAsyncProvider,
+    );
     return rawData.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
