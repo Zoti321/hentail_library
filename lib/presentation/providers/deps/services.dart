@@ -5,7 +5,9 @@ import 'package:hentai_library/services/comic/read_resource_get/api/read_resourc
 import 'package:hentai_library/services/comic/read_resource_get/internal/open/comic_read_resource_opener.dart';
 import 'package:hentai_library/services/comic/read_resource_get/internal/session/comic_read_resource_session_manager.dart';
 import 'package:hentai_library/services/comic/read_resource_get/internal/utils/comic_read_path_normalizer.dart';
+import 'package:hentai_library/services/metadata/metadata_import_export_service.dart';
 import 'package:hentai_library/model/app_setting.dart';
+import 'package:hentai_library/presentation/providers/deps/repos.dart';
 import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
 import 'package:hentai_library/services/comic/scan/comic_scan_parse_service.dart';
 import 'package:hentai_library/services/comic/scan/resource_parser.dart';
@@ -52,6 +54,15 @@ ComicReadResourceSessionManager comicReadResourceSessionManager(Ref ref) =>
 ReadResourceGetService readResourceGetService(Ref ref) =>
     DefaultReadResourceGetService(
       sessions: ref.read(comicReadResourceSessionManagerProvider),
+    );
+
+@Riverpod(keepAlive: true)
+MetadataImportExportService metadataImportExportService(Ref ref) =>
+    DefaultMetadataImportExportService(
+      authorRepository: ref.read(libraryAuthorRepoProvider),
+      tagRepository: ref.read(libraryTagRepoProvider),
+      seriesRepository: ref.read(librarySeriesRepoProvider),
+      comicRepository: ref.read(comicRepoProvider),
     );
 
 /// 是否启用归档封面磁盘缓存（与 [AppSetting.archiveCoverDiskCacheEnabled] 一致）。
