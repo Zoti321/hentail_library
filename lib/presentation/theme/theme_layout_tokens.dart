@@ -14,7 +14,7 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
     required this.layout,
   });
 
-  factory AppThemeTokens.light() => const AppThemeTokens(
+  static const AppThemeTokens shared = AppThemeTokens(
     text: AppTextTokens(
       labelXs: 12,
       bodySm: 13,
@@ -32,7 +32,9 @@ class AppThemeTokens extends ThemeExtension<AppThemeTokens> {
     ),
   );
 
-  factory AppThemeTokens.dark() => AppThemeTokens.light();
+  factory AppThemeTokens.light() => shared;
+
+  factory AppThemeTokens.dark() => shared;
 
   @override
   AppThemeTokens copyWith({

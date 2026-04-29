@@ -14,7 +14,7 @@ ThemeData buildAppTheme(Brightness brightness) {
     borderRadius: BorderRadius.circular(tokens.radius.md),
   );
 
-  return ThemeData(
+  var themeData = ThemeData(
     useMaterial3: true,
     colorScheme: colorScheme,
     scaffoldBackgroundColor: colorScheme.surface,
@@ -26,25 +26,7 @@ ThemeData buildAppTheme(Brightness brightness) {
     fontFamily: 'MI_Sans_Regular',
     appBarTheme: _buildAppBarThemeData(colorScheme),
     navigationRailTheme: _buildNavRailThemeData(colorScheme),
-    scrollbarTheme: ScrollbarThemeData(
-      thumbVisibility: WidgetStateProperty.all(false),
-      thickness: WidgetStateProperty.all(4),
-      mainAxisMargin: 10,
-      crossAxisMargin: 3,
-      radius: const Radius.circular(999),
-      thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
-        final base = colorScheme.onSurfaceVariant;
-        if (states.contains(WidgetState.dragged)) {
-          return base.withOpacity(0.95);
-        }
-        if (states.contains(WidgetState.hovered)) {
-          return base.withOpacity(0.85);
-        }
-        return base.withOpacity(0.65);
-      }),
-      trackColor: WidgetStateProperty.all(Colors.transparent),
-      trackBorderColor: WidgetStateProperty.all(Colors.transparent),
-    ),
+    scrollbarTheme: _buildScrollbarTheme(colorScheme),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(shape: buttonShape),
     ),
@@ -61,6 +43,29 @@ ThemeData buildAppTheme(Brightness brightness) {
       },
     ),
     extensions: [tokens],
+  );
+  return themeData;
+}
+
+ScrollbarThemeData _buildScrollbarTheme(ColorScheme colorScheme) {
+  return ScrollbarThemeData(
+    thumbVisibility: WidgetStateProperty.all(false),
+    thickness: WidgetStateProperty.all(4),
+    mainAxisMargin: 10,
+    crossAxisMargin: 3,
+    radius: const Radius.circular(999),
+    thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+      final base = colorScheme.onSurfaceVariant;
+      if (states.contains(WidgetState.dragged)) {
+        return base.withOpacity(0.95);
+      }
+      if (states.contains(WidgetState.hovered)) {
+        return base.withOpacity(0.85);
+      }
+      return base.withOpacity(0.65);
+    }),
+    trackColor: WidgetStateProperty.all(Colors.transparent),
+    trackBorderColor: WidgetStateProperty.all(Colors.transparent),
   );
 }
 

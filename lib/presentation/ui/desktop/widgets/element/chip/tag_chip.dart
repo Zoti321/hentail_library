@@ -11,7 +11,7 @@ class TagChip extends StatelessWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final BorderRadius radius = BorderRadius.circular(tokens.radius.pill);
-    const Color chipBackground = Color(0xFFFFFFFF);
+    final Color chipBackground = cs.subtleTagBackground;
     final TextStyle textStyle = TextStyle(
       fontSize: tokens.text.labelXs,
       height: 1.2,
@@ -31,7 +31,7 @@ class TagChip extends StatelessWidget {
           border: Border.all(color: cs.borderSubtle, width: 1),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: cs.cardShadow,
               blurRadius: 3,
               offset: const Offset(0, 1),
             ),
