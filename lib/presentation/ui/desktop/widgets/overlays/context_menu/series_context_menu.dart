@@ -41,7 +41,6 @@ class _MenuContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     return ContextMenuContainer(
       title: title,
@@ -67,13 +66,13 @@ class _MenuContent extends StatelessWidget {
             label: '添加漫画',
             onTap: () => handleAction(SeriesContextAction.addComics),
           ),
-          Divider(height: 14, thickness: 1.4, color: cs.hentai.borderMedium),
+          const ContextMenuDivider(),
           _FluentMenuItem(
             icon: LucideIcons.squarePen,
             label: '重命名',
             onTap: () => handleAction(SeriesContextAction.rename),
           ),
-          Divider(height: 14, thickness: 1.4, color: cs.hentai.borderMedium),
+          const ContextMenuDivider(),
           _FluentMenuItem(
             icon: LucideIcons.trash2,
             label: '删除',
@@ -107,9 +106,10 @@ class _FluentMenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final HentaiColorScheme palette = cs.hentai;
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: tokens.spacing.xs + 2,
+        horizontal: tokens.spacing.xs + 1,
         vertical: 1,
       ),
       child: Material(
@@ -118,13 +118,13 @@ class _FluentMenuItem extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(tokens.radius.md),
           hoverColor: isDestructive
-              ? cs.hentai.warning.withAlpha(16)
-              : cs.hentai.hoverBackground,
+              ? palette.contextMenuDanger.withAlpha(26)
+              : palette.contextMenuHover,
           splashFactory: NoSplash.splashFactory,
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: tokens.spacing.sm + 2,
-              vertical: tokens.spacing.sm,
+              horizontal: tokens.spacing.sm + 1,
+              vertical: tokens.spacing.sm - 1,
             ),
             child: Row(
               children: <Widget>[
@@ -132,8 +132,8 @@ class _FluentMenuItem extends StatelessWidget {
                   icon,
                   size: 16,
                   color: isDestructive
-                      ? cs.hentai.warning
-                      : cs.hentai.textSecondary,
+                      ? palette.contextMenuDanger
+                      : palette.contextMenuMutedText,
                 ),
                 SizedBox(width: tokens.spacing.md),
                 Expanded(
@@ -143,8 +143,8 @@ class _FluentMenuItem extends StatelessWidget {
                       fontSize: tokens.text.bodySm,
                       fontWeight: FontWeight.w500,
                       color: isDestructive
-                          ? cs.hentai.warning
-                          : cs.hentai.textPrimary,
+                          ? palette.contextMenuDanger
+                          : palette.contextMenuText,
                     ),
                   ),
                 ),
@@ -153,7 +153,7 @@ class _FluentMenuItem extends StatelessWidget {
                     shortcut!,
                     style: TextStyle(
                       fontSize: tokens.text.labelXs - 1,
-                      color: cs.hentai.textDisabled,
+                      color: palette.contextMenuMutedText,
                     ),
                   ),
               ],

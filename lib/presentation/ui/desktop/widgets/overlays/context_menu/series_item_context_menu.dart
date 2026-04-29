@@ -82,9 +82,10 @@ class _FluentMenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final HentaiColorScheme palette = cs.hentai;
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: tokens.spacing.xs + 2,
+        horizontal: tokens.spacing.xs + 1,
         vertical: 1,
       ),
       child: Material(
@@ -92,19 +93,19 @@ class _FluentMenuItem extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(tokens.radius.md),
-          hoverColor: cs.hentai.hoverBackground,
+          hoverColor: palette.contextMenuHover,
           splashFactory: NoSplash.splashFactory,
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: tokens.spacing.sm + 2,
-              vertical: tokens.spacing.sm,
+              horizontal: tokens.spacing.sm + 1,
+              vertical: tokens.spacing.sm - 1,
             ),
             child: Row(
               children: <Widget>[
                 Icon(
                   icon,
                   size: 16,
-                  color: cs.hentai.textSecondary,
+                  color: palette.contextMenuMutedText,
                 ),
                 SizedBox(width: tokens.spacing.md),
                 Expanded(
@@ -113,7 +114,7 @@ class _FluentMenuItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: tokens.text.bodySm,
                       fontWeight: FontWeight.w500,
-                      color: cs.hentai.textPrimary,
+                      color: palette.contextMenuText,
                     ),
                   ),
                 ),

@@ -65,18 +65,20 @@ class ContextMenuContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
-    final double panelRadius = tokens.radius.lg + 2;
+    final HentaiColorScheme palette = cs.hentai;
+    final double panelRadius = tokens.radius.md + 2;
     return Container(
       width: width,
       decoration: BoxDecoration(
-        color: cs.hentai.winSurface,
+        color: palette.contextMenuBackground,
         borderRadius: BorderRadius.circular(panelRadius),
-        border: Border.all(color: cs.hentai.borderMedium),
+        border: Border.all(color: palette.contextMenuBorder),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: cs.hentai.cardShadow,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: palette.contextMenuShadow,
+            blurRadius: 20,
+            spreadRadius: -4,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -89,13 +91,13 @@ class ContextMenuContainer extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: EdgeInsets.symmetric(
-                horizontal: tokens.spacing.md,
-                vertical: tokens.spacing.sm + 2,
+                horizontal: tokens.spacing.md + 2,
+                vertical: tokens.spacing.sm + 1,
               ),
               decoration: BoxDecoration(
-                color: cs.surfaceContainer,
+                color: palette.contextMenuBackground,
                 border: Border(
-                  bottom: BorderSide(color: cs.hentai.borderSubtle),
+                  bottom: BorderSide(color: palette.contextMenuSeparator),
                 ),
               ),
               child: Row(
@@ -103,16 +105,16 @@ class ContextMenuContainer extends StatelessWidget {
                   Icon(
                     leadingIcon,
                     size: 14,
-                    color: cs.hentai.iconSecondary,
+                    color: palette.contextMenuMutedText,
                   ),
                   SizedBox(width: tokens.spacing.xs + 2),
                   Expanded(
                     child: Text(
                       title,
                       style: TextStyle(
-                        fontSize: tokens.text.labelXs,
-                        fontWeight: FontWeight.w700,
-                        color: cs.hentai.textPrimary,
+                        fontSize: tokens.text.bodySm,
+                        fontWeight: FontWeight.w600,
+                        color: palette.contextMenuText,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -124,6 +126,26 @@ class ContextMenuContainer extends StatelessWidget {
             child,
           ],
         ),
+      ),
+    );
+  }
+}
+
+class ContextMenuDivider extends StatelessWidget {
+  const ContextMenuDivider({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    final HentaiColorScheme palette = Theme.of(context).colorScheme.hentai;
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: tokens.spacing.xs + 1,
+        vertical: tokens.spacing.xs + 1,
+      ),
+      child: Container(
+        width: double.infinity,
+        height: 1,
+        color: palette.contextMenuSeparator,
       ),
     );
   }

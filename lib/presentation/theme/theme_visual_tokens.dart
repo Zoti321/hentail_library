@@ -211,6 +211,14 @@ class HentaiColorScheme {
     required this.readerPanelSubtle,
     required this.readerPanelSubtleBorder,
     required this.readerSliderOverlay,
+    required this.contextMenuBackground,
+    required this.contextMenuBorder,
+    required this.contextMenuSeparator,
+    required this.contextMenuText,
+    required this.contextMenuMutedText,
+    required this.contextMenuHover,
+    required this.contextMenuDanger,
+    required this.contextMenuShadow,
   });
 
   static const HentaiColorScheme light = HentaiColorScheme(
@@ -259,6 +267,14 @@ class HentaiColorScheme {
     readerPanelSubtle: Color(0x28000000),
     readerPanelSubtleBorder: Color(0x0DFFFFFF),
     readerSliderOverlay: Color(0x1AFFFFFF),
+    contextMenuBackground: Color(0xFFFFFFFF),
+    contextMenuBorder: Color(0xFFD0D7DE),
+    contextMenuSeparator: Color(0xFFD8DEE4),
+    contextMenuText: Color(0xFF24292F),
+    contextMenuMutedText: Color(0xFF57606A),
+    contextMenuHover: Color(0xFFEAEFF4),
+    contextMenuDanger: Color(0xFFCF222E),
+    contextMenuShadow: Color(0x29000000),
   );
 
   static const HentaiColorScheme dark = HentaiColorScheme(
@@ -307,6 +323,14 @@ class HentaiColorScheme {
     readerPanelSubtle: Color(0x28000000),
     readerPanelSubtleBorder: Color(0x0DFFFFFF),
     readerSliderOverlay: Color(0x1AFFFFFF),
+    contextMenuBackground: Color(0xFF2D333B),
+    contextMenuBorder: Color(0xFF444C56),
+    contextMenuSeparator: Color(0xFF373E47),
+    contextMenuText: Color(0xFFADBAC7),
+    contextMenuMutedText: Color(0xFF768390),
+    contextMenuHover: Color(0xFF3D444D),
+    contextMenuDanger: Color(0xFFF47067),
+    contextMenuShadow: Color(0x7A010409),
   );
 
   final Color hoverBackground;
@@ -354,6 +378,14 @@ class HentaiColorScheme {
   final Color readerPanelSubtle;
   final Color readerPanelSubtleBorder;
   final Color readerSliderOverlay;
+  final Color contextMenuBackground;
+  final Color contextMenuBorder;
+  final Color contextMenuSeparator;
+  final Color contextMenuText;
+  final Color contextMenuMutedText;
+  final Color contextMenuHover;
+  final Color contextMenuDanger;
+  final Color contextMenuShadow;
 }
 
 extension HentaiColorSchemeExtension on ColorScheme {
