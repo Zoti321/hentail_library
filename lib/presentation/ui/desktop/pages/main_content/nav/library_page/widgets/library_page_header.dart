@@ -26,60 +26,14 @@ class LibraryPageHeader extends ConsumerWidget {
           style: _buildLibraryPageTitleStyle(theme.colorScheme),
         ),
         const SizedBox(width: 12),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: theme.colorScheme.borderSubtle),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                LucideIcons.library,
-                size: 14,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                AppStrings.comicCount(comicCount),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.textSecondary,
-                ),
-              ),
-            ],
-          ),
+        MetaChip(
+          icon: LucideIcons.library,
+          label: AppStrings.comicCount(comicCount),
         ),
         const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: theme.colorScheme.borderSubtle),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                LucideIcons.bookMarked,
-                size: 14,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '$seriesCount 个系列',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.textSecondary,
-                ),
-              ),
-            ],
-          ),
+        MetaChip(
+          icon: LucideIcons.bookMarked,
+          label: '$seriesCount 个系列',
         ),
       ],
     );

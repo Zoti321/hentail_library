@@ -14,6 +14,7 @@ import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/filter_popup_button.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/actions/sort_popup_button.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/element/chip/meta_chip.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/element/card/comic_card.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/element/tile/comic_tile.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/element/card/series_card.dart';

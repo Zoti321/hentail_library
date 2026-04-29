@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/presentation/providers/providers.dart';
 import 'package:hentai_library/presentation/ui/desktop/pages/main_content/selected_paths_page/widgets/add_path_popover_btn.dart';
+import 'package:hentai_library/presentation/ui/desktop/widgets/element/chip/meta_chip.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/remove_saved_paths_batch_confirm_dialog.dart';
 import 'package:hentai_library/presentation/theme/theme.dart';
@@ -128,9 +129,9 @@ class _SelectedPathsHeaderSummary extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: <Widget>[
-            _MetaChip(icon: LucideIcons.link, label: '路径 $totalCount'),
+            MetaChip(icon: LucideIcons.link, label: '路径 $totalCount'),
             if (selectedCount > 0)
-              _MetaChip(
+              MetaChip(
                 icon: LucideIcons.circleCheckBig,
                 label: '已选 $selectedCount',
               ),
@@ -186,44 +187,6 @@ class _SelectedPathsHeaderActions extends StatelessWidget {
             ),
           ),
       ],
-    );
-  }
-}
-
-class _MetaChip extends StatelessWidget {
-  const _MetaChip({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final Color iconColor = theme.colorScheme.onSurfaceVariant;
-    final Color backgroundColor = theme.colorScheme.surfaceContainerHighest;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: theme.colorScheme.borderSubtle),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Icon(icon, size: 14, color: iconColor),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.textSecondary,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
