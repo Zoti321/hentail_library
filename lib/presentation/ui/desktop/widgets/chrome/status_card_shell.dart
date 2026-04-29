@@ -22,7 +22,7 @@ class StatusCardShell extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(color: theme.colorScheme.borderSubtle),
+        border: Border.all(color: theme.colorScheme.hentai.borderSubtle),
       ),
       child: child,
     );

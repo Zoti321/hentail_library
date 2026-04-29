@@ -27,7 +27,7 @@ class ArchiveCoverDiskCacheRow extends ConsumerWidget {
       icon: Icon(
         LucideIcons.image,
         size: 20,
-        color: theme.colorScheme.iconDefault,
+        color: theme.colorScheme.hentai.iconDefault,
       ),
       label: '封面磁盘缓存',
       description: enabled
@@ -86,7 +86,7 @@ class _ArchiveCoverCacheUsageRowState
       icon: Icon(
         LucideIcons.hardDrive,
         size: 20,
-        color: theme.colorScheme.iconDefault,
+        color: theme.colorScheme.hentai.iconDefault,
       ),
       label: '缓存占用',
       description: description,
@@ -99,8 +99,8 @@ class _ArchiveCoverCacheUsageRowState
         iconSize: 15,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         borderRadius: tokens.radius.md,
-        foregroundColor: theme.colorScheme.textSecondary,
-        hoverColor: theme.colorScheme.hoverBackground,
+        foregroundColor: theme.colorScheme.hentai.textSecondary,
+        hoverColor: theme.colorScheme.hentai.hoverBackground,
         overlayColor: theme.colorScheme.primary.withAlpha(14),
         delayTooltipThreeSeconds: false,
       ),

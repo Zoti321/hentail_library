@@ -97,7 +97,7 @@ class _DatePickerState extends State<DatePicker> {
     final isToday = _formatDate(DateTime.now()) == dateStr;
 
     Color? bgColor;
-    Color textColor = Theme.of(context).colorScheme.textSecondary;
+    Color textColor = Theme.of(context).colorScheme.hentai.textSecondary;
     FontWeight? fontWeight;
 
     if (isSelected) {
@@ -137,7 +137,7 @@ class _DatePickerState extends State<DatePicker> {
     final displayDate = widget.value.isEmpty ? '选择日期' : widget.value;
     final borderColor = _isOpen
         ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.borderSubtle;
+        : Theme.of(context).colorScheme.hentai.borderSubtle;
 
     return CompositedTransformTarget(
       link: _layerLink,
@@ -169,7 +169,8 @@ class _DatePickerState extends State<DatePicker> {
                         ),
                       ],
                       border: Border.all(
-                        color: Theme.of(context).colorScheme.borderSubtle,
+                        color:
+                            Theme.of(context).colorScheme.hentai.borderSubtle,
                       ),
                     ),
                     child: Padding(
@@ -191,7 +192,7 @@ class _DatePickerState extends State<DatePicker> {
                                   fontWeight: FontWeight.w600,
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.textPrimary,
+                                  ).colorScheme.hentai.textPrimary,
                                 ),
                               ),
                               _buildNavButton(
@@ -216,7 +217,7 @@ class _DatePickerState extends State<DatePicker> {
                                           fontWeight: FontWeight.w500,
                                           color: Theme.of(
                                             context,
-                                          ).colorScheme.textPlaceholder,
+                                            ).colorScheme.hentai.textPlaceholder,
                                         ),
                                       ),
                                     ),
@@ -256,8 +257,8 @@ class _DatePickerState extends State<DatePicker> {
                       LucideIcons.calendar,
                       size: 16,
                       color: widget.value.isEmpty
-                          ? Theme.of(context).colorScheme.textPlaceholder
-                          : Theme.of(context).colorScheme.textTertiary,
+                          ? Theme.of(context).colorScheme.hentai.textPlaceholder
+                          : Theme.of(context).colorScheme.hentai.textTertiary,
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -265,8 +266,8 @@ class _DatePickerState extends State<DatePicker> {
                       style: TextStyle(
                         fontSize: 14,
                         color: widget.value.isEmpty
-                            ? Theme.of(context).colorScheme.textPlaceholder
-                            : Theme.of(context).colorScheme.textSecondary,
+                            ? Theme.of(context).colorScheme.hentai.textPlaceholder
+                            : Theme.of(context).colorScheme.hentai.textSecondary,
                       ),
                     ),
                     const Spacer(),
@@ -280,7 +281,7 @@ class _DatePickerState extends State<DatePicker> {
                             decoration: BoxDecoration(
                               color: Theme.of(
                                 context,
-                              ).colorScheme.inputBackgroundDisabled,
+                              ).colorScheme.hentai.inputBackgroundDisabled,
                               borderRadius: BorderRadius.circular(999),
                             ),
                             child: Icon(
@@ -288,7 +289,7 @@ class _DatePickerState extends State<DatePicker> {
                               size: 14,
                               color: Theme.of(
                                 context,
-                              ).colorScheme.textPlaceholder,
+                              ).colorScheme.hentai.textPlaceholder,
                             ),
                           ),
                         ),

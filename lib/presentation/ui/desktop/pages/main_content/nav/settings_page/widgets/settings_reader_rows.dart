@@ -22,7 +22,7 @@ class ReaderAutoPlayIntervalRow extends ConsumerWidget {
       icon: Icon(
         LucideIcons.timer,
         size: 20,
-        color: Theme.of(context).colorScheme.iconDefault,
+        color: Theme.of(context).colorScheme.hentai.iconDefault,
       ),
       label: '自动播放间隔',
       description: '$seconds 秒',

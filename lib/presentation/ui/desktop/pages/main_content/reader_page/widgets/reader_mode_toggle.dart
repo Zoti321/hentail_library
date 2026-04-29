@@ -33,7 +33,8 @@ class ReadModeToggleButton extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: isActive ? cs.activeButtonBg : Colors.transparent,
+              color:
+                  isActive ? cs.hentai.activeButtonBg : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -44,8 +45,8 @@ class ReadModeToggleButton extends StatelessWidget {
                   icon,
                   size: 14,
                   color: isActive
-                      ? cs.readerTextOnWhite
-                      : cs.readerTextIconPrimary,
+                      ? cs.hentai.readerTextOnWhite
+                      : cs.hentai.readerTextIconPrimary,
                 ),
                 Text(
                   label,
@@ -53,8 +54,8 @@ class ReadModeToggleButton extends StatelessWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: isActive
-                        ? cs.readerTextOnWhite
-                        : cs.readerTextIconPrimary,
+                        ? cs.hentai.readerTextOnWhite
+                        : cs.hentai.readerTextIconPrimary,
                   ),
                 ),
               ],

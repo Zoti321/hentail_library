@@ -23,10 +23,10 @@ class SelectedPathsListCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: theme.colorScheme.borderSubtle),
+        border: Border.all(color: theme.colorScheme.hentai.borderSubtle),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: theme.colorScheme.cardShadow,
+            color: theme.colorScheme.hentai.cardShadow,
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -41,7 +41,9 @@ class SelectedPathsListCard extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: theme.colorScheme.surfaceContainerHighest,
                 border: Border(
-                  bottom: BorderSide(color: theme.colorScheme.borderSubtle),
+                  bottom: BorderSide(
+                    color: theme.colorScheme.hentai.borderSubtle,
+                  ),
                 ),
               ),
               child: Row(
@@ -57,7 +59,7 @@ class SelectedPathsListCard extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.textSecondary,
+                    color: theme.colorScheme.hentai.textSecondary,
                     ),
                   ),
                   const Spacer(),
@@ -65,7 +67,7 @@ class SelectedPathsListCard extends ConsumerWidget {
                     '共 ${paths.length} 项',
                     style: TextStyle(
                       fontSize: 12,
-                      color: theme.colorScheme.textTertiary,
+                      color: theme.colorScheme.hentai.textTertiary,
                     ),
                   ),
                 ],
@@ -79,7 +81,10 @@ class SelectedPathsListCard extends ConsumerWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: paths.length,
                 separatorBuilder: (_, int index) =>
-                    Divider(height: 1, color: theme.colorScheme.borderSubtle),
+                    Divider(
+                      height: 1,
+                      color: theme.colorScheme.hentai.borderSubtle,
+                    ),
                 itemBuilder: (BuildContext context, int index) {
                   final String path = paths[index];
                   return PathTile(path: path);
@@ -114,7 +119,7 @@ class _EmptyPaths extends StatelessWidget {
               '暂无路径，请添加文件或文件夹',
               style: TextStyle(
                 fontSize: 13,
-                color: theme.colorScheme.textTertiary,
+                color: theme.colorScheme.hentai.textTertiary,
               ),
             ),
           ],

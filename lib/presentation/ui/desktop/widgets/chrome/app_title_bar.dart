@@ -43,7 +43,9 @@ class _AppTitleBarState extends State<AppTitleBar> with WindowListener {
       height: 36,
       decoration: BoxDecoration(
         color: cs.surface,
-        border: Border(bottom: BorderSide(color: cs.borderSubtle, width: 1)),
+        border: Border(
+          bottom: BorderSide(color: cs.hentai.borderSubtle, width: 1),
+        ),
       ),
       child: Row(
         children: [

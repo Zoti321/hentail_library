@@ -160,7 +160,10 @@ class ComicTile extends HookConsumerWidget {
                 ? theme.colorScheme.surfaceContainer
                 : theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(tokens.radius.md),
-            border: Border.all(color: theme.colorScheme.borderSubtle, width: 1),
+            border: Border.all(
+              color: theme.colorScheme.hentai.borderSubtle,
+              width: 1,
+            ),
           ),
           child: Row(
             children: [
@@ -170,7 +173,7 @@ class ComicTile extends HookConsumerWidget {
                 child: Container(
                   width: 56,
                   height: 80,
-                  color: theme.colorScheme.imagePlaceholder,
+                  color: theme.colorScheme.hentai.imagePlaceholder,
                   child: AppComicImage(
                     filePath: coverData?.filePath,
                     memoryBytes: coverData?.memoryBytes,
@@ -178,11 +181,11 @@ class ComicTile extends HookConsumerWidget {
                     cacheWidth: coverCacheWidth,
                     placeholder: Icon(
                       Icons.broken_image,
-                      color: theme.colorScheme.iconSecondary,
+                      color: theme.colorScheme.hentai.iconSecondary,
                     ),
                     errorPlaceholder: Icon(
                       Icons.broken_image,
-                      color: theme.colorScheme.iconSecondary,
+                      color: theme.colorScheme.hentai.iconSecondary,
                     ),
                   ),
                 ),
@@ -203,7 +206,7 @@ class ComicTile extends HookConsumerWidget {
                       style: TextStyle(
                         fontSize: tokens.text.bodyMd,
                         fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.textPrimary,
+                        color: theme.colorScheme.hentai.textPrimary,
                       ),
                     ),
                     SizedBox(height: tokens.spacing.xs - 2),
@@ -215,12 +218,12 @@ class ComicTile extends HookConsumerWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.subtleTagBackground,
+                            color: theme.colorScheme.hentai.subtleTagBackground,
                             borderRadius: BorderRadius.circular(
                               tokens.radius.xs,
                             ),
                             border: Border.all(
-                              color: theme.colorScheme.borderSubtle,
+                              color: theme.colorScheme.hentai.borderSubtle,
                             ),
                           ),
                           child: Text(
@@ -228,7 +231,7 @@ class ComicTile extends HookConsumerWidget {
                             style: TextStyle(
                               fontSize: tokens.text.labelXs - 1,
                               fontWeight: FontWeight.w500,
-                              color: theme.colorScheme.textSecondary,
+                              color: theme.colorScheme.hentai.textSecondary,
                             ),
                           ),
                         ),
@@ -237,7 +240,7 @@ class ComicTile extends HookConsumerWidget {
                           '${pageCount}p',
                           style: TextStyle(
                             fontSize: tokens.text.labelXs,
-                            color: theme.colorScheme.textTertiary,
+                            color: theme.colorScheme.hentai.textTertiary,
                           ),
                         ),
                       ],

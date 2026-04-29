@@ -69,12 +69,12 @@ class ContextMenuContainer extends StatelessWidget {
     return Container(
       width: width,
       decoration: BoxDecoration(
-        color: cs.winSurface,
+        color: cs.hentai.winSurface,
         borderRadius: BorderRadius.circular(panelRadius),
-        border: Border.all(color: cs.borderMedium),
+        border: Border.all(color: cs.hentai.borderMedium),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: cs.cardShadow,
+            color: cs.hentai.cardShadow,
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -94,11 +94,17 @@ class ContextMenuContainer extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: cs.surfaceContainer,
-                border: Border(bottom: BorderSide(color: cs.borderSubtle)),
+                border: Border(
+                  bottom: BorderSide(color: cs.hentai.borderSubtle),
+                ),
               ),
               child: Row(
                 children: <Widget>[
-                  Icon(leadingIcon, size: 14, color: cs.iconSecondary),
+                  Icon(
+                    leadingIcon,
+                    size: 14,
+                    color: cs.hentai.iconSecondary,
+                  ),
                   SizedBox(width: tokens.spacing.xs + 2),
                   Expanded(
                     child: Text(
@@ -106,7 +112,7 @@ class ContextMenuContainer extends StatelessWidget {
                       style: TextStyle(
                         fontSize: tokens.text.labelXs,
                         fontWeight: FontWeight.w700,
-                        color: cs.textPrimary,
+                        color: cs.hentai.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

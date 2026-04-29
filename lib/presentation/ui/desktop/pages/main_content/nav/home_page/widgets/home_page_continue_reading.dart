@@ -31,7 +31,7 @@ class HomePageContinueReadingSection extends ConsumerWidget {
             style: TextStyle(
               fontSize: tokens.text.titleSm,
               fontWeight: FontWeight.w600,
-              color: colorScheme.textPrimary,
+              color: colorScheme.hentai.textPrimary,
             ),
           ),
           SizedBox(height: tokens.spacing.sm),
@@ -69,7 +69,7 @@ class HomePageContinueReadingSection extends ConsumerWidget {
           style: TextStyle(
             fontSize: tokens.text.titleSm,
             fontWeight: FontWeight.w600,
-            color: colorScheme.textPrimary,
+            color: colorScheme.hentai.textPrimary,
           ),
         ),
         SizedBox(height: tokens.spacing.sm),
@@ -168,7 +168,7 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
           '加载失败',
           style: TextStyle(
             fontSize: widget.tokens.text.bodySm,
-            color: widget.colorScheme.textSecondary,
+            color: widget.colorScheme.hentai.textSecondary,
           ),
         ),
       );
@@ -181,14 +181,14 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
             Icon(
               LucideIcons.bookOpen,
               size: 20,
-              color: widget.colorScheme.textTertiary,
+              color: widget.colorScheme.hentai.textTertiary,
             ),
             SizedBox(width: widget.tokens.spacing.sm),
             Text(
               '暂无阅读记录，',
               style: TextStyle(
                 fontSize: widget.tokens.text.bodySm,
-                color: widget.colorScheme.textSecondary,
+              color: widget.colorScheme.hentai.textSecondary,
               ),
             ),
             TextButton(

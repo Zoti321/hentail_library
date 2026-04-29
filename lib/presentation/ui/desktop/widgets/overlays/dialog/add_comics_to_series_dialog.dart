@@ -137,7 +137,10 @@ class _AddComicsToSeriesDialogState
           Text(
             '已在系列中的漫画打开对话框时与「已选中」相同；点击可取消选中。勾选顺序决定排序。'
             '若全部取消选中后确认，将从系列中移出当前全部漫画。',
-            style: TextStyle(fontSize: 12, color: cs.textTertiary),
+            style: TextStyle(
+              fontSize: 12,
+              color: cs.hentai.textTertiary,
+            ),
           ),
           const SizedBox(height: 10),
           CustomTextField(
@@ -154,7 +157,10 @@ class _AddComicsToSeriesDialogState
                 ? Center(
                     child: Text(
                       '没有可显示的漫画',
-                      style: TextStyle(color: cs.textTertiary, fontSize: 13),
+                      style: TextStyle(
+                        color: cs.hentai.textTertiary,
+                        fontSize: 13,
+                      ),
                     ),
                   )
                 : Padding(
@@ -167,7 +173,7 @@ class _AddComicsToSeriesDialogState
                         padding: const EdgeInsets.only(right: 14),
                         itemCount: dialogState.visibleComics.length,
                         separatorBuilder: (context, _) =>
-                            Divider(height: 1, color: cs.borderSubtle),
+                            Divider(height: 1, color: cs.hentai.borderSubtle),
                         itemBuilder: (context, index) {
                           final comic = dialogState.visibleComics[index];
                           return _ComicSelectableTile(
@@ -257,7 +263,7 @@ class _ComicSelectableTile extends StatelessWidget {
           comic.title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: cs.textPrimary, fontSize: 13),
+          style: TextStyle(color: cs.hentai.textPrimary, fontSize: 13),
         ),
         subtitle: comic.authors.isEmpty
             ? null
@@ -265,7 +271,10 @@ class _ComicSelectableTile extends StatelessWidget {
                 comic.authors.map((a) => a.name).join(' / '),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: cs.textTertiary, fontSize: 12),
+                style: TextStyle(
+                  color: cs.hentai.textTertiary,
+                  fontSize: 12,
+                ),
               ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -307,8 +316,8 @@ class _ComicSelectableTile extends StatelessWidget {
                 isSelected ? LucideIcons.squareCheckBig : LucideIcons.square,
                 size: 16,
                 color: enabled
-                    ? (isSelected ? cs.primary : cs.textTertiary)
-                    : cs.textDisabled,
+                    ? (isSelected ? cs.primary : cs.hentai.textTertiary)
+                    : cs.hentai.textDisabled,
               ),
             ),
           ],

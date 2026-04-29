@@ -5,7 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 TextStyle _buildDesktopPageTitleStyle(ColorScheme colorScheme) {
   return TextStyle(
-    color: colorScheme.textPrimary,
+    color: colorScheme.hentai.textPrimary,
     fontSize: 26,
     fontWeight: FontWeight.w600,
     letterSpacing: -0.4,
@@ -76,7 +76,10 @@ class _HomeHeaderTextBlock extends StatelessWidget {
         SizedBox(height: tokens.spacing.xs),
         Text(
           greetingText,
-          style: TextStyle(color: colorScheme.textTertiary, fontSize: 13),
+          style: TextStyle(
+            color: colorScheme.hentai.textTertiary,
+            fontSize: 13,
+          ),
         ),
       ],
     );
@@ -108,7 +111,7 @@ class _HomeHeaderActionBlock extends StatelessWidget {
           iconSize: 16,
           size: 24,
           borderRadius: 10,
-          foregroundColor: colorScheme.iconDefault,
+          foregroundColor: colorScheme.hentai.iconDefault,
           hoverColor: colorScheme.surfaceContainerHighest,
           overlayColor: colorScheme.primary.withAlpha(32),
           delayTooltipThreeSeconds: false,
@@ -121,7 +124,7 @@ class _HomeHeaderActionBlock extends StatelessWidget {
           iconSize: 16,
           size: 24,
           borderRadius: 10,
-          foregroundColor: colorScheme.iconDefault,
+          foregroundColor: colorScheme.hentai.iconDefault,
           hoverColor: colorScheme.surfaceContainerHighest,
           overlayColor: colorScheme.primary.withAlpha(32),
           delayTooltipThreeSeconds: false,

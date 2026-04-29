@@ -191,7 +191,7 @@ class ReaderPage extends HookConsumerWidget {
         },
         child: Scaffold(
           key: scaffoldKey,
-          backgroundColor: theme.colorScheme.readerBackground,
+          backgroundColor: theme.colorScheme.hentai.readerBackground,
           body: viewAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (Object e, StackTrace st) => Center(child: Text('$e')),

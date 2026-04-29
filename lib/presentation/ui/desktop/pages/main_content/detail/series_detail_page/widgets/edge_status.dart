@@ -59,7 +59,7 @@ class SeriesNotFound extends StatelessWidget {
           children: <Widget>[
             Text(
               '未找到系列「$seriesName」',
-              style: TextStyle(fontSize: 14, color: cs.textTertiary),
+              style: TextStyle(fontSize: 14, color: cs.hentai.textTertiary),
             ),
             const SizedBox(height: 12),
             const LibraryReturnBreadcrumb(),

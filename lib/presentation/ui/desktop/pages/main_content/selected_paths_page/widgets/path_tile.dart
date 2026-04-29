@@ -87,13 +87,13 @@ class PathTile extends HookConsumerWidget {
                   size: 16,
                   color: isSelected
                       ? theme.colorScheme.primary
-                      : theme.colorScheme.textTertiary,
+                      : theme.colorScheme.hentai.textTertiary,
                 ),
                 const SizedBox(width: 16),
                 Icon(
                   _resolvePathTypeIcon(path),
                   size: 20,
-                  color: theme.colorScheme.iconDefault,
+                  color: theme.colorScheme.hentai.iconDefault,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -130,7 +130,7 @@ class PathTile extends HookConsumerWidget {
                         iconSize: 16,
                         size: 28,
                         borderRadius: 8,
-                        foregroundColor: theme.colorScheme.iconDefault,
+                        foregroundColor: theme.colorScheme.hentai.iconDefault,
                         hoverColor: theme.colorScheme.primary.withAlpha(10),
                         overlayColor: theme.colorScheme.primary.withAlpha(14),
                         delayTooltipThreeSeconds: true,

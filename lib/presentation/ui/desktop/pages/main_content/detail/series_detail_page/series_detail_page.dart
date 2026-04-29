@@ -17,7 +17,7 @@ class SeriesDetailPage extends ConsumerWidget {
 
     final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
     return Container(
-      color: cs.winBackground,
+      color: cs.hentai.winBackground,
       padding: .symmetric(
         horizontal: tokens.spacing.lg + 8,
         vertical: tokens.spacing.lg + 8,

@@ -45,10 +45,10 @@ class _EmptyLibraryHero extends StatelessWidget {
     final ColorScheme colorScheme = theme.colorScheme;
     final Color accent = colorScheme.primary;
     final BorderSide actionBorderSide = BorderSide(
-      color: colorScheme.borderSubtle,
+      color: colorScheme.hentai.borderSubtle,
     );
     final ButtonStyle outlinedActionStyle = OutlinedButton.styleFrom(
-      foregroundColor: colorScheme.textPrimary,
+      foregroundColor: colorScheme.hentai.textPrimary,
       side: actionBorderSide,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -70,7 +70,7 @@ class _EmptyLibraryHero extends StatelessWidget {
         border: Border.all(
           color: Color.alphaBlend(
             accent.withAlpha(50),
-            colorScheme.borderSubtle,
+            colorScheme.hentai.borderSubtle,
           ),
         ),
         boxShadow: <BoxShadow>[
@@ -142,7 +142,7 @@ class _EmptyLibraryHero extends StatelessWidget {
                                 fontSize: tokens.text.titleMd,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: -0.3,
-                                color: colorScheme.textPrimary,
+                                color: colorScheme.hentai.textPrimary,
                               ),
                             ),
                             SizedBox(height: tokens.spacing.sm),
@@ -150,7 +150,7 @@ class _EmptyLibraryHero extends StatelessWidget {
                               '请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。',
                               style: TextStyle(
                                 fontSize: tokens.text.bodySm,
-                                color: colorScheme.textSecondary,
+                                color: colorScheme.hentai.textSecondary,
                                 height: 1.5,
                               ),
                             ),
@@ -664,7 +664,7 @@ class _StatSummaryCardState extends State<_StatSummaryCard> {
           border: Border.all(
             color: Color.alphaBlend(
               accent.withAlpha(52),
-              colorScheme.borderSubtle,
+              colorScheme.hentai.borderSubtle,
             ),
           ),
           boxShadow: <BoxShadow>[
@@ -711,7 +711,7 @@ class _StatSummaryCardState extends State<_StatSummaryCard> {
                               letterSpacing: 0.8,
                               color: Color.alphaBlend(
                                 accent.withAlpha(200),
-                                colorScheme.textTertiary,
+                                colorScheme.hentai.textTertiary,
                               ),
                             ),
                           ),
@@ -723,7 +723,7 @@ class _StatSummaryCardState extends State<_StatSummaryCard> {
                               fontWeight: FontWeight.w700,
                               letterSpacing: -0.8,
                               height: 1.05,
-                              color: colorScheme.textPrimary,
+                              color: colorScheme.hentai.textPrimary,
                             ),
                           ),
                           SizedBox(height: tokens.spacing.sm - 1),
@@ -731,7 +731,7 @@ class _StatSummaryCardState extends State<_StatSummaryCard> {
                             widget.caption,
                             style: TextStyle(
                               fontSize: tokens.text.bodySm,
-                              color: colorScheme.textSecondary,
+                              color: colorScheme.hentai.textSecondary,
                               height: 1.35,
                             ),
                           ),

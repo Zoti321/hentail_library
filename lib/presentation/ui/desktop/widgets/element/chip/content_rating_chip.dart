@@ -50,22 +50,22 @@ class ContentRatingChip extends StatelessWidget {
         return _ContentRatingVisual(
           label: '未知',
           backgroundColor: colorScheme.surfaceContainerHighest,
-          borderColor: colorScheme.borderSubtle,
-          textColor: colorScheme.textTertiary,
+          borderColor: colorScheme.hentai.borderSubtle,
+          textColor: colorScheme.hentai.textTertiary,
         );
       case ContentRating.safe:
         return _ContentRatingVisual(
           label: '全年龄',
-          backgroundColor: colorScheme.success.withAlpha(30),
-          borderColor: colorScheme.success.withAlpha(90),
-          textColor: colorScheme.success,
+          backgroundColor: colorScheme.hentai.success.withAlpha(30),
+          borderColor: colorScheme.hentai.success.withAlpha(90),
+          textColor: colorScheme.hentai.success,
         );
       case ContentRating.r18:
         return _ContentRatingVisual(
           label: 'NSFW',
-          backgroundColor: colorScheme.warning.withAlpha(30),
-          borderColor: colorScheme.warning.withAlpha(90),
-          textColor: colorScheme.warning,
+          backgroundColor: colorScheme.hentai.warning.withAlpha(30),
+          borderColor: colorScheme.hentai.warning.withAlpha(90),
+          textColor: colorScheme.hentai.warning,
         );
     }
   }

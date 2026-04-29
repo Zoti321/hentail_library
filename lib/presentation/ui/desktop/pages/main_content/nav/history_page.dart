@@ -61,7 +61,7 @@ class _Header extends ConsumerWidget {
               Text(
                 "阅读历史",
                 style: TextStyle(
-                  color: theme.colorScheme.textPrimary,
+                  color: theme.colorScheme.hentai.textPrimary,
                   fontSize: tokens.text.titleLg + 4,
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.4,
@@ -72,7 +72,7 @@ class _Header extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: tokens.text.bodySm,
                   fontWeight: FontWeight.w400,
-                  color: theme.colorScheme.textTertiary,
+                  color: theme.colorScheme.hentai.textTertiary,
                 ),
               ),
             ],
@@ -124,7 +124,7 @@ class _Header extends ConsumerWidget {
                 }
               }
             },
-      foregroundColor: cs.warning,
+      foregroundColor: cs.hentai.warning,
       hoverColor: cs.error.withAlpha(24),
       overlayColor: cs.error.withAlpha(20),
     );
@@ -160,7 +160,7 @@ class _HistoryListSliver extends ConsumerWidget {
               '加载失败',
               style: TextStyle(
                 fontSize: 14,
-                color: theme.colorScheme.textSecondary,
+                color: theme.colorScheme.hentai.textSecondary,
               ),
             ),
           ),
@@ -185,13 +185,13 @@ class _HistoryListSliver extends ConsumerWidget {
                 Icon(
                   LucideIcons.bookOpen,
                   size: 48,
-                  color: theme.colorScheme.textTertiary,
+                  color: theme.colorScheme.hentai.textTertiary,
                 ),
                 Text(
                   q.isEmpty ? '暂无阅读历史' : '没有匹配的历史记录',
                   style: TextStyle(
                     fontSize: 14,
-                    color: theme.colorScheme.textSecondary,
+                    color: theme.colorScheme.hentai.textSecondary,
                   ),
                 ),
               ],

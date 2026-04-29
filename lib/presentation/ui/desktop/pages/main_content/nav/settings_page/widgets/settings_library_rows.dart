@@ -18,7 +18,7 @@ class LibraryLocationRow extends StatelessWidget {
       icon: Icon(
         LucideIcons.folderSearch,
         size: 20,
-        color: theme.colorScheme.iconDefault,
+        color: theme.colorScheme.hentai.iconDefault,
       ),
       label: '库位置',
       description: '管理扫描路径',
@@ -26,7 +26,7 @@ class LibraryLocationRow extends StatelessWidget {
       action: Icon(
         LucideIcons.chevronRight,
         size: 16,
-        color: theme.colorScheme.iconSecondary,
+        color: theme.colorScheme.hentai.iconSecondary,
       ),
     );
   }
@@ -47,7 +47,7 @@ class AutoScanRow extends ConsumerWidget {
       icon: Icon(
         LucideIcons.refreshCw,
         size: 20,
-        color: theme.colorScheme.iconDefault,
+        color: theme.colorScheme.hentai.iconDefault,
       ),
       label: '自动扫描',
       description: autoScan ? '已启用（启动时扫描选中路径）' : '已禁用',
@@ -76,7 +76,7 @@ class LibraryHideComicsInSeriesRow extends ConsumerWidget {
       icon: Icon(
         LucideIcons.layers,
         size: 20,
-        color: theme.colorScheme.iconDefault,
+        color: theme.colorScheme.hentai.iconDefault,
       ),
       label: '漫画库隐藏系列内漫画',
       description: hide ? '已启用（漫画分区不显示已归入系列的漫画）' : '已禁用（漫画分区显示全部漫画）',
@@ -107,12 +107,12 @@ class HealthyModeRow extends ConsumerWidget {
           ? Icon(
               LucideIcons.shield,
               size: 20,
-              color: theme.colorScheme.iconDefault,
+              color: theme.colorScheme.hentai.iconDefault,
             )
           : Icon(
               LucideIcons.shieldOff,
               size: 20,
-              color: theme.colorScheme.warning,
+              color: theme.colorScheme.hentai.warning,
             ),
       label: '健全模式',
       description: healthy ? '已启用（隐藏 R18）' : '已禁用（显示 R18）',

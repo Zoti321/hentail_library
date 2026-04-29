@@ -68,7 +68,7 @@ class _LibraryToolbar extends ConsumerWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cs.borderSubtle),
+        border: Border.all(color: cs.hentai.borderSubtle),
       ),
       padding: const EdgeInsets.all(3),
       child: Row(
@@ -80,7 +80,7 @@ class _LibraryToolbar extends ConsumerWidget {
             iconSize: 16,
             size: 28,
             borderRadius: 6,
-            foregroundColor: cs.iconDefault,
+            foregroundColor: cs.hentai.iconDefault,
             hoverColor: theme.hoverColor,
             overlayColor: theme.hoverColor,
             delayTooltipThreeSeconds: true,
@@ -95,7 +95,7 @@ class _LibraryToolbar extends ConsumerWidget {
           const SizedBox(width: 12),
           DecoratedBox(
             decoration: BoxDecoration(
-              color: cs.borderSubtle,
+              color: cs.hentai.borderSubtle,
               borderRadius: BorderRadius.circular(999),
             ),
             child: const SizedBox(width: 1, height: 22),
@@ -155,16 +155,16 @@ class _ViewToggleButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: isActive ? cs.subtleTagBackground : Colors.transparent,
+            color: isActive ? cs.hentai.subtleTagBackground : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isActive ? cs.borderSubtle : Colors.transparent,
+              color: isActive ? cs.hentai.borderSubtle : Colors.transparent,
             ),
           ),
           child: Icon(
             icon,
             size: 16,
-            color: isActive ? activeColor : cs.iconSecondary,
+            color: isActive ? activeColor : cs.hentai.iconSecondary,
           ),
         ),
       ),

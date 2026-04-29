@@ -36,8 +36,10 @@ class DesktopSidebar extends StatelessWidget {
       width: isExpanded ? expandedWidth : collapsedWidth,
       height: double.infinity,
       decoration: BoxDecoration(
-        color: cs.sidebarBackground,
-        border: Border(right: BorderSide(color: cs.borderSubtle)),
+        color: cs.hentai.sidebarBackground,
+        border: Border(
+          right: BorderSide(color: cs.hentai.borderSubtle),
+        ),
       ),
       padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
       child: Column(
@@ -56,9 +58,10 @@ class DesktopSidebar extends StatelessWidget {
                 iconSize: 18,
                 size: 32,
                 borderRadius: 8,
-                foregroundColor: cs.textSecondary,
-                hoverColor: cs.sidebarItemHoverBackground,
-                overlayColor: cs.sidebarItemHoverBackground.withAlpha(110),
+                foregroundColor: cs.hentai.textSecondary,
+                hoverColor: cs.hentai.sidebarItemHoverBackground,
+                overlayColor:
+                    cs.hentai.sidebarItemHoverBackground.withAlpha(110),
                 delayTooltipThreeSeconds: false,
                 onPressed: onToggleExpanded,
               ),
@@ -119,18 +122,18 @@ class _SidebarButtonState extends State<_SidebarButton> {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
 
-    final Color idleBackground = cs.sidebarBackground;
+    final Color idleBackground = cs.hentai.sidebarBackground;
     final Color backgroundColor = widget.isActive
-        ? cs.sidebarItemActiveBackground
-        : (_isHovered ? cs.sidebarItemHoverBackground : idleBackground);
+        ? cs.hentai.sidebarItemActiveBackground
+        : (_isHovered ? cs.hentai.sidebarItemHoverBackground : idleBackground);
 
     final Color textColor = widget.isActive
-        ? cs.textPrimary
-        : (_isHovered ? cs.textPrimary : cs.textSecondary);
+        ? cs.hentai.textPrimary
+        : (_isHovered ? cs.hentai.textPrimary : cs.hentai.textSecondary);
 
     final Color iconColor = widget.isActive
-        ? cs.textPrimary
-        : (_isHovered ? cs.textPrimary : cs.textSecondary);
+        ? cs.hentai.textPrimary
+        : (_isHovered ? cs.hentai.textPrimary : cs.hentai.textSecondary);
 
     final Widget buttonBody = widget.isExpanded
         ? Padding(
@@ -194,13 +197,13 @@ class _SidebarButtonState extends State<_SidebarButton> {
             border: Border.all(
               width: widget.isActive ? 1 : 0.8,
               color: widget.isActive
-                  ? cs.sidebarItemActiveBorder
+                    ? cs.hentai.sidebarItemActiveBorder
                   : idleBackground,
             ),
             boxShadow: widget.isActive
                 ? <BoxShadow>[
                     BoxShadow(
-                      color: cs.sidebarItemActiveShadowColor,
+                      color: cs.hentai.sidebarItemActiveShadowColor,
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),

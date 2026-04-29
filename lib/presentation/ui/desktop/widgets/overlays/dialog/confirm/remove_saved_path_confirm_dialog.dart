@@ -19,7 +19,10 @@ class RemoveSavedPathConfirmDialog extends StatelessWidget {
         children: [
           Text(
             '将从库中移除该路径。此操作不可撤销。',
-            style: TextStyle(fontSize: 14, color: cs.textSecondary),
+            style: TextStyle(
+              fontSize: 14,
+              color: cs.hentai.textSecondary,
+            ),
           ),
           const SizedBox(height: 10),
           Text(
@@ -29,7 +32,7 @@ class RemoveSavedPathConfirmDialog extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: cs.textPrimary,
+              color: cs.hentai.textPrimary,
             ),
           ),
         ],

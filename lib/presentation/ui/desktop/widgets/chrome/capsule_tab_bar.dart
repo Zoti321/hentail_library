@@ -33,7 +33,7 @@ class CapsuleTabBar extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(_radius),
-        border: Border.all(color: cs.borderSubtle),
+        border: Border.all(color: cs.hentai.borderSubtle),
       ),
       child: Padding(
         padding: _padding,

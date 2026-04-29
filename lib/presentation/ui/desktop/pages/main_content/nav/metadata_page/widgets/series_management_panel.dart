@@ -123,13 +123,16 @@ class _Header extends ConsumerWidget {
                   fontSize: 26,
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.4,
-                  color: cs.textPrimary,
+                  color: cs.hentai.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 '创建、重命名或删除系列；删除系列仅移除归属关系，漫画仍保留在库中',
-                style: TextStyle(color: cs.textTertiary, fontSize: 13),
+                style: TextStyle(
+                  color: cs.hentai.textTertiary,
+                  fontSize: 13,
+                ),
               ),
             ],
           ),
@@ -349,7 +352,7 @@ class _SeriesListCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cs.borderSubtle),
+        border: Border.all(color: cs.hentai.borderSubtle),
       ),
       child: Column(
         children: <Widget>[
@@ -375,13 +378,16 @@ class _SeriesListCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: cs.textSecondary,
+                    color: cs.hentai.textSecondary,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Text(
                   '共 ${series.length} 条',
-                  style: TextStyle(fontSize: 13, color: cs.textTertiary),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: cs.hentai.textTertiary,
+                  ),
                 ),
               ],
             ),
@@ -393,7 +399,7 @@ class _SeriesListCard extends StatelessWidget {
                 return _SeriesRow(series: series[index]);
               },
               separatorBuilder: (BuildContext context, int index) =>
-                  Divider(height: 1, color: cs.borderSubtle),
+                  Divider(height: 1, color: cs.hentai.borderSubtle),
             ),
           ),
         ],
@@ -428,13 +434,16 @@ class _SeriesRow extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: cs.textPrimary,
+                      color: cs.hentai.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     '包含 $count 本',
-                    style: TextStyle(fontSize: 12, color: cs.textTertiary),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: cs.hentai.textTertiary,
+                    ),
                   ),
                 ],
               ),
@@ -569,7 +578,10 @@ class _SeriesManagementEmptyState extends StatelessWidget {
       child: Center(
         child: Text(
           '暂无系列',
-          style: TextStyle(fontSize: 14, color: cs.textTertiary),
+              style: TextStyle(
+                fontSize: 14,
+                color: cs.hentai.textTertiary,
+              ),
         ),
       ),
     );

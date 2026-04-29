@@ -113,7 +113,7 @@ class ReaderImageItem extends ConsumerWidget {
       child: Icon(
         LucideIcons.bookImage,
         size: 24,
-        color: Theme.of(context).colorScheme.readerTextMuted,
+        color: Theme.of(context).colorScheme.hentai.readerTextMuted,
       ),
     );
   }

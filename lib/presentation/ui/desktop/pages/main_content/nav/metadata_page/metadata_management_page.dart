@@ -99,7 +99,10 @@ class _MetadataManagementPageState
                     Expanded(
                       child: Text(
                         '管理作者、标签与系列',
-                        style: TextStyle(fontSize: 13, color: cs.textTertiary),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: cs.hentai.textTertiary,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -299,12 +302,11 @@ class _MetadataManagementPageState
       }
       showErrorToast(context, error);
     } finally {
-      if (!mounted) {
-        return;
+      if (mounted) {
+        setState(() {
+          _isExecutingMetadataIo = false;
+        });
       }
-      setState(() {
-        _isExecutingMetadataIo = false;
-      });
     }
   }
 

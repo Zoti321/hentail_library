@@ -97,7 +97,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(widget.icon, size: 14, color: cs.textTertiary),
+            Icon(widget.icon, size: 14, color: cs.hentai.textTertiary),
             SizedBox(width: tokens.spacing.sm),
             FormLabel(widget.label),
             SizedBox(width: tokens.spacing.md),
@@ -136,7 +136,10 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                       decoration: BoxDecoration(
                         color: cs.surface,
                         borderRadius: BorderRadius.circular(tokens.radius.md),
-                        border: Border.all(color: cs.borderSubtle, width: 1.5),
+                        border: Border.all(
+                          color: cs.hentai.borderSubtle,
+                          width: 1.5,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: cs.shadow,
@@ -153,8 +156,8 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                               style: TextStyle(
                                 fontSize: tokens.text.bodySm,
                                 color: n == 0
-                                    ? cs.textPlaceholder
-                                    : cs.textPrimary,
+                                    ? cs.hentai.textPlaceholder
+                                    : cs.hentai.textPrimary,
                                 height: 1.35,
                               ),
                             ),
@@ -172,7 +175,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                             Icon(
                               LucideIcons.chevronsUpDown,
                               size: 15,
-                              color: cs.iconSecondary,
+                              color: cs.hentai.iconSecondary,
                             ),
                         ],
                       ),
@@ -188,13 +191,17 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
             padding: EdgeInsets.only(top: tokens.spacing.sm),
             child: Row(
               children: [
-                Icon(LucideIcons.circleAlert, size: 14, color: cs.warning),
+                Icon(
+                  LucideIcons.circleAlert,
+                  size: 14,
+                  color: cs.hentai.warning,
+                ),
                 SizedBox(width: tokens.spacing.sm),
                 Text(
                   widget.copy.listLoadFailed,
                   style: TextStyle(
                     fontSize: tokens.text.labelXs,
-                    color: cs.textSecondary,
+                    color: cs.hentai.textSecondary,
                   ),
                 ),
                 TextButton(
@@ -264,7 +271,7 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
               Text(
                 '加载失败',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.textPrimary,
+                  color: Theme.of(context).colorScheme.hentai.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -305,10 +312,10 @@ class _MultiSelectMenuSizedShell extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(tokens.radius.lg),
-        border: Border.all(color: cs.borderSubtle),
+        border: Border.all(color: cs.hentai.borderSubtle),
         boxShadow: [
           BoxShadow(
-            color: cs.cardShadowHover,
+            color: cs.hentai.cardShadowHover,
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -399,10 +406,10 @@ class _MultiSelectMenuWithFilterState<T>
         decoration: BoxDecoration(
           color: cs.surface,
           borderRadius: BorderRadius.circular(tokens.radius.lg),
-          border: Border.all(color: cs.borderSubtle),
+          border: Border.all(color: cs.hentai.borderSubtle),
           boxShadow: [
             BoxShadow(
-              color: cs.cardShadowHover,
+            color: cs.hentai.cardShadowHover,
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -476,7 +483,7 @@ class _MultiSelectSearchField extends StatelessWidget {
         style: TextStyle(
           fontSize: tokens.text.bodySm,
           height: 1.3,
-          color: cs.textPrimary,
+          color: cs.hentai.textPrimary,
         ),
         decoration: InputDecoration(
           isDense: true,
@@ -484,11 +491,15 @@ class _MultiSelectSearchField extends StatelessWidget {
           hintStyle: TextStyle(
             fontSize: tokens.text.bodySm,
             height: 1.3,
-            color: cs.textPlaceholder,
+            color: cs.hentai.textPlaceholder,
           ),
           prefixIcon: Padding(
             padding: EdgeInsets.only(left: tokens.spacing.xs),
-            child: Icon(LucideIcons.search, size: 14, color: cs.iconSecondary),
+            child: Icon(
+              LucideIcons.search,
+              size: 14,
+              color: cs.hentai.iconSecondary,
+            ),
           ),
           prefixIconConstraints: BoxConstraints(
             minWidth: 30,
@@ -503,11 +514,17 @@ class _MultiSelectSearchField extends StatelessWidget {
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(tokens.radius.md),
-            borderSide: BorderSide(color: cs.borderSubtle, width: borderWidth),
+            borderSide: BorderSide(
+              color: cs.hentai.borderSubtle,
+              width: borderWidth,
+            ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(tokens.radius.md),
-            borderSide: BorderSide(color: cs.borderSubtle, width: borderWidth),
+            borderSide: BorderSide(
+              color: cs.hentai.borderSubtle,
+              width: borderWidth,
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(tokens.radius.md),
@@ -556,7 +573,7 @@ class _MultiSelectVirtualizedList<T> extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: tokens.text.bodySm,
-              color: cs.textTertiary,
+              color: cs.hentai.textTertiary,
             ),
           ),
         ),
@@ -574,7 +591,7 @@ class _MultiSelectVirtualizedList<T> extends StatelessWidget {
       itemCount: itemCount,
       itemBuilder: (BuildContext context, int index) {
         if (index.isOdd) {
-          return Divider(height: 1, color: cs.borderSubtle);
+          return Divider(height: 1, color: cs.hentai.borderSubtle);
         }
         final int rowIndex = index ~/ 2;
         final T item = filteredItems[rowIndex];
@@ -644,7 +661,7 @@ class _MultiSelectDropdownRow extends StatelessWidget {
                         ? LucideIcons.squareCheckBig
                         : LucideIcons.square,
                     size: 15,
-                    color: isSelected ? cs.primary : cs.textTertiary,
+                    color: isSelected ? cs.primary : cs.hentai.textTertiary,
                   ),
                 ),
                 Expanded(
@@ -653,7 +670,7 @@ class _MultiSelectDropdownRow extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: cs.textPrimary,
+                      color: cs.hentai.textPrimary,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

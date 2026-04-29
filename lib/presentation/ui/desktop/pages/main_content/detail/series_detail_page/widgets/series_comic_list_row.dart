@@ -128,7 +128,7 @@ class SeriesItemComicTile extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: colorScheme.textSecondary,
+                      color: colorScheme.hentai.textSecondary,
                     ),
                   ),
                 ),
@@ -138,7 +138,7 @@ class SeriesItemComicTile extends ConsumerWidget {
                   child: Container(
                     width: thumbnailWidth,
                     height: 50,
-                    color: colorScheme.imagePlaceholder,
+                    color: colorScheme.hentai.imagePlaceholder,
                     child: AppComicImage(
                       memoryBytes: coverDisplay?.memoryBytes,
                       filePath: coverDisplay?.filePath,
@@ -150,7 +150,7 @@ class SeriesItemComicTile extends ConsumerWidget {
                         child: Icon(
                           Icons.broken_image,
                           size: 18,
-                          color: colorScheme.iconSecondary,
+                          color: colorScheme.hentai.iconSecondary,
                         ),
                       ),
                     ),
@@ -164,7 +164,7 @@ class SeriesItemComicTile extends ConsumerWidget {
                     textStyle: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: colorScheme.textPrimary,
+                      color: colorScheme.hentai.textPrimary,
                       height: 1.25,
                     ),
                   ),
@@ -221,7 +221,7 @@ class SeriesItemComicTile extends ConsumerWidget {
                 child: Icon(
                   LucideIcons.info,
                   size: 14,
-                  color: colorScheme.textTertiary,
+                  color: colorScheme.hentai.textTertiary,
                 ),
               ),
             ),

@@ -22,10 +22,10 @@ class ComicDetailCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: radius,
-        border: Border.all(color: cs.borderSubtle),
+        border: Border.all(color: cs.hentai.borderSubtle),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: cs.cardShadow,
+            color: cs.hentai.cardShadow,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

@@ -268,7 +268,7 @@ class _EditMetadataContentRatingSection extends StatelessWidget {
         : cs.primary.withValues(alpha: 0.05);
     final Color borderColor = isR18
         ? cs.error.withValues(alpha: 0.28)
-        : cs.borderSubtle;
+        : cs.hentai.borderSubtle;
     final Color iconBg = isR18
         ? cs.error.withValues(alpha: 0.14)
         : cs.primary.withValues(alpha: 0.12);
@@ -324,7 +324,9 @@ class _EditMetadataContentRatingSection extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: isR18 ? cs.error : cs.textPrimary,
+                          color: isR18
+                              ? cs.error
+                              : cs.hentai.textPrimary,
                           height: 1.25,
                         ),
                       ),
@@ -334,7 +336,7 @@ class _EditMetadataContentRatingSection extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           height: 1.3,
-                          color: cs.textTertiary,
+                          color: cs.hentai.textTertiary,
                         ),
                       ),
                     ],

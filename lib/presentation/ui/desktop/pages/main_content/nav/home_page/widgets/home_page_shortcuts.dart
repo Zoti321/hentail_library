@@ -20,7 +20,7 @@ class HomePageShortcutEntries extends StatelessWidget {
           style: TextStyle(
             fontSize: tokens.text.titleSm,
             fontWeight: FontWeight.w600,
-            color: colorScheme.textPrimary,
+            color: colorScheme.hentai.textPrimary,
           ),
         ),
         SizedBox(height: tokens.spacing.sm),
@@ -135,7 +135,7 @@ class _ShortcutTileState extends State<_ShortcutTile> {
               border: Border.all(
                 color: isHovered
                     ? colorScheme.primary.withAlpha(100)
-                    : colorScheme.borderSubtle,
+                    : colorScheme.hentai.borderSubtle,
                 width: 1,
               ),
               boxShadow: isHovered
@@ -177,7 +177,7 @@ class _ShortcutTileState extends State<_ShortcutTile> {
                   style: TextStyle(
                     fontSize: tokens.text.bodySm,
                     fontWeight: FontWeight.w600,
-                    color: colorScheme.textPrimary,
+                    color: colorScheme.hentai.textPrimary,
                     height: 1.25,
                     letterSpacing: -0.1,
                   ),

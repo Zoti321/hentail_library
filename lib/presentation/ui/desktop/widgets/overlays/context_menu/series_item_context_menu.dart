@@ -92,7 +92,7 @@ class _FluentMenuItem extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(tokens.radius.md),
-          hoverColor: cs.hoverBackground,
+          hoverColor: cs.hentai.hoverBackground,
           splashFactory: NoSplash.splashFactory,
           child: Padding(
             padding: EdgeInsets.symmetric(
@@ -101,7 +101,11 @@ class _FluentMenuItem extends StatelessWidget {
             ),
             child: Row(
               children: <Widget>[
-                Icon(icon, size: 16, color: cs.textSecondary),
+                Icon(
+                  icon,
+                  size: 16,
+                  color: cs.hentai.textSecondary,
+                ),
                 SizedBox(width: tokens.spacing.md),
                 Expanded(
                   child: Text(
@@ -109,7 +113,7 @@ class _FluentMenuItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: tokens.text.bodySm,
                       fontWeight: FontWeight.w500,
-                      color: cs.textPrimary,
+                      color: cs.hentai.textPrimary,
                     ),
                   ),
                 ),

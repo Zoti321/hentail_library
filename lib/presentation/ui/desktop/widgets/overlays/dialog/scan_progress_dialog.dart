@@ -31,9 +31,9 @@ class ScanProgressDialog extends ConsumerWidget {
               maxHeight: MediaQuery.of(context).size.height * 0.7,
             ),
             decoration: BoxDecoration(
-              color: cs.cardHover,
+              color: cs.hentai.cardHover,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: cs.borderSubtle, width: 1),
+              border: Border.all(color: cs.hentai.borderSubtle, width: 1),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withAlpha(10),
@@ -69,7 +69,9 @@ class ScanProgressDialog extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: cs.borderSubtle, width: 1)),
+        border: Border(
+          bottom: BorderSide(color: cs.hentai.borderSubtle, width: 1),
+        ),
       ),
       child: Row(
         children: [
@@ -80,7 +82,7 @@ class ScanProgressDialog extends ConsumerWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: cs.textPrimary,
+              color: cs.hentai.textPrimary,
             ),
           ),
         ],
@@ -103,7 +105,10 @@ class ScanProgressDialog extends ConsumerWidget {
             Expanded(
               child: Text(
                 '准备中…',
-                style: TextStyle(fontSize: 14, color: cs.textSecondary),
+            style: TextStyle(
+              fontSize: 14,
+              color: cs.hentai.textSecondary,
+            ),
               ),
             ),
           ],
@@ -132,7 +137,8 @@ class ScanProgressDialog extends ConsumerWidget {
 
   Widget _buildRunningBody(ThemeData theme, SyncLibraryProgress p) {
     final cs = theme.colorScheme;
-    final secondary = TextStyle(fontSize: 14, color: cs.textSecondary);
+    final secondary =
+        TextStyle(fontSize: 14, color: cs.hentai.textSecondary);
 
     switch (p.route) {
       case SyncLibraryRoute.noRootsNoop:
@@ -163,7 +169,7 @@ class ScanProgressDialog extends ConsumerWidget {
           Text(
             '已识别 ${p.acceptedTotal} 本 · (dir: ${p.counts.dir}, zip: ${p.counts.zip}, '
             'cbz: ${p.counts.cbz}, epub: ${p.counts.epub})',
-            style: TextStyle(fontSize: 13, color: cs.textSecondary),
+            style: TextStyle(fontSize: 13, color: cs.hentai.textSecondary),
           ),
         ],
       );
@@ -183,7 +189,7 @@ class ScanProgressDialog extends ConsumerWidget {
         Text(
           '已识别 ${p.acceptedTotal} 本 · (dir: ${p.counts.dir}, zip: ${p.counts.zip}, '
           'cbz: ${p.counts.cbz}, epub: ${p.counts.epub})',
-          style: TextStyle(fontSize: 13, color: cs.textSecondary),
+          style: TextStyle(fontSize: 13, color: cs.hentai.textSecondary),
         ),
       ],
     );
@@ -200,7 +206,7 @@ class ScanProgressDialog extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
         child: Text(
           '已取消扫描',
-          style: TextStyle(fontSize: 14, color: cs.textSecondary),
+          style: TextStyle(fontSize: 14, color: cs.hentai.textSecondary),
         ),
       );
     }
@@ -231,7 +237,7 @@ class ScanProgressDialog extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
       child: Text(
         label,
-        style: TextStyle(fontSize: 14, color: cs.textSecondary),
+        style: TextStyle(fontSize: 14, color: cs.hentai.textSecondary),
       ),
     );
   }
@@ -247,7 +253,7 @@ class ScanProgressDialog extends ConsumerWidget {
           Expanded(
             child: Text(
               error,
-              style: TextStyle(fontSize: 13, color: cs.textSecondary),
+              style: TextStyle(fontSize: 13, color: cs.hentai.textSecondary),
             ),
           ),
         ],
@@ -269,7 +275,9 @@ class ScanProgressDialog extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: cs.borderSubtle, width: 1)),
+        border: Border(
+          top: BorderSide(color: cs.hentai.borderSubtle, width: 1),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -298,7 +306,7 @@ class ScanProgressDialog extends ConsumerWidget {
                 if (context.mounted) Navigator.of(context).pop();
               },
               style: TextButton.styleFrom(
-                foregroundColor: cs.textSecondary,
+                foregroundColor: cs.hentai.textSecondary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 10,

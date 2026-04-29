@@ -54,11 +54,11 @@ class SeriesCard extends HookConsumerWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(tokens.radius.lg),
             color: cs.surface,
-            border: Border.all(color: cs.borderSubtle),
+            border: Border.all(color: cs.hentai.borderSubtle),
             boxShadow: isHover.value
                 ? <BoxShadow>[
                     BoxShadow(
-                      color: cs.cardShadowHover,
+                      color: cs.hentai.cardShadowHover,
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -117,18 +117,18 @@ class _SeriesCardCover extends StatelessWidget {
       curve: Curves.easeOut,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(tokens.radius.md),
-        color: cs.imagePlaceholder,
+        color: cs.hentai.imagePlaceholder,
         boxShadow: isHover
             ? <BoxShadow>[
                 BoxShadow(
-                  color: cs.cardShadowHover,
+                  color: cs.hentai.cardShadowHover,
                   blurRadius: 20,
                   offset: Offset.zero,
                 ),
               ]
             : <BoxShadow>[
                 BoxShadow(
-                  color: cs.cardShadow,
+                  color: cs.hentai.cardShadow,
                   blurRadius: 2,
                   offset: const Offset(0, 1),
                 ),
@@ -147,14 +147,20 @@ class _SeriesCardCover extends StatelessWidget {
                     fit: BoxFit.cover,
                     cacheWidth: coverCacheWidth,
                     placeholder: Container(
-                      color: cs.imageFallback,
+                      color: cs.hentai.imageFallback,
                       alignment: Alignment.center,
-                      child: Icon(Icons.broken_image, color: cs.iconSecondary),
+                      child: Icon(
+                        Icons.broken_image,
+                        color: cs.hentai.iconSecondary,
+                      ),
                     ),
                     errorPlaceholder: Container(
-                      color: cs.imageFallback,
+                      color: cs.hentai.imageFallback,
                       alignment: Alignment.center,
-                      child: Icon(Icons.broken_image, color: cs.iconSecondary),
+                      child: Icon(
+                        Icons.broken_image,
+                        color: cs.hentai.iconSecondary,
+                      ),
                     ),
                   )
                   .animate(target: isHover ? 1 : 0)
@@ -164,7 +170,7 @@ class _SeriesCardCover extends StatelessWidget {
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.easeOutQuad,
                   ),
-              Container(color: cs.overlayScrim)
+              Container(color: cs.hentai.overlayScrim)
                   .animate(target: isHover ? 1 : 0)
                   .fade(begin: 0.0, end: 1.0, duration: 200.ms),
               Center(
@@ -225,7 +231,7 @@ class _SeriesCardInfo extends StatelessWidget {
             fontSize: tokens.text.bodyMd,
             fontWeight: FontWeight.w600,
             height: 1.25,
-            color: isHover ? cs.primary : cs.textPrimary,
+            color: isHover ? cs.primary : cs.hentai.textPrimary,
           ),
           child: Text(
             series.name,
@@ -237,7 +243,7 @@ class _SeriesCardInfo extends StatelessWidget {
           '包含 $count 本',
           style: TextStyle(
             fontSize: tokens.text.labelXs - 1,
-            color: cs.textTertiary,
+            color: cs.hentai.textTertiary,
           ),
         ),
       ],

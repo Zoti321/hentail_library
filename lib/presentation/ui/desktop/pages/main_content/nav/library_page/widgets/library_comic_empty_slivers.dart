@@ -26,7 +26,7 @@ class _NoMatchingComicsSliver extends StatelessWidget {
                 message,
                 style: TextStyle(
                   fontSize: 13,
-                  color: theme.colorScheme.textTertiary,
+                  color: theme.colorScheme.hentai.textTertiary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -41,7 +41,7 @@ class _NoMatchingComicsSliver extends StatelessWidget {
                   label: const Text('管理扫描路径'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: theme.colorScheme.primary,
-                    side: BorderSide(color: theme.colorScheme.borderSubtle),
+                    side: BorderSide(color: theme.colorScheme.hentai.borderSubtle),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 10,
@@ -89,21 +89,21 @@ class _EmptyLibrarySliver extends StatelessWidget {
               Icon(
                 LucideIcons.library,
                 size: 56,
-                color: theme.colorScheme.textTertiary,
+                color: theme.colorScheme.hentai.textTertiary,
               ),
               Text(
                 title,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.textPrimary,
+                  color: theme.colorScheme.hentai.textPrimary,
                 ),
               ),
               Text(
                 hint,
                 style: TextStyle(
                   fontSize: 13,
-                  color: theme.colorScheme.textSecondary,
+                  color: theme.colorScheme.hentai.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -120,7 +120,7 @@ class _EmptyLibrarySliver extends StatelessWidget {
                     label: const Text('管理扫描路径'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: theme.colorScheme.primary,
-                      side: BorderSide(color: theme.colorScheme.borderSubtle),
+                      side: BorderSide(color: theme.colorScheme.hentai.borderSubtle),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 10,

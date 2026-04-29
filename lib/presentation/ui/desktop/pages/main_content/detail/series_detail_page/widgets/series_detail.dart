@@ -37,14 +37,14 @@ class SeriesDetail extends StatelessWidget {
               fontSize: 22,
               fontWeight: FontWeight.w600,
               letterSpacing: -0.4,
-              color: cs.textPrimary,
+              color: cs.hentai.textPrimary,
             ),
           ),
         ),
         const SizedBox(height: 6),
         Text(
           '包含 $count 本',
-          style: TextStyle(color: cs.textTertiary, fontSize: 12),
+          style: TextStyle(color: cs.hentai.textTertiary, fontSize: 12),
         ),
       ],
     );

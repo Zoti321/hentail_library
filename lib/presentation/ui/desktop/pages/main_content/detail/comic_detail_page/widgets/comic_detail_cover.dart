@@ -23,10 +23,14 @@ class ComicDetailCover extends ConsumerWidget {
     return AdaptiveCover(
       coverDisplay: coverData,
       fallbackAspectRatio: 2 / 3,
-      backgroundColor: cs.imagePlaceholder,
+      backgroundColor: cs.hentai.imagePlaceholder,
       placeholder: const SizedBox.expand(),
       errorPlaceholder: Center(
-        child: Icon(LucideIcons.imageOff, color: cs.iconSecondary, size: 40),
+        child: Icon(
+          LucideIcons.imageOff,
+          color: cs.hentai.iconSecondary,
+          size: 40,
+        ),
       ),
       clipBorderRadius: BorderRadius.circular(tokens.radius.lg),
     );

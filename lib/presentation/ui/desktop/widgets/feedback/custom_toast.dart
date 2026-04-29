@@ -115,7 +115,7 @@ class CustomToast extends StatelessWidget {
       AppToastType.error => cs.error,
       AppToastType.info => cs.primary,
     };
-    final Color foregroundColor = cs.textPrimary;
+    final Color foregroundColor = cs.hentai.textPrimary;
     final Color iconColor = accentColor;
     final List<BoxShadow> elevationShadows = isLight
         ? <BoxShadow>[

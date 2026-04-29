@@ -36,7 +36,7 @@ class _FilterPopupButtonState extends ConsumerState<FilterPopupButton> {
         iconSize: 16,
         size: 28,
         borderRadius: 6,
-        foregroundColor: cs.iconDefault,
+        foregroundColor: cs.hentai.iconDefault,
         hoverColor: Theme.of(context).hoverColor,
         overlayColor: Theme.of(context).hoverColor,
         delayTooltipThreeSeconds: true,
@@ -84,7 +84,7 @@ class _FilterMenu extends HookConsumerWidget {
             decoration: BoxDecoration(
               color: colorScheme.surfaceContainerHighest,
               border: Border(
-                bottom: BorderSide(color: colorScheme.borderSubtle),
+                bottom: BorderSide(color: colorScheme.hentai.borderSubtle),
               ),
             ),
             child: Text(
@@ -92,7 +92,7 @@ class _FilterMenu extends HookConsumerWidget {
               style: TextStyle(
                 fontSize: context.tokens.text.bodySm,
                 fontWeight: FontWeight.w600,
-                color: colorScheme.textPrimary,
+                color: colorScheme.hentai.textPrimary,
               ),
             ),
           ),
@@ -106,7 +106,7 @@ class _FilterMenu extends HookConsumerWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: colorScheme.textSecondary,
+                  color: colorScheme.hentai.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -140,7 +140,11 @@ class _FilterMenu extends HookConsumerWidget {
               ],
             ),
           ),
-          Divider(height: 1, thickness: 1, color: colorScheme.borderSubtle),
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: colorScheme.hentai.borderSubtle,
+          ),
           Container(
             padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
             color: colorScheme.surfaceContainerHighest,
@@ -151,7 +155,7 @@ class _FilterMenu extends HookConsumerWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: colorScheme.textSecondary,
+                    color: colorScheme.hentai.textSecondary,
                   ),
                 ),
                 const Spacer(),
@@ -209,7 +213,7 @@ class _DisplayTargetChip extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: isSelected ? cs.primary : cs.borderSubtle,
+                color: isSelected ? cs.primary : cs.hentai.borderSubtle,
               ),
             ),
             child: Center(
@@ -218,7 +222,8 @@ class _DisplayTargetChip extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: isSelected ? cs.onPrimary : cs.textSecondary,
+                  color:
+                      isSelected ? cs.onPrimary : cs.hentai.textSecondary,
                 ),
               ),
             ),

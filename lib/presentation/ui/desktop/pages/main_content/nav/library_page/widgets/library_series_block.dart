@@ -139,7 +139,7 @@ class _NoMatchingSeriesSliver extends StatelessWidget {
             message,
             style: TextStyle(
               fontSize: 13,
-              color: theme.colorScheme.textTertiary,
+              color: theme.colorScheme.hentai.textTertiary,
             ),
             textAlign: TextAlign.center,
           ),

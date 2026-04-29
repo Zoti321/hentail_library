@@ -65,7 +65,10 @@ class SeriesTile extends HookConsumerWidget {
                 ? theme.colorScheme.surfaceContainer
                 : theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(tokens.radius.md),
-            border: Border.all(color: theme.colorScheme.borderSubtle, width: 1),
+            border: Border.all(
+              color: theme.colorScheme.hentai.borderSubtle,
+              width: 1,
+            ),
           ),
           child: Row(
             children: <Widget>[
@@ -74,7 +77,7 @@ class SeriesTile extends HookConsumerWidget {
                 child: Container(
                   width: 56,
                   height: 80,
-                  color: theme.colorScheme.imagePlaceholder,
+                  color: theme.colorScheme.hentai.imagePlaceholder,
                   child: AppComicImage(
                     filePath: coverData?.filePath,
                     memoryBytes: coverData?.memoryBytes,
@@ -82,11 +85,11 @@ class SeriesTile extends HookConsumerWidget {
                     cacheWidth: coverCacheWidth,
                     placeholder: Icon(
                       Icons.broken_image,
-                      color: theme.colorScheme.iconSecondary,
+                      color: theme.colorScheme.hentai.iconSecondary,
                     ),
                     errorPlaceholder: Icon(
                       Icons.broken_image,
-                      color: theme.colorScheme.iconSecondary,
+                      color: theme.colorScheme.hentai.iconSecondary,
                     ),
                   ),
                 ),
@@ -106,7 +109,7 @@ class SeriesTile extends HookConsumerWidget {
                         style: TextStyle(
                           fontSize: tokens.text.bodyMd,
                           fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.textPrimary,
+                          color: theme.colorScheme.hentai.textPrimary,
                         ),
                       ),
                     ),
@@ -115,7 +118,7 @@ class SeriesTile extends HookConsumerWidget {
                       '包含 $count 本',
                       style: TextStyle(
                         fontSize: tokens.text.labelXs,
-                        color: theme.colorScheme.textTertiary,
+                        color: theme.colorScheme.hentai.textTertiary,
                       ),
                     ),
                   ],

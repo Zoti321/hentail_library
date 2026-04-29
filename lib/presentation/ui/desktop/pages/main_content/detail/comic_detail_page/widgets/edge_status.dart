@@ -41,7 +41,7 @@ class ComicDetailNotFound extends StatelessWidget {
               leading: Icon(
                 LucideIcons.bookOpen,
                 size: 48,
-                color: Theme.of(context).colorScheme.textTertiary,
+                color: Theme.of(context).colorScheme.hentai.textTertiary,
               ),
               label: '漫画不存在或已移除',
               action: TextButton.icon(
@@ -84,7 +84,7 @@ class _ComicDetailErrorState extends State<ComicDetailError> {
               leading: Icon(
                 LucideIcons.circleAlert,
                 size: 48,
-                color: theme.colorScheme.textTertiary,
+                color: theme.colorScheme.hentai.textTertiary,
               ),
               label: '加载失败，请重试',
               action: TextButton.icon(
@@ -139,7 +139,7 @@ class _ComicDetailStatusView extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: tokens.text.bodyMd,
-                color: cs.textSecondary,
+                color: cs.hentai.textSecondary,
               ),
             ),
             if (action != null) action!,

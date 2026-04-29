@@ -11,12 +11,12 @@ class TagChip extends StatelessWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final BorderRadius radius = BorderRadius.circular(tokens.radius.pill);
-    final Color chipBackground = cs.subtleTagBackground;
+    final Color chipBackground = cs.hentai.subtleTagBackground;
     final TextStyle textStyle = TextStyle(
       fontSize: tokens.text.labelXs,
       height: 1.2,
       letterSpacing: 0.1,
-      color: cs.textSecondary,
+      color: cs.hentai.textSecondary,
       fontWeight: FontWeight.w600,
     );
 
@@ -28,10 +28,10 @@ class TagChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: chipBackground,
           borderRadius: radius,
-          border: Border.all(color: cs.borderSubtle, width: 1),
+          border: Border.all(color: cs.hentai.borderSubtle, width: 1),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: cs.cardShadow,
+              color: cs.hentai.cardShadow,
               blurRadius: 3,
               offset: const Offset(0, 1),
             ),

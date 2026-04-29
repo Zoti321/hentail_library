@@ -67,13 +67,13 @@ class _MenuContent extends StatelessWidget {
             label: '添加漫画',
             onTap: () => handleAction(SeriesContextAction.addComics),
           ),
-          Divider(height: 14, thickness: 1.4, color: cs.borderMedium),
+          Divider(height: 14, thickness: 1.4, color: cs.hentai.borderMedium),
           _FluentMenuItem(
             icon: LucideIcons.squarePen,
             label: '重命名',
             onTap: () => handleAction(SeriesContextAction.rename),
           ),
-          Divider(height: 14, thickness: 1.4, color: cs.borderMedium),
+          Divider(height: 14, thickness: 1.4, color: cs.hentai.borderMedium),
           _FluentMenuItem(
             icon: LucideIcons.trash2,
             label: '删除',
@@ -118,8 +118,8 @@ class _FluentMenuItem extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(tokens.radius.md),
           hoverColor: isDestructive
-              ? cs.warning.withAlpha(16)
-              : cs.hoverBackground,
+              ? cs.hentai.warning.withAlpha(16)
+              : cs.hentai.hoverBackground,
           splashFactory: NoSplash.splashFactory,
           child: Padding(
             padding: EdgeInsets.symmetric(
@@ -131,7 +131,9 @@ class _FluentMenuItem extends StatelessWidget {
                 Icon(
                   icon,
                   size: 16,
-                  color: isDestructive ? cs.warning : cs.textSecondary,
+                  color: isDestructive
+                      ? cs.hentai.warning
+                      : cs.hentai.textSecondary,
                 ),
                 SizedBox(width: tokens.spacing.md),
                 Expanded(
@@ -140,7 +142,9 @@ class _FluentMenuItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: tokens.text.bodySm,
                       fontWeight: FontWeight.w500,
-                      color: isDestructive ? cs.warning : cs.textPrimary,
+                      color: isDestructive
+                          ? cs.hentai.warning
+                          : cs.hentai.textPrimary,
                     ),
                   ),
                 ),
@@ -149,7 +153,7 @@ class _FluentMenuItem extends StatelessWidget {
                     shortcut!,
                     style: TextStyle(
                       fontSize: tokens.text.labelXs - 1,
-                      color: cs.textDisabled,
+                      color: cs.hentai.textDisabled,
                     ),
                   ),
               ],

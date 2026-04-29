@@ -13,21 +13,21 @@ class AboutVersionRow extends StatelessWidget {
       icon: Icon(
         LucideIcons.info,
         size: 20,
-        color: theme.colorScheme.iconDefault,
+        color: theme.colorScheme.hentai.iconDefault,
       ),
       label: '版本',
       description: 'v1.0.0',
       action: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: theme.colorScheme.inputBackgroundDisabled,
+          color: theme.colorScheme.hentai.inputBackgroundDisabled,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Text(
           '检查更新',
           style: TextStyle(
             fontSize: 11,
-            color: theme.colorScheme.textTertiary,
+            color: theme.colorScheme.hentai.textTertiary,
             fontFamily: 'monospace',
           ),
         ),

@@ -9,6 +9,6 @@ TextStyle buildSettingsPageTitleStyle(ColorScheme colorScheme) {
   return TextStyle(
     fontSize: 24,
     fontWeight: FontWeight.w600,
-    color: colorScheme.textPrimary,
+    color: colorScheme.hentai.textPrimary,
   );
 }

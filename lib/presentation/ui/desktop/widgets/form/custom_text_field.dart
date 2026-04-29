@@ -45,7 +45,7 @@ class CustomTextField extends HookWidget {
         border: Border.all(
           color: isFocused.value
               ? colorScheme.primary
-              : colorScheme.borderMedium,
+              : colorScheme.hentai.borderMedium,
           width: 0.8,
         ),
         boxShadow: isFocused.value
@@ -67,7 +67,7 @@ class CustomTextField extends HookWidget {
               size: 16,
               color: isFocused.value
                   ? colorScheme.primary
-                  : colorScheme.textPlaceholder,
+                  : colorScheme.hentai.textPlaceholder,
             ),
           ),
           Expanded(
@@ -76,7 +76,10 @@ class CustomTextField extends HookWidget {
               focusNode: focusNode,
               onChanged: onChanged,
               onSubmitted: onSubmitted,
-              style: TextStyle(fontSize: 13, color: colorScheme.textPrimary),
+              style: TextStyle(
+                fontSize: 13,
+                color: colorScheme.hentai.textPrimary,
+              ),
               cursorColor: colorScheme.onSurface,
               cursorWidth: 0.8,
               cursorHeight: 16,
@@ -86,7 +89,7 @@ class CustomTextField extends HookWidget {
                 hintStyle: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w300,
-                  color: colorScheme.textPlaceholder,
+                  color: colorScheme.hentai.textPlaceholder,
                 ),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.zero,
@@ -111,7 +114,7 @@ class CustomTextField extends HookWidget {
                     child: Icon(
                       LucideIcons.circleX,
                       size: 14,
-                      color: colorScheme.textPlaceholder,
+                        color: colorScheme.hentai.textPlaceholder,
                     ),
                   ),
                 ),

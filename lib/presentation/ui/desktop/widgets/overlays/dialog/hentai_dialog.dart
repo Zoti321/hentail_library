@@ -40,9 +40,9 @@ class HentaiDialog extends StatelessWidget {
         child: Container(
           width: width,
           decoration: BoxDecoration(
-            color: cs.cardHover,
+            color: cs.hentai.cardHover,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: cs.borderSubtle, width: 1),
+            border: Border.all(color: cs.hentai.borderSubtle, width: 1),
             boxShadow: [
               BoxShadow(
                 color: ambient,
@@ -51,13 +51,13 @@ class HentaiDialog extends StatelessWidget {
                 offset: const Offset(0, 14),
               ),
               BoxShadow(
-                color: cs.cardShadowHover,
+                color: cs.hentai.cardShadowHover,
                 blurRadius: 24,
                 spreadRadius: 0,
                 offset: const Offset(0, 8),
               ),
               BoxShadow(
-                color: cs.cardShadow,
+                color: cs.hentai.cardShadow,
                 blurRadius: 8,
                 spreadRadius: 0,
                 offset: const Offset(0, 2),
@@ -81,7 +81,7 @@ class HentaiDialog extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: cs.textPrimary,
+                    color: cs.hentai.textPrimary,
                   ),
                 ),
               ),
@@ -93,7 +93,7 @@ class HentaiDialog extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
                 decoration: BoxDecoration(
                   border: Border(
-                    top: BorderSide(color: cs.borderSubtle, width: 1),
+                    top: BorderSide(color: cs.hentai.borderSubtle, width: 1),
                   ),
                 ),
                 child: Row(

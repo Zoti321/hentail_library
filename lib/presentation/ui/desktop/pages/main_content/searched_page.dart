@@ -63,7 +63,7 @@ class SearchedPage extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.textPrimary,
+                    color: theme.colorScheme.hentai.textPrimary,
                     letterSpacing: -0.4,
                   ),
                 ),
@@ -74,7 +74,7 @@ class SearchedPage extends ConsumerWidget {
                       trimmedQuery.isEmpty ? '请输入关键词进行搜索' : '关键词：$trimmedQuery',
                       style: TextStyle(
                         fontSize: 13,
-                        color: theme.colorScheme.textTertiary,
+                        color: theme.colorScheme.hentai.textTertiary,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -87,7 +87,7 @@ class SearchedPage extends ConsumerWidget {
                         color: theme.colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: theme.colorScheme.borderSubtle,
+                          color: theme.colorScheme.hentai.borderSubtle,
                         ),
                       ),
                       child: Text(
@@ -95,7 +95,7 @@ class SearchedPage extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.textSecondary,
+                          color: theme.colorScheme.hentai.textSecondary,
                         ),
                       ),
                     ),

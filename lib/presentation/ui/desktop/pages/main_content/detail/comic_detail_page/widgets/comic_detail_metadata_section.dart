@@ -64,7 +64,7 @@ class ComicDetailMetadataSection extends HookConsumerWidget {
           decoration: BoxDecoration(
             color: cs.surfaceContainerHighest.withAlpha(120),
             borderRadius: BorderRadius.circular(tokens.radius.md + 2),
-            border: Border.all(color: cs.borderSubtle.withAlpha(180)),
+            border: Border.all(color: cs.hentai.borderSubtle.withAlpha(180)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,7 +101,7 @@ class _StatRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Icon(icon, size: 17, color: cs.iconSecondary),
+        Icon(icon, size: 17, color: cs.hentai.iconSecondary),
         SizedBox(width: tokens.spacing.sm),
         SizedBox(
           width: kStatLabelWidth,
@@ -109,7 +109,7 @@ class _StatRow extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: tokens.text.labelXs,
-              color: cs.textTertiary,
+              color: cs.hentai.textTertiary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -119,7 +119,7 @@ class _StatRow extends StatelessWidget {
             value,
             style: TextStyle(
               fontSize: tokens.text.bodySm,
-              color: cs.textSecondary,
+              color: cs.hentai.textSecondary,
               height: 1.35,
             ),
           ),
@@ -149,7 +149,7 @@ class _StatWidgetRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Icon(icon, size: 17, color: cs.iconSecondary),
+        Icon(icon, size: 17, color: cs.hentai.iconSecondary),
         SizedBox(width: tokens.spacing.sm),
         SizedBox(
           width: kStatLabelWidth,
@@ -157,7 +157,7 @@ class _StatWidgetRow extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: tokens.text.labelXs,
-              color: cs.textTertiary,
+              color: cs.hentai.textTertiary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -185,7 +185,7 @@ class _MetadataLabeledRow extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: tokens.text.labelXs,
-            color: cs.textSecondary,
+            color: cs.hentai.textSecondary,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -207,7 +207,10 @@ class _TagsExpandableSection extends HookWidget {
     if (tags.isEmpty) {
       return Text(
         '暂无标签',
-        style: TextStyle(fontSize: tokens.text.labelXs, color: cs.textTertiary),
+        style: TextStyle(
+          fontSize: tokens.text.labelXs,
+          color: cs.hentai.textTertiary,
+        ),
       );
     }
     final bool needsToggle = tags.length > kComicDetailTagsCollapsedMaxCount;
@@ -266,7 +269,10 @@ class _MetaTagSection extends StatelessWidget {
     if (items.isEmpty) {
       return Text(
         emptyText,
-        style: TextStyle(fontSize: tokens.text.labelXs, color: cs.textTertiary),
+        style: TextStyle(
+          fontSize: tokens.text.labelXs,
+          color: cs.hentai.textTertiary,
+        ),
       );
     }
     return Wrap(

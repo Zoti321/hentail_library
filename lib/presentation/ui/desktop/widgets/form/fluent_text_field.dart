@@ -69,12 +69,12 @@ class FluentTextFieldState extends State<FluentTextField> {
               vertical: useDense ? 0 : tokens.spacing.xs,
             ),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.inputBackground,
+              color: Theme.of(context).colorScheme.hentai.inputBackground,
               borderRadius: BorderRadius.circular(tokens.radius.md),
               border: Border.all(
                 color: _isFocused
-                    ? Theme.of(context).colorScheme.inputBorderActive
-                    : Theme.of(context).colorScheme.inputBorder,
+                    ? Theme.of(context).colorScheme.hentai.inputBorderActive
+                    : Theme.of(context).colorScheme.hentai.inputBorder,
                 width: 1,
               ),
               boxShadow: _isFocused
@@ -100,13 +100,13 @@ class FluentTextFieldState extends State<FluentTextField> {
               maxLines: widget.maxLines,
               style: TextStyle(
                 fontSize: tokens.text.bodyMd,
-                color: Theme.of(context).colorScheme.textPrimary,
+                color: Theme.of(context).colorScheme.hentai.textPrimary,
                 height: 1.4,
               ),
               decoration: InputDecoration(
                 hintText: widget.hintText,
                 hintStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.textPlaceholder,
+                  color: Theme.of(context).colorScheme.hentai.textPlaceholder,
                   fontSize: tokens.text.bodyMd,
                 ),
                 contentPadding: isTextarea
@@ -147,7 +147,7 @@ class FormLabel extends StatelessWidget {
       style: TextStyle(
         fontSize: tokens.text.labelXs,
         fontWeight: FontWeight.w700,
-        color: Theme.of(context).colorScheme.textTertiary,
+        color: Theme.of(context).colorScheme.hentai.textTertiary,
       ),
     );
   }

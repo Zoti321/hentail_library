@@ -36,7 +36,7 @@ class LibrarySectionSliver extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.textSecondary,
+                color: Theme.of(context).colorScheme.hentai.textSecondary,
               ),
             ),
           ),

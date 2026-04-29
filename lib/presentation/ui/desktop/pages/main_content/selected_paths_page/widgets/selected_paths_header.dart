@@ -122,7 +122,10 @@ class _SelectedPathsHeaderSummary extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           '管理本地漫画根路径（文件或文件夹），支持批量选择',
-          style: TextStyle(color: colorScheme.textTertiary, fontSize: 13),
+          style: TextStyle(
+            color: colorScheme.hentai.textTertiary,
+            fontSize: 13,
+          ),
         ),
         const SizedBox(height: 10),
         Wrap(
@@ -196,6 +199,6 @@ TextStyle buildSelectedPathsPageTitleStyle(ColorScheme colorScheme) {
     fontSize: 26,
     fontWeight: FontWeight.w600,
     letterSpacing: -0.4,
-    color: colorScheme.textPrimary,
+    color: colorScheme.hentai.textPrimary,
   );
 }

@@ -22,7 +22,7 @@ class SettingsGroup extends StatelessWidget {
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.textTertiary,
+              color: theme.colorScheme.hentai.textTertiary,
               letterSpacing: 1.0,
             ),
           ),
@@ -31,10 +31,10 @@ class SettingsGroup extends StatelessWidget {
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: theme.colorScheme.borderSubtle),
+            border: Border.all(color: theme.colorScheme.hentai.borderSubtle),
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: theme.colorScheme.cardShadow,
+                color: theme.colorScheme.hentai.cardShadow,
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -52,7 +52,7 @@ class SettingsGroup extends StatelessWidget {
                         Divider(
                           height: 1,
                           thickness: 1,
-                          color: theme.colorScheme.inputBackgroundDisabled,
+                          color: theme.colorScheme.hentai.inputBackgroundDisabled,
                         ),
                     ],
                   ),
@@ -106,7 +106,7 @@ class _SettingsRowState extends State<SettingsRow> {
           duration: const Duration(milliseconds: 150),
           decoration: BoxDecoration(
             color: isHovered
-                ? colorScheme.hoverBackground
+                ? colorScheme.hentai.hoverBackground
                 : colorScheme.surface,
           ),
           child: Padding(
@@ -126,7 +126,7 @@ class _SettingsRowState extends State<SettingsRow> {
                           fontWeight: FontWeight.w500,
                           color: widget.isDestructive
                               ? colorScheme.error
-                              : colorScheme.textPrimary,
+                              : colorScheme.hentai.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -137,7 +137,7 @@ class _SettingsRowState extends State<SettingsRow> {
                           widget.description!,
                           style: TextStyle(
                             fontSize: 12,
-                            color: colorScheme.textTertiary,
+                            color: colorScheme.hentai.textTertiary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -199,7 +199,7 @@ class IntervalAdjuster extends StatelessWidget {
             '$value s',
             style: TextStyle(
               fontSize: 12,
-              color: theme.colorScheme.textSecondary,
+              color: theme.colorScheme.hentai.textSecondary,
               fontWeight: FontWeight.w600,
             ),
           ),

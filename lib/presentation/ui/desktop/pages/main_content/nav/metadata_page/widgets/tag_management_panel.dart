@@ -151,7 +151,7 @@ class _TagManagementErrorCard extends StatelessWidget {
         '$error',
         style: TextStyle(
           fontSize: _TagStyles.subtitleFontSize,
-          color: theme.colorScheme.textTertiary,
+          color: theme.colorScheme.hentai.textTertiary,
         ),
       ),
     );
@@ -178,7 +178,7 @@ class _TagManagementEmptyState extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: cs.textPrimary,
+              color: cs.hentai.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
@@ -186,7 +186,7 @@ class _TagManagementEmptyState extends StatelessWidget {
             '你可以从这里添加、重命名或删除标签。',
             style: TextStyle(
               fontSize: _TagStyles.subtitleFontSize,
-              color: cs.textSecondary,
+              color: cs.hentai.textSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -219,14 +219,14 @@ class _TagManagementHeader extends ConsumerWidget {
                   fontSize: _TagStyles.titleFontSize,
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.4,
-                  color: cs.textPrimary,
+                  color: cs.hentai.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 '查看、添加、重命名以及批量删除分类标签',
                 style: TextStyle(
-                  color: cs.textTertiary,
+                  color: cs.hentai.textTertiary,
                   fontSize: _TagStyles.subtitleFontSize,
                 ),
               ),
@@ -345,7 +345,7 @@ class _TagListCard extends StatelessWidget {
                 );
               },
               separatorBuilder: (BuildContext context, int index) =>
-                  Divider(height: 1, color: cs.borderSubtle),
+                  Divider(height: 1, color: cs.hentai.borderSubtle),
             ),
           ),
         ],
@@ -369,7 +369,7 @@ class _TagListHeader extends ConsumerWidget {
       padding: _TagStyles.listHeaderPadding,
       decoration: BoxDecoration(
         color: cs.surfaceContainerHighest,
-        border: Border(bottom: BorderSide(color: cs.borderSubtle)),
+          border: Border(bottom: BorderSide(color: cs.hentai.borderSubtle)),
       ),
       child: Row(
         children: [
@@ -384,7 +384,7 @@ class _TagListHeader extends ConsumerWidget {
             style: TextStyle(
               fontSize: _TagStyles.listHeaderFontSize,
               fontWeight: FontWeight.w600,
-              color: cs.textSecondary,
+              color: cs.hentai.textSecondary,
             ),
           ),
           const SizedBox(width: 12),
@@ -392,7 +392,7 @@ class _TagListHeader extends ConsumerWidget {
             '共 $totalCount 条',
             style: TextStyle(
               fontSize: _TagStyles.listHeaderFontSize,
-              color: cs.textTertiary,
+              color: cs.hentai.textTertiary,
             ),
           ),
           if (selectionCount > 0) ...[
@@ -440,7 +440,8 @@ class _TagRow extends ConsumerWidget {
                 iconSize: 16,
                 size: _TagStyles.iconButtonSize.width,
                 tooltip: isSelected ? '取消选中' : '选中',
-                foregroundColor: isSelected ? cs.primary : cs.textTertiary,
+                foregroundColor:
+                    isSelected ? cs.primary : cs.hentai.textTertiary,
                 hoverColor: theme.colorScheme.primary.withAlpha(10),
                 overlayColor: theme.colorScheme.primary.withAlpha(14),
                 borderRadius: 8,
@@ -455,7 +456,7 @@ class _TagRow extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: cs.textPrimary,
+                    color: cs.hentai.textPrimary,
                   ),
                 ),
               ),

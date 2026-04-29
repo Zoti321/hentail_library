@@ -37,7 +37,7 @@ class _SortPopupButtonState extends ConsumerState<SortPopupButton> {
         iconSize: 16,
         size: 28,
         borderRadius: tokens.radius.sm,
-        foregroundColor: theme.colorScheme.iconDefault,
+        foregroundColor: theme.colorScheme.hentai.iconDefault,
         hoverColor: theme.hoverColor,
         overlayColor: theme.hoverColor,
         delayTooltipThreeSeconds: true,
@@ -73,7 +73,8 @@ class _SortMenu extends HookConsumerWidget {
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHighest,
               border: Border(
-                bottom: BorderSide(color: theme.colorScheme.borderSubtle),
+                bottom:
+                    BorderSide(color: theme.colorScheme.hentai.borderSubtle),
               ),
             ),
             child: Row(
@@ -89,7 +90,7 @@ class _SortMenu extends HookConsumerWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.textPrimary,
+                    color: theme.colorScheme.hentai.textPrimary,
                   ),
                 ),
               ],
@@ -102,7 +103,7 @@ class _SortMenu extends HookConsumerWidget {
           Divider(
             height: 1,
             thickness: 1,
-            color: theme.colorScheme.borderSubtle,
+            color: theme.colorScheme.hentai.borderSubtle,
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
@@ -162,20 +163,20 @@ class _SortSection extends HookConsumerWidget {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                color: colorScheme.textSecondary,
+                color: colorScheme.hentai.textSecondary,
                 letterSpacing: 0.5,
               ),
             ),
             Material(
               color: isAsc
                   ? colorScheme.primaryContainer
-                  : colorScheme.warning.withAlpha(24),
+                  : colorScheme.hentai.warning.withAlpha(24),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
                 side: BorderSide(
                   color: isAsc
                       ? colorScheme.primary.withAlpha(70)
-                      : colorScheme.warning.withAlpha(90),
+                      : colorScheme.hentai.warning.withAlpha(90),
                   width: 1,
                 ),
               ),
@@ -200,7 +201,7 @@ class _SortSection extends HookConsumerWidget {
                         size: 12,
                         color: isAsc
                             ? colorScheme.primary
-                            : colorScheme.warning,
+                        : colorScheme.hentai.warning,
                       ),
                       Text(
                         isAsc ? "升序" : "降序",
@@ -209,7 +210,7 @@ class _SortSection extends HookConsumerWidget {
                           fontWeight: FontWeight.w600,
                           color: isAsc
                               ? colorScheme.primary
-                              : colorScheme.warning,
+                          : colorScheme.hentai.warning,
                         ),
                       ),
                     ],
@@ -258,7 +259,7 @@ class _SortOption extends HookConsumerWidget {
         color: isSelected ? colorScheme.primary : colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isSelected ? colorScheme.primary : colorScheme.borderSubtle,
+          color: isSelected ? colorScheme.primary : colorScheme.hentai.borderSubtle,
         ),
         boxShadow: isSelected
             ? [
@@ -287,7 +288,7 @@ class _SortOption extends HookConsumerWidget {
                   fontWeight: FontWeight.w500,
                   color: isSelected
                       ? colorScheme.onPrimary
-                      : colorScheme.textTertiary,
+                      : colorScheme.hentai.textTertiary,
                 ),
               ),
             ),

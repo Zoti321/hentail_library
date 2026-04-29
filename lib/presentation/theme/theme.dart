@@ -6,7 +6,7 @@ part 'theme_typography_tokens.dart';
 part 'theme_visual_tokens.dart';
 
 ThemeData buildAppTheme(Brightness brightness) {
-  final colorScheme = appFluentColorScheme(brightness);
+  final colorScheme = HentaiColorScheme.buildBaseColorScheme(brightness);
   final tokens = brightness == Brightness.dark
       ? AppThemeTokens.dark()
       : AppThemeTokens.light();

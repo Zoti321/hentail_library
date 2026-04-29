@@ -142,14 +142,14 @@ class _AuthorManagementHeader extends ConsumerWidget {
                   fontSize: _AuthorStyles.titleFontSize,
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.4,
-                  color: cs.textPrimary,
+                  color: cs.hentai.textPrimary,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 '查看、添加、重命名以及批量删除作者',
                 style: TextStyle(
-                  color: cs.textTertiary,
+                  color: cs.hentai.textTertiary,
                   fontSize: _AuthorStyles.subtitleFontSize,
                 ),
               ),
@@ -268,7 +268,7 @@ class _AuthorListCard extends StatelessWidget {
                 );
               },
               separatorBuilder: (BuildContext context, int index) =>
-                  Divider(height: 1, color: cs.borderSubtle),
+                  Divider(height: 1, color: cs.hentai.borderSubtle),
             ),
           ),
         ],
@@ -292,7 +292,7 @@ class _AuthorListHeader extends ConsumerWidget {
       padding: _AuthorStyles.listHeaderPadding,
       decoration: BoxDecoration(
         color: cs.surfaceContainerHighest,
-        border: Border(bottom: BorderSide(color: cs.borderSubtle)),
+        border: Border(bottom: BorderSide(color: cs.hentai.borderSubtle)),
       ),
       child: Row(
         children: [
@@ -307,7 +307,7 @@ class _AuthorListHeader extends ConsumerWidget {
             style: TextStyle(
               fontSize: _AuthorStyles.listHeaderFontSize,
               fontWeight: FontWeight.w600,
-              color: cs.textSecondary,
+              color: cs.hentai.textSecondary,
             ),
           ),
           const SizedBox(width: 12),
@@ -315,7 +315,7 @@ class _AuthorListHeader extends ConsumerWidget {
             '共 $totalCount 条',
             style: TextStyle(
               fontSize: _AuthorStyles.listHeaderFontSize,
-              color: cs.textTertiary,
+              color: cs.hentai.textTertiary,
             ),
           ),
           if (selectionCount > 0) ...[
@@ -363,7 +363,7 @@ class _AuthorRow extends ConsumerWidget {
                 iconSize: 16,
                 size: _AuthorStyles.iconButtonSize.width,
                 tooltip: '',
-                foregroundColor: isSelected ? cs.primary : cs.textTertiary,
+                foregroundColor: isSelected ? cs.primary : cs.hentai.textTertiary,
                 hoverColor: theme.colorScheme.primary.withAlpha(10),
                 overlayColor: theme.colorScheme.primary.withAlpha(14),
                 borderRadius: 8,
@@ -377,7 +377,7 @@ class _AuthorRow extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: cs.textPrimary,
+                    color: cs.hentai.textPrimary,
                   ),
                 ),
               ),
@@ -484,7 +484,7 @@ class _AuthorManagementErrorCard extends StatelessWidget {
         '$error',
         style: TextStyle(
           fontSize: _AuthorStyles.subtitleFontSize,
-          color: theme.colorScheme.textTertiary,
+          color: theme.colorScheme.hentai.textTertiary,
         ),
       ),
     );
@@ -511,7 +511,7 @@ class _AuthorManagementEmptyState extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: cs.textPrimary,
+              color: cs.hentai.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
@@ -519,7 +519,7 @@ class _AuthorManagementEmptyState extends StatelessWidget {
             '你可以从这里添加、重命名或删除作者。',
             style: TextStyle(
               fontSize: _AuthorStyles.subtitleFontSize,
-              color: cs.textSecondary,
+              color: cs.hentai.textSecondary,
             ),
             textAlign: TextAlign.center,
           ),

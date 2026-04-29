@@ -4,7 +4,7 @@ TextStyle _buildLibraryPageTitleStyle(ColorScheme colorScheme) {
   return TextStyle(
     fontSize: 26,
     fontWeight: FontWeight.w600,
-    color: colorScheme.textPrimary,
+    color: colorScheme.hentai.textPrimary,
     letterSpacing: -0.4,
   );
 }
@@ -48,7 +48,10 @@ class LibraryPageSubtitle extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     return Text(
       '浏览、搜索与筛选本地漫画',
-      style: TextStyle(fontSize: 13, color: theme.colorScheme.textTertiary),
+      style: TextStyle(
+        fontSize: 13,
+        color: theme.colorScheme.hentai.textTertiary,
+      ),
     );
   }
 }

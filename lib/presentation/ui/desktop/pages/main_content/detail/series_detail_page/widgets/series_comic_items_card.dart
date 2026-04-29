@@ -39,7 +39,7 @@ class SeriesComicItemsCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: .circular(listCardRadius),
-        border: Border.all(color: colorScheme.borderSubtle),
+        border: Border.all(color: colorScheme.hentai.borderSubtle),
       ),
       clipBehavior: .antiAlias,
       child: ClipRRect(
@@ -57,7 +57,7 @@ class SeriesComicItemsCard extends StatelessWidget {
                 shrinkWrap: true,
                 itemCount: itemCount,
                 separatorBuilder: (BuildContext context, int index) {
-                  return Divider(height: 1, color: colorScheme.borderSubtle);
+                  return Divider(height: 1, color: colorScheme.hentai.borderSubtle);
                 },
                 itemBuilder: (BuildContext context, int index) {
                   return SeriesItemComicTile(
@@ -83,7 +83,9 @@ class SeriesComicItemsCard extends StatelessWidget {
           topRight: .circular(listCardRadius),
         ),
         color: colorScheme.surfaceContainerHighest,
-        border: Border(bottom: BorderSide(color: colorScheme.borderSubtle)),
+        border: Border(
+          bottom: BorderSide(color: colorScheme.hentai.borderSubtle),
+        ),
       ),
       child: Row(
         children: <Widget>[
@@ -98,7 +100,7 @@ class SeriesComicItemsCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: colorScheme.textSecondary,
+              color: colorScheme.hentai.textSecondary,
             ),
           ),
         ],
@@ -121,9 +123,9 @@ class _SeriesComicItemsEmptyListArea extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         border: Border(
-          left: BorderSide(color: colorScheme.borderSubtle),
-          right: BorderSide(color: colorScheme.borderSubtle),
-          bottom: BorderSide(color: colorScheme.borderSubtle),
+          left: BorderSide(color: colorScheme.hentai.borderSubtle),
+          right: BorderSide(color: colorScheme.hentai.borderSubtle),
+          bottom: BorderSide(color: colorScheme.hentai.borderSubtle),
         ),
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(listCardRadius),
@@ -136,7 +138,10 @@ class _SeriesComicItemsEmptyListArea extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
           child: Text(
             '暂无漫画，点击「添加漫画」加入',
-            style: TextStyle(fontSize: 14, color: colorScheme.textTertiary),
+            style: TextStyle(
+              fontSize: 14,
+              color: colorScheme.hentai.textTertiary,
+            ),
           ),
         ),
       ),

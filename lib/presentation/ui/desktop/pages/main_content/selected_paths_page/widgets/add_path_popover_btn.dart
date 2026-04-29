@@ -195,10 +195,10 @@ class _AddPathMenuPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(tokens.radius.lg),
-        border: Border.all(color: colorScheme.borderSubtle),
+        border: Border.all(color: colorScheme.hentai.borderSubtle),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: colorScheme.cardShadowHover,
+            color: colorScheme.hentai.cardShadowHover,
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -220,7 +220,7 @@ class _AddPathMenuPanel extends StatelessWidget {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: tokens.spacing.sm),
-                child: Divider(height: 1, color: colorScheme.borderSubtle),
+                child: Divider(height: 1, color: colorScheme.hentai.borderSubtle),
               ),
             ],
             _AddPathMenuItem(
@@ -277,7 +277,9 @@ class _AddPathMenuItem extends StatelessWidget {
               Icon(
                 icon,
                 size: 20,
-                color: enabled ? colorScheme.primary : colorScheme.textTertiary,
+                color: enabled
+                    ? colorScheme.primary
+                    : colorScheme.hentai.textTertiary,
               ),
               SizedBox(width: tokens.spacing.sm),
               Expanded(
@@ -291,15 +293,15 @@ class _AddPathMenuItem extends StatelessWidget {
                         fontSize: tokens.text.bodySm,
                         fontWeight: FontWeight.w600,
                         color: enabled
-                            ? colorScheme.textPrimary
-                            : colorScheme.textDisabled,
+                            ? colorScheme.hentai.textPrimary
+                            : colorScheme.hentai.textDisabled,
                       ),
                     ),
                     Text(
                       subtitle,
                       style: TextStyle(
                         fontSize: tokens.text.labelXs,
-                        color: colorScheme.textTertiary,
+                        color: colorScheme.hentai.textTertiary,
                       ),
                     ),
                   ],

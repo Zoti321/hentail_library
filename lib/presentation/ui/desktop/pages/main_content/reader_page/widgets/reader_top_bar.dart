@@ -64,9 +64,12 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: cs.readerPanelBackground,
+                  color: cs.hentai.readerPanelBackground,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(width: 1, color: cs.readerPanelBorder),
+                  border: Border.all(
+                    width: 1,
+                    color: cs.hentai.readerPanelBorder,
+                  ),
                 ),
                 child: Row(
                   spacing: 8,
@@ -79,9 +82,9 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                       iconSize: 16,
                       size: 28,
                       borderRadius: 8,
-                      foregroundColor: cs.readerTextIconPrimary,
-                      hoverColor: cs.readerPanelSubtle,
-                      overlayColor: cs.readerPanelSubtle,
+                      foregroundColor: cs.hentai.readerTextIconPrimary,
+                      hoverColor: cs.hentai.readerPanelSubtle,
+                      overlayColor: cs.hentai.readerPanelSubtle,
                       onPressed: () async {
                         await widget.onExit();
                       },
@@ -91,7 +94,7 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: cs.readerTextIconPrimary,
+                        color: cs.hentai.readerTextIconPrimary,
                         letterSpacing: 0.6,
                       ),
                       maxLines: 1,
@@ -105,9 +108,9 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                       iconSize: 16,
                       size: 32,
                       borderRadius: 8,
-                      foregroundColor: cs.readerTextIconPrimary,
-                      hoverColor: cs.readerPanelSubtle,
-                      overlayColor: cs.readerPanelSubtle,
+                      foregroundColor: cs.hentai.readerTextIconPrimary,
+                      hoverColor: cs.hentai.readerPanelSubtle,
+                      overlayColor: cs.hentai.readerPanelSubtle,
                       onPressed: widget.canOpenComicList
                           ? widget.onOpenSeriesList
                           : null,
@@ -128,9 +131,9 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                         iconSize: 16,
                         size: 32,
                         borderRadius: 8,
-                        foregroundColor: cs.readerTextIconPrimary,
-                        hoverColor: cs.readerPanelSubtle,
-                        overlayColor: cs.readerPanelSubtle,
+                      foregroundColor: cs.hentai.readerTextIconPrimary,
+                      hoverColor: cs.hentai.readerPanelSubtle,
+                      overlayColor: cs.hentai.readerPanelSubtle,
                         onPressed: () => _readModeController.toggleMenu(),
                       ),
                     ),
@@ -151,10 +154,10 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cs.borderSubtle),
+        border: Border.all(color: cs.hentai.borderSubtle),
         boxShadow: [
           BoxShadow(
-            color: cs.cardShadowHover,
+            color: cs.hentai.cardShadowHover,
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -173,7 +176,7 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: cs.textPrimary,
+                  color: cs.hentai.textPrimary,
                 ),
               ),
             ),

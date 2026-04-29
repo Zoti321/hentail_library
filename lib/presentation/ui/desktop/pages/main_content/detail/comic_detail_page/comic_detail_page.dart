@@ -19,7 +19,7 @@ class ComicDetailPage extends ConsumerWidget {
     );
 
     return Container(
-      color: cs.winBackground,
+      color: cs.hentai.winBackground,
       padding: EdgeInsets.symmetric(
         horizontal: tokens.spacing.lg + 8,
         vertical: tokens.spacing.lg + 8,

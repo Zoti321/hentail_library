@@ -78,7 +78,10 @@ class _ReorderSeriesItemsDialogState
         children: <Widget>[
           Text(
             '拖拽左侧手柄排序，数字越小越靠前。',
-            style: TextStyle(fontSize: 13, color: cs.textTertiary),
+            style: TextStyle(
+              fontSize: 13,
+              color: cs.hentai.textTertiary,
+            ),
           ),
           const SizedBox(height: 12),
           SizedBox(
@@ -141,12 +144,15 @@ class _ReorderSeriesItemsDialogState
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: cs.textPrimary,
+                          color: cs.hentai.textPrimary,
                         ),
                       ),
                       subtitle: Text(
                         '${index + 1} / ${_items.length}',
-                        style: TextStyle(fontSize: 11, color: cs.textTertiary),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: cs.hentai.textTertiary,
+                        ),
                       ),
                     ),
                   );

@@ -24,10 +24,10 @@ class PopupMenuPanelShell extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(tokens.radius.lg),
-        border: Border.all(color: colorScheme.borderSubtle),
+        border: Border.all(color: colorScheme.hentai.borderSubtle),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: colorScheme.cardShadowHover,
+            color: colorScheme.hentai.cardShadowHover,
             blurRadius: blurRadius,
             offset: shadowOffset,
           ),

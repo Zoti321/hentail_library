@@ -63,7 +63,7 @@ class _SelectedPathsErrorCardState
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.warning,
+              color: theme.colorScheme.hentai.warning,
             ),
           ),
           const SizedBox(height: 8),
@@ -71,7 +71,7 @@ class _SelectedPathsErrorCardState
             widget.error.toString(),
             style: TextStyle(
               fontSize: 13,
-              color: theme.colorScheme.textTertiary,
+              color: theme.colorScheme.hentai.textTertiary,
             ),
           ),
           const SizedBox(height: 12),
@@ -90,7 +90,7 @@ class _SelectedPathsErrorCardState
             label: Text(isRetrying ? '重试中…' : '重试'),
             style: OutlinedButton.styleFrom(
               foregroundColor: theme.colorScheme.onSurface,
-              side: BorderSide(color: theme.colorScheme.borderSubtle),
+              side: BorderSide(color: theme.colorScheme.hentai.borderSubtle),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),

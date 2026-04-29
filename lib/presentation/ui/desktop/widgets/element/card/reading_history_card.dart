@@ -77,8 +77,8 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
 
     final Color cardBackground = _isHovered ? cs.surfaceContainer : cs.surface;
     final Color cardBorderColor = _isHovered
-        ? cs.borderStrong
-        : cs.borderSubtle;
+        ? cs.hentai.borderStrong
+        : cs.hentai.borderSubtle;
     final List<BoxShadow> cardShadows = _isHovered && !isSeries
         ? <BoxShadow>[
             BoxShadow(
@@ -130,7 +130,7 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
-                              color: cs.textPrimary,
+                              color: cs.hentai.textPrimary,
                             ),
                           ),
                         ),
@@ -142,14 +142,14 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
                         Icon(
                           LucideIcons.clock,
                           size: 12,
-                          color: cs.textTertiary,
+                          color: cs.hentai.textTertiary,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           _formatLastRead(widget._lastReadTime),
                           style: TextStyle(
                             fontSize: 12,
-                            color: cs.textTertiary,
+                            color: cs.hentai.textTertiary,
                           ),
                         ),
                       ],
@@ -171,7 +171,7 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
                   iconSize: 18,
                   size: 32,
                   borderRadius: 8,
-                  foregroundColor: cs.textTertiary,
+                  foregroundColor: cs.hentai.textTertiary,
                   hoverColor: theme.hoverColor,
                   overlayColor: theme.hoverColor.withAlpha(110),
                   delayTooltipThreeSeconds: true,
@@ -222,7 +222,7 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: cs.textSecondary,
+            color: cs.hentai.textSecondary,
           ),
         ),
       ),
@@ -243,10 +243,18 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
       fit: BoxFit.cover,
       cacheWidth: cacheWidth,
       placeholder: Center(
-        child: Icon(LucideIcons.bookOpen, size: 28, color: cs.textTertiary),
+        child: Icon(
+          LucideIcons.bookOpen,
+          size: 28,
+          color: cs.hentai.textTertiary,
+        ),
       ),
       errorPlaceholder: Center(
-        child: Icon(LucideIcons.bookOpen, size: 28, color: cs.textTertiary),
+        child: Icon(
+          LucideIcons.bookOpen,
+          size: 28,
+          color: cs.hentai.textTertiary,
+        ),
       ),
     );
 

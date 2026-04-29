@@ -19,7 +19,7 @@ class SeriesReaderDrawer extends StatelessWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final String drawerTitle = navContext.seriesName ?? '漫画列表';
     return Drawer(
-      backgroundColor: cs.readerBackground,
+      backgroundColor: cs.hentai.readerBackground,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -34,7 +34,7 @@ class SeriesReaderDrawer extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: cs.readerTextIconPrimary,
+                        color: cs.hentai.readerTextIconPrimary,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -43,12 +43,15 @@ class SeriesReaderDrawer extends StatelessWidget {
                   IconButton(
                     tooltip: '关闭',
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(LucideIcons.x, color: cs.readerTextIconPrimary),
+                    icon: Icon(
+                      LucideIcons.x,
+                      color: cs.hentai.readerTextIconPrimary,
+                    ),
                   ),
                 ],
               ),
             ),
-            Divider(height: 1, color: cs.readerPanelBorder),
+            Divider(height: 1, color: cs.hentai.readerPanelBorder),
             Expanded(
               child: ListView.builder(
                 itemCount: navContext.items.length,
@@ -57,14 +60,14 @@ class SeriesReaderDrawer extends StatelessWidget {
                   final bool isCurrent = item.comicId == comicId;
                   return ListTile(
                     selected: isCurrent,
-                    selectedTileColor: cs.readerPanelSubtle,
+                    selectedTileColor: cs.hentai.readerPanelSubtle,
                     title: Text(
                       item.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 13,
-                        color: cs.readerTextIconPrimary,
+                        color: cs.hentai.readerTextIconPrimary,
                         fontWeight: isCurrent
                             ? FontWeight.w600
                             : FontWeight.w400,
@@ -77,7 +80,7 @@ class SeriesReaderDrawer extends StatelessWidget {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 12,
-                          color: cs.readerTextSecondary,
+                          color: cs.hentai.readerTextSecondary,
                         ),
                       ),
                     ),

@@ -155,11 +155,11 @@ class ComicCard extends HookConsumerWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(tokens.radius.lg),
             color: cs.surface,
-            border: Border.all(color: cs.borderSubtle),
+            border: Border.all(color: cs.hentai.borderSubtle),
             boxShadow: isHover.value
                 ? [
                     BoxShadow(
-                      color: cs.cardShadowHover,
+                      color: cs.hentai.cardShadowHover,
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -199,18 +199,18 @@ class ComicCard extends HookConsumerWidget {
       curve: Curves.easeOut,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(tokens.radius.md),
-        color: cs.imagePlaceholder,
+        color: cs.hentai.imagePlaceholder,
         boxShadow: isHover
             ? [
                 BoxShadow(
-                  color: cs.cardShadowHover,
+                  color: cs.hentai.cardShadowHover,
                   blurRadius: 20,
                   offset: const Offset(0, 0),
                 ),
               ]
             : [
                 BoxShadow(
-                  color: cs.cardShadow,
+                  color: cs.hentai.cardShadow,
                   blurRadius: 2,
                   offset: const Offset(0, 1),
                 ),
@@ -230,14 +230,20 @@ class ComicCard extends HookConsumerWidget {
                     fit: BoxFit.cover,
                     cacheWidth: coverCacheWidth,
                     placeholder: Container(
-                      color: cs.imageFallback,
+                      color: cs.hentai.imageFallback,
                       alignment: Alignment.center,
-                      child: Icon(Icons.broken_image, color: cs.iconSecondary),
+                      child: Icon(
+                        Icons.broken_image,
+                        color: cs.hentai.iconSecondary,
+                      ),
                     ),
                     errorPlaceholder: Container(
-                      color: cs.imageFallback,
+                      color: cs.hentai.imageFallback,
                       alignment: Alignment.center,
-                      child: Icon(Icons.broken_image, color: cs.iconSecondary),
+                      child: Icon(
+                        Icons.broken_image,
+                        color: cs.hentai.iconSecondary,
+                      ),
                     ),
                   )
                   .animate(target: isHover ? 1 : 0)
@@ -249,7 +255,7 @@ class ComicCard extends HookConsumerWidget {
                   ),
 
               // 2. 黑色遮罩层 (Hover 时显示)
-              Container(color: cs.overlayScrim)
+              Container(color: cs.hentai.overlayScrim)
                   .animate(target: isHover ? 1 : 0)
                   .fade(begin: 0.0, end: 1.0, duration: 200.ms),
             ],
@@ -274,7 +280,7 @@ class ComicCard extends HookConsumerWidget {
             height: 1.25,
             color: isHover
                 ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.textPrimary,
+                : Theme.of(context).colorScheme.hentai.textPrimary,
           ),
           child: Text(
             comic.title,
@@ -289,7 +295,7 @@ class ComicCard extends HookConsumerWidget {
               '$pageCount页',
               style: TextStyle(
                 fontSize: tokens.text.labelXs - 1,
-                color: Theme.of(context).colorScheme.textTertiary,
+                color: Theme.of(context).colorScheme.hentai.textTertiary,
               ),
             ),
           ],

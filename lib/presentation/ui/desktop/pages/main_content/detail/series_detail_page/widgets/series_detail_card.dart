@@ -24,11 +24,11 @@ class SeriesDetailCard extends StatelessWidget {
       padding: padding,
       decoration: BoxDecoration(
         color: cs.surface,
-        border: Border.all(color: cs.borderSubtle),
+        border: Border.all(color: cs.hentai.borderSubtle),
         borderRadius: radius,
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: cs.cardShadow,
+            color: cs.hentai.cardShadow,
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
