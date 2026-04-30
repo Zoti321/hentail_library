@@ -230,6 +230,7 @@ class _SeriesCardInfo extends StatelessWidget {
           style: TextStyle(
             fontSize: tokens.text.bodyMd,
             fontWeight: FontWeight.w600,
+            fontFamily: 'MI_Sans_Regular',
             height: 1.25,
             color: isHover ? cs.primary : cs.hentai.textPrimary,
           ),

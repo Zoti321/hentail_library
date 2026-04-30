@@ -117,85 +117,6 @@ class _TagStyles {
       MetadataPanelHeightCalculator.defaultConfig;
 }
 
-class _TagManagementLoadingCard extends StatelessWidget {
-  const _TagManagementLoadingCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return StatusCardShell(
-      padding: _TagStyles.statusLoadingPadding,
-      borderRadius: _TagStyles.statusCardRadius,
-      child: Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 2.2,
-          color: theme.colorScheme.primary,
-        ),
-      ),
-    );
-  }
-}
-
-class _TagManagementErrorCard extends StatelessWidget {
-  const _TagManagementErrorCard({required this.error});
-
-  final Object error;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return StatusCardShell(
-      padding: _TagStyles.statusErrorPadding,
-      borderRadius: _TagStyles.statusCardRadius,
-      child: Text(
-        '$error',
-        style: TextStyle(
-          fontSize: _TagStyles.subtitleFontSize,
-          color: theme.colorScheme.hentai.textTertiary,
-        ),
-      ),
-    );
-  }
-}
-
-class _TagManagementEmptyState extends StatelessWidget {
-  const _TagManagementEmptyState();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    return StatusCardShell(
-      padding: _TagStyles.statusEmptyPadding,
-      borderRadius: _TagStyles.statusCardRadius,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(LucideIcons.tags, size: 32, color: cs.onSurfaceVariant),
-          const SizedBox(height: 12),
-          Text(
-            '暂无标签',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: cs.hentai.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '你可以从这里添加、重命名或删除标签。',
-            style: TextStyle(
-              fontSize: _TagStyles.subtitleFontSize,
-              color: cs.hentai.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _TagManagementHeader extends ConsumerWidget {
   const _TagManagementHeader({required this.onAddTag});
 
@@ -334,14 +255,15 @@ class _TagListCard extends StatelessWidget {
               itemBuilder: (BuildContext context, int index) {
                 final Tag tag = tags[index];
                 return Consumer(
-                  builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                    final bool isSelected = ref.watch(
-                      tagSelectionProvider.select(
-                        (Set<Tag> selected) => selected.contains(tag),
-                      ),
-                    );
-                    return _TagRow(tag: tag, isSelected: isSelected);
-                  },
+                  builder:
+                      (BuildContext context, WidgetRef ref, Widget? child) {
+                        final bool isSelected = ref.watch(
+                          tagSelectionProvider.select(
+                            (Set<Tag> selected) => selected.contains(tag),
+                          ),
+                        );
+                        return _TagRow(tag: tag, isSelected: isSelected);
+                      },
                 );
               },
               separatorBuilder: (BuildContext context, int index) =>
@@ -369,7 +291,7 @@ class _TagListHeader extends ConsumerWidget {
       padding: _TagStyles.listHeaderPadding,
       decoration: BoxDecoration(
         color: cs.surfaceContainerHighest,
-          border: Border(bottom: BorderSide(color: cs.hentai.borderSubtle)),
+        border: Border(bottom: BorderSide(color: cs.hentai.borderSubtle)),
       ),
       child: Row(
         children: [
@@ -440,8 +362,9 @@ class _TagRow extends ConsumerWidget {
                 iconSize: 16,
                 size: _TagStyles.iconButtonSize.width,
                 tooltip: isSelected ? '取消选中' : '选中',
-                foregroundColor:
-                    isSelected ? cs.primary : cs.hentai.textTertiary,
+                foregroundColor: isSelected
+                    ? cs.primary
+                    : cs.hentai.textTertiary,
                 hoverColor: theme.colorScheme.primary.withAlpha(10),
                 overlayColor: theme.colorScheme.primary.withAlpha(14),
                 borderRadius: 8,
@@ -524,6 +447,85 @@ class _TagRow extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _TagManagementLoadingCard extends StatelessWidget {
+  const _TagManagementLoadingCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return StatusCardShell(
+      padding: _TagStyles.statusLoadingPadding,
+      borderRadius: _TagStyles.statusCardRadius,
+      child: Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2.2,
+          color: theme.colorScheme.primary,
+        ),
+      ),
+    );
+  }
+}
+
+class _TagManagementErrorCard extends StatelessWidget {
+  const _TagManagementErrorCard({required this.error});
+
+  final Object error;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return StatusCardShell(
+      padding: _TagStyles.statusErrorPadding,
+      borderRadius: _TagStyles.statusCardRadius,
+      child: Text(
+        '$error',
+        style: TextStyle(
+          fontSize: _TagStyles.subtitleFontSize,
+          color: theme.colorScheme.hentai.textTertiary,
+        ),
+      ),
+    );
+  }
+}
+
+class _TagManagementEmptyState extends StatelessWidget {
+  const _TagManagementEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    return StatusCardShell(
+      padding: _TagStyles.statusEmptyPadding,
+      borderRadius: _TagStyles.statusCardRadius,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(LucideIcons.tags, size: 32, color: cs.onSurfaceVariant),
+          const SizedBox(height: 12),
+          Text(
+            '暂无标签',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: cs.hentai.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '你可以从这里添加、重命名或删除标签。',
+            style: TextStyle(
+              fontSize: _TagStyles.subtitleFontSize,
+              color: cs.hentai.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

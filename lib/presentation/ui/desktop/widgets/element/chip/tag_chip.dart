@@ -11,7 +11,9 @@ class TagChip extends StatelessWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final BorderRadius radius = BorderRadius.circular(tokens.radius.pill);
-    final Color chipBackground = cs.hentai.subtleTagBackground;
+    final Color chipBackground = cs.brightness == Brightness.light
+        ? Colors.white
+        : cs.hentai.subtleTagBackground;
     final TextStyle textStyle = TextStyle(
       fontSize: tokens.text.labelXs,
       height: 1.2,

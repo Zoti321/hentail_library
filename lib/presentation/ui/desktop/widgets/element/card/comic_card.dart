@@ -277,6 +277,7 @@ class ComicCard extends HookConsumerWidget {
           style: TextStyle(
             fontSize: tokens.text.bodyMd,
             fontWeight: FontWeight.w600,
+            fontFamily: 'MI_Sans_Regular',
             height: 1.25,
             color: isHover
                 ? Theme.of(context).colorScheme.primary

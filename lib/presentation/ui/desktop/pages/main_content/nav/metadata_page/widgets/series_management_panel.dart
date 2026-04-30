@@ -57,7 +57,9 @@ class _FilteredSeriesSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<Series>> seriesAsync = ref.watch(filteredSeriesProvider);
+    final AsyncValue<List<Series>> seriesAsync = ref.watch(
+      filteredSeriesProvider,
+    );
     return seriesAsync.when(
       data: (List<Series> series) {
         if (series.isEmpty) {
@@ -129,10 +131,7 @@ class _Header extends ConsumerWidget {
               const SizedBox(height: 8),
               Text(
                 '创建、重命名或删除系列；删除系列仅移除归属关系，漫画仍保留在库中',
-                style: TextStyle(
-                  color: cs.hentai.textTertiary,
-                  fontSize: 13,
-                ),
+                style: TextStyle(color: cs.hentai.textTertiary, fontSize: 13),
               ),
             ],
           ),
@@ -354,55 +353,57 @@ class _SeriesListCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: cs.hentai.borderSubtle),
       ),
-      child: Column(
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: cs.surfaceContainerHighest,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
+      child: ClipRRect(
+        borderRadius: .circular(12),
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: cs.surfaceContainerHighest,
+                border: Border(
+                  bottom: BorderSide(color: cs.hentai.borderSubtle),
+                ),
+              ),
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    LucideIcons.layers,
+                    size: 16,
+                    color: cs.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '全部系列',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: cs.hentai.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    '共 ${series.length} 条',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: cs.hentai.textTertiary,
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              children: <Widget>[
-                Icon(
-                  LucideIcons.layers,
-                  size: 16,
-                  color: cs.onSurfaceVariant,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '全部系列',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: cs.hentai.textSecondary,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  '共 ${series.length} 条',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: cs.hentai.textTertiary,
-                  ),
-                ),
-              ],
+            Expanded(
+              child: ListView.separated(
+                itemCount: series.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return _SeriesRow(series: series[index]);
+                },
+                separatorBuilder: (BuildContext context, int index) =>
+                    Divider(height: 1, color: cs.hentai.borderSubtle),
+              ),
             ),
-          ),
-          Expanded(
-            child: ListView.separated(
-              itemCount: series.length,
-              itemBuilder: (BuildContext context, int index) {
-                return _SeriesRow(series: series[index]);
-              },
-              separatorBuilder: (BuildContext context, int index) =>
-                  Divider(height: 1, color: cs.hentai.borderSubtle),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -578,10 +579,7 @@ class _SeriesManagementEmptyState extends StatelessWidget {
       child: Center(
         child: Text(
           '暂无系列',
-              style: TextStyle(
-                fontSize: 14,
-                color: cs.hentai.textTertiary,
-              ),
+          style: TextStyle(fontSize: 14, color: cs.hentai.textTertiary),
         ),
       ),
     );
