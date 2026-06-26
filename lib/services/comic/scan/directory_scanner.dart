@@ -1,10 +1,1 @@
-import 'dart:io';
-
-class DirectoryScanner {
-  const DirectoryScanner();
-
-  Stream<FileSystemEntity> scanDirectory(Directory dir) {
-    return dir.list(recursive: false, followLinks: false);
-  }
-}
-
+﻿export 'package:hentai_library/data/services/comic/scan/directory_scanner.dart';
