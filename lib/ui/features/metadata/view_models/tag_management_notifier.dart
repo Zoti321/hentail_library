@@ -1,6 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/model/entity/comic/tag.dart';
-import 'package:hentai_library/presentation/providers/deps/deps.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 
 /// 全部标签列表（用于标签管理页面）
 final allTagsProvider = FutureProvider<List<Tag>>((ref) async {

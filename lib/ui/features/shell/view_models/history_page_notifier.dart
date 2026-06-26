@@ -6,10 +6,10 @@ import 'package:hentai_library/model/entity/comic/series_item.dart';
 import 'package:hentai_library/model/entity/series_reading_history.dart'
     as series_entity;
 import 'package:hentai_library/model/enums.dart';
-import 'package:hentai_library/presentation/providers/aggregates/comic_aggregate_notifier.dart';
-import 'package:hentai_library/presentation/providers/aggregates/series_aggregate_notifier.dart';
-import 'package:hentai_library/presentation/dto/history_grid_item_dto.dart';
-import 'package:hentai_library/presentation/providers/deps/deps.dart';
+import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
+import 'package:hentai_library/ui/core/dto/history_grid_item_dto.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

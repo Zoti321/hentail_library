@@ -1,9 +1,9 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:hentai_library/presentation/theme/theme.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/model/entity/comic/comic.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/navigation/library_return_breadcrumb.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/responsive_layout/detail_page_layout.dart';
+import 'package:hentai_library/ui/core/widgets/navigation/library_return_breadcrumb.dart';
+import 'package:hentai_library/ui/core/widgets/responsive_layout/detail_page_layout.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_card.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_cover.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_metadata_section.dart';

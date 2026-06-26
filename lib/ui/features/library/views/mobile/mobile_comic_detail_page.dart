@@ -11,13 +11,13 @@ import 'package:hentai_library/model/entity/comic/tag.dart';
 import 'package:hentai_library/model/entity/reading_history.dart';
 import 'package:hentai_library/model/enums.dart';
 import 'package:hentai_library/model/value_objects/form/comic_metadata_form.dart';
-import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
+import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
-import 'package:hentai_library/presentation/providers/pages/reader/reader_page_notifier.dart';
-import 'package:hentai_library/presentation/providers/pages/tag_management/tag_management_notifier.dart';
-import 'package:hentai_library/presentation/providers/usecases/comic_meta.dart';
-import 'package:hentai_library/presentation/providers/usecases/sync_library.dart';
-import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
+import 'package:hentai_library/ui/features/reader/view_models/reader_page_notifier.dart';
+import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
+import 'package:hentai_library/ui/features/shell/di/usecases/comic_meta.dart';
+import 'package:hentai_library/ui/features/shell/di/usecases/sync_library.dart';
+import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 
 class MobileComicDetailPage extends ConsumerWidget {
   const MobileComicDetailPage({super.key, required this.comicId});

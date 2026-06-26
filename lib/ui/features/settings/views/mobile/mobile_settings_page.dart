@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/util/format_byte_size.dart';
 import 'package:hentai_library/model/app_setting.dart';
-import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/ui/providers.dart';
 
 class MobileSettingsPage extends ConsumerWidget {
   const MobileSettingsPage({super.key});

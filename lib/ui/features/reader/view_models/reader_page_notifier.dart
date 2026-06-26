@@ -9,16 +9,16 @@ import 'package:hentai_library/services/comic/read_resource_get/api/read_resourc
 import 'package:hentai_library/services/comic/read_resource_get/core/comic_read_resource_accessor.dart';
 import 'package:hentai_library/services/comic/read_resource_get/core/reader_image.dart';
 import 'package:hentai_library/services/comic/read_resource_get/isolate/archive_cover_loader.dart';
-import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
+import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/model/models.dart' as entity;
-import 'package:hentai_library/presentation/providers/aggregates/reading_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
 import 'package:hentai_library/model/enums.dart';
-import 'package:hentai_library/presentation/providers/deps/deps.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/reader/view_models/reader_window_fullscreen.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
-import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
+import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

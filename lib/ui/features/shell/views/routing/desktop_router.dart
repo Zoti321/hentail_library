@@ -1,12 +1,12 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/comic_detail_page/comic_detail_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/detail/series_detail_page/series_detail_page.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/comic_detail_page.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/series_detail_page.dart';
 import 'package:hentai_library/ui/features/shell/views/desktop/history_page.dart';
 import 'package:hentai_library/ui/features/shell/views/desktop/home_page/home_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/library_page/library_page.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/library_page/library_page.dart';
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/settings_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/searched_page.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/searched_page.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/shared_content_routes.dart';
 import 'package:hentai_library/ui/features/shell/views/adaptive_app_shell.dart';
 

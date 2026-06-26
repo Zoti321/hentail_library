@@ -1,15 +1,15 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/presentation/theme/theme.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
-import 'package:hentai_library/presentation/dto/history_grid_item_dto.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/element/card/reading_history_card.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/clear_reading_history_confirm_dialog.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/form/custom_text_field.dart';
+import 'package:hentai_library/ui/core/dto/history_grid_item_dto.dart';
+import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/ui/core/widgets/element/card/reading_history_card.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/clear_reading_history_confirm_dialog.dart';
+import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HistoryPage extends ConsumerWidget {

@@ -1,9 +1,9 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/presentation/theme/theme.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/database/dao/home_page_dao_types.dart';
-import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/desktop/home_page/widgets/home_page_constants.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

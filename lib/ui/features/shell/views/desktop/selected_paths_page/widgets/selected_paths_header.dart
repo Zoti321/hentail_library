@@ -1,11 +1,11 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/desktop/selected_paths_page/widgets/add_path_popover_btn.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/element/chip/meta_chip.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/confirm/remove_saved_paths_batch_confirm_dialog.dart';
-import 'package:hentai_library/presentation/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/element/chip/meta_chip.dart';
+import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/remove_saved_paths_batch_confirm_dialog.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SelectedPathsPageHeader extends ConsumerStatefulWidget {

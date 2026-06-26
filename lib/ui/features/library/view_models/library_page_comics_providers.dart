@@ -5,12 +5,12 @@ import 'package:hentai_library/model/entity/comic/series.dart';
 import 'package:hentai_library/model/entity/comic/series_item.dart';
 import 'package:hentai_library/model/models.dart' show AppSetting;
 import 'package:hentai_library/module/comic_list_query/comic_list_query.dart';
-import 'package:hentai_library/presentation/providers/aggregates/comic_aggregate_notifier.dart';
-import 'package:hentai_library/presentation/providers/aggregates/series_aggregate_notifier.dart';
-import 'package:hentai_library/presentation/providers/deps/tools.dart';
+import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/di/tools.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
-import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
+import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 
 /// Projection 层（漫画）：把数据源、设置与 intent 合成为页面可直接消费的只读结果。
 @immutable

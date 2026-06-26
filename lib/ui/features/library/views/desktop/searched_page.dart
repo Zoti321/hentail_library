@@ -1,11 +1,11 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/presentation/theme/theme.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/model/entity/comic/series.dart';
-import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/widgets.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/responsive_layout/library_blocks_layout.dart';
+import 'package:hentai_library/ui/core/widgets/responsive_layout/library_blocks_layout.dart';
 
 class SearchedPage extends ConsumerWidget {
   const SearchedPage({super.key, required this.query});

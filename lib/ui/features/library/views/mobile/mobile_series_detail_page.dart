@@ -8,15 +8,15 @@ import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/model/entity/comic/series.dart';
 import 'package:hentai_library/model/entity/comic/series_item.dart';
 import 'package:hentai_library/model/entity/series_reading_history.dart';
-import 'package:hentai_library/presentation/providers/aggregates/series_aggregate_notifier.dart';
-import 'package:hentai_library/presentation/providers/aggregates/comic_aggregate_notifier.dart';
-import 'package:hentai_library/presentation/providers/deps/repos.dart';
-import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
+import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/di/repos.dart';
+import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
-import 'package:hentai_library/presentation/providers/pages/reader/reader_page_notifier.dart';
-import 'package:hentai_library/presentation/providers/pages/series_management/series_add_comics_dialog_notifier.dart';
-import 'package:hentai_library/presentation/providers/pages/series_management/series_management_notifier.dart';
-import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
+import 'package:hentai_library/ui/features/reader/view_models/reader_page_notifier.dart';
+import 'package:hentai_library/ui/features/metadata/view_models/series_add_comics_dialog_notifier.dart';
+import 'package:hentai_library/ui/features/metadata/view_models/series_management_notifier.dart';
+import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 
 class MobileSeriesDetailPage extends ConsumerWidget {
   const MobileSeriesDetailPage({super.key, required this.seriesName});

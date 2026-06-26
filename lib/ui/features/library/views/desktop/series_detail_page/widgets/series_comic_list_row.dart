@@ -1,18 +1,18 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/model/entity/comic/series_item.dart';
-import 'package:hentai_library/presentation/dto/comic_cover_display_data.dart';
-import 'package:hentai_library/presentation/providers/providers.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/element/image/app_comic_image.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/context_menu/series_item_context_menu.dart';
-import 'package:hentai_library/presentation/ui/shared/routing/app_router.dart';
-import 'package:hentai_library/presentation/ui/shared/routing/reader_route_args.dart';
-import 'package:hentai_library/presentation/theme/theme.dart';
+import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
+import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
+import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/context_menu/series_item_context_menu.dart';
+import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
+import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SeriesItemComicTile extends ConsumerWidget {

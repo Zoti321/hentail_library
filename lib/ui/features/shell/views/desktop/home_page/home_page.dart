@@ -1,12 +1,12 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/presentation/theme/theme.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/database/dao/home_page_dao_types.dart';
 import 'package:hentai_library/services/comic/content_rating/auto_detect_comic_content_rating_service.dart';
-import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/desktop/home_page/widgets/widgets.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/overlays/dialog/scan_progress_dialog.dart';
+import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/scan_progress_dialog.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});

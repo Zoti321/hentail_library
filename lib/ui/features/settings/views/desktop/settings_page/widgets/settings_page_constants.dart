@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:hentai_library/presentation/theme/theme.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 
 const int readerAutoPlayIntervalMin = 1;
 const int readerAutoPlayIntervalMax = 60;

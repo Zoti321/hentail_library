@@ -1,7 +1,7 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/model/entity/comic/series.dart';
-import 'package:hentai_library/presentation/providers/aggregates/series_aggregate_notifier.dart';
-import 'package:hentai_library/presentation/providers/deps/deps.dart';
+import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 
 /// 系列名称筛选关键词
 class SeriesFilterNotifier extends Notifier<String> {

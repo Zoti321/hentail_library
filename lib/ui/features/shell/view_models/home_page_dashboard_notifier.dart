@@ -1,7 +1,7 @@
 ﻿import 'package:hentai_library/database/dao/dao.dart';
 import 'package:hentai_library/database/dao/home_page_dao_types.dart';
-import 'package:hentai_library/presentation/dto/history_grid_item_dto.dart';
-import 'package:hentai_library/presentation/providers/deps/deps.dart';
+import 'package:hentai_library/ui/core/dto/history_grid_item_dto.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

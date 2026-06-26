@@ -9,9 +9,9 @@ import 'package:hentai_library/ui/features/library/view_models/library_query_int
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_query.dart';
-import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
-import 'package:hentai_library/presentation/providers/deps/repos.dart';
-import 'package:hentai_library/presentation/providers/deps/tools.dart';
+import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
+import 'package:hentai_library/ui/features/shell/di/repos.dart';
+import 'package:hentai_library/ui/features/shell/di/tools.dart';
 
 final librarySearchPageComicsProvider =
     FutureProvider.family<List<Comic>, String>((Ref ref, String keyword) async {

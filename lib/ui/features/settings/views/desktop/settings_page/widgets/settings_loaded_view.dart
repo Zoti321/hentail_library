@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:hentai_library/presentation/theme/theme.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_about_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_cache_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_library_rows.dart';

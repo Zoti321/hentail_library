@@ -1,8 +1,8 @@
 ﻿import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/presentation/theme/theme.dart';
-import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/reader/view_models/reader_page_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';

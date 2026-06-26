@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:hentai_library/model/entity/comic/series.dart';
 import 'package:hentai_library/model/entity/comic/series_item.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/responsive_layout/detail_page_layout.dart';
-import 'package:hentai_library/presentation/ui/desktop/widgets/navigation/library_return_breadcrumb.dart';
+import 'package:hentai_library/ui/core/widgets/responsive_layout/detail_page_layout.dart';
+import 'package:hentai_library/ui/core/widgets/navigation/library_return_breadcrumb.dart';
 import 'actions.dart';
 import 'series_comic_items_card.dart';
 import 'series_detail_card.dart';
 import 'series_detail_cover.dart';
-import 'package:hentai_library/presentation/theme/theme.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 
 class SeriesDetail extends StatelessWidget {
   const SeriesDetail({super.key, required this.series});

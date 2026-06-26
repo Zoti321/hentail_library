@@ -1,6 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/model/entity/comic/author.dart';
-import 'package:hentai_library/presentation/providers/deps/deps.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 
 /// 全部作者列表（用于作者管理页面）；监听 Drift `authors` 表变化。
 final allAuthorsProvider = StreamProvider<List<Author>>((ref) {

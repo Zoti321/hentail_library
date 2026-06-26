@@ -3,12 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/model/entity/comic/comic.dart';
 import 'package:hentai_library/model/entity/comic/series.dart';
 import 'package:hentai_library/model/models.dart' show AppSetting;
-import 'package:hentai_library/presentation/providers/aggregates/comic_aggregate_notifier.dart';
-import 'package:hentai_library/presentation/providers/aggregates/series_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_query.dart';
-import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
+import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 
 /// Projection 层（系列）：负责生成系列区块渲染所需的只读视图数据。
 @immutable

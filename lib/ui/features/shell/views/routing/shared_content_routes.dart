@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/nav/metadata_page/metadata_management_page.dart';
-import 'package:hentai_library/presentation/ui/desktop/pages/main_content/reader_page/reader_page.dart';
+import 'package:hentai_library/ui/features/metadata/views/desktop/metadata_page/metadata_management_page.dart';
+import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/reader_page.dart';
 import 'package:hentai_library/ui/features/shell/views/desktop/selected_paths_page/selected_paths_page.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 

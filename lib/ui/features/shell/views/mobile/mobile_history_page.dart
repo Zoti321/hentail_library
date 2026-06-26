@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/presentation/dto/history_grid_item_dto.dart';
+import 'package:hentai_library/ui/core/dto/history_grid_item_dto.dart';
 import 'package:hentai_library/ui/features/shell/view_models/history_page_notifier.dart';
 
 class MobileHistoryPage extends ConsumerWidget {

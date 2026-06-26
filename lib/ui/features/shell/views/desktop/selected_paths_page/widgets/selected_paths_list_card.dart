@@ -1,8 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/features/shell/views/desktop/selected_paths_page/widgets/path_tile.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hentai_library/presentation/theme/theme.dart';
-import 'package:hentai_library/presentation/providers/providers.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SelectedPathsListCard extends ConsumerWidget {
