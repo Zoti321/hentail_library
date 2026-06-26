@@ -1,5 +1,1 @@
-export 'home_page_constants.dart';
-export 'home_page_continue_reading.dart';
-export 'home_page_header.dart';
-export 'home_page_hero.dart';
-export 'home_page_shortcuts.dart';
+﻿export 'package:hentai_library/ui/features/shell/views/desktop/home_page/widgets/widgets.dart';

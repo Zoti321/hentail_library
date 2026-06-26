@@ -1,6 +1,1 @@
-const double homeContentMaxWidth = 1280;
-const double homeStatsStackBreakpointWidth = 720;
-const double continueReadingItemWidth = 304;
-const double continueReadingStripHeight = 138;
-const double heroStatCardRadius = 16;
-const Duration heroStatCardHoverDuration = Duration(milliseconds: 200);
+﻿export 'package:hentai_library/ui/features/shell/views/desktop/home_page/widgets/home_page_constants.dart';

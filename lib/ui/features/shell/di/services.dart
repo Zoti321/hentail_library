@@ -8,7 +8,7 @@ import 'package:hentai_library/services/comic/read_resource_get/internal/utils/c
 import 'package:hentai_library/services/metadata/metadata_import_export_service.dart';
 import 'package:hentai_library/model/app_setting.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
-import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
+import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/services/comic/scan/comic_scan_parse_service.dart';
 import 'package:hentai_library/services/comic/scan/resource_parser.dart';
 import 'package:hentai_library/ui/features/shell/di/database_dao.dart';

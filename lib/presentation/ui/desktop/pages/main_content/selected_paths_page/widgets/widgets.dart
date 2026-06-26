@@ -1,3 +1,1 @@
-export 'selected_paths_header.dart';
-export 'selected_paths_list_card.dart';
-export 'edge_status.dart';
+﻿export 'package:hentai_library/ui/features/shell/views/desktop/selected_paths_page/widgets/widgets.dart';

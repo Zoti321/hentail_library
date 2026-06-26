@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:hentai_library/model/models.dart' show AppSetting;
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
-import 'package:hentai_library/presentation/providers/pages/settings/settings_notifier.dart';
+import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/usecases/scan_library_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
