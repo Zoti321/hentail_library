@@ -1,6 +1,6 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/model/entity/comic/author.dart';
-import 'package:hentai_library/model/entity/comic/tag.dart';
+﻿import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hentai_library/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 
 part 'comic_metadata_form.freezed.dart';
 

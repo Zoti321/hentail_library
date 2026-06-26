@@ -1,7 +1,7 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/model/entity/comic/comic.dart';
-import 'package:hentai_library/model/entity/comic/series_item.dart';
-import 'package:hentai_library/model/enums.dart';
+﻿import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 
 part 'series.freezed.dart';
 

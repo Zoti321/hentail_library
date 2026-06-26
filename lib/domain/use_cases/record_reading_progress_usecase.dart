@@ -1,5 +1,5 @@
-import 'package:hentai_library/model/entity/reading_history.dart';
-import 'package:hentai_library/model/entity/series_reading_history.dart';
+﻿import 'package:hentai_library/domain/models/entity/reading_history.dart';
+import 'package:hentai_library/domain/models/entity/series_reading_history.dart';
 import 'package:hentai_library/repository/reading_history_repository.dart';
 
 /// 用例：记录或更新阅读进度（进入阅读页、翻页时调用）。

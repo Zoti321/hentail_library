@@ -1,6 +1,6 @@
-import 'package:hentai_library/services/series/auto_series_infer_service.dart';
-import 'package:hentai_library/model/entity/comic/comic.dart';
-import 'package:hentai_library/model/entity/comic/series.dart';
+﻿import 'package:hentai_library/services/series/auto_series_infer_service.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/repository/comic_repository.dart';
 import 'package:hentai_library/repository/series_repository.dart';
 
