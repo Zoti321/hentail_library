@@ -1,2 +1,2 @@
-// UI layer barrel — features and core widgets will be re-exported here
-// as the migration progresses.
+export 'core/theme/theme.dart';
+export 'features/shell/shell.dart';

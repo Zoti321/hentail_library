@@ -1,4 +1,1 @@
-export 'database_dao.dart';
-export 'repos.dart';
-export 'services.dart';
-export 'tools.dart';
+﻿export 'package:hentai_library/ui/features/shell/di/deps.dart';
