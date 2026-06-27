@@ -6,6 +6,7 @@ import '../database.dart';
 
 part 'dao.g.dart';
 part 'dao.comic_series.dart';
+part 'dao.comic_thumbnail.dart';
 part 'dao.tag_author.dart';
 part 'dao.saved_paths.dart';
 part 'dao.reading_history.dart';

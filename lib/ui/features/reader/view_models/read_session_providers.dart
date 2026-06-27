@@ -2,14 +2,8 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:hentai_library/core/logging/log_manager.dart';
-import 'package:hentai_library/data/services/comic/cache/archive_cover_cache.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/api/read_resource_get_service.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/core/comic_read_resource_accessor.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/core/reader_image.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/isolate/archive_cover_loader.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/reading_history.dart';
-import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/reading/read_session_exceptions.dart';
 import 'package:hentai_library/domain/reading/read_session_loader.dart';
 import 'package:hentai_library/domain/reading/read_session_page.dart';
@@ -91,67 +85,14 @@ Future<ComicCoverDisplayData?> comicCoverDisplay(
   if (comic == null) {
     return null;
   }
-  final ResourceType resourceType = comic.resourceType;
-  if (resourceType == ResourceType.epub ||
-      resourceType == ResourceType.zip ||
-      resourceType == ResourceType.cbz) {
-    try {
-      final String sourceNorm = normalizeArchiveCoverSourcePath(comic.path);
-      final bool useDiskCache = ref.read(archiveCoverDiskCacheEnabledProvider);
-      final ArchiveCoverCache coverCache = ref.read(archiveCoverCacheProvider);
-      if (useDiskCache) {
-        final String? cachedPath = await coverCache.tryReadValidPath(
-          comicId: comicId,
-          sourcePathNormalized: sourceNorm,
-        );
-        if (cachedPath != null) {
-          return ComicCoverDisplayData.file(cachedPath);
-        }
-      }
-      final ArchiveCoverDecodeResult decoded =
-          await loadArchiveCoverDecodeResultOffMainUi(
-            path: comic.path,
-            type: resourceType,
-          );
-      final Uint8List? bytes = decoded.bytes;
-      if (bytes != null && bytes.isNotEmpty) {
-        if (useDiskCache) {
-          final String? writtenPath = await coverCache.write(
-            comicId: comicId,
-            sourcePathNormalized: sourceNorm,
-            bytes: bytes,
-            fileExtension: decoded.fileExtension,
-          );
-          if (writtenPath != null) {
-            return ComicCoverDisplayData.file(writtenPath);
-          }
-        }
-        return ComicCoverDisplayData.bytes(bytes);
-      }
-      return null;
-    } on Object catch (error, stackTrace) {
-      LogManager.instance.handle(
-        error,
-        stackTrace,
-        '加载漫画封面失败(isolate): comicId=$comicId, path=${comic.path}, type=$resourceType',
-      );
-      return null;
-    }
-  }
-  final ReadResourceGetService readResourceService = ref.read(
-    readResourceGetServiceProvider,
-  );
   try {
-    final ComicReadResourceAccessor accessor = await readResourceService
-        .acquire(comicId: comicId, path: comic.path, type: resourceType);
-    final ReaderImage cover = await accessor.getCoverImage();
-    if (cover is ReaderFileImage) {
-      return ComicCoverDisplayData.file(cover.file.path);
+    final Uint8List? bytes = await ref
+        .read(comicThumbnailServiceProvider)
+        .resolveThumbnailBytes(comic);
+    if (bytes == null || bytes.isEmpty) {
+      return null;
     }
-    if (cover is ReaderBytesImage) {
-      return ComicCoverDisplayData.bytes(cover.bytes);
-    }
-    return null;
+    return ComicCoverDisplayData.bytes(bytes);
   } on Object catch (error, stackTrace) {
     LogManager.instance.handle(
       error,

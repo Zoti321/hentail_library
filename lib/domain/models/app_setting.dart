@@ -19,9 +19,6 @@ abstract class AppSetting with _$AppSetting {
     /// 漫画库「漫画」分区不显示已归入任意系列的漫画。
     @Default(false) bool libraryHideComicsInSeries,
 
-    /// 是否将 epub/zip/cbz 列表封面解码结果写入应用缓存目录（关闭后不读写，已落盘文件保留）。
-    @Default(true) bool archiveCoverDiskCacheEnabled,
-
     /// 启动时是否自动检查应用更新。
     @Default(true) bool autoUpdate,
 

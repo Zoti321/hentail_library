@@ -152,6 +152,7 @@ class ComicRepositoryImpl implements ComicRepository {
       existingIds: existingIds,
       scannedIds: scannedIds,
     );
+    final List<String> thumbnailInvalidatedComicIds = <String>[];
     final toUpsert = <Comic>[];
     for (final e in unique.entries) {
       final id = e.key;
@@ -160,6 +161,10 @@ class ComicRepositoryImpl implements ComicRepository {
         toUpsert.add(row);
       } else {
         final prior = existingById[id]!;
+        if (prior.path != row.path ||
+            prior.resourceType != row.resourceType) {
+          thumbnailInvalidatedComicIds.add(id);
+        }
         toUpsert.add(_mergeKeptScanWithExisting(row, prior));
       }
     }
@@ -168,6 +173,7 @@ class ComicRepositoryImpl implements ComicRepository {
       addedCount: idDiff.addedIds.length,
       keptCount: idDiff.keptIds.length,
       toUpsert: toUpsert,
+      thumbnailInvalidatedComicIds: thumbnailInvalidatedComicIds,
     );
   }
 

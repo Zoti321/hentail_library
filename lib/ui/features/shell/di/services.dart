@@ -1,18 +1,15 @@
 import 'package:hentai_library/data/services/app_update/app_update_service.dart';
-import 'package:hentai_library/data/services/comic/cache/archive_cover_cache.dart';
-import 'package:hentai_library/data/services/comic/cache/archive_cover_disk_cache.dart';
+import 'package:hentai_library/data/services/comic/thumbnail/comic_thumbnail_service.dart';
 import 'package:hentai_library/data/services/comic/content_rating/auto_detect_comic_content_rating_service.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/api/read_resource_get_service.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/internal/open/comic_read_resource_opener.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/internal/session/comic_read_resource_session_manager.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/internal/utils/comic_read_path_normalizer.dart';
 import 'package:hentai_library/data/services/metadata/metadata_import_export_service.dart';
-import 'package:hentai_library/domain/models/app_setting.dart';
-import 'package:hentai_library/ui/features/shell/di/repos.dart';
-import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/data/services/comic/scan/comic_scan_parse_service.dart';
 import 'package:hentai_library/data/services/comic/scan/resource_parser.dart';
 import 'package:hentai_library/domain/library/auto_series_infer_service.dart';
+import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'services.g.dart';
@@ -71,22 +68,7 @@ MetadataImportExportService metadataImportExportService(Ref ref) =>
       comicRepository: ref.read(comicRepoProvider),
     );
 
-/// 是否启用归档封面磁盘缓存（与 [AppSetting.archiveCoverDiskCacheEnabled] 一致）。
 @Riverpod(keepAlive: true)
-bool archiveCoverDiskCacheEnabled(Ref ref) {
-  final AsyncValue<AppSetting> async = ref.watch(settingsProvider);
-  return async.maybeWhen(
-    data: (AppSetting s) => s.archiveCoverDiskCacheEnabled,
-    orElse: () => true,
-  );
-}
-
-@Riverpod(keepAlive: true)
-ArchiveCoverCache archiveCoverCache(Ref ref) => ArchiveCoverDiskCache();
-
-/// 归档封面在应用缓存目录中的占用（字节）。
-@Riverpod(keepAlive: true)
-Future<int> archiveCoverCacheDiskUsageBytes(Ref ref) async {
-  final ArchiveCoverCache cache = ref.watch(archiveCoverCacheProvider);
-  return cache.totalBytesInCache();
-}
+ComicThumbnailService comicThumbnailService(Ref ref) => ComicThumbnailService(
+  ref.read(comicThumbnailRepoProvider),
+);

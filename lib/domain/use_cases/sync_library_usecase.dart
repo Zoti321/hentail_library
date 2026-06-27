@@ -3,6 +3,7 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/ports/library_scan_port.dart';
 import 'package:hentai_library/domain/ports/reader_session_port.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/domain/repositories/path_repository.dart';
 import 'package:hentai_library/domain/use_cases/delete_comics_usecase.dart';
 import 'package:hentai_library/domain/use_cases/sync_library_types.dart';
@@ -12,17 +13,20 @@ class SyncLibraryUseCase {
   SyncLibraryUseCase({
     required PathRepository pathRepository,
     required ComicRepository comicRepository,
+    required ComicThumbnailRepository comicThumbnailRepository,
     required DeleteComicsUseCase deleteComicsUseCase,
     required LibraryScanPort libraryScanPort,
     required ReaderSessionPort readerSessionPort,
   }) : _pathRepository = pathRepository,
        _comicRepository = comicRepository,
+       _comicThumbnailRepository = comicThumbnailRepository,
        _deleteComicsUseCase = deleteComicsUseCase,
        _libraryScanPort = libraryScanPort,
        _readerSessionPort = readerSessionPort;
 
   final PathRepository _pathRepository;
   final ComicRepository _comicRepository;
+  final ComicThumbnailRepository _comicThumbnailRepository;
   final DeleteComicsUseCase _deleteComicsUseCase;
   final LibraryScanPort _libraryScanPort;
   final ReaderSessionPort _readerSessionPort;
@@ -172,6 +176,11 @@ class SyncLibraryUseCase {
     );
     if (plan.removedIds.isNotEmpty) {
       await _deleteComicsUseCase(plan.removedIds);
+    }
+    if (plan.thumbnailInvalidatedComicIds.isNotEmpty) {
+      await _comicThumbnailRepository.deleteByComicIds(
+        plan.thumbnailInvalidatedComicIds,
+      );
     }
     await _comicRepository.upsertMany(plan.toUpsert);
     await _readerSessionPort.clear();

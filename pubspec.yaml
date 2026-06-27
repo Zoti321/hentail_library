@@ -57,6 +57,7 @@ dependencies:
   dio: ^5.9.2
   package_info_plus: ^9.0.1
   open_filex: ^4.7.0
+  image: ^4.3.0
 
 dev_dependencies:
   flutter_test:

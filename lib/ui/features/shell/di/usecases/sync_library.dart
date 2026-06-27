@@ -9,6 +9,7 @@ part 'sync_library.g.dart';
 SyncLibraryUseCase syncLibraryUseCase(Ref ref) => SyncLibraryUseCase(
   pathRepository: ref.read(pathRepoProvider),
   comicRepository: ref.read(comicRepoProvider),
+  comicThumbnailRepository: ref.read(comicThumbnailRepoProvider),
   deleteComicsUseCase: ref.read(deleteComicsUseCaseProvider),
   libraryScanPort: ref.read(libraryScanPortProvider),
   readerSessionPort: ref.read(readerSessionPortProvider),

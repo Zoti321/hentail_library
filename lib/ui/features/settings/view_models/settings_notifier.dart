@@ -82,12 +82,6 @@ class SettingsNotifier extends _$SettingsNotifier {
     await updateSettings(current.copyWith(libraryHideComicsInSeries: value));
   }
 
-  Future<void> setArchiveCoverDiskCacheEnabled(bool value) async {
-    final AppSetting? current = state.asData?.value;
-    if (current == null) return;
-    await updateSettings(current.copyWith(archiveCoverDiskCacheEnabled: value));
-  }
-
   Future<void> setReaderDimLevel(double value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;

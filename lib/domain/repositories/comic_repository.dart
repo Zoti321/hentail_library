@@ -9,6 +9,7 @@ typedef ComicScanReplacePlan = ({
   int addedCount,
   int keptCount,
   List<Comic> toUpsert,
+  List<String> thumbnailInvalidatedComicIds,
 });
 
 abstract class ComicRepository {

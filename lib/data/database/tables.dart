@@ -16,6 +16,23 @@ class Comics extends Table {
   Set<Column> get primaryKey => {comicId};
 }
 
+/// 漫画封面缩略图（JPEG，列表/详情展示用）。
+@DataClassName('DbComicThumbnail')
+class ComicThumbnails extends Table {
+  TextColumn get comicId => text().references(
+    Comics,
+    #comicId,
+    onDelete: KeyAction.cascade,
+  )();
+  BlobColumn get thumbnail => blob()();
+  IntColumn get sourceModifiedMs => integer()();
+  IntColumn get sourceSize => integer()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {comicId};
+}
+
 @DataClassName('DbTag')
 class Tags extends Table {
   TextColumn get name => text()();

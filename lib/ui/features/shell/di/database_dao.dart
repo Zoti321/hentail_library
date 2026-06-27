@@ -15,6 +15,10 @@ AppDatabase database(Ref ref) {
 ComicDao comicDao(Ref ref) => ComicDao(ref.read(databaseProvider));
 
 @Riverpod(keepAlive: true)
+ComicThumbnailDao comicThumbnailDao(Ref ref) =>
+    ComicThumbnailDao(ref.read(databaseProvider));
+
+@Riverpod(keepAlive: true)
 SeriesDao seriesDao(Ref ref) => SeriesDao(ref.read(databaseProvider));
 
 @Riverpod(keepAlive: true)
