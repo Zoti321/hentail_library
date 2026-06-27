@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/presentation/app.dart';
+import 'package:hentai_library/ui/features/shell/views/app.dart';
 
 void main() {
   testWidgets('MyApp smoke test - pumps without crash and builds app', (

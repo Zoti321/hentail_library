@@ -1,0 +1,28 @@
+import 'package:hentai_library/data/database/dao/dao.dart';
+import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/domain/repositories/tag_repository.dart';
+
+class TagRepositoryImpl implements TagRepository {
+  TagRepositoryImpl(this._dao);
+
+  final TagDao _dao;
+
+  @override
+  Future<List<Tag>> listAll() async {
+    final rows = await _dao.listAll();
+    rows.sort((a, b) => a.name.compareTo(b.name));
+    return rows.map((r) => Tag(name: r.name)).toList();
+  }
+
+  @override
+  Future<void> add(Tag tag) => _dao.addTag(tag.name);
+
+  @override
+  Future<void> deleteByNames(List<String> names) async {
+    await _dao.deleteByNames(names);
+  }
+
+  @override
+  Future<void> rename(String oldName, String newName) =>
+      _dao.renameTag(oldName, newName);
+}
