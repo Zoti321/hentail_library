@@ -6,10 +6,10 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
-import 'package:hentai_library/data/repositories/author_repository.dart';
+import 'package:hentai_library/domain/repositories/author_repository.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
-import 'package:hentai_library/data/repositories/tag_repository.dart';
+import 'package:hentai_library/domain/repositories/tag_repository.dart';
 import 'package:hentai_library/data/services/metadata/metadata_io_exception.dart';
 import 'package:hentai_library/data/services/metadata/metadata_io_models.dart';
 

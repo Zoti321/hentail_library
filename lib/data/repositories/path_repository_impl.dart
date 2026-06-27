@@ -1,22 +1,13 @@
-﻿import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/data/database/dao/dao.dart';
 import 'package:hentai_library/data/database/database.dart';
-
-abstract class PathRepository {
-  Future<List<String>> getAll();
-
-  Stream<List<String>> watch();
-
-  Future<void> add(String path);
-
-  Future<void> remove(String path);
-}
+import 'package:hentai_library/domain/repositories/path_repository.dart';
 
 class PathRepositoryImpl implements PathRepository {
-  final SavedPathDao _savedPathDao;
-
   PathRepositoryImpl(this._savedPathDao);
+
+  final SavedPathDao _savedPathDao;
 
   @override
   Future<List<String>> getAll() async {

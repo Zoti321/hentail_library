@@ -3,7 +3,7 @@ import 'dart:io' show FileSystemEntity, FileSystemEntityType;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/data/repositories/path_repository.dart';
+import 'package:hentai_library/domain/repositories/path_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'selected_paths_page_notifier.freezed.dart';
