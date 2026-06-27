@@ -5,6 +5,7 @@ import 'package:hentai_library/data/repositories/comic_repository_impl.dart';
 import 'package:hentai_library/data/repositories/path_repository_impl.dart';
 import 'package:hentai_library/data/repositories/reading_history_repository_impl.dart';
 import 'package:hentai_library/data/repositories/series_repository_impl.dart';
+import 'package:hentai_library/data/repositories/home_page_repository_impl.dart';
 import 'package:hentai_library/data/repositories/tag_repository_impl.dart';
 import 'package:hentai_library/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/domain/repositories/author_repository.dart';
@@ -12,6 +13,7 @@ import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/path_repository.dart';
 import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
+import 'package:hentai_library/domain/repositories/home_page_repository.dart';
 import 'package:hentai_library/domain/repositories/tag_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -52,3 +54,7 @@ ReadingHistoryRepository readingHistoryRepo(Ref ref) =>
 
 @Riverpod(keepAlive: true)
 AppSettingRepository appSettingRepo(Ref ref) => AppSettingRepositoryImpl();
+
+@Riverpod(keepAlive: true)
+HomePageRepository homePageRepo(Ref ref) =>
+    HomePageRepositoryImpl(ref.read(homePageDaoProvider));

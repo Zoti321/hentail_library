@@ -1,5 +1,6 @@
 import 'package:hentai_library/data/database/dao/dao.dart';
 import 'package:hentai_library/data/database/database.dart' as db;
+import 'package:hentai_library/data/mappers/mapping.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
@@ -9,6 +10,76 @@ class SeriesRepositoryImpl implements SeriesRepository {
 
   final SeriesDao _dao;
   final SearchDao _searchDao;
+
+  Map<String, List<SeriesItem>> _groupItemsBySeriesName(
+    List<db.DbSeriesItem> items,
+  ) {
+    final Map<String, List<SeriesItem>> groupedItemsBySeries =
+        <String, List<SeriesItem>>{};
+    for (final db.DbSeriesItem item in items) {
+      final List<SeriesItem> grouped = groupedItemsBySeries.putIfAbsent(
+        item.seriesName,
+        () => <SeriesItem>[],
+      );
+      grouped.add(item.toEntity());
+    }
+    return groupedItemsBySeries;
+  }
+
+  List<Series> _buildSeriesList(
+    List<db.DbSeries> seriesRows,
+    Map<String, List<SeriesItem>> groupedItemsBySeries,
+  ) {
+    return seriesRows
+        .map(
+          (db.DbSeries series) => Series(
+            name: series.name,
+            items: groupedItemsBySeries[series.name] ?? const <SeriesItem>[],
+          ),
+        )
+        .toList();
+  }
+
+  List<Series> _orderSeriesByNames(
+    List<Series> series,
+    List<String> orderedNames,
+  ) {
+    final Map<String, Series> seriesByName = <String, Series>{
+      for (final Series series in series) series.name: series,
+    };
+    final List<Series> ordered = <Series>[];
+    for (final String name in orderedNames) {
+      final Series? matched = seriesByName[name];
+      if (matched != null) {
+        ordered.add(matched);
+      }
+    }
+    return ordered;
+  }
+
+  Future<Map<String, List<SeriesItem>>> _loadGroupedItemsBySeriesName() async {
+    final List<db.DbSeriesItem> allItems = await _dao
+        .getAllSeriesItemsOrdered();
+    return _groupItemsBySeriesName(allItems);
+  }
+
+  Future<List<Series>> _loadSeriesOrderedByNames(
+    List<String> seriesNames,
+  ) async {
+    if (seriesNames.isEmpty) {
+      return <Series>[];
+    }
+    final List<db.DbSeries> seriesRows = await _dao.getSeriesByNames(
+      seriesNames,
+    );
+    final Map<String, List<SeriesItem>> groupedItemsBySeries =
+        await _loadGroupedItemsBySeriesName();
+    final List<Series> mapped = _buildSeriesList(
+      seriesRows,
+      groupedItemsBySeries,
+    );
+    return _orderSeriesByNames(mapped, seriesNames);
+  }
 
   @override
   Stream<List<Series>> watchAll() {
@@ -20,35 +91,21 @@ class SeriesRepositoryImpl implements SeriesRepository {
   @override
   Future<List<Series>> getAll() async {
     final List<db.DbSeries> seriesRows = await _dao.getAllSeries();
-    final List<db.DbSeriesItem> allItems = await _dao
-        .getAllSeriesItemsOrdered();
     final Map<String, List<SeriesItem>> groupedItemsBySeries =
-        <String, List<SeriesItem>>{};
-    for (final db.DbSeriesItem item in allItems) {
-      final List<SeriesItem> grouped = groupedItemsBySeries.putIfAbsent(
-        item.seriesName,
-        () => <SeriesItem>[],
-      );
-      grouped.add(SeriesItem(comicId: item.comicId, order: item.sortOrder));
-    }
-    return seriesRows.map((db.DbSeries series) {
-      return Series(
-        name: series.name,
-        items: groupedItemsBySeries[series.name] ?? const <SeriesItem>[],
-      );
-    }).toList();
+        await _loadGroupedItemsBySeriesName();
+    return _buildSeriesList(seriesRows, groupedItemsBySeries);
   }
 
   @override
   Future<Series?> findByName(String name) async {
     final row = await _dao.findByName(name);
-    if (row == null) return null;
+    if (row == null) {
+      return null;
+    }
     final items = await _dao.getItemsForSeries(name);
     return Series(
       name: row.name,
-      items: items
-          .map((i) => SeriesItem(comicId: i.comicId, order: i.sortOrder))
-          .toList(),
+      items: items.map((db.DbSeriesItem i) => i.toEntity()).toList(),
     );
   }
 
@@ -115,38 +172,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
   Future<List<Series>> searchByKeyword(String keyword) async {
     final List<String> seriesNames = await _searchDao
         .searchSeriesNamesByKeyword(keyword);
-    if (seriesNames.isEmpty) {
-      return <Series>[];
-    }
-    final List<db.DbSeries> seriesRows = await _dao.getSeriesByNames(
-      seriesNames,
-    );
-    final List<db.DbSeriesItem> allItems = await _dao
-        .getAllSeriesItemsOrdered();
-    final Map<String, List<SeriesItem>> groupedItemsBySeries =
-        <String, List<SeriesItem>>{};
-    for (final db.DbSeriesItem item in allItems) {
-      final List<SeriesItem> grouped = groupedItemsBySeries.putIfAbsent(
-        item.seriesName,
-        () => <SeriesItem>[],
-      );
-      grouped.add(SeriesItem(comicId: item.comicId, order: item.sortOrder));
-    }
-    final Map<String, Series> mapped = <String, Series>{
-      for (final db.DbSeries series in seriesRows)
-        series.name: Series(
-          name: series.name,
-          items: groupedItemsBySeries[series.name] ?? const <SeriesItem>[],
-        ),
-    };
-    final List<Series> ordered = <Series>[];
-    for (final String name in seriesNames) {
-      final Series? series = mapped[name];
-      if (series != null) {
-        ordered.add(series);
-      }
-    }
-    return ordered;
+    return _loadSeriesOrderedByNames(seriesNames);
   }
 
   @override
@@ -161,37 +187,6 @@ class SeriesRepositoryImpl implements SeriesRepository {
           optionalOr: optionalOr,
           mustExclude: mustExclude,
         );
-    if (seriesNames.isEmpty) {
-      return <Series>[];
-    }
-    final List<db.DbSeries> seriesRows = await _dao.getSeriesByNames(
-      seriesNames,
-    );
-    final List<db.DbSeriesItem> allItems = await _dao
-        .getAllSeriesItemsOrdered();
-    final Map<String, List<SeriesItem>> groupedItemsBySeries =
-        <String, List<SeriesItem>>{};
-    for (final db.DbSeriesItem item in allItems) {
-      final List<SeriesItem> grouped = groupedItemsBySeries.putIfAbsent(
-        item.seriesName,
-        () => <SeriesItem>[],
-      );
-      grouped.add(SeriesItem(comicId: item.comicId, order: item.sortOrder));
-    }
-    final Map<String, Series> mapped = <String, Series>{
-      for (final db.DbSeries series in seriesRows)
-        series.name: Series(
-          name: series.name,
-          items: groupedItemsBySeries[series.name] ?? const <SeriesItem>[],
-        ),
-    };
-    final List<Series> ordered = <Series>[];
-    for (final String name in seriesNames) {
-      final Series? series = mapped[name];
-      if (series != null) {
-        ordered.add(series);
-      }
-    }
-    return ordered;
+    return _loadSeriesOrderedByNames(seriesNames);
   }
 }

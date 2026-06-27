@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:hentai_library/data/database/dao/dao.dart';
 import 'package:hentai_library/data/database/database.dart' as db;
+import 'package:hentai_library/data/mappers/mapping.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
@@ -34,23 +35,38 @@ class ComicRepositoryImpl implements ComicRepository {
   final SeriesRepository _librarySeries;
 
   Future<List<Comic>> _mapRows(List<db.DbComic> rows) async {
-    final ids = rows.map((e) => e.comicId);
-    final tagMap = await _comicDao.getTagNamesForComics(ids);
-    final authorMap = await _comicDao.getAuthorNamesForComics(ids);
-    return rows.map((r) {
-      final tagNames = tagMap[r.comicId] ?? const <String>[];
-      final authorNames = authorMap[r.comicId] ?? const <String>[];
-      return Comic(
-        comicId: r.comicId,
-        path: r.path,
-        resourceType: r.resourceType,
-        title: r.title,
-        authors: authorNames.map((n) => Author(name: n)).toList(),
-        contentRating: r.contentRating,
-        tags: tagNames.map((n) => Tag(name: n)).toList(),
-        pageCount: r.pageCount,
-      );
-    }).toList();
+    final Iterable<String> ids = rows.map((db.DbComic e) => e.comicId);
+    final Map<String, List<String>> tagMap = await _comicDao
+        .getTagNamesForComics(ids);
+    final Map<String, List<String>> authorMap = await _comicDao
+        .getAuthorNamesForComics(ids);
+    return rows
+        .map(
+          (db.DbComic row) => row.toEntity(
+            authorNames: authorMap[row.comicId] ?? const <String>[],
+            tagNames: tagMap[row.comicId] ?? const <String>[],
+          ),
+        )
+        .toList();
+  }
+
+  Future<List<Comic>> _loadComicsOrderedByIds(List<String> comicIds) async {
+    if (comicIds.isEmpty) {
+      return <Comic>[];
+    }
+    final List<db.DbComic> rows = await _comicDao.getComicsByIds(comicIds);
+    final List<Comic> mapped = await _mapRows(rows);
+    final Map<String, Comic> comicsById = <String, Comic>{
+      for (final Comic comic in mapped) comic.comicId: comic,
+    };
+    final List<Comic> ordered = <Comic>[];
+    for (final String comicId in comicIds) {
+      final Comic? comic = comicsById[comicId];
+      if (comic != null) {
+        ordered.add(comic);
+      }
+    }
+    return ordered;
   }
 
   @override
@@ -67,18 +83,14 @@ class ComicRepositoryImpl implements ComicRepository {
   @override
   Future<Comic?> findById(String comicId) async {
     final row = await _comicDao.findById(comicId);
-    if (row == null) return null;
-    final tagNames = await _comicDao.getTagNamesForComic(comicId);
-    final authorNames = await _comicDao.getAuthorNamesForComic(comicId);
-    return Comic(
-      comicId: row.comicId,
-      path: row.path,
-      resourceType: row.resourceType,
-      title: row.title,
-      authors: authorNames.map((n) => Author(name: n)).toList(),
-      contentRating: row.contentRating,
-      tags: tagNames.map((n) => Tag(name: n)).toList(),
+    if (row == null) {
+      return null;
+    }
+    final List<String> tagNames = await _comicDao.getTagNamesForComic(comicId);
+    final List<String> authorNames = await _comicDao.getAuthorNamesForComic(
+      comicId,
     );
+    return row.toEntity(authorNames: authorNames, tagNames: tagNames);
   }
 
   @override
@@ -191,22 +203,7 @@ class ComicRepositoryImpl implements ComicRepository {
     final List<String> comicIds = await _searchDao.searchComicIdsByKeyword(
       keyword,
     );
-    if (comicIds.isEmpty) {
-      return <Comic>[];
-    }
-    final List<db.DbComic> rows = await _comicDao.getComicsByIds(comicIds);
-    final List<Comic> mapped = await _mapRows(rows);
-    final Map<String, Comic> comicsById = <String, Comic>{
-      for (final Comic comic in mapped) comic.comicId: comic,
-    };
-    final List<Comic> ordered = <Comic>[];
-    for (final String comicId in comicIds) {
-      final Comic? comic = comicsById[comicId];
-      if (comic != null) {
-        ordered.add(comic);
-      }
-    }
-    return ordered;
+    return _loadComicsOrderedByIds(comicIds);
   }
 
   @override
@@ -221,22 +218,7 @@ class ComicRepositoryImpl implements ComicRepository {
           optionalOr: optionalOr,
           mustExclude: mustExclude,
         );
-    if (comicIds.isEmpty) {
-      return <Comic>[];
-    }
-    final List<db.DbComic> rows = await _comicDao.getComicsByIds(comicIds);
-    final List<Comic> mapped = await _mapRows(rows);
-    final Map<String, Comic> comicsById = <String, Comic>{
-      for (final Comic comic in mapped) comic.comicId: comic,
-    };
-    final List<Comic> ordered = <Comic>[];
-    for (final String comicId in comicIds) {
-      final Comic? comic = comicsById[comicId];
-      if (comic != null) {
-        ordered.add(comic);
-      }
-    }
-    return ordered;
+    return _loadComicsOrderedByIds(comicIds);
   }
 
   Map<String, Comic> _dedupeScannedByComicId(List<Comic> scanned) {

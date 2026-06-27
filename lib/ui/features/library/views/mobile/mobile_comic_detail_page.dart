@@ -16,7 +16,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_page_comi
 import 'package:hentai_library/ui/features/reader/view_models/reader_page_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/usecases/comic_meta.dart';
-import 'package:hentai_library/ui/features/shell/di/usecases/sync_library.dart';
+import 'package:hentai_library/ui/features/shell/di/usecases/reading_progress.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 
 class MobileComicDetailPage extends ConsumerWidget {

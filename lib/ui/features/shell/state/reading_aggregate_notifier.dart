@@ -1,6 +1,6 @@
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/models.dart' as entity;
-import 'package:hentai_library/ui/features/shell/di/usecases/sync_library.dart';
+import 'package:hentai_library/ui/features/shell/di/usecases/reading_progress.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reading_aggregate_notifier.g.dart';

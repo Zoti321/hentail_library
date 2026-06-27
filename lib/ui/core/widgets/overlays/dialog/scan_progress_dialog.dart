@@ -1,6 +1,7 @@
 ﻿import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/domain/use_cases/sync_library_types.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/terminal_spinner.dart';
