@@ -3,6 +3,8 @@ import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/data/database/dao/dao.dart';
 import 'package:hentai_library/data/mappers/mapping.dart';
 import 'package:hentai_library/domain/models/models.dart' as entity;
+import 'package:hentai_library/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
 
 class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
@@ -40,6 +42,37 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   }
 
   @override
+  Future<PagedResult<entity.ReadingHistory>> fetchHistoryPage(
+    PageRequest request,
+  ) async {
+    final int totalCount = await _dao.countAllHistory();
+    if (totalCount <= 0) {
+      return PagedResult<entity.ReadingHistory>(
+        items: const <entity.ReadingHistory>[],
+        totalCount: 0,
+        page: 1,
+        pageSize: request.pageSize,
+      );
+    }
+    final int totalPages = (totalCount + request.pageSize - 1) ~/ request.pageSize;
+    int effectivePage = request.page;
+    if (effectivePage > totalPages) {
+      effectivePage = totalPages;
+    }
+    final int offset = (effectivePage - 1) * request.pageSize;
+    final rows = await _dao.fetchHistoryPage(
+      limit: request.pageSize,
+      offset: offset,
+    );
+    return PagedResult<entity.ReadingHistory>(
+      items: rows.map((e) => e.toEntity()).toList(),
+      totalCount: totalCount,
+      page: effectivePage,
+      pageSize: request.pageSize,
+    );
+  }
+
+  @override
   Future<void> recordSeriesReading(entity.SeriesReadingHistory history) async {
     try {
       final companion = history.toSeriesCompanion();
@@ -66,6 +99,37 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   Stream<List<entity.SeriesReadingHistory>> watchAllSeriesReading() {
     return _seriesDao.watchAllSeriesReading().map(
       (event) => event.map((e) => e.toEntity()).toList(),
+    );
+  }
+
+  @override
+  Future<PagedResult<entity.SeriesReadingHistory>> fetchSeriesHistoryPage(
+    PageRequest request,
+  ) async {
+    final int totalCount = await _seriesDao.countAllSeriesReading();
+    if (totalCount <= 0) {
+      return PagedResult<entity.SeriesReadingHistory>(
+        items: const <entity.SeriesReadingHistory>[],
+        totalCount: 0,
+        page: 1,
+        pageSize: request.pageSize,
+      );
+    }
+    final int totalPages = (totalCount + request.pageSize - 1) ~/ request.pageSize;
+    int effectivePage = request.page;
+    if (effectivePage > totalPages) {
+      effectivePage = totalPages;
+    }
+    final int offset = (effectivePage - 1) * request.pageSize;
+    final rows = await _seriesDao.fetchSeriesReadingPage(
+      limit: request.pageSize,
+      offset: offset,
+    );
+    return PagedResult<entity.SeriesReadingHistory>(
+      items: rows.map((e) => e.toEntity()).toList(),
+      totalCount: totalCount,
+      page: effectivePage,
+      pageSize: request.pageSize,
     );
   }
 

@@ -1,10 +1,96 @@
 part of 'dao.dart';
 
-@DriftAccessor(tables: [Comics, ComicTags, Authors, ComicAuthors])
+@DriftAccessor(tables: [Comics, ComicTags, Authors, ComicAuthors, SeriesItems])
 class ComicDao extends DatabaseAccessor<AppDatabase> with _$ComicDaoMixin {
   ComicDao(super.db);
 
   Stream<List<DbComic>> watchAllComics() => select(comics).watch();
+
+  Stream<void> watchComicTableChanges() {
+    return select(comics).watch().map((List<DbComic> _) {});
+  }
+
+  Future<int> countAllComics() async {
+    final QueryRow row = await customSelect(
+      'SELECT COUNT(*) AS c FROM comics',
+      readsFrom: <TableInfo<Table, Object>>{comics},
+    ).getSingle();
+    return row.read<int>('c')!;
+  }
+
+  Future<int> countComicsFiltered(ComicPageSqlCriteria criteria) async {
+    final ComicPageSqlQuery query = ComicPageSqlBuilder.buildCountQuery(
+      criteria,
+    );
+    final QueryRow row = await customSelect(
+      query.sql,
+      variables: query.variables,
+      readsFrom: <TableInfo<Table, Object>>{
+        comics,
+        comicTags,
+        comicAuthors,
+        seriesItems,
+      },
+    ).getSingle();
+    return row.read<int>('c')!;
+  }
+
+  Future<List<String>> fetchComicIdsPageFiltered({
+    required ComicPageSqlCriteria criteria,
+    required bool sortDescending,
+    required int limit,
+    required int offset,
+  }) async {
+    final ComicPageSqlQuery query = ComicPageSqlBuilder.buildIdsPageQuery(
+      criteria: criteria,
+      sortDescending: sortDescending,
+      limit: limit,
+      offset: offset,
+    );
+    final List<QueryRow> rows = await customSelect(
+      query.sql,
+      variables: query.variables,
+      readsFrom: <TableInfo<Table, Object>>{
+        comics,
+        comicTags,
+        comicAuthors,
+        seriesItems,
+      },
+    ).get();
+    return rows
+        .map((QueryRow row) => row.read<String>('comic_id'))
+        .whereType<String>()
+        .toList();
+  }
+
+  Future<List<DbComic>> fetchComicsPageFiltered({
+    required ComicPageSqlCriteria criteria,
+    required bool sortDescending,
+    required int limit,
+    required int offset,
+  }) async {
+    final List<String> comicIds = await fetchComicIdsPageFiltered(
+      criteria: criteria,
+      sortDescending: sortDescending,
+      limit: limit,
+      offset: offset,
+    );
+    if (comicIds.isEmpty) {
+      return <DbComic>[];
+    }
+    final List<DbComic> rows = await getComicsByIds(comicIds);
+    final Map<String, DbComic> comicsById = <String, DbComic>{
+      for (final DbComic row in rows) row.comicId: row,
+    };
+    final List<DbComic> ordered = <DbComic>[];
+    for (final String comicId in comicIds) {
+      final DbComic? row = comicsById[comicId];
+      if (row != null) {
+        ordered.add(row);
+      }
+    }
+    return ordered;
+  }
 
   Future<List<DbComic>> getAllComics() => select(comics).get();
 
@@ -181,6 +267,26 @@ class SeriesDao extends DatabaseAccessor<AppDatabase> with _$SeriesDaoMixin {
   Stream<List<DbSeries>> watchAllSeries() => select(seriesTable).watch();
 
   Future<List<DbSeries>> getAllSeries() => select(seriesTable).get();
+
+  Future<int> countAllSeries() async {
+    final QueryRow row = await customSelect(
+      'SELECT COUNT(*) AS c FROM series',
+      readsFrom: <TableInfo<Table, Object>>{seriesTable},
+    ).getSingle();
+    return row.read<int>('c')!;
+  }
+
+  Future<List<DbSeries>> fetchSeriesPage({
+    required int limit,
+    required int offset,
+  }) {
+    return (select(seriesTable)
+          ..orderBy(<OrderingTerm Function(SeriesTable t)>[
+            (SeriesTable t) => OrderingTerm.asc(t.name),
+          ])
+          ..limit(limit, offset: offset))
+        .get();
+  }
 
   Future<DbSeries?> findByName(String name) {
     return (select(

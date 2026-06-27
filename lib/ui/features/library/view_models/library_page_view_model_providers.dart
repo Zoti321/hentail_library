@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_pagination_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_series_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
@@ -10,6 +12,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_query_int
 class LibraryPageViewModel {
   const LibraryPageViewModel({
     required this.comicsAsync,
+    required this.comicsPagination,
     required this.seriesViewData,
     required this.displayedComicCount,
     required this.displayedSeriesCount,
@@ -20,6 +23,7 @@ class LibraryPageViewModel {
     required this.isComicTableEmpty,
   });
   final AsyncValue<List<Comic>> comicsAsync;
+  final LibraryComicsPagination comicsPagination;
   final LibrarySeriesViewData seriesViewData;
   final int displayedComicCount;
   final int displayedSeriesCount;
@@ -56,6 +60,9 @@ final libraryPageViewModelProvider = Provider<LibraryPageViewModel>((Ref ref) {
   final AsyncValue<List<Comic>> comicsAsync = ref.watch(
     libraryDisplayedComicsProvider,
   );
+  final AsyncValue<PagedResult<Comic>> comicsPageAsync = ref.watch(
+    libraryComicsPageProvider,
+  );
   final LibrarySeriesViewData seriesViewData = ref.watch(
     librarySeriesViewDataProvider,
   );
@@ -71,10 +78,30 @@ final libraryPageViewModelProvider = Provider<LibraryPageViewModel>((Ref ref) {
   final bool hasReceivedFirstEmit = ref.watch(
     libraryHasReceivedFirstEmitProvider,
   );
-  final bool isComicTableEmpty =
-      hasReceivedFirstEmit && displayedComicCount == 0;
+  final AsyncValue<int> tableTotalAsync = ref.watch(
+    libraryComicTableTotalCountProvider,
+  );
+  final bool isComicTableEmpty = tableTotalAsync.maybeWhen(
+    data: (int count) => hasReceivedFirstEmit && count == 0,
+    orElse: () => false,
+  );
+  final LibraryComicsPagination pagination = comicsPageAsync.maybeWhen(
+    data: (PagedResult<Comic> page) => LibraryComicsPagination(
+      page: page.page,
+      totalPages: page.totalPages,
+      totalCount: page.totalCount,
+      isLoading: false,
+    ),
+    orElse: () => const LibraryComicsPagination(
+      page: 1,
+      totalPages: 0,
+      totalCount: 0,
+      isLoading: true,
+    ),
+  );
   return LibraryPageViewModel(
     comicsAsync: comicsAsync,
+    comicsPagination: pagination,
     seriesViewData: seriesViewData,
     displayedComicCount: displayedComicCount,
     displayedSeriesCount: displayedSeriesCount,

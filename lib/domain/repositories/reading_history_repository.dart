@@ -1,4 +1,6 @@
 import 'package:hentai_library/domain/models/models.dart' as entity;
+import 'package:hentai_library/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 
 abstract class ReadingHistoryRepository {
   Future<void> recordReading(entity.ReadingHistory history);
@@ -7,6 +9,10 @@ abstract class ReadingHistoryRepository {
 
   Stream<List<entity.ReadingHistory>> watchAllHistory();
 
+  Future<PagedResult<entity.ReadingHistory>> fetchHistoryPage(
+    PageRequest request,
+  );
+
   Future<void> recordSeriesReading(entity.SeriesReadingHistory history);
 
   Future<entity.SeriesReadingHistory?> getSeriesReadingBySeriesName(
@@ -14,6 +20,10 @@ abstract class ReadingHistoryRepository {
   );
 
   Stream<List<entity.SeriesReadingHistory>> watchAllSeriesReading();
+
+  Future<PagedResult<entity.SeriesReadingHistory>> fetchSeriesHistoryPage(
+    PageRequest request,
+  );
 
   Future<void> deleteSeriesReadingBySeriesName(String seriesName);
 

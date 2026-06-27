@@ -3,6 +3,8 @@ import 'package:hentai_library/data/database/database.dart' as db;
 import 'package:hentai_library/data/mappers/mapping.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
 
 class SeriesRepositoryImpl implements SeriesRepository {
@@ -94,6 +96,41 @@ class SeriesRepositoryImpl implements SeriesRepository {
     final Map<String, List<SeriesItem>> groupedItemsBySeries =
         await _loadGroupedItemsBySeriesName();
     return _buildSeriesList(seriesRows, groupedItemsBySeries);
+  }
+
+  @override
+  Future<PagedResult<Series>> fetchPage(PageRequest request) async {
+    final int totalCount = await _dao.countAllSeries();
+    if (totalCount <= 0) {
+      return PagedResult<Series>(
+        items: const <Series>[],
+        totalCount: 0,
+        page: 1,
+        pageSize: request.pageSize,
+      );
+    }
+    final int totalPages = (totalCount + request.pageSize - 1) ~/ request.pageSize;
+    int effectivePage = request.page;
+    if (effectivePage > totalPages) {
+      effectivePage = totalPages;
+    }
+    final int offset = (effectivePage - 1) * request.pageSize;
+    final List<db.DbSeries> seriesRows = await _dao.fetchSeriesPage(
+      limit: request.pageSize,
+      offset: offset,
+    );
+    final Map<String, List<SeriesItem>> groupedItemsBySeries =
+        await _loadGroupedItemsBySeriesName();
+    final List<Series> items = _buildSeriesList(
+      seriesRows,
+      groupedItemsBySeries,
+    );
+    return PagedResult<Series>(
+      items: items,
+      totalCount: totalCount,
+      page: effectivePage,
+      pageSize: request.pageSize,
+    );
   }
 
   @override

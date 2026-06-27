@@ -7,6 +7,8 @@ import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
@@ -39,15 +41,35 @@ class _AddComicsToSeriesDialogState
       if (!mounted) {
         return;
       }
-      final ComicAggregateState libraryPage = ref.read(comicAggregateProvider);
-      _addComicsNotifier.reset();
-      _addComicsNotifier.updateSource(
-        comics: libraryPage.rawList,
-        existingComicIdsInSeriesOrder: _existingComicIdsInSeriesOrder(
-          widget.series,
-        ),
-      );
+      unawaited(_reloadComicSource());
     });
+  }
+
+  Future<void> _reloadComicSource() async {
+    final List<Comic> comics = await ref.read(comicRepoProvider).getAll();
+    if (!mounted) {
+      return;
+    }
+    _addComicsNotifier.reset();
+    _addComicsNotifier.updateSource(
+      comics: comics,
+      existingComicIdsInSeriesOrder: _existingComicIdsInSeriesOrder(
+        widget.series,
+      ),
+    );
+  }
+
+  Future<void> _reloadComicSourceWithoutReset() async {
+    final List<Comic> comics = await ref.read(comicRepoProvider).getAll();
+    if (!mounted) {
+      return;
+    }
+    _addComicsNotifier.updateSource(
+      comics: comics,
+      existingComicIdsInSeriesOrder: _existingComicIdsInSeriesOrder(
+        widget.series,
+      ),
+    );
   }
 
   @override
@@ -104,24 +126,26 @@ class _AddComicsToSeriesDialogState
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final ComicAggregateState libraryPage = ref.watch(comicAggregateProvider);
     final notifier = ref.read(seriesAddComicsDialogProvider.notifier);
-    ref.listen(comicAggregateProvider, (
-      ComicAggregateState? previous,
-      ComicAggregateState next,
-    ) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) {
+    ref.listen<int>(
+      comicAggregateProvider.select((ComicAggregateState s) => s.changeGeneration),
+      (int? previous, int next) {
+        if (previous == null) {
           return;
         }
-        notifier.updateSource(
-          comics: next.rawList,
-          existingComicIdsInSeriesOrder: _existingComicIdsInSeriesOrder(
-            widget.series,
-          ),
-        );
-      });
-    });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) {
+            return;
+          }
+          unawaited(_reloadComicSourceWithoutReset());
+        });
+      },
+    );
+    final bool hasLoadedComics = ref.watch(
+      comicAggregateProvider.select(
+        (ComicAggregateState s) => s.hasReceivedFirstChange,
+      ),
+    );
     final dialogState = ref.watch(seriesAddComicsDialogProvider);
     final listHeight = (MediaQuery.of(context).size.height * 0.45).clamp(
       280.0,
@@ -148,7 +172,7 @@ class _AddComicsToSeriesDialogState
           const SizedBox(height: 12),
           SizedBox(
             height: listHeight,
-            child: !libraryPage.hasReceivedFirstEmit
+            child: !hasLoadedComics
                 ? const Center(child: CircularProgressIndicator())
                 : dialogState.visibleComics.isEmpty
                 ? Center(

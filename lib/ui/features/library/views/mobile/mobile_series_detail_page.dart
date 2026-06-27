@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -10,7 +11,7 @@ import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/entity/series_reading_history.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
-import 'package:hentai_library/ui/features/shell/di/repos.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
 import 'package:hentai_library/ui/features/reader/reader.dart';
@@ -442,15 +443,35 @@ class _SeriesManageItemsSheetState
     _queryController = TextEditingController();
     _notifier = ref.read(seriesAddComicsDialogProvider.notifier);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final ComicAggregateState libraryPage = ref.read(comicAggregateProvider);
-      _notifier.reset();
-      _notifier.updateSource(
-        comics: libraryPage.rawList,
-        existingComicIdsInSeriesOrder: _existingComicIdsInSeriesOrder(
-          widget.series,
-        ),
-      );
+      unawaited(_reloadComicSource());
     });
+  }
+
+  Future<void> _reloadComicSource() async {
+    final List<Comic> comics = await ref.read(comicRepoProvider).getAll();
+    if (!mounted) {
+      return;
+    }
+    _notifier.reset();
+    _notifier.updateSource(
+      comics: comics,
+      existingComicIdsInSeriesOrder: _existingComicIdsInSeriesOrder(
+        widget.series,
+      ),
+    );
+  }
+
+  Future<void> _reloadComicSourceWithoutReset() async {
+    final List<Comic> comics = await ref.read(comicRepoProvider).getAll();
+    if (!mounted) {
+      return;
+    }
+    _notifier.updateSource(
+      comics: comics,
+      existingComicIdsInSeriesOrder: _existingComicIdsInSeriesOrder(
+        widget.series,
+      ),
+    );
   }
 
   @override
@@ -462,17 +483,15 @@ class _SeriesManageItemsSheetState
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(comicAggregateProvider, (
-      ComicAggregateState? prev,
-      ComicAggregateState next,
-    ) {
-      _notifier.updateSource(
-        comics: next.rawList,
-        existingComicIdsInSeriesOrder: _existingComicIdsInSeriesOrder(
-          widget.series,
-        ),
-      );
-    });
+    ref.listen<int>(
+      comicAggregateProvider.select((ComicAggregateState s) => s.changeGeneration),
+      (int? previous, int next) {
+        if (previous == null) {
+          return;
+        }
+        unawaited(_reloadComicSourceWithoutReset());
+      },
+    );
     final SeriesAddComicsDialogState state = ref.watch(
       seriesAddComicsDialogProvider,
     );
@@ -766,7 +785,7 @@ class _SeriesReorderSheetState extends ConsumerState<_SeriesReorderSheet> {
 }
 
 String _resolveComicTitle(WidgetRef ref, String comicId) {
-  final Comic? comic = ref.read(libraryComicByIdProvider(comicId));
+  final Comic? comic = ref.watch(libraryComicByIdProvider(comicId)).value;
   if (comic != null && comic.title.isNotEmpty) {
     return comic.title;
   }

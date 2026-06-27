@@ -46,16 +46,28 @@ Stream<List<series_entity.SeriesReadingHistory>> seriesReadingHistoryStream(
 }
 
 @Riverpod(keepAlive: true)
+Future<Map<String, Comic>> historyComicsById(Ref ref) async {
+  ref.watch(
+    comicAggregateProvider.select((ComicAggregateState s) => s.changeGeneration),
+  );
+  final List<Comic> comics = await ref.read(comicRepoProvider).getAll();
+  return <String, Comic>{
+    for (final Comic comic in comics) comic.comicId: comic,
+  };
+}
+
+@Riverpod(keepAlive: true)
 List<HistoryGridItemDto> mergedHistoryGridItems(Ref ref) {
   final bool isHealthy =
       (ref.watch(settingsProvider).value?.isHealthyMode) ?? false;
-  final ComicAggregateState aggregate = ref.watch(comicAggregateProvider);
-  if (isHealthy && !aggregate.hasReceivedFirstEmit) {
+  final AsyncValue<Map<String, Comic>> comicsByIdAsync = ref.watch(
+    historyComicsByIdProvider,
+  );
+  if (isHealthy && comicsByIdAsync.isLoading) {
     return const <HistoryGridItemDto>[];
   }
-  final Map<String, Comic> comicsById = <String, Comic>{
-    for (final Comic c in aggregate.rawList) c.comicId: c,
-  };
+  final Map<String, Comic> comicsById =
+      comicsByIdAsync.value ?? <String, Comic>{};
   List<entity.ReadingHistory> comics = ref
       .watch(readingHistoryStreamProvider)
       .maybeWhen(
@@ -136,12 +148,14 @@ HistoryFeedViewData historyFeedView(Ref ref) {
   final AsyncValue<List<series_entity.SeriesReadingHistory>> seriesAsync = ref
       .watch(seriesReadingHistoryStreamProvider);
   final AsyncValue<List<Series>> allSeriesAsync = ref.watch(allSeriesProvider);
-  final ComicAggregateState aggregate = ref.watch(comicAggregateProvider);
+  final AsyncValue<Map<String, Comic>> comicsByIdAsync = ref.watch(
+    historyComicsByIdProvider,
+  );
   final bool isLoading =
       comicsAsync.isLoading ||
       seriesAsync.isLoading ||
       allSeriesAsync.isLoading ||
-      (isHealthy && !aggregate.hasReceivedFirstEmit);
+      (isHealthy && comicsByIdAsync.isLoading);
   final bool hasError =
       comicsAsync.hasError || seriesAsync.hasError || allSeriesAsync.hasError;
   final List<HistoryGridItemDto> visibleItems = ref.watch(

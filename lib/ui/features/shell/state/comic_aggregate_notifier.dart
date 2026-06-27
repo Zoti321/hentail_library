@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -9,21 +7,24 @@ part 'comic_aggregate_notifier.g.dart';
 
 class ComicAggregateState {
   const ComicAggregateState({
-    this.rawList = const <Comic>[],
-    this.hasReceivedFirstEmit = false,
+    this.changeGeneration = 0,
+    this.hasReceivedFirstChange = false,
     this.streamError,
   });
-  final List<Comic> rawList;
-  final bool hasReceivedFirstEmit;
+
+  final int changeGeneration;
+  final bool hasReceivedFirstChange;
   final Object? streamError;
+
   ComicAggregateState copyWith({
-    List<Comic>? rawList,
-    bool? hasReceivedFirstEmit,
+    int? changeGeneration,
+    bool? hasReceivedFirstChange,
     Object? streamError = _unsetStreamError,
   }) {
     return ComicAggregateState(
-      rawList: rawList ?? this.rawList,
-      hasReceivedFirstEmit: hasReceivedFirstEmit ?? this.hasReceivedFirstEmit,
+      changeGeneration: changeGeneration ?? this.changeGeneration,
+      hasReceivedFirstChange:
+          hasReceivedFirstChange ?? this.hasReceivedFirstChange,
       streamError: identical(streamError, _unsetStreamError)
           ? this.streamError
           : streamError,
@@ -35,41 +36,39 @@ const Object _unsetStreamError = Object();
 
 @Riverpod(keepAlive: true)
 class ComicAggregateNotifier extends _$ComicAggregateNotifier {
-  StreamSubscription<List<Comic>>? _subscription;
+  StreamSubscription<void>? _subscription;
 
   @override
   ComicAggregateState build() {
-    _subscribeComicStream();
+    _subscribeComicChanges();
     ref.onDispose(() {
       _subscription?.cancel();
     });
     return const ComicAggregateState();
   }
 
-  void _subscribeComicStream() {
+  void _subscribeComicChanges() {
     final repo = ref.read(comicRepoProvider);
-    _subscription = repo.watchAll().listen(
-      (List<Comic> list) {
+    _subscription = repo.watchChanges().listen(
+      (_) {
         state = state.copyWith(
-          rawList: list,
-          hasReceivedFirstEmit: true,
+          changeGeneration: state.changeGeneration + 1,
+          hasReceivedFirstChange: true,
           streamError: null,
         );
       },
       onError: (Object error, StackTrace stackTrace) {
-        state = state.copyWith(hasReceivedFirstEmit: true, streamError: error);
+        state = state.copyWith(
+          hasReceivedFirstChange: true,
+          streamError: error,
+        );
       },
     );
   }
 
   void refreshStream() {
     _subscription?.cancel();
-    _subscribeComicStream();
-  }
-
-  Comic? findComicById(String comicId) {
-    return state.rawList.firstWhereOrNull(
-      (Comic comic) => comic.comicId == comicId,
-    );
+    _subscribeComicChanges();
+    state = state.copyWith(changeGeneration: state.changeGeneration + 1);
   }
 }

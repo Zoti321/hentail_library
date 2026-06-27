@@ -21,20 +21,25 @@ class LibraryComicsBlock extends ConsumerWidget {
     final bool isGridView = vm.isGridView;
     return LibrarySectionSliver(
       title: '漫画',
-      contentSliver: LibraryAdaptiveItemsSliver(
-        isGridView: isGridView,
-        gridSliver: _LibraryComicsGridSliver(
-          comics: comics,
-          hasSeriesSection: hasSeriesSection,
-          isComicTableEmpty: isComicTableEmpty,
-          effectiveQuery: filterQuery,
-        ),
-        listSliver: _LibraryComicsListSliver(
-          comics: comics,
-          hasSeriesSection: hasSeriesSection,
-          isComicTableEmpty: isComicTableEmpty,
-          effectiveQuery: filterQuery,
-        ),
+      contentSliver: SliverMainAxisGroup(
+        slivers: <Widget>[
+          LibraryAdaptiveItemsSliver(
+            isGridView: isGridView,
+            gridSliver: _LibraryComicsGridSliver(
+              comics: comics,
+              hasSeriesSection: hasSeriesSection,
+              isComicTableEmpty: isComicTableEmpty,
+              effectiveQuery: filterQuery,
+            ),
+            listSliver: _LibraryComicsListSliver(
+              comics: comics,
+              hasSeriesSection: hasSeriesSection,
+              isComicTableEmpty: isComicTableEmpty,
+              effectiveQuery: filterQuery,
+            ),
+          ),
+          const LibraryPaginationBarSliver(),
+        ],
       ),
     );
   }

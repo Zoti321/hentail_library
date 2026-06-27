@@ -1,11 +1,16 @@
 import 'package:drift/drift.dart';
+import 'package:hentai_library/data/database/comic_page_sql_builder.dart';
 import 'package:hentai_library/data/database/dao/dao.dart';
 import 'package:hentai_library/data/database/database.dart' as db;
 import 'package:hentai_library/data/mappers/mapping.dart';
+import 'package:hentai_library/domain/library/library_comic_filter.dart';
+import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 
 typedef _ComicScanIdDiff = ({
@@ -57,14 +62,56 @@ class ComicRepositoryImpl implements ComicRepository {
   }
 
   @override
-  Stream<List<Comic>> watchAll() {
-    return _comicDao.watchAllComics().asyncMap(_mapRows);
-  }
+  Stream<void> watchChanges() => _comicDao.watchComicTableChanges();
+
+  @override
+  Future<int> countAll() => _comicDao.countAllComics();
 
   @override
   Future<List<Comic>> getAll() async {
     final rows = await _comicDao.getAllComics();
     return _mapRows(rows);
+  }
+
+  @override
+  Future<PagedResult<Comic>> fetchComicsPage({
+    required PageRequest request,
+    required LibraryComicFilter filter,
+    required LibraryComicSortOption sortOption,
+  }) async {
+    final ComicPageSqlCriteria criteria = ComicPageSqlCriteria.fromFilter(
+      filter,
+    );
+    final int totalCount = await _comicDao.countComicsFiltered(criteria);
+    final int totalPages = totalCount <= 0
+        ? 0
+        : (totalCount + request.pageSize - 1) ~/ request.pageSize;
+    int effectivePage = request.page;
+    if (totalPages > 0 && effectivePage > totalPages) {
+      effectivePage = totalPages;
+    }
+    if (totalCount <= 0) {
+      return PagedResult<Comic>(
+        items: const <Comic>[],
+        totalCount: 0,
+        page: 1,
+        pageSize: request.pageSize,
+      );
+    }
+    final int offset = (effectivePage - 1) * request.pageSize;
+    final List<db.DbComic> rows = await _comicDao.fetchComicsPageFiltered(
+      criteria: criteria,
+      sortDescending: sortOption.descending,
+      limit: request.pageSize,
+      offset: offset,
+    );
+    final List<Comic> items = await _mapRows(rows);
+    return PagedResult<Comic>(
+      items: items,
+      totalCount: totalCount,
+      page: effectivePage,
+      pageSize: request.pageSize,
+    );
   }
 
   @override

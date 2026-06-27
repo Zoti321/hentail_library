@@ -1,11 +1,15 @@
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 
 /// Series 仓储：系列独立聚合，维护漫画归属与顺序。
 abstract class SeriesRepository {
   Stream<List<Series>> watchAll();
 
   Future<List<Series>> getAll();
+
+  Future<PagedResult<Series>> fetchPage(PageRequest request);
 
   Future<Series?> findByName(String name);
 

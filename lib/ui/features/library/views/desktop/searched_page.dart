@@ -4,6 +4,7 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_pagination_providers.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/core/widgets/responsive_layout/library_blocks_layout.dart';
 
@@ -39,6 +40,12 @@ class SearchedPage extends ConsumerWidget {
     final int searchedResultCount = searchedComicCount + searchedSeriesCount;
     final LibraryPageViewModel searchedViewModel = LibraryPageViewModel(
       comicsAsync: searchedComics,
+      comicsPagination: LibraryComicsPagination(
+        page: 1,
+        totalPages: searchedComicCount > 0 ? 1 : 0,
+        totalCount: searchedComicCount,
+        isLoading: searchedComics.isLoading,
+      ),
       seriesViewData: searchedSeriesData,
       displayedComicCount: searchedComicCount,
       displayedSeriesCount: searchedSeriesCount,
