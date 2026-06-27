@@ -11,7 +11,7 @@ import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/data/services/comic/scan/comic_scan_parse_service.dart';
 import 'package:hentai_library/data/services/comic/scan/resource_parser.dart';
-import 'package:hentai_library/data/services/series/auto_series_infer_service.dart';
+import 'package:hentai_library/domain/library/auto_series_infer_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'services.g.dart';

@@ -1,6 +1,4 @@
-﻿import 'package:hentai_library/data/services/series/comic_title_to_series_item_mapping.dart';
-
-export 'comic_title_to_series_item_mapping.dart';
+﻿import 'package:hentai_library/domain/library/comic_title_to_series_item_mapping.dart';
 
 /// 参与推断的单本漫画（comicId + 可见标题）。
 typedef ComicTitleInput = ({String comicId, String title});
@@ -219,8 +217,6 @@ final class InferredSeriesGrouper {
 }
 
 /// 自动从漫画标题推断系列：编排「单标题解析」与「按基名分组」两步（无 I/O）。
-///
-/// 对外请只 `import` 本文件；其通过 [export] 再导出 [ComicTitleToSeriesItemMapping] 与 [MappedSeriesVolume]。
 final class AutoSeriesInferService {
   const AutoSeriesInferService({
     ComicTitleToSeriesItemMapping titleMapping =
