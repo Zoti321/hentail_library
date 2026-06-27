@@ -1,5 +1,6 @@
-import 'package:hentai_library/data/database/dao/dao.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/repositories/comic_repository.dart';
 
 typedef AutoDetectComicContentRatingResult = ({
   int totalComics,
@@ -9,9 +10,9 @@ typedef AutoDetectComicContentRatingResult = ({
 
 class AutoDetectComicContentRatingService {
   AutoDetectComicContentRatingService({
-    required ComicDao comicDao,
+    required ComicRepository comicRepository,
     Set<String>? r18PathKeywords,
-  }) : _comicDao = comicDao,
+  }) : _comicRepository = comicRepository,
        _r18PathKeywords = (r18PathKeywords ?? _defaultR18PathKeywords)
            .map((String keyword) => keyword.trim().toLowerCase())
            .where((String keyword) => keyword.isNotEmpty)
@@ -22,33 +23,43 @@ class AutoDetectComicContentRatingService {
     '色情',
     'nsfw',
   };
-  final ComicDao _comicDao;
+  final ComicRepository _comicRepository;
   final Set<String> _r18PathKeywords;
 
   Future<AutoDetectComicContentRatingResult> executeAutoDetect() async {
-    final List<({String comicId, String path})> comicIdAndPaths =
-        await _comicDao.getAllComicIdAndPaths();
-    if (comicIdAndPaths.isEmpty) {
+    final List<Comic> comics = await _comicRepository.getAll();
+    if (comics.isEmpty) {
       return (totalComics: 0, matchedComics: 0, updatedComics: 0);
     }
 
     final Set<String> matchedComicIds = <String>{};
-    for (final ({String comicId, String path}) item in comicIdAndPaths) {
-      if (_isR18Path(item.path)) {
-        matchedComicIds.add(item.comicId);
+    for (final Comic comic in comics) {
+      if (_isR18Path(comic.path)) {
+        matchedComicIds.add(comic.comicId);
       }
     }
     if (matchedComicIds.isEmpty) {
       return (
-        totalComics: comicIdAndPaths.length,
+        totalComics: comics.length,
         matchedComics: 0,
         updatedComics: 0,
       );
     }
-    final int updatedComics = await _comicDao
-        .batchUpdateContentRatingByComicIds(matchedComicIds, ContentRating.r18);
+
+    var updatedComics = 0;
+    for (final String comicId in matchedComicIds) {
+      final Comic comic = comics.firstWhere((Comic c) => c.comicId == comicId);
+      if (comic.contentRating == ContentRating.r18) {
+        continue;
+      }
+      await _comicRepository.updateUserMeta(
+        comicId,
+        contentRating: ContentRating.r18,
+      );
+      updatedComics++;
+    }
     return (
-      totalComics: comicIdAndPaths.length,
+      totalComics: comics.length,
       matchedComics: matchedComicIds.length,
       updatedComics: updatedComics,
     );

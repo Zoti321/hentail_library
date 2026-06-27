@@ -1,8 +1,8 @@
 import 'package:hentai_library/data/services/series/auto_series_infer_service.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/data/repositories/comic_repository.dart';
-import 'package:hentai_library/data/repositories/series_repository.dart';
+import 'package:hentai_library/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/domain/repositories/series_repository.dart';
 
 /// [InferSeriesFromComicTitlesUseCase] 执行结果（供 UI 展示）。
 final class InferSeriesFromComicTitlesResult {

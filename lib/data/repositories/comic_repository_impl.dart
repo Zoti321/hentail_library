@@ -1,55 +1,14 @@
 import 'package:drift/drift.dart';
 import 'package:hentai_library/data/database/dao/dao.dart';
 import 'package:hentai_library/data/database/database.dart' as db;
-import 'package:hentai_library/domain/use_cases/purge_comics_side_effects.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/data/repositories/reading_history_repository.dart';
-import 'package:hentai_library/data/repositories/series_repository.dart';
-
-/// [replaceByScan] 应用结果统计（供 UI 进度等）。
-typedef ComicReplaceByScanResult = ({
-  int removedCount,
-  int addedCount,
-  int keptCount,
-});
-
-abstract class ComicRepository {
-  Stream<List<Comic>> watchAll();
-
-  Future<List<Comic>> getAll();
-
-  Future<Comic?> findById(String comicId);
-
-  /// 用于扫描导入（写入/更新）。
-  Future<void> upsertMany(List<Comic> comics);
-
-  Future<void> deleteByIds(List<String> comicIds);
-
-  /// 用户编辑覆盖解析值：title/authors/contentRating/tags 等。
-  Future<void> updateUserMeta(
-    String comicId, {
-    String? title,
-    List<Author>? authors,
-    ContentRating? contentRating,
-    List<Tag>? tags,
-  });
-
-  /// 扫描 diff：删除库中本次未出现的条目并清理关联；新增与保留条目写入（保留合并用户元数据）。
-  Future<ComicReplaceByScanResult> replaceByScan(List<Comic> scanned);
-
-  /// 关键词搜索（数据库命中），由上层决定是否再应用额外业务过滤。
-  Future<List<Comic>> searchByKeyword(String keyword);
-
-  /// 标签表达式搜索（数据库命中），由上层决定是否再应用额外业务过滤。
-  Future<List<Comic>> searchByTagExpression({
-    required Set<String> mustInclude,
-    required Set<String> optionalOr,
-    required Set<String> mustExclude,
-  });
-}
+import 'package:hentai_library/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
+import 'package:hentai_library/domain/repositories/series_repository.dart';
+import 'package:hentai_library/domain/use_cases/purge_comics_side_effects.dart';
 
 typedef _ComicScanIdDiff = ({
   Set<String> removedIds,
@@ -58,7 +17,7 @@ typedef _ComicScanIdDiff = ({
 });
 
 /// 漫画主表与标签的持久化；**跨聚合**（阅读历史、系列）的删除/替换流程请放在
-/// [domain/usecases]（例如 [purgeComicsFromApp]、[replaceByScan] 内已编排的 purge），
+/// [domain/use_cases]（例如 [purgeComicsFromApp]、[replaceByScan] 内已编排的 purge），
 /// 避免在本类中继续堆叠多仓储协调逻辑。
 class ComicRepositoryImpl implements ComicRepository {
   ComicRepositoryImpl(

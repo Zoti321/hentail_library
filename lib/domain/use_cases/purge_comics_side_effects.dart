@@ -1,6 +1,6 @@
-import 'package:hentai_library/data/repositories/comic_repository.dart';
-import 'package:hentai_library/data/repositories/reading_history_repository.dart';
-import 'package:hentai_library/data/repositories/series_repository.dart';
+import 'package:hentai_library/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
+import 'package:hentai_library/domain/repositories/series_repository.dart';
 
 /// 删除漫画及其阅读历史、系列归属（顺序与无根清空分支一致）。
 Future<void> purgeComicsFromApp({
