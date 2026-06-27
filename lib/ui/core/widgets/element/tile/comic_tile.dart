@@ -6,7 +6,7 @@ import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/use_cases/purge_comics_side_effects.dart';
+import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
@@ -71,9 +71,9 @@ class ComicTile extends HookConsumerWidget {
                     builder: (BuildContext context) => EditMetadataDialog(
                       comic: comic,
                       onSave: (data) async {
-                        await ref.read(updateComicMetadataUseCaseProvider)(
+                        await data.applyTo(
+                          ref.read(comicRepoProvider),
                           comic.comicId,
-                          data,
                         );
                       },
                     ),
@@ -126,12 +126,9 @@ class ComicTile extends HookConsumerWidget {
                       return;
                     }
                     try {
-                      await purgeComicsFromApp(
-                        libraryComics: ref.read(comicRepoProvider),
-                        readingHistory: ref.read(readingHistoryRepoProvider),
-                        librarySeries: ref.read(librarySeriesRepoProvider),
-                        comicIds: <String>[comic.comicId],
-                      );
+                      await ref
+                          .read(deleteComicsUseCaseProvider)
+                          .call(<String>[comic.comicId]);
                       if (context.mounted) {
                         showSuccessToast(context, '已删除漫画');
                       }

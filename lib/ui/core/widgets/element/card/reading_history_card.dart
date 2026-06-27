@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
-import 'package:hentai_library/ui/features/reader/view_models/reader_page_notifier.dart';
+import 'package:hentai_library/ui/features/reader/reader.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

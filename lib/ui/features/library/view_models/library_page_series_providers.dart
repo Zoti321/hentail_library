@@ -2,13 +2,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/models.dart' show AppSetting;
+import 'package:hentai_library/domain/library/comic_list_query.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_query.dart';
-import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_view_settings_providers.dart';
+
+const LibraryComicProjection _libraryComicProjection = LibraryComicProjection();
 
 /// Projection 层（系列）：负责生成系列区块渲染所需的只读视图数据。
 @immutable
@@ -27,11 +29,8 @@ class LibrarySeriesViewData {
 final Provider<LibrarySeriesViewData> librarySeriesViewDataProvider =
     Provider<LibrarySeriesViewData>((Ref ref) {
       final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
-      final bool showR18 = !ref.watch(
-        settingsProvider.select(
-          (AsyncValue<AppSetting> async) =>
-              async.asData?.value.isHealthyMode ?? false,
-        ),
+      final LibraryViewSettings viewSettings = ref.watch(
+        libraryViewSettingsProvider,
       );
       final List<Comic> rawComics = ref.watch(
         comicAggregateProvider.select((ComicAggregateState s) => s.rawList),
@@ -44,7 +43,9 @@ final Provider<LibrarySeriesViewData> librarySeriesViewDataProvider =
       return seriesAsync.when(
         data: (List<Series> list) {
           final LibrarySeriesQueryResult result = LibrarySeriesQuery(
-            showR18: showR18,
+            showR18: _libraryComicProjection.showR18(
+              isHealthyMode: viewSettings.isHealthyMode,
+            ),
             query: '',
             sortOption: intent.sortOption,
             comicsById: comicsById,

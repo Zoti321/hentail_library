@@ -1,13 +1,10 @@
-import 'package:hentai_library/data/mappers/mapping.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/api/read_resource_get_service.dart';
-import 'package:hentai_library/data/services/comic/scan/comic_scan_parse_service.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/ports/library_scan_port.dart';
+import 'package:hentai_library/domain/ports/reader_session_port.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/path_repository.dart';
-import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
-import 'package:hentai_library/domain/repositories/series_repository.dart';
-import 'package:hentai_library/domain/use_cases/purge_comics_side_effects.dart';
+import 'package:hentai_library/domain/use_cases/delete_comics_usecase.dart';
 import 'package:hentai_library/domain/use_cases/sync_library_types.dart';
 
 /// 用例：同步漫画库（扫描根路径、写库、无根清空）。
@@ -15,26 +12,20 @@ class SyncLibraryUseCase {
   SyncLibraryUseCase({
     required PathRepository pathRepository,
     required ComicRepository comicRepository,
-    required ReadingHistoryRepository readingHistoryRepository,
-    required SeriesRepository seriesRepository,
-    required ComicScanParseService scanParseService,
-    required ComicMapper comicMapper,
-    required ReadResourceGetService readResourceGetService,
+    required DeleteComicsUseCase deleteComicsUseCase,
+    required LibraryScanPort libraryScanPort,
+    required ReaderSessionPort readerSessionPort,
   }) : _pathRepository = pathRepository,
        _comicRepository = comicRepository,
-       _readingHistoryRepository = readingHistoryRepository,
-       _seriesRepository = seriesRepository,
-       _scanParseService = scanParseService,
-       _comicMapper = comicMapper,
-       _readResourceGetService = readResourceGetService;
+       _deleteComicsUseCase = deleteComicsUseCase,
+       _libraryScanPort = libraryScanPort,
+       _readerSessionPort = readerSessionPort;
 
   final PathRepository _pathRepository;
   final ComicRepository _comicRepository;
-  final ReadingHistoryRepository _readingHistoryRepository;
-  final SeriesRepository _seriesRepository;
-  final ComicScanParseService _scanParseService;
-  final ComicMapper _comicMapper;
-  final ReadResourceGetService _readResourceGetService;
+  final DeleteComicsUseCase _deleteComicsUseCase;
+  final LibraryScanPort _libraryScanPort;
+  final ReaderSessionPort _readerSessionPort;
 
   LibrarySyncCounts _bump(LibrarySyncCounts c, ResourceType t) {
     return switch (t) {
@@ -116,14 +107,7 @@ class SyncLibraryUseCase {
         addedCount: null,
         keptCount: null,
       ));
-      await purgeComicsFromApp(
-        libraryComics: _comicRepository,
-        readingHistory: _readingHistoryRepository,
-        librarySeries: _seriesRepository,
-        comicIds: ids,
-      );
-      await _seriesRepository.removeOrphanSeriesItems();
-      await _readResourceGetService.clear();
+      await _deleteComicsUseCase(ids);
       emit((
         phase: SyncLibraryPhase.done,
         route: SyncLibraryRoute.noRootsCleared,
@@ -139,7 +123,7 @@ class SyncLibraryUseCase {
     var counts = emptyLibrarySyncCounts();
     var acceptedTotal = 0;
     final comics = <Comic>[];
-    await for (final p in _scanParseService.scanAndParseRoots(
+    await for (final LibraryScanItem item in _libraryScanPort.scanRoots(
       effectiveRoots,
       isCancelled: isCancelled,
     )) {
@@ -149,20 +133,20 @@ class SyncLibraryUseCase {
       emit((
         phase: SyncLibraryPhase.scanning,
         route: SyncLibraryRoute.withRoots,
-        currentPath: p.path,
+        currentPath: item.path,
         acceptedTotal: acceptedTotal,
         counts: counts,
         removedCount: null,
         addedCount: null,
         keptCount: null,
       ));
-      counts = _bump(counts, p.type);
+      counts = _bump(counts, item.resourceType);
       acceptedTotal++;
-      comics.add(_comicMapper.fromParsedResource(p));
+      comics.add(item.comic);
       emit((
         phase: SyncLibraryPhase.scanning,
         route: SyncLibraryRoute.withRoots,
-        currentPath: p.path,
+        currentPath: item.path,
         acceptedTotal: acceptedTotal,
         counts: counts,
         removedCount: null,
@@ -183,18 +167,23 @@ class SyncLibraryUseCase {
       addedCount: null,
       keptCount: null,
     ));
-    final apply = await _comicRepository.replaceByScan(List<Comic>.from(comics));
-    await _seriesRepository.removeOrphanSeriesItems();
-    await _readResourceGetService.clear();
+    final plan = await _comicRepository.buildScanReplacePlan(
+      List<Comic>.from(comics),
+    );
+    if (plan.removedIds.isNotEmpty) {
+      await _deleteComicsUseCase(plan.removedIds);
+    }
+    await _comicRepository.upsertMany(plan.toUpsert);
+    await _readerSessionPort.clear();
     emit((
       phase: SyncLibraryPhase.done,
       route: SyncLibraryRoute.withRoots,
       currentPath: null,
       acceptedTotal: acceptedTotal,
       counts: counts,
-      removedCount: apply.removedCount,
-      addedCount: apply.addedCount,
-      keptCount: apply.keptCount,
+      removedCount: plan.removedIds.length,
+      addedCount: plan.addedCount,
+      keptCount: plan.keptCount,
     ));
   }
 }

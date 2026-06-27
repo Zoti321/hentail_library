@@ -7,9 +7,6 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
-import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
-import 'package:hentai_library/domain/repositories/series_repository.dart';
-import 'package:hentai_library/domain/use_cases/purge_comics_side_effects.dart';
 
 typedef _ComicScanIdDiff = ({
   Set<String> removedIds,
@@ -17,22 +14,12 @@ typedef _ComicScanIdDiff = ({
   Set<String> keptIds,
 });
 
-/// 漫画主表与标签的持久化；**跨聚合**（阅读历史、系列）的删除/替换流程请放在
-/// [domain/use_cases]（例如 [purgeComicsFromApp]、[replaceByScan] 内已编排的 purge），
-/// 避免在本类中继续堆叠多仓储协调逻辑。
+/// 漫画主表与标签的持久化；跨聚合删除请经 [DeleteComicsUseCase]。
 class ComicRepositoryImpl implements ComicRepository {
-  ComicRepositoryImpl(
-    this._comicDao,
-    this._searchDao, {
-    required ReadingHistoryRepository readingHistory,
-    required SeriesRepository librarySeries,
-  }) : _readingHistory = readingHistory,
-       _librarySeries = librarySeries;
+  ComicRepositoryImpl(this._comicDao, this._searchDao);
 
   final ComicDao _comicDao;
   final SearchDao _searchDao;
-  final ReadingHistoryRepository _readingHistory;
-  final SeriesRepository _librarySeries;
 
   Future<List<Comic>> _mapRows(List<db.DbComic> rows) async {
     final Iterable<String> ids = rows.map((db.DbComic e) => e.comicId);
@@ -155,28 +142,16 @@ class ComicRepositoryImpl implements ComicRepository {
   }
 
   @override
-  Future<ComicReplaceByScanResult> replaceByScan(List<Comic> scanned) async {
+  Future<ComicScanReplacePlan> buildScanReplacePlan(List<Comic> scanned) async {
     final unique = _dedupeScannedByComicId(scanned);
     final scannedIds = unique.keys.toSet();
-
     final existing = await getAll();
     final existingById = {for (final c in existing) c.comicId: c};
     final existingIds = existingById.keys.toSet();
-
     final idDiff = _computeComicScanIdDiff(
       existingIds: existingIds,
       scannedIds: scannedIds,
     );
-
-    if (idDiff.removedIds.isNotEmpty) {
-      await purgeComicsFromApp(
-        libraryComics: this,
-        readingHistory: _readingHistory,
-        librarySeries: _librarySeries,
-        comicIds: idDiff.removedIds,
-      );
-    }
-
     final toUpsert = <Comic>[];
     for (final e in unique.entries) {
       final id = e.key;
@@ -188,13 +163,11 @@ class ComicRepositoryImpl implements ComicRepository {
         toUpsert.add(_mergeKeptScanWithExisting(row, prior));
       }
     }
-
-    await upsertMany(toUpsert);
-
     return (
-      removedCount: idDiff.removedIds.length,
+      removedIds: idDiff.removedIds.toList(),
       addedCount: idDiff.addedIds.length,
       keptCount: idDiff.keptIds.length,
+      toUpsert: toUpsert,
     );
   }
 

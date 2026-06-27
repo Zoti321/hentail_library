@@ -23,8 +23,6 @@ part 'repos.g.dart';
 ComicRepository comicRepo(Ref ref) => ComicRepositoryImpl(
   ref.read(comicDaoProvider),
   ref.read(searchDaoProvider),
-  readingHistory: ref.read(readingHistoryRepoProvider),
-  librarySeries: ref.read(librarySeriesRepoProvider),
 );
 
 @Riverpod(keepAlive: true)

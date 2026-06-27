@@ -2,15 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
-import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/domain/library/comic_list_query.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
-import 'package:hentai_library/ui/features/shell/di/tools.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
-import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_view_settings_providers.dart';
+
+const LibraryComicProjection _libraryComicProjection = LibraryComicProjection();
 
 /// Projection 层（漫画）：把数据源、设置与 intent 合成为页面可直接消费的只读结果。
 @immutable
@@ -94,15 +93,8 @@ final Provider<Set<String>> libraryComicIdsInAnySeriesProvider =
     Provider<Set<String>>((Ref ref) {
       final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
       return seriesAsync.maybeWhen(
-        data: (List<Series> list) {
-          final Set<String> out = <String>{};
-          for (final Series series in list) {
-            for (final SeriesItem item in series.items) {
-              out.add(item.comicId);
-            }
-          }
-          return out;
-        },
+        data: (List<Series> list) =>
+            _libraryComicProjection.collectComicIdsInAnySeries(list),
         orElse: () => <String>{},
       );
     });
@@ -114,27 +106,24 @@ final Provider<AsyncValue<List<Comic>>> libraryDisplayedComicsProvider =
         comicAggregateProvider,
       );
       final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
-      final bool showR18 = !ref.watch(
-        settingsProvider.select(
-          (AsyncValue<AppSetting> async) =>
-              async.asData?.value.isHealthyMode ?? false,
-        ),
-      );
-      final _LibraryComicsStreamInput input = _LibraryComicsStreamInput(
-        rawList: aggregateState.rawList,
-        filter: intent.buildBaseFilter(showR18: showR18),
-        sortOption: intent.sortOption,
-        hasReceivedFirstEmit: aggregateState.hasReceivedFirstEmit,
-        streamError: aggregateState.streamError,
-      );
-      final bool hideComicsInSeries = ref.watch(
-        settingsProvider.select(
-          (AsyncValue<AppSetting> async) =>
-              async.asData?.value.libraryHideComicsInSeries ?? false,
-        ),
+      final LibraryViewSettings viewSettings = ref.watch(
+        libraryViewSettingsProvider,
       );
       final Set<String> seriesComicIds = ref.watch(
         libraryComicIdsInAnySeriesProvider,
+      );
+      final LibraryComicFilter filter = _libraryComicProjection.buildListFilter(
+        displayTarget: intent.displayTarget,
+        isHealthyMode: viewSettings.isHealthyMode,
+        hideComicsInSeries: viewSettings.hideComicsInSeries,
+        comicIdsInAnySeries: seriesComicIds,
+      );
+      final _LibraryComicsStreamInput input = _LibraryComicsStreamInput(
+        rawList: aggregateState.rawList,
+        filter: filter,
+        sortOption: intent.sortOption,
+        hasReceivedFirstEmit: aggregateState.hasReceivedFirstEmit,
+        streamError: aggregateState.streamError,
       );
       if (input.streamError != null) {
         return AsyncValue.error(input.streamError!, StackTrace.current);
@@ -142,16 +131,9 @@ final Provider<AsyncValue<List<Comic>>> libraryDisplayedComicsProvider =
       if (!input.hasReceivedFirstEmit) {
         return const AsyncValue.loading();
       }
-      final LibraryComicFilter filter = input.filter.copyWith(
-        comicIdsExcludedBySeriesMembership: hideComicsInSeries
-            ? seriesComicIds
-            : null,
-      );
       return AsyncValue.data(
-        ref.read(comicListQueryModuleProvider).apply(
-          comics: input.rawList,
-          filter: filter,
-          sortOption: input.sortOption,
+        ComicQuery(filter: input.filter, sortOption: input.sortOption).apply(
+          input.rawList,
         ),
       );
     });

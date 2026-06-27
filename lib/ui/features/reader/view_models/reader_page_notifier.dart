@@ -1,49 +1,20 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/core/logging/log_manager.dart';
-import 'package:hentai_library/data/services/comic/cache/archive_cover_cache.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/api/read_resource_get_service.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/core/comic_read_resource_accessor.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/core/reader_image.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/isolate/archive_cover_loader.dart';
-import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/models.dart' as entity;
-import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
-import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
 import 'package:hentai_library/ui/features/reader/view_models/reader_window_fullscreen.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
+import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader_page_notifier.freezed.dart';
 part 'reader_page_notifier.g.dart';
 
 enum ReaderTapZone { left, center, right }
-
-sealed class ReaderPageImageData {
-  const ReaderPageImageData();
-}
-
-class ReaderDirPageImageData extends ReaderPageImageData {
-  const ReaderDirPageImageData(this.file);
-  final File file;
-}
-
-class ReaderArchivePageImageData extends ReaderPageImageData {
-  const ReaderArchivePageImageData({
-    required this.comicId,
-    required this.pageIndex,
-  });
-  final String comicId;
-  final int pageIndex;
-}
 
 @freezed
 abstract class ReaderViewState with _$ReaderViewState {
@@ -289,183 +260,4 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
       targetComicId: targetComicId,
     );
   }
-}
-
-@Riverpod()
-Future<List<ReaderPageImageData>> comicImages(
-  Ref ref, {
-  required String comicId,
-  String? chapterId,
-}) async {
-  final v2Comic = await ref.read(comicRepoProvider).findById(comicId);
-  if (v2Comic == null) return [];
-
-  final ReadResourceGetService readResourceService = ref.read(
-    readResourceGetServiceProvider,
-  );
-  try {
-    final accessor = await readResourceService.acquire(
-      comicId: comicId,
-      path: v2Comic.path,
-      type: v2Comic.resourceType,
-    );
-    final int total = accessor.pageCount;
-    if (total <= 0) {
-      return const <ReaderPageImageData>[];
-    }
-    if (v2Comic.resourceType == ResourceType.dir) {
-      final List<ReaderPageImageData> result = <ReaderPageImageData>[];
-      for (int i = 0; i < total; i++) {
-        final ReaderImage img = await accessor.getPageImage(i);
-        if (img is ReaderFileImage) {
-          result.add(ReaderDirPageImageData(img.file));
-        }
-      }
-      return List<ReaderPageImageData>.unmodifiable(result);
-    }
-    final List<ReaderPageImageData> result = <ReaderPageImageData>[];
-    for (int i = 0; i < total; i++) {
-      result.add(ReaderArchivePageImageData(comicId: comicId, pageIndex: i));
-    }
-    return List<ReaderPageImageData>.unmodifiable(result);
-  } catch (e, st) {
-    LogManager.instance.handle(
-      e,
-      st,
-      '加载漫画图片失败: comicId=$comicId, path=${v2Comic.path}, type=${v2Comic.resourceType}',
-    );
-    return [];
-  }
-}
-
-@Riverpod()
-Future<ComicCoverDisplayData?> comicCoverDisplay(
-  Ref ref, {
-  required String comicId,
-}) async {
-  final Comic? v2Comic = await ref.read(comicRepoProvider).findById(comicId);
-  if (v2Comic == null) {
-    return null;
-  }
-  final ResourceType resourceType = v2Comic.resourceType;
-  if (resourceType == ResourceType.epub ||
-      resourceType == ResourceType.zip ||
-      resourceType == ResourceType.cbz) {
-    try {
-      final String sourceNorm = normalizeArchiveCoverSourcePath(v2Comic.path);
-      final bool useDiskCache = ref.read(archiveCoverDiskCacheEnabledProvider);
-      final ArchiveCoverCache coverCache = ref.read(archiveCoverCacheProvider);
-      if (useDiskCache) {
-        final String? cachedPath = await coverCache.tryReadValidPath(
-          comicId: comicId,
-          sourcePathNormalized: sourceNorm,
-        );
-        if (cachedPath != null) {
-          return ComicCoverDisplayData.file(cachedPath);
-        }
-      }
-      final ArchiveCoverDecodeResult decoded =
-          await loadArchiveCoverDecodeResultOffMainUi(
-            path: v2Comic.path,
-            type: resourceType,
-          );
-      final Uint8List? bytes = decoded.bytes;
-      if (bytes != null && bytes.isNotEmpty) {
-        if (useDiskCache) {
-          final String? writtenPath = await coverCache.write(
-            comicId: comicId,
-            sourcePathNormalized: sourceNorm,
-            bytes: bytes,
-            fileExtension: decoded.fileExtension,
-          );
-          if (writtenPath != null) {
-            return ComicCoverDisplayData.file(writtenPath);
-          }
-        }
-        return ComicCoverDisplayData.bytes(bytes);
-      }
-      return null;
-    } catch (e, st) {
-      LogManager.instance.handle(
-        e,
-        st,
-        '加载漫画封面失败(isolate): comicId=$comicId, path=${v2Comic.path}, type=$resourceType',
-      );
-      return null;
-    }
-  }
-  final ReadResourceGetService readResourceService = ref.read(
-    readResourceGetServiceProvider,
-  );
-  try {
-    final ComicReadResourceAccessor accessor = await readResourceService.acquire(
-      comicId: comicId,
-      path: v2Comic.path,
-      type: resourceType,
-    );
-    final ReaderImage cover = await accessor.getCoverImage();
-    if (cover is ReaderFileImage) {
-      return ComicCoverDisplayData.file(cover.file.path);
-    }
-    if (cover is ReaderBytesImage) {
-      return ComicCoverDisplayData.bytes(cover.bytes);
-    }
-    return null;
-  } catch (e, st) {
-    LogManager.instance.handle(
-      e,
-      st,
-      '加载漫画封面失败: comicId=$comicId, path=${v2Comic.path}, type=${v2Comic.resourceType}',
-    );
-    return null;
-  }
-}
-
-@Riverpod()
-Future<Uint8List?> comicReaderPageBytes(
-  Ref ref, {
-  required String comicId,
-  required int pageIndex,
-}) async {
-  final Comic? v2Comic = await ref.read(comicRepoProvider).findById(comicId);
-  if (v2Comic == null) {
-    return null;
-  }
-  if (v2Comic.resourceType == ResourceType.dir) {
-    return null;
-  }
-  final ReadResourceGetService readResourceService = ref.read(
-    readResourceGetServiceProvider,
-  );
-  try {
-    final ComicReadResourceAccessor accessor = await readResourceService.acquire(
-      comicId: comicId,
-      path: v2Comic.path,
-      type: v2Comic.resourceType,
-    );
-    final ReaderImage img = await accessor.getPageImage(pageIndex);
-    if (img is ReaderBytesImage) {
-      return img.bytes;
-    }
-    if (img is ReaderFileImage) {
-      return img.file.readAsBytes();
-    }
-    return null;
-  } catch (e, st) {
-    LogManager.instance.handle(
-      e,
-      st,
-      '加载漫画页面字节失败: comicId=$comicId pageIndex=$pageIndex',
-    );
-    return null;
-  }
-}
-
-@Riverpod()
-Future<entity.ReadingHistory?> readingProgress(
-  Ref ref, {
-  required String comicId,
-}) async {
-  final repo = ref.watch(readingHistoryRepoProvider);
-  return repo.getByComicId(comicId);
 }

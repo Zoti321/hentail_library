@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
@@ -86,9 +87,9 @@ class ComicDetailPrimaryActions extends HookConsumerWidget {
                 builder: (BuildContext context) => EditMetadataDialog(
                   comic: comic,
                   onSave: (data) async {
-                    await ref.read(updateComicMetadataUseCaseProvider)(
+                    await data.applyTo(
+                      ref.read(comicRepoProvider),
                       comic.comicId,
-                      data,
                     );
                   },
                 ),

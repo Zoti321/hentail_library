@@ -16,15 +16,6 @@ class LibraryQueryIntent {
   final bool isGridView;
   final String mergeSearchQuery;
 
-  /// 由 intent 组装基础过滤条件，数据层附加动态策略（如隐藏系列成员）后再执行查询。
-  LibraryComicFilter buildBaseFilter({required bool showR18}) {
-    return LibraryComicFilter(
-      showR18: showR18,
-      query: null,
-      displayTarget: displayTarget,
-    );
-  }
-
   LibraryQueryIntent copyWith({
     String? keyword,
     LibraryComicSortOption? sortOption,

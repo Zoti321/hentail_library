@@ -13,7 +13,7 @@ import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
-import 'package:hentai_library/ui/features/reader/view_models/reader_page_notifier.dart';
+import 'package:hentai_library/ui/features/reader/reader.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/series_add_comics_dialog_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/series_management_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';

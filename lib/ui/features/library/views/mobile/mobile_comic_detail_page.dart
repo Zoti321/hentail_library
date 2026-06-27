@@ -12,11 +12,7 @@ import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
-import 'package:hentai_library/ui/features/reader/view_models/reader_page_notifier.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
-import 'package:hentai_library/ui/features/shell/di/usecases/comic_meta.dart';
-import 'package:hentai_library/ui/features/shell/di/usecases/reading_progress.dart';
+import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 
 class MobileComicDetailPage extends ConsumerWidget {
@@ -446,9 +442,10 @@ class _EditMetadataSheetState extends ConsumerState<_EditMetadataSheet> {
         tags: selectedTags,
         authors: authors,
       );
-      await ref
-          .read(updateComicMetadataUseCaseProvider)
-          .call(widget.comic.comicId, form);
+      await form.applyTo(
+        ref.read(comicRepoProvider),
+        widget.comic.comicId,
+      );
       if (!mounted) {
         return;
       }

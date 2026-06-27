@@ -3,11 +3,12 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 
-/// [replaceByScan] 应用结果统计（供 UI 进度等）。
-typedef ComicReplaceByScanResult = ({
-  int removedCount,
+/// Library sync 扫描 diff 计划：调用方须先对 [removedIds] 执行 [DeleteComicsUseCase]。
+typedef ComicScanReplacePlan = ({
+  List<String> removedIds,
   int addedCount,
   int keptCount,
+  List<Comic> toUpsert,
 });
 
 abstract class ComicRepository {
@@ -31,8 +32,8 @@ abstract class ComicRepository {
     List<Tag>? tags,
   });
 
-  /// 扫描 diff：删除库中本次未出现的条目并清理关联；新增与保留条目写入（保留合并用户元数据）。
-  Future<ComicReplaceByScanResult> replaceByScan(List<Comic> scanned);
+  /// 计算扫描 diff 与待 upsert 列表；不删除 [ComicScanReplacePlan.removedIds]。
+  Future<ComicScanReplacePlan> buildScanReplacePlan(List<Comic> scanned);
 
   /// 关键词搜索（数据库命中），由上层决定是否再应用额外业务过滤。
   Future<List<Comic>> searchByKeyword(String keyword);

@@ -13,7 +13,7 @@ Clean-architecture layers under `lib/`:
 | `lib/data/` | Services, repositories, database (Drift), and mappers. |
 | `lib/ui/` | Shared widgets/theme (`core/`) and feature modules (`features/<feature>/` with `view_models/` + `views/`). |
 
-Import canonical paths directly (`domain/models/…`, `data/repositories/…`, etc.). Do not add files under removed legacy roots (`model/`, `repository/`, `services/`, `usecases/`, `database/`, `module/` at `lib/` root).
+Import canonical paths directly (`domain/models/…`, `data/repositories/…`, etc.). Do not add files under removed legacy roots (`presentation/`, `model/`, `repository/`, `services/`, `usecases/`, `database/`, `module/` at `lib/` root). Canonical top-level layout is `core/`, `data/`, `domain/`, `ui/` only.
 
 ## Widget state
 
