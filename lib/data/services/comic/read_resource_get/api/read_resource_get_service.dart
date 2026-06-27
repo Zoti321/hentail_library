@@ -1,4 +1,4 @@
-﻿import 'package:hentai_library/model/enums.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/core/comic_read_resource_accessor.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/internal/session/comic_read_resource_session_manager.dart';
 

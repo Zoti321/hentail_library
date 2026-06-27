@@ -1,7 +1,7 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/model/entity/comic/comic.dart';
-import 'package:hentai_library/model/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 

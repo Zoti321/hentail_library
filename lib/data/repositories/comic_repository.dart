@@ -1,11 +1,11 @@
-﻿import 'package:drift/drift.dart';
+import 'package:drift/drift.dart';
 import 'package:hentai_library/data/database/dao/dao.dart';
 import 'package:hentai_library/data/database/database.dart' as db;
-import 'package:hentai_library/usecases/purge_comics_side_effects.dart';
-import 'package:hentai_library/model/entity/comic/author.dart';
-import 'package:hentai_library/model/entity/comic/comic.dart';
-import 'package:hentai_library/model/entity/comic/tag.dart';
-import 'package:hentai_library/model/enums.dart';
+import 'package:hentai_library/domain/use_cases/purge_comics_side_effects.dart';
+import 'package:hentai_library/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/data/repositories/reading_history_repository.dart';
 import 'package:hentai_library/data/repositories/series_repository.dart';
 

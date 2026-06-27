@@ -1,6 +1,6 @@
 import 'package:hentai_library/core/logging/log_manager.dart';
-import 'package:hentai_library/module/comic_list_query/comic_list_query.dart';
-import 'package:hentai_library/module/mapping/mapping.dart';
+import 'package:hentai_library/domain/library/comic_list_query.dart';
+import 'package:hentai_library/data/mappers/mapping.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:talker/talker.dart';
 

@@ -1,11 +1,11 @@
-﻿import 'dart:ui' show clampDouble;
+import 'dart:ui' show clampDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/model/entity/comic/series.dart';
-import 'package:hentai_library/model/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';

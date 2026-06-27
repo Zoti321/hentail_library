@@ -1,11 +1,11 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:hentai_library/model/entity/comic/author.dart';
-import 'package:hentai_library/model/entity/comic/comic.dart';
-import 'package:hentai_library/model/entity/comic/series.dart';
-import 'package:hentai_library/model/entity/comic/series_item.dart';
-import 'package:hentai_library/model/entity/comic/tag.dart';
+import 'package:hentai_library/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/data/repositories/author_repository.dart';
 import 'package:hentai_library/data/repositories/comic_repository.dart';
 import 'package:hentai_library/data/repositories/series_repository.dart';

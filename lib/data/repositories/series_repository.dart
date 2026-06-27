@@ -1,7 +1,7 @@
-﻿import 'package:hentai_library/data/database/dao/dao.dart';
+import 'package:hentai_library/data/database/dao/dao.dart';
 import 'package:hentai_library/data/database/database.dart' as db;
-import 'package:hentai_library/model/entity/comic/series.dart';
-import 'package:hentai_library/model/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 
 /// Series 仓储：系列独立聚合，维护漫画归属与顺序。
 abstract class SeriesRepository {

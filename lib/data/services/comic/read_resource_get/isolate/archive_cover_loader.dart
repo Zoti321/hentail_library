@@ -7,7 +7,7 @@ import 'package:epub_image_extractor/epub_image_extractor.dart';
 import 'package:hentai_library/core/util/comic_file_types.dart';
 import 'package:hentai_library/core/util/filename_natural_compare.dart';
 import 'package:hentai_library/core/util/path_normalizer.dart';
-import 'package:hentai_library/model/enums.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:path/path.dart' as p;
 
 /// 隔离线程封面解码结果：用于归档封面缓存写入与展示。

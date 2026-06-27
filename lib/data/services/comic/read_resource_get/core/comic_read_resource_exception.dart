@@ -1,4 +1,4 @@
-import 'package:hentai_library/model/enums.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 
 /// 阅读资源访问异常基类。
 class ComicReadResourceException implements Exception {

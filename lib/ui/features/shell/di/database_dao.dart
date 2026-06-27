@@ -1,5 +1,5 @@
-import 'package:hentai_library/database/dao/dao.dart';
-import 'package:hentai_library/database/database.dart';
+import 'package:hentai_library/data/database/dao/dao.dart';
+import 'package:hentai_library/data/database/database.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'database_dao.g.dart';

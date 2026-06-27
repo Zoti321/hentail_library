@@ -1,5 +1,5 @@
-﻿import 'package:flutter/material.dart';
-import 'package:hentai_library/model/entity/comic/author.dart';
+import 'package:flutter/material.dart';
+import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

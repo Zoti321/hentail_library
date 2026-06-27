@@ -1,7 +1,7 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:hentai_library/core/logging/log_manager.dart';
-import 'package:hentai_library/model/enums.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/data/services/comic/scan/directory_scanner.dart';
 import 'package:hentai_library/data/services/comic/scan/resource_parse_dispatcher.dart';
 import 'package:hentai_library/data/services/comic/scan/resource_parser.dart';

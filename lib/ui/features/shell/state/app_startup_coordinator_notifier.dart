@@ -1,7 +1,7 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:hentai_library/model/models.dart' show AppSetting;
+import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';

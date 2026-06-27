@@ -2,6 +2,19 @@
 
 Project-specific conventions for UI widgets and lightweight data shapes. Agents should follow these when writing or refactoring code.
 
+## Project layout
+
+Clean-architecture layers under `lib/`:
+
+| Directory | Role |
+|-----------|------|
+| `lib/core/` | Cross-cutting utilities (logging, l10n, path/format helpers). Not domain or persistence — keep as a separate top-level folder. |
+| `lib/domain/` | Domain models (`models/`), use cases (`use_cases/`), and library query logic (`library/`). |
+| `lib/data/` | Services, repositories, database (Drift), and mappers. |
+| `lib/ui/` | Shared widgets/theme (`core/`) and feature modules (`features/<feature>/` with `view_models/` + `views/`). |
+
+Import canonical paths directly (`domain/models/…`, `data/repositories/…`, etc.). Do not add files under removed legacy roots (`model/`, `repository/`, `services/`, `usecases/`, `database/`, `module/` at `lib/` root).
+
 ## Widget state
 
 Prefer stateless widget variants. Avoid Flutter's built-in stateful widgets unless there is a concrete reason hooks or Riverpod cannot cover the case.

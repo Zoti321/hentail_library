@@ -1,7 +1,7 @@
-﻿import 'package:drift/drift.dart';
+import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:hentai_library/data/database/tables.dart';
-import 'package:hentai_library/model/enums.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:path_provider/path_provider.dart';
 
 export 'tables.dart';

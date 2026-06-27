@@ -1,5 +1,5 @@
-﻿import 'package:hentai_library/model/enums.dart';
-import 'package:hentai_library/module/comic_list_query/comic_list_query.dart';
+import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/library/comic_list_query.dart';
 import 'package:hentai_library/ui/features/shell/view_models/debounced_action_runner.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

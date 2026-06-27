@@ -1,8 +1,8 @@
-﻿import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/core/util/path_normalizer.dart';
 import 'package:hentai_library/data/services/comic/scan/comic_scan_parse_service.dart';
-import 'package:hentai_library/model/entity/comic/author.dart';
-import 'package:hentai_library/model/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 
 /// ParsedResource 映射为领域 `Comic`。
 class ComicMapper {

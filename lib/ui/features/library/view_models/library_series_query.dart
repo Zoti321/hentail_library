@@ -1,6 +1,6 @@
-import 'package:hentai_library/model/entity/comic/comic.dart';
-import 'package:hentai_library/model/entity/comic/series.dart';
-import 'package:hentai_library/module/comic_list_query/comic_list_query.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/domain/library/comic_list_query.dart';
 
 /// 领域查询对象：封装“系列筛选 + 排序”规则，避免 UI/Provider 出现过程式循环细节。
 class LibrarySeriesQueryResult {

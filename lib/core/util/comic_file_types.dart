@@ -1,4 +1,4 @@
-import 'package:hentai_library/model/enums.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 
 /// 统一的漫画/来源文件类型与扩展名常量。
 ///

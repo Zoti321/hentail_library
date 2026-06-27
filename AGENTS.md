@@ -18,7 +18,7 @@ Single-context layout: `CONTEXT.md` at the repo root and `docs/adr/` for ADRs. S
 
 ### Coding style
 
-Widget state: prefer `StatelessWidget` / `HookWidget` / `ConsumerWidget` / `HookConsumerWidget` over `StatefulWidget`. Lightweight pass-through data: prefer `typedef` + record over classes without serialization needs. See `docs/agents/coding-style.md`.
+Widget state: prefer `StatelessWidget` / `HookWidget` / `ConsumerWidget` / `HookConsumerWidget` over `StatefulWidget`. Lightweight pass-through data: prefer `typedef` + record over classes without serialization needs. Layer layout: `core/` (utilities), `domain/`, `data/`, `ui/` — see `docs/agents/coding-style.md`.
 
 ### UI style & responsive design
 

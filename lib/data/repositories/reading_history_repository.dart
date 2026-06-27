@@ -1,7 +1,7 @@
-﻿import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/data/database/dao/dao.dart';
-import 'package:hentai_library/model/models.dart' as entity;
+import 'package:hentai_library/domain/models/models.dart' as entity;
 import 'package:hentai_library/data/mappers/mapping.dart';
 
 abstract class ReadingHistoryRepository {

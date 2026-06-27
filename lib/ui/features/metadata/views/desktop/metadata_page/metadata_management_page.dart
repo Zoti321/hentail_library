@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -6,8 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/model/entity/comic/author.dart';
-import 'package:hentai_library/model/entity/comic/tag.dart';
+import 'package:hentai_library/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/metadata/views/desktop/metadata_page/widgets/author_management_panel.dart';
 import 'package:hentai_library/ui/features/metadata/views/desktop/metadata_page/widgets/series_management_panel.dart';
@@ -17,8 +17,8 @@ import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/add_series_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/rename_tag_dialog.dart';
-import 'package:hentai_library/services/metadata/metadata_io_exception.dart';
-import 'package:hentai_library/services/metadata/metadata_io_models.dart';
+import 'package:hentai_library/data/services/metadata/metadata_io_exception.dart';
+import 'package:hentai_library/data/services/metadata/metadata_io_models.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class MetadataManagementPage extends ConsumerStatefulWidget {

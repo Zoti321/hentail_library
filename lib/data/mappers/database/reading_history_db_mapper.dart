@@ -1,6 +1,6 @@
-﻿import 'package:drift/drift.dart';
+import 'package:drift/drift.dart';
 import 'package:hentai_library/data/database/database.dart';
-import 'package:hentai_library/model/models.dart' as entity;
+import 'package:hentai_library/domain/models/models.dart' as entity;
 
 class ReadingHistoryDbMapper {
   const ReadingHistoryDbMapper();

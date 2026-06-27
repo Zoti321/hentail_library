@@ -1,10 +1,10 @@
-﻿import 'package:hentai_library/model/entity/comic/tag.dart';
-import 'package:hentai_library/model/enums.dart';
-import 'package:hentai_library/usecases/assign_comic_to_series_usecase.dart';
-import 'package:hentai_library/usecases/infer_series_from_comic_titles_usecase.dart';
-import 'package:hentai_library/usecases/ingest_library_resources_usecase.dart';
-import 'package:hentai_library/usecases/update_comic_meta_usecase.dart';
-import 'package:hentai_library/model/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/use_cases/assign_comic_to_series_usecase.dart';
+import 'package:hentai_library/domain/use_cases/infer_series_from_comic_titles_usecase.dart';
+import 'package:hentai_library/domain/use_cases/ingest_library_resources_usecase.dart';
+import 'package:hentai_library/domain/use_cases/update_comic_meta_usecase.dart';
+import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

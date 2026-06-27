@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:hentai_library/core/logging/log_manager.dart';
-import 'package:hentai_library/model/models.dart' show AppSetting;
+import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 

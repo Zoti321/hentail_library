@@ -1,5 +1,5 @@
-﻿import 'package:hentai_library/data/database/dao/dao.dart';
-import 'package:hentai_library/model/entity/comic/tag.dart';
+import 'package:hentai_library/data/database/dao/dao.dart';
+import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 
 /// Tag 仓储：独立于 Comic/Series 的“标签字典管理”。
 abstract class TagRepository {

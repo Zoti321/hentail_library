@@ -1,5 +1,5 @@
-﻿import 'package:flutter/material.dart';
-import 'package:hentai_library/model/entity/comic/series.dart';
+import 'package:flutter/material.dart';
+import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 
 class SeriesConfirmDeleteDialog extends StatelessWidget {
