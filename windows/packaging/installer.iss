@@ -2,11 +2,11 @@
 #define MyAppVersion "1.0.0"
 #define MyAppPublisher "hentai_library"
 #define MyAppExeName "hentai_library.exe"
-#define MySourceDir "build\windows\x64\runner\Release"
+#define MySourceDir "..\..\build\windows\x64\runner\Release"
 #define MyAppId "{{8FCD170B-6A2A-47A9-8FB9-89B84DABEEA5}"
 
-#ifexist "windows\runner\resources\app_icon.ico"
-  #define MySetupIconFile "windows\runner\resources\app_icon.ico"
+#ifexist "..\runner\resources\app_icon.ico"
+  #define MySetupIconFile "..\runner\resources\app_icon.ico"
 #endif
 
 [Setup]
@@ -16,7 +16,7 @@ AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-OutputDir=dist_installer
+OutputDir=..\..\dist_installer
 OutputBaseFilename={#MyAppName}_Setup_{#MyAppVersion}_x64
 Compression=lzma2
 SolidCompression=yes
@@ -31,7 +31,7 @@ SetupIconFile={#MySetupIconFile}
 #endif
 
 [Languages]
-Name: "chinesesimp"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+Name: "chinesesimp"; MessagesFile: "ChineseSimplified.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "创建桌面快捷方式"; GroupDescription: "附加任务:"; Flags: unchecked

@@ -73,7 +73,7 @@ jobs:
         run: |
           $version = "${{ needs.gate.outputs.version }}"
           $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-          & $iscc "/DMyAppVersion=$version" installer.iss
+          & $iscc "/DMyAppVersion=$version" "windows\packaging\installer.iss"
 
       - name: Package portable zip
         shell: pwsh
