@@ -23,8 +23,7 @@ enum ResourceType {
   cbr,
 
   /// .rar 占位（暂不解析）
-  rar,
-  ;
+  rar;
 
   static ResourceType? fromFilePath(String path) {
     final String ext = p.extension(path).toLowerCase();

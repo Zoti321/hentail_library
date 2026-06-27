@@ -65,4 +65,3 @@ class ComicReadResourceSessionManager {
     _cache.clear();
   }
 }
-

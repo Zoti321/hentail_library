@@ -442,10 +442,7 @@ class _EditMetadataSheetState extends ConsumerState<_EditMetadataSheet> {
         tags: selectedTags,
         authors: authors,
       );
-      await form.applyTo(
-        ref.read(comicRepoProvider),
-        widget.comic.comicId,
-      );
+      await form.applyTo(ref.read(comicRepoProvider), widget.comic.comicId);
       if (!mounted) {
         return;
       }

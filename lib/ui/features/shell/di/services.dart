@@ -21,9 +21,8 @@ List<ResourceParser> comicResourceParsers(Ref ref) =>
     defaultComicResourceParsers();
 
 @Riverpod(keepAlive: true)
-ComicScanParseService comicScanParseService(Ref ref) => ComicScanParseService(
-  parsers: ref.read(comicResourceParsersProvider),
-);
+ComicScanParseService comicScanParseService(Ref ref) =>
+    ComicScanParseService(parsers: ref.read(comicResourceParsersProvider));
 
 @Riverpod(keepAlive: true)
 AutoSeriesInferService autoSeriesInferService(Ref ref) =>
@@ -38,7 +37,9 @@ AutoDetectComicContentRatingService autoDetectComicContentRatingService(
 
 @Riverpod(keepAlive: true)
 ComicReadResourceOpener comicReadResourceOpener(Ref ref) =>
-    ComicReadResourceOpener(pathNormalizer: ref.read(comicReadPathNormalizerProvider));
+    ComicReadResourceOpener(
+      pathNormalizer: ref.read(comicReadPathNormalizerProvider),
+    );
 
 @Riverpod(keepAlive: true)
 ComicReadPathNormalizer comicReadPathNormalizer(Ref ref) =>

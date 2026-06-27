@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/common.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -102,11 +102,7 @@ class _FluentMenuItem extends StatelessWidget {
             ),
             child: Row(
               children: <Widget>[
-                Icon(
-                  icon,
-                  size: 16,
-                  color: palette.contextMenuMutedText,
-                ),
+                Icon(icon, size: 16, color: palette.contextMenuMutedText),
                 SizedBox(width: tokens.spacing.md),
                 Expanded(
                   child: Text(

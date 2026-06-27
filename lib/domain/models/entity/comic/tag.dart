@@ -7,4 +7,3 @@ part 'tag.freezed.dart';
 abstract class Tag with _$Tag {
   factory Tag({required String name}) = _Tag;
 }
-

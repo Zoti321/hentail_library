@@ -13,4 +13,3 @@ String? inferComicImageMimeType(String filePathOrName) {
     _ => null,
   };
 }
-

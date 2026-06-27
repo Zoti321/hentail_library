@@ -1,4 +1,4 @@
-﻿import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/domain/use_cases/sync_library_types.dart';
 import 'package:hentai_library/ui/features/shell/di/usecases/sync_library.dart';
@@ -70,4 +70,3 @@ class ScanLibraryController extends _$ScanLibraryController {
     state = state.copyWith(runInBackground: value);
   }
 }
-

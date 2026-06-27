@@ -58,8 +58,10 @@ class LogFileWriter {
       if (await _logFile!.exists() &&
           await _logFile!.length() > maxFileSizeBytes) {
         final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final backupPath =
-            _logFile!.path.replaceFirst('.txt', '_$timestamp.bak');
+        final backupPath = _logFile!.path.replaceFirst(
+          '.txt',
+          '_$timestamp.bak',
+        );
         await _logFile!.rename(backupPath);
       }
     } catch (e, st) {
@@ -74,8 +76,11 @@ class LogFileWriter {
         if (e is File && e.path.endsWith('.bak')) backups.add(e);
       }
       if (backups.length <= maxBackupFiles) return;
-      backups.sort((a, b) =>
-          (a as File).lastModifiedSync().compareTo((b as File).lastModifiedSync()));
+      backups.sort(
+        (a, b) => (a as File).lastModifiedSync().compareTo(
+          (b as File).lastModifiedSync(),
+        ),
+      );
       for (var i = 0; i < backups.length - maxBackupFiles; i++) {
         await (backups[i] as File).delete();
       }

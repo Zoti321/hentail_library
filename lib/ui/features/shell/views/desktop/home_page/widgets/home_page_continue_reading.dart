@@ -188,7 +188,7 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
               '暂无阅读记录，',
               style: TextStyle(
                 fontSize: widget.tokens.text.bodySm,
-              color: widget.colorScheme.hentai.textSecondary,
+                color: widget.colorScheme.hentai.textSecondary,
               ),
             ),
             TextButton(

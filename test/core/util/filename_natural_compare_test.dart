@@ -3,19 +3,28 @@ import 'package:test/test.dart';
 
 void main() {
   group('compareFilenameNatural', () {
-    test('numeric prefix: larger id sorts after smaller lexicographic trap', () {
-      const String smallerNumericLargerLex = '92313559_p0-anastasia.png';
-      const String largerNumericSmallerLex =
-          '142918999_p0-\u5e02\u5ddd\u96cf\u83dc \uff0f Hinana.png';
-      expect(
-        compareFilenameNatural(smallerNumericLargerLex, largerNumericSmallerLex),
-        lessThan(0),
-      );
-      expect(
-        compareFilenameNatural(largerNumericSmallerLex, smallerNumericLargerLex),
-        greaterThan(0),
-      );
-    });
+    test(
+      'numeric prefix: larger id sorts after smaller lexicographic trap',
+      () {
+        const String smallerNumericLargerLex = '92313559_p0-anastasia.png';
+        const String largerNumericSmallerLex =
+            '142918999_p0-\u5e02\u5ddd\u96cf\u83dc \uff0f Hinana.png';
+        expect(
+          compareFilenameNatural(
+            smallerNumericLargerLex,
+            largerNumericSmallerLex,
+          ),
+          lessThan(0),
+        );
+        expect(
+          compareFilenameNatural(
+            largerNumericSmallerLex,
+            smallerNumericLargerLex,
+          ),
+          greaterThan(0),
+        );
+      },
+    );
 
     test('a1 a2 a10 order', () {
       final List<String> names = <String>['a10.png', 'a2.png', 'a1.png'];

@@ -126,7 +126,9 @@ class HentaiColorScheme {
   );
 
   static ColorScheme buildBaseColorScheme(Brightness brightness) =>
-      brightness == Brightness.dark ? _baseDarkColorScheme : _baseLightColorScheme;
+      brightness == Brightness.dark
+      ? _baseDarkColorScheme
+      : _baseLightColorScheme;
 
   static ColorScheme _buildFluentColorScheme({
     required Brightness brightness,

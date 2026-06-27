@@ -73,9 +73,8 @@ class ImageQualityPolicy {
 }
 
 ImageQualityPolicy configureImageQualityPolicy() {
-  final PlatformDispatcher dispatcher = WidgetsBinding
-      .instance
-      .platformDispatcher;
+  final PlatformDispatcher dispatcher =
+      WidgetsBinding.instance.platformDispatcher;
   final FlutterView? primaryView = dispatcher.views.isNotEmpty
       ? dispatcher.views.first
       : null;

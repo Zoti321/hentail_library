@@ -132,9 +132,10 @@ final Provider<AsyncValue<List<Comic>>> libraryDisplayedComicsProvider =
         return const AsyncValue.loading();
       }
       return AsyncValue.data(
-        ComicQuery(filter: input.filter, sortOption: input.sortOption).apply(
-          input.rawList,
-        ),
+        ComicQuery(
+          filter: input.filter,
+          sortOption: input.sortOption,
+        ).apply(input.rawList),
       );
     });
 

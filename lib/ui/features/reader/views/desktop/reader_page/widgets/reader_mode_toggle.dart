@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 
 class ReadModeToggleButton extends StatelessWidget {
@@ -33,8 +33,7 @@ class ReadModeToggleButton extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color:
-                  isActive ? cs.hentai.activeButtonBg : Colors.transparent,
+              color: isActive ? cs.hentai.activeButtonBg : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(

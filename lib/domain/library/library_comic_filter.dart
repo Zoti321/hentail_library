@@ -1,4 +1,4 @@
-﻿import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/library_tag_pick.dart';
@@ -29,7 +29,9 @@ abstract class LibraryComicFilter with _$LibraryComicFilter {
     if (query != null && query!.trim().isNotEmpty) {
       final q = query!.toLowerCase();
       final inTitle = comic.title.toLowerCase().contains(q);
-      final inAuthors = comic.authors.any((a) => a.name.toLowerCase().contains(q));
+      final inAuthors = comic.authors.any(
+        (a) => a.name.toLowerCase().contains(q),
+      );
       if (!inTitle && !inAuthors) return false;
     }
     if (!showR18 && comic.contentRating == ContentRating.r18) {

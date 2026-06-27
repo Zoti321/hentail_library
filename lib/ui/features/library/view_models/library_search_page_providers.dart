@@ -44,9 +44,10 @@ final librarySearchPageComicsProvider =
         hideComicsInSeries: viewSettings.hideComicsInSeries,
         comicIdsInAnySeries: seriesComicIds,
       );
-      return ComicQuery(filter: filter, sortOption: intent.sortOption).apply(
-        matched,
-      );
+      return ComicQuery(
+        filter: filter,
+        sortOption: intent.sortOption,
+      ).apply(matched);
     });
 
 final librarySearchPageSeriesViewDataProvider =

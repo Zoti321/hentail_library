@@ -13,15 +13,14 @@ class ComicReadResourceOpener {
     Set<String>? imageExtensions,
     ComicReadPathNormalizer? pathNormalizer,
     ComicReadResourceAccessorFactory? accessorFactory,
-  })
-    : _pathNormalizer = pathNormalizer ?? const ComicReadPathNormalizer(),
-      _accessorFactory =
-          accessorFactory ??
-          ComicReadResourceAccessorFactory(
-            imageExtensions:
-                imageExtensions ??
-                Set<String>.from(ComicFileTypes.comicImageExtensions),
-          );
+  }) : _pathNormalizer = pathNormalizer ?? const ComicReadPathNormalizer(),
+       _accessorFactory =
+           accessorFactory ??
+           ComicReadResourceAccessorFactory(
+             imageExtensions:
+                 imageExtensions ??
+                 Set<String>.from(ComicFileTypes.comicImageExtensions),
+           );
 
   final ComicReadPathNormalizer _pathNormalizer;
   final ComicReadResourceAccessorFactory _accessorFactory;
@@ -35,7 +34,11 @@ class ComicReadResourceOpener {
   }) async {
     final String normalized = _pathNormalizer.normalizePath(path);
     if (normalized.isEmpty) {
-      throw _buildKindMismatch(path: path, type: type, detail: _pathEmptyDetail);
+      throw _buildKindMismatch(
+        path: path,
+        type: type,
+        detail: _pathEmptyDetail,
+      );
     }
     final FileSystemEntityType entityType = await FileSystemEntity.type(
       normalized,
@@ -100,4 +103,3 @@ class ComicReadResourceOpener {
     );
   }
 }
-

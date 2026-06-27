@@ -1,4 +1,4 @@
-﻿import 'package:hentai_library/data/mappers/comic/comic_mapper.dart';
+import 'package:hentai_library/data/mappers/comic/comic_mapper.dart';
 import 'package:hentai_library/data/mappers/database/comic_db_mapper.dart';
 import 'package:hentai_library/data/mappers/database/reading_history_db_mapper.dart';
 import 'package:hentai_library/data/mappers/database/series_db_mapper.dart';
@@ -31,4 +31,3 @@ class DefaultMappingModule implements MappingModule {
   SeriesReadingHistoryDbMapper get seriesReadingHistoryDb =>
       const SeriesReadingHistoryDbMapper();
 }
-

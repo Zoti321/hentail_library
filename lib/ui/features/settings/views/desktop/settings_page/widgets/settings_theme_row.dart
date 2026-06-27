@@ -38,7 +38,11 @@ class _ThemePreferenceRowState extends ConsumerState<ThemePreferenceRow> {
     final ColorScheme colorScheme = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     return SettingsRow(
-      icon: Icon(LucideIcons.palette, size: 20, color: colorScheme.hentai.iconDefault),
+      icon: Icon(
+        LucideIcons.palette,
+        size: 20,
+        color: colorScheme.hentai.iconDefault,
+      ),
       label: '应用主题',
       description: '可跟随系统或固定浅色、深色；当前：${preference.labelZh}',
       onRowTap: () => menuController.showMenu(),

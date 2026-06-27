@@ -43,7 +43,8 @@ class _LibrarySeriesGridSliver extends StatefulWidget {
   final List<Series> series;
 
   @override
-  State<_LibrarySeriesGridSliver> createState() => _LibrarySeriesGridSliverState();
+  State<_LibrarySeriesGridSliver> createState() =>
+      _LibrarySeriesGridSliverState();
 }
 
 class _LibrarySeriesGridSliverState extends State<_LibrarySeriesGridSliver> {
@@ -197,9 +198,8 @@ Future<void> _handleSeriesContextAction({
       }
       await showDialog<void>(
         context: context,
-        builder: (BuildContext context) => ReorderSeriesItemsDialog(
-          series: series,
-        ),
+        builder: (BuildContext context) =>
+            ReorderSeriesItemsDialog(series: series),
       );
       return;
     case SeriesContextAction.addComics:

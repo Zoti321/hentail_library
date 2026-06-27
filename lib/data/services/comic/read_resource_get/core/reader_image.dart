@@ -23,4 +23,3 @@ final class ReaderBytesImage extends ReaderImage {
   final Uint8List bytes;
   final String? mimeType;
 }
-

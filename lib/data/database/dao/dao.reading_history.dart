@@ -52,7 +52,9 @@ class ReadingHistoryDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> clearExpiredHistory() async {
-    final DateTime limitDate = DateTime.now().subtract(const Duration(days: 365));
+    final DateTime limitDate = DateTime.now().subtract(
+      const Duration(days: 365),
+    );
     await (delete(
       comicReadingHistories,
     )..where((t) => t.lastReadTime.isSmallerThanValue(limitDate))).go();
@@ -113,7 +115,9 @@ class SeriesReadingHistoryDao extends DatabaseAccessor<AppDatabase>
   }
 
   Future<void> clearExpiredSeriesReading() async {
-    final DateTime limitDate = DateTime.now().subtract(const Duration(days: 365));
+    final DateTime limitDate = DateTime.now().subtract(
+      const Duration(days: 365),
+    );
     await (delete(
       seriesReadingHistories,
     )..where((t) => t.lastReadTime.isSmallerThanValue(limitDate))).go();

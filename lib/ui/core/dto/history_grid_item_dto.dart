@@ -2,10 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'history_grid_item_dto.freezed.dart';
 
-enum HistoryGridItemKind {
-  comic,
-  series,
-}
+enum HistoryGridItemKind { comic, series }
 
 @freezed
 abstract class HistoryGridItemDto with _$HistoryGridItemDto {

@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
@@ -131,9 +131,9 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                         iconSize: 16,
                         size: 32,
                         borderRadius: 8,
-                      foregroundColor: cs.hentai.readerTextIconPrimary,
-                      hoverColor: cs.hentai.readerPanelSubtle,
-                      overlayColor: cs.hentai.readerPanelSubtle,
+                        foregroundColor: cs.hentai.readerTextIconPrimary,
+                        hoverColor: cs.hentai.readerPanelSubtle,
+                        overlayColor: cs.hentai.readerPanelSubtle,
                         onPressed: () => _readModeController.toggleMenu(),
                       ),
                     ),

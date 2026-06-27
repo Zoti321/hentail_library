@@ -7,4 +7,3 @@ class DirectoryScanner {
     return dir.list(recursive: false, followLinks: false);
   }
 }
-

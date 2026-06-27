@@ -45,4 +45,3 @@ class PathNormalizer {
     return current;
   }
 }
-

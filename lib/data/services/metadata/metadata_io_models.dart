@@ -53,7 +53,9 @@ class MetadataIoSeries {
   Map<String, Object> toJson() {
     return <String, Object>{
       'name': name,
-      'items': items.map((MetadataIoSeriesItem value) => value.toJson()).toList(),
+      'items': items
+          .map((MetadataIoSeriesItem value) => value.toJson())
+          .toList(),
     };
   }
 }
@@ -68,4 +70,3 @@ class MetadataIoSeriesItem {
     return <String, Object>{'comicTitle': comicTitle, 'order': order};
   }
 }
-

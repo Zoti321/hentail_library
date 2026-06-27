@@ -8,6 +8,7 @@ class DebouncedActionRunner {
     _timer?.cancel();
     _timer = Timer(duration, action);
   }
+
   void dispose() {
     _timer?.cancel();
   }

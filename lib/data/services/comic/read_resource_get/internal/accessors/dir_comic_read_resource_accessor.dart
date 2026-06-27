@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:hentai_library/core/util/filename_natural_compare.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/core/comic_read_resource_accessor.dart';
@@ -92,4 +92,3 @@ class DirComicReadResourceAccessor implements ComicReadResourceAccessor {
     _orderedFiles = List<File>.unmodifiable(imageFiles);
   }
 }
-

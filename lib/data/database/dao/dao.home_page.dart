@@ -200,8 +200,7 @@ class HomePageDao extends DatabaseAccessor<AppDatabase>
   Stream<List<HomeContinueReadingEntry>> _watchRecentTop5Reading({
     required bool excludeR18,
   }) {
-    final Set<TableInfo<Table, Object>> readsFrom =
-        excludeR18
+    final Set<TableInfo<Table, Object>> readsFrom = excludeR18
         ? <TableInfo<Table, Object>>{
             comics,
             seriesItems,
@@ -215,9 +214,7 @@ class HomePageDao extends DatabaseAccessor<AppDatabase>
     return customSelect(
       _kSqlWatchTrigger,
       readsFrom: readsFrom,
-    ).watch().asyncMap(
-      (_) => _loadRecentTop5Reading(excludeR18: excludeR18),
-    );
+    ).watch().asyncMap((_) => _loadRecentTop5Reading(excludeR18: excludeR18));
   }
 
   Map<String, int> _mapSeriesComicOrder(Iterable<DbSeriesItem> rows) {

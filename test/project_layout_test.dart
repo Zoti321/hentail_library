@@ -6,9 +6,7 @@ import 'package:test/test.dart';
 void main() {
   group('lib/ top-level layout', () {
     test('only canonical directories exist', () {
-      final Directory libDir = Directory(
-        p.join(Directory.current.path, 'lib'),
-      );
+      final Directory libDir = Directory(p.join(Directory.current.path, 'lib'));
       final Set<String> actualNames = libDir
           .listSync()
           .whereType<Directory>()

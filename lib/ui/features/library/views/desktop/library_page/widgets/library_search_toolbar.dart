@@ -155,7 +155,9 @@ class _ViewToggleButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: isActive ? cs.hentai.subtleTagBackground : Colors.transparent,
+            color: isActive
+                ? cs.hentai.subtleTagBackground
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: isActive ? cs.hentai.borderSubtle : Colors.transparent,

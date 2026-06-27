@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -114,7 +114,7 @@ class CustomTextField extends HookWidget {
                     child: Icon(
                       LucideIcons.circleX,
                       size: 14,
-                        color: colorScheme.hentai.textPlaceholder,
+                      color: colorScheme.hentai.textPlaceholder,
                     ),
                   ),
                 ),

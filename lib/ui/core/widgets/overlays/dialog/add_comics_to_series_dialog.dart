@@ -137,10 +137,7 @@ class _AddComicsToSeriesDialogState
           Text(
             '已在系列中的漫画打开对话框时与「已选中」相同；点击可取消选中。勾选顺序决定排序。'
             '若全部取消选中后确认，将从系列中移出当前全部漫画。',
-            style: TextStyle(
-              fontSize: 12,
-              color: cs.hentai.textTertiary,
-            ),
+            style: TextStyle(fontSize: 12, color: cs.hentai.textTertiary),
           ),
           const SizedBox(height: 10),
           CustomTextField(
@@ -271,10 +268,7 @@ class _ComicSelectableTile extends StatelessWidget {
                 comic.authors.map((a) => a.name).join(' / '),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: cs.hentai.textTertiary,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: cs.hentai.textTertiary, fontSize: 12),
               ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

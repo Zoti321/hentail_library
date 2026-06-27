@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/features/shell/views/desktop/selected_paths_page/widgets/path_tile.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -59,7 +59,7 @@ class SelectedPathsListCard extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.hentai.textSecondary,
+                      color: theme.colorScheme.hentai.textSecondary,
                     ),
                   ),
                   const Spacer(),
@@ -80,11 +80,10 @@ class SelectedPathsListCard extends ConsumerWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: paths.length,
-                separatorBuilder: (_, int index) =>
-                    Divider(
-                      height: 1,
-                      color: theme.colorScheme.hentai.borderSubtle,
-                    ),
+                separatorBuilder: (_, int index) => Divider(
+                  height: 1,
+                  color: theme.colorScheme.hentai.borderSubtle,
+                ),
                 itemBuilder: (BuildContext context, int index) {
                   final String path = paths[index];
                   return PathTile(path: path);

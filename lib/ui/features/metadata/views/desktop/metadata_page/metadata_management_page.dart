@@ -343,4 +343,3 @@ int _tabIndexFromQuery(String? tab) {
       return 1;
   }
 }
-

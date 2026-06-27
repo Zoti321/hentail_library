@@ -41,7 +41,9 @@ final class ComicTitleToSeriesItemMapping {
   static final RegExp _whitespaceDigitSuffix = RegExp(
     r'^(.+?)\s+(\d+)(?:\s|$)',
   );
-  static final RegExp _contiguousDigitWithSubtitle = RegExp(r'^(.+?)(\d+)\s+.+$');
+  static final RegExp _contiguousDigitWithSubtitle = RegExp(
+    r'^(.+?)(\d+)\s+.+$',
+  );
   static final RegExp _whitespaceDaiWaSuffix = RegExp(
     r'^(.+?)\s+第([一二三四五六七八九十百千]+)話$',
   );
@@ -85,8 +87,9 @@ final class ComicTitleToSeriesItemMapping {
     if (withoutComiketPrefix.isEmpty) {
       return null;
     }
-    final MappedSeriesVolume? parsed =
-        _parseSeriesNameAndVolumeOrder(withoutComiketPrefix);
+    final MappedSeriesVolume? parsed = _parseSeriesNameAndVolumeOrder(
+      withoutComiketPrefix,
+    );
     if (parsed == null) {
       return null;
     }
@@ -130,9 +133,8 @@ final class ComicTitleToSeriesItemMapping {
     if (decimalVol != null) {
       return decimalVol;
     }
-    final MappedSeriesVolume? contiguousDecimalVol = _tryContiguousDecimalVolume(
-      titleAfterComiketPrefix,
-    );
+    final MappedSeriesVolume? contiguousDecimalVol =
+        _tryContiguousDecimalVolume(titleAfterComiketPrefix);
     if (contiguousDecimalVol != null) {
       return contiguousDecimalVol;
     }
@@ -168,9 +170,7 @@ final class ComicTitleToSeriesItemMapping {
     if (uoShita != null) {
       return uoShita;
     }
-    final MappedSeriesVolume? jk = _tryJkKuppukuVolume(
-      titleAfterComiketPrefix,
-    );
+    final MappedSeriesVolume? jk = _tryJkKuppukuVolume(titleAfterComiketPrefix);
     if (jk != null) {
       return jk;
     }
@@ -377,7 +377,9 @@ final class ComicTitleToSeriesItemMapping {
   static MappedSeriesVolume? _trySpacedDecimalVolume(
     String titleAfterComiketPrefix,
   ) {
-    final Match? m = _whitespaceDecimalSuffix.firstMatch(titleAfterComiketPrefix);
+    final Match? m = _whitespaceDecimalSuffix.firstMatch(
+      titleAfterComiketPrefix,
+    );
     if (m == null) {
       return null;
     }
@@ -517,7 +519,9 @@ final class ComicTitleToSeriesItemMapping {
   }
 
   static MappedSeriesVolume? _tryUoShitaVolume(String titleAfterComiketPrefix) {
-    final Match? m = _whitespaceUoShitaSuffix.firstMatch(titleAfterComiketPrefix);
+    final Match? m = _whitespaceUoShitaSuffix.firstMatch(
+      titleAfterComiketPrefix,
+    );
     if (m == null) {
       return null;
     }
@@ -657,10 +661,7 @@ final class SeriesTitleClustering {
 
   /// 去掉装饰用心形符号，便于「おほっ♥…」与「おほっ…」合并。
   static String stripHeartSymbols(String title) {
-    return title
-        .replaceAll('\u2665', '')
-        .replaceAll('\u2661', '')
-        .trim();
+    return title.replaceAll('\u2665', '').replaceAll('\u2661', '').trim();
   }
 
   /// 解析得到的基名：去掉末尾全角句号，便于与无句号标题合并。

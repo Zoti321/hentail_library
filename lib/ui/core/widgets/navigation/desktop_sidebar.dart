@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/dto/nav_item_data.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -37,9 +37,7 @@ class DesktopSidebar extends StatelessWidget {
       height: double.infinity,
       decoration: BoxDecoration(
         color: cs.hentai.sidebarBackground,
-        border: Border(
-          right: BorderSide(color: cs.hentai.borderSubtle),
-        ),
+        border: Border(right: BorderSide(color: cs.hentai.borderSubtle)),
       ),
       padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
       child: Column(
@@ -60,8 +58,9 @@ class DesktopSidebar extends StatelessWidget {
                 borderRadius: 8,
                 foregroundColor: cs.hentai.textSecondary,
                 hoverColor: cs.hentai.sidebarItemHoverBackground,
-                overlayColor:
-                    cs.hentai.sidebarItemHoverBackground.withAlpha(110),
+                overlayColor: cs.hentai.sidebarItemHoverBackground.withAlpha(
+                  110,
+                ),
                 delayTooltipThreeSeconds: false,
                 onPressed: onToggleExpanded,
               ),
@@ -197,7 +196,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
             border: Border.all(
               width: widget.isActive ? 1 : 0.8,
               color: widget.isActive
-                    ? cs.hentai.sidebarItemActiveBorder
+                  ? cs.hentai.sidebarItemActiveBorder
                   : idleBackground,
             ),
             boxShadow: widget.isActive

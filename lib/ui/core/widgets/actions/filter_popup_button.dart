@@ -106,7 +106,7 @@ class _FilterMenu extends HookConsumerWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                  color: colorScheme.hentai.textSecondary,
+                    color: colorScheme.hentai.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -222,8 +222,7 @@ class _DisplayTargetChip extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color:
-                      isSelected ? cs.onPrimary : cs.hentai.textSecondary,
+                  color: isSelected ? cs.onPrimary : cs.hentai.textSecondary,
                 ),
               ),
             ),

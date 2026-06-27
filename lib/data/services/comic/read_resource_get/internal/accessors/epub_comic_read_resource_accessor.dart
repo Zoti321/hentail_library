@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:epub_image_extractor/epub_image_extractor.dart';
@@ -98,4 +98,3 @@ class EpubComicReadResourceAccessor implements ComicReadResourceAccessor {
     return ReaderBytesImage(data, mimeType: mime);
   }
 }
-

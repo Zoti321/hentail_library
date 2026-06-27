@@ -1,4 +1,4 @@
-﻿import 'package:hentai_library/data/services/comic/read_resource_get/core/reader_image.dart';
+import 'package:hentai_library/data/services/comic/read_resource_get/core/reader_image.dart';
 
 /// 已打开的漫画阅读资源访问器。
 ///
@@ -22,4 +22,3 @@ abstract class ComicReadResourceAccessor {
   /// 获取指定页图像（从 0 开始）。
   Future<ReaderImage> getPageImage(int pageIndex);
 }
-

@@ -35,6 +35,7 @@ class GhostButton extends StatelessWidget {
     this.delayTooltipThreeSeconds = true,
   }) : size = 32,
        _variant = _GhostButtonVariant.iconText;
+
   /// Label-only; same hover / overlay behavior as [GhostButton.iconText].
   const GhostButton.text({
     super.key,

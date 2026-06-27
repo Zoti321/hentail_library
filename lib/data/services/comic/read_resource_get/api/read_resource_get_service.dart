@@ -15,8 +15,9 @@ abstract class ReadResourceGetService {
 
 /// 默认门面实现：内部委托给会话管理器。
 class DefaultReadResourceGetService implements ReadResourceGetService {
-  DefaultReadResourceGetService({required ComicReadResourceSessionManager sessions})
-    : _sessions = sessions;
+  DefaultReadResourceGetService({
+    required ComicReadResourceSessionManager sessions,
+  }) : _sessions = sessions;
 
   final ComicReadResourceSessionManager _sessions;
 
@@ -34,4 +35,3 @@ class DefaultReadResourceGetService implements ReadResourceGetService {
     return _sessions.clear();
   }
 }
-

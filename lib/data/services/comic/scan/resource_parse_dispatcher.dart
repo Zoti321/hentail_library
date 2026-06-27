@@ -94,4 +94,3 @@ class ResourceParseDispatcher {
     return null;
   }
 }
-

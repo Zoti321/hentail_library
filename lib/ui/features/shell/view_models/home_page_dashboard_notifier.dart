@@ -23,9 +23,7 @@ Stream<List<HomeContinueReadingEntry>> homeContinueReadingTop5Stream(Ref ref) {
 
 @Riverpod(keepAlive: true)
 Stream<Map<String, int>> homeSeriesComicOrderMapStream(Ref ref) {
-  return ref
-      .watch(homePageRepoProvider)
-      .watchHomeSeriesComicOrderMap();
+  return ref.watch(homePageRepoProvider).watchHomeSeriesComicOrderMap();
 }
 
 @Riverpod(keepAlive: true)

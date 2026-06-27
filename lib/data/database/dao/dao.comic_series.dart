@@ -76,8 +76,9 @@ class ComicDao extends DatabaseAccessor<AppDatabase> with _$ComicDaoMixin {
     List<String> authorNames,
   ) async {
     await transaction(() async {
-      await (delete(comicAuthors)..where((t) => t.comicId.equals(comicId)))
-          .go();
+      await (delete(
+        comicAuthors,
+      )..where((t) => t.comicId.equals(comicId))).go();
       final uniqueNames = authorNames.toSet().toList();
       if (uniqueNames.isEmpty) return;
       await batch((b) {
@@ -167,9 +168,7 @@ class ComicDao extends DatabaseAccessor<AppDatabase> with _$ComicDaoMixin {
     if (ids.isEmpty) {
       return Future<int>.value(0);
     }
-    return (update(
-      comics,
-    )..where((Comics t) => t.comicId.isIn(ids))).write(
+    return (update(comics)..where((Comics t) => t.comicId.isIn(ids))).write(
       ComicsCompanion(contentRating: Value<ContentRating>(contentRating)),
     );
   }

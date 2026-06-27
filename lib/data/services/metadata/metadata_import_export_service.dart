@@ -44,7 +44,9 @@ class DefaultMetadataImportExportService
       final ({int added, int skipped}) authorStats = await _importAuthors(
         payload.authors,
       );
-      final ({int added, int skipped}) tagStats = await _importTags(payload.tags);
+      final ({int added, int skipped}) tagStats = await _importTags(
+        payload.tags,
+      );
       final ({
         int addedSeries,
         int skippedSeries,
@@ -52,7 +54,8 @@ class DefaultMetadataImportExportService
         int skippedMissingComic,
         int skippedOccupied,
         int skippedOrderConflict,
-      }) seriesStats = await _importSeries(payload.series);
+      })
+      seriesStats = await _importSeries(payload.series);
       return MetadataImportReport(
         addedAuthors: authorStats.added,
         skippedAuthors: authorStats.skipped,
@@ -134,7 +137,9 @@ class DefaultMetadataImportExportService
     return MetadataIoPayload(authors: authors, tags: tags, series: series);
   }
 
-  Future<({int added, int skipped})> _importAuthors(List<String> authors) async {
+  Future<({int added, int skipped})> _importAuthors(
+    List<String> authors,
+  ) async {
     final Set<String> existing = (await _authorRepository.listAll())
         .map((item) => item.name.trim())
         .where((item) => item.isNotEmpty)

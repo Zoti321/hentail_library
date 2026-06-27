@@ -41,7 +41,9 @@ class _NoMatchingComicsSliver extends StatelessWidget {
                   label: const Text('管理扫描路径'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: theme.colorScheme.primary,
-                    side: BorderSide(color: theme.colorScheme.hentai.borderSubtle),
+                    side: BorderSide(
+                      color: theme.colorScheme.hentai.borderSubtle,
+                    ),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 10,
@@ -120,7 +122,9 @@ class _EmptyLibrarySliver extends StatelessWidget {
                     label: const Text('管理扫描路径'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: theme.colorScheme.primary,
-                      side: BorderSide(color: theme.colorScheme.hentai.borderSubtle),
+                      side: BorderSide(
+                        color: theme.colorScheme.hentai.borderSubtle,
+                      ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 10,

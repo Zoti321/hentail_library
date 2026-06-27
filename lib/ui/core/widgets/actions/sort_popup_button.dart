@@ -73,8 +73,9 @@ class _SortMenu extends HookConsumerWidget {
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHighest,
               border: Border(
-                bottom:
-                    BorderSide(color: theme.colorScheme.hentai.borderSubtle),
+                bottom: BorderSide(
+                  color: theme.colorScheme.hentai.borderSubtle,
+                ),
               ),
             ),
             child: Row(
@@ -201,7 +202,7 @@ class _SortSection extends HookConsumerWidget {
                         size: 12,
                         color: isAsc
                             ? colorScheme.primary
-                        : colorScheme.hentai.warning,
+                            : colorScheme.hentai.warning,
                       ),
                       Text(
                         isAsc ? "升序" : "降序",
@@ -210,7 +211,7 @@ class _SortSection extends HookConsumerWidget {
                           fontWeight: FontWeight.w600,
                           color: isAsc
                               ? colorScheme.primary
-                          : colorScheme.hentai.warning,
+                              : colorScheme.hentai.warning,
                         ),
                       ),
                     ],
@@ -259,7 +260,9 @@ class _SortOption extends HookConsumerWidget {
         color: isSelected ? colorScheme.primary : colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isSelected ? colorScheme.primary : colorScheme.hentai.borderSubtle,
+          color: isSelected
+              ? colorScheme.primary
+              : colorScheme.hentai.borderSubtle,
         ),
         boxShadow: isSelected
             ? [

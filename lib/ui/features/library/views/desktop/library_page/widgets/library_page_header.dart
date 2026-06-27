@@ -31,10 +31,7 @@ class LibraryPageHeader extends ConsumerWidget {
           label: AppStrings.comicCount(comicCount),
         ),
         const SizedBox(width: 8),
-        MetaChip(
-          icon: LucideIcons.bookMarked,
-          label: '$seriesCount 个系列',
-        ),
+        MetaChip(icon: LucideIcons.bookMarked, label: '$seriesCount 个系列'),
       ],
     );
   }

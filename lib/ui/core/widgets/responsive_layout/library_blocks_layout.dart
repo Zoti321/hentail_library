@@ -13,11 +13,6 @@ class LibraryBlocksSliverGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverMainAxisGroup(
-      slivers: <Widget>[
-        seriesBlock,
-        comicsBlock,
-      ],
-    );
+    return SliverMainAxisGroup(slivers: <Widget>[seriesBlock, comicsBlock]);
   }
 }

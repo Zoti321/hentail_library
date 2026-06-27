@@ -57,7 +57,10 @@ class SeriesComicItemsCard extends StatelessWidget {
                 shrinkWrap: true,
                 itemCount: itemCount,
                 separatorBuilder: (BuildContext context, int index) {
-                  return Divider(height: 1, color: colorScheme.hentai.borderSubtle);
+                  return Divider(
+                    height: 1,
+                    color: colorScheme.hentai.borderSubtle,
+                  );
                 },
                 itemBuilder: (BuildContext context, int index) {
                   return SeriesItemComicTile(

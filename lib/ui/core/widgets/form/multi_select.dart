@@ -1,4 +1,4 @@
-﻿import 'dart:math' as math;
+import 'dart:math' as math;
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
@@ -409,7 +409,7 @@ class _MultiSelectMenuWithFilterState<T>
           border: Border.all(color: cs.hentai.borderSubtle),
           boxShadow: [
             BoxShadow(
-            color: cs.hentai.cardShadowHover,
+              color: cs.hentai.cardShadowHover,
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),

@@ -38,13 +38,16 @@ class AuthorDao extends DatabaseAccessor<AppDatabase> with _$AuthorDaoMixin {
   Future<List<DbAuthor>> listAll() => select(authors).get();
 
   Stream<List<DbAuthor>> watchAll() {
-    return (select(authors)..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
+    return (select(
+      authors,
+    )..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
   }
 
   Future<void> addAuthor(String name) async {
-    await into(
-      authors,
-    ).insert(AuthorsCompanion.insert(name: name), mode: InsertMode.insertOrIgnore);
+    await into(authors).insert(
+      AuthorsCompanion.insert(name: name),
+      mode: InsertMode.insertOrIgnore,
+    );
   }
 
   Future<int> deleteByNames(List<String> names) {

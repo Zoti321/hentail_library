@@ -18,8 +18,11 @@ class ComicLibraryScanAdapter implements LibraryScanPort {
     Iterable<String> roots, {
     bool Function()? isCancelled,
   }) async* {
-    await for (final ParsedResource resource in _scanParseService
-        .scanAndParseRoots(roots, isCancelled: isCancelled)) {
+    await for (final ParsedResource resource
+        in _scanParseService.scanAndParseRoots(
+          roots,
+          isCancelled: isCancelled,
+        )) {
       yield (
         path: resource.path,
         resourceType: resource.type,

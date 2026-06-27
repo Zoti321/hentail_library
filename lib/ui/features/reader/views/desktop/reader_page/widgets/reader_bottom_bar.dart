@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
@@ -98,8 +98,10 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                 decoration: BoxDecoration(
                   color: cs.hentai.floatingUiBackground,
                   borderRadius: BorderRadius.circular(16),
-                  border:
-                      Border.all(color: cs.hentai.readerPanelBorder, width: 1),
+                  border: Border.all(
+                    color: cs.hentai.readerPanelBorder,
+                    width: 1,
+                  ),
                 ),
                 child: Column(
                   spacing: 8,
@@ -362,10 +364,7 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                 const SizedBox(height: 4),
                 Text(
                   '与设置页保持一致，范围 1-60 秒',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: cs.hentai.textTertiary,
-                  ),
+                  style: TextStyle(fontSize: 11, color: cs.hentai.textTertiary),
                 ),
                 const SizedBox(height: 10),
                 Container(

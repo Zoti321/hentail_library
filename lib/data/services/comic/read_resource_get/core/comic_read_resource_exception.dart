@@ -53,4 +53,3 @@ class ComicReadResourceInvalidContentException
     Object? cause,
   }) : super(message, cause: cause);
 }
-

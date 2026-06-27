@@ -21,17 +21,17 @@ class HomeContinueReadingEntry {
     required this.title,
     required this.lastReadTime,
     required this.pageIndex,
-  })  : kind = HomeContinueReadingKind.comic,
-        seriesName = null,
-        lastReadComicId = null;
+  }) : kind = HomeContinueReadingKind.comic,
+       seriesName = null,
+       lastReadComicId = null;
   const HomeContinueReadingEntry.series({
     required this.seriesName,
     required this.lastReadComicId,
     required this.lastReadTime,
     required this.pageIndex,
-  })  : kind = HomeContinueReadingKind.series,
-        comicId = null,
-        title = null;
+  }) : kind = HomeContinueReadingKind.series,
+       comicId = null,
+       title = null;
   final HomeContinueReadingKind kind;
   final String? comicId;
   final String? title;

@@ -140,4 +140,3 @@ String _normalizeDotExtension(String ext) {
   }
   return lower.startsWith('.') ? lower : '.$lower';
 }
-

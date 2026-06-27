@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 
@@ -19,10 +19,7 @@ class RemoveSavedPathConfirmDialog extends StatelessWidget {
         children: [
           Text(
             '将从库中移除该路径。此操作不可撤销。',
-            style: TextStyle(
-              fontSize: 14,
-              color: cs.hentai.textSecondary,
-            ),
+            style: TextStyle(fontSize: 14, color: cs.hentai.textSecondary),
           ),
           const SizedBox(height: 10),
           Text(

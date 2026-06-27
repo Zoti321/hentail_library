@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/use_cases/sync_library_types.dart';
@@ -106,10 +106,7 @@ class ScanProgressDialog extends ConsumerWidget {
             Expanded(
               child: Text(
                 '准备中…',
-            style: TextStyle(
-              fontSize: 14,
-              color: cs.hentai.textSecondary,
-            ),
+                style: TextStyle(fontSize: 14, color: cs.hentai.textSecondary),
               ),
             ),
           ],
@@ -138,8 +135,7 @@ class ScanProgressDialog extends ConsumerWidget {
 
   Widget _buildRunningBody(ThemeData theme, SyncLibraryProgress p) {
     final cs = theme.colorScheme;
-    final secondary =
-        TextStyle(fontSize: 14, color: cs.hentai.textSecondary);
+    final secondary = TextStyle(fontSize: 14, color: cs.hentai.textSecondary);
 
     switch (p.route) {
       case SyncLibraryRoute.noRootsNoop:

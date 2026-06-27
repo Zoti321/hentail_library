@@ -32,7 +32,8 @@ class DetailResponsiveLayout extends StatelessWidget {
 
   final Widget header;
   final double headerSpacing;
-  final Widget Function(BuildContext context, DetailPanelSize panel) bodyBuilder;
+  final Widget Function(BuildContext context, DetailPanelSize panel)
+  bodyBuilder;
 
   @override
   Widget build(BuildContext context) {

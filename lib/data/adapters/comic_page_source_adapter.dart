@@ -40,10 +40,8 @@ class ComicPageSourceAdapter implements ComicPageSourcePort {
     }
     return List<ReadSessionPage>.generate(
       total,
-      (int index) => ReadSessionArchivePage(
-        comicId: comic.comicId,
-        pageIndex: index,
-      ),
+      (int index) =>
+          ReadSessionArchivePage(comicId: comic.comicId, pageIndex: index),
     );
   }
 

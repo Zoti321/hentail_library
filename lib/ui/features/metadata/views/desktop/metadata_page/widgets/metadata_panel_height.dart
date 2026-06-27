@@ -17,13 +17,14 @@ class MetadataPanelHeightConfig {
 
 class MetadataPanelHeightCalculator {
   const MetadataPanelHeightCalculator._();
-  static const MetadataPanelHeightConfig defaultConfig = MetadataPanelHeightConfig(
-    minHeight: 240,
-    maxHeight: 640,
-    heightFactor: 0.78,
-    headerHeight: 52,
-    estimatedRowHeight: 52,
-  );
+  static const MetadataPanelHeightConfig defaultConfig =
+      MetadataPanelHeightConfig(
+        minHeight: 240,
+        maxHeight: 640,
+        heightFactor: 0.78,
+        headerHeight: 52,
+        estimatedRowHeight: 52,
+      );
   static double calculateCardHeight({
     required BoxConstraints constraints,
     required int itemCount,

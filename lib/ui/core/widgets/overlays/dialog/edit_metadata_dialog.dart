@@ -324,9 +324,7 @@ class _EditMetadataContentRatingSection extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: isR18
-                              ? cs.error
-                              : cs.hentai.textPrimary,
+                          color: isR18 ? cs.error : cs.hentai.textPrimary,
                           height: 1.25,
                         ),
                       ),

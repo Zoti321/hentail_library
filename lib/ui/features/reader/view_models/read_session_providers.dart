@@ -21,9 +21,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'read_session_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-ReadSessionLoader readSessionLoader(Ref ref) => ReadSessionLoader(
-  pageSource: ref.read(comicPageSourcePortProvider),
-);
+ReadSessionLoader readSessionLoader(Ref ref) =>
+    ReadSessionLoader(pageSource: ref.read(comicPageSourcePortProvider));
 
 ReaderPageImageData _mapReadSessionPageToUi(ReadSessionPage page) {
   return switch (page) {
@@ -144,11 +143,7 @@ Future<ComicCoverDisplayData?> comicCoverDisplay(
   );
   try {
     final ComicReadResourceAccessor accessor = await readResourceService
-        .acquire(
-          comicId: comicId,
-          path: comic.path,
-          type: resourceType,
-        );
+        .acquire(comicId: comicId, path: comic.path, type: resourceType);
     final ReaderImage cover = await accessor.getCoverImage();
     if (cover is ReaderFileImage) {
       return ComicCoverDisplayData.file(cover.file.path);

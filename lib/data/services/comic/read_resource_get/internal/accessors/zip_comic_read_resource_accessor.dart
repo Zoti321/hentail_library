@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
@@ -122,4 +122,3 @@ class ZipComicReadResourceAccessor implements ComicReadResourceAccessor {
     return ReaderBytesImage(bytes, mimeType: mime);
   }
 }
-

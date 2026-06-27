@@ -39,11 +39,7 @@ class AutoDetectComicContentRatingService {
       }
     }
     if (matchedComicIds.isEmpty) {
-      return (
-        totalComics: comics.length,
-        matchedComics: 0,
-        updatedComics: 0,
-      );
+      return (totalComics: comics.length, matchedComics: 0, updatedComics: 0);
     }
 
     var updatedComics = 0;

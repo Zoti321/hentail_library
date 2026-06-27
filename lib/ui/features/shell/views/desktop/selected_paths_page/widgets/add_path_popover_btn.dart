@@ -220,7 +220,10 @@ class _AddPathMenuPanel extends StatelessWidget {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: tokens.spacing.sm),
-                child: Divider(height: 1, color: colorScheme.hentai.borderSubtle),
+                child: Divider(
+                  height: 1,
+                  color: colorScheme.hentai.borderSubtle,
+                ),
               ),
             ],
             _AddPathMenuItem(

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 
@@ -169,8 +169,9 @@ class _DatePickerState extends State<DatePicker> {
                         ),
                       ],
                       border: Border.all(
-                        color:
-                            Theme.of(context).colorScheme.hentai.borderSubtle,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.hentai.borderSubtle,
                       ),
                     ),
                     child: Padding(
@@ -217,7 +218,7 @@ class _DatePickerState extends State<DatePicker> {
                                           fontWeight: FontWeight.w500,
                                           color: Theme.of(
                                             context,
-                                            ).colorScheme.hentai.textPlaceholder,
+                                          ).colorScheme.hentai.textPlaceholder,
                                         ),
                                       ),
                                     ),
@@ -266,8 +267,12 @@ class _DatePickerState extends State<DatePicker> {
                       style: TextStyle(
                         fontSize: 14,
                         color: widget.value.isEmpty
-                            ? Theme.of(context).colorScheme.hentai.textPlaceholder
-                            : Theme.of(context).colorScheme.hentai.textSecondary,
+                            ? Theme.of(
+                                context,
+                              ).colorScheme.hentai.textPlaceholder
+                            : Theme.of(
+                                context,
+                              ).colorScheme.hentai.textSecondary,
                       ),
                     ),
                     const Spacer(),

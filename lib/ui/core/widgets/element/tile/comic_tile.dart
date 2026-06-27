@@ -126,9 +126,9 @@ class ComicTile extends HookConsumerWidget {
                       return;
                     }
                     try {
-                      await ref
-                          .read(deleteComicsUseCaseProvider)
-                          .call(<String>[comic.comicId]);
+                      await ref.read(deleteComicsUseCaseProvider).call(<String>[
+                        comic.comicId,
+                      ]);
                       if (context.mounted) {
                         showSuccessToast(context, '已删除漫画');
                       }

@@ -24,15 +24,13 @@ void main() {
         ),
         Series(
           name: 'B',
-          items: <SeriesItem>[
-            SeriesItem(comicId: 'c2', order: 1),
-          ],
+          items: <SeriesItem>[SeriesItem(comicId: 'c2', order: 1)],
         ),
       ];
-      expect(
-        projection.collectComicIdsInAnySeries(inputSeries),
-        <String>{'c1', 'c2'},
-      );
+      expect(projection.collectComicIdsInAnySeries(inputSeries), <String>{
+        'c1',
+        'c2',
+      });
     });
 
     test('buildListFilter applies Healthy mode and series exclusion', () {

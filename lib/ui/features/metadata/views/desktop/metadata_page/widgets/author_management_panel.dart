@@ -257,14 +257,18 @@ class _AuthorListCard extends StatelessWidget {
               itemBuilder: (BuildContext context, int index) {
                 final Author author = authors[index];
                 return Consumer(
-                  builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                    final bool isSelected = ref.watch(
-                      authorSelectionProvider.select(
-                        (Set<Author> selected) => selected.contains(author),
-                      ),
-                    );
-                    return _AuthorRow(author: author, isSelected: isSelected);
-                  },
+                  builder:
+                      (BuildContext context, WidgetRef ref, Widget? child) {
+                        final bool isSelected = ref.watch(
+                          authorSelectionProvider.select(
+                            (Set<Author> selected) => selected.contains(author),
+                          ),
+                        );
+                        return _AuthorRow(
+                          author: author,
+                          isSelected: isSelected,
+                        );
+                      },
                 );
               },
               separatorBuilder: (BuildContext context, int index) =>
@@ -363,7 +367,9 @@ class _AuthorRow extends ConsumerWidget {
                 iconSize: 16,
                 size: _AuthorStyles.iconButtonSize.width,
                 tooltip: '',
-                foregroundColor: isSelected ? cs.primary : cs.hentai.textTertiary,
+                foregroundColor: isSelected
+                    ? cs.primary
+                    : cs.hentai.textTertiary,
                 hoverColor: theme.colorScheme.primary.withAlpha(10),
                 overlayColor: theme.colorScheme.primary.withAlpha(14),
                 borderRadius: 8,

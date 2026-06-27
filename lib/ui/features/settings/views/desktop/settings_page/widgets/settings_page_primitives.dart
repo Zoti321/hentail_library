@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -52,7 +52,8 @@ class SettingsGroup extends StatelessWidget {
                         Divider(
                           height: 1,
                           thickness: 1,
-                          color: theme.colorScheme.hentai.inputBackgroundDisabled,
+                          color:
+                              theme.colorScheme.hentai.inputBackgroundDisabled,
                         ),
                     ],
                   ),
