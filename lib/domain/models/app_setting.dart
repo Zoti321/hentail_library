@@ -21,6 +21,12 @@ abstract class AppSetting with _$AppSetting {
 
     /// 是否将 epub/zip/cbz 列表封面解码结果写入应用缓存目录（关闭后不读写，已落盘文件保留）。
     @Default(true) bool archiveCoverDiskCacheEnabled,
+
+    /// 启动时是否自动检查应用更新。
+    @Default(true) bool autoUpdate,
+
+    /// 用户选择「稍后提醒」所忽略的远程版本号；空字符串表示未忽略。
+    @Default('') String dismissedUpdateVersion,
   }) = _AppSetting;
 
   factory AppSetting.fromJson(Map<String, dynamic> json) =>

@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/util/format_byte_size.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/features/settings/state/app_update_controller.dart';
+import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
+import 'package:hentai_library/ui/features/shell/di/services.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class MobileSettingsPage extends ConsumerWidget {
   const MobileSettingsPage({super.key});
@@ -192,6 +195,35 @@ class MobileSettingsPage extends ConsumerWidget {
                         ],
                       ),
                     ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _SectionCard(
+                title: '关于',
+                children: <Widget>[
+                  SwitchListTile(
+                    title: const Text('自动更新'),
+                    subtitle: Text(
+                      settings.autoUpdate ? '启动时检查更新' : '启动时不检查更新',
+                    ),
+                    value: settings.autoUpdate,
+                    onChanged: (bool value) {
+                      ref.read(settingsProvider.notifier).setAutoUpdate(value);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.system_update_outlined),
+                    title: const Text('检查更新'),
+                    subtitle: ref.watch(packageInfoProvider).maybeWhen(
+                      data: (PackageInfo info) => Text('当前版本 v${info.version}'),
+                      orElse: () => const Text('正在读取版本…'),
+                    ),
+                    onTap: () {
+                      ref
+                          .read(appUpdateControllerProvider.notifier)
+                          .runManualCheck(context: context);
+                    },
                   ),
                 ],
               ),

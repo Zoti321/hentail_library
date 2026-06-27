@@ -1,3 +1,4 @@
+import 'package:hentai_library/data/services/app_update/app_update_service.dart';
 import 'package:hentai_library/data/services/comic/cache/archive_cover_cache.dart';
 import 'package:hentai_library/data/services/comic/cache/archive_cover_disk_cache.dart';
 import 'package:hentai_library/data/services/comic/content_rating/auto_detect_comic_content_rating_service.dart';
@@ -15,6 +16,9 @@ import 'package:hentai_library/domain/library/auto_series_infer_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'services.g.dart';
+
+@Riverpod(keepAlive: true)
+AppUpdateService appUpdateService(Ref ref) => AppUpdateService();
 
 @Riverpod(keepAlive: true)
 List<ResourceParser> comicResourceParsers(Ref ref) =>

@@ -54,7 +54,7 @@ class SettingsView extends StatelessWidget {
           ),
           const SettingsGroup(
             title: '关于',
-            children: <Widget>[AboutVersionRow()],
+            children: <Widget>[AutoUpdateRow(), AboutVersionRow()],
           ),
         ],
       ),
