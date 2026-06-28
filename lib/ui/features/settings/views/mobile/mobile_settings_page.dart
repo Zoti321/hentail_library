@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/core/util/format_byte_size.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/features/settings/state/app_update_controller.dart';
+import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class MobileSettingsPage extends ConsumerWidget {
   const MobileSettingsPage({super.key});
@@ -16,9 +17,6 @@ class MobileSettingsPage extends ConsumerWidget {
         skipLoadingOnRefresh: true,
         skipLoadingOnReload: true,
         data: (AppSetting settings) {
-          final AsyncValue<int> archiveCoverUsage = ref.watch(
-            archiveCoverCacheDiskUsageBytesProvider,
-          );
           return ListView(
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
             children: <Widget>[
@@ -102,43 +100,6 @@ class MobileSettingsPage extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               _SectionCard(
-                title: '缓存',
-                children: <Widget>[
-                  SwitchListTile(
-                    title: const Text('归档封面磁盘缓存'),
-                    subtitle: Text(
-                      settings.archiveCoverDiskCacheEnabled
-                          ? '列表封面解码结果写入应用缓存'
-                          : '不读写缓存文件（每次重新解码）',
-                    ),
-                    value: settings.archiveCoverDiskCacheEnabled,
-                    onChanged: (bool value) {
-                      ref
-                          .read(settingsProvider.notifier)
-                          .setArchiveCoverDiskCacheEnabled(value);
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.storage_outlined),
-                    title: const Text('归档封面缓存占用'),
-                    subtitle: archiveCoverUsage.when(
-                      data: (int bytes) =>
-                          Text('应用缓存目录；当前 ${formatByteSizeBin1024(bytes)}'),
-                      loading: () => const Text('正在计算占用…'),
-                      error: (Object _, StackTrace _) => const Text('无法读取占用'),
-                    ),
-                    trailing: TextButton(
-                      onPressed: () async {
-                        await ref.read(archiveCoverCacheProvider).clearAll();
-                        ref.invalidate(archiveCoverCacheDiskUsageBytesProvider);
-                      },
-                      child: const Text('清理'),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _SectionCard(
                 title: '阅读',
                 children: <Widget>[
                   SwitchListTile(
@@ -192,6 +153,38 @@ class MobileSettingsPage extends ConsumerWidget {
                         ],
                       ),
                     ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _SectionCard(
+                title: '关于',
+                children: <Widget>[
+                  SwitchListTile(
+                    title: const Text('自动更新'),
+                    subtitle: Text(
+                      settings.autoUpdate ? '启动时检查更新' : '启动时不检查更新',
+                    ),
+                    value: settings.autoUpdate,
+                    onChanged: (bool value) {
+                      ref.read(settingsProvider.notifier).setAutoUpdate(value);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.system_update_outlined),
+                    title: const Text('检查更新'),
+                    subtitle: ref
+                        .watch(packageInfoProvider)
+                        .maybeWhen(
+                          data: (PackageInfo info) =>
+                              Text('当前版本 v${info.version}'),
+                          orElse: () => const Text('正在读取版本…'),
+                        ),
+                    onTap: () {
+                      ref
+                          .read(appUpdateControllerProvider.notifier)
+                          .runManualCheck(context: context);
+                    },
                   ),
                 ],
               ),

@@ -1,7 +1,11 @@
+import 'package:hentai_library/domain/library/library_comic_filter.dart';
+import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 
 /// Library sync 扫描 diff 计划：调用方须先对 [removedIds] 执行 [DeleteComicsUseCase]。
 typedef ComicScanReplacePlan = ({
@@ -9,14 +13,25 @@ typedef ComicScanReplacePlan = ({
   int addedCount,
   int keptCount,
   List<Comic> toUpsert,
+  List<String> thumbnailInvalidatedComicIds,
+  List<Comic> thumbnailGenerationTargets,
 });
 
 abstract class ComicRepository {
-  Stream<List<Comic>> watchAll();
+  /// 漫画表变更通知（不推送全量数据）。
+  Stream<void> watchChanges();
 
   Future<List<Comic>> getAll();
 
+  Future<int> countAll();
+
   Future<Comic?> findById(String comicId);
+
+  Future<PagedResult<Comic>> fetchComicsPage({
+    required PageRequest request,
+    required LibraryComicFilter filter,
+    required LibraryComicSortOption sortOption,
+  });
 
   /// 用于扫描导入（写入/更新）。
   Future<void> upsertMany(List<Comic> comics);

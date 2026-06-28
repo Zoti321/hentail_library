@@ -1,165 +1,81 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/library/comic_list_query.dart';
-import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
-import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
+import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_pagination_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_view_settings_providers.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-const LibraryComicProjection _libraryComicProjection = LibraryComicProjection();
+part 'library_page_comics_providers.g.dart';
 
-/// Projection 层（漫画）：把数据源、设置与 intent 合成为页面可直接消费的只读结果。
-@immutable
-class _LibraryComicsStreamInput {
-  const _LibraryComicsStreamInput({
-    required this.rawList,
-    required this.filter,
-    required this.sortOption,
-    required this.hasReceivedFirstEmit,
-    required this.streamError,
-  });
-  final List<Comic> rawList;
-  final LibraryComicFilter filter;
-  final LibraryComicSortOption sortOption;
-  final bool hasReceivedFirstEmit;
-  final Object? streamError;
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
-    return other is _LibraryComicsStreamInput &&
-        identical(rawList, other.rawList) &&
-        filter == other.filter &&
-        sortOption == other.sortOption &&
-        hasReceivedFirstEmit == other.hasReceivedFirstEmit &&
-        streamError == other.streamError;
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    rawList,
-    filter,
-    sortOption,
-    hasReceivedFirstEmit,
-    streamError,
+@Riverpod(keepAlive: true)
+Future<Comic?> libraryComicById(Ref ref, String comicId) {
+  ref.watch(
+    comicAggregateProvider.select(
+      (ComicAggregateState s) => s.changeGeneration,
+    ),
   );
+  return ref.read(comicRepoProvider).findById(comicId);
 }
 
-final libraryComicByIdProvider = Provider.family<Comic?, String>((
-  Ref ref,
-  String comicId,
-) {
-  final List<Comic> comics = ref.watch(
-    comicAggregateProvider.select((ComicAggregateState s) => s.rawList),
-  );
-  for (final Comic comic in comics) {
-    if (comic.comicId == comicId) {
-      return comic;
-    }
-  }
-  return null;
-});
-
 /// 合并弹窗专用查询：基于当前关键字对“可合并漫画”做过滤。
-final filteredMergeComicsProvider = FutureProvider.family<List<Comic>, String>((
-  Ref ref,
-  String comicId,
-) async {
-  final List<Comic> comics = ref.watch(
-    comicAggregateProvider.select((ComicAggregateState s) => s.rawList),
+@Riverpod(keepAlive: true)
+Future<List<Comic>> filteredMergeComics(Ref ref, String comicId) async {
+  ref.watch(
+    comicAggregateProvider.select(
+      (ComicAggregateState s) => s.changeGeneration,
+    ),
   );
   final String query = ref.watch(
     libraryQueryIntentProvider.select(
       (LibraryQueryIntent s) => s.mergeSearchQuery,
     ),
   );
+  final List<Comic> comics = await ref.read(comicRepoProvider).getAll();
   final List<Comic> filtered = comics
-      .where((Comic e) => e.comicId != comicId)
+      .where((Comic comic) => comic.comicId != comicId)
       .toList();
   if (query.isEmpty) {
     return filtered;
   }
   final String lowerQuery = query.toLowerCase();
   return filtered
-      .where((Comic e) => e.title.toLowerCase().contains(lowerQuery))
+      .where((Comic comic) => comic.title.toLowerCase().contains(lowerQuery))
       .toList();
-});
+}
 
-final Provider<Set<String>> libraryComicIdsInAnySeriesProvider =
-    Provider<Set<String>>((Ref ref) {
-      final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
-      return seriesAsync.maybeWhen(
-        data: (List<Series> list) =>
-            _libraryComicProjection.collectComicIdsInAnySeries(list),
-        orElse: () => <String>{},
-      );
+/// 漫画主列表：分页读取当前页。
+final Provider<AsyncValue<PagedResult<Comic>>> libraryComicsPageAsyncProvider =
+    Provider<AsyncValue<PagedResult<Comic>>>((Ref ref) {
+      return ref.watch(libraryComicsPageProvider);
     });
 
-/// 漫画主列表投影：这里统一处理 loading/error/data 以及业务过滤和排序。
+/// 当前页漫画条目（供现有 UI 组件消费）。
 final Provider<AsyncValue<List<Comic>>> libraryDisplayedComicsProvider =
     Provider<AsyncValue<List<Comic>>>((Ref ref) {
-      final ComicAggregateState aggregateState = ref.watch(
-        comicAggregateProvider,
+      final AsyncValue<PagedResult<Comic>> pageAsync = ref.watch(
+        libraryComicsPageProvider,
       );
-      final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
-      final LibraryViewSettings viewSettings = ref.watch(
-        libraryViewSettingsProvider,
-      );
-      final Set<String> seriesComicIds = ref.watch(
-        libraryComicIdsInAnySeriesProvider,
-      );
-      final LibraryComicFilter filter = _libraryComicProjection.buildListFilter(
-        displayTarget: intent.displayTarget,
-        isHealthyMode: viewSettings.isHealthyMode,
-        hideComicsInSeries: viewSettings.hideComicsInSeries,
-        comicIdsInAnySeries: seriesComicIds,
-      );
-      final _LibraryComicsStreamInput input = _LibraryComicsStreamInput(
-        rawList: aggregateState.rawList,
-        filter: filter,
-        sortOption: intent.sortOption,
-        hasReceivedFirstEmit: aggregateState.hasReceivedFirstEmit,
-        streamError: aggregateState.streamError,
-      );
-      if (input.streamError != null) {
-        return AsyncValue.error(input.streamError!, StackTrace.current);
-      }
-      if (!input.hasReceivedFirstEmit) {
-        return const AsyncValue.loading();
-      }
-      return AsyncValue.data(
-        ComicQuery(
-          filter: input.filter,
-          sortOption: input.sortOption,
-        ).apply(input.rawList),
+      return pageAsync.when(
+        data: (PagedResult<Comic> page) => AsyncValue.data(page.items),
+        loading: () => const AsyncValue.loading(),
+        error: (Object error, StackTrace stackTrace) =>
+            AsyncValue.error(error, stackTrace),
+        skipLoadingOnReload: true,
       );
     });
-
-/// 原始漫画流投影：供详情页、对话框等场景复用。
-final Provider<AsyncValue<List<Comic>>>
-libraryRawComicsAsyncProvider = Provider<AsyncValue<List<Comic>>>((Ref ref) {
-  final ComicAggregateState aggregateState = ref.watch(comicAggregateProvider);
-  if (aggregateState.streamError != null) {
-    return AsyncValue.error(aggregateState.streamError!, StackTrace.current);
-  }
-  if (!aggregateState.hasReceivedFirstEmit) {
-    return const AsyncValue.loading();
-  }
-  return AsyncValue.data(aggregateState.rawList);
-});
 
 final Provider<int> libraryDisplayedComicCountProvider = Provider<int>((
   Ref ref,
 ) {
-  final AsyncValue<List<Comic>> displayedAsync = ref.watch(
-    libraryDisplayedComicsProvider,
+  final AsyncValue<PagedResult<Comic>> pageAsync = ref.watch(
+    libraryComicsPageProvider,
   );
-  return displayedAsync.maybeWhen(
-    data: (List<Comic> comics) => comics.length,
+  return pageAsync.maybeWhen(
+    data: (PagedResult<Comic> page) => page.totalCount,
     orElse: () => 0,
   );
 });
@@ -169,13 +85,27 @@ final Provider<bool> libraryHasReceivedFirstEmitProvider = Provider<bool>((
 ) {
   return ref.watch(
     comicAggregateProvider.select(
-      (ComicAggregateState s) => s.hasReceivedFirstEmit,
+      (ComicAggregateState s) => s.hasReceivedFirstChange,
     ),
   );
 });
 
-/// Action 门面：UI 只拿到一个刷新动作，不再依赖旧页面状态 notifier。
+/// Action 门面：刷新变更通知并重置到第一页。
 final Provider<VoidCallback> libraryRefreshActionProvider =
     Provider<VoidCallback>((Ref ref) {
-      return () => ref.read(comicAggregateProvider.notifier).refreshStream();
+      return () {
+        ref.read(comicAggregateProvider.notifier).refreshStream();
+        ref.read(libraryComicsPageIndexProvider.notifier).resetToFirstPage();
+        ref.invalidate(libraryComicsPageProvider);
+      };
     });
+
+@Riverpod(keepAlive: true)
+Future<Comic?> libraryComicDetail(Ref ref, String comicId) {
+  ref.watch(
+    comicAggregateProvider.select(
+      (ComicAggregateState s) => s.changeGeneration,
+    ),
+  );
+  return ref.read(comicRepoProvider).findById(comicId);
+}

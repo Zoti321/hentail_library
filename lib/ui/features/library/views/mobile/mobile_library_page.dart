@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/use_cases/sync_library_types.dart';
+import 'package:hentai_library/ui/core/widgets/pagination/library_pagination_bar.dart';
 import 'package:hentai_library/ui/providers.dart';
 
 class MobileLibraryPage extends ConsumerStatefulWidget {
@@ -17,8 +19,25 @@ class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
     final AsyncValue<List<Comic>> comicsAsync = ref.watch(
       libraryDisplayedComicsProvider,
     );
+    final AsyncValue<PagedResult<Comic>> pageAsync = ref.watch(
+      libraryComicsPageProvider,
+    );
     final ScanLibraryState scanState = ref.watch(scanLibraryControllerProvider);
     final bool isScanning = scanState.running;
+    final LibraryComicsPagination pagination = pageAsync.maybeWhen(
+      data: (PagedResult<Comic> page) => LibraryComicsPagination(
+        page: page.page,
+        totalPages: page.totalPages,
+        totalCount: page.totalCount,
+        isLoading: false,
+      ),
+      orElse: () => const LibraryComicsPagination(
+        page: 1,
+        totalPages: 0,
+        totalCount: 0,
+        isLoading: true,
+      ),
+    );
     return Scaffold(
       appBar: AppBar(
         title: const Text('漫画库'),
@@ -106,6 +125,12 @@ class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
               },
             ),
           ),
+          LibraryPaginationBar(
+            totalCount: pagination.totalCount,
+            page: pagination.page,
+            totalPages: pagination.totalPages,
+            isLoading: pagination.isLoading,
+          ),
         ],
       ),
     );
@@ -150,7 +175,7 @@ class _ScanActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final SyncLibraryProgress? progress = scanState.progress;
     final String phaseText = _phaseText(progress);
-    final String countText = '已发现 ${progress?.acceptedTotal ?? 0} 项';
+    final String countText = '已发现 ${progress?.acceptedTotal ?? 0} 本';
     return Card(
       margin: const EdgeInsets.fromLTRB(12, 4, 12, 12),
       child: Padding(
@@ -195,9 +220,11 @@ class _ScanActionCard extends StatelessWidget {
       case SyncLibraryPhase.clearingLibrary:
         return '清空旧数据';
       case SyncLibraryPhase.scanning:
-        return '扫描文件中';
+        return '扫描文件夹';
       case SyncLibraryPhase.writingDb:
         return '写入数据库';
+      case SyncLibraryPhase.generatingThumbnails:
+        return '生成缩略图';
       case SyncLibraryPhase.done:
         return '扫描完成';
     }

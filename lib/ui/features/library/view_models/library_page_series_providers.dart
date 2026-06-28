@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/library/comic_list_query.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
@@ -32,16 +33,23 @@ final Provider<LibrarySeriesViewData> librarySeriesViewDataProvider =
       final LibraryViewSettings viewSettings = ref.watch(
         libraryViewSettingsProvider,
       );
-      final List<Comic> rawComics = ref.watch(
-        comicAggregateProvider.select((ComicAggregateState s) => s.rawList),
+      ref.watch(
+        comicAggregateProvider.select(
+          (ComicAggregateState s) => s.changeGeneration,
+        ),
+      );
+      final AsyncValue<List<Comic>> comicsAsync = ref.watch(
+        librarySeriesComicsByIdSourceProvider,
       );
       final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
-      final Map<String, Comic> comicsById = <String, Comic>{};
-      for (final Comic comic in rawComics) {
-        comicsById[comic.comicId] = comic;
-      }
       return seriesAsync.when(
         data: (List<Series> list) {
+          final Map<String, Comic> comicsById = comicsAsync.maybeWhen(
+            data: (List<Comic> comics) => <String, Comic>{
+              for (final Comic comic in comics) comic.comicId: comic,
+            },
+            orElse: () => <String, Comic>{},
+          );
           final LibrarySeriesQueryResult result = LibrarySeriesQuery(
             showR18: _libraryComicProjection.showR18(
               isHealthyMode: viewSettings.isHealthyMode,
@@ -69,6 +77,16 @@ final Provider<LibrarySeriesViewData> librarySeriesViewDataProvider =
         ),
         skipLoadingOnReload: true,
       );
+    });
+
+final FutureProvider<List<Comic>> librarySeriesComicsByIdSourceProvider =
+    FutureProvider<List<Comic>>((Ref ref) async {
+      ref.watch(
+        comicAggregateProvider.select(
+          (ComicAggregateState s) => s.changeGeneration,
+        ),
+      );
+      return ref.read(comicRepoProvider).getAll();
     });
 
 final Provider<int> libraryDisplayedSeriesCountProvider = Provider<int>((

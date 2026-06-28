@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,10 +20,10 @@ class MobileComicDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<Comic>> rawData = ref.watch(
-      libraryRawComicsAsyncProvider,
+    final AsyncValue<Comic?> comicAsync = ref.watch(
+      libraryComicDetailProvider(comicId),
     );
-    return rawData.when(
+    return comicAsync.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (Object error, StackTrace stackTrace) => Scaffold(
@@ -43,10 +42,7 @@ class MobileComicDetailPage extends ConsumerWidget {
           ),
         ),
       ),
-      data: (List<Comic> comics) {
-        final Comic? comic = comics.firstWhereOrNull(
-          (Comic item) => item.comicId == comicId,
-        );
+      data: (Comic? comic) {
         if (comic == null) {
           return Scaffold(
             appBar: AppBar(title: const Text('漫画详情')),

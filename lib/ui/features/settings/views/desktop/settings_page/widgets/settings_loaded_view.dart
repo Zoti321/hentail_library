@@ -1,7 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_about_rows.dart';
-import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_cache_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_library_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_page_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_page_primitives.dart';
@@ -42,19 +41,12 @@ class SettingsView extends StatelessWidget {
             ],
           ),
           const SettingsGroup(
-            title: '缓存',
-            children: <Widget>[
-              ArchiveCoverDiskCacheRow(),
-              ArchiveCoverCacheUsageRow(),
-            ],
-          ),
-          const SettingsGroup(
             title: '阅读',
             children: <Widget>[ReaderAutoPlayIntervalRow()],
           ),
           const SettingsGroup(
             title: '关于',
-            children: <Widget>[AboutVersionRow()],
+            children: <Widget>[AutoUpdateRow(), AboutVersionRow()],
           ),
         ],
       ),

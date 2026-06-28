@@ -4,7 +4,8 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/core/util/app_theme_mode.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/features/settings/settings.dart';
+import 'package:hentai_library/ui/features/shell/state/app_startup_coordinator_notifier.dart';
 import 'package:hentai_library/ui/core/theme/mobile_material_theme.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 
@@ -28,6 +29,7 @@ class _AppRootState extends ConsumerState<_AppRoot> {
   @override
   Widget build(BuildContext context) {
     ref.watch(appStartupCoordinatorProvider);
+    ref.watch(appUpdateCoordinatorProvider);
 
     final ThemeMode themeMode = ref.watch(
       settingsProvider.select((AsyncValue<AppSetting> async) {

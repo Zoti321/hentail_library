@@ -33,6 +33,26 @@ class ReadingHistoryDao extends DatabaseAccessor<AppDatabase>
     )..orderBy([(t) => OrderingTerm.desc(t.lastReadTime)])).watch();
   }
 
+  Future<int> countAllHistory() async {
+    final QueryRow row = await customSelect(
+      'SELECT COUNT(*) AS c FROM comic_reading_histories',
+      readsFrom: <TableInfo<Table, Object>>{comicReadingHistories},
+    ).getSingle();
+    return row.read<int>('c');
+  }
+
+  Future<List<ComicReadingHistoryRow>> fetchHistoryPage({
+    required int limit,
+    required int offset,
+  }) {
+    return (select(comicReadingHistories)
+          ..orderBy(<OrderingTerm Function(ComicReadingHistories t)>[
+            (ComicReadingHistories t) => OrderingTerm.desc(t.lastReadTime),
+          ])
+          ..limit(limit, offset: offset))
+        .get();
+  }
+
   Future<int> deleteByComicId(String comicId) {
     return (delete(
       comicReadingHistories,
@@ -94,6 +114,26 @@ class SeriesReadingHistoryDao extends DatabaseAccessor<AppDatabase>
     return (select(
       seriesReadingHistories,
     )..orderBy([(t) => OrderingTerm.desc(t.lastReadTime)])).watch();
+  }
+
+  Future<int> countAllSeriesReading() async {
+    final QueryRow row = await customSelect(
+      'SELECT COUNT(*) AS c FROM series_reading_histories',
+      readsFrom: <TableInfo<Table, Object>>{seriesReadingHistories},
+    ).getSingle();
+    return row.read<int>('c');
+  }
+
+  Future<List<SeriesReadingHistoryRow>> fetchSeriesReadingPage({
+    required int limit,
+    required int offset,
+  }) {
+    return (select(seriesReadingHistories)
+          ..orderBy(<OrderingTerm Function(SeriesReadingHistories t)>[
+            (SeriesReadingHistories t) => OrderingTerm.desc(t.lastReadTime),
+          ])
+          ..limit(limit, offset: offset))
+        .get();
   }
 
   Future<int> deleteBySeriesName(String seriesName) {

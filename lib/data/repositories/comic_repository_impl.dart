@@ -1,12 +1,21 @@
 import 'package:drift/drift.dart';
+import 'package:hentai_library/data/database/comic_page_sql_builder.dart';
 import 'package:hentai_library/data/database/dao/dao.dart';
 import 'package:hentai_library/data/database/database.dart' as db;
 import 'package:hentai_library/data/mappers/mapping.dart';
+import 'package:hentai_library/domain/library/library_comic_filter.dart';
+import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/data/repositories/comic_scan_merge.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
+import 'package:hentai_library/data/services/comic/thumbnail/comic_thumbnail_generation_policy.dart';
+import 'package:hentai_library/data/services/comic/thumbnail/comic_thumbnail_generator.dart';
 
 typedef _ComicScanIdDiff = ({
   Set<String> removedIds,
@@ -16,10 +25,15 @@ typedef _ComicScanIdDiff = ({
 
 /// 漫画主表与标签的持久化；跨聚合删除请经 [DeleteComicsUseCase]。
 class ComicRepositoryImpl implements ComicRepository {
-  ComicRepositoryImpl(this._comicDao, this._searchDao);
+  ComicRepositoryImpl(
+    this._comicDao,
+    this._searchDao,
+    this._thumbnailRepository,
+  );
 
   final ComicDao _comicDao;
   final SearchDao _searchDao;
+  final ComicThumbnailRepository _thumbnailRepository;
 
   Future<List<Comic>> _mapRows(List<db.DbComic> rows) async {
     final Iterable<String> ids = rows.map((db.DbComic e) => e.comicId);
@@ -57,14 +71,56 @@ class ComicRepositoryImpl implements ComicRepository {
   }
 
   @override
-  Stream<List<Comic>> watchAll() {
-    return _comicDao.watchAllComics().asyncMap(_mapRows);
-  }
+  Stream<void> watchChanges() => _comicDao.watchComicTableChanges();
+
+  @override
+  Future<int> countAll() => _comicDao.countAllComics();
 
   @override
   Future<List<Comic>> getAll() async {
     final rows = await _comicDao.getAllComics();
     return _mapRows(rows);
+  }
+
+  @override
+  Future<PagedResult<Comic>> fetchComicsPage({
+    required PageRequest request,
+    required LibraryComicFilter filter,
+    required LibraryComicSortOption sortOption,
+  }) async {
+    final ComicPageSqlCriteria criteria = ComicPageSqlCriteria.fromFilter(
+      filter,
+    );
+    final int totalCount = await _comicDao.countComicsFiltered(criteria);
+    final int totalPages = totalCount <= 0
+        ? 0
+        : (totalCount + request.pageSize - 1) ~/ request.pageSize;
+    int effectivePage = request.page;
+    if (totalPages > 0 && effectivePage > totalPages) {
+      effectivePage = totalPages;
+    }
+    if (totalCount <= 0) {
+      return PagedResult<Comic>(
+        items: const <Comic>[],
+        totalCount: 0,
+        page: 1,
+        pageSize: request.pageSize,
+      );
+    }
+    final int offset = (effectivePage - 1) * request.pageSize;
+    final List<db.DbComic> rows = await _comicDao.fetchComicsPageFiltered(
+      criteria: criteria,
+      sortDescending: sortOption.descending,
+      limit: request.pageSize,
+      offset: offset,
+    );
+    final List<Comic> items = await _mapRows(rows);
+    return PagedResult<Comic>(
+      items: items,
+      totalCount: totalCount,
+      page: effectivePage,
+      pageSize: request.pageSize,
+    );
   }
 
   @override
@@ -152,6 +208,7 @@ class ComicRepositoryImpl implements ComicRepository {
       existingIds: existingIds,
       scannedIds: scannedIds,
     );
+    final List<String> thumbnailInvalidatedComicIds = <String>[];
     final toUpsert = <Comic>[];
     for (final e in unique.entries) {
       final id = e.key;
@@ -160,7 +217,10 @@ class ComicRepositoryImpl implements ComicRepository {
         toUpsert.add(row);
       } else {
         final prior = existingById[id]!;
-        toUpsert.add(_mergeKeptScanWithExisting(row, prior));
+        if (prior.path != row.path || prior.resourceType != row.resourceType) {
+          thumbnailInvalidatedComicIds.add(id);
+        }
+        toUpsert.add(mergeKeptScanWithExisting(row, prior));
       }
     }
     return (
@@ -168,7 +228,41 @@ class ComicRepositoryImpl implements ComicRepository {
       addedCount: idDiff.addedIds.length,
       keptCount: idDiff.keptIds.length,
       toUpsert: toUpsert,
+      thumbnailInvalidatedComicIds: thumbnailInvalidatedComicIds,
+      thumbnailGenerationTargets: await _buildThumbnailGenerationTargets(
+        toUpsert: toUpsert,
+        addedIds: idDiff.addedIds,
+        keptIds: idDiff.keptIds,
+        invalidatedIds: thumbnailInvalidatedComicIds.toSet(),
+      ),
     );
+  }
+
+  Future<List<Comic>> _buildThumbnailGenerationTargets({
+    required List<Comic> toUpsert,
+    required Set<String> addedIds,
+    required Set<String> keptIds,
+    required Set<String> invalidatedIds,
+  }) async {
+    final List<Comic> targets = <Comic>[];
+    for (final Comic comic in toUpsert) {
+      if (!canGenerateComicThumbnail(comic.resourceType)) {
+        continue;
+      }
+      final String id = comic.comicId;
+      if (addedIds.contains(id) || invalidatedIds.contains(id)) {
+        targets.add(comic);
+        continue;
+      }
+      if (keptIds.contains(id) &&
+          await needsComicThumbnailGeneration(
+            comic: comic,
+            repository: _thumbnailRepository,
+          )) {
+        targets.add(comic);
+      }
+    }
+    return targets;
   }
 
   @override
@@ -210,13 +304,6 @@ class ComicRepositoryImpl implements ComicRepository {
       removedIds: existingIds.difference(scannedIds),
       addedIds: scannedIds.difference(existingIds),
       keptIds: existingIds.intersection(scannedIds),
-    );
-  }
-
-  Comic _mergeKeptScanWithExisting(Comic scanned, Comic existing) {
-    return existing.copyWith(
-      path: scanned.path,
-      resourceType: scanned.resourceType,
     );
   }
 }

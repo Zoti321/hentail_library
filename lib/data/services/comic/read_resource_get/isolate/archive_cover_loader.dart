@@ -42,6 +42,15 @@ Future<Uint8List?> loadArchiveCoverBytesOffMainUi({
   return r.bytes;
 }
 
+/// 已在 isolate 内调用，避免嵌套 [Isolate.run]。
+Future<ArchiveCoverDecodeResult> decodeArchiveCoverInWorker({
+  required String path,
+  required ResourceType type,
+}) {
+  final String normalized = const PathNormalizer().normalizeForKey(path);
+  return _decodeArchiveCoverInWorker(normalized, type);
+}
+
 Future<ArchiveCoverDecodeResult> _decodeArchiveCoverInWorker(
   String normalizedPath,
   ResourceType type,

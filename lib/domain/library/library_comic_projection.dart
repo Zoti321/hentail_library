@@ -24,10 +24,14 @@ class LibraryComicProjection {
     required bool isHealthyMode,
     required bool hideComicsInSeries,
     required Set<String> comicIdsInAnySeries,
+    String? keyword,
   }) {
+    final String? query = keyword?.trim().isEmpty ?? true
+        ? null
+        : keyword!.trim();
     return LibraryComicFilter(
       showR18: showR18(isHealthyMode: isHealthyMode),
-      query: null,
+      query: query,
       displayTarget: displayTarget,
       comicIdsExcludedBySeriesMembership: hideComicsInSeries
           ? comicIdsInAnySeries

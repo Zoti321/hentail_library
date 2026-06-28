@@ -1,6 +1,7 @@
 import 'package:hentai_library/ui/features/shell/di/database_dao.dart';
 import 'package:hentai_library/data/repositories/app_setting_repository_impl.dart';
 import 'package:hentai_library/data/repositories/author_repository_impl.dart';
+import 'package:hentai_library/data/repositories/comic_thumbnail_repository_impl.dart';
 import 'package:hentai_library/data/repositories/comic_repository_impl.dart';
 import 'package:hentai_library/data/repositories/path_repository_impl.dart';
 import 'package:hentai_library/data/repositories/reading_history_repository_impl.dart';
@@ -10,6 +11,7 @@ import 'package:hentai_library/data/repositories/tag_repository_impl.dart';
 import 'package:hentai_library/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/domain/repositories/author_repository.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/domain/repositories/path_repository.dart';
 import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
@@ -20,9 +22,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'repos.g.dart';
 
 @Riverpod(keepAlive: true)
+ComicThumbnailRepository comicThumbnailRepo(Ref ref) =>
+    ComicThumbnailRepositoryImpl(ref.read(comicThumbnailDaoProvider));
+
+@Riverpod(keepAlive: true)
 ComicRepository comicRepo(Ref ref) => ComicRepositoryImpl(
   ref.read(comicDaoProvider),
   ref.read(searchDaoProvider),
+  ref.read(comicThumbnailRepoProvider),
 );
 
 @Riverpod(keepAlive: true)

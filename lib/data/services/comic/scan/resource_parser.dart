@@ -153,19 +153,18 @@ Future<ParsedResource?> parsePureImageZipArchive(
     return null;
   }
 
-  var hasImage = false;
+  var pageCount = 0;
   for (final f in archive.files) {
     final name = f.name.replaceAll(r'\', '/');
     if (!f.isFile || name.endsWith('/')) continue;
 
     final ext = p.extension(name).toLowerCase();
     if (context.imageExts.contains(ext)) {
-      hasImage = true;
-      break;
+      pageCount++;
     }
   }
 
-  if (!hasImage) return null;
+  if (pageCount == 0) return null;
 
   return (
     path: file.path,
@@ -173,7 +172,7 @@ Future<ParsedResource?> parsePureImageZipArchive(
     meta: (
       title: p.basenameWithoutExtension(file.path),
       authors: <String>[],
-      pageCount: null,
+      pageCount: pageCount,
     ),
   );
 }

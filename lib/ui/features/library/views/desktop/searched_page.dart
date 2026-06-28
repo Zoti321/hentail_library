@@ -39,6 +39,12 @@ class SearchedPage extends ConsumerWidget {
     final int searchedResultCount = searchedComicCount + searchedSeriesCount;
     final LibraryPageViewModel searchedViewModel = LibraryPageViewModel(
       comicsAsync: searchedComics,
+      comicsPagination: LibraryComicsPagination(
+        page: 1,
+        totalPages: searchedComicCount > 0 ? 1 : 0,
+        totalCount: searchedComicCount,
+        isLoading: searchedComics.isLoading,
+      ),
       seriesViewData: searchedSeriesData,
       displayedComicCount: searchedComicCount,
       displayedSeriesCount: searchedSeriesCount,

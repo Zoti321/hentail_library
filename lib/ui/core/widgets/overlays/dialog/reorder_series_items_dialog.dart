@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -34,9 +35,9 @@ class _ReorderSeriesItemsDialogState
   }
 
   String _labelForComic(String comicId) {
-    final String? title = ref.read(libraryComicByIdProvider(comicId))?.title;
-    if (title != null && title.isNotEmpty) {
-      return title;
+    final Comic? comic = ref.watch(libraryComicByIdProvider(comicId)).value;
+    if (comic != null && comic.title.isNotEmpty) {
+      return comic.title;
     }
     return comicId.length > 12 ? '${comicId.substring(0, 12)}…' : comicId;
   }

@@ -42,7 +42,8 @@ void showCustomToast(
     return;
   }
   _removeActiveToastImmediately();
-  final OverlayState? overlay = Overlay.maybeOf(context, rootOverlay: true);
+  OverlayState? overlay = Navigator.maybeOf(context)?.overlay;
+  overlay ??= Overlay.maybeOf(context, rootOverlay: true);
   if (overlay == null) {
     return;
   }

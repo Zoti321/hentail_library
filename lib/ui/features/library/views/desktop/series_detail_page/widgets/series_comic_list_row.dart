@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -29,9 +31,9 @@ class SeriesItemComicTile extends ConsumerWidget {
   static const double _kTooltipIconSlot = 22;
 
   static String titleForComic(WidgetRef ref, String comicId) {
-    final String? title = ref.read(libraryComicByIdProvider(comicId))?.title;
-    if (title != null && title.isNotEmpty) {
-      return title;
+    final Comic? comic = ref.watch(libraryComicByIdProvider(comicId)).value;
+    if (comic != null && comic.title.isNotEmpty) {
+      return comic.title;
     }
     return comicId.length > 12 ? '${comicId.substring(0, 12)}…' : comicId;
   }
@@ -71,35 +73,42 @@ class SeriesItemComicTile extends ConsumerWidget {
                     pathParameters: <String, String>{'id': item.comicId},
                   );
                 case SeriesItemContextAction.showInExplorer:
-                  final path = ref
-                      .read(libraryComicByIdProvider(item.comicId))
-                      ?.path;
-                  if (path == null) {
-                    showErrorToast(context, AppException('找不到该漫画的文件路径'));
-                    return;
-                  }
-
-                  showInFileExplorer(path).catchError((
-                    Object error,
-                    StackTrace stackTrace,
-                  ) {
-                    debugPrint('showInFileExplorer failed for "$path": $error');
-                    if (!context.mounted) {
+                  unawaited(() async {
+                    final Comic? comic = await ref
+                        .read(comicRepoProvider)
+                        .findById(item.comicId);
+                    final String? path = comic?.path;
+                    if (path == null) {
+                      if (!context.mounted) {
+                        return;
+                      }
+                      showErrorToast(context, AppException('找不到该漫画的文件路径'));
                       return;
                     }
-                    if (error is AppException) {
-                      showErrorToast(context, error);
-                      return;
-                    }
-                    showErrorToast(
-                      context,
-                      AppException(
-                        '无法在文件资源管理器中显示该项目',
-                        cause: error,
-                        stackTrace: stackTrace,
-                      ),
-                    );
-                  });
+                    await showInFileExplorer(path).catchError((
+                      Object error,
+                      StackTrace stackTrace,
+                    ) {
+                      debugPrint(
+                        'showInFileExplorer failed for "$path": $error',
+                      );
+                      if (!context.mounted) {
+                        return;
+                      }
+                      if (error is AppException) {
+                        showErrorToast(context, error);
+                        return;
+                      }
+                      showErrorToast(
+                        context,
+                        AppException(
+                          '无法在文件资源管理器中显示该项目',
+                          cause: error,
+                          stackTrace: stackTrace,
+                        ),
+                      );
+                    });
+                  }());
                   break;
               }
             },
