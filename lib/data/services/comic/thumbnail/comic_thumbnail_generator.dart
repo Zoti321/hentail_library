@@ -127,9 +127,7 @@ Uint8List? _encodeThumbnailJpeg(Uint8List sourceBytes) {
       ? _flattenAlphaOnWhite(decoded)
       : decoded;
   if (flattened.numChannels < 3) {
-    flattened = flattened.convert(
-      numChannels: flattened.hasAlpha ? 4 : 3,
-    );
+    flattened = flattened.convert(numChannels: flattened.hasAlpha ? 4 : 3);
   }
   final img.Image resized = _resizeToMaxLongEdge(
     flattened,
