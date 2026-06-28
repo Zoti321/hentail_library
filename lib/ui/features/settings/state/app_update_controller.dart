@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/widgets.dart';
 import 'package:hentai_library/core/constants/app_update_constants.dart';
 import 'package:hentai_library/core/util/app_root_navigator.dart';
 import 'package:hentai_library/core/util/semver_utils.dart';
@@ -35,6 +34,7 @@ class AppUpdateController extends _$AppUpdateController {
     required bool showFeedbackToasts,
     BuildContext? dialogContext,
   }) async {
+    final BuildContext? uiContext = dialogContext;
     try {
       final PackageInfo info = await ref.read(packageInfoProvider.future);
       final String currentVersion = SemverUtils.normalizeVersion(info.version);
@@ -43,13 +43,13 @@ class AppUpdateController extends _$AppUpdateController {
           .fetchLatestStableRelease();
       if (latestRelease == null) {
         if (showFeedbackToasts) {
-          _showInfoToast('检查更新失败，请稍后重试', dialogContext);
+          _showFeedbackToast('检查更新失败，请稍后重试', uiContext);
         }
         return AppUpdateCheckOutcome.failed;
       }
       if (!SemverUtils.isGreaterThan(latestRelease.version, currentVersion)) {
         if (showFeedbackToasts) {
-          _showInfoToast('当前已是最新版本', dialogContext);
+          _showFeedbackToast('当前已是最新版本', uiContext);
         }
         return AppUpdateCheckOutcome.upToDate;
       }
@@ -61,12 +61,12 @@ class AppUpdateController extends _$AppUpdateController {
         }
       }
       if (showDialogOnUpdate) {
-        await _showUpdateDialog(latestRelease, dialogContext);
+        await _showUpdateDialogForContext(latestRelease, uiContext);
       }
       return AppUpdateCheckOutcome.updateAvailable;
     } catch (_) {
       if (showFeedbackToasts) {
-        _showInfoToast('检查更新失败，请稍后重试', dialogContext);
+        _showFeedbackToast('检查更新失败，请稍后重试', uiContext);
       }
       return AppUpdateCheckOutcome.failed;
     }
@@ -109,33 +109,28 @@ class AppUpdateController extends _$AppUpdateController {
     return completer.future;
   }
 
-  Future<void> _showUpdateDialog(
+  Future<void> _showUpdateDialogForContext(
     AppReleaseInfo release,
-    BuildContext? preferredContext,
+    BuildContext? uiContext,
   ) async {
-    final BuildContext? context = _resolveDialogContext(preferredContext);
-    if (context == null) {
+    if (uiContext != null && uiContext.mounted) {
+      await showAppUpdateDialog(context: uiContext, release: release);
       return;
-    }
-    await showAppUpdateDialog(context: context, release: release);
-  }
-
-  void _showInfoToast(String message, BuildContext? preferredContext) {
-    final BuildContext? context = _resolveDialogContext(preferredContext);
-    if (context == null) {
-      return;
-    }
-    showInfoToast(context, message);
-  }
-
-  BuildContext? _resolveDialogContext(BuildContext? preferredContext) {
-    if (preferredContext != null && preferredContext.mounted) {
-      return preferredContext;
     }
     final BuildContext? rootContext = appRootNavigatorKey.currentContext;
     if (rootContext != null && rootContext.mounted) {
-      return rootContext;
+      await showAppUpdateDialog(context: rootContext, release: release);
     }
-    return null;
+  }
+
+  void _showFeedbackToast(String message, BuildContext? uiContext) {
+    if (uiContext != null && uiContext.mounted) {
+      showInfoToast(uiContext, message);
+      return;
+    }
+    final BuildContext? rootContext = appRootNavigatorKey.currentContext;
+    if (rootContext != null && rootContext.mounted) {
+      showInfoToast(rootContext, message);
+    }
   }
 }

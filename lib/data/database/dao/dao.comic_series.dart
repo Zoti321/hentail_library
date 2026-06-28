@@ -15,7 +15,7 @@ class ComicDao extends DatabaseAccessor<AppDatabase> with _$ComicDaoMixin {
       'SELECT COUNT(*) AS c FROM comics',
       readsFrom: <TableInfo<Table, Object>>{comics},
     ).getSingle();
-    return row.read<int>('c')!;
+    return row.read<int>('c');
   }
 
   Future<int> countComicsFiltered(ComicPageSqlCriteria criteria) async {
@@ -32,7 +32,7 @@ class ComicDao extends DatabaseAccessor<AppDatabase> with _$ComicDaoMixin {
         seriesItems,
       },
     ).getSingle();
-    return row.read<int>('c')!;
+    return row.read<int>('c');
   }
 
   Future<List<String>> fetchComicIdsPageFiltered({
@@ -273,7 +273,7 @@ class SeriesDao extends DatabaseAccessor<AppDatabase> with _$SeriesDaoMixin {
       'SELECT COUNT(*) AS c FROM series',
       readsFrom: <TableInfo<Table, Object>>{seriesTable},
     ).getSingle();
-    return row.read<int>('c')!;
+    return row.read<int>('c');
   }
 
   Future<List<DbSeries>> fetchSeriesPage({

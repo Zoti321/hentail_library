@@ -38,7 +38,7 @@ class ReadingHistoryDao extends DatabaseAccessor<AppDatabase>
       'SELECT COUNT(*) AS c FROM comic_reading_histories',
       readsFrom: <TableInfo<Table, Object>>{comicReadingHistories},
     ).getSingle();
-    return row.read<int>('c')!;
+    return row.read<int>('c');
   }
 
   Future<List<ComicReadingHistoryRow>> fetchHistoryPage({
@@ -121,7 +121,7 @@ class SeriesReadingHistoryDao extends DatabaseAccessor<AppDatabase>
       'SELECT COUNT(*) AS c FROM series_reading_histories',
       readsFrom: <TableInfo<Table, Object>>{seriesReadingHistories},
     ).getSingle();
-    return row.read<int>('c')!;
+    return row.read<int>('c');
   }
 
   Future<List<SeriesReadingHistoryRow>> fetchSeriesReadingPage({

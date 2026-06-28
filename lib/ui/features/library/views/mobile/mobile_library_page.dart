@@ -5,7 +5,6 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/use_cases/sync_library_types.dart';
 import 'package:hentai_library/ui/core/widgets/pagination/library_pagination_bar.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_page_pagination_providers.dart';
 import 'package:hentai_library/ui/providers.dart';
 
 class MobileLibraryPage extends ConsumerStatefulWidget {

@@ -11,6 +11,7 @@ import 'package:hentai_library/ui/features/settings/view_models/settings_notifie
 import 'package:hentai_library/ui/features/shell/di/services.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:riverpod/misc.dart' show Override;
 
 class MockAppUpdateService extends Mock implements AppUpdateService {}
 
@@ -122,8 +123,8 @@ Widget _buildHarness({required MockAppUpdateService mockService}) {
       home: Builder(
         builder: (BuildContext context) {
           return ElevatedButton(
-            onPressed: () {
-              ProviderScope.containerOf(context)
+            onPressed: () async {
+              await ProviderScope.containerOf(context)
                   .read(appUpdateControllerProvider.notifier)
                   .runManualCheck(context: context);
             },
@@ -135,7 +136,7 @@ Widget _buildHarness({required MockAppUpdateService mockService}) {
   );
 }
 
-_overrides(MockAppUpdateService mockService) {
+List<Override> _overrides(MockAppUpdateService mockService) {
   return [
     appUpdateServiceProvider.overrideWithValue(mockService),
     packageInfoProvider.overrideWith(

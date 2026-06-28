@@ -11,7 +11,7 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
       'SELECT COUNT(*) AS c FROM tags',
       readsFrom: <TableInfo<Table, Object>>{tags},
     ).getSingle();
-    return row.read<int>('c')!;
+    return row.read<int>('c');
   }
 
   Future<List<DbTag>> fetchTagsPage({required int limit, required int offset}) {
@@ -59,7 +59,7 @@ class AuthorDao extends DatabaseAccessor<AppDatabase> with _$AuthorDaoMixin {
       'SELECT COUNT(*) AS c FROM authors',
       readsFrom: <TableInfo<Table, Object>>{authors},
     ).getSingle();
-    return row.read<int>('c')!;
+    return row.read<int>('c');
   }
 
   Future<List<DbAuthor>> fetchAuthorsPage({
