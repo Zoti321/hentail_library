@@ -5,7 +5,6 @@ import 'package:hentai_library/data/services/comic/read_resource_get/api/read_re
 import 'package:hentai_library/data/services/comic/read_resource_get/internal/open/comic_read_resource_opener.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/internal/session/comic_read_resource_session_manager.dart';
 import 'package:hentai_library/data/services/comic/read_resource_get/internal/utils/comic_read_path_normalizer.dart';
-import 'package:hentai_library/data/services/metadata/metadata_import_export_service.dart';
 import 'package:hentai_library/data/services/comic/scan/comic_scan_parse_service.dart';
 import 'package:hentai_library/data/services/comic/scan/resource_parser.dart';
 import 'package:hentai_library/domain/library/auto_series_infer_service.dart';
@@ -57,15 +56,6 @@ ComicReadResourceSessionManager comicReadResourceSessionManager(Ref ref) =>
 ReadResourceGetService readResourceGetService(Ref ref) =>
     DefaultReadResourceGetService(
       sessions: ref.read(comicReadResourceSessionManagerProvider),
-    );
-
-@Riverpod(keepAlive: true)
-MetadataImportExportService metadataImportExportService(Ref ref) =>
-    DefaultMetadataImportExportService(
-      authorRepository: ref.read(libraryAuthorRepoProvider),
-      tagRepository: ref.read(libraryTagRepoProvider),
-      seriesRepository: ref.read(librarySeriesRepoProvider),
-      comicRepository: ref.read(comicRepoProvider),
     );
 
 @Riverpod(keepAlive: true)

@@ -62,14 +62,6 @@ _Avoid_: 分级、年龄限制
 应用级浏览过滤：开启后库、搜索、历史等视图隐藏 `contentRating == r18` 的 Comic；不修改 Comic 自身的分级。
 _Avoid_: 安全模式、青少年模式、R18 过滤
 
-**Metadata export**:
-将 Author 名录、Tag 名录与 Series 结构（卷序以 Comic 标题标识）序列化为 JSON；不包含 Comic 本体、Saved path、阅读历史、Content rating，也不包含 Comic 与 Author/Tag 的关联。
-_Avoid_: 库备份、完整导出
-
-**Metadata import**:
-从 JSON 合并 Author 名录、Tag 名录与 Series 结构；Series 卷册通过 Comic 标题匹配库中已有 Comic。标题重名时匹配不可靠，以库中先出现的 Comic 为准；不匹配或已占用归属的卷册项跳过。
-_Avoid_: 库恢复、完整导入
-
 ### Reading
 
 **Standalone read**:
