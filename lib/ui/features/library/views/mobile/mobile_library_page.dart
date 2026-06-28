@@ -224,6 +224,8 @@ class _ScanActionCard extends StatelessWidget {
         return '扫描文件夹';
       case SyncLibraryPhase.writingDb:
         return '写入数据库';
+      case SyncLibraryPhase.generatingThumbnails:
+        return '生成缩略图';
       case SyncLibraryPhase.done:
         return '扫描完成';
     }

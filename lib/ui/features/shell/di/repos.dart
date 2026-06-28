@@ -29,6 +29,7 @@ ComicThumbnailRepository comicThumbnailRepo(Ref ref) =>
 ComicRepository comicRepo(Ref ref) => ComicRepositoryImpl(
   ref.read(comicDaoProvider),
   ref.read(searchDaoProvider),
+  ref.read(comicThumbnailRepoProvider),
 );
 
 @Riverpod(keepAlive: true)

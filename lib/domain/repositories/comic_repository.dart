@@ -14,6 +14,7 @@ typedef ComicScanReplacePlan = ({
   int keptCount,
   List<Comic> toUpsert,
   List<String> thumbnailInvalidatedComicIds,
+  List<Comic> thumbnailGenerationTargets,
 });
 
 abstract class ComicRepository {

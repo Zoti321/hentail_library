@@ -12,6 +12,9 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
+import 'package:hentai_library/data/services/comic/thumbnail/comic_thumbnail_generation_policy.dart';
+import 'package:hentai_library/data/services/comic/thumbnail/comic_thumbnail_generator.dart';
 
 typedef _ComicScanIdDiff = ({
   Set<String> removedIds,
@@ -21,10 +24,15 @@ typedef _ComicScanIdDiff = ({
 
 /// 漫画主表与标签的持久化；跨聚合删除请经 [DeleteComicsUseCase]。
 class ComicRepositoryImpl implements ComicRepository {
-  ComicRepositoryImpl(this._comicDao, this._searchDao);
+  ComicRepositoryImpl(
+    this._comicDao,
+    this._searchDao,
+    this._thumbnailRepository,
+  );
 
   final ComicDao _comicDao;
   final SearchDao _searchDao;
+  final ComicThumbnailRepository _thumbnailRepository;
 
   Future<List<Comic>> _mapRows(List<db.DbComic> rows) async {
     final Iterable<String> ids = rows.map((db.DbComic e) => e.comicId);
@@ -221,7 +229,40 @@ class ComicRepositoryImpl implements ComicRepository {
       keptCount: idDiff.keptIds.length,
       toUpsert: toUpsert,
       thumbnailInvalidatedComicIds: thumbnailInvalidatedComicIds,
+      thumbnailGenerationTargets: await _buildThumbnailGenerationTargets(
+        toUpsert: toUpsert,
+        addedIds: idDiff.addedIds,
+        keptIds: idDiff.keptIds,
+        invalidatedIds: thumbnailInvalidatedComicIds.toSet(),
+      ),
     );
+  }
+
+  Future<List<Comic>> _buildThumbnailGenerationTargets({
+    required List<Comic> toUpsert,
+    required Set<String> addedIds,
+    required Set<String> keptIds,
+    required Set<String> invalidatedIds,
+  }) async {
+    final List<Comic> targets = <Comic>[];
+    for (final Comic comic in toUpsert) {
+      if (!canGenerateComicThumbnail(comic.resourceType)) {
+        continue;
+      }
+      final String id = comic.comicId;
+      if (addedIds.contains(id) || invalidatedIds.contains(id)) {
+        targets.add(comic);
+        continue;
+      }
+      if (keptIds.contains(id) &&
+          await needsComicThumbnailGeneration(
+            comic: comic,
+            repository: _thumbnailRepository,
+          )) {
+        targets.add(comic);
+      }
+    }
+    return targets;
   }
 
   @override

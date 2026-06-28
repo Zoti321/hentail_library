@@ -172,6 +172,34 @@ class ScanProgressDialog extends ConsumerWidget {
       );
     }
 
+    if (p.phase == SyncLibraryPhase.generatingThumbnails) {
+      final int total = p.thumbnailTotal ?? 0;
+      final int done = p.thumbnailDone ?? 0;
+      final int failed = p.thumbnailFailedCount ?? 0;
+      final String? path = p.currentPath;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('正在生成封面缩略图…', style: secondary),
+          const SizedBox(height: 8),
+          Text(
+            '进度 $done / $total'
+            '${failed > 0 ? ' · 失败 $failed' : ''}',
+            style: TextStyle(fontSize: 13, color: cs.hentai.textSecondary),
+          ),
+          if (path != null && path.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              path,
+              style: TextStyle(fontSize: 13, color: cs.hentai.textSecondary),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ],
+      );
+    }
+
     final path = p.currentPath;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,8 +248,13 @@ class ScanProgressDialog extends ConsumerWidget {
           final r = p.removedCount;
           final a = p.addedCount;
           final k = p.keptCount;
+          final int? thumbFailed = p.thumbnailFailedCount;
           if (r != null && a != null && k != null) {
-            label = '同步完成 · 移除 $r · 新增 $a · 保留 $k';
+            final String thumbSuffix =
+                thumbFailed != null && thumbFailed > 0
+                ? ' · 缩略图失败 $thumbFailed'
+                : '';
+            label = '同步完成 · 移除 $r · 新增 $a · 保留 $k$thumbSuffix';
           } else {
             label = '同步完成';
           }

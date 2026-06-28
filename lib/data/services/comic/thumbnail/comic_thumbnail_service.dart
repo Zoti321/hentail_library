@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:hentai_library/data/services/comic/thumbnail/comic_thumbnail_generation_policy.dart';
 import 'package:hentai_library/data/services/comic/thumbnail/comic_thumbnail_generator.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
@@ -10,6 +11,9 @@ class ComicThumbnailService {
 
   final ComicThumbnailRepository _repository;
   final Map<String, Future<Uint8List?>> _inFlight = <String, Future<Uint8List?>>{};
+
+  Future<bool> needsThumbnailGeneration(Comic comic) =>
+      needsComicThumbnailGeneration(comic: comic, repository: _repository);
 
   Future<Uint8List?> resolveThumbnailBytes(Comic comic) async {
     if (!canGenerateComicThumbnail(comic.resourceType)) {
