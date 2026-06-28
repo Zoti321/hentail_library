@@ -11,6 +11,7 @@ import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/data/repositories/comic_scan_merge.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/data/services/comic/thumbnail/comic_thumbnail_generation_policy.dart';
@@ -220,7 +221,7 @@ class ComicRepositoryImpl implements ComicRepository {
             prior.resourceType != row.resourceType) {
           thumbnailInvalidatedComicIds.add(id);
         }
-        toUpsert.add(_mergeKeptScanWithExisting(row, prior));
+        toUpsert.add(mergeKeptScanWithExisting(row, prior));
       }
     }
     return (
@@ -304,13 +305,6 @@ class ComicRepositoryImpl implements ComicRepository {
       removedIds: existingIds.difference(scannedIds),
       addedIds: scannedIds.difference(existingIds),
       keptIds: existingIds.intersection(scannedIds),
-    );
-  }
-
-  Comic _mergeKeptScanWithExisting(Comic scanned, Comic existing) {
-    return existing.copyWith(
-      path: scanned.path,
-      resourceType: scanned.resourceType,
     );
   }
 }
