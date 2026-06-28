@@ -13,14 +13,22 @@ part 'library_page_comics_providers.g.dart';
 
 @Riverpod(keepAlive: true)
 Future<Comic?> libraryComicById(Ref ref, String comicId) {
-  ref.watch(comicAggregateProvider.select((ComicAggregateState s) => s.changeGeneration));
+  ref.watch(
+    comicAggregateProvider.select(
+      (ComicAggregateState s) => s.changeGeneration,
+    ),
+  );
   return ref.read(comicRepoProvider).findById(comicId);
 }
 
 /// 合并弹窗专用查询：基于当前关键字对“可合并漫画”做过滤。
 @Riverpod(keepAlive: true)
 Future<List<Comic>> filteredMergeComics(Ref ref, String comicId) async {
-  ref.watch(comicAggregateProvider.select((ComicAggregateState s) => s.changeGeneration));
+  ref.watch(
+    comicAggregateProvider.select(
+      (ComicAggregateState s) => s.changeGeneration,
+    ),
+  );
   final String query = ref.watch(
     libraryQueryIntentProvider.select(
       (LibraryQueryIntent s) => s.mergeSearchQuery,
@@ -94,6 +102,10 @@ final Provider<VoidCallback> libraryRefreshActionProvider =
 
 @Riverpod(keepAlive: true)
 Future<Comic?> libraryComicDetail(Ref ref, String comicId) {
-  ref.watch(comicAggregateProvider.select((ComicAggregateState s) => s.changeGeneration));
+  ref.watch(
+    comicAggregateProvider.select(
+      (ComicAggregateState s) => s.changeGeneration,
+    ),
+  );
   return ref.read(comicRepoProvider).findById(comicId);
 }

@@ -31,7 +31,10 @@ class LibraryPaginationBar extends ConsumerWidget {
     final bool canGoPrevious = !isLoading && page > 1;
     final bool canGoNext = !isLoading && page < totalPages;
     return Padding(
-      padding: EdgeInsets.only(top: tokens.spacing.md, bottom: tokens.spacing.lg),
+      padding: EdgeInsets.only(
+        top: tokens.spacing.md,
+        bottom: tokens.spacing.lg,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -124,9 +127,8 @@ class LibraryPaginationBarSliver extends ConsumerWidget {
           ),
         );
       },
-      error: (Object _, StackTrace _) => const SliverToBoxAdapter(
-        child: SizedBox.shrink(),
-      ),
+      error: (Object _, StackTrace _) =>
+          const SliverToBoxAdapter(child: SizedBox.shrink()),
       skipLoadingOnReload: true,
     );
   }

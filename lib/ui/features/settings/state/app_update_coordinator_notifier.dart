@@ -39,7 +39,11 @@ class AppUpdateCoordinatorNotifier extends _$AppUpdateCoordinatorNotifier {
     }
     _startupScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((Duration _) {
-      unawaited(ref.read(appUpdateControllerProvider.notifier).scheduleStartupCheckIfNeeded());
+      unawaited(
+        ref
+            .read(appUpdateControllerProvider.notifier)
+            .scheduleStartupCheckIfNeeded(),
+      );
     });
   }
 }

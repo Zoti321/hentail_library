@@ -54,7 +54,8 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
         pageSize: request.pageSize,
       );
     }
-    final int totalPages = (totalCount + request.pageSize - 1) ~/ request.pageSize;
+    final int totalPages =
+        (totalCount + request.pageSize - 1) ~/ request.pageSize;
     int effectivePage = request.page;
     if (effectivePage > totalPages) {
       effectivePage = totalPages;
@@ -115,7 +116,8 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
         pageSize: request.pageSize,
       );
     }
-    final int totalPages = (totalCount + request.pageSize - 1) ~/ request.pageSize;
+    final int totalPages =
+        (totalCount + request.pageSize - 1) ~/ request.pageSize;
     int effectivePage = request.page;
     if (effectivePage > totalPages) {
       effectivePage = totalPages;

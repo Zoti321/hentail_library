@@ -43,9 +43,9 @@ void main() {
             'https://github.com/Zoti321/hentail_library/releases/tag/v1.0.1',
         assets: <AppReleaseAsset>[],
       );
-      when(() => mockService.fetchLatestStableRelease()).thenAnswer(
-        (_) async => newerRelease,
-      );
+      when(
+        () => mockService.fetchLatestStableRelease(),
+      ).thenAnswer((_) async => newerRelease);
 
       await tester.pumpWidget(_buildHarness(mockService: mockService));
       await tester.tap(find.text('检查更新'));
@@ -55,61 +55,63 @@ void main() {
       expect(find.text('发现新版本 v1.0.1'), findsOneWidget);
     });
 
-    testWidgets('shows toast instead of dialog when remote is older than local', (
-      WidgetTester tester,
-    ) async {
-      final AppReleaseInfo olderRelease = (
-        version: '0.0.1',
-        publishedAt: DateTime.utc(2026, 4, 25),
-        releaseNotes: <String>['windows'],
-        htmlUrl:
-            'https://github.com/Zoti321/hentail_library/releases/tag/0.0.1',
-        assets: <AppReleaseAsset>[],
-      );
-      when(() => mockService.fetchLatestStableRelease()).thenAnswer(
-        (_) async => olderRelease,
-      );
+    testWidgets(
+      'shows toast instead of dialog when remote is older than local',
+      (WidgetTester tester) async {
+        final AppReleaseInfo olderRelease = (
+          version: '0.0.1',
+          publishedAt: DateTime.utc(2026, 4, 25),
+          releaseNotes: <String>['windows'],
+          htmlUrl:
+              'https://github.com/Zoti321/hentail_library/releases/tag/0.0.1',
+          assets: <AppReleaseAsset>[],
+        );
+        when(
+          () => mockService.fetchLatestStableRelease(),
+        ).thenAnswer((_) async => olderRelease);
 
-      await tester.pumpWidget(_buildHarness(mockService: mockService));
-      await tester.tap(find.text('检查更新'));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(_buildHarness(mockService: mockService));
+        await tester.tap(find.text('检查更新'));
+        await tester.pumpAndSettle();
 
-      expect(find.byType(AppUpdateDialog), findsNothing);
-      expect(find.text('当前已是最新版本'), findsOneWidget);
-    });
+        expect(find.byType(AppUpdateDialog), findsNothing);
+        expect(find.text('当前已是最新版本'), findsOneWidget);
+      },
+    );
 
-    testWidgets('root navigator key alone does not show dialog without context param', (
-      WidgetTester tester,
-    ) async {
-      final AppReleaseInfo newerRelease = (
-        version: '1.0.1',
-        publishedAt: DateTime.utc(2026, 6, 27),
-        releaseNotes: <String>['修复若干问题'],
-        htmlUrl:
-            'https://github.com/Zoti321/hentail_library/releases/tag/v1.0.1',
-        assets: <AppReleaseAsset>[],
-      );
-      when(() => mockService.fetchLatestStableRelease()).thenAnswer(
-        (_) async => newerRelease,
-      );
+    testWidgets(
+      'root navigator key alone does not show dialog without context param',
+      (WidgetTester tester) async {
+        final AppReleaseInfo newerRelease = (
+          version: '1.0.1',
+          publishedAt: DateTime.utc(2026, 6, 27),
+          releaseNotes: <String>['修复若干问题'],
+          htmlUrl:
+              'https://github.com/Zoti321/hentail_library/releases/tag/v1.0.1',
+          assets: <AppReleaseAsset>[],
+        );
+        when(
+          () => mockService.fetchLatestStableRelease(),
+        ).thenAnswer((_) async => newerRelease);
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: _overrides(mockService),
-          child: const MaterialApp(home: SizedBox.shrink()),
-        ),
-      );
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: _overrides(mockService),
+            child: const MaterialApp(home: SizedBox.shrink()),
+          ),
+        );
 
-      final ProviderContainer container = ProviderScope.containerOf(
-        tester.element(find.byType(SizedBox)),
-      );
-      await container
-          .read(appUpdateControllerProvider.notifier)
-          .runManualCheck();
-      await tester.pumpAndSettle();
+        final ProviderContainer container = ProviderScope.containerOf(
+          tester.element(find.byType(SizedBox)),
+        );
+        await container
+            .read(appUpdateControllerProvider.notifier)
+            .runManualCheck();
+        await tester.pumpAndSettle();
 
-      expect(find.byType(AppUpdateDialog), findsNothing);
-    });
+        expect(find.byType(AppUpdateDialog), findsNothing);
+      },
+    );
   });
 }
 

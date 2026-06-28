@@ -90,7 +90,9 @@ class SeriesItemComicTile extends ConsumerWidget {
                       Object error,
                       StackTrace stackTrace,
                     ) {
-                      debugPrint('showInFileExplorer failed for "$path": $error');
+                      debugPrint(
+                        'showInFileExplorer failed for "$path": $error',
+                      );
                       if (!context.mounted) {
                         return;
                       }

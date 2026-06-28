@@ -2,7 +2,8 @@
 abstract final class SemverUtils {
   static String normalizeVersion(String raw) {
     final String trimmed = raw.trim();
-    final String withoutPrefix = trimmed.startsWith('v') || trimmed.startsWith('V')
+    final String withoutPrefix =
+        trimmed.startsWith('v') || trimmed.startsWith('V')
         ? trimmed.substring(1)
         : trimmed;
     return withoutPrefix.split('+').first;

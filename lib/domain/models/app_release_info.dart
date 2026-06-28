@@ -1,8 +1,4 @@
-typedef AppReleaseAsset = ({
-  String name,
-  String downloadUrl,
-  int size,
-});
+typedef AppReleaseAsset = ({String name, String downloadUrl, int size});
 
 typedef AppReleaseInfo = ({
   String version,

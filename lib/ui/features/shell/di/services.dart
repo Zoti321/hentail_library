@@ -69,6 +69,5 @@ MetadataImportExportService metadataImportExportService(Ref ref) =>
     );
 
 @Riverpod(keepAlive: true)
-ComicThumbnailService comicThumbnailService(Ref ref) => ComicThumbnailService(
-  ref.read(comicThumbnailRepoProvider),
-);
+ComicThumbnailService comicThumbnailService(Ref ref) =>
+    ComicThumbnailService(ref.read(comicThumbnailRepoProvider));

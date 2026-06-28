@@ -26,7 +26,9 @@ class LibraryComicProjection {
     required Set<String> comicIdsInAnySeries,
     String? keyword,
   }) {
-    final String? query = keyword?.trim().isEmpty ?? true ? null : keyword!.trim();
+    final String? query = keyword?.trim().isEmpty ?? true
+        ? null
+        : keyword!.trim();
     return LibraryComicFilter(
       showR18: showR18(isHealthyMode: isHealthyMode),
       query: query,

@@ -10,7 +10,8 @@ class ComicThumbnailService {
   ComicThumbnailService(this._repository);
 
   final ComicThumbnailRepository _repository;
-  final Map<String, Future<Uint8List?>> _inFlight = <String, Future<Uint8List?>>{};
+  final Map<String, Future<Uint8List?>> _inFlight =
+      <String, Future<Uint8List?>>{};
 
   Future<bool> needsThumbnailGeneration(Comic comic) =>
       needsComicThumbnailGeneration(comic: comic, repository: _repository);

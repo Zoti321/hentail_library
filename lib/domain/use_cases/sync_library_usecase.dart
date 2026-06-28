@@ -280,10 +280,15 @@ class SyncLibraryUseCase {
         removedCount: plan.removedIds.length,
         addedCount: plan.addedCount,
         keptCount: plan.keptCount,
-        thumbnailTotal: thumbnailTargets.isEmpty ? null : thumbnailTargets.length,
-        thumbnailDone: thumbnailTargets.isEmpty ? null : thumbnailTargets.length,
-        thumbnailFailedCount:
-            thumbnailTargets.isEmpty ? null : thumbnailFailedCount,
+        thumbnailTotal: thumbnailTargets.isEmpty
+            ? null
+            : thumbnailTargets.length,
+        thumbnailDone: thumbnailTargets.isEmpty
+            ? null
+            : thumbnailTargets.length,
+        thumbnailFailedCount: thumbnailTargets.isEmpty
+            ? null
+            : thumbnailFailedCount,
       ),
     );
   }

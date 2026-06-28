@@ -484,7 +484,9 @@ class _SeriesManageItemsSheetState
   @override
   Widget build(BuildContext context) {
     ref.listen<int>(
-      comicAggregateProvider.select((ComicAggregateState s) => s.changeGeneration),
+      comicAggregateProvider.select(
+        (ComicAggregateState s) => s.changeGeneration,
+      ),
       (int? previous, int next) {
         if (previous == null) {
           return;

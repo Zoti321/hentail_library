@@ -250,8 +250,7 @@ class ScanProgressDialog extends ConsumerWidget {
           final k = p.keptCount;
           final int? thumbFailed = p.thumbnailFailedCount;
           if (r != null && a != null && k != null) {
-            final String thumbSuffix =
-                thumbFailed != null && thumbFailed > 0
+            final String thumbSuffix = thumbFailed != null && thumbFailed > 0
                 ? ' · 缩略图失败 $thumbFailed'
                 : '';
             label = '同步完成 · 移除 $r · 新增 $a · 保留 $k$thumbSuffix';

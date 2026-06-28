@@ -58,18 +58,17 @@ Future<Uint8List?> _generateThumbnailInWorker(
   String normalizedPath,
   ResourceType type,
 ) async {
-  final Uint8List? sourceBytes =
-      await _loadCoverSourceBytes(normalizedPath, type);
+  final Uint8List? sourceBytes = await _loadCoverSourceBytes(
+    normalizedPath,
+    type,
+  );
   if (sourceBytes == null || sourceBytes.isEmpty) {
     return null;
   }
   return _encodeThumbnailJpeg(sourceBytes);
 }
 
-Future<Uint8List?> _loadCoverSourceBytes(
-  String path,
-  ResourceType type,
-) async {
+Future<Uint8List?> _loadCoverSourceBytes(String path, ResourceType type) async {
   if (type == ResourceType.epub ||
       type == ResourceType.zip ||
       type == ResourceType.cbz) {

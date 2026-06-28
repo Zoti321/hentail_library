@@ -48,7 +48,9 @@ Stream<List<series_entity.SeriesReadingHistory>> seriesReadingHistoryStream(
 @Riverpod(keepAlive: true)
 Future<Map<String, Comic>> historyComicsById(Ref ref) async {
   ref.watch(
-    comicAggregateProvider.select((ComicAggregateState s) => s.changeGeneration),
+    comicAggregateProvider.select(
+      (ComicAggregateState s) => s.changeGeneration,
+    ),
   );
   final List<Comic> comics = await ref.read(comicRepoProvider).getAll();
   return <String, Comic>{

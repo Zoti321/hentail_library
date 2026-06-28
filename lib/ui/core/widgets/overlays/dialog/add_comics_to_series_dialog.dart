@@ -128,7 +128,9 @@ class _AddComicsToSeriesDialogState
     final cs = Theme.of(context).colorScheme;
     final notifier = ref.read(seriesAddComicsDialogProvider.notifier);
     ref.listen<int>(
-      comicAggregateProvider.select((ComicAggregateState s) => s.changeGeneration),
+      comicAggregateProvider.select(
+        (ComicAggregateState s) => s.changeGeneration,
+      ),
       (int? previous, int next) {
         if (previous == null) {
           return;

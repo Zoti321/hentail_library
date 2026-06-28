@@ -33,8 +33,8 @@ class ComicThumbnailDao extends DatabaseAccessor<AppDatabase>
     if (comicIds.isEmpty) {
       return;
     }
-    await (delete(comicThumbnails)
-          ..where((ComicThumbnails t) => t.comicId.isIn(comicIds)))
-        .go();
+    await (delete(
+      comicThumbnails,
+    )..where((ComicThumbnails t) => t.comicId.isIn(comicIds))).go();
   }
 }

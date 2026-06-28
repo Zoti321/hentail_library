@@ -34,7 +34,9 @@ final Provider<LibrarySeriesViewData> librarySeriesViewDataProvider =
         libraryViewSettingsProvider,
       );
       ref.watch(
-        comicAggregateProvider.select((ComicAggregateState s) => s.changeGeneration),
+        comicAggregateProvider.select(
+          (ComicAggregateState s) => s.changeGeneration,
+        ),
       );
       final AsyncValue<List<Comic>> comicsAsync = ref.watch(
         librarySeriesComicsByIdSourceProvider,
@@ -80,7 +82,9 @@ final Provider<LibrarySeriesViewData> librarySeriesViewDataProvider =
 final FutureProvider<List<Comic>> librarySeriesComicsByIdSourceProvider =
     FutureProvider<List<Comic>>((Ref ref) async {
       ref.watch(
-        comicAggregateProvider.select((ComicAggregateState s) => s.changeGeneration),
+        comicAggregateProvider.select(
+          (ComicAggregateState s) => s.changeGeneration,
+        ),
       );
       return ref.read(comicRepoProvider).getAll();
     });

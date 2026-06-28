@@ -14,10 +14,7 @@ class TagDao extends DatabaseAccessor<AppDatabase> with _$TagDaoMixin {
     return row.read<int>('c')!;
   }
 
-  Future<List<DbTag>> fetchTagsPage({
-    required int limit,
-    required int offset,
-  }) {
+  Future<List<DbTag>> fetchTagsPage({required int limit, required int offset}) {
     return (select(tags)
           ..orderBy(<OrderingTerm Function(Tags t)>[
             (Tags t) => OrderingTerm.asc(t.name),

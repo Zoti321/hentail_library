@@ -115,9 +115,13 @@ class LibraryComicsPage extends _$LibraryComicsPage {
   @override
   Future<PagedResult<Comic>> build() async {
     ref.watch(
-      comicAggregateProvider.select((ComicAggregateState s) => s.changeGeneration),
+      comicAggregateProvider.select(
+        (ComicAggregateState s) => s.changeGeneration,
+      ),
     );
-    final ComicAggregateState aggregateState = ref.watch(comicAggregateProvider);
+    final ComicAggregateState aggregateState = ref.watch(
+      comicAggregateProvider,
+    );
     if (aggregateState.streamError != null) {
       throw aggregateState.streamError!;
     }
@@ -152,6 +156,10 @@ class LibraryComicsPage extends _$LibraryComicsPage {
 
 @Riverpod(keepAlive: true)
 Future<int> libraryComicTableTotalCount(Ref ref) async {
-  ref.watch(comicAggregateProvider.select((ComicAggregateState s) => s.changeGeneration));
+  ref.watch(
+    comicAggregateProvider.select(
+      (ComicAggregateState s) => s.changeGeneration,
+    ),
+  );
   return ref.read(comicRepoProvider).countAll();
 }

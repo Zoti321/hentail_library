@@ -34,7 +34,8 @@ class AuthorRepositoryImpl implements AuthorRepository {
         pageSize: request.pageSize,
       );
     }
-    final int totalPages = (totalCount + request.pageSize - 1) ~/ request.pageSize;
+    final int totalPages =
+        (totalCount + request.pageSize - 1) ~/ request.pageSize;
     int effectivePage = request.page;
     if (effectivePage > totalPages) {
       effectivePage = totalPages;

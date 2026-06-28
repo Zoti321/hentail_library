@@ -80,8 +80,7 @@ class AppUpdateService {
     if (Platform.isAndroid) {
       return assets.firstWhereOrNull(
         (AppReleaseAsset asset) =>
-            asset.name.endsWith('_android.apk') ||
-            asset.name.endsWith('.apk'),
+            asset.name.endsWith('_android.apk') || asset.name.endsWith('.apk'),
       );
     }
     return null;
@@ -95,10 +94,7 @@ class AppUpdateService {
         .split('\n')
         .map((String line) => line.trim())
         .where((String line) => line.isNotEmpty)
-        .map(
-          (String line) =>
-              line.replaceFirst(RegExp(r'^[-*]\s*'), '').trim(),
-        )
+        .map((String line) => line.replaceFirst(RegExp(r'^[-*]\s*'), '').trim())
         .where((String line) => line.isNotEmpty)
         .toList();
   }

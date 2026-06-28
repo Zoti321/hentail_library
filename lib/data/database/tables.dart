@@ -19,11 +19,8 @@ class Comics extends Table {
 /// 漫画封面缩略图（JPEG，列表/详情展示用）。
 @DataClassName('DbComicThumbnail')
 class ComicThumbnails extends Table {
-  TextColumn get comicId => text().references(
-    Comics,
-    #comicId,
-    onDelete: KeyAction.cascade,
-  )();
+  TextColumn get comicId =>
+      text().references(Comics, #comicId, onDelete: KeyAction.cascade)();
   BlobColumn get thumbnail => blob()();
   IntColumn get sourceModifiedMs => integer()();
   IntColumn get sourceSize => integer()();

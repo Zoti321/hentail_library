@@ -173,10 +173,13 @@ class MobileSettingsPage extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.system_update_outlined),
                     title: const Text('检查更新'),
-                    subtitle: ref.watch(packageInfoProvider).maybeWhen(
-                      data: (PackageInfo info) => Text('当前版本 v${info.version}'),
-                      orElse: () => const Text('正在读取版本…'),
-                    ),
+                    subtitle: ref
+                        .watch(packageInfoProvider)
+                        .maybeWhen(
+                          data: (PackageInfo info) =>
+                              Text('当前版本 v${info.version}'),
+                          orElse: () => const Text('正在读取版本…'),
+                        ),
                     onTap: () {
                       ref
                           .read(appUpdateControllerProvider.notifier)

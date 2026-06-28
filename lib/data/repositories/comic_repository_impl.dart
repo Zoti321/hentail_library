@@ -217,8 +217,7 @@ class ComicRepositoryImpl implements ComicRepository {
         toUpsert.add(row);
       } else {
         final prior = existingById[id]!;
-        if (prior.path != row.path ||
-            prior.resourceType != row.resourceType) {
+        if (prior.path != row.path || prior.resourceType != row.resourceType) {
           thumbnailInvalidatedComicIds.add(id);
         }
         toUpsert.add(mergeKeptScanWithExisting(row, prior));

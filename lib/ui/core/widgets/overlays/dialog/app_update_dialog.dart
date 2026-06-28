@@ -115,10 +115,7 @@ class AppUpdateDialog extends ConsumerWidget {
             if (!context.mounted) {
               return;
             }
-            await showAppUpdateDownloadDialog(
-              context: context,
-              asset: asset,
-            );
+            await showAppUpdateDownloadDialog(context: context, asset: asset);
           },
           child: const Text('立即更新'),
         ),
