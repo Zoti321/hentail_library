@@ -16,6 +16,10 @@ permissions:
 env:
   FLUTTER_VERSION: "3.38.5"
 
+defaults:
+  run:
+    working-directory: app
+
 jobs:
   gate:
     name: gate
@@ -87,7 +91,7 @@ jobs:
         with:
           name: windows-release
           path: |
-            dist_installer/*.exe
+            ../dist_installer/*.exe
             hentai_library_*_windows_x64_portable.zip
           if-no-files-found: error
 
