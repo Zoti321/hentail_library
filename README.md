@@ -37,7 +37,18 @@
 
 ## 协作建议
 
-- 提交前至少执行：`dart format .`、`flutter analyze`、`flutter test`
+本仓库为 **Monorepo**：Flutter 应用在 `app/`，Rust 核心（迁移中）将位于 `core/`。
+
+```bash
+cd app
+flutter pub get
+dart run build_runner build --delete-conflicting-outputs
+dart format .
+flutter analyze
+flutter test
+flutter run -d windows   # 或其他平台
+```
+
+- 提交前至少执行：`dart format .`、`flutter analyze`、`flutter test`（均在 `app/` 下）
 - 新增模型/DAO/Provider 后同步更新生成代码
-- PR 说明建议包含：改动背景、核心改动点、测试方式、截图（UI 改动）
 - PR 说明建议包含：改动背景、核心改动点、测试方式、截图（UI 改动）
