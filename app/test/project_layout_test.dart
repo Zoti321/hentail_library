@@ -13,8 +13,14 @@ void main() {
     });
 
     test('Flutter app lives under app/', () {
-      expect(Directory(p.join(repoRoot.path, 'app', 'lib')).existsSync(), isTrue);
-      expect(File(p.join(repoRoot.path, 'app', 'pubspec.yaml')).existsSync(), isTrue);
+      expect(
+        Directory(p.join(repoRoot.path, 'app', 'lib')).existsSync(),
+        isTrue,
+      );
+      expect(
+        File(p.join(repoRoot.path, 'app', 'pubspec.yaml')).existsSync(),
+        isTrue,
+      );
       expect(Directory(p.join(repoRoot.path, 'lib')).existsSync(), isFalse);
       expect(File(p.join(repoRoot.path, 'pubspec.yaml')).existsSync(), isFalse);
     });
