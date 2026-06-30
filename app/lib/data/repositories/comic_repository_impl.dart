@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
-import 'package:hentai_library/data/database/comic_page_sql_builder.dart';
 import 'package:hentai_library/data/database/dao/dao.dart';
 import 'package:hentai_library/data/database/database.dart' as db;
-import 'package:hentai_library/data/mappers/mapping.dart';
+import 'package:hentai_library/data/repositories/comic_frb_mapper.dart';
+import 'package:hentai_library/data/repositories/comic_scan_merge.dart';
 import 'package:hentai_library/domain/library/library_comic_filter.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
@@ -11,11 +11,11 @@ import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/data/repositories/comic_scan_merge.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/data/services/comic/thumbnail/comic_thumbnail_generation_policy.dart';
 import 'package:hentai_library/data/services/comic/thumbnail/comic_thumbnail_generator.dart';
+import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 
 typedef _ComicScanIdDiff = ({
   Set<String> removedIds,
@@ -23,7 +23,7 @@ typedef _ComicScanIdDiff = ({
   Set<String> keptIds,
 });
 
-/// 漫画主表与标签的持久化；跨聚合删除请经 [DeleteComicsUseCase]。
+/// 漫画主表与标签的持久化；读路径经 Rust/SeaORM，写路径仍用 Drift（#14）。
 class ComicRepositoryImpl implements ComicRepository {
   ComicRepositoryImpl(
     this._comicDao,
@@ -35,51 +35,24 @@ class ComicRepositoryImpl implements ComicRepository {
   final SearchDao _searchDao;
   final ComicThumbnailRepository _thumbnailRepository;
 
-  Future<List<Comic>> _mapRows(List<db.DbComic> rows) async {
-    final Iterable<String> ids = rows.map((db.DbComic e) => e.comicId);
-    final Map<String, List<String>> tagMap = await _comicDao
-        .getTagNamesForComics(ids);
-    final Map<String, List<String>> authorMap = await _comicDao
-        .getAuthorNamesForComics(ids);
-    return rows
-        .map(
-          (db.DbComic row) => row.toEntity(
-            authorNames: authorMap[row.comicId] ?? const <String>[],
-            tagNames: tagMap[row.comicId] ?? const <String>[],
-          ),
-        )
-        .toList();
-  }
-
-  Future<List<Comic>> _loadComicsOrderedByIds(List<String> comicIds) async {
-    if (comicIds.isEmpty) {
-      return <Comic>[];
-    }
-    final List<db.DbComic> rows = await _comicDao.getComicsByIds(comicIds);
-    final List<Comic> mapped = await _mapRows(rows);
-    final Map<String, Comic> comicsById = <String, Comic>{
-      for (final Comic comic in mapped) comic.comicId: comic,
-    };
-    final List<Comic> ordered = <Comic>[];
-    for (final String comicId in comicIds) {
-      final Comic? comic = comicsById[comicId];
-      if (comic != null) {
-        ordered.add(comic);
-      }
-    }
-    return ordered;
-  }
+  @override
+  Stream<void> watchChanges() => rust.watchComicChanges().map((int _) {});
 
   @override
-  Stream<void> watchChanges() => _comicDao.watchComicTableChanges();
-
-  @override
-  Future<int> countAll() => _comicDao.countAllComics();
+  Future<int> countAll() async => rust.countAllComicsFrb().toInt();
 
   @override
   Future<List<Comic>> getAll() async {
-    final rows = await _comicDao.getAllComics();
-    return _mapRows(rows);
+    final int total = await countAll();
+    if (total <= 0) {
+      return <Comic>[];
+    }
+    final rust.PagedComicResultDto page = rust.fetchComicsPageFrb(
+      request: rust.PageRequestDto(page: 1, pageSize: total),
+      filter: unrestrictedListFilter(),
+      sort: const rust.ComicSortOptionDto(descending: false),
+    );
+    return page.items.map(mapRustComic).toList();
   }
 
   @override
@@ -88,52 +61,18 @@ class ComicRepositoryImpl implements ComicRepository {
     required LibraryComicFilter filter,
     required LibraryComicSortOption sortOption,
   }) async {
-    final ComicPageSqlCriteria criteria = ComicPageSqlCriteria.fromFilter(
-      filter,
+    final rust.PagedComicResultDto page = rust.fetchComicsPageFrb(
+      request: mapPageRequest(request),
+      filter: mapLibraryFilter(filter),
+      sort: mapSortOption(sortOption),
     );
-    final int totalCount = await _comicDao.countComicsFiltered(criteria);
-    final int totalPages = totalCount <= 0
-        ? 0
-        : (totalCount + request.pageSize - 1) ~/ request.pageSize;
-    int effectivePage = request.page;
-    if (totalPages > 0 && effectivePage > totalPages) {
-      effectivePage = totalPages;
-    }
-    if (totalCount <= 0) {
-      return PagedResult<Comic>(
-        items: const <Comic>[],
-        totalCount: 0,
-        page: 1,
-        pageSize: request.pageSize,
-      );
-    }
-    final int offset = (effectivePage - 1) * request.pageSize;
-    final List<db.DbComic> rows = await _comicDao.fetchComicsPageFiltered(
-      criteria: criteria,
-      sortDescending: sortOption.descending,
-      limit: request.pageSize,
-      offset: offset,
-    );
-    final List<Comic> items = await _mapRows(rows);
-    return PagedResult<Comic>(
-      items: items,
-      totalCount: totalCount,
-      page: effectivePage,
-      pageSize: request.pageSize,
-    );
+    return mapPagedResult(page);
   }
 
   @override
   Future<Comic?> findById(String comicId) async {
-    final row = await _comicDao.findById(comicId);
-    if (row == null) {
-      return null;
-    }
-    final List<String> tagNames = await _comicDao.getTagNamesForComic(comicId);
-    final List<String> authorNames = await _comicDao.getAuthorNamesForComic(
-      comicId,
-    );
-    return row.toEntity(authorNames: authorNames, tagNames: tagNames);
+    final rust.ComicDto? dto = rust.findComicByIdFrb(comicId: comicId);
+    return dto == null ? null : mapRustComic(dto);
   }
 
   @override
@@ -267,10 +206,7 @@ class ComicRepositoryImpl implements ComicRepository {
 
   @override
   Future<List<Comic>> searchByKeyword(String keyword) async {
-    final List<String> comicIds = await _searchDao.searchComicIdsByKeyword(
-      keyword,
-    );
-    return _loadComicsOrderedByIds(comicIds);
+    return rust.searchByKeywordFrb(keyword: keyword).map(mapRustComic).toList();
   }
 
   @override
@@ -285,7 +221,14 @@ class ComicRepositoryImpl implements ComicRepository {
           optionalOr: optionalOr,
           mustExclude: mustExclude,
         );
-    return _loadComicsOrderedByIds(comicIds);
+    final List<Comic> ordered = <Comic>[];
+    for (final String comicId in comicIds) {
+      final Comic? comic = await findById(comicId);
+      if (comic != null) {
+        ordered.add(comic);
+      }
+    }
+    return ordered;
   }
 
   Map<String, Comic> _dedupeScannedByComicId(List<Comic> scanned) {

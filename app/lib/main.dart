@@ -3,7 +3,7 @@ import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:hentai_library/core/image/image_quality_policy.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/src/rust/api/init.dart';
+import 'package:hentai_library/src/rust/api/comic.dart';
 import 'package:hentai_library/src/rust/frb_generated.dart';
 import 'package:hentai_library/ui/features/shell/views/app.dart';
 import 'package:path_provider/path_provider.dart';

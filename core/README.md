@@ -2,6 +2,9 @@
 
 Rust workspace：`hentai-core`（业务逻辑）+ `hentai_flutter`（FRB cdylib）。
 
+- `hentai-core`：SeaORM 接管 SQLite、`comic_id`、Comic 读 API
+- 集成测试 fixture：`tests/fixtures/drift_v2.sql`
+
 ## 开发
 
 ```bash

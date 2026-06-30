@@ -8,15 +8,6 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `from`
 
-void initDbFrb({required String appDataDir, required String dbFileName}) =>
-    RustLib.instance.api.crateApiInitInitDbFrb(
-      appDataDir: appDataDir,
-      dbFileName: dbFileName,
-    );
-
-String comicIdFromPathFrb({required String rawPath}) =>
-    RustLib.instance.api.crateApiInitComicIdFromPathFrb(rawPath: rawPath);
-
 class HentaiErrorDto implements FrbException {
   final String code;
   final String message;
