@@ -36,8 +36,7 @@ class ComicRepositoryImpl implements ComicRepository {
   final ComicThumbnailRepository _thumbnailRepository;
 
   @override
-  Stream<void> watchChanges() =>
-      rust.watchComicChanges().map((int _) {});
+  Stream<void> watchChanges() => rust.watchComicChanges().map((int _) {});
 
   @override
   Future<int> countAll() async => rust.countAllComicsFrb().toInt();
@@ -207,10 +206,7 @@ class ComicRepositoryImpl implements ComicRepository {
 
   @override
   Future<List<Comic>> searchByKeyword(String keyword) async {
-    return rust
-        .searchByKeywordFrb(keyword: keyword)
-        .map(mapRustComic)
-        .toList();
+    return rust.searchByKeywordFrb(keyword: keyword).map(mapRustComic).toList();
   }
 
   @override
