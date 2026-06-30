@@ -1,0 +1,16 @@
+[package]
+name = "hentai_flutter"
+description = "Flutter Rust Bridge glue for Hentai Library"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[lints.rust]
+unexpected_cfgs = { level = "allow", check-cfg = ['cfg(frb_expand)'] }
+
+[dependencies]
+flutter_rust_bridge = "=2.12.0"
+hentai-core = { path = "../core" }

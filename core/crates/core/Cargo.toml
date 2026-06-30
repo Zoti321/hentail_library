@@ -1,0 +1,15 @@
+[package]
+name = "hentai-core"
+description = "Hentai Library core logic (scan, DB, reader)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha1 = "0.10"
+thiserror = "2"
+
+[dev-dependencies]
+serde_json = "1"

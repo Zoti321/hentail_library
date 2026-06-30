@@ -1,0 +1,58 @@
+{
+  "cases": [
+    {
+      "description": "windows backslash",
+      "raw": "C:\\漫画\\test.zip",
+      "normalized": "C:/漫画/test.zip",
+      "expected_comic_id": "86408880d30b0de95ca959feb60a3b72dcb1889b"
+    },
+    {
+      "description": "windows trailing slash",
+      "raw": "C:\\漫画\\test.zip\\",
+      "normalized": "C:/漫画/test.zip",
+      "expected_comic_id": "86408880d30b0de95ca959feb60a3b72dcb1889b"
+    },
+    {
+      "description": "posix",
+      "raw": "/home/user/comics/foo.cbz",
+      "normalized": "/home/user/comics/foo.cbz",
+      "expected_comic_id": "af738b6b1b3bbfab9a0fd591459572509d7ef4d5"
+    },
+    {
+      "description": "mixed separators",
+      "raw": "C:/漫画\\子目录",
+      "normalized": "C:/漫画/子目录",
+      "expected_comic_id": "e931fd412112e427f7335e127af79c8b0f87887b"
+    },
+    {
+      "description": "trim and trailing slash",
+      "raw": "  /foo/bar/  ",
+      "normalized": "/foo/bar",
+      "expected_comic_id": "a82cce35fd860de6f63f97e6c482dc6a14d002e8"
+    },
+    {
+      "description": "windows drive root",
+      "raw": "C:\\",
+      "normalized": "C:",
+      "expected_comic_id": "1173dbb43313d07b70a93fae991af36789693f17"
+    },
+    {
+      "description": "posix root",
+      "raw": "/",
+      "normalized": "/",
+      "expected_comic_id": "42099b4af021e53fd8fd4e056c2568d7c2e3ffa8"
+    },
+    {
+      "description": "empty",
+      "raw": "",
+      "normalized": "",
+      "expected_comic_id": ""
+    },
+    {
+      "description": "whitespace only",
+      "raw": "   ",
+      "normalized": "",
+      "expected_comic_id": ""
+    }
+  ]
+}
