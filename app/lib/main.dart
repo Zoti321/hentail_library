@@ -1,13 +1,25 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
-import 'package:hentai_library/ui/features/shell/views/app.dart';
 import 'package:hentai_library/core/image/image_quality_policy.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/src/rust/api/init.dart';
+import 'package:hentai_library/src/rust/frb_generated.dart';
+import 'package:hentai_library/ui/features/shell/views/app.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await RustLib.init();
+
+  try {
+    final appDataDir = await getApplicationSupportDirectory();
+    initDbFrb(appDataDir: appDataDir.path, dbFileName: 'my_database');
+  } catch (e, st) {
+    debugPrint('Rust init_db 失败: $e\n$st');
+  }
 
   _initImageQualityPolicy();
 

@@ -31,8 +31,12 @@ void main() {
       expect(Directory(p.join(repoRoot.path, '.github')).existsSync(), isTrue);
     });
 
-    test('core/ placeholder exists for upcoming Rust workspace', () {
+    test('core/ Rust workspace exists', () {
       expect(Directory(p.join(repoRoot.path, 'core')).existsSync(), isTrue);
+      expect(
+        File(p.join(repoRoot.path, 'core', 'Cargo.toml')).existsSync(),
+        isTrue,
+      );
     });
   });
 
@@ -48,6 +52,7 @@ void main() {
         'core',
         'data',
         'domain',
+        'src',
         'ui',
       };
       expect(actualNames, expectedNames);
