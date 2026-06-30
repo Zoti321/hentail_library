@@ -65,7 +65,9 @@ EPUB and PDF are supported as first-class comic carriers when content is comic-l
 | `pdf` | — | — | Not in `ResourceType` yet |
 | `7z` / `cb7` | — | — | Not in `ResourceType` yet |
 
-When adding format support, extend `ResourceType`, add a `ResourceParser` for scan, and a read accessor under `data/services/comic/read_resource_get/`. Update scan progress UI counts if a new type is accepted.
+**Planned:** Core scan/read/DB logic migrates to Rust (`core/`) via FRB; see `docs/agents/rust-migration.md` and ADR-0002. Target: in-place SQLite takeover, incremental Library sync, and full support for rar/cbr, 7z/cb7, pdf.
+
+When adding format support during migration, extend `ResourceType`, implement parser and `PageSource` in Rust, expose via FRB; update Library sync progress counts for new types.
 
 ### Out of scope (unless explicitly requested)
 

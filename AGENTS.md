@@ -1,5 +1,11 @@
 ## Agent skills
 
+### Monorepo layout (Rust migration)
+
+The repo is moving to a **monorepo**: Flutter lives under **`app/`**, Rust under **`core/`**. Root keeps `README.md`, `AGENTS.md`, `CONTEXT.md`, `docs/`, `.github/`. Until the move lands, legacy paths may still be at the repo root — follow the parent GitHub issue for Rust FRB migration.
+
+See **`docs/agents/rust-migration.md`** and **`docs/adr/0002-rust-core-via-frb.md`**.
+
 ### Product positioning
 
 Cross-platform local comic reading & management app. Target formats: image dirs, comic archives (zip/cbz, rar/cbr, 7z/cb7), epub, pdf. See `docs/agents/product-positioning.md`.
@@ -18,7 +24,7 @@ Single-context layout: `CONTEXT.md` at the repo root and `docs/adr/` for ADRs. S
 
 ### Coding style
 
-Widget state: prefer `StatelessWidget` / `HookWidget` / `ConsumerWidget` / `HookConsumerWidget` over `StatefulWidget`. Lightweight pass-through data: prefer `typedef` + record over classes without serialization needs. Layer layout: `core/` (utilities), `domain/`, `data/`, `ui/` — see `docs/agents/coding-style.md`.
+Widget state: prefer `StatelessWidget` / `HookWidget` / `ConsumerWidget` / `HookConsumerWidget` over `StatefulWidget`. Lightweight pass-through data: prefer `typedef` + record over classes without serialization needs. Layer layout under **`app/lib/`**: `core/` (utilities), `domain/` (models; no use cases after migration), `data/` (repositories → FRB), `ui/` — see `docs/agents/coding-style.md`. Business logic for scan/sync/read/DB lives in **`core/`** (Rust).
 
 ### UI style & responsive design
 

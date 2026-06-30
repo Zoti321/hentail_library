@@ -4,16 +4,20 @@ Project-specific conventions for UI widgets and lightweight data shapes. Agents 
 
 ## Project layout
 
-Clean-architecture layers under `lib/`:
+**Target monorepo** (see `docs/agents/rust-migration.md`):
 
-| Directory | Role |
-|-----------|------|
-| `lib/core/` | Cross-cutting utilities (logging, l10n, path/format helpers). Not domain or persistence — keep as a separate top-level folder. |
-| `lib/domain/` | Domain models (`models/`), use cases (`use_cases/`), and library query logic (`library/`). |
-| `lib/data/` | Services, repositories, database (Drift), and mappers. |
-| `lib/ui/` | Shared widgets/theme (`core/`) and feature modules (`features/<feature>/` with `view_models/` + `views/`). |
+| Path | Role |
+|------|------|
+| `app/lib/core/` | Cross-cutting Dart utilities (logging, l10n, path/format helpers). |
+| `app/lib/domain/` | Domain models (`models/`). Use cases are removed after Rust migration; library query **projection** (`library/`) may remain for UI filter building. |
+| `app/lib/data/` | Repositories (thin FRB adapters). No Drift, no `services/comic/` after migration. |
+| `app/lib/ui/` | Shared widgets/theme and feature modules. |
+| `core/crates/core/` | Rust: SeaORM, scan, sync, reader, thumbnail, series inference. |
+| `core/crates/flutter/` | FRB glue (`#[frb]` API). |
 
-Import canonical paths directly (`domain/models/…`, `data/repositories/…`, etc.). Do not add files under removed legacy roots (`presentation/`, `model/`, `repository/`, `services/`, `usecases/`, `database/`, `module/` at `lib/` root). Canonical top-level layout is `core/`, `data/`, `domain/`, `ui/` only.
+**Legacy (pre-migration):** layers under repo-root `lib/` — same roles as `app/lib/` above.
+
+Import canonical paths from `app/lib/` once the monorepo move lands. Do not add files under removed legacy roots (`presentation/`, `model/`, `repository/`, `services/`, `usecases/`, `database/`, `module/` at `lib/` root).
 
 ## Widget state
 
