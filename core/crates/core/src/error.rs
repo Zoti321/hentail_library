@@ -4,6 +4,7 @@ use thiserror::Error;
 pub enum HentaiErrorCode {
     Validation,
     DbInitFailed,
+    DbQueryFailed,
 }
 
 #[derive(Debug, Clone, Error)]
@@ -26,6 +27,14 @@ impl HentaiError {
     pub fn db_init_failed(message: impl Into<String>, context: Option<String>) -> Self {
         Self {
             code: HentaiErrorCode::DbInitFailed,
+            message: message.into(),
+            context,
+        }
+    }
+
+    pub fn db_query_failed(message: impl Into<String>, context: Option<String>) -> Self {
+        Self {
+            code: HentaiErrorCode::DbQueryFailed,
             message: message.into(),
             context,
         }

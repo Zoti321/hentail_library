@@ -60,6 +60,7 @@ app/test/fixtures/thumbnail_bug/comic.zip
 app/test/fixtures/thumbnail_bug/out/
 
 *.sql
+!core/tests/fixtures/drift_v2.sql
 
 development.md
 .cursor

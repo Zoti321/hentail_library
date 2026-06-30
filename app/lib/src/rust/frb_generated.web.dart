@@ -6,6 +6,7 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
+import 'api/comic.dart';
 import 'api/init.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -21,10 +22,55 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   });
 
   @protected
+  AnyhowException dco_decode_AnyhowException(dynamic raw);
+
+  @protected
+  RustStreamSink<int> dco_decode_StreamSink_i_32_Sse(dynamic raw);
+
+  @protected
   String dco_decode_String(dynamic raw);
 
   @protected
+  bool dco_decode_bool(dynamic raw);
+
+  @protected
+  ComicDto dco_decode_box_autoadd_comic_dto(dynamic raw);
+
+  @protected
+  ComicFilterDto dco_decode_box_autoadd_comic_filter_dto(dynamic raw);
+
+  @protected
+  ComicSortOptionDto dco_decode_box_autoadd_comic_sort_option_dto(dynamic raw);
+
+  @protected
+  int dco_decode_box_autoadd_i_32(dynamic raw);
+
+  @protected
+  PageRequestDto dco_decode_box_autoadd_page_request_dto(dynamic raw);
+
+  @protected
+  ComicDto dco_decode_comic_dto(dynamic raw);
+
+  @protected
+  ComicFilterDto dco_decode_comic_filter_dto(dynamic raw);
+
+  @protected
+  ComicSortOptionDto dco_decode_comic_sort_option_dto(dynamic raw);
+
+  @protected
   HentaiErrorDto dco_decode_hentai_error_dto(dynamic raw);
+
+  @protected
+  int dco_decode_i_32(dynamic raw);
+
+  @protected
+  PlatformInt64 dco_decode_i_64(dynamic raw);
+
+  @protected
+  List<String> dco_decode_list_String(dynamic raw);
+
+  @protected
+  List<ComicDto> dco_decode_list_comic_dto(dynamic raw);
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
@@ -33,16 +79,83 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String? dco_decode_opt_String(dynamic raw);
 
   @protected
+  ComicDto? dco_decode_opt_box_autoadd_comic_dto(dynamic raw);
+
+  @protected
+  int? dco_decode_opt_box_autoadd_i_32(dynamic raw);
+
+  @protected
+  PageRequestDto dco_decode_page_request_dto(dynamic raw);
+
+  @protected
+  PagedComicResultDto dco_decode_paged_comic_result_dto(dynamic raw);
+
+  @protected
   int dco_decode_u_8(dynamic raw);
 
   @protected
   void dco_decode_unit(dynamic raw);
 
   @protected
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
+
+  @protected
+  RustStreamSink<int> sse_decode_StreamSink_i_32_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
+  bool sse_decode_bool(SseDeserializer deserializer);
+
+  @protected
+  ComicDto sse_decode_box_autoadd_comic_dto(SseDeserializer deserializer);
+
+  @protected
+  ComicFilterDto sse_decode_box_autoadd_comic_filter_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ComicSortOptionDto sse_decode_box_autoadd_comic_sort_option_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  int sse_decode_box_autoadd_i_32(SseDeserializer deserializer);
+
+  @protected
+  PageRequestDto sse_decode_box_autoadd_page_request_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ComicDto sse_decode_comic_dto(SseDeserializer deserializer);
+
+  @protected
+  ComicFilterDto sse_decode_comic_filter_dto(SseDeserializer deserializer);
+
+  @protected
+  ComicSortOptionDto sse_decode_comic_sort_option_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   HentaiErrorDto sse_decode_hentai_error_dto(SseDeserializer deserializer);
+
+  @protected
+  int sse_decode_i_32(SseDeserializer deserializer);
+
+  @protected
+  PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
+
+  @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer);
+
+  @protected
+  List<ComicDto> sse_decode_list_comic_dto(SseDeserializer deserializer);
 
   @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
@@ -51,25 +164,102 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String? sse_decode_opt_String(SseDeserializer deserializer);
 
   @protected
+  ComicDto? sse_decode_opt_box_autoadd_comic_dto(SseDeserializer deserializer);
+
+  @protected
+  int? sse_decode_opt_box_autoadd_i_32(SseDeserializer deserializer);
+
+  @protected
+  PageRequestDto sse_decode_page_request_dto(SseDeserializer deserializer);
+
+  @protected
+  PagedComicResultDto sse_decode_paged_comic_result_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer);
 
   @protected
   void sse_decode_unit(SseDeserializer deserializer);
 
   @protected
-  int sse_decode_i_32(SseDeserializer deserializer);
+  void sse_encode_AnyhowException(
+    AnyhowException self,
+    SseSerializer serializer,
+  );
 
   @protected
-  bool sse_decode_bool(SseDeserializer deserializer);
+  void sse_encode_StreamSink_i_32_Sse(
+    RustStreamSink<int> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_String(String self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_comic_dto(
+    ComicDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_comic_filter_dto(
+    ComicFilterDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_comic_sort_option_dto(
+    ComicSortOptionDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_page_request_dto(
+    PageRequestDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_comic_dto(ComicDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_comic_filter_dto(
+    ComicFilterDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_comic_sort_option_dto(
+    ComicSortOptionDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_hentai_error_dto(
     HentaiErrorDto self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_i_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_comic_dto(List<ComicDto> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_prim_u_8_strict(
@@ -81,16 +271,31 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_opt_String(String? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_opt_box_autoadd_comic_dto(
+    ComicDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_i_32(int? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_page_request_dto(
+    PageRequestDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_paged_comic_result_dto(
+    PagedComicResultDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_unit(void self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer);
 }
 
 // Section: wire_class
