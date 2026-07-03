@@ -45,6 +45,9 @@ class LibrarySyncCountsDto {
     required this.pdf,
   });
 
+  static Future<LibrarySyncCountsDto> default_() =>
+      RustLib.instance.api.crateApiSyncLibrarySyncCountsDtoDefault();
+
   @override
   int get hashCode =>
       dir.hashCode ^
