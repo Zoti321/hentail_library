@@ -1951,7 +1951,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           },
           codec: SseCodec(
             decodeSuccessData: sse_decode_unit,
-            decodeErrorData: sse_decode_hentai_error_dto,
+            decodeErrorData: null,
           ),
           constMeta: kCrateApiSyncSyncLibraryFrbConstMeta,
           argValues: [handle, sink],
@@ -3006,8 +3006,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SyncLibraryProgressDto dco_decode_sync_library_progress_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 11)
-      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    if (arr.length != 12)
+      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
     return SyncLibraryProgressDto(
       phase: dco_decode_sync_library_phase_dto(arr[0]),
       route: dco_decode_sync_library_route_dto(arr[1]),
@@ -3020,6 +3020,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       thumbnailTotal: dco_decode_opt_box_autoadd_i_32(arr[8]),
       thumbnailDone: dco_decode_opt_box_autoadd_i_32(arr[9]),
       thumbnailFailedCount: dco_decode_opt_box_autoadd_i_32(arr[10]),
+      errorMessage: dco_decode_opt_String(arr[11]),
     );
   }
 
@@ -3860,6 +3861,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_thumbnailFailedCount = sse_decode_opt_box_autoadd_i_32(
       deserializer,
     );
+    var var_errorMessage = sse_decode_opt_String(deserializer);
     return SyncLibraryProgressDto(
       phase: var_phase,
       route: var_route,
@@ -3872,6 +3874,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       thumbnailTotal: var_thumbnailTotal,
       thumbnailDone: var_thumbnailDone,
       thumbnailFailedCount: var_thumbnailFailedCount,
+      errorMessage: var_errorMessage,
     );
   }
 
@@ -4718,6 +4721,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_i_32(self.thumbnailTotal, serializer);
     sse_encode_opt_box_autoadd_i_32(self.thumbnailDone, serializer);
     sse_encode_opt_box_autoadd_i_32(self.thumbnailFailedCount, serializer);
+    sse_encode_opt_String(self.errorMessage, serializer);
   }
 
   @protected

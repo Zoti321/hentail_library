@@ -14,6 +14,7 @@ pub enum SyncLibraryPhaseDto {
     WritingDb,
     GeneratingThumbnails,
     Done,
+    Failed,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -23,7 +24,7 @@ pub enum SyncLibraryRouteDto {
     WithRoots,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct LibrarySyncCountsDto {
     pub dir: i32,
     pub zip: i32,
@@ -49,6 +50,7 @@ pub struct SyncLibraryProgressDto {
     pub thumbnail_total: Option<i32>,
     pub thumbnail_done: Option<i32>,
     pub thumbnail_failed_count: Option<i32>,
+    pub error_message: Option<String>,
 }
 
 pub struct SyncHandleDto {
@@ -71,12 +73,15 @@ pub fn cancel_sync_frb(handle: &SyncHandleDto) {
 pub async fn sync_library_frb(
     handle: SyncHandleDto,
     sink: crate::frb_generated::StreamSink<SyncLibraryProgressDto>,
-) -> Result<(), HentaiErrorDto> {
-    core_sync_library(handle.inner, |progress| {
+) {
+    if let Err(error) = core_sync_library(handle.inner, |progress| {
         let _ = sink.add(map_progress(progress));
     })
     .await
-    .map_err(HentaiErrorDto::from)
+    {
+        let dto = HentaiErrorDto::from(error);
+        let _ = sink.add(failed_progress(dto.message));
+    }
 }
 
 fn map_progress(p: CoreProgress) -> SyncLibraryProgressDto {
@@ -102,6 +107,24 @@ fn map_progress(p: CoreProgress) -> SyncLibraryProgressDto {
         thumbnail_total: p.thumbnail_total,
         thumbnail_done: p.thumbnail_done,
         thumbnail_failed_count: p.thumbnail_failed_count,
+        error_message: p.error_message,
+    }
+}
+
+fn failed_progress(message: String) -> SyncLibraryProgressDto {
+    SyncLibraryProgressDto {
+        phase: SyncLibraryPhaseDto::Failed,
+        route: SyncLibraryRouteDto::WithRoots,
+        current_path: None,
+        accepted_total: 0,
+        counts: LibrarySyncCountsDto::default(),
+        removed_count: None,
+        added_count: None,
+        kept_count: None,
+        thumbnail_total: None,
+        thumbnail_done: None,
+        thumbnail_failed_count: None,
+        error_message: Some(message),
     }
 }
 
@@ -112,6 +135,7 @@ fn map_phase(p: CorePhase) -> SyncLibraryPhaseDto {
         CorePhase::WritingDb => SyncLibraryPhaseDto::WritingDb,
         CorePhase::GeneratingThumbnails => SyncLibraryPhaseDto::GeneratingThumbnails,
         CorePhase::Done => SyncLibraryPhaseDto::Done,
+        CorePhase::Failed => SyncLibraryPhaseDto::Failed,
     }
 }
 

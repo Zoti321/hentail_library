@@ -1924,10 +1924,11 @@ fn wire__crate__api__sync__sync_library_frb_impl(
             >>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
-                transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
+                transform_result_sse::<_, ()>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::sync::sync_library_frb(api_handle, api_sink).await?;
+                        let output_ok = Result::<_, ()>::Ok({
+                            crate::api::sync::sync_library_frb(api_handle, api_sink).await;
+                        })?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -3131,6 +3132,7 @@ impl SseDecode for crate::api::sync::SyncLibraryPhaseDto {
             2 => crate::api::sync::SyncLibraryPhaseDto::WritingDb,
             3 => crate::api::sync::SyncLibraryPhaseDto::GeneratingThumbnails,
             4 => crate::api::sync::SyncLibraryPhaseDto::Done,
+            5 => crate::api::sync::SyncLibraryPhaseDto::Failed,
             _ => unreachable!("Invalid variant for SyncLibraryPhaseDto: {}", inner),
         };
     }
@@ -3150,6 +3152,7 @@ impl SseDecode for crate::api::sync::SyncLibraryProgressDto {
         let mut var_thumbnailTotal = <Option<i32>>::sse_decode(deserializer);
         let mut var_thumbnailDone = <Option<i32>>::sse_decode(deserializer);
         let mut var_thumbnailFailedCount = <Option<i32>>::sse_decode(deserializer);
+        let mut var_errorMessage = <Option<String>>::sse_decode(deserializer);
         return crate::api::sync::SyncLibraryProgressDto {
             phase: var_phase,
             route: var_route,
@@ -3162,6 +3165,7 @@ impl SseDecode for crate::api::sync::SyncLibraryProgressDto {
             thumbnail_total: var_thumbnailTotal,
             thumbnail_done: var_thumbnailDone,
             thumbnail_failed_count: var_thumbnailFailedCount,
+            error_message: var_errorMessage,
         };
     }
 }
@@ -3923,6 +3927,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::sync::SyncLibraryPhaseDto {
             Self::WritingDb => 2.into_dart(),
             Self::GeneratingThumbnails => 3.into_dart(),
             Self::Done => 4.into_dart(),
+            Self::Failed => 5.into_dart(),
             _ => unreachable!(),
         }
     }
@@ -3953,6 +3958,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::sync::SyncLibraryProgressDto 
             self.thumbnail_total.into_into_dart().into_dart(),
             self.thumbnail_done.into_into_dart().into_dart(),
             self.thumbnail_failed_count.into_into_dart().into_dart(),
+            self.error_message.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4573,6 +4579,7 @@ impl SseEncode for crate::api::sync::SyncLibraryPhaseDto {
                 crate::api::sync::SyncLibraryPhaseDto::WritingDb => 2,
                 crate::api::sync::SyncLibraryPhaseDto::GeneratingThumbnails => 3,
                 crate::api::sync::SyncLibraryPhaseDto::Done => 4,
+                crate::api::sync::SyncLibraryPhaseDto::Failed => 5,
                 _ => {
                     unimplemented!("");
                 }
@@ -4596,6 +4603,7 @@ impl SseEncode for crate::api::sync::SyncLibraryProgressDto {
         <Option<i32>>::sse_encode(self.thumbnail_total, serializer);
         <Option<i32>>::sse_encode(self.thumbnail_done, serializer);
         <Option<i32>>::sse_encode(self.thumbnail_failed_count, serializer);
+        <Option<String>>::sse_encode(self.error_message, serializer);
     }
 }
 

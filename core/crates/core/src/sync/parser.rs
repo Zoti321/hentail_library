@@ -105,13 +105,16 @@ pub fn parse_directory(dir: &Path) -> Result<Option<ParsedResource>, HentaiError
 
 pub fn parse_zip_archive(file: &Path, resource_type: &str) -> Result<Option<ParsedResource>, HentaiError> {
     let f = File::open(file).map_err(|e| HentaiError::validation(e.to_string()))?;
-    let mut archive = ZipArchive::new(BufReader::new(f))
-        .map_err(|_| HentaiError::validation("zip 解码失败".to_string()))?;
+    let mut archive = match ZipArchive::new(BufReader::new(f)) {
+        Ok(archive) => archive,
+        Err(_) => return Ok(None),
+    };
     let mut page_count = 0i32;
     for i in 0..archive.len() {
-        let entry = archive
-            .by_index(i)
-            .map_err(|e| HentaiError::validation(e.to_string()))?;
+        let entry = match archive.by_index(i) {
+            Ok(entry) => entry,
+            Err(_) => return Ok(None),
+        };
         let name = entry.name().replace('\\', "/");
         if entry.is_dir() || name.ends_with('/') {
             continue;
@@ -333,4 +336,49 @@ pub fn normalize_roots(roots: &[String]) -> Vec<PathBuf> {
         .filter(|r| !r.is_empty())
         .map(PathBuf::from)
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+    use tempfile::TempDir;
+    use zip::write::SimpleFileOptions;
+    use zip::ZipWriter;
+
+    #[test]
+    fn parse_zip_archive_skips_invalid_zip() {
+        let temp = TempDir::new().expect("tempdir");
+        let path = temp.path().join("broken.zip");
+        std::fs::write(&path, b"not-a-zip").expect("write");
+
+        let parsed = parse_zip_archive(&path, "zip").expect("parse");
+
+        assert!(parsed.is_none());
+    }
+
+    #[test]
+    fn parse_zip_archive_counts_image_entries() {
+        let temp = TempDir::new().expect("tempdir");
+        let path = temp.path().join("comic.cbz");
+        let file = File::create(&path).expect("create");
+        let mut zip = ZipWriter::new(file);
+        zip.start_file("01.jpg", SimpleFileOptions::default())
+            .expect("start");
+        zip.write_all(b"fake-jpeg").expect("write");
+        zip.start_file("02.png", SimpleFileOptions::default())
+            .expect("start");
+        zip.write_all(b"fake-png").expect("write");
+        zip.start_file("readme.txt", SimpleFileOptions::default())
+            .expect("start");
+        zip.write_all(b"notes").expect("write");
+        zip.finish().expect("finish");
+
+        let parsed = parse_zip_archive(&path, "cbz")
+            .expect("parse")
+            .expect("resource");
+
+        assert_eq!(parsed.resource_type, "cbz");
+        assert_eq!(parsed.page_count, Some(2));
+    }
 }

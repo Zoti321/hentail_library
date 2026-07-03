@@ -5,7 +5,10 @@ use sea_orm::{
 
 use crate::comic::ComicDto;
 use crate::db::map_db_err;
-use crate::entity::{authors, comic_authors, comic_tags, comic_thumbnails, comics, prelude::*, tags};
+use crate::entity::{
+    authors, comic_authors, comic_tags, comic_thumbnails, comics, prelude::*,
+    series_reading_histories, tags,
+};
 use crate::error::HentaiError;
 
 use super::plan::ComicScanReplacePlan;
@@ -40,8 +43,19 @@ pub async fn clear_all_comics(db: &DatabaseConnection) -> Result<i32, HentaiErro
         return Ok(0);
     }
     let txn = db.begin().await.map_err(map_db_err)?;
-    let ids = load_all_comic_ids(&txn).await?;
-    delete_comics_side_effects(&txn, &ids).await?;
+    for table in [
+        "comic_reading_histories",
+        "series_reading_histories",
+        "series_items",
+        "comics",
+    ] {
+        txn.execute(Statement::from_string(
+            sea_orm::DatabaseBackend::Sqlite,
+            format!("DELETE FROM {table}"),
+        ))
+        .await
+        .map_err(map_db_err)?;
+    }
     txn.commit().await.map_err(map_db_err)?;
     Ok(count)
 }
@@ -59,12 +73,21 @@ async fn count_comics(db: &DatabaseConnection) -> Result<i64, HentaiError> {
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
 }
 
-async fn load_all_comic_ids<C: ConnectionTrait>(db: &C) -> Result<Vec<String>, HentaiError> {
-    let rows = Comics::find().all(db).await.map_err(map_db_err)?;
-    Ok(rows.into_iter().map(|r| r.comic_id).collect())
+async fn delete_comics_side_effects<C: ConnectionTrait>(
+    db: &C,
+    comic_ids: &[String],
+) -> Result<(), HentaiError> {
+    if comic_ids.is_empty() {
+        return Ok(());
+    }
+    const BATCH_SIZE: usize = 500;
+    for chunk in comic_ids.chunks(BATCH_SIZE) {
+        delete_comics_side_effects_batch(db, chunk).await?;
+    }
+    Ok(())
 }
 
-async fn delete_comics_side_effects<C: ConnectionTrait>(
+async fn delete_comics_side_effects_batch<C: ConnectionTrait>(
     db: &C,
     comic_ids: &[String],
 ) -> Result<(), HentaiError> {
@@ -87,6 +110,11 @@ async fn delete_comics_side_effects<C: ConnectionTrait>(
     ))
     .await
     .map_err(map_db_err)?;
+    SeriesReadingHistories::delete_many()
+        .filter(series_reading_histories::Column::LastReadComicId.is_in(comic_ids.to_vec()))
+        .exec(db)
+        .await
+        .map_err(map_db_err)?;
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         format!("DELETE FROM series_items WHERE comic_id IN ({placeholders})"),

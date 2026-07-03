@@ -5,6 +5,7 @@ pub enum SyncLibraryPhaseDto {
     WritingDb,
     GeneratingThumbnails,
     Done,
+    Failed,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -40,6 +41,7 @@ pub struct SyncLibraryProgressDto {
     pub thumbnail_total: Option<i32>,
     pub thumbnail_done: Option<i32>,
     pub thumbnail_failed_count: Option<i32>,
+    pub error_message: Option<String>,
 }
 
 impl LibrarySyncCountsDto {
