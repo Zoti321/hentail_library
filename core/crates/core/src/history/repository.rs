@@ -4,13 +4,10 @@ use sea_orm::{
 
 use crate::comic::read_data_version;
 use crate::db::{connection, map_db_err};
-use crate::entity::{comic_reading_histories, prelude::*, series_reading_histories};
+use crate::entity::{comic_reading_histories, prelude::*};
 use crate::error::HentaiError;
 
-use super::dto::{
-    PagedReadingHistoryDto, PagedSeriesReadingHistoryDto, ReadingHistoryDto,
-    SeriesReadingHistoryDto,
-};
+use super::dto::{PagedReadingHistoryDto, ReadingHistoryDto};
 
 pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> {
     let db = connection()?;
@@ -37,31 +34,6 @@ pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> 
     Ok(())
 }
 
-pub async fn record_series_reading(dto: &SeriesReadingHistoryDto) -> Result<(), HentaiError> {
-    let db = connection()?;
-    let model = series_reading_histories::ActiveModel {
-        series_name: Set(dto.series_name.clone()),
-        last_read_comic_id: Set(dto.last_read_comic_id.clone()),
-        last_read_time: Set(dto.last_read_time_ms),
-        page_index: Set(dto.page_index),
-        ..Default::default()
-    };
-    SeriesReadingHistories::insert(model)
-        .on_conflict(
-            sea_orm::sea_query::OnConflict::column(series_reading_histories::Column::SeriesName)
-                .update_columns([
-                    series_reading_histories::Column::LastReadComicId,
-                    series_reading_histories::Column::LastReadTime,
-                    series_reading_histories::Column::PageIndex,
-                ])
-                .to_owned(),
-        )
-        .exec(&db)
-        .await
-        .map_err(map_db_err)?;
-    Ok(())
-}
-
 pub async fn get_reading_by_comic_id(comic_id: &str) -> Result<Option<ReadingHistoryDto>, HentaiError> {
     let db = connection()?;
     let row = ComicReadingHistories::find_by_id(comic_id)
@@ -69,17 +41,6 @@ pub async fn get_reading_by_comic_id(comic_id: &str) -> Result<Option<ReadingHis
         .await
         .map_err(map_db_err)?;
     Ok(row.map(map_reading_row))
-}
-
-pub async fn get_series_reading_by_name(
-    series_name: &str,
-) -> Result<Option<SeriesReadingHistoryDto>, HentaiError> {
-    let db = connection()?;
-    let row = SeriesReadingHistories::find_by_id(series_name)
-        .one(&db)
-        .await
-        .map_err(map_db_err)?;
-    Ok(row.map(map_series_reading_row))
 }
 
 pub async fn list_all_reading() -> Result<Vec<ReadingHistoryDto>, HentaiError> {
@@ -90,16 +51,6 @@ pub async fn list_all_reading() -> Result<Vec<ReadingHistoryDto>, HentaiError> {
         .await
         .map_err(map_db_err)?;
     Ok(rows.into_iter().map(map_reading_row).collect())
-}
-
-pub async fn list_all_series_reading() -> Result<Vec<SeriesReadingHistoryDto>, HentaiError> {
-    let db = connection()?;
-    let rows = SeriesReadingHistories::find()
-        .order_by_desc(series_reading_histories::Column::LastReadTime)
-        .all(&db)
-        .await
-        .map_err(map_db_err)?;
-    Ok(rows.into_iter().map(map_series_reading_row).collect())
 }
 
 pub async fn fetch_reading_page(page: i32, page_size: i32) -> Result<PagedReadingHistoryDto, HentaiError> {
@@ -121,32 +72,6 @@ pub async fn fetch_reading_page(page: i32, page_size: i32) -> Result<PagedReadin
         .map_err(map_db_err)?;
     Ok(PagedReadingHistoryDto {
         items: rows.into_iter().map(map_reading_row).collect(),
-        total_count,
-    })
-}
-
-pub async fn fetch_series_reading_page(
-    page: i32,
-    page_size: i32,
-) -> Result<PagedSeriesReadingHistoryDto, HentaiError> {
-    let db = connection()?;
-    if page_size <= 0 {
-        return Ok(PagedSeriesReadingHistoryDto {
-            items: vec![],
-            total_count: 0,
-        });
-    }
-    let paginator = SeriesReadingHistories::find()
-        .order_by_desc(series_reading_histories::Column::LastReadTime)
-        .paginate(&db, page_size as u64);
-    let total_count = paginator.num_items().await.map_err(map_db_err)? as i64;
-    let page_index = if page <= 0 { 1 } else { page } as u64;
-    let rows = paginator
-        .fetch_page(page_index - 1)
-        .await
-        .map_err(map_db_err)?;
-    Ok(PagedSeriesReadingHistoryDto {
-        items: rows.into_iter().map(map_series_reading_row).collect(),
         total_count,
     })
 }
@@ -173,41 +98,13 @@ pub async fn delete_reading_by_comic_ids(comic_ids: &[String]) -> Result<i32, He
     Ok(res.rows_affected as i32)
 }
 
-pub async fn delete_series_reading_by_name(series_name: &str) -> Result<i32, HentaiError> {
-    let db = connection()?;
-    let res = SeriesReadingHistories::delete_by_id(series_name)
-        .exec(&db)
-        .await
-        .map_err(map_db_err)?;
-    Ok(res.rows_affected as i32)
-}
-
-pub async fn delete_series_reading_by_last_read_comic_ids(
-    comic_ids: &[String],
-) -> Result<i32, HentaiError> {
-    if comic_ids.is_empty() {
-        return Ok(0);
-    }
-    let db = connection()?;
-    let res = SeriesReadingHistories::delete_many()
-        .filter(series_reading_histories::Column::LastReadComicId.is_in(comic_ids.to_vec()))
-        .exec(&db)
-        .await
-        .map_err(map_db_err)?;
-    Ok(res.rows_affected as i32)
-}
-
 pub async fn clear_all_reading() -> Result<i32, HentaiError> {
     let db = connection()?;
-    let comic_res = ComicReadingHistories::delete_many()
+    let res = ComicReadingHistories::delete_many()
         .exec(&db)
         .await
         .map_err(map_db_err)?;
-    let series_res = SeriesReadingHistories::delete_many()
-        .exec(&db)
-        .await
-        .map_err(map_db_err)?;
-    Ok((comic_res.rows_affected + series_res.rows_affected) as i32)
+    Ok(res.rows_affected as i32)
 }
 
 pub async fn watch_reading_histories(
@@ -224,33 +121,10 @@ pub async fn watch_reading_histories(
     }
 }
 
-pub async fn watch_series_reading_histories(
-    mut emit: impl FnMut(Vec<SeriesReadingHistoryDto>) -> Result<(), HentaiError>,
-) -> Result<(), HentaiError> {
-    let mut last = read_data_version().await?;
-    loop {
-        tokio::time::sleep(std::time::Duration::from_millis(400)).await;
-        let version = read_data_version().await?;
-        if version != last {
-            last = version;
-            emit(list_all_series_reading().await?)?;
-        }
-    }
-}
-
 fn map_reading_row(row: comic_reading_histories::Model) -> ReadingHistoryDto {
     ReadingHistoryDto {
         comic_id: row.comic_id,
         title: row.title,
-        last_read_time_ms: row.last_read_time,
-        page_index: row.page_index,
-    }
-}
-
-fn map_series_reading_row(row: series_reading_histories::Model) -> SeriesReadingHistoryDto {
-    SeriesReadingHistoryDto {
-        series_name: row.series_name,
-        last_read_comic_id: row.last_read_comic_id,
         last_read_time_ms: row.last_read_time,
         page_index: row.page_index,
     }

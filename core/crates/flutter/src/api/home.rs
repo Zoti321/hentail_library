@@ -5,6 +5,7 @@ use hentai_core::{
 };
 
 use super::init::HentaiErrorDto;
+use super::stream_watch::{emit_or_closed, normalize_watch_result};
 
 #[derive(Debug, Clone)]
 pub struct HomePageCountsDto {
@@ -16,12 +17,9 @@ pub struct HomePageCountsDto {
 
 #[derive(Debug, Clone)]
 pub struct HomeContinueReadingDto {
-    pub kind: String,
+    pub comic_id: String,
+    pub title: String,
     pub last_read_time_ms: i64,
-    pub comic_id: Option<String>,
-    pub title: Option<String>,
-    pub series_name: Option<String>,
-    pub last_read_comic_id: Option<String>,
     pub page_index: Option<i32>,
 }
 
@@ -39,12 +37,9 @@ impl From<CoreCounts> for HomePageCountsDto {
 impl From<CoreContinue> for HomeContinueReadingDto {
     fn from(v: CoreContinue) -> Self {
         Self {
-            kind: v.kind,
-            last_read_time_ms: v.last_read_time_ms,
             comic_id: v.comic_id,
             title: v.title,
-            series_name: v.series_name,
-            last_read_comic_id: v.last_read_comic_id,
+            last_read_time_ms: v.last_read_time_ms,
             page_index: v.page_index,
         }
     }
@@ -62,12 +57,12 @@ pub async fn watch_home_page_counts_frb(
     exclude_r18: bool,
     sink: crate::frb_generated::StreamSink<HomePageCountsDto>,
 ) -> Result<(), HentaiErrorDto> {
-    core_watch_counts(exclude_r18, |counts| {
-        sink.add(HomePageCountsDto::from(counts))
-            .map_err(|_| hentai_core::HentaiError::validation("stream closed"))
-    })
-    .await
-    .map_err(HentaiErrorDto::from)
+    normalize_watch_result(
+        core_watch_counts(exclude_r18, |counts| {
+            emit_or_closed(&sink, HomePageCountsDto::from(counts))
+        })
+        .await,
+    )
 }
 
 #[flutter_rust_bridge::frb(sync)]
@@ -84,11 +79,11 @@ pub async fn watch_continue_reading_top5_frb(
     exclude_r18: bool,
     sink: crate::frb_generated::StreamSink<Vec<HomeContinueReadingDto>>,
 ) -> Result<(), HentaiErrorDto> {
-    core_watch_top5(exclude_r18, |rows| {
-        let mapped = rows.into_iter().map(HomeContinueReadingDto::from).collect();
-        sink.add(mapped)
-            .map_err(|_| hentai_core::HentaiError::validation("stream closed"))
-    })
-    .await
-    .map_err(HentaiErrorDto::from)
+    normalize_watch_result(
+        core_watch_top5(exclude_r18, |rows| {
+            let mapped = rows.into_iter().map(HomeContinueReadingDto::from).collect();
+            emit_or_closed(&sink, mapped)
+        })
+        .await,
+    )
 }

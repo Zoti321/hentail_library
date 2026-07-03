@@ -217,37 +217,18 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
           return SizedBox(
             width: continueReadingItemWidth,
             height: continueReadingStripHeight,
-            child: item.map(
-              comic: (ComicHistoryGridItemDto comicItem) =>
-                  ReadingHistoryCard.comic(
-                    comicId: comicItem.comicId,
-                    title: comicItem.title,
-                    lastReadTime: comicItem.lastReadTime,
-                    pageIndex: comicItem.pageIndex,
-                    onTap: () => appRouter.pushNamed(
-                      ReaderRouteArgs.readerRouteName,
-                      queryParameters: ReaderRouteArgs(
-                        comicId: comicItem.comicId,
-                        readType: ReaderRouteArgs.readTypeComic,
-                      ).toQueryParameters(),
-                    ),
-                  ),
-              series: (SeriesHistoryGridItemDto seriesItem) =>
-                  ReadingHistoryCard.series(
-                    seriesName: seriesItem.seriesName,
-                    lastReadComicId: seriesItem.lastReadComicId,
-                    lastReadTime: seriesItem.lastReadTime,
-                    pageIndex: seriesItem.pageIndex,
-                    lastReadComicOrder: seriesItem.lastReadComicOrder,
-                    onTap: () => appRouter.pushNamed(
-                      ReaderRouteArgs.readerRouteName,
-                      queryParameters: ReaderRouteArgs(
-                        comicId: seriesItem.lastReadComicId,
-                        readType: ReaderRouteArgs.readTypeSeries,
-                        seriesName: seriesItem.seriesName,
-                      ).toQueryParameters(),
-                    ),
-                  ),
+            child: ReadingHistoryCard(
+              comicId: item.comicId,
+              title: item.title,
+              lastReadTime: item.lastReadTime,
+              pageIndex: item.pageIndex,
+              onTap: () => appRouter.pushNamed(
+                ReaderRouteArgs.readerRouteName,
+                queryParameters: ReaderRouteArgs(
+                  comicId: item.comicId,
+                  readType: ReaderRouteArgs.readTypeComic,
+                ).toQueryParameters(),
+              ),
             ),
           );
         },

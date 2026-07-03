@@ -227,6 +227,8 @@ class _ScanActionCard extends StatelessWidget {
         return '生成缩略图';
       case SyncLibraryPhase.done:
         return '扫描完成';
+      case SyncLibraryPhase.failed:
+        return progress.errorMessage ?? '同步失败';
     }
   }
 }

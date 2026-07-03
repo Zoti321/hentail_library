@@ -256,19 +256,7 @@ Future<void> _openSeriesReader({
     showInfoToast(context, '系列内暂无漫画');
     return;
   }
-  final SeriesReadingHistory? seriesProgress = await ref
-      .read(readingHistoryRepoProvider)
-      .getSeriesReadingBySeriesName(series.name);
-  String comicIdToOpen = sortedItems.first.comicId;
-  if (seriesProgress != null) {
-    final String lastId = seriesProgress.lastReadComicId;
-    final bool lastStillInSeries = sortedItems.any(
-      (SeriesItem item) => item.comicId == lastId,
-    );
-    if (lastStillInSeries) {
-      comicIdToOpen = lastId;
-    }
-  }
+  final String comicIdToOpen = sortedItems.first.comicId;
   appRouter.pushNamed(
     ReaderRouteArgs.readerRouteName,
     queryParameters: ReaderRouteArgs(

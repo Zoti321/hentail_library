@@ -11,6 +11,7 @@ use hentai_core::{
 
 use super::comic::PageRequestDto;
 use super::init::HentaiErrorDto;
+use super::stream_watch::{emit_or_closed, normalize_watch_result};
 
 #[derive(Debug, Clone)]
 pub struct InferSeriesResultDto {
@@ -86,13 +87,13 @@ pub fn infer_series_frb() -> Result<InferSeriesResultDto, HentaiErrorDto> {
 pub async fn watch_all_series_frb(
     sink: crate::frb_generated::StreamSink<Vec<SeriesDto>>,
 ) -> Result<(), HentaiErrorDto> {
-    watch_all_series(|items| {
-        let mapped = items.into_iter().map(SeriesDto::from).collect();
-        sink.add(mapped)
-            .map_err(|_| hentai_core::HentaiError::validation("stream closed"))
-    })
-    .await
-    .map_err(HentaiErrorDto::from)
+    normalize_watch_result(
+        watch_all_series(|items| {
+            let mapped = items.into_iter().map(SeriesDto::from).collect();
+            emit_or_closed(&sink, mapped)
+        })
+        .await,
+    )
 }
 
 #[flutter_rust_bridge::frb(sync)]
@@ -229,14 +230,14 @@ pub fn load_home_series_comic_order_map_frb() -> Result<Vec<SeriesComicOrderEntr
 pub async fn watch_home_series_comic_order_map_frb(
     sink: crate::frb_generated::StreamSink<Vec<SeriesComicOrderEntryDto>>,
 ) -> Result<(), HentaiErrorDto> {
-    watch_home_series_comic_order_map(|map| {
-        let items = map
-            .into_iter()
-            .map(|(key, sort_order)| SeriesComicOrderEntryDto { key, sort_order })
-            .collect();
-        sink.add(items)
-            .map_err(|_| hentai_core::HentaiError::validation("stream closed"))
-    })
-    .await
-    .map_err(HentaiErrorDto::from)
+    normalize_watch_result(
+        watch_home_series_comic_order_map(|map| {
+            let items = map
+                .into_iter()
+                .map(|(key, sort_order)| SeriesComicOrderEntryDto { key, sort_order })
+                .collect();
+            emit_or_closed(&sink, items)
+        })
+        .await,
+    )
 }

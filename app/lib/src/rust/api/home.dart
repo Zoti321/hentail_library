@@ -32,32 +32,23 @@ Stream<List<HomeContinueReadingDto>> watchContinueReadingTop5Frb({
 );
 
 class HomeContinueReadingDto {
-  final String kind;
+  final String comicId;
+  final String title;
   final PlatformInt64 lastReadTimeMs;
-  final String? comicId;
-  final String? title;
-  final String? seriesName;
-  final String? lastReadComicId;
   final int? pageIndex;
 
   const HomeContinueReadingDto({
-    required this.kind,
+    required this.comicId,
+    required this.title,
     required this.lastReadTimeMs,
-    this.comicId,
-    this.title,
-    this.seriesName,
-    this.lastReadComicId,
     this.pageIndex,
   });
 
   @override
   int get hashCode =>
-      kind.hashCode ^
-      lastReadTimeMs.hashCode ^
       comicId.hashCode ^
       title.hashCode ^
-      seriesName.hashCode ^
-      lastReadComicId.hashCode ^
+      lastReadTimeMs.hashCode ^
       pageIndex.hashCode;
 
   @override
@@ -65,12 +56,9 @@ class HomeContinueReadingDto {
       identical(this, other) ||
       other is HomeContinueReadingDto &&
           runtimeType == other.runtimeType &&
-          kind == other.kind &&
-          lastReadTimeMs == other.lastReadTimeMs &&
           comicId == other.comicId &&
           title == other.title &&
-          seriesName == other.seriesName &&
-          lastReadComicId == other.lastReadComicId &&
+          lastReadTimeMs == other.lastReadTimeMs &&
           pageIndex == other.pageIndex;
 }
 

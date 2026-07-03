@@ -89,18 +89,17 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                         await widget.onExit();
                       },
                     ),
-                    Text(
-                      widget.title,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: cs.hentai.readerTextIconPrimary,
-                        letterSpacing: 0.6,
+                    Expanded(
+                      child: _ReaderTopBarTitle(
+                        title: widget.title,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: cs.hentai.readerTextIconPrimary,
+                          letterSpacing: 0.6,
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const Spacer(),
                     GhostButton.icon(
                       icon: LucideIcons.list,
                       tooltip: '漫画列表',
@@ -205,6 +204,50 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
         ),
       ),
     );
+  }
+}
+
+class _ReaderTopBarTitle extends StatelessWidget {
+  const _ReaderTopBarTitle({required this.title, required this.style});
+
+  final String title;
+  final TextStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget text = Text(
+      title,
+      style: style,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        if (!_isTextTruncated(
+          context: context,
+          maxWidth: constraints.maxWidth,
+        )) {
+          return text;
+        }
+        return Tooltip(
+          message: title,
+          waitDuration: const Duration(milliseconds: 400),
+          child: text,
+        );
+      },
+    );
+  }
+
+  bool _isTextTruncated({
+    required BuildContext context,
+    required double maxWidth,
+  }) {
+    final TextPainter textPainter = TextPainter(
+      text: TextSpan(text: title, style: style),
+      maxLines: 1,
+      textDirection: Directionality.of(context),
+    )..layout(maxWidth: maxWidth);
+    return textPainter.didExceedMaxLines;
   }
 }
 

@@ -1,12 +1,13 @@
 // 同步漫画库任务专用进度快照（typedef record，不单独建 class）。
 
-/// 扫描 / 清空 / 写库 / 生成缩略图 / 结束
+/// 扫描 / 清空 / 写库 / 生成缩略图 / 结束 / 失败
 enum SyncLibraryPhase {
   clearingLibrary,
   scanning,
   writingDb,
   generatingThumbnails,
   done,
+  failed,
 }
 
 /// 无根无数据 / 无根已清空 / 有根扫描
@@ -40,6 +41,9 @@ typedef SyncLibraryProgress = ({
   int? thumbnailTotal,
   int? thumbnailDone,
   int? thumbnailFailedCount,
+
+  /// Rust 同步失败时的错误文案；仅 [SyncLibraryPhase.failed] 时有值。
+  String? errorMessage,
 });
 
 LibrarySyncCounts emptyLibrarySyncCounts() => (

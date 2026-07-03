@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
-import 'package:hentai_library/domain/models/entity/series_reading_history.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
@@ -204,18 +203,7 @@ class _MobileSeriesDetailBody extends ConsumerWidget {
       ).showSnackBar(const SnackBar(content: Text('系列内暂无漫画')));
       return;
     }
-    final SeriesReadingHistory? history = await ref
-        .read(readingHistoryRepoProvider)
-        .getSeriesReadingBySeriesName(targetSeries.name);
-    String comicId = sortedItems.first.comicId;
-    if (history != null) {
-      final bool exists = sortedItems.any(
-        (SeriesItem item) => item.comicId == history.lastReadComicId,
-      );
-      if (exists) {
-        comicId = history.lastReadComicId;
-      }
-    }
+    final String comicId = sortedItems.first.comicId;
     if (!context.mounted) {
       return;
     }

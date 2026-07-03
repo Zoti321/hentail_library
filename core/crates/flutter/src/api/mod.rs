@@ -6,6 +6,7 @@ pub mod init;
 pub mod path;
 pub mod reader;
 pub mod series;
+pub mod stream_watch;
 pub mod sync;
 pub mod tag;
 pub mod thumbnail;

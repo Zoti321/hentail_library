@@ -273,5 +273,6 @@ fn progress(
         thumbnail_total,
         thumbnail_done,
         thumbnail_failed_count,
+        error_message: None,
     }
 }

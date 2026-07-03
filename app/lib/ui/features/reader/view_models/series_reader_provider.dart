@@ -1,6 +1,6 @@
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
-import 'package:hentai_library/domain/models/entity/series_reading_history.dart';
+import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -26,16 +26,14 @@ Future<Series?> seriesByNameForReader(Ref ref, String seriesName) async {
 }
 
 @riverpod
-Future<SeriesReadingHistory?> seriesReadingProgressForReader(
-  Ref ref,
-  String seriesName,
-) async {
-  if (seriesName.isEmpty) {
+Future<int?> comicReadingPageIndexForReader(Ref ref, String comicId) async {
+  if (comicId.isEmpty) {
     return null;
   }
-  return ref
+  final ReadingHistory? history = await ref
       .read(readingHistoryRepoProvider)
-      .getSeriesReadingBySeriesName(seriesName);
+      .getByComicId(comicId);
+  return history?.pageIndex;
 }
 
 @riverpod
@@ -65,12 +63,9 @@ Future<ReaderSeriesContextData> readerSeriesContextForReader(
     ref,
     series,
   );
-  final SeriesReadingHistory? progress = await ref.watch(
-    seriesReadingProgressForReaderProvider(seriesName).future,
+  final int? preferredPageIndex = await ref.watch(
+    comicReadingPageIndexForReaderProvider(comicId).future,
   );
-  final int? preferredPageIndex = progress?.lastReadComicId == comicId
-      ? progress?.pageIndex
-      : null;
   return ReaderSeriesContextData(
     navContext: buildReaderNavContextData(
       items: seriesItems,

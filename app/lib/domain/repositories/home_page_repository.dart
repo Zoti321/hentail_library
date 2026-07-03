@@ -6,6 +6,4 @@ abstract class HomePageRepository {
   Stream<List<HomeContinueReadingEntry>> watchContinueReadingTop5({
     required bool excludeR18,
   });
-
-  Stream<Map<String, int>> watchHomeSeriesComicOrderMap();
 }

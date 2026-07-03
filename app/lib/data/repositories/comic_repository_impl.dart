@@ -1,3 +1,4 @@
+import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/repositories/comic_frb_mapper.dart';
 import 'package:hentai_library/domain/library/library_comic_filter.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
@@ -15,10 +16,16 @@ class ComicRepositoryImpl implements ComicRepository {
   const ComicRepositoryImpl();
 
   @override
-  Stream<void> watchChanges() => rust.watchComicChanges().map((int _) {});
+  Stream<void> watchChanges() => guardFrbStream(
+    () => rust.watchComicChanges().map((int _) {}),
+    fallbackMessage: '监听漫画变更失败',
+  );
 
   @override
-  Future<int> countAll() async => rust.countAllComicsFrb().toInt();
+  Future<int> countAll() async => guardFrbSync(
+    () => rust.countAllComicsFrb().toInt(),
+    fallbackMessage: '统计漫画数量失败',
+  );
 
   @override
   Future<List<Comic>> getAll() async {
@@ -26,10 +33,13 @@ class ComicRepositoryImpl implements ComicRepository {
     if (total <= 0) {
       return <Comic>[];
     }
-    final rust.PagedComicResultDto page = rust.fetchComicsPageFrb(
-      request: rust.PageRequestDto(page: 1, pageSize: total),
-      filter: unrestrictedListFilter(),
-      sort: const rust.ComicSortOptionDto(descending: false),
+    final rust.PagedComicResultDto page = guardFrbSync(
+      () => rust.fetchComicsPageFrb(
+        request: rust.PageRequestDto(page: 1, pageSize: total),
+        filter: unrestrictedListFilter(),
+        sort: const rust.ComicSortOptionDto(descending: false),
+      ),
+      fallbackMessage: '读取漫画列表失败',
     );
     return page.items.map(mapRustComic).toList();
   }
@@ -40,23 +50,32 @@ class ComicRepositoryImpl implements ComicRepository {
     required LibraryComicFilter filter,
     required LibraryComicSortOption sortOption,
   }) async {
-    final rust.PagedComicResultDto page = rust.fetchComicsPageFrb(
-      request: mapPageRequest(request),
-      filter: mapLibraryFilter(filter),
-      sort: mapSortOption(sortOption),
+    final rust.PagedComicResultDto page = guardFrbSync(
+      () => rust.fetchComicsPageFrb(
+        request: mapPageRequest(request),
+        filter: mapLibraryFilter(filter),
+        sort: mapSortOption(sortOption),
+      ),
+      fallbackMessage: '读取漫画分页失败',
     );
     return mapPagedResult(page);
   }
 
   @override
   Future<Comic?> findById(String comicId) async {
-    final rust.ComicDto? dto = rust.findComicByIdFrb(comicId: comicId);
+    final rust.ComicDto? dto = guardFrbSync(
+      () => rust.findComicByIdFrb(comicId: comicId),
+      fallbackMessage: '读取漫画失败',
+    );
     return dto == null ? null : mapRustComic(dto);
   }
 
   @override
   Future<void> deleteByIds(List<String> comicIds) async {
-    rust.deleteComicsByIdsFrb(comicIds: comicIds);
+    guardFrbSync(
+      () => rust.deleteComicsByIdsFrb(comicIds: comicIds),
+      fallbackMessage: '删除漫画失败',
+    );
   }
 
   @override
@@ -67,20 +86,27 @@ class ComicRepositoryImpl implements ComicRepository {
     ContentRating? contentRating,
     List<Tag>? tags,
   }) async {
-    rust.updateComicUserMetaFrb(
-      comicId: comicId,
-      meta: rust.UpdateComicUserMetaFrbDto(
-        title: title,
-        contentRating: contentRating?.name,
-        authors: authors?.map((Author a) => a.name).toList(),
-        tags: tags?.map((Tag t) => t.name).toList(),
+    guardFrbSync(
+      () => rust.updateComicUserMetaFrb(
+        comicId: comicId,
+        meta: rust.UpdateComicUserMetaFrbDto(
+          title: title,
+          contentRating: contentRating?.name,
+          authors: authors?.map((Author a) => a.name).toList(),
+          tags: tags?.map((Tag t) => t.name).toList(),
+        ),
       ),
+      fallbackMessage: '更新漫画元数据失败',
     );
   }
 
   @override
   Future<List<Comic>> searchByKeyword(String keyword) async {
-    return rust.searchByKeywordFrb(keyword: keyword).map(mapRustComic).toList();
+    return guardFrbSync(
+      () =>
+          rust.searchByKeywordFrb(keyword: keyword).map(mapRustComic).toList(),
+      fallbackMessage: '搜索漫画失败',
+    );
   }
 
   @override
@@ -89,13 +115,16 @@ class ComicRepositoryImpl implements ComicRepository {
     required Set<String> optionalOr,
     required Set<String> mustExclude,
   }) async {
-    return rust
-        .searchByTagExpressionFrb(
-          mustInclude: mustInclude.toList(),
-          optionalOr: optionalOr.toList(),
-          mustExclude: mustExclude.toList(),
-        )
-        .map(mapRustComic)
-        .toList();
+    return guardFrbSync(
+      () => rust
+          .searchByTagExpressionFrb(
+            mustInclude: mustInclude.toList(),
+            optionalOr: optionalOr.toList(),
+            mustExclude: mustExclude.toList(),
+          )
+          .map(mapRustComic)
+          .toList(),
+      fallbackMessage: '按标签搜索漫画失败',
+    );
   }
 }

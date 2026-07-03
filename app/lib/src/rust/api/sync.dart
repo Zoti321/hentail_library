@@ -4,10 +4,9 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
-import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `map_phase`, `map_progress`, `map_route`
+// These functions are ignored because they are not marked as `pub`: `failed_progress`, `map_phase`, `map_progress`, `map_route`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`
 
 SyncHandleDto createSyncHandleFrb() =>
@@ -46,6 +45,9 @@ class LibrarySyncCountsDto {
     required this.pdf,
   });
 
+  static Future<LibrarySyncCountsDto> default_() =>
+      RustLib.instance.api.crateApiSyncLibrarySyncCountsDtoDefault();
+
   @override
   int get hashCode =>
       dir.hashCode ^
@@ -80,6 +82,7 @@ enum SyncLibraryPhaseDto {
   writingDb,
   generatingThumbnails,
   done,
+  failed,
 }
 
 class SyncLibraryProgressDto {
@@ -94,6 +97,7 @@ class SyncLibraryProgressDto {
   final int? thumbnailTotal;
   final int? thumbnailDone;
   final int? thumbnailFailedCount;
+  final String? errorMessage;
 
   const SyncLibraryProgressDto({
     required this.phase,
@@ -107,6 +111,7 @@ class SyncLibraryProgressDto {
     this.thumbnailTotal,
     this.thumbnailDone,
     this.thumbnailFailedCount,
+    this.errorMessage,
   });
 
   @override
@@ -121,7 +126,8 @@ class SyncLibraryProgressDto {
       keptCount.hashCode ^
       thumbnailTotal.hashCode ^
       thumbnailDone.hashCode ^
-      thumbnailFailedCount.hashCode;
+      thumbnailFailedCount.hashCode ^
+      errorMessage.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -138,7 +144,8 @@ class SyncLibraryProgressDto {
           keptCount == other.keptCount &&
           thumbnailTotal == other.thumbnailTotal &&
           thumbnailDone == other.thumbnailDone &&
-          thumbnailFailedCount == other.thumbnailFailedCount;
+          thumbnailFailedCount == other.thumbnailFailedCount &&
+          errorMessage == other.errorMessage;
 }
 
 enum SyncLibraryRouteDto { noRootsNoop, noRootsCleared, withRoots }

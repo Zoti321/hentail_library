@@ -1,4 +1,4 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -8,54 +8,26 @@ import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dar
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ReadingHistoryCard extends ConsumerStatefulWidget {
-  const ReadingHistoryCard.comic({
+  const ReadingHistoryCard({
     super.key,
-    required String comicId,
-    required String title,
-    required DateTime lastReadTime,
-    required int? pageIndex,
+    required this.comicId,
+    required this.title,
+    required this.lastReadTime,
+    required this.pageIndex,
     required this.onTap,
     this.onDelete,
-  }) : _kind = _ReadingHistoryCardKind.comic,
-       _comicId = comicId,
-       _lastReadComicId = null,
-       _lastReadComicOrder = null,
-       _title = title,
-       _lastReadTime = lastReadTime,
-       _pageIndex = pageIndex;
+  });
 
-  const ReadingHistoryCard.series({
-    super.key,
-    required String seriesName,
-    required String lastReadComicId,
-    required DateTime lastReadTime,
-    required int? pageIndex,
-    required int? lastReadComicOrder,
-    required this.onTap,
-    this.onDelete,
-  }) : _kind = _ReadingHistoryCardKind.series,
-       _comicId = null,
-       _lastReadComicId = lastReadComicId,
-       _lastReadComicOrder = lastReadComicOrder,
-       _title = seriesName,
-       _lastReadTime = lastReadTime,
-       _pageIndex = pageIndex;
-
-  final _ReadingHistoryCardKind _kind;
-  final String? _comicId;
-  final String? _lastReadComicId;
-  final int? _lastReadComicOrder;
-  final String _title;
-  final DateTime _lastReadTime;
-  final int? _pageIndex;
+  final String comicId;
+  final String title;
+  final DateTime lastReadTime;
+  final int? pageIndex;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
 
   @override
   ConsumerState<ReadingHistoryCard> createState() => _ReadingHistoryCardState();
 }
-
-enum _ReadingHistoryCardKind { comic, series }
 
 class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
   bool _isHovered = false;
@@ -64,22 +36,16 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final bool isSeries = widget._kind == _ReadingHistoryCardKind.series;
-    final Color kindColor = isSeries ? cs.primary : cs.secondary;
-    final String kindLabel = isSeries ? '系列' : '漫画';
-    final String coverComicId = widget._kind == _ReadingHistoryCardKind.comic
-        ? widget._comicId!
-        : widget._lastReadComicId!;
 
     final ComicCoverDisplayData? coverDisplay = ref
-        .watch(comicCoverDisplayProvider(comicId: coverComicId))
+        .watch(comicCoverDisplayProvider(comicId: widget.comicId))
         .maybeWhen(data: (ComicCoverDisplayData? v) => v, orElse: () => null);
 
     final Color cardBackground = _isHovered ? cs.surfaceContainer : cs.surface;
     final Color cardBorderColor = _isHovered
         ? cs.hentai.borderStrong
         : cs.hentai.borderSubtle;
-    final List<BoxShadow> cardShadows = _isHovered && !isSeries
+    final List<BoxShadow> cardShadows = _isHovered
         ? <BoxShadow>[
             BoxShadow(
               color: cs.shadow.withAlpha(28),
@@ -118,13 +84,13 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
                       children: [
                         _buildKindChip(
                           cs: cs,
-                          label: kindLabel,
-                          color: kindColor,
+                          label: '漫画',
+                          color: cs.secondary,
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            widget._title,
+                            widget.title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -146,7 +112,7 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          _formatLastRead(widget._lastReadTime),
+                          _formatLastRead(widget.lastReadTime),
                           style: TextStyle(
                             fontSize: 12,
                             color: cs.hentai.textTertiary,
@@ -284,22 +250,7 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
   }
 
   String _buildProgressLabel() {
-    if (widget._kind == _ReadingHistoryCardKind.comic) {
-      final int? pageIndex = widget._pageIndex;
-      if (pageIndex == null || pageIndex <= 0) {
-        return '';
-      }
-      return '第 $pageIndex 页';
-    }
-    final int? order = widget._lastReadComicOrder;
-    final int? pageIndex = widget._pageIndex;
-    if (order != null && order >= 0) {
-      final int displayOrder = order + 1;
-      if (pageIndex == null || pageIndex <= 0) {
-        return '第 $displayOrder 话';
-      }
-      return '第 $displayOrder 话 · 第 $pageIndex 页';
-    }
+    final int? pageIndex = widget.pageIndex;
     if (pageIndex == null || pageIndex <= 0) {
       return '';
     }

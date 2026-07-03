@@ -1,6 +1,7 @@
 use hentai_core::{add_path as core_add, list_all_paths, remove_path as core_remove, watch_paths};
 
 use super::init::HentaiErrorDto;
+use super::stream_watch::{emit_or_closed, normalize_watch_result};
 
 #[flutter_rust_bridge::frb(sync)]
 pub fn list_all_paths_frb() -> Result<Vec<String>, HentaiErrorDto> {
@@ -19,10 +20,5 @@ pub fn remove_path_frb(raw_path: String) -> Result<(), HentaiErrorDto> {
 
 #[flutter_rust_bridge::frb]
 pub async fn watch_paths_frb(sink: crate::frb_generated::StreamSink<Vec<String>>) -> Result<(), HentaiErrorDto> {
-    watch_paths(|items| {
-        sink.add(items)
-            .map_err(|_| hentai_core::HentaiError::validation("stream closed"))
-    })
-    .await
-    .map_err(HentaiErrorDto::from)
+    normalize_watch_result(watch_paths(|items| emit_or_closed(&sink, items)).await)
 }

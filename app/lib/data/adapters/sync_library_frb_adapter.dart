@@ -1,5 +1,9 @@
+import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/data/adapters/frb_error_mapper.dart';
 import 'package:hentai_library/domain/ports/reader_session_port.dart';
 import 'package:hentai_library/domain/use_cases/sync_library_types.dart';
+import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 
 /// Library sync 经 Rust FRB 执行；Dart 仅负责进度映射与阅读会话清理。
@@ -18,12 +22,16 @@ class SyncLibraryFrbAdapter {
     _activeHandle = handle;
     try {
       var clearedSessions = false;
-      await for (final rust.SyncLibraryProgressDto event in rust.syncLibraryFrb(
-        handle: handle,
+      await for (final rust.SyncLibraryProgressDto event in guardFrbStream(
+        () => rust.syncLibraryFrb(handle: handle),
+        fallbackMessage: '漫画库同步失败',
       )) {
         if (isCancelled()) {
           rust.cancelSyncFrb(handle: handle);
           return;
+        }
+        if (event.phase == rust.SyncLibraryPhaseDto.failed) {
+          throw SyncException(event.errorMessage ?? '漫画库同步失败');
         }
         onProgress?.call(mapRustSyncProgress(event));
         if (!clearedSessions &&
@@ -37,6 +45,12 @@ class SyncLibraryFrbAdapter {
           break;
         }
       }
+    } on HentaiErrorDto catch (error, stackTrace) {
+      throw mapFrbError(
+        error,
+        fallbackMessage: '漫画库同步失败',
+        stackTrace: stackTrace,
+      );
     } finally {
       _activeHandle = null;
     }
@@ -73,6 +87,7 @@ SyncLibraryProgress mapRustSyncProgress(rust.SyncLibraryProgressDto dto) {
     thumbnailTotal: dto.thumbnailTotal,
     thumbnailDone: dto.thumbnailDone,
     thumbnailFailedCount: dto.thumbnailFailedCount,
+    errorMessage: dto.errorMessage,
   );
 }
 
@@ -85,6 +100,7 @@ SyncLibraryPhase _mapPhase(rust.SyncLibraryPhaseDto phase) {
     rust.SyncLibraryPhaseDto.generatingThumbnails =>
       SyncLibraryPhase.generatingThumbnails,
     rust.SyncLibraryPhaseDto.done => SyncLibraryPhase.done,
+    rust.SyncLibraryPhaseDto.failed => SyncLibraryPhase.failed,
   };
 }
 

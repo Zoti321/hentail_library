@@ -7,39 +7,20 @@ import '../frb_generated.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`, `from`, `from`
 
 void recordReadingFrb({required ReadingHistoryDto history}) =>
     RustLib.instance.api.crateApiHistoryRecordReadingFrb(history: history);
-
-void recordSeriesReadingFrb({required SeriesReadingHistoryDto history}) =>
-    RustLib.instance.api.crateApiHistoryRecordSeriesReadingFrb(
-      history: history,
-    );
 
 ReadingHistoryDto? getReadingByComicIdFrb({required String comicId}) => RustLib
     .instance
     .api
     .crateApiHistoryGetReadingByComicIdFrb(comicId: comicId);
 
-SeriesReadingHistoryDto? getSeriesReadingByNameFrb({
-  required String seriesName,
-}) => RustLib.instance.api.crateApiHistoryGetSeriesReadingByNameFrb(
-  seriesName: seriesName,
-);
-
 PagedReadingHistoryDto fetchReadingPageFrb({
   required int page,
   required int pageSize,
 }) => RustLib.instance.api.crateApiHistoryFetchReadingPageFrb(
-  page: page,
-  pageSize: pageSize,
-);
-
-PagedSeriesReadingHistoryDto fetchSeriesReadingPageFrb({
-  required int page,
-  required int pageSize,
-}) => RustLib.instance.api.crateApiHistoryFetchSeriesReadingPageFrb(
   page: page,
   pageSize: pageSize,
 );
@@ -52,26 +33,11 @@ int deleteReadingByComicIdsFrb({required List<String> comicIds}) => RustLib
     .api
     .crateApiHistoryDeleteReadingByComicIdsFrb(comicIds: comicIds);
 
-int deleteSeriesReadingByNameFrb({required String seriesName}) => RustLib
-    .instance
-    .api
-    .crateApiHistoryDeleteSeriesReadingByNameFrb(seriesName: seriesName);
-
-int deleteSeriesReadingByLastReadComicIdsFrb({
-  required List<String> comicIds,
-}) => RustLib.instance.api
-    .crateApiHistoryDeleteSeriesReadingByLastReadComicIdsFrb(
-      comicIds: comicIds,
-    );
-
 int clearAllReadingFrb() =>
     RustLib.instance.api.crateApiHistoryClearAllReadingFrb();
 
 Stream<List<ReadingHistoryDto>> watchReadingHistoriesFrb() =>
     RustLib.instance.api.crateApiHistoryWatchReadingHistoriesFrb();
-
-Stream<List<SeriesReadingHistoryDto>> watchSeriesReadingHistoriesFrb() =>
-    RustLib.instance.api.crateApiHistoryWatchSeriesReadingHistoriesFrb();
 
 class PagedReadingHistoryDto {
   final List<ReadingHistoryDto> items;
@@ -86,27 +52,6 @@ class PagedReadingHistoryDto {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is PagedReadingHistoryDto &&
-          runtimeType == other.runtimeType &&
-          items == other.items &&
-          totalCount == other.totalCount;
-}
-
-class PagedSeriesReadingHistoryDto {
-  final List<SeriesReadingHistoryDto> items;
-  final PlatformInt64 totalCount;
-
-  const PagedSeriesReadingHistoryDto({
-    required this.items,
-    required this.totalCount,
-  });
-
-  @override
-  int get hashCode => items.hashCode ^ totalCount.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PagedSeriesReadingHistoryDto &&
           runtimeType == other.runtimeType &&
           items == other.items &&
           totalCount == other.totalCount;
@@ -139,37 +84,6 @@ class ReadingHistoryDto {
           runtimeType == other.runtimeType &&
           comicId == other.comicId &&
           title == other.title &&
-          lastReadTimeMs == other.lastReadTimeMs &&
-          pageIndex == other.pageIndex;
-}
-
-class SeriesReadingHistoryDto {
-  final String seriesName;
-  final String lastReadComicId;
-  final PlatformInt64 lastReadTimeMs;
-  final int? pageIndex;
-
-  const SeriesReadingHistoryDto({
-    required this.seriesName,
-    required this.lastReadComicId,
-    required this.lastReadTimeMs,
-    this.pageIndex,
-  });
-
-  @override
-  int get hashCode =>
-      seriesName.hashCode ^
-      lastReadComicId.hashCode ^
-      lastReadTimeMs.hashCode ^
-      pageIndex.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SeriesReadingHistoryDto &&
-          runtimeType == other.runtimeType &&
-          seriesName == other.seriesName &&
-          lastReadComicId == other.lastReadComicId &&
           lastReadTimeMs == other.lastReadTimeMs &&
           pageIndex == other.pageIndex;
 }
