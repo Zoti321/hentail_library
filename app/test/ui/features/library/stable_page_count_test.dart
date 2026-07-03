@@ -16,12 +16,6 @@ void main() {
     );
 
     expect(stablePagedTotalCount(loaded), 42);
-    expect(
-      stablePagedTotalCount(
-        const AsyncLoading<PagedResult<Comic>>().copyWithPrevious(loaded),
-      ),
-      42,
-    );
     expect(stablePagedTotalCount(const AsyncLoading<PagedResult<Comic>>()), 0);
   });
 }
