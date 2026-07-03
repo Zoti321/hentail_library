@@ -5,6 +5,12 @@ import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 abstract class ReadingHistoryRepository {
   Future<void> recordReading(entity.ReadingHistory history);
 
+  /// 有系列上下文时只写系列历史，否则写漫画历史。
+  Future<void> recordProgress(
+    entity.ReadingHistory history, {
+    entity.SeriesReadingHistory? series,
+  });
+
   Future<entity.ReadingHistory?> getByComicId(String comicId);
 
   Stream<List<entity.ReadingHistory>> watchAllHistory();

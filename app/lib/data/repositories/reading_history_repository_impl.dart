@@ -1,23 +1,19 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
-import 'package:hentai_library/data/database/dao/dao.dart';
-import 'package:hentai_library/data/mappers/mapping.dart';
+import 'package:hentai_library/data/adapters/history_frb_mapper.dart';
 import 'package:hentai_library/domain/models/models.dart' as entity;
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
+import 'package:hentai_library/src/rust/api/history.dart' as rust;
 
 class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
-  ReadingHistoryRepositoryImpl(this._dao, this._seriesDao);
-
-  final ReadingHistoryDao _dao;
-  final SeriesReadingHistoryDao _seriesDao;
+  const ReadingHistoryRepositoryImpl();
 
   @override
   Future<void> recordReading(entity.ReadingHistory history) async {
     try {
-      final companion = history.toCompanion();
-      await _dao.recordReading(companion);
+      rust.recordReadingFrb(history: toReadingHistoryDto(history));
     } catch (e, st) {
       LogManager.instance.handle(
         e,
@@ -29,55 +25,9 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   }
 
   @override
-  Future<entity.ReadingHistory?> getByComicId(String comicId) async {
-    final row = await _dao.getReadingHistoryByComicId(comicId);
-    return row?.toEntity();
-  }
-
-  @override
-  Stream<List<entity.ReadingHistory>> watchAllHistory() {
-    return _dao.watchAllHistory().map(
-      (event) => event.map((e) => e.toEntity()).toList(),
-    );
-  }
-
-  @override
-  Future<PagedResult<entity.ReadingHistory>> fetchHistoryPage(
-    PageRequest request,
-  ) async {
-    final int totalCount = await _dao.countAllHistory();
-    if (totalCount <= 0) {
-      return PagedResult<entity.ReadingHistory>(
-        items: const <entity.ReadingHistory>[],
-        totalCount: 0,
-        page: 1,
-        pageSize: request.pageSize,
-      );
-    }
-    final int totalPages =
-        (totalCount + request.pageSize - 1) ~/ request.pageSize;
-    int effectivePage = request.page;
-    if (effectivePage > totalPages) {
-      effectivePage = totalPages;
-    }
-    final int offset = (effectivePage - 1) * request.pageSize;
-    final rows = await _dao.fetchHistoryPage(
-      limit: request.pageSize,
-      offset: offset,
-    );
-    return PagedResult<entity.ReadingHistory>(
-      items: rows.map((e) => e.toEntity()).toList(),
-      totalCount: totalCount,
-      page: effectivePage,
-      pageSize: request.pageSize,
-    );
-  }
-
-  @override
   Future<void> recordSeriesReading(entity.SeriesReadingHistory history) async {
     try {
-      final companion = history.toSeriesCompanion();
-      await _seriesDao.recordSeriesReading(companion);
+      rust.recordSeriesReadingFrb(history: toSeriesReadingHistoryDto(history));
     } catch (e, st) {
       LogManager.instance.handle(
         e,
@@ -89,17 +39,79 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   }
 
   @override
+  Future<void> recordProgress(
+    entity.ReadingHistory history, {
+    entity.SeriesReadingHistory? series,
+  }) async {
+    if (series != null) {
+      await recordSeriesReading(series);
+      return;
+    }
+    await recordReading(history);
+  }
+
+  @override
+  Future<entity.ReadingHistory?> getByComicId(String comicId) async {
+    final rust.ReadingHistoryDto? row = rust.getReadingByComicIdFrb(
+      comicId: comicId,
+    );
+    return row == null ? null : mapReadingHistoryDto(row);
+  }
+
+  @override
+  Stream<List<entity.ReadingHistory>> watchAllHistory() {
+    return rust.watchReadingHistoriesFrb().map(
+      (List<rust.ReadingHistoryDto> rows) =>
+          rows.map(mapReadingHistoryDto).toList(growable: false),
+    );
+  }
+
+  @override
+  Future<PagedResult<entity.ReadingHistory>> fetchHistoryPage(
+    PageRequest request,
+  ) async {
+    final rust.PagedReadingHistoryDto page = rust.fetchReadingPageFrb(
+      page: request.page,
+      pageSize: request.pageSize,
+    );
+    if (page.totalCount.toInt() <= 0) {
+      return PagedResult<entity.ReadingHistory>(
+        items: const <entity.ReadingHistory>[],
+        totalCount: 0,
+        page: 1,
+        pageSize: request.pageSize,
+      );
+    }
+    final int totalPages =
+        (page.totalCount.toInt() + request.pageSize - 1) ~/ request.pageSize;
+    final int effectivePage = request.page > totalPages
+        ? totalPages
+        : request.page;
+    if (effectivePage != request.page) {
+      final rust.PagedReadingHistoryDto adjusted = rust.fetchReadingPageFrb(
+        page: effectivePage,
+        pageSize: request.pageSize,
+      );
+      return mapPagedReadingHistory(adjusted, effectivePage, request.pageSize);
+    }
+    return mapPagedReadingHistory(page, effectivePage, request.pageSize);
+  }
+
+  @override
   Future<entity.SeriesReadingHistory?> getSeriesReadingBySeriesName(
     String seriesName,
   ) async {
-    final row = await _seriesDao.getBySeriesName(seriesName);
-    return row?.toEntity();
+    final rust.SeriesReadingHistoryDto? row = rust.getSeriesReadingByNameFrb(
+      seriesName: seriesName,
+    );
+    return row == null ? null : mapSeriesReadingHistoryDto(row);
   }
 
   @override
   Stream<List<entity.SeriesReadingHistory>> watchAllSeriesReading() {
-    return _seriesDao.watchAllSeriesReading().map(
-      (event) => event.map((e) => e.toEntity()).toList(),
+    return rust.watchSeriesReadingHistoriesFrb().map(
+      (List<rust.SeriesReadingHistoryDto> rows) =>
+          rows.map(mapSeriesReadingHistoryDto).toList(growable: false),
     );
   }
 
@@ -107,8 +119,12 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   Future<PagedResult<entity.SeriesReadingHistory>> fetchSeriesHistoryPage(
     PageRequest request,
   ) async {
-    final int totalCount = await _seriesDao.countAllSeriesReading();
-    if (totalCount <= 0) {
+    final rust.PagedSeriesReadingHistoryDto page = rust
+        .fetchSeriesReadingPageFrb(
+          page: request.page,
+          pageSize: request.pageSize,
+        );
+    if (page.totalCount.toInt() <= 0) {
       return PagedResult<entity.SeriesReadingHistory>(
         items: const <entity.SeriesReadingHistory>[],
         totalCount: 0,
@@ -117,28 +133,29 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
       );
     }
     final int totalPages =
-        (totalCount + request.pageSize - 1) ~/ request.pageSize;
-    int effectivePage = request.page;
-    if (effectivePage > totalPages) {
-      effectivePage = totalPages;
+        (page.totalCount.toInt() + request.pageSize - 1) ~/ request.pageSize;
+    final int effectivePage = request.page > totalPages
+        ? totalPages
+        : request.page;
+    if (effectivePage != request.page) {
+      final rust.PagedSeriesReadingHistoryDto adjusted = rust
+          .fetchSeriesReadingPageFrb(
+            page: effectivePage,
+            pageSize: request.pageSize,
+          );
+      return mapPagedSeriesReadingHistory(
+        adjusted,
+        effectivePage,
+        request.pageSize,
+      );
     }
-    final int offset = (effectivePage - 1) * request.pageSize;
-    final rows = await _seriesDao.fetchSeriesReadingPage(
-      limit: request.pageSize,
-      offset: offset,
-    );
-    return PagedResult<entity.SeriesReadingHistory>(
-      items: rows.map((e) => e.toEntity()).toList(),
-      totalCount: totalCount,
-      page: effectivePage,
-      pageSize: request.pageSize,
-    );
+    return mapPagedSeriesReadingHistory(page, effectivePage, request.pageSize);
   }
 
   @override
   Future<void> deleteSeriesReadingBySeriesName(String seriesName) async {
     try {
-      await _seriesDao.deleteBySeriesName(seriesName);
+      rust.deleteSeriesReadingByNameFrb(seriesName: seriesName);
     } catch (e, st) {
       LogManager.instance.handle(
         e,
@@ -152,8 +169,10 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   @override
   Future<void> deleteByComicId(String comicId) async {
     try {
-      await _dao.deleteByComicId(comicId);
-      await _seriesDao.deleteByLastReadComicIds(<String>[comicId]);
+      rust.deleteReadingByComicIdFrb(comicId: comicId);
+      rust.deleteSeriesReadingByLastReadComicIdsFrb(
+        comicIds: <String>[comicId],
+      );
     } catch (e, st) {
       LogManager.instance.handle(
         e,
@@ -167,8 +186,12 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   @override
   Future<void> deleteByComicIds(Iterable<String> comicIds) async {
     try {
-      await _dao.deleteByComicIds(comicIds);
-      await _seriesDao.deleteByLastReadComicIds(comicIds);
+      final List<String> ids = comicIds.toList(growable: false);
+      if (ids.isEmpty) {
+        return;
+      }
+      rust.deleteReadingByComicIdsFrb(comicIds: ids);
+      rust.deleteSeriesReadingByLastReadComicIdsFrb(comicIds: ids);
     } catch (e, st) {
       LogManager.instance.handle(e, st, '[READING_HISTORY_REPO] 批量删除阅读历史失败');
       throw AppException('批量删除阅读历史失败', cause: e, stackTrace: st);
@@ -180,7 +203,11 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
     Iterable<String> comicIds,
   ) async {
     try {
-      await _seriesDao.deleteByLastReadComicIds(comicIds);
+      final List<String> ids = comicIds.toList(growable: false);
+      if (ids.isEmpty) {
+        return;
+      }
+      rust.deleteSeriesReadingByLastReadComicIdsFrb(comicIds: ids);
     } catch (e, st) {
       LogManager.instance.handle(e, st, '[READING_HISTORY_REPO] 按漫画删除系列阅读历史失败');
       throw AppException('删除系列阅读历史失败', cause: e, stackTrace: st);
@@ -190,8 +217,7 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   @override
   Future<void> clearAllHistory() async {
     try {
-      await _dao.clearAllHistory();
-      await _seriesDao.clearAllSeriesReading();
+      rust.clearAllReadingFrb();
     } catch (e, st) {
       LogManager.instance.handle(e, st, '[READING_HISTORY_REPO] 清空阅读历史失败');
       throw AppException('清空阅读历史失败', cause: e, stackTrace: st);
@@ -200,12 +226,6 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
 
   @override
   Future<void> clearExpiredHistory() async {
-    try {
-      await _dao.clearExpiredHistory();
-      await _seriesDao.clearExpiredSeriesReading();
-    } catch (e, st) {
-      LogManager.instance.handle(e, st, '[READING_HISTORY_REPO] 清理过期阅读历史失败');
-      throw AppException('清理过期阅读历史失败', cause: e, stackTrace: st);
-    }
+    // 365 天清理：暂由 Rust 侧与 Drift 行为对齐的 SQL 在后续 slice 补齐；当前无 UI 调用。
   }
 }
