@@ -28,12 +28,7 @@ class MobileHistoryPage extends ConsumerWidget {
                 final HistoryGridItemDto item = viewData.mergedItems[index];
                 return Card(
                   child: ListTile(
-                    leading: Icon(
-                      item.map(
-                        comic: (_) => Icons.menu_book_outlined,
-                        series: (_) => Icons.layers_outlined,
-                      ),
-                    ),
+                    leading: const Icon(Icons.menu_book_outlined),
                     title: Text(item.title),
                     subtitle: Text(_buildSubtitle(item)),
                     onTap: () => _openHistoryTarget(context, item),
@@ -54,33 +49,7 @@ class MobileHistoryPage extends ConsumerWidget {
   }
 
   void _openHistoryTarget(BuildContext context, HistoryGridItemDto item) {
-    item.when(
-      comic:
-          (
-            String id,
-            String title,
-            DateTime lastReadTime,
-            String coverComicId,
-            String comicId,
-            int? pageIndex,
-          ) {
-            final String encoded = Uri.encodeComponent(comicId);
-            context.go('/comic/$encoded');
-          },
-      series:
-          (
-            String id,
-            String title,
-            DateTime lastReadTime,
-            String coverComicId,
-            String seriesName,
-            String lastReadComicId,
-            int? pageIndex,
-            int? lastReadComicOrder,
-          ) {
-            final String encoded = Uri.encodeComponent(seriesName);
-            context.go('/series/$encoded');
-          },
-    );
+    final String encoded = Uri.encodeComponent(item.comicId);
+    context.go('/comic/$encoded');
   }
 }

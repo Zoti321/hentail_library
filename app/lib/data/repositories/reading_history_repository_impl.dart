@@ -25,32 +25,6 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   }
 
   @override
-  Future<void> recordSeriesReading(entity.SeriesReadingHistory history) async {
-    try {
-      rust.recordSeriesReadingFrb(history: toSeriesReadingHistoryDto(history));
-    } catch (e, st) {
-      LogManager.instance.handle(
-        e,
-        st,
-        '[READING_HISTORY_REPO] 记录系列阅读进度失败，seriesName=${history.seriesName}',
-      );
-      throw AppException('记录系列阅读进度失败', cause: e, stackTrace: st);
-    }
-  }
-
-  @override
-  Future<void> recordProgress(
-    entity.ReadingHistory history, {
-    entity.SeriesReadingHistory? series,
-  }) async {
-    if (series != null) {
-      await recordSeriesReading(series);
-      return;
-    }
-    await recordReading(history);
-  }
-
-  @override
   Future<entity.ReadingHistory?> getByComicId(String comicId) async {
     final rust.ReadingHistoryDto? row = rust.getReadingByComicIdFrb(
       comicId: comicId,
@@ -98,81 +72,9 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   }
 
   @override
-  Future<entity.SeriesReadingHistory?> getSeriesReadingBySeriesName(
-    String seriesName,
-  ) async {
-    final rust.SeriesReadingHistoryDto? row = rust.getSeriesReadingByNameFrb(
-      seriesName: seriesName,
-    );
-    return row == null ? null : mapSeriesReadingHistoryDto(row);
-  }
-
-  @override
-  Stream<List<entity.SeriesReadingHistory>> watchAllSeriesReading() {
-    return rust.watchSeriesReadingHistoriesFrb().map(
-      (List<rust.SeriesReadingHistoryDto> rows) =>
-          rows.map(mapSeriesReadingHistoryDto).toList(growable: false),
-    );
-  }
-
-  @override
-  Future<PagedResult<entity.SeriesReadingHistory>> fetchSeriesHistoryPage(
-    PageRequest request,
-  ) async {
-    final rust.PagedSeriesReadingHistoryDto page = rust
-        .fetchSeriesReadingPageFrb(
-          page: request.page,
-          pageSize: request.pageSize,
-        );
-    if (page.totalCount.toInt() <= 0) {
-      return PagedResult<entity.SeriesReadingHistory>(
-        items: const <entity.SeriesReadingHistory>[],
-        totalCount: 0,
-        page: 1,
-        pageSize: request.pageSize,
-      );
-    }
-    final int totalPages =
-        (page.totalCount.toInt() + request.pageSize - 1) ~/ request.pageSize;
-    final int effectivePage = request.page > totalPages
-        ? totalPages
-        : request.page;
-    if (effectivePage != request.page) {
-      final rust.PagedSeriesReadingHistoryDto adjusted = rust
-          .fetchSeriesReadingPageFrb(
-            page: effectivePage,
-            pageSize: request.pageSize,
-          );
-      return mapPagedSeriesReadingHistory(
-        adjusted,
-        effectivePage,
-        request.pageSize,
-      );
-    }
-    return mapPagedSeriesReadingHistory(page, effectivePage, request.pageSize);
-  }
-
-  @override
-  Future<void> deleteSeriesReadingBySeriesName(String seriesName) async {
-    try {
-      rust.deleteSeriesReadingByNameFrb(seriesName: seriesName);
-    } catch (e, st) {
-      LogManager.instance.handle(
-        e,
-        st,
-        '[READING_HISTORY_REPO] 删除系列阅读历史失败，seriesName=$seriesName',
-      );
-      throw AppException('删除系列阅读历史失败', cause: e, stackTrace: st);
-    }
-  }
-
-  @override
   Future<void> deleteByComicId(String comicId) async {
     try {
       rust.deleteReadingByComicIdFrb(comicId: comicId);
-      rust.deleteSeriesReadingByLastReadComicIdsFrb(
-        comicIds: <String>[comicId],
-      );
     } catch (e, st) {
       LogManager.instance.handle(
         e,
@@ -191,26 +93,9 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
         return;
       }
       rust.deleteReadingByComicIdsFrb(comicIds: ids);
-      rust.deleteSeriesReadingByLastReadComicIdsFrb(comicIds: ids);
     } catch (e, st) {
       LogManager.instance.handle(e, st, '[READING_HISTORY_REPO] 批量删除阅读历史失败');
       throw AppException('批量删除阅读历史失败', cause: e, stackTrace: st);
-    }
-  }
-
-  @override
-  Future<void> deleteSeriesReadingByLastReadComicIds(
-    Iterable<String> comicIds,
-  ) async {
-    try {
-      final List<String> ids = comicIds.toList(growable: false);
-      if (ids.isEmpty) {
-        return;
-      }
-      rust.deleteSeriesReadingByLastReadComicIdsFrb(comicIds: ids);
-    } catch (e, st) {
-      LogManager.instance.handle(e, st, '[READING_HISTORY_REPO] 按漫画删除系列阅读历史失败');
-      throw AppException('删除系列阅读历史失败', cause: e, stackTrace: st);
     }
   }
 

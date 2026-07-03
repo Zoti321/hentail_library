@@ -1,7 +1,6 @@
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/domain/repositories/home_page_repository.dart';
 import 'package:hentai_library/src/rust/api/home.dart' as rust;
-import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 
 class HomePageRepositoryImpl implements HomePageRepository {
   const HomePageRepositoryImpl();
@@ -23,16 +22,6 @@ class HomePageRepositoryImpl implements HomePageRepository {
         );
   }
 
-  @override
-  Stream<Map<String, int>> watchHomeSeriesComicOrderMap() {
-    return rust_series.watchHomeSeriesComicOrderMapFrb().map(
-      (List<rust_series.SeriesComicOrderEntryDto> rows) => <String, int>{
-        for (final rust_series.SeriesComicOrderEntryDto row in rows)
-          row.key: row.sortOrder,
-      },
-    );
-  }
-
   HomePageCounts _mapCounts(rust.HomePageCountsDto dto) {
     return HomePageCounts(
       comicCount: dto.comicCount,
@@ -45,21 +34,12 @@ class HomePageRepositoryImpl implements HomePageRepository {
   HomeContinueReadingEntry _mapContinueReading(
     rust.HomeContinueReadingDto dto,
   ) {
-    final DateTime lastReadTime = DateTime.fromMillisecondsSinceEpoch(
-      dto.lastReadTimeMs,
-    );
-    if (dto.kind == 'c') {
-      return HomeContinueReadingEntry.comic(
-        comicId: dto.comicId ?? '',
-        title: dto.title ?? '',
-        lastReadTime: lastReadTime,
-        pageIndex: dto.pageIndex,
-      );
-    }
-    return HomeContinueReadingEntry.series(
-      seriesName: dto.seriesName ?? '',
-      lastReadComicId: dto.lastReadComicId ?? '',
-      lastReadTime: lastReadTime,
+    return HomeContinueReadingEntry(
+      comicId: dto.comicId,
+      title: dto.title,
+      lastReadTime: DateTime.fromMillisecondsSinceEpoch(
+        dto.lastReadTimeMs,
+      ),
       pageIndex: dto.pageIndex,
     );
   }

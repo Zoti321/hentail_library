@@ -52,11 +52,11 @@ fn create_fixture_db(dir: &Path) -> PathBuf {
     db_path
 }
 
-async fn count_series_reading_histories(db: &DatabaseConnection) -> i64 {
+async fn count_comic_reading_histories(db: &DatabaseConnection) -> i64 {
     let row = db
         .query_one(Statement::from_string(
             sea_orm::DatabaseBackend::Sqlite,
-            "SELECT COUNT(*) FROM series_reading_histories".to_string(),
+            "SELECT COUNT(*) FROM comic_reading_histories".to_string(),
         ))
         .await
         .expect("count query")
@@ -113,7 +113,7 @@ fn fetch_comics_page_hides_r18_by_default() {
 }
 
 #[test]
-fn clear_all_comics_removes_series_reading_histories() {
+fn clear_all_comics_removes_comic_reading_histories() {
     with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = create_fixture_db(temp.path());
@@ -123,17 +123,17 @@ fn clear_all_comics_removes_series_reading_histories() {
             let db = connection().expect("connection");
             db.execute(Statement::from_string(
                 sea_orm::DatabaseBackend::Sqlite,
-                "INSERT INTO series_reading_histories (series_name, last_read_comic_id, last_read_time, page_index) \
-                 VALUES ('测试系列', 'af738b6b1b3bbfab9a0fd591459572509d7ef4d5', 1_700_000_000, 3)"
+                "INSERT INTO comic_reading_histories (comic_id, title, last_read_time, page_index) \
+                 VALUES ('af738b6b1b3bbfab9a0fd591459572509d7ef4d5', '测试', 1_700_000_000, 3)"
                     .to_string(),
             ))
             .await
-            .expect("seed series reading");
-            assert_eq!(count_series_reading_histories(&db).await, 1);
+            .expect("seed comic reading");
+            assert_eq!(count_comic_reading_histories(&db).await, 1);
 
             let removed = clear_all_comics(&db).await.expect("clear_all_comics");
             assert_eq!(removed, 3);
-            assert_eq!(count_series_reading_histories(&db).await, 0);
+            assert_eq!(count_comic_reading_histories(&db).await, 0);
         });
     });
 }

@@ -47,13 +47,9 @@ pub use series::{
     SeriesDto, SeriesItemDto,
 };
 pub use history::{
-    PagedReadingHistoryDto, PagedSeriesReadingHistoryDto, ReadingHistoryDto,
-    SeriesReadingHistoryDto, clear_all_reading, delete_reading_by_comic_id,
-    delete_reading_by_comic_ids, delete_series_reading_by_last_read_comic_ids,
-    delete_series_reading_by_name, fetch_reading_page, fetch_series_reading_page,
-    get_reading_by_comic_id, get_series_reading_by_name, list_all_reading,
-    list_all_series_reading, record_reading, record_series_reading, watch_reading_histories,
-    watch_series_reading_histories,
+    PagedReadingHistoryDto, ReadingHistoryDto, clear_all_reading, delete_reading_by_comic_id,
+    delete_reading_by_comic_ids, fetch_reading_page, get_reading_by_comic_id, list_all_reading,
+    record_reading, watch_reading_histories,
 };
 pub use home::{
     get_continue_reading_top5, get_home_page_counts, watch_continue_reading_top5,

@@ -106,7 +106,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                     onRefresh: () {
                       ref.invalidate(homePageCountsStreamProvider);
                       ref.invalidate(homeContinueReadingTop5StreamProvider);
-                      ref.invalidate(homeSeriesComicOrderMapStreamProvider);
                     },
                     onScan: onScan,
                   ),

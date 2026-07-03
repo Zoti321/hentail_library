@@ -14,12 +14,9 @@ pub struct HomePageCountsDto {
 
 #[derive(Debug, Clone)]
 pub struct HomeContinueReadingDto {
-    pub kind: String,
+    pub comic_id: String,
+    pub title: String,
     pub last_read_time_ms: i64,
-    pub comic_id: Option<String>,
-    pub title: Option<String>,
-    pub series_name: Option<String>,
-    pub last_read_comic_id: Option<String>,
     pub page_index: Option<i32>,
 }
 
@@ -28,8 +25,7 @@ SELECT
   (SELECT COUNT(*) FROM comics) AS c_comic,
   (SELECT COUNT(*) FROM tags) AS c_tag,
   (SELECT COUNT(*) FROM series) AS c_series,
-  (SELECT COUNT(*) FROM comic_reading_histories) AS c_comic_h,
-  (SELECT COUNT(*) FROM series_reading_histories) AS c_series_h
+  (SELECT COUNT(*) FROM comic_reading_histories) AS c_reading
 "#;
 
 const SQL_COUNTS_HEALTHY: &str = r#"
@@ -52,53 +48,22 @@ SELECT
     FROM comic_reading_histories h
     INNER JOIN comics c ON c.comic_id = h.comic_id
     WHERE c.content_rating != ?
-  ) AS c_comic_h,
-  (
-    SELECT COUNT(*)
-    FROM series_reading_histories srh
-    WHERE NOT EXISTS (
-      SELECT 1
-      FROM series_items si2
-      INNER JOIN comics c2 ON c2.comic_id = si2.comic_id
-      WHERE si2.series_name = srh.series_name AND c2.content_rating = ?
-    )
-  ) AS c_series_h
+  ) AS c_reading
 "#;
 
 const SQL_TOP5: &str = r#"
-SELECT kind, last_read_time, comic_id, title, series_name, last_read_comic_id, page_index
-FROM (
-  SELECT 'c' AS kind, h.last_read_time, h.comic_id, h.title,
-         NULL AS series_name, NULL AS last_read_comic_id, h.page_index
-  FROM comic_reading_histories h
-  UNION ALL
-  SELECT 's' AS kind, srh.last_read_time, NULL AS comic_id, NULL AS title,
-         srh.series_name, srh.last_read_comic_id, srh.page_index
-  FROM series_reading_histories srh
-) AS merged
-ORDER BY last_read_time DESC
+SELECT h.last_read_time, h.comic_id, h.title, h.page_index
+FROM comic_reading_histories h
+ORDER BY h.last_read_time DESC
 LIMIT 5
 "#;
 
 const SQL_TOP5_HEALTHY: &str = r#"
-SELECT kind, last_read_time, comic_id, title, series_name, last_read_comic_id, page_index
-FROM (
-  SELECT 'c' AS kind, h.last_read_time, h.comic_id, h.title,
-         NULL AS series_name, NULL AS last_read_comic_id, h.page_index
-  FROM comic_reading_histories h
-  INNER JOIN comics c ON c.comic_id = h.comic_id
-  WHERE c.content_rating != ?
-  UNION ALL
-  SELECT 's' AS kind, srh.last_read_time, NULL AS comic_id, NULL AS title,
-         srh.series_name, srh.last_read_comic_id, srh.page_index
-  FROM series_reading_histories srh
-  WHERE NOT EXISTS (
-    SELECT 1 FROM series_items si
-    INNER JOIN comics c ON c.comic_id = si.comic_id
-    WHERE si.series_name = srh.series_name AND c.content_rating = ?
-  )
-) AS merged
-ORDER BY last_read_time DESC
+SELECT h.last_read_time, h.comic_id, h.title, h.page_index
+FROM comic_reading_histories h
+INNER JOIN comics c ON c.comic_id = h.comic_id
+WHERE c.content_rating != ?
+ORDER BY h.last_read_time DESC
 LIMIT 5
 "#;
 
@@ -156,7 +121,7 @@ async fn load_continue_reading(
         let stmt = Statement::from_sql_and_values(
             db.get_database_backend(),
             SQL_TOP5_HEALTHY,
-            vec![Value::from("r18"); 2],
+            vec![Value::from("r18")],
         );
         db.query_all(stmt).await.map_err(map_db_err)?
     } else {
@@ -166,12 +131,9 @@ async fn load_continue_reading(
     rows.into_iter()
         .map(|row| {
             Ok(HomeContinueReadingDto {
-                kind: row.try_get("", "kind").unwrap_or_default(),
                 last_read_time_ms: row.try_get("", "last_read_time").unwrap_or(0),
-                comic_id: row.try_get("", "comic_id").ok(),
-                title: row.try_get("", "title").ok(),
-                series_name: row.try_get("", "series_name").ok(),
-                last_read_comic_id: row.try_get("", "last_read_comic_id").ok(),
+                comic_id: row.try_get("", "comic_id").unwrap_or_default(),
+                title: row.try_get("", "title").unwrap_or_default(),
                 page_index: row.try_get("", "page_index").ok(),
             })
         })
@@ -183,7 +145,7 @@ async fn load_counts(db: &DatabaseConnection, exclude_r18: bool) -> Result<HomeP
         let stmt = Statement::from_sql_and_values(
             db.get_database_backend(),
             SQL_COUNTS_HEALTHY,
-            vec![Value::from("r18"); 4],
+            vec![Value::from("r18"); 3],
         );
         db.query_one(stmt).await.map_err(map_db_err)?
     } else {
@@ -193,12 +155,10 @@ async fn load_counts(db: &DatabaseConnection, exclude_r18: bool) -> Result<HomeP
     let Some(row) = row else {
         return Ok(HomePageCountsDto::default());
     };
-    let comic_h: i64 = row.try_get("", "c_comic_h").unwrap_or(0);
-    let series_h: i64 = row.try_get("", "c_series_h").unwrap_or(0);
     Ok(HomePageCountsDto {
         comic_count: row.try_get::<i32>("", "c_comic").unwrap_or(0),
         tag_count: row.try_get::<i32>("", "c_tag").unwrap_or(0),
         series_count: row.try_get::<i32>("", "c_series").unwrap_or(0),
-        reading_record_count: (comic_h + series_h) as i32,
+        reading_record_count: row.try_get::<i32>("", "c_reading").unwrap_or(0),
     })
 }

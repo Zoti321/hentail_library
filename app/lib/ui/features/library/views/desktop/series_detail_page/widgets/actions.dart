@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
-import 'package:hentai_library/domain/models/entity/series_reading_history.dart';
-import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/add_comics_to_series_dialog.dart';
@@ -37,19 +35,7 @@ class SeriesDetailActions extends ConsumerWidget {
               showInfoToast(context, '系列内暂无漫画');
               return;
             }
-            final SeriesReadingHistory? seriesProgress = await ref
-                .read(readingHistoryRepoProvider)
-                .getSeriesReadingBySeriesName(series.name);
-            String comicIdToOpen = sortedItems.first.comicId;
-            if (seriesProgress != null) {
-              final String lastId = seriesProgress.lastReadComicId;
-              final bool lastStillInSeries = sortedItems.any(
-                (SeriesItem e) => e.comicId == lastId,
-              );
-              if (lastStillInSeries) {
-                comicIdToOpen = lastId;
-              }
-            }
+            final String comicIdToOpen = sortedItems.first.comicId;
             appRouter.pushNamed(
               ReaderRouteArgs.readerRouteName,
               queryParameters: ReaderRouteArgs(

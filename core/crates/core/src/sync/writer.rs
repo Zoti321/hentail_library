@@ -6,8 +6,7 @@ use sea_orm::{
 use crate::comic::ComicDto;
 use crate::db::map_db_err;
 use crate::entity::{
-    authors, comic_authors, comic_tags, comic_thumbnails, comics, prelude::*,
-    series_reading_histories, tags,
+    authors, comic_authors, comic_tags, comic_thumbnails, comics, prelude::*, tags,
 };
 use crate::error::HentaiError;
 
@@ -45,7 +44,6 @@ pub async fn clear_all_comics(db: &DatabaseConnection) -> Result<i32, HentaiErro
     let txn = db.begin().await.map_err(map_db_err)?;
     for table in [
         "comic_reading_histories",
-        "series_reading_histories",
         "series_items",
         "comics",
     ] {
@@ -110,11 +108,6 @@ async fn delete_comics_side_effects_batch<C: ConnectionTrait>(
     ))
     .await
     .map_err(map_db_err)?;
-    SeriesReadingHistories::delete_many()
-        .filter(series_reading_histories::Column::LastReadComicId.is_in(comic_ids.to_vec()))
-        .exec(db)
-        .await
-        .map_err(map_db_err)?;
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         format!("DELETE FROM series_items WHERE comic_id IN ({placeholders})"),

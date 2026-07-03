@@ -7,7 +7,6 @@ pub mod comics;
 pub mod saved_paths;
 pub mod series;
 pub mod series_items;
-pub mod series_reading_histories;
 pub mod tags;
 
 pub mod prelude {
@@ -20,6 +19,5 @@ pub mod prelude {
     pub use super::saved_paths::Entity as SavedPaths;
     pub use super::series::Entity as Series;
     pub use super::series_items::Entity as SeriesItems;
-    pub use super::series_reading_histories::Entity as SeriesReadingHistories;
     pub use super::tags::Entity as Tags;
 }

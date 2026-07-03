@@ -215,46 +215,22 @@ class _HistoryListSliver extends ConsumerWidget {
           itemCount: merged.length,
           itemBuilder: (BuildContext context, int index) {
             final HistoryGridItemDto item = merged[index];
-            if (item is ComicHistoryGridItemDto) {
-              return ReadingHistoryCard.comic(
-                comicId: item.comicId,
-                title: item.title,
-                lastReadTime: item.lastReadTime,
-                pageIndex: item.pageIndex,
-                onTap: () => appRouter.pushNamed(
-                  ReaderRouteArgs.readerRouteName,
-                  queryParameters: ReaderRouteArgs(
-                    comicId: item.comicId,
-                    readType: ReaderRouteArgs.readTypeComic,
-                  ).toQueryParameters(),
-                ),
-                onDelete: () => _handleDeleteComicHistory(
-                  context: context,
-                  ref: ref,
-                  comicId: item.comicId,
-                ),
-              );
-            }
-            final SeriesHistoryGridItemDto seriesItem =
-                item as SeriesHistoryGridItemDto;
-            return ReadingHistoryCard.series(
-              seriesName: seriesItem.seriesName,
-              lastReadComicId: seriesItem.lastReadComicId,
-              lastReadTime: seriesItem.lastReadTime,
-              pageIndex: seriesItem.pageIndex,
-              lastReadComicOrder: seriesItem.lastReadComicOrder,
+            return ReadingHistoryCard(
+              comicId: item.comicId,
+              title: item.title,
+              lastReadTime: item.lastReadTime,
+              pageIndex: item.pageIndex,
               onTap: () => appRouter.pushNamed(
                 ReaderRouteArgs.readerRouteName,
                 queryParameters: ReaderRouteArgs(
-                  comicId: seriesItem.lastReadComicId,
-                  readType: ReaderRouteArgs.readTypeSeries,
-                  seriesName: seriesItem.seriesName,
+                  comicId: item.comicId,
+                  readType: ReaderRouteArgs.readTypeComic,
                 ).toQueryParameters(),
               ),
-              onDelete: () => _handleDeleteSeriesHistory(
+              onDelete: () => _handleDeleteComicHistory(
                 context: context,
                 ref: ref,
-                seriesName: seriesItem.seriesName,
+                comicId: item.comicId,
               ),
             );
           },
@@ -283,25 +259,6 @@ class _HistoryListSliver extends ConsumerWidget {
   }) async {
     try {
       await ref.read(readingHistoryRepoProvider).deleteByComicId(comicId);
-      if (context.mounted) {
-        showSuccessToast(context, '已删除记录');
-      }
-    } catch (e) {
-      if (context.mounted) {
-        showErrorToast(context, e);
-      }
-    }
-  }
-
-  Future<void> _handleDeleteSeriesHistory({
-    required BuildContext context,
-    required WidgetRef ref,
-    required String seriesName,
-  }) async {
-    try {
-      await ref
-          .read(readingHistoryRepoProvider)
-          .deleteSeriesReadingBySeriesName(seriesName);
       if (context.mounted) {
         showSuccessToast(context, '已删除记录');
       }
