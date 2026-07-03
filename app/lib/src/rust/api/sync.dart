@@ -28,17 +28,35 @@ class LibrarySyncCountsDto {
   final int zip;
   final int cbz;
   final int epub;
+  final int cbr;
+  final int rar;
+  final int cb7;
+  final int sevenz;
+  final int pdf;
 
   const LibrarySyncCountsDto({
     required this.dir,
     required this.zip,
     required this.cbz,
     required this.epub,
+    required this.cbr,
+    required this.rar,
+    required this.cb7,
+    required this.sevenz,
+    required this.pdf,
   });
 
   @override
   int get hashCode =>
-      dir.hashCode ^ zip.hashCode ^ cbz.hashCode ^ epub.hashCode;
+      dir.hashCode ^
+      zip.hashCode ^
+      cbz.hashCode ^
+      epub.hashCode ^
+      cbr.hashCode ^
+      rar.hashCode ^
+      cb7.hashCode ^
+      sevenz.hashCode ^
+      pdf.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -48,7 +66,12 @@ class LibrarySyncCountsDto {
           dir == other.dir &&
           zip == other.zip &&
           cbz == other.cbz &&
-          epub == other.epub;
+          epub == other.epub &&
+          cbr == other.cbr &&
+          rar == other.rar &&
+          cb7 == other.cb7 &&
+          sevenz == other.sevenz &&
+          pdf == other.pdf;
 }
 
 enum SyncLibraryPhaseDto {

@@ -12,7 +12,17 @@ enum SyncLibraryPhase {
 /// 无根无数据 / 无根已清空 / 有根扫描
 enum SyncLibraryRoute { noRootsNoop, noRootsCleared, withRoots }
 
-typedef LibrarySyncCounts = ({int dir, int zip, int cbz, int epub});
+typedef LibrarySyncCounts = ({
+  int dir,
+  int zip,
+  int cbz,
+  int epub,
+  int cbr,
+  int rar,
+  int cb7,
+  int sevenZ,
+  int pdf,
+});
 
 typedef SyncLibraryProgress = ({
   SyncLibraryPhase phase,
@@ -32,4 +42,20 @@ typedef SyncLibraryProgress = ({
   int? thumbnailFailedCount,
 });
 
-LibrarySyncCounts emptyLibrarySyncCounts() => (dir: 0, zip: 0, cbz: 0, epub: 0);
+LibrarySyncCounts emptyLibrarySyncCounts() => (
+  dir: 0,
+  zip: 0,
+  cbz: 0,
+  epub: 0,
+  cbr: 0,
+  rar: 0,
+  cb7: 0,
+  sevenZ: 0,
+  pdf: 0,
+);
+
+String formatLibrarySyncCounts(LibrarySyncCounts counts) {
+  return 'dir: ${counts.dir}, zip: ${counts.zip}, cbz: ${counts.cbz}, '
+      'epub: ${counts.epub}, cbr: ${counts.cbr}, rar: ${counts.rar}, '
+      'cb7: ${counts.cb7}, 7z: ${counts.sevenZ}, pdf: ${counts.pdf}';
+}

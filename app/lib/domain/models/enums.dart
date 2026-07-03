@@ -19,11 +19,20 @@ enum ResourceType {
   /// 确认内容是否为漫画
   epub,
 
-  /// .cbr 占位（暂不解析）
+  /// .cbr 压缩包
   cbr,
 
-  /// .rar 占位（暂不解析）
-  rar;
+  /// .rar 压缩包
+  rar,
+
+  /// .cb7 压缩包
+  cb7,
+
+  /// .7z 压缩包
+  sevenZ,
+
+  /// PDF 文档
+  pdf;
 
   static ResourceType? fromFilePath(String path) {
     final String ext = p.extension(path).toLowerCase();
@@ -33,6 +42,9 @@ enum ResourceType {
       '.epub' => ResourceType.epub,
       '.cbr' => ResourceType.cbr,
       '.rar' => ResourceType.rar,
+      '.cb7' => ResourceType.cb7,
+      '.7z' => ResourceType.sevenZ,
+      '.pdf' => ResourceType.pdf,
       _ => null,
     };
   }

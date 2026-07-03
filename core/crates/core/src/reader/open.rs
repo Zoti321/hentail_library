@@ -1,5 +1,7 @@
 use crate::error::HentaiError;
 
+use crate::formats::{read_pdf_page, read_rar_page, read_sevenz_page};
+
 use super::backend::{read_epub_page, read_zip_page, ReaderBackend};
 use super::dto::ReaderPageListDto;
 use super::manager::{open_reader, with_session};
@@ -30,6 +32,21 @@ pub fn load_page_list(
             page_count: epub.image_entries.len() as i32,
             dir_page_paths: vec![],
         }),
+        ReaderBackend::Rar(rar) => Ok(ReaderPageListDto {
+            resource_type: resource_type.to_string(),
+            page_count: rar.entry_names.len() as i32,
+            dir_page_paths: vec![],
+        }),
+        ReaderBackend::SevenZ(sevenz) => Ok(ReaderPageListDto {
+            resource_type: resource_type.to_string(),
+            page_count: sevenz.entry_names.len() as i32,
+            dir_page_paths: vec![],
+        }),
+        ReaderBackend::Pdf(pdf) => Ok(ReaderPageListDto {
+            resource_type: "pdf".to_string(),
+            page_count: pdf.page_count,
+            dir_page_paths: vec![],
+        }),
     })
 }
 
@@ -54,5 +71,8 @@ pub fn load_page_bytes(
         )),
         ReaderBackend::Zip(zip) => read_zip_page(zip, page_index),
         ReaderBackend::Epub(epub) => read_epub_page(epub, page_index),
+        ReaderBackend::Rar(rar) => read_rar_page(rar, page_index),
+        ReaderBackend::SevenZ(sevenz) => read_sevenz_page(sevenz, page_index),
+        ReaderBackend::Pdf(pdf) => read_pdf_page(pdf, page_index),
     })
 }

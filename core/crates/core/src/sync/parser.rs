@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 use zip::ZipArchive;
 
+use crate::formats::{count_pdf_pages, count_rar_images, count_sevenz_images};
 use crate::comic_id::comic_id_from_path;
 use crate::error::HentaiError;
 
@@ -146,8 +147,58 @@ pub fn parse_file(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
         ".zip" => parse_zip_archive(file, "zip"),
         ".cbz" => parse_zip_archive(file, "cbz"),
         ".epub" => parse_epub(file),
+        ".cbr" => parse_rar_archive(file, "cbr"),
+        ".rar" => parse_rar_archive(file, "rar"),
+        ".cb7" => parse_sevenz_archive(file, "cb7"),
+        ".7z" => parse_sevenz_archive(file, "sevenz"),
+        ".pdf" => parse_pdf(file),
         _ => Ok(None),
     }
+}
+
+pub fn parse_rar_archive(file: &Path, resource_type: &str) -> Result<Option<ParsedResource>, HentaiError> {
+    let page_count = count_rar_images(file)?;
+    let Some(page_count) = page_count else {
+        return Ok(None);
+    };
+    Ok(Some(ParsedResource {
+        path: file.to_string_lossy().to_string(),
+        resource_type: resource_type.to_string(),
+        title: basename_without_extension(file),
+        authors: vec![],
+        page_count: Some(page_count),
+    }))
+}
+
+pub fn parse_sevenz_archive(
+    file: &Path,
+    resource_type: &str,
+) -> Result<Option<ParsedResource>, HentaiError> {
+    let page_count = count_sevenz_images(file)?;
+    let Some(page_count) = page_count else {
+        return Ok(None);
+    };
+    Ok(Some(ParsedResource {
+        path: file.to_string_lossy().to_string(),
+        resource_type: resource_type.to_string(),
+        title: basename_without_extension(file),
+        authors: vec![],
+        page_count: Some(page_count),
+    }))
+}
+
+pub fn parse_pdf(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
+    let page_count = count_pdf_pages(file)?;
+    let Some(page_count) = page_count else {
+        return Ok(None);
+    };
+    Ok(Some(ParsedResource {
+        path: file.to_string_lossy().to_string(),
+        resource_type: "pdf".to_string(),
+        title: basename_without_extension(file),
+        authors: vec![],
+        page_count: Some(page_count),
+    }))
 }
 
 pub fn parse_epub(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {

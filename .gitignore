@@ -62,6 +62,11 @@ app/test/fixtures/thumbnail_bug/out/
 *.sql
 !core/tests/fixtures/drift_v2.sql
 
+# Native vendor binaries (fetch via core/vendor/fetch-native-deps.*)
+core/vendor/**/pdfium.dll
+core/vendor/**/libpdfium.so
+core/vendor/**/libpdfium.dylib
+
 development.md
 .cursor
 /dist_installer/
