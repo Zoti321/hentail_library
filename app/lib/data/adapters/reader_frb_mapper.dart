@@ -38,5 +38,8 @@ String mapResourceType(ResourceType type) {
     ResourceType.epub => 'epub',
     ResourceType.cbr => 'cbr',
     ResourceType.rar => 'rar',
+    ResourceType.cb7 => 'cb7',
+    ResourceType.sevenZ => 'sevenz',
+    ResourceType.pdf => 'pdf',
   };
 }

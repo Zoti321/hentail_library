@@ -1,6 +1,28 @@
+use std::fs;
 use std::io::Write;
 
 use hentai_core::{load_page_bytes, load_page_list, open_reader};
+
+#[test]
+fn sevenz_reader_lists_and_reads_image_pages() {
+    let temp = tempfile::tempdir().expect("tempdir");
+    let source_dir = temp.path().join("pages");
+    fs::create_dir_all(&source_dir).expect("mkdir");
+    fs::write(source_dir.join("001.png"), b"page-one").expect("write1");
+    fs::write(source_dir.join("002.png"), b"page-two").expect("write2");
+
+    let archive_path = temp.path().join("comic.cb7");
+    sevenz_rust::compress_to_path(&source_dir, &archive_path).expect("compress");
+
+    let path = archive_path.to_string_lossy().to_string();
+    open_reader("sevenz-comic", &path, "cb7").expect("open");
+    let list = load_page_list("sevenz-comic", &path, "cb7").expect("list");
+    assert_eq!(list.page_count, 2);
+    let page0 = load_page_bytes("sevenz-comic", &path, "cb7", 0).expect("page0");
+    let page1 = load_page_bytes("sevenz-comic", &path, "cb7", 1).expect("page1");
+    assert_eq!(page0, b"page-one");
+    assert_eq!(page1, b"page-two");
+}
 
 #[test]
 fn zip_reader_session_reuses_archive_for_multiple_pages() {

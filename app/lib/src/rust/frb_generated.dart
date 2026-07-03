@@ -778,13 +778,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LibrarySyncCountsDto dco_decode_library_sync_counts_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
     return LibrarySyncCountsDto(
       dir: dco_decode_i_32(arr[0]),
       zip: dco_decode_i_32(arr[1]),
       cbz: dco_decode_i_32(arr[2]),
       epub: dco_decode_i_32(arr[3]),
+      cbr: dco_decode_i_32(arr[4]),
+      rar: dco_decode_i_32(arr[5]),
+      cb7: dco_decode_i_32(arr[6]),
+      sevenz: dco_decode_i_32(arr[7]),
+      pdf: dco_decode_i_32(arr[8]),
     );
   }
 
@@ -1112,11 +1117,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_zip = sse_decode_i_32(deserializer);
     var var_cbz = sse_decode_i_32(deserializer);
     var var_epub = sse_decode_i_32(deserializer);
+    var var_cbr = sse_decode_i_32(deserializer);
+    var var_rar = sse_decode_i_32(deserializer);
+    var var_cb7 = sse_decode_i_32(deserializer);
+    var var_sevenz = sse_decode_i_32(deserializer);
+    var var_pdf = sse_decode_i_32(deserializer);
     return LibrarySyncCountsDto(
       dir: var_dir,
       zip: var_zip,
       cbz: var_cbz,
       epub: var_epub,
+      cbr: var_cbr,
+      rar: var_rar,
+      cb7: var_cb7,
+      sevenz: var_sevenz,
+      pdf: var_pdf,
     );
   }
 
@@ -1499,6 +1514,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.zip, serializer);
     sse_encode_i_32(self.cbz, serializer);
     sse_encode_i_32(self.epub, serializer);
+    sse_encode_i_32(self.cbr, serializer);
+    sse_encode_i_32(self.rar, serializer);
+    sse_encode_i_32(self.cb7, serializer);
+    sse_encode_i_32(self.sevenz, serializer);
+    sse_encode_i_32(self.pdf, serializer);
   }
 
   @protected

@@ -105,5 +105,8 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Fetch native dependencies
+        run: bash vendor/fetch-native-deps.sh
+
       - name: Run Rust workspace tests
         run: cargo test --workspace

@@ -26,20 +26,20 @@
 
 // Section: imports
 
-use crate::api::sync::*;
-use flutter_rust_bridge::for_generated::byteorder::{NativeEndian, ReadBytesExt, WriteBytesExt};
-use flutter_rust_bridge::for_generated::{transform_result_dco, Lifetimeable, Lockable};
-use flutter_rust_bridge::{Handler, IntoIntoDart};
+use crate::api::sync::*;use flutter_rust_bridge::{Handler, IntoIntoDart};
+use flutter_rust_bridge::for_generated::{Lockable, transform_result_dco, Lifetimeable};
+use flutter_rust_bridge::for_generated::byteorder::{NativeEndian, WriteBytesExt, ReadBytesExt};
 
 // Section: boilerplate
 
 flutter_rust_bridge::frb_generated_boilerplate!(
-    default_stream_sink_codec = SseCodec,
-    default_rust_opaque = RustOpaqueMoi,
-    default_rust_auto_opaque = RustAutoOpaqueMoi,
-);
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 169457050;
+                    default_stream_sink_codec = SseCodec,
+                    default_rust_opaque = RustOpaqueMoi,
+                    default_rust_auto_opaque = RustAutoOpaqueMoi,
+                );
+                pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
+                pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 169457050;
+            
 
 // Section: executor
 
@@ -47,1591 +47,942 @@ flutter_rust_bridge::frb_generated_default_handler!();
 
 // Section: wire_funcs
 
-fn wire__crate__api__sync__cancel_sync_frb_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "cancel_sync_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_handle = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_handle_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_handle,
-                            0,
-                            false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_handle_guard = Some(api_handle.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_handle_guard = api_handle_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    crate::api::sync::cancel_sync_frb(&*api_handle_guard);
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__reader__clear_reader_sessions_frb_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "clear_reader_sessions_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let output_ok = Result::<_, ()>::Ok({
-                    crate::api::reader::clear_reader_sessions_frb();
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__reader__close_reader_frb_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "close_reader_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_comic_id = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let output_ok = Result::<_, ()>::Ok({
-                    crate::api::reader::close_reader_frb(api_comic_id);
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__comic__comic_id_from_path_frb_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "comic_id_from_path_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_raw_path = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let output_ok =
-                    Result::<_, ()>::Ok(crate::api::comic::comic_id_from_path_frb(api_raw_path))?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__comic__count_all_comics_frb_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "count_all_comics_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            deserializer.end();
-            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
-                let output_ok = crate::api::comic::count_all_comics_frb()?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__sync__create_sync_handle_frb_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "create_sync_handle_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let output_ok = Result::<_, ()>::Ok(crate::api::sync::create_sync_handle_frb())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__comic__fetch_comics_page_frb_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "fetch_comics_page_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_request = <crate::api::comic::PageRequestDto>::sse_decode(&mut deserializer);
-            let api_filter = <crate::api::comic::ComicFilterDto>::sse_decode(&mut deserializer);
-            let api_sort = <crate::api::comic::ComicSortOptionDto>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
-                let output_ok =
-                    crate::api::comic::fetch_comics_page_frb(api_request, api_filter, api_sort)?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__comic__find_comic_by_id_frb_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "find_comic_by_id_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_comic_id = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
-                let output_ok = crate::api::comic::find_comic_by_id_frb(api_comic_id)?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__comic__init_app_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "init_app",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            deserializer.end();
-            move |context| {
+fn wire__crate__api__sync__cancel_sync_frb_impl(ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "cancel_sync_frb", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_handle = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>>::sse_decode(&mut deserializer);deserializer.end();
                 transform_result_sse::<_, ()>((move || {
-                    let output_ok = Result::<_, ()>::Ok({
-                        crate::api::comic::init_app();
-                    })?;
-                    Ok(output_ok)
-                })())
+                    let mut api_handle_guard = None;
+let decode_indices_ = flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![flutter_rust_bridge::for_generated::LockableOrderInfo::new(&api_handle, 0, false)]);
+        for i in decode_indices_ {
+            match i {
+                0 => api_handle_guard = Some(api_handle.lockable_decode_sync_ref()),
+                _ => unreachable!(),
             }
-        },
-    )
-}
-fn wire__crate__api__comic__init_db_frb_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "init_db_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+        }
+        let api_handle_guard = api_handle_guard.unwrap();
+ let output_ok = Result::<_,()>::Ok({ crate::api::sync::cancel_sync_frb(&*api_handle_guard); })?;   Ok(output_ok)
+                })()) })
+            }fn wire__crate__api__reader__clear_reader_sessions_frb_impl(ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "clear_reader_sessions_frb", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                     let output_ok = Result::<_,()>::Ok({ crate::api::reader::clear_reader_sessions_frb(); })?;   Ok(output_ok)
+                })()) })
+            }fn wire__crate__api__reader__close_reader_frb_impl(ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "close_reader_frb", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_comic_id = <String>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                     let output_ok = Result::<_,()>::Ok({ crate::api::reader::close_reader_frb(api_comic_id); })?;   Ok(output_ok)
+                })()) })
+            }fn wire__crate__api__comic__comic_id_from_path_frb_impl(ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "comic_id_from_path_frb", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_raw_path = <String>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                     let output_ok = Result::<_,()>::Ok(crate::api::comic::comic_id_from_path_frb(api_raw_path))?;   Ok(output_ok)
+                })()) })
+            }fn wire__crate__api__comic__count_all_comics_frb_impl(ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "count_all_comics_frb", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+                transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
+                     let output_ok = crate::api::comic::count_all_comics_frb()?;   Ok(output_ok)
+                })()) })
+            }fn wire__crate__api__sync__create_sync_handle_frb_impl(ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "create_sync_handle_frb", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+                transform_result_sse::<_, ()>((move || {
+                     let output_ok = Result::<_,()>::Ok(crate::api::sync::create_sync_handle_frb())?;   Ok(output_ok)
+                })()) })
+            }fn wire__crate__api__comic__fetch_comics_page_frb_impl(ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "fetch_comics_page_frb", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_request = <crate::api::comic::PageRequestDto>::sse_decode(&mut deserializer);
+let api_filter = <crate::api::comic::ComicFilterDto>::sse_decode(&mut deserializer);
+let api_sort = <crate::api::comic::ComicSortOptionDto>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
+                     let output_ok = crate::api::comic::fetch_comics_page_frb(api_request, api_filter, api_sort)?;   Ok(output_ok)
+                })()) })
+            }fn wire__crate__api__comic__find_comic_by_id_frb_impl(ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "find_comic_by_id_frb", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_comic_id = <String>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
+                     let output_ok = crate::api::comic::find_comic_by_id_frb(api_comic_id)?;   Ok(output_ok)
+                })()) })
+            }fn wire__crate__api__comic__init_app_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "init_app", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end(); move |context|  {
+                    transform_result_sse::<_, ()>((move ||  {
+                         let output_ok = Result::<_,()>::Ok({ crate::api::comic::init_app(); })?;   Ok(output_ok)
+                    })())
+                } })
+            }fn wire__crate__api__comic__init_db_frb_impl(ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "init_db_frb", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_app_data_dir = <String>::sse_decode(&mut deserializer);
-            let api_db_file_name = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
-                let output_ok = crate::api::comic::init_db_frb(api_app_data_dir, api_db_file_name)?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__reader__load_page_bytes_frb_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "load_page_bytes_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+let api_db_file_name = <String>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
+                     let output_ok = crate::api::comic::init_db_frb(api_app_data_dir, api_db_file_name)?;   Ok(output_ok)
+                })()) })
+            }fn wire__crate__api__reader__load_page_bytes_frb_impl(ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "load_page_bytes_frb", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_comic_id = <String>::sse_decode(&mut deserializer);
-            let api_path = <String>::sse_decode(&mut deserializer);
-            let api_resource_type = <String>::sse_decode(&mut deserializer);
-            let api_page_index = <i32>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
-                let output_ok = crate::api::reader::load_page_bytes_frb(
-                    api_comic_id,
-                    api_path,
-                    api_resource_type,
-                    api_page_index,
-                )?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__reader__load_page_list_frb_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "load_page_list_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+let api_path = <String>::sse_decode(&mut deserializer);
+let api_resource_type = <String>::sse_decode(&mut deserializer);
+let api_page_index = <i32>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
+                     let output_ok = crate::api::reader::load_page_bytes_frb(api_comic_id, api_path, api_resource_type, api_page_index)?;   Ok(output_ok)
+                })()) })
+            }fn wire__crate__api__reader__load_page_list_frb_impl(ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "load_page_list_frb", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_comic_id = <String>::sse_decode(&mut deserializer);
-            let api_path = <String>::sse_decode(&mut deserializer);
-            let api_resource_type = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
-                let output_ok = crate::api::reader::load_page_list_frb(
-                    api_comic_id,
-                    api_path,
-                    api_resource_type,
-                )?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__reader__open_reader_frb_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "open_reader_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+let api_path = <String>::sse_decode(&mut deserializer);
+let api_resource_type = <String>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
+                     let output_ok = crate::api::reader::load_page_list_frb(api_comic_id, api_path, api_resource_type)?;   Ok(output_ok)
+                })()) })
+            }fn wire__crate__api__reader__open_reader_frb_impl(ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "open_reader_frb", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_comic_id = <String>::sse_decode(&mut deserializer);
-            let api_path = <String>::sse_decode(&mut deserializer);
-            let api_resource_type = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
-                let output_ok =
-                    crate::api::reader::open_reader_frb(api_comic_id, api_path, api_resource_type)?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__comic__search_by_keyword_frb_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "search_by_keyword_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_keyword = <String>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
-                let output_ok = crate::api::comic::search_by_keyword_frb(api_keyword)?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__sync__sync_library_frb_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "sync_library_frb",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+let api_path = <String>::sse_decode(&mut deserializer);
+let api_resource_type = <String>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
+                     let output_ok = crate::api::reader::open_reader_frb(api_comic_id, api_path, api_resource_type)?;   Ok(output_ok)
+                })()) })
+            }fn wire__crate__api__comic__search_by_keyword_frb_impl(ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "search_by_keyword_frb", port: None, mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_keyword = <String>::sse_decode(&mut deserializer);deserializer.end();
+                transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
+                     let output_ok = crate::api::comic::search_by_keyword_frb(api_keyword)?;   Ok(output_ok)
+                })()) })
+            }fn wire__crate__api__sync__sync_library_frb_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "sync_library_frb", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_handle = <SyncHandleDto>::sse_decode(&mut deserializer);
-            let api_sink = <StreamSink<
-                crate::api::sync::SyncLibraryProgressDto,
-                flutter_rust_bridge::for_generated::SseCodec,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
-                    (move || async move {
-                        let output_ok =
-                            crate::api::sync::sync_library_frb(api_handle, api_sink).await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
+let api_sink = <StreamSink<crate::api::sync::SyncLibraryProgressDto,flutter_rust_bridge::for_generated::SseCodec>>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
+                    transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || async move {
+                         let output_ok = crate::api::sync::sync_library_frb(api_handle, api_sink).await?;   Ok(output_ok)
+                    })().await)
+                } })
+            }fn wire__crate__api__comic__watch_comic_changes_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "watch_comic_changes", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_sink = <StreamSink<i32,flutter_rust_bridge::for_generated::SseCodec>>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
+                    transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || async move {
+                         let output_ok = crate::api::comic::watch_comic_changes(api_sink).await?;   Ok(output_ok)
+                    })().await)
+                } })
             }
-        },
-    )
-}
-fn wire__crate__api__comic__watch_comic_changes_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "watch_comic_changes",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_sink =
-                <StreamSink<i32, flutter_rust_bridge::for_generated::SseCodec>>::sse_decode(
-                    &mut deserializer,
-                );
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
-                    (move || async move {
-                        let output_ok = crate::api::comic::watch_comic_changes(api_sink).await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
 
 // Section: related_funcs
 
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>
-);
+flutter_rust_bridge::frb_generated_moi_arc_impl_value!(flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>);
+
 
 // Section: dart2rust
 
-impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <String>::sse_decode(deserializer);
-        return flutter_rust_bridge::for_generated::anyhow::anyhow!("{}", inner);
-    }
-}
 
-impl SseDecode for SyncHandleDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <RustOpaqueMoi<
-            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>,
-        >>::sse_decode(deserializer);
-        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
-    }
-}
-
-impl SseDecode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
-    }
-}
-
-impl SseDecode for StreamSink<i32, flutter_rust_bridge::for_generated::SseCodec> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <String>::sse_decode(deserializer);
-        return StreamSink::deserialize(inner);
-    }
-}
-
-impl SseDecode
-    for StreamSink<
-        crate::api::sync::SyncLibraryProgressDto,
-        flutter_rust_bridge::for_generated::SseCodec,
-    >
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <String>::sse_decode(deserializer);
-        return StreamSink::deserialize(inner);
-    }
-}
-
-impl SseDecode for String {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <Vec<u8>>::sse_decode(deserializer);
-        return String::from_utf8(inner).unwrap();
-    }
-}
-
-impl SseDecode for bool {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        deserializer.cursor.read_u8().unwrap() != 0
-    }
-}
-
-impl SseDecode for crate::api::comic::ComicDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_comicId = <String>::sse_decode(deserializer);
-        let mut var_path = <String>::sse_decode(deserializer);
-        let mut var_resourceType = <String>::sse_decode(deserializer);
-        let mut var_title = <String>::sse_decode(deserializer);
-        let mut var_contentRating = <String>::sse_decode(deserializer);
-        let mut var_pageCount = <Option<i32>>::sse_decode(deserializer);
-        let mut var_authors = <Vec<String>>::sse_decode(deserializer);
-        let mut var_tags = <Vec<String>>::sse_decode(deserializer);
-        return crate::api::comic::ComicDto {
-            comic_id: var_comicId,
-            path: var_path,
-            resource_type: var_resourceType,
-            title: var_title,
-            content_rating: var_contentRating,
-            page_count: var_pageCount,
-            authors: var_authors,
-            tags: var_tags,
-        };
-    }
-}
-
-impl SseDecode for crate::api::comic::ComicFilterDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_showR18 = <bool>::sse_decode(deserializer);
-        let mut var_query = <Option<String>>::sse_decode(deserializer);
-        let mut var_resourceTypes = <Vec<String>>::sse_decode(deserializer);
-        let mut var_contentRatings = <Vec<String>>::sse_decode(deserializer);
-        let mut var_tagsAll = <Vec<String>>::sse_decode(deserializer);
-        let mut var_tagsAny = <Vec<String>>::sse_decode(deserializer);
-        let mut var_tagsExclude = <Vec<String>>::sse_decode(deserializer);
-        let mut var_excludeComicsInAnySeries = <bool>::sse_decode(deserializer);
-        return crate::api::comic::ComicFilterDto {
-            show_r18: var_showR18,
-            query: var_query,
-            resource_types: var_resourceTypes,
-            content_ratings: var_contentRatings,
-            tags_all: var_tagsAll,
-            tags_any: var_tagsAny,
-            tags_exclude: var_tagsExclude,
-            exclude_comics_in_any_series: var_excludeComicsInAnySeries,
-        };
-    }
-}
-
-impl SseDecode for crate::api::comic::ComicSortOptionDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_descending = <bool>::sse_decode(deserializer);
-        return crate::api::comic::ComicSortOptionDto {
-            descending: var_descending,
-        };
-    }
-}
-
-impl SseDecode for crate::api::init::HentaiErrorDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_code = <String>::sse_decode(deserializer);
-        let mut var_message = <String>::sse_decode(deserializer);
-        let mut var_context = <Option<String>>::sse_decode(deserializer);
-        return crate::api::init::HentaiErrorDto {
-            code: var_code,
-            message: var_message,
-            context: var_context,
-        };
-    }
-}
-
-impl SseDecode for i32 {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        deserializer.cursor.read_i32::<NativeEndian>().unwrap()
-    }
-}
-
-impl SseDecode for i64 {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        deserializer.cursor.read_i64::<NativeEndian>().unwrap()
-    }
-}
-
-impl SseDecode for crate::api::sync::LibrarySyncCountsDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_dir = <i32>::sse_decode(deserializer);
-        let mut var_zip = <i32>::sse_decode(deserializer);
-        let mut var_cbz = <i32>::sse_decode(deserializer);
-        let mut var_epub = <i32>::sse_decode(deserializer);
-        return crate::api::sync::LibrarySyncCountsDto {
-            dir: var_dir,
-            zip: var_zip,
-            cbz: var_cbz,
-            epub: var_epub,
-        };
-    }
-}
-
-impl SseDecode for Vec<String> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
+                impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut inner = <String>::sse_decode(deserializer);
+        return flutter_rust_bridge::for_generated::anyhow::anyhow!("{}", inner);}
+                }
+                
+                impl SseDecode for SyncHandleDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut inner = <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>>::sse_decode(deserializer);
+        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);}
+                }
+                
+                impl SseDecode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut inner = <usize>::sse_decode(deserializer);
+        return decode_rust_opaque_moi(inner);}
+                }
+                
+                impl SseDecode for StreamSink<i32,flutter_rust_bridge::for_generated::SseCodec> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut inner = <String>::sse_decode(deserializer);
+        return StreamSink::deserialize(inner);}
+                }
+                
+                impl SseDecode for StreamSink<crate::api::sync::SyncLibraryProgressDto,flutter_rust_bridge::for_generated::SseCodec> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut inner = <String>::sse_decode(deserializer);
+        return StreamSink::deserialize(inner);}
+                }
+                
+                impl SseDecode for String {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut inner = <Vec<u8>>::sse_decode(deserializer);
+        return String::from_utf8(inner).unwrap();}
+                }
+                
+                impl SseDecode for bool {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {deserializer.cursor.read_u8().unwrap() != 0}
+                }
+                
+                impl SseDecode for crate::api::comic::ComicDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_comicId = <String>::sse_decode(deserializer);
+let mut var_path = <String>::sse_decode(deserializer);
+let mut var_resourceType = <String>::sse_decode(deserializer);
+let mut var_title = <String>::sse_decode(deserializer);
+let mut var_contentRating = <String>::sse_decode(deserializer);
+let mut var_pageCount = <Option<i32>>::sse_decode(deserializer);
+let mut var_authors = <Vec<String>>::sse_decode(deserializer);
+let mut var_tags = <Vec<String>>::sse_decode(deserializer);
+return crate::api::comic::ComicDto{comic_id: var_comicId, path: var_path, resource_type: var_resourceType, title: var_title, content_rating: var_contentRating, page_count: var_pageCount, authors: var_authors, tags: var_tags};}
+                }
+                
+                impl SseDecode for crate::api::comic::ComicFilterDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_showR18 = <bool>::sse_decode(deserializer);
+let mut var_query = <Option<String>>::sse_decode(deserializer);
+let mut var_resourceTypes = <Vec<String>>::sse_decode(deserializer);
+let mut var_contentRatings = <Vec<String>>::sse_decode(deserializer);
+let mut var_tagsAll = <Vec<String>>::sse_decode(deserializer);
+let mut var_tagsAny = <Vec<String>>::sse_decode(deserializer);
+let mut var_tagsExclude = <Vec<String>>::sse_decode(deserializer);
+let mut var_excludeComicsInAnySeries = <bool>::sse_decode(deserializer);
+return crate::api::comic::ComicFilterDto{show_r18: var_showR18, query: var_query, resource_types: var_resourceTypes, content_ratings: var_contentRatings, tags_all: var_tagsAll, tags_any: var_tagsAny, tags_exclude: var_tagsExclude, exclude_comics_in_any_series: var_excludeComicsInAnySeries};}
+                }
+                
+                impl SseDecode for crate::api::comic::ComicSortOptionDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_descending = <bool>::sse_decode(deserializer);
+return crate::api::comic::ComicSortOptionDto{descending: var_descending};}
+                }
+                
+                impl SseDecode for crate::api::init::HentaiErrorDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_code = <String>::sse_decode(deserializer);
+let mut var_message = <String>::sse_decode(deserializer);
+let mut var_context = <Option<String>>::sse_decode(deserializer);
+return crate::api::init::HentaiErrorDto{code: var_code, message: var_message, context: var_context};}
+                }
+                
+                impl SseDecode for i32 {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {deserializer.cursor.read_i32::<NativeEndian>().unwrap()}
+                }
+                
+                impl SseDecode for i64 {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {deserializer.cursor.read_i64::<NativeEndian>().unwrap()}
+                }
+                
+                impl SseDecode for crate::api::sync::LibrarySyncCountsDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_dir = <i32>::sse_decode(deserializer);
+let mut var_zip = <i32>::sse_decode(deserializer);
+let mut var_cbz = <i32>::sse_decode(deserializer);
+let mut var_epub = <i32>::sse_decode(deserializer);
+let mut var_cbr = <i32>::sse_decode(deserializer);
+let mut var_rar = <i32>::sse_decode(deserializer);
+let mut var_cb7 = <i32>::sse_decode(deserializer);
+let mut var_sevenz = <i32>::sse_decode(deserializer);
+let mut var_pdf = <i32>::sse_decode(deserializer);
+return crate::api::sync::LibrarySyncCountsDto{dir: var_dir, zip: var_zip, cbz: var_cbz, epub: var_epub, cbr: var_cbr, rar: var_rar, cb7: var_cb7, sevenz: var_sevenz, pdf: var_pdf};}
+                }
+                
+                impl SseDecode for Vec<String> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = Vec::with_capacity(len_ as usize);
-        for idx_ in 0..len_ {
-            ans_.push(<String>::sse_decode(deserializer));
-        }
-        return ans_;
-    }
-}
-
-impl SseDecode for Vec<crate::api::comic::ComicDto> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
+        for idx_ in 0..len_ { ans_.push(<String>::sse_decode(deserializer)); }
+        return ans_;}
+                }
+                
+                impl SseDecode for Vec<crate::api::comic::ComicDto> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = Vec::with_capacity(len_ as usize);
-        for idx_ in 0..len_ {
-            ans_.push(<crate::api::comic::ComicDto>::sse_decode(deserializer));
-        }
-        return ans_;
-    }
-}
-
-impl SseDecode for Vec<u8> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
+        for idx_ in 0..len_ { ans_.push(<crate::api::comic::ComicDto>::sse_decode(deserializer)); }
+        return ans_;}
+                }
+                
+                impl SseDecode for Vec<u8> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = Vec::with_capacity(len_ as usize);
-        for idx_ in 0..len_ {
-            ans_.push(<u8>::sse_decode(deserializer));
-        }
-        return ans_;
-    }
-}
-
-impl SseDecode for Option<String> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        if (<bool>::sse_decode(deserializer)) {
-            return Some(<String>::sse_decode(deserializer));
-        } else {
-            return None;
-        }
-    }
-}
-
-impl SseDecode for Option<crate::api::comic::ComicDto> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        if (<bool>::sse_decode(deserializer)) {
-            return Some(<crate::api::comic::ComicDto>::sse_decode(deserializer));
-        } else {
-            return None;
-        }
-    }
-}
-
-impl SseDecode for Option<i32> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        if (<bool>::sse_decode(deserializer)) {
-            return Some(<i32>::sse_decode(deserializer));
-        } else {
-            return None;
-        }
-    }
-}
-
-impl SseDecode for crate::api::comic::PageRequestDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_page = <i32>::sse_decode(deserializer);
-        let mut var_pageSize = <i32>::sse_decode(deserializer);
-        return crate::api::comic::PageRequestDto {
-            page: var_page,
-            page_size: var_pageSize,
-        };
-    }
-}
-
-impl SseDecode for crate::api::comic::PagedComicResultDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_items = <Vec<crate::api::comic::ComicDto>>::sse_decode(deserializer);
-        let mut var_totalCount = <i64>::sse_decode(deserializer);
-        let mut var_page = <i32>::sse_decode(deserializer);
-        let mut var_pageSize = <i32>::sse_decode(deserializer);
-        return crate::api::comic::PagedComicResultDto {
-            items: var_items,
-            total_count: var_totalCount,
-            page: var_page,
-            page_size: var_pageSize,
-        };
-    }
-}
-
-impl SseDecode for crate::api::reader::ReaderPageListDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_resourceType = <String>::sse_decode(deserializer);
-        let mut var_pageCount = <i32>::sse_decode(deserializer);
-        let mut var_dirPagePaths = <Vec<String>>::sse_decode(deserializer);
-        return crate::api::reader::ReaderPageListDto {
-            resource_type: var_resourceType,
-            page_count: var_pageCount,
-            dir_page_paths: var_dirPagePaths,
-        };
-    }
-}
-
-impl SseDecode for crate::api::sync::SyncLibraryPhaseDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <i32>::sse_decode(deserializer);
+        for idx_ in 0..len_ { ans_.push(<u8>::sse_decode(deserializer)); }
+        return ans_;}
+                }
+                
+                impl SseDecode for Option<String> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {if (<bool>::sse_decode(deserializer)) {
+                return Some(<String>::sse_decode(deserializer));
+            } else {
+                return None;
+            }}
+                }
+                
+                impl SseDecode for Option<crate::api::comic::ComicDto> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {if (<bool>::sse_decode(deserializer)) {
+                return Some(<crate::api::comic::ComicDto>::sse_decode(deserializer));
+            } else {
+                return None;
+            }}
+                }
+                
+                impl SseDecode for Option<i32> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {if (<bool>::sse_decode(deserializer)) {
+                return Some(<i32>::sse_decode(deserializer));
+            } else {
+                return None;
+            }}
+                }
+                
+                impl SseDecode for crate::api::comic::PageRequestDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_page = <i32>::sse_decode(deserializer);
+let mut var_pageSize = <i32>::sse_decode(deserializer);
+return crate::api::comic::PageRequestDto{page: var_page, page_size: var_pageSize};}
+                }
+                
+                impl SseDecode for crate::api::comic::PagedComicResultDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_items = <Vec<crate::api::comic::ComicDto>>::sse_decode(deserializer);
+let mut var_totalCount = <i64>::sse_decode(deserializer);
+let mut var_page = <i32>::sse_decode(deserializer);
+let mut var_pageSize = <i32>::sse_decode(deserializer);
+return crate::api::comic::PagedComicResultDto{items: var_items, total_count: var_totalCount, page: var_page, page_size: var_pageSize};}
+                }
+                
+                impl SseDecode for crate::api::reader::ReaderPageListDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_resourceType = <String>::sse_decode(deserializer);
+let mut var_pageCount = <i32>::sse_decode(deserializer);
+let mut var_dirPagePaths = <Vec<String>>::sse_decode(deserializer);
+return crate::api::reader::ReaderPageListDto{resource_type: var_resourceType, page_count: var_pageCount, dir_page_paths: var_dirPagePaths};}
+                }
+                
+                impl SseDecode for crate::api::sync::SyncLibraryPhaseDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut inner = <i32>::sse_decode(deserializer);
         return match inner {
             0 => crate::api::sync::SyncLibraryPhaseDto::ClearingLibrary,
-            1 => crate::api::sync::SyncLibraryPhaseDto::Scanning,
-            2 => crate::api::sync::SyncLibraryPhaseDto::WritingDb,
-            3 => crate::api::sync::SyncLibraryPhaseDto::GeneratingThumbnails,
-            4 => crate::api::sync::SyncLibraryPhaseDto::Done,
+1 => crate::api::sync::SyncLibraryPhaseDto::Scanning,
+2 => crate::api::sync::SyncLibraryPhaseDto::WritingDb,
+3 => crate::api::sync::SyncLibraryPhaseDto::GeneratingThumbnails,
+4 => crate::api::sync::SyncLibraryPhaseDto::Done,
             _ => unreachable!("Invalid variant for SyncLibraryPhaseDto: {}", inner),
-        };
-    }
-}
-
-impl SseDecode for crate::api::sync::SyncLibraryProgressDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_phase = <crate::api::sync::SyncLibraryPhaseDto>::sse_decode(deserializer);
-        let mut var_route = <crate::api::sync::SyncLibraryRouteDto>::sse_decode(deserializer);
-        let mut var_currentPath = <Option<String>>::sse_decode(deserializer);
-        let mut var_acceptedTotal = <i32>::sse_decode(deserializer);
-        let mut var_counts = <crate::api::sync::LibrarySyncCountsDto>::sse_decode(deserializer);
-        let mut var_removedCount = <Option<i32>>::sse_decode(deserializer);
-        let mut var_addedCount = <Option<i32>>::sse_decode(deserializer);
-        let mut var_keptCount = <Option<i32>>::sse_decode(deserializer);
-        let mut var_thumbnailTotal = <Option<i32>>::sse_decode(deserializer);
-        let mut var_thumbnailDone = <Option<i32>>::sse_decode(deserializer);
-        let mut var_thumbnailFailedCount = <Option<i32>>::sse_decode(deserializer);
-        return crate::api::sync::SyncLibraryProgressDto {
-            phase: var_phase,
-            route: var_route,
-            current_path: var_currentPath,
-            accepted_total: var_acceptedTotal,
-            counts: var_counts,
-            removed_count: var_removedCount,
-            added_count: var_addedCount,
-            kept_count: var_keptCount,
-            thumbnail_total: var_thumbnailTotal,
-            thumbnail_done: var_thumbnailDone,
-            thumbnail_failed_count: var_thumbnailFailedCount,
-        };
-    }
-}
-
-impl SseDecode for crate::api::sync::SyncLibraryRouteDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <i32>::sse_decode(deserializer);
+        };}
+                }
+                
+                impl SseDecode for crate::api::sync::SyncLibraryProgressDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_phase = <crate::api::sync::SyncLibraryPhaseDto>::sse_decode(deserializer);
+let mut var_route = <crate::api::sync::SyncLibraryRouteDto>::sse_decode(deserializer);
+let mut var_currentPath = <Option<String>>::sse_decode(deserializer);
+let mut var_acceptedTotal = <i32>::sse_decode(deserializer);
+let mut var_counts = <crate::api::sync::LibrarySyncCountsDto>::sse_decode(deserializer);
+let mut var_removedCount = <Option<i32>>::sse_decode(deserializer);
+let mut var_addedCount = <Option<i32>>::sse_decode(deserializer);
+let mut var_keptCount = <Option<i32>>::sse_decode(deserializer);
+let mut var_thumbnailTotal = <Option<i32>>::sse_decode(deserializer);
+let mut var_thumbnailDone = <Option<i32>>::sse_decode(deserializer);
+let mut var_thumbnailFailedCount = <Option<i32>>::sse_decode(deserializer);
+return crate::api::sync::SyncLibraryProgressDto{phase: var_phase, route: var_route, current_path: var_currentPath, accepted_total: var_acceptedTotal, counts: var_counts, removed_count: var_removedCount, added_count: var_addedCount, kept_count: var_keptCount, thumbnail_total: var_thumbnailTotal, thumbnail_done: var_thumbnailDone, thumbnail_failed_count: var_thumbnailFailedCount};}
+                }
+                
+                impl SseDecode for crate::api::sync::SyncLibraryRouteDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut inner = <i32>::sse_decode(deserializer);
         return match inner {
             0 => crate::api::sync::SyncLibraryRouteDto::NoRootsNoop,
-            1 => crate::api::sync::SyncLibraryRouteDto::NoRootsCleared,
-            2 => crate::api::sync::SyncLibraryRouteDto::WithRoots,
+1 => crate::api::sync::SyncLibraryRouteDto::NoRootsCleared,
+2 => crate::api::sync::SyncLibraryRouteDto::WithRoots,
             _ => unreachable!("Invalid variant for SyncLibraryRouteDto: {}", inner),
-        };
-    }
-}
-
-impl SseDecode for u8 {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        deserializer.cursor.read_u8().unwrap()
-    }
-}
-
-impl SseDecode for () {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {}
-}
-
-impl SseDecode for usize {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        deserializer.cursor.read_u64::<NativeEndian>().unwrap() as _
-    }
-}
-
-fn pde_ffi_dispatcher_primary_impl(
-    func_id: i32,
-    port: flutter_rust_bridge::for_generated::MessagePort,
-    ptr: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len: i32,
-    data_len: i32,
-) {
-    // Codec=Pde (Serialization + dispatch), see doc to use other codecs
-    match func_id {
-        9 => wire__crate__api__comic__init_app_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__crate__api__sync__sync_library_frb_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire__crate__api__comic__watch_comic_changes_impl(port, ptr, rust_vec_len, data_len),
-        _ => unreachable!(),
-    }
-}
-
-fn pde_ffi_dispatcher_sync_impl(
-    func_id: i32,
-    ptr: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len: i32,
-    data_len: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    // Codec=Pde (Serialization + dispatch), see doc to use other codecs
-    match func_id {
-        1 => wire__crate__api__sync__cancel_sync_frb_impl(ptr, rust_vec_len, data_len),
-        2 => wire__crate__api__reader__clear_reader_sessions_frb_impl(ptr, rust_vec_len, data_len),
-        3 => wire__crate__api__reader__close_reader_frb_impl(ptr, rust_vec_len, data_len),
-        4 => wire__crate__api__comic__comic_id_from_path_frb_impl(ptr, rust_vec_len, data_len),
-        5 => wire__crate__api__comic__count_all_comics_frb_impl(ptr, rust_vec_len, data_len),
-        6 => wire__crate__api__sync__create_sync_handle_frb_impl(ptr, rust_vec_len, data_len),
-        7 => wire__crate__api__comic__fetch_comics_page_frb_impl(ptr, rust_vec_len, data_len),
-        8 => wire__crate__api__comic__find_comic_by_id_frb_impl(ptr, rust_vec_len, data_len),
-        10 => wire__crate__api__comic__init_db_frb_impl(ptr, rust_vec_len, data_len),
-        11 => wire__crate__api__reader__load_page_bytes_frb_impl(ptr, rust_vec_len, data_len),
-        12 => wire__crate__api__reader__load_page_list_frb_impl(ptr, rust_vec_len, data_len),
-        13 => wire__crate__api__reader__open_reader_frb_impl(ptr, rust_vec_len, data_len),
-        14 => wire__crate__api__comic__search_by_keyword_frb_impl(ptr, rust_vec_len, data_len),
-        _ => unreachable!(),
-    }
-}
+        };}
+                }
+                
+                impl SseDecode for u8 {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {deserializer.cursor.read_u8().unwrap()}
+                }
+                
+                impl SseDecode for () {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {}
+                }
+                
+                impl SseDecode for usize {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {deserializer.cursor.read_u64::<NativeEndian>().unwrap() as _}
+                }
+                
+                fn pde_ffi_dispatcher_primary_impl(
+                    func_id: i32,port: flutter_rust_bridge::for_generated::MessagePort,
+                    ptr: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+                    rust_vec_len: i32,
+                    data_len: i32,
+                )  {
+                    // Codec=Pde (Serialization + dispatch), see doc to use other codecs
+                    match func_id {
+                        9 => wire__crate__api__comic__init_app_impl(port, ptr, rust_vec_len, data_len),
+15 => wire__crate__api__sync__sync_library_frb_impl(port, ptr, rust_vec_len, data_len),
+16 => wire__crate__api__comic__watch_comic_changes_impl(port, ptr, rust_vec_len, data_len),
+                        _ => unreachable!(),
+                    }
+                }
+                
+                fn pde_ffi_dispatcher_sync_impl(
+                    func_id: i32,
+                    ptr: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+                    rust_vec_len: i32,
+                    data_len: i32,
+                ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+                    // Codec=Pde (Serialization + dispatch), see doc to use other codecs
+                    match func_id {
+                        1 => wire__crate__api__sync__cancel_sync_frb_impl(ptr, rust_vec_len, data_len),
+2 => wire__crate__api__reader__clear_reader_sessions_frb_impl(ptr, rust_vec_len, data_len),
+3 => wire__crate__api__reader__close_reader_frb_impl(ptr, rust_vec_len, data_len),
+4 => wire__crate__api__comic__comic_id_from_path_frb_impl(ptr, rust_vec_len, data_len),
+5 => wire__crate__api__comic__count_all_comics_frb_impl(ptr, rust_vec_len, data_len),
+6 => wire__crate__api__sync__create_sync_handle_frb_impl(ptr, rust_vec_len, data_len),
+7 => wire__crate__api__comic__fetch_comics_page_frb_impl(ptr, rust_vec_len, data_len),
+8 => wire__crate__api__comic__find_comic_by_id_frb_impl(ptr, rust_vec_len, data_len),
+10 => wire__crate__api__comic__init_db_frb_impl(ptr, rust_vec_len, data_len),
+11 => wire__crate__api__reader__load_page_bytes_frb_impl(ptr, rust_vec_len, data_len),
+12 => wire__crate__api__reader__load_page_list_frb_impl(ptr, rust_vec_len, data_len),
+13 => wire__crate__api__reader__open_reader_frb_impl(ptr, rust_vec_len, data_len),
+14 => wire__crate__api__comic__search_by_keyword_frb_impl(ptr, rust_vec_len, data_len),
+                        _ => unreachable!(),
+                    }
+                }
+                
 
 // Section: rust2dart
 
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<SyncHandleDto> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
-            .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<SyncHandleDto> {}
 
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<SyncHandleDto>> for SyncHandleDto {
-    fn into_into_dart(self) -> FrbWrapper<SyncHandleDto> {
-        self.into()
-    }
-}
-
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.comic_id.into_into_dart().into_dart(),
-            self.path.into_into_dart().into_dart(),
-            self.resource_type.into_into_dart().into_dart(),
-            self.title.into_into_dart().into_dart(),
-            self.content_rating.into_into_dart().into_dart(),
-            self.page_count.into_into_dart().into_dart(),
-            self.authors.into_into_dart().into_dart(),
-            self.tags.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::comic::ComicDto {}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::ComicDto>
-    for crate::api::comic::ComicDto
-{
-    fn into_into_dart(self) -> crate::api::comic::ComicDto {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicFilterDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.show_r18.into_into_dart().into_dart(),
-            self.query.into_into_dart().into_dart(),
-            self.resource_types.into_into_dart().into_dart(),
-            self.content_ratings.into_into_dart().into_dart(),
-            self.tags_all.into_into_dart().into_dart(),
-            self.tags_any.into_into_dart().into_dart(),
-            self.tags_exclude.into_into_dart().into_dart(),
-            self.exclude_comics_in_any_series
-                .into_into_dart()
-                .into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::comic::ComicFilterDto
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::ComicFilterDto>
-    for crate::api::comic::ComicFilterDto
-{
-    fn into_into_dart(self) -> crate::api::comic::ComicFilterDto {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicSortOptionDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [self.descending.into_into_dart().into_dart()].into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::comic::ComicSortOptionDto
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::ComicSortOptionDto>
-    for crate::api::comic::ComicSortOptionDto
-{
-    fn into_into_dart(self) -> crate::api::comic::ComicSortOptionDto {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::init::HentaiErrorDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.code.into_into_dart().into_dart(),
-            self.message.into_into_dart().into_dart(),
-            self.context.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::init::HentaiErrorDto
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::init::HentaiErrorDto>
-    for crate::api::init::HentaiErrorDto
-{
-    fn into_into_dart(self) -> crate::api::init::HentaiErrorDto {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::sync::LibrarySyncCountsDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.dir.into_into_dart().into_dart(),
-            self.zip.into_into_dart().into_dart(),
-            self.cbz.into_into_dart().into_dart(),
-            self.epub.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::sync::LibrarySyncCountsDto
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::LibrarySyncCountsDto>
-    for crate::api::sync::LibrarySyncCountsDto
-{
-    fn into_into_dart(self) -> crate::api::sync::LibrarySyncCountsDto {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::comic::PageRequestDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.page.into_into_dart().into_dart(),
-            self.page_size.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::comic::PageRequestDto
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::PageRequestDto>
-    for crate::api::comic::PageRequestDto
-{
-    fn into_into_dart(self) -> crate::api::comic::PageRequestDto {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::comic::PagedComicResultDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.items.into_into_dart().into_dart(),
-            self.total_count.into_into_dart().into_dart(),
-            self.page.into_into_dart().into_dart(),
-            self.page_size.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::comic::PagedComicResultDto
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::PagedComicResultDto>
-    for crate::api::comic::PagedComicResultDto
-{
-    fn into_into_dart(self) -> crate::api::comic::PagedComicResultDto {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::reader::ReaderPageListDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.resource_type.into_into_dart().into_dart(),
-            self.page_count.into_into_dart().into_dart(),
-            self.dir_page_paths.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::reader::ReaderPageListDto
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::reader::ReaderPageListDto>
-    for crate::api::reader::ReaderPageListDto
-{
-    fn into_into_dart(self) -> crate::api::reader::ReaderPageListDto {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::sync::SyncLibraryPhaseDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        match self {
-            Self::ClearingLibrary => 0.into_dart(),
-            Self::Scanning => 1.into_dart(),
-            Self::WritingDb => 2.into_dart(),
-            Self::GeneratingThumbnails => 3.into_dart(),
-            Self::Done => 4.into_dart(),
-            _ => unreachable!(),
-        }
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::sync::SyncLibraryPhaseDto
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::SyncLibraryPhaseDto>
-    for crate::api::sync::SyncLibraryPhaseDto
-{
-    fn into_into_dart(self) -> crate::api::sync::SyncLibraryPhaseDto {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::sync::SyncLibraryProgressDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        [
-            self.phase.into_into_dart().into_dart(),
-            self.route.into_into_dart().into_dart(),
-            self.current_path.into_into_dart().into_dart(),
-            self.accepted_total.into_into_dart().into_dart(),
-            self.counts.into_into_dart().into_dart(),
-            self.removed_count.into_into_dart().into_dart(),
-            self.added_count.into_into_dart().into_dart(),
-            self.kept_count.into_into_dart().into_dart(),
-            self.thumbnail_total.into_into_dart().into_dart(),
-            self.thumbnail_done.into_into_dart().into_dart(),
-            self.thumbnail_failed_count.into_into_dart().into_dart(),
-        ]
-        .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::sync::SyncLibraryProgressDto
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::SyncLibraryProgressDto>
-    for crate::api::sync::SyncLibraryProgressDto
-{
-    fn into_into_dart(self) -> crate::api::sync::SyncLibraryProgressDto {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::sync::SyncLibraryRouteDto {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        match self {
-            Self::NoRootsNoop => 0.into_dart(),
-            Self::NoRootsCleared => 1.into_dart(),
-            Self::WithRoots => 2.into_dart(),
-            _ => unreachable!(),
-        }
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::sync::SyncLibraryRouteDto
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::SyncLibraryRouteDto>
-    for crate::api::sync::SyncLibraryRouteDto
-{
-    fn into_into_dart(self) -> crate::api::sync::SyncLibraryRouteDto {
-        self
-    }
-}
-
-impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(format!("{:?}", self), serializer);
-    }
-}
-
-impl SseEncode for SyncHandleDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
-    }
-}
-
-impl SseEncode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
-    }
-}
-
-impl SseEncode for StreamSink<i32, flutter_rust_bridge::for_generated::SseCodec> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        unimplemented!("")
-    }
-}
-
-impl SseEncode
-    for StreamSink<
-        crate::api::sync::SyncLibraryProgressDto,
-        flutter_rust_bridge::for_generated::SseCodec,
-    >
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        unimplemented!("")
-    }
-}
-
-impl SseEncode for String {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<u8>>::sse_encode(self.into_bytes(), serializer);
-    }
-}
-
-impl SseEncode for bool {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        serializer.cursor.write_u8(self as _).unwrap();
-    }
-}
-
-impl SseEncode for crate::api::comic::ComicDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(self.comic_id, serializer);
-        <String>::sse_encode(self.path, serializer);
-        <String>::sse_encode(self.resource_type, serializer);
-        <String>::sse_encode(self.title, serializer);
-        <String>::sse_encode(self.content_rating, serializer);
-        <Option<i32>>::sse_encode(self.page_count, serializer);
-        <Vec<String>>::sse_encode(self.authors, serializer);
-        <Vec<String>>::sse_encode(self.tags, serializer);
-    }
-}
-
-impl SseEncode for crate::api::comic::ComicFilterDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.show_r18, serializer);
-        <Option<String>>::sse_encode(self.query, serializer);
-        <Vec<String>>::sse_encode(self.resource_types, serializer);
-        <Vec<String>>::sse_encode(self.content_ratings, serializer);
-        <Vec<String>>::sse_encode(self.tags_all, serializer);
-        <Vec<String>>::sse_encode(self.tags_any, serializer);
-        <Vec<String>>::sse_encode(self.tags_exclude, serializer);
-        <bool>::sse_encode(self.exclude_comics_in_any_series, serializer);
-    }
-}
-
-impl SseEncode for crate::api::comic::ComicSortOptionDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.descending, serializer);
-    }
-}
-
-impl SseEncode for crate::api::init::HentaiErrorDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(self.code, serializer);
-        <String>::sse_encode(self.message, serializer);
-        <Option<String>>::sse_encode(self.context, serializer);
-    }
-}
-
-impl SseEncode for i32 {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        serializer.cursor.write_i32::<NativeEndian>(self).unwrap();
-    }
-}
-
-impl SseEncode for i64 {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        serializer.cursor.write_i64::<NativeEndian>(self).unwrap();
-    }
-}
-
-impl SseEncode for crate::api::sync::LibrarySyncCountsDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.dir, serializer);
-        <i32>::sse_encode(self.zip, serializer);
-        <i32>::sse_encode(self.cbz, serializer);
-        <i32>::sse_encode(self.epub, serializer);
-    }
-}
-
-impl SseEncode for Vec<String> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <String>::sse_encode(item, serializer);
-        }
-    }
-}
-
-impl SseEncode for Vec<crate::api::comic::ComicDto> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <crate::api::comic::ComicDto>::sse_encode(item, serializer);
-        }
-    }
-}
-
-impl SseEncode for Vec<u8> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <u8>::sse_encode(item, serializer);
-        }
-    }
-}
-
-impl SseEncode for Option<String> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.is_some(), serializer);
-        if let Some(value) = self {
-            <String>::sse_encode(value, serializer);
-        }
-    }
-}
-
-impl SseEncode for Option<crate::api::comic::ComicDto> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.is_some(), serializer);
-        if let Some(value) = self {
-            <crate::api::comic::ComicDto>::sse_encode(value, serializer);
-        }
-    }
-}
-
-impl SseEncode for Option<i32> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.is_some(), serializer);
-        if let Some(value) = self {
-            <i32>::sse_encode(value, serializer);
-        }
-    }
-}
-
-impl SseEncode for crate::api::comic::PageRequestDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.page, serializer);
-        <i32>::sse_encode(self.page_size, serializer);
-    }
-}
-
-impl SseEncode for crate::api::comic::PagedComicResultDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<crate::api::comic::ComicDto>>::sse_encode(self.items, serializer);
-        <i64>::sse_encode(self.total_count, serializer);
-        <i32>::sse_encode(self.page, serializer);
-        <i32>::sse_encode(self.page_size, serializer);
-    }
-}
-
-impl SseEncode for crate::api::reader::ReaderPageListDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(self.resource_type, serializer);
-        <i32>::sse_encode(self.page_count, serializer);
-        <Vec<String>>::sse_encode(self.dir_page_paths, serializer);
-    }
-}
-
-impl SseEncode for crate::api::sync::SyncLibraryPhaseDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(
-            match self {
-                crate::api::sync::SyncLibraryPhaseDto::ClearingLibrary => 0,
-                crate::api::sync::SyncLibraryPhaseDto::Scanning => 1,
-                crate::api::sync::SyncLibraryPhaseDto::WritingDb => 2,
-                crate::api::sync::SyncLibraryPhaseDto::GeneratingThumbnails => 3,
-                crate::api::sync::SyncLibraryPhaseDto::Done => 4,
-                _ => {
-                    unimplemented!("");
+                // Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for FrbWrapper<SyncHandleDto> {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0).into_dart()
                 }
-            },
-            serializer,
-        );
-    }
-}
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<SyncHandleDto> {}
 
-impl SseEncode for crate::api::sync::SyncLibraryProgressDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <crate::api::sync::SyncLibraryPhaseDto>::sse_encode(self.phase, serializer);
-        <crate::api::sync::SyncLibraryRouteDto>::sse_encode(self.route, serializer);
-        <Option<String>>::sse_encode(self.current_path, serializer);
-        <i32>::sse_encode(self.accepted_total, serializer);
-        <crate::api::sync::LibrarySyncCountsDto>::sse_encode(self.counts, serializer);
-        <Option<i32>>::sse_encode(self.removed_count, serializer);
-        <Option<i32>>::sse_encode(self.added_count, serializer);
-        <Option<i32>>::sse_encode(self.kept_count, serializer);
-        <Option<i32>>::sse_encode(self.thumbnail_total, serializer);
-        <Option<i32>>::sse_encode(self.thumbnail_done, serializer);
-        <Option<i32>>::sse_encode(self.thumbnail_failed_count, serializer);
-    }
-}
+                impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<SyncHandleDto>> for SyncHandleDto {
+            fn into_into_dart(self) -> FrbWrapper<SyncHandleDto> {
+                self.into()
+            }
+        }
 
-impl SseEncode for crate::api::sync::SyncLibraryRouteDto {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(
-            match self {
-                crate::api::sync::SyncLibraryRouteDto::NoRootsNoop => 0,
-                crate::api::sync::SyncLibraryRouteDto::NoRootsCleared => 1,
-                crate::api::sync::SyncLibraryRouteDto::WithRoots => 2,
-                _ => {
-                    unimplemented!("");
+                // Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicDto {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    [
+                    self.comic_id.into_into_dart().into_dart(),
+self.path.into_into_dart().into_dart(),
+self.resource_type.into_into_dart().into_dart(),
+self.title.into_into_dart().into_dart(),
+self.content_rating.into_into_dart().into_dart(),
+self.page_count.into_into_dart().into_dart(),
+self.authors.into_into_dart().into_dart(),
+self.tags.into_into_dart().into_dart()
+                ].into_dart()
                 }
-            },
-            serializer,
-        );
-    }
-}
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::comic::ComicDto {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::ComicDto> for crate::api::comic::ComicDto {
+            fn into_into_dart(self) -> crate::api::comic::ComicDto {
+                self
+            }
+        }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicFilterDto {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    [
+                    self.show_r18.into_into_dart().into_dart(),
+self.query.into_into_dart().into_dart(),
+self.resource_types.into_into_dart().into_dart(),
+self.content_ratings.into_into_dart().into_dart(),
+self.tags_all.into_into_dart().into_dart(),
+self.tags_any.into_into_dart().into_dart(),
+self.tags_exclude.into_into_dart().into_dart(),
+self.exclude_comics_in_any_series.into_into_dart().into_dart()
+                ].into_dart()
+                }
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::comic::ComicFilterDto {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::ComicFilterDto> for crate::api::comic::ComicFilterDto {
+            fn into_into_dart(self) -> crate::api::comic::ComicFilterDto {
+                self
+            }
+        }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicSortOptionDto {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    [
+                    self.descending.into_into_dart().into_dart()
+                ].into_dart()
+                }
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::comic::ComicSortOptionDto {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::ComicSortOptionDto> for crate::api::comic::ComicSortOptionDto {
+            fn into_into_dart(self) -> crate::api::comic::ComicSortOptionDto {
+                self
+            }
+        }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::api::init::HentaiErrorDto {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    [
+                    self.code.into_into_dart().into_dart(),
+self.message.into_into_dart().into_dart(),
+self.context.into_into_dart().into_dart()
+                ].into_dart()
+                }
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::init::HentaiErrorDto {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::init::HentaiErrorDto> for crate::api::init::HentaiErrorDto {
+            fn into_into_dart(self) -> crate::api::init::HentaiErrorDto {
+                self
+            }
+        }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::api::sync::LibrarySyncCountsDto {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    [
+                    self.dir.into_into_dart().into_dart(),
+self.zip.into_into_dart().into_dart(),
+self.cbz.into_into_dart().into_dart(),
+self.epub.into_into_dart().into_dart(),
+self.cbr.into_into_dart().into_dart(),
+self.rar.into_into_dart().into_dart(),
+self.cb7.into_into_dart().into_dart(),
+self.sevenz.into_into_dart().into_dart(),
+self.pdf.into_into_dart().into_dart()
+                ].into_dart()
+                }
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::sync::LibrarySyncCountsDto {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::LibrarySyncCountsDto> for crate::api::sync::LibrarySyncCountsDto {
+            fn into_into_dart(self) -> crate::api::sync::LibrarySyncCountsDto {
+                self
+            }
+        }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::api::comic::PageRequestDto {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    [
+                    self.page.into_into_dart().into_dart(),
+self.page_size.into_into_dart().into_dart()
+                ].into_dart()
+                }
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::comic::PageRequestDto {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::PageRequestDto> for crate::api::comic::PageRequestDto {
+            fn into_into_dart(self) -> crate::api::comic::PageRequestDto {
+                self
+            }
+        }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::api::comic::PagedComicResultDto {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    [
+                    self.items.into_into_dart().into_dart(),
+self.total_count.into_into_dart().into_dart(),
+self.page.into_into_dart().into_dart(),
+self.page_size.into_into_dart().into_dart()
+                ].into_dart()
+                }
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::comic::PagedComicResultDto {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::PagedComicResultDto> for crate::api::comic::PagedComicResultDto {
+            fn into_into_dart(self) -> crate::api::comic::PagedComicResultDto {
+                self
+            }
+        }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::api::reader::ReaderPageListDto {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    [
+                    self.resource_type.into_into_dart().into_dart(),
+self.page_count.into_into_dart().into_dart(),
+self.dir_page_paths.into_into_dart().into_dart()
+                ].into_dart()
+                }
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::reader::ReaderPageListDto {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::reader::ReaderPageListDto> for crate::api::reader::ReaderPageListDto {
+            fn into_into_dart(self) -> crate::api::reader::ReaderPageListDto {
+                self
+            }
+        }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::api::sync::SyncLibraryPhaseDto {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    match self {
+                    Self::ClearingLibrary => 0.into_dart(),
+Self::Scanning => 1.into_dart(),
+Self::WritingDb => 2.into_dart(),
+Self::GeneratingThumbnails => 3.into_dart(),
+Self::Done => 4.into_dart(),
+                    _ => unreachable!(),
+                }
+                }
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::sync::SyncLibraryPhaseDto {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::SyncLibraryPhaseDto> for crate::api::sync::SyncLibraryPhaseDto {
+            fn into_into_dart(self) -> crate::api::sync::SyncLibraryPhaseDto {
+                self
+            }
+        }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::api::sync::SyncLibraryProgressDto {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    [
+                    self.phase.into_into_dart().into_dart(),
+self.route.into_into_dart().into_dart(),
+self.current_path.into_into_dart().into_dart(),
+self.accepted_total.into_into_dart().into_dart(),
+self.counts.into_into_dart().into_dart(),
+self.removed_count.into_into_dart().into_dart(),
+self.added_count.into_into_dart().into_dart(),
+self.kept_count.into_into_dart().into_dart(),
+self.thumbnail_total.into_into_dart().into_dart(),
+self.thumbnail_done.into_into_dart().into_dart(),
+self.thumbnail_failed_count.into_into_dart().into_dart()
+                ].into_dart()
+                }
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::sync::SyncLibraryProgressDto {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::SyncLibraryProgressDto> for crate::api::sync::SyncLibraryProgressDto {
+            fn into_into_dart(self) -> crate::api::sync::SyncLibraryProgressDto {
+                self
+            }
+        }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::api::sync::SyncLibraryRouteDto {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    match self {
+                    Self::NoRootsNoop => 0.into_dart(),
+Self::NoRootsCleared => 1.into_dart(),
+Self::WithRoots => 2.into_dart(),
+                    _ => unreachable!(),
+                }
+                }
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::sync::SyncLibraryRouteDto {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::SyncLibraryRouteDto> for crate::api::sync::SyncLibraryRouteDto {
+            fn into_into_dart(self) -> crate::api::sync::SyncLibraryRouteDto {
+                self
+            }
+        }
 
-impl SseEncode for u8 {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        serializer.cursor.write_u8(self).unwrap();
-    }
-}
+                impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<String>::sse_encode(format!("{:?}", self), serializer);}
+                }
+                
+                impl SseEncode for SyncHandleDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);}
+                }
+                
+                impl SseEncode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {let (ptr, size) = self.sse_encode_raw();
+                <usize>::sse_encode(ptr, serializer);
+                <i32>::sse_encode(size, serializer);}
+                }
+                
+                impl SseEncode for StreamSink<i32,flutter_rust_bridge::for_generated::SseCodec> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {unimplemented!("")}
+                }
+                
+                impl SseEncode for StreamSink<crate::api::sync::SyncLibraryProgressDto,flutter_rust_bridge::for_generated::SseCodec> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {unimplemented!("")}
+                }
+                
+                impl SseEncode for String {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<Vec<u8>>::sse_encode(self.into_bytes(), serializer);}
+                }
+                
+                impl SseEncode for bool {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {serializer.cursor.write_u8(self as _).unwrap();}
+                }
+                
+                impl SseEncode for crate::api::comic::ComicDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<String>::sse_encode(self.comic_id, serializer);
+<String>::sse_encode(self.path, serializer);
+<String>::sse_encode(self.resource_type, serializer);
+<String>::sse_encode(self.title, serializer);
+<String>::sse_encode(self.content_rating, serializer);
+<Option<i32>>::sse_encode(self.page_count, serializer);
+<Vec<String>>::sse_encode(self.authors, serializer);
+<Vec<String>>::sse_encode(self.tags, serializer);}
+                }
+                
+                impl SseEncode for crate::api::comic::ComicFilterDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<bool>::sse_encode(self.show_r18, serializer);
+<Option<String>>::sse_encode(self.query, serializer);
+<Vec<String>>::sse_encode(self.resource_types, serializer);
+<Vec<String>>::sse_encode(self.content_ratings, serializer);
+<Vec<String>>::sse_encode(self.tags_all, serializer);
+<Vec<String>>::sse_encode(self.tags_any, serializer);
+<Vec<String>>::sse_encode(self.tags_exclude, serializer);
+<bool>::sse_encode(self.exclude_comics_in_any_series, serializer);}
+                }
+                
+                impl SseEncode for crate::api::comic::ComicSortOptionDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<bool>::sse_encode(self.descending, serializer);}
+                }
+                
+                impl SseEncode for crate::api::init::HentaiErrorDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<String>::sse_encode(self.code, serializer);
+<String>::sse_encode(self.message, serializer);
+<Option<String>>::sse_encode(self.context, serializer);}
+                }
+                
+                impl SseEncode for i32 {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {serializer.cursor.write_i32::<NativeEndian>(self).unwrap();}
+                }
+                
+                impl SseEncode for i64 {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {serializer.cursor.write_i64::<NativeEndian>(self).unwrap();}
+                }
+                
+                impl SseEncode for crate::api::sync::LibrarySyncCountsDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<i32>::sse_encode(self.dir, serializer);
+<i32>::sse_encode(self.zip, serializer);
+<i32>::sse_encode(self.cbz, serializer);
+<i32>::sse_encode(self.epub, serializer);
+<i32>::sse_encode(self.cbr, serializer);
+<i32>::sse_encode(self.rar, serializer);
+<i32>::sse_encode(self.cb7, serializer);
+<i32>::sse_encode(self.sevenz, serializer);
+<i32>::sse_encode(self.pdf, serializer);}
+                }
+                
+                impl SseEncode for Vec<String> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<i32>::sse_encode(self.len() as _, serializer);
+        for item in self { <String>::sse_encode(item, serializer); }}
+                }
+                
+                impl SseEncode for Vec<crate::api::comic::ComicDto> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<i32>::sse_encode(self.len() as _, serializer);
+        for item in self { <crate::api::comic::ComicDto>::sse_encode(item, serializer); }}
+                }
+                
+                impl SseEncode for Vec<u8> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<i32>::sse_encode(self.len() as _, serializer);
+        for item in self { <u8>::sse_encode(item, serializer); }}
+                }
+                
+                impl SseEncode for Option<String> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<bool>::sse_encode(self.is_some(), serializer);
+                if let Some(value) = self {
+                    <String>::sse_encode(value, serializer);
+                }}
+                }
+                
+                impl SseEncode for Option<crate::api::comic::ComicDto> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<bool>::sse_encode(self.is_some(), serializer);
+                if let Some(value) = self {
+                    <crate::api::comic::ComicDto>::sse_encode(value, serializer);
+                }}
+                }
+                
+                impl SseEncode for Option<i32> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<bool>::sse_encode(self.is_some(), serializer);
+                if let Some(value) = self {
+                    <i32>::sse_encode(value, serializer);
+                }}
+                }
+                
+                impl SseEncode for crate::api::comic::PageRequestDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<i32>::sse_encode(self.page, serializer);
+<i32>::sse_encode(self.page_size, serializer);}
+                }
+                
+                impl SseEncode for crate::api::comic::PagedComicResultDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<Vec<crate::api::comic::ComicDto>>::sse_encode(self.items, serializer);
+<i64>::sse_encode(self.total_count, serializer);
+<i32>::sse_encode(self.page, serializer);
+<i32>::sse_encode(self.page_size, serializer);}
+                }
+                
+                impl SseEncode for crate::api::reader::ReaderPageListDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<String>::sse_encode(self.resource_type, serializer);
+<i32>::sse_encode(self.page_count, serializer);
+<Vec<String>>::sse_encode(self.dir_page_paths, serializer);}
+                }
+                
+                impl SseEncode for crate::api::sync::SyncLibraryPhaseDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<i32>::sse_encode(match self {crate::api::sync::SyncLibraryPhaseDto::ClearingLibrary => { 0 }
+crate::api::sync::SyncLibraryPhaseDto::Scanning => { 1 }
+crate::api::sync::SyncLibraryPhaseDto::WritingDb => { 2 }
+crate::api::sync::SyncLibraryPhaseDto::GeneratingThumbnails => { 3 }
+crate::api::sync::SyncLibraryPhaseDto::Done => { 4 }
+ _ => { unimplemented!(""); }}, serializer);}
+                }
+                
+                impl SseEncode for crate::api::sync::SyncLibraryProgressDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<crate::api::sync::SyncLibraryPhaseDto>::sse_encode(self.phase, serializer);
+<crate::api::sync::SyncLibraryRouteDto>::sse_encode(self.route, serializer);
+<Option<String>>::sse_encode(self.current_path, serializer);
+<i32>::sse_encode(self.accepted_total, serializer);
+<crate::api::sync::LibrarySyncCountsDto>::sse_encode(self.counts, serializer);
+<Option<i32>>::sse_encode(self.removed_count, serializer);
+<Option<i32>>::sse_encode(self.added_count, serializer);
+<Option<i32>>::sse_encode(self.kept_count, serializer);
+<Option<i32>>::sse_encode(self.thumbnail_total, serializer);
+<Option<i32>>::sse_encode(self.thumbnail_done, serializer);
+<Option<i32>>::sse_encode(self.thumbnail_failed_count, serializer);}
+                }
+                
+                impl SseEncode for crate::api::sync::SyncLibraryRouteDto {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<i32>::sse_encode(match self {crate::api::sync::SyncLibraryRouteDto::NoRootsNoop => { 0 }
+crate::api::sync::SyncLibraryRouteDto::NoRootsCleared => { 1 }
+crate::api::sync::SyncLibraryRouteDto::WithRoots => { 2 }
+ _ => { unimplemented!(""); }}, serializer);}
+                }
+                
+                impl SseEncode for u8 {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {serializer.cursor.write_u8(self).unwrap();}
+                }
+                
+                impl SseEncode for () {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
+                }
+                
+                impl SseEncode for usize {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {serializer.cursor.write_u64::<NativeEndian>(self as _).unwrap();}
+                }
+                
 
-impl SseEncode for () {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
-}
 
-impl SseEncode for usize {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        serializer
-            .cursor
-            .write_u64::<NativeEndian>(self as _)
-            .unwrap();
-    }
-}
+        
+        
+        #[cfg(not(target_family = "wasm"))]
+        mod io {
+            // This file is automatically generated, so please do not edit it.
+// @generated by `flutter_rust_bridge`@ 2.12.0.
 
-#[cfg(not(target_family = "wasm"))]
-mod io {
-    // This file is automatically generated, so please do not edit it.
-    // @generated by `flutter_rust_bridge`@ 2.12.0.
 
-    // Section: imports
 
-    use super::*;
-    use crate::api::sync::*;
-    use flutter_rust_bridge::for_generated::byteorder::{
-        NativeEndian, ReadBytesExt, WriteBytesExt,
-    };
-    use flutter_rust_bridge::for_generated::{transform_result_dco, Lifetimeable, Lockable};
-    use flutter_rust_bridge::{Handler, IntoIntoDart};
+// Section: imports
 
-    // Section: boilerplate
+use crate::api::sync::*;use flutter_rust_bridge::{Handler, IntoIntoDart};
+use flutter_rust_bridge::for_generated::{Lockable, transform_result_dco, Lifetimeable};
+use flutter_rust_bridge::for_generated::byteorder::{NativeEndian, WriteBytesExt, ReadBytesExt};use super::*;
 
-    flutter_rust_bridge::frb_generated_boilerplate_io!();
+// Section: boilerplate
 
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_hentai_library_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>::increment_strong_count(ptr as _);
-    }
+flutter_rust_bridge::frb_generated_boilerplate_io!();
 
-    #[unsafe(no_mangle)]
-    pub extern "C" fn frbgen_hentai_library_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>::decrement_strong_count(ptr as _);
-    }
-}
-#[cfg(not(target_family = "wasm"))]
-pub use io::*;
+                #[unsafe(no_mangle)]
+                pub extern "C" fn frbgen_hentai_library_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(ptr: *const std::ffi::c_void)  {
+                    MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>::increment_strong_count(ptr as _);
+                }
+            
 
-/// cbindgen:ignore
-#[cfg(target_family = "wasm")]
-mod web {
-    // This file is automatically generated, so please do not edit it.
-    // @generated by `flutter_rust_bridge`@ 2.12.0.
+                #[unsafe(no_mangle)]
+                pub extern "C" fn frbgen_hentai_library_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(ptr: *const std::ffi::c_void)  {
+                    MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>::decrement_strong_count(ptr as _);
+                }
+            
 
-    // Section: imports
+        }
+        #[cfg(not(target_family = "wasm"))]
+        pub use io::*;
+        
+        
+        /// cbindgen:ignore
+        #[cfg(target_family = "wasm")]
+        mod web {
+            // This file is automatically generated, so please do not edit it.
+// @generated by `flutter_rust_bridge`@ 2.12.0.
 
-    use super::*;
-    use crate::api::sync::*;
-    use flutter_rust_bridge::for_generated::byteorder::{
-        NativeEndian, ReadBytesExt, WriteBytesExt,
-    };
-    use flutter_rust_bridge::for_generated::wasm_bindgen;
-    use flutter_rust_bridge::for_generated::wasm_bindgen::prelude::*;
-    use flutter_rust_bridge::for_generated::{transform_result_dco, Lifetimeable, Lockable};
-    use flutter_rust_bridge::{Handler, IntoIntoDart};
 
-    // Section: boilerplate
 
-    flutter_rust_bridge::frb_generated_boilerplate_web!();
+// Section: imports
 
-    #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>::increment_strong_count(ptr as _);
-    }
+use crate::api::sync::*;use flutter_rust_bridge::{Handler, IntoIntoDart};
+use flutter_rust_bridge::for_generated::{Lockable, transform_result_dco, Lifetimeable};
+use flutter_rust_bridge::for_generated::byteorder::{NativeEndian, WriteBytesExt, ReadBytesExt};use super::*;
+                use flutter_rust_bridge::for_generated::wasm_bindgen;
+                use flutter_rust_bridge::for_generated::wasm_bindgen::prelude::*;
 
-    #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>::decrement_strong_count(ptr as _);
-    }
-}
-#[cfg(target_family = "wasm")]
-pub use web::*;
+
+// Section: boilerplate
+
+flutter_rust_bridge::frb_generated_boilerplate_web!();
+
+                #[wasm_bindgen]
+                pub  fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(ptr: *const std::ffi::c_void)  {
+                    MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>::increment_strong_count(ptr as _);
+                }
+            
+
+                #[wasm_bindgen]
+                pub  fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(ptr: *const std::ffi::c_void)  {
+                    MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>::decrement_strong_count(ptr as _);
+                }
+            
+
+        }
+        #[cfg(target_family = "wasm")]
+        pub use web::*;
+        

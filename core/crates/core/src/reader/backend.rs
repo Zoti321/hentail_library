@@ -7,6 +7,9 @@ use zip::ZipArchive;
 
 use crate::comic_id::normalize_path_for_key;
 use crate::error::HentaiError;
+use crate::formats::{
+    open_pdf_backend, open_rar_backend, open_sevenz_backend, PdfBackend, RarBackend, SevenZBackend,
+};
 use crate::sync::parser::{basename, extension_lower, is_comic_image_extension};
 use crate::util::natural_sort::compare_filename_natural;
 
@@ -14,6 +17,9 @@ pub enum ReaderBackend {
     Dir(DirBackend),
     Zip(ZipBackend),
     Epub(EpubBackend),
+    Rar(RarBackend),
+    SevenZ(SevenZBackend),
+    Pdf(PdfBackend),
 }
 
 pub struct DirBackend {
@@ -34,9 +40,6 @@ pub fn open_backend(path: &str, resource_type: &str) -> Result<ReaderBackend, He
   let normalized = normalize_path_for_key(path);
   if normalized.is_empty() {
     return Err(HentaiError::reader_kind_mismatch("path 为空"));
-  }
-  if matches!(resource_type, "cbr" | "rar") {
-    return Err(HentaiError::reader_unsupported_type(resource_type));
   }
   let fs_path = PathBuf::from(&normalized);
   if !fs_path.exists() {
@@ -69,6 +72,33 @@ pub fn open_backend(path: &str, resource_type: &str) -> Result<ReaderBackend, He
       ensure_extension(&fs_path, "epub")?;
       Ok(ReaderBackend::Epub(open_epub(&fs_path)?))
     }
+    "cbr" | "rar" => {
+      if !fs_path.is_file() {
+        return Err(HentaiError::reader_kind_mismatch(format!(
+          "资源类型与路径不一致: path={normalized} expected={resource_type} 期望文件"
+        )));
+      }
+      ensure_extension(&fs_path, resource_type)?;
+      Ok(ReaderBackend::Rar(open_rar_backend(&fs_path)?))
+    }
+    "cb7" | "sevenz" => {
+      if !fs_path.is_file() {
+        return Err(HentaiError::reader_kind_mismatch(format!(
+          "资源类型与路径不一致: path={normalized} expected={resource_type} 期望文件"
+        )));
+      }
+      ensure_extension(&fs_path, resource_type)?;
+      Ok(ReaderBackend::SevenZ(open_sevenz_backend(&fs_path)?))
+    }
+    "pdf" => {
+      if !fs_path.is_file() {
+        return Err(HentaiError::reader_kind_mismatch(format!(
+          "资源类型与路径不一致: path={normalized} expected=pdf 期望文件"
+        )));
+      }
+      ensure_extension(&fs_path, "pdf")?;
+      Ok(ReaderBackend::Pdf(open_pdf_backend(&fs_path)?))
+    }
     other => Err(HentaiError::reader_unsupported_type(other)),
   }
 }
@@ -79,6 +109,11 @@ fn ensure_extension(path: &Path, resource_type: &str) -> Result<(), HentaiError>
     "zip" => ".zip",
     "cbz" => ".cbz",
     "epub" => ".epub",
+    "cbr" => ".cbr",
+    "rar" => ".rar",
+    "cb7" => ".cb7",
+    "sevenz" => ".7z",
+    "pdf" => ".pdf",
     other => return Err(HentaiError::reader_unsupported_type(other)),
   };
   if ext != expected {

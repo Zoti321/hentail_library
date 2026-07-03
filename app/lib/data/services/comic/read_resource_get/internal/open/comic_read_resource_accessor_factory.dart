@@ -34,6 +34,9 @@ class ComicReadResourceAccessorFactory {
         return EpubComicReadResourceAccessor(epubFile: File(normalizedPath));
       case ResourceType.cbr:
       case ResourceType.rar:
+      case ResourceType.cb7:
+      case ResourceType.sevenZ:
+      case ResourceType.pdf:
         throw ComicReadResourceUnsupportedTypeException(type: type);
     }
   }

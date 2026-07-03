@@ -20,6 +20,11 @@ pub struct LibrarySyncCountsDto {
     pub zip: i32,
     pub cbz: i32,
     pub epub: i32,
+    pub cbr: i32,
+    pub rar: i32,
+    pub cb7: i32,
+    pub sevenz: i32,
+    pub pdf: i32,
 }
 
 #[derive(Debug, Clone)]
@@ -44,6 +49,11 @@ impl LibrarySyncCountsDto {
             "zip" => self.zip += 1,
             "cbz" => self.cbz += 1,
             "epub" => self.epub += 1,
+            "cbr" => self.cbr += 1,
+            "rar" => self.rar += 1,
+            "cb7" => self.cb7 += 1,
+            "sevenz" => self.sevenz += 1,
+            "pdf" => self.pdf += 1,
             _ => {}
         }
     }

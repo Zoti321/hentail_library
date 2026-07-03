@@ -29,6 +29,11 @@ pub struct LibrarySyncCountsDto {
     pub zip: i32,
     pub cbz: i32,
     pub epub: i32,
+    pub cbr: i32,
+    pub rar: i32,
+    pub cb7: i32,
+    pub sevenz: i32,
+    pub pdf: i32,
 }
 
 #[derive(Debug, Clone)]
@@ -85,6 +90,11 @@ fn map_progress(p: CoreProgress) -> SyncLibraryProgressDto {
             zip: p.counts.zip,
             cbz: p.counts.cbz,
             epub: p.counts.epub,
+            cbr: p.counts.cbr,
+            rar: p.counts.rar,
+            cb7: p.counts.cb7,
+            sevenz: p.counts.sevenz,
+            pdf: p.counts.pdf,
         },
         removed_count: p.removed_count,
         added_count: p.added_count,

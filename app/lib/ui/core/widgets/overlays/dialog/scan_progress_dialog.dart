@@ -164,8 +164,7 @@ class ScanProgressDialog extends ConsumerWidget {
           Text('正在应用扫描结果到数据库…', style: secondary),
           const SizedBox(height: 8),
           Text(
-            '已识别 ${p.acceptedTotal} 本 · (dir: ${p.counts.dir}, zip: ${p.counts.zip}, '
-            'cbz: ${p.counts.cbz}, epub: ${p.counts.epub})',
+            '已识别 ${p.acceptedTotal} 本 · (${formatLibrarySyncCounts(p.counts)})',
             style: TextStyle(fontSize: 13, color: cs.hentai.textSecondary),
           ),
         ],
@@ -212,8 +211,7 @@ class ScanProgressDialog extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          '已识别 ${p.acceptedTotal} 本 · (dir: ${p.counts.dir}, zip: ${p.counts.zip}, '
-          'cbz: ${p.counts.cbz}, epub: ${p.counts.epub})',
+          '已识别 ${p.acceptedTotal} 本 · (${formatLibrarySyncCounts(p.counts)})',
           style: TextStyle(fontSize: 13, color: cs.hentai.textSecondary),
         ),
       ],

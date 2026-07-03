@@ -3,6 +3,7 @@ pub mod comic_id;
 pub mod db;
 pub mod entity;
 pub mod error;
+pub mod formats;
 pub mod migration;
 pub mod reader;
 pub mod runtime;

@@ -60,6 +60,9 @@ class ResourceParseDispatcher {
       ResourceType.epub => '.epub',
       ResourceType.cbr => '.cbr',
       ResourceType.rar => '.rar',
+      ResourceType.cb7 => '.cb7',
+      ResourceType.sevenZ => '.7z',
+      ResourceType.pdf => '.pdf',
       _ => null,
     };
   }

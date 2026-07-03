@@ -15,9 +15,14 @@ file(RELATIVE_PATH RUST_CRATE_REL "${CMAKE_CURRENT_SOURCE_DIR}" "${RUST_CRATE_DI
 apply_cargokit(${PROJECT_NAME} "${RUST_CRATE_REL}" hentai_flutter "")
 
 # List of absolute paths to libraries that should be bundled with the plugin.
-# This list could contain prebuilt libraries, or libraries created by an
-# external build triggered from this build file.
 set(hentai_flutter_bundled_libraries
   "${${PROJECT_NAME}_cargokit_lib}"
-  PARENT_SCOPE
 )
+
+get_filename_component(VENDOR_ROOT "${PLUGIN_ROOT}/../../core/vendor/windows-x86_64" REALPATH)
+set(PDFIUM_DLL "${VENDOR_ROOT}/pdfium.dll")
+if(EXISTS "${PDFIUM_DLL}")
+  list(APPEND hentai_flutter_bundled_libraries "${PDFIUM_DLL}")
+endif()
+
+set(hentai_flutter_bundled_libraries "${hentai_flutter_bundled_libraries}" PARENT_SCOPE)

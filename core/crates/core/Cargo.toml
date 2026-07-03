@@ -4,6 +4,7 @@ description = "Hentai Library core logic (scan, DB, reader)"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+build = "build.rs"
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
@@ -19,6 +20,9 @@ zip = "2"
 image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp", "gif", "bmp"] }
 quick-xml = { version = "0.37", features = ["serialize"] }
 rayon = "1"
+sevenz-rust = "0.6"
+unrar = "0.5"
+pdfium-render = "0.8"
 
 [dev-dependencies]
 serde_json = "1"
