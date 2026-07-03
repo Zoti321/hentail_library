@@ -39,6 +39,7 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
         error,
         resourceType: comic.resourceType,
         path: comic.path,
+        comicId: comic.comicId,
       );
     }
   }
@@ -63,6 +64,7 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
         error,
         resourceType: comic.resourceType,
         path: comic.path,
+        comicId: comic.comicId,
       );
     }
   }

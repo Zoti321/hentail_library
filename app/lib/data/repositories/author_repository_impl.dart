@@ -1,65 +1,55 @@
-import 'package:hentai_library/data/database/dao/dao.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/author_repository.dart';
+import 'package:hentai_library/src/rust/api/author.dart' as rust_author;
+import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 
 class AuthorRepositoryImpl implements AuthorRepository {
-  AuthorRepositoryImpl(this._dao);
-
-  final AuthorDao _dao;
+  const AuthorRepositoryImpl();
 
   @override
   Future<List<Author>> listAll() async {
-    final rows = await _dao.listAll();
-    rows.sort((a, b) => a.name.compareTo(b.name));
-    return rows.map((r) => Author(name: r.name)).toList();
+    final List<String> names = rust_author.listAllAuthorsFrb();
+    return names.map((String n) => Author(name: n)).toList();
   }
 
   @override
   Stream<List<Author>> watchAll() {
-    return _dao.watchAll().map(
-      (rows) => rows.map((r) => Author(name: r.name)).toList(),
+    return rust_author.watchAuthorsFrb().map(
+      (List<String> names) => names.map((String n) => Author(name: n)).toList(),
     );
   }
 
   @override
   Future<PagedResult<Author>> fetchPage(PageRequest request) async {
-    final int totalCount = await _dao.countAllAuthors();
-    if (totalCount <= 0) {
-      return PagedResult<Author>(
-        items: const <Author>[],
-        totalCount: 0,
-        page: 1,
-        pageSize: request.pageSize,
-      );
-    }
-    final int totalPages =
-        (totalCount + request.pageSize - 1) ~/ request.pageSize;
-    int effectivePage = request.page;
-    if (effectivePage > totalPages) {
-      effectivePage = totalPages;
-    }
-    final int offset = (effectivePage - 1) * request.pageSize;
-    final rows = await _dao.fetchAuthorsPage(
-      limit: request.pageSize,
-      offset: offset,
-    );
+    final rust_author.AuthorPagedNamesDto page = rust_author
+        .fetchAuthorsPageFrb(
+          request: rust.PageRequestDto(
+            page: request.page,
+            pageSize: request.pageSize,
+          ),
+        );
     return PagedResult<Author>(
-      items: rows.map((r) => Author(name: r.name)).toList(),
-      totalCount: totalCount,
-      page: effectivePage,
-      pageSize: request.pageSize,
+      items: page.items.map((String n) => Author(name: n)).toList(),
+      totalCount: page.totalCount.toInt(),
+      page: page.page,
+      pageSize: page.pageSize,
     );
   }
 
   @override
-  Future<void> add(Author author) => _dao.addAuthor(author.name);
+  Future<void> add(Author author) async {
+    rust_author.addAuthorFrb(name: author.name);
+  }
 
   @override
-  Future<void> deleteByNames(List<String> names) => _dao.deleteByNames(names);
+  Future<void> deleteByNames(List<String> names) async {
+    rust_author.deleteAuthorsByNamesFrb(names: names);
+  }
 
   @override
-  Future<void> rename(String oldName, String newName) =>
-      _dao.renameAuthor(oldName, newName);
+  Future<void> rename(String oldName, String newName) async {
+    rust_author.renameAuthorFrb(oldName: oldName, newName: newName);
+  }
 }

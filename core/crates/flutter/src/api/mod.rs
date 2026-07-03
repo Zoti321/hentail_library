@@ -1,15 +1,23 @@
+pub mod author;
 pub mod comic;
 pub mod history;
 pub mod home;
 pub mod init;
+pub mod path;
 pub mod reader;
 pub mod series;
 pub mod sync;
+pub mod tag;
+pub mod thumbnail;
 
+pub use author::*;
 pub use comic::*;
 pub use history::*;
 pub use home::*;
 pub use init::HentaiErrorDto;
+pub use path::*;
 pub use reader::*;
 pub use series::*;
 pub use sync::*;
+pub use tag::*;
+pub use thumbnail::*;

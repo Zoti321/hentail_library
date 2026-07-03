@@ -7,7 +7,7 @@ import '../frb_generated.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`, `from`
 
 HomePageCountsDto getHomePageCountsFrb({required bool excludeR18}) => RustLib
     .instance
@@ -18,6 +18,61 @@ Stream<HomePageCountsDto> watchHomePageCountsFrb({required bool excludeR18}) =>
     RustLib.instance.api.crateApiHomeWatchHomePageCountsFrb(
       excludeR18: excludeR18,
     );
+
+List<HomeContinueReadingDto> getContinueReadingTop5Frb({
+  required bool excludeR18,
+}) => RustLib.instance.api.crateApiHomeGetContinueReadingTop5Frb(
+  excludeR18: excludeR18,
+);
+
+Stream<List<HomeContinueReadingDto>> watchContinueReadingTop5Frb({
+  required bool excludeR18,
+}) => RustLib.instance.api.crateApiHomeWatchContinueReadingTop5Frb(
+  excludeR18: excludeR18,
+);
+
+class HomeContinueReadingDto {
+  final String kind;
+  final PlatformInt64 lastReadTimeMs;
+  final String? comicId;
+  final String? title;
+  final String? seriesName;
+  final String? lastReadComicId;
+  final int? pageIndex;
+
+  const HomeContinueReadingDto({
+    required this.kind,
+    required this.lastReadTimeMs,
+    this.comicId,
+    this.title,
+    this.seriesName,
+    this.lastReadComicId,
+    this.pageIndex,
+  });
+
+  @override
+  int get hashCode =>
+      kind.hashCode ^
+      lastReadTimeMs.hashCode ^
+      comicId.hashCode ^
+      title.hashCode ^
+      seriesName.hashCode ^
+      lastReadComicId.hashCode ^
+      pageIndex.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HomeContinueReadingDto &&
+          runtimeType == other.runtimeType &&
+          kind == other.kind &&
+          lastReadTimeMs == other.lastReadTimeMs &&
+          comicId == other.comicId &&
+          title == other.title &&
+          seriesName == other.seriesName &&
+          lastReadComicId == other.lastReadComicId &&
+          pageIndex == other.pageIndex;
+}
 
 class HomePageCountsDto {
   final int comicCount;

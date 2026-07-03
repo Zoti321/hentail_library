@@ -1,17 +1,16 @@
 import 'dart:typed_data';
 
-import 'package:hentai_library/data/database/dao/dao.dart';
-import 'package:hentai_library/data/database/database.dart';
 import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
+import 'package:hentai_library/src/rust/api/thumbnail.dart' as rust;
 
 class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
-  ComicThumbnailRepositoryImpl(this._dao);
-
-  final ComicThumbnailDao _dao;
+  const ComicThumbnailRepositoryImpl();
 
   @override
   Future<ComicThumbnailRecord?> findByComicId(String comicId) async {
-    final DbComicThumbnail? row = await _dao.findByComicId(comicId);
+    final rust.ComicThumbnailDto? row = rust.findThumbnailByComicIdFrb(
+      comicId: comicId,
+    );
     if (row == null) {
       return null;
     }
@@ -29,17 +28,11 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
     required int sourceModifiedMs,
     required int sourceSize,
   }) {
-    return _dao.upsert(
-      comicId: comicId,
-      thumbnail: thumbnail,
-      sourceModifiedMs: sourceModifiedMs,
-      sourceSize: sourceSize,
-      updatedAt: DateTime.now(),
-    );
+    throw UnsupportedError('缩略图写入由 Rust sync 负责');
   }
 
   @override
-  Future<void> deleteByComicIds(List<String> comicIds) {
-    return _dao.deleteByComicIds(comicIds);
+  Future<void> deleteByComicIds(List<String> comicIds) async {
+    rust.deleteThumbnailsByComicIdsFrb(comicIds: comicIds);
   }
 }

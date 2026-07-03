@@ -4,13 +4,87 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import 'comic.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`
 
 InferSeriesResultDto inferSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesInferSeriesFrb();
+
+Stream<List<SeriesDto>> watchAllSeriesFrb() =>
+    RustLib.instance.api.crateApiSeriesWatchAllSeriesFrb();
+
+List<SeriesDto> getAllSeriesFrb() =>
+    RustLib.instance.api.crateApiSeriesGetAllSeriesFrb();
+
+PagedSeriesResultDto fetchSeriesPageFrb({required PageRequestDto request}) =>
+    RustLib.instance.api.crateApiSeriesFetchSeriesPageFrb(request: request);
+
+SeriesDto? findSeriesByNameFrb({required String name}) =>
+    RustLib.instance.api.crateApiSeriesFindSeriesByNameFrb(name: name);
+
+void createSeriesFrb({required String name}) =>
+    RustLib.instance.api.crateApiSeriesCreateSeriesFrb(name: name);
+
+void renameSeriesFrb({required String name, required String newName}) => RustLib
+    .instance
+    .api
+    .crateApiSeriesRenameSeriesFrb(name: name, newName: newName);
+
+void deleteSeriesFrb({required String name}) =>
+    RustLib.instance.api.crateApiSeriesDeleteSeriesFrb(name: name);
+
+void assignComicExclusiveFrb({
+  required String comicId,
+  required String targetSeriesName,
+  required int sortOrder,
+}) => RustLib.instance.api.crateApiSeriesAssignComicExclusiveFrb(
+  comicId: comicId,
+  targetSeriesName: targetSeriesName,
+  sortOrder: sortOrder,
+);
+
+void removeComicFromSeriesFrb({required String comicId}) => RustLib.instance.api
+    .crateApiSeriesRemoveComicFromSeriesFrb(comicId: comicId);
+
+void removeComicsFromSeriesFrb({required List<String> comicIds}) => RustLib
+    .instance
+    .api
+    .crateApiSeriesRemoveComicsFromSeriesFrb(comicIds: comicIds);
+
+void removeOrphanSeriesItemsFrb() =>
+    RustLib.instance.api.crateApiSeriesRemoveOrphanSeriesItemsFrb();
+
+void setSeriesItemsOrderFrb({
+  required String seriesName,
+  required List<String> orderedComicIds,
+}) => RustLib.instance.api.crateApiSeriesSetSeriesItemsOrderFrb(
+  seriesName: seriesName,
+  orderedComicIds: orderedComicIds,
+);
+
+List<SeriesDto> searchSeriesByKeywordFrb({required String keyword}) => RustLib
+    .instance
+    .api
+    .crateApiSeriesSearchSeriesByKeywordFrb(keyword: keyword);
+
+List<SeriesDto> searchSeriesByTagExpressionFrb({
+  required List<String> mustInclude,
+  required List<String> optionalOr,
+  required List<String> mustExclude,
+}) => RustLib.instance.api.crateApiSeriesSearchSeriesByTagExpressionFrb(
+  mustInclude: mustInclude,
+  optionalOr: optionalOr,
+  mustExclude: mustExclude,
+);
+
+List<SeriesComicOrderEntryDto> loadHomeSeriesComicOrderMapFrb() =>
+    RustLib.instance.api.crateApiSeriesLoadHomeSeriesComicOrderMapFrb();
+
+Stream<List<SeriesComicOrderEntryDto>> watchHomeSeriesComicOrderMapFrb() =>
+    RustLib.instance.api.crateApiSeriesWatchHomeSeriesComicOrderMapFrb();
 
 class InferSeriesResultDto {
   final int groupsApplied;
@@ -37,4 +111,93 @@ class InferSeriesResultDto {
           groupsApplied == other.groupsApplied &&
           comicsAssigned == other.comicsAssigned &&
           newSeriesCreated == other.newSeriesCreated;
+}
+
+class PagedSeriesResultDto {
+  final List<SeriesDto> items;
+  final PlatformInt64 totalCount;
+  final int page;
+  final int pageSize;
+
+  const PagedSeriesResultDto({
+    required this.items,
+    required this.totalCount,
+    required this.page,
+    required this.pageSize,
+  });
+
+  @override
+  int get hashCode =>
+      items.hashCode ^ totalCount.hashCode ^ page.hashCode ^ pageSize.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PagedSeriesResultDto &&
+          runtimeType == other.runtimeType &&
+          items == other.items &&
+          totalCount == other.totalCount &&
+          page == other.page &&
+          pageSize == other.pageSize;
+}
+
+class SeriesComicOrderEntryDto {
+  final String key;
+  final int sortOrder;
+
+  const SeriesComicOrderEntryDto({required this.key, required this.sortOrder});
+
+  @override
+  int get hashCode => key.hashCode ^ sortOrder.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesComicOrderEntryDto &&
+          runtimeType == other.runtimeType &&
+          key == other.key &&
+          sortOrder == other.sortOrder;
+}
+
+class SeriesDto {
+  final String name;
+  final List<SeriesItemDto> items;
+
+  const SeriesDto({required this.name, required this.items});
+
+  @override
+  int get hashCode => name.hashCode ^ items.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesDto &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          items == other.items;
+}
+
+class SeriesItemDto {
+  final String seriesName;
+  final String comicId;
+  final int sortOrder;
+
+  const SeriesItemDto({
+    required this.seriesName,
+    required this.comicId,
+    required this.sortOrder,
+  });
+
+  @override
+  int get hashCode =>
+      seriesName.hashCode ^ comicId.hashCode ^ sortOrder.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesItemDto &&
+          runtimeType == other.runtimeType &&
+          seriesName == other.seriesName &&
+          comicId == other.comicId &&
+          sortOrder == other.sortOrder;
 }

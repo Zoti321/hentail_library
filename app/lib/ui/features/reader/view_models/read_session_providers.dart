@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:hentai_library/core/logging/log_manager.dart';
-import 'package:hentai_library/data/services/comic/read_resource_get/core/comic_read_resource_exception.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/domain/reading/read_session_exceptions.dart';
@@ -60,13 +59,6 @@ Future<Uint8List?> comicReaderPageBytes(
     return await ref
         .read(comicPageSourcePortProvider)
         .loadPageBytes(comic: comic, pageIndex: pageIndex);
-  } on ComicReadResourceException catch (error, stackTrace) {
-    throw ReadSessionPageLoadException.loadFailed(
-      comicId: comicId,
-      path: comic.path,
-      cause: error,
-      stackTrace: stackTrace,
-    );
   } on HentaiErrorDto catch (error, stackTrace) {
     throw ReadSessionPageLoadException.loadFailed(
       comicId: comicId,
@@ -102,9 +94,10 @@ Future<ComicCoverDisplayData?> comicCoverDisplay(
     return null;
   }
   try {
-    final Uint8List? bytes = await ref
-        .read(comicThumbnailServiceProvider)
-        .resolveThumbnailBytes(comic);
+    final record = await ref
+        .read(comicThumbnailRepoProvider)
+        .findByComicId(comicId);
+    final Uint8List? bytes = record?.thumbnail;
     if (bytes == null || bytes.isEmpty) {
       return null;
     }

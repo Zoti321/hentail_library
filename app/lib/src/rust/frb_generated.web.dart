@@ -6,13 +6,17 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
+import 'api/author.dart';
 import 'api/comic.dart';
 import 'api/history.dart';
 import 'api/home.dart';
 import 'api/init.dart';
+import 'api/path.dart';
 import 'api/reader.dart';
 import 'api/series.dart';
 import 'api/sync.dart';
+import 'api/tag.dart';
+import 'api/thumbnail.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -59,8 +63,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustStreamSink<int> dco_decode_StreamSink_i_32_Sse(dynamic raw);
 
   @protected
+  RustStreamSink<List<String>> dco_decode_StreamSink_list_String_Sse(
+    dynamic raw,
+  );
+
+  @protected
+  RustStreamSink<List<HomeContinueReadingDto>>
+  dco_decode_StreamSink_list_home_continue_reading_dto_Sse(dynamic raw);
+
+  @protected
   RustStreamSink<List<ReadingHistoryDto>>
   dco_decode_StreamSink_list_reading_history_dto_Sse(dynamic raw);
+
+  @protected
+  RustStreamSink<List<SeriesComicOrderEntryDto>>
+  dco_decode_StreamSink_list_series_comic_order_entry_dto_Sse(dynamic raw);
+
+  @protected
+  RustStreamSink<List<SeriesDto>> dco_decode_StreamSink_list_series_dto_Sse(
+    dynamic raw,
+  );
 
   @protected
   RustStreamSink<List<SeriesReadingHistoryDto>>
@@ -72,6 +94,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   String dco_decode_String(dynamic raw);
+
+  @protected
+  AuthorPagedNamesDto dco_decode_author_paged_names_dto(dynamic raw);
 
   @protected
   bool dco_decode_bool(dynamic raw);
@@ -86,6 +111,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicSortOptionDto dco_decode_box_autoadd_comic_sort_option_dto(dynamic raw);
 
   @protected
+  ComicThumbnailDto dco_decode_box_autoadd_comic_thumbnail_dto(dynamic raw);
+
+  @protected
   int dco_decode_box_autoadd_i_32(dynamic raw);
 
   @protected
@@ -95,9 +123,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ReadingHistoryDto dco_decode_box_autoadd_reading_history_dto(dynamic raw);
 
   @protected
+  SeriesDto dco_decode_box_autoadd_series_dto(dynamic raw);
+
+  @protected
   SeriesReadingHistoryDto dco_decode_box_autoadd_series_reading_history_dto(
     dynamic raw,
   );
+
+  @protected
+  UpdateComicUserMetaFrbDto
+  dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw);
 
   @protected
   ComicDto dco_decode_comic_dto(dynamic raw);
@@ -109,7 +144,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicSortOptionDto dco_decode_comic_sort_option_dto(dynamic raw);
 
   @protected
+  ComicThumbnailDto dco_decode_comic_thumbnail_dto(dynamic raw);
+
+  @protected
   HentaiErrorDto dco_decode_hentai_error_dto(dynamic raw);
+
+  @protected
+  HomeContinueReadingDto dco_decode_home_continue_reading_dto(dynamic raw);
 
   @protected
   HomePageCountsDto dco_decode_home_page_counts_dto(dynamic raw);
@@ -133,10 +174,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<ComicDto> dco_decode_list_comic_dto(dynamic raw);
 
   @protected
+  List<HomeContinueReadingDto> dco_decode_list_home_continue_reading_dto(
+    dynamic raw,
+  );
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
   List<ReadingHistoryDto> dco_decode_list_reading_history_dto(dynamic raw);
+
+  @protected
+  List<SeriesComicOrderEntryDto> dco_decode_list_series_comic_order_entry_dto(
+    dynamic raw,
+  );
+
+  @protected
+  List<SeriesDto> dco_decode_list_series_dto(dynamic raw);
+
+  @protected
+  List<SeriesItemDto> dco_decode_list_series_item_dto(dynamic raw);
 
   @protected
   List<SeriesReadingHistoryDto> dco_decode_list_series_reading_history_dto(
@@ -150,6 +207,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicDto? dco_decode_opt_box_autoadd_comic_dto(dynamic raw);
 
   @protected
+  ComicThumbnailDto? dco_decode_opt_box_autoadd_comic_thumbnail_dto(
+    dynamic raw,
+  );
+
+  @protected
   int? dco_decode_opt_box_autoadd_i_32(dynamic raw);
 
   @protected
@@ -158,8 +220,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  SeriesDto? dco_decode_opt_box_autoadd_series_dto(dynamic raw);
+
+  @protected
   SeriesReadingHistoryDto?
   dco_decode_opt_box_autoadd_series_reading_history_dto(dynamic raw);
+
+  @protected
+  List<String>? dco_decode_opt_list_String(dynamic raw);
 
   @protected
   PageRequestDto dco_decode_page_request_dto(dynamic raw);
@@ -176,10 +244,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  PagedSeriesResultDto dco_decode_paged_series_result_dto(dynamic raw);
+
+  @protected
   ReaderPageListDto dco_decode_reader_page_list_dto(dynamic raw);
 
   @protected
   ReadingHistoryDto dco_decode_reading_history_dto(dynamic raw);
+
+  @protected
+  SeriesComicOrderEntryDto dco_decode_series_comic_order_entry_dto(dynamic raw);
+
+  @protected
+  SeriesDto dco_decode_series_dto(dynamic raw);
+
+  @protected
+  SeriesItemDto dco_decode_series_item_dto(dynamic raw);
 
   @protected
   SeriesReadingHistoryDto dco_decode_series_reading_history_dto(dynamic raw);
@@ -194,10 +274,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SyncLibraryRouteDto dco_decode_sync_library_route_dto(dynamic raw);
 
   @protected
+  TagPagedNamesDto dco_decode_tag_paged_names_dto(dynamic raw);
+
+  @protected
   int dco_decode_u_8(dynamic raw);
 
   @protected
   void dco_decode_unit(dynamic raw);
+
+  @protected
+  UpdateComicUserMetaFrbDto dco_decode_update_comic_user_meta_frb_dto(
+    dynamic raw,
+  );
 
   @protected
   BigInt dco_decode_usize(dynamic raw);
@@ -233,8 +321,30 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  RustStreamSink<List<String>> sse_decode_StreamSink_list_String_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  RustStreamSink<List<HomeContinueReadingDto>>
+  sse_decode_StreamSink_list_home_continue_reading_dto_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   RustStreamSink<List<ReadingHistoryDto>>
   sse_decode_StreamSink_list_reading_history_dto_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  RustStreamSink<List<SeriesComicOrderEntryDto>>
+  sse_decode_StreamSink_list_series_comic_order_entry_dto_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  RustStreamSink<List<SeriesDto>> sse_decode_StreamSink_list_series_dto_Sse(
     SseDeserializer deserializer,
   );
 
@@ -254,6 +364,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
+  AuthorPagedNamesDto sse_decode_author_paged_names_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
@@ -266,6 +381,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ComicSortOptionDto sse_decode_box_autoadd_comic_sort_option_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ComicThumbnailDto sse_decode_box_autoadd_comic_thumbnail_dto(
     SseDeserializer deserializer,
   );
 
@@ -283,7 +403,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  SeriesDto sse_decode_box_autoadd_series_dto(SseDeserializer deserializer);
+
+  @protected
   SeriesReadingHistoryDto sse_decode_box_autoadd_series_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  UpdateComicUserMetaFrbDto
+  sse_decode_box_autoadd_update_comic_user_meta_frb_dto(
     SseDeserializer deserializer,
   );
 
@@ -299,7 +428,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ComicThumbnailDto sse_decode_comic_thumbnail_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   HentaiErrorDto sse_decode_hentai_error_dto(SseDeserializer deserializer);
+
+  @protected
+  HomeContinueReadingDto sse_decode_home_continue_reading_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   HomePageCountsDto sse_decode_home_page_counts_dto(
@@ -329,10 +468,28 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<ComicDto> sse_decode_list_comic_dto(SseDeserializer deserializer);
 
   @protected
+  List<HomeContinueReadingDto> sse_decode_list_home_continue_reading_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
   List<ReadingHistoryDto> sse_decode_list_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<SeriesComicOrderEntryDto> sse_decode_list_series_comic_order_entry_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<SeriesDto> sse_decode_list_series_dto(SseDeserializer deserializer);
+
+  @protected
+  List<SeriesItemDto> sse_decode_list_series_item_dto(
     SseDeserializer deserializer,
   );
 
@@ -348,6 +505,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicDto? sse_decode_opt_box_autoadd_comic_dto(SseDeserializer deserializer);
 
   @protected
+  ComicThumbnailDto? sse_decode_opt_box_autoadd_comic_thumbnail_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   int? sse_decode_opt_box_autoadd_i_32(SseDeserializer deserializer);
 
   @protected
@@ -356,10 +518,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  SeriesDto? sse_decode_opt_box_autoadd_series_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   SeriesReadingHistoryDto?
   sse_decode_opt_box_autoadd_series_reading_history_dto(
     SseDeserializer deserializer,
   );
+
+  @protected
+  List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
 
   @protected
   PageRequestDto sse_decode_page_request_dto(SseDeserializer deserializer);
@@ -380,6 +550,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  PagedSeriesResultDto sse_decode_paged_series_result_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ReaderPageListDto sse_decode_reader_page_list_dto(
     SseDeserializer deserializer,
   );
@@ -388,6 +563,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ReadingHistoryDto sse_decode_reading_history_dto(
     SseDeserializer deserializer,
   );
+
+  @protected
+  SeriesComicOrderEntryDto sse_decode_series_comic_order_entry_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SeriesDto sse_decode_series_dto(SseDeserializer deserializer);
+
+  @protected
+  SeriesItemDto sse_decode_series_item_dto(SseDeserializer deserializer);
 
   @protected
   SeriesReadingHistoryDto sse_decode_series_reading_history_dto(
@@ -410,10 +596,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  TagPagedNamesDto sse_decode_tag_paged_names_dto(SseDeserializer deserializer);
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer);
 
   @protected
   void sse_decode_unit(SseDeserializer deserializer);
+
+  @protected
+  UpdateComicUserMetaFrbDto sse_decode_update_comic_user_meta_frb_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   BigInt sse_decode_usize(SseDeserializer deserializer);
@@ -458,8 +652,32 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_StreamSink_list_String_Sse(
+    RustStreamSink<List<String>> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_StreamSink_list_home_continue_reading_dto_Sse(
+    RustStreamSink<List<HomeContinueReadingDto>> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_StreamSink_list_reading_history_dto_Sse(
     RustStreamSink<List<ReadingHistoryDto>> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_StreamSink_list_series_comic_order_entry_dto_Sse(
+    RustStreamSink<List<SeriesComicOrderEntryDto>> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_StreamSink_list_series_dto_Sse(
+    RustStreamSink<List<SeriesDto>> self,
     SseSerializer serializer,
   );
 
@@ -477,6 +695,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_String(String self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_author_paged_names_dto(
+    AuthorPagedNamesDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
@@ -500,6 +724,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_comic_thumbnail_dto(
+    ComicThumbnailDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer);
 
   @protected
@@ -515,8 +745,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_series_dto(
+    SeriesDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_series_reading_history_dto(
     SeriesReadingHistoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_update_comic_user_meta_frb_dto(
+    UpdateComicUserMetaFrbDto self,
     SseSerializer serializer,
   );
 
@@ -536,8 +778,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_comic_thumbnail_dto(
+    ComicThumbnailDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_hentai_error_dto(
     HentaiErrorDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_home_continue_reading_dto(
+    HomeContinueReadingDto self,
     SseSerializer serializer,
   );
 
@@ -572,6 +826,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_list_comic_dto(List<ComicDto> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_home_continue_reading_dto(
+    List<HomeContinueReadingDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
     SseSerializer serializer,
@@ -580,6 +840,24 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_reading_history_dto(
     List<ReadingHistoryDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_series_comic_order_entry_dto(
+    List<SeriesComicOrderEntryDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_series_dto(
+    List<SeriesDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_series_item_dto(
+    List<SeriesItemDto> self,
     SseSerializer serializer,
   );
 
@@ -599,6 +877,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_comic_thumbnail_dto(
+    ComicThumbnailDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_i_32(int? self, SseSerializer serializer);
 
   @protected
@@ -608,10 +892,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_series_dto(
+    SeriesDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_series_reading_history_dto(
     SeriesReadingHistoryDto? self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
 
   @protected
   void sse_encode_page_request_dto(
@@ -638,6 +931,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_paged_series_result_dto(
+    PagedSeriesResultDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_reader_page_list_dto(
     ReaderPageListDto self,
     SseSerializer serializer,
@@ -648,6 +947,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     ReadingHistoryDto self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_series_comic_order_entry_dto(
+    SeriesComicOrderEntryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_series_dto(SeriesDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_series_item_dto(SeriesItemDto self, SseSerializer serializer);
 
   @protected
   void sse_encode_series_reading_history_dto(
@@ -674,10 +985,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_tag_paged_names_dto(
+    TagPagedNamesDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_unit(void self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_update_comic_user_meta_frb_dto(
+    UpdateComicUserMetaFrbDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer);

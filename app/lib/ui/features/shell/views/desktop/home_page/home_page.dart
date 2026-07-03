@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
-import 'package:hentai_library/data/services/comic/content_rating/auto_detect_comic_content_rating_service.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/desktop/home_page/widgets/widgets.dart';
-import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/scan_progress_dialog.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -17,7 +15,6 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   bool deferredSectionsReady = false;
-  bool isAutoDetectingContentRating = false;
 
   @override
   void initState() {
@@ -44,44 +41,6 @@ class _HomePageState extends ConsumerState<HomePage> {
       barrierDismissible: false,
       builder: (_) => const ScanProgressDialog(),
     );
-  }
-
-  Future<void> onTapAutoDetectContentRating() async {
-    if (isAutoDetectingContentRating) {
-      return;
-    }
-    setState(() {
-      isAutoDetectingContentRating = true;
-    });
-    try {
-      final AutoDetectComicContentRatingService service = ref.read(
-        autoDetectComicContentRatingServiceProvider,
-      );
-      final AutoDetectComicContentRatingResult result = await service
-          .executeAutoDetect();
-      if (!mounted) {
-        return;
-      }
-      if (result.matchedComics == 0) {
-        showInfoToast(context, '未命中分级关键词目录');
-        return;
-      }
-      showSuccessToast(
-        context,
-        '已识别 ${result.matchedComics} 本疑似成人漫画，成功更新 ${result.updatedComics} 本为 R18。',
-      );
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      showErrorToast(context, error);
-    } finally {
-      if (mounted) {
-        setState(() {
-          isAutoDetectingContentRating = false;
-        });
-      }
-    }
   }
 
   String greetingPhraseForNow() {
@@ -126,10 +85,6 @@ class _HomePageState extends ConsumerState<HomePage> {
       onTapScanLibrary(context, ref);
     }
 
-    void onAutoDetectContentRating() {
-      onTapAutoDetectContentRating();
-    }
-
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double maxWidth = constraints.maxWidth.clamp(
@@ -153,7 +108,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ref.invalidate(homeContinueReadingTop5StreamProvider);
                       ref.invalidate(homeSeriesComicOrderMapStreamProvider);
                     },
-                    onAutoDetectContentRating: onAutoDetectContentRating,
                     onScan: onScan,
                   ),
                   SizedBox(height: tokens.spacing.xl + 12),
