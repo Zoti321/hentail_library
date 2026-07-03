@@ -36,19 +36,3 @@ class LibraryPageHeader extends ConsumerWidget {
     );
   }
 }
-
-class LibraryPageSubtitle extends StatelessWidget {
-  const LibraryPageSubtitle({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Text(
-      '浏览、搜索与筛选本地漫画',
-      style: TextStyle(
-        fontSize: 13,
-        color: theme.colorScheme.hentai.textTertiary,
-      ),
-    );
-  }
-}
