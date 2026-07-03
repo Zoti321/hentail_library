@@ -15,9 +15,7 @@ import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/sort_popup_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/comic_card.dart';
-import 'package:hentai_library/ui/core/widgets/element/tile/comic_tile.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/series_card.dart';
-import 'package:hentai_library/ui/core/widgets/element/tile/series_tile.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/add_comics_to_series_dialog.dart';
@@ -25,7 +23,6 @@ import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/series_co
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/rename_series_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/reorder_series_items_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/series_context_menu.dart';
-import 'package:hentai_library/ui/core/widgets/responsive_layout/library_section_sliver.dart';
 import 'package:hentai_library/ui/core/widgets/pagination/library_pagination_bar.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

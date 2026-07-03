@@ -47,7 +47,7 @@ void main() {
 
     test('buildListFilter skips series exclusion when setting off', () {
       final filter = projection.buildListFilter(
-        displayTarget: LibraryDisplayTarget.all,
+        displayTarget: LibraryDisplayTarget.comics,
         isHealthyMode: false,
         hideComicsInSeries: false,
         comicIdsInAnySeries: <String>{'in-series'},

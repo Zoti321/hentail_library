@@ -20,6 +20,9 @@ void main() {
     addTearDown(container.dispose);
 
     expect(container.read(libraryComicsPageIndexProvider), 1);
+    container
+        .read(libraryQueryIntentProvider.notifier)
+        .setDisplayTarget(LibraryDisplayTarget.series);
     container.read(libraryComicsPageIndexProvider.notifier).setPage(4);
     expect(container.read(libraryComicsPageIndexProvider), 4);
 

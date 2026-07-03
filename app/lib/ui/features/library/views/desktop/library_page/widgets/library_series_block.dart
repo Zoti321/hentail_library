@@ -7,33 +7,20 @@ class LibrarySeriesBlock extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
     final LibraryPageViewModel vm = ref.watch(libraryPageViewModelProvider);
-    final LibraryDisplayTarget displayTarget = vm.displayTarget;
-    final bool showSeriesSection = displayTarget != LibraryDisplayTarget.comics;
-    final bool showComicsSection = displayTarget != LibraryDisplayTarget.series;
+    if (vm.displayTarget != LibraryDisplayTarget.series) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
     final LibrarySeriesViewData seriesData = vm.seriesViewData;
     final List<Series> seriesToShow = seriesData.filteredSeries;
     final String filterQuery = vm.filterQuery;
-    if (!showSeriesSection) {
-      return const SliverToBoxAdapter(child: SizedBox.shrink());
-    }
     if (seriesToShow.isEmpty) {
-      if (!showComicsSection) {
-        return _NoMatchingSeriesSliver(query: filterQuery);
-      }
-      return const SliverToBoxAdapter(child: SizedBox.shrink());
+      return _NoMatchingSeriesSliver(query: filterQuery);
     }
-    final bool isGridView = vm.isGridView;
-    return LibrarySectionSliver(
-      title: '系列',
-      contentPadding: EdgeInsets.symmetric(
+    return SliverPadding(
+      padding: EdgeInsets.symmetric(
         horizontal: tokens.layout.contentHorizontalPadding,
       ),
-      bottomSpacing: 16,
-      contentSliver: LibraryAdaptiveItemsSliver(
-        isGridView: isGridView,
-        gridSliver: _LibrarySeriesGridSliver(series: seriesToShow),
-        listSliver: _LibrarySeriesListSliver(series: seriesToShow),
-      ),
+      sliver: _LibrarySeriesGridSliver(series: seriesToShow),
     );
   }
 }
@@ -84,36 +71,6 @@ class _LibrarySeriesGridSliverState extends State<_LibrarySeriesGridSliver> {
                   );
                 },
               ),
-            );
-          },
-        );
-      },
-    );
-  }
-}
-
-class _LibrarySeriesListSliver extends ConsumerWidget {
-  const _LibrarySeriesListSliver({required this.series});
-  final List<Series> series;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return SliverList.separated(
-      itemCount: series.length,
-      separatorBuilder: (BuildContext context, int index) =>
-          const SizedBox(height: 8),
-      itemBuilder: (BuildContext context, int index) {
-        final Series s = series[index];
-        return SeriesTile(
-          key: Key('library-series-${s.name}'),
-          series: s,
-          onTap: () => _openSeriesDetail(s),
-          onSecondaryTapDown: (TapDownDetails details) {
-            _showSeriesContextMenu(
-              context: context,
-              ref: ref,
-              series: s,
-              globalPosition: details.globalPosition,
             );
           },
         );

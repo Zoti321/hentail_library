@@ -53,7 +53,7 @@ class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
   void resetFilter() {
     state = state.copyWith(
       keyword: '',
-      displayTarget: LibraryDisplayTarget.all,
+      displayTarget: LibraryDisplayTarget.comics,
     );
   }
 
@@ -63,7 +63,4 @@ class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
     });
   }
 
-  void setIsGridView(bool isGridView) {
-    state = state.copyWith(isGridView: isGridView);
-  }
 }

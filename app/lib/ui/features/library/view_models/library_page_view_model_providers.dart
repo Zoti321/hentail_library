@@ -16,7 +16,6 @@ class LibraryPageViewModel {
     required this.seriesViewData,
     required this.displayedComicCount,
     required this.displayedSeriesCount,
-    required this.isGridView,
     required this.displayTarget,
     required this.filterQuery,
     required this.hasReceivedFirstEmit,
@@ -27,7 +26,6 @@ class LibraryPageViewModel {
   final LibrarySeriesViewData seriesViewData;
   final int displayedComicCount;
   final int displayedSeriesCount;
-  final bool isGridView;
   final LibraryDisplayTarget displayTarget;
   final String filterQuery;
   final bool hasReceivedFirstEmit;
@@ -49,12 +47,6 @@ final libraryFilterQueryProvider = Provider<String>((Ref ref) {
   );
 });
 
-final libraryIsGridViewProvider = Provider<bool>((Ref ref) {
-  return ref.watch(
-    libraryQueryIntentProvider.select((LibraryQueryIntent s) => s.isGridView),
-  );
-});
-
 /// 页面级只读模型：UI 层优先消费这个 provider，减少组件内拼装逻辑。
 final libraryPageViewModelProvider = Provider<LibraryPageViewModel>((Ref ref) {
   final AsyncValue<List<Comic>> comicsAsync = ref.watch(
@@ -70,7 +62,6 @@ final libraryPageViewModelProvider = Provider<LibraryPageViewModel>((Ref ref) {
   final int displayedSeriesCount = ref.watch(
     libraryDisplayedSeriesCountProvider,
   );
-  final bool isGridView = ref.watch(libraryIsGridViewProvider);
   final LibraryDisplayTarget displayTarget = ref.watch(
     libraryDisplayTargetProvider,
   );
@@ -105,7 +96,6 @@ final libraryPageViewModelProvider = Provider<LibraryPageViewModel>((Ref ref) {
     seriesViewData: seriesViewData,
     displayedComicCount: displayedComicCount,
     displayedSeriesCount: displayedSeriesCount,
-    isGridView: isGridView,
     displayTarget: displayTarget,
     filterQuery: filterQuery,
     hasReceivedFirstEmit: hasReceivedFirstEmit,

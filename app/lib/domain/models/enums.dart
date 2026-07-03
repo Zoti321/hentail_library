@@ -50,4 +50,4 @@ enum ResourceType {
   }
 }
 
-enum LibraryDisplayTarget { all, comics, series }
+enum LibraryDisplayTarget { comics, series }

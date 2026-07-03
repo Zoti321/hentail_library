@@ -6,28 +6,24 @@ class LibraryQueryIntent {
   LibraryQueryIntent({
     this.keyword = '',
     LibraryComicSortOption? sortOption,
-    this.displayTarget = LibraryDisplayTarget.all,
-    this.isGridView = true,
+    this.displayTarget = LibraryDisplayTarget.comics,
     this.mergeSearchQuery = '',
   }) : sortOption = sortOption ?? LibraryComicSortOption();
   final String keyword;
   final LibraryComicSortOption sortOption;
   final LibraryDisplayTarget displayTarget;
-  final bool isGridView;
   final String mergeSearchQuery;
 
   LibraryQueryIntent copyWith({
     String? keyword,
     LibraryComicSortOption? sortOption,
     LibraryDisplayTarget? displayTarget,
-    bool? isGridView,
     String? mergeSearchQuery,
   }) {
     return LibraryQueryIntent(
       keyword: keyword ?? this.keyword,
       sortOption: sortOption ?? this.sortOption,
       displayTarget: displayTarget ?? this.displayTarget,
-      isGridView: isGridView ?? this.isGridView,
       mergeSearchQuery: mergeSearchQuery ?? this.mergeSearchQuery,
     );
   }

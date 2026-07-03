@@ -1,7 +1,9 @@
 part of 'library_page_widgets.dart';
 
 class LibrarySearchToolbarRow extends ConsumerStatefulWidget {
-  const LibrarySearchToolbarRow({super.key});
+  const LibrarySearchToolbarRow({super.key, this.initialQuery = ''});
+
+  final String initialQuery;
 
   @override
   ConsumerState<LibrarySearchToolbarRow> createState() =>
@@ -15,7 +17,7 @@ class _LibrarySearchToolbarRowState
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController();
+    _controller = TextEditingController(text: widget.initialQuery);
   }
 
   @override
@@ -27,19 +29,29 @@ class _LibrarySearchToolbarRowState
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: [
-        ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.25,
-          ),
-          child: CustomTextField(
-            controller: _controller,
-            hintText: '搜索…',
-            onSubmitted: _handleSubmitSearch,
+      children: <Widget>[
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.sizeOf(context).width * 0.25,
+              ),
+              child: CustomTextField(
+                controller: _controller,
+                hintText: '搜索…',
+                onSubmitted: _handleSubmitSearch,
+              ),
+            ),
           ),
         ),
-        const Spacer(),
-        const _LibraryToolbar(),
+        const Expanded(child: Center(child: LibraryDisplayTargetTabs())),
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: const _LibraryToolbar(),
+          ),
+        ),
       ],
     );
   }
@@ -55,6 +67,85 @@ class _LibrarySearchToolbarRowState
   }
 }
 
+class LibraryDisplayTargetTabs extends ConsumerWidget {
+  const LibraryDisplayTargetTabs({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
+    );
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        _UnderlineTab(
+          label: '漫画',
+          isSelected: displayTarget == LibraryDisplayTarget.comics,
+          onTap: () => ref
+              .read(libraryQueryIntentProvider.notifier)
+              .setDisplayTarget(LibraryDisplayTarget.comics),
+        ),
+        const SizedBox(width: 24),
+        _UnderlineTab(
+          label: '系列',
+          isSelected: displayTarget == LibraryDisplayTarget.series,
+          onTap: () => ref
+              .read(libraryQueryIntentProvider.notifier)
+              .setDisplayTarget(LibraryDisplayTarget.series),
+        ),
+      ],
+    );
+  }
+}
+
+class _UnderlineTab extends StatelessWidget {
+  const _UnderlineTab({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4),
+      splashFactory: NoSplash.splashFactory,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? cs.primary : cs.hentai.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 6),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              height: 2,
+              width: label.length * 14.0,
+              decoration: BoxDecoration(
+                color: isSelected ? cs.primary : Colors.transparent,
+                borderRadius: BorderRadius.circular(1),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _LibraryToolbar extends ConsumerWidget {
   const _LibraryToolbar();
 
@@ -62,7 +153,6 @@ class _LibraryToolbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
-    final bool isGridView = ref.watch(libraryIsGridViewProvider);
     return Container(
       height: 40,
       decoration: BoxDecoration(
@@ -72,7 +162,8 @@ class _LibraryToolbar extends ConsumerWidget {
       ),
       padding: const EdgeInsets.all(3),
       child: Row(
-        children: [
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
           GhostButton.icon(
             icon: LucideIcons.rotateCw,
             tooltip: '刷新',
@@ -92,83 +183,7 @@ class _LibraryToolbar extends ConsumerWidget {
           const FilterPopupButton(),
           const SizedBox(width: 8),
           const SortPopupButton(),
-          const SizedBox(width: 12),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: cs.hentai.borderSubtle,
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: const SizedBox(width: 1, height: 22),
-          ),
-          const SizedBox(width: 12),
-          Row(
-            children: [
-              _ViewToggleButton(
-                icon: LucideIcons.layoutGrid,
-                isActive: isGridView,
-                onTap: () => ref
-                    .read(libraryQueryIntentProvider.notifier)
-                    .setIsGridView(true),
-                activeColor: theme.colorScheme.primary,
-              ),
-              const SizedBox(width: 4),
-              _ViewToggleButton(
-                icon: LucideIcons.list,
-                isActive: !isGridView,
-                onTap: () => ref
-                    .read(libraryQueryIntentProvider.notifier)
-                    .setIsGridView(false),
-                activeColor: theme.colorScheme.primary,
-              ),
-            ],
-          ),
         ],
-      ),
-    );
-  }
-}
-
-class _ViewToggleButton extends StatelessWidget {
-  const _ViewToggleButton({
-    required this.icon,
-    required this.isActive,
-    required this.onTap,
-    required this.activeColor,
-  });
-  final IconData icon;
-  final bool isActive;
-  final VoidCallback onTap;
-  final Color activeColor;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
-    return Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        hoverColor: theme.hoverColor,
-        splashFactory: NoSplash.splashFactory,
-        child: Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: isActive
-                ? cs.hentai.subtleTagBackground
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isActive ? cs.hentai.borderSubtle : Colors.transparent,
-            ),
-          ),
-          child: Icon(
-            icon,
-            size: 16,
-            color: isActive ? activeColor : cs.hentai.iconSecondary,
-          ),
-        ),
       ),
     );
   }
