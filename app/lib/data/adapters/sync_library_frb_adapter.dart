@@ -31,9 +31,7 @@ class SyncLibraryFrbAdapter {
           return;
         }
         if (event.phase == rust.SyncLibraryPhaseDto.failed) {
-          throw SyncException(
-            event.errorMessage ?? '漫画库同步失败',
-          );
+          throw SyncException(event.errorMessage ?? '漫画库同步失败');
         }
         onProgress?.call(mapRustSyncProgress(event));
         if (!clearedSessions &&

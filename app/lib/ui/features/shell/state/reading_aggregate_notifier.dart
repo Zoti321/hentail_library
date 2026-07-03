@@ -41,7 +41,9 @@ class ReadingAggregateNotifier extends _$ReadingAggregateNotifier {
     required int pageIndex,
   }) async {
     final DateTime now = DateTime.now();
-    await ref.read(readingHistoryRepoProvider).recordReading(
+    await ref
+        .read(readingHistoryRepoProvider)
+        .recordReading(
           ReadingHistory(
             comicId: comic.comicId,
             title: comic.title,

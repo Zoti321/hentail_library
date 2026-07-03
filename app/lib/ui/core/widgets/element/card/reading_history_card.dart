@@ -1,4 +1,4 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -82,7 +82,11 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
                   children: [
                     Row(
                       children: [
-                        _buildKindChip(cs: cs, label: '漫画', color: cs.secondary),
+                        _buildKindChip(
+                          cs: cs,
+                          label: '漫画',
+                          color: cs.secondary,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(

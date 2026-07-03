@@ -34,15 +34,12 @@ void main() {
     addTearDown(container.dispose);
 
     container.read(libraryComicsPageIndexProvider.notifier).setPage(2);
-    expect(
-      () {
-        container
-            .read(libraryQueryIntentProvider.notifier)
-            .setDisplayTarget(LibraryDisplayTarget.series);
-        container.read(libraryComicsPageIndexProvider);
-      },
-      returnsNormally,
-    );
+    expect(() {
+      container
+          .read(libraryQueryIntentProvider.notifier)
+          .setDisplayTarget(LibraryDisplayTarget.series);
+      container.read(libraryComicsPageIndexProvider);
+    }, returnsNormally);
     expect(container.read(libraryComicsPageIndexProvider), 1);
   });
 }

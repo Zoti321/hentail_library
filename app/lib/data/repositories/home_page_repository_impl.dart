@@ -44,9 +44,7 @@ class HomePageRepositoryImpl implements HomePageRepository {
     return HomeContinueReadingEntry(
       comicId: dto.comicId,
       title: dto.title,
-      lastReadTime: DateTime.fromMillisecondsSinceEpoch(
-        dto.lastReadTimeMs,
-      ),
+      lastReadTime: DateTime.fromMillisecondsSinceEpoch(dto.lastReadTimeMs),
       pageIndex: dto.pageIndex,
     );
   }

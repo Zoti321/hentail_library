@@ -103,7 +103,8 @@ class ComicRepositoryImpl implements ComicRepository {
   @override
   Future<List<Comic>> searchByKeyword(String keyword) async {
     return guardFrbSync(
-      () => rust.searchByKeywordFrb(keyword: keyword).map(mapRustComic).toList(),
+      () =>
+          rust.searchByKeywordFrb(keyword: keyword).map(mapRustComic).toList(),
       fallbackMessage: '搜索漫画失败',
     );
   }

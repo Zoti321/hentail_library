@@ -48,12 +48,10 @@ Stream<T> guardFrbStream<T>(
   Stream<T> Function() create, {
   String? fallbackMessage,
 }) {
-  return create().handleError(
-    (Object error, StackTrace stackTrace) {
-      if (error is HentaiErrorDto && isBenignFrbStreamClosed(error)) {
-        return;
-      }
-      _rethrowFrb(error, stackTrace, fallbackMessage: fallbackMessage);
-    },
-  );
+  return create().handleError((Object error, StackTrace stackTrace) {
+    if (error is HentaiErrorDto && isBenignFrbStreamClosed(error)) {
+      return;
+    }
+    _rethrowFrb(error, stackTrace, fallbackMessage: fallbackMessage);
+  });
 }

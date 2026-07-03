@@ -8,16 +8,12 @@ class PathRepositoryImpl implements PathRepository {
   const PathRepositoryImpl();
 
   @override
-  Future<List<String>> getAll() async => guardFrbSync(
-    rust.listAllPathsFrb,
-    fallbackMessage: '读取路径列表失败',
-  );
+  Future<List<String>> getAll() async =>
+      guardFrbSync(rust.listAllPathsFrb, fallbackMessage: '读取路径列表失败');
 
   @override
-  Stream<List<String>> watch() => guardFrbStream(
-    rust.watchPathsFrb,
-    fallbackMessage: '监听路径列表失败',
-  );
+  Stream<List<String>> watch() =>
+      guardFrbStream(rust.watchPathsFrb, fallbackMessage: '监听路径列表失败');
 
   @override
   Future<void> add(String path) async {

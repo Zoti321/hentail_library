@@ -14,43 +14,37 @@ import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 Future<void> main() async {
-  runZonedGuarded(
-    () async {
-      WidgetsFlutterBinding.ensureInitialized();
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-      await RustLib.init();
+    await RustLib.init();
 
-      try {
-        final appDataDir = await getApplicationSupportDirectory();
-        guardFrbSync(
-          () => initDbFrb(
-            appDataDir: appDataDir.path,
-            dbFileName: 'my_database',
-          ),
-          fallbackMessage: '数据库初始化失败',
-        );
-      } catch (e, st) {
-        debugPrint('Rust init_db 失败: $e\n$st');
-      }
+    try {
+      final appDataDir = await getApplicationSupportDirectory();
+      guardFrbSync(
+        () => initDbFrb(appDataDir: appDataDir.path, dbFileName: 'my_database'),
+        fallbackMessage: '数据库初始化失败',
+      );
+    } catch (e, st) {
+      debugPrint('Rust init_db 失败: $e\n$st');
+    }
 
-      _initImageQualityPolicy();
+    _initImageQualityPolicy();
 
-      if (isDesktop) {
-        await _initWindow();
-      }
+    if (isDesktop) {
+      await _initWindow();
+    }
 
-      LogManager.init();
-      try {
-        final logWriter = LogFileWriter(LogManager.instance);
-        await logWriter.init();
-      } catch (e, st) {
-        LogManager.instance.handle(e, st, '文件日志初始化失败');
-      }
+    LogManager.init();
+    try {
+      final logWriter = LogFileWriter(LogManager.instance);
+      await logWriter.init();
+    } catch (e, st) {
+      LogManager.instance.handle(e, st, '文件日志初始化失败');
+    }
 
-      runApp(const MyApp());
-    },
-    handleUncaughtFrbZoneError,
-  );
+    runApp(const MyApp());
+  }, handleUncaughtFrbZoneError);
 }
 
 void _initImageQualityPolicy() {

@@ -13,23 +13,26 @@ AppException mapFrbError(
       : (fallbackMessage ?? '操作失败');
 
   return switch (error.code) {
-    'Validation' => SyncException(detail.isEmpty ? message : detail,
-        cause: error, stackTrace: stackTrace),
+    'Validation' => SyncException(
+      detail.isEmpty ? message : detail,
+      cause: error,
+      stackTrace: stackTrace,
+    ),
     'DbInitFailed' => AppException(
-        detail.isEmpty ? '数据库未初始化' : detail,
-        cause: error,
-        stackTrace: stackTrace,
-      ),
+      detail.isEmpty ? '数据库未初始化' : detail,
+      cause: error,
+      stackTrace: stackTrace,
+    ),
     'DbQueryFailed' => SyncException(
-        detail.isEmpty ? '数据库操作失败' : detail,
-        cause: error,
-        stackTrace: stackTrace,
-      ),
+      detail.isEmpty ? '数据库操作失败' : detail,
+      cause: error,
+      stackTrace: stackTrace,
+    ),
     _ => AppException(
-        detail.isEmpty ? message : detail,
-        cause: error,
-        stackTrace: stackTrace,
-      ),
+      detail.isEmpty ? message : detail,
+      cause: error,
+      stackTrace: stackTrace,
+    ),
   };
 }
 

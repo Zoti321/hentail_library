@@ -15,8 +15,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
   Stream<List<Series>> watchAll() {
     return guardFrbStream(
       () => rust_series.watchAllSeriesFrb().map(
-        (List<rust_series.SeriesDto> rows) =>
-            rows.map(mapRustSeries).toList(),
+        (List<rust_series.SeriesDto> rows) => rows.map(mapRustSeries).toList(),
       ),
       fallbackMessage: '监听系列列表失败',
     );
