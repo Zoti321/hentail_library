@@ -5,6 +5,10 @@ pub enum HentaiErrorCode {
     Validation,
     DbInitFailed,
     DbQueryFailed,
+    ReaderNotFound,
+    ReaderKindMismatch,
+    ReaderUnsupportedType,
+    ReaderInvalidContent,
 }
 
 #[derive(Debug, Clone, Error)]
@@ -37,6 +41,38 @@ impl HentaiError {
             code: HentaiErrorCode::DbQueryFailed,
             message: message.into(),
             context,
+        }
+    }
+
+    pub fn reader_not_found(path: impl Into<String>) -> Self {
+        Self {
+            code: HentaiErrorCode::ReaderNotFound,
+            message: format!("路径不存在: {}", path.into()),
+            context: None,
+        }
+    }
+
+    pub fn reader_kind_mismatch(message: impl Into<String>) -> Self {
+        Self {
+            code: HentaiErrorCode::ReaderKindMismatch,
+            message: message.into(),
+            context: None,
+        }
+    }
+
+    pub fn reader_unsupported_type(resource_type: impl Into<String>) -> Self {
+        Self {
+            code: HentaiErrorCode::ReaderUnsupportedType,
+            message: format!("暂不支持的资源类型: {}", resource_type.into()),
+            context: None,
+        }
+    }
+
+    pub fn reader_invalid_content(message: impl Into<String>) -> Self {
+        Self {
+            code: HentaiErrorCode::ReaderInvalidContent,
+            message: message.into(),
+            context: None,
         }
     }
 }

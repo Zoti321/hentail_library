@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use crate::db::connection;
 use crate::error::HentaiError;
+use crate::reader::clear_reader_sessions;
 
 use super::dto::{
     LibrarySyncCountsDto, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto,
@@ -84,6 +85,7 @@ async fn sync_no_roots(
         None,
     ));
     let removed = clear_all_comics(db).await?;
+    clear_reader_sessions();
     emit(progress(
         SyncLibraryPhaseDto::Done,
         SyncLibraryRouteDto::NoRootsCleared,
@@ -173,6 +175,7 @@ async fn sync_with_roots(
         return Ok(());
     }
     apply_scan_replace_plan(db, &plan).await?;
+    clear_reader_sessions();
 
     let thumbnail_targets = plan.thumbnail_generation_targets.clone();
     let mut thumbnail_failed = 0i32;

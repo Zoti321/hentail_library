@@ -5,6 +5,7 @@
 
 import 'api/comic.dart';
 import 'api/init.dart';
+import 'api/reader.dart';
 import 'api/sync.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -117,6 +118,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PagedComicResultDto dco_decode_paged_comic_result_dto(dynamic raw);
+
+  @protected
+  ReaderPageListDto dco_decode_reader_page_list_dto(dynamic raw);
 
   @protected
   SyncLibraryPhaseDto dco_decode_sync_library_phase_dto(dynamic raw);
@@ -243,6 +247,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PagedComicResultDto sse_decode_paged_comic_result_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ReaderPageListDto sse_decode_reader_page_list_dto(
     SseDeserializer deserializer,
   );
 
@@ -408,6 +417,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_paged_comic_result_dto(
     PagedComicResultDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_reader_page_list_dto(
+    ReaderPageListDto self,
     SseSerializer serializer,
   );
 

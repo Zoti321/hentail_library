@@ -4,8 +4,10 @@ pub mod db;
 pub mod entity;
 pub mod error;
 pub mod migration;
+pub mod reader;
 pub mod runtime;
 pub mod sync;
+pub mod util;
 
 pub use comic::{
     ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
@@ -17,4 +19,8 @@ pub use error::{HentaiError, HentaiErrorCode};
 pub use sync::{
     LibrarySyncCountsDto, SyncHandle, SyncLibraryPhaseDto, SyncLibraryProgressDto,
     SyncLibraryRouteDto, cancel_sync, create_sync_handle, sync_library,
+};
+pub use reader::{
+    ReaderPageListDto, clear_reader_sessions, close_reader, load_page_bytes, load_page_list,
+    open_reader,
 };
