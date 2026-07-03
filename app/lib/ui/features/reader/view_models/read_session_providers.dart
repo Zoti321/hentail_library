@@ -2,11 +2,13 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/data/services/comic/read_resource_get/core/comic_read_resource_exception.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/domain/reading/read_session_exceptions.dart';
 import 'package:hentai_library/domain/reading/read_session_loader.dart';
 import 'package:hentai_library/domain/reading/read_session_page.dart';
+import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
@@ -58,6 +60,20 @@ Future<Uint8List?> comicReaderPageBytes(
     return await ref
         .read(comicPageSourcePortProvider)
         .loadPageBytes(comic: comic, pageIndex: pageIndex);
+  } on ComicReadResourceException catch (error, stackTrace) {
+    throw ReadSessionPageLoadException.loadFailed(
+      comicId: comicId,
+      path: comic.path,
+      cause: error,
+      stackTrace: stackTrace,
+    );
+  } on HentaiErrorDto catch (error, stackTrace) {
+    throw ReadSessionPageLoadException.loadFailed(
+      comicId: comicId,
+      path: comic.path,
+      cause: error,
+      stackTrace: stackTrace,
+    );
   } on Object catch (error, stackTrace) {
     LogManager.instance.handle(
       error,
