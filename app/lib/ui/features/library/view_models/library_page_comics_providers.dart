@@ -68,16 +68,23 @@ final Provider<AsyncValue<List<Comic>>> libraryDisplayedComicsProvider =
       );
     });
 
+/// 分页 totalCount 在 reload 期间保持上一帧，避免头部 chip 闪烁为 0。
+int stablePagedTotalCount(AsyncValue<PagedResult<Comic>> pageAsync) {
+  return pageAsync.when(
+    data: (PagedResult<Comic> page) => page.totalCount,
+    loading: () => pageAsync.value?.totalCount ?? 0,
+    error: (Object _, StackTrace _) => pageAsync.value?.totalCount ?? 0,
+    skipLoadingOnReload: true,
+  );
+}
+
 final Provider<int> libraryDisplayedComicCountProvider = Provider<int>((
   Ref ref,
 ) {
   final AsyncValue<PagedResult<Comic>> pageAsync = ref.watch(
     libraryComicsPageProvider,
   );
-  return pageAsync.maybeWhen(
-    data: (PagedResult<Comic> page) => page.totalCount,
-    orElse: () => 0,
-  );
+  return stablePagedTotalCount(pageAsync);
 });
 
 final Provider<bool> libraryHasReceivedFirstEmitProvider = Provider<bool>((

@@ -13,6 +13,54 @@ import 'package:hentai_library/ui/features/library/view_models/library_view_sett
 
 const LibraryComicProjection _libraryComicProjection = LibraryComicProjection();
 
+Map<String, Comic> _comicsByIdFromAsync(AsyncValue<List<Comic>> comicsAsync) {
+  return comicsAsync.when(
+    data: (List<Comic> comics) => <String, Comic>{
+      for (final Comic comic in comics) comic.comicId: comic,
+    },
+    loading: () {
+      final List<Comic>? previous = comicsAsync.value;
+      if (previous == null) {
+        return <String, Comic>{};
+      }
+      return <String, Comic>{
+        for (final Comic comic in previous) comic.comicId: comic,
+      };
+    },
+    error: (Object _, StackTrace _) {
+      final List<Comic>? previous = comicsAsync.value;
+      if (previous == null) {
+        return <String, Comic>{};
+      }
+      return <String, Comic>{
+        for (final Comic comic in previous) comic.comicId: comic,
+      };
+    },
+    skipLoadingOnReload: true,
+  );
+}
+
+LibrarySeriesViewData _seriesViewDataFrom(
+  List<Series> seriesList,
+  Map<String, Comic> comicsById,
+  LibraryViewSettings viewSettings,
+  LibraryQueryIntent intent,
+) {
+  final LibrarySeriesQueryResult result = LibrarySeriesQuery(
+    showR18: _libraryComicProjection.showR18(
+      isHealthyMode: viewSettings.isHealthyMode,
+    ),
+    query: '',
+    sortOption: intent.sortOption,
+    comicsById: comicsById,
+  ).apply(seriesList);
+  return LibrarySeriesViewData(
+    headerTotalSeriesWithItemsCount: result.headerTotalSeriesWithItemsCount,
+    seriesWithItemsCount: result.seriesWithItemsCount,
+    filteredSeries: result.filteredSeries,
+  );
+}
+
 /// Projection 层（系列）：负责生成系列区块渲染所需的只读视图数据。
 @immutable
 class LibrarySeriesViewData {
@@ -42,39 +90,46 @@ final Provider<LibrarySeriesViewData> librarySeriesViewDataProvider =
         librarySeriesComicsByIdSourceProvider,
       );
       final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
+      final Map<String, Comic> comicsById = _comicsByIdFromAsync(comicsAsync);
       return seriesAsync.when(
-        data: (List<Series> list) {
-          final Map<String, Comic> comicsById = comicsAsync.maybeWhen(
-            data: (List<Comic> comics) => <String, Comic>{
-              for (final Comic comic in comics) comic.comicId: comic,
-            },
-            orElse: () => <String, Comic>{},
-          );
-          final LibrarySeriesQueryResult result = LibrarySeriesQuery(
-            showR18: _libraryComicProjection.showR18(
-              isHealthyMode: viewSettings.isHealthyMode,
-            ),
-            query: '',
-            sortOption: intent.sortOption,
-            comicsById: comicsById,
-          ).apply(list);
-          return LibrarySeriesViewData(
-            headerTotalSeriesWithItemsCount:
-                result.headerTotalSeriesWithItemsCount,
-            seriesWithItemsCount: result.seriesWithItemsCount,
-            filteredSeries: result.filteredSeries,
+        data: (List<Series> list) => _seriesViewDataFrom(
+          list,
+          comicsById,
+          viewSettings,
+          intent,
+        ),
+        loading: () {
+          final List<Series>? previous = seriesAsync.value;
+          if (previous == null) {
+            return const LibrarySeriesViewData(
+              headerTotalSeriesWithItemsCount: 0,
+              seriesWithItemsCount: 0,
+              filteredSeries: <Series>[],
+            );
+          }
+          return _seriesViewDataFrom(
+            previous,
+            comicsById,
+            viewSettings,
+            intent,
           );
         },
-        loading: () => const LibrarySeriesViewData(
-          headerTotalSeriesWithItemsCount: 0,
-          seriesWithItemsCount: 0,
-          filteredSeries: <Series>[],
-        ),
-        error: (Object _, StackTrace _) => const LibrarySeriesViewData(
-          headerTotalSeriesWithItemsCount: 0,
-          seriesWithItemsCount: 0,
-          filteredSeries: <Series>[],
-        ),
+        error: (Object _, StackTrace _) {
+          final List<Series>? previous = seriesAsync.value;
+          if (previous == null) {
+            return const LibrarySeriesViewData(
+              headerTotalSeriesWithItemsCount: 0,
+              seriesWithItemsCount: 0,
+              filteredSeries: <Series>[],
+            );
+          }
+          return _seriesViewDataFrom(
+            previous,
+            comicsById,
+            viewSettings,
+            intent,
+          );
+        },
         skipLoadingOnReload: true,
       );
     });

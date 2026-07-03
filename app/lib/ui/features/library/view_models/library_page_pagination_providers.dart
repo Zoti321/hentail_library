@@ -53,10 +53,24 @@ Object libraryComicsPageQueryKey(Ref ref) {
 @Riverpod(keepAlive: true)
 Set<String> libraryComicIdsInAnySeries(Ref ref) {
   final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
-  return seriesAsync.maybeWhen(
+  return seriesAsync.when(
     data: (List<Series> list) =>
         _libraryComicProjection.collectComicIdsInAnySeries(list),
-    orElse: () => <String>{},
+    loading: () {
+      final List<Series>? previous = seriesAsync.value;
+      if (previous == null) {
+        return <String>{};
+      }
+      return _libraryComicProjection.collectComicIdsInAnySeries(previous);
+    },
+    error: (Object _, StackTrace _) {
+      final List<Series>? previous = seriesAsync.value;
+      if (previous == null) {
+        return <String>{};
+      }
+      return _libraryComicProjection.collectComicIdsInAnySeries(previous);
+    },
+    skipLoadingOnReload: true,
   );
 }
 
@@ -64,14 +78,7 @@ Set<String> libraryComicIdsInAnySeries(Ref ref) {
 class LibraryComicsPageIndex extends _$LibraryComicsPageIndex {
   @override
   int build() {
-    ref.listen<Object>(libraryComicsPageQueryKeyProvider, (
-      Object? previous,
-      Object next,
-    ) {
-      if (previous != null) {
-        state = 1;
-      }
-    });
+    ref.watch(libraryComicsPageQueryKeyProvider);
     return 1;
   }
 
