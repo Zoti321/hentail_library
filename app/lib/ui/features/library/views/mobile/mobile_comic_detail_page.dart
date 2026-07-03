@@ -153,7 +153,9 @@ class _MobileComicDetailBody extends ConsumerWidget {
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: () async {
-                        await ref.read(readingHistoryRepoProvider).recordReading(
+                        await ref
+                            .read(readingHistoryRepoProvider)
+                            .recordReading(
                               ReadingHistory(
                                 comicId: comic.comicId,
                                 title: comic.title,

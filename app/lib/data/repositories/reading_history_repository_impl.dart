@@ -52,8 +52,9 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
 
   @override
   Future<entity.ReadingHistory?> getByComicId(String comicId) async {
-    final rust.ReadingHistoryDto? row =
-        rust.getReadingByComicIdFrb(comicId: comicId);
+    final rust.ReadingHistoryDto? row = rust.getReadingByComicIdFrb(
+      comicId: comicId,
+    );
     return row == null ? null : mapReadingHistoryDto(row);
   }
 
@@ -83,7 +84,9 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
     }
     final int totalPages =
         (page.totalCount.toInt() + request.pageSize - 1) ~/ request.pageSize;
-    final int effectivePage = request.page > totalPages ? totalPages : request.page;
+    final int effectivePage = request.page > totalPages
+        ? totalPages
+        : request.page;
     if (effectivePage != request.page) {
       final rust.PagedReadingHistoryDto adjusted = rust.fetchReadingPageFrb(
         page: effectivePage,
@@ -98,8 +101,9 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   Future<entity.SeriesReadingHistory?> getSeriesReadingBySeriesName(
     String seriesName,
   ) async {
-    final rust.SeriesReadingHistoryDto? row =
-        rust.getSeriesReadingByNameFrb(seriesName: seriesName);
+    final rust.SeriesReadingHistoryDto? row = rust.getSeriesReadingByNameFrb(
+      seriesName: seriesName,
+    );
     return row == null ? null : mapSeriesReadingHistoryDto(row);
   }
 
@@ -115,10 +119,11 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   Future<PagedResult<entity.SeriesReadingHistory>> fetchSeriesHistoryPage(
     PageRequest request,
   ) async {
-    final rust.PagedSeriesReadingHistoryDto page = rust.fetchSeriesReadingPageFrb(
-      page: request.page,
-      pageSize: request.pageSize,
-    );
+    final rust.PagedSeriesReadingHistoryDto page = rust
+        .fetchSeriesReadingPageFrb(
+          page: request.page,
+          pageSize: request.pageSize,
+        );
     if (page.totalCount.toInt() <= 0) {
       return PagedResult<entity.SeriesReadingHistory>(
         items: const <entity.SeriesReadingHistory>[],
@@ -129,10 +134,12 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
     }
     final int totalPages =
         (page.totalCount.toInt() + request.pageSize - 1) ~/ request.pageSize;
-    final int effectivePage = request.page > totalPages ? totalPages : request.page;
+    final int effectivePage = request.page > totalPages
+        ? totalPages
+        : request.page;
     if (effectivePage != request.page) {
-      final rust.PagedSeriesReadingHistoryDto adjusted =
-          rust.fetchSeriesReadingPageFrb(
+      final rust.PagedSeriesReadingHistoryDto adjusted = rust
+          .fetchSeriesReadingPageFrb(
             page: effectivePage,
             pageSize: request.pageSize,
           );
@@ -163,7 +170,9 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   Future<void> deleteByComicId(String comicId) async {
     try {
       rust.deleteReadingByComicIdFrb(comicId: comicId);
-      rust.deleteSeriesReadingByLastReadComicIdsFrb(comicIds: <String>[comicId]);
+      rust.deleteSeriesReadingByLastReadComicIdsFrb(
+        comicIds: <String>[comicId],
+      );
     } catch (e, st) {
       LogManager.instance.handle(
         e,

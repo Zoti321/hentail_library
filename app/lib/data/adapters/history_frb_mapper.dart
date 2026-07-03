@@ -6,7 +6,9 @@ entity.ReadingHistory mapReadingHistoryDto(rust.ReadingHistoryDto dto) {
   return entity.ReadingHistory(
     comicId: dto.comicId,
     title: dto.title,
-    lastReadTime: DateTime.fromMillisecondsSinceEpoch(dto.lastReadTimeMs.toInt()),
+    lastReadTime: DateTime.fromMillisecondsSinceEpoch(
+      dto.lastReadTimeMs.toInt(),
+    ),
     pageIndex: dto.pageIndex,
   );
 }
@@ -17,7 +19,9 @@ entity.SeriesReadingHistory mapSeriesReadingHistoryDto(
   return entity.SeriesReadingHistory(
     seriesName: dto.seriesName,
     lastReadComicId: dto.lastReadComicId,
-    lastReadTime: DateTime.fromMillisecondsSinceEpoch(dto.lastReadTimeMs.toInt()),
+    lastReadTime: DateTime.fromMillisecondsSinceEpoch(
+      dto.lastReadTimeMs.toInt(),
+    ),
     pageIndex: dto.pageIndex,
   );
 }

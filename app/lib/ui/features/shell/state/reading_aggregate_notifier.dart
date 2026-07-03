@@ -56,14 +56,16 @@ class ReadingAggregateNotifier extends _$ReadingAggregateNotifier {
             pageIndex: pageIndex,
           )
         : null;
-    await ref.read(readingHistoryRepoProvider).recordProgress(
-      ReadingHistory(
-        comicId: comic.comicId,
-        title: comic.title,
-        lastReadTime: now,
-        pageIndex: pageIndex,
-      ),
-      series: series,
-    );
+    await ref
+        .read(readingHistoryRepoProvider)
+        .recordProgress(
+          ReadingHistory(
+            comicId: comic.comicId,
+            title: comic.title,
+            lastReadTime: now,
+            pageIndex: pageIndex,
+          ),
+          series: series,
+        );
   }
 }

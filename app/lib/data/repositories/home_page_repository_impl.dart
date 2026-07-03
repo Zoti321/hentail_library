@@ -10,9 +10,7 @@ class HomePageRepositoryImpl implements HomePageRepository {
 
   @override
   Stream<HomePageCounts> watchHomePageCounts() {
-    return rust
-        .watchHomePageCountsFrb(excludeR18: false)
-        .map(_mapCounts);
+    return rust.watchHomePageCountsFrb(excludeR18: false).map(_mapCounts);
   }
 
   @override
