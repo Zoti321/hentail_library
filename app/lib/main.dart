@@ -1,41 +1,56 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:hentai_library/core/image/image_quality_policy.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/data/adapters/frb_zone_guard.dart';
 import 'package:hentai_library/src/rust/api/comic.dart';
 import 'package:hentai_library/src/rust/frb_generated.dart';
 import 'package:hentai_library/ui/features/shell/views/app.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+Future<void> main() async {
+  runZonedGuarded(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
 
-  await RustLib.init();
+      await RustLib.init();
 
-  try {
-    final appDataDir = await getApplicationSupportDirectory();
-    initDbFrb(appDataDir: appDataDir.path, dbFileName: 'my_database');
-  } catch (e, st) {
-    debugPrint('Rust init_db 失败: $e\n$st');
-  }
+      try {
+        final appDataDir = await getApplicationSupportDirectory();
+        guardFrbSync(
+          () => initDbFrb(
+            appDataDir: appDataDir.path,
+            dbFileName: 'my_database',
+          ),
+          fallbackMessage: '数据库初始化失败',
+        );
+      } catch (e, st) {
+        debugPrint('Rust init_db 失败: $e\n$st');
+      }
 
-  _initImageQualityPolicy();
+      _initImageQualityPolicy();
 
-  if (isDesktop) {
-    await _initWindow();
-  }
+      if (isDesktop) {
+        await _initWindow();
+      }
 
-  LogManager.init();
-  try {
-    final logWriter = LogFileWriter(LogManager.instance);
-    await logWriter.init();
-  } catch (e, st) {
-    LogManager.instance.handle(e, st, '文件日志初始化失败');
-  }
+      LogManager.init();
+      try {
+        final logWriter = LogFileWriter(LogManager.instance);
+        await logWriter.init();
+      } catch (e, st) {
+        LogManager.instance.handle(e, st, '文件日志初始化失败');
+      }
 
-  runApp(const MyApp());
+      runApp(const MyApp());
+    },
+    handleUncaughtFrbZoneError,
+  );
 }
 
 void _initImageQualityPolicy() {

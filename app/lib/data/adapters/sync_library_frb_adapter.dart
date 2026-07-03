@@ -1,4 +1,5 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/frb_error_mapper.dart';
 import 'package:hentai_library/domain/ports/reader_session_port.dart';
 import 'package:hentai_library/domain/use_cases/sync_library_types.dart';
@@ -21,8 +22,9 @@ class SyncLibraryFrbAdapter {
     _activeHandle = handle;
     try {
       var clearedSessions = false;
-      await for (final rust.SyncLibraryProgressDto event in rust.syncLibraryFrb(
-        handle: handle,
+      await for (final rust.SyncLibraryProgressDto event in guardFrbStream(
+        () => rust.syncLibraryFrb(handle: handle),
+        fallbackMessage: '漫画库同步失败',
       )) {
         if (isCancelled()) {
           rust.cancelSyncFrb(handle: handle);

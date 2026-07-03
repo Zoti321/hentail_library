@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart' as rust;
 
@@ -8,8 +9,9 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
 
   @override
   Future<ComicThumbnailRecord?> findByComicId(String comicId) async {
-    final rust.ComicThumbnailDto? row = rust.findThumbnailByComicIdFrb(
-      comicId: comicId,
+    final rust.ComicThumbnailDto? row = guardFrbSync(
+      () => rust.findThumbnailByComicIdFrb(comicId: comicId),
+      fallbackMessage: '读取缩略图失败',
     );
     if (row == null) {
       return null;
@@ -33,6 +35,9 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
 
   @override
   Future<void> deleteByComicIds(List<String> comicIds) async {
-    rust.deleteThumbnailsByComicIdsFrb(comicIds: comicIds);
+    guardFrbSync(
+      () => rust.deleteThumbnailsByComicIdsFrb(comicIds: comicIds),
+      fallbackMessage: '删除缩略图失败',
+    );
   }
 }

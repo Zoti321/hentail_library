@@ -7,6 +7,7 @@ use hentai_core::{
 };
 
 use super::init::HentaiErrorDto;
+use super::stream_watch::{emit_or_closed, normalize_watch_result};
 
 #[derive(Debug, Clone)]
 pub struct ReadingHistoryDto {
@@ -103,14 +104,15 @@ pub async fn watch_reading_histories_frb(
         .into_iter()
         .map(ReadingHistoryDto::from)
         .collect();
-    if sink.add(initial).is_err() {
+    if emit_or_closed(&sink, initial).is_err() {
         return Ok(());
     }
-    core_watch_reading(|items| {
-        let mapped: Vec<ReadingHistoryDto> = items.into_iter().map(ReadingHistoryDto::from).collect();
-        sink.add(mapped)
-            .map_err(|_| hentai_core::HentaiError::validation("stream closed"))
-    })
-    .await
-    .map_err(HentaiErrorDto::from)
+    normalize_watch_result(
+        core_watch_reading(|items| {
+            let mapped: Vec<ReadingHistoryDto> =
+                items.into_iter().map(ReadingHistoryDto::from).collect();
+            emit_or_closed(&sink, mapped)
+        })
+        .await,
+    )
 }

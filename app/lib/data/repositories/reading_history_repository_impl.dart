@@ -1,5 +1,6 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/history_frb_mapper.dart';
 import 'package:hentai_library/domain/models/models.dart' as entity;
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
@@ -13,30 +14,40 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   @override
   Future<void> recordReading(entity.ReadingHistory history) async {
     try {
-      rust.recordReadingFrb(history: toReadingHistoryDto(history));
+      guardFrbSync(
+        () => rust.recordReadingFrb(history: toReadingHistoryDto(history)),
+        fallbackMessage: '记录阅读进度失败',
+      );
     } catch (e, st) {
       LogManager.instance.handle(
         e,
         st,
         '[READING_HISTORY_REPO] 记录阅读进度失败，comicId=${history.comicId}',
       );
+      if (e is AppException) {
+        rethrow;
+      }
       throw AppException('记录阅读进度失败', cause: e, stackTrace: st);
     }
   }
 
   @override
   Future<entity.ReadingHistory?> getByComicId(String comicId) async {
-    final rust.ReadingHistoryDto? row = rust.getReadingByComicIdFrb(
-      comicId: comicId,
+    final rust.ReadingHistoryDto? row = guardFrbSync(
+      () => rust.getReadingByComicIdFrb(comicId: comicId),
+      fallbackMessage: '读取阅读进度失败',
     );
     return row == null ? null : mapReadingHistoryDto(row);
   }
 
   @override
   Stream<List<entity.ReadingHistory>> watchAllHistory() {
-    return rust.watchReadingHistoriesFrb().map(
-      (List<rust.ReadingHistoryDto> rows) =>
-          rows.map(mapReadingHistoryDto).toList(growable: false),
+    return guardFrbStream(
+      () => rust.watchReadingHistoriesFrb().map(
+        (List<rust.ReadingHistoryDto> rows) =>
+            rows.map(mapReadingHistoryDto).toList(growable: false),
+      ),
+      fallbackMessage: '监听阅读历史失败',
     );
   }
 
@@ -44,9 +55,12 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   Future<PagedResult<entity.ReadingHistory>> fetchHistoryPage(
     PageRequest request,
   ) async {
-    final rust.PagedReadingHistoryDto page = rust.fetchReadingPageFrb(
-      page: request.page,
-      pageSize: request.pageSize,
+    final rust.PagedReadingHistoryDto page = guardFrbSync(
+      () => rust.fetchReadingPageFrb(
+        page: request.page,
+        pageSize: request.pageSize,
+      ),
+      fallbackMessage: '读取阅读历史失败',
     );
     if (page.totalCount.toInt() <= 0) {
       return PagedResult<entity.ReadingHistory>(
@@ -62,9 +76,12 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
         ? totalPages
         : request.page;
     if (effectivePage != request.page) {
-      final rust.PagedReadingHistoryDto adjusted = rust.fetchReadingPageFrb(
-        page: effectivePage,
-        pageSize: request.pageSize,
+      final rust.PagedReadingHistoryDto adjusted = guardFrbSync(
+        () => rust.fetchReadingPageFrb(
+          page: effectivePage,
+          pageSize: request.pageSize,
+        ),
+        fallbackMessage: '读取阅读历史失败',
       );
       return mapPagedReadingHistory(adjusted, effectivePage, request.pageSize);
     }
@@ -74,13 +91,19 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   @override
   Future<void> deleteByComicId(String comicId) async {
     try {
-      rust.deleteReadingByComicIdFrb(comicId: comicId);
+      guardFrbSync(
+        () => rust.deleteReadingByComicIdFrb(comicId: comicId),
+        fallbackMessage: '删除阅读历史失败',
+      );
     } catch (e, st) {
       LogManager.instance.handle(
         e,
         st,
         '[READING_HISTORY_REPO] 删除阅读历史失败，comicId=$comicId',
       );
+      if (e is AppException) {
+        rethrow;
+      }
       throw AppException('删除阅读历史失败', cause: e, stackTrace: st);
     }
   }
@@ -92,9 +115,15 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
       if (ids.isEmpty) {
         return;
       }
-      rust.deleteReadingByComicIdsFrb(comicIds: ids);
+      guardFrbSync(
+        () => rust.deleteReadingByComicIdsFrb(comicIds: ids),
+        fallbackMessage: '批量删除阅读历史失败',
+      );
     } catch (e, st) {
       LogManager.instance.handle(e, st, '[READING_HISTORY_REPO] 批量删除阅读历史失败');
+      if (e is AppException) {
+        rethrow;
+      }
       throw AppException('批量删除阅读历史失败', cause: e, stackTrace: st);
     }
   }
@@ -102,9 +131,15 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
   @override
   Future<void> clearAllHistory() async {
     try {
-      rust.clearAllReadingFrb();
+      guardFrbSync(
+        () => rust.clearAllReadingFrb(),
+        fallbackMessage: '清空阅读历史失败',
+      );
     } catch (e, st) {
       LogManager.instance.handle(e, st, '[READING_HISTORY_REPO] 清空阅读历史失败');
+      if (e is AppException) {
+        rethrow;
+      }
       throw AppException('清空阅读历史失败', cause: e, stackTrace: st);
     }
   }

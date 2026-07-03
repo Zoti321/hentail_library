@@ -5,6 +5,7 @@ use hentai_core::{
 
 use super::comic::PageRequestDto;
 use super::init::HentaiErrorDto;
+use super::stream_watch::{emit_or_closed, normalize_watch_result};
 
 #[derive(Debug, Clone)]
 pub struct TagPagedNamesDto {
@@ -66,10 +67,5 @@ pub fn rename_tag_frb(old_name: String, new_name: String) -> Result<(), HentaiEr
 
 #[flutter_rust_bridge::frb]
 pub async fn watch_tags_frb(sink: crate::frb_generated::StreamSink<Vec<String>>) -> Result<(), HentaiErrorDto> {
-    watch_tags(|items| {
-        sink.add(items)
-            .map_err(|_| hentai_core::HentaiError::validation("stream closed"))
-    })
-    .await
-    .map_err(HentaiErrorDto::from)
+    normalize_watch_result(watch_tags(|items| emit_or_closed(&sink, items)).await)
 }

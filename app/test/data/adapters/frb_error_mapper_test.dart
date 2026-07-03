@@ -29,4 +29,14 @@ void main() {
       'too many SQL variables (DELETE FROM comics)',
     );
   });
+
+  test('isBenignFrbStreamClosed detects cancelled watch streams', () {
+    const error = HentaiErrorDto(
+      code: 'Validation',
+      message: 'stream closed',
+      context: null,
+    );
+
+    expect(isBenignFrbStreamClosed(error), isTrue);
+  });
 }

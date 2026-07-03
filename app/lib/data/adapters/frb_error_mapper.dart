@@ -44,6 +44,11 @@ String frbErrorMessage(HentaiErrorDto error, {String? fallbackMessage}) {
   return fallbackMessage ?? '操作失败';
 }
 
+/// Dart 侧取消 Stream 订阅后，Rust 会向已关闭 sink 写入；这是正常生命周期。
+bool isBenignFrbStreamClosed(HentaiErrorDto error) {
+  return error.code == 'Validation' && error.message.trim() == 'stream closed';
+}
+
 String _formatDetail(HentaiErrorDto error) {
   final String message = error.message.trim();
   final String? context = error.context?.trim();
