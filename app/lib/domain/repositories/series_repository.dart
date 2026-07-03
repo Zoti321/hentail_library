@@ -49,4 +49,20 @@ abstract class SeriesRepository {
     required Set<String> optionalOr,
     required Set<String> mustExclude,
   });
+
+  /// 从未归属漫画标题推断系列并写入数据库（Rust 原子 API）。
+  Future<InferSeriesFromComicTitlesResult> inferFromUnassignedComics();
+}
+
+/// 系列推断结果（供 UI 展示）。
+final class InferSeriesFromComicTitlesResult {
+  const InferSeriesFromComicTitlesResult({
+    required this.groupsApplied,
+    required this.comicsAssigned,
+    required this.newSeriesCreated,
+  });
+
+  final int groupsApplied;
+  final int comicsAssigned;
+  final int newSeriesCreated;
 }

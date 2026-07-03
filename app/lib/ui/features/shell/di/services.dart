@@ -7,7 +7,6 @@ import 'package:hentai_library/data/services/comic/read_resource_get/internal/se
 import 'package:hentai_library/data/services/comic/read_resource_get/internal/utils/comic_read_path_normalizer.dart';
 import 'package:hentai_library/data/services/comic/scan/comic_scan_parse_service.dart';
 import 'package:hentai_library/data/services/comic/scan/resource_parser.dart';
-import 'package:hentai_library/domain/library/auto_series_infer_service.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -23,10 +22,6 @@ List<ResourceParser> comicResourceParsers(Ref ref) =>
 @Riverpod(keepAlive: true)
 ComicScanParseService comicScanParseService(Ref ref) =>
     ComicScanParseService(parsers: ref.read(comicResourceParsersProvider));
-
-@Riverpod(keepAlive: true)
-AutoSeriesInferService autoSeriesInferService(Ref ref) =>
-    const AutoSeriesInferService();
 
 @Riverpod(keepAlive: true)
 AutoDetectComicContentRatingService autoDetectComicContentRatingService(

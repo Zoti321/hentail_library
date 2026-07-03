@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/use_cases/infer_series_from_comic_titles_usecase.dart';
+import 'package:hentai_library/domain/repositories/series_repository.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/add_comics_to_series_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/add_series_dialog.dart';
@@ -187,10 +187,9 @@ class _SeriesManagementToolbarState
       _isInferring = true;
     });
     try {
-      final InferSeriesFromComicTitlesUseCase useCase = ref.read(
-        inferSeriesFromComicTitlesUseCaseProvider,
-      );
-      final InferSeriesFromComicTitlesResult result = await useCase.call();
+      final InferSeriesFromComicTitlesResult result = await ref
+          .read(librarySeriesRepoProvider)
+          .inferFromUnassignedComics();
       ref.invalidate(allSeriesProvider);
       if (!mounted) {
         return;

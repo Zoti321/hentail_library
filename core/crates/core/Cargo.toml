@@ -6,6 +6,10 @@ edition.workspace = true
 license.workspace = true
 build = "build.rs"
 
+[[test]]
+name = "series_inference_golden"
+path = "../../tests/series_inference_golden.rs"
+
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -20,6 +24,7 @@ zip = "2"
 image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp", "gif", "bmp"] }
 quick-xml = { version = "0.37", features = ["serialize"] }
 rayon = "1"
+regex = "1"
 sevenz-rust = "0.6"
 unrar = "0.5"
 pdfium-render = "0.8"

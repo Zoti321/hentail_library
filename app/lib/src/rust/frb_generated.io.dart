@@ -4,8 +4,11 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/comic.dart';
+import 'api/history.dart';
+import 'api/home.dart';
 import 'api/init.dart';
 import 'api/reader.dart';
+import 'api/series.dart';
 import 'api/sync.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -47,7 +50,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  RustStreamSink<HomePageCountsDto>
+  dco_decode_StreamSink_home_page_counts_dto_Sse(dynamic raw);
+
+  @protected
   RustStreamSink<int> dco_decode_StreamSink_i_32_Sse(dynamic raw);
+
+  @protected
+  RustStreamSink<List<ReadingHistoryDto>>
+  dco_decode_StreamSink_list_reading_history_dto_Sse(dynamic raw);
+
+  @protected
+  RustStreamSink<List<SeriesReadingHistoryDto>>
+  dco_decode_StreamSink_list_series_reading_history_dto_Sse(dynamic raw);
 
   @protected
   RustStreamSink<SyncLibraryProgressDto>
@@ -75,6 +90,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PageRequestDto dco_decode_box_autoadd_page_request_dto(dynamic raw);
 
   @protected
+  ReadingHistoryDto dco_decode_box_autoadd_reading_history_dto(dynamic raw);
+
+  @protected
+  SeriesReadingHistoryDto dco_decode_box_autoadd_series_reading_history_dto(
+    dynamic raw,
+  );
+
+  @protected
   ComicDto dco_decode_comic_dto(dynamic raw);
 
   @protected
@@ -87,10 +110,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   HentaiErrorDto dco_decode_hentai_error_dto(dynamic raw);
 
   @protected
+  HomePageCountsDto dco_decode_home_page_counts_dto(dynamic raw);
+
+  @protected
   int dco_decode_i_32(dynamic raw);
 
   @protected
   PlatformInt64 dco_decode_i_64(dynamic raw);
+
+  @protected
+  InferSeriesResultDto dco_decode_infer_series_result_dto(dynamic raw);
 
   @protected
   LibrarySyncCountsDto dco_decode_library_sync_counts_dto(dynamic raw);
@@ -105,6 +134,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
+  List<ReadingHistoryDto> dco_decode_list_reading_history_dto(dynamic raw);
+
+  @protected
+  List<SeriesReadingHistoryDto> dco_decode_list_series_reading_history_dto(
+    dynamic raw,
+  );
+
+  @protected
   String? dco_decode_opt_String(dynamic raw);
 
   @protected
@@ -114,13 +151,36 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int? dco_decode_opt_box_autoadd_i_32(dynamic raw);
 
   @protected
+  ReadingHistoryDto? dco_decode_opt_box_autoadd_reading_history_dto(
+    dynamic raw,
+  );
+
+  @protected
+  SeriesReadingHistoryDto?
+  dco_decode_opt_box_autoadd_series_reading_history_dto(dynamic raw);
+
+  @protected
   PageRequestDto dco_decode_page_request_dto(dynamic raw);
 
   @protected
   PagedComicResultDto dco_decode_paged_comic_result_dto(dynamic raw);
 
   @protected
+  PagedReadingHistoryDto dco_decode_paged_reading_history_dto(dynamic raw);
+
+  @protected
+  PagedSeriesReadingHistoryDto dco_decode_paged_series_reading_history_dto(
+    dynamic raw,
+  );
+
+  @protected
   ReaderPageListDto dco_decode_reader_page_list_dto(dynamic raw);
+
+  @protected
+  ReadingHistoryDto dco_decode_reading_history_dto(dynamic raw);
+
+  @protected
+  SeriesReadingHistoryDto dco_decode_series_reading_history_dto(dynamic raw);
 
   @protected
   SyncLibraryPhaseDto dco_decode_sync_library_phase_dto(dynamic raw);
@@ -162,7 +222,23 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  RustStreamSink<HomePageCountsDto>
+  sse_decode_StreamSink_home_page_counts_dto_Sse(SseDeserializer deserializer);
+
+  @protected
   RustStreamSink<int> sse_decode_StreamSink_i_32_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  RustStreamSink<List<ReadingHistoryDto>>
+  sse_decode_StreamSink_list_reading_history_dto_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  RustStreamSink<List<SeriesReadingHistoryDto>>
+  sse_decode_StreamSink_list_series_reading_history_dto_Sse(
     SseDeserializer deserializer,
   );
 
@@ -200,6 +276,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ReadingHistoryDto sse_decode_box_autoadd_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SeriesReadingHistoryDto sse_decode_box_autoadd_series_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ComicDto sse_decode_comic_dto(SseDeserializer deserializer);
 
   @protected
@@ -214,10 +300,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   HentaiErrorDto sse_decode_hentai_error_dto(SseDeserializer deserializer);
 
   @protected
+  HomePageCountsDto sse_decode_home_page_counts_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
+
+  @protected
+  InferSeriesResultDto sse_decode_infer_series_result_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   LibrarySyncCountsDto sse_decode_library_sync_counts_dto(
@@ -234,6 +330,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
+  List<ReadingHistoryDto> sse_decode_list_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<SeriesReadingHistoryDto> sse_decode_list_series_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
 
   @protected
@@ -241,6 +347,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   int? sse_decode_opt_box_autoadd_i_32(SseDeserializer deserializer);
+
+  @protected
+  ReadingHistoryDto? sse_decode_opt_box_autoadd_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SeriesReadingHistoryDto?
+  sse_decode_opt_box_autoadd_series_reading_history_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   PageRequestDto sse_decode_page_request_dto(SseDeserializer deserializer);
@@ -251,7 +368,27 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  PagedReadingHistoryDto sse_decode_paged_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  PagedSeriesReadingHistoryDto sse_decode_paged_series_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ReaderPageListDto sse_decode_reader_page_list_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ReadingHistoryDto sse_decode_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SeriesReadingHistoryDto sse_decode_series_reading_history_dto(
     SseDeserializer deserializer,
   );
 
@@ -307,8 +444,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_StreamSink_home_page_counts_dto_Sse(
+    RustStreamSink<HomePageCountsDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_StreamSink_i_32_Sse(
     RustStreamSink<int> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_StreamSink_list_reading_history_dto_Sse(
+    RustStreamSink<List<ReadingHistoryDto>> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_StreamSink_list_series_reading_history_dto_Sse(
+    RustStreamSink<List<SeriesReadingHistoryDto>> self,
     SseSerializer serializer,
   );
 
@@ -352,6 +507,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_reading_history_dto(
+    ReadingHistoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_series_reading_history_dto(
+    SeriesReadingHistoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_comic_dto(ComicDto self, SseSerializer serializer);
 
   @protected
@@ -373,10 +540,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_home_page_counts_dto(
+    HomePageCountsDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_infer_series_result_dto(
+    InferSeriesResultDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_library_sync_counts_dto(
@@ -397,6 +576,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_reading_history_dto(
+    List<ReadingHistoryDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_series_reading_history_dto(
+    List<SeriesReadingHistoryDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
 
   @protected
@@ -407,6 +598,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_box_autoadd_i_32(int? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_reading_history_dto(
+    ReadingHistoryDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_series_reading_history_dto(
+    SeriesReadingHistoryDto? self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_page_request_dto(
@@ -421,8 +624,32 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_paged_reading_history_dto(
+    PagedReadingHistoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_paged_series_reading_history_dto(
+    PagedSeriesReadingHistoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_reader_page_list_dto(
     ReaderPageListDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_reading_history_dto(
+    ReadingHistoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_series_reading_history_dto(
+    SeriesReadingHistoryDto self,
     SseSerializer serializer,
   );
 

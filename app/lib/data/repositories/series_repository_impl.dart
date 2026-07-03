@@ -6,6 +6,7 @@ import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
+import 'package:hentai_library/src/rust/api/series.dart' as rust;
 
 class SeriesRepositoryImpl implements SeriesRepository {
   SeriesRepositoryImpl(this._dao, this._searchDao);
@@ -226,5 +227,15 @@ class SeriesRepositoryImpl implements SeriesRepository {
           mustExclude: mustExclude,
         );
     return _loadSeriesOrderedByNames(seriesNames);
+  }
+
+  @override
+  Future<InferSeriesFromComicTitlesResult> inferFromUnassignedComics() async {
+    final rust.InferSeriesResultDto result = rust.inferSeriesFrb();
+    return InferSeriesFromComicTitlesResult(
+      groupsApplied: result.groupsApplied,
+      comicsAssigned: result.comicsAssigned,
+      newSeriesCreated: result.newSeriesCreated,
+    );
   }
 }
