@@ -5,6 +5,7 @@
 
 import 'api/comic.dart';
 import 'api/init.dart';
+import 'api/sync.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -67,7 +68,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -1233586118;
+  int get rustContentHash => -1711627604;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -79,9 +80,13 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
+  void crateApiSyncCancelSyncFrb({required SyncHandleDto handle});
+
   String crateApiComicComicIdFromPathFrb({required String rawPath});
 
   PlatformInt64 crateApiComicCountAllComicsFrb();
+
+  SyncHandleDto crateApiSyncCreateSyncHandleFrb();
 
   PagedComicResultDto crateApiComicFetchComicsPageFrb({
     required PageRequestDto request,
@@ -100,7 +105,20 @@ abstract class RustLibApi extends BaseApi {
 
   List<ComicDto> crateApiComicSearchByKeywordFrb({required String keyword});
 
+  Stream<SyncLibraryProgressDto> crateApiSyncSyncLibraryFrb({
+    required SyncHandleDto handle,
+  });
+
   Stream<int> crateApiComicWatchComicChanges();
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_SyncHandleDto;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_SyncHandleDto;
+
+  CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_SyncHandleDtoPtr;
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -112,13 +130,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
+  void crateApiSyncCancelSyncFrb({required SyncHandleDto handle}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+            handle,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSyncCancelSyncFrbConstMeta,
+        argValues: [handle],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSyncCancelSyncFrbConstMeta =>
+      const TaskConstMeta(debugName: "cancel_sync_frb", argNames: ["handle"]);
+
+  @override
   String crateApiComicComicIdFromPathFrb({required String rawPath}) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(rawPath, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -143,7 +187,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_i_64,
@@ -160,6 +204,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "count_all_comics_frb", argNames: []);
 
   @override
+  SyncHandleDto crateApiSyncCreateSyncHandleFrb() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSyncCreateSyncHandleFrbConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSyncCreateSyncHandleFrbConstMeta =>
+      const TaskConstMeta(debugName: "create_sync_handle_frb", argNames: []);
+
+  @override
   PagedComicResultDto crateApiComicFetchComicsPageFrb({
     required PageRequestDto request,
     required ComicFilterDto filter,
@@ -172,7 +239,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_box_autoadd_page_request_dto(request, serializer);
           sse_encode_box_autoadd_comic_filter_dto(filter, serializer);
           sse_encode_box_autoadd_comic_sort_option_dto(sort, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_paged_comic_result_dto,
@@ -198,7 +265,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(comicId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_comic_dto,
@@ -226,7 +293,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 5,
+            funcId: 7,
             port: port_,
           );
         },
@@ -255,7 +322,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(appDataDir, serializer);
           sse_encode_String(dbFileName, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -280,7 +347,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(keyword, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_comic_dto,
@@ -300,6 +367,49 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Stream<SyncLibraryProgressDto> crateApiSyncSyncLibraryFrb({
+    required SyncHandleDto handle,
+  }) {
+    final sink = RustStreamSink<SyncLibraryProgressDto>();
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+              handle,
+              serializer,
+            );
+            sse_encode_StreamSink_sync_library_progress_dto_Sse(
+              sink,
+              serializer,
+            );
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 10,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: sse_decode_hentai_error_dto,
+          ),
+          constMeta: kCrateApiSyncSyncLibraryFrbConstMeta,
+          argValues: [handle, sink],
+          apiImpl: this,
+        ),
+      ),
+    );
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiSyncSyncLibraryFrbConstMeta => const TaskConstMeta(
+    debugName: "sync_library_frb",
+    argNames: ["handle", "sink"],
+  );
+
+  @override
   Stream<int> crateApiComicWatchComicChanges() {
     final sink = RustStreamSink<int>();
     unawaited(
@@ -311,7 +421,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 8,
+              funcId: 11,
               port: port_,
             );
           },
@@ -331,6 +441,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiComicWatchComicChangesConstMeta =>
       const TaskConstMeta(debugName: "watch_comic_changes", argNames: ["sink"]);
 
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_SyncHandleDto => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_SyncHandleDto => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto;
+
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -338,7 +456,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SyncHandleDto
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SyncHandleDtoImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  SyncHandleDto
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SyncHandleDtoImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  SyncHandleDto
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SyncHandleDtoImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
   RustStreamSink<int> dco_decode_StreamSink_i_32_Sse(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
+  RustStreamSink<SyncLibraryProgressDto>
+  dco_decode_StreamSink_sync_library_progress_dto_Sse(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
   }
@@ -456,6 +608,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  LibrarySyncCountsDto dco_decode_library_sync_counts_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return LibrarySyncCountsDto(
+      dir: dco_decode_i_32(arr[0]),
+      zip: dco_decode_i_32(arr[1]),
+      cbz: dco_decode_i_32(arr[2]),
+      epub: dco_decode_i_32(arr[3]),
+    );
+  }
+
+  @protected
   List<String> dco_decode_list_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_String).toList();
@@ -518,6 +684,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SyncLibraryPhaseDto dco_decode_sync_library_phase_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SyncLibraryPhaseDto.values[raw as int];
+  }
+
+  @protected
+  SyncLibraryProgressDto dco_decode_sync_library_progress_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    return SyncLibraryProgressDto(
+      phase: dco_decode_sync_library_phase_dto(arr[0]),
+      route: dco_decode_sync_library_route_dto(arr[1]),
+      currentPath: dco_decode_opt_String(arr[2]),
+      acceptedTotal: dco_decode_i_32(arr[3]),
+      counts: dco_decode_library_sync_counts_dto(arr[4]),
+      removedCount: dco_decode_opt_box_autoadd_i_32(arr[5]),
+      addedCount: dco_decode_opt_box_autoadd_i_32(arr[6]),
+      keptCount: dco_decode_opt_box_autoadd_i_32(arr[7]),
+      thumbnailTotal: dco_decode_opt_box_autoadd_i_32(arr[8]),
+      thumbnailDone: dco_decode_opt_box_autoadd_i_32(arr[9]),
+      thumbnailFailedCount: dco_decode_opt_box_autoadd_i_32(arr[10]),
+    );
+  }
+
+  @protected
+  SyncLibraryRouteDto dco_decode_sync_library_route_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SyncLibraryRouteDto.values[raw as int];
+  }
+
+  @protected
   int dco_decode_u_8(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
@@ -530,6 +729,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  BigInt dco_decode_usize(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeU64(raw);
+  }
+
+  @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_String(deserializer);
@@ -537,7 +742,52 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SyncHandleDto
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return SyncHandleDtoImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  SyncHandleDto
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return SyncHandleDtoImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  SyncHandleDto
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return SyncHandleDtoImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
   RustStreamSink<int> sse_decode_StreamSink_i_32_Sse(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
+  RustStreamSink<SyncLibraryProgressDto>
+  sse_decode_StreamSink_sync_library_progress_dto_Sse(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -674,6 +924,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  LibrarySyncCountsDto sse_decode_library_sync_counts_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_dir = sse_decode_i_32(deserializer);
+    var var_zip = sse_decode_i_32(deserializer);
+    var var_cbz = sse_decode_i_32(deserializer);
+    var var_epub = sse_decode_i_32(deserializer);
+    return LibrarySyncCountsDto(
+      dir: var_dir,
+      zip: var_zip,
+      cbz: var_cbz,
+      epub: var_epub,
+    );
+  }
+
+  @protected
   List<String> sse_decode_list_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -763,6 +1030,57 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SyncLibraryPhaseDto sse_decode_sync_library_phase_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return SyncLibraryPhaseDto.values[inner];
+  }
+
+  @protected
+  SyncLibraryProgressDto sse_decode_sync_library_progress_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_phase = sse_decode_sync_library_phase_dto(deserializer);
+    var var_route = sse_decode_sync_library_route_dto(deserializer);
+    var var_currentPath = sse_decode_opt_String(deserializer);
+    var var_acceptedTotal = sse_decode_i_32(deserializer);
+    var var_counts = sse_decode_library_sync_counts_dto(deserializer);
+    var var_removedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_addedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_keptCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_thumbnailTotal = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_thumbnailDone = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_thumbnailFailedCount = sse_decode_opt_box_autoadd_i_32(
+      deserializer,
+    );
+    return SyncLibraryProgressDto(
+      phase: var_phase,
+      route: var_route,
+      currentPath: var_currentPath,
+      acceptedTotal: var_acceptedTotal,
+      counts: var_counts,
+      removedCount: var_removedCount,
+      addedCount: var_addedCount,
+      keptCount: var_keptCount,
+      thumbnailTotal: var_thumbnailTotal,
+      thumbnailDone: var_thumbnailDone,
+      thumbnailFailedCount: var_thumbnailFailedCount,
+    );
+  }
+
+  @protected
+  SyncLibraryRouteDto sse_decode_sync_library_route_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return SyncLibraryRouteDto.values[inner];
+  }
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8();
@@ -771,6 +1089,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_decode_unit(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  BigInt sse_decode_usize(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getBigUint64();
   }
 
   @protected
@@ -783,6 +1107,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    SyncHandleDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as SyncHandleDtoImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    SyncHandleDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as SyncHandleDtoImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    SyncHandleDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as SyncHandleDtoImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
+  }
+
+  @protected
   void sse_encode_StreamSink_i_32_Sse(
     RustStreamSink<int> self,
     SseSerializer serializer,
@@ -792,6 +1155,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       self.setupAndSerialize(
         codec: SseCodec(
           decodeSuccessData: sse_decode_i_32,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+      ),
+      serializer,
+    );
+  }
+
+  @protected
+  void sse_encode_StreamSink_sync_library_progress_dto_Sse(
+    RustStreamSink<SyncLibraryProgressDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+      self.setupAndSerialize(
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_sync_library_progress_dto,
           decodeErrorData: sse_decode_AnyhowException,
         ),
       ),
@@ -915,6 +1295,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_library_sync_counts_dto(
+    LibrarySyncCountsDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.dir, serializer);
+    sse_encode_i_32(self.zip, serializer);
+    sse_encode_i_32(self.cbz, serializer);
+    sse_encode_i_32(self.epub, serializer);
+  }
+
+  @protected
   void sse_encode_list_String(List<String> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
@@ -1001,6 +1393,43 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_sync_library_phase_dto(
+    SyncLibraryPhaseDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_sync_library_progress_dto(
+    SyncLibraryProgressDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_sync_library_phase_dto(self.phase, serializer);
+    sse_encode_sync_library_route_dto(self.route, serializer);
+    sse_encode_opt_String(self.currentPath, serializer);
+    sse_encode_i_32(self.acceptedTotal, serializer);
+    sse_encode_library_sync_counts_dto(self.counts, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.removedCount, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.addedCount, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.keptCount, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.thumbnailTotal, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.thumbnailDone, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.thumbnailFailedCount, serializer);
+  }
+
+  @protected
+  void sse_encode_sync_library_route_dto(
+    SyncLibraryRouteDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self);
@@ -1010,4 +1439,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_unit(void self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
   }
+
+  @protected
+  void sse_encode_usize(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putBigUint64(self);
+  }
+}
+
+@sealed
+class SyncHandleDtoImpl extends RustOpaque implements SyncHandleDto {
+  // Not to be used by end users
+  SyncHandleDtoImpl.frbInternalDcoDecode(List<dynamic> wire)
+    : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  SyncHandleDtoImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_SyncHandleDto,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_SyncHandleDto,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_SyncHandleDtoPtr,
+  );
 }

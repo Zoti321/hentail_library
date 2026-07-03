@@ -143,7 +143,7 @@ async fn query_ids_from_stmt(
         .collect()
 }
 
-async fn load_comics_ordered(
+pub async fn load_comics_ordered(
     db: &DatabaseConnection,
     comic_ids: Vec<String>,
 ) -> Result<Vec<ComicDto>, HentaiError> {

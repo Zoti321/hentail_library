@@ -40,8 +40,8 @@ class ScanLibraryController extends _$ScanLibraryController {
       progress: null,
     );
 
-    final useCase = ref.read(syncLibraryUseCaseProvider);
-    _future = useCase
+    final adapter = ref.read(syncLibraryFrbAdapterProvider);
+    _future = adapter
         .call(
           isCancelled: () => _cancelled,
           onProgress: (p) {
@@ -63,6 +63,7 @@ class ScanLibraryController extends _$ScanLibraryController {
   void cancel() {
     if (!state.running) return;
     _cancelled = true;
+    ref.read(syncLibraryFrbAdapterProvider).cancelActive();
     state = state.copyWith(running: false, cancelled: true);
   }
 

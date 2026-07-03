@@ -8,6 +8,7 @@
 
 import 'api/comic.dart';
 import 'api/init.dart';
+import 'api/sync.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -21,11 +22,37 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     required super.portManager,
   });
 
+  CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_SyncHandleDtoPtr => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto;
+
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw);
 
   @protected
+  SyncHandleDto
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    dynamic raw,
+  );
+
+  @protected
+  SyncHandleDto
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    dynamic raw,
+  );
+
+  @protected
+  SyncHandleDto
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    dynamic raw,
+  );
+
+  @protected
   RustStreamSink<int> dco_decode_StreamSink_i_32_Sse(dynamic raw);
+
+  @protected
+  RustStreamSink<SyncLibraryProgressDto>
+  dco_decode_StreamSink_sync_library_progress_dto_Sse(dynamic raw);
 
   @protected
   String dco_decode_String(dynamic raw);
@@ -67,6 +94,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
+  LibrarySyncCountsDto dco_decode_library_sync_counts_dto(dynamic raw);
+
+  @protected
   List<String> dco_decode_list_String(dynamic raw);
 
   @protected
@@ -91,16 +121,52 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PagedComicResultDto dco_decode_paged_comic_result_dto(dynamic raw);
 
   @protected
+  SyncLibraryPhaseDto dco_decode_sync_library_phase_dto(dynamic raw);
+
+  @protected
+  SyncLibraryProgressDto dco_decode_sync_library_progress_dto(dynamic raw);
+
+  @protected
+  SyncLibraryRouteDto dco_decode_sync_library_route_dto(dynamic raw);
+
+  @protected
   int dco_decode_u_8(dynamic raw);
 
   @protected
   void dco_decode_unit(dynamic raw);
 
   @protected
+  BigInt dco_decode_usize(dynamic raw);
+
+  @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
 
   @protected
+  SyncHandleDto
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SyncHandleDto
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SyncHandleDto
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   RustStreamSink<int> sse_decode_StreamSink_i_32_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  RustStreamSink<SyncLibraryProgressDto>
+  sse_decode_StreamSink_sync_library_progress_dto_Sse(
     SseDeserializer deserializer,
   );
 
@@ -152,6 +218,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
   @protected
+  LibrarySyncCountsDto sse_decode_library_sync_counts_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<String> sse_decode_list_String(SseDeserializer deserializer);
 
   @protected
@@ -178,10 +249,28 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  SyncLibraryPhaseDto sse_decode_sync_library_phase_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SyncLibraryProgressDto sse_decode_sync_library_progress_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SyncLibraryRouteDto sse_decode_sync_library_route_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer);
 
   @protected
   void sse_decode_unit(SseDeserializer deserializer);
+
+  @protected
+  BigInt sse_decode_usize(SseDeserializer deserializer);
 
   @protected
   void sse_encode_AnyhowException(
@@ -190,8 +279,35 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    SyncHandleDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    SyncHandleDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    SyncHandleDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_StreamSink_i_32_Sse(
     RustStreamSink<int> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_StreamSink_sync_library_progress_dto_Sse(
+    RustStreamSink<SyncLibraryProgressDto> self,
     SseSerializer serializer,
   );
 
@@ -256,6 +372,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
+  void sse_encode_library_sync_counts_dto(
+    LibrarySyncCountsDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_String(List<String> self, SseSerializer serializer);
 
   @protected
@@ -292,16 +414,53 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_sync_library_phase_dto(
+    SyncLibraryPhaseDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_sync_library_progress_dto(
+    SyncLibraryProgressDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_sync_library_route_dto(
+    SyncLibraryRouteDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_unit(void self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_usize(BigInt self, SseSerializer serializer);
 }
 
 // Section: wire_class
 
 class RustLibWire implements BaseWire {
   RustLibWire.fromExternalLibrary(ExternalLibrary lib);
+
+  void
+  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    int ptr,
+  ) => wasmModule
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+        ptr,
+      );
+
+  void
+  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    int ptr,
+  ) => wasmModule
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+        ptr,
+      );
 }
 
 @JS('wasm_bindgen')
@@ -309,4 +468,14 @@ external RustLibWasmModule get wasmModule;
 
 @JS()
 @anonymous
-extension type RustLibWasmModule._(JSObject _) implements JSObject {}
+extension type RustLibWasmModule._(JSObject _) implements JSObject {
+  external void
+  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    int ptr,
+  );
+
+  external void
+  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSyncHandleDto(
+    int ptr,
+  );
+}
