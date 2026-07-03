@@ -3,13 +3,17 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/author.dart';
 import 'api/comic.dart';
 import 'api/history.dart';
 import 'api/home.dart';
 import 'api/init.dart';
+import 'api/path.dart';
 import 'api/reader.dart';
 import 'api/series.dart';
 import 'api/sync.dart';
+import 'api/tag.dart';
+import 'api/thumbnail.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -72,7 +76,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => 775622949;
+  int get rustContentHash => -1401019506;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -84,6 +88,18 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
+  void crateApiAuthorAddAuthorFrb({required String name});
+
+  void crateApiPathAddPathFrb({required String rawPath});
+
+  void crateApiTagAddTagFrb({required String name});
+
+  void crateApiSeriesAssignComicExclusiveFrb({
+    required String comicId,
+    required String targetSeriesName,
+    required int sortOrder,
+  });
+
   void crateApiSyncCancelSyncFrb({required SyncHandleDto handle});
 
   int crateApiHistoryClearAllReadingFrb();
@@ -96,7 +112,13 @@ abstract class RustLibApi extends BaseApi {
 
   PlatformInt64 crateApiComicCountAllComicsFrb();
 
+  void crateApiSeriesCreateSeriesFrb({required String name});
+
   SyncHandleDto crateApiSyncCreateSyncHandleFrb();
+
+  void crateApiAuthorDeleteAuthorsByNamesFrb({required List<String> names});
+
+  void crateApiComicDeleteComicsByIdsFrb({required List<String> comicIds});
 
   int crateApiHistoryDeleteReadingByComicIdFrb({required String comicId});
 
@@ -104,11 +126,23 @@ abstract class RustLibApi extends BaseApi {
     required List<String> comicIds,
   });
 
+  void crateApiSeriesDeleteSeriesFrb({required String name});
+
   int crateApiHistoryDeleteSeriesReadingByLastReadComicIdsFrb({
     required List<String> comicIds,
   });
 
   int crateApiHistoryDeleteSeriesReadingByNameFrb({required String seriesName});
+
+  void crateApiTagDeleteTagsByNamesFrb({required List<String> names});
+
+  void crateApiThumbnailDeleteThumbnailsByComicIdsFrb({
+    required List<String> comicIds,
+  });
+
+  AuthorPagedNamesDto crateApiAuthorFetchAuthorsPageFrb({
+    required PageRequestDto request,
+  });
 
   PagedComicResultDto crateApiComicFetchComicsPageFrb({
     required PageRequestDto request,
@@ -121,12 +155,32 @@ abstract class RustLibApi extends BaseApi {
     required int pageSize,
   });
 
+  PagedSeriesResultDto crateApiSeriesFetchSeriesPageFrb({
+    required PageRequestDto request,
+  });
+
   PagedSeriesReadingHistoryDto crateApiHistoryFetchSeriesReadingPageFrb({
     required int page,
     required int pageSize,
   });
 
+  TagPagedNamesDto crateApiTagFetchTagsPageFrb({
+    required PageRequestDto request,
+  });
+
   ComicDto? crateApiComicFindComicByIdFrb({required String comicId});
+
+  SeriesDto? crateApiSeriesFindSeriesByNameFrb({required String name});
+
+  ComicThumbnailDto? crateApiThumbnailFindThumbnailByComicIdFrb({
+    required String comicId,
+  });
+
+  List<SeriesDto> crateApiSeriesGetAllSeriesFrb();
+
+  List<HomeContinueReadingDto> crateApiHomeGetContinueReadingTop5Frb({
+    required bool excludeR18,
+  });
 
   HomePageCountsDto crateApiHomeGetHomePageCountsFrb({
     required bool excludeR18,
@@ -148,6 +202,14 @@ abstract class RustLibApi extends BaseApi {
     required String appDataDir,
     required String dbFileName,
   });
+
+  List<String> crateApiAuthorListAllAuthorsFrb();
+
+  List<String> crateApiPathListAllPathsFrb();
+
+  List<String> crateApiTagListAllTagsFrb();
+
+  List<SeriesComicOrderEntryDto> crateApiSeriesLoadHomeSeriesComicOrderMapFrb();
 
   Uint8List crateApiReaderLoadPageBytesFrb({
     required String comicId,
@@ -174,22 +236,91 @@ abstract class RustLibApi extends BaseApi {
     required SeriesReadingHistoryDto history,
   });
 
+  void crateApiSeriesRemoveComicFromSeriesFrb({required String comicId});
+
+  void crateApiSeriesRemoveComicsFromSeriesFrb({
+    required List<String> comicIds,
+  });
+
+  void crateApiSeriesRemoveOrphanSeriesItemsFrb();
+
+  void crateApiPathRemovePathFrb({required String rawPath});
+
+  void crateApiAuthorRenameAuthorFrb({
+    required String oldName,
+    required String newName,
+  });
+
+  void crateApiSeriesRenameSeriesFrb({
+    required String name,
+    required String newName,
+  });
+
+  void crateApiTagRenameTagFrb({
+    required String oldName,
+    required String newName,
+  });
+
   List<ComicDto> crateApiComicSearchByKeywordFrb({required String keyword});
+
+  List<ComicDto> crateApiComicSearchByTagExpressionFrb({
+    required List<String> mustInclude,
+    required List<String> optionalOr,
+    required List<String> mustExclude,
+  });
+
+  List<SeriesDto> crateApiSeriesSearchSeriesByKeywordFrb({
+    required String keyword,
+  });
+
+  List<SeriesDto> crateApiSeriesSearchSeriesByTagExpressionFrb({
+    required List<String> mustInclude,
+    required List<String> optionalOr,
+    required List<String> mustExclude,
+  });
+
+  void crateApiSeriesSetSeriesItemsOrderFrb({
+    required String seriesName,
+    required List<String> orderedComicIds,
+  });
 
   Stream<SyncLibraryProgressDto> crateApiSyncSyncLibraryFrb({
     required SyncHandleDto handle,
   });
 
+  void crateApiComicUpdateComicUserMetaFrb({
+    required String comicId,
+    required UpdateComicUserMetaFrbDto meta,
+  });
+
+  Future<UpdateComicUserMetaFrbDto>
+  crateApiComicUpdateComicUserMetaFrbDtoDefault();
+
+  Stream<List<SeriesDto>> crateApiSeriesWatchAllSeriesFrb();
+
+  Stream<List<String>> crateApiAuthorWatchAuthorsFrb();
+
   Stream<int> crateApiComicWatchComicChanges();
+
+  Stream<List<HomeContinueReadingDto>> crateApiHomeWatchContinueReadingTop5Frb({
+    required bool excludeR18,
+  });
 
   Stream<HomePageCountsDto> crateApiHomeWatchHomePageCountsFrb({
     required bool excludeR18,
   });
 
+  Stream<List<SeriesComicOrderEntryDto>>
+  crateApiSeriesWatchHomeSeriesComicOrderMapFrb();
+
+  Stream<List<String>> crateApiPathWatchPathsFrb();
+
   Stream<List<ReadingHistoryDto>> crateApiHistoryWatchReadingHistoriesFrb();
 
   Stream<List<SeriesReadingHistoryDto>>
   crateApiHistoryWatchSeriesReadingHistoriesFrb();
+
+  Stream<List<String>> crateApiTagWatchTagsFrb();
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_SyncHandleDto;
@@ -210,6 +341,107 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
+  void crateApiAuthorAddAuthorFrb({required String name}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(name, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiAuthorAddAuthorFrbConstMeta,
+        argValues: [name],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiAuthorAddAuthorFrbConstMeta =>
+      const TaskConstMeta(debugName: "add_author_frb", argNames: ["name"]);
+
+  @override
+  void crateApiPathAddPathFrb({required String rawPath}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(rawPath, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiPathAddPathFrbConstMeta,
+        argValues: [rawPath],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPathAddPathFrbConstMeta =>
+      const TaskConstMeta(debugName: "add_path_frb", argNames: ["rawPath"]);
+
+  @override
+  void crateApiTagAddTagFrb({required String name}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(name, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiTagAddTagFrbConstMeta,
+        argValues: [name],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTagAddTagFrbConstMeta =>
+      const TaskConstMeta(debugName: "add_tag_frb", argNames: ["name"]);
+
+  @override
+  void crateApiSeriesAssignComicExclusiveFrb({
+    required String comicId,
+    required String targetSeriesName,
+    required int sortOrder,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(comicId, serializer);
+          sse_encode_String(targetSeriesName, serializer);
+          sse_encode_i_32(sortOrder, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesAssignComicExclusiveFrbConstMeta,
+        argValues: [comicId, targetSeriesName, sortOrder],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesAssignComicExclusiveFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "assign_comic_exclusive_frb",
+        argNames: ["comicId", "targetSeriesName", "sortOrder"],
+      );
+
+  @override
   void crateApiSyncCancelSyncFrb({required SyncHandleDto handle}) {
     return handler.executeSync(
       SyncTask(
@@ -219,7 +451,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             handle,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -241,7 +473,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_i_32,
@@ -263,7 +495,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -286,7 +518,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(comicId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -309,7 +541,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(rawPath, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -334,7 +566,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_i_64,
@@ -351,12 +583,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "count_all_comics_frb", argNames: []);
 
   @override
+  void crateApiSeriesCreateSeriesFrb({required String name}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(name, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesCreateSeriesFrbConstMeta,
+        argValues: [name],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesCreateSeriesFrbConstMeta =>
+      const TaskConstMeta(debugName: "create_series_frb", argNames: ["name"]);
+
+  @override
   SyncHandleDto crateApiSyncCreateSyncHandleFrb() {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -374,13 +629,65 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "create_sync_handle_frb", argNames: []);
 
   @override
+  void crateApiAuthorDeleteAuthorsByNamesFrb({required List<String> names}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_String(names, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiAuthorDeleteAuthorsByNamesFrbConstMeta,
+        argValues: [names],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiAuthorDeleteAuthorsByNamesFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "delete_authors_by_names_frb",
+        argNames: ["names"],
+      );
+
+  @override
+  void crateApiComicDeleteComicsByIdsFrb({required List<String> comicIds}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_String(comicIds, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiComicDeleteComicsByIdsFrbConstMeta,
+        argValues: [comicIds],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiComicDeleteComicsByIdsFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "delete_comics_by_ids_frb",
+        argNames: ["comicIds"],
+      );
+
+  @override
   int crateApiHistoryDeleteReadingByComicIdFrb({required String comicId}) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(comicId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_i_32,
@@ -408,7 +715,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_String(comicIds, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_i_32,
@@ -428,6 +735,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  void crateApiSeriesDeleteSeriesFrb({required String name}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(name, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesDeleteSeriesFrbConstMeta,
+        argValues: [name],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesDeleteSeriesFrbConstMeta =>
+      const TaskConstMeta(debugName: "delete_series_frb", argNames: ["name"]);
+
+  @override
   int crateApiHistoryDeleteSeriesReadingByLastReadComicIdsFrb({
     required List<String> comicIds,
   }) {
@@ -436,7 +766,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_String(comicIds, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_i_32,
@@ -466,7 +796,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(seriesName, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_i_32,
@@ -486,6 +816,88 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  void crateApiTagDeleteTagsByNamesFrb({required List<String> names}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_String(names, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiTagDeleteTagsByNamesFrbConstMeta,
+        argValues: [names],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTagDeleteTagsByNamesFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "delete_tags_by_names_frb",
+        argNames: ["names"],
+      );
+
+  @override
+  void crateApiThumbnailDeleteThumbnailsByComicIdsFrb({
+    required List<String> comicIds,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_String(comicIds, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiThumbnailDeleteThumbnailsByComicIdsFrbConstMeta,
+        argValues: [comicIds],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiThumbnailDeleteThumbnailsByComicIdsFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "delete_thumbnails_by_comic_ids_frb",
+        argNames: ["comicIds"],
+      );
+
+  @override
+  AuthorPagedNamesDto crateApiAuthorFetchAuthorsPageFrb({
+    required PageRequestDto request,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_page_request_dto(request, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_author_paged_names_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiAuthorFetchAuthorsPageFrbConstMeta,
+        argValues: [request],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiAuthorFetchAuthorsPageFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "fetch_authors_page_frb",
+        argNames: ["request"],
+      );
+
+  @override
   PagedComicResultDto crateApiComicFetchComicsPageFrb({
     required PageRequestDto request,
     required ComicFilterDto filter,
@@ -498,7 +910,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_box_autoadd_page_request_dto(request, serializer);
           sse_encode_box_autoadd_comic_filter_dto(filter, serializer);
           sse_encode_box_autoadd_comic_sort_option_dto(sort, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_paged_comic_result_dto,
@@ -528,7 +940,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_i_32(page, serializer);
           sse_encode_i_32(pageSize, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_paged_reading_history_dto,
@@ -548,6 +960,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  PagedSeriesResultDto crateApiSeriesFetchSeriesPageFrb({
+    required PageRequestDto request,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_page_request_dto(request, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_paged_series_result_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesFetchSeriesPageFrbConstMeta,
+        argValues: [request],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesFetchSeriesPageFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "fetch_series_page_frb",
+        argNames: ["request"],
+      );
+
+  @override
   PagedSeriesReadingHistoryDto crateApiHistoryFetchSeriesReadingPageFrb({
     required int page,
     required int pageSize,
@@ -558,7 +998,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_i_32(page, serializer);
           sse_encode_i_32(pageSize, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_paged_series_reading_history_dto,
@@ -578,13 +1018,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  TagPagedNamesDto crateApiTagFetchTagsPageFrb({
+    required PageRequestDto request,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_page_request_dto(request, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_tag_paged_names_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiTagFetchTagsPageFrbConstMeta,
+        argValues: [request],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTagFetchTagsPageFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "fetch_tags_page_frb",
+        argNames: ["request"],
+      );
+
+  @override
   ComicDto? crateApiComicFindComicByIdFrb({required String comicId}) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(comicId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 28)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_comic_dto,
@@ -604,6 +1072,110 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  SeriesDto? crateApiSeriesFindSeriesByNameFrb({required String name}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(name, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_box_autoadd_series_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesFindSeriesByNameFrbConstMeta,
+        argValues: [name],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesFindSeriesByNameFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "find_series_by_name_frb",
+        argNames: ["name"],
+      );
+
+  @override
+  ComicThumbnailDto? crateApiThumbnailFindThumbnailByComicIdFrb({
+    required String comicId,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(comicId, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_box_autoadd_comic_thumbnail_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiThumbnailFindThumbnailByComicIdFrbConstMeta,
+        argValues: [comicId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiThumbnailFindThumbnailByComicIdFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "find_thumbnail_by_comic_id_frb",
+        argNames: ["comicId"],
+      );
+
+  @override
+  List<SeriesDto> crateApiSeriesGetAllSeriesFrb() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_series_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesGetAllSeriesFrbConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesGetAllSeriesFrbConstMeta =>
+      const TaskConstMeta(debugName: "get_all_series_frb", argNames: []);
+
+  @override
+  List<HomeContinueReadingDto> crateApiHomeGetContinueReadingTop5Frb({
+    required bool excludeR18,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_bool(excludeR18, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 32)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_home_continue_reading_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiHomeGetContinueReadingTop5FrbConstMeta,
+        argValues: [excludeR18],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiHomeGetContinueReadingTop5FrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_continue_reading_top5_frb",
+        argNames: ["excludeR18"],
+      );
+
+  @override
   HomePageCountsDto crateApiHomeGetHomePageCountsFrb({
     required bool excludeR18,
   }) {
@@ -612,7 +1184,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_bool(excludeR18, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 16)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 33)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_home_page_counts_dto,
@@ -640,7 +1212,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(comicId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 34)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_reading_history_dto,
@@ -668,7 +1240,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(seriesName, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 35)!;
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -694,7 +1266,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 36)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_infer_series_result_dto,
@@ -719,7 +1291,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 20,
+            funcId: 37,
             port: port_,
           );
         },
@@ -748,7 +1320,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(appDataDir, serializer);
           sse_encode_String(dbFileName, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 21)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 38)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -767,6 +1339,98 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   );
 
   @override
+  List<String> crateApiAuthorListAllAuthorsFrb() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_String,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiAuthorListAllAuthorsFrbConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiAuthorListAllAuthorsFrbConstMeta =>
+      const TaskConstMeta(debugName: "list_all_authors_frb", argNames: []);
+
+  @override
+  List<String> crateApiPathListAllPathsFrb() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 40)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_String,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiPathListAllPathsFrbConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPathListAllPathsFrbConstMeta =>
+      const TaskConstMeta(debugName: "list_all_paths_frb", argNames: []);
+
+  @override
+  List<String> crateApiTagListAllTagsFrb() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 41)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_String,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiTagListAllTagsFrbConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTagListAllTagsFrbConstMeta =>
+      const TaskConstMeta(debugName: "list_all_tags_frb", argNames: []);
+
+  @override
+  List<SeriesComicOrderEntryDto>
+  crateApiSeriesLoadHomeSeriesComicOrderMapFrb() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 42)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_series_comic_order_entry_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesLoadHomeSeriesComicOrderMapFrbConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesLoadHomeSeriesComicOrderMapFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "load_home_series_comic_order_map_frb",
+        argNames: [],
+      );
+
+  @override
   Uint8List crateApiReaderLoadPageBytesFrb({
     required String comicId,
     required String path,
@@ -781,7 +1445,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(path, serializer);
           sse_encode_String(resourceType, serializer);
           sse_encode_i_32(pageIndex, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 43)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
@@ -813,7 +1477,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(comicId, serializer);
           sse_encode_String(path, serializer);
           sse_encode_String(resourceType, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 44)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_reader_page_list_dto,
@@ -845,7 +1509,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(comicId, serializer);
           sse_encode_String(path, serializer);
           sse_encode_String(resourceType, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -871,7 +1535,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_reading_history_dto(history, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 46)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -902,7 +1566,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             history,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 47)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -922,13 +1586,204 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  void crateApiSeriesRemoveComicFromSeriesFrb({required String comicId}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(comicId, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 48)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesRemoveComicFromSeriesFrbConstMeta,
+        argValues: [comicId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesRemoveComicFromSeriesFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "remove_comic_from_series_frb",
+        argNames: ["comicId"],
+      );
+
+  @override
+  void crateApiSeriesRemoveComicsFromSeriesFrb({
+    required List<String> comicIds,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_String(comicIds, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 49)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesRemoveComicsFromSeriesFrbConstMeta,
+        argValues: [comicIds],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesRemoveComicsFromSeriesFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "remove_comics_from_series_frb",
+        argNames: ["comicIds"],
+      );
+
+  @override
+  void crateApiSeriesRemoveOrphanSeriesItemsFrb() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 50)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesRemoveOrphanSeriesItemsFrbConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesRemoveOrphanSeriesItemsFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "remove_orphan_series_items_frb",
+        argNames: [],
+      );
+
+  @override
+  void crateApiPathRemovePathFrb({required String rawPath}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(rawPath, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 51)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiPathRemovePathFrbConstMeta,
+        argValues: [rawPath],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiPathRemovePathFrbConstMeta =>
+      const TaskConstMeta(debugName: "remove_path_frb", argNames: ["rawPath"]);
+
+  @override
+  void crateApiAuthorRenameAuthorFrb({
+    required String oldName,
+    required String newName,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(oldName, serializer);
+          sse_encode_String(newName, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 52)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiAuthorRenameAuthorFrbConstMeta,
+        argValues: [oldName, newName],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiAuthorRenameAuthorFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "rename_author_frb",
+        argNames: ["oldName", "newName"],
+      );
+
+  @override
+  void crateApiSeriesRenameSeriesFrb({
+    required String name,
+    required String newName,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(name, serializer);
+          sse_encode_String(newName, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 53)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesRenameSeriesFrbConstMeta,
+        argValues: [name, newName],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesRenameSeriesFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "rename_series_frb",
+        argNames: ["name", "newName"],
+      );
+
+  @override
+  void crateApiTagRenameTagFrb({
+    required String oldName,
+    required String newName,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(oldName, serializer);
+          sse_encode_String(newName, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 54)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiTagRenameTagFrbConstMeta,
+        argValues: [oldName, newName],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTagRenameTagFrbConstMeta => const TaskConstMeta(
+    debugName: "rename_tag_frb",
+    argNames: ["oldName", "newName"],
+  );
+
+  @override
   List<ComicDto> crateApiComicSearchByKeywordFrb({required String keyword}) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(keyword, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 55)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_comic_dto,
@@ -945,6 +1800,128 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(
         debugName: "search_by_keyword_frb",
         argNames: ["keyword"],
+      );
+
+  @override
+  List<ComicDto> crateApiComicSearchByTagExpressionFrb({
+    required List<String> mustInclude,
+    required List<String> optionalOr,
+    required List<String> mustExclude,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_String(mustInclude, serializer);
+          sse_encode_list_String(optionalOr, serializer);
+          sse_encode_list_String(mustExclude, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 56)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_comic_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiComicSearchByTagExpressionFrbConstMeta,
+        argValues: [mustInclude, optionalOr, mustExclude],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiComicSearchByTagExpressionFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "search_by_tag_expression_frb",
+        argNames: ["mustInclude", "optionalOr", "mustExclude"],
+      );
+
+  @override
+  List<SeriesDto> crateApiSeriesSearchSeriesByKeywordFrb({
+    required String keyword,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(keyword, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 57)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_series_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesSearchSeriesByKeywordFrbConstMeta,
+        argValues: [keyword],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesSearchSeriesByKeywordFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "search_series_by_keyword_frb",
+        argNames: ["keyword"],
+      );
+
+  @override
+  List<SeriesDto> crateApiSeriesSearchSeriesByTagExpressionFrb({
+    required List<String> mustInclude,
+    required List<String> optionalOr,
+    required List<String> mustExclude,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_String(mustInclude, serializer);
+          sse_encode_list_String(optionalOr, serializer);
+          sse_encode_list_String(mustExclude, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 58)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_series_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesSearchSeriesByTagExpressionFrbConstMeta,
+        argValues: [mustInclude, optionalOr, mustExclude],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesSearchSeriesByTagExpressionFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "search_series_by_tag_expression_frb",
+        argNames: ["mustInclude", "optionalOr", "mustExclude"],
+      );
+
+  @override
+  void crateApiSeriesSetSeriesItemsOrderFrb({
+    required String seriesName,
+    required List<String> orderedComicIds,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(seriesName, serializer);
+          sse_encode_list_String(orderedComicIds, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesSetSeriesItemsOrderFrbConstMeta,
+        argValues: [seriesName, orderedComicIds],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesSetSeriesItemsOrderFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_series_items_order_frb",
+        argNames: ["seriesName", "orderedComicIds"],
       );
 
   @override
@@ -968,7 +1945,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 28,
+              funcId: 60,
               port: port_,
             );
           },
@@ -991,6 +1968,137 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   );
 
   @override
+  void crateApiComicUpdateComicUserMetaFrb({
+    required String comicId,
+    required UpdateComicUserMetaFrbDto meta,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(comicId, serializer);
+          sse_encode_box_autoadd_update_comic_user_meta_frb_dto(
+            meta,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 61)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiComicUpdateComicUserMetaFrbConstMeta,
+        argValues: [comicId, meta],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiComicUpdateComicUserMetaFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "update_comic_user_meta_frb",
+        argNames: ["comicId", "meta"],
+      );
+
+  @override
+  Future<UpdateComicUserMetaFrbDto>
+  crateApiComicUpdateComicUserMetaFrbDtoDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 62,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_update_comic_user_meta_frb_dto,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiComicUpdateComicUserMetaFrbDtoDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiComicUpdateComicUserMetaFrbDtoDefaultConstMeta =>
+      const TaskConstMeta(
+        debugName: "update_comic_user_meta_frb_dto_default",
+        argNames: [],
+      );
+
+  @override
+  Stream<List<SeriesDto>> crateApiSeriesWatchAllSeriesFrb() {
+    final sink = RustStreamSink<List<SeriesDto>>();
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_StreamSink_list_series_dto_Sse(sink, serializer);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 63,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: sse_decode_hentai_error_dto,
+          ),
+          constMeta: kCrateApiSeriesWatchAllSeriesFrbConstMeta,
+          argValues: [sink],
+          apiImpl: this,
+        ),
+      ),
+    );
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiSeriesWatchAllSeriesFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "watch_all_series_frb",
+        argNames: ["sink"],
+      );
+
+  @override
+  Stream<List<String>> crateApiAuthorWatchAuthorsFrb() {
+    final sink = RustStreamSink<List<String>>();
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_StreamSink_list_String_Sse(sink, serializer);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 64,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: sse_decode_hentai_error_dto,
+          ),
+          constMeta: kCrateApiAuthorWatchAuthorsFrbConstMeta,
+          argValues: [sink],
+          apiImpl: this,
+        ),
+      ),
+    );
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiAuthorWatchAuthorsFrbConstMeta =>
+      const TaskConstMeta(debugName: "watch_authors_frb", argNames: ["sink"]);
+
+  @override
   Stream<int> crateApiComicWatchComicChanges() {
     final sink = RustStreamSink<int>();
     unawaited(
@@ -1002,7 +2110,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 29,
+              funcId: 65,
               port: port_,
             );
           },
@@ -1023,6 +2131,47 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "watch_comic_changes", argNames: ["sink"]);
 
   @override
+  Stream<List<HomeContinueReadingDto>> crateApiHomeWatchContinueReadingTop5Frb({
+    required bool excludeR18,
+  }) {
+    final sink = RustStreamSink<List<HomeContinueReadingDto>>();
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_bool(excludeR18, serializer);
+            sse_encode_StreamSink_list_home_continue_reading_dto_Sse(
+              sink,
+              serializer,
+            );
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 66,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: sse_decode_hentai_error_dto,
+          ),
+          constMeta: kCrateApiHomeWatchContinueReadingTop5FrbConstMeta,
+          argValues: [excludeR18, sink],
+          apiImpl: this,
+        ),
+      ),
+    );
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiHomeWatchContinueReadingTop5FrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "watch_continue_reading_top5_frb",
+        argNames: ["excludeR18", "sink"],
+      );
+
+  @override
   Stream<HomePageCountsDto> crateApiHomeWatchHomePageCountsFrb({
     required bool excludeR18,
   }) {
@@ -1037,7 +2186,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 30,
+              funcId: 67,
               port: port_,
             );
           },
@@ -1061,6 +2210,77 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Stream<List<SeriesComicOrderEntryDto>>
+  crateApiSeriesWatchHomeSeriesComicOrderMapFrb() {
+    final sink = RustStreamSink<List<SeriesComicOrderEntryDto>>();
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_StreamSink_list_series_comic_order_entry_dto_Sse(
+              sink,
+              serializer,
+            );
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 68,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: sse_decode_hentai_error_dto,
+          ),
+          constMeta: kCrateApiSeriesWatchHomeSeriesComicOrderMapFrbConstMeta,
+          argValues: [sink],
+          apiImpl: this,
+        ),
+      ),
+    );
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiSeriesWatchHomeSeriesComicOrderMapFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "watch_home_series_comic_order_map_frb",
+        argNames: ["sink"],
+      );
+
+  @override
+  Stream<List<String>> crateApiPathWatchPathsFrb() {
+    final sink = RustStreamSink<List<String>>();
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_StreamSink_list_String_Sse(sink, serializer);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 69,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: sse_decode_hentai_error_dto,
+          ),
+          constMeta: kCrateApiPathWatchPathsFrbConstMeta,
+          argValues: [sink],
+          apiImpl: this,
+        ),
+      ),
+    );
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiPathWatchPathsFrbConstMeta =>
+      const TaskConstMeta(debugName: "watch_paths_frb", argNames: ["sink"]);
+
+  @override
   Stream<List<ReadingHistoryDto>> crateApiHistoryWatchReadingHistoriesFrb() {
     final sink = RustStreamSink<List<ReadingHistoryDto>>();
     unawaited(
@@ -1075,7 +2295,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 31,
+              funcId: 70,
               port: port_,
             );
           },
@@ -1114,7 +2334,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 32,
+              funcId: 71,
               port: port_,
             );
           },
@@ -1136,6 +2356,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         debugName: "watch_series_reading_histories_frb",
         argNames: ["sink"],
       );
+
+  @override
+  Stream<List<String>> crateApiTagWatchTagsFrb() {
+    final sink = RustStreamSink<List<String>>();
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_StreamSink_list_String_Sse(sink, serializer);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 72,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: sse_decode_hentai_error_dto,
+          ),
+          constMeta: kCrateApiTagWatchTagsFrbConstMeta,
+          argValues: [sink],
+          apiImpl: this,
+        ),
+      ),
+    );
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiTagWatchTagsFrbConstMeta =>
+      const TaskConstMeta(debugName: "watch_tags_frb", argNames: ["sink"]);
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_SyncHandleDto => wire
@@ -1192,8 +2444,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RustStreamSink<List<String>> dco_decode_StreamSink_list_String_Sse(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
+  RustStreamSink<List<HomeContinueReadingDto>>
+  dco_decode_StreamSink_list_home_continue_reading_dto_Sse(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
   RustStreamSink<List<ReadingHistoryDto>>
   dco_decode_StreamSink_list_reading_history_dto_Sse(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
+  RustStreamSink<List<SeriesComicOrderEntryDto>>
+  dco_decode_StreamSink_list_series_comic_order_entry_dto_Sse(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
+  RustStreamSink<List<SeriesDto>> dco_decode_StreamSink_list_series_dto_Sse(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
   }
@@ -1216,6 +2498,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   String dco_decode_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as String;
+  }
+
+  @protected
+  AuthorPagedNamesDto dco_decode_author_paged_names_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return AuthorPagedNamesDto(
+      items: dco_decode_list_String(arr[0]),
+      totalCount: dco_decode_i_64(arr[1]),
+      page: dco_decode_i_32(arr[2]),
+      pageSize: dco_decode_i_32(arr[3]),
+    );
   }
 
   @protected
@@ -1243,6 +2539,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ComicThumbnailDto dco_decode_box_autoadd_comic_thumbnail_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_comic_thumbnail_dto(raw);
+  }
+
+  @protected
   int dco_decode_box_autoadd_i_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
@@ -1261,11 +2563,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SeriesDto dco_decode_box_autoadd_series_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_series_dto(raw);
+  }
+
+  @protected
   SeriesReadingHistoryDto dco_decode_box_autoadd_series_reading_history_dto(
     dynamic raw,
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_series_reading_history_dto(raw);
+  }
+
+  @protected
+  UpdateComicUserMetaFrbDto
+  dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_update_comic_user_meta_frb_dto(raw);
   }
 
   @protected
@@ -1314,6 +2629,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ComicThumbnailDto dco_decode_comic_thumbnail_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return ComicThumbnailDto(
+      thumbnail: dco_decode_list_prim_u_8_strict(arr[0]),
+      sourceModifiedMs: dco_decode_i_64(arr[1]),
+      sourceSize: dco_decode_i_64(arr[2]),
+    );
+  }
+
+  @protected
   HentaiErrorDto dco_decode_hentai_error_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -1323,6 +2651,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       code: dco_decode_String(arr[0]),
       message: dco_decode_String(arr[1]),
       context: dco_decode_opt_String(arr[2]),
+    );
+  }
+
+  @protected
+  HomeContinueReadingDto dco_decode_home_continue_reading_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    return HomeContinueReadingDto(
+      kind: dco_decode_String(arr[0]),
+      lastReadTimeMs: dco_decode_i_64(arr[1]),
+      comicId: dco_decode_opt_String(arr[2]),
+      title: dco_decode_opt_String(arr[3]),
+      seriesName: dco_decode_opt_String(arr[4]),
+      lastReadComicId: dco_decode_opt_String(arr[5]),
+      pageIndex: dco_decode_opt_box_autoadd_i_32(arr[6]),
     );
   }
 
@@ -1397,6 +2742,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<HomeContinueReadingDto> dco_decode_list_home_continue_reading_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_home_continue_reading_dto)
+        .toList();
+  }
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
@@ -1406,6 +2761,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<ReadingHistoryDto> dco_decode_list_reading_history_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_reading_history_dto).toList();
+  }
+
+  @protected
+  List<SeriesComicOrderEntryDto> dco_decode_list_series_comic_order_entry_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_series_comic_order_entry_dto)
+        .toList();
+  }
+
+  @protected
+  List<SeriesDto> dco_decode_list_series_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_series_dto).toList();
+  }
+
+  @protected
+  List<SeriesItemDto> dco_decode_list_series_item_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_series_item_dto).toList();
   }
 
   @protected
@@ -1431,6 +2808,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ComicThumbnailDto? dco_decode_opt_box_autoadd_comic_thumbnail_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_comic_thumbnail_dto(raw);
+  }
+
+  @protected
   int? dco_decode_opt_box_autoadd_i_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_i_32(raw);
@@ -1445,12 +2830,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SeriesDto? dco_decode_opt_box_autoadd_series_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_series_dto(raw);
+  }
+
+  @protected
   SeriesReadingHistoryDto?
   dco_decode_opt_box_autoadd_series_reading_history_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null
         ? null
         : dco_decode_box_autoadd_series_reading_history_dto(raw);
+  }
+
+  @protected
+  List<String>? dco_decode_opt_list_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_list_String(raw);
   }
 
   @protected
@@ -1506,6 +2903,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PagedSeriesResultDto dco_decode_paged_series_result_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return PagedSeriesResultDto(
+      items: dco_decode_list_series_dto(arr[0]),
+      totalCount: dco_decode_i_64(arr[1]),
+      page: dco_decode_i_32(arr[2]),
+      pageSize: dco_decode_i_32(arr[3]),
+    );
+  }
+
+  @protected
   ReaderPageListDto dco_decode_reader_page_list_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -1529,6 +2940,45 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       title: dco_decode_String(arr[1]),
       lastReadTimeMs: dco_decode_i_64(arr[2]),
       pageIndex: dco_decode_opt_box_autoadd_i_32(arr[3]),
+    );
+  }
+
+  @protected
+  SeriesComicOrderEntryDto dco_decode_series_comic_order_entry_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return SeriesComicOrderEntryDto(
+      key: dco_decode_String(arr[0]),
+      sortOrder: dco_decode_i_32(arr[1]),
+    );
+  }
+
+  @protected
+  SeriesDto dco_decode_series_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return SeriesDto(
+      name: dco_decode_String(arr[0]),
+      items: dco_decode_list_series_item_dto(arr[1]),
+    );
+  }
+
+  @protected
+  SeriesItemDto dco_decode_series_item_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return SeriesItemDto(
+      seriesName: dco_decode_String(arr[0]),
+      comicId: dco_decode_String(arr[1]),
+      sortOrder: dco_decode_i_32(arr[2]),
     );
   }
 
@@ -1580,6 +3030,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TagPagedNamesDto dco_decode_tag_paged_names_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return TagPagedNamesDto(
+      items: dco_decode_list_String(arr[0]),
+      totalCount: dco_decode_i_64(arr[1]),
+      page: dco_decode_i_32(arr[2]),
+      pageSize: dco_decode_i_32(arr[3]),
+    );
+  }
+
+  @protected
   int dco_decode_u_8(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as int;
@@ -1589,6 +3053,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void dco_decode_unit(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return;
+  }
+
+  @protected
+  UpdateComicUserMetaFrbDto dco_decode_update_comic_user_meta_frb_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return UpdateComicUserMetaFrbDto(
+      title: dco_decode_opt_String(arr[0]),
+      contentRating: dco_decode_opt_String(arr[1]),
+      authors: dco_decode_opt_list_String(arr[2]),
+      tags: dco_decode_opt_list_String(arr[3]),
+    );
   }
 
   @protected
@@ -1656,8 +3136,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  RustStreamSink<List<String>> sse_decode_StreamSink_list_String_Sse(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
+  RustStreamSink<List<HomeContinueReadingDto>>
+  sse_decode_StreamSink_list_home_continue_reading_dto_Sse(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
   RustStreamSink<List<ReadingHistoryDto>>
   sse_decode_StreamSink_list_reading_history_dto_Sse(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
+  RustStreamSink<List<SeriesComicOrderEntryDto>>
+  sse_decode_StreamSink_list_series_comic_order_entry_dto_Sse(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
+  RustStreamSink<List<SeriesDto>> sse_decode_StreamSink_list_series_dto_Sse(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -1690,6 +3204,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AuthorPagedNamesDto sse_decode_author_paged_names_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_items = sse_decode_list_String(deserializer);
+    var var_totalCount = sse_decode_i_64(deserializer);
+    var var_page = sse_decode_i_32(deserializer);
+    var var_pageSize = sse_decode_i_32(deserializer);
+    return AuthorPagedNamesDto(
+      items: var_items,
+      totalCount: var_totalCount,
+      page: var_page,
+      pageSize: var_pageSize,
+    );
+  }
+
+  @protected
   bool sse_decode_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8() != 0;
@@ -1718,6 +3249,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ComicThumbnailDto sse_decode_box_autoadd_comic_thumbnail_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_comic_thumbnail_dto(deserializer));
+  }
+
+  @protected
   int sse_decode_box_autoadd_i_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_i_32(deserializer));
@@ -1740,11 +3279,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SeriesDto sse_decode_box_autoadd_series_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_series_dto(deserializer));
+  }
+
+  @protected
   SeriesReadingHistoryDto sse_decode_box_autoadd_series_reading_history_dto(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_series_reading_history_dto(deserializer));
+  }
+
+  @protected
+  UpdateComicUserMetaFrbDto
+  sse_decode_box_autoadd_update_comic_user_meta_frb_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_update_comic_user_meta_frb_dto(deserializer));
   }
 
   @protected
@@ -1803,6 +3357,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ComicThumbnailDto sse_decode_comic_thumbnail_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_thumbnail = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_sourceModifiedMs = sse_decode_i_64(deserializer);
+    var var_sourceSize = sse_decode_i_64(deserializer);
+    return ComicThumbnailDto(
+      thumbnail: var_thumbnail,
+      sourceModifiedMs: var_sourceModifiedMs,
+      sourceSize: var_sourceSize,
+    );
+  }
+
+  @protected
   HentaiErrorDto sse_decode_hentai_error_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_code = sse_decode_String(deserializer);
@@ -1812,6 +3381,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       code: var_code,
       message: var_message,
       context: var_context,
+    );
+  }
+
+  @protected
+  HomeContinueReadingDto sse_decode_home_continue_reading_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_kind = sse_decode_String(deserializer);
+    var var_lastReadTimeMs = sse_decode_i_64(deserializer);
+    var var_comicId = sse_decode_opt_String(deserializer);
+    var var_title = sse_decode_opt_String(deserializer);
+    var var_seriesName = sse_decode_opt_String(deserializer);
+    var var_lastReadComicId = sse_decode_opt_String(deserializer);
+    var var_pageIndex = sse_decode_opt_box_autoadd_i_32(deserializer);
+    return HomeContinueReadingDto(
+      kind: var_kind,
+      lastReadTimeMs: var_lastReadTimeMs,
+      comicId: var_comicId,
+      title: var_title,
+      seriesName: var_seriesName,
+      lastReadComicId: var_lastReadComicId,
+      pageIndex: var_pageIndex,
     );
   }
 
@@ -1911,6 +3503,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<HomeContinueReadingDto> sse_decode_list_home_continue_reading_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <HomeContinueReadingDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_home_continue_reading_dto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
@@ -1927,6 +3533,46 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <ReadingHistoryDto>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_reading_history_dto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<SeriesComicOrderEntryDto> sse_decode_list_series_comic_order_entry_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <SeriesComicOrderEntryDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_series_comic_order_entry_dto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<SeriesDto> sse_decode_list_series_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <SeriesDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_series_dto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<SeriesItemDto> sse_decode_list_series_item_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <SeriesItemDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_series_item_dto(deserializer));
     }
     return ans_;
   }
@@ -1968,6 +3614,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ComicThumbnailDto? sse_decode_opt_box_autoadd_comic_thumbnail_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_comic_thumbnail_dto(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   int? sse_decode_opt_box_autoadd_i_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -1992,6 +3651,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SeriesDto? sse_decode_opt_box_autoadd_series_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_series_dto(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   SeriesReadingHistoryDto?
   sse_decode_opt_box_autoadd_series_reading_history_dto(
     SseDeserializer deserializer,
@@ -2000,6 +3672,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_series_reading_history_dto(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  List<String>? sse_decode_opt_list_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_list_String(deserializer));
     } else {
       return null;
     }
@@ -2054,6 +3737,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PagedSeriesResultDto sse_decode_paged_series_result_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_items = sse_decode_list_series_dto(deserializer);
+    var var_totalCount = sse_decode_i_64(deserializer);
+    var var_page = sse_decode_i_32(deserializer);
+    var var_pageSize = sse_decode_i_32(deserializer);
+    return PagedSeriesResultDto(
+      items: var_items,
+      totalCount: var_totalCount,
+      page: var_page,
+      pageSize: var_pageSize,
+    );
+  }
+
+  @protected
   ReaderPageListDto sse_decode_reader_page_list_dto(
     SseDeserializer deserializer,
   ) {
@@ -2082,6 +3782,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       title: var_title,
       lastReadTimeMs: var_lastReadTimeMs,
       pageIndex: var_pageIndex,
+    );
+  }
+
+  @protected
+  SeriesComicOrderEntryDto sse_decode_series_comic_order_entry_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_key = sse_decode_String(deserializer);
+    var var_sortOrder = sse_decode_i_32(deserializer);
+    return SeriesComicOrderEntryDto(key: var_key, sortOrder: var_sortOrder);
+  }
+
+  @protected
+  SeriesDto sse_decode_series_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_String(deserializer);
+    var var_items = sse_decode_list_series_item_dto(deserializer);
+    return SeriesDto(name: var_name, items: var_items);
+  }
+
+  @protected
+  SeriesItemDto sse_decode_series_item_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_seriesName = sse_decode_String(deserializer);
+    var var_comicId = sse_decode_String(deserializer);
+    var var_sortOrder = sse_decode_i_32(deserializer);
+    return SeriesItemDto(
+      seriesName: var_seriesName,
+      comicId: var_comicId,
+      sortOrder: var_sortOrder,
     );
   }
 
@@ -2154,6 +3885,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  TagPagedNamesDto sse_decode_tag_paged_names_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_items = sse_decode_list_String(deserializer);
+    var var_totalCount = sse_decode_i_64(deserializer);
+    var var_page = sse_decode_i_32(deserializer);
+    var var_pageSize = sse_decode_i_32(deserializer);
+    return TagPagedNamesDto(
+      items: var_items,
+      totalCount: var_totalCount,
+      page: var_page,
+      pageSize: var_pageSize,
+    );
+  }
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8();
@@ -2162,6 +3910,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_decode_unit(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  UpdateComicUserMetaFrbDto sse_decode_update_comic_user_meta_frb_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_title = sse_decode_opt_String(deserializer);
+    var var_contentRating = sse_decode_opt_String(deserializer);
+    var var_authors = sse_decode_opt_list_String(deserializer);
+    var var_tags = sse_decode_opt_list_String(deserializer);
+    return UpdateComicUserMetaFrbDto(
+      title: var_title,
+      contentRating: var_contentRating,
+      authors: var_authors,
+      tags: var_tags,
+    );
   }
 
   @protected
@@ -2253,6 +4018,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_StreamSink_list_String_Sse(
+    RustStreamSink<List<String>> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+      self.setupAndSerialize(
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_String,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+      ),
+      serializer,
+    );
+  }
+
+  @protected
+  void sse_encode_StreamSink_list_home_continue_reading_dto_Sse(
+    RustStreamSink<List<HomeContinueReadingDto>> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+      self.setupAndSerialize(
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_home_continue_reading_dto,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+      ),
+      serializer,
+    );
+  }
+
+  @protected
   void sse_encode_StreamSink_list_reading_history_dto_Sse(
     RustStreamSink<List<ReadingHistoryDto>> self,
     SseSerializer serializer,
@@ -2262,6 +4061,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       self.setupAndSerialize(
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_reading_history_dto,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+      ),
+      serializer,
+    );
+  }
+
+  @protected
+  void sse_encode_StreamSink_list_series_comic_order_entry_dto_Sse(
+    RustStreamSink<List<SeriesComicOrderEntryDto>> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+      self.setupAndSerialize(
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_series_comic_order_entry_dto,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+      ),
+      serializer,
+    );
+  }
+
+  @protected
+  void sse_encode_StreamSink_list_series_dto_Sse(
+    RustStreamSink<List<SeriesDto>> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+      self.setupAndSerialize(
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_series_dto,
           decodeErrorData: sse_decode_AnyhowException,
         ),
       ),
@@ -2310,6 +4143,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_author_paged_names_dto(
+    AuthorPagedNamesDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_String(self.items, serializer);
+    sse_encode_i_64(self.totalCount, serializer);
+    sse_encode_i_32(self.page, serializer);
+    sse_encode_i_32(self.pageSize, serializer);
+  }
+
+  @protected
   void sse_encode_bool(bool self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
@@ -2343,6 +4188,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_comic_thumbnail_dto(
+    ComicThumbnailDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_comic_thumbnail_dto(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self, serializer);
@@ -2367,12 +4221,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_series_dto(
+    SeriesDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_series_dto(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_series_reading_history_dto(
     SeriesReadingHistoryDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_series_reading_history_dto(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_update_comic_user_meta_frb_dto(
+    UpdateComicUserMetaFrbDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_update_comic_user_meta_frb_dto(self, serializer);
   }
 
   @protected
@@ -2414,6 +4286,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_comic_thumbnail_dto(
+    ComicThumbnailDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.thumbnail, serializer);
+    sse_encode_i_64(self.sourceModifiedMs, serializer);
+    sse_encode_i_64(self.sourceSize, serializer);
+  }
+
+  @protected
   void sse_encode_hentai_error_dto(
     HentaiErrorDto self,
     SseSerializer serializer,
@@ -2422,6 +4305,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.code, serializer);
     sse_encode_String(self.message, serializer);
     sse_encode_opt_String(self.context, serializer);
+  }
+
+  @protected
+  void sse_encode_home_continue_reading_dto(
+    HomeContinueReadingDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.kind, serializer);
+    sse_encode_i_64(self.lastReadTimeMs, serializer);
+    sse_encode_opt_String(self.comicId, serializer);
+    sse_encode_opt_String(self.title, serializer);
+    sse_encode_opt_String(self.seriesName, serializer);
+    sse_encode_opt_String(self.lastReadComicId, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.pageIndex, serializer);
   }
 
   @protected
@@ -2498,6 +4396,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_home_continue_reading_dto(
+    List<HomeContinueReadingDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_home_continue_reading_dto(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
     SseSerializer serializer,
@@ -2516,6 +4426,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_reading_history_dto(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_series_comic_order_entry_dto(
+    List<SeriesComicOrderEntryDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_series_comic_order_entry_dto(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_series_dto(
+    List<SeriesDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_series_dto(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_series_item_dto(
+    List<SeriesItemDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_series_item_dto(item, serializer);
     }
   }
 
@@ -2555,6 +4501,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_comic_thumbnail_dto(
+    ComicThumbnailDto? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_comic_thumbnail_dto(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_i_32(int? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -2578,6 +4537,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_series_dto(
+    SeriesDto? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_series_dto(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_series_reading_history_dto(
     SeriesReadingHistoryDto? self,
     SseSerializer serializer,
@@ -2587,6 +4559,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_series_reading_history_dto(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_list_String(
+    List<String>? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_list_String(self, serializer);
     }
   }
 
@@ -2633,6 +4618,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_paged_series_result_dto(
+    PagedSeriesResultDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_series_dto(self.items, serializer);
+    sse_encode_i_64(self.totalCount, serializer);
+    sse_encode_i_32(self.page, serializer);
+    sse_encode_i_32(self.pageSize, serializer);
+  }
+
+  @protected
   void sse_encode_reader_page_list_dto(
     ReaderPageListDto self,
     SseSerializer serializer,
@@ -2653,6 +4650,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.title, serializer);
     sse_encode_i_64(self.lastReadTimeMs, serializer);
     sse_encode_opt_box_autoadd_i_32(self.pageIndex, serializer);
+  }
+
+  @protected
+  void sse_encode_series_comic_order_entry_dto(
+    SeriesComicOrderEntryDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.key, serializer);
+    sse_encode_i_32(self.sortOrder, serializer);
+  }
+
+  @protected
+  void sse_encode_series_dto(SeriesDto self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.name, serializer);
+    sse_encode_list_series_item_dto(self.items, serializer);
+  }
+
+  @protected
+  void sse_encode_series_item_dto(
+    SeriesItemDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.seriesName, serializer);
+    sse_encode_String(self.comicId, serializer);
+    sse_encode_i_32(self.sortOrder, serializer);
   }
 
   @protected
@@ -2705,6 +4730,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_tag_paged_names_dto(
+    TagPagedNamesDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_String(self.items, serializer);
+    sse_encode_i_64(self.totalCount, serializer);
+    sse_encode_i_32(self.page, serializer);
+    sse_encode_i_32(self.pageSize, serializer);
+  }
+
+  @protected
   void sse_encode_u_8(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self);
@@ -2713,6 +4750,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_unit(void self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  void sse_encode_update_comic_user_meta_frb_dto(
+    UpdateComicUserMetaFrbDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_String(self.title, serializer);
+    sse_encode_opt_String(self.contentRating, serializer);
+    sse_encode_opt_list_String(self.authors, serializer);
+    sse_encode_opt_list_String(self.tags, serializer);
   }
 
   @protected

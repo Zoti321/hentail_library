@@ -1,4 +1,3 @@
-import 'package:hentai_library/ui/features/shell/di/database_dao.dart';
 import 'package:hentai_library/data/repositories/app_setting_repository_impl.dart';
 import 'package:hentai_library/data/repositories/author_repository_impl.dart';
 import 'package:hentai_library/data/repositories/comic_thumbnail_repository_impl.dart';
@@ -23,32 +22,22 @@ part 'repos.g.dart';
 
 @Riverpod(keepAlive: true)
 ComicThumbnailRepository comicThumbnailRepo(Ref ref) =>
-    ComicThumbnailRepositoryImpl(ref.read(comicThumbnailDaoProvider));
+    const ComicThumbnailRepositoryImpl();
 
 @Riverpod(keepAlive: true)
-ComicRepository comicRepo(Ref ref) => ComicRepositoryImpl(
-  ref.read(comicDaoProvider),
-  ref.read(searchDaoProvider),
-  ref.read(comicThumbnailRepoProvider),
-);
+ComicRepository comicRepo(Ref ref) => const ComicRepositoryImpl();
 
 @Riverpod(keepAlive: true)
-SeriesRepository librarySeriesRepo(Ref ref) => SeriesRepositoryImpl(
-  ref.read(seriesDaoProvider),
-  ref.read(searchDaoProvider),
-);
+SeriesRepository librarySeriesRepo(Ref ref) => const SeriesRepositoryImpl();
 
 @Riverpod(keepAlive: true)
-TagRepository libraryTagRepo(Ref ref) =>
-    TagRepositoryImpl(ref.read(tagDaoProvider));
+TagRepository libraryTagRepo(Ref ref) => const TagRepositoryImpl();
 
 @Riverpod(keepAlive: true)
-AuthorRepository libraryAuthorRepo(Ref ref) =>
-    AuthorRepositoryImpl(ref.read(authorDaoProvider));
+AuthorRepository libraryAuthorRepo(Ref ref) => const AuthorRepositoryImpl();
 
 @Riverpod(keepAlive: true)
-PathRepository pathRepo(Ref ref) =>
-    PathRepositoryImpl(ref.read(savedPathDaoProvider));
+PathRepository pathRepo(Ref ref) => const PathRepositoryImpl();
 
 @Riverpod(keepAlive: true)
 ReadingHistoryRepository readingHistoryRepo(Ref ref) =>
@@ -58,5 +47,4 @@ ReadingHistoryRepository readingHistoryRepo(Ref ref) =>
 AppSettingRepository appSettingRepo(Ref ref) => AppSettingRepositoryImpl();
 
 @Riverpod(keepAlive: true)
-HomePageRepository homePageRepo(Ref ref) =>
-    HomePageRepositoryImpl(ref.read(homePageDaoProvider));
+HomePageRepository homePageRepo(Ref ref) => const HomePageRepositoryImpl();

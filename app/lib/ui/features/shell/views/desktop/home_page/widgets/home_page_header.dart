@@ -18,14 +18,12 @@ class HomePageHeader extends StatelessWidget {
     required this.title,
     required this.greetingText,
     required this.onRefresh,
-    required this.onAutoDetectContentRating,
     required this.onScan,
   });
 
   final String title;
   final String greetingText;
   final VoidCallback onRefresh;
-  final VoidCallback onAutoDetectContentRating;
   final VoidCallback onScan;
 
   @override
@@ -46,7 +44,6 @@ class HomePageHeader extends StatelessWidget {
         _HomeHeaderActionBlock(
           colorScheme: colorScheme,
           onRefresh: onRefresh,
-          onAutoDetectContentRating: onAutoDetectContentRating,
           onScan: onScan,
         ),
       ],
@@ -90,13 +87,11 @@ class _HomeHeaderActionBlock extends StatelessWidget {
   const _HomeHeaderActionBlock({
     required this.colorScheme,
     required this.onRefresh,
-    required this.onAutoDetectContentRating,
     required this.onScan,
   });
 
   final ColorScheme colorScheme;
   final VoidCallback onRefresh;
-  final VoidCallback onAutoDetectContentRating;
   final VoidCallback onScan;
 
   @override
@@ -116,19 +111,6 @@ class _HomeHeaderActionBlock extends StatelessWidget {
           overlayColor: colorScheme.primary.withAlpha(32),
           delayTooltipThreeSeconds: false,
           onPressed: onRefresh,
-        ),
-        GhostButton.icon(
-          icon: LucideIcons.wandSparkles,
-          tooltip: '自动内容分级',
-          semanticLabel: '自动内容分级',
-          iconSize: 16,
-          size: 24,
-          borderRadius: 10,
-          foregroundColor: colorScheme.hentai.iconDefault,
-          hoverColor: colorScheme.surfaceContainerHighest,
-          overlayColor: colorScheme.primary.withAlpha(32),
-          delayTooltipThreeSeconds: false,
-          onPressed: onAutoDetectContentRating,
         ),
         FilledButton.icon(
           onPressed: onScan,

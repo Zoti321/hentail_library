@@ -7,7 +7,7 @@ import '../frb_generated.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
 
 void initDbFrb({required String appDataDir, required String dbFileName}) =>
     RustLib.instance.api.crateApiComicInitDbFrb(
@@ -33,6 +33,27 @@ ComicDto? findComicByIdFrb({required String comicId}) =>
 
 List<ComicDto> searchByKeywordFrb({required String keyword}) =>
     RustLib.instance.api.crateApiComicSearchByKeywordFrb(keyword: keyword);
+
+void deleteComicsByIdsFrb({required List<String> comicIds}) =>
+    RustLib.instance.api.crateApiComicDeleteComicsByIdsFrb(comicIds: comicIds);
+
+void updateComicUserMetaFrb({
+  required String comicId,
+  required UpdateComicUserMetaFrbDto meta,
+}) => RustLib.instance.api.crateApiComicUpdateComicUserMetaFrb(
+  comicId: comicId,
+  meta: meta,
+);
+
+List<ComicDto> searchByTagExpressionFrb({
+  required List<String> mustInclude,
+  required List<String> optionalOr,
+  required List<String> mustExclude,
+}) => RustLib.instance.api.crateApiComicSearchByTagExpressionFrb(
+  mustInclude: mustInclude,
+  optionalOr: optionalOr,
+  mustExclude: mustExclude,
+);
 
 PlatformInt64 countAllComicsFrb() =>
     RustLib.instance.api.crateApiComicCountAllComicsFrb();
@@ -194,4 +215,38 @@ class PagedComicResultDto {
           totalCount == other.totalCount &&
           page == other.page &&
           pageSize == other.pageSize;
+}
+
+class UpdateComicUserMetaFrbDto {
+  final String? title;
+  final String? contentRating;
+  final List<String>? authors;
+  final List<String>? tags;
+
+  const UpdateComicUserMetaFrbDto({
+    this.title,
+    this.contentRating,
+    this.authors,
+    this.tags,
+  });
+
+  static Future<UpdateComicUserMetaFrbDto> default_() =>
+      RustLib.instance.api.crateApiComicUpdateComicUserMetaFrbDtoDefault();
+
+  @override
+  int get hashCode =>
+      title.hashCode ^
+      contentRating.hashCode ^
+      authors.hashCode ^
+      tags.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UpdateComicUserMetaFrbDto &&
+          runtimeType == other.runtimeType &&
+          title == other.title &&
+          contentRating == other.contentRating &&
+          authors == other.authors &&
+          tags == other.tags;
 }

@@ -104,7 +104,7 @@ async fn delete_comics_side_effects<C: ConnectionTrait>(
     Ok(())
 }
 
-async fn remove_orphan_series_items<C: ConnectionTrait>(db: &C) -> Result<(), HentaiError> {
+pub async fn remove_orphan_series_items<C: ConnectionTrait>(db: &C) -> Result<(), HentaiError> {
     db.execute(Statement::from_string(
         sea_orm::DatabaseBackend::Sqlite,
         "DELETE FROM series_items WHERE comic_id NOT IN (SELECT comic_id FROM comics)".to_string(),
@@ -146,7 +146,7 @@ async fn upsert_comics<C: ConnectionTrait>(db: &C, comics_list: &[ComicDto]) -> 
     Ok(())
 }
 
-async fn replace_comic_authors<C: ConnectionTrait>(
+pub async fn replace_comic_authors<C: ConnectionTrait>(
     db: &C,
     comic_id: &str,
     author_names: &[String],
@@ -181,7 +181,7 @@ async fn replace_comic_authors<C: ConnectionTrait>(
     Ok(())
 }
 
-async fn replace_comic_tags<C: ConnectionTrait>(
+pub async fn replace_comic_tags<C: ConnectionTrait>(
     db: &C,
     comic_id: &str,
     tag_names: &[String],

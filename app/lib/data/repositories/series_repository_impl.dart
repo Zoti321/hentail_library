@@ -1,166 +1,65 @@
-import 'package:hentai_library/data/database/dao/dao.dart';
-import 'package:hentai_library/data/database/database.dart' as db;
-import 'package:hentai_library/data/mappers/mapping.dart';
+import 'package:hentai_library/data/repositories/series_frb_mapper.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
-import 'package:hentai_library/src/rust/api/series.dart' as rust;
+import 'package:hentai_library/src/rust/api/comic.dart' as rust;
+import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 
 class SeriesRepositoryImpl implements SeriesRepository {
-  SeriesRepositoryImpl(this._dao, this._searchDao);
-
-  final SeriesDao _dao;
-  final SearchDao _searchDao;
-
-  Map<String, List<SeriesItem>> _groupItemsBySeriesName(
-    List<db.DbSeriesItem> items,
-  ) {
-    final Map<String, List<SeriesItem>> groupedItemsBySeries =
-        <String, List<SeriesItem>>{};
-    for (final db.DbSeriesItem item in items) {
-      final List<SeriesItem> grouped = groupedItemsBySeries.putIfAbsent(
-        item.seriesName,
-        () => <SeriesItem>[],
-      );
-      grouped.add(item.toEntity());
-    }
-    return groupedItemsBySeries;
-  }
-
-  List<Series> _buildSeriesList(
-    List<db.DbSeries> seriesRows,
-    Map<String, List<SeriesItem>> groupedItemsBySeries,
-  ) {
-    return seriesRows
-        .map(
-          (db.DbSeries series) => Series(
-            name: series.name,
-            items: groupedItemsBySeries[series.name] ?? const <SeriesItem>[],
-          ),
-        )
-        .toList();
-  }
-
-  List<Series> _orderSeriesByNames(
-    List<Series> series,
-    List<String> orderedNames,
-  ) {
-    final Map<String, Series> seriesByName = <String, Series>{
-      for (final Series series in series) series.name: series,
-    };
-    final List<Series> ordered = <Series>[];
-    for (final String name in orderedNames) {
-      final Series? matched = seriesByName[name];
-      if (matched != null) {
-        ordered.add(matched);
-      }
-    }
-    return ordered;
-  }
-
-  Future<Map<String, List<SeriesItem>>> _loadGroupedItemsBySeriesName() async {
-    final List<db.DbSeriesItem> allItems = await _dao
-        .getAllSeriesItemsOrdered();
-    return _groupItemsBySeriesName(allItems);
-  }
-
-  Future<List<Series>> _loadSeriesOrderedByNames(
-    List<String> seriesNames,
-  ) async {
-    if (seriesNames.isEmpty) {
-      return <Series>[];
-    }
-    final List<db.DbSeries> seriesRows = await _dao.getSeriesByNames(
-      seriesNames,
-    );
-    final Map<String, List<SeriesItem>> groupedItemsBySeries =
-        await _loadGroupedItemsBySeriesName();
-    final List<Series> mapped = _buildSeriesList(
-      seriesRows,
-      groupedItemsBySeries,
-    );
-    return _orderSeriesByNames(mapped, seriesNames);
-  }
+  const SeriesRepositoryImpl();
 
   @override
   Stream<List<Series>> watchAll() {
-    return _dao.watchAllSeries().asyncMap((rows) async {
-      return rows.map((r) => Series(name: r.name, items: const [])).toList();
-    });
+    return rust_series.watchAllSeriesFrb().map(
+      (List<rust_series.SeriesDto> rows) => rows.map(mapRustSeries).toList(),
+    );
   }
 
   @override
   Future<List<Series>> getAll() async {
-    final List<db.DbSeries> seriesRows = await _dao.getAllSeries();
-    final Map<String, List<SeriesItem>> groupedItemsBySeries =
-        await _loadGroupedItemsBySeriesName();
-    return _buildSeriesList(seriesRows, groupedItemsBySeries);
+    return rust_series.getAllSeriesFrb().map(mapRustSeries).toList();
   }
 
   @override
   Future<PagedResult<Series>> fetchPage(PageRequest request) async {
-    final int totalCount = await _dao.countAllSeries();
-    if (totalCount <= 0) {
-      return PagedResult<Series>(
-        items: const <Series>[],
-        totalCount: 0,
-        page: 1,
-        pageSize: request.pageSize,
-      );
-    }
-    final int totalPages =
-        (totalCount + request.pageSize - 1) ~/ request.pageSize;
-    int effectivePage = request.page;
-    if (effectivePage > totalPages) {
-      effectivePage = totalPages;
-    }
-    final int offset = (effectivePage - 1) * request.pageSize;
-    final List<db.DbSeries> seriesRows = await _dao.fetchSeriesPage(
-      limit: request.pageSize,
-      offset: offset,
-    );
-    final Map<String, List<SeriesItem>> groupedItemsBySeries =
-        await _loadGroupedItemsBySeriesName();
-    final List<Series> items = _buildSeriesList(
-      seriesRows,
-      groupedItemsBySeries,
-    );
+    final rust_series.PagedSeriesResultDto page = rust_series
+        .fetchSeriesPageFrb(
+          request: rust.PageRequestDto(
+            page: request.page,
+            pageSize: request.pageSize,
+          ),
+        );
     return PagedResult<Series>(
-      items: items,
-      totalCount: totalCount,
-      page: effectivePage,
-      pageSize: request.pageSize,
+      items: page.items.map(mapRustSeries).toList(),
+      totalCount: page.totalCount.toInt(),
+      page: page.page,
+      pageSize: page.pageSize,
     );
   }
 
   @override
   Future<Series?> findByName(String name) async {
-    final row = await _dao.findByName(name);
-    if (row == null) {
-      return null;
-    }
-    final items = await _dao.getItemsForSeries(name);
-    return Series(
-      name: row.name,
-      items: items.map((db.DbSeriesItem i) => i.toEntity()).toList(),
+    final rust_series.SeriesDto? dto = rust_series.findSeriesByNameFrb(
+      name: name,
     );
+    return dto == null ? null : mapRustSeries(dto);
   }
 
   @override
   Future<void> create(String name) async {
-    await _dao.createSeries(db.SeriesTableCompanion.insert(name: name));
+    rust_series.createSeriesFrb(name: name);
   }
 
   @override
   Future<void> rename({required String name, required String newName}) async {
-    await _dao.renameSeries(name: name, newName: newName);
+    rust_series.renameSeriesFrb(name: name, newName: newName);
   }
 
   @override
   Future<void> delete(String name) async {
-    await _dao.deleteSeries(name);
+    rust_series.deleteSeriesFrb(name: name);
   }
 
   @override
@@ -169,7 +68,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
     required String targetSeriesName,
     required int order,
   }) async {
-    await _dao.assignComicExclusive(
+    rust_series.assignComicExclusiveFrb(
       comicId: comicId,
       targetSeriesName: targetSeriesName,
       sortOrder: order,
@@ -178,17 +77,17 @@ class SeriesRepositoryImpl implements SeriesRepository {
 
   @override
   Future<void> removeComic(String comicId) async {
-    await _dao.removeComic(comicId);
+    rust_series.removeComicFromSeriesFrb(comicId: comicId);
   }
 
   @override
   Future<void> removeComicsFromSeries(Iterable<String> comicIds) async {
-    await _dao.removeComicsFromSeries(comicIds);
+    rust_series.removeComicsFromSeriesFrb(comicIds: comicIds.toList());
   }
 
   @override
   Future<void> removeOrphanSeriesItems() async {
-    await _dao.removeOrphanSeriesItems();
+    rust_series.removeOrphanSeriesItemsFrb();
   }
 
   @override
@@ -196,22 +95,18 @@ class SeriesRepositoryImpl implements SeriesRepository {
     String seriesName,
     List<SeriesItem> orderedItems,
   ) async {
-    await _dao.transaction(() async {
-      for (int i = 0; i < orderedItems.length; i++) {
-        await _dao.updateSeriesItemSortOrder(
-          seriesName: seriesName,
-          comicId: orderedItems[i].comicId,
-          sortOrder: i,
-        );
-      }
-    });
+    rust_series.setSeriesItemsOrderFrb(
+      seriesName: seriesName,
+      orderedComicIds: orderedItems.map((SeriesItem i) => i.comicId).toList(),
+    );
   }
 
   @override
   Future<List<Series>> searchByKeyword(String keyword) async {
-    final List<String> seriesNames = await _searchDao
-        .searchSeriesNamesByKeyword(keyword);
-    return _loadSeriesOrderedByNames(seriesNames);
+    return rust_series
+        .searchSeriesByKeywordFrb(keyword: keyword)
+        .map(mapRustSeries)
+        .toList();
   }
 
   @override
@@ -220,18 +115,20 @@ class SeriesRepositoryImpl implements SeriesRepository {
     required Set<String> optionalOr,
     required Set<String> mustExclude,
   }) async {
-    final List<String> seriesNames = await _searchDao
-        .searchSeriesNamesByTagExpression(
-          mustInclude: mustInclude,
-          optionalOr: optionalOr,
-          mustExclude: mustExclude,
-        );
-    return _loadSeriesOrderedByNames(seriesNames);
+    return rust_series
+        .searchSeriesByTagExpressionFrb(
+          mustInclude: mustInclude.toList(),
+          optionalOr: optionalOr.toList(),
+          mustExclude: mustExclude.toList(),
+        )
+        .map(mapRustSeries)
+        .toList();
   }
 
   @override
   Future<InferSeriesFromComicTitlesResult> inferFromUnassignedComics() async {
-    final rust.InferSeriesResultDto result = rust.inferSeriesFrb();
+    final rust_series.InferSeriesResultDto result = rust_series
+        .inferSeriesFrb();
     return InferSeriesFromComicTitlesResult(
       groupsApplied: result.groupsApplied,
       comicsAssigned: result.comicsAssigned,

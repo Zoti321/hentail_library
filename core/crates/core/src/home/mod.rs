@@ -1,5 +1,6 @@
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement, Value};
 
+use crate::comic::read_data_version;
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
 
@@ -9,6 +10,17 @@ pub struct HomePageCountsDto {
     pub tag_count: i32,
     pub series_count: i32,
     pub reading_record_count: i32,
+}
+
+#[derive(Debug, Clone)]
+pub struct HomeContinueReadingDto {
+    pub kind: String,
+    pub last_read_time_ms: i64,
+    pub comic_id: Option<String>,
+    pub title: Option<String>,
+    pub series_name: Option<String>,
+    pub last_read_comic_id: Option<String>,
+    pub page_index: Option<i32>,
 }
 
 const SQL_COUNTS: &str = r#"
@@ -53,6 +65,43 @@ SELECT
   ) AS c_series_h
 "#;
 
+const SQL_TOP5: &str = r#"
+SELECT kind, last_read_time, comic_id, title, series_name, last_read_comic_id, page_index
+FROM (
+  SELECT 'c' AS kind, h.last_read_time, h.comic_id, h.title,
+         NULL AS series_name, NULL AS last_read_comic_id, h.page_index
+  FROM comic_reading_histories h
+  UNION ALL
+  SELECT 's' AS kind, srh.last_read_time, NULL AS comic_id, NULL AS title,
+         srh.series_name, srh.last_read_comic_id, srh.page_index
+  FROM series_reading_histories srh
+) AS merged
+ORDER BY last_read_time DESC
+LIMIT 5
+"#;
+
+const SQL_TOP5_HEALTHY: &str = r#"
+SELECT kind, last_read_time, comic_id, title, series_name, last_read_comic_id, page_index
+FROM (
+  SELECT 'c' AS kind, h.last_read_time, h.comic_id, h.title,
+         NULL AS series_name, NULL AS last_read_comic_id, h.page_index
+  FROM comic_reading_histories h
+  INNER JOIN comics c ON c.comic_id = h.comic_id
+  WHERE c.content_rating != ?
+  UNION ALL
+  SELECT 's' AS kind, srh.last_read_time, NULL AS comic_id, NULL AS title,
+         srh.series_name, srh.last_read_comic_id, srh.page_index
+  FROM series_reading_histories srh
+  WHERE NOT EXISTS (
+    SELECT 1 FROM series_items si
+    INNER JOIN comics c ON c.comic_id = si.comic_id
+    WHERE si.series_name = srh.series_name AND c.content_rating = ?
+  )
+) AS merged
+ORDER BY last_read_time DESC
+LIMIT 5
+"#;
+
 pub async fn get_home_page_counts(exclude_r18: bool) -> Result<HomePageCountsDto, HentaiError> {
     let db = connection()?;
     load_counts(&db, exclude_r18).await
@@ -73,6 +122,60 @@ pub async fn watch_home_page_counts(
             emit(load_counts(&db, exclude_r18).await?)?;
         }
     }
+}
+
+pub async fn get_continue_reading_top5(
+    exclude_r18: bool,
+) -> Result<Vec<HomeContinueReadingDto>, HentaiError> {
+    let db = connection()?;
+    load_continue_reading(&db, exclude_r18).await
+}
+
+pub async fn watch_continue_reading_top5(
+    exclude_r18: bool,
+    mut emit: impl FnMut(Vec<HomeContinueReadingDto>) -> Result<(), HentaiError>,
+) -> Result<(), HentaiError> {
+    let db = connection()?;
+    let mut last = read_data_version().await?;
+    emit(load_continue_reading(&db, exclude_r18).await?)?;
+    loop {
+        tokio::time::sleep(std::time::Duration::from_millis(400)).await;
+        let version = read_data_version().await?;
+        if version != last {
+            last = version;
+            emit(load_continue_reading(&db, exclude_r18).await?)?;
+        }
+    }
+}
+
+async fn load_continue_reading(
+    db: &DatabaseConnection,
+    exclude_r18: bool,
+) -> Result<Vec<HomeContinueReadingDto>, HentaiError> {
+    let rows = if exclude_r18 {
+        let stmt = Statement::from_sql_and_values(
+            db.get_database_backend(),
+            SQL_TOP5_HEALTHY,
+            vec![Value::from("r18"); 2],
+        );
+        db.query_all(stmt).await.map_err(map_db_err)?
+    } else {
+        let stmt = Statement::from_sql_and_values(db.get_database_backend(), SQL_TOP5, []);
+        db.query_all(stmt).await.map_err(map_db_err)?
+    };
+    rows.into_iter()
+        .map(|row| {
+            Ok(HomeContinueReadingDto {
+                kind: row.try_get("", "kind").unwrap_or_default(),
+                last_read_time_ms: row.try_get("", "last_read_time").unwrap_or(0),
+                comic_id: row.try_get("", "comic_id").ok(),
+                title: row.try_get("", "title").ok(),
+                series_name: row.try_get("", "series_name").ok(),
+                last_read_comic_id: row.try_get("", "last_read_comic_id").ok(),
+                page_index: row.try_get("", "page_index").ok(),
+            })
+        })
+        .collect()
 }
 
 async fn load_counts(db: &DatabaseConnection, exclude_r18: bool) -> Result<HomePageCountsDto, HentaiError> {

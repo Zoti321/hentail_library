@@ -140,6 +140,52 @@ pub fn search_by_keyword_frb(keyword: String) -> Result<Vec<ComicDto>, HentaiErr
         .map_err(HentaiErrorDto::from)
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct UpdateComicUserMetaFrbDto {
+    pub title: Option<String>,
+    pub content_rating: Option<String>,
+    pub authors: Option<Vec<String>>,
+    pub tags: Option<Vec<String>>,
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn delete_comics_by_ids_frb(comic_ids: Vec<String>) -> Result<(), HentaiErrorDto> {
+    hentai_core::runtime::block_on(hentai_core::delete_comics_by_ids(comic_ids))
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn update_comic_user_meta_frb(
+    comic_id: String,
+    meta: UpdateComicUserMetaFrbDto,
+) -> Result<(), HentaiErrorDto> {
+    hentai_core::runtime::block_on(hentai_core::update_comic_user_meta(
+        &comic_id,
+        hentai_core::UpdateComicUserMetaDto {
+            title: meta.title,
+            content_rating: meta.content_rating,
+            authors: meta.authors,
+            tags: meta.tags,
+        },
+    ))
+    .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn search_by_tag_expression_frb(
+    must_include: Vec<String>,
+    optional_or: Vec<String>,
+    must_exclude: Vec<String>,
+) -> Result<Vec<ComicDto>, HentaiErrorDto> {
+    hentai_core::runtime::block_on(hentai_core::search_by_tag_expression(
+        must_include,
+        optional_or,
+        must_exclude,
+    ))
+    .map(|rows| rows.into_iter().map(ComicDto::from).collect())
+    .map_err(HentaiErrorDto::from)
+}
+
 #[flutter_rust_bridge::frb(sync)]
 pub fn count_all_comics_frb() -> Result<i64, HentaiErrorDto> {
     hentai_core::runtime::block_on(count_all()).map_err(HentaiErrorDto::from)

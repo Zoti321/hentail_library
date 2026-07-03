@@ -1,60 +1,47 @@
-import 'package:hentai_library/data/database/dao/dao.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/tag_repository.dart';
+import 'package:hentai_library/src/rust/api/comic.dart' as rust;
+import 'package:hentai_library/src/rust/api/tag.dart' as rust_tag;
 
 class TagRepositoryImpl implements TagRepository {
-  TagRepositoryImpl(this._dao);
-
-  final TagDao _dao;
+  const TagRepositoryImpl();
 
   @override
   Future<List<Tag>> listAll() async {
-    final rows = await _dao.listAll();
-    rows.sort((a, b) => a.name.compareTo(b.name));
-    return rows.map((r) => Tag(name: r.name)).toList();
+    final List<String> names = rust_tag.listAllTagsFrb();
+    return names.map((String n) => Tag(name: n)).toList();
   }
 
   @override
   Future<PagedResult<Tag>> fetchPage(PageRequest request) async {
-    final int totalCount = await _dao.countAllTags();
-    if (totalCount <= 0) {
-      return PagedResult<Tag>(
-        items: const <Tag>[],
-        totalCount: 0,
-        page: 1,
+    final rust_tag.TagPagedNamesDto page = rust_tag.fetchTagsPageFrb(
+      request: rust.PageRequestDto(
+        page: request.page,
         pageSize: request.pageSize,
-      );
-    }
-    final int totalPages =
-        (totalCount + request.pageSize - 1) ~/ request.pageSize;
-    int effectivePage = request.page;
-    if (effectivePage > totalPages) {
-      effectivePage = totalPages;
-    }
-    final int offset = (effectivePage - 1) * request.pageSize;
-    final rows = await _dao.fetchTagsPage(
-      limit: request.pageSize,
-      offset: offset,
+      ),
     );
     return PagedResult<Tag>(
-      items: rows.map((r) => Tag(name: r.name)).toList(),
-      totalCount: totalCount,
-      page: effectivePage,
-      pageSize: request.pageSize,
+      items: page.items.map((String n) => Tag(name: n)).toList(),
+      totalCount: page.totalCount.toInt(),
+      page: page.page,
+      pageSize: page.pageSize,
     );
   }
 
   @override
-  Future<void> add(Tag tag) => _dao.addTag(tag.name);
+  Future<void> add(Tag tag) async {
+    rust_tag.addTagFrb(name: tag.name);
+  }
 
   @override
   Future<void> deleteByNames(List<String> names) async {
-    await _dao.deleteByNames(names);
+    rust_tag.deleteTagsByNamesFrb(names: names);
   }
 
   @override
-  Future<void> rename(String oldName, String newName) =>
-      _dao.renameTag(oldName, newName);
+  Future<void> rename(String oldName, String newName) async {
+    rust_tag.renameTagFrb(oldName: oldName, newName: newName);
+  }
 }
