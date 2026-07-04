@@ -12,14 +12,12 @@ enum LibraryPaginationPlacement { top, bottom }
 class LibraryPaginationBar extends ConsumerWidget {
   const LibraryPaginationBar({
     super.key,
-    required this.totalCount,
     required this.page,
     required this.totalPages,
     required this.isLoading,
     this.placement = LibraryPaginationPlacement.bottom,
   });
 
-  final int totalCount;
   final int page;
   final int totalPages;
   final bool isLoading;
@@ -27,7 +25,7 @@ class LibraryPaginationBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (totalCount <= 0 || totalPages <= 0) {
+    if (isLoading || totalPages <= 1) {
       return const SizedBox.shrink();
     }
     final AppThemeTokens tokens = context.tokens;
@@ -64,7 +62,7 @@ class LibraryPaginationBar extends ConsumerWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
             child: Text(
-              '共 $totalCount 本 · 第 $page / $totalPages 页',
+              '第 $page / $totalPages 页',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -127,7 +125,6 @@ class LibraryPaginationBarSliver extends ConsumerWidget {
       data: (PagedResult<Comic> page) {
         return SliverToBoxAdapter(
           child: LibraryPaginationBar(
-            totalCount: page.totalCount,
             page: page.page,
             totalPages: page.totalPages,
             isLoading: false,
@@ -135,18 +132,7 @@ class LibraryPaginationBarSliver extends ConsumerWidget {
           ),
         );
       },
-      loading: () {
-        final int currentPage = ref.watch(libraryComicsPageIndexProvider);
-        return SliverToBoxAdapter(
-          child: LibraryPaginationBar(
-            totalCount: 1,
-            page: currentPage,
-            totalPages: 1,
-            isLoading: true,
-            placement: placement,
-          ),
-        );
-      },
+      loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
       error: (Object _, StackTrace _) =>
           const SliverToBoxAdapter(child: SizedBox.shrink()),
       skipLoadingOnReload: true,
