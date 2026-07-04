@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/widgets.dart';
 
-/// 库页可粘连 header 内容：标题、副标题与搜索工具行。
+/// 库页可粘连 header：标题、数量 chip、Tab 切换与操作按钮（单行三栏）。
 class LibraryPageHeaderSection extends StatelessWidget {
   const LibraryPageHeaderSection({super.key, this.onOpenFilterSort});
 
@@ -13,15 +13,7 @@ class LibraryPageHeaderSection extends StatelessWidget {
     final AppThemeTokens tokens = context.tokens;
     return Padding(
       padding: tokens.layout.contentAreaPadding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const LibraryPageHeader(),
-          const SizedBox(height: 12),
-          LibrarySearchToolbarRow(onOpenFilterSort: onOpenFilterSort),
-        ],
-      ),
+      child: LibraryPageHeaderToolbar(onOpenFilterSort: onOpenFilterSort),
     );
   }
 }

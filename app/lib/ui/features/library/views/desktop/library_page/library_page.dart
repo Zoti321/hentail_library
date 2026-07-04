@@ -68,6 +68,7 @@ class _LibraryPageState extends State<LibraryPage> {
                 child: header,
               ),
             ),
+          const LibraryContentSearchSliver(),
           const LibraryBlocksSliverGroup(
             seriesBlock: LibrarySeriesBlock(),
             comicsBlock: LibraryComicsBlock(),

@@ -1,22 +1,81 @@
 part of 'library_page_widgets.dart';
 
-class LibrarySearchToolbarRow extends ConsumerStatefulWidget {
-  const LibrarySearchToolbarRow({
+class LibraryPageHeaderToolbar extends ConsumerWidget {
+  const LibraryPageHeaderToolbar({
     super.key,
-    this.initialQuery = '',
     this.onOpenFilterSort,
   });
 
-  final String initialQuery;
   final VoidCallback? onOpenFilterSort;
 
   @override
-  ConsumerState<LibrarySearchToolbarRow> createState() =>
-      _LibrarySearchToolbarRowState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool showCountChips = libraryHeaderShowsCountChips(context);
+    return SizedBox(
+      height: 44,
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: LibraryPageHeader(showCountChips: showCountChips),
+                ),
+              ),
+              if (onOpenFilterSort != null)
+                _LibraryCompactToolbar(onOpenFilterSort: onOpenFilterSort!)
+              else
+                const _LegacyLibraryToolbar(),
+            ],
+          ),
+          LibraryDisplayTargetTabs(showCountBadges: !showCountChips),
+        ],
+      ),
+    );
+  }
 }
 
-class _LibrarySearchToolbarRowState
-    extends ConsumerState<LibrarySearchToolbarRow> {
+class LibraryContentSearchSliver extends ConsumerWidget {
+  const LibraryContentSearchSliver({super.key, this.initialQuery = ''});
+
+  final String initialQuery;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppThemeTokens tokens = context.tokens;
+    return SliverPadding(
+      padding: EdgeInsets.fromLTRB(
+        tokens.layout.contentHorizontalPadding,
+        tokens.layout.contentVerticalPadding,
+        tokens.layout.contentHorizontalPadding,
+        0,
+      ),
+      sliver: SliverToBoxAdapter(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            LibrarySearchField(initialQuery: initialQuery),
+            const SizedBox(height: kLibrarySearchToGridSpacing),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LibrarySearchField extends ConsumerStatefulWidget {
+  const LibrarySearchField({super.key, this.initialQuery = ''});
+
+  final String initialQuery;
+
+  @override
+  ConsumerState<LibrarySearchField> createState() => _LibrarySearchFieldState();
+}
+
+class _LibrarySearchFieldState extends ConsumerState<LibrarySearchField> {
   late final TextEditingController _controller;
 
   @override
@@ -33,35 +92,16 @@ class _LibrarySearchToolbarRowState
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.sizeOf(context).width * 0.25,
-              ),
-              child: CustomTextField(
-                controller: _controller,
-                hintText: '搜索…',
-                onSubmitted: _handleSubmitSearch,
-              ),
-            ),
-          ),
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: kLibrarySearchMaxWidth),
+        child: CustomTextField(
+          controller: _controller,
+          hintText: '搜索…',
+          onSubmitted: _handleSubmitSearch,
         ),
-        const Expanded(child: Center(child: LibraryDisplayTargetTabs())),
-        Expanded(
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: widget.onOpenFilterSort != null
-                ? _LibraryCompactToolbar(
-                    onOpenFilterSort: widget.onOpenFilterSort!,
-                  )
-                : const _LegacyLibraryToolbar(),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -77,19 +117,24 @@ class _LibrarySearchToolbarRowState
 }
 
 class LibraryDisplayTargetTabs extends ConsumerWidget {
-  const LibraryDisplayTargetTabs({super.key});
+  const LibraryDisplayTargetTabs({super.key, this.showCountBadges = false});
+
+  final bool showCountBadges;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
       libraryDisplayTargetProvider,
     );
+    final int comicCount = ref.watch(libraryDisplayedComicCountProvider);
+    final int seriesCount = ref.watch(libraryDisplayedSeriesCountProvider);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         _UnderlineTab(
           label: '漫画',
           isSelected: displayTarget == LibraryDisplayTarget.comics,
+          badgeCount: showCountBadges ? comicCount : null,
           onTap: () => ref
               .read(libraryQueryIntentProvider.notifier)
               .setDisplayTarget(LibraryDisplayTarget.comics),
@@ -98,6 +143,7 @@ class LibraryDisplayTargetTabs extends ConsumerWidget {
         _UnderlineTab(
           label: '系列',
           isSelected: displayTarget == LibraryDisplayTarget.series,
+          badgeCount: showCountBadges ? seriesCount : null,
           onTap: () => ref
               .read(libraryQueryIntentProvider.notifier)
               .setDisplayTarget(LibraryDisplayTarget.series),
@@ -112,11 +158,13 @@ class _UnderlineTab extends StatelessWidget {
     required this.label,
     required this.isSelected,
     required this.onTap,
+    this.badgeCount,
   });
 
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  final int? badgeCount;
 
   @override
   Widget build(BuildContext context) {
@@ -127,28 +175,68 @@ class _UnderlineTab extends StatelessWidget {
       splashFactory: NoSplash.splashFactory,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: Stack(
+          clipBehavior: Clip.none,
           children: <Widget>[
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? cs.primary : cs.hentai.textSecondary,
-              ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected ? cs.primary : cs.hentai.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  height: 2,
+                  width: label.length * 14.0,
+                  decoration: BoxDecoration(
+                    color: isSelected ? cs.primary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(1),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 6),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              height: 2,
-              width: label.length * 14.0,
-              decoration: BoxDecoration(
-                color: isSelected ? cs.primary : Colors.transparent,
-                borderRadius: BorderRadius.circular(1),
+            if (badgeCount != null)
+              Positioned(
+                top: -2,
+                right: -10,
+                child: _TabCountBadge(count: badgeCount!),
               ),
-            ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TabCountBadge extends StatelessWidget {
+  const _TabCountBadge({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return Container(
+      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        color: cs.primary,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        '$count',
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: cs.onPrimary,
+          height: 1.1,
         ),
       ),
     );

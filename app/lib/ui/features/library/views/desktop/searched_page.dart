@@ -115,7 +115,15 @@ class SearchedPage extends ConsumerWidget {
                 ),
                 if (trimmedQuery.isNotEmpty) ...<Widget>[
                   const SizedBox(height: 12),
-                  LibrarySearchToolbarRow(initialQuery: trimmedQuery),
+                  LibrarySearchField(initialQuery: trimmedQuery),
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: LibraryDisplayTargetTabs(
+                      showCountBadges:
+                          !libraryHeaderShowsCountChips(context),
+                    ),
+                  ),
                 ],
               ],
             ),
