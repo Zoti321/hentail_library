@@ -1,3 +1,4 @@
+export 'view_models/comic_detail_series_nav_provider.dart';
 export 'view_models/library_age_restriction_notifier.dart';
 export 'view_models/library_page_comics_providers.dart';
 export 'view_models/library_page_pagination_providers.dart';

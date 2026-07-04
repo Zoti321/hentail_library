@@ -1,29 +1,20 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_back_header.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_back_header.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_series_nav.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-
-Series? findSeriesContainingComic(List<Series> allSeries, String comicId) {
-  for (final Series series in allSeries) {
-    if (series.containsComic(comicId)) {
-      return series;
-    }
-  }
-  return null;
-}
 
 class ComicDetailHeader extends ConsumerWidget {
   const ComicDetailHeader({super.key, required this.comic});
@@ -34,15 +25,6 @@ class ComicDetailHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
-    final Series? parentSeries = ref
-        .watch(allSeriesProvider)
-        .maybeWhen(
-          data: (List<Series> all) =>
-              findSeriesContainingComic(all, comic.comicId),
-          orElse: () => null,
-        );
-    final bool showSeriesNav = parentSeries != null;
-
     return DecoratedBox(
       decoration: BoxDecoration(
         color: cs.surface,
@@ -90,7 +72,7 @@ class ComicDetailHeader extends ConsumerWidget {
                   onPressed: () => _openEditMetadata(context, ref),
                 ),
                 const Spacer(),
-                if (showSeriesNav) const _ComicDetailSeriesNavPlaceholder(),
+                ComicDetailSeriesNav(comicId: comic.comicId),
               ],
             ),
           ),
@@ -108,58 +90,6 @@ class ComicDetailHeader extends ConsumerWidget {
           await data.applyTo(ref.read(comicRepoProvider), comic.comicId);
         },
       ),
-    );
-  }
-}
-
-class _ComicDetailSeriesNavPlaceholder extends StatelessWidget {
-  const _ComicDetailSeriesNavPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final ThemeData theme = Theme.of(context);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      spacing: 4,
-      children: <Widget>[
-        GhostButton.icon(
-          icon: LucideIcons.chevronLeft,
-          tooltip: '上一本',
-          semanticLabel: '系列上一本',
-          iconSize: 16,
-          size: 32,
-          borderRadius: 8,
-          foregroundColor: cs.hentai.iconDefault,
-          hoverColor: theme.hoverColor,
-          overlayColor: theme.hoverColor,
-          onPressed: null,
-        ),
-        GhostButton.icon(
-          icon: LucideIcons.menu,
-          tooltip: '系列目录',
-          semanticLabel: '系列目录',
-          iconSize: 16,
-          size: 32,
-          borderRadius: 8,
-          foregroundColor: cs.hentai.iconDefault,
-          hoverColor: theme.hoverColor,
-          overlayColor: theme.hoverColor,
-          onPressed: null,
-        ),
-        GhostButton.icon(
-          icon: LucideIcons.chevronRight,
-          tooltip: '下一本',
-          semanticLabel: '系列下一本',
-          iconSize: 16,
-          size: 32,
-          borderRadius: 8,
-          foregroundColor: cs.hentai.iconDefault,
-          hoverColor: theme.hoverColor,
-          overlayColor: theme.hoverColor,
-          onPressed: null,
-        ),
-      ],
     );
   }
 }
