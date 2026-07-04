@@ -32,8 +32,7 @@ class LibrarySortControls extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: fields
           .map(
-            (LibraryComicSortField field) =>
-                _LibrarySortListRow(field: field),
+            (LibraryComicSortField field) => _LibrarySortListRow(field: field),
           )
           .toList(),
     );
@@ -61,9 +60,7 @@ class _LibrarySortListRow extends ConsumerWidget {
     final TextStyle labelStyle = TextStyle(
       fontSize: 13,
       fontWeight: FontWeight.w400,
-      color: isImplemented
-          ? cs.hentai.textSecondary
-          : cs.hentai.textTertiary,
+      color: isImplemented ? cs.hentai.textSecondary : cs.hentai.textTertiary,
     );
 
     return Material(
@@ -100,19 +97,11 @@ class _LibrarySortListRow extends ConsumerWidget {
                     : null,
               ),
               const SizedBox(width: kLibrarySortIconLabelGap),
-              Expanded(
-                child: Text(
-                  field.label,
-                  style: labelStyle,
-                ),
-              ),
+              Expanded(child: Text(field.label, style: labelStyle)),
               if (!isImplemented)
                 Text(
                   '即将推出',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: cs.hentai.textTertiary,
-                  ),
+                  style: TextStyle(fontSize: 11, color: cs.hentai.textTertiary),
                 ),
             ],
           ),

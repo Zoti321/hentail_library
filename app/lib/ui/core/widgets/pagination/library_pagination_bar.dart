@@ -86,10 +86,12 @@ class LibraryPaginationBar extends ConsumerWidget {
 
   dynamic _pageIndexNotifier(WidgetRef ref) {
     return switch (target) {
-      LibraryPaginationTarget.comics =>
-        ref.read(libraryComicsPageIndexProvider.notifier),
-      LibraryPaginationTarget.series =>
-        ref.read(librarySeriesPageIndexProvider.notifier),
+      LibraryPaginationTarget.comics => ref.read(
+        libraryComicsPageIndexProvider.notifier,
+      ),
+      LibraryPaginationTarget.series => ref.read(
+        librarySeriesPageIndexProvider.notifier,
+      ),
     };
   }
 

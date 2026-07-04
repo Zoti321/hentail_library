@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_about_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_library_rows.dart';
@@ -33,10 +33,7 @@ class SettingsView extends StatelessWidget {
           ),
           const SettingsGroup(
             title: '漫画库',
-            children: <Widget>[
-              LibraryLocationRow(),
-              AutoScanRow(),
-            ],
+            children: <Widget>[LibraryLocationRow(), AutoScanRow()],
           ),
           const SettingsGroup(
             title: '阅读',

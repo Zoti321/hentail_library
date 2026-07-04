@@ -128,8 +128,7 @@ class SearchedPage extends ConsumerWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: LibraryDisplayTargetTabs(
-                      showCountBadges:
-                          !libraryHeaderShowsCountChips(context),
+                      showCountBadges: !libraryHeaderShowsCountChips(context),
                     ),
                   ),
                 ],

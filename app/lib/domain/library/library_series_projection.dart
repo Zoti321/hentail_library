@@ -25,8 +25,8 @@ class LibrarySeriesProjection {
     final String? query = keyword?.trim().isEmpty ?? true
         ? null
         : keyword!.trim();
-    final ({bool showR18, bool r18Only}) flags =
-        ageRestriction.seriesFilterFlags();
+    final ({bool showR18, bool r18Only}) flags = ageRestriction
+        .seriesFilterFlags();
     return LibrarySeriesFilter(
       showR18: flags.showR18,
       r18Only: flags.r18Only,

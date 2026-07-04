@@ -33,7 +33,9 @@ rust_series.SeriesSortOptionDto mapSeriesSortOption(
   return rust_series.SeriesSortOptionDto(descending: sortOption.descending);
 }
 
-PagedResult<Series> mapPagedSeriesResult(rust_series.PagedSeriesResultDto page) {
+PagedResult<Series> mapPagedSeriesResult(
+  rust_series.PagedSeriesResultDto page,
+) {
   return PagedResult<Series>(
     items: page.items.map(mapRustSeries).toList(),
     totalCount: page.totalCount.toInt(),

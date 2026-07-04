@@ -77,16 +77,16 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
                 .map(
                   (LibraryAgeRestrictionFilter option) =>
                       _AgeRestrictionOptionRow(
-                    label: option.label,
-                    selected: selected == option,
-                    onTap: () {
-                      ref
-                          .read(
-                            libraryAgeRestrictionFilterProvider.notifier,
-                          )
-                          .toggleFilterOption(displayTarget, option);
-                    },
-                  ),
+                        label: option.label,
+                        selected: selected == option,
+                        onTap: () {
+                          ref
+                              .read(
+                                libraryAgeRestrictionFilterProvider.notifier,
+                              )
+                              .toggleFilterOption(displayTarget, option);
+                        },
+                      ),
                 )
                 .toList(),
           ),
@@ -139,10 +139,7 @@ class _AgeRestrictionOptionRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: cs.hentai.textPrimary,
-                  ),
+                  style: TextStyle(fontSize: 13, color: cs.hentai.textPrimary),
                 ),
               ),
             ],

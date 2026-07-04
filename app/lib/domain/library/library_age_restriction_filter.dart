@@ -43,10 +43,7 @@ enum LibraryAgeRestrictionFilter {
 
   /// 系列分页 filter 标志。
   ({bool showR18, bool r18Only}) seriesFilterFlags() => switch (this) {
-    LibraryAgeRestrictionFilter.unrestricted => (
-      showR18: true,
-      r18Only: false,
-    ),
+    LibraryAgeRestrictionFilter.unrestricted => (showR18: true, r18Only: false),
     LibraryAgeRestrictionFilter.allAges => (showR18: false, r18Only: false),
     LibraryAgeRestrictionFilter.r18Only => (showR18: true, r18Only: true),
   };

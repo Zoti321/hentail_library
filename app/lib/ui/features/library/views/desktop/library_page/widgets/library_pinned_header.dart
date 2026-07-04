@@ -26,10 +26,7 @@ class LibraryPageHeaderSection extends StatelessWidget {
 const double kLibraryHeaderShadowGradientHeight = 6;
 
 class LibraryPinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
-  LibraryPinnedHeaderDelegate({
-    required this.extent,
-    required this.child,
-  });
+  LibraryPinnedHeaderDelegate({required this.extent, required this.child});
 
   final double extent;
   final Widget child;
@@ -52,10 +49,7 @@ class LibraryPinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
       child: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          Align(
-            alignment: Alignment.topCenter,
-            child: child,
-          ),
+          Align(alignment: Alignment.topCenter, child: child),
           Positioned(
             left: 0,
             right: 0,

@@ -55,8 +55,7 @@ class _LibraryScrollToTopButtonState extends State<LibraryScrollToTopButton> {
       return;
     }
     final double offset = widget.scrollController.offset;
-    final double viewport =
-        widget.scrollController.position.viewportDimension;
+    final double viewport = widget.scrollController.position.viewportDimension;
     final double showThreshold =
         viewport * kLibraryScrollToTopShowViewportRatio;
     final double hideThreshold =

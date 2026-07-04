@@ -75,70 +75,70 @@ class LibrarySeriesViewData {
 }
 
 /// 系列视图投影：统一组合设置、intent、漫画索引和系列源数据。
-final Provider<LibrarySeriesViewData>
-librarySeriesViewDataProvider = Provider<LibrarySeriesViewData>((Ref ref) {
-  final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
-  final LibraryAgeRestrictionFilter ageRestriction = ref.watch(
-    librarySeriesTabAgeRestrictionFilterProvider,
-  );
-  final String keyword = ref.watch(libraryFilterQueryProvider);
-  final LibraryComicSortOption sortOption = ref.watch(
-    librarySeriesTabSortOptionProvider,
-  );
-  ref.watch(
-    comicAggregateProvider.select(
-      (ComicAggregateState s) => s.changeGeneration,
-    ),
-  );
-  final AsyncValue<List<Comic>> comicsAsync = ref.watch(
-    librarySeriesComicsByIdSourceProvider,
-  );
-  final Map<String, Comic> comicsById = _comicsByIdFromAsync(comicsAsync);
-  return seriesAsync.when(
-    data: (List<Series> list) => _seriesViewDataFrom(
-      list,
-      comicsById,
-      ageRestriction,
-      keyword,
-      sortOption,
-    ),
-    loading: () {
-      final List<Series>? previous = seriesAsync.value;
-      if (previous == null) {
-        return const LibrarySeriesViewData(
-          headerTotalSeriesWithItemsCount: 0,
-          seriesWithItemsCount: 0,
-          filteredSeries: <Series>[],
-        );
-      }
-      return _seriesViewDataFrom(
-        previous,
-        comicsById,
-        ageRestriction,
-        keyword,
-        sortOption,
+final Provider<LibrarySeriesViewData> librarySeriesViewDataProvider =
+    Provider<LibrarySeriesViewData>((Ref ref) {
+      final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
+      final LibraryAgeRestrictionFilter ageRestriction = ref.watch(
+        librarySeriesTabAgeRestrictionFilterProvider,
       );
-    },
-    error: (Object _, StackTrace _) {
-      final List<Series>? previous = seriesAsync.value;
-      if (previous == null) {
-        return const LibrarySeriesViewData(
-          headerTotalSeriesWithItemsCount: 0,
-          seriesWithItemsCount: 0,
-          filteredSeries: <Series>[],
-        );
-      }
-      return _seriesViewDataFrom(
-        previous,
-        comicsById,
-        ageRestriction,
-        keyword,
-        sortOption,
+      final String keyword = ref.watch(libraryFilterQueryProvider);
+      final LibraryComicSortOption sortOption = ref.watch(
+        librarySeriesTabSortOptionProvider,
       );
-    },
-    skipLoadingOnReload: true,
-  );
-});
+      ref.watch(
+        comicAggregateProvider.select(
+          (ComicAggregateState s) => s.changeGeneration,
+        ),
+      );
+      final AsyncValue<List<Comic>> comicsAsync = ref.watch(
+        librarySeriesComicsByIdSourceProvider,
+      );
+      final Map<String, Comic> comicsById = _comicsByIdFromAsync(comicsAsync);
+      return seriesAsync.when(
+        data: (List<Series> list) => _seriesViewDataFrom(
+          list,
+          comicsById,
+          ageRestriction,
+          keyword,
+          sortOption,
+        ),
+        loading: () {
+          final List<Series>? previous = seriesAsync.value;
+          if (previous == null) {
+            return const LibrarySeriesViewData(
+              headerTotalSeriesWithItemsCount: 0,
+              seriesWithItemsCount: 0,
+              filteredSeries: <Series>[],
+            );
+          }
+          return _seriesViewDataFrom(
+            previous,
+            comicsById,
+            ageRestriction,
+            keyword,
+            sortOption,
+          );
+        },
+        error: (Object _, StackTrace _) {
+          final List<Series>? previous = seriesAsync.value;
+          if (previous == null) {
+            return const LibrarySeriesViewData(
+              headerTotalSeriesWithItemsCount: 0,
+              seriesWithItemsCount: 0,
+              filteredSeries: <Series>[],
+            );
+          }
+          return _seriesViewDataFrom(
+            previous,
+            comicsById,
+            ageRestriction,
+            keyword,
+            sortOption,
+          );
+        },
+        skipLoadingOnReload: true,
+      );
+    });
 
 final FutureProvider<List<Comic>> librarySeriesComicsByIdSourceProvider =
     FutureProvider<List<Comic>>((Ref ref) async {

@@ -6,11 +6,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 part 'library_age_restriction_notifier.g.dart';
 
-const LibraryTabAgeRestrictionSettings kDefaultLibraryTabAgeRestrictionSettings =
-    (
-      comics: LibraryAgeRestrictionFilter.unrestricted,
-      series: LibraryAgeRestrictionFilter.unrestricted,
-    );
+const LibraryTabAgeRestrictionSettings
+kDefaultLibraryTabAgeRestrictionSettings = (
+  comics: LibraryAgeRestrictionFilter.unrestricted,
+  series: LibraryAgeRestrictionFilter.unrestricted,
+);
 
 @Riverpod(keepAlive: true)
 class LibraryAgeRestrictionFilterNotifier
@@ -42,8 +42,8 @@ class LibraryAgeRestrictionFilterNotifier
         prefs.containsKey(_legacyStorageKey)) {
       final LibraryAgeRestrictionFilter legacy =
           LibraryAgeRestrictionFilter.fromStorage(
-        prefs.getString(_legacyStorageKey),
-      );
+            prefs.getString(_legacyStorageKey),
+          );
       if (legacy != LibraryAgeRestrictionFilter.unrestricted) {
         await prefs.setString(_comicsStorageKey, legacy.name);
         await prefs.setString(_seriesStorageKey, legacy.name);

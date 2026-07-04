@@ -1,10 +1,7 @@
 part of 'library_page_widgets.dart';
 
 class LibraryPageHeaderToolbar extends ConsumerWidget {
-  const LibraryPageHeaderToolbar({
-    super.key,
-    this.onOpenFilterSort,
-  });
+  const LibraryPageHeaderToolbar({super.key, this.onOpenFilterSort});
 
   final VoidCallback? onOpenFilterSort;
 
@@ -252,7 +249,9 @@ class _LibraryCompactToolbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
-    final bool isCustomized = ref.watch(libraryActiveFilterSortIsCustomizedProvider);
+    final bool isCustomized = ref.watch(
+      libraryActiveFilterSortIsCustomizedProvider,
+    );
     return Row(
       mainAxisSize: MainAxisSize.min,
       spacing: 8,
@@ -264,8 +263,7 @@ class _LibraryCompactToolbar extends ConsumerWidget {
           iconSize: 16,
           size: 32,
           borderRadius: 8,
-          foregroundColor:
-              isCustomized ? cs.primary : cs.hentai.iconDefault,
+          foregroundColor: isCustomized ? cs.primary : cs.hentai.iconDefault,
           hoverColor: theme.hoverColor,
           overlayColor: theme.hoverColor,
           delayTooltipThreeSeconds: true,

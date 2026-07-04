@@ -57,7 +57,12 @@ class ScanProgressDialog extends ConsumerWidget {
                   _buildError(theme, state.error!)
                 else if (!state.running ||
                     state.progress?.phase == SyncLibraryPhase.done)
-                  _buildDone(theme, state.cancelled, state.progress, thumbnailProgress)
+                  _buildDone(
+                    theme,
+                    state.cancelled,
+                    state.progress,
+                    thumbnailProgress,
+                  )
                 else
                   _buildRunning(theme, state.progress),
                 _buildFooter(context, ref, theme, state),

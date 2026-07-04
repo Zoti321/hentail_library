@@ -16,7 +16,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'library_page_pagination_providers.g.dart';
 
 const LibraryComicProjection _libraryComicProjection = LibraryComicProjection();
-const LibrarySeriesProjection _librarySeriesProjection = LibrarySeriesProjection();
+const LibrarySeriesProjection _librarySeriesProjection =
+    LibrarySeriesProjection();
 
 class LibraryComicsPagination {
   const LibraryComicsPagination({
@@ -42,18 +43,40 @@ Object libraryComicsPageQueryKey(Ref ref) {
   final LibraryComicSortOption sortOption = ref.watch(
     libraryComicsTabSortOptionProvider,
   );
-  return (
-    keyword,
-    ageRestriction,
-    sortOption,
-  );
+  return (keyword, ageRestriction, sortOption);
 }
 
 @Riverpod(keepAlive: true)
 class LibraryComicsPageIndex extends _$LibraryComicsPageIndex {
   @override
   int build() {
-    ref.watch(libraryComicsPageQueryKeyProvider);
+    ref.listen<String>(libraryFilterQueryProvider, (
+      String? previous,
+      String next,
+    ) {
+      if (previous != null && previous != next) {
+        state = 1;
+      }
+    });
+    ref.listen<LibraryAgeRestrictionFilter>(
+      libraryComicsTabAgeRestrictionFilterProvider,
+      (
+        LibraryAgeRestrictionFilter? previous,
+        LibraryAgeRestrictionFilter next,
+      ) {
+        if (previous != null && previous != next) {
+          state = 1;
+        }
+      },
+    );
+    ref.listen<LibraryComicSortOption>(libraryComicsTabSortOptionProvider, (
+      LibraryComicSortOption? previous,
+      LibraryComicSortOption next,
+    ) {
+      if (previous != null && previous != next) {
+        state = 1;
+      }
+    });
     return 1;
   }
 
@@ -153,18 +176,40 @@ Object librarySeriesPageQueryKey(Ref ref) {
   final LibraryComicSortOption sortOption = ref.watch(
     librarySeriesTabSortOptionProvider,
   );
-  return (
-    keyword,
-    ageRestriction,
-    sortOption,
-  );
+  return (keyword, ageRestriction, sortOption);
 }
 
 @Riverpod(keepAlive: true)
 class LibrarySeriesPageIndex extends _$LibrarySeriesPageIndex {
   @override
   int build() {
-    ref.watch(librarySeriesPageQueryKeyProvider);
+    ref.listen<String>(libraryFilterQueryProvider, (
+      String? previous,
+      String next,
+    ) {
+      if (previous != null && previous != next) {
+        state = 1;
+      }
+    });
+    ref.listen<LibraryAgeRestrictionFilter>(
+      librarySeriesTabAgeRestrictionFilterProvider,
+      (
+        LibraryAgeRestrictionFilter? previous,
+        LibraryAgeRestrictionFilter next,
+      ) {
+        if (previous != null && previous != next) {
+          state = 1;
+        }
+      },
+    );
+    ref.listen<LibraryComicSortOption>(librarySeriesTabSortOptionProvider, (
+      LibraryComicSortOption? previous,
+      LibraryComicSortOption next,
+    ) {
+      if (previous != null && previous != next) {
+        state = 1;
+      }
+    });
     return 1;
   }
 

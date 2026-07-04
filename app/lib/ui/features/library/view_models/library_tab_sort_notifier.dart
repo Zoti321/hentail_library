@@ -33,15 +33,12 @@ class LibraryTabSortNotifier extends _$LibraryTabSortNotifier {
     if (parts.length != 2) {
       return kLibraryDefaultSortOption;
     }
-    final LibraryComicSortField? field =
-        LibraryComicSortField.values.asNameMap()[parts[0]];
+    final LibraryComicSortField? field = LibraryComicSortField.values
+        .asNameMap()[parts[0]];
     if (field == null) {
       return kLibraryDefaultSortOption;
     }
-    return LibraryComicSortOption(
-      field: field,
-      descending: parts[1] == 'true',
-    );
+    return LibraryComicSortOption(field: field, descending: parts[1] == 'true');
   }
 
   static String _encodeSortOption(LibraryComicSortOption option) {

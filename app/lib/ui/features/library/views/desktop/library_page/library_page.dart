@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_pagination_providers.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/widgets.dart';
@@ -65,19 +65,13 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<int>(libraryComicsPageIndexProvider, (
-      int? previous,
-      int next,
-    ) {
+    ref.listen<int>(libraryComicsPageIndexProvider, (int? previous, int next) {
       if (previous == null || previous == next) {
         return;
       }
       _scrollToContentTop();
     });
-    ref.listen<int>(librarySeriesPageIndexProvider, (
-      int? previous,
-      int next,
-    ) {
+    ref.listen<int>(librarySeriesPageIndexProvider, (int? previous, int next) {
       if (previous == null || previous == next) {
         return;
       }

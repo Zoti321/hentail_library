@@ -38,14 +38,8 @@ LibraryTabAgeRestrictionSettings copyAgeRestrictionForTarget(
   LibraryAgeRestrictionFilter value,
 ) {
   return switch (target) {
-    LibraryDisplayTarget.comics => (
-      comics: value,
-      series: settings.series,
-    ),
-    LibraryDisplayTarget.series => (
-      comics: settings.comics,
-      series: value,
-    ),
+    LibraryDisplayTarget.comics => (comics: value, series: settings.series),
+    LibraryDisplayTarget.series => (comics: settings.comics, series: value),
   };
 }
 
@@ -55,18 +49,13 @@ LibraryTabSortSettings copySortForTarget(
   LibraryComicSortOption value,
 ) {
   return switch (target) {
-    LibraryDisplayTarget.comics => (
-      comics: value,
-      series: settings.series,
-    ),
-    LibraryDisplayTarget.series => (
-      comics: settings.comics,
-      series: value,
-    ),
+    LibraryDisplayTarget.comics => (comics: value, series: settings.series),
+    LibraryDisplayTarget.series => (comics: settings.comics, series: value),
   };
 }
 
-final LibraryComicSortOption kLibraryDefaultSortOption = LibraryComicSortOption();
+final LibraryComicSortOption kLibraryDefaultSortOption =
+    LibraryComicSortOption();
 
 bool isLibraryFilterSortCustomized({
   required LibraryAgeRestrictionFilter ageRestriction,
