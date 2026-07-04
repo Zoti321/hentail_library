@@ -12,11 +12,18 @@ class LibraryPageHeaderSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     return Padding(
-      padding: tokens.layout.contentAreaPadding,
+      padding: tokens.layout.contentAreaPadding.copyWith(
+        top: kLibraryHeaderVerticalPadding,
+        bottom: kLibraryHeaderVerticalPadding,
+      ),
       child: LibraryPageHeaderToolbar(onOpenFilterSort: onOpenFilterSort),
     );
   }
 }
+
+/// Header 底部阴影渐变高度。须画在 delegate 边界内——[SliverPersistentHeader] 会裁掉
+/// 落在 extent 外的 [BoxDecoration.boxShadow]。
+const double kLibraryHeaderShadowGradientHeight = 6;
 
 class LibraryPinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
   LibraryPinnedHeaderDelegate({
@@ -53,22 +60,20 @@ class LibraryPinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
             left: 0,
             right: 0,
             bottom: 0,
+            height: kLibraryHeaderShadowGradientHeight,
             child: IgnorePointer(
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.easeOut,
-                opacity: overlapsContent ? 1 : 0,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    boxShadow: <BoxShadow>[
-                      BoxShadow(
-                        color: cs.hentai.cardShadow,
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: <Color>[
+                      cs.hentai.cardShadow.withValues(alpha: 0),
+                      cs.hentai.cardShadow.withValues(alpha: 0.025),
+                      cs.hentai.cardShadow.withValues(alpha: 0.05),
                     ],
+                    stops: const <double>[0, 0.75, 1],
                   ),
-                  child: const SizedBox(height: 1),
                 ),
               ),
             ),

@@ -3,6 +3,7 @@ part of 'library_page_widgets.dart';
 const double kLibraryHeaderCompactBreakpoint = 768;
 const double kLibrarySearchMaxWidth = 480;
 const double kLibrarySearchToGridSpacing = 16;
+const double kLibraryHeaderVerticalPadding = 10;
 
 bool libraryHeaderShowsCountChips(BuildContext context) {
   return MediaQuery.sizeOf(context).width >= kLibraryHeaderCompactBreakpoint;
