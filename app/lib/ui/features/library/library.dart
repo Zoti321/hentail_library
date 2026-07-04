@@ -8,4 +8,7 @@ export 'view_models/library_page_view_model_providers.dart';
 export 'view_models/library_search_page_providers.dart';
 export 'view_models/library_series_query.dart';
 export 'view_models/library_tab_filter_sort_providers.dart';
+export 'view_models/library_tab_page_size_notifier.dart';
+export 'view_models/library_tab_page_size_providers.dart';
+export 'view_models/library_tab_page_size_settings.dart';
 export 'view_models/library_tab_sort_notifier.dart';

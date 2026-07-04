@@ -8,6 +8,7 @@ import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_view_model_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
@@ -77,6 +78,11 @@ class LibraryComicsPageIndex extends _$LibraryComicsPageIndex {
         state = 1;
       }
     });
+    ref.listen<int>(libraryComicsTabPageSizeProvider, (int? previous, int next) {
+      if (previous != null && previous != next) {
+        state = 1;
+      }
+    });
     return 1;
   }
 
@@ -142,10 +148,11 @@ class LibraryComicsPage extends _$LibraryComicsPage {
       keyword: keyword,
     );
     final int page = ref.watch(libraryComicsPageIndexProvider);
+    final int pageSize = ref.watch(libraryComicsTabPageSizeProvider);
     final PagedResult<Comic> result = await ref
         .read(comicRepoProvider)
         .fetchComicsPage(
-          request: PageRequest(page: page),
+          request: PageRequest(page: page, pageSize: pageSize),
           filter: filter,
           sortOption: sortOption,
         );
@@ -210,6 +217,11 @@ class LibrarySeriesPageIndex extends _$LibrarySeriesPageIndex {
         state = 1;
       }
     });
+    ref.listen<int>(librarySeriesTabPageSizeProvider, (int? previous, int next) {
+      if (previous != null && previous != next) {
+        state = 1;
+      }
+    });
     return 1;
   }
 
@@ -265,10 +277,11 @@ class LibrarySeriesPage extends _$LibrarySeriesPage {
       keyword: keyword,
     );
     final int page = ref.watch(librarySeriesPageIndexProvider);
+    final int pageSize = ref.watch(librarySeriesTabPageSizeProvider);
     final PagedResult<Series> result = await ref
         .read(librarySeriesRepoProvider)
         .fetchPage(
-          request: PageRequest(page: page),
+          request: PageRequest(page: page, pageSize: pageSize),
           filter: filter,
           sortOption: sortOption,
         );

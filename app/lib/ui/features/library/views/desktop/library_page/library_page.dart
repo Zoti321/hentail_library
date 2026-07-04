@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_pagination_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/core/widgets/responsive_layout/library_blocks_layout.dart';
 
@@ -72,6 +73,18 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       _scrollToContentTop();
     });
     ref.listen<int>(librarySeriesPageIndexProvider, (int? previous, int next) {
+      if (previous == null || previous == next) {
+        return;
+      }
+      _scrollToContentTop();
+    });
+    ref.listen<int>(libraryComicsTabPageSizeProvider, (int? previous, int next) {
+      if (previous == null || previous == next) {
+        return;
+      }
+      _scrollToContentTop();
+    });
+    ref.listen<int>(librarySeriesTabPageSizeProvider, (int? previous, int next) {
       if (previous == null || previous == next) {
         return;
       }
