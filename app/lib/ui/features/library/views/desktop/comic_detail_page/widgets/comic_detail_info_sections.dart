@@ -96,10 +96,10 @@ class ComicDetailMetadataBlock extends HookWidget {
 
     final List<Widget> rows = <Widget>[];
     if (authors.isNotEmpty) {
-      rows.add(_LabeledMetaChipRow(label: '作者', items: authors));
+      rows.add(LabeledMetaChipRow(label: '作者', items: authors));
     }
     if (tags.isNotEmpty) {
-      rows.add(_LabeledMetaChipRow(label: '标签', items: tags));
+      rows.add(LabeledMetaChipRow(label: '标签', items: tags));
     }
     rows.add(
       ComicDetailInfoRow(
@@ -159,8 +159,8 @@ Future<ComicFileTimestamps?> loadComicFileTimestamps(String path) async {
   }
 }
 
-class _LabeledMetaChipRow extends StatelessWidget {
-  const _LabeledMetaChipRow({required this.label, required this.items});
+class LabeledMetaChipRow extends StatelessWidget {
+  const LabeledMetaChipRow({super.key, required this.label, required this.items});
 
   final String label;
   final List<String> items;

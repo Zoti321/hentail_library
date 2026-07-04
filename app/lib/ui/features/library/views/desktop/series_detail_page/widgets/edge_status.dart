@@ -1,15 +1,33 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:hentai_library/ui/core/widgets/navigation/library_return_breadcrumb.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_back_header.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SeriesDetailLoading extends StatelessWidget {
   const SeriesDetailLoading({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 48),
-      child: Center(child: CircularProgressIndicator()),
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const ComicDetailBackHeader(),
+        Expanded(
+          child: _SeriesDetailStatusView(
+            leading: SizedBox(
+              width: 32,
+              height: 32,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: cs.primary,
+              ),
+            ),
+            label: '加载中…',
+          ),
+        ),
+      ],
     );
   }
 }
@@ -21,23 +39,21 @@ class SeriesDetailError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              '加载失败：$error',
-              style: TextStyle(color: colorScheme.error, fontSize: 14),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const ComicDetailBackHeader(),
+        Expanded(
+          child: _SeriesDetailStatusView(
+            leading: Icon(
+              LucideIcons.circleAlert,
+              size: 48,
+              color: Theme.of(context).colorScheme.hentai.textTertiary,
             ),
-            const SizedBox(height: 16),
-            const LibraryReturnBreadcrumb(),
-          ],
+            label: '加载失败：$error',
+          ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -49,20 +65,61 @@ class SeriesNotFound extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        const ComicDetailBackHeader(),
+        Expanded(
+          child: _SeriesDetailStatusView(
+            leading: Icon(
+              LucideIcons.library,
+              size: 48,
+              color: Theme.of(context).colorScheme.hentai.textTertiary,
+            ),
+            label: '未找到系列「$seriesName」',
+            action: TextButton.icon(
+              onPressed: () => context.go('/local'),
+              icon: const Icon(LucideIcons.library, size: 16),
+              label: const Text('前往漫画库'),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
 
+class _SeriesDetailStatusView extends StatelessWidget {
+  const _SeriesDetailStatusView({
+    required this.leading,
+    required this.label,
+    this.action,
+  });
+
+  final Widget leading;
+  final String label;
+  final Widget? action;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24),
+        padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl * 2 + 8),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          spacing: tokens.spacing.lg,
           children: <Widget>[
+            leading,
             Text(
-              '未找到系列「$seriesName」',
-              style: TextStyle(fontSize: 14, color: cs.hentai.textTertiary),
+              label,
+              style: TextStyle(
+                fontSize: tokens.text.bodyMd,
+                color: cs.hentai.textSecondary,
+              ),
             ),
-            const SizedBox(height: 12),
-            const LibraryReturnBreadcrumb(),
+            if (action != null) action!,
           ],
         ),
       ),

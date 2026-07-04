@@ -1,99 +1,127 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
-import 'package:hentai_library/ui/core/widgets/responsive_layout/detail_page_layout.dart';
-import 'package:hentai_library/ui/core/widgets/navigation/library_return_breadcrumb.dart';
-import 'actions.dart';
-import 'series_comic_items_card.dart';
-import 'series_detail_card.dart';
-import 'series_detail_cover.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_comics_grid.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_cover.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_header.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_info_sections.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class SeriesDetail extends StatelessWidget {
+class SeriesDetail extends HookConsumerWidget {
   const SeriesDetail({super.key, required this.series});
 
   final Series series;
 
+  static const double _coverWidth = 220;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
-
     final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
       ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
-    final int count = series.items.length;
+    final int changeGeneration = ref.watch(
+      comicAggregateProvider.select(
+        (ComicAggregateState state) => state.changeGeneration,
+      ),
+    );
+    final Future<List<Comic>> comicsFuture = useMemoized(
+      () => ref.read(comicRepoProvider).getAll(),
+      <Object?>[changeGeneration, series.name],
+    );
+    final AsyncSnapshot<List<Comic>> comicsSnapshot = useFuture(comicsFuture);
+    final Map<String, Comic> comicsById = comicsByIdFromList(
+      comicsSnapshot.data ?? <Comic>[],
+    );
 
-    final Widget titleBlock = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Tooltip(
-          message: series.name,
-          waitDuration: const Duration(milliseconds: 2000),
-          child: SelectableText(
-            series.name,
-            maxLines: 1,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.4,
-              color: cs.hentai.textPrimary,
+        SeriesDetailHeader(series: series),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              tokens.layout.contentHorizontalPadding,
+              tokens.spacing.xl,
+              tokens.layout.contentHorizontalPadding,
+              tokens.spacing.xl + 8,
             ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: tokens.spacing.xl + 8,
+              children: <Widget>[
+                _buildPrimaryRow(context, tokens, cs, comicsById),
+                SeriesDetailMetadataBlock(
+                  sortedItems: sortedItems,
+                  comicsById: comicsById,
+                ),
+                SeriesDetailComicsGrid(
+                  sortedItems: sortedItems,
+                  comicsById: comicsById,
+                ),
+              ],
+            )
+                .animate()
+                .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
+                .slideY(
+                  begin: 0.03,
+                  duration: 260.ms,
+                  curve: Curves.easeOutCubic,
+                ),
           ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          '包含 $count 本',
-          style: TextStyle(color: cs.hentai.textTertiary, fontSize: 12),
         ),
       ],
     );
+  }
 
-    return DetailResponsiveLayout(
-      header: LibraryReturnBreadcrumb(
-        trailingLabel: series.name,
-        trailingTooltip: series.name,
-      ),
-      headerSpacing: tokens.spacing.md + 4,
-      bodyBuilder: (BuildContext context, DetailPanelSize panel) {
-        return SeriesDetailCard(
-          maxWidth: panel.targetWidth,
-          padding: EdgeInsets.all(tokens.spacing.xl),
-          child: Row(
+  Widget _buildPrimaryRow(
+    BuildContext context,
+    AppThemeTokens tokens,
+    ColorScheme cs,
+    Map<String, Comic> comicsById,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        SizedBox(
+          width: _coverWidth,
+          child: SeriesDetailCover(series: series),
+        ),
+        SizedBox(width: tokens.spacing.xl),
+        Expanded(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.spacing.md,
             children: <Widget>[
-              Flexible(
-                flex: 2,
-                child: Center(child: SeriesDetailCover(series: series)),
-              ),
-              SizedBox(width: tokens.spacing.lg + 16),
-              Flexible(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: .min,
-                  spacing: 16,
-                  children: <Widget>[
-                    titleBlock,
-                    SeriesDetailActions(
-                      series: series,
-                      sortedItems: sortedItems,
-                    ),
-                    Flexible(
-                      child: SeriesComicItemsCard(
-                        colorScheme: cs,
-                        listCardRadius: tokens.radius.lg,
-                        sortedItems: sortedItems,
-                        seriesName: series.name,
-                      ),
-                    ),
-                  ],
+              Tooltip(
+                message: series.name,
+                waitDuration: const Duration(milliseconds: 2000),
+                child: SelectableText(
+                  series.name,
+                  maxLines: 2,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.4,
+                    color: cs.hentai.textPrimary,
+                    height: 1.25,
+                  ),
                 ),
+              ),
+              SeriesDetailSummaryMetaRow(
+                series: series,
+                comicsById: comicsById,
               ),
             ],
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 }
