@@ -3,7 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/use_cases/sync_library_types.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
+import 'package:hentai_library/ui/features/shell/di/usecases/scan_library_controller.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/terminal_spinner.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -17,6 +18,9 @@ class ScanProgressDialog extends ConsumerWidget {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final state = ref.watch(scanLibraryControllerProvider);
+    final ThumbnailBackgroundProgress thumbnailProgress = ref.watch(
+      thumbnailEventCoordinatorProvider,
+    );
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -53,7 +57,7 @@ class ScanProgressDialog extends ConsumerWidget {
                   _buildError(theme, state.error!)
                 else if (!state.running ||
                     state.progress?.phase == SyncLibraryPhase.done)
-                  _buildDone(theme, state.cancelled, state.progress)
+                  _buildDone(theme, state.cancelled, state.progress, thumbnailProgress)
                 else
                   _buildRunning(theme, state.progress),
                 _buildFooter(context, ref, theme, state),
@@ -222,6 +226,7 @@ class ScanProgressDialog extends ConsumerWidget {
     ThemeData theme,
     bool cancelled,
     SyncLibraryProgress? progress,
+    ThumbnailBackgroundProgress thumbnailProgress,
   ) {
     final cs = theme.colorScheme;
     if (cancelled) {
@@ -262,9 +267,22 @@ class ScanProgressDialog extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-      child: Text(
-        label,
-        style: TextStyle(fontSize: 14, color: cs.hentai.textSecondary),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(fontSize: 14, color: cs.hentai.textSecondary),
+          ),
+          if (thumbnailProgress.isActive) ...[
+            const SizedBox(height: 8),
+            Text(
+              '后台生成缩略图 ${thumbnailProgress.done} / ${thumbnailProgress.total}'
+              '${thumbnailProgress.failed > 0 ? ' · 失败 ${thumbnailProgress.failed}' : ''}',
+              style: TextStyle(fontSize: 13, color: cs.hentai.textTertiary),
+            ),
+          ],
+        ],
       ),
     );
   }

@@ -89,6 +89,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   dco_decode_StreamSink_sync_library_progress_dto_Sse(dynamic raw);
 
   @protected
+  RustStreamSink<ThumbnailEventDto>
+  dco_decode_StreamSink_thumbnail_event_dto_Sse(dynamic raw);
+
+  @protected
   String dco_decode_String(dynamic raw);
 
   @protected
@@ -251,6 +255,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   TagPagedNamesDto dco_decode_tag_paged_names_dto(dynamic raw);
 
   @protected
+  ThumbnailEventDto dco_decode_thumbnail_event_dto(dynamic raw);
+
+  @protected
+  ThumbnailPriorityDto dco_decode_thumbnail_priority_dto(dynamic raw);
+
+  @protected
   int dco_decode_u_8(dynamic raw);
 
   @protected
@@ -327,6 +337,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   sse_decode_StreamSink_sync_library_progress_dto_Sse(
     SseDeserializer deserializer,
   );
+
+  @protected
+  RustStreamSink<ThumbnailEventDto>
+  sse_decode_StreamSink_thumbnail_event_dto_Sse(SseDeserializer deserializer);
 
   @protected
   String sse_decode_String(SseDeserializer deserializer);
@@ -541,6 +555,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   TagPagedNamesDto sse_decode_tag_paged_names_dto(SseDeserializer deserializer);
 
   @protected
+  ThumbnailEventDto sse_decode_thumbnail_event_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ThumbnailPriorityDto sse_decode_thumbnail_priority_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   int sse_decode_u_8(SseDeserializer deserializer);
 
   @protected
@@ -626,6 +650,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_StreamSink_sync_library_progress_dto_Sse(
     RustStreamSink<SyncLibraryProgressDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_StreamSink_thumbnail_event_dto_Sse(
+    RustStreamSink<ThumbnailEventDto> self,
     SseSerializer serializer,
   );
 
@@ -893,6 +923,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_tag_paged_names_dto(
     TagPagedNamesDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_thumbnail_event_dto(
+    ThumbnailEventDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_thumbnail_priority_dto(
+    ThumbnailPriorityDto self,
     SseSerializer serializer,
   );
 

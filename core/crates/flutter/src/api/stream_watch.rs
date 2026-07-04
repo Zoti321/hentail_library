@@ -6,6 +6,7 @@ use crate::frb_generated::{SseEncode, StreamSink};
 /// Dart 侧取消 Stream 订阅后，向已关闭的 [StreamSink] 写入会失败；这是正常生命周期，不是错误。
 pub const STREAM_CLOSED: &str = "stream closed";
 
+#[flutter_rust_bridge::frb(ignore)]
 pub fn emit_or_closed<T>(sink: &StreamSink<T>, item: T) -> Result<(), HentaiError>
 where
     T: SseEncode,
@@ -15,6 +16,7 @@ where
 }
 
 /// 将 watch 循环结果中的「流已关闭」规范为成功退出。
+#[flutter_rust_bridge::frb(ignore)]
 pub fn normalize_watch_result(
     result: Result<(), HentaiError>,
 ) -> Result<(), HentaiErrorDto> {

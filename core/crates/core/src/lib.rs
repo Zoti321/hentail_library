@@ -60,5 +60,7 @@ pub use tag::{
     watch_tags,
 };
 pub use thumbnail::{
-    delete_thumbnails_by_comic_ids, find_thumbnail_by_comic_id, ComicThumbnailDto,
+    delete_thumbnails_by_comic_ids, ensure_thumbnail, enqueue_thumbnails_low,
+    find_thumbnail_by_comic_id, watch_thumbnail_events, ComicThumbnailDto, ThumbnailEvent,
+    ThumbnailPriority,
 };

@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:hentai_library/src/rust/api/thumbnail.dart';
+
 typedef ComicThumbnailRecord = ({
   Uint8List thumbnail,
   int sourceModifiedMs,
@@ -8,6 +10,11 @@ typedef ComicThumbnailRecord = ({
 
 abstract class ComicThumbnailRepository {
   Future<ComicThumbnailRecord?> findByComicId(String comicId);
+
+  Future<ComicThumbnailRecord?> ensureByComicId({
+    required String comicId,
+    required ThumbnailPriorityDto priority,
+  });
 
   Future<void> upsert({
     required String comicId,

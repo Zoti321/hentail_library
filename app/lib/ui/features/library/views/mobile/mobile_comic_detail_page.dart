@@ -11,6 +11,7 @@ import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
+import 'package:hentai_library/src/rust/api/thumbnail.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 
@@ -76,7 +77,12 @@ class _MobileComicDetailBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ComicCoverDisplayData? coverData = ref
-        .watch(comicCoverDisplayProvider(comicId: comic.comicId))
+        .watch(
+          comicCoverDisplayProvider(
+            comicId: comic.comicId,
+            priority: ThumbnailPriorityDto.critical,
+          ),
+        )
         .maybeWhen(
           data: (ComicCoverDisplayData? value) => value,
           orElse: () => null,

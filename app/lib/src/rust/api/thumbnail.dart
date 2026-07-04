@@ -6,18 +6,32 @@
 import '../frb_generated.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
+part 'thumbnail.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `from`
+// These functions are ignored because they are not marked as `pub`: `map_event`, `map_priority`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `from`
 
 ComicThumbnailDto? findThumbnailByComicIdFrb({required String comicId}) =>
     RustLib.instance.api.crateApiThumbnailFindThumbnailByComicIdFrb(
       comicId: comicId,
     );
 
+ComicThumbnailDto? ensureThumbnailByComicIdFrb({
+  required String comicId,
+  required ThumbnailPriorityDto priority,
+}) => RustLib.instance.api.crateApiThumbnailEnsureThumbnailByComicIdFrb(
+  comicId: comicId,
+  priority: priority,
+);
+
 void deleteThumbnailsByComicIdsFrb({required List<String> comicIds}) => RustLib
     .instance
     .api
     .crateApiThumbnailDeleteThumbnailsByComicIdsFrb(comicIds: comicIds);
+
+Stream<ThumbnailEventDto> watchThumbnailEventsFrb() =>
+    RustLib.instance.api.crateApiThumbnailWatchThumbnailEventsFrb();
 
 class ComicThumbnailDto {
   final Uint8List thumbnail;
@@ -43,3 +57,18 @@ class ComicThumbnailDto {
           sourceModifiedMs == other.sourceModifiedMs &&
           sourceSize == other.sourceSize;
 }
+
+@freezed
+sealed class ThumbnailEventDto with _$ThumbnailEventDto {
+  const ThumbnailEventDto._();
+
+  const factory ThumbnailEventDto.ready({required String comicId}) =
+      ThumbnailEventDto_Ready;
+  const factory ThumbnailEventDto.progress({
+    required int done,
+    required int total,
+    required int failed,
+  }) = ThumbnailEventDto_Progress;
+}
+
+enum ThumbnailPriorityDto { critical, high, low }
