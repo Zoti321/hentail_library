@@ -250,11 +250,6 @@ class ComicCard extends HookConsumerWidget {
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.easeOutQuad,
                   ),
-
-              // 2. 黑色遮罩层 (Hover 时显示)
-              Container(color: cs.hentai.overlayScrim)
-                  .animate(target: isHover ? 1 : 0)
-                  .fade(begin: 0.0, end: 1.0, duration: 200.ms),
             ],
           ),
         ),
@@ -290,7 +285,7 @@ class ComicCard extends HookConsumerWidget {
         Row(
           children: [
             Text(
-              '$pageCount页',
+              '$pageCount 页',
               style: TextStyle(
                 fontSize: tokens.text.labelXs - 1,
                 color: Theme.of(context).colorScheme.hentai.textTertiary,

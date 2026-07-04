@@ -71,7 +71,6 @@ class SeriesCard extends HookConsumerWidget {
             spacing: 12,
             children: <Widget>[
               _SeriesCardCover(
-                series: series,
                 coverData: coverData,
                 isHover: isHover.value,
               ),
@@ -94,12 +93,10 @@ class SeriesCard extends HookConsumerWidget {
 
 class _SeriesCardCover extends StatelessWidget {
   const _SeriesCardCover({
-    required this.series,
     required this.coverData,
     required this.isHover,
   });
 
-  final Series series;
   final ComicCoverDisplayData? coverData;
   final bool isHover;
 
@@ -170,34 +167,6 @@ class _SeriesCardCover extends StatelessWidget {
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.easeOutQuad,
                   ),
-              Container(color: cs.hentai.overlayScrim)
-                  .animate(target: isHover ? 1 : 0)
-                  .fade(begin: 0.0, end: 1.0, duration: 200.ms),
-              Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Text(
-                        series.name,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: tokens.text.bodySm,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          height: 1.2,
-                          shadows: <Shadow>[
-                            Shadow(
-                              color: Colors.black.withValues(alpha: 0.85),
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                  .animate(target: isHover ? 1 : 0)
-                  .fade(begin: 0.0, end: 1.0, duration: 200.ms),
             ],
           ),
         ),
@@ -241,7 +210,7 @@ class _SeriesCardInfo extends StatelessWidget {
           ),
         ),
         Text(
-          '包含 $count 本',
+          '$count 本',
           style: TextStyle(
             fontSize: tokens.text.labelXs - 1,
             color: cs.hentai.textTertiary,
