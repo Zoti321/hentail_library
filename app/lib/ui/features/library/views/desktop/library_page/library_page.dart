@@ -12,12 +12,20 @@ class LibraryPage extends StatefulWidget {
 class _LibraryPageState extends State<LibraryPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey _headerMeasureKey = GlobalKey();
+  final ScrollController _scrollController = ScrollController();
   double? _headerExtent;
+  bool _isEndDrawerOpen = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -55,23 +63,37 @@ class _LibraryPageState extends State<LibraryPage> {
     return Scaffold(
       key: _scaffoldKey,
       endDrawer: const LibraryFilterSortDrawer(),
-      body: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: <Widget>[
-          if (_headerExtent == null)
-            SliverToBoxAdapter(child: header)
-          else
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: LibraryPinnedHeaderDelegate(
-                extent: _headerExtent!,
-                child: header,
+      onEndDrawerChanged: (bool isOpen) {
+        if (_isEndDrawerOpen != isOpen) {
+          setState(() => _isEndDrawerOpen = isOpen);
+        }
+      },
+      body: Stack(
+        children: <Widget>[
+          CustomScrollView(
+            controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: <Widget>[
+              if (_headerExtent == null)
+                SliverToBoxAdapter(child: header)
+              else
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: LibraryPinnedHeaderDelegate(
+                    extent: _headerExtent!,
+                    child: header,
+                  ),
+                ),
+              const LibraryContentSearchSliver(),
+              const LibraryBlocksSliverGroup(
+                seriesBlock: LibrarySeriesBlock(),
+                comicsBlock: LibraryComicsBlock(),
               ),
-            ),
-          const LibraryContentSearchSliver(),
-          const LibraryBlocksSliverGroup(
-            seriesBlock: LibrarySeriesBlock(),
-            comicsBlock: LibraryComicsBlock(),
+            ],
+          ),
+          LibraryScrollToTopButton(
+            scrollController: _scrollController,
+            isDrawerOpen: _isEndDrawerOpen,
           ),
         ],
       ),
