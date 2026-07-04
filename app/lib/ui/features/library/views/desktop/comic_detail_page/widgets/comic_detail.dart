@@ -1,91 +1,93 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/ui/core/widgets/navigation/library_return_breadcrumb.dart';
-import 'package:hentai_library/ui/core/widgets/responsive_layout/detail_page_layout.dart';
-import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_card.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_cover.dart';
-import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_metadata_section.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_header.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_info_sections.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_primary_actions.dart';
 
 class ComicDetail extends StatelessWidget {
   const ComicDetail({super.key, required this.comic});
+
   final Comic comic;
+
+  static const double _coverWidth = 220;
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
 
-    return DetailResponsiveLayout(
-      header: LibraryReturnBreadcrumb(
-        trailingLabel: comic.title,
-        trailingTooltip: comic.title,
-      ),
-      headerSpacing: tokens.spacing.md + 4,
-      bodyBuilder: (BuildContext context, DetailPanelSize panel) {
-        return ComicDetailCard(
-          maxWidth: panel.targetWidth,
-          padding: EdgeInsets.all(tokens.spacing.xl),
-          child: _buildCardContent(tokens, cs)
-              .animate()
-              .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
-              .slideY(
-                begin: 0.03,
-                duration: 260.ms,
-                curve: Curves.easeOutCubic,
-              ),
-        );
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        ComicDetailHeader(comic: comic),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              tokens.layout.contentHorizontalPadding,
+              tokens.spacing.xl,
+              tokens.layout.contentHorizontalPadding,
+              tokens.spacing.xl + 8,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: tokens.spacing.xl + 8,
+              children: <Widget>[
+                _buildPrimaryRow(context, tokens, cs),
+                ComicDetailMetadataBlock(comic: comic),
+              ],
+            )
+                .animate()
+                .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
+                .slideY(
+                  begin: 0.03,
+                  duration: 260.ms,
+                  curve: Curves.easeOutCubic,
+                ),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildCardContent(AppThemeTokens tokens, ColorScheme cs) {
-    final Widget titleBlock = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Tooltip(
-          message: comic.title,
-          waitDuration: const Duration(milliseconds: 2000),
-          child: SelectableText(
-            comic.title,
-            maxLines: 1,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.4,
-              color: cs.hentai.textPrimary,
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-      ],
-    );
-
+  Widget _buildPrimaryRow(
+    BuildContext context,
+    AppThemeTokens tokens,
+    ColorScheme cs,
+  ) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Flexible(
-          flex: 2,
-          child: Center(child: ComicDetailCover(comic: comic)),
+        SizedBox(
+          width: _coverWidth,
+          child: ComicDetailCover(comic: comic),
         ),
-        SizedBox(width: tokens.spacing.lg + 16),
-        Flexible(
-          flex: 3,
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              spacing: 16,
-              children: <Widget>[
-                titleBlock,
-                ComicDetailMetadataSection(comic: comic),
-                ComicDetailPrimaryActions(comic: comic),
-              ],
-            ),
+        SizedBox(width: tokens.spacing.xl),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.spacing.md,
+            children: <Widget>[
+              Tooltip(
+                message: comic.title,
+                waitDuration: const Duration(milliseconds: 2000),
+                child: SelectableText(
+                  comic.title,
+                  maxLines: 2,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.4,
+                    color: cs.hentai.textPrimary,
+                    height: 1.25,
+                  ),
+                ),
+              ),
+              ComicDetailSummaryMetaRow(comic: comic),
+              ComicDetailPrimaryActions(comic: comic),
+            ],
           ),
         ),
       ],

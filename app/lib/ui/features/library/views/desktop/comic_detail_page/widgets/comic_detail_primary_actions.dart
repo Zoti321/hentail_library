@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
-import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -30,14 +27,39 @@ ButtonStyle comicDetailPrimaryActionStyle(
   );
 }
 
+ButtonStyle comicDetailSecondaryActionStyle(
+  ThemeData theme,
+  AppThemeTokens tokens,
+) {
+  final ColorScheme cs = theme.colorScheme;
+  return OutlinedButton.styleFrom(
+    foregroundColor: cs.hentai.textSecondary,
+    disabledForegroundColor: cs.hentai.textTertiary,
+    padding: EdgeInsets.symmetric(
+      horizontal: tokens.spacing.xl,
+      vertical: tokens.spacing.sm + 6,
+    ),
+    side: BorderSide(color: cs.hentai.borderSubtle),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(tokens.radius.md),
+    ),
+  );
+}
+
 class ComicDetailPrimaryActions extends HookConsumerWidget {
   const ComicDetailPrimaryActions({super.key, required this.comic});
+
   final Comic comic;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final ButtonStyle primaryStyle = comicDetailPrimaryActionStyle(
+      theme,
+      tokens,
+    );
+    final ButtonStyle secondaryStyle = comicDetailSecondaryActionStyle(
       theme,
       tokens,
     );
@@ -68,33 +90,19 @@ class ComicDetailPrimaryActions extends HookConsumerWidget {
                 ).toQueryParameters(),
               );
             },
-            icon: Icon(LucideIcons.play, size: 16),
+            icon: const Icon(LucideIcons.play, size: 16),
             label: const Text('开始阅读'),
             style: primaryStyle,
           ),
         ),
         Semantics(
-          label: '编辑元数据',
+          label: '无痕阅读',
           button: true,
-          child: GhostButton.icon(
-            icon: LucideIcons.pencil,
-            tooltip: '编辑元数据',
-            semanticLabel: '编辑元数据',
-            size: 32,
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) => EditMetadataDialog(
-                  comic: comic,
-                  onSave: (data) async {
-                    await data.applyTo(
-                      ref.read(comicRepoProvider),
-                      comic.comicId,
-                    );
-                  },
-                ),
-              );
-            },
+          child: OutlinedButton.icon(
+            onPressed: null,
+            icon: const Icon(LucideIcons.eyeOff, size: 16),
+            label: const Text('无痕阅读'),
+            style: secondaryStyle,
           ),
         ),
       ],

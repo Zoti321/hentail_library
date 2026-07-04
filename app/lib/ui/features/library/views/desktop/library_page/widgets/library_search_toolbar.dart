@@ -304,7 +304,6 @@ class _LibraryPageSizeMenuButtonState
       libraryDisplayTargetProvider,
     );
     final int activePageSize = ref.watch(libraryActivePageSizeProvider);
-    final bool isNonDefault = activePageSize != kDefaultPageSize;
     return CustomPopupMenu(
       controller: _controller,
       barrierColor: Colors.transparent,
@@ -327,7 +326,7 @@ class _LibraryPageSizeMenuButtonState
         iconSize: 16,
         size: 32,
         borderRadius: 8,
-        foregroundColor: isNonDefault ? cs.primary : cs.hentai.iconDefault,
+        foregroundColor: cs.hentai.iconDefault,
         hoverColor: theme.hoverColor,
         overlayColor: theme.hoverColor,
         delayTooltipThreeSeconds: true,
