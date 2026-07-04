@@ -10,23 +10,29 @@ class ReaderPagedContent extends HookConsumerWidget {
   const ReaderPagedContent({
     super.key,
     required this.comicId,
+    required this.incognito,
     required this.initialPage,
     required this.preferredPageIndex,
   });
   final String comicId;
+  final bool incognito;
   final int initialPage;
   final int? preferredPageIndex;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final ReaderViewKey viewKey = readerViewKey(
+      comicId,
+      incognito: incognito,
+    );
     final int currentIndex = ref.watch(
-      readerViewProvider(comicId).select(
+      readerViewProvider(viewKey).select(
         (AsyncValue<ReaderViewState> value) =>
             value.asData?.value.currentIndex ?? 1,
       ),
     );
     final int totalPages = ref.watch(
-      readerViewProvider(comicId).select(
+      readerViewProvider(viewKey).select(
         (AsyncValue<ReaderViewState> value) =>
             value.asData?.value.totalPages ?? 1,
       ),
@@ -64,7 +70,7 @@ class ReaderPagedContent extends HookConsumerWidget {
           if (!context.mounted) {
             return;
           }
-          ref.read(readerViewProvider(comicId).notifier).setIndex(safeIndex);
+          ref.read(readerViewProvider(viewKey).notifier).setIndex(safeIndex);
         });
       }
       return null;
@@ -131,7 +137,7 @@ class ReaderPagedContent extends HookConsumerWidget {
             }
             lastWheelAt.value = now;
             final ReaderViewNotifier notifier = ref.read(
-              readerViewProvider(comicId).notifier,
+              readerViewProvider(viewKey).notifier,
             );
             if (dy > 0) {
               notifier.nextPage();
@@ -147,7 +153,7 @@ class ReaderPagedContent extends HookConsumerWidget {
                 return;
               }
               ref
-                  .read(readerViewProvider(comicId).notifier)
+                  .read(readerViewProvider(viewKey).notifier)
                   .setIndex(index + 1);
             },
             itemCount: imageList.length,

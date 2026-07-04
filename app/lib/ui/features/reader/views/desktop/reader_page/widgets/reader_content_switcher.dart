@@ -6,6 +6,7 @@ class ReaderContentSwitcher extends StatelessWidget {
   const ReaderContentSwitcher({
     super.key,
     required this.comicId,
+    required this.incognito,
     required this.initialPage,
     required this.preferredPageIndex,
     required this.isVertical,
@@ -13,6 +14,7 @@ class ReaderContentSwitcher extends StatelessWidget {
     this.pagedChild,
   });
   final String comicId;
+  final bool incognito;
   final int initialPage;
   final int? preferredPageIndex;
   final bool isVertical;
@@ -28,6 +30,7 @@ class ReaderContentSwitcher extends StatelessWidget {
       }
       return ReaderVerticalContent(
         comicId: comicId,
+        incognito: incognito,
         preferredPageIndex: preferredPageIndex,
       );
     }
@@ -37,6 +40,7 @@ class ReaderContentSwitcher extends StatelessWidget {
     }
     return ReaderPagedContent(
       comicId: comicId,
+      incognito: incognito,
       initialPage: initialPage,
       preferredPageIndex: preferredPageIndex,
     );

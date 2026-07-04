@@ -16,6 +16,11 @@ part 'reader_page_notifier.g.dart';
 
 enum ReaderTapZone { left, center, right }
 
+typedef ReaderViewKey = ({String comicId, bool incognito});
+
+ReaderViewKey readerViewKey(String comicId, {bool incognito = false}) =>
+    (comicId: comicId, incognito: incognito);
+
 @freezed
 abstract class ReaderViewState with _$ReaderViewState {
   factory ReaderViewState({
@@ -48,15 +53,17 @@ AsyncValue<ReaderPageViewModel> readerPageViewModel(
   required String comicId,
   required bool isSeriesMode,
   String? seriesName,
+  bool incognito = false,
 }) {
   final AsyncValue<ReaderViewState> viewAsync = ref.watch(
-    readerViewProvider(comicId),
+    readerViewProvider(readerViewKey(comicId, incognito: incognito)),
   );
   final AsyncValue<ReaderSeriesContextData> seriesContextAsync = ref.watch(
     readerSeriesContextForReaderProvider(
       comicId: comicId,
       isSeriesMode: isSeriesMode,
       seriesName: seriesName,
+      incognito: incognito,
     ),
   );
   if (viewAsync.hasError) {
@@ -86,26 +93,35 @@ AsyncValue<ReaderPageViewModel> readerPageViewModel(
 @riverpod
 class ReaderViewNotifier extends _$ReaderViewNotifier {
   @override
-  Future<ReaderViewState> build(String id) async {
+  Future<ReaderViewState> build(ReaderViewKey key) async {
+    final String id = key.comicId;
+    final bool incognito = key.incognito;
     final comic = await ref.read(comicRepoProvider).findById(id);
     if (comic == null) {
       throw StateError('Comic not found: $id');
     }
-    final progress = await ref.watch(
-      readingProgressProvider(comicId: id).future,
-    );
     final images = await ref.watch(comicImagesProvider(comicId: id).future);
     final totalPages = images.length;
-    final oneBased = (progress?.pageIndex ?? 1).clamp(
-      1,
-      totalPages > 0 ? totalPages : 1,
-    );
+    final int oneBased;
+    if (incognito) {
+      oneBased = 1;
+    } else {
+      final progress = await ref.watch(
+        readingProgressProvider(comicId: id).future,
+      );
+      oneBased = (progress?.pageIndex ?? 1).clamp(
+        1,
+        totalPages > 0 ? totalPages : 1,
+      );
+    }
     return ReaderViewState(
       comic: comic,
       currentIndex: oneBased,
       totalPagesOverride: totalPages > 0 ? totalPages : null,
     );
   }
+
+  String get _comicId => (ref.$arg as ReaderViewKey).comicId;
 
   void _updateDataState(ReaderViewState Function(ReaderViewState) updater) {
     final current = state.asData?.value;
@@ -181,6 +197,9 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
   Future<void> executeSaveProgress({
     required ReaderRouteContext routeContext,
   }) async {
+    if (routeContext.incognito) {
+      return;
+    }
     final ReaderViewState? currentState = state.asData?.value;
     if (currentState == null) {
       return;
@@ -188,7 +207,7 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
     await ref
         .read(readingAggregateProvider.notifier)
         .saveProgress(
-          comicId: id,
+          comicId: _comicId,
           comic: currentState.comic,
           pageIndex: currentState.currentIndex,
           isSeriesMode: routeContext.isSeriesMode,
@@ -244,6 +263,7 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
             : ReaderRouteArgs.readTypeComic,
         seriesName: routeContext.seriesName,
         keepControlsOpen: true,
+        incognito: routeContext.incognito,
       ).toQueryParameters(),
     );
   }

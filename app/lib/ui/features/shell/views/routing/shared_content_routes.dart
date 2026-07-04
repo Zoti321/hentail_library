@@ -68,6 +68,7 @@ List<RouteBase> buildSharedContentRoutes({
           readType: args.readType,
           seriesName: args.seriesName,
           keepControlsOpen: args.keepControlsOpen,
+          incognito: args.incognito,
         );
       },
     ),

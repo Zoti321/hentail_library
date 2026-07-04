@@ -19,12 +19,14 @@ class ReaderPage extends HookConsumerWidget {
     required this.readType,
     this.seriesName,
     this.keepControlsOpen = false,
+    this.incognito = false,
   });
 
   final String comicId;
   final String readType;
   final String? seriesName;
   final bool keepControlsOpen;
+  final bool incognito;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,6 +34,11 @@ class ReaderPage extends HookConsumerWidget {
       comicId: comicId,
       readType: readType,
       seriesName: seriesName,
+      incognito: incognito,
+    );
+    final ReaderViewKey viewKey = readerViewKey(
+      routeContext.comicId,
+      incognito: routeContext.incognito,
     );
 
     if (routeContext.comicId.isEmpty) {
@@ -47,10 +54,11 @@ class ReaderPage extends HookConsumerWidget {
         comicId: routeContext.comicId,
         isSeriesMode: routeContext.isSeriesMode,
         seriesName: routeContext.seriesName,
+        incognito: routeContext.incognito,
       ),
     );
     final ReaderViewNotifier notifier = ref.read(
-      readerViewProvider(routeContext.comicId).notifier,
+      readerViewProvider(viewKey).notifier,
     );
     final ObjectRef<bool> hasAppliedKeepControls = useRef<bool>(false);
     final bool readerWindowFullscreen = ref.watch(
@@ -82,7 +90,7 @@ class ReaderPage extends HookConsumerWidget {
     );
     final ({int currentIndex, int totalPages, bool isVertical})? autoPlayState =
         ref.watch(
-          readerViewProvider(routeContext.comicId).select((
+          readerViewProvider(viewKey).select((
             AsyncValue<ReaderViewState> asyncState,
           ) {
             final ReaderViewState? readerState = asyncState.asData?.value;
@@ -143,7 +151,7 @@ class ReaderPage extends HookConsumerWidget {
         Timer? timer;
         timer = Timer.periodic(interval, (_) {
           final ReaderViewState? currentState = ref
-              .read(readerViewProvider(routeContext.comicId))
+              .read(readerViewProvider(viewKey))
               .asData
               ?.value;
           if (currentState == null) {
@@ -222,6 +230,7 @@ class ReaderPage extends HookConsumerWidget {
                     child: ReaderContent(
                       key: ValueKey<String>(routeContext.comicId),
                       comicId: routeContext.comicId,
+                      incognito: routeContext.incognito,
                       initialPage: initialPage,
                       preferredPageIndex: preferredPageIndex,
                       isVertical: readerIsVertical,

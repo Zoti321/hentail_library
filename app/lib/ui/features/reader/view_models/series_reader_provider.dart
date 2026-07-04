@@ -42,6 +42,7 @@ Future<ReaderSeriesContextData> readerSeriesContextForReader(
   required String comicId,
   required bool isSeriesMode,
   String? seriesName,
+  bool incognito = false,
 }) async {
   if (!isSeriesMode || seriesName == null || seriesName.isEmpty) {
     final String title = await _readComicTitle(ref, comicId);
@@ -63,9 +64,11 @@ Future<ReaderSeriesContextData> readerSeriesContextForReader(
     ref,
     series,
   );
-  final int? preferredPageIndex = await ref.watch(
-    comicReadingPageIndexForReaderProvider(comicId).future,
-  );
+  final int? preferredPageIndex = incognito
+      ? null
+      : await ref.watch(
+          comicReadingPageIndexForReaderProvider(comicId).future,
+        );
   return ReaderSeriesContextData(
     navContext: buildReaderNavContextData(
       items: seriesItems,

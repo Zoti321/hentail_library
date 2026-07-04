@@ -13,15 +13,21 @@ class ReaderVerticalContent extends HookConsumerWidget {
   const ReaderVerticalContent({
     super.key,
     required this.comicId,
+    required this.incognito,
     required this.preferredPageIndex,
   });
   final String comicId;
+  final bool incognito;
   final int? preferredPageIndex;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final ReaderViewKey viewKey = readerViewKey(
+      comicId,
+      incognito: incognito,
+    );
     final int currentIndex = ref.watch(
-      readerViewProvider(comicId).select(
+      readerViewProvider(viewKey).select(
         (AsyncValue<ReaderViewState> value) =>
             value.asData?.value.currentIndex ?? 1,
       ),
@@ -35,7 +41,7 @@ class ReaderVerticalContent extends HookConsumerWidget {
         images ?? const <ReaderPageImageData>[];
 
     final ReaderViewNotifier notifier = ref.read(
-      readerViewProvider(comicId).notifier,
+      readerViewProvider(viewKey).notifier,
     );
     final ItemScrollController itemScrollController = useMemoized(
       ItemScrollController.new,

@@ -44,11 +44,13 @@ class ReaderRouteContext {
     required this.comicId,
     required this.readType,
     this.seriesName,
+    this.incognito = false,
   });
 
   final String comicId;
   final ReaderReadType readType;
   final String? seriesName;
+  final bool incognito;
 
   bool get isSeriesMode => readType == ReaderReadType.series;
 
@@ -56,6 +58,7 @@ class ReaderRouteContext {
     required String comicId,
     required String readType,
     String? seriesName,
+    bool incognito = false,
   }) {
     final ReaderReadType parsedType = readType == 'series'
         ? ReaderReadType.series
@@ -69,6 +72,7 @@ class ReaderRouteContext {
       comicId: normalizedComicId,
       readType: isValidSeries ? ReaderReadType.series : ReaderReadType.comic,
       seriesName: isValidSeries ? normalizedSeriesName : null,
+      incognito: incognito,
     );
   }
 }

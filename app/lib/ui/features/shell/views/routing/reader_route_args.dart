@@ -4,6 +4,7 @@ class ReaderRouteArgs {
     required this.readType,
     this.seriesName,
     this.keepControlsOpen = false,
+    this.incognito = false,
   });
 
   static const String readerRouteName = '阅读页面';
@@ -13,10 +14,12 @@ class ReaderRouteArgs {
   static const String comicIdKey = 'comic_id';
   static const String seriesNameKey = 'series_name';
   static const String keepControlsOpenKey = 'keep_controls_open';
+  static const String incognitoKey = 'incognito';
   final String comicId;
   final String readType;
   final String? seriesName;
   final bool keepControlsOpen;
+  final bool incognito;
   bool get isSeriesMode => readType == readTypeSeries;
 
   factory ReaderRouteArgs.fromQuery(Map<String, String> queryParameters) {
@@ -33,11 +36,13 @@ class ReaderRouteArgs {
     final bool isValidSeries =
         normalizedReadType == readTypeSeries && normalizedSeriesName != null;
     final bool keepControlsOpen = queryParameters[keepControlsOpenKey] == '1';
+    final bool incognito = queryParameters[incognitoKey] == '1';
     return ReaderRouteArgs(
       comicId: comicId,
       readType: isValidSeries ? readTypeSeries : readTypeComic,
       seriesName: isValidSeries ? normalizedSeriesName : null,
       keepControlsOpen: keepControlsOpen,
+      incognito: incognito,
     );
   }
 
@@ -51,6 +56,9 @@ class ReaderRouteArgs {
     }
     if (keepControlsOpen) {
       queryParameters[keepControlsOpenKey] = '1';
+    }
+    if (incognito) {
+      queryParameters[incognitoKey] = '1';
     }
     return queryParameters;
   }
