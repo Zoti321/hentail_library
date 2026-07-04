@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
