@@ -36,8 +36,6 @@ class SettingsView extends StatelessWidget {
             children: <Widget>[
               LibraryLocationRow(),
               AutoScanRow(),
-              LibraryHideComicsInSeriesRow(),
-              HealthyModeRow(),
             ],
           ),
           const SettingsGroup(

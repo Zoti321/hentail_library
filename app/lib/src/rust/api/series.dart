@@ -186,17 +186,23 @@ class SeriesDto {
 
 class SeriesFilterDto {
   final bool showR18;
+  final bool r18Only;
   final String? query;
   final bool requireItems;
 
   const SeriesFilterDto({
     required this.showR18,
+    required this.r18Only,
     this.query,
     required this.requireItems,
   });
 
   @override
-  int get hashCode => showR18.hashCode ^ query.hashCode ^ requireItems.hashCode;
+  int get hashCode =>
+      showR18.hashCode ^
+      r18Only.hashCode ^
+      query.hashCode ^
+      requireItems.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -204,6 +210,7 @@ class SeriesFilterDto {
       other is SeriesFilterDto &&
           runtimeType == other.runtimeType &&
           showR18 == other.showR18 &&
+          r18Only == other.r18Only &&
           query == other.query &&
           requireItems == other.requireItems;
 }

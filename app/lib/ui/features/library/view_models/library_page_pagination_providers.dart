@@ -1,13 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/comic_list_query.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_view_settings_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
@@ -17,6 +18,11 @@ part 'library_page_pagination_providers.g.dart';
 
 const LibraryComicProjection _libraryComicProjection = LibraryComicProjection();
 const LibrarySeriesProjection _librarySeriesProjection = LibrarySeriesProjection();
+
+LibraryAgeRestrictionFilter _ageRestrictionFromRef(Ref ref) {
+  return ref.watch(libraryAgeRestrictionFilterProvider).value ??
+      LibraryAgeRestrictionFilter.unrestricted;
+}
 
 class LibraryComicsPagination {
   const LibraryComicsPagination({
@@ -36,43 +42,12 @@ class LibraryComicsPagination {
 @Riverpod(keepAlive: true)
 Object libraryComicsPageQueryKey(Ref ref) {
   final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
-  final LibraryViewSettings viewSettings = ref.watch(
-    libraryViewSettingsProvider,
-  );
-  final Set<String> seriesComicIds = ref.watch(
-    libraryComicIdsInAnySeriesProvider,
-  );
+  final LibraryAgeRestrictionFilter ageRestriction = _ageRestrictionFromRef(ref);
   return (
     intent.displayTarget,
     intent.sortOption,
     intent.keyword,
-    viewSettings.isHealthyMode,
-    viewSettings.hideComicsInSeries,
-    seriesComicIds.length,
-  );
-}
-
-@Riverpod(keepAlive: true)
-Set<String> libraryComicIdsInAnySeries(Ref ref) {
-  final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
-  return seriesAsync.when(
-    data: (List<Series> list) =>
-        _libraryComicProjection.collectComicIdsInAnySeries(list),
-    loading: () {
-      final List<Series>? previous = seriesAsync.value;
-      if (previous == null) {
-        return <String>{};
-      }
-      return _libraryComicProjection.collectComicIdsInAnySeries(previous);
-    },
-    error: (Object _, StackTrace _) {
-      final List<Series>? previous = seriesAsync.value;
-      if (previous == null) {
-        return <String>{};
-      }
-      return _libraryComicProjection.collectComicIdsInAnySeries(previous);
-    },
-    skipLoadingOnReload: true,
+    ageRestriction,
   );
 }
 
@@ -135,17 +110,11 @@ class LibraryComicsPage extends _$LibraryComicsPage {
       throw aggregateState.streamError!;
     }
     final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
-    final LibraryViewSettings viewSettings = ref.watch(
-      libraryViewSettingsProvider,
-    );
-    final Set<String> seriesComicIds = ref.watch(
-      libraryComicIdsInAnySeriesProvider,
+    final LibraryAgeRestrictionFilter ageRestriction = _ageRestrictionFromRef(
+      ref,
     );
     final LibraryComicFilter filter = _libraryComicProjection.buildListFilter(
-      displayTarget: intent.displayTarget,
-      isHealthyMode: viewSettings.isHealthyMode,
-      hideComicsInSeries: viewSettings.hideComicsInSeries,
-      comicIdsInAnySeries: seriesComicIds,
+      ageRestriction: ageRestriction,
       keyword: intent.keyword,
     );
     final int page = ref.watch(libraryComicsPageIndexProvider);
@@ -177,13 +146,11 @@ Future<int> libraryComicTableTotalCount(Ref ref) async {
 @Riverpod(keepAlive: true)
 Object librarySeriesPageQueryKey(Ref ref) {
   final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
-  final LibraryViewSettings viewSettings = ref.watch(
-    libraryViewSettingsProvider,
-  );
+  final LibraryAgeRestrictionFilter ageRestriction = _ageRestrictionFromRef(ref);
   return (
     intent.sortOption,
     intent.keyword,
-    viewSettings.isHealthyMode,
+    ageRestriction,
   );
 }
 
@@ -236,11 +203,11 @@ class LibrarySeriesPage extends _$LibrarySeriesPage {
   Future<PagedResult<Series>> build() async {
     ref.watch(seriesAggregateProvider);
     final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
-    final LibraryViewSettings viewSettings = ref.watch(
-      libraryViewSettingsProvider,
+    final LibraryAgeRestrictionFilter ageRestriction = _ageRestrictionFromRef(
+      ref,
     );
     final LibrarySeriesFilter filter = _librarySeriesProjection.buildListFilter(
-      isHealthyMode: viewSettings.isHealthyMode,
+      ageRestriction: ageRestriction,
       keyword: intent.keyword,
     );
     final int page = ref.watch(librarySeriesPageIndexProvider);

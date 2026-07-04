@@ -39,7 +39,13 @@ class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
   }
 
   void setSortField(LibraryComicSortField field) {
-    state = state.copyWith(sortOption: state.sortOption.copyWith(field: field));
+    if (state.sortOption.field == field) {
+      setSortDescending(!state.sortOption.descending);
+      return;
+    }
+    state = state.copyWith(
+      sortOption: state.sortOption.copyWith(field: field, descending: false),
+    );
   }
 
   void resetSortOption() {

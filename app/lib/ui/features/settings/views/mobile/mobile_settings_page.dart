@@ -72,30 +72,6 @@ class MobileSettingsPage extends ConsumerWidget {
                       ref.read(settingsProvider.notifier).setAutoScan(value);
                     },
                   ),
-                  SwitchListTile(
-                    title: const Text('漫画库隐藏系列内漫画'),
-                    subtitle: Text(
-                      settings.libraryHideComicsInSeries
-                          ? '漫画列表不显示已归入系列的条目'
-                          : '漫画列表显示全部漫画',
-                    ),
-                    value: settings.libraryHideComicsInSeries,
-                    onChanged: (bool value) {
-                      ref
-                          .read(settingsProvider.notifier)
-                          .setLibraryHideComicsInSeries(value);
-                    },
-                  ),
-                  SwitchListTile(
-                    title: const Text('健全模式'),
-                    subtitle: Text(
-                      settings.isHealthyMode ? '隐藏 R18' : '显示 R18',
-                    ),
-                    value: settings.isHealthyMode,
-                    onChanged: (_) {
-                      ref.read(settingsProvider.notifier).toggleHealthyMode();
-                    },
-                  ),
                 ],
               ),
               const SizedBox(height: 12),

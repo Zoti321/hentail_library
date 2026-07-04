@@ -2962,10 +2962,12 @@ impl SseDecode for crate::api::series::SeriesFilterDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_showR18 = <bool>::sse_decode(deserializer);
+        let mut var_r18Only = <bool>::sse_decode(deserializer);
         let mut var_query = <Option<String>>::sse_decode(deserializer);
         let mut var_requireItems = <bool>::sse_decode(deserializer);
         return crate::api::series::SeriesFilterDto {
             show_r18: var_showR18,
+            r18_only: var_r18Only,
             query: var_query,
             require_items: var_requireItems,
         };
@@ -3757,6 +3759,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::series::SeriesFilterDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.show_r18.into_into_dart().into_dart(),
+            self.r18_only.into_into_dart().into_dart(),
             self.query.into_into_dart().into_dart(),
             self.require_items.into_into_dart().into_dart(),
         ]
@@ -4475,6 +4478,7 @@ impl SseEncode for crate::api::series::SeriesFilterDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <bool>::sse_encode(self.show_r18, serializer);
+        <bool>::sse_encode(self.r18_only, serializer);
         <Option<String>>::sse_encode(self.query, serializer);
         <bool>::sse_encode(self.require_items, serializer);
     }

@@ -37,6 +37,7 @@ pub struct SeriesDto {
 #[derive(Debug, Clone)]
 pub struct SeriesFilterDto {
     pub show_r18: bool,
+    pub r18_only: bool,
     pub query: Option<String>,
     pub require_items: bool,
 }
@@ -95,6 +96,7 @@ impl From<SeriesFilterDto> for CoreSeriesFilter {
     fn from(value: SeriesFilterDto) -> Self {
         CoreSeriesFilter {
             show_r18: value.show_r18,
+            r18_only: value.r18_only,
             query: value.query,
             require_items: value.require_items,
         }

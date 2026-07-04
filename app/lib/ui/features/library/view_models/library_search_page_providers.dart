@@ -1,14 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/library/comic_list_query.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_page_pagination_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_series_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_query.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_view_settings_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 
 const LibraryComicProjection _libraryComicProjection = LibraryComicProjection();
@@ -32,17 +32,11 @@ final librarySearchPageComicsProvider =
                   mustExclude: tagExpression.mustExclude,
                 );
       final LibraryQueryIntent intent = ref.read(libraryQueryIntentProvider);
-      final LibraryViewSettings viewSettings = ref.read(
-        libraryViewSettingsProvider,
-      );
-      final Set<String> seriesComicIds = ref.read(
-        libraryComicIdsInAnySeriesProvider,
-      );
+      final LibraryAgeRestrictionFilter ageRestriction =
+          ref.read(libraryAgeRestrictionFilterProvider).value ??
+          LibraryAgeRestrictionFilter.unrestricted;
       final LibraryComicFilter filter = _libraryComicProjection.buildListFilter(
-        displayTarget: intent.displayTarget,
-        isHealthyMode: viewSettings.isHealthyMode,
-        hideComicsInSeries: viewSettings.hideComicsInSeries,
-        comicIdsInAnySeries: seriesComicIds,
+        ageRestriction: ageRestriction,
       );
       return ComicQuery(
         filter: filter,
@@ -76,17 +70,15 @@ final librarySearchPageSeriesViewDataProvider =
                   mustExclude: tagExpression.mustExclude,
                 );
       final List<Comic> rawComics = await ref.read(comicRepoProvider).getAll();
-      final LibraryViewSettings viewSettings = ref.read(
-        libraryViewSettingsProvider,
-      );
+      final LibraryAgeRestrictionFilter ageRestriction =
+          ref.read(libraryAgeRestrictionFilterProvider).value ??
+          LibraryAgeRestrictionFilter.unrestricted;
       final LibraryQueryIntent intent = ref.read(libraryQueryIntentProvider);
       final Map<String, Comic> comicsById = <String, Comic>{
         for (final Comic comic in rawComics) comic.comicId: comic,
       };
       final LibrarySeriesQueryResult result = LibrarySeriesQuery(
-        showR18: _libraryComicProjection.showR18(
-          isHealthyMode: viewSettings.isHealthyMode,
-        ),
+        ageRestriction: ageRestriction,
         query: '',
         sortOption: intent.sortOption,
         comicsById: comicsById,

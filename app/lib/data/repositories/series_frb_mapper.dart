@@ -21,6 +21,7 @@ SeriesItem mapRustSeriesItem(rust_series.SeriesItemDto dto) {
 rust_series.SeriesFilterDto mapLibrarySeriesFilter(LibrarySeriesFilter filter) {
   return rust_series.SeriesFilterDto(
     showR18: filter.showR18,
+    r18Only: filter.r18Only,
     query: filter.query,
     requireItems: filter.requireItems,
   );
