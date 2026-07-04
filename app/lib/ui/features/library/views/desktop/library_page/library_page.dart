@@ -1,15 +1,17 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_pagination_providers.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/core/widgets/responsive_layout/library_blocks_layout.dart';
 
-class LibraryPage extends StatefulWidget {
+class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({super.key});
 
   @override
-  State<LibraryPage> createState() => _LibraryPageState();
+  ConsumerState<LibraryPage> createState() => _LibraryPageState();
 }
 
-class _LibraryPageState extends State<LibraryPage> {
+class _LibraryPageState extends ConsumerState<LibraryPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey _headerMeasureKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
@@ -50,8 +52,29 @@ class _LibraryPageState extends State<LibraryPage> {
     _scaffoldKey.currentState?.openEndDrawer();
   }
 
+  void _scrollToContentTop() {
+    if (!_scrollController.hasClients) {
+      return;
+    }
+    _scrollController.animateTo(
+      0,
+      duration: kLibraryScrollToTopScrollDuration,
+      curve: Curves.easeOutCubic,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    ref.listen<int>(libraryComicsPageIndexProvider, (
+      int? previous,
+      int next,
+    ) {
+      if (previous == null || previous == next) {
+        return;
+      }
+      _scrollToContentTop();
+    });
+
     final Widget headerSection = LibraryPageHeaderSection(
       onOpenFilterSort: _openFilterSortDrawer,
     );

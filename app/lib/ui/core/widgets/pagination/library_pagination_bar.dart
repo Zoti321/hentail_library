@@ -7,6 +7,8 @@ import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_pagination_providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+enum LibraryPaginationPlacement { top, bottom }
+
 class LibraryPaginationBar extends ConsumerWidget {
   const LibraryPaginationBar({
     super.key,
@@ -14,12 +16,14 @@ class LibraryPaginationBar extends ConsumerWidget {
     required this.page,
     required this.totalPages,
     required this.isLoading,
+    this.placement = LibraryPaginationPlacement.bottom,
   });
 
   final int totalCount;
   final int page;
   final int totalPages;
   final bool isLoading;
+  final LibraryPaginationPlacement placement;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,10 +35,7 @@ class LibraryPaginationBar extends ConsumerWidget {
     final bool canGoPrevious = !isLoading && page > 1;
     final bool canGoNext = !isLoading && page < totalPages;
     return Padding(
-      padding: EdgeInsets.only(
-        top: tokens.spacing.md,
-        bottom: tokens.spacing.lg,
-      ),
+      padding: _paddingForPlacement(tokens),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -95,10 +96,27 @@ class LibraryPaginationBar extends ConsumerWidget {
       ),
     );
   }
+
+  EdgeInsets _paddingForPlacement(AppThemeTokens tokens) {
+    return switch (placement) {
+      LibraryPaginationPlacement.top => EdgeInsets.only(
+        bottom: tokens.spacing.sm,
+      ),
+      LibraryPaginationPlacement.bottom => EdgeInsets.only(
+        top: tokens.spacing.md,
+        bottom: tokens.spacing.lg,
+      ),
+    };
+  }
 }
 
 class LibraryPaginationBarSliver extends ConsumerWidget {
-  const LibraryPaginationBarSliver({super.key});
+  const LibraryPaginationBarSliver({
+    super.key,
+    this.placement = LibraryPaginationPlacement.bottom,
+  });
+
+  final LibraryPaginationPlacement placement;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -113,6 +131,7 @@ class LibraryPaginationBarSliver extends ConsumerWidget {
             page: page.page,
             totalPages: page.totalPages,
             isLoading: false,
+            placement: placement,
           ),
         );
       },
@@ -124,6 +143,7 @@ class LibraryPaginationBarSliver extends ConsumerWidget {
             page: currentPage,
             totalPages: 1,
             isLoading: true,
+            placement: placement,
           ),
         );
       },

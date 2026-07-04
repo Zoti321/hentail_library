@@ -19,12 +19,17 @@ class LibraryComicsBlock extends ConsumerWidget {
       ),
       sliver: SliverMainAxisGroup(
         slivers: <Widget>[
+          const LibraryPaginationBarSliver(
+            placement: LibraryPaginationPlacement.top,
+          ),
           _LibraryComicsGridSliver(
             comics: comics,
             isComicTableEmpty: isComicTableEmpty,
             effectiveQuery: filterQuery,
           ),
-          const LibraryPaginationBarSliver(),
+          const LibraryPaginationBarSliver(
+            placement: LibraryPaginationPlacement.bottom,
+          ),
         ],
       ),
     );
