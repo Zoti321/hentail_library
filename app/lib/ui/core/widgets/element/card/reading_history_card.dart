@@ -80,27 +80,15 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Row(
-                      children: [
-                        _buildKindChip(
-                          cs: cs,
-                          label: '漫画',
-                          color: cs.secondary,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            widget.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: cs.hentai.textPrimary,
-                            ),
-                          ),
-                        ),
-                      ],
+                    Text(
+                      widget.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: cs.hentai.textPrimary,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -122,7 +110,14 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
                     ),
                     if (_buildProgressLabel().isNotEmpty) ...[
                       const SizedBox(height: 8),
-                      _buildProgressChip(cs),
+                      Text(
+                        _buildProgressLabel(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: cs.hentai.textSecondary,
+                        ),
+                      ),
                     ],
                   ],
                 ),
@@ -144,51 +139,6 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
                 ),
               ],
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildKindChip({
-    required ColorScheme cs,
-    required String label,
-    required Color color,
-  }) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withAlpha(28),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withAlpha(90), width: 1),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: color,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProgressChip(ColorScheme cs) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Text(
-          _buildProgressLabel(),
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: cs.hentai.textSecondary,
           ),
         ),
       ),
