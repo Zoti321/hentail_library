@@ -18,6 +18,13 @@ enum LibraryAgeRestrictionFilter {
         LibraryAgeRestrictionFilter.unrestricted;
   }
 
+  /// 抽屉 UI 可选项（不含「不限」；无选中即 [unrestricted]）。
+  static const List<LibraryAgeRestrictionFilter> selectableOptions =
+      <LibraryAgeRestrictionFilter>[
+        LibraryAgeRestrictionFilter.allAges,
+        LibraryAgeRestrictionFilter.r18Only,
+      ];
+
   String get label => switch (this) {
     LibraryAgeRestrictionFilter.unrestricted => '不限',
     LibraryAgeRestrictionFilter.allAges => '全年龄',

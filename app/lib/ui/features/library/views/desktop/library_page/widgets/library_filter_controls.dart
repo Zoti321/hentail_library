@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/library_filter_sort_drawer.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_view_model_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/library_filter_sort_drawer.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// 库页抽屉筛选控件（年龄限制手风琴）。
@@ -23,19 +26,22 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
-    final AsyncValue<LibraryAgeRestrictionFilter> filterAsync = ref.watch(
-      libraryAgeRestrictionFilterProvider,
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
     );
-    final LibraryAgeRestrictionFilter selected =
-        filterAsync.value ?? LibraryAgeRestrictionFilter.unrestricted;
+    final LibraryAgeRestrictionFilter selected = ref.watch(
+      libraryActiveAgeRestrictionFilterProvider,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Material(
-          color: cs.surfaceContainerHighest,
+          color: Colors.transparent,
           child: InkWell(
             onTap: () => setState(() => _expanded = !_expanded),
+            hoverColor: theme.hoverColor,
+            splashColor: theme.splashColor,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(
                 kLibraryFilterSortDrawerContentInset,
@@ -66,58 +72,81 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
           ),
         ),
         if (_expanded)
-          ColoredBox(
-            color: cs.surface,
-            child: Column(
-              children: LibraryAgeRestrictionFilter.values
-                  .map(
-                    (LibraryAgeRestrictionFilter option) => _AgeRestrictionOptionTile(
-                      label: option.label,
-                      selected: selected == option,
-                      onChanged: () {
-                        ref
-                            .read(
-                              libraryAgeRestrictionFilterProvider.notifier,
-                            )
-                            .setFilter(option);
-                      },
-                    ),
-                  )
-                  .toList(),
-            ),
+          Column(
+            children: LibraryAgeRestrictionFilter.selectableOptions
+                .map(
+                  (LibraryAgeRestrictionFilter option) =>
+                      _AgeRestrictionOptionRow(
+                    label: option.label,
+                    selected: selected == option,
+                    onTap: () {
+                      ref
+                          .read(
+                            libraryAgeRestrictionFilterProvider.notifier,
+                          )
+                          .toggleFilterOption(displayTarget, option);
+                    },
+                  ),
+                )
+                .toList(),
           ),
       ],
     );
   }
 }
 
-class _AgeRestrictionOptionTile extends StatelessWidget {
-  const _AgeRestrictionOptionTile({
+class _AgeRestrictionOptionRow extends StatelessWidget {
+  const _AgeRestrictionOptionRow({
     required this.label,
     required this.selected,
-    required this.onChanged,
+    required this.onTap,
   });
 
   final String label;
   final bool selected;
-  final VoidCallback onChanged;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return CheckboxListTile(
-      value: selected,
-      onChanged: (_) => onChanged(),
-      controlAffinity: ListTileControlAffinity.leading,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: kLibraryFilterSortDrawerContentInset,
-      ),
-      dense: true,
-      title: Text(
-        label,
-        style: TextStyle(
-          fontSize: 13,
-          color: cs.hentai.textPrimary,
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        hoverColor: theme.hoverColor,
+        splashColor: theme.splashColor,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            kLibraryFilterSortDrawerContentInset,
+            8,
+            kLibraryFilterSortDrawerContentInset,
+            8,
+          ),
+          child: Row(
+            children: <Widget>[
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: Checkbox(
+                  value: selected,
+                  onChanged: (_) => onTap(),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: cs.hentai.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

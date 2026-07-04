@@ -6,9 +6,8 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_view_model_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
@@ -18,11 +17,6 @@ part 'library_page_pagination_providers.g.dart';
 
 const LibraryComicProjection _libraryComicProjection = LibraryComicProjection();
 const LibrarySeriesProjection _librarySeriesProjection = LibrarySeriesProjection();
-
-LibraryAgeRestrictionFilter _ageRestrictionFromRef(Ref ref) {
-  return ref.watch(libraryAgeRestrictionFilterProvider).value ??
-      LibraryAgeRestrictionFilter.unrestricted;
-}
 
 class LibraryComicsPagination {
   const LibraryComicsPagination({
@@ -41,13 +35,17 @@ class LibraryComicsPagination {
 /// 筛选/排序/intent 变化时用于重置页码的查询键。
 @Riverpod(keepAlive: true)
 Object libraryComicsPageQueryKey(Ref ref) {
-  final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
-  final LibraryAgeRestrictionFilter ageRestriction = _ageRestrictionFromRef(ref);
+  final String keyword = ref.watch(libraryFilterQueryProvider);
+  final LibraryAgeRestrictionFilter ageRestriction = ref.watch(
+    libraryComicsTabAgeRestrictionFilterProvider,
+  );
+  final LibraryComicSortOption sortOption = ref.watch(
+    libraryComicsTabSortOptionProvider,
+  );
   return (
-    intent.displayTarget,
-    intent.sortOption,
-    intent.keyword,
+    keyword,
     ageRestriction,
+    sortOption,
   );
 }
 
@@ -109,13 +107,16 @@ class LibraryComicsPage extends _$LibraryComicsPage {
     if (aggregateState.streamError != null) {
       throw aggregateState.streamError!;
     }
-    final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
-    final LibraryAgeRestrictionFilter ageRestriction = _ageRestrictionFromRef(
-      ref,
+    final String keyword = ref.watch(libraryFilterQueryProvider);
+    final LibraryAgeRestrictionFilter ageRestriction = ref.watch(
+      libraryComicsTabAgeRestrictionFilterProvider,
+    );
+    final LibraryComicSortOption sortOption = ref.watch(
+      libraryComicsTabSortOptionProvider,
     );
     final LibraryComicFilter filter = _libraryComicProjection.buildListFilter(
       ageRestriction: ageRestriction,
-      keyword: intent.keyword,
+      keyword: keyword,
     );
     final int page = ref.watch(libraryComicsPageIndexProvider);
     final PagedResult<Comic> result = await ref
@@ -123,7 +124,7 @@ class LibraryComicsPage extends _$LibraryComicsPage {
         .fetchComicsPage(
           request: PageRequest(page: page),
           filter: filter,
-          sortOption: intent.sortOption,
+          sortOption: sortOption,
         );
     if (result.page != page) {
       ref.read(libraryComicsPageIndexProvider.notifier).setPage(result.page);
@@ -145,12 +146,17 @@ Future<int> libraryComicTableTotalCount(Ref ref) async {
 /// 系列筛选/intent 变化时用于重置页码的查询键。
 @Riverpod(keepAlive: true)
 Object librarySeriesPageQueryKey(Ref ref) {
-  final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
-  final LibraryAgeRestrictionFilter ageRestriction = _ageRestrictionFromRef(ref);
+  final String keyword = ref.watch(libraryFilterQueryProvider);
+  final LibraryAgeRestrictionFilter ageRestriction = ref.watch(
+    librarySeriesTabAgeRestrictionFilterProvider,
+  );
+  final LibraryComicSortOption sortOption = ref.watch(
+    librarySeriesTabSortOptionProvider,
+  );
   return (
-    intent.sortOption,
-    intent.keyword,
+    keyword,
     ageRestriction,
+    sortOption,
   );
 }
 
@@ -202,13 +208,16 @@ class LibrarySeriesPage extends _$LibrarySeriesPage {
   @override
   Future<PagedResult<Series>> build() async {
     ref.watch(seriesAggregateProvider);
-    final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
-    final LibraryAgeRestrictionFilter ageRestriction = _ageRestrictionFromRef(
-      ref,
+    final String keyword = ref.watch(libraryFilterQueryProvider);
+    final LibraryAgeRestrictionFilter ageRestriction = ref.watch(
+      librarySeriesTabAgeRestrictionFilterProvider,
+    );
+    final LibraryComicSortOption sortOption = ref.watch(
+      librarySeriesTabSortOptionProvider,
     );
     final LibrarySeriesFilter filter = _librarySeriesProjection.buildListFilter(
       ageRestriction: ageRestriction,
-      keyword: intent.keyword,
+      keyword: keyword,
     );
     final int page = ref.watch(librarySeriesPageIndexProvider);
     final PagedResult<Series> result = await ref
@@ -216,7 +225,7 @@ class LibrarySeriesPage extends _$LibrarySeriesPage {
         .fetchPage(
           request: PageRequest(page: page),
           filter: filter,
-          sortOption: intent.sortOption,
+          sortOption: sortOption,
         );
     if (result.page != page) {
       ref.read(librarySeriesPageIndexProvider.notifier).setPage(result.page);

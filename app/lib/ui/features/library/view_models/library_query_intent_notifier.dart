@@ -1,7 +1,6 @@
 import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/domain/library/comic_list_query.dart';
-import 'package:hentai_library/ui/features/shell/view_models/debounced_action_runner.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
+import 'package:hentai_library/ui/features/shell/view_models/debounced_action_runner.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_query_intent_notifier.g.dart';
@@ -32,26 +31,6 @@ class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
     });
   }
 
-  void setSortDescending(bool descending) {
-    state = state.copyWith(
-      sortOption: state.sortOption.copyWith(descending: descending),
-    );
-  }
-
-  void setSortField(LibraryComicSortField field) {
-    if (state.sortOption.field == field) {
-      setSortDescending(!state.sortOption.descending);
-      return;
-    }
-    state = state.copyWith(
-      sortOption: state.sortOption.copyWith(field: field, descending: false),
-    );
-  }
-
-  void resetSortOption() {
-    state = state.copyWith(sortOption: LibraryComicSortOption());
-  }
-
   void setDisplayTarget(LibraryDisplayTarget target) {
     state = state.copyWith(displayTarget: target);
   }
@@ -68,5 +47,4 @@ class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
       state = state.copyWith(mergeSearchQuery: value);
     });
   }
-
 }

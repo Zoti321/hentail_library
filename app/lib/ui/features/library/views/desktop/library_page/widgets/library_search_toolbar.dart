@@ -243,15 +243,16 @@ class _TabCountBadge extends StatelessWidget {
   }
 }
 
-class _LibraryCompactToolbar extends StatelessWidget {
+class _LibraryCompactToolbar extends ConsumerWidget {
   const _LibraryCompactToolbar({required this.onOpenFilterSort});
 
   final VoidCallback onOpenFilterSort;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
+    final bool isCustomized = ref.watch(libraryActiveFilterSortIsCustomizedProvider);
     return Row(
       mainAxisSize: MainAxisSize.min,
       spacing: 8,
@@ -263,7 +264,8 @@ class _LibraryCompactToolbar extends StatelessWidget {
           iconSize: 16,
           size: 32,
           borderRadius: 8,
-          foregroundColor: cs.hentai.iconDefault,
+          foregroundColor:
+              isCustomized ? cs.primary : cs.hentai.iconDefault,
           hoverColor: theme.hoverColor,
           overlayColor: theme.hoverColor,
           delayTooltipThreeSeconds: true,

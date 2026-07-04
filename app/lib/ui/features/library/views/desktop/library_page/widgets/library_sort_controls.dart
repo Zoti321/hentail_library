@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/library/comic_list_query.dart';
+import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_view_model_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tab_sort_notifier.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/library_filter_sort_drawer.dart';
-import 'package:hentai_library/ui/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double kLibrarySortIconSlotWidth = 20;
@@ -46,10 +49,11 @@ class _LibrarySortListRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
+    );
     final LibraryComicSortOption sortOption = ref.watch(
-      libraryQueryIntentProvider.select(
-        (LibraryQueryIntent s) => s.sortOption,
-      ),
+      libraryActiveSortOptionProvider,
     );
     final bool isSelected = sortOption.field == field;
     final bool isImplemented = field.isImplemented;
@@ -68,8 +72,8 @@ class _LibrarySortListRow extends ConsumerWidget {
         onTap: isImplemented
             ? () {
                 ref
-                    .read(libraryQueryIntentProvider.notifier)
-                    .setSortField(field);
+                    .read(libraryTabSortProvider.notifier)
+                    .setSortField(displayTarget, field);
               }
             : null,
         hoverColor: isImplemented ? theme.hoverColor : null,

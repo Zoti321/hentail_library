@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
@@ -8,11 +10,9 @@ import 'package:hentai_library/ui/features/library/view_models/library_page_pagi
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_query.dart';
-import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_view_model_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 
 Map<String, Comic> _comicsByIdFromAsync(AsyncValue<List<Comic>> comicsAsync) {
   return comicsAsync.when(
@@ -45,12 +45,13 @@ LibrarySeriesViewData _seriesViewDataFrom(
   List<Series> seriesList,
   Map<String, Comic> comicsById,
   LibraryAgeRestrictionFilter ageRestriction,
-  LibraryQueryIntent intent,
+  String keyword,
+  LibraryComicSortOption sortOption,
 ) {
   final LibrarySeriesQueryResult result = LibrarySeriesQuery(
     ageRestriction: ageRestriction,
-    query: intent.keyword,
-    sortOption: intent.sortOption,
+    query: keyword,
+    sortOption: sortOption,
     comicsById: comicsById,
   ).apply(seriesList);
   return LibrarySeriesViewData(
@@ -77,9 +78,13 @@ class LibrarySeriesViewData {
 final Provider<LibrarySeriesViewData>
 librarySeriesViewDataProvider = Provider<LibrarySeriesViewData>((Ref ref) {
   final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
-  final LibraryAgeRestrictionFilter ageRestriction =
-      ref.watch(libraryAgeRestrictionFilterProvider).value ??
-      LibraryAgeRestrictionFilter.unrestricted;
+  final LibraryAgeRestrictionFilter ageRestriction = ref.watch(
+    librarySeriesTabAgeRestrictionFilterProvider,
+  );
+  final String keyword = ref.watch(libraryFilterQueryProvider);
+  final LibraryComicSortOption sortOption = ref.watch(
+    librarySeriesTabSortOptionProvider,
+  );
   ref.watch(
     comicAggregateProvider.select(
       (ComicAggregateState s) => s.changeGeneration,
@@ -88,11 +93,15 @@ librarySeriesViewDataProvider = Provider<LibrarySeriesViewData>((Ref ref) {
   final AsyncValue<List<Comic>> comicsAsync = ref.watch(
     librarySeriesComicsByIdSourceProvider,
   );
-  final LibraryQueryIntent intent = ref.watch(libraryQueryIntentProvider);
   final Map<String, Comic> comicsById = _comicsByIdFromAsync(comicsAsync);
   return seriesAsync.when(
-    data: (List<Series> list) =>
-        _seriesViewDataFrom(list, comicsById, ageRestriction, intent),
+    data: (List<Series> list) => _seriesViewDataFrom(
+      list,
+      comicsById,
+      ageRestriction,
+      keyword,
+      sortOption,
+    ),
     loading: () {
       final List<Series>? previous = seriesAsync.value;
       if (previous == null) {
@@ -102,7 +111,13 @@ librarySeriesViewDataProvider = Provider<LibrarySeriesViewData>((Ref ref) {
           filteredSeries: <Series>[],
         );
       }
-      return _seriesViewDataFrom(previous, comicsById, ageRestriction, intent);
+      return _seriesViewDataFrom(
+        previous,
+        comicsById,
+        ageRestriction,
+        keyword,
+        sortOption,
+      );
     },
     error: (Object _, StackTrace _) {
       final List<Series>? previous = seriesAsync.value;
@@ -113,7 +128,13 @@ librarySeriesViewDataProvider = Provider<LibrarySeriesViewData>((Ref ref) {
           filteredSeries: <Series>[],
         );
       }
-      return _seriesViewDataFrom(previous, comicsById, ageRestriction, intent);
+      return _seriesViewDataFrom(
+        previous,
+        comicsById,
+        ageRestriction,
+        keyword,
+        sortOption,
+      );
     },
     skipLoadingOnReload: true,
   );
