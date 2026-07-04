@@ -10,7 +10,7 @@ abstract class LibraryComicFilter with _$LibraryComicFilter {
   factory LibraryComicFilter({
     String? query,
     @Default(true) bool showR18,
-    @Default(LibraryDisplayTarget.all) LibraryDisplayTarget displayTarget,
+    @Default(LibraryDisplayTarget.comics) LibraryDisplayTarget displayTarget,
     Set<ResourceType>? resourceTypes,
     Set<ContentRating>? contentRatings,
     Set<LibraryTagPick>? tagsAll,

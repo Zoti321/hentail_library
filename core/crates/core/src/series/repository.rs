@@ -5,11 +5,14 @@ use sea_orm::{
     QueryFilter, QueryOrder, QuerySelect, Set, Statement, TransactionTrait,
 };
 
-use crate::comic::{read_data_version, search_comic_ids_by_tag_expression};
+use crate::comic::{read_data_version, search_comic_ids_by_tag_expression, PageRequestDto};
 use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
 use crate::sync::writer::remove_orphan_series_items;
+
+use super::dto::{SeriesFilterDto, SeriesSortOptionDto};
+use super::page_query::{build_count_query, build_names_page_query};
 
 #[derive(Debug, Clone)]
 pub struct SeriesItemDto {
@@ -22,6 +25,14 @@ pub struct SeriesItemDto {
 pub struct SeriesDto {
     pub name: String,
     pub items: Vec<SeriesItemDto>,
+}
+
+#[derive(Debug, Clone)]
+pub struct PagedSeriesResultDto {
+    pub items: Vec<SeriesDto>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
 }
 
 pub async fn watch_all_series(
@@ -49,17 +60,79 @@ pub async fn count_all_series() -> Result<i64, HentaiError> {
     Series::find().count(&db).await.map_err(map_db_err).map(|c| c as i64)
 }
 
-pub async fn fetch_series_page(limit: i32, offset: i32) -> Result<Vec<SeriesDto>, HentaiError> {
+pub async fn fetch_series_page(
+    request: PageRequestDto,
+    filter: SeriesFilterDto,
+    sort: SeriesSortOptionDto,
+) -> Result<PagedSeriesResultDto, HentaiError> {
     let db = connection()?;
-    let rows = Series::find()
-        .order_by_asc(series::Column::Name)
-        .limit(limit as u64)
-        .offset(offset as u64)
-        .all(&db)
+    let filter = filter.normalized();
+    let page_size = request.page_size.max(1);
+    let total_count = count_filtered_series(&db, &filter).await?;
+    let total_pages = if total_count <= 0 {
+        0
+    } else {
+        (total_count + page_size as i64 - 1) / page_size as i64
+    };
+    let mut effective_page = request.page.max(1);
+    if total_pages > 0 && effective_page as i64 > total_pages {
+        effective_page = total_pages as i32;
+    }
+    if total_count <= 0 {
+        return Ok(PagedSeriesResultDto {
+            items: vec![],
+            total_count: 0,
+            page: 1,
+            page_size,
+        });
+    }
+    let offset = (effective_page - 1) * page_size;
+    let names_query = build_names_page_query(&filter, sort.descending, page_size, offset);
+    let series_names = query_series_names(&db, &names_query).await?;
+    let items = load_series_by_names(&db, series_names).await?;
+    Ok(PagedSeriesResultDto {
+        items,
+        total_count,
+        page: effective_page,
+        page_size,
+    })
+}
+
+async fn count_filtered_series(
+    db: &DatabaseConnection,
+    filter: &SeriesFilterDto,
+) -> Result<i64, HentaiError> {
+    let query = build_count_query(filter);
+    let stmt = Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        query.sql,
+        query.values,
+    );
+    let row = db
+        .query_one(stmt)
         .await
-        .map_err(map_db_err)?;
-    let names: Vec<String> = rows.into_iter().map(|r| r.name).collect();
-    load_series_by_names(&db, names).await
+        .map_err(map_db_err)?
+        .ok_or_else(|| HentaiError::db_query_failed("series count 无结果", None))?;
+    row.try_get_by_index::<i64>(0)
+        .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+}
+
+async fn query_series_names(
+    db: &DatabaseConnection,
+    query: &super::page_query::PageSqlQuery,
+) -> Result<Vec<String>, HentaiError> {
+    let stmt = Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        query.sql.clone(),
+        query.values.clone(),
+    );
+    let rows = db.query_all(stmt).await.map_err(map_db_err)?;
+    rows.into_iter()
+        .map(|row| {
+            row.try_get_by_index::<String>(0)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+        })
+        .collect()
 }
 
 pub async fn find_series_by_name(name: &str) -> Result<Option<SeriesDto>, HentaiError> {

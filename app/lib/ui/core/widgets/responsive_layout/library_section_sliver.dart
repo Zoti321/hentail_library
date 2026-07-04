@@ -48,22 +48,3 @@ class LibrarySectionSliver extends StatelessWidget {
     );
   }
 }
-
-/// 复用系列/漫画区块“网格/列表切换”的公共壳层。
-class LibraryAdaptiveItemsSliver extends StatelessWidget {
-  const LibraryAdaptiveItemsSliver({
-    super.key,
-    required this.isGridView,
-    required this.gridSliver,
-    required this.listSliver,
-  });
-
-  final bool isGridView;
-  final Widget gridSliver;
-  final Widget listSliver;
-
-  @override
-  Widget build(BuildContext context) {
-    return isGridView ? gridSliver : listSliver;
-  }
-}

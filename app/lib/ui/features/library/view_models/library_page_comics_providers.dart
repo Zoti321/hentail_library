@@ -7,6 +7,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_query_int
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_page_comics_providers.g.dart';
@@ -69,9 +70,9 @@ final Provider<AsyncValue<List<Comic>>> libraryDisplayedComicsProvider =
     });
 
 /// 分页 totalCount 在 reload 期间保持上一帧，避免头部 chip 闪烁为 0。
-int stablePagedTotalCount(AsyncValue<PagedResult<Comic>> pageAsync) {
+int stablePagedTotalCount<T>(AsyncValue<PagedResult<T>> pageAsync) {
   return pageAsync.when(
-    data: (PagedResult<Comic> page) => page.totalCount,
+    data: (PagedResult<T> page) => page.totalCount,
     loading: () => pageAsync.value?.totalCount ?? 0,
     error: (Object _, StackTrace _) => pageAsync.value?.totalCount ?? 0,
     skipLoadingOnReload: true,
@@ -104,6 +105,9 @@ final Provider<VoidCallback> libraryRefreshActionProvider =
         ref.read(comicAggregateProvider.notifier).refreshStream();
         ref.read(libraryComicsPageIndexProvider.notifier).resetToFirstPage();
         ref.invalidate(libraryComicsPageProvider);
+        ref.read(librarySeriesPageIndexProvider.notifier).resetToFirstPage();
+        ref.invalidate(librarySeriesPageProvider);
+        ref.read(seriesAggregateProvider.notifier).refreshAllSeries();
       };
     });
 

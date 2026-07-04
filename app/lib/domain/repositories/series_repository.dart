@@ -1,3 +1,5 @@
+import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
@@ -9,7 +11,11 @@ abstract class SeriesRepository {
 
   Future<List<Series>> getAll();
 
-  Future<PagedResult<Series>> fetchPage(PageRequest request);
+  Future<PagedResult<Series>> fetchPage({
+    required PageRequest request,
+    required LibrarySeriesFilter filter,
+    required LibraryComicSortOption sortOption,
+  });
 
   Future<Series?> findByName(String name);
 

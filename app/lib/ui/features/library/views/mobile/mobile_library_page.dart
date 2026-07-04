@@ -126,7 +126,7 @@ class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
             ),
           ),
           LibraryPaginationBar(
-            totalCount: pagination.totalCount,
+            target: LibraryPaginationTarget.comics,
             page: pagination.page,
             totalPages: pagination.totalPages,
             isLoading: pagination.isLoading,

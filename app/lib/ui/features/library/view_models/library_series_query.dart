@@ -1,3 +1,4 @@
+import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/library/comic_list_query.dart';
@@ -16,12 +17,12 @@ class LibrarySeriesQueryResult {
 
 class LibrarySeriesQuery {
   const LibrarySeriesQuery({
-    required this.showR18,
+    required this.ageRestriction,
     required this.query,
     required this.sortOption,
     required this.comicsById,
   });
-  final bool showR18;
+  final LibraryAgeRestrictionFilter ageRestriction;
   final String query;
   final LibraryComicSortOption sortOption;
   final Map<String, Comic> comicsById;
@@ -50,10 +51,9 @@ class LibrarySeriesQuery {
   }
 
   bool _canDisplaySeries(Series series) {
-    if (showR18) {
-      return true;
-    }
-    return !series.hasR18Comic(comicsById: comicsById);
+    return ageRestriction.matchesSeriesR18Visibility(
+      hasR18Comic: series.hasR18Comic(comicsById: comicsById),
+    );
   }
 
   List<Series> _applySort(List<Series> source) {
@@ -64,6 +64,13 @@ class LibrarySeriesQuery {
           final int result = a.name.compareTo(b.name);
           return sortOption.descending ? -result : result;
         });
+        return sorted;
+      case LibraryComicSortField.createdAt:
+      case LibraryComicSortField.updatedAt:
+      case LibraryComicSortField.publishedAt:
+      case LibraryComicSortField.readAt:
+      case LibraryComicSortField.fileSize:
+      case LibraryComicSortField.pageCount:
         return sorted;
     }
   }

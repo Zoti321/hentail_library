@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -8,6 +9,7 @@ import 'package:hentai_library/domain/reading/read_session_exceptions.dart';
 import 'package:hentai_library/domain/reading/read_session_loader.dart';
 import 'package:hentai_library/domain/reading/read_session_page.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
+import 'package:hentai_library/src/rust/api/thumbnail.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
@@ -88,16 +90,23 @@ Future<ReadingHistory?> readingProgress(
 Future<ComicCoverDisplayData?> comicCoverDisplay(
   Ref ref, {
   required String comicId,
+  ThumbnailPriorityDto priority = ThumbnailPriorityDto.high,
 }) async {
   final Comic? comic = await ref.read(comicRepoProvider).findById(comicId);
   if (comic == null) {
     return null;
   }
   try {
-    final record = await ref
-        .read(comicThumbnailRepoProvider)
-        .findByComicId(comicId);
-    final Uint8List? bytes = record?.thumbnail;
+    final repo = ref.read(comicThumbnailRepoProvider);
+    final record = await repo.findByComicId(comicId);
+    Uint8List? bytes = record?.thumbnail;
+    if (bytes == null || bytes.isEmpty) {
+      final ensured = await repo.ensureByComicId(
+        comicId: comicId,
+        priority: priority,
+      );
+      bytes = ensured?.thumbnail;
+    }
     if (bytes == null || bytes.isEmpty) {
       return null;
     }
@@ -109,5 +118,47 @@ Future<ComicCoverDisplayData?> comicCoverDisplay(
       '加载漫画封面失败: comicId=$comicId, path=${comic.path}, type=${comic.resourceType}',
     );
     return null;
+  }
+}
+
+class ThumbnailBackgroundProgress {
+  const ThumbnailBackgroundProgress({
+    this.done = 0,
+    this.total = 0,
+    this.failed = 0,
+  });
+
+  final int done;
+  final int total;
+  final int failed;
+
+  bool get isActive => total > 0 && done < total;
+}
+
+@Riverpod(keepAlive: true)
+class ThumbnailEventCoordinator extends _$ThumbnailEventCoordinator {
+  StreamSubscription<ThumbnailEventDto>? _subscription;
+
+  @override
+  ThumbnailBackgroundProgress build() {
+    ref.onDispose(() {
+      unawaited(_subscription?.cancel());
+      _subscription = null;
+    });
+    _subscription ??= watchThumbnailEventsFrb().listen(_onEvent);
+    return const ThumbnailBackgroundProgress();
+  }
+
+  void _onEvent(ThumbnailEventDto event) {
+    switch (event) {
+      case ThumbnailEventDto_Ready(:final comicId):
+        ref.invalidate(comicCoverDisplayProvider(comicId: comicId));
+      case ThumbnailEventDto_Progress(:final done, :final total, :final failed):
+        state = ThumbnailBackgroundProgress(
+          done: done,
+          total: total,
+          failed: failed,
+        );
+    }
   }
 }

@@ -8,16 +8,12 @@ abstract class AppSetting with _$AppSetting {
   factory AppSetting({
     @Default(3) int version,
     @Default(AppThemePreference.system) AppThemePreference themePreference,
-    @Default(false) bool isHealthyMode,
     @Default(false) bool autoScan,
     @Default(0.0) double readerDimLevel,
     @Default(false) bool readerIsVertical,
     @Default(false) bool readerAutoPlayEnabled,
     @Default(5) int readerAutoPlayIntervalSeconds,
     @Default(true) bool desktopSidebarExpanded,
-
-    /// 漫画库「漫画」分区不显示已归入任意系列的漫画。
-    @Default(false) bool libraryHideComicsInSeries,
 
     /// 启动时是否自动检查应用更新。
     @Default(true) bool autoUpdate,

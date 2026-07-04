@@ -8,7 +8,7 @@ import 'comic.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`
 
 InferSeriesResultDto inferSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesInferSeriesFrb();
@@ -19,8 +19,15 @@ Stream<List<SeriesDto>> watchAllSeriesFrb() =>
 List<SeriesDto> getAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesGetAllSeriesFrb();
 
-PagedSeriesResultDto fetchSeriesPageFrb({required PageRequestDto request}) =>
-    RustLib.instance.api.crateApiSeriesFetchSeriesPageFrb(request: request);
+PagedSeriesResultDto fetchSeriesPageFrb({
+  required PageRequestDto request,
+  required SeriesFilterDto filter,
+  required SeriesSortOptionDto sort,
+}) => RustLib.instance.api.crateApiSeriesFetchSeriesPageFrb(
+  request: request,
+  filter: filter,
+  sort: sort,
+);
 
 SeriesDto? findSeriesByNameFrb({required String name}) =>
     RustLib.instance.api.crateApiSeriesFindSeriesByNameFrb(name: name);
@@ -177,6 +184,37 @@ class SeriesDto {
           items == other.items;
 }
 
+class SeriesFilterDto {
+  final bool showR18;
+  final bool r18Only;
+  final String? query;
+  final bool requireItems;
+
+  const SeriesFilterDto({
+    required this.showR18,
+    required this.r18Only,
+    this.query,
+    required this.requireItems,
+  });
+
+  @override
+  int get hashCode =>
+      showR18.hashCode ^
+      r18Only.hashCode ^
+      query.hashCode ^
+      requireItems.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesFilterDto &&
+          runtimeType == other.runtimeType &&
+          showR18 == other.showR18 &&
+          r18Only == other.r18Only &&
+          query == other.query &&
+          requireItems == other.requireItems;
+}
+
 class SeriesItemDto {
   final String seriesName;
   final String comicId;
@@ -200,4 +238,20 @@ class SeriesItemDto {
           seriesName == other.seriesName &&
           comicId == other.comicId &&
           sortOrder == other.sortOrder;
+}
+
+class SeriesSortOptionDto {
+  final bool descending;
+
+  const SeriesSortOptionDto({required this.descending});
+
+  @override
+  int get hashCode => descending.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesSortOptionDto &&
+          runtimeType == other.runtimeType &&
+          descending == other.descending;
 }

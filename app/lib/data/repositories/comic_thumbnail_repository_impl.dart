@@ -24,6 +24,28 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
   }
 
   @override
+  Future<ComicThumbnailRecord?> ensureByComicId({
+    required String comicId,
+    required rust.ThumbnailPriorityDto priority,
+  }) async {
+    final rust.ComicThumbnailDto? row = guardFrbSync(
+      () => rust.ensureThumbnailByComicIdFrb(
+        comicId: comicId,
+        priority: priority,
+      ),
+      fallbackMessage: '生成缩略图失败',
+    );
+    if (row == null) {
+      return null;
+    }
+    return (
+      thumbnail: Uint8List.fromList(row.thumbnail),
+      sourceModifiedMs: row.sourceModifiedMs.toInt(),
+      sourceSize: row.sourceSize.toInt(),
+    );
+  }
+
+  @override
   Future<void> upsert({
     required String comicId,
     required Uint8List thumbnail,

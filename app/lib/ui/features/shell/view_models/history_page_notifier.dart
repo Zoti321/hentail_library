@@ -2,11 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/reading_history.dart'
     as entity;
-import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hentai_library/ui/core/dto/history_grid_item_dto.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'history_page_notifier.g.dart';
@@ -48,29 +46,12 @@ Future<Map<String, Comic>> historyComicsById(Ref ref) async {
 
 @Riverpod(keepAlive: true)
 List<HistoryGridItemDto> mergedHistoryGridItems(Ref ref) {
-  final bool isHealthy =
-      (ref.watch(settingsProvider).value?.isHealthyMode) ?? false;
-  final AsyncValue<Map<String, Comic>> comicsByIdAsync = ref.watch(
-    historyComicsByIdProvider,
-  );
-  if (isHealthy && comicsByIdAsync.isLoading) {
-    return const <HistoryGridItemDto>[];
-  }
-  final Map<String, Comic> comicsById =
-      comicsByIdAsync.value ?? <String, Comic>{};
-  List<entity.ReadingHistory> comics = ref
+  final List<entity.ReadingHistory> comics = ref
       .watch(readingHistoryStreamProvider)
       .maybeWhen(
         data: (data) => data,
         orElse: () => const <entity.ReadingHistory>[],
       );
-  if (isHealthy) {
-    comics = comics
-        .where((entity.ReadingHistory h) {
-          return comicsById[h.comicId]?.contentRating != ContentRating.r18;
-        })
-        .toList(growable: false);
-  }
   final List<HistoryGridItemDto> merged = comics
       .map(
         (entity.ReadingHistory history) => HistoryGridItemDto(
@@ -89,17 +70,11 @@ List<HistoryGridItemDto> mergedHistoryGridItems(Ref ref) {
 
 @Riverpod(keepAlive: true)
 HistoryFeedViewData historyFeedView(Ref ref) {
-  final bool isHealthy =
-      (ref.watch(settingsProvider).value?.isHealthyMode) ?? false;
   final AsyncValue<List<entity.ReadingHistory>> comicsAsync = ref.watch(
     readingHistoryStreamProvider,
   );
-  final AsyncValue<Map<String, Comic>> comicsByIdAsync = ref.watch(
-    historyComicsByIdProvider,
-  );
-  final bool isLoading =
-      comicsAsync.isLoading || (isHealthy && comicsByIdAsync.isLoading);
-  final bool hasError = comicsAsync.hasError || comicsByIdAsync.hasError;
+  final bool isLoading = comicsAsync.isLoading;
+  final bool hasError = comicsAsync.hasError;
   final List<HistoryGridItemDto> visibleItems = ref.watch(
     historyVisibleGridItemsProvider,
   );

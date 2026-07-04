@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
+import 'package:hentai_library/src/rust/api/thumbnail.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/adaptive_cover.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
@@ -17,7 +18,12 @@ class ComicDetailCover extends ConsumerWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final ComicCoverDisplayData? coverData = ref
-        .watch(comicCoverDisplayProvider(comicId: comic.comicId))
+        .watch(
+          comicCoverDisplayProvider(
+            comicId: comic.comicId,
+            priority: ThumbnailPriorityDto.critical,
+          ),
+        )
         .maybeWhen(data: (ComicCoverDisplayData? v) => v, orElse: () => null);
 
     return AdaptiveCover(

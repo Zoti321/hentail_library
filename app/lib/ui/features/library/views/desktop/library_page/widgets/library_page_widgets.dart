@@ -1,3 +1,4 @@
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,12 +13,11 @@ import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/core/widgets/actions/filter_popup_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/core/widgets/actions/sort_popup_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/comic_card.dart';
-import 'package:hentai_library/ui/core/widgets/element/tile/comic_tile.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/series_card.dart';
-import 'package:hentai_library/ui/core/widgets/element/tile/series_tile.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/add_comics_to_series_dialog.dart';
@@ -25,7 +25,6 @@ import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/series_co
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/rename_series_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/reorder_series_items_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/series_context_menu.dart';
-import 'package:hentai_library/ui/core/widgets/responsive_layout/library_section_sliver.dart';
 import 'package:hentai_library/ui/core/widgets/pagination/library_pagination_bar.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

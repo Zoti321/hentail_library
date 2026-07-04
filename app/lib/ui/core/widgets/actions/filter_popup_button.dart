@@ -46,7 +46,7 @@ class _FilterPopupButtonState extends ConsumerState<FilterPopupButton> {
   }
 }
 
-class _FilterMenu extends HookConsumerWidget {
+class _FilterMenu extends ConsumerWidget {
   const _FilterMenu({required this.menuController});
 
   final CustomPopupMenuController menuController;
@@ -61,12 +61,9 @@ class _FilterMenu extends HookConsumerWidget {
       libraryDisplayTargetProvider,
     );
     final int displayedSeriesCount = ref.watch(
-      librarySeriesViewDataProvider.select(
-        (LibrarySeriesViewData data) => data.seriesWithItemsCount,
-      ),
+      libraryDisplayedSeriesCountProvider,
     );
     final int resultCount = switch (displayTarget) {
-      LibraryDisplayTarget.all => displayedComicCount + displayedSeriesCount,
       LibraryDisplayTarget.comics => displayedComicCount,
       LibraryDisplayTarget.series => displayedSeriesCount,
     };
@@ -96,138 +93,19 @@ class _FilterMenu extends HookConsumerWidget {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '显示目标',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.hentai.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    _DisplayTargetChip(
-                      label: '全部',
-                      isSelected: displayTarget == LibraryDisplayTarget.all,
-                      onTap: () => ref
-                          .read(libraryQueryIntentProvider.notifier)
-                          .setDisplayTarget(LibraryDisplayTarget.all),
-                    ),
-                    const SizedBox(width: 6),
-                    _DisplayTargetChip(
-                      label: '漫画',
-                      isSelected: displayTarget == LibraryDisplayTarget.comics,
-                      onTap: () => ref
-                          .read(libraryQueryIntentProvider.notifier)
-                          .setDisplayTarget(LibraryDisplayTarget.comics),
-                    ),
-                    const SizedBox(width: 6),
-                    _DisplayTargetChip(
-                      label: '系列',
-                      isSelected: displayTarget == LibraryDisplayTarget.series,
-                      onTap: () => ref
-                          .read(libraryQueryIntentProvider.notifier)
-                          .setDisplayTarget(LibraryDisplayTarget.series),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Divider(
-            height: 1,
-            thickness: 1,
-            color: colorScheme.hentai.borderSubtle,
-          ),
           Container(
-            padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
             color: colorScheme.surfaceContainerHighest,
-            child: Row(
-              children: [
-                Text(
-                  '$resultCount 个结果',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: colorScheme.hentai.textSecondary,
-                  ),
-                ),
-                const Spacer(),
-                GhostButton.iconText(
-                  icon: LucideIcons.rotateCcw,
-                  text: '重置',
-                  tooltip: '重置所有筛选',
-                  semanticLabel: '重置所有筛选',
-                  iconSize: 14,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  borderRadius: 7,
-                  foregroundColor: colorScheme.primary,
-                  hoverColor: colorScheme.primary.withAlpha(10),
-                  overlayColor: colorScheme.primary.withAlpha(14),
-                  delayTooltipThreeSeconds: false,
-                  onPressed: () {
-                    ref.read(libraryQueryIntentProvider.notifier).resetFilter();
-                  },
-                ),
-              ],
+            child: Text(
+              '$resultCount 个结果',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: colorScheme.hentai.textSecondary,
+              ),
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _DisplayTargetChip extends StatelessWidget {
-  const _DisplayTargetChip({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return Expanded(
-      child: Material(
-        color: isSelected ? cs.primary : cs.surface,
-        borderRadius: BorderRadius.circular(8),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: isSelected ? cs.primary : cs.hentai.borderSubtle,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: isSelected ? cs.onPrimary : cs.hentai.textSecondary,
-                ),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/core/widgets/responsive_layout/library_blocks_layout.dart';
@@ -14,7 +15,11 @@ class SearchedPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
+    final AppThemeTokens tokens = context.tokens;
     final String trimmedQuery = query.trim();
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
+    );
 
     final AsyncValue<List<Comic>> searchedComics = ref.watch(
       librarySearchPageComicsProvider(trimmedQuery),
@@ -36,7 +41,10 @@ class SearchedPage extends ConsumerWidget {
       orElse: () => 0,
     );
     final int searchedSeriesCount = searchedSeriesData.filteredSeries.length;
-    final int searchedResultCount = searchedComicCount + searchedSeriesCount;
+    final int searchedResultCount = switch (displayTarget) {
+      LibraryDisplayTarget.comics => searchedComicCount,
+      LibraryDisplayTarget.series => searchedSeriesCount,
+    };
     final LibraryPageViewModel searchedViewModel = LibraryPageViewModel(
       comicsAsync: searchedComics,
       comicsPagination: LibraryComicsPagination(
@@ -45,22 +53,28 @@ class SearchedPage extends ConsumerWidget {
         totalCount: searchedComicCount,
         isLoading: searchedComics.isLoading,
       ),
-      seriesViewData: searchedSeriesData,
+      seriesAsync: searchedSeriesDataAsync.when(
+        data: (LibrarySeriesViewData data) =>
+            AsyncValue.data(data.filteredSeries),
+        loading: () => const AsyncValue.loading(),
+        error: (Object error, StackTrace stackTrace) =>
+            AsyncValue.error(error, stackTrace),
+        skipLoadingOnReload: true,
+      ),
       displayedComicCount: searchedComicCount,
       displayedSeriesCount: searchedSeriesCount,
-      isGridView: ref.watch(libraryIsGridViewProvider),
-      displayTarget: ref.watch(libraryDisplayTargetProvider),
+      displayTarget: displayTarget,
       filterQuery: trimmedQuery,
       hasReceivedFirstEmit: true,
-      isComicTableEmpty: searchedResultCount == 0,
+      isComicTableEmpty: searchedComicCount + searchedSeriesCount == 0,
+      showPagination: false,
     );
 
     return CustomScrollView(
       slivers: <Widget>[
-        // header
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(48, 20, 48, 12),
+            padding: tokens.layout.contentAreaPadding,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -107,6 +121,17 @@ class SearchedPage extends ConsumerWidget {
                     ),
                   ],
                 ),
+                if (trimmedQuery.isNotEmpty) ...<Widget>[
+                  const SizedBox(height: 12),
+                  LibrarySearchField(initialQuery: trimmedQuery),
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: LibraryDisplayTargetTabs(
+                      showCountBadges: !libraryHeaderShowsCountChips(context),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

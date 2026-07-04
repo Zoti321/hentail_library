@@ -14,8 +14,8 @@ use super::plan::{
     load_thumbnail_stats,
 };
 use super::scanner::{ScanContext, scan_roots};
-use super::thumbnail::generate_thumbnails;
 use super::writer::{apply_scan_replace_plan, clear_all_comics};
+use crate::thumbnail::enqueue_thumbnails_low;
 
 pub async fn sync_library(
     handle: SyncHandle,
@@ -178,45 +178,13 @@ async fn sync_with_roots(
     clear_reader_sessions();
 
     let thumbnail_targets = plan.thumbnail_generation_targets.clone();
-    let mut thumbnail_failed = 0i32;
+    let thumb_total = thumbnail_targets.len() as i32;
     if !thumbnail_targets.is_empty() {
-        if handle.is_cancelled() {
-            return Ok(());
-        }
-        let thumb_total = thumbnail_targets.len() as i32;
-        emit(progress(
-            SyncLibraryPhaseDto::GeneratingThumbnails,
-            SyncLibraryRouteDto::WithRoots,
-            None,
-            accepted_total,
-            counts.clone(),
-            Some(plan.removed_ids.len() as i32),
-            Some(plan.added_count),
-            Some(plan.kept_count),
-            Some(thumb_total),
-            Some(0),
-            Some(0),
-        ));
-        let result = generate_thumbnails(db, &thumbnail_targets, handle, |done, total, path| {
-            emit(progress(
-                SyncLibraryPhaseDto::GeneratingThumbnails,
-                SyncLibraryRouteDto::WithRoots,
-                path,
-                accepted_total,
-                counts.clone(),
-                Some(plan.removed_ids.len() as i32),
-                Some(plan.added_count),
-                Some(plan.kept_count),
-                Some(total),
-                Some(done),
-                Some(thumbnail_failed),
-            ));
-        })
-        .await?;
-        thumbnail_failed = result.failed_count;
-        if handle.is_cancelled() {
-            return Ok(());
-        }
+        let comic_ids: Vec<String> = thumbnail_targets
+            .iter()
+            .map(|c| c.comic_id.clone())
+            .collect();
+        enqueue_thumbnails_low(comic_ids).await?;
     }
 
     emit(progress(
@@ -228,21 +196,13 @@ async fn sync_with_roots(
         Some(plan.removed_ids.len() as i32),
         Some(plan.added_count),
         Some(plan.kept_count),
-        if thumbnail_targets.is_empty() {
-            None
+        if thumb_total > 0 {
+            Some(thumb_total)
         } else {
-            Some(thumbnail_targets.len() as i32)
-        },
-        if thumbnail_targets.is_empty() {
             None
-        } else {
-            Some(thumbnail_targets.len() as i32)
         },
-        if thumbnail_targets.is_empty() {
-            None
-        } else {
-            Some(thumbnail_failed)
-        },
+        Some(0),
+        Some(0),
     ));
     Ok(())
 }

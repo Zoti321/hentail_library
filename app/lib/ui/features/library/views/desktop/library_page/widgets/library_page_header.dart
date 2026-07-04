@@ -1,5 +1,14 @@
 part of 'library_page_widgets.dart';
 
+const double kLibraryHeaderCompactBreakpoint = 768;
+const double kLibrarySearchMaxWidth = 480;
+const double kLibrarySearchToGridSpacing = 16;
+const double kLibraryHeaderVerticalPadding = 10;
+
+bool libraryHeaderShowsCountChips(BuildContext context) {
+  return MediaQuery.sizeOf(context).width >= kLibraryHeaderCompactBreakpoint;
+}
+
 TextStyle _buildLibraryPageTitleStyle(ColorScheme colorScheme) {
   return TextStyle(
     fontSize: 26,
@@ -10,7 +19,9 @@ TextStyle _buildLibraryPageTitleStyle(ColorScheme colorScheme) {
 }
 
 class LibraryPageHeader extends ConsumerWidget {
-  const LibraryPageHeader({super.key});
+  const LibraryPageHeader({super.key, this.showCountChips = true});
+
+  final bool showCountChips;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -19,36 +30,23 @@ class LibraryPageHeader extends ConsumerWidget {
     final int seriesCount = ref.watch(libraryDisplayedSeriesCountProvider);
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
+      children: <Widget>[
         Text(
           AppStrings.libraryTitle,
           style: _buildLibraryPageTitleStyle(theme.colorScheme),
         ),
-        const SizedBox(width: 12),
-        MetaChip(
-          icon: LucideIcons.library,
-          label: AppStrings.comicCount(comicCount),
-        ),
-        const SizedBox(width: 8),
-        MetaChip(icon: LucideIcons.bookMarked, label: '$seriesCount 个系列'),
+        if (showCountChips) ...<Widget>[
+          const SizedBox(width: 12),
+          MetaChip(
+            icon: LucideIcons.library,
+            label: AppStrings.comicCount(comicCount),
+          ),
+          const SizedBox(width: 8),
+          MetaChip(icon: LucideIcons.bookMarked, label: '$seriesCount 个系列'),
+        ],
       ],
-    );
-  }
-}
-
-class LibraryPageSubtitle extends StatelessWidget {
-  const LibraryPageSubtitle({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Text(
-      '浏览、搜索与筛选本地漫画',
-      style: TextStyle(
-        fontSize: 13,
-        color: theme.colorScheme.hentai.textTertiary,
-      ),
     );
   }
 }

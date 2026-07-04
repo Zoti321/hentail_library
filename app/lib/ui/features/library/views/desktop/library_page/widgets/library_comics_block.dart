@@ -5,40 +5,36 @@ class LibraryComicsBlock extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppThemeTokens tokens = context.tokens;
     final LibraryPageViewModel vm = ref.watch(libraryPageViewModelProvider);
-    final LibraryDisplayTarget displayTarget = vm.displayTarget;
-    final bool showComicsSection = displayTarget != LibraryDisplayTarget.series;
-    if (!showComicsSection) {
+    if (vm.displayTarget != LibraryDisplayTarget.comics) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
     final AsyncValue<List<Comic>> comics = vm.comicsAsync;
-    final LibrarySeriesViewData seriesData = vm.seriesViewData;
-    final bool showSeriesSection = displayTarget != LibraryDisplayTarget.comics;
-    final bool hasSeriesSection =
-        showSeriesSection && seriesData.filteredSeries.isNotEmpty;
     final String filterQuery = vm.filterQuery;
     final bool isComicTableEmpty = vm.isComicTableEmpty;
-    final bool isGridView = vm.isGridView;
-    return LibrarySectionSliver(
-      title: '漫画',
-      contentSliver: SliverMainAxisGroup(
+    final bool showPagination = vm.showPagination;
+    return SliverPadding(
+      padding: EdgeInsets.symmetric(
+        horizontal: tokens.layout.contentHorizontalPadding,
+      ),
+      sliver: SliverMainAxisGroup(
         slivers: <Widget>[
-          LibraryAdaptiveItemsSliver(
-            isGridView: isGridView,
-            gridSliver: _LibraryComicsGridSliver(
-              comics: comics,
-              hasSeriesSection: hasSeriesSection,
-              isComicTableEmpty: isComicTableEmpty,
-              effectiveQuery: filterQuery,
+          if (showPagination)
+            const LibraryPaginationBarSliver(
+              target: LibraryPaginationTarget.comics,
+              placement: LibraryPaginationPlacement.top,
             ),
-            listSliver: _LibraryComicsListSliver(
-              comics: comics,
-              hasSeriesSection: hasSeriesSection,
-              isComicTableEmpty: isComicTableEmpty,
-              effectiveQuery: filterQuery,
-            ),
+          _LibraryComicsGridSliver(
+            comics: comics,
+            isComicTableEmpty: isComicTableEmpty,
+            effectiveQuery: filterQuery,
           ),
-          const LibraryPaginationBarSliver(),
+          if (showPagination)
+            const LibraryPaginationBarSliver(
+              target: LibraryPaginationTarget.comics,
+              placement: LibraryPaginationPlacement.bottom,
+            ),
         ],
       ),
     );
@@ -48,12 +44,10 @@ class LibraryComicsBlock extends ConsumerWidget {
 class _LibraryComicsGridSliver extends StatefulWidget {
   const _LibraryComicsGridSliver({
     required this.comics,
-    required this.hasSeriesSection,
     required this.isComicTableEmpty,
     required this.effectiveQuery,
   });
   final AsyncValue<List<Comic>> comics;
-  final bool hasSeriesSection;
   final bool isComicTableEmpty;
   final String effectiveQuery;
 
@@ -81,12 +75,6 @@ class _LibraryComicsGridSliverState extends State<_LibraryComicsGridSliver> {
       data: (List<Comic> comics) {
         final String q = widget.effectiveQuery.trim();
         if (comics.isEmpty) {
-          if (widget.hasSeriesSection) {
-            return _NoMatchingComicsSliver(
-              query: q,
-              showManagePathsEntry: widget.isComicTableEmpty,
-            );
-          }
           return _EmptyLibrarySliver(
             query: q,
             showManagePathsEntry: widget.isComicTableEmpty,
@@ -121,69 +109,6 @@ class _LibraryComicsGridSliverState extends State<_LibraryComicsGridSliver> {
         ),
       ),
       loading: () => const SliverToBoxAdapter(
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      skipLoadingOnReload: true,
-    );
-  }
-}
-
-class _LibraryComicsListSliver extends StatelessWidget {
-  const _LibraryComicsListSliver({
-    required this.comics,
-    required this.hasSeriesSection,
-    required this.isComicTableEmpty,
-    required this.effectiveQuery,
-  });
-  final AsyncValue<List<Comic>> comics;
-  final bool hasSeriesSection;
-  final bool isComicTableEmpty;
-  final String effectiveQuery;
-
-  @override
-  Widget build(BuildContext context) {
-    return comics.when(
-      data: (List<Comic> comics) {
-        final String q = effectiveQuery.trim();
-        if (comics.isEmpty) {
-          if (hasSeriesSection) {
-            return _NoMatchingComicsSliver(
-              query: q,
-              showManagePathsEntry: isComicTableEmpty,
-            );
-          }
-          return _EmptyLibrarySliver(
-            query: q,
-            showManagePathsEntry: isComicTableEmpty,
-          );
-        }
-        return SliverList.separated(
-          itemCount: comics.length,
-          separatorBuilder: (BuildContext ctx, int i) =>
-              const SizedBox(height: 8),
-          itemBuilder: (BuildContext context, int index) {
-            final Comic manga = comics[index];
-            return ComicTile(
-              key: Key(manga.comicId),
-              comic: manga,
-              onTap: () {
-                appRouter.pushNamed(
-                  '漫画详情',
-                  pathParameters: <String, String>{'id': manga.comicId},
-                );
-              },
-            );
-          },
-        );
-      },
-      error: (Object err, StackTrace stack) => SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text('Error: $err'),
-        ),
-      ),
-      loading: () => const SliverFillRemaining(
-        hasScrollBody: false,
         child: Center(child: CircularProgressIndicator()),
       ),
       skipLoadingOnReload: true,

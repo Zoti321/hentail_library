@@ -44,7 +44,7 @@ pub use series::{
     remove_comic_from_series, remove_comics_from_series, remove_orphan_series_items_public,
     rename_series, search_series_by_keyword, search_series_by_tag_expression,
     set_series_items_order, watch_all_series, watch_home_series_comic_order_map, InferSeriesResultDto,
-    SeriesDto, SeriesItemDto,
+    PagedSeriesResultDto, SeriesDto, SeriesFilterDto, SeriesItemDto, SeriesSortOptionDto,
 };
 pub use history::{
     PagedReadingHistoryDto, ReadingHistoryDto, clear_all_reading, delete_reading_by_comic_id,
@@ -60,5 +60,7 @@ pub use tag::{
     watch_tags,
 };
 pub use thumbnail::{
-    delete_thumbnails_by_comic_ids, find_thumbnail_by_comic_id, ComicThumbnailDto,
+    delete_thumbnails_by_comic_ids, ensure_thumbnail, enqueue_thumbnails_low,
+    find_thumbnail_by_comic_id, watch_thumbnail_events, ComicThumbnailDto, ThumbnailEvent,
+    ThumbnailPriority,
 };

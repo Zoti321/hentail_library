@@ -89,6 +89,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   dco_decode_StreamSink_sync_library_progress_dto_Sse(dynamic raw);
 
   @protected
+  RustStreamSink<ThumbnailEventDto>
+  dco_decode_StreamSink_thumbnail_event_dto_Sse(dynamic raw);
+
+  @protected
   String dco_decode_String(dynamic raw);
 
   @protected
@@ -120,6 +124,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesDto dco_decode_box_autoadd_series_dto(dynamic raw);
+
+  @protected
+  SeriesFilterDto dco_decode_box_autoadd_series_filter_dto(dynamic raw);
+
+  @protected
+  SeriesSortOptionDto dco_decode_box_autoadd_series_sort_option_dto(
+    dynamic raw,
+  );
 
   @protected
   UpdateComicUserMetaFrbDto
@@ -236,7 +248,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesDto dco_decode_series_dto(dynamic raw);
 
   @protected
+  SeriesFilterDto dco_decode_series_filter_dto(dynamic raw);
+
+  @protected
   SeriesItemDto dco_decode_series_item_dto(dynamic raw);
+
+  @protected
+  SeriesSortOptionDto dco_decode_series_sort_option_dto(dynamic raw);
 
   @protected
   SyncLibraryPhaseDto dco_decode_sync_library_phase_dto(dynamic raw);
@@ -249,6 +267,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   TagPagedNamesDto dco_decode_tag_paged_names_dto(dynamic raw);
+
+  @protected
+  ThumbnailEventDto dco_decode_thumbnail_event_dto(dynamic raw);
+
+  @protected
+  ThumbnailPriorityDto dco_decode_thumbnail_priority_dto(dynamic raw);
 
   @protected
   int dco_decode_u_8(dynamic raw);
@@ -329,6 +353,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  RustStreamSink<ThumbnailEventDto>
+  sse_decode_StreamSink_thumbnail_event_dto_Sse(SseDeserializer deserializer);
+
+  @protected
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
@@ -372,6 +400,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesDto sse_decode_box_autoadd_series_dto(SseDeserializer deserializer);
+
+  @protected
+  SeriesFilterDto sse_decode_box_autoadd_series_filter_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SeriesSortOptionDto sse_decode_box_autoadd_series_sort_option_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   UpdateComicUserMetaFrbDto
@@ -520,7 +558,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesDto sse_decode_series_dto(SseDeserializer deserializer);
 
   @protected
+  SeriesFilterDto sse_decode_series_filter_dto(SseDeserializer deserializer);
+
+  @protected
   SeriesItemDto sse_decode_series_item_dto(SseDeserializer deserializer);
+
+  @protected
+  SeriesSortOptionDto sse_decode_series_sort_option_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   SyncLibraryPhaseDto sse_decode_sync_library_phase_dto(
@@ -539,6 +585,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   TagPagedNamesDto sse_decode_tag_paged_names_dto(SseDeserializer deserializer);
+
+  @protected
+  ThumbnailEventDto sse_decode_thumbnail_event_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ThumbnailPriorityDto sse_decode_thumbnail_priority_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   int sse_decode_u_8(SseDeserializer deserializer);
@@ -630,6 +686,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_StreamSink_thumbnail_event_dto_Sse(
+    RustStreamSink<ThumbnailEventDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
@@ -683,6 +745,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_series_dto(
     SeriesDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_series_filter_dto(
+    SeriesFilterDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_series_sort_option_dto(
+    SeriesSortOptionDto self,
     SseSerializer serializer,
   );
 
@@ -870,7 +944,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_series_dto(SeriesDto self, SseSerializer serializer);
 
   @protected
+  void sse_encode_series_filter_dto(
+    SeriesFilterDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_series_item_dto(SeriesItemDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_series_sort_option_dto(
+    SeriesSortOptionDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_sync_library_phase_dto(
@@ -893,6 +979,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_tag_paged_names_dto(
     TagPagedNamesDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_thumbnail_event_dto(
+    ThumbnailEventDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_thumbnail_priority_dto(
+    ThumbnailPriorityDto self,
     SseSerializer serializer,
   );
 

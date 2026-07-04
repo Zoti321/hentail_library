@@ -50,14 +50,6 @@ class SettingsNotifier extends _$SettingsNotifier {
     await updateSettings(current.copyWith(themePreference: value));
   }
 
-  Future<void> toggleHealthyMode() async {
-    final AppSetting? current = state.asData?.value;
-    if (current == null) return;
-    await updateSettings(
-      current.copyWith(isHealthyMode: !current.isHealthyMode),
-    );
-  }
-
   Future<void> setAutoScan(bool value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
@@ -74,12 +66,6 @@ class SettingsNotifier extends _$SettingsNotifier {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
     await updateSettings(current.copyWith(dismissedUpdateVersion: value));
-  }
-
-  Future<void> setLibraryHideComicsInSeries(bool value) async {
-    final AppSetting? current = state.asData?.value;
-    if (current == null) return;
-    await updateSettings(current.copyWith(libraryHideComicsInSeries: value));
   }
 
   Future<void> setReaderDimLevel(double value) async {
