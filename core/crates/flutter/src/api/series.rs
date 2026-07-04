@@ -1,12 +1,13 @@
 use hentai_core::{
-    assign_comic_exclusive as core_assign, count_all_series as core_count, create_series as core_create,
+    assign_comic_exclusive as core_assign, create_series as core_create,
     delete_series as core_delete, fetch_series_page as core_fetch_page, find_series_by_name as core_find,
     get_all_series, infer_series as core_infer_series, load_home_series_comic_order_map,
     remove_comic_from_series as core_remove_comic, remove_comics_from_series as core_remove_comics,
     remove_orphan_series_items_public, rename_series as core_rename, search_series_by_keyword,
     search_series_by_tag_expression, set_series_items_order as core_set_order, watch_all_series,
-    watch_home_series_comic_order_map, InferSeriesResultDto as CoreInferResult, SeriesDto as CoreSeries,
-    SeriesItemDto as CoreItem,
+    watch_home_series_comic_order_map, InferSeriesResultDto as CoreInferResult, PagedSeriesResultDto as CorePagedSeries,
+    SeriesDto as CoreSeries, SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
+    SeriesSortOptionDto as CoreSeriesSort,
 };
 
 use super::comic::PageRequestDto;
@@ -31,6 +32,18 @@ pub struct SeriesItemDto {
 pub struct SeriesDto {
     pub name: String,
     pub items: Vec<SeriesItemDto>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SeriesFilterDto {
+    pub show_r18: bool,
+    pub query: Option<String>,
+    pub require_items: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct SeriesSortOptionDto {
+    pub descending: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -63,6 +76,35 @@ impl From<CoreItem> for SeriesItemDto {
             series_name: v.series_name,
             comic_id: v.comic_id,
             sort_order: v.sort_order,
+        }
+    }
+}
+
+impl From<CorePagedSeries> for PagedSeriesResultDto {
+    fn from(value: CorePagedSeries) -> Self {
+        Self {
+            items: value.items.into_iter().map(SeriesDto::from).collect(),
+            total_count: value.total_count,
+            page: value.page,
+            page_size: value.page_size,
+        }
+    }
+}
+
+impl From<SeriesFilterDto> for CoreSeriesFilter {
+    fn from(value: SeriesFilterDto) -> Self {
+        CoreSeriesFilter {
+            show_r18: value.show_r18,
+            query: value.query,
+            require_items: value.require_items,
+        }
+    }
+}
+
+impl From<SeriesSortOptionDto> for CoreSeriesSort {
+    fn from(value: SeriesSortOptionDto) -> Self {
+        CoreSeriesSort {
+            descending: value.descending,
         }
     }
 }
@@ -104,37 +146,14 @@ pub fn get_all_series_frb() -> Result<Vec<SeriesDto>, HentaiErrorDto> {
 }
 
 #[flutter_rust_bridge::frb(sync)]
-pub fn fetch_series_page_frb(request: PageRequestDto) -> Result<PagedSeriesResultDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(async {
-        let total = core_count().await?;
-        let page_size = request.page_size.max(1);
-        if total <= 0 {
-            return Ok::<PagedSeriesResultDto, hentai_core::HentaiError>(PagedSeriesResultDto {
-                items: vec![],
-                total_count: 0,
-                page: 1,
-                page_size,
-            });
-        }
-        let total_pages = (total + page_size as i64 - 1) / page_size as i64;
-        let mut page = request.page.max(1);
-        if page as i64 > total_pages {
-            page = total_pages as i32;
-        }
-        let offset = (page - 1) * page_size;
-        let items = core_fetch_page(page_size, offset)
-            .await?
-            .into_iter()
-            .map(SeriesDto::from)
-            .collect();
-        Ok(PagedSeriesResultDto {
-            items,
-            total_count: total,
-            page,
-            page_size,
-        })
-    })
-    .map_err(HentaiErrorDto::from)
+pub fn fetch_series_page_frb(
+    request: PageRequestDto,
+    filter: SeriesFilterDto,
+    sort: SeriesSortOptionDto,
+) -> Result<PagedSeriesResultDto, HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_fetch_page(request.into(), filter.into(), sort.into()))
+        .map(PagedSeriesResultDto::from)
+        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]

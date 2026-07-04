@@ -74,6 +74,15 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       }
       _scrollToContentTop();
     });
+    ref.listen<int>(librarySeriesPageIndexProvider, (
+      int? previous,
+      int next,
+    ) {
+      if (previous == null || previous == next) {
+        return;
+      }
+      _scrollToContentTop();
+    });
 
     final Widget headerSection = LibraryPageHeaderSection(
       onOpenFilterSort: _openFilterSortDrawer,

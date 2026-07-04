@@ -169,3 +169,78 @@ fn fetch_comics_page_excludes_series_members() {
         });
     });
 }
+
+#[test]
+fn fetch_series_page_hides_r18_series_by_default() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let db = connection().expect("connection");
+            db.execute(Statement::from_string(
+                sea_orm::DatabaseBackend::Sqlite,
+                "INSERT INTO series (name) VALUES ('R18系列')".to_string(),
+            ))
+            .await
+            .expect("seed r18 series");
+            db.execute(Statement::from_string(
+                sea_orm::DatabaseBackend::Sqlite,
+                "INSERT INTO series_items (series_name, comic_id, sort_order) \
+                 VALUES ('R18系列', 'e931fd412112e427f7335e127af79c8b0f87887b', 0)"
+                    .to_string(),
+            ))
+            .await
+            .expect("seed r18 series item");
+            use hentai_core::{fetch_series_page, SeriesFilterDto, SeriesSortOptionDto};
+            let page = fetch_series_page(
+                PageRequestDto {
+                    page: 1,
+                    page_size: 50,
+                },
+                SeriesFilterDto {
+                    show_r18: false,
+                    require_items: true,
+                    ..Default::default()
+                },
+                SeriesSortOptionDto { descending: false },
+            )
+            .await
+            .expect("page");
+            assert_eq!(page.total_count, 1);
+            assert_eq!(page.items.len(), 1);
+            assert_eq!(page.items[0].name, "测试系列");
+        });
+    });
+}
+
+#[test]
+fn fetch_series_page_returns_series_with_items() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            use hentai_core::{fetch_series_page, SeriesFilterDto, SeriesSortOptionDto};
+            let page = fetch_series_page(
+                PageRequestDto {
+                    page: 1,
+                    page_size: 50,
+                },
+                SeriesFilterDto {
+                    show_r18: true,
+                    require_items: true,
+                    ..Default::default()
+                },
+                SeriesSortOptionDto { descending: false },
+            )
+            .await
+            .expect("page");
+            assert_eq!(page.total_count, 1);
+            assert_eq!(page.items.len(), 1);
+            assert_eq!(page.items[0].name, "测试系列");
+        });
+    });
+}

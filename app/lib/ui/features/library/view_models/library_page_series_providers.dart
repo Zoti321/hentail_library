@@ -2,7 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/library/comic_list_query.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_pagination_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
@@ -50,7 +53,7 @@ LibrarySeriesViewData _seriesViewDataFrom(
     showR18: _libraryComicProjection.showR18(
       isHealthyMode: viewSettings.isHealthyMode,
     ),
-    query: '',
+    query: intent.keyword,
     sortOption: intent.sortOption,
     comicsById: comicsById,
   ).apply(seriesList);
@@ -130,11 +133,26 @@ final FutureProvider<List<Comic>> librarySeriesComicsByIdSourceProvider =
       return ref.read(comicRepoProvider).getAll();
     });
 
+/// 当前页系列条目（供库页网格消费）。
+final Provider<AsyncValue<List<Series>>> libraryDisplayedSeriesProvider =
+    Provider<AsyncValue<List<Series>>>((Ref ref) {
+      final AsyncValue<PagedResult<Series>> pageAsync = ref.watch(
+        librarySeriesPageProvider,
+      );
+      return pageAsync.when(
+        data: (PagedResult<Series> page) => AsyncValue.data(page.items),
+        loading: () => const AsyncValue.loading(),
+        error: (Object error, StackTrace stackTrace) =>
+            AsyncValue.error(error, stackTrace),
+        skipLoadingOnReload: true,
+      );
+    });
+
 final Provider<int> libraryDisplayedSeriesCountProvider = Provider<int>((
   Ref ref,
 ) {
-  final LibrarySeriesViewData viewData = ref.watch(
-    librarySeriesViewDataProvider,
+  final AsyncValue<PagedResult<Series>> pageAsync = ref.watch(
+    librarySeriesPageProvider,
   );
-  return viewData.filteredSeries.length;
+  return stablePagedTotalCount(pageAsync);
 });

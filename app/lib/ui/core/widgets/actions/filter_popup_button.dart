@@ -61,9 +61,7 @@ class _FilterMenu extends ConsumerWidget {
       libraryDisplayTargetProvider,
     );
     final int displayedSeriesCount = ref.watch(
-      librarySeriesViewDataProvider.select(
-        (LibrarySeriesViewData data) => data.seriesWithItemsCount,
-      ),
+      libraryDisplayedSeriesCountProvider,
     );
     final int resultCount = switch (displayTarget) {
       LibraryDisplayTarget.comics => displayedComicCount,

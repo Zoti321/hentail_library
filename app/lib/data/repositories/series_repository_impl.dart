@@ -1,11 +1,12 @@
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/repositories/series_frb_mapper.dart';
+import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
-import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 
 class SeriesRepositoryImpl implements SeriesRepository {
@@ -30,22 +31,20 @@ class SeriesRepositoryImpl implements SeriesRepository {
   }
 
   @override
-  Future<PagedResult<Series>> fetchPage(PageRequest request) async {
+  Future<PagedResult<Series>> fetchPage({
+    required PageRequest request,
+    required LibrarySeriesFilter filter,
+    required LibraryComicSortOption sortOption,
+  }) async {
     final rust_series.PagedSeriesResultDto page = guardFrbSync(
       () => rust_series.fetchSeriesPageFrb(
-        request: rust.PageRequestDto(
-          page: request.page,
-          pageSize: request.pageSize,
-        ),
+        request: mapSeriesPageRequest(request),
+        filter: mapLibrarySeriesFilter(filter),
+        sort: mapSeriesSortOption(sortOption),
       ),
       fallbackMessage: '读取系列分页失败',
     );
-    return PagedResult<Series>(
-      items: page.items.map(mapRustSeries).toList(),
-      totalCount: page.totalCount.toInt(),
-      page: page.page,
-      pageSize: page.pageSize,
-    );
+    return mapPagedSeriesResult(page);
   }
 
   @override

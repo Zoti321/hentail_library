@@ -53,13 +53,21 @@ class SearchedPage extends ConsumerWidget {
         totalCount: searchedComicCount,
         isLoading: searchedComics.isLoading,
       ),
-      seriesViewData: searchedSeriesData,
+      seriesAsync: searchedSeriesDataAsync.when(
+        data: (LibrarySeriesViewData data) =>
+            AsyncValue.data(data.filteredSeries),
+        loading: () => const AsyncValue.loading(),
+        error: (Object error, StackTrace stackTrace) =>
+            AsyncValue.error(error, stackTrace),
+        skipLoadingOnReload: true,
+      ),
       displayedComicCount: searchedComicCount,
       displayedSeriesCount: searchedSeriesCount,
       displayTarget: displayTarget,
       filterQuery: trimmedQuery,
       hasReceivedFirstEmit: true,
       isComicTableEmpty: searchedComicCount + searchedSeriesCount == 0,
+      showPagination: false,
     );
 
     return CustomScrollView(

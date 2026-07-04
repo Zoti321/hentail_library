@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -9,15 +10,19 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum LibraryPaginationPlacement { top, bottom }
 
+enum LibraryPaginationTarget { comics, series }
+
 class LibraryPaginationBar extends ConsumerWidget {
   const LibraryPaginationBar({
     super.key,
+    required this.target,
     required this.page,
     required this.totalPages,
     required this.isLoading,
     this.placement = LibraryPaginationPlacement.bottom,
   });
 
+  final LibraryPaginationTarget target;
   final int page;
   final int totalPages;
   final bool isLoading;
@@ -41,22 +46,14 @@ class LibraryPaginationBar extends ConsumerWidget {
             icon: LucideIcons.chevronsLeft,
             tooltip: '首页',
             onPressed: canGoPrevious
-                ? () {
-                    ref
-                        .read(libraryComicsPageIndexProvider.notifier)
-                        .goToFirstPage();
-                  }
+                ? () => _pageIndexNotifier(ref).goToFirstPage()
                 : null,
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronLeft,
             tooltip: '上一页',
             onPressed: canGoPrevious
-                ? () {
-                    ref
-                        .read(libraryComicsPageIndexProvider.notifier)
-                        .goToPreviousPage();
-                  }
+                ? () => _pageIndexNotifier(ref).goToPreviousPage()
                 : null,
           ),
           Padding(
@@ -72,27 +69,28 @@ class LibraryPaginationBar extends ConsumerWidget {
             icon: LucideIcons.chevronRight,
             tooltip: '下一页',
             onPressed: canGoNext
-                ? () {
-                    ref
-                        .read(libraryComicsPageIndexProvider.notifier)
-                        .goToNextPage(totalPages);
-                  }
+                ? () => _pageIndexNotifier(ref).goToNextPage(totalPages)
                 : null,
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronsRight,
             tooltip: '末页',
             onPressed: canGoNext
-                ? () {
-                    ref
-                        .read(libraryComicsPageIndexProvider.notifier)
-                        .goToLastPage(totalPages);
-                  }
+                ? () => _pageIndexNotifier(ref).goToLastPage(totalPages)
                 : null,
           ),
         ],
       ),
     );
+  }
+
+  dynamic _pageIndexNotifier(WidgetRef ref) {
+    return switch (target) {
+      LibraryPaginationTarget.comics =>
+        ref.read(libraryComicsPageIndexProvider.notifier),
+      LibraryPaginationTarget.series =>
+        ref.read(librarySeriesPageIndexProvider.notifier),
+    };
   }
 
   EdgeInsets _paddingForPlacement(AppThemeTokens tokens) {
@@ -111,13 +109,22 @@ class LibraryPaginationBar extends ConsumerWidget {
 class LibraryPaginationBarSliver extends ConsumerWidget {
   const LibraryPaginationBarSliver({
     super.key,
+    required this.target,
     this.placement = LibraryPaginationPlacement.bottom,
   });
 
+  final LibraryPaginationTarget target;
   final LibraryPaginationPlacement placement;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    return switch (target) {
+      LibraryPaginationTarget.comics => _buildComicsSliver(ref),
+      LibraryPaginationTarget.series => _buildSeriesSliver(ref),
+    };
+  }
+
+  Widget _buildComicsSliver(WidgetRef ref) {
     final AsyncValue<PagedResult<Comic>> pageAsync = ref.watch(
       libraryComicsPageProvider,
     );
@@ -125,6 +132,30 @@ class LibraryPaginationBarSliver extends ConsumerWidget {
       data: (PagedResult<Comic> page) {
         return SliverToBoxAdapter(
           child: LibraryPaginationBar(
+            target: LibraryPaginationTarget.comics,
+            page: page.page,
+            totalPages: page.totalPages,
+            isLoading: false,
+            placement: placement,
+          ),
+        );
+      },
+      loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
+      error: (Object _, StackTrace _) =>
+          const SliverToBoxAdapter(child: SizedBox.shrink()),
+      skipLoadingOnReload: true,
+    );
+  }
+
+  Widget _buildSeriesSliver(WidgetRef ref) {
+    final AsyncValue<PagedResult<Series>> pageAsync = ref.watch(
+      librarySeriesPageProvider,
+    );
+    return pageAsync.when(
+      data: (PagedResult<Series> page) {
+        return SliverToBoxAdapter(
+          child: LibraryPaginationBar(
+            target: LibraryPaginationTarget.series,
             page: page.page,
             totalPages: page.totalPages,
             isLoading: false,

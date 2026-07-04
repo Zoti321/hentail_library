@@ -13,23 +13,28 @@ class LibraryComicsBlock extends ConsumerWidget {
     final AsyncValue<List<Comic>> comics = vm.comicsAsync;
     final String filterQuery = vm.filterQuery;
     final bool isComicTableEmpty = vm.isComicTableEmpty;
+    final bool showPagination = vm.showPagination;
     return SliverPadding(
       padding: EdgeInsets.symmetric(
         horizontal: tokens.layout.contentHorizontalPadding,
       ),
       sliver: SliverMainAxisGroup(
         slivers: <Widget>[
-          const LibraryPaginationBarSliver(
-            placement: LibraryPaginationPlacement.top,
-          ),
+          if (showPagination)
+            const LibraryPaginationBarSliver(
+              target: LibraryPaginationTarget.comics,
+              placement: LibraryPaginationPlacement.top,
+            ),
           _LibraryComicsGridSliver(
             comics: comics,
             isComicTableEmpty: isComicTableEmpty,
             effectiveQuery: filterQuery,
           ),
-          const LibraryPaginationBarSliver(
-            placement: LibraryPaginationPlacement.bottom,
-          ),
+          if (showPagination)
+            const LibraryPaginationBarSliver(
+              target: LibraryPaginationTarget.comics,
+              placement: LibraryPaginationPlacement.bottom,
+            ),
         ],
       ),
     );

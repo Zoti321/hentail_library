@@ -156,6 +156,8 @@ abstract class RustLibApi extends BaseApi {
 
   PagedSeriesResultDto crateApiSeriesFetchSeriesPageFrb({
     required PageRequestDto request,
+    required SeriesFilterDto filter,
+    required SeriesSortOptionDto sort,
   });
 
   TagPagedNamesDto crateApiTagFetchTagsPageFrb({
@@ -921,12 +923,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   PagedSeriesResultDto crateApiSeriesFetchSeriesPageFrb({
     required PageRequestDto request,
+    required SeriesFilterDto filter,
+    required SeriesSortOptionDto sort,
   }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_page_request_dto(request, serializer);
+          sse_encode_box_autoadd_series_filter_dto(filter, serializer);
+          sse_encode_box_autoadd_series_sort_option_dto(sort, serializer);
           return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
         },
         codec: SseCodec(
@@ -934,7 +940,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiSeriesFetchSeriesPageFrbConstMeta,
-        argValues: [request],
+        argValues: [request, filter, sort],
         apiImpl: this,
       ),
     );
@@ -943,7 +949,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiSeriesFetchSeriesPageFrbConstMeta =>
       const TaskConstMeta(
         debugName: "fetch_series_page_frb",
-        argNames: ["request"],
+        argNames: ["request", "filter", "sort"],
       );
 
   @override
@@ -2464,6 +2470,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SeriesFilterDto dco_decode_box_autoadd_series_filter_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_series_filter_dto(raw);
+  }
+
+  @protected
+  SeriesSortOptionDto dco_decode_box_autoadd_series_sort_option_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_series_sort_option_dto(raw);
+  }
+
+  @protected
   UpdateComicUserMetaFrbDto
   dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -2821,6 +2841,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SeriesFilterDto dco_decode_series_filter_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return SeriesFilterDto(
+      showR18: dco_decode_bool(arr[0]),
+      query: dco_decode_opt_String(arr[1]),
+      requireItems: dco_decode_bool(arr[2]),
+    );
+  }
+
+  @protected
   SeriesItemDto dco_decode_series_item_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -2831,6 +2864,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       comicId: dco_decode_String(arr[1]),
       sortOrder: dco_decode_i_32(arr[2]),
     );
+  }
+
+  @protected
+  SeriesSortOptionDto dco_decode_series_sort_option_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 1)
+      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
+    return SeriesSortOptionDto(descending: dco_decode_bool(arr[0]));
   }
 
   @protected
@@ -3141,6 +3183,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SeriesDto sse_decode_box_autoadd_series_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_series_dto(deserializer));
+  }
+
+  @protected
+  SeriesFilterDto sse_decode_box_autoadd_series_filter_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_series_filter_dto(deserializer));
+  }
+
+  @protected
+  SeriesSortOptionDto sse_decode_box_autoadd_series_sort_option_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_series_sort_option_dto(deserializer));
   }
 
   @protected
@@ -3608,6 +3666,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SeriesFilterDto sse_decode_series_filter_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_showR18 = sse_decode_bool(deserializer);
+    var var_query = sse_decode_opt_String(deserializer);
+    var var_requireItems = sse_decode_bool(deserializer);
+    return SeriesFilterDto(
+      showR18: var_showR18,
+      query: var_query,
+      requireItems: var_requireItems,
+    );
+  }
+
+  @protected
   SeriesItemDto sse_decode_series_item_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_seriesName = sse_decode_String(deserializer);
@@ -3618,6 +3689,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       comicId: var_comicId,
       sortOrder: var_sortOrder,
     );
+  }
+
+  @protected
+  SeriesSortOptionDto sse_decode_series_sort_option_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_descending = sse_decode_bool(deserializer);
+    return SeriesSortOptionDto(descending: var_descending);
   }
 
   @protected
@@ -4053,6 +4133,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_series_filter_dto(
+    SeriesFilterDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_series_filter_dto(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_series_sort_option_dto(
+    SeriesSortOptionDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_series_sort_option_dto(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_update_comic_user_meta_frb_dto(
     UpdateComicUserMetaFrbDto self,
     SseSerializer serializer,
@@ -4446,6 +4544,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_series_filter_dto(
+    SeriesFilterDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bool(self.showR18, serializer);
+    sse_encode_opt_String(self.query, serializer);
+    sse_encode_bool(self.requireItems, serializer);
+  }
+
+  @protected
   void sse_encode_series_item_dto(
     SeriesItemDto self,
     SseSerializer serializer,
@@ -4454,6 +4563,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.seriesName, serializer);
     sse_encode_String(self.comicId, serializer);
     sse_encode_i_32(self.sortOrder, serializer);
+  }
+
+  @protected
+  void sse_encode_series_sort_option_dto(
+    SeriesSortOptionDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bool(self.descending, serializer);
   }
 
   @protected

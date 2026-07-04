@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
@@ -13,23 +14,25 @@ class LibraryPageViewModel {
   const LibraryPageViewModel({
     required this.comicsAsync,
     required this.comicsPagination,
-    required this.seriesViewData,
+    required this.seriesAsync,
     required this.displayedComicCount,
     required this.displayedSeriesCount,
     required this.displayTarget,
     required this.filterQuery,
     required this.hasReceivedFirstEmit,
     required this.isComicTableEmpty,
+    this.showPagination = true,
   });
   final AsyncValue<List<Comic>> comicsAsync;
   final LibraryComicsPagination comicsPagination;
-  final LibrarySeriesViewData seriesViewData;
+  final AsyncValue<List<Series>> seriesAsync;
   final int displayedComicCount;
   final int displayedSeriesCount;
   final LibraryDisplayTarget displayTarget;
   final String filterQuery;
   final bool hasReceivedFirstEmit;
   final bool isComicTableEmpty;
+  final bool showPagination;
 }
 
 /// 细粒度 UI 选择器：给工具条/布局切换等局部组件直接订阅。
@@ -55,8 +58,8 @@ final libraryPageViewModelProvider = Provider<LibraryPageViewModel>((Ref ref) {
   final AsyncValue<PagedResult<Comic>> comicsPageAsync = ref.watch(
     libraryComicsPageProvider,
   );
-  final LibrarySeriesViewData seriesViewData = ref.watch(
-    librarySeriesViewDataProvider,
+  final AsyncValue<List<Series>> seriesAsync = ref.watch(
+    libraryDisplayedSeriesProvider,
   );
   final int displayedComicCount = ref.watch(libraryDisplayedComicCountProvider);
   final int displayedSeriesCount = ref.watch(
@@ -93,7 +96,7 @@ final libraryPageViewModelProvider = Provider<LibraryPageViewModel>((Ref ref) {
   return LibraryPageViewModel(
     comicsAsync: comicsAsync,
     comicsPagination: pagination,
-    seriesViewData: seriesViewData,
+    seriesAsync: seriesAsync,
     displayedComicCount: displayedComicCount,
     displayedSeriesCount: displayedSeriesCount,
     displayTarget: displayTarget,
