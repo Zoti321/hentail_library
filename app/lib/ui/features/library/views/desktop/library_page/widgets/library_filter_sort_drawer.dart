@@ -5,6 +5,9 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/library_filter_controls.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/library_sort_controls.dart';
 
+/// 抽屉分区标题等内容相对左缘的内边距。
+const double kLibraryFilterSortDrawerContentInset = 16;
+
 class LibraryFilterSortDrawer extends StatelessWidget {
   const LibraryFilterSortDrawer({super.key});
 
@@ -19,29 +22,40 @@ class LibraryFilterSortDrawer extends StatelessWidget {
     return Drawer(
       width: widthFor(context),
       backgroundColor: cs.surface,
+      shape: const RoundedRectangleBorder(),
       child: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          padding: const EdgeInsets.fromLTRB(0, 16, 0, 24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Text(
-                '筛选',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: cs.hentai.textSecondary,
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: kLibraryFilterSortDrawerContentInset,
+                ),
+                child: Text(
+                  '筛选',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: cs.hentai.textSecondary,
+                  ),
                 ),
               ),
               SizedBox(height: tokens.spacing.sm),
               const LibraryFilterControls(),
               SizedBox(height: tokens.spacing.lg),
-              Text(
-                '排序',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: cs.hentai.textSecondary,
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: kLibraryFilterSortDrawerContentInset,
+                ),
+                child: Text(
+                  '排序',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: cs.hentai.textSecondary,
+                  ),
                 ),
               ),
               SizedBox(height: tokens.spacing.sm),

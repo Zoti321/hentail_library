@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/library_filter_sort_drawer.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -36,7 +37,12 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
           child: InkWell(
             onTap: () => setState(() => _expanded = !_expanded),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: const EdgeInsets.fromLTRB(
+                kLibraryFilterSortDrawerContentInset,
+                10,
+                kLibraryFilterSortDrawerContentInset,
+                10,
+              ),
               child: Row(
                 children: <Widget>[
                   Expanded(
@@ -103,7 +109,9 @@ class _AgeRestrictionOptionTile extends StatelessWidget {
       value: selected,
       onChanged: (_) => onChanged(),
       controlAffinity: ListTileControlAffinity.leading,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: kLibraryFilterSortDrawerContentInset,
+      ),
       dense: true,
       title: Text(
         label,

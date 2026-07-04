@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/library/comic_list_query.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/library_filter_sort_drawer.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double kLibrarySortIconSlotWidth = 20;
+const double kLibrarySortIconLabelGap = 8;
 
 /// 库页排序列表行控件，供抽屉复用。
 class LibrarySortControls extends ConsumerWidget {
@@ -52,11 +54,16 @@ class _LibrarySortListRow extends ConsumerWidget {
     final bool isSelected = sortOption.field == field;
     final bool isImplemented = field.isImplemented;
     final bool isAscending = !sortOption.descending;
+    final TextStyle labelStyle = TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w400,
+      color: isImplemented
+          ? cs.hentai.textSecondary
+          : cs.hentai.textTertiary,
+    );
 
     return Material(
-      color: isSelected
-          ? cs.primaryContainer.withValues(alpha: 0.35)
-          : Colors.transparent,
+      color: Colors.transparent,
       child: InkWell(
         onTap: isImplemented
             ? () {
@@ -68,7 +75,12 @@ class _LibrarySortListRow extends ConsumerWidget {
         hoverColor: isImplemented ? theme.hoverColor : null,
         splashColor: isImplemented ? theme.splashColor : null,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(
+            kLibraryFilterSortDrawerContentInset,
+            8,
+            kLibraryFilterSortDrawerContentInset,
+            8,
+          ),
           child: Row(
             children: <Widget>[
               SizedBox(
@@ -83,18 +95,11 @@ class _LibrarySortListRow extends ConsumerWidget {
                       )
                     : null,
               ),
+              const SizedBox(width: kLibrarySortIconLabelGap),
               Expanded(
                 child: Text(
                   field.label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                    color: isImplemented
-                        ? (isSelected
-                              ? cs.hentai.textPrimary
-                              : cs.hentai.textSecondary)
-                        : cs.hentai.textTertiary,
-                  ),
+                  style: labelStyle,
                 ),
               ),
               if (!isImplemented)
