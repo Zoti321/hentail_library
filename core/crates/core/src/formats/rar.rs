@@ -4,6 +4,8 @@ use unrar::Archive;
 
 use crate::error::HentaiError;
 
+use crate::sync::parser::basename_without_extension;
+
 use super::{is_comic_image_name, map_archive_err, map_reader_err, sort_archive_entry_names};
 
 pub struct RarBackend {
@@ -31,6 +33,21 @@ pub fn open_rar_backend(file: &Path) -> Result<RarBackend, HentaiError> {
         path: file.to_path_buf(),
         entry_names,
     })
+}
+
+pub fn read_rar_cover_bytes(file: &Path) -> Result<Option<Vec<u8>>, HentaiError> {
+    let names = list_rar_image_names(file)?;
+    if names.is_empty() {
+        return Ok(None);
+    }
+    let chosen = names
+        .iter()
+        .find(|name| {
+            let normalized = name.replace('\\', "/");
+            basename_without_extension(Path::new(&normalized)).eq_ignore_ascii_case("cover")
+        })
+        .unwrap_or(&names[0]);
+    read_rar_entry(file, chosen).map(Some)
 }
 
 pub fn read_rar_page(backend: &RarBackend, page_index: usize) -> Result<Vec<u8>, HentaiError> {

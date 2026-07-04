@@ -8,6 +8,7 @@ use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, Se
 use zip::ZipArchive;
 
 use crate::comic::ComicDto;
+use crate::formats::read_rar_cover_bytes;
 use crate::db::map_db_err;
 use crate::entity::{comic_thumbnails, prelude::*};
 use crate::error::HentaiError;
@@ -144,6 +145,7 @@ fn load_cover_bytes(path: &Path, resource_type: &str) -> Result<Option<Vec<u8>>,
     match resource_type {
         "dir" => load_dir_cover(path),
         "zip" | "cbz" => load_zip_cover(path),
+        "rar" | "cbr" => read_rar_cover_bytes(path),
         "epub" => load_epub_cover(path),
         _ => Ok(None),
     }

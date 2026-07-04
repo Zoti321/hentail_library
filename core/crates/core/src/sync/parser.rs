@@ -24,7 +24,10 @@ pub fn comic_id_for_path(path: &str) -> String {
 }
 
 pub fn can_generate_thumbnail(resource_type: &str) -> bool {
-    matches!(resource_type, "dir" | "zip" | "cbz" | "epub")
+    matches!(
+        resource_type,
+        "dir" | "zip" | "cbz" | "epub" | "rar" | "cbr"
+    )
 }
 
 pub fn is_comic_image_extension(ext: &str) -> bool {
@@ -345,6 +348,12 @@ mod tests {
     use tempfile::TempDir;
     use zip::write::SimpleFileOptions;
     use zip::ZipWriter;
+
+    #[test]
+    fn can_generate_thumbnail_includes_rar_and_cbr() {
+        assert!(can_generate_thumbnail("rar"));
+        assert!(can_generate_thumbnail("cbr"));
+    }
 
     #[test]
     fn parse_zip_archive_skips_invalid_zip() {
