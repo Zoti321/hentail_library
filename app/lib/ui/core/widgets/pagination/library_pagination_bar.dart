@@ -29,7 +29,7 @@ class LibraryPaginationBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (isLoading || totalPages <= 1) {
+    if (totalPages <= 1) {
       return const SizedBox.shrink();
     }
     final AppThemeTokens tokens = context.tokens;

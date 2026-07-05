@@ -108,7 +108,7 @@ class _LibrarySeriesGridSliverState extends State<_LibrarySeriesGridSliver> {
         final Series s = widget.series[index];
         return Center(
           child: SeriesCard(
-            key: Key('library-series-${s.name}'),
+            key: Key('library-series-${s.id}'),
             series: s,
             size: const Size(double.infinity, double.infinity),
             onTap: () => _openSeriesDetail(s),
