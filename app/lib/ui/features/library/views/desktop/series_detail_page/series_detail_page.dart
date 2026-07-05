@@ -12,22 +12,17 @@ class SeriesDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
+    final AsyncValue<Series?> seriesAsync = ref.watch(
+      seriesByIdProvider(seriesId),
+    );
     return ColoredBox(
       color: cs.surface,
       child: seriesAsync.when(
-        data: (List<Series> list) {
-          Series? found;
-          for (final Series series in list) {
-            if (series.id == seriesId) {
-              found = series;
-              break;
-            }
-          }
-          if (found == null) {
+        data: (Series? series) {
+          if (series == null) {
             return SeriesNotFound(seriesId: seriesId);
           }
-          return SeriesDetail(series: found);
+          return SeriesDetail(series: series);
         },
         loading: () => const SeriesDetailLoading(),
         error: (Object error, StackTrace _) => SeriesDetailError(error: error),

@@ -9,9 +9,7 @@ import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_series_dialog.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
-import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
-import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
+import 'package:hentai_library/ui/providers.dart';
 
 class MobileSeriesDetailPage extends ConsumerWidget {
   const MobileSeriesDetailPage({super.key, required this.seriesId});
@@ -19,23 +17,18 @@ class MobileSeriesDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<List<Series>> seriesAsync = ref.watch(allSeriesProvider);
+    final AsyncValue<Series?> seriesAsync = ref.watch(
+      seriesByIdProvider(seriesId),
+    );
     return seriesAsync.when(
-      data: (List<Series> seriesList) {
-        Series? target;
-        for (final Series series in seriesList) {
-          if (series.id == seriesId) {
-            target = series;
-            break;
-          }
-        }
-        if (target == null) {
+      data: (Series? series) {
+        if (series == null) {
           return Scaffold(
             appBar: AppBar(title: const Text('系列详情')),
             body: Center(child: Text('未找到系列「$seriesId」')),
           );
         }
-        return _MobileSeriesDetailBody(series: target);
+        return _MobileSeriesDetailBody(series: series);
       },
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),

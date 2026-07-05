@@ -47,11 +47,4 @@ enum LibraryAgeRestrictionFilter {
     LibraryAgeRestrictionFilter.allAges => (showR18: false, r18Only: false),
     LibraryAgeRestrictionFilter.r18Only => (showR18: true, r18Only: true),
   };
-
-  bool matchesSeriesR18Visibility({required bool hasR18Comic}) =>
-      switch (this) {
-        LibraryAgeRestrictionFilter.unrestricted => true,
-        LibraryAgeRestrictionFilter.allAges => !hasR18Comic,
-        LibraryAgeRestrictionFilter.r18Only => hasR18Comic,
-      };
 }
