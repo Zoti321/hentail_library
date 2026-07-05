@@ -6,8 +6,8 @@ import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/domain/reading/read_session_exceptions.dart';
-import 'package:hentai_library/domain/reading/read_session_loader.dart';
 import 'package:hentai_library/domain/reading/read_session_page.dart';
+import 'package:hentai_library/domain/reading/reader_session_snapshot.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
@@ -16,10 +16,6 @@ import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'read_session_providers.g.dart';
-
-@Riverpod(keepAlive: true)
-ReadSessionLoader readSessionLoader(Ref ref) =>
-    ReadSessionLoader(pageSource: ref.read(comicPageSourcePortProvider));
 
 ReaderPageImageData _mapReadSessionPageToUi(ReadSessionPage page) {
   return switch (page) {
@@ -32,18 +28,25 @@ ReaderPageImageData _mapReadSessionPageToUi(ReadSessionPage page) {
 }
 
 @Riverpod()
+Future<ReaderSessionSnapshot> readerSessionOpen(
+  Ref ref, {
+  required String comicId,
+  bool incognito = false,
+}) {
+  return ref
+      .read(readerSessionServiceProvider)
+      .open(comicId: comicId, incognito: incognito);
+}
+
+@Riverpod()
 Future<List<ReaderPageImageData>> comicImages(
   Ref ref, {
   required String comicId,
   String? chapterId,
 }) async {
-  final Comic? comic = await ref.read(comicRepoProvider).findById(comicId);
-  if (comic == null) {
-    throw ReadSessionPageLoadException.comicNotFound(comicId);
-  }
   final List<ReadSessionPage> pages = await ref
-      .read(readSessionLoaderProvider)
-      .loadPages(comic);
+      .read(readerSessionServiceProvider)
+      .loadPages(comicId);
   return pages.map(_mapReadSessionPageToUi).toList(growable: false);
 }
 
@@ -59,8 +62,8 @@ Future<Uint8List?> comicReaderPageBytes(
   }
   try {
     return await ref
-        .read(comicPageSourcePortProvider)
-        .loadPageBytes(comic: comic, pageIndex: pageIndex);
+        .read(readerSessionServiceProvider)
+        .loadPageBytes(comic: comic, archivePageIndex: pageIndex);
   } on HentaiErrorDto catch (error, stackTrace) {
     throw ReadSessionPageLoadException.loadFailed(
       comicId: comicId,

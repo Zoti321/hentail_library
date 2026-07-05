@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/reading/reader_session_snapshot.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
 import 'package:hentai_library/ui/features/reader/view_models/reader_window_fullscreen.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
@@ -95,28 +96,13 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
   Future<ReaderViewState> build(ReaderViewKey key) async {
     final String id = key.comicId;
     final bool incognito = key.incognito;
-    final comic = await ref.read(comicRepoProvider).findById(id);
-    if (comic == null) {
-      throw StateError('Comic not found: $id');
-    }
-    final images = await ref.watch(comicImagesProvider(comicId: id).future);
-    final totalPages = images.length;
-    final int oneBased;
-    if (incognito) {
-      oneBased = 1;
-    } else {
-      final progress = await ref.watch(
-        readingProgressProvider(comicId: id).future,
-      );
-      oneBased = (progress?.pageIndex ?? 1).clamp(
-        1,
-        totalPages > 0 ? totalPages : 1,
-      );
-    }
+    final ReaderSessionSnapshot snapshot = await ref.watch(
+      readerSessionOpenProvider(comicId: id, incognito: incognito).future,
+    );
     return ReaderViewState(
-      comic: comic,
-      currentIndex: oneBased,
-      totalPagesOverride: totalPages > 0 ? totalPages : null,
+      comic: snapshot.comic,
+      currentIndex: snapshot.resumePageIndex,
+      totalPagesOverride: snapshot.totalPages > 0 ? snapshot.totalPages : null,
     );
   }
 
@@ -213,6 +199,10 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
         );
   }
 
+  Future<void> closeSession() async {
+    await ref.read(readerSessionServiceProvider).close(_comicId);
+  }
+
   Future<void> executeExitReader({
     required BuildContext context,
     required ReaderRouteContext routeContext,
@@ -221,6 +211,7 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
         .read(readerWindowFullscreenProvider.notifier)
         .exitFullscreenIfNeeded();
     await executeSaveProgress(routeContext: routeContext);
+    await closeSession();
     if (!context.mounted) {
       return;
     }

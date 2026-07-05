@@ -102,6 +102,9 @@ Future<void> navigateToSeriesComicInReader(
       incognito: currentSession.incognito,
     ),
   );
+  await ref
+      .read(readerSessionServiceProvider)
+      .close(currentSession.comicId);
   final ReadSessionRouteParams nextSession = ReadSessionRouteParams(
     comicId: targetComicId,
     seriesId: currentSession.seriesId,
