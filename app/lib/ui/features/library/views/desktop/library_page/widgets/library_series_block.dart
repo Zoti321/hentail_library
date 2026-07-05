@@ -144,10 +144,8 @@ class _NoMatchingSeriesSliver extends StatelessWidget {
 }
 
 void _openSeriesDetail(Series series) {
-  appRouter.pushNamed(
-    '系列详情',
-    pathParameters: <String, String>{'name': series.name},
-  );
+  final String encoded = Uri.encodeComponent(series.id);
+  appRouter.push('/series/$encoded');
 }
 
 void _showSeriesContextMenu({
@@ -184,57 +182,6 @@ Future<void> _handleSeriesContextAction({
     case SeriesContextAction.read:
       await _openSeriesReader(context: context, ref: ref, series: series);
       return;
-    case SeriesContextAction.reorder:
-      if (series.items.length < 2) {
-        showInfoToast(context, '至少需要 2 本漫画才能调整顺序');
-        return;
-      }
-      await showDialog<void>(
-        context: context,
-        builder: (BuildContext context) =>
-            ReorderSeriesItemsDialog(series: series),
-      );
-      return;
-    case SeriesContextAction.addComics:
-      await showDialog<void>(
-        context: context,
-        builder: (BuildContext context) => AddComicsToSeriesDialog(
-          key: ValueKey<String>(series.name),
-          series: series,
-        ),
-      );
-      return;
-    case SeriesContextAction.rename:
-      final String? newName = await showDialog<String>(
-        context: context,
-        builder: (BuildContext context) => RenameSeriesDialog(series: series),
-      );
-      if (newName != null && context.mounted) {
-        showSuccessToast(context, '已重命名');
-      }
-      return;
-    case SeriesContextAction.delete:
-      final bool confirmed =
-          await showDialog<bool>(
-            context: context,
-            builder: (BuildContext context) =>
-                SeriesConfirmDeleteDialog(series: series),
-          ) ??
-          false;
-      if (!confirmed || !context.mounted) {
-        return;
-      }
-      try {
-        await ref.read(seriesActionsProvider).delete(series.name);
-        if (context.mounted) {
-          showSuccessToast(context, '已删除系列');
-        }
-      } catch (error) {
-        if (context.mounted) {
-          showErrorToast(context, error);
-        }
-      }
-      return;
   }
 }
 
@@ -255,7 +202,7 @@ Future<void> _openSeriesReader({
     queryParameters: ReaderRouteArgs(
       comicId: comicIdToOpen,
       readType: ReaderRouteArgs.readTypeSeries,
-      seriesName: series.name,
+      seriesId: series.id,
     ).toQueryParameters(),
   );
 }

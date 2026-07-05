@@ -11,6 +11,7 @@ use crate::entity::{
 use crate::error::HentaiError;
 
 use super::plan::ComicScanReplacePlan;
+use super::series_rebuild::rebuild_series_from_comics;
 
 pub async fn apply_scan_replace_plan(
     db: &DatabaseConnection,
@@ -31,7 +32,7 @@ pub async fn apply_scan_replace_plan(
             .map_err(map_db_err)?;
     }
     upsert_comics(&txn, &plan.to_upsert).await?;
-    remove_orphan_series_items(&txn).await?;
+    rebuild_series_from_comics(&txn).await?;
     txn.commit().await.map_err(map_db_err)?;
     Ok(())
 }
@@ -119,16 +120,6 @@ async fn delete_comics_side_effects_batch<C: ConnectionTrait>(
         sea_orm::DatabaseBackend::Sqlite,
         format!("DELETE FROM comics WHERE comic_id IN ({placeholders})"),
         values,
-    ))
-    .await
-    .map_err(map_db_err)?;
-    Ok(())
-}
-
-pub async fn remove_orphan_series_items<C: ConnectionTrait>(db: &C) -> Result<(), HentaiError> {
-    db.execute(Statement::from_string(
-        sea_orm::DatabaseBackend::Sqlite,
-        "DELETE FROM series_items WHERE comic_id NOT IN (SELECT comic_id FROM comics)".to_string(),
     ))
     .await
     .map_err(map_db_err)?;

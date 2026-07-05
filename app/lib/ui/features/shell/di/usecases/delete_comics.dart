@@ -8,6 +8,5 @@ part 'delete_comics.g.dart';
 DeleteComicsUseCase deleteComicsUseCase(Ref ref) => DeleteComicsUseCase(
   comicRepository: ref.read(comicRepoProvider),
   readingHistoryRepository: ref.read(readingHistoryRepoProvider),
-  seriesRepository: ref.read(librarySeriesRepoProvider),
   readerSessionPort: ref.read(readerSessionPortProvider),
 );

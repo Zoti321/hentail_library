@@ -8,6 +8,7 @@ use crate::comic::repository::load_comics_ordered;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_authors, comic_meta, comic_tags, comics, prelude::*};
 use crate::error::HentaiError;
+use crate::sync::series_rebuild::rebuild_series_from_comics;
 use crate::sync::writer::{replace_comic_authors, replace_comic_tags};
 
 #[derive(Debug, Clone, Default)]
@@ -51,6 +52,7 @@ pub async fn delete_comics_by_ids(comic_ids: Vec<String>) -> Result<(), HentaiEr
     ))
     .await
     .map_err(map_db_err)?;
+    rebuild_series_from_comics(&db).await?;
     Ok(())
 }
 

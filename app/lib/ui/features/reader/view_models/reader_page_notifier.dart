@@ -52,7 +52,7 @@ AsyncValue<ReaderPageViewModel> readerPageViewModel(
   Ref ref, {
   required String comicId,
   required bool isSeriesMode,
-  String? seriesName,
+  String? seriesId,
   bool incognito = false,
 }) {
   final AsyncValue<ReaderViewState> viewAsync = ref.watch(
@@ -62,7 +62,7 @@ AsyncValue<ReaderPageViewModel> readerPageViewModel(
     readerSeriesContextForReaderProvider(
       comicId: comicId,
       isSeriesMode: isSeriesMode,
-      seriesName: seriesName,
+      seriesId: seriesId,
       incognito: incognito,
     ),
   );
@@ -211,7 +211,7 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
           comic: currentState.comic,
           pageIndex: currentState.currentIndex,
           isSeriesMode: routeContext.isSeriesMode,
-          seriesName: routeContext.seriesName,
+          seriesId: routeContext.seriesId,
         );
   }
 
@@ -231,13 +231,13 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
       router.pop();
       return;
     }
-    final String? seriesName = routeContext.isSeriesMode
-        ? routeContext.seriesName
+    final String? seriesId = routeContext.isSeriesMode
+        ? routeContext.seriesId
         : null;
-    if (seriesName != null) {
+    if (seriesId != null) {
       router.goNamed(
         '系列详情',
-        pathParameters: <String, String>{'name': seriesName},
+        pathParameters: <String, String>{'id': seriesId},
       );
       return;
     }
@@ -261,23 +261,10 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
         readType: isSeriesMode
             ? ReaderRouteArgs.readTypeSeries
             : ReaderRouteArgs.readTypeComic,
-        seriesName: routeContext.seriesName,
+        seriesId: routeContext.seriesId,
         keepControlsOpen: true,
         incognito: routeContext.incognito,
       ).toQueryParameters(),
-    );
-  }
-
-  Future<void> executeSelectSeriesComic({
-    required BuildContext context,
-    required ReaderRouteContext routeContext,
-    required String targetComicId,
-    required String seriesName,
-  }) async {
-    await executeSelectComic(
-      context: context,
-      routeContext: routeContext,
-      targetComicId: targetComicId,
     );
   }
 }

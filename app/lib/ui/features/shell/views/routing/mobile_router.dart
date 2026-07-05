@@ -54,8 +54,8 @@ final GoRouter mobileRouter = GoRouter(
         ...buildSharedContentRoutes(
           comicDetailBuilder: (BuildContext context, String comicId) =>
               MobileComicDetailPage(comicId: comicId),
-          seriesDetailBuilder: (BuildContext context, String seriesName) =>
-              MobileSeriesDetailPage(seriesName: seriesName),
+          seriesDetailBuilder: (BuildContext context, String seriesId) =>
+              MobileSeriesDetailPage(seriesId: seriesId),
         ),
       ],
     ),

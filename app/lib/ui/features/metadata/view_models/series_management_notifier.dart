@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_page_pagination_providers.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
 
 /// 系列名称筛选关键词
@@ -33,38 +31,4 @@ final filteredSeriesProvider = Provider<AsyncValue<List<Series>>>((ref) {
         .where((Series item) => item.name.toLowerCase().contains(query))
         .toList();
   });
-});
-
-class SeriesActions {
-  SeriesActions(this._ref);
-
-  final Ref _ref;
-
-  Future<void> create(String name) async {
-    final trimmed = name.trim();
-    if (trimmed.isEmpty) return;
-    await _ref.read(librarySeriesRepoProvider).create(trimmed);
-    _ref.read(seriesAggregateProvider.notifier).refreshAllSeries();
-    _ref.invalidate(librarySeriesPageProvider);
-  }
-
-  Future<void> rename(String name, String newName) async {
-    final trimmed = newName.trim();
-    if (trimmed.isEmpty) return;
-    await _ref
-        .read(librarySeriesRepoProvider)
-        .rename(name: name, newName: trimmed);
-    _ref.read(seriesAggregateProvider.notifier).refreshAllSeries();
-    _ref.invalidate(librarySeriesPageProvider);
-  }
-
-  Future<void> delete(String seriesId) async {
-    await _ref.read(librarySeriesRepoProvider).delete(seriesId);
-    _ref.read(seriesAggregateProvider.notifier).refreshAllSeries();
-    _ref.invalidate(librarySeriesPageProvider);
-  }
-}
-
-final seriesActionsProvider = Provider<SeriesActions>((ref) {
-  return SeriesActions(ref);
 });

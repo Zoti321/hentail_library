@@ -8,7 +8,7 @@ import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args
 typedef ComicDetailBuilder =
     Widget Function(BuildContext context, String comicId);
 typedef SeriesDetailBuilder =
-    Widget Function(BuildContext context, String seriesName);
+    Widget Function(BuildContext context, String seriesId);
 
 List<RouteBase> buildSharedContentRoutes({
   required ComicDetailBuilder comicDetailBuilder,
@@ -44,11 +44,13 @@ List<RouteBase> buildSharedContentRoutes({
           '/metadata?tab=authors',
     ),
     GoRoute(
-      path: '/series/:name',
+      path: '/series/:id',
       name: '系列详情',
       builder: (context, state) {
-        final String seriesName = state.pathParameters['name']!;
-        return seriesDetailBuilder(context, seriesName);
+        final String seriesId = Uri.decodeComponent(
+          state.pathParameters['id']!,
+        );
+        return seriesDetailBuilder(context, seriesId);
       },
     ),
     GoRoute(
@@ -66,7 +68,7 @@ List<RouteBase> buildSharedContentRoutes({
         return ReaderPage(
           comicId: args.comicId,
           readType: args.readType,
-          seriesName: args.seriesName,
+          seriesId: args.seriesId,
           keepControlsOpen: args.keepControlsOpen,
           incognito: args.incognito,
         );

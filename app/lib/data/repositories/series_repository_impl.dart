@@ -4,6 +4,7 @@ import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
@@ -48,86 +49,42 @@ class SeriesRepositoryImpl implements SeriesRepository {
   }
 
   @override
-  Future<Series?> findByName(String name) async {
+  Future<Series?> findById(String seriesId) async {
     final rust_series.SeriesDto? dto = guardFrbSync(
-      () => rust_series.findSeriesByNameFrb(name: name),
+      () => rust_series.findSeriesByIdFrb(seriesId: seriesId),
       fallbackMessage: '读取系列失败',
     );
     return dto == null ? null : mapRustSeries(dto);
   }
 
   @override
-  Future<void> create(String name) async {
-    guardFrbSync(
-      () => rust_series.createSeriesFrb(name: name),
-      fallbackMessage: '创建系列失败',
-    );
-  }
-
-  @override
-  Future<void> rename({required String name, required String newName}) async {
-    guardFrbSync(
-      () => rust_series.renameSeriesFrb(name: name, newName: newName),
-      fallbackMessage: '重命名系列失败',
-    );
-  }
-
-  @override
-  Future<void> delete(String name) async {
-    guardFrbSync(
-      () => rust_series.deleteSeriesFrb(name: name),
-      fallbackMessage: '删除系列失败',
-    );
-  }
-
-  @override
-  Future<void> assignComicExclusive({
-    required String comicId,
-    required String targetSeriesName,
-    required int order,
+  Future<void> updateUserMeta({
+    required String seriesId,
+    SerializationStatus? serializationStatus,
+    int? totalCount,
+    bool clearTotalCount = false,
   }) async {
     guardFrbSync(
-      () => rust_series.assignComicExclusiveFrb(
-        comicId: comicId,
-        targetSeriesName: targetSeriesName,
-        sortOrder: order,
+      () => rust_series.updateSeriesUserMetaFrb(
+        seriesId: seriesId,
+        meta: mapUpdateSeriesUserMeta(
+          serializationStatus: serializationStatus,
+          totalCount: totalCount,
+          clearTotalCount: clearTotalCount,
+        ),
       ),
-      fallbackMessage: '分配漫画到系列失败',
-    );
-  }
-
-  @override
-  Future<void> removeComic(String comicId) async {
-    guardFrbSync(
-      () => rust_series.removeComicFromSeriesFrb(comicId: comicId),
-      fallbackMessage: '从系列移除漫画失败',
-    );
-  }
-
-  @override
-  Future<void> removeComicsFromSeries(Iterable<String> comicIds) async {
-    guardFrbSync(
-      () => rust_series.removeComicsFromSeriesFrb(comicIds: comicIds.toList()),
-      fallbackMessage: '批量从系列移除漫画失败',
-    );
-  }
-
-  @override
-  Future<void> removeOrphanSeriesItems() async {
-    guardFrbSync(
-      rust_series.removeOrphanSeriesItemsFrb,
-      fallbackMessage: '清理孤立系列项失败',
+      fallbackMessage: '更新系列元数据失败',
     );
   }
 
   @override
   Future<void> setSeriesItemsOrder(
-    String seriesName,
+    String seriesId,
     List<SeriesItem> orderedItems,
   ) async {
     guardFrbSync(
       () => rust_series.setSeriesItemsOrderFrb(
-        seriesName: seriesName,
+        seriesId: seriesId,
         orderedComicIds: orderedItems.map((SeriesItem i) => i.comicId).toList(),
       ),
       fallbackMessage: '更新系列排序失败',
@@ -161,19 +118,6 @@ class SeriesRepositoryImpl implements SeriesRepository {
           .map(mapRustSeries)
           .toList(),
       fallbackMessage: '按标签搜索系列失败',
-    );
-  }
-
-  @override
-  Future<InferSeriesFromComicTitlesResult> inferFromUnassignedComics() async {
-    final rust_series.InferSeriesResultDto result = guardFrbSync(
-      rust_series.inferSeriesFrb,
-      fallbackMessage: '推断系列失败',
-    );
-    return InferSeriesFromComicTitlesResult(
-      groupsApplied: result.groupsApplied,
-      comicsAssigned: result.comicsAssigned,
-      newSeriesCreated: result.newSeriesCreated,
     );
   }
 }

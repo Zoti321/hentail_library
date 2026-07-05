@@ -23,11 +23,13 @@ class ComicDetailSeriesNavItem {
 
 class ComicDetailSeriesNavData {
   const ComicDetailSeriesNavData({
+    required this.seriesId,
     required this.seriesName,
     required this.items,
     required this.currentIndex,
   });
 
+  final String seriesId;
   final String seriesName;
   final List<ComicDetailSeriesNavItem> items;
   final int currentIndex;
@@ -125,6 +127,7 @@ Future<ComicDetailSeriesNavResult> comicDetailSeriesNav(
   }
   return ComicDetailSeriesNavReady(
     ComicDetailSeriesNavData(
+      seriesId: series.id,
       seriesName: series.name,
       items: items,
       currentIndex: currentIndex,

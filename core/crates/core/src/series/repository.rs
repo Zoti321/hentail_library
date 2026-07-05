@@ -1,29 +1,32 @@
 use std::collections::HashMap;
 
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, PaginatorTrait,
-    QueryFilter, QueryOrder, QuerySelect, Set, Statement, TransactionTrait,
+    ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, PaginatorTrait, QueryFilter,
+    QueryOrder, Set, Statement, TransactionTrait,
 };
 
 use crate::comic::{read_data_version, search_comic_ids_by_tag_expression, PageRequestDto};
 use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
-use crate::sync::writer::remove_orphan_series_items;
 
 use super::dto::{SeriesFilterDto, SeriesSortOptionDto};
-use super::page_query::{build_count_query, build_names_page_query};
+use super::page_query::{build_count_query, build_ids_page_query};
 
 #[derive(Debug, Clone)]
 pub struct SeriesItemDto {
-    pub series_name: String,
+    pub series_id: String,
     pub comic_id: String,
     pub sort_order: i32,
 }
 
 #[derive(Debug, Clone)]
 pub struct SeriesDto {
+    pub series_id: String,
+    pub folder_path: String,
     pub name: String,
+    pub serialization_status: String,
+    pub total_count: Option<i32>,
     pub items: Vec<SeriesItemDto>,
 }
 
@@ -57,7 +60,11 @@ pub async fn get_all_series() -> Result<Vec<SeriesDto>, HentaiError> {
 
 pub async fn count_all_series() -> Result<i64, HentaiError> {
     let db = connection()?;
-    Series::find().count(&db).await.map_err(map_db_err).map(|c| c as i64)
+    Series::find()
+        .count(&db)
+        .await
+        .map_err(map_db_err)
+        .map(|c| c as i64)
 }
 
 pub async fn fetch_series_page(
@@ -87,9 +94,9 @@ pub async fn fetch_series_page(
         });
     }
     let offset = (effective_page - 1) * page_size;
-    let names_query = build_names_page_query(&filter, sort.descending, page_size, offset);
-    let series_names = query_series_names(&db, &names_query).await?;
-    let items = load_series_by_names(&db, series_names).await?;
+    let ids_query = build_ids_page_query(&filter, sort.descending, page_size, offset);
+    let series_ids = query_series_ids(&db, &ids_query).await?;
+    let items = load_series_by_ids(&db, series_ids).await?;
     Ok(PagedSeriesResultDto {
         items,
         total_count,
@@ -117,7 +124,7 @@ async fn count_filtered_series(
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
 }
 
-async fn query_series_names(
+async fn query_series_ids(
     db: &DatabaseConnection,
     query: &super::page_query::PageSqlQuery,
 ) -> Result<Vec<String>, HentaiError> {
@@ -135,114 +142,21 @@ async fn query_series_names(
         .collect()
 }
 
-pub async fn find_series_by_name(name: &str) -> Result<Option<SeriesDto>, HentaiError> {
+pub async fn find_series_by_id(series_id: &str) -> Result<Option<SeriesDto>, HentaiError> {
     let db = connection()?;
-    let exists = Series::find_by_id(name).one(&db).await.map_err(map_db_err)?;
+    let exists = Series::find_by_id(series_id)
+        .one(&db)
+        .await
+        .map_err(map_db_err)?;
     if exists.is_none() {
         return Ok(None);
     }
-    let mut list = load_series_by_names(&db, vec![name.to_string()]).await?;
+    let mut list = load_series_by_ids(&db, vec![series_id.to_string()]).await?;
     Ok(list.pop())
 }
 
-pub async fn create_series(name: &str) -> Result<(), HentaiError> {
-    let db = connection()?;
-    let active = series::ActiveModel {
-        name: Set(name.to_string()),
-        ..Default::default()
-    };
-    Series::insert(active)
-        .on_conflict(
-            sea_orm::sea_query::OnConflict::column(series::Column::Name)
-                .do_nothing()
-                .to_owned(),
-        )
-        .exec(&db)
-        .await
-        .map_err(map_db_err)?;
-    Ok(())
-}
-
-pub async fn rename_series(name: &str, new_name: &str) -> Result<(), HentaiError> {
-    let db = connection()?;
-    let mut active: series::ActiveModel = series::ActiveModel {
-        name: Set(name.to_string()),
-        ..Default::default()
-    };
-    active.name = Set(new_name.to_string());
-    active.update(&db).await.map_err(map_db_err)?;
-    Ok(())
-}
-
-pub async fn delete_series(name: &str) -> Result<(), HentaiError> {
-    let db = connection()?;
-    Series::delete_by_id(name).exec(&db).await.map_err(map_db_err)?;
-    Ok(())
-}
-
-pub async fn assign_comic_exclusive(
-    comic_id: &str,
-    target_series_name: &str,
-    sort_order: i32,
-) -> Result<(), HentaiError> {
-    let db = connection()?;
-    let txn = db.begin().await.map_err(map_db_err)?;
-    SeriesItems::delete_many()
-        .filter(series_items::Column::ComicId.eq(comic_id))
-        .exec(&txn)
-        .await
-        .map_err(map_db_err)?;
-    SeriesItems::insert(series_items::ActiveModel {
-        series_name: Set(target_series_name.to_string()),
-        comic_id: Set(comic_id.to_string()),
-        sort_order: Set(sort_order),
-        ..Default::default()
-    })
-    .on_conflict(
-        sea_orm::sea_query::OnConflict::column(series_items::Column::ComicId)
-            .update_columns([
-                series_items::Column::SeriesName,
-                series_items::Column::SortOrder,
-            ])
-            .to_owned(),
-    )
-    .exec(&txn)
-    .await
-    .map_err(map_db_err)?;
-    txn.commit().await.map_err(map_db_err)?;
-    Ok(())
-}
-
-pub async fn remove_comic_from_series(comic_id: &str) -> Result<(), HentaiError> {
-    let db = connection()?;
-    SeriesItems::delete_many()
-        .filter(series_items::Column::ComicId.eq(comic_id))
-        .exec(&db)
-        .await
-        .map_err(map_db_err)?;
-    Ok(())
-}
-
-pub async fn remove_comics_from_series(comic_ids: Vec<String>) -> Result<(), HentaiError> {
-    if comic_ids.is_empty() {
-        return Ok(());
-    }
-    let db = connection()?;
-    SeriesItems::delete_many()
-        .filter(series_items::Column::ComicId.is_in(comic_ids))
-        .exec(&db)
-        .await
-        .map_err(map_db_err)?;
-    Ok(())
-}
-
-pub async fn remove_orphan_series_items_public() -> Result<(), HentaiError> {
-    let db = connection()?;
-    remove_orphan_series_items(&db).await
-}
-
 pub async fn set_series_items_order(
-    series_name: &str,
+    series_id: &str,
     ordered_comic_ids: Vec<String>,
 ) -> Result<(), HentaiError> {
     let db = connection()?;
@@ -253,7 +167,7 @@ pub async fn set_series_items_order(
                 series_items::Column::SortOrder,
                 sea_orm::sea_query::Expr::value(index as i32),
             )
-            .filter(series_items::Column::SeriesName.eq(series_name))
+            .filter(series_items::Column::SeriesId.eq(series_id))
             .filter(series_items::Column::ComicId.eq(comic_id))
             .exec(&txn)
             .await
@@ -271,15 +185,18 @@ pub async fn search_series_by_keyword(keyword: &str) -> Result<Vec<SeriesDto>, H
     let db = connection()?;
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT name FROM series WHERE lower(name) LIKE ?",
-        vec![sea_orm::Value::String(Some(Box::new(format!("%{q}%"))))],
+        "SELECT series_id FROM series WHERE lower(name) LIKE ? OR lower(folder_path) LIKE ?",
+        vec![
+            sea_orm::Value::String(Some(Box::new(format!("%{q}%")))),
+            sea_orm::Value::String(Some(Box::new(format!("%{q}%")))),
+        ],
     );
     let rows = db.query_all(stmt).await.map_err(map_db_err)?;
-    let names: Vec<String> = rows
+    let ids: Vec<String> = rows
         .into_iter()
         .filter_map(|row| row.try_get_by_index::<String>(0).ok())
         .collect();
-    load_series_by_names(&db, names).await
+    load_series_by_ids(&db, ids).await
 }
 
 pub async fn search_series_by_tag_expression(
@@ -298,11 +215,11 @@ pub async fn search_series_by_tag_expression(
         .all(&db)
         .await
         .map_err(map_db_err)?;
-    let mut names = std::collections::BTreeSet::new();
+    let mut ids = std::collections::BTreeSet::new();
     for row in rows {
-        names.insert(row.series_name);
+        ids.insert(row.series_id);
     }
-    load_series_by_names(&db, names.into_iter().collect()).await
+    load_series_by_ids(&db, ids.into_iter().collect()).await
 }
 
 async fn load_all_series(db: &DatabaseConnection) -> Result<Vec<SeriesDto>, HentaiError> {
@@ -311,24 +228,25 @@ async fn load_all_series(db: &DatabaseConnection) -> Result<Vec<SeriesDto>, Hent
         .all(db)
         .await
         .map_err(map_db_err)?;
-    let names: Vec<String> = rows.into_iter().map(|r| r.name).collect();
-    load_series_by_names(db, names).await
+    let ids: Vec<String> = rows.into_iter().map(|r| r.series_id).collect();
+    load_series_by_ids(db, ids).await
 }
 
-async fn load_series_by_names(
+async fn load_series_by_ids(
     db: &DatabaseConnection,
-    names: Vec<String>,
+    ids: Vec<String>,
 ) -> Result<Vec<SeriesDto>, HentaiError> {
-    if names.is_empty() {
+    if ids.is_empty() {
         return Ok(vec![]);
     }
     let series_rows = Series::find()
-        .filter(series::Column::Name.is_in(names.clone()))
+        .filter(series::Column::SeriesId.is_in(ids.clone()))
         .all(db)
         .await
         .map_err(map_db_err)?;
     let item_rows = SeriesItems::find()
-        .order_by_asc(series_items::Column::SeriesName)
+        .filter(series_items::Column::SeriesId.is_in(ids.clone()))
+        .order_by_asc(series_items::Column::SeriesId)
         .order_by_asc(series_items::Column::SortOrder)
         .all(db)
         .await
@@ -336,28 +254,32 @@ async fn load_series_by_names(
     let mut items_by_series: HashMap<String, Vec<SeriesItemDto>> = HashMap::new();
     for item in item_rows {
         items_by_series
-            .entry(item.series_name.clone())
+            .entry(item.series_id.clone())
             .or_default()
             .push(SeriesItemDto {
-                series_name: item.series_name,
+                series_id: item.series_id,
                 comic_id: item.comic_id,
                 sort_order: item.sort_order,
             });
     }
-    let mut by_name: HashMap<String, SeriesDto> = HashMap::new();
+    let mut by_id: HashMap<String, SeriesDto> = HashMap::new();
     for row in series_rows {
-        let name = row.name.clone();
-        by_name.insert(
-            name.clone(),
+        let series_id = row.series_id.clone();
+        by_id.insert(
+            series_id.clone(),
             SeriesDto {
-                name,
-                items: items_by_series.remove(&row.name).unwrap_or_default(),
+                series_id,
+                folder_path: row.folder_path,
+                name: row.name,
+                serialization_status: row.serialization_status,
+                total_count: row.total_count,
+                items: items_by_series.remove(&row.series_id).unwrap_or_default(),
             },
         );
     }
-    Ok(names
+    Ok(ids
         .into_iter()
-        .filter_map(|name| by_name.remove(&name))
+        .filter_map(|id| by_id.remove(&id))
         .collect())
 }
 
@@ -366,7 +288,7 @@ pub async fn load_home_series_comic_order_map() -> Result<HashMap<String, i32>, 
     let rows = SeriesItems::find().all(&db).await.map_err(map_db_err)?;
     let mut map = HashMap::new();
     for row in rows {
-        map.insert(format!("{}|{}", row.series_name, row.comic_id), row.sort_order);
+        map.insert(format!("{}|{}", row.series_id, row.comic_id), row.sort_order);
     }
     Ok(map)
 }

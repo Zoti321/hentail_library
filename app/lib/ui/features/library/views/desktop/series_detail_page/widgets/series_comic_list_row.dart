@@ -22,12 +22,12 @@ class SeriesItemComicTile extends ConsumerWidget {
     super.key,
     required this.item,
     required this.sequenceNumber,
-    required this.seriesName,
+    required this.seriesId,
   });
 
   final SeriesItem item;
   final int sequenceNumber;
-  final String seriesName;
+  final String seriesId;
   static const double _kTooltipIconSlot = 22;
 
   static String titleForComic(WidgetRef ref, String comicId) {
@@ -121,7 +121,7 @@ class SeriesItemComicTile extends ConsumerWidget {
               queryParameters: ReaderRouteArgs(
                 comicId: item.comicId,
                 readType: ReaderRouteArgs.readTypeSeries,
-                seriesName: seriesName,
+                seriesId: seriesId,
               ).toQueryParameters(),
             );
           },

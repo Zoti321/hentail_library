@@ -2,7 +2,7 @@ class ReaderRouteArgs {
   const ReaderRouteArgs({
     required this.comicId,
     required this.readType,
-    this.seriesName,
+    this.seriesId,
     this.keepControlsOpen = false,
     this.incognito = false,
   });
@@ -12,12 +12,12 @@ class ReaderRouteArgs {
   static const String readTypeComic = 'comic';
   static const String readTypeKey = 'read_type';
   static const String comicIdKey = 'comic_id';
-  static const String seriesNameKey = 'series_name';
+  static const String seriesIdKey = 'series_id';
   static const String keepControlsOpenKey = 'keep_controls_open';
   static const String incognitoKey = 'incognito';
   final String comicId;
   final String readType;
-  final String? seriesName;
+  final String? seriesId;
   final bool keepControlsOpen;
   final bool incognito;
   bool get isSeriesMode => readType == readTypeSeries;
@@ -28,19 +28,17 @@ class ReaderRouteArgs {
         queryParameters[readTypeKey] == readTypeSeries
         ? readTypeSeries
         : readTypeComic;
-    final String? rawSeriesName = queryParameters[seriesNameKey];
-    final String? normalizedSeriesName =
-        rawSeriesName != null && rawSeriesName.isNotEmpty
-        ? rawSeriesName
-        : null;
+    final String? rawSeriesId = queryParameters[seriesIdKey];
+    final String? normalizedSeriesId =
+        rawSeriesId != null && rawSeriesId.isNotEmpty ? rawSeriesId : null;
     final bool isValidSeries =
-        normalizedReadType == readTypeSeries && normalizedSeriesName != null;
+        normalizedReadType == readTypeSeries && normalizedSeriesId != null;
     final bool keepControlsOpen = queryParameters[keepControlsOpenKey] == '1';
     final bool incognito = queryParameters[incognitoKey] == '1';
     return ReaderRouteArgs(
       comicId: comicId,
       readType: isValidSeries ? readTypeSeries : readTypeComic,
-      seriesName: isValidSeries ? normalizedSeriesName : null,
+      seriesId: isValidSeries ? normalizedSeriesId : null,
       keepControlsOpen: keepControlsOpen,
       incognito: incognito,
     );
@@ -51,8 +49,8 @@ class ReaderRouteArgs {
       readTypeKey: readType,
       comicIdKey: comicId,
     };
-    if (isSeriesMode && seriesName != null) {
-      queryParameters[seriesNameKey] = seriesName!;
+    if (isSeriesMode && seriesId != null) {
+      queryParameters[seriesIdKey] = seriesId!;
     }
     if (keepControlsOpen) {
       queryParameters[keepControlsOpenKey] = '1';

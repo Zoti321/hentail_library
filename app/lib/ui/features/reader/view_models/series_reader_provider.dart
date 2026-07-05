@@ -16,13 +16,13 @@ class ReaderSeriesContextData {
   final int? preferredPageIndex;
 }
 
-/// Loads a [Series] by name for reader navigation (series read mode).
+/// Loads a [Series] by id for reader navigation (series read mode).
 @riverpod
-Future<Series?> seriesByNameForReader(Ref ref, String seriesName) async {
-  if (seriesName.isEmpty) {
+Future<Series?> seriesByIdForReader(Ref ref, String seriesId) async {
+  if (seriesId.isEmpty) {
     return null;
   }
-  return ref.read(librarySeriesRepoProvider).findByName(seriesName);
+  return ref.read(librarySeriesRepoProvider).findById(seriesId);
 }
 
 @riverpod
@@ -41,10 +41,10 @@ Future<ReaderSeriesContextData> readerSeriesContextForReader(
   Ref ref, {
   required String comicId,
   required bool isSeriesMode,
-  String? seriesName,
+  String? seriesId,
   bool incognito = false,
 }) async {
-  if (!isSeriesMode || seriesName == null || seriesName.isEmpty) {
+  if (!isSeriesMode || seriesId == null || seriesId.isEmpty) {
     final String title = await _readComicTitle(ref, comicId);
     return ReaderSeriesContextData(
       navContext: buildReaderNavContextData(
@@ -58,7 +58,7 @@ Future<ReaderSeriesContextData> readerSeriesContextForReader(
     );
   }
   final Series? series = await ref.watch(
-    seriesByNameForReaderProvider(seriesName).future,
+    seriesByIdForReaderProvider(seriesId).future,
   );
   final List<ReaderComicListItem> seriesItems = await _buildSeriesItems(
     ref,
@@ -74,7 +74,7 @@ Future<ReaderSeriesContextData> readerSeriesContextForReader(
       items: seriesItems,
       currentComicId: comicId,
       preferredPageIndex: preferredPageIndex,
-      seriesName: seriesName,
+      seriesName: series?.name,
     ),
     preferredPageIndex: preferredPageIndex,
   );

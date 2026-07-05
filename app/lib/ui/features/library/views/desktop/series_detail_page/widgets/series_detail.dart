@@ -5,6 +5,7 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/actions.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_comics_grid.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_cover.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_header.dart';
@@ -33,7 +34,7 @@ class SeriesDetail extends HookConsumerWidget {
     );
     final Future<List<Comic>> comicsFuture = useMemoized(
       () => ref.read(comicRepoProvider).getAll(),
-      <Object?>[changeGeneration, series.name],
+      <Object?>[changeGeneration, series.id],
     );
     final AsyncSnapshot<List<Comic>> comicsSnapshot = useFuture(comicsFuture);
     final Map<String, Comic> comicsById = comicsByIdFromList(
@@ -60,7 +61,7 @@ class SeriesDetail extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                _buildPrimaryRow(context, tokens, cs, comicsById),
+                _buildPrimaryRow(context, tokens, cs, comicsById, sortedItems),
                 SizedBox(height: sectionGap),
                 if (hasMetadata) ...<Widget>[
                   SeriesDetailMetadataBlock(
@@ -99,6 +100,7 @@ class SeriesDetail extends HookConsumerWidget {
     AppThemeTokens tokens,
     ColorScheme cs,
     Map<String, Comic> comicsById,
+    List<SeriesItem> sortedItems,
   ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,6 +134,8 @@ class SeriesDetail extends HookConsumerWidget {
                 series: series,
                 comicsById: comicsById,
               ),
+              SeriesDetailUserMetaEditor(series: series),
+              SeriesDetailActions(series: series, sortedItems: sortedItems),
             ],
           ),
         ),

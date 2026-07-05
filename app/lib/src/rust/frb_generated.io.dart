@@ -139,6 +139,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw);
 
   @protected
+  UpdateSeriesUserMetaFrbDto
+  dco_decode_box_autoadd_update_series_user_meta_frb_dto(dynamic raw);
+
+  @protected
   ComicDto dco_decode_comic_dto(dynamic raw);
 
   @protected
@@ -164,9 +168,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PlatformInt64 dco_decode_i_64(dynamic raw);
-
-  @protected
-  InferSeriesResultDto dco_decode_infer_series_result_dto(dynamic raw);
 
   @protected
   LibrarySyncCountsDto dco_decode_library_sync_counts_dto(dynamic raw);
@@ -286,6 +287,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   UpdateComicUserMetaFrbDto dco_decode_update_comic_user_meta_frb_dto(
+    dynamic raw,
+  );
+
+  @protected
+  UpdateSeriesUserMetaFrbDto dco_decode_update_series_user_meta_frb_dto(
     dynamic raw,
   );
 
@@ -425,6 +431,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  UpdateSeriesUserMetaFrbDto
+  sse_decode_box_autoadd_update_series_user_meta_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ComicDto sse_decode_comic_dto(SseDeserializer deserializer);
 
   @protected
@@ -458,11 +470,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
-
-  @protected
-  InferSeriesResultDto sse_decode_infer_series_result_dto(
-    SseDeserializer deserializer,
-  );
 
   @protected
   LibrarySyncCountsDto sse_decode_library_sync_counts_dto(
@@ -614,6 +621,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   UpdateComicUserMetaFrbDto sse_decode_update_comic_user_meta_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  UpdateSeriesUserMetaFrbDto sse_decode_update_series_user_meta_frb_dto(
     SseDeserializer deserializer,
   );
 
@@ -783,6 +795,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_update_series_user_meta_frb_dto(
+    UpdateSeriesUserMetaFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_comic_dto(ComicDto self, SseSerializer serializer);
 
   @protected
@@ -826,12 +844,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_infer_series_result_dto(
-    InferSeriesResultDto self,
-    SseSerializer serializer,
-  );
 
   @protected
   void sse_encode_library_sync_counts_dto(
@@ -1025,6 +1037,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_update_comic_user_meta_frb_dto(
     UpdateComicUserMetaFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_update_series_user_meta_frb_dto(
+    UpdateSeriesUserMetaFrbDto self,
     SseSerializer serializer,
   );
 

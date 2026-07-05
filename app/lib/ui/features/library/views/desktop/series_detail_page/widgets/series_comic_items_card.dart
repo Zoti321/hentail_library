@@ -10,12 +10,12 @@ class SeriesComicItemsCard extends StatelessWidget {
     required this.colorScheme,
     required this.listCardRadius,
     required this.sortedItems,
-    required this.seriesName,
+    required this.seriesId,
   });
   final ColorScheme colorScheme;
   final double listCardRadius;
   final List<SeriesItem> sortedItems;
-  final String seriesName;
+  final String seriesId;
   @override
   Widget build(BuildContext context) {
     // 空数据边缘情况处理
@@ -66,7 +66,7 @@ class SeriesComicItemsCard extends StatelessWidget {
                   return SeriesItemComicTile(
                     item: sortedItems[index],
                     sequenceNumber: index + 1,
-                    seriesName: seriesName,
+                    seriesId: seriesId,
                   );
                 },
               ),
@@ -140,7 +140,7 @@ class _SeriesComicItemsEmptyListArea extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
           child: Text(
-            '暂无漫画，点击「添加漫画」加入',
+            '暂无漫画',
             style: TextStyle(
               fontSize: 14,
               color: colorScheme.hentai.textTertiary,

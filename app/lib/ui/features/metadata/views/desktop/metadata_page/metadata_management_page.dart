@@ -9,8 +9,6 @@ import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/metadata/views/desktop/metadata_page/widgets/author_management_panel.dart';
 import 'package:hentai_library/ui/features/metadata/views/desktop/metadata_page/widgets/series_management_panel.dart';
 import 'package:hentai_library/ui/features/metadata/views/desktop/metadata_page/widgets/tag_management_panel.dart';
-import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/add_series_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/rename_tag_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -134,7 +132,6 @@ class _MetadataManagementPageState
         await _openAddTagDialog(context);
         break;
       case 2:
-        await _openAddSeriesDialog(context);
         break;
       default:
         break;
@@ -166,17 +163,6 @@ class _MetadataManagementPageState
         initialValue: '',
         onSubmit: (String value) async {
           await ref.read(authorActionsProvider).addAuthor(Author(name: value));
-        },
-      ),
-    );
-  }
-
-  Future<void> _openAddSeriesDialog(BuildContext context) async {
-    await showDialog<void>(
-      context: context,
-      builder: (BuildContext dialogContext) => AddSeriesDialog(
-        onCreated: () {
-          showSuccessToast(context, '系列创建成功');
         },
       ),
     );

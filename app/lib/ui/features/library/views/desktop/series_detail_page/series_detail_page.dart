@@ -5,9 +5,9 @@ import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/widgets.dart';
 
 class SeriesDetailPage extends ConsumerWidget {
-  const SeriesDetailPage({super.key, required this.seriesName});
+  const SeriesDetailPage({super.key, required this.seriesId});
 
-  final String seriesName;
+  final String seriesId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -19,13 +19,13 @@ class SeriesDetailPage extends ConsumerWidget {
         data: (List<Series> list) {
           Series? found;
           for (final Series series in list) {
-            if (series.name == seriesName) {
+            if (series.id == seriesId) {
               found = series;
               break;
             }
           }
           if (found == null) {
-            return SeriesNotFound(seriesName: seriesName);
+            return SeriesNotFound(seriesId: seriesId);
           }
           return SeriesDetail(series: found);
         },

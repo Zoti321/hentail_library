@@ -4,7 +4,7 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "series_items")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
-    pub series_name: String,
+    pub series_id: String,
     #[sea_orm(primary_key, auto_increment = false)]
     pub comic_id: String,
     pub sort_order: i32,

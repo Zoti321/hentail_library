@@ -2,6 +2,7 @@ import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
@@ -9,7 +10,11 @@ import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 
 Series mapRustSeries(rust_series.SeriesDto dto) {
   return Series(
+    id: dto.seriesId,
     name: dto.name,
+    folderPath: dto.folderPath,
+    serializationStatus: SerializationStatus.fromRust(dto.serializationStatus),
+    totalCount: dto.totalCount?.toInt(),
     items: dto.items.map(mapRustSeriesItem).toList(),
   );
 }
@@ -46,4 +51,16 @@ PagedResult<Series> mapPagedSeriesResult(
 
 rust.PageRequestDto mapSeriesPageRequest(PageRequest request) {
   return rust.PageRequestDto(page: request.page, pageSize: request.pageSize);
+}
+
+rust_series.UpdateSeriesUserMetaFrbDto mapUpdateSeriesUserMeta({
+  SerializationStatus? serializationStatus,
+  int? totalCount,
+  bool clearTotalCount = false,
+}) {
+  return rust_series.UpdateSeriesUserMetaFrbDto(
+    serializationStatus: serializationStatus?.toRust(),
+    totalCount: totalCount,
+    clearTotalCount: clearTotalCount,
+  );
 }

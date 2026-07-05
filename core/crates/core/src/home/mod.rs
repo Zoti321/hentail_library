@@ -35,12 +35,12 @@ SELECT
   (
     SELECT COUNT(*)
     FROM series s
-    WHERE EXISTS (SELECT 1 FROM series_items si0 WHERE si0.series_name = s.name)
+    WHERE EXISTS (SELECT 1 FROM series_items si0 WHERE si0.series_id = s.series_id)
     AND NOT EXISTS (
       SELECT 1
       FROM series_items si1
       INNER JOIN comic_meta cm1 ON cm1.comic_id = si1.comic_id
-      WHERE si1.series_name = s.name AND cm1.content_rating = ?
+      WHERE si1.series_id = s.series_id AND cm1.content_rating = ?
     )
   ) AS c_series,
   (

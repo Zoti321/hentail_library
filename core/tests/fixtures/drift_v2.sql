@@ -34,17 +34,22 @@ CREATE TABLE IF NOT EXISTS comic_authors (
 );
 
 CREATE TABLE IF NOT EXISTS series (
-  name TEXT NOT NULL PRIMARY KEY
+  series_id TEXT NOT NULL PRIMARY KEY,
+  folder_path TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
+  serialization_status TEXT NOT NULL DEFAULT 'unknown'
+    CHECK (serialization_status IN ('unknown', 'ongoing', 'ended', 'hiatus')),
+  total_count INTEGER NULL CHECK (total_count IS NULL OR total_count > 0)
 );
 
 CREATE TABLE IF NOT EXISTS series_items (
-  series_name TEXT NOT NULL,
+  series_id TEXT NOT NULL,
   comic_id TEXT NOT NULL,
   sort_order INTEGER NOT NULL,
-  PRIMARY KEY (series_name, comic_id),
+  PRIMARY KEY (series_id, comic_id),
   UNIQUE(comic_id),
-  FOREIGN KEY(series_name) REFERENCES series(name) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY(comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY(series_id) REFERENCES series(series_id) ON DELETE CASCADE,
+  FOREIGN KEY(comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS comic_thumbnails (
@@ -67,11 +72,11 @@ CREATE TABLE IF NOT EXISTS comic_reading_histories (
 );
 
 CREATE TABLE IF NOT EXISTS series_reading_histories (
-  series_name TEXT NOT NULL PRIMARY KEY,
+  series_id TEXT NOT NULL PRIMARY KEY,
   last_read_comic_id TEXT NOT NULL,
   last_read_time INTEGER NOT NULL,
   page_index INTEGER,
-  FOREIGN KEY(series_name) REFERENCES series(name) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY(series_id) REFERENCES series(series_id) ON DELETE CASCADE
 );
 
 INSERT INTO comics (comic_id, path, resource_type, title, content_rating, page_count) VALUES
@@ -87,7 +92,3 @@ INSERT INTO comic_authors (comic_id, author_name) VALUES
 
 INSERT INTO comic_tags (comic_id, tag_name) VALUES
   ('86408880d30b0de95ca959feb60a3b72dcb1889b', '冒险');
-
-INSERT INTO series (name) VALUES ('测试系列');
-INSERT INTO series_items (series_name, comic_id, sort_order) VALUES
-  ('测试系列', 'af738b6b1b3bbfab9a0fd591459572509d7ef4d5', 0);

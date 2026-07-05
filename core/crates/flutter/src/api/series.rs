@@ -1,13 +1,10 @@
 use hentai_core::{
-    assign_comic_exclusive as core_assign, create_series as core_create,
-    delete_series as core_delete, fetch_series_page as core_fetch_page, find_series_by_name as core_find,
-    get_all_series, infer_series as core_infer_series, load_home_series_comic_order_map,
-    remove_comic_from_series as core_remove_comic, remove_comics_from_series as core_remove_comics,
-    remove_orphan_series_items_public, rename_series as core_rename, search_series_by_keyword,
-    search_series_by_tag_expression, set_series_items_order as core_set_order, watch_all_series,
-    watch_home_series_comic_order_map, InferSeriesResultDto as CoreInferResult, PagedSeriesResultDto as CorePagedSeries,
+    fetch_series_page as core_fetch_page, find_series_by_id as core_find, get_all_series,
+    load_home_series_comic_order_map, search_series_by_keyword, search_series_by_tag_expression,
+    set_series_items_order as core_set_order, update_series_user_meta as core_update_meta,
+    watch_all_series, watch_home_series_comic_order_map, PagedSeriesResultDto as CorePagedSeries,
     SeriesDto as CoreSeries, SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
-    SeriesSortOptionDto as CoreSeriesSort,
+    SeriesSortOptionDto as CoreSeriesSort, UpdateSeriesUserMetaDto as CoreUpdateSeriesUserMeta,
 };
 
 use super::comic::PageRequestDto;
@@ -15,22 +12,19 @@ use super::init::HentaiErrorDto;
 use super::stream_watch::{emit_or_closed, normalize_watch_result};
 
 #[derive(Debug, Clone)]
-pub struct InferSeriesResultDto {
-    pub groups_applied: i32,
-    pub comics_assigned: i32,
-    pub new_series_created: i32,
-}
-
-#[derive(Debug, Clone)]
 pub struct SeriesItemDto {
-    pub series_name: String,
+    pub series_id: String,
     pub comic_id: String,
     pub sort_order: i32,
 }
 
 #[derive(Debug, Clone)]
 pub struct SeriesDto {
+    pub series_id: String,
+    pub folder_path: String,
     pub name: String,
+    pub serialization_status: String,
+    pub total_count: Option<i32>,
     pub items: Vec<SeriesItemDto>,
 }
 
@@ -61,20 +55,17 @@ pub struct SeriesComicOrderEntryDto {
     pub sort_order: i32,
 }
 
-impl From<CoreInferResult> for InferSeriesResultDto {
-    fn from(value: CoreInferResult) -> Self {
-        Self {
-            groups_applied: value.groups_applied,
-            comics_assigned: value.comics_assigned,
-            new_series_created: value.new_series_created,
-        }
-    }
+#[derive(Debug, Clone, Default)]
+pub struct UpdateSeriesUserMetaFrbDto {
+    pub serialization_status: Option<String>,
+    pub total_count: Option<i32>,
+    pub clear_total_count: bool,
 }
 
 impl From<CoreItem> for SeriesItemDto {
     fn from(v: CoreItem) -> Self {
         Self {
-            series_name: v.series_name,
+            series_id: v.series_id,
             comic_id: v.comic_id,
             sort_order: v.sort_order,
         }
@@ -114,17 +105,14 @@ impl From<SeriesSortOptionDto> for CoreSeriesSort {
 impl From<CoreSeries> for SeriesDto {
     fn from(v: CoreSeries) -> Self {
         Self {
+            series_id: v.series_id,
+            folder_path: v.folder_path,
             name: v.name,
+            serialization_status: v.serialization_status,
+            total_count: v.total_count,
             items: v.items.into_iter().map(SeriesItemDto::from).collect(),
         }
     }
-}
-
-#[flutter_rust_bridge::frb(sync)]
-pub fn infer_series_frb() -> Result<InferSeriesResultDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_infer_series())
-        .map(InferSeriesResultDto::from)
-        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb]
@@ -159,58 +147,34 @@ pub fn fetch_series_page_frb(
 }
 
 #[flutter_rust_bridge::frb(sync)]
-pub fn find_series_by_name_frb(name: String) -> Result<Option<SeriesDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_find(&name))
+pub fn find_series_by_id_frb(series_id: String) -> Result<Option<SeriesDto>, HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_find(&series_id))
         .map(|opt| opt.map(SeriesDto::from))
         .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]
-pub fn create_series_frb(name: String) -> Result<(), HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_create(&name)).map_err(HentaiErrorDto::from)
-}
-
-#[flutter_rust_bridge::frb(sync)]
-pub fn rename_series_frb(name: String, new_name: String) -> Result<(), HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_rename(&name, &new_name)).map_err(HentaiErrorDto::from)
-}
-
-#[flutter_rust_bridge::frb(sync)]
-pub fn delete_series_frb(name: String) -> Result<(), HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_delete(&name)).map_err(HentaiErrorDto::from)
-}
-
-#[flutter_rust_bridge::frb(sync)]
-pub fn assign_comic_exclusive_frb(
-    comic_id: String,
-    target_series_name: String,
-    sort_order: i32,
+pub fn update_series_user_meta_frb(
+    series_id: String,
+    meta: UpdateSeriesUserMetaFrbDto,
 ) -> Result<(), HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_assign(&comic_id, &target_series_name, sort_order))
-        .map_err(HentaiErrorDto::from)
-}
-
-#[flutter_rust_bridge::frb(sync)]
-pub fn remove_comic_from_series_frb(comic_id: String) -> Result<(), HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_remove_comic(&comic_id)).map_err(HentaiErrorDto::from)
-}
-
-#[flutter_rust_bridge::frb(sync)]
-pub fn remove_comics_from_series_frb(comic_ids: Vec<String>) -> Result<(), HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_remove_comics(comic_ids)).map_err(HentaiErrorDto::from)
-}
-
-#[flutter_rust_bridge::frb(sync)]
-pub fn remove_orphan_series_items_frb() -> Result<(), HentaiErrorDto> {
-    hentai_core::runtime::block_on(remove_orphan_series_items_public()).map_err(HentaiErrorDto::from)
+    hentai_core::runtime::block_on(core_update_meta(
+        &series_id,
+        CoreUpdateSeriesUserMeta {
+            serialization_status: meta.serialization_status,
+            total_count: meta.total_count,
+            clear_total_count: meta.clear_total_count,
+        },
+    ))
+    .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]
 pub fn set_series_items_order_frb(
-    series_name: String,
+    series_id: String,
     ordered_comic_ids: Vec<String>,
 ) -> Result<(), HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_set_order(&series_name, ordered_comic_ids))
+    hentai_core::runtime::block_on(core_set_order(&series_id, ordered_comic_ids))
         .map_err(HentaiErrorDto::from)
 }
 

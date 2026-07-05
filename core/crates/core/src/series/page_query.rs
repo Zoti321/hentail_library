@@ -16,7 +16,7 @@ pub fn build_count_query(filter: &SeriesFilterDto) -> PageSqlQuery {
     }
 }
 
-pub fn build_names_page_query(
+pub fn build_ids_page_query(
     filter: &SeriesFilterDto,
     sort_descending: bool,
     limit: i32,
@@ -29,7 +29,7 @@ pub fn build_names_page_query(
     values.push(Value::Int(Some(offset)));
     PageSqlQuery {
         sql: format!(
-            "SELECT s.name AS series_name FROM series s \
+            "SELECT s.series_id FROM series s \
              WHERE {where_clause} \
              ORDER BY lower(s.name) {order} \
              LIMIT ? OFFSET ?"
@@ -42,7 +42,7 @@ fn build_where_clause(filter: &SeriesFilterDto, values: &mut Vec<Value>) -> Stri
     let mut parts = vec!["1=1".to_string()];
     if filter.require_items {
         parts.push(
-            "EXISTS (SELECT 1 FROM series_items si WHERE si.series_name = s.name)".to_string(),
+            "EXISTS (SELECT 1 FROM series_items si WHERE si.series_id = s.series_id)".to_string(),
         );
     }
     if filter.r18_only {
@@ -50,7 +50,7 @@ fn build_where_clause(filter: &SeriesFilterDto, values: &mut Vec<Value>) -> Stri
             "EXISTS (\
              SELECT 1 FROM series_items si \
              INNER JOIN comic_meta cm ON cm.comic_id = si.comic_id \
-             WHERE si.series_name = s.name AND cm.content_rating = 'r18')"
+             WHERE si.series_id = s.series_id AND cm.content_rating = 'r18')"
                 .to_string(),
         );
     } else if !filter.show_r18 {
@@ -58,12 +58,13 @@ fn build_where_clause(filter: &SeriesFilterDto, values: &mut Vec<Value>) -> Stri
             "NOT EXISTS (\
              SELECT 1 FROM series_items si \
              INNER JOIN comic_meta cm ON cm.comic_id = si.comic_id \
-             WHERE si.series_name = s.name AND cm.content_rating = 'r18')"
+             WHERE si.series_id = s.series_id AND cm.content_rating = 'r18')"
                 .to_string(),
         );
     }
     if let Some(query) = &filter.query {
-        parts.push("lower(s.name) LIKE ?".to_string());
+        parts.push("(lower(s.name) LIKE ? OR lower(s.folder_path) LIKE ?)".to_string());
+        push_sqlite_text(values, format!("%{query}%"));
         push_sqlite_text(values, format!("%{query}%"));
     }
     parts.join(" AND ")

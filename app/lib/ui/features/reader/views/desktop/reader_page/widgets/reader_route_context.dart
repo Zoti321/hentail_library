@@ -28,10 +28,12 @@ class ReaderNavContextData {
 
 class SeriesReaderNavData {
   const SeriesReaderNavData({
+    required this.seriesId,
     required this.seriesName,
     required this.sortedItems,
     required this.currentIndex,
   });
+  final String seriesId;
   final String seriesName;
   final List<SeriesItem> sortedItems;
   final int currentIndex;
@@ -43,13 +45,13 @@ class ReaderRouteContext {
   const ReaderRouteContext({
     required this.comicId,
     required this.readType,
-    this.seriesName,
+    this.seriesId,
     this.incognito = false,
   });
 
   final String comicId;
   final ReaderReadType readType;
-  final String? seriesName;
+  final String? seriesId;
   final bool incognito;
 
   bool get isSeriesMode => readType == ReaderReadType.series;
@@ -57,21 +59,21 @@ class ReaderRouteContext {
   static ReaderRouteContext normalize({
     required String comicId,
     required String readType,
-    String? seriesName,
+    String? seriesId,
     bool incognito = false,
   }) {
     final ReaderReadType parsedType = readType == 'series'
         ? ReaderReadType.series
         : ReaderReadType.comic;
     final String normalizedComicId = comicId.trim();
-    final String? normalizedSeriesName =
-        seriesName != null && seriesName.isNotEmpty ? seriesName : null;
+    final String? normalizedSeriesId =
+        seriesId != null && seriesId.isNotEmpty ? seriesId : null;
     final bool isValidSeries =
-        parsedType == ReaderReadType.series && normalizedSeriesName != null;
+        parsedType == ReaderReadType.series && normalizedSeriesId != null;
     return ReaderRouteContext(
       comicId: normalizedComicId,
       readType: isValidSeries ? ReaderReadType.series : ReaderReadType.comic,
-      seriesName: isValidSeries ? normalizedSeriesName : null,
+      seriesId: isValidSeries ? normalizedSeriesId : null,
       incognito: incognito,
     );
   }
@@ -88,6 +90,7 @@ SeriesReaderNavData? buildSeriesReaderNavData(Series? series, String comicId) {
     return null;
   }
   return SeriesReaderNavData(
+    seriesId: series.id,
     seriesName: series.name,
     sortedItems: sorted,
     currentIndex: idx,

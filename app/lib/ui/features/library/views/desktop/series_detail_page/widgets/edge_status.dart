@@ -59,9 +59,22 @@ class SeriesDetailError extends StatelessWidget {
 }
 
 class SeriesNotFound extends StatelessWidget {
-  const SeriesNotFound({super.key, required this.seriesName});
+  const SeriesNotFound({super.key, this.seriesId, this.seriesName});
 
-  final String seriesName;
+  final String? seriesId;
+  final String? seriesName;
+
+  String get _displayLabel {
+    final String? name = seriesName?.trim();
+    if (name != null && name.isNotEmpty) {
+      return name;
+    }
+    final String? id = seriesId?.trim();
+    if (id != null && id.isNotEmpty) {
+      return id;
+    }
+    return '未知系列';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +89,7 @@ class SeriesNotFound extends StatelessWidget {
               size: 48,
               color: Theme.of(context).colorScheme.hentai.textTertiary,
             ),
-            label: '未找到系列「$seriesName」',
+            label: '未找到系列「$_displayLabel」',
             action: TextButton.icon(
               onPressed: () => context.go('/local'),
               icon: const Icon(LucideIcons.library, size: 16),

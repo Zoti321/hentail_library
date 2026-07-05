@@ -242,27 +242,22 @@ class _ManageSeriesTab extends ConsumerWidget {
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: TextField(
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    labelText: '搜索系列',
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (String value) {
-                    ref.read(seriesFilterProvider.notifier).setQuery(value);
-                  },
-                ),
-              ),
-              const SizedBox(width: 8),
-              FilledButton.icon(
-                onPressed: () => _onAddSeries(context, ref),
-                icon: const Icon(Icons.add),
-                label: const Text('新增'),
-              ),
-            ],
+          child: TextField(
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.search),
+              labelText: '搜索系列',
+              border: OutlineInputBorder(),
+            ),
+            onChanged: (String value) {
+              ref.read(seriesFilterProvider.notifier).setQuery(value);
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+          child: Text(
+            '系列由 Library 同步时根据文件夹结构自动生成',
+            style: Theme.of(context).textTheme.bodySmall,
           ),
         ),
         Expanded(
@@ -288,33 +283,15 @@ class _ManageSeriesTab extends ConsumerWidget {
                     child: ListTile(
                       leading: const Icon(Icons.layers_outlined),
                       title: Text(series.name),
-                      subtitle: Text('共 ${series.items.length} 本'),
+                      subtitle: Text(
+                        series.progressLabel == null
+                            ? '共 ${series.items.length} 本'
+                            : '共 ${series.items.length} 本 · ${series.progressLabel}',
+                      ),
                       onTap: () {
-                        final String encoded = Uri.encodeComponent(series.name);
+                        final String encoded = Uri.encodeComponent(series.id);
                         context.go('/series/$encoded');
                       },
-                      trailing: PopupMenuButton<String>(
-                        onSelected: (String value) async {
-                          if (value == 'rename') {
-                            await _onRenameSeries(context, ref, series);
-                            return;
-                          }
-                          if (value == 'delete') {
-                            await _onDeleteSeries(context, ref, series);
-                          }
-                        },
-                        itemBuilder: (BuildContext context) =>
-                            const <PopupMenuEntry<String>>[
-                              PopupMenuItem<String>(
-                                value: 'rename',
-                                child: Text('重命名'),
-                              ),
-                              PopupMenuItem<String>(
-                                value: 'delete',
-                                child: Text('删除'),
-                              ),
-                            ],
-                      ),
                     ),
                   );
                 },
@@ -328,90 +305,6 @@ class _ManageSeriesTab extends ConsumerWidget {
         ),
       ],
     );
-  }
-
-  Future<void> _onAddSeries(BuildContext context, WidgetRef ref) async {
-    final String? input = await _showNameDialog(context, title: '新增系列');
-    if (input == null || input.trim().isEmpty) {
-      return;
-    }
-    try {
-      await ref.read(seriesActionsProvider).create(input.trim());
-      if (!context.mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('系列已创建')));
-    } catch (error) {
-      if (!context.mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('创建失败：$error')));
-    }
-  }
-
-  Future<void> _onRenameSeries(
-    BuildContext context,
-    WidgetRef ref,
-    Series series,
-  ) async {
-    final String? input = await _showNameDialog(
-      context,
-      title: '重命名系列',
-      initialValue: series.name,
-    );
-    if (input == null || input.trim().isEmpty) {
-      return;
-    }
-    try {
-      await ref.read(seriesActionsProvider).rename(series.name, input.trim());
-      if (!context.mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('系列已重命名')));
-    } catch (error) {
-      if (!context.mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('重命名失败：$error')));
-    }
-  }
-
-  Future<void> _onDeleteSeries(
-    BuildContext context,
-    WidgetRef ref,
-    Series series,
-  ) async {
-    final bool confirmed = await _showDeleteConfirmDialog(
-      context,
-      message: '确认删除系列「${series.name}」吗？',
-    );
-    if (!confirmed) {
-      return;
-    }
-    try {
-      await ref.read(seriesActionsProvider).delete(series.name);
-      if (!context.mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('系列已删除')));
-    } catch (error) {
-      if (!context.mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('删除失败：$error')));
-    }
   }
 }
 

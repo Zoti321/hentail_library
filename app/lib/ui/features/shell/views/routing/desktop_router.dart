@@ -58,8 +58,8 @@ final GoRouter desktopRouter = GoRouter(
         ...buildSharedContentRoutes(
           comicDetailBuilder: (BuildContext context, String comicId) =>
               ComicDetailPage(comicId: comicId),
-          seriesDetailBuilder: (BuildContext context, String seriesName) =>
-              SeriesDetailPage(seriesName: seriesName),
+          seriesDetailBuilder: (BuildContext context, String seriesId) =>
+              SeriesDetailPage(seriesId: seriesId),
         ),
       ],
     ),

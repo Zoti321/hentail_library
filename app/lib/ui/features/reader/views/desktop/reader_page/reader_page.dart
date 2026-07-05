@@ -17,14 +17,14 @@ class ReaderPage extends HookConsumerWidget {
     super.key,
     required this.comicId,
     required this.readType,
-    this.seriesName,
+    this.seriesId,
     this.keepControlsOpen = false,
     this.incognito = false,
   });
 
   final String comicId;
   final String readType;
-  final String? seriesName;
+  final String? seriesId;
   final bool keepControlsOpen;
   final bool incognito;
 
@@ -33,7 +33,7 @@ class ReaderPage extends HookConsumerWidget {
     final ReaderRouteContext routeContext = ReaderRouteContext.normalize(
       comicId: comicId,
       readType: readType,
-      seriesName: seriesName,
+      seriesId: seriesId,
       incognito: incognito,
     );
     final ReaderViewKey viewKey = readerViewKey(
@@ -53,7 +53,7 @@ class ReaderPage extends HookConsumerWidget {
       readerPageViewModelProvider(
         comicId: routeContext.comicId,
         isSeriesMode: routeContext.isSeriesMode,
-        seriesName: routeContext.seriesName,
+        seriesId: routeContext.seriesId,
         incognito: routeContext.incognito,
       ),
     );
