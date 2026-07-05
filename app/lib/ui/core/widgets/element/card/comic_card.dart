@@ -171,7 +171,7 @@ class ComicCard extends HookConsumerWidget {
               // 封面图容器
               _buildCover(context, coverData, isHover.value),
               // --- 文本信息区域 ---
-              _buildInfoSection(isHover.value, context, comic.pageCount ?? 0),
+              _buildInfoSection(isHover.value, context, comic.pageCount),
             ],
           ),
         ),

@@ -21,9 +21,14 @@ pub struct ComicDto {
     pub comic_id: String,
     pub path: String,
     pub resource_type: String,
+    pub resource_size: i64,
+    pub created_at: i64,
+    pub last_updated_at: i64,
     pub title: String,
     pub content_rating: String,
-    pub page_count: Option<i32>,
+    pub page_count: i32,
+    pub description: Option<String>,
+    pub published_at: Option<i64>,
     pub authors: Vec<String>,
     pub tags: Vec<String>,
 }
@@ -53,9 +58,14 @@ impl From<hentai_core::ComicDto> for ComicDto {
             comic_id: value.comic_id,
             path: value.path,
             resource_type: value.resource_type,
+            resource_size: value.resource_size,
+            created_at: value.created_at,
+            last_updated_at: value.last_updated_at,
             title: value.title,
             content_rating: value.content_rating,
             page_count: value.page_count,
+            description: value.description,
+            published_at: value.published_at,
             authors: value.authors,
             tags: value.tags,
         }
@@ -144,6 +154,8 @@ pub fn search_by_keyword_frb(keyword: String) -> Result<Vec<ComicDto>, HentaiErr
 pub struct UpdateComicUserMetaFrbDto {
     pub title: Option<String>,
     pub content_rating: Option<String>,
+    pub description: Option<String>,
+    pub published_at: Option<i64>,
     pub authors: Option<Vec<String>>,
     pub tags: Option<Vec<String>>,
 }
@@ -164,6 +176,8 @@ pub fn update_comic_user_meta_frb(
         hentai_core::UpdateComicUserMetaDto {
             title: meta.title,
             content_rating: meta.content_rating,
+            description: meta.description,
+            published_at: meta.published_at,
             authors: meta.authors,
             tags: meta.tags,
         },

@@ -49,16 +49,16 @@ fn build_where_clause(filter: &SeriesFilterDto, values: &mut Vec<Value>) -> Stri
         parts.push(
             "EXISTS (\
              SELECT 1 FROM series_items si \
-             INNER JOIN comics c ON c.comic_id = si.comic_id \
-             WHERE si.series_name = s.name AND c.content_rating = 'r18')"
+             INNER JOIN comic_meta cm ON cm.comic_id = si.comic_id \
+             WHERE si.series_name = s.name AND cm.content_rating = 'r18')"
                 .to_string(),
         );
     } else if !filter.show_r18 {
         parts.push(
             "NOT EXISTS (\
              SELECT 1 FROM series_items si \
-             INNER JOIN comics c ON c.comic_id = si.comic_id \
-             WHERE si.series_name = s.name AND c.content_rating = 'r18')"
+             INNER JOIN comic_meta cm ON cm.comic_id = si.comic_id \
+             WHERE si.series_name = s.name AND cm.content_rating = 'r18')"
                 .to_string(),
         );
     }

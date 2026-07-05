@@ -65,9 +65,14 @@ class ComicDto {
   final String comicId;
   final String path;
   final String resourceType;
+  final PlatformInt64 resourceSize;
+  final PlatformInt64 createdAt;
+  final PlatformInt64 lastUpdatedAt;
   final String title;
   final String contentRating;
-  final int? pageCount;
+  final int pageCount;
+  final String? description;
+  final PlatformInt64? publishedAt;
   final List<String> authors;
   final List<String> tags;
 
@@ -75,9 +80,14 @@ class ComicDto {
     required this.comicId,
     required this.path,
     required this.resourceType,
+    required this.resourceSize,
+    required this.createdAt,
+    required this.lastUpdatedAt,
     required this.title,
     required this.contentRating,
-    this.pageCount,
+    required this.pageCount,
+    this.description,
+    this.publishedAt,
     required this.authors,
     required this.tags,
   });
@@ -87,9 +97,14 @@ class ComicDto {
       comicId.hashCode ^
       path.hashCode ^
       resourceType.hashCode ^
+      resourceSize.hashCode ^
+      createdAt.hashCode ^
+      lastUpdatedAt.hashCode ^
       title.hashCode ^
       contentRating.hashCode ^
       pageCount.hashCode ^
+      description.hashCode ^
+      publishedAt.hashCode ^
       authors.hashCode ^
       tags.hashCode;
 
@@ -101,9 +116,14 @@ class ComicDto {
           comicId == other.comicId &&
           path == other.path &&
           resourceType == other.resourceType &&
+          resourceSize == other.resourceSize &&
+          createdAt == other.createdAt &&
+          lastUpdatedAt == other.lastUpdatedAt &&
           title == other.title &&
           contentRating == other.contentRating &&
           pageCount == other.pageCount &&
+          description == other.description &&
+          publishedAt == other.publishedAt &&
           authors == other.authors &&
           tags == other.tags;
 }
@@ -220,12 +240,16 @@ class PagedComicResultDto {
 class UpdateComicUserMetaFrbDto {
   final String? title;
   final String? contentRating;
+  final String? description;
+  final PlatformInt64? publishedAt;
   final List<String>? authors;
   final List<String>? tags;
 
   const UpdateComicUserMetaFrbDto({
     this.title,
     this.contentRating,
+    this.description,
+    this.publishedAt,
     this.authors,
     this.tags,
   });
@@ -237,6 +261,8 @@ class UpdateComicUserMetaFrbDto {
   int get hashCode =>
       title.hashCode ^
       contentRating.hashCode ^
+      description.hashCode ^
+      publishedAt.hashCode ^
       authors.hashCode ^
       tags.hashCode;
 
@@ -247,6 +273,8 @@ class UpdateComicUserMetaFrbDto {
           runtimeType == other.runtimeType &&
           title == other.title &&
           contentRating == other.contentRating &&
+          description == other.description &&
+          publishedAt == other.publishedAt &&
           authors == other.authors &&
           tags == other.tags;
 }

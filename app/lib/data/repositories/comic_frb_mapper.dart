@@ -14,11 +14,18 @@ Comic mapRustComic(rust.ComicDto dto) {
     comicId: dto.comicId,
     path: dto.path,
     resourceType: ResourceType.values.byName(dto.resourceType),
+    resourceSize: dto.resourceSize.toInt(),
+    createdAt: comicTimestampFromMs(dto.createdAt.toInt()),
+    lastUpdatedAt: comicTimestampFromMs(dto.lastUpdatedAt.toInt()),
     title: dto.title,
     authors: dto.authors.map((String n) => Author(name: n)).toList(),
     contentRating: ContentRating.values.byName(dto.contentRating),
     tags: dto.tags.map((String n) => Tag(name: n)).toList(),
     pageCount: dto.pageCount,
+    description: dto.description,
+    publishedAt: dto.publishedAt == null
+        ? null
+        : comicTimestampFromMs(dto.publishedAt!.toInt()),
   );
 }
 

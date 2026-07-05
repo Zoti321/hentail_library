@@ -3,10 +3,10 @@ use sea_orm::{
     Set, Statement, TransactionTrait,
 };
 
-use crate::comic::ComicDto;
+use crate::comic::{now_ms, ComicDto};
 use crate::db::map_db_err;
 use crate::entity::{
-    authors, comic_authors, comic_tags, comic_thumbnails, comics, prelude::*, tags,
+    authors, comic_authors, comic_meta, comic_tags, comic_thumbnails, comics, prelude::*, tags,
 };
 use crate::error::HentaiError;
 
@@ -137,34 +137,125 @@ pub async fn remove_orphan_series_items<C: ConnectionTrait>(db: &C) -> Result<()
 
 async fn upsert_comics<C: ConnectionTrait>(db: &C, comics_list: &[ComicDto]) -> Result<(), HentaiError> {
     for comic in comics_list {
-        let active = comics::ActiveModel {
+        if comic.page_count <= 0 {
+            continue;
+        }
+        let existing_comic = Comics::find_by_id(comic.comic_id.clone())
+            .one(db)
+            .await
+            .map_err(map_db_err)?;
+        let existing_meta = ComicMeta::find_by_id(comic.comic_id.clone())
+            .one(db)
+            .await
+            .map_err(map_db_err)?;
+        let is_new = existing_comic.is_none();
+        let now = now_ms();
+        let created_at = if is_new {
+            now
+        } else {
+            comic.created_at
+        };
+        let mut changed = is_new;
+        if let Some(ref row) = existing_comic {
+            changed |= row.path != comic.path
+                || row.resource_type != comic.resource_type
+                || row.resource_size != comic.resource_size;
+        }
+        if let Some(ref row) = existing_meta {
+            changed |= row.title != comic.title
+                || row.content_rating != comic.content_rating
+                || row.page_count != comic.page_count
+                || row.description != comic.description
+                || row.published_at != comic.published_at;
+        }
+        if !is_new {
+            let existing_authors = load_author_names_for_comic(db, &comic.comic_id).await?;
+            let existing_tags = load_tag_names_for_comic(db, &comic.comic_id).await?;
+            changed |= existing_authors != comic.authors || existing_tags != comic.tags;
+        }
+        let last_updated_at = if changed { now } else { comic.last_updated_at };
+
+        let comic_active = comics::ActiveModel {
             comic_id: Set(comic.comic_id.clone()),
             path: Set(comic.path.clone()),
             resource_type: Set(comic.resource_type.clone()),
-            title: Set(comic.title.clone()),
-            content_rating: Set(comic.content_rating.clone()),
-            page_count: Set(comic.page_count),
+            resource_size: Set(comic.resource_size),
+            created_at: Set(created_at),
+            last_updated_at: Set(last_updated_at),
             ..Default::default()
         };
-        Comics::insert(active)
+        Comics::insert(comic_active)
             .on_conflict(
                 sea_orm::sea_query::OnConflict::column(comics::Column::ComicId)
                     .update_columns([
                         comics::Column::Path,
                         comics::Column::ResourceType,
-                        comics::Column::Title,
-                        comics::Column::ContentRating,
-                        comics::Column::PageCount,
+                        comics::Column::ResourceSize,
+                        comics::Column::LastUpdatedAt,
                     ])
                     .to_owned(),
             )
             .exec(db)
             .await
             .map_err(map_db_err)?;
+
+        let meta_active = comic_meta::ActiveModel {
+            comic_id: Set(comic.comic_id.clone()),
+            title: Set(comic.title.clone()),
+            content_rating: Set(comic.content_rating.clone()),
+            page_count: Set(comic.page_count),
+            description: Set(comic.description.clone()),
+            published_at: Set(comic.published_at),
+            ..Default::default()
+        };
+        ComicMeta::insert(meta_active)
+            .on_conflict(
+                sea_orm::sea_query::OnConflict::column(comic_meta::Column::ComicId)
+                    .update_columns([
+                        comic_meta::Column::Title,
+                        comic_meta::Column::ContentRating,
+                        comic_meta::Column::PageCount,
+                        comic_meta::Column::Description,
+                        comic_meta::Column::PublishedAt,
+                    ])
+                    .to_owned(),
+            )
+            .exec(db)
+            .await
+            .map_err(map_db_err)?;
+
         replace_comic_authors(db, &comic.comic_id, &comic.authors).await?;
         replace_comic_tags(db, &comic.comic_id, &comic.tags).await?;
     }
     Ok(())
+}
+
+async fn load_author_names_for_comic<C: ConnectionTrait>(
+    db: &C,
+    comic_id: &str,
+) -> Result<Vec<String>, HentaiError> {
+    let rows = ComicAuthors::find()
+        .filter(comic_authors::Column::ComicId.eq(comic_id))
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let mut names: Vec<String> = rows.into_iter().map(|r| r.author_name).collect();
+    names.sort();
+    Ok(names)
+}
+
+async fn load_tag_names_for_comic<C: ConnectionTrait>(
+    db: &C,
+    comic_id: &str,
+) -> Result<Vec<String>, HentaiError> {
+    let rows = ComicTags::find()
+        .filter(comic_tags::Column::ComicId.eq(comic_id))
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let mut names: Vec<String> = rows.into_iter().map(|r| r.tag_name).collect();
+    names.sort();
+    Ok(names)
 }
 
 pub async fn replace_comic_authors<C: ConnectionTrait>(

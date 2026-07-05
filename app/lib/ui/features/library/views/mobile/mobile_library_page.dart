@@ -252,7 +252,7 @@ class _LibraryEmptyView extends StatelessWidget {
 
 String _buildComicSubtitle(Comic comic) {
   final String rating = comic.contentRating.name.toUpperCase();
-  final int pageCount = comic.pageCount ?? 0;
+  final int pageCount = comic.pageCount;
   final int tagCount = comic.tags.length;
   return '评级: $rating  页数: $pageCount  标签: $tagCount';
 }

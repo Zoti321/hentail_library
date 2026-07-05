@@ -32,11 +32,16 @@ class _FakeComicPageSourcePort implements ComicPageSourcePort {
 }
 
 Comic _inputComic() {
+  final DateTime now = DateTime.utc(2026, 1, 1);
   return Comic(
     comicId: 'c1',
     path: '/tmp/comic',
     resourceType: ResourceType.zip,
+    resourceSize: 1024,
+    createdAt: now,
+    lastUpdatedAt: now,
     title: 'Test',
+    pageCount: 1,
   );
 }
 

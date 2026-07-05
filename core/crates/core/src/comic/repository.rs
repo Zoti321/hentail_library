@@ -7,7 +7,7 @@ use sea_orm::{
 use sea_orm::sea_query::Expr;
 
 use crate::db::{connection, map_db_err};
-use crate::entity::{comic_authors, comic_tags, comics, prelude::*};
+use crate::entity::{comic_authors, comic_meta, comic_tags, comics, prelude::*};
 use crate::error::HentaiError;
 
 use super::dto::{
@@ -81,7 +81,9 @@ pub async fn search_by_keyword(keyword: &str) -> Result<Vec<ComicDto>, HentaiErr
     let db = connection()?;
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT comic_id FROM comics WHERE lower(title) LIKE ?",
+        "SELECT c.comic_id FROM comics c \
+         INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
+         WHERE lower(m.title) LIKE ?",
         vec![Value::String(Some(Box::new(format!("%{q}%"))))],
     );
     let comic_ids = query_ids_from_stmt(&db, stmt).await?;
@@ -155,8 +157,17 @@ pub async fn load_comics_ordered(
         .all(db)
         .await
         .map_err(map_db_err)?;
+    let meta_models = ComicMeta::find()
+        .filter(Expr::col(comic_meta::Column::ComicId).is_in(comic_ids.clone()))
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
     let mut by_id: HashMap<String, comics::Model> =
         models.into_iter().map(|m| (m.comic_id.clone(), m)).collect();
+    let meta_by_id: HashMap<String, comic_meta::Model> = meta_models
+        .into_iter()
+        .map(|m| (m.comic_id.clone(), m))
+        .collect();
     let tag_map = load_tag_names(db, &comic_ids).await?;
     let author_map = load_author_names(db, &comic_ids).await?;
     let mut result = Vec::with_capacity(comic_ids.len());
@@ -164,13 +175,21 @@ pub async fn load_comics_ordered(
         let Some(model) = by_id.remove(&id) else {
             continue;
         };
+        let Some(meta) = meta_by_id.get(&model.comic_id) else {
+            continue;
+        };
         result.push(ComicDto {
             comic_id: model.comic_id.clone(),
             path: model.path,
             resource_type: model.resource_type,
-            title: model.title,
-            content_rating: model.content_rating,
-            page_count: model.page_count,
+            resource_size: model.resource_size,
+            created_at: model.created_at,
+            last_updated_at: model.last_updated_at,
+            title: meta.title.clone(),
+            content_rating: meta.content_rating.clone(),
+            page_count: meta.page_count,
+            description: meta.description.clone(),
+            published_at: meta.published_at,
             authors: author_map.get(&model.comic_id).cloned().unwrap_or_default(),
             tags: tag_map.get(&model.comic_id).cloned().unwrap_or_default(),
         });

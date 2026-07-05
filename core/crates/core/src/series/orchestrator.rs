@@ -48,9 +48,14 @@ async fn load_unassigned_comics(
     assigned: &HashSet<String>,
 ) -> Result<Vec<ComicTitleInput>, HentaiError> {
     let rows = Comics::find().all(db).await.map_err(map_db_err)?;
-    Ok(rows
+    let comic_ids: Vec<String> = rows
         .into_iter()
         .filter(|c| !assigned.contains(&c.comic_id))
+        .map(|c| c.comic_id)
+        .collect();
+    let comics = crate::comic::load_comics_ordered(db, comic_ids).await?;
+    Ok(comics
+        .into_iter()
         .map(|c| ComicTitleInput {
             comic_id: c.comic_id,
             title: c.title,

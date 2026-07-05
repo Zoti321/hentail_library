@@ -25,9 +25,7 @@ class ComicDetailMetadataSection extends HookConsumerWidget {
         );
     final List<String> tags = comic.tags.map((t) => t.name).toList();
     final List<String> authors = comic.authors.map((a) => a.name).toList();
-    final String pageLabel = pageCount == null || pageCount == 0
-        ? '未知'
-        : '$pageCount 页';
+    final String pageLabel = pageCount == 0 ? '未知' : '$pageCount 页';
     final String formatLabel = comic.resourceType.name.toUpperCase();
     final AppThemeTokens tokens = context.tokens;
 

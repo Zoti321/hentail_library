@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS series_reading_histories (
 
 INSERT INTO comics (comic_id, path, resource_type, title, content_rating, page_count) VALUES
   ('86408880d30b0de95ca959feb60a3b72dcb1889b', 'C:/漫画/test.zip', 'zip', '测试漫画', 'safe', 42),
-  ('af738b6b1b3bbfab9a0fd591459572509d7ef4d5', '/home/user/comics/foo.cbz', 'cbz', 'POSIX 漫画', 'unknown', NULL),
+  ('af738b6b1b3bbfab9a0fd591459572509d7ef4d5', '/home/user/comics/foo.cbz', 'cbz', 'POSIX 漫画', 'unknown', 12),
   ('e931fd412112e427f7335e127af79c8b0f87887b', 'C:/漫画/子目录', 'dir', 'R18 样本', 'r18', 10);
 
 INSERT INTO authors (name) VALUES ('作者A'), ('作者B');

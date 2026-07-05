@@ -2452,6 +2452,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_i_64(raw);
+  }
+
+  @protected
   PageRequestDto dco_decode_box_autoadd_page_request_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_page_request_dto(raw);
@@ -2494,17 +2500,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ComicDto dco_decode_comic_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 13)
+      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
     return ComicDto(
       comicId: dco_decode_String(arr[0]),
       path: dco_decode_String(arr[1]),
       resourceType: dco_decode_String(arr[2]),
-      title: dco_decode_String(arr[3]),
-      contentRating: dco_decode_String(arr[4]),
-      pageCount: dco_decode_opt_box_autoadd_i_32(arr[5]),
-      authors: dco_decode_list_String(arr[6]),
-      tags: dco_decode_list_String(arr[7]),
+      resourceSize: dco_decode_i_64(arr[3]),
+      createdAt: dco_decode_i_64(arr[4]),
+      lastUpdatedAt: dco_decode_i_64(arr[5]),
+      title: dco_decode_String(arr[6]),
+      contentRating: dco_decode_String(arr[7]),
+      pageCount: dco_decode_i_32(arr[8]),
+      description: dco_decode_opt_String(arr[9]),
+      publishedAt: dco_decode_opt_box_autoadd_i_64(arr[10]),
+      authors: dco_decode_list_String(arr[11]),
+      tags: dco_decode_list_String(arr[12]),
     );
   }
 
@@ -2713,6 +2724,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   int? dco_decode_opt_box_autoadd_i_32(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_i_32(raw);
+  }
+
+  @protected
+  PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_i_64(raw);
   }
 
   @protected
@@ -2965,13 +2982,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return UpdateComicUserMetaFrbDto(
       title: dco_decode_opt_String(arr[0]),
       contentRating: dco_decode_opt_String(arr[1]),
-      authors: dco_decode_opt_list_String(arr[2]),
-      tags: dco_decode_opt_list_String(arr[3]),
+      description: dco_decode_opt_String(arr[2]),
+      publishedAt: dco_decode_opt_box_autoadd_i_64(arr[3]),
+      authors: dco_decode_opt_list_String(arr[4]),
+      tags: dco_decode_opt_list_String(arr[5]),
     );
   }
 
@@ -3165,6 +3184,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_i_64(deserializer));
+  }
+
+  @protected
   PageRequestDto sse_decode_box_autoadd_page_request_dto(
     SseDeserializer deserializer,
   ) {
@@ -3217,18 +3242,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_comicId = sse_decode_String(deserializer);
     var var_path = sse_decode_String(deserializer);
     var var_resourceType = sse_decode_String(deserializer);
+    var var_resourceSize = sse_decode_i_64(deserializer);
+    var var_createdAt = sse_decode_i_64(deserializer);
+    var var_lastUpdatedAt = sse_decode_i_64(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_contentRating = sse_decode_String(deserializer);
-    var var_pageCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_pageCount = sse_decode_i_32(deserializer);
+    var var_description = sse_decode_opt_String(deserializer);
+    var var_publishedAt = sse_decode_opt_box_autoadd_i_64(deserializer);
     var var_authors = sse_decode_list_String(deserializer);
     var var_tags = sse_decode_list_String(deserializer);
     return ComicDto(
       comicId: var_comicId,
       path: var_path,
       resourceType: var_resourceType,
+      resourceSize: var_resourceSize,
+      createdAt: var_createdAt,
+      lastUpdatedAt: var_lastUpdatedAt,
       title: var_title,
       contentRating: var_contentRating,
       pageCount: var_pageCount,
+      description: var_description,
+      publishedAt: var_publishedAt,
       authors: var_authors,
       tags: var_tags,
     );
@@ -3522,6 +3557,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_i_32(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_i_64(deserializer));
     } else {
       return null;
     }
@@ -3825,11 +3871,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_title = sse_decode_opt_String(deserializer);
     var var_contentRating = sse_decode_opt_String(deserializer);
+    var var_description = sse_decode_opt_String(deserializer);
+    var var_publishedAt = sse_decode_opt_box_autoadd_i_64(deserializer);
     var var_authors = sse_decode_opt_list_String(deserializer);
     var var_tags = sse_decode_opt_list_String(deserializer);
     return UpdateComicUserMetaFrbDto(
       title: var_title,
       contentRating: var_contentRating,
+      description: var_description,
+      publishedAt: var_publishedAt,
       authors: var_authors,
       tags: var_tags,
     );
@@ -4109,6 +4159,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_i_64(
+    PlatformInt64 self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_64(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_page_request_dto(
     PageRequestDto self,
     SseSerializer serializer,
@@ -4168,9 +4227,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.comicId, serializer);
     sse_encode_String(self.path, serializer);
     sse_encode_String(self.resourceType, serializer);
+    sse_encode_i_64(self.resourceSize, serializer);
+    sse_encode_i_64(self.createdAt, serializer);
+    sse_encode_i_64(self.lastUpdatedAt, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_String(self.contentRating, serializer);
-    sse_encode_opt_box_autoadd_i_32(self.pageCount, serializer);
+    sse_encode_i_32(self.pageCount, serializer);
+    sse_encode_opt_String(self.description, serializer);
+    sse_encode_opt_box_autoadd_i_64(self.publishedAt, serializer);
     sse_encode_list_String(self.authors, serializer);
     sse_encode_list_String(self.tags, serializer);
   }
@@ -4420,6 +4484,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_i_32(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_i_64(
+    PlatformInt64? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_i_64(self, serializer);
     }
   }
 
@@ -4678,6 +4755,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_opt_String(self.title, serializer);
     sse_encode_opt_String(self.contentRating, serializer);
+    sse_encode_opt_String(self.description, serializer);
+    sse_encode_opt_box_autoadd_i_64(self.publishedAt, serializer);
     sse_encode_opt_list_String(self.authors, serializer);
     sse_encode_opt_list_String(self.tags, serializer);
   }

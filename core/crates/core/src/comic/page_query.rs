@@ -7,11 +7,15 @@ pub struct PageSqlQuery {
     pub values: Vec<Value>,
 }
 
+const COMIC_META_JOIN: &str = "INNER JOIN comic_meta m ON m.comic_id = c.comic_id";
+
 pub fn build_count_query(filter: &ComicFilterDto) -> PageSqlQuery {
     let mut values = Vec::new();
     let where_clause = build_where_clause(filter, &mut values);
     PageSqlQuery {
-        sql: format!("SELECT COUNT(*) AS c FROM comics c WHERE {where_clause}"),
+        sql: format!(
+            "SELECT COUNT(*) AS c FROM comics c {COMIC_META_JOIN} WHERE {where_clause}"
+        ),
         values,
     }
 }
@@ -29,9 +33,9 @@ pub fn build_ids_page_query(
     values.push(Value::Int(Some(offset)));
     PageSqlQuery {
         sql: format!(
-            "SELECT c.comic_id AS comic_id FROM comics c \
+            "SELECT c.comic_id AS comic_id FROM comics c {COMIC_META_JOIN} \
              WHERE {where_clause} \
-             ORDER BY lower(c.title) {order} \
+             ORDER BY lower(m.title) {order} \
              LIMIT ? OFFSET ?"
         ),
         values,
@@ -41,12 +45,12 @@ pub fn build_ids_page_query(
 fn build_where_clause(filter: &ComicFilterDto, values: &mut Vec<Value>) -> String {
     let mut parts = vec!["1=1".to_string()];
     if !filter.show_r18 {
-        parts.push("c.content_rating != 'r18'".to_string());
+        parts.push("m.content_rating != 'r18'".to_string());
     }
     if let Some(query) = &filter.query {
         let pattern = format!("%{query}%");
         parts.push(
-            "(lower(c.title) LIKE ? OR EXISTS (\
+            "(lower(m.title) LIKE ? OR EXISTS (\
              SELECT 1 FROM comic_authors ca \
              WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) LIKE ?))"
                 .to_string(),
@@ -63,7 +67,7 @@ fn build_where_clause(filter: &ComicFilterDto, values: &mut Vec<Value>) -> Strin
     }
     if !filter.content_ratings.is_empty() {
         let placeholders = placeholders(filter.content_ratings.len());
-        parts.push(format!("c.content_rating IN ({placeholders})"));
+        parts.push(format!("m.content_rating IN ({placeholders})"));
         for rating in &filter.content_ratings {
             push_sqlite_text(values, rating.clone());
         }

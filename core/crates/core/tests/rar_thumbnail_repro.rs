@@ -17,7 +17,7 @@ fn rar_thumbnail_pipeline_includes_recognized_archives() {
     let parsed = parse_rar_archive(path, "rar")
         .expect("parse rar")
         .expect("rar should be recognized as comic");
-    assert!(parsed.page_count.unwrap_or(0) > 0, "rar should contain image pages");
+    assert!(parsed.page_count > 0, "rar should contain image pages");
     assert!(
         can_generate_thumbnail("rar"),
         "rar should be eligible for thumbnail generation"

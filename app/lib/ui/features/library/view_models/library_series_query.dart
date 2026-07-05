@@ -66,7 +66,7 @@ class LibrarySeriesQuery {
         });
         return sorted;
       case LibraryComicSortField.createdAt:
-      case LibraryComicSortField.updatedAt:
+      case LibraryComicSortField.lastUpdatedAt:
       case LibraryComicSortField.publishedAt:
       case LibraryComicSortField.readAt:
       case LibraryComicSortField.fileSize:

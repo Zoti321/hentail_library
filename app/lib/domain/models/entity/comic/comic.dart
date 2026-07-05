@@ -11,13 +11,23 @@ abstract class Comic with _$Comic {
     required String comicId,
     required String path,
     required ResourceType resourceType,
+    required int resourceSize,
+    required DateTime createdAt,
+    required DateTime lastUpdatedAt,
     required String title,
 
     @Default(<Author>[]) List<Author> authors,
     @Default(ContentRating.unknown) ContentRating contentRating,
     @Default(<Tag>[]) List<Tag> tags,
-    int? pageCount,
+    required int pageCount,
+    String? description,
+    DateTime? publishedAt,
   }) = _Comic;
 
   Comic._();
 }
+
+DateTime comicTimestampFromMs(int ms) =>
+    DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true);
+
+int comicTimestampToMs(DateTime dateTime) => dateTime.toUtc().millisecondsSinceEpoch;

@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -32,11 +29,9 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
           data: (List<ReaderPageImageData> refs) => refs.length,
           orElse: () => comic.pageCount,
         );
-    final String? pageLabel = pageCount == null || pageCount == 0
-        ? null
-        : '$pageCount 页';
+    final String? pageLabel = pageCount == 0 ? null : '$pageCount 页';
     final bool showR18 = comic.contentRating == ContentRating.r18;
-    final String? publishedLabel = formatComicPublishedDate(null);
+    final String? publishedLabel = formatComicPublishedDate(comic.publishedAt);
 
     if (pageLabel == null && !showR18 && publishedLabel == null) {
       return const SizedBox.shrink();
@@ -79,7 +74,7 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
 }
 
 /// 作者、标签与资源信息统一信息区。
-class ComicDetailMetadataBlock extends HookWidget {
+class ComicDetailMetadataBlock extends StatelessWidget {
   const ComicDetailMetadataBlock({super.key, required this.comic});
 
   final Comic comic;
@@ -89,17 +84,17 @@ class ComicDetailMetadataBlock extends HookWidget {
     final AppThemeTokens tokens = context.tokens;
     final List<String> authors = comic.authors.map((a) => a.name).toList();
     final List<String> tags = comic.tags.map((t) => t.name).toList();
-    final AsyncSnapshot<ComicFileTimestamps?> timestampsSnapshot = useFuture(
-      useMemoized(() => loadComicFileTimestamps(comic.path), <Object?>[comic.path]),
-    );
-    final ComicFileTimestamps? timestamps = timestampsSnapshot.data;
-
     final List<Widget> rows = <Widget>[];
     if (authors.isNotEmpty) {
       rows.add(LabeledMetaChipRow(label: '作者', items: authors));
     }
     if (tags.isNotEmpty) {
       rows.add(LabeledMetaChipRow(label: '标签', items: tags));
+    }
+    if (comic.description != null && comic.description!.trim().isNotEmpty) {
+      rows.add(
+        ComicDetailInfoRow(label: '概要', value: comic.description!.trim()),
+      );
     }
     rows.add(
       ComicDetailInfoRow(
@@ -109,24 +104,24 @@ class ComicDetailMetadataBlock extends HookWidget {
     );
     rows.add(
       ComicDetailInfoRow(
+        label: '资源大小',
+        value: formatComicResourceSize(comic.resourceSize),
+      ),
+    );
+    rows.add(
+      ComicDetailInfoRow(
         label: '资源路径',
         value: comic.path,
         tooltip: comic.path,
       ),
     );
-    if (timestamps != null) {
-      final String? createdLabel = formatComicDetailDateTime(timestamps.createdAt);
-      if (createdLabel != null) {
-        rows.add(ComicDetailInfoRow(label: '创建于', value: createdLabel));
-      }
-      final String? modifiedLabel = formatComicDetailDateTime(
-        timestamps.modifiedAt,
-      );
-      if (modifiedLabel != null) {
-        rows.add(
-          ComicDetailInfoRow(label: '最后修改时间', value: modifiedLabel),
-        );
-      }
+    final String? createdLabel = formatComicDetailDateTime(comic.createdAt);
+    if (createdLabel != null) {
+      rows.add(ComicDetailInfoRow(label: '添加时间', value: createdLabel));
+    }
+    final String? updatedLabel = formatComicDetailDateTime(comic.lastUpdatedAt);
+    if (updatedLabel != null) {
+      rows.add(ComicDetailInfoRow(label: '更新时间', value: updatedLabel));
     }
 
     return Column(
@@ -137,26 +132,18 @@ class ComicDetailMetadataBlock extends HookWidget {
   }
 }
 
-class ComicFileTimestamps {
-  const ComicFileTimestamps({
-    required this.createdAt,
-    required this.modifiedAt,
-  });
 
-  final DateTime createdAt;
-  final DateTime modifiedAt;
-}
-
-Future<ComicFileTimestamps?> loadComicFileTimestamps(String path) async {
-  try {
-    final FileStat stat = await File(path).stat();
-    return ComicFileTimestamps(
-      createdAt: stat.changed,
-      modifiedAt: stat.modified,
-    );
-  } on Object {
-    return null;
+String formatComicResourceSize(int bytes) {
+  if (bytes < 1024) {
+    return '$bytes B';
   }
+  if (bytes < 1024 * 1024) {
+    return '${(bytes / 1024).toStringAsFixed(1)} KB';
+  }
+  if (bytes < 1024 * 1024 * 1024) {
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+  return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
 }
 
 class LabeledMetaChipRow extends StatelessWidget {
