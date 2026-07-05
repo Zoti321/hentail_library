@@ -31,20 +31,13 @@ extension ReadingModeX on ReadingMode {
 
   bool get supportsAutoPlay => !isContinuousVertical;
 
-  /// #32 仅实现 [ReadingMode.paged] viewport；双页模式暂回落到单页。
-  ReadingMode get effectiveViewportMode {
-    switch (this) {
-      case ReadingMode.continuousVertical:
-        return ReadingMode.continuousVertical;
-      case ReadingMode.paged:
-      case ReadingMode.dualPage:
-      case ReadingMode.dualPageNoCover:
-        return ReadingMode.paged;
-    }
-  }
+  bool get isDualPageMode =>
+      this == ReadingMode.dualPage || this == ReadingMode.dualPageNoCover;
+
+  bool get usesSpreadNavigation => isDualPageMode;
 }
 
-const ReadingMode kDefaultReadingMode = ReadingMode.dualPageNoCover;
+const ReadingMode kDefaultReadingMode = ReadingMode.paged;
 
 ReadingMode readingModeFromJson(Object? json) {
   if (json is String) {

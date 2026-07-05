@@ -11,20 +11,24 @@ import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widg
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class ReaderVerticalContent extends HookConsumerWidget {
-  const ReaderVerticalContent({
+class ContinuousVerticalViewport extends HookConsumerWidget {
+  const ContinuousVerticalViewport({
     super.key,
     required this.comicId,
     required this.incognito,
     required this.preferredPageIndex,
   });
+
   final String comicId;
   final bool incognito;
   final int? preferredPageIndex;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ReaderControllerKey viewKey = readerControllerKey(comicId, incognito: incognito);
+    final ReaderControllerKey viewKey = readerControllerKey(
+      comicId,
+      incognito: incognito,
+    );
     final int currentIndex = ref.watch(
       readerControllerProvider(viewKey).select(
         (AsyncValue<ReaderState> value) =>

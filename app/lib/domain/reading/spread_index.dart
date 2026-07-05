@@ -50,6 +50,22 @@ class SpreadIndex {
     };
   }
 
+  static int primaryPageForSpread({
+    required ReadingMode mode,
+    required int totalPages,
+    required int spreadIndex,
+  }) {
+    final List<int> pages = pagesInSpread(
+      mode: mode,
+      totalPages: totalPages,
+      spreadIndex: spreadIndex,
+    );
+    if (pages.isEmpty) {
+      return 1;
+    }
+    return pages.first;
+  }
+
   static int spreadIndexForPage({
     required ReadingMode mode,
     required int totalPages,
@@ -66,20 +82,83 @@ class SpreadIndex {
     };
   }
 
-  static int primaryPageForSpread({
+  /// 按 spread 前进，返回下一 spread 的主页码；无法前进时返回 null。
+  static int? nextPrimaryPage({
     required ReadingMode mode,
     required int totalPages,
-    required int spreadIndex,
+    required int currentPageIndex,
   }) {
-    final List<int> pages = pagesInSpread(
+    if (totalPages <= 0 || currentPageIndex < 1) {
+      return null;
+    }
+    if (!mode.usesSpreadNavigation) {
+      final int next = currentPageIndex + 1;
+      return next <= totalPages ? next : null;
+    }
+    final int spread = spreadIndexForPage(
       mode: mode,
       totalPages: totalPages,
-      spreadIndex: spreadIndex,
+      pageIndex: currentPageIndex,
     );
-    if (pages.isEmpty) {
-      return 1;
+    final int totalSpreadsCount = totalSpreads(
+      mode: mode,
+      totalPages: totalPages,
+    );
+    if (spread + 1 >= totalSpreadsCount) {
+      return null;
     }
-    return pages.first;
+    return primaryPageForSpread(
+      mode: mode,
+      totalPages: totalPages,
+      spreadIndex: spread + 1,
+    );
+  }
+
+  /// 按 spread 后退，返回上一 spread 的主页码；无法后退时返回 null。
+  static int? previousPrimaryPage({
+    required ReadingMode mode,
+    required int totalPages,
+    required int currentPageIndex,
+  }) {
+    if (totalPages <= 0 || currentPageIndex < 1) {
+      return null;
+    }
+    if (!mode.usesSpreadNavigation) {
+      final int prev = currentPageIndex - 1;
+      return prev >= 1 ? prev : null;
+    }
+    final int spread = spreadIndexForPage(
+      mode: mode,
+      totalPages: totalPages,
+      pageIndex: currentPageIndex,
+    );
+    if (spread <= 0) {
+      return null;
+    }
+    return primaryPageForSpread(
+      mode: mode,
+      totalPages: totalPages,
+      spreadIndex: spread - 1,
+    );
+  }
+
+  static bool isOnLastSpread({
+    required ReadingMode mode,
+    required int totalPages,
+    required int currentPageIndex,
+  }) {
+    if (totalPages <= 0 || currentPageIndex < 1) {
+      return true;
+    }
+    if (!mode.usesSpreadNavigation) {
+      return currentPageIndex >= totalPages;
+    }
+    final int spread = spreadIndexForPage(
+      mode: mode,
+      totalPages: totalPages,
+      pageIndex: currentPageIndex,
+    );
+    return spread >= totalSpreads(mode: mode, totalPages: totalPages) - 1;
   }
 
   static List<int> _dualPageSpread({

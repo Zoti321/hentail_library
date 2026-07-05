@@ -16,6 +16,7 @@ class ReaderBottomBar extends StatefulWidget {
     required this.readerAutoPlayIntervalSeconds,
     required this.readerDimLevel,
     required this.readerWindowFullscreen,
+    required this.showAutoPlayControls,
     required this.onPrevPage,
     required this.onNextPage,
     required this.onSetIndex,
@@ -31,6 +32,7 @@ class ReaderBottomBar extends StatefulWidget {
   final int readerAutoPlayIntervalSeconds;
   final double readerDimLevel;
   final bool readerWindowFullscreen;
+  final bool showAutoPlayControls;
   final VoidCallback onPrevPage;
   final VoidCallback onNextPage;
   final ValueChanged<int> onSetIndex;
@@ -169,8 +171,10 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                         _buildNavActionGroup(cs),
                         const Spacer(),
 
-                        _buildIntervalMenuButton(cs),
-                        const SizedBox(width: 8),
+                        if (widget.showAutoPlayControls) ...<Widget>[
+                          _buildIntervalMenuButton(cs),
+                          const SizedBox(width: 8),
+                        ],
                         _buildDimMenuButton(cs),
                         const SizedBox(width: 8),
                         GhostButton.icon(
@@ -228,26 +232,29 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
             overlayColor: cs.hentai.readerPanelSubtle,
             onPressed: widget.onPrevPage,
           ),
-          GhostButton.icon(
-            icon: widget.readerAutoPlayEnabled
-                ? LucideIcons.pause
-                : LucideIcons.play,
-            tooltip: widget.readerAutoPlayEnabled ? '关闭自动播放' : '开启自动播放',
-            semanticLabel: widget.readerAutoPlayEnabled ? '关闭自动播放' : '开启自动播放',
-            iconSize: 14,
-            size: 28,
-            borderRadius: 999,
-            foregroundColor: widget.readerAutoPlayEnabled
-                ? cs.primary
-                : cs.hentai.readerTextIconPrimary,
-            hoverColor: cs.hentai.readerPanelSubtle,
-            overlayColor: cs.hentai.readerPanelSubtle,
-            onPressed: () {
-              widget.onReaderAutoPlayEnabledChanged(
-                !widget.readerAutoPlayEnabled,
-              );
-            },
-          ),
+          if (widget.showAutoPlayControls)
+            GhostButton.icon(
+              icon: widget.readerAutoPlayEnabled
+                  ? LucideIcons.pause
+                  : LucideIcons.play,
+              tooltip: widget.readerAutoPlayEnabled ? '关闭自动播放' : '开启自动播放',
+              semanticLabel: widget.readerAutoPlayEnabled
+                  ? '关闭自动播放'
+                  : '开启自动播放',
+              iconSize: 14,
+              size: 28,
+              borderRadius: 999,
+              foregroundColor: widget.readerAutoPlayEnabled
+                  ? cs.primary
+                  : cs.hentai.readerTextIconPrimary,
+              hoverColor: cs.hentai.readerPanelSubtle,
+              overlayColor: cs.hentai.readerPanelSubtle,
+              onPressed: () {
+                widget.onReaderAutoPlayEnabledChanged(
+                  !widget.readerAutoPlayEnabled,
+                );
+              },
+            ),
           GhostButton.icon(
             icon: LucideIcons.chevronRight,
             tooltip: '下一页',

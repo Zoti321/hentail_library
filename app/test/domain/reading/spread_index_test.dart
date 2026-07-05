@@ -96,4 +96,65 @@ void main() {
       );
     });
   });
+
+  group('SpreadIndex.nextPrimaryPage', () {
+    test('dualPageNoCover skips by spread', () {
+      expect(
+        SpreadIndex.nextPrimaryPage(
+          mode: ReadingMode.dualPageNoCover,
+          totalPages: 4,
+          currentPageIndex: 1,
+        ),
+        2,
+      );
+      expect(
+        SpreadIndex.nextPrimaryPage(
+          mode: ReadingMode.dualPageNoCover,
+          totalPages: 4,
+          currentPageIndex: 3,
+        ),
+        4,
+      );
+      expect(
+        SpreadIndex.nextPrimaryPage(
+          mode: ReadingMode.dualPageNoCover,
+          totalPages: 4,
+          currentPageIndex: 4,
+        ),
+        isNull,
+      );
+    });
+
+    test('dualPage pairs advance two pages at a time', () {
+      expect(
+        SpreadIndex.nextPrimaryPage(
+          mode: ReadingMode.dualPage,
+          totalPages: 3,
+          currentPageIndex: 1,
+        ),
+        3,
+      );
+    });
+  });
+
+  group('SpreadIndex.isOnLastSpread', () {
+    test('detects last spread for dualPageNoCover', () {
+      expect(
+        SpreadIndex.isOnLastSpread(
+          mode: ReadingMode.dualPageNoCover,
+          totalPages: 4,
+          currentPageIndex: 4,
+        ),
+        isTrue,
+      );
+      expect(
+        SpreadIndex.isOnLastSpread(
+          mode: ReadingMode.dualPageNoCover,
+          totalPages: 4,
+          currentPageIndex: 2,
+        ),
+        isFalse,
+      );
+    });
+  });
 }

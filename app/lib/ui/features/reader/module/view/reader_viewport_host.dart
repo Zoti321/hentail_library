@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/continuous_vertical_viewport.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/dual_page_viewport.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/paged_viewport.dart';
-import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_vertical_content.dart';
 
 class ReaderViewportHost extends StatelessWidget {
   const ReaderViewportHost({
@@ -21,10 +22,19 @@ class ReaderViewportHost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (readingMode.effectiveViewportMode.isContinuousVertical) {
-      return ReaderVerticalContent(
+    if (readingMode.isContinuousVertical) {
+      return ContinuousVerticalViewport(
         comicId: comicId,
         incognito: incognito,
+        preferredPageIndex: preferredPageIndex,
+      );
+    }
+    if (readingMode.isDualPageMode) {
+      return DualPageViewport(
+        comicId: comicId,
+        incognito: incognito,
+        readingMode: readingMode,
+        initialPage: initialPage,
         preferredPageIndex: preferredPageIndex,
       );
     }

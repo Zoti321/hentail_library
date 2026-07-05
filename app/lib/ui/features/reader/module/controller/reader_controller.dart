@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/reading/reader_session_snapshot.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
+import 'package:hentai_library/domain/reading/spread_index.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/ui/features/reader/view_models/reader_window_fullscreen.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
@@ -152,15 +153,29 @@ class ReaderController extends _$ReaderController {
 
   void nextPage() {
     _updateDataState((s) {
-      if (s.currentIndex + 1 > s.totalPages) return s;
-      return s.copyWith(currentIndex: s.currentIndex + 1);
+      final int? next = SpreadIndex.nextPrimaryPage(
+        mode: s.readingMode,
+        totalPages: s.totalPages,
+        currentPageIndex: s.currentIndex,
+      );
+      if (next == null) {
+        return s;
+      }
+      return s.copyWith(currentIndex: next);
     });
   }
 
   void prevPage() {
     _updateDataState((s) {
-      if (s.currentIndex - 1 < 1) return s;
-      return s.copyWith(currentIndex: s.currentIndex - 1);
+      final int? prev = SpreadIndex.previousPrimaryPage(
+        mode: s.readingMode,
+        totalPages: s.totalPages,
+        currentPageIndex: s.currentIndex,
+      );
+      if (prev == null) {
+        return s;
+      }
+      return s.copyWith(currentIndex: prev);
     });
   }
 

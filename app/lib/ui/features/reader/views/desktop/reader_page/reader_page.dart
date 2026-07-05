@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
-import 'package:hentai_library/domain/reading/reading_mode.dart';
+import 'package:hentai_library/domain/reading/spread_index.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/view_models/reader_window_fullscreen.dart';
@@ -167,7 +167,11 @@ class ReaderPage extends HookConsumerWidget {
             autoPlayState != null &&
             autoPlayState.readingMode.supportsAutoPlay &&
             autoPlayState.totalPages > 0 &&
-            autoPlayState.currentIndex < autoPlayState.totalPages;
+            !SpreadIndex.isOnLastSpread(
+              mode: autoPlayState.readingMode,
+              totalPages: autoPlayState.totalPages,
+              currentPageIndex: autoPlayState.currentIndex,
+            );
         if (!canStartAutoPlay) {
           return null;
         }
@@ -186,7 +190,11 @@ class ReaderPage extends HookConsumerWidget {
           final bool shouldStop =
               !currentState.readingMode.supportsAutoPlay ||
               currentState.totalPages <= 0 ||
-              currentState.currentIndex >= currentState.totalPages;
+              SpreadIndex.isOnLastSpread(
+                mode: currentState.readingMode,
+                totalPages: currentState.totalPages,
+                currentPageIndex: currentState.currentIndex,
+              );
           if (shouldStop) {
             timer?.cancel();
             return;
@@ -285,6 +293,11 @@ class ReaderPage extends HookConsumerWidget {
                     },
                     onReadingModeChanged: (ReadingMode mode) {
                       ref.read(settingsProvider.notifier).setReadingMode(mode);
+                      if (mode.isContinuousVertical && readerAutoPlayEnabled) {
+                        ref
+                            .read(settingsProvider.notifier)
+                            .setReaderAutoPlayEnabled(false);
+                      }
                     },
                   ),
                   ReaderBottomBar(
@@ -296,6 +309,7 @@ class ReaderPage extends HookConsumerWidget {
                         readerAutoPlayIntervalSeconds,
                     readerDimLevel: readerDimLevel,
                     readerWindowFullscreen: readerWindowFullscreen,
+                    showAutoPlayControls: activeReadingMode.supportsAutoPlay,
                     onPrevPage: controller.prevPage,
                     onNextPage: controller.nextPage,
                     onSetIndex: controller.setIndex,
