@@ -5,7 +5,7 @@ import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
-import 'package:hentai_library/ui/features/reader/read_session_launcher.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_series_navigation.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -34,8 +34,7 @@ class _ReaderSeriesNavState extends ConsumerState<ReaderSeriesNav> {
     if (targetComicId == widget.session.comicId) {
       return;
     }
-    await navigateToSeriesComicInReader(
-      ref,
+    await ref.read(readerSeriesNavigationProvider.notifier).switchComic(
       router: GoRouter.of(context),
       currentSession: widget.session,
       targetComicId: targetComicId,

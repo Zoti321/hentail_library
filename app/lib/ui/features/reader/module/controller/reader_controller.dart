@@ -7,7 +7,7 @@ import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/domain/reading/spread_index.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
-import 'package:hentai_library/ui/features/reader/read_session_launcher.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_series_navigation.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_fullscreen_controller.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
@@ -28,13 +28,6 @@ ReaderControllerKey readerControllerKey(
   bool incognito = false,
 }) => (comicId: comicId, incognito: incognito);
 
-@Deprecated('Use readerControllerKey')
-typedef ReaderViewKey = ReaderControllerKey;
-
-@Deprecated('Use readerControllerKey')
-ReaderControllerKey readerViewKey(String comicId, {bool incognito = false}) =>
-    readerControllerKey(comicId, incognito: incognito);
-
 @freezed
 abstract class ReaderState with _$ReaderState {
   factory ReaderState({
@@ -50,9 +43,6 @@ abstract class ReaderState with _$ReaderState {
 
   int get totalPages => totalPagesOverride ?? 0;
 }
-
-@Deprecated('Use ReaderState')
-typedef ReaderViewState = ReaderState;
 
 class ReaderPageViewModel {
   const ReaderPageViewModel({
@@ -213,8 +203,7 @@ class ReaderController extends _$ReaderController {
       _updateDataState(
         (ReaderState s) => s.copyWith(seriesAdvancePromptPending: false),
       );
-      await navigateToSeriesComicInReader(
-        ref,
+      await ref.read(readerSeriesNavigationProvider.notifier).switchComic(
         router: router,
         currentSession: session,
         targetComicId: nextItem.comicId,
