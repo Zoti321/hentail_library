@@ -46,8 +46,8 @@ class SearchedPage extends ConsumerWidget {
       LibraryDisplayTarget.comics => searchedComicCount,
       LibraryDisplayTarget.series => searchedSeriesCount,
     };
-    final AsyncValue<LibraryPageSnapshot> searchCatalogAsync =
-        searchedComics.when(
+    final AsyncValue<LibraryPageSnapshot> searchCatalogAsync = searchedComics
+        .when(
           data: (List<Comic> comics) => searchedSeriesDataAsync.when(
             data: (LibrarySeriesViewData seriesData) => AsyncData(
               LibraryPageSnapshot(

@@ -1,4 +1,4 @@
-﻿import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
@@ -12,7 +12,8 @@ abstract class Series with _$Series {
     required String id,
     required String name,
     required String folderPath,
-    @Default(SerializationStatus.unknown) SerializationStatus serializationStatus,
+    @Default(SerializationStatus.unknown)
+    SerializationStatus serializationStatus,
     int? totalCount,
     @Default(<SeriesItem>[]) List<SeriesItem> items,
   }) = _Series;

@@ -1,4 +1,4 @@
-﻿import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
@@ -30,4 +30,5 @@ abstract class Comic with _$Comic {
 DateTime comicTimestampFromMs(int ms) =>
     DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true);
 
-int comicTimestampToMs(DateTime dateTime) => dateTime.toUtc().millisecondsSinceEpoch;
+int comicTimestampToMs(DateTime dateTime) =>
+    dateTime.toUtc().millisecondsSinceEpoch;

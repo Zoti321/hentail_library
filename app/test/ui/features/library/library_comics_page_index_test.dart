@@ -134,20 +134,27 @@ void main() {
     );
   });
 
-  test('query key change does not mutate page index during provider read', () async {
-    final ProviderContainer container = createContainer();
-    addTearDown(container.dispose);
+  test(
+    'query key change does not mutate page index during provider read',
+    () async {
+      final ProviderContainer container = createContainer();
+      addTearDown(container.dispose);
 
-    await container.read(libraryCatalogControllerProvider.future);
-    container.read(libraryCatalogControllerProvider.notifier).setComicsPage(2);
-    await container.read(libraryCatalogControllerProvider.future);
-    await expectLater(() async {
-      container.read(_comicsSortRevisionProvider.notifier).state = 1;
       await container.read(libraryCatalogControllerProvider.future);
-    }, returnsNormally);
-    expect(
-      container.read(libraryCatalogControllerProvider.notifier).comicsPageIndex,
-      1,
-    );
-  });
+      container
+          .read(libraryCatalogControllerProvider.notifier)
+          .setComicsPage(2);
+      await container.read(libraryCatalogControllerProvider.future);
+      await expectLater(() async {
+        container.read(_comicsSortRevisionProvider.notifier).state = 1;
+        await container.read(libraryCatalogControllerProvider.future);
+      }, returnsNormally);
+      expect(
+        container
+            .read(libraryCatalogControllerProvider.notifier)
+            .comicsPageIndex,
+        1,
+      );
+    },
+  );
 }

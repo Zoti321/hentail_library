@@ -42,7 +42,9 @@ class LibraryCatalogController extends _$LibraryCatalogController {
 
   void _syncPaginationWithQueryKeys() {
     final String keyword = ref.watch(
-      libraryQueryIntentProvider.select((LibraryQueryIntent intent) => intent.keyword),
+      libraryQueryIntentProvider.select(
+        (LibraryQueryIntent intent) => intent.keyword,
+      ),
     );
     final Object comicsQueryKey = (
       keyword,

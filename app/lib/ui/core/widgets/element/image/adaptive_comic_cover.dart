@@ -43,8 +43,7 @@ class AdaptiveComicCover extends StatelessWidget {
 
   bool get _usesFixedContainer => containerAspectRatio != null;
 
-  BoxFit get _effectiveFit =>
-      _usesFixedContainer ? BoxFit.contain : fit;
+  BoxFit get _effectiveFit => _usesFixedContainer ? BoxFit.contain : fit;
 
   Color _resolveBackgroundColor() {
     if (backgroundColor != null) {

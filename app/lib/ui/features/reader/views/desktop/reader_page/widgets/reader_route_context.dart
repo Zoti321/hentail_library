@@ -23,14 +23,12 @@ class ReaderNavContextData {
 
   bool get hasPrevious => currentIndex > 0;
 
-  bool get hasNext =>
-      currentIndex >= 0 && currentIndex < items.length - 1;
+  bool get hasNext => currentIndex >= 0 && currentIndex < items.length - 1;
 
   ReaderComicListItem? get previousItem =>
       hasPrevious ? items[currentIndex - 1] : null;
 
-  ReaderComicListItem? get nextItem =>
-      hasNext ? items[currentIndex + 1] : null;
+  ReaderComicListItem? get nextItem => hasNext ? items[currentIndex + 1] : null;
 }
 
 class ReaderRouteContext {
@@ -74,11 +72,10 @@ ReaderNavContextData buildReaderNavContextData({
   required int? preferredPageIndex,
 }) {
   final List<ReaderComicListItem> sortedItems =
-      List<ReaderComicListItem>.from(items)
-        ..sort(
-          (ReaderComicListItem a, ReaderComicListItem b) =>
-              a.order.compareTo(b.order),
-        );
+      List<ReaderComicListItem>.from(items)..sort(
+        (ReaderComicListItem a, ReaderComicListItem b) =>
+            a.order.compareTo(b.order),
+      );
   final int currentIndex = sortedItems.indexWhere(
     (ReaderComicListItem item) => item.comicId == currentComicId,
   );

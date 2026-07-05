@@ -50,8 +50,9 @@ class ReaderSessionService {
     final int resumePageIndex = incognito
         ? 1
         : clampOneBasedResumeIndex(
-            storedPageIndex: (await _readingHistoryRepo.getByComicId(comicId))
-                ?.pageIndex,
+            storedPageIndex: (await _readingHistoryRepo.getByComicId(
+              comicId,
+            ))?.pageIndex,
             totalPages: opened.pages.length,
           );
     return ReaderSessionSnapshot(
@@ -73,10 +74,7 @@ class ReaderSessionService {
     required Comic comic,
     required int archivePageIndex,
   }) {
-    return _pageSource.loadPageBytes(
-      comic: comic,
-      pageIndex: archivePageIndex,
-    );
+    return _pageSource.loadPageBytes(comic: comic, pageIndex: archivePageIndex);
   }
 
   Future<({Comic comic, List<ReadSessionPage> pages})> _openPages(

@@ -109,10 +109,7 @@ class _ReaderSeriesNavState extends ConsumerState<ReaderSeriesNav> {
 }
 
 class _ReaderSeriesMenu extends StatelessWidget {
-  const _ReaderSeriesMenu({
-    required this.navContext,
-    required this.onSelect,
-  });
+  const _ReaderSeriesMenu({required this.navContext, required this.onSelect});
 
   final ReaderNavContextData navContext;
   final ValueChanged<String> onSelect;
@@ -124,7 +121,9 @@ class _ReaderSeriesMenu extends StatelessWidget {
       blurRadius: 6,
       shadowOffset: const Offset(0, 4),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: _kReaderSeriesMenuMaxHeight),
+        constraints: const BoxConstraints(
+          maxHeight: _kReaderSeriesMenuMaxHeight,
+        ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(
@@ -135,7 +134,8 @@ class _ReaderSeriesMenu extends StatelessWidget {
                   (ReaderComicListItem item) => _ReaderSeriesMenuItem(
                     item: item,
                     displayIndex: navContext.items.indexOf(item) + 1,
-                    isCurrent: item.comicId ==
+                    isCurrent:
+                        item.comicId ==
                         navContext.items[navContext.currentIndex].comicId,
                     onTap: () => onSelect(item.comicId),
                   ),

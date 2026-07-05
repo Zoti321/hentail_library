@@ -30,10 +30,7 @@ class SeriesDetailPrimaryActions extends HookConsumerWidget {
           child: ElevatedButton.icon(
             onPressed: series.items.isEmpty
                 ? null
-                : () => openSeriesReadSession(
-                    ref,
-                    seriesId: series.id,
-                  ),
+                : () => openSeriesReadSession(ref, seriesId: series.id),
             icon: const Icon(LucideIcons.bookOpen, size: 16),
             label: const Text('系列阅读'),
             style: primaryStyle,

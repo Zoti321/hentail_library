@@ -45,7 +45,8 @@ class SeriesDetailHeader extends ConsumerWidget {
                   foregroundColor: cs.hentai.iconDefault,
                   hoverColor: theme.hoverColor,
                   overlayColor: theme.hoverColor,
-                  onPressed: () => ComicDetailBackHeader.popOrGoLibrary(context),
+                  onPressed: () =>
+                      ComicDetailBackHeader.popOrGoLibrary(context),
                 ),
                 const SizedBox(width: 4),
                 GhostButton.icon(

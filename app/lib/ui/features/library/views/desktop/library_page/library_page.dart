@@ -91,13 +91,19 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         _scrollToContentTop();
       },
     );
-    ref.listen<int>(libraryComicsTabPageSizeProvider, (int? previous, int next) {
+    ref.listen<int>(libraryComicsTabPageSizeProvider, (
+      int? previous,
+      int next,
+    ) {
       if (previous == null || previous == next) {
         return;
       }
       _scrollToContentTop();
     });
-    ref.listen<int>(librarySeriesTabPageSizeProvider, (int? previous, int next) {
+    ref.listen<int>(librarySeriesTabPageSizeProvider, (
+      int? previous,
+      int next,
+    ) {
       if (previous == null || previous == next) {
         return;
       }

@@ -1,8 +1,5 @@
 /// Series read 与 Standalone read 的路由与会话参数。
-enum ReadSessionMode {
-  standalone,
-  series,
-}
+enum ReadSessionMode { standalone, series }
 
 class ReadSessionRouteParams {
   const ReadSessionRouteParams({
@@ -17,10 +14,9 @@ class ReadSessionRouteParams {
   final bool keepControlsOpen;
   final bool incognito;
 
-  ReadSessionMode get mode =>
-      seriesId != null && seriesId!.isNotEmpty
-          ? ReadSessionMode.series
-          : ReadSessionMode.standalone;
+  ReadSessionMode get mode => seriesId != null && seriesId!.isNotEmpty
+      ? ReadSessionMode.series
+      : ReadSessionMode.standalone;
 
   bool get isSeriesRead => mode == ReadSessionMode.series;
 }

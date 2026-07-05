@@ -70,10 +70,7 @@ class SeriesCard extends HookConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: 12,
             children: <Widget>[
-              _SeriesCardCover(
-                coverData: coverData,
-                isHover: isHover.value,
-              ),
+              _SeriesCardCover(coverData: coverData, isHover: isHover.value),
               _SeriesCardInfo(
                 series: series,
                 count: count,
@@ -92,10 +89,7 @@ class SeriesCard extends HookConsumerWidget {
 }
 
 class _SeriesCardCover extends StatelessWidget {
-  const _SeriesCardCover({
-    required this.coverData,
-    required this.isHover,
-  });
+  const _SeriesCardCover({required this.coverData, required this.isHover});
 
   final ComicCoverDisplayData? coverData;
   final bool isHover;

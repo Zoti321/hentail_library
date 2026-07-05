@@ -31,21 +31,22 @@ class ComicDetail extends StatelessWidget {
               horizontalPadding,
               tokens.spacing.xl + 8,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: tokens.spacing.xl + 8,
-              children: <Widget>[
-                _buildPrimarySection(context, tokens, cs),
-                ComicDetailMetadataBlock(comic: comic),
-              ],
-            )
-                .animate()
-                .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
-                .slideY(
-                  begin: 0.03,
-                  duration: 260.ms,
-                  curve: Curves.easeOutCubic,
-                ),
+            child:
+                Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      spacing: tokens.spacing.xl + 8,
+                      children: <Widget>[
+                        _buildPrimarySection(context, tokens, cs),
+                        ComicDetailMetadataBlock(comic: comic),
+                      ],
+                    )
+                    .animate()
+                    .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
+                    .slideY(
+                      begin: 0.03,
+                      duration: 260.ms,
+                      curve: Curves.easeOutCubic,
+                    ),
           ),
         ),
       ],

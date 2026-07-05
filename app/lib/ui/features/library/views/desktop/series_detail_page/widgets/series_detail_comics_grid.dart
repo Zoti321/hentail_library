@@ -69,11 +69,7 @@ class SeriesDetailComicsGrid extends ConsumerWidget {
               );
             },
             onPlay: () {
-              openReadSession(
-                ref,
-                comicId: comic.comicId,
-                seriesId: seriesId,
-              );
+              openReadSession(ref, comicId: comic.comicId, seriesId: seriesId);
             },
           ),
         );

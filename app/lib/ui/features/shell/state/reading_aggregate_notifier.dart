@@ -100,26 +100,30 @@ class ReadingAggregateNotifier extends _$ReadingAggregateNotifier {
 
   Future<void> _persistSession(_ActiveReadingSession session) async {
     final DateTime now = DateTime.now();
-    await ref.read(readingHistoryRepoProvider).recordReading(
-      ReadingHistory(
-        comicId: session.comic.comicId,
-        title: session.comic.title,
-        lastReadTime: now,
-        pageIndex: session.pageIndex,
-      ),
-    );
+    await ref
+        .read(readingHistoryRepoProvider)
+        .recordReading(
+          ReadingHistory(
+            comicId: session.comic.comicId,
+            title: session.comic.title,
+            lastReadTime: now,
+            pageIndex: session.pageIndex,
+          ),
+        );
     final String? seriesId = session.seriesId;
     if (seriesId == null || seriesId.isEmpty) {
       return;
     }
-    await ref.read(seriesReadingHistoryRepoProvider).recordSeriesReading(
-      SeriesReadingHistory(
-        seriesId: seriesId,
-        lastReadComicId: session.comic.comicId,
-        lastReadTime: now,
-        pageIndex: session.pageIndex,
-      ),
-    );
+    await ref
+        .read(seriesReadingHistoryRepoProvider)
+        .recordSeriesReading(
+          SeriesReadingHistory(
+            seriesId: seriesId,
+            lastReadComicId: session.comic.comicId,
+            lastReadTime: now,
+            pageIndex: session.pageIndex,
+          ),
+        );
   }
 
   String? _normalizeSeriesId(String? seriesId) {

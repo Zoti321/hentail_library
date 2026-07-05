@@ -80,8 +80,10 @@ Future<void> navigateToSeriesComicInReader(
     incognito: currentSession.incognito,
   );
   if (!currentSession.incognito) {
-    final ReaderViewState? viewState =
-        ref.read(readerViewProvider(viewKey)).asData?.value;
+    final ReaderViewState? viewState = ref
+        .read(readerViewProvider(viewKey))
+        .asData
+        ?.value;
     if (viewState != null) {
       ref
           .read(readingAggregateProvider.notifier)
@@ -89,9 +91,7 @@ Future<void> navigateToSeriesComicInReader(
     }
     await ref.read(readingAggregateProvider.notifier).endSession();
   }
-  await ref
-      .read(readerSessionServiceProvider)
-      .close(currentSession.comicId);
+  await ref.read(readerSessionServiceProvider).close(currentSession.comicId);
   final ReadSessionRouteParams nextSession = ReadSessionRouteParams(
     comicId: targetComicId,
     seriesId: currentSession.seriesId,
@@ -100,7 +100,9 @@ Future<void> navigateToSeriesComicInReader(
   router.go(
     Uri(
       path: '/reader',
-      queryParameters: ReaderRouteArgs.fromSession(nextSession).toQueryParameters(),
+      queryParameters: ReaderRouteArgs.fromSession(
+        nextSession,
+      ).toQueryParameters(),
     ).toString(),
   );
 }

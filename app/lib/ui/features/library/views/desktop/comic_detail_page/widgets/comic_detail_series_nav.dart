@@ -50,19 +50,14 @@ class _ComicDetailSeriesNavState extends ConsumerState<ComicDetailSeriesNav> {
           return;
         }
         final String seriesList = result.seriesNames.join('、');
-        debugPrint(
-          '漫画 ${widget.comicId} 同时属于多个系列：$seriesList',
-        );
-        ref.read(logManagerProvider).error(
-          '漫画详情系列导航冲突：comicId=${widget.comicId}，系列=[$seriesList]',
-        );
+        debugPrint('漫画 ${widget.comicId} 同时属于多个系列：$seriesList');
+        ref
+            .read(logManagerProvider)
+            .error('漫画详情系列导航冲突：comicId=${widget.comicId}，系列=[$seriesList]');
         if (!context.mounted) {
           return;
         }
-        showErrorToast(
-          context,
-          AppException('系列数据异常：该漫画同时属于多个系列，无法使用系列导航'),
-        );
+        showErrorToast(context, AppException('系列数据异常：该漫画同时属于多个系列，无法使用系列导航'));
       },
     );
 
@@ -167,10 +162,7 @@ class _ComicDetailSeriesNavControls extends StatelessWidget {
 }
 
 class _ComicDetailSeriesMenu extends StatelessWidget {
-  const _ComicDetailSeriesMenu({
-    required this.data,
-    required this.onSelect,
-  });
+  const _ComicDetailSeriesMenu({required this.data, required this.onSelect});
 
   final ComicDetailSeriesNavData data;
   final ValueChanged<String> onSelect;
@@ -182,7 +174,9 @@ class _ComicDetailSeriesMenu extends StatelessWidget {
       blurRadius: 6,
       shadowOffset: const Offset(0, 4),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: kComicDetailSeriesMenuMaxHeight),
+        constraints: const BoxConstraints(
+          maxHeight: kComicDetailSeriesMenuMaxHeight,
+        ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(
@@ -192,8 +186,8 @@ class _ComicDetailSeriesMenu extends StatelessWidget {
                 .map(
                   (ComicDetailSeriesNavItem item) => _ComicDetailSeriesMenuItem(
                     item: item,
-                    isCurrent: item.comicId ==
-                        data.items[data.currentIndex].comicId,
+                    isCurrent:
+                        item.comicId == data.items[data.currentIndex].comicId,
                     onTap: () => onSelect(item.comicId),
                   ),
                 )

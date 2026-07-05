@@ -71,14 +71,16 @@ Future<ReadSessionContextData> readSessionContextForReader(
   final String? normalizedSeriesId = seriesId?.trim();
   Series? series;
   if (normalizedSeriesId != null && normalizedSeriesId.isNotEmpty) {
-    series = await ref.read(librarySeriesRepoProvider).findById(
-      normalizedSeriesId,
-    );
+    series = await ref
+        .read(librarySeriesRepoProvider)
+        .findById(normalizedSeriesId);
   }
 
   if (series == null) {
     final comic = await ref.read(comicRepoProvider).findById(normalizedComicId);
-    final String fallbackTitle = comicTitleFallbackForDisplay(normalizedComicId);
+    final String fallbackTitle = comicTitleFallbackForDisplay(
+      normalizedComicId,
+    );
     final String title = comic?.title ?? fallbackTitle;
     final int? preferredPageIndex = incognito
         ? null
@@ -103,7 +105,10 @@ Future<ReadSessionContextData> readSessionContextForReader(
     );
   }
 
-  final List<ReaderComicListItem> items = await _buildSeriesNavItems(ref, series);
+  final List<ReaderComicListItem> items = await _buildSeriesNavItems(
+    ref,
+    series,
+  );
   final int? preferredPageIndex = incognito
       ? null
       : await ref.watch(
@@ -127,9 +132,9 @@ Future<String> resolveSeriesReadComicId(
   Ref ref, {
   required String seriesId,
 }) async {
-  final Series? series = await ref.read(librarySeriesRepoProvider).findById(
-    seriesId,
-  );
+  final Series? series = await ref
+      .read(librarySeriesRepoProvider)
+      .findById(seriesId);
   if (series == null || series.items.isEmpty) {
     return '';
   }

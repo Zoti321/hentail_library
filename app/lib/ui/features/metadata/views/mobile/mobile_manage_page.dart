@@ -283,9 +283,7 @@ class _ManageSeriesTab extends ConsumerWidget {
                     child: ListTile(
                       leading: const Icon(Icons.layers_outlined),
                       title: Text(series.name),
-                      subtitle: Text(
-                        series.volumeCountLabel,
-                      ),
+                      subtitle: Text(series.volumeCountLabel),
                       onTap: () {
                         final String encoded = Uri.encodeComponent(series.id);
                         context.go('/series/$encoded');

@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -22,10 +22,7 @@ class ReaderVerticalContent extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ReaderViewKey viewKey = readerViewKey(
-      comicId,
-      incognito: incognito,
-    );
+    final ReaderViewKey viewKey = readerViewKey(comicId, incognito: incognito);
     final int currentIndex = ref.watch(
       readerViewProvider(viewKey).select(
         (AsyncValue<ReaderViewState> value) =>

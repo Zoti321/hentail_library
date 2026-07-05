@@ -84,10 +84,7 @@ class ComicDetailPrimaryActions extends HookConsumerWidget {
           button: true,
           child: ElevatedButton.icon(
             onPressed: () => _openReader(ref, incognito: true),
-            icon: IncognitoReadIcon(
-              size: 16,
-              color: cs.hentai.textPrimary,
-            ),
+            icon: IncognitoReadIcon(size: 16, color: cs.hentai.textPrimary),
             label: const Text('阅读'),
             style: incognitoStyle,
           ),

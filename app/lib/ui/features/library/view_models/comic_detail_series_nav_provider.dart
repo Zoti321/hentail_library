@@ -36,8 +36,7 @@ class ComicDetailSeriesNavData {
 
   bool get hasPrevious => currentIndex > 0;
 
-  bool get hasNext =>
-      currentIndex >= 0 && currentIndex < items.length - 1;
+  bool get hasNext => currentIndex >= 0 && currentIndex < items.length - 1;
 
   ComicDetailSeriesNavItem? get previousItem =>
       hasPrevious ? items[currentIndex - 1] : null;
@@ -93,7 +92,10 @@ Future<ComicDetailSeriesNavResult> comicDetailSeriesNav(
   String comicId,
 ) async {
   final List<Series> allSeries = await ref.watch(allSeriesProvider.future);
-  final List<Series> matches = findSeriesListContainingComic(allSeries, comicId);
+  final List<Series> matches = findSeriesListContainingComic(
+    allSeries,
+    comicId,
+  );
   if (matches.isEmpty) {
     return const ComicDetailSeriesNavNone();
   }

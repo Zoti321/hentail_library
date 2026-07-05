@@ -109,11 +109,7 @@ class ComicDetailMetadataBlock extends StatelessWidget {
       ),
     );
     rows.add(
-      ComicDetailInfoRow(
-        label: '资源路径',
-        value: comic.path,
-        tooltip: comic.path,
-      ),
+      ComicDetailInfoRow(label: '资源路径', value: comic.path, tooltip: comic.path),
     );
     final String? createdLabel = formatComicDetailDateTime(comic.createdAt);
     if (createdLabel != null) {
@@ -132,7 +128,6 @@ class ComicDetailMetadataBlock extends StatelessWidget {
   }
 }
 
-
 String formatComicResourceSize(int bytes) {
   if (bytes < 1024) {
     return '$bytes B';
@@ -147,7 +142,11 @@ String formatComicResourceSize(int bytes) {
 }
 
 class LabeledMetaChipRow extends StatelessWidget {
-  const LabeledMetaChipRow({super.key, required this.label, required this.items});
+  const LabeledMetaChipRow({
+    super.key,
+    required this.label,
+    required this.items,
+  });
 
   final String label;
   final List<String> items;

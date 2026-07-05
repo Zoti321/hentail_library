@@ -41,8 +41,8 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
     final bool showR18 = series.hasR18Comic(comicsById: comicsById);
     final String? serializationLabel =
         series.serializationStatus == SerializationStatus.unknown
-            ? null
-            : series.serializationStatus.label;
+        ? null
+        : series.serializationStatus.label;
     final List<Widget> segments = <Widget>[
       Text(
         series.volumeCountLabel,

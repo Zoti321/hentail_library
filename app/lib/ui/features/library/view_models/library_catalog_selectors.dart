@@ -12,7 +12,8 @@ int stableCatalogDisplayedCount(
 }) {
   return catalogAsync.when(
     data: readCount,
-    loading: () => catalogAsync.value == null ? 0 : readCount(catalogAsync.value!),
+    loading: () =>
+        catalogAsync.value == null ? 0 : readCount(catalogAsync.value!),
     error: (Object _, StackTrace _) =>
         catalogAsync.value == null ? 0 : readCount(catalogAsync.value!),
     skipLoadingOnReload: true,
@@ -30,7 +31,9 @@ final libraryDisplayTargetProvider = Provider<LibraryDisplayTarget>((Ref ref) {
 
 final libraryFilterQueryProvider = Provider<String>((Ref ref) {
   return ref.watch(
-    libraryQueryIntentProvider.select((LibraryQueryIntent state) => state.keyword),
+    libraryQueryIntentProvider.select(
+      (LibraryQueryIntent state) => state.keyword,
+    ),
   );
 });
 

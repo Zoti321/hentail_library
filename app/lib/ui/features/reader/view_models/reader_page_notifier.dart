@@ -83,10 +83,7 @@ AsyncValue<ReaderPageViewModel> readerPageViewModel(
     return const AsyncLoading();
   }
   return AsyncData(
-    ReaderPageViewModel(
-      viewState: viewState,
-      sessionContext: sessionContext,
-    ),
+    ReaderPageViewModel(viewState: viewState, sessionContext: sessionContext),
   );
 }
 

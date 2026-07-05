@@ -63,7 +63,9 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
     }
     setState(() => _saving = true);
     try {
-      await ref.read(librarySeriesRepoProvider).updateUserMeta(
+      await ref
+          .read(librarySeriesRepoProvider)
+          .updateUserMeta(
             seriesId: widget.series.id,
             name: name,
             serializationStatus: _serializationStatus,
@@ -117,9 +119,9 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
                 .map(
                   (SerializationStatus status) =>
                       DropdownMenuItem<SerializationStatus>(
-                    value: status,
-                    child: Text(status.label),
-                  ),
+                        value: status,
+                        child: Text(status.label),
+                      ),
                 )
                 .toList(),
             onChanged: _saving

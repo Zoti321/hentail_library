@@ -58,38 +58,45 @@ class SeriesDetail extends HookConsumerWidget {
               horizontalPadding,
               tokens.spacing.xl + 8,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                _buildPrimarySection(context, tokens, cs, comicsById, sortedItems),
-                SizedBox(height: sectionGap),
-                if (hasMetadata) ...<Widget>[
-                  SeriesDetailMetadataBlock(
-                    sortedItems: sortedItems,
-                    comicsById: comicsById,
-                  ),
-                  SizedBox(height: sectionGap),
-                ],
-                Divider(
-                  height: 1,
-                  thickness: 1 / MediaQuery.devicePixelRatioOf(context),
-                  color: cs.hentai.borderSubtle,
-                ),
-                SizedBox(height: tokens.spacing.lg),
-                SeriesDetailComicsGrid(
-                  seriesId: series.id,
-                  sortedItems: sortedItems,
-                  comicsById: comicsById,
-                ),
-              ],
-            )
-                .animate()
-                .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
-                .slideY(
-                  begin: 0.03,
-                  duration: 260.ms,
-                  curve: Curves.easeOutCubic,
-                ),
+            child:
+                Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        _buildPrimarySection(
+                          context,
+                          tokens,
+                          cs,
+                          comicsById,
+                          sortedItems,
+                        ),
+                        SizedBox(height: sectionGap),
+                        if (hasMetadata) ...<Widget>[
+                          SeriesDetailMetadataBlock(
+                            sortedItems: sortedItems,
+                            comicsById: comicsById,
+                          ),
+                          SizedBox(height: sectionGap),
+                        ],
+                        Divider(
+                          height: 1,
+                          thickness: 1 / MediaQuery.devicePixelRatioOf(context),
+                          color: cs.hentai.borderSubtle,
+                        ),
+                        SizedBox(height: tokens.spacing.lg),
+                        SeriesDetailComicsGrid(
+                          seriesId: series.id,
+                          sortedItems: sortedItems,
+                          comicsById: comicsById,
+                        ),
+                      ],
+                    )
+                    .animate()
+                    .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
+                    .slideY(
+                      begin: 0.03,
+                      duration: 260.ms,
+                      curve: Curves.easeOutCubic,
+                    ),
           ),
         ),
       ],
@@ -124,10 +131,7 @@ class SeriesDetail extends HookConsumerWidget {
               ),
             ),
           ),
-          SeriesDetailSummaryMetaRow(
-            series: series,
-            comicsById: comicsById,
-          ),
+          SeriesDetailSummaryMetaRow(series: series, comicsById: comicsById),
           SeriesDetailPrimaryActions(series: series),
         ],
       ),

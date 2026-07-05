@@ -54,26 +54,31 @@ class ReaderPage extends HookConsumerWidget {
     );
     final bool readerReady = viewAsync.hasValue;
     final ReaderPageViewModel? loadedViewModel = viewAsync.asData?.value;
-    useEffect(() {
-      if (!readerReady || loadedViewModel == null) {
+    useEffect(
+      () {
+        if (!readerReady || loadedViewModel == null) {
+          return null;
+        }
+        unawaited(
+          ref
+              .read(readingAggregateProvider.notifier)
+              .beginSession(
+                comic: loadedViewModel.viewState.comic,
+                mode: routeContext.session.mode,
+                seriesId: routeContext.seriesId,
+                incognito: routeContext.incognito,
+                initialPageIndex: loadedViewModel.viewState.currentIndex,
+              ),
+        );
         return null;
-      }
-      unawaited(
-        ref.read(readingAggregateProvider.notifier).beginSession(
-          comic: loadedViewModel.viewState.comic,
-          mode: routeContext.session.mode,
-          seriesId: routeContext.seriesId,
-          incognito: routeContext.incognito,
-          initialPageIndex: loadedViewModel.viewState.currentIndex,
-        ),
-      );
-      return null;
-    }, <Object?>[
-      routeContext.comicId,
-      routeContext.seriesId,
-      routeContext.incognito,
-      readerReady,
-    ]);
+      },
+      <Object?>[
+        routeContext.comicId,
+        routeContext.seriesId,
+        routeContext.incognito,
+        readerReady,
+      ],
+    );
     final ReaderViewNotifier notifier = ref.read(
       readerViewProvider(viewKey).notifier,
     );
@@ -263,7 +268,9 @@ class ReaderPage extends HookConsumerWidget {
                     showControls: state.showControls,
                     isVertical: readerIsVertical,
                     title: state.comic.title,
-                    navContext: viewModel.isSeriesRead ? viewModel.navContext : null,
+                    navContext: viewModel.isSeriesRead
+                        ? viewModel.navContext
+                        : null,
                     session: routeContext.session,
                     onExit: () async {
                       await notifier.executeExitReader(

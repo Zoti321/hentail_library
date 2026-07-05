@@ -31,7 +31,8 @@ LibraryPageSnapshot _snapshot({int comicCount = 42}) {
   );
 }
 
-int _readComicCount(LibraryPageSnapshot snapshot) => snapshot.displayedComicCount;
+int _readComicCount(LibraryPageSnapshot snapshot) =>
+    snapshot.displayedComicCount;
 
 void main() {
   test('stableCatalogDisplayedCount keeps previous total during reload', () {
