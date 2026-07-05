@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/responsive_layout/detail_primary_row_layout.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_cover.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_header.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_info_sections.dart';
@@ -12,12 +13,11 @@ class ComicDetail extends StatelessWidget {
 
   final Comic comic;
 
-  static const double _coverWidth = 220;
-
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final double horizontalPadding = detailContentHorizontalPadding(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -26,16 +26,16 @@ class ComicDetail extends StatelessWidget {
         Expanded(
           child: SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(
-              tokens.layout.contentHorizontalPadding,
+              horizontalPadding,
               tokens.spacing.xl,
-              tokens.layout.contentHorizontalPadding,
+              horizontalPadding,
               tokens.spacing.xl + 8,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: tokens.spacing.xl + 8,
               children: <Widget>[
-                _buildPrimaryRow(context, tokens, cs),
+                _buildPrimarySection(context, tokens, cs),
                 ComicDetailMetadataBlock(comic: comic),
               ],
             )
@@ -52,45 +52,36 @@ class ComicDetail extends StatelessWidget {
     );
   }
 
-  Widget _buildPrimaryRow(
+  Widget _buildPrimarySection(
     BuildContext context,
     AppThemeTokens tokens,
     ColorScheme cs,
   ) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        SizedBox(
-          width: _coverWidth,
-          child: ComicDetailCover(comic: comic),
-        ),
-        SizedBox(width: tokens.spacing.xl),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: tokens.spacing.md,
-            children: <Widget>[
-              Tooltip(
-                message: comic.title,
-                waitDuration: const Duration(milliseconds: 2000),
-                child: SelectableText(
-                  comic.title,
-                  maxLines: 2,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.4,
-                    color: cs.hentai.textPrimary,
-                    height: 1.25,
-                  ),
-                ),
+    return DetailPrimaryRowLayout(
+      cover: ComicDetailCover(comic: comic),
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: tokens.spacing.md,
+        children: <Widget>[
+          Tooltip(
+            message: comic.title,
+            waitDuration: const Duration(milliseconds: 2000),
+            child: SelectableText(
+              comic.title,
+              maxLines: 2,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.4,
+                color: cs.hentai.textPrimary,
+                height: 1.25,
               ),
-              ComicDetailSummaryMetaRow(comic: comic),
-              ComicDetailPrimaryActions(comic: comic),
-            ],
+            ),
           ),
-        ),
-      ],
+          ComicDetailSummaryMetaRow(comic: comic),
+          ComicDetailPrimaryActions(comic: comic),
+        ],
+      ),
     );
   }
 }

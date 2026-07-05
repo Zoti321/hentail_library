@@ -5,6 +5,7 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/responsive_layout/detail_primary_row_layout.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_comics_grid.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_cover.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_header.dart';
@@ -19,12 +20,11 @@ class SeriesDetail extends HookConsumerWidget {
 
   final Series series;
 
-  static const double _coverWidth = 220;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final double horizontalPadding = detailContentHorizontalPadding(context);
     final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
       ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
     final int changeGeneration = ref.watch(
@@ -53,15 +53,15 @@ class SeriesDetail extends HookConsumerWidget {
         Expanded(
           child: SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(
-              tokens.layout.contentHorizontalPadding,
+              horizontalPadding,
               tokens.spacing.xl,
-              tokens.layout.contentHorizontalPadding,
+              horizontalPadding,
               tokens.spacing.xl + 8,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                _buildPrimaryRow(context, tokens, cs, comicsById, sortedItems),
+                _buildPrimarySection(context, tokens, cs, comicsById, sortedItems),
                 SizedBox(height: sectionGap),
                 if (hasMetadata) ...<Widget>[
                   SeriesDetailMetadataBlock(
@@ -96,50 +96,41 @@ class SeriesDetail extends HookConsumerWidget {
     );
   }
 
-  Widget _buildPrimaryRow(
+  Widget _buildPrimarySection(
     BuildContext context,
     AppThemeTokens tokens,
     ColorScheme cs,
     Map<String, Comic> comicsById,
     List<SeriesItem> sortedItems,
   ) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        SizedBox(
-          width: _coverWidth,
-          child: SeriesDetailCover(series: series),
-        ),
-        SizedBox(width: tokens.spacing.xl),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: tokens.spacing.md,
-            children: <Widget>[
-              Tooltip(
-                message: series.name,
-                waitDuration: const Duration(milliseconds: 2000),
-                child: SelectableText(
-                  series.name,
-                  maxLines: 2,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.4,
-                    color: cs.hentai.textPrimary,
-                    height: 1.25,
-                  ),
-                ),
+    return DetailPrimaryRowLayout(
+      cover: SeriesDetailCover(series: series),
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: tokens.spacing.md,
+        children: <Widget>[
+          Tooltip(
+            message: series.name,
+            waitDuration: const Duration(milliseconds: 2000),
+            child: SelectableText(
+              series.name,
+              maxLines: 2,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.4,
+                color: cs.hentai.textPrimary,
+                height: 1.25,
               ),
-              SeriesDetailSummaryMetaRow(
-                series: series,
-                comicsById: comicsById,
-              ),
-              SeriesDetailPrimaryActions(series: series),
-            ],
+            ),
           ),
-        ),
-      ],
+          SeriesDetailSummaryMetaRow(
+            series: series,
+            comicsById: comicsById,
+          ),
+          SeriesDetailPrimaryActions(series: series),
+        ],
+      ),
     );
   }
 }

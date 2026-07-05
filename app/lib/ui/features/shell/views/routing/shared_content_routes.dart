@@ -1,5 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/comic_detail_page.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/series_detail_page.dart';
 import 'package:hentai_library/ui/features/metadata/views/desktop/metadata_page/metadata_management_page.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/reader_page.dart';
 import 'package:hentai_library/ui/features/shell/views/desktop/selected_paths_page/selected_paths_page.dart';
@@ -10,17 +12,29 @@ typedef ComicDetailBuilder =
 typedef SeriesDetailBuilder =
     Widget Function(BuildContext context, String seriesId);
 
+Widget buildSharedComicDetailPage(BuildContext context, String comicId) {
+  return ComicDetailPage(comicId: comicId);
+}
+
+Widget buildSharedSeriesDetailPage(BuildContext context, String seriesId) {
+  return SeriesDetailPage(seriesId: seriesId);
+}
+
 List<RouteBase> buildSharedContentRoutes({
-  required ComicDetailBuilder comicDetailBuilder,
-  required SeriesDetailBuilder seriesDetailBuilder,
+  ComicDetailBuilder? comicDetailBuilder,
+  SeriesDetailBuilder? seriesDetailBuilder,
 }) {
+  final ComicDetailBuilder resolvedComicDetailBuilder =
+      comicDetailBuilder ?? buildSharedComicDetailPage;
+  final SeriesDetailBuilder resolvedSeriesDetailBuilder =
+      seriesDetailBuilder ?? buildSharedSeriesDetailPage;
   return <RouteBase>[
     GoRoute(
       path: '/comic/:id',
       name: '漫画详情',
       builder: (context, state) {
         final String comicId = Uri.decodeComponent(state.pathParameters['id']!);
-        return comicDetailBuilder(context, comicId);
+        return resolvedComicDetailBuilder(context, comicId);
       },
     ),
     GoRoute(
@@ -50,7 +64,7 @@ List<RouteBase> buildSharedContentRoutes({
         final String seriesId = Uri.decodeComponent(
           state.pathParameters['id']!,
         );
-        return seriesDetailBuilder(context, seriesId);
+        return resolvedSeriesDetailBuilder(context, seriesId);
       },
     ),
     GoRoute(
