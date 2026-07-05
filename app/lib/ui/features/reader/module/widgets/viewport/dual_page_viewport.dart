@@ -1,7 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/core/image/image_quality_policy.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/domain/reading/spread_index.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
@@ -55,20 +56,32 @@ class DualPageViewport extends HookConsumerWidget {
       pageIndex: initialPage + 1,
     );
     final Size viewportSize = MediaQuery.sizeOf(context);
-    final ImageQualityPolicy imageQualityPolicy = ImageQualityPolicy.current;
     final PageController pageController = usePageController(
       initialPage: initialSpread,
     );
     final ObjectRef<bool> hasAppliedPreferredPage = useRef<bool>(false);
     final ObjectRef<bool> isProgrammaticScroll = useRef<bool>(false);
     final ObjectRef<DateTime?> lastWheelAt = useRef<DateTime?>(null);
-    final ObjectRef<int?> lastPrecachedCenterIndex = useRef<int?>(null);
     const int wheelThrottleMs = 200;
 
     final int currentSpread = SpreadIndex.spreadIndexForPage(
       mode: activeMode,
       totalPages: totalPages > 0 ? totalPages : 1,
       pageIndex: currentIndex,
+    );
+    final int safeTotalPages = totalPages > 0 ? totalPages : 1;
+    final List<int> spreadPages = SpreadIndex.pagesInSpread(
+      mode: activeMode,
+      totalPages: safeTotalPages,
+      spreadIndex: currentSpread,
+    );
+
+    useReaderPrefetchWindow(
+      ref: ref,
+      comicId: comicId,
+      centerPageOneBased: currentIndex,
+      totalPages: safeTotalPages,
+      extraPageIndexesOneBased: spreadPages,
     );
 
     useEffect(() {
@@ -103,36 +116,19 @@ class DualPageViewport extends HookConsumerWidget {
         return null;
       }
       isProgrammaticScroll.value = true;
-      pageController.jumpToPage(currentSpread);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        isProgrammaticScroll.value = false;
-      });
+      pageController
+          .animateToPage(
+            currentSpread,
+            duration: kReaderPageTurnAnimationDuration,
+            curve: Curves.easeInOut,
+          )
+          .whenComplete(() {
+            if (context.mounted) {
+              isProgrammaticScroll.value = false;
+            }
+          });
       return null;
     }, <Object?>[currentSpread, pageController]);
-    useEffect(() {
-      if (imageList.isEmpty) {
-        lastPrecachedCenterIndex.value = null;
-        return null;
-      }
-      if (lastPrecachedCenterIndex.value == currentIndex) {
-        return null;
-      }
-      lastPrecachedCenterIndex.value = currentIndex;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!context.mounted) {
-          return;
-        }
-        ReaderImageItem.precacheNeighborPages(
-          context: context,
-          imageDataList: imageList,
-          ref: ref,
-          comicId: comicId,
-          currentIndexOneBased: currentIndex,
-          neighborCount: imageQualityPolicy.readerPrecacheNeighborCount + 1,
-        );
-      });
-      return null;
-    }, <Object?>[currentIndex, imageList.length]);
 
     return Center(
       child: ConstrainedBox(
@@ -227,7 +223,7 @@ class _DualSpreadPage extends StatelessWidget {
       return Row(
         children: <Widget>[
           if (coverOnRight) const Expanded(child: SizedBox.shrink()),
-          Expanded(child: ReaderImageItem(imageData: imageData)),
+          Expanded(child: ReaderImageItem(imageData: imageData, enableCrossfade: true)),
           if (!coverOnRight) const Expanded(child: SizedBox.shrink()),
         ],
       );
@@ -239,12 +235,12 @@ class _DualSpreadPage extends StatelessWidget {
         Expanded(
           child: leftImage == null
               ? const SizedBox.shrink()
-              : ReaderImageItem(imageData: leftImage),
+              : ReaderImageItem(imageData: leftImage, enableCrossfade: true),
         ),
         Expanded(
           child: rightImage == null
               ? const SizedBox.shrink()
-              : ReaderImageItem(imageData: rightImage),
+              : ReaderImageItem(imageData: rightImage, enableCrossfade: true),
         ),
       ],
     );

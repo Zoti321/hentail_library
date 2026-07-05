@@ -1,4 +1,6 @@
 export 'domain/domain.dart';
+export 'controller/reader_prefetch_controller.dart';
+export 'controller/reader_prefetch_logic.dart';
 export 'controller/reader_controller.dart';
 export 'session/reader_session_bindings.dart';
 export 'view/reader_viewport_host.dart';

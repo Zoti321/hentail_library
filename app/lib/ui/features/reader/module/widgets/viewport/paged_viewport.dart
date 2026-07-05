@@ -1,9 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/core/image/image_quality_policy.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_image_item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -47,15 +48,21 @@ class PagedViewport extends HookConsumerWidget {
     final List<ReaderPageImageData> imageList =
         images ?? const <ReaderPageImageData>[];
     final Size viewportSize = MediaQuery.sizeOf(context);
-    final ImageQualityPolicy imageQualityPolicy = ImageQualityPolicy.current;
     final PageController pageController = usePageController(
       initialPage: initialPage,
     );
     final ObjectRef<bool> hasAppliedPreferredPage = useRef<bool>(false);
     final ObjectRef<bool> isProgrammaticScroll = useRef<bool>(false);
     final ObjectRef<DateTime?> lastWheelAt = useRef<DateTime?>(null);
-    final ObjectRef<int?> lastPrecachedCenterIndex = useRef<int?>(null);
     const int wheelThrottleMs = 200;
+
+    useReaderPrefetchWindow(
+      ref: ref,
+      comicId: comicId,
+      centerPageOneBased: currentIndex,
+      totalPages: totalPages,
+    );
+
     useEffect(() {
       hasAppliedPreferredPage.value = false;
       return null;
@@ -91,37 +98,20 @@ class PagedViewport extends HookConsumerWidget {
         return null;
       }
       isProgrammaticScroll.value = true;
-      pageController.jumpToPage(targetPage);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        isProgrammaticScroll.value = false;
-      });
+      pageController
+          .animateToPage(
+            targetPage,
+            duration: kReaderPageTurnAnimationDuration,
+            curve: Curves.easeInOut,
+          )
+          .whenComplete(() {
+            if (context.mounted) {
+              isProgrammaticScroll.value = false;
+            }
+          });
       return null;
     }, <Object?>[currentIndex, pageController]);
-    useEffect(() {
-      if (imageList.isEmpty) {
-        lastPrecachedCenterIndex.value = null;
-        return null;
-      }
-      final int safeIndex = currentIndex.clamp(1, imageList.length);
-      if (lastPrecachedCenterIndex.value == safeIndex) {
-        return null;
-      }
-      lastPrecachedCenterIndex.value = safeIndex;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!context.mounted) {
-          return;
-        }
-        ReaderImageItem.precacheNeighborPages(
-          context: context,
-          imageDataList: imageList,
-          ref: ref,
-          comicId: comicId,
-          currentIndexOneBased: safeIndex,
-          neighborCount: imageQualityPolicy.readerPrecacheNeighborCount,
-        );
-      });
-      return null;
-    }, <Object?>[currentIndex, imageList.length]);
+
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: viewportSize.width),
@@ -164,7 +154,10 @@ class PagedViewport extends HookConsumerWidget {
             itemCount: imageList.length,
             itemBuilder: (BuildContext context, int index) {
               final ReaderPageImageData imageData = imageList[index];
-              return ReaderImageItem(imageData: imageData);
+              return ReaderImageItem(
+                imageData: imageData,
+                enableCrossfade: true,
+              );
             },
           ),
         ),

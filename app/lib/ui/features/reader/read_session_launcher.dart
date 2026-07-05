@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_controller.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
@@ -92,6 +93,16 @@ Future<void> navigateToSeriesComicInReader(
     await ref.read(readingAggregateProvider.notifier).endSession();
   }
   await ref.read(readerSessionServiceProvider).close(currentSession.comicId);
+  ref.read(readerPrefetchControllerProvider.notifier).clearComic(
+    currentSession.comicId,
+  );
+  try {
+    await ref
+        .read(readerPrefetchControllerProvider.notifier)
+        .warmOpenComic(comicId: targetComicId);
+  } catch (_) {
+    // warm-open 失败不阻断切卷导航。
+  }
   final ReadSessionRouteParams nextSession = ReadSessionRouteParams(
     comicId: targetComicId,
     seriesId: currentSession.seriesId,

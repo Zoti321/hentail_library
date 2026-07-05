@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hentai_library/core/image/image_quality_policy.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
@@ -53,12 +53,18 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       ItemPositionsListener.create,
     );
 
-    final ObjectRef<int?> lastPrecachedCenterIndex = useRef<int?>(null);
+    final ObjectRef<bool> hasAppliedPreferredPage = useRef<bool>(false);
     final ObjectRef<int?> lastVisibleMainIndex = useRef<int?>(null);
     final ObjectRef<bool> isProgrammaticScroll = useRef<bool>(false);
-    final ObjectRef<bool> hasAppliedPreferredPage = useRef<bool>(false);
     final Size viewportSize = MediaQuery.sizeOf(context);
-    final ImageQualityPolicy imageQualityPolicy = ImageQualityPolicy.current;
+    final int totalPages = imageList.length;
+
+    useReaderPrefetchWindow(
+      ref: ref,
+      comicId: comicId,
+      centerPageOneBased: currentIndex,
+      totalPages: totalPages,
+    );
     Future<void> executeScrollToIndex(int targetIndexOneBased) async {
       if (!itemScrollController.isAttached) {
         return;
@@ -184,31 +190,6 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       });
       return null;
     }, <Object?>[currentIndex, imageList.length]);
-    useEffect(() {
-      if (imageList.isEmpty) {
-        lastPrecachedCenterIndex.value = null;
-        return null;
-      }
-      final int safeIndex = currentIndex.clamp(1, imageList.length);
-      if (lastPrecachedCenterIndex.value == safeIndex) {
-        return null;
-      }
-      lastPrecachedCenterIndex.value = safeIndex;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!context.mounted) {
-          return;
-        }
-        ReaderImageItem.precacheNeighborPages(
-          context: context,
-          imageDataList: imageList,
-          ref: ref,
-          comicId: comicId,
-          currentIndexOneBased: safeIndex,
-          neighborCount: imageQualityPolicy.readerPrecacheNeighborCount,
-        );
-      });
-      return null;
-    }, <Object?>[currentIndex, imageList.length]);
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(
@@ -221,7 +202,10 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
           itemCount: imageList.length,
           itemBuilder: (BuildContext context, int index) {
             final ReaderPageImageData imageData = imageList[index];
-            return ReaderImageItem(imageData: imageData);
+            return ReaderImageItem(
+              imageData: imageData,
+              enableCrossfade: false,
+            );
           },
         ),
       ),
