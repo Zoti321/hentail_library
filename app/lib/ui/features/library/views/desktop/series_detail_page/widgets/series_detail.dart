@@ -39,6 +39,11 @@ class SeriesDetail extends HookConsumerWidget {
     final Map<String, Comic> comicsById = comicsByIdFromList(
       comicsSnapshot.data ?? <Comic>[],
     );
+    final bool hasMetadata = seriesDetailHasMetadataBlock(
+      sortedItems,
+      comicsById,
+    );
+    final double sectionGap = tokens.spacing.xl + 8;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -54,13 +59,22 @@ class SeriesDetail extends HookConsumerWidget {
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: tokens.spacing.xl + 8,
               children: <Widget>[
                 _buildPrimaryRow(context, tokens, cs, comicsById),
-                SeriesDetailMetadataBlock(
-                  sortedItems: sortedItems,
-                  comicsById: comicsById,
+                SizedBox(height: sectionGap),
+                if (hasMetadata) ...<Widget>[
+                  SeriesDetailMetadataBlock(
+                    sortedItems: sortedItems,
+                    comicsById: comicsById,
+                  ),
+                  SizedBox(height: sectionGap),
+                ],
+                Divider(
+                  height: 1,
+                  thickness: 1 / MediaQuery.devicePixelRatioOf(context),
+                  color: cs.hentai.borderSubtle,
                 ),
+                SizedBox(height: tokens.spacing.lg),
                 SeriesDetailComicsGrid(
                   sortedItems: sortedItems,
                   comicsById: comicsById,

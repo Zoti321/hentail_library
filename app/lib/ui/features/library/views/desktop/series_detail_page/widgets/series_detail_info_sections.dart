@@ -64,6 +64,14 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
   }
 }
 
+bool seriesDetailHasMetadataBlock(
+  List<SeriesItem> sortedItems,
+  Map<String, Comic> comicsById,
+) {
+  return _aggregateAuthors(sortedItems, comicsById).isNotEmpty ||
+      _aggregateTags(sortedItems, comicsById).isNotEmpty;
+}
+
 class SeriesDetailMetadataBlock extends StatelessWidget {
   const SeriesDetailMetadataBlock({
     super.key,
