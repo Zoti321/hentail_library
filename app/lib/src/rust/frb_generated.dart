@@ -76,7 +76,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => 955120104;
+  int get rustContentHash => 762956084;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -269,13 +269,13 @@ abstract class RustLibApi extends BaseApi {
   Future<UpdateComicUserMetaFrbDto>
   crateApiComicUpdateComicUserMetaFrbDtoDefault();
 
+  Future<UpdateSeriesUserMetaDto>
+  crateApiSeriesUpdateSeriesUserMetaDtoDefault();
+
   void crateApiSeriesUpdateSeriesUserMetaFrb({
     required String seriesId,
-    required UpdateSeriesUserMetaFrbDto meta,
+    required UpdateSeriesUserMetaDto meta,
   });
-
-  Future<UpdateSeriesUserMetaFrbDto>
-  crateApiSeriesUpdateSeriesUserMetaFrbDtoDefault();
 
   Stream<List<SeriesDto>> crateApiSeriesWatchAllSeriesFrb();
 
@@ -1779,20 +1779,48 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<UpdateSeriesUserMetaDto>
+  crateApiSeriesUpdateSeriesUserMetaDtoDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 54,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_update_series_user_meta_dto,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSeriesUpdateSeriesUserMetaDtoDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesUpdateSeriesUserMetaDtoDefaultConstMeta =>
+      const TaskConstMeta(
+        debugName: "update_series_user_meta_dto_default",
+        argNames: [],
+      );
+
+  @override
   void crateApiSeriesUpdateSeriesUserMetaFrb({
     required String seriesId,
-    required UpdateSeriesUserMetaFrbDto meta,
+    required UpdateSeriesUserMetaDto meta,
   }) {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(seriesId, serializer);
-          sse_encode_box_autoadd_update_series_user_meta_frb_dto(
-            meta,
-            serializer,
-          );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 54)!;
+          sse_encode_box_autoadd_update_series_user_meta_dto(meta, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 55)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1809,37 +1837,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(
         debugName: "update_series_user_meta_frb",
         argNames: ["seriesId", "meta"],
-      );
-
-  @override
-  Future<UpdateSeriesUserMetaFrbDto>
-  crateApiSeriesUpdateSeriesUserMetaFrbDtoDefault() {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 55,
-            port: port_,
-          );
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_update_series_user_meta_frb_dto,
-          decodeErrorData: null,
-        ),
-        constMeta: kCrateApiSeriesUpdateSeriesUserMetaFrbDtoDefaultConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiSeriesUpdateSeriesUserMetaFrbDtoDefaultConstMeta =>
-      const TaskConstMeta(
-        debugName: "update_series_user_meta_frb_dto_default",
-        argNames: [],
       );
 
   @override
@@ -2411,10 +2408,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  UpdateSeriesUserMetaFrbDto
-  dco_decode_box_autoadd_update_series_user_meta_frb_dto(dynamic raw) {
+  UpdateSeriesUserMetaDto dco_decode_box_autoadd_update_series_user_meta_dto(
+    dynamic raw,
+  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return dco_decode_update_series_user_meta_frb_dto(raw);
+    return dco_decode_update_series_user_meta_dto(raw);
   }
 
   @protected
@@ -2930,14 +2928,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  UpdateSeriesUserMetaFrbDto dco_decode_update_series_user_meta_frb_dto(
-    dynamic raw,
-  ) {
+  UpdateSeriesUserMetaDto dco_decode_update_series_user_meta_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
     if (arr.length != 4)
       throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return UpdateSeriesUserMetaFrbDto(
+    return UpdateSeriesUserMetaDto(
       name: dco_decode_opt_String(arr[0]),
       serializationStatus: dco_decode_opt_String(arr[1]),
       totalCount: dco_decode_opt_box_autoadd_i_32(arr[2]),
@@ -3196,12 +3192,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  UpdateSeriesUserMetaFrbDto
-  sse_decode_box_autoadd_update_series_user_meta_frb_dto(
+  UpdateSeriesUserMetaDto sse_decode_box_autoadd_update_series_user_meta_dto(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return (sse_decode_update_series_user_meta_frb_dto(deserializer));
+    return (sse_decode_update_series_user_meta_dto(deserializer));
   }
 
   @protected
@@ -3881,7 +3876,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  UpdateSeriesUserMetaFrbDto sse_decode_update_series_user_meta_frb_dto(
+  UpdateSeriesUserMetaDto sse_decode_update_series_user_meta_dto(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3889,7 +3884,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_serializationStatus = sse_decode_opt_String(deserializer);
     var var_totalCount = sse_decode_opt_box_autoadd_i_32(deserializer);
     var var_clearTotalCount = sse_decode_bool(deserializer);
-    return UpdateSeriesUserMetaFrbDto(
+    return UpdateSeriesUserMetaDto(
       name: var_name,
       serializationStatus: var_serializationStatus,
       totalCount: var_totalCount,
@@ -4243,12 +4238,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_box_autoadd_update_series_user_meta_frb_dto(
-    UpdateSeriesUserMetaFrbDto self,
+  void sse_encode_box_autoadd_update_series_user_meta_dto(
+    UpdateSeriesUserMetaDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_update_series_user_meta_frb_dto(self, serializer);
+    sse_encode_update_series_user_meta_dto(self, serializer);
   }
 
   @protected
@@ -4810,8 +4805,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_update_series_user_meta_frb_dto(
-    UpdateSeriesUserMetaFrbDto self,
+  void sse_encode_update_series_user_meta_dto(
+    UpdateSeriesUserMetaDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs

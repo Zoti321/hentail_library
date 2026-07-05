@@ -146,8 +146,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw);
 
   @protected
-  UpdateSeriesUserMetaFrbDto
-  dco_decode_box_autoadd_update_series_user_meta_frb_dto(dynamic raw);
+  UpdateSeriesUserMetaDto dco_decode_box_autoadd_update_series_user_meta_dto(
+    dynamic raw,
+  );
 
   @protected
   ComicDto dco_decode_comic_dto(dynamic raw);
@@ -305,9 +306,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  UpdateSeriesUserMetaFrbDto dco_decode_update_series_user_meta_frb_dto(
-    dynamic raw,
-  );
+  UpdateSeriesUserMetaDto dco_decode_update_series_user_meta_dto(dynamic raw);
 
   @protected
   BigInt dco_decode_usize(dynamic raw);
@@ -450,8 +449,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  UpdateSeriesUserMetaFrbDto
-  sse_decode_box_autoadd_update_series_user_meta_frb_dto(
+  UpdateSeriesUserMetaDto sse_decode_box_autoadd_update_series_user_meta_dto(
     SseDeserializer deserializer,
   );
 
@@ -655,7 +653,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  UpdateSeriesUserMetaFrbDto sse_decode_update_series_user_meta_frb_dto(
+  UpdateSeriesUserMetaDto sse_decode_update_series_user_meta_dto(
     SseDeserializer deserializer,
   );
 
@@ -831,8 +829,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_box_autoadd_update_series_user_meta_frb_dto(
-    UpdateSeriesUserMetaFrbDto self,
+  void sse_encode_box_autoadd_update_series_user_meta_dto(
+    UpdateSeriesUserMetaDto self,
     SseSerializer serializer,
   );
 
@@ -1089,8 +1087,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_update_series_user_meta_frb_dto(
-    UpdateSeriesUserMetaFrbDto self,
+  void sse_encode_update_series_user_meta_dto(
+    UpdateSeriesUserMetaDto self,
     SseSerializer serializer,
   );
 

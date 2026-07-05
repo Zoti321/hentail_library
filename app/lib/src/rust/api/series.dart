@@ -8,7 +8,8 @@ import 'comic.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
+// These functions are ignored because they are not marked as `pub`: `map_series_list`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Stream<List<SeriesDto>> watchAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesWatchAllSeriesFrb();
@@ -31,7 +32,7 @@ SeriesDto? findSeriesByIdFrb({required String seriesId}) =>
 
 void updateSeriesUserMetaFrb({
   required String seriesId,
-  required UpdateSeriesUserMetaFrbDto meta,
+  required UpdateSeriesUserMetaDto meta,
 }) => RustLib.instance.api.crateApiSeriesUpdateSeriesUserMetaFrb(
   seriesId: seriesId,
   meta: meta,
@@ -112,6 +113,7 @@ class SeriesComicOrderEntryDto {
           sortOrder == other.sortOrder;
 }
 
+/// FRB 层 DTO：字段与 `hentai_core::SeriesDto` 对齐。
 class SeriesDto {
   final String seriesId;
   final String folderPath;
@@ -182,6 +184,7 @@ class SeriesFilterDto {
           requireItems == other.requireItems;
 }
 
+/// FRB 层 DTO：字段与 `hentai_core::SeriesItemDto` 对齐，避免跨 crate opaque 绑定。
 class SeriesItemDto {
   final String seriesId;
   final String comicId;
@@ -222,21 +225,22 @@ class SeriesSortOptionDto {
           descending == other.descending;
 }
 
-class UpdateSeriesUserMetaFrbDto {
+/// 与 core `UpdateSeriesUserMetaDto` 同名，减少 Dart/Rust 双命名。
+class UpdateSeriesUserMetaDto {
   final String? name;
   final String? serializationStatus;
   final int? totalCount;
   final bool clearTotalCount;
 
-  const UpdateSeriesUserMetaFrbDto({
+  const UpdateSeriesUserMetaDto({
     this.name,
     this.serializationStatus,
     this.totalCount,
     required this.clearTotalCount,
   });
 
-  static Future<UpdateSeriesUserMetaFrbDto> default_() =>
-      RustLib.instance.api.crateApiSeriesUpdateSeriesUserMetaFrbDtoDefault();
+  static Future<UpdateSeriesUserMetaDto> default_() =>
+      RustLib.instance.api.crateApiSeriesUpdateSeriesUserMetaDtoDefault();
 
   @override
   int get hashCode =>
@@ -248,7 +252,7 @@ class UpdateSeriesUserMetaFrbDto {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is UpdateSeriesUserMetaFrbDto &&
+      other is UpdateSeriesUserMetaDto &&
           runtimeType == other.runtimeType &&
           name == other.name &&
           serializationStatus == other.serializationStatus &&

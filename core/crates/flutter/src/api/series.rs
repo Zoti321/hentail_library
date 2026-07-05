@@ -2,8 +2,9 @@ use hentai_core::{
     fetch_series_page as core_fetch_page, find_series_by_id as core_find, get_all_series,
     load_home_series_comic_order_map, search_series_by_keyword, search_series_by_tag_expression,
     set_series_items_order as core_set_order, update_series_user_meta as core_update_meta,
-    watch_all_series, watch_home_series_comic_order_map, PagedSeriesResultDto as CorePagedSeries,
-    SeriesDto as CoreSeries, SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
+    watch_all_series, watch_home_series_comic_order_map,
+    PagedSeriesResultDto as CorePagedSeries, SeriesDto as CoreSeries,
+    SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
     SeriesSortOptionDto as CoreSeriesSort, UpdateSeriesUserMetaDto as CoreUpdateSeriesUserMeta,
 };
 
@@ -11,6 +12,7 @@ use super::comic::PageRequestDto;
 use super::init::HentaiErrorDto;
 use super::stream_watch::{emit_or_closed, normalize_watch_result};
 
+/// FRB 层 DTO：字段与 `hentai_core::SeriesItemDto` 对齐，避免跨 crate opaque 绑定。
 #[derive(Debug, Clone)]
 pub struct SeriesItemDto {
     pub series_id: String,
@@ -18,6 +20,7 @@ pub struct SeriesItemDto {
     pub sort_order: i32,
 }
 
+/// FRB 层 DTO：字段与 `hentai_core::SeriesDto` 对齐。
 #[derive(Debug, Clone)]
 pub struct SeriesDto {
     pub series_id: String,
@@ -55,12 +58,35 @@ pub struct SeriesComicOrderEntryDto {
     pub sort_order: i32,
 }
 
+/// 与 core `UpdateSeriesUserMetaDto` 同名，减少 Dart/Rust 双命名。
 #[derive(Debug, Clone, Default)]
-pub struct UpdateSeriesUserMetaFrbDto {
+pub struct UpdateSeriesUserMetaDto {
     pub name: Option<String>,
     pub serialization_status: Option<String>,
     pub total_count: Option<i32>,
     pub clear_total_count: bool,
+}
+
+macro_rules! map_series_dto {
+    ($core:expr) => {{
+        let v = $core;
+        SeriesDto {
+            series_id: v.series_id,
+            folder_path: v.folder_path,
+            name: v.name,
+            serialization_status: v.serialization_status,
+            total_count: v.total_count,
+            items: v
+                .items
+                .into_iter()
+                .map(|i| SeriesItemDto {
+                    series_id: i.series_id,
+                    comic_id: i.comic_id,
+                    sort_order: i.sort_order,
+                })
+                .collect(),
+        }
+    }};
 }
 
 impl From<CoreItem> for SeriesItemDto {
@@ -70,6 +96,12 @@ impl From<CoreItem> for SeriesItemDto {
             comic_id: v.comic_id,
             sort_order: v.sort_order,
         }
+    }
+}
+
+impl From<CoreSeries> for SeriesDto {
+    fn from(v: CoreSeries) -> Self {
+        map_series_dto!(v)
     }
 }
 
@@ -103,17 +135,19 @@ impl From<SeriesSortOptionDto> for CoreSeriesSort {
     }
 }
 
-impl From<CoreSeries> for SeriesDto {
-    fn from(v: CoreSeries) -> Self {
-        Self {
-            series_id: v.series_id,
-            folder_path: v.folder_path,
-            name: v.name,
-            serialization_status: v.serialization_status,
-            total_count: v.total_count,
-            items: v.items.into_iter().map(SeriesItemDto::from).collect(),
+impl From<UpdateSeriesUserMetaDto> for CoreUpdateSeriesUserMeta {
+    fn from(value: UpdateSeriesUserMetaDto) -> Self {
+        CoreUpdateSeriesUserMeta {
+            name: value.name,
+            serialization_status: value.serialization_status,
+            total_count: value.total_count,
+            clear_total_count: value.clear_total_count,
         }
     }
+}
+
+fn map_series_list(rows: Vec<CoreSeries>) -> Vec<SeriesDto> {
+    rows.into_iter().map(SeriesDto::from).collect()
 }
 
 #[flutter_rust_bridge::frb]
@@ -122,8 +156,7 @@ pub async fn watch_all_series_frb(
 ) -> Result<(), HentaiErrorDto> {
     normalize_watch_result(
         watch_all_series(|items| {
-            let mapped = items.into_iter().map(SeriesDto::from).collect();
-            emit_or_closed(&sink, mapped)
+            emit_or_closed(&sink, map_series_list(items))
         })
         .await,
     )
@@ -132,7 +165,7 @@ pub async fn watch_all_series_frb(
 #[flutter_rust_bridge::frb(sync)]
 pub fn get_all_series_frb() -> Result<Vec<SeriesDto>, HentaiErrorDto> {
     hentai_core::runtime::block_on(get_all_series())
-        .map(|rows| rows.into_iter().map(SeriesDto::from).collect())
+        .map(map_series_list)
         .map_err(HentaiErrorDto::from)
 }
 
@@ -157,18 +190,10 @@ pub fn find_series_by_id_frb(series_id: String) -> Result<Option<SeriesDto>, Hen
 #[flutter_rust_bridge::frb(sync)]
 pub fn update_series_user_meta_frb(
     series_id: String,
-    meta: UpdateSeriesUserMetaFrbDto,
+    meta: UpdateSeriesUserMetaDto,
 ) -> Result<(), HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_update_meta(
-        &series_id,
-        CoreUpdateSeriesUserMeta {
-            name: meta.name,
-            serialization_status: meta.serialization_status,
-            total_count: meta.total_count,
-            clear_total_count: meta.clear_total_count,
-        },
-    ))
-    .map_err(HentaiErrorDto::from)
+    hentai_core::runtime::block_on(core_update_meta(&series_id, meta.into()))
+        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]
@@ -183,7 +208,7 @@ pub fn set_series_items_order_frb(
 #[flutter_rust_bridge::frb(sync)]
 pub fn search_series_by_keyword_frb(keyword: String) -> Result<Vec<SeriesDto>, HentaiErrorDto> {
     hentai_core::runtime::block_on(search_series_by_keyword(&keyword))
-        .map(|rows| rows.into_iter().map(SeriesDto::from).collect())
+        .map(map_series_list)
         .map_err(HentaiErrorDto::from)
 }
 
@@ -198,7 +223,7 @@ pub fn search_series_by_tag_expression_frb(
         optional_or,
         must_exclude,
     ))
-    .map(|rows| rows.into_iter().map(SeriesDto::from).collect())
+    .map(map_series_list)
     .map_err(HentaiErrorDto::from)
 }
 

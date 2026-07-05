@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 955120104;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 762956084;
 
 // Section: executor
 
@@ -1734,6 +1734,40 @@ fn wire__crate__api__comic__update_comic_user_meta_frb_dto_default_impl(
         },
     )
 }
+fn wire__crate__api__series__update_series_user_meta_dto_default_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "update_series_user_meta_dto_default",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Result::<_, ()>::Ok(
+                        crate::api::series::UpdateSeriesUserMetaDto::default(),
+                    )?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__api__series__update_series_user_meta_frb_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -1757,47 +1791,13 @@ fn wire__crate__api__series__update_series_user_meta_frb_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_series_id = <String>::sse_decode(&mut deserializer);
             let api_meta =
-                <crate::api::series::UpdateSeriesUserMetaFrbDto>::sse_decode(&mut deserializer);
+                <crate::api::series::UpdateSeriesUserMetaDto>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
                 let output_ok =
                     crate::api::series::update_series_user_meta_frb(api_series_id, api_meta)?;
                 Ok(output_ok)
             })())
-        },
-    )
-}
-fn wire__crate__api__series__update_series_user_meta_frb_dto_default_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "update_series_user_meta_frb_dto_default",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            deserializer.end();
-            move |context| {
-                transform_result_sse::<_, ()>((move || {
-                    let output_ok = Result::<_, ()>::Ok(
-                        crate::api::series::UpdateSeriesUserMetaFrbDto::default(),
-                    )?;
-                    Ok(output_ok)
-                })())
-            }
         },
     )
 }
@@ -3076,14 +3076,14 @@ impl SseDecode for crate::api::comic::UpdateComicUserMetaFrbDto {
     }
 }
 
-impl SseDecode for crate::api::series::UpdateSeriesUserMetaFrbDto {
+impl SseDecode for crate::api::series::UpdateSeriesUserMetaDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_name = <Option<String>>::sse_decode(deserializer);
         let mut var_serializationStatus = <Option<String>>::sse_decode(deserializer);
         let mut var_totalCount = <Option<i32>>::sse_decode(deserializer);
         let mut var_clearTotalCount = <bool>::sse_decode(deserializer);
-        return crate::api::series::UpdateSeriesUserMetaFrbDto {
+        return crate::api::series::UpdateSeriesUserMetaDto {
             name: var_name,
             serialization_status: var_serializationStatus,
             total_count: var_totalCount,
@@ -3122,7 +3122,7 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        55 => wire__crate__api__series__update_series_user_meta_frb_dto_default_impl(
+        54 => wire__crate__api__series__update_series_user_meta_dto_default_impl(
             port,
             ptr,
             rust_vec_len,
@@ -3272,7 +3272,7 @@ fn pde_ffi_dispatcher_sync_impl(
             wire__crate__api__series__set_series_items_order_frb_impl(ptr, rust_vec_len, data_len)
         }
         52 => wire__crate__api__comic__update_comic_user_meta_frb_impl(ptr, rust_vec_len, data_len),
-        54 => {
+        55 => {
             wire__crate__api__series__update_series_user_meta_frb_impl(ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -3957,7 +3957,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::UpdateComicUserMetaFrb
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::series::UpdateSeriesUserMetaFrbDto {
+impl flutter_rust_bridge::IntoDart for crate::api::series::UpdateSeriesUserMetaDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.name.into_into_dart().into_dart(),
@@ -3969,13 +3969,13 @@ impl flutter_rust_bridge::IntoDart for crate::api::series::UpdateSeriesUserMetaF
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::series::UpdateSeriesUserMetaFrbDto
+    for crate::api::series::UpdateSeriesUserMetaDto
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::series::UpdateSeriesUserMetaFrbDto>
-    for crate::api::series::UpdateSeriesUserMetaFrbDto
+impl flutter_rust_bridge::IntoIntoDart<crate::api::series::UpdateSeriesUserMetaDto>
+    for crate::api::series::UpdateSeriesUserMetaDto
 {
-    fn into_into_dart(self) -> crate::api::series::UpdateSeriesUserMetaFrbDto {
+    fn into_into_dart(self) -> crate::api::series::UpdateSeriesUserMetaDto {
         self
     }
 }
@@ -4643,7 +4643,7 @@ impl SseEncode for crate::api::comic::UpdateComicUserMetaFrbDto {
     }
 }
 
-impl SseEncode for crate::api::series::UpdateSeriesUserMetaFrbDto {
+impl SseEncode for crate::api::series::UpdateSeriesUserMetaDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Option<String>>::sse_encode(self.name, serializer);

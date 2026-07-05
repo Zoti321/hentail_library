@@ -1,5 +1,5 @@
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
-import 'package:hentai_library/data/repositories/series_frb_mapper.dart';
+import 'package:hentai_library/data/adapters/series_frb_mapper.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
