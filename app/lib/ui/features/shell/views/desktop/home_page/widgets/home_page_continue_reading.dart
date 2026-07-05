@@ -226,7 +226,6 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
                 ReaderRouteArgs.readerRouteName,
                 queryParameters: ReaderRouteArgs(
                   comicId: item.comicId,
-                  readType: ReaderRouteArgs.readTypeComic,
                 ).toQueryParameters(),
               ),
             ),

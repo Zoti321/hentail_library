@@ -13,7 +13,6 @@ import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dar
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/series_item_context_menu.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -117,12 +116,8 @@ class SeriesItemComicTile extends ConsumerWidget {
         child: InkWell(
           onTap: () {
             appRouter.pushNamed(
-              ReaderRouteArgs.readerRouteName,
-              queryParameters: ReaderRouteArgs(
-                comicId: item.comicId,
-                readType: ReaderRouteArgs.readTypeSeries,
-                seriesId: seriesId,
-              ).toQueryParameters(),
+              '漫画详情',
+              pathParameters: <String, String>{'id': item.comicId},
             );
           },
           child: Padding(

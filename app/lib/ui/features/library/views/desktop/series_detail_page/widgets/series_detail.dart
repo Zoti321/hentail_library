@@ -5,7 +5,6 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/actions.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_comics_grid.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_cover.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_header.dart';
@@ -134,8 +133,6 @@ class SeriesDetail extends HookConsumerWidget {
                 series: series,
                 comicsById: comicsById,
               ),
-              SeriesDetailUserMetaEditor(series: series),
-              SeriesDetailActions(series: series, sortedItems: sortedItems),
             ],
           ),
         ),

@@ -12,20 +12,16 @@ class ReaderTopBar extends StatefulWidget {
     required this.showControls,
     required this.isVertical,
     required this.title,
-    required this.canOpenComicList,
     required this.onExit,
     required this.onSetHorizontalMode,
     required this.onSetVerticalMode,
-    required this.onOpenSeriesList,
   });
   final bool showControls;
   final bool isVertical;
   final String title;
-  final bool canOpenComicList;
   final Future<void> Function() onExit;
   final VoidCallback onSetHorizontalMode;
   final VoidCallback onSetVerticalMode;
-  final VoidCallback onOpenSeriesList;
 
   @override
   State<ReaderTopBar> createState() => _ReaderTopBarState();
@@ -99,20 +95,6 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                           letterSpacing: 0.6,
                         ),
                       ),
-                    ),
-                    GhostButton.icon(
-                      icon: LucideIcons.list,
-                      tooltip: '漫画列表',
-                      semanticLabel: '打开系列漫画列表',
-                      iconSize: 16,
-                      size: 32,
-                      borderRadius: 8,
-                      foregroundColor: cs.hentai.readerTextIconPrimary,
-                      hoverColor: cs.hentai.readerPanelSubtle,
-                      overlayColor: cs.hentai.readerPanelSubtle,
-                      onPressed: widget.canOpenComicList
-                          ? widget.onOpenSeriesList
-                          : null,
                     ),
                     CustomPopupMenu(
                       controller: _readModeController,

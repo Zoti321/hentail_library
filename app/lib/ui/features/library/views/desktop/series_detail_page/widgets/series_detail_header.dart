@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_series_dialog.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/widgets/comic_detail_back_header.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -45,6 +46,25 @@ class SeriesDetailHeader extends ConsumerWidget {
                   hoverColor: theme.hoverColor,
                   overlayColor: theme.hoverColor,
                   onPressed: () => ComicDetailBackHeader.popOrGoLibrary(context),
+                ),
+                const SizedBox(width: 4),
+                GhostButton.icon(
+                  icon: LucideIcons.pencil,
+                  tooltip: '编辑系列',
+                  semanticLabel: '编辑系列',
+                  iconSize: 16,
+                  size: 32,
+                  borderRadius: 8,
+                  foregroundColor: cs.hentai.iconDefault,
+                  hoverColor: theme.hoverColor,
+                  overlayColor: theme.hoverColor,
+                  onPressed: () {
+                    showDialog<void>(
+                      context: context,
+                      builder: (BuildContext context) =>
+                          EditSeriesDialog(series: series),
+                    );
+                  },
                 ),
               ],
             ),

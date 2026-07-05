@@ -54,11 +54,13 @@ rust.PageRequestDto mapSeriesPageRequest(PageRequest request) {
 }
 
 rust_series.UpdateSeriesUserMetaFrbDto mapUpdateSeriesUserMeta({
+  String? name,
   SerializationStatus? serializationStatus,
   int? totalCount,
   bool clearTotalCount = false,
 }) {
   return rust_series.UpdateSeriesUserMetaFrbDto(
+    name: name,
     serializationStatus: serializationStatus?.toRust(),
     totalCount: totalCount,
     clearTotalCount: clearTotalCount,

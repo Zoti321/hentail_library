@@ -223,11 +223,13 @@ class SeriesSortOptionDto {
 }
 
 class UpdateSeriesUserMetaFrbDto {
+  final String? name;
   final String? serializationStatus;
   final int? totalCount;
   final bool clearTotalCount;
 
   const UpdateSeriesUserMetaFrbDto({
+    this.name,
     this.serializationStatus,
     this.totalCount,
     required this.clearTotalCount,
@@ -238,6 +240,7 @@ class UpdateSeriesUserMetaFrbDto {
 
   @override
   int get hashCode =>
+      name.hashCode ^
       serializationStatus.hashCode ^
       totalCount.hashCode ^
       clearTotalCount.hashCode;
@@ -247,6 +250,7 @@ class UpdateSeriesUserMetaFrbDto {
       identical(this, other) ||
       other is UpdateSeriesUserMetaFrbDto &&
           runtimeType == other.runtimeType &&
+          name == other.name &&
           serializationStatus == other.serializationStatus &&
           totalCount == other.totalCount &&
           clearTotalCount == other.clearTotalCount;

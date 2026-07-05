@@ -4,10 +4,9 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
 import 'package:hentai_library/ui/features/reader/view_models/reader_window_fullscreen.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
-import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -51,8 +50,6 @@ class ReaderPageViewModel {
 AsyncValue<ReaderPageViewModel> readerPageViewModel(
   Ref ref, {
   required String comicId,
-  required bool isSeriesMode,
-  String? seriesId,
   bool incognito = false,
 }) {
   final AsyncValue<ReaderViewState> viewAsync = ref.watch(
@@ -61,8 +58,6 @@ AsyncValue<ReaderPageViewModel> readerPageViewModel(
   final AsyncValue<ReaderSeriesContextData> seriesContextAsync = ref.watch(
     readerSeriesContextForReaderProvider(
       comicId: comicId,
-      isSeriesMode: isSeriesMode,
-      seriesId: seriesId,
       incognito: incognito,
     ),
   );
@@ -210,8 +205,6 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
           comicId: _comicId,
           comic: currentState.comic,
           pageIndex: currentState.currentIndex,
-          isSeriesMode: routeContext.isSeriesMode,
-          seriesId: routeContext.seriesId,
         );
   }
 
@@ -231,40 +224,6 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
       router.pop();
       return;
     }
-    final String? seriesId = routeContext.isSeriesMode
-        ? routeContext.seriesId
-        : null;
-    if (seriesId != null) {
-      router.goNamed(
-        '系列详情',
-        pathParameters: <String, String>{'id': seriesId},
-      );
-      return;
-    }
     router.go('/home');
-  }
-
-  Future<void> executeSelectComic({
-    required BuildContext context,
-    required ReaderRouteContext routeContext,
-    required String targetComicId,
-  }) async {
-    await executeSaveProgress(routeContext: routeContext);
-    if (!context.mounted) {
-      return;
-    }
-    final bool isSeriesMode = routeContext.isSeriesMode;
-    context.pushReplacementNamed(
-      ReaderRouteArgs.readerRouteName,
-      queryParameters: ReaderRouteArgs(
-        comicId: targetComicId,
-        readType: isSeriesMode
-            ? ReaderRouteArgs.readTypeSeries
-            : ReaderRouteArgs.readTypeComic,
-        seriesId: routeContext.seriesId,
-        keepControlsOpen: true,
-        incognito: routeContext.incognito,
-      ).toQueryParameters(),
-    );
   }
 }

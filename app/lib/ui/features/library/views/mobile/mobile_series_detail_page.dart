@@ -6,11 +6,12 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
-import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_series_dialog.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
+import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
 
 class MobileSeriesDetailPage extends ConsumerWidget {
   const MobileSeriesDetailPage({super.key, required this.seriesId});
@@ -63,9 +64,23 @@ class _MobileSeriesDetailBody extends ConsumerWidget {
                 data: (ComicCoverDisplayData? value) => value,
                 orElse: () => null,
               );
-    final String? progressLabel = series.progressLabel;
     return Scaffold(
-      appBar: AppBar(title: Text(series.name)),
+      appBar: AppBar(
+        title: Text(series.name),
+        actions: <Widget>[
+          IconButton(
+            tooltip: '编辑系列',
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () {
+              showDialog<void>(
+                context: context,
+                builder: (BuildContext context) =>
+                    EditSeriesDialog(series: series),
+              );
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: <Widget>[
           Card(
@@ -105,25 +120,12 @@ class _MobileSeriesDetailBody extends ConsumerWidget {
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 6),
-                        Text(
-                          progressLabel == null
-                              ? '共 ${sortedItems.length} 本漫画'
-                              : '共 ${sortedItems.length} 本 · $progressLabel',
-                        ),
-                        if (series.serializationStatus.name != 'unknown') ...[
+                        Text(series.volumeCountLabel),
+                        if (series.serializationStatus !=
+                            SerializationStatus.unknown) ...[
                           const SizedBox(height: 4),
                           Text(series.serializationStatus.label),
                         ],
-                        const SizedBox(height: 12),
-                        FilledButton.icon(
-                          onPressed: () => _openSeriesReader(
-                            context,
-                            series,
-                            sortedItems,
-                          ),
-                          icon: const Icon(Icons.menu_book_outlined),
-                          label: const Text('阅读系列'),
-                        ),
                       ],
                     ),
                   ),
@@ -141,11 +143,7 @@ class _MobileSeriesDetailBody extends ConsumerWidget {
                         const SizedBox(height: 8),
                     itemBuilder: (BuildContext context, int index) {
                       final SeriesItem item = sortedItems[index];
-                      return _SeriesComicTile(
-                        seriesId: series.id,
-                        item: item,
-                        index: index,
-                      );
+                      return _SeriesComicTile(item: item, index: index);
                     },
                   ),
           ),
@@ -153,38 +151,11 @@ class _MobileSeriesDetailBody extends ConsumerWidget {
       ),
     );
   }
-
-  void _openSeriesReader(
-    BuildContext context,
-    Series targetSeries,
-    List<SeriesItem> sortedItems,
-  ) {
-    if (sortedItems.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('系列内暂无漫画')));
-      return;
-    }
-    final String comicId = sortedItems.first.comicId;
-    context.pushNamed(
-      ReaderRouteArgs.readerRouteName,
-      queryParameters: ReaderRouteArgs(
-        comicId: comicId,
-        readType: ReaderRouteArgs.readTypeSeries,
-        seriesId: targetSeries.id,
-      ).toQueryParameters(),
-    );
-  }
 }
 
 class _SeriesComicTile extends ConsumerWidget {
-  const _SeriesComicTile({
-    required this.seriesId,
-    required this.item,
-    required this.index,
-  });
+  const _SeriesComicTile({required this.item, required this.index});
 
-  final String seriesId;
   final SeriesItem item;
   final int index;
 
@@ -219,14 +190,8 @@ class _SeriesComicTile extends ConsumerWidget {
         subtitle: Text('序号 ${index + 1}'),
         trailing: const Icon(Icons.chevron_right),
         onTap: () {
-          context.pushNamed(
-            ReaderRouteArgs.readerRouteName,
-            queryParameters: ReaderRouteArgs(
-              comicId: item.comicId,
-              readType: ReaderRouteArgs.readTypeSeries,
-              seriesId: seriesId,
-            ).toQueryParameters(),
-          );
+          final String encoded = Uri.encodeComponent(item.comicId);
+          context.go('/comic/$encoded');
         },
       ),
     );

@@ -210,7 +210,7 @@ class _SeriesCardInfo extends StatelessWidget {
           ),
         ),
         Text(
-          '$count 本',
+          series.volumeCountLabel,
           style: TextStyle(
             fontSize: tokens.text.labelXs - 1,
             color: cs.hentai.textTertiary,

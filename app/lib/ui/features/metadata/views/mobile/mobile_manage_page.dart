@@ -284,9 +284,7 @@ class _ManageSeriesTab extends ConsumerWidget {
                       leading: const Icon(Icons.layers_outlined),
                       title: Text(series.name),
                       subtitle: Text(
-                        series.progressLabel == null
-                            ? '共 ${series.items.length} 本'
-                            : '共 ${series.items.length} 本 · ${series.progressLabel}',
+                        series.volumeCountLabel,
                       ),
                       onTap: () {
                         final String encoded = Uri.encodeComponent(series.id);

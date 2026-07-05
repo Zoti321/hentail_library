@@ -56,10 +56,6 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
                     series::Column::FolderPath,
                     sea_orm::sea_query::Expr::value(folder_path.clone()),
                 )
-                .col_expr(
-                    series::Column::Name,
-                    sea_orm::sea_query::Expr::value(name.clone()),
-                )
                 .filter(series::Column::SeriesId.eq(series_id.clone()))
                 .exec(db)
                 .await

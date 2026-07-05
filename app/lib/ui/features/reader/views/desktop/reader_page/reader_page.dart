@@ -9,22 +9,17 @@ import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widg
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_content.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_top_bar.dart';
-import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/series_reader_drawer.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ReaderPage extends HookConsumerWidget {
   const ReaderPage({
     super.key,
     required this.comicId,
-    required this.readType,
-    this.seriesId,
     this.keepControlsOpen = false,
     this.incognito = false,
   });
 
   final String comicId;
-  final String readType;
-  final String? seriesId;
   final bool keepControlsOpen;
   final bool incognito;
 
@@ -32,8 +27,6 @@ class ReaderPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ReaderRouteContext routeContext = ReaderRouteContext.normalize(
       comicId: comicId,
-      readType: readType,
-      seriesId: seriesId,
       incognito: incognito,
     );
     final ReaderViewKey viewKey = readerViewKey(
@@ -52,8 +45,6 @@ class ReaderPage extends HookConsumerWidget {
     final AsyncValue<ReaderPageViewModel> viewAsync = ref.watch(
       readerPageViewModelProvider(
         comicId: routeContext.comicId,
-        isSeriesMode: routeContext.isSeriesMode,
-        seriesId: routeContext.seriesId,
         incognito: routeContext.incognito,
       ),
     );
@@ -205,9 +196,7 @@ class ReaderPage extends HookConsumerWidget {
             error: (Object e, StackTrace st) => Center(child: Text('$e')),
             data: (ReaderPageViewModel viewModel) {
               final ReaderViewState state = viewModel.viewState;
-              final ReaderNavContextData navContext = viewModel.navContext;
               final int? preferredPageIndex = viewModel.preferredPageIndex;
-              final bool canOpenComicList = navContext.items.length > 1;
               if (state.totalPages == 0) {
                 return const Center(child: Text('暂无图片'));
               }
@@ -248,15 +237,11 @@ class ReaderPage extends HookConsumerWidget {
                     showControls: state.showControls,
                     isVertical: readerIsVertical,
                     title: state.comic.title,
-                    canOpenComicList: canOpenComicList,
                     onExit: () async {
                       await notifier.executeExitReader(
                         context: context,
                         routeContext: routeContext,
                       );
-                    },
-                    onOpenSeriesList: () {
-                      scaffoldKey.currentState?.openEndDrawer();
                     },
                     onSetHorizontalMode: () {
                       ref
@@ -303,24 +288,6 @@ class ReaderPage extends HookConsumerWidget {
                     },
                   ),
                 ],
-              );
-            },
-          ),
-          endDrawer: SeriesReaderDrawer(
-            navContext:
-                viewAsync.asData?.value.navContext ??
-                ReaderNavContextData(
-                  items: const <ReaderComicListItem>[],
-                  currentIndex: -1,
-                  preferredPageIndex: null,
-                ),
-            comicId: routeContext.comicId,
-            onSelectComic: (String targetComicId) async {
-              scaffoldKey.currentState?.closeEndDrawer();
-              await notifier.executeSelectComic(
-                context: context,
-                routeContext: routeContext,
-                targetComicId: targetComicId,
               );
             },
           ),

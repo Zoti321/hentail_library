@@ -164,6 +164,7 @@ fn update_series_user_meta_preserves_fields_on_rebuild() {
         update_series_user_meta(
             &series_id,
             UpdateSeriesUserMetaDto {
+                name: Some("自定义系列名".to_string()),
                 serialization_status: Some("ongoing".to_string()),
                 total_count: Some(12),
                 clear_total_count: false,
@@ -178,14 +179,16 @@ fn update_series_user_meta_preserves_fields_on_rebuild() {
             .query_one(Statement::from_string(
                 sea_orm::DatabaseBackend::Sqlite,
                 format!(
-                    "SELECT serialization_status, total_count FROM series WHERE series_id = '{series_id}'"
+                    "SELECT name, serialization_status, total_count FROM series WHERE series_id = '{series_id}'"
                 ),
             ))
             .await
             .expect("query")
             .expect("row");
-        let status: String = row.try_get_by_index(0).expect("status");
-        let total: Option<i32> = row.try_get_by_index(1).expect("total");
+        let name: String = row.try_get_by_index(0).expect("name");
+        let status: String = row.try_get_by_index(1).expect("status");
+        let total: Option<i32> = row.try_get_by_index(2).expect("total");
+        assert_eq!(name, "自定义系列名");
         assert_eq!(status, "ongoing");
         assert_eq!(total, Some(12));
     });

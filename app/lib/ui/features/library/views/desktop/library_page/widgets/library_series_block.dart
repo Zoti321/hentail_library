@@ -86,14 +86,6 @@ class _LibrarySeriesGridSliverState extends State<_LibrarySeriesGridSliver> {
                     series: s,
                     size: const Size(double.infinity, double.infinity),
                     onTap: () => _openSeriesDetail(s),
-                    onSecondaryTapDown: (TapDownDetails details) {
-                      _showSeriesContextMenu(
-                        context: context,
-                        ref: ref,
-                        series: s,
-                        globalPosition: details.globalPosition,
-                      );
-                    },
                   ),
                 );
               },
@@ -146,63 +138,4 @@ class _NoMatchingSeriesSliver extends StatelessWidget {
 void _openSeriesDetail(Series series) {
   final String encoded = Uri.encodeComponent(series.id);
   appRouter.push('/series/$encoded');
-}
-
-void _showSeriesContextMenu({
-  required BuildContext context,
-  required WidgetRef ref,
-  required Series series,
-  required Offset globalPosition,
-}) {
-  final RenderBox overlay =
-      Overlay.of(context).context.findRenderObject() as RenderBox;
-  final Offset relativePosition = overlay.globalToLocal(globalPosition);
-  SeriesContextMenu.show(
-    context,
-    position: relativePosition,
-    seriesName: series.name,
-    onAction: (SeriesContextAction action) {
-      _handleSeriesContextAction(
-        context: context,
-        ref: ref,
-        series: series,
-        action: action,
-      );
-    },
-  );
-}
-
-Future<void> _handleSeriesContextAction({
-  required BuildContext context,
-  required WidgetRef ref,
-  required Series series,
-  required SeriesContextAction action,
-}) async {
-  switch (action) {
-    case SeriesContextAction.read:
-      await _openSeriesReader(context: context, ref: ref, series: series);
-      return;
-  }
-}
-
-Future<void> _openSeriesReader({
-  required BuildContext context,
-  required WidgetRef ref,
-  required Series series,
-}) async {
-  final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
-    ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
-  if (sortedItems.isEmpty) {
-    showInfoToast(context, '系列内暂无漫画');
-    return;
-  }
-  final String comicIdToOpen = sortedItems.first.comicId;
-  appRouter.pushNamed(
-    ReaderRouteArgs.readerRouteName,
-    queryParameters: ReaderRouteArgs(
-      comicId: comicIdToOpen,
-      readType: ReaderRouteArgs.readTypeSeries,
-      seriesId: series.id,
-    ).toQueryParameters(),
-  );
 }

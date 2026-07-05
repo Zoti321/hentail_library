@@ -60,6 +60,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
   @override
   Future<void> updateUserMeta({
     required String seriesId,
+    String? name,
     SerializationStatus? serializationStatus,
     int? totalCount,
     bool clearTotalCount = false,
@@ -68,6 +69,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
       () => rust_series.updateSeriesUserMetaFrb(
         seriesId: seriesId,
         meta: mapUpdateSeriesUserMeta(
+          name: name,
           serializationStatus: serializationStatus,
           totalCount: totalCount,
           clearTotalCount: clearTotalCount,

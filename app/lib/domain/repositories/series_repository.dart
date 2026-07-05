@@ -22,6 +22,7 @@ abstract class SeriesRepository {
 
   Future<void> updateUserMeta({
     required String seriesId,
+    String? name,
     SerializationStatus? serializationStatus,
     int? totalCount,
     bool clearTotalCount = false,

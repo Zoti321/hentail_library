@@ -57,6 +57,7 @@ pub struct SeriesComicOrderEntryDto {
 
 #[derive(Debug, Clone, Default)]
 pub struct UpdateSeriesUserMetaFrbDto {
+    pub name: Option<String>,
     pub serialization_status: Option<String>,
     pub total_count: Option<i32>,
     pub clear_total_count: bool,
@@ -161,6 +162,7 @@ pub fn update_series_user_meta_frb(
     hentai_core::runtime::block_on(core_update_meta(
         &series_id,
         CoreUpdateSeriesUserMeta {
+            name: meta.name,
             serialization_status: meta.serialization_status,
             total_count: meta.total_count,
             clear_total_count: meta.clear_total_count,

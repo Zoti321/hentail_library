@@ -175,7 +175,6 @@ class _MobileComicDetailBody extends ConsumerWidget {
                           ReaderRouteArgs.readerRouteName,
                           queryParameters: ReaderRouteArgs(
                             comicId: comic.comicId,
-                            readType: ReaderRouteArgs.readTypeComic,
                           ).toQueryParameters(),
                         );
                       },

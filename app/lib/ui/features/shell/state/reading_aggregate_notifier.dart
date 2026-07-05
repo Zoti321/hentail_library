@@ -16,8 +16,6 @@ class ReadingAggregateNotifier extends _$ReadingAggregateNotifier {
     required String comicId,
     required Comic comic,
     required int pageIndex,
-    required bool isSeriesMode,
-    required String? seriesId,
   }) async {
     final Future<void>? inFlightSave = _savingProgressByComic[comicId];
     if (inFlightSave != null) {

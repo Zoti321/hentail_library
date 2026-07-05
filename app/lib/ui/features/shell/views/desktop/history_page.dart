@@ -224,7 +224,6 @@ class _HistoryListSliver extends ConsumerWidget {
                 ReaderRouteArgs.readerRouteName,
                 queryParameters: ReaderRouteArgs(
                   comicId: item.comicId,
-                  readType: ReaderRouteArgs.readTypeComic,
                 ).toQueryParameters(),
               ),
               onDelete: () => _handleDeleteComicHistory(

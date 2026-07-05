@@ -61,7 +61,6 @@ class ComicTile extends HookConsumerWidget {
                     ReaderRouteArgs.readerRouteName,
                     queryParameters: ReaderRouteArgs(
                       comicId: comic.comicId,
-                      readType: ReaderRouteArgs.readTypeComic,
                     ).toQueryParameters(),
                   );
                   break;

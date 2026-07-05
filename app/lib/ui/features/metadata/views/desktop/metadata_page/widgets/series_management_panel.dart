@@ -107,7 +107,7 @@ class _Header extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                '系列由 Library 同步时根据文件夹结构自动生成；可在此浏览并编辑连载状态与计划总卷数',
+                '系列由 Library 同步时根据文件夹结构自动生成；可在系列详情页编辑名称、连载状态与漫画总数',
                 style: TextStyle(color: cs.hentai.textTertiary, fontSize: 13),
               ),
             ],
@@ -206,8 +206,6 @@ class _SeriesRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final int count = series.items.length;
-    final String? progressLabel = series.progressLabel;
 
     return Material(
       color: cs.surface,
@@ -235,9 +233,7 @@ class _SeriesRow extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      progressLabel == null
-                          ? '包含 $count 本'
-                          : '包含 $count 本 · $progressLabel',
+                      series.volumeCountLabel,
                       style: TextStyle(
                         fontSize: 12,
                         color: cs.hentai.textTertiary,

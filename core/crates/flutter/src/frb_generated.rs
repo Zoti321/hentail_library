@@ -2988,10 +2988,12 @@ impl SseDecode for crate::api::comic::UpdateComicUserMetaFrbDto {
 impl SseDecode for crate::api::series::UpdateSeriesUserMetaFrbDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_name = <Option<String>>::sse_decode(deserializer);
         let mut var_serializationStatus = <Option<String>>::sse_decode(deserializer);
         let mut var_totalCount = <Option<i32>>::sse_decode(deserializer);
         let mut var_clearTotalCount = <bool>::sse_decode(deserializer);
         return crate::api::series::UpdateSeriesUserMetaFrbDto {
+            name: var_name,
             serialization_status: var_serializationStatus,
             total_count: var_totalCount,
             clear_total_count: var_clearTotalCount,
@@ -3836,6 +3838,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::UpdateComicUserMetaFrb
 impl flutter_rust_bridge::IntoDart for crate::api::series::UpdateSeriesUserMetaFrbDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
+            self.name.into_into_dart().into_dart(),
             self.serialization_status.into_into_dart().into_dart(),
             self.total_count.into_into_dart().into_dart(),
             self.clear_total_count.into_into_dart().into_dart(),
@@ -4501,6 +4504,7 @@ impl SseEncode for crate::api::comic::UpdateComicUserMetaFrbDto {
 impl SseEncode for crate::api::series::UpdateSeriesUserMetaFrbDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Option<String>>::sse_encode(self.name, serializer);
         <Option<String>>::sse_encode(self.serialization_status, serializer);
         <Option<i32>>::sse_encode(self.total_count, serializer);
         <bool>::sse_encode(self.clear_total_count, serializer);

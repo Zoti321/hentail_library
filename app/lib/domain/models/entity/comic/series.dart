@@ -49,11 +49,12 @@ abstract class Series with _$Series {
     return false;
   }
 
-  String? get progressLabel {
+  String get volumeCountLabel {
+    final int actual = items.length;
     final int? planned = totalCount;
     if (planned == null || planned <= 0) {
-      return null;
+      return '$actual 本书';
     }
-    return '${items.length} / $planned';
+    return '$actual / 共 $planned 本书';
   }
 }

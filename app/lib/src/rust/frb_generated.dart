@@ -2836,12 +2836,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return UpdateSeriesUserMetaFrbDto(
-      serializationStatus: dco_decode_opt_String(arr[0]),
-      totalCount: dco_decode_opt_box_autoadd_i_32(arr[1]),
-      clearTotalCount: dco_decode_bool(arr[2]),
+      name: dco_decode_opt_String(arr[0]),
+      serializationStatus: dco_decode_opt_String(arr[1]),
+      totalCount: dco_decode_opt_box_autoadd_i_32(arr[2]),
+      clearTotalCount: dco_decode_bool(arr[3]),
     );
   }
 
@@ -3746,10 +3747,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_opt_String(deserializer);
     var var_serializationStatus = sse_decode_opt_String(deserializer);
     var var_totalCount = sse_decode_opt_box_autoadd_i_32(deserializer);
     var var_clearTotalCount = sse_decode_bool(deserializer);
     return UpdateSeriesUserMetaFrbDto(
+      name: var_name,
       serializationStatus: var_serializationStatus,
       totalCount: var_totalCount,
       clearTotalCount: var_clearTotalCount,
@@ -4640,6 +4643,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_String(self.name, serializer);
     sse_encode_opt_String(self.serializationStatus, serializer);
     sse_encode_opt_box_autoadd_i_32(self.totalCount, serializer);
     sse_encode_bool(self.clearTotalCount, serializer);
