@@ -1,11 +1,10 @@
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/ui/features/reader/view_models/reader_page_notifier.dart';
-import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -17,7 +16,6 @@ Future<void> openReadSession(
   String? seriesId,
   bool incognito = false,
   bool keepControlsOpen = false,
-  bool recordStandaloneStart = true,
 }) async {
   final ReadSessionRouteParams session = ReadSessionRouteParams(
     comicId: comicId,
@@ -25,18 +23,6 @@ Future<void> openReadSession(
     incognito: incognito,
     keepControlsOpen: keepControlsOpen,
   );
-  if (!incognito && recordStandaloneStart && !session.isSeriesRead) {
-    final Comic? comic = await ref.read(comicRepoProvider).findById(comicId);
-    if (comic != null) {
-      await ref.read(readingHistoryRepoProvider).recordReading(
-        ReadingHistory(
-          comicId: comic.comicId,
-          title: comic.title,
-          lastReadTime: DateTime.now(),
-        ),
-      );
-    }
-  }
   appRouter.pushNamed(
     ReaderRouteArgs.readerRouteName,
     queryParameters: ReaderRouteArgs.fromSession(session).toQueryParameters(),
@@ -59,7 +45,6 @@ Future<void> openSeriesReadSession(
     comicId: comicId,
     seriesId: seriesId,
     incognito: incognito,
-    recordStandaloneStart: false,
   );
 }
 
@@ -78,7 +63,6 @@ Future<void> openComicReadSession(
     comicId: comic.comicId,
     seriesId: seriesId,
     incognito: incognito,
-    recordStandaloneStart: !incognito && seriesId == null,
   );
 }
 
@@ -95,13 +79,16 @@ Future<void> navigateToSeriesComicInReader(
     currentSession.comicId,
     incognito: currentSession.incognito,
   );
-  await ref.read(readerViewProvider(viewKey).notifier).executeSaveProgress(
-    routeContext: ReaderRouteContext.normalize(
-      comicId: currentSession.comicId,
-      seriesId: currentSession.seriesId,
-      incognito: currentSession.incognito,
-    ),
-  );
+  if (!currentSession.incognito) {
+    final ReaderViewState? viewState =
+        ref.read(readerViewProvider(viewKey)).asData?.value;
+    if (viewState != null) {
+      ref
+          .read(readingAggregateProvider.notifier)
+          .updatePage(viewState.currentIndex);
+    }
+    await ref.read(readingAggregateProvider.notifier).endSession();
+  }
   await ref
       .read(readerSessionServiceProvider)
       .close(currentSession.comicId);

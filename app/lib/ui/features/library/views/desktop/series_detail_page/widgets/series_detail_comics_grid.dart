@@ -73,7 +73,6 @@ class SeriesDetailComicsGrid extends ConsumerWidget {
                 ref,
                 comicId: comic.comicId,
                 seriesId: seriesId,
-                recordStandaloneStart: false,
               );
             },
           ),

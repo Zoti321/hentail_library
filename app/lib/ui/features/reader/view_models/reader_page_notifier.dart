@@ -108,10 +108,22 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
 
   String get _comicId => (ref.$arg as ReaderViewKey).comicId;
 
+  void _notifyPageChanged(int pageIndex) {
+    final ReaderViewKey key = ref.$arg as ReaderViewKey;
+    if (key.incognito) {
+      return;
+    }
+    ref.read(readingAggregateProvider.notifier).updatePage(pageIndex);
+  }
+
   void _updateDataState(ReaderViewState Function(ReaderViewState) updater) {
     final current = state.asData?.value;
     if (current == null) return;
-    state = AsyncData(updater(current));
+    final ReaderViewState next = updater(current);
+    if (next.currentIndex != current.currentIndex) {
+      _notifyPageChanged(next.currentIndex);
+    }
+    state = AsyncData(next);
   }
 
   void toggleShowControls() {
@@ -186,17 +198,12 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
       return;
     }
     final ReaderViewState? currentState = state.asData?.value;
-    if (currentState == null) {
-      return;
+    if (currentState != null) {
+      ref
+          .read(readingAggregateProvider.notifier)
+          .updatePage(currentState.currentIndex);
     }
-    await ref
-        .read(readingAggregateProvider.notifier)
-        .saveProgress(
-          comicId: _comicId,
-          comic: currentState.comic,
-          pageIndex: currentState.currentIndex,
-          seriesId: routeContext.seriesId,
-        );
+    await ref.read(readingAggregateProvider.notifier).flushProgress();
   }
 
   Future<void> closeSession() async {
@@ -210,7 +217,15 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
     await ref
         .read(readerWindowFullscreenProvider.notifier)
         .exitFullscreenIfNeeded();
-    await executeSaveProgress(routeContext: routeContext);
+    if (!routeContext.incognito) {
+      final ReaderViewState? currentState = state.asData?.value;
+      if (currentState != null) {
+        ref
+            .read(readingAggregateProvider.notifier)
+            .updatePage(currentState.currentIndex);
+      }
+      await ref.read(readingAggregateProvider.notifier).endSession();
+    }
     await closeSession();
     if (!context.mounted) {
       return;
