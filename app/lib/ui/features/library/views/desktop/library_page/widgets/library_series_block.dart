@@ -6,13 +6,35 @@ class LibrarySeriesBlock extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
-    final LibraryPageViewModel vm = ref.watch(libraryPageViewModelProvider);
-    if (vm.displayTarget != LibraryDisplayTarget.series) {
+    final AsyncValue<LibraryPageSnapshot> catalogAsync = ref.watch(
+      libraryPageContentProvider,
+    );
+    if (catalogAsync.hasError) {
+      return catalogAsync.when(
+        data: (_) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+        loading: () => const SliverToBoxAdapter(
+          child: Center(child: CircularProgressIndicator()),
+        ),
+        error: (Object err, StackTrace stack) => SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text('Error: $err'),
+          ),
+        ),
+      );
+    }
+    final LibraryPageSnapshot? snapshot = catalogAsync.value;
+    if (snapshot == null) {
+      return const SliverToBoxAdapter(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (snapshot.displayTarget != LibraryDisplayTarget.series) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
-    final AsyncValue<List<Series>> seriesAsync = vm.seriesAsync;
-    final String filterQuery = vm.filterQuery;
-    final bool showPagination = vm.showPagination;
+    final List<Series> series = snapshot.series;
+    final String filterQuery = snapshot.filterQuery;
+    final bool showPagination = snapshot.showPagination;
     return SliverPadding(
       padding: EdgeInsets.symmetric(
         horizontal: tokens.layout.contentHorizontalPadding,
@@ -25,8 +47,9 @@ class LibrarySeriesBlock extends ConsumerWidget {
               placement: LibraryPaginationPlacement.top,
             ),
           _LibrarySeriesGridSliver(
-            seriesAsync: seriesAsync,
+            series: series,
             effectiveQuery: filterQuery,
+            isReloading: catalogAsync.isLoading,
           ),
           if (showPagination)
             const LibraryPaginationBarSliver(
@@ -41,11 +64,13 @@ class LibrarySeriesBlock extends ConsumerWidget {
 
 class _LibrarySeriesGridSliver extends StatefulWidget {
   const _LibrarySeriesGridSliver({
-    required this.seriesAsync,
+    required this.series,
     required this.effectiveQuery,
+    this.isReloading = false,
   });
-  final AsyncValue<List<Series>> seriesAsync;
+  final List<Series> series;
   final String effectiveQuery;
+  final bool isReloading;
 
   @override
   State<_LibrarySeriesGridSliver> createState() =>
@@ -67,42 +92,29 @@ class _LibrarySeriesGridSliverState extends State<_LibrarySeriesGridSliver> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.seriesAsync.when(
-      data: (List<Series> series) {
-        final String q = widget.effectiveQuery.trim();
-        if (series.isEmpty) {
-          return _NoMatchingSeriesSliver(query: q);
-        }
-        return Consumer(
-          builder: (BuildContext context, WidgetRef ref, Widget? child) {
-            return SliverGrid.builder(
-              gridDelegate: _delegateFor(context),
-              itemCount: series.length,
-              itemBuilder: (BuildContext context, int index) {
-                final Series s = series[index];
-                return Center(
-                  child: SeriesCard(
-                    key: Key('library-series-${s.name}'),
-                    series: s,
-                    size: const Size(double.infinity, double.infinity),
-                    onTap: () => _openSeriesDetail(s),
-                  ),
-                );
-              },
-            );
-          },
+    if (widget.isReloading && widget.series.isEmpty) {
+      return const SliverToBoxAdapter(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final String q = widget.effectiveQuery.trim();
+    if (widget.series.isEmpty) {
+      return _NoMatchingSeriesSliver(query: q);
+    }
+    return SliverGrid.builder(
+      gridDelegate: _delegateFor(context),
+      itemCount: widget.series.length,
+      itemBuilder: (BuildContext context, int index) {
+        final Series s = widget.series[index];
+        return Center(
+          child: SeriesCard(
+            key: Key('library-series-${s.name}'),
+            series: s,
+            size: const Size(double.infinity, double.infinity),
+            onTap: () => _openSeriesDetail(s),
+          ),
         );
       },
-      error: (Object err, StackTrace stack) => SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text('Error: $err'),
-        ),
-      ),
-      loading: () => const SliverToBoxAdapter(
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      skipLoadingOnReload: true,
     );
   }
 }
