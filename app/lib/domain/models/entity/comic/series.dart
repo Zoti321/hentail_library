@@ -1,15 +1,20 @@
-﻿import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 
 part 'series.freezed.dart';
 
-/// 系列聚合（独立于 Comic，本质上维护归属与顺序）。
+/// 系列聚合：由 Library sync 根据文件夹结构自动生成。
 @freezed
 abstract class Series with _$Series {
   factory Series({
+    required String id,
     required String name,
+    required String folderPath,
+    @Default(SerializationStatus.unknown)
+    SerializationStatus serializationStatus,
+    int? totalCount,
     @Default(<SeriesItem>[]) List<SeriesItem> items,
   }) = _Series;
 
@@ -45,17 +50,12 @@ abstract class Series with _$Series {
     return false;
   }
 
-  /// 将漫画加入系列（若已存在则更新其顺序）。
-  Series upsertComic(String comicId, {required int order}) {
-    final next = <SeriesItem>[
-      for (final i in items)
-        if (i.comicId != comicId) i,
-      SeriesItem(comicId: comicId, order: order),
-    ]..sort((a, b) => a.order.compareTo(b.order));
-    return copyWith(items: next);
-  }
-
-  Series removeComic(String comicId) {
-    return copyWith(items: items.where((e) => e.comicId != comicId).toList());
+  String get volumeCountLabel {
+    final int actual = items.length;
+    final int? planned = totalCount;
+    if (planned == null || planned <= 0) {
+      return '$actual 本书';
+    }
+    return '$actual / 共 $planned 本书';
   }
 }

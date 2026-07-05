@@ -8,10 +8,8 @@ import 'comic.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These functions are ignored because they are not marked as `pub`: `map_series_list`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`
-
-InferSeriesResultDto inferSeriesFrb() =>
-    RustLib.instance.api.crateApiSeriesInferSeriesFrb();
 
 Stream<List<SeriesDto>> watchAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesWatchAllSeriesFrb();
@@ -29,46 +27,22 @@ PagedSeriesResultDto fetchSeriesPageFrb({
   sort: sort,
 );
 
-SeriesDto? findSeriesByNameFrb({required String name}) =>
-    RustLib.instance.api.crateApiSeriesFindSeriesByNameFrb(name: name);
+SeriesDto? findSeriesByIdFrb({required String seriesId}) =>
+    RustLib.instance.api.crateApiSeriesFindSeriesByIdFrb(seriesId: seriesId);
 
-void createSeriesFrb({required String name}) =>
-    RustLib.instance.api.crateApiSeriesCreateSeriesFrb(name: name);
-
-void renameSeriesFrb({required String name, required String newName}) => RustLib
-    .instance
-    .api
-    .crateApiSeriesRenameSeriesFrb(name: name, newName: newName);
-
-void deleteSeriesFrb({required String name}) =>
-    RustLib.instance.api.crateApiSeriesDeleteSeriesFrb(name: name);
-
-void assignComicExclusiveFrb({
-  required String comicId,
-  required String targetSeriesName,
-  required int sortOrder,
-}) => RustLib.instance.api.crateApiSeriesAssignComicExclusiveFrb(
-  comicId: comicId,
-  targetSeriesName: targetSeriesName,
-  sortOrder: sortOrder,
+void updateSeriesUserMetaFrb({
+  required String seriesId,
+  required UpdateSeriesUserMetaDto meta,
+}) => RustLib.instance.api.crateApiSeriesUpdateSeriesUserMetaFrb(
+  seriesId: seriesId,
+  meta: meta,
 );
 
-void removeComicFromSeriesFrb({required String comicId}) => RustLib.instance.api
-    .crateApiSeriesRemoveComicFromSeriesFrb(comicId: comicId);
-
-void removeComicsFromSeriesFrb({required List<String> comicIds}) => RustLib
-    .instance
-    .api
-    .crateApiSeriesRemoveComicsFromSeriesFrb(comicIds: comicIds);
-
-void removeOrphanSeriesItemsFrb() =>
-    RustLib.instance.api.crateApiSeriesRemoveOrphanSeriesItemsFrb();
-
 void setSeriesItemsOrderFrb({
-  required String seriesName,
+  required String seriesId,
   required List<String> orderedComicIds,
 }) => RustLib.instance.api.crateApiSeriesSetSeriesItemsOrderFrb(
-  seriesName: seriesName,
+  seriesId: seriesId,
   orderedComicIds: orderedComicIds,
 );
 
@@ -92,33 +66,6 @@ List<SeriesComicOrderEntryDto> loadHomeSeriesComicOrderMapFrb() =>
 
 Stream<List<SeriesComicOrderEntryDto>> watchHomeSeriesComicOrderMapFrb() =>
     RustLib.instance.api.crateApiSeriesWatchHomeSeriesComicOrderMapFrb();
-
-class InferSeriesResultDto {
-  final int groupsApplied;
-  final int comicsAssigned;
-  final int newSeriesCreated;
-
-  const InferSeriesResultDto({
-    required this.groupsApplied,
-    required this.comicsAssigned,
-    required this.newSeriesCreated,
-  });
-
-  @override
-  int get hashCode =>
-      groupsApplied.hashCode ^
-      comicsAssigned.hashCode ^
-      newSeriesCreated.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is InferSeriesResultDto &&
-          runtimeType == other.runtimeType &&
-          groupsApplied == other.groupsApplied &&
-          comicsAssigned == other.comicsAssigned &&
-          newSeriesCreated == other.newSeriesCreated;
-}
 
 class PagedSeriesResultDto {
   final List<SeriesDto> items;
@@ -166,21 +113,43 @@ class SeriesComicOrderEntryDto {
           sortOrder == other.sortOrder;
 }
 
+/// FRB 层 DTO：字段与 `hentai_core::SeriesDto` 对齐。
 class SeriesDto {
+  final String seriesId;
+  final String folderPath;
   final String name;
+  final String serializationStatus;
+  final int? totalCount;
   final List<SeriesItemDto> items;
 
-  const SeriesDto({required this.name, required this.items});
+  const SeriesDto({
+    required this.seriesId,
+    required this.folderPath,
+    required this.name,
+    required this.serializationStatus,
+    this.totalCount,
+    required this.items,
+  });
 
   @override
-  int get hashCode => name.hashCode ^ items.hashCode;
+  int get hashCode =>
+      seriesId.hashCode ^
+      folderPath.hashCode ^
+      name.hashCode ^
+      serializationStatus.hashCode ^
+      totalCount.hashCode ^
+      items.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is SeriesDto &&
           runtimeType == other.runtimeType &&
+          seriesId == other.seriesId &&
+          folderPath == other.folderPath &&
           name == other.name &&
+          serializationStatus == other.serializationStatus &&
+          totalCount == other.totalCount &&
           items == other.items;
 }
 
@@ -215,27 +184,27 @@ class SeriesFilterDto {
           requireItems == other.requireItems;
 }
 
+/// FRB 层 DTO：字段与 `hentai_core::SeriesItemDto` 对齐，避免跨 crate opaque 绑定。
 class SeriesItemDto {
-  final String seriesName;
+  final String seriesId;
   final String comicId;
   final int sortOrder;
 
   const SeriesItemDto({
-    required this.seriesName,
+    required this.seriesId,
     required this.comicId,
     required this.sortOrder,
   });
 
   @override
-  int get hashCode =>
-      seriesName.hashCode ^ comicId.hashCode ^ sortOrder.hashCode;
+  int get hashCode => seriesId.hashCode ^ comicId.hashCode ^ sortOrder.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is SeriesItemDto &&
           runtimeType == other.runtimeType &&
-          seriesName == other.seriesName &&
+          seriesId == other.seriesId &&
           comicId == other.comicId &&
           sortOrder == other.sortOrder;
 }
@@ -254,4 +223,39 @@ class SeriesSortOptionDto {
       other is SeriesSortOptionDto &&
           runtimeType == other.runtimeType &&
           descending == other.descending;
+}
+
+/// 与 core `UpdateSeriesUserMetaDto` 同名，减少 Dart/Rust 双命名。
+class UpdateSeriesUserMetaDto {
+  final String? name;
+  final String? serializationStatus;
+  final int? totalCount;
+  final bool clearTotalCount;
+
+  const UpdateSeriesUserMetaDto({
+    this.name,
+    this.serializationStatus,
+    this.totalCount,
+    required this.clearTotalCount,
+  });
+
+  static Future<UpdateSeriesUserMetaDto> default_() =>
+      RustLib.instance.api.crateApiSeriesUpdateSeriesUserMetaDtoDefault();
+
+  @override
+  int get hashCode =>
+      name.hashCode ^
+      serializationStatus.hashCode ^
+      totalCount.hashCode ^
+      clearTotalCount.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UpdateSeriesUserMetaDto &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          serializationStatus == other.serializationStatus &&
+          totalCount == other.totalCount &&
+          clearTotalCount == other.clearTotalCount;
 }

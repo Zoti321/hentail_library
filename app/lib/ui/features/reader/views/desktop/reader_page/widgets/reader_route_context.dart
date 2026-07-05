@@ -1,5 +1,4 @@
-import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/reading/read_session.dart';
 
 class ReaderComicListItem {
   const ReaderComicListItem({
@@ -17,84 +16,60 @@ class ReaderNavContextData {
     required this.items,
     required this.currentIndex,
     required this.preferredPageIndex,
-    this.seriesName,
   });
   final List<ReaderComicListItem> items;
   final int currentIndex;
   final int? preferredPageIndex;
-  final String? seriesName;
-  bool get hasMultipleItems => items.length > 1;
-}
 
-class SeriesReaderNavData {
-  const SeriesReaderNavData({
-    required this.seriesName,
-    required this.sortedItems,
-    required this.currentIndex,
-  });
-  final String seriesName;
-  final List<SeriesItem> sortedItems;
-  final int currentIndex;
-}
+  bool get hasPrevious => currentIndex > 0;
 
-enum ReaderReadType { comic, series }
+  bool get hasNext => currentIndex >= 0 && currentIndex < items.length - 1;
+
+  ReaderComicListItem? get previousItem =>
+      hasPrevious ? items[currentIndex - 1] : null;
+
+  ReaderComicListItem? get nextItem => hasNext ? items[currentIndex + 1] : null;
+}
 
 class ReaderRouteContext {
   const ReaderRouteContext({
     required this.comicId,
-    required this.readType,
-    this.seriesName,
+    this.seriesId,
+    this.incognito = false,
   });
 
   final String comicId;
-  final ReaderReadType readType;
-  final String? seriesName;
+  final String? seriesId;
+  final bool incognito;
 
-  bool get isSeriesMode => readType == ReaderReadType.series;
+  ReadSessionRouteParams get session => ReadSessionRouteParams(
+    comicId: comicId,
+    seriesId: seriesId,
+    incognito: incognito,
+  );
+
+  bool get isSeriesRead => session.isSeriesRead;
 
   static ReaderRouteContext normalize({
     required String comicId,
-    required String readType,
-    String? seriesName,
+    String? seriesId,
+    bool incognito = false,
   }) {
-    final ReaderReadType parsedType = readType == 'series'
-        ? ReaderReadType.series
-        : ReaderReadType.comic;
-    final String normalizedComicId = comicId.trim();
-    final String? normalizedSeriesName =
-        seriesName != null && seriesName.isNotEmpty ? seriesName : null;
-    final bool isValidSeries =
-        parsedType == ReaderReadType.series && normalizedSeriesName != null;
+    final String? resolvedSeriesId = seriesId?.trim();
     return ReaderRouteContext(
-      comicId: normalizedComicId,
-      readType: isValidSeries ? ReaderReadType.series : ReaderReadType.comic,
-      seriesName: isValidSeries ? normalizedSeriesName : null,
+      comicId: comicId.trim(),
+      seriesId: resolvedSeriesId == null || resolvedSeriesId.isEmpty
+          ? null
+          : resolvedSeriesId,
+      incognito: incognito,
     );
   }
-}
-
-SeriesReaderNavData? buildSeriesReaderNavData(Series? series, String comicId) {
-  if (series == null || !series.containsComic(comicId)) {
-    return null;
-  }
-  final List<SeriesItem> sorted = List<SeriesItem>.from(series.items)
-    ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
-  final int idx = sorted.indexWhere((SeriesItem e) => e.comicId == comicId);
-  if (idx < 0) {
-    return null;
-  }
-  return SeriesReaderNavData(
-    seriesName: series.name,
-    sortedItems: sorted,
-    currentIndex: idx,
-  );
 }
 
 ReaderNavContextData buildReaderNavContextData({
   required List<ReaderComicListItem> items,
   required String currentComicId,
   required int? preferredPageIndex,
-  String? seriesName,
 }) {
   final List<ReaderComicListItem> sortedItems =
       List<ReaderComicListItem>.from(items)..sort(
@@ -108,6 +83,5 @@ ReaderNavContextData buildReaderNavContextData({
     items: sortedItems,
     currentIndex: currentIndex,
     preferredPageIndex: preferredPageIndex,
-    seriesName: seriesName,
   );
 }

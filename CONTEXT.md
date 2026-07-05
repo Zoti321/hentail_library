@@ -39,12 +39,12 @@ _Scan_ 与 _Library sync_ 在用户触发的场景中指同一操作；领域文
 ### Organization & metadata
 
 **Series**:
-库中有名、有顺序的 Comic 集合；可手动创建，也可由 Series inference 批量生成或并入同名 Series，入库后均为同一实体。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series；不在任何 Series 中的 Comic 仍作为独立条目存在于 Library 中。
+库中有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。用户可编辑连载状态与计划总卷数；成员顺序由 sync 按文件名自然排序写入。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series；不在任何 Series 中的 Comic 仍作为独立条目存在于 Library 中。
 _Avoid_: 合集、专辑、套系
 
-**Series inference**:
-根据 Comic 标题规则猜测系列名与卷序，将尚未归属任何 Series 的 Comic 编入 Series 的操作；若同名 Series 已存在则追加卷。
-_Avoid_: 自动分组、智能归类
+**Folder series**:
+Comic 的直接父目录对应一个 Series；Saved path 根目录下直接存放的 Comic 也会形成以根文件夹命名的 Series。Series 身份由规范化 `folder_path` 派生（`seriesId`）。
+_Avoid_: 标题推断、自动分组
 
 **Tag**:
 用户为 Comic 附加的自由文本标签，用于筛选与归类。

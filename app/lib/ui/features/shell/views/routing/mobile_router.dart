@@ -1,10 +1,8 @@
-import 'package:hentai_library/ui/features/library/views/mobile/mobile_comic_detail_page.dart';
+import 'package:hentai_library/ui/features/shell/views/mobile/mobile_history_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/ui/features/shell/views/mobile/mobile_history_page.dart';
 import 'package:hentai_library/ui/features/library/views/mobile/mobile_library_page.dart';
 import 'package:hentai_library/ui/features/metadata/views/mobile/mobile_manage_page.dart';
-import 'package:hentai_library/ui/features/library/views/mobile/mobile_series_detail_page.dart';
 import 'package:hentai_library/ui/features/settings/views/mobile/mobile_settings_page.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/shared_content_routes.dart';
 import 'package:hentai_library/ui/features/shell/views/adaptive_app_shell.dart';
@@ -51,12 +49,7 @@ final GoRouter mobileRouter = GoRouter(
           builder: (BuildContext context, GoRouterState state) =>
               const MobileManagePage(),
         ),
-        ...buildSharedContentRoutes(
-          comicDetailBuilder: (BuildContext context, String comicId) =>
-              MobileComicDetailPage(comicId: comicId),
-          seriesDetailBuilder: (BuildContext context, String seriesName) =>
-              MobileSeriesDetailPage(seriesName: seriesName),
-        ),
+        ...buildSharedContentRoutes(),
       ],
     ),
   ],

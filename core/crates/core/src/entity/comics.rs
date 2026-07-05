@@ -7,9 +7,9 @@ pub struct Model {
     pub comic_id: String,
     pub path: String,
     pub resource_type: String,
-    pub title: String,
-    pub content_rating: String,
-    pub page_count: Option<i32>,
+    pub resource_size: i64,
+    pub created_at: i64,
+    pub last_updated_at: i64,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

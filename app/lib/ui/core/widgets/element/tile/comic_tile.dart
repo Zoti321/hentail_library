@@ -30,7 +30,7 @@ class ComicTile extends HookConsumerWidget {
     final ComicCoverDisplayData? coverData = ref
         .watch(comicCoverDisplayProvider(comicId: comic.comicId))
         .maybeWhen(data: (ComicCoverDisplayData? v) => v, orElse: () => null);
-    final int pageCount = comic.pageCount ?? 0;
+    final int pageCount = comic.pageCount;
     final int coverCacheWidth = AppComicImage.resolveCacheWidth(
       context: context,
       logicalWidth: 56 * 3,
@@ -61,7 +61,6 @@ class ComicTile extends HookConsumerWidget {
                     ReaderRouteArgs.readerRouteName,
                     queryParameters: ReaderRouteArgs(
                       comicId: comic.comicId,
-                      readType: ReaderRouteArgs.readTypeComic,
                     ).toQueryParameters(),
                   );
                   break;

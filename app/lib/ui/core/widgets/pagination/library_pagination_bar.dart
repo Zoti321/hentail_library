@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_page_pagination_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_controller.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum LibraryPaginationPlacement { top, bottom }
@@ -37,6 +36,9 @@ class LibraryPaginationBar extends ConsumerWidget {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final bool canGoPrevious = !isLoading && page > 1;
     final bool canGoNext = !isLoading && page < totalPages;
+    final LibraryCatalogController controller = ref.read(
+      libraryCatalogControllerProvider.notifier,
+    );
     return Padding(
       padding: _paddingForPlacement(tokens),
       child: Row(
@@ -46,14 +48,24 @@ class LibraryPaginationBar extends ConsumerWidget {
             icon: LucideIcons.chevronsLeft,
             tooltip: '首页',
             onPressed: canGoPrevious
-                ? () => _pageIndexNotifier(ref).goToFirstPage()
+                ? () => switch (target) {
+                    LibraryPaginationTarget.comics =>
+                      controller.goToComicsFirstPage(),
+                    LibraryPaginationTarget.series =>
+                      controller.goToSeriesFirstPage(),
+                  }
                 : null,
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronLeft,
             tooltip: '上一页',
             onPressed: canGoPrevious
-                ? () => _pageIndexNotifier(ref).goToPreviousPage()
+                ? () => switch (target) {
+                    LibraryPaginationTarget.comics =>
+                      controller.goToComicsPreviousPage(),
+                    LibraryPaginationTarget.series =>
+                      controller.goToSeriesPreviousPage(),
+                  }
                 : null,
           ),
           Padding(
@@ -69,30 +81,29 @@ class LibraryPaginationBar extends ConsumerWidget {
             icon: LucideIcons.chevronRight,
             tooltip: '下一页',
             onPressed: canGoNext
-                ? () => _pageIndexNotifier(ref).goToNextPage(totalPages)
+                ? () => switch (target) {
+                    LibraryPaginationTarget.comics =>
+                      controller.goToComicsNextPage(totalPages),
+                    LibraryPaginationTarget.series =>
+                      controller.goToSeriesNextPage(totalPages),
+                  }
                 : null,
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronsRight,
             tooltip: '末页',
             onPressed: canGoNext
-                ? () => _pageIndexNotifier(ref).goToLastPage(totalPages)
+                ? () => switch (target) {
+                    LibraryPaginationTarget.comics =>
+                      controller.goToComicsLastPage(totalPages),
+                    LibraryPaginationTarget.series =>
+                      controller.goToSeriesLastPage(totalPages),
+                  }
                 : null,
           ),
         ],
       ),
     );
-  }
-
-  dynamic _pageIndexNotifier(WidgetRef ref) {
-    return switch (target) {
-      LibraryPaginationTarget.comics => ref.read(
-        libraryComicsPageIndexProvider.notifier,
-      ),
-      LibraryPaginationTarget.series => ref.read(
-        librarySeriesPageIndexProvider.notifier,
-      ),
-    };
   }
 
   EdgeInsets _paddingForPlacement(AppThemeTokens tokens) {
@@ -120,55 +131,28 @@ class LibraryPaginationBarSliver extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return switch (target) {
-      LibraryPaginationTarget.comics => _buildComicsSliver(ref),
-      LibraryPaginationTarget.series => _buildSeriesSliver(ref),
+    final AsyncValue<LibraryPageSnapshot> catalogAsync = ref.watch(
+      libraryPageContentProvider,
+    );
+    final LibraryPageSnapshot? snapshot = catalogAsync.value;
+    if (snapshot == null) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
+    final LibraryPagination pagination = switch (target) {
+      LibraryPaginationTarget.comics => snapshot.comicsPagination,
+      LibraryPaginationTarget.series => snapshot.seriesPagination,
     };
-  }
-
-  Widget _buildComicsSliver(WidgetRef ref) {
-    final AsyncValue<PagedResult<Comic>> pageAsync = ref.watch(
-      libraryComicsPageProvider,
-    );
-    return pageAsync.when(
-      data: (PagedResult<Comic> page) {
-        return SliverToBoxAdapter(
-          child: LibraryPaginationBar(
-            target: LibraryPaginationTarget.comics,
-            page: page.page,
-            totalPages: page.totalPages,
-            isLoading: false,
-            placement: placement,
-          ),
-        );
-      },
-      loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-      error: (Object _, StackTrace _) =>
-          const SliverToBoxAdapter(child: SizedBox.shrink()),
-      skipLoadingOnReload: true,
-    );
-  }
-
-  Widget _buildSeriesSliver(WidgetRef ref) {
-    final AsyncValue<PagedResult<Series>> pageAsync = ref.watch(
-      librarySeriesPageProvider,
-    );
-    return pageAsync.when(
-      data: (PagedResult<Series> page) {
-        return SliverToBoxAdapter(
-          child: LibraryPaginationBar(
-            target: LibraryPaginationTarget.series,
-            page: page.page,
-            totalPages: page.totalPages,
-            isLoading: false,
-            placement: placement,
-          ),
-        );
-      },
-      loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-      error: (Object _, StackTrace _) =>
-          const SliverToBoxAdapter(child: SizedBox.shrink()),
-      skipLoadingOnReload: true,
+    if (pagination.totalPages <= 1) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
+    return SliverToBoxAdapter(
+      child: LibraryPaginationBar(
+        target: target,
+        page: pagination.page,
+        totalPages: pagination.totalPages,
+        isLoading: catalogAsync.isLoading,
+        placement: placement,
+      ),
     );
   }
 }

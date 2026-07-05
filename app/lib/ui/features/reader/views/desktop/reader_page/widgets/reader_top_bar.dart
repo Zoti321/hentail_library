@@ -2,8 +2,11 @@ import 'dart:ui';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_series_nav.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ReaderTopBar extends StatefulWidget {
@@ -12,20 +15,20 @@ class ReaderTopBar extends StatefulWidget {
     required this.showControls,
     required this.isVertical,
     required this.title,
-    required this.canOpenComicList,
+    required this.session,
     required this.onExit,
     required this.onSetHorizontalMode,
     required this.onSetVerticalMode,
-    required this.onOpenSeriesList,
+    this.navContext,
   });
   final bool showControls;
   final bool isVertical;
   final String title;
-  final bool canOpenComicList;
+  final ReadSessionRouteParams session;
+  final ReaderNavContextData? navContext;
   final Future<void> Function() onExit;
   final VoidCallback onSetHorizontalMode;
   final VoidCallback onSetVerticalMode;
-  final VoidCallback onOpenSeriesList;
 
   @override
   State<ReaderTopBar> createState() => _ReaderTopBarState();
@@ -89,6 +92,11 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                         await widget.onExit();
                       },
                     ),
+                    if (widget.navContext != null)
+                      ReaderSeriesNav(
+                        navContext: widget.navContext!,
+                        session: widget.session,
+                      ),
                     Expanded(
                       child: _ReaderTopBarTitle(
                         title: widget.title,
@@ -99,20 +107,6 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                           letterSpacing: 0.6,
                         ),
                       ),
-                    ),
-                    GhostButton.icon(
-                      icon: LucideIcons.list,
-                      tooltip: '漫画列表',
-                      semanticLabel: '打开系列漫画列表',
-                      iconSize: 16,
-                      size: 32,
-                      borderRadius: 8,
-                      foregroundColor: cs.hentai.readerTextIconPrimary,
-                      hoverColor: cs.hentai.readerPanelSubtle,
-                      overlayColor: cs.hentai.readerPanelSubtle,
-                      onPressed: widget.canOpenComicList
-                          ? widget.onOpenSeriesList
-                          : null,
                     ),
                     CustomPopupMenu(
                       controller: _readModeController,

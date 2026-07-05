@@ -117,6 +117,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int dco_decode_box_autoadd_i_32(dynamic raw);
 
   @protected
+  PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
+
+  @protected
   PageRequestDto dco_decode_box_autoadd_page_request_dto(dynamic raw);
 
   @protected
@@ -129,6 +132,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesFilterDto dco_decode_box_autoadd_series_filter_dto(dynamic raw);
 
   @protected
+  SeriesReadingHistoryDto dco_decode_box_autoadd_series_reading_history_dto(
+    dynamic raw,
+  );
+
+  @protected
   SeriesSortOptionDto dco_decode_box_autoadd_series_sort_option_dto(
     dynamic raw,
   );
@@ -136,6 +144,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   UpdateComicUserMetaFrbDto
   dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw);
+
+  @protected
+  UpdateSeriesUserMetaDto dco_decode_box_autoadd_update_series_user_meta_dto(
+    dynamic raw,
+  );
 
   @protected
   ComicDto dco_decode_comic_dto(dynamic raw);
@@ -163,9 +176,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PlatformInt64 dco_decode_i_64(dynamic raw);
-
-  @protected
-  InferSeriesResultDto dco_decode_infer_series_result_dto(dynamic raw);
 
   @protected
   LibrarySyncCountsDto dco_decode_library_sync_counts_dto(dynamic raw);
@@ -213,12 +223,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int? dco_decode_opt_box_autoadd_i_32(dynamic raw);
 
   @protected
+  PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
+
+  @protected
   ReadingHistoryDto? dco_decode_opt_box_autoadd_reading_history_dto(
     dynamic raw,
   );
 
   @protected
   SeriesDto? dco_decode_opt_box_autoadd_series_dto(dynamic raw);
+
+  @protected
+  SeriesReadingHistoryDto?
+  dco_decode_opt_box_autoadd_series_reading_history_dto(dynamic raw);
 
   @protected
   List<String>? dco_decode_opt_list_String(dynamic raw);
@@ -254,6 +271,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesItemDto dco_decode_series_item_dto(dynamic raw);
 
   @protected
+  SeriesReadingHistoryDto dco_decode_series_reading_history_dto(dynamic raw);
+
+  @protected
   SeriesSortOptionDto dco_decode_series_sort_option_dto(dynamic raw);
 
   @protected
@@ -284,6 +304,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   UpdateComicUserMetaFrbDto dco_decode_update_comic_user_meta_frb_dto(
     dynamic raw,
   );
+
+  @protected
+  UpdateSeriesUserMetaDto dco_decode_update_series_user_meta_dto(dynamic raw);
 
   @protected
   BigInt dco_decode_usize(dynamic raw);
@@ -389,6 +412,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int sse_decode_box_autoadd_i_32(SseDeserializer deserializer);
 
   @protected
+  PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
+
+  @protected
   PageRequestDto sse_decode_box_autoadd_page_request_dto(
     SseDeserializer deserializer,
   );
@@ -407,6 +433,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  SeriesReadingHistoryDto sse_decode_box_autoadd_series_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   SeriesSortOptionDto sse_decode_box_autoadd_series_sort_option_dto(
     SseDeserializer deserializer,
   );
@@ -414,6 +445,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   UpdateComicUserMetaFrbDto
   sse_decode_box_autoadd_update_comic_user_meta_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  UpdateSeriesUserMetaDto sse_decode_box_autoadd_update_series_user_meta_dto(
     SseDeserializer deserializer,
   );
 
@@ -451,11 +487,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
-
-  @protected
-  InferSeriesResultDto sse_decode_infer_series_result_dto(
-    SseDeserializer deserializer,
-  );
 
   @protected
   LibrarySyncCountsDto sse_decode_library_sync_counts_dto(
@@ -509,12 +540,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int? sse_decode_opt_box_autoadd_i_32(SseDeserializer deserializer);
 
   @protected
+  PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
+
+  @protected
   ReadingHistoryDto? sse_decode_opt_box_autoadd_reading_history_dto(
     SseDeserializer deserializer,
   );
 
   @protected
   SeriesDto? sse_decode_opt_box_autoadd_series_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SeriesReadingHistoryDto?
+  sse_decode_opt_box_autoadd_series_reading_history_dto(
     SseDeserializer deserializer,
   );
 
@@ -564,6 +604,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesItemDto sse_decode_series_item_dto(SseDeserializer deserializer);
 
   @protected
+  SeriesReadingHistoryDto sse_decode_series_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   SeriesSortOptionDto sse_decode_series_sort_option_dto(
     SseDeserializer deserializer,
   );
@@ -604,6 +649,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   UpdateComicUserMetaFrbDto sse_decode_update_comic_user_meta_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  UpdateSeriesUserMetaDto sse_decode_update_series_user_meta_dto(
     SseDeserializer deserializer,
   );
 
@@ -731,6 +781,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_i_64(
+    PlatformInt64 self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_page_request_dto(
     PageRequestDto self,
     SseSerializer serializer,
@@ -755,6 +811,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_series_reading_history_dto(
+    SeriesReadingHistoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_series_sort_option_dto(
     SeriesSortOptionDto self,
     SseSerializer serializer,
@@ -763,6 +825,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_update_comic_user_meta_frb_dto(
     UpdateComicUserMetaFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_update_series_user_meta_dto(
+    UpdateSeriesUserMetaDto self,
     SseSerializer serializer,
   );
 
@@ -810,12 +878,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_infer_series_result_dto(
-    InferSeriesResultDto self,
-    SseSerializer serializer,
-  );
 
   @protected
   void sse_encode_library_sync_counts_dto(
@@ -884,6 +946,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_opt_box_autoadd_i_32(int? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_opt_box_autoadd_i_64(
+    PlatformInt64? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_reading_history_dto(
     ReadingHistoryDto? self,
     SseSerializer serializer,
@@ -892,6 +960,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_series_dto(
     SeriesDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_series_reading_history_dto(
+    SeriesReadingHistoryDto? self,
     SseSerializer serializer,
   );
 
@@ -953,6 +1027,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_series_item_dto(SeriesItemDto self, SseSerializer serializer);
 
   @protected
+  void sse_encode_series_reading_history_dto(
+    SeriesReadingHistoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_series_sort_option_dto(
     SeriesSortOptionDto self,
     SseSerializer serializer,
@@ -1003,6 +1083,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_update_comic_user_meta_frb_dto(
     UpdateComicUserMetaFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_update_series_user_meta_dto(
+    UpdateSeriesUserMetaDto self,
     SseSerializer serializer,
   );
 

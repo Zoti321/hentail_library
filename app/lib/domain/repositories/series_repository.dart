@@ -2,10 +2,11 @@ import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 
-/// Series 仓储：系列独立聚合，维护漫画归属与顺序。
+/// Series 仓储：文件夹 sync 自动生成；用户可编辑连载状态与计划总卷数。
 abstract class SeriesRepository {
   Stream<List<Series>> watchAll();
 
@@ -17,58 +18,27 @@ abstract class SeriesRepository {
     required LibraryComicSortOption sortOption,
   });
 
-  Future<Series?> findByName(String name);
+  Future<Series?> findById(String seriesId);
 
-  Future<void> create(String name);
-
-  Future<void> rename({required String name, required String newName});
-
-  Future<void> delete(String name);
-
-  /// 排他归属：保证同一 comicId 只能属于一个系列。
-  Future<void> assignComicExclusive({
-    required String comicId,
-    required String targetSeriesName,
-    required int order,
+  Future<void> updateUserMeta({
+    required String seriesId,
+    String? name,
+    SerializationStatus? serializationStatus,
+    int? totalCount,
+    bool clearTotalCount = false,
   });
 
-  Future<void> removeComic(String comicId);
-
-  /// 批量移除系列中的漫画归属。
-  Future<void> removeComicsFromSeries(Iterable<String> comicIds);
-
-  /// 清理系列中指向不存在漫画的脏关联。
-  Future<void> removeOrphanSeriesItems();
-
-  /// 按 [orderedItems] 顺序将 [seriesName] 下各条目的顺序写为 0..length-1。
+  /// 保留底层 API，供后续开放手动排序。
   Future<void> setSeriesItemsOrder(
-    String seriesName,
+    String seriesId,
     List<SeriesItem> orderedItems,
   );
 
-  /// 关键词搜索（数据库命中），由上层决定是否再应用额外业务过滤。
   Future<List<Series>> searchByKeyword(String keyword);
 
-  /// 标签表达式搜索（数据库命中），由上层决定是否再应用额外业务过滤。
   Future<List<Series>> searchByTagExpression({
     required Set<String> mustInclude,
     required Set<String> optionalOr,
     required Set<String> mustExclude,
   });
-
-  /// 从未归属漫画标题推断系列并写入数据库（Rust 原子 API）。
-  Future<InferSeriesFromComicTitlesResult> inferFromUnassignedComics();
-}
-
-/// 系列推断结果（供 UI 展示）。
-final class InferSeriesFromComicTitlesResult {
-  const InferSeriesFromComicTitlesResult({
-    required this.groupsApplied,
-    required this.comicsAssigned,
-    required this.newSeriesCreated,
-  });
-
-  final int groupsApplied;
-  final int comicsAssigned;
-  final int newSeriesCreated;
 }

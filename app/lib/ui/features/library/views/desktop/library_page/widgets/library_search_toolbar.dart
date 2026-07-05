@@ -270,6 +270,7 @@ class _LibraryCompactToolbar extends ConsumerWidget {
           onPressed: onOpenFilterSort,
         ),
         const _LibraryOverflowMenuButton(),
+        const _LibraryPageSizeMenuButton(),
       ],
     );
   }
@@ -281,6 +282,128 @@ class _LibraryOverflowMenuButton extends ConsumerStatefulWidget {
   @override
   ConsumerState<_LibraryOverflowMenuButton> createState() =>
       _LibraryOverflowMenuButtonState();
+}
+
+class _LibraryPageSizeMenuButton extends ConsumerStatefulWidget {
+  const _LibraryPageSizeMenuButton();
+
+  @override
+  ConsumerState<_LibraryPageSizeMenuButton> createState() =>
+      _LibraryPageSizeMenuButtonState();
+}
+
+class _LibraryPageSizeMenuButtonState
+    extends ConsumerState<_LibraryPageSizeMenuButton> {
+  final CustomPopupMenuController _controller = CustomPopupMenuController();
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
+    );
+    final int activePageSize = ref.watch(libraryActivePageSizeProvider);
+    return CustomPopupMenu(
+      controller: _controller,
+      barrierColor: Colors.transparent,
+      pressType: PressType.singleClick,
+      showArrow: false,
+      verticalMargin: -24,
+      menuBuilder: () => _LibraryPageSizeMenu(
+        activePageSize: activePageSize,
+        onSelected: (int pageSize) {
+          _controller.hideMenu();
+          ref
+              .read(libraryTabPageSizeProvider.notifier)
+              .setPageSize(displayTarget, pageSize);
+        },
+      ),
+      child: GhostButton.icon(
+        icon: LucideIcons.layoutGrid,
+        tooltip: '每页数量',
+        semanticLabel: '设置每页数量',
+        iconSize: 16,
+        size: 32,
+        borderRadius: 8,
+        foregroundColor: cs.hentai.iconDefault,
+        hoverColor: theme.hoverColor,
+        overlayColor: theme.hoverColor,
+        delayTooltipThreeSeconds: true,
+        onPressed: () => _controller.toggleMenu(),
+      ),
+    );
+  }
+}
+
+class _LibraryPageSizeMenu extends StatelessWidget {
+  const _LibraryPageSizeMenu({
+    required this.activePageSize,
+    required this.onSelected,
+  });
+
+  final int activePageSize;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuPanelShell(
+      width: 120,
+      blurRadius: 6,
+      shadowOffset: const Offset(0, 4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: kLibraryPageSizeOptions
+              .map(
+                (int pageSize) => _LibraryPageSizeMenuItem(
+                  pageSize: pageSize,
+                  isSelected: pageSize == activePageSize,
+                  onTap: () => onSelected(pageSize),
+                ),
+              )
+              .toList(),
+        ),
+      ),
+    );
+  }
+}
+
+class _LibraryPageSizeMenuItem extends StatelessWidget {
+  const _LibraryPageSizeMenuItem({
+    required this.pageSize,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final int pageSize;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return Material(
+      color: isSelected ? cs.primary.withAlpha(14) : Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        hoverColor: isSelected ? Colors.transparent : cs.primary.withAlpha(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Text(
+            '$pageSize',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              color: isSelected ? cs.primary : cs.hentai.textPrimary,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _LibraryOverflowMenuButtonState

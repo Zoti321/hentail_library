@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/use_cases/sync_library_types.dart';
 import 'package:hentai_library/ui/core/widgets/pagination/library_pagination_bar.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -16,28 +15,20 @@ class MobileLibraryPage extends ConsumerStatefulWidget {
 class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<List<Comic>> comicsAsync = ref.watch(
-      libraryDisplayedComicsProvider,
-    );
-    final AsyncValue<PagedResult<Comic>> pageAsync = ref.watch(
-      libraryComicsPageProvider,
+    final AsyncValue<LibraryPageSnapshot> catalogAsync = ref.watch(
+      libraryCatalogControllerProvider,
     );
     final ScanLibraryState scanState = ref.watch(scanLibraryControllerProvider);
     final bool isScanning = scanState.running;
-    final LibraryComicsPagination pagination = pageAsync.maybeWhen(
-      data: (PagedResult<Comic> page) => LibraryComicsPagination(
-        page: page.page,
-        totalPages: page.totalPages,
-        totalCount: page.totalCount,
-        isLoading: false,
-      ),
-      orElse: () => const LibraryComicsPagination(
-        page: 1,
-        totalPages: 0,
-        totalCount: 0,
-        isLoading: true,
-      ),
-    );
+    final LibraryPageSnapshot? snapshot = catalogAsync.value;
+    final LibraryPagination pagination =
+        snapshot?.comicsPagination ??
+        const LibraryPagination(
+          page: 1,
+          totalPages: 0,
+          totalCount: 0,
+          isLoading: true,
+        );
     return Scaffold(
       appBar: AppBar(
         title: const Text('漫画库'),
@@ -77,8 +68,9 @@ class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
             onStartOrCancelTap: () => _onStartOrCancelTap(isScanning),
           ),
           Expanded(
-            child: comicsAsync.when(
-              data: (List<Comic> comics) {
+            child: catalogAsync.when(
+              data: (LibraryPageSnapshot loadedSnapshot) {
+                final List<Comic> comics = loadedSnapshot.comics;
                 if (comics.isEmpty) {
                   return const _LibraryEmptyView();
                 }
@@ -123,13 +115,14 @@ class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
               error: (Object error, StackTrace stackTrace) {
                 return Center(child: Text('加载失败：$error'));
               },
+              skipLoadingOnReload: true,
             ),
           ),
           LibraryPaginationBar(
             target: LibraryPaginationTarget.comics,
             page: pagination.page,
             totalPages: pagination.totalPages,
-            isLoading: pagination.isLoading,
+            isLoading: catalogAsync.isLoading && snapshot == null,
           ),
         ],
       ),
@@ -252,7 +245,7 @@ class _LibraryEmptyView extends StatelessWidget {
 
 String _buildComicSubtitle(Comic comic) {
   final String rating = comic.contentRating.name.toUpperCase();
-  final int pageCount = comic.pageCount ?? 0;
+  final int pageCount = comic.pageCount;
   final int tagCount = comic.tags.length;
   return '评级: $rating  页数: $pageCount  标签: $tagCount';
 }

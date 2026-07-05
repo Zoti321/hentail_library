@@ -7,8 +7,8 @@ license.workspace = true
 build = "build.rs"
 
 [[test]]
-name = "series_inference_golden"
-path = "../../tests/series_inference_golden.rs"
+name = "folder_series_rebuild"
+path = "tests/folder_series_rebuild.rs"
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }

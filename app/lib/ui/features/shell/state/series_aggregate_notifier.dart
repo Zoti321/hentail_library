@@ -11,6 +11,17 @@ Future<List<Series>> allSeries(Ref ref) async {
   return list;
 }
 
+/// 系列详情页入口：按 id 单条查询，依赖 [seriesAggregateProvider] 在 sync/编辑后刷新。
+@Riverpod(keepAlive: true)
+Future<Series?> seriesById(Ref ref, String seriesId) {
+  ref.watch(seriesAggregateProvider);
+  final String normalizedId = seriesId.trim();
+  if (normalizedId.isEmpty) {
+    return Future<Series?>.value(null);
+  }
+  return ref.read(librarySeriesRepoProvider).findById(normalizedId);
+}
+
 @Riverpod(keepAlive: true)
 class SeriesAggregateNotifier extends _$SeriesAggregateNotifier {
   @override

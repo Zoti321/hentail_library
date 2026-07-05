@@ -8,12 +8,12 @@ import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
+import 'package:hentai_library/ui/features/library/shared/comic_display_title.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/series_item_context_menu.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -22,20 +22,16 @@ class SeriesItemComicTile extends ConsumerWidget {
     super.key,
     required this.item,
     required this.sequenceNumber,
-    required this.seriesName,
+    required this.seriesId,
   });
 
   final SeriesItem item;
   final int sequenceNumber;
-  final String seriesName;
+  final String seriesId;
   static const double _kTooltipIconSlot = 22;
 
   static String titleForComic(WidgetRef ref, String comicId) {
-    final Comic? comic = ref.watch(libraryComicByIdProvider(comicId)).value;
-    if (comic != null && comic.title.isNotEmpty) {
-      return comic.title;
-    }
-    return comicId.length > 12 ? '${comicId.substring(0, 12)}…' : comicId;
+    return comicDisplayTitle(ref, comicId);
   }
 
   @override
@@ -117,12 +113,8 @@ class SeriesItemComicTile extends ConsumerWidget {
         child: InkWell(
           onTap: () {
             appRouter.pushNamed(
-              ReaderRouteArgs.readerRouteName,
-              queryParameters: ReaderRouteArgs(
-                comicId: item.comicId,
-                readType: ReaderRouteArgs.readTypeSeries,
-                seriesName: seriesName,
-              ).toQueryParameters(),
+              '漫画详情',
+              pathParameters: <String, String>{'id': item.comicId},
             );
           },
           child: Padding(

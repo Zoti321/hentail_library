@@ -59,9 +59,14 @@ pub struct ComicDto {
     pub comic_id: String,
     pub path: String,
     pub resource_type: String,
+    pub resource_size: i64,
+    pub created_at: i64,
+    pub last_updated_at: i64,
     pub title: String,
     pub content_rating: String,
-    pub page_count: Option<i32>,
+    pub page_count: i32,
+    pub description: Option<String>,
+    pub published_at: Option<i64>,
     pub authors: Vec<String>,
     pub tags: Vec<String>,
 }
@@ -83,4 +88,11 @@ pub struct PagedComicResultDto {
     pub total_count: i64,
     pub page: i32,
     pub page_size: i32,
+}
+
+pub fn now_ms() -> i64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_millis() as i64)
+        .unwrap_or(0)
 }

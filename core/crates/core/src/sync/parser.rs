@@ -1,10 +1,12 @@
 use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::{Path, PathBuf};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use zip::ZipArchive;
 
-use crate::formats::{count_pdf_pages, count_rar_images, count_sevenz_images};
+use crate::comic::now_ms;
+use crate::formats::{count_pdf_pages, count_rar_images, count_sevenz_images, read_pdf_embedded_meta};
 use crate::comic_id::comic_id_from_path;
 use crate::error::HentaiError;
 
@@ -16,7 +18,10 @@ pub struct ParsedResource {
     pub resource_type: String,
     pub title: String,
     pub authors: Vec<String>,
-    pub page_count: Option<i32>,
+    pub page_count: i32,
+    pub description: Option<String>,
+    pub published_at: Option<i64>,
+    pub resource_size: i64,
 }
 
 pub fn comic_id_for_path(path: &str) -> String {
@@ -56,6 +61,40 @@ pub fn basename_without_extension(path: &Path) -> String {
         .to_string()
 }
 
+pub fn read_resource_size(path: &Path, resource_type: &str) -> Result<Option<i64>, HentaiError> {
+    if !path.exists() {
+        return Ok(None);
+    }
+    if resource_type == "dir" {
+        return compute_dir_image_files_size(path);
+    }
+    let meta = std::fs::metadata(path).map_err(|e| {
+        HentaiError::validation(format!("stat 失败: {} ({})", path.display(), e))
+    })?;
+    Ok(Some(meta.len() as i64))
+}
+
+fn compute_dir_image_files_size(dir: &Path) -> Result<Option<i64>, HentaiError> {
+    let mut total = 0i64;
+    for entry in std::fs::read_dir(dir).map_err(|e| {
+        HentaiError::validation(format!("读取目录失败: {} ({})", dir.display(), e))
+    })? {
+        let entry = entry.map_err(|e| HentaiError::validation(e.to_string()))?;
+        let path = entry.path();
+        if path.is_dir() {
+            return Ok(None);
+        }
+        if path.is_file() && is_comic_image_extension(&extension_lower(&path)) {
+            let meta = std::fs::metadata(&path).map_err(|e| HentaiError::validation(e.to_string()))?;
+            total += meta.len() as i64;
+        }
+    }
+    if total <= 0 {
+        return Ok(None);
+    }
+    Ok(Some(total))
+}
+
 pub fn read_source_stat(path: &Path, resource_type: &str) -> Result<Option<(i64, i64)>, HentaiError> {
     if !path.exists() {
         return Ok(None);
@@ -66,12 +105,38 @@ pub fn read_source_stat(path: &Path, resource_type: &str) -> Result<Option<(i64,
     let modified_ms = meta
         .modified()
         .ok()
-        .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
         .map(|d| d.as_millis() as i64)
         .unwrap_or(0);
-    let size = meta.len() as i64;
-    let _ = resource_type;
+    let size = read_resource_size(path, resource_type)?.unwrap_or(0);
     Ok(Some((modified_ms, size)))
+}
+
+fn finalize_parsed(
+    path: &Path,
+    resource_type: &str,
+    title: String,
+    authors: Vec<String>,
+    page_count: i32,
+    description: Option<String>,
+    published_at: Option<i64>,
+) -> Result<Option<ParsedResource>, HentaiError> {
+    if page_count <= 0 {
+        return Ok(None);
+    }
+    let Some(resource_size) = read_resource_size(path, resource_type)? else {
+        return Ok(None);
+    };
+    Ok(Some(ParsedResource {
+        path: path.to_string_lossy().to_string(),
+        resource_type: resource_type.to_string(),
+        title,
+        authors,
+        page_count,
+        description,
+        published_at,
+        resource_size,
+    }))
 }
 
 pub fn parse_directory(dir: &Path) -> Result<Option<ParsedResource>, HentaiError> {
@@ -97,13 +162,15 @@ pub fn parse_directory(dir: &Path) -> Result<Option<ParsedResource>, HentaiError
     if !files.iter().all(|f| is_comic_image_extension(&extension_lower(f))) {
         return Ok(None);
     }
-    Ok(Some(ParsedResource {
-        path: dir.to_string_lossy().to_string(),
-        resource_type: "dir".to_string(),
-        title: basename(dir),
-        authors: vec![],
-        page_count: Some(files.len() as i32),
-    }))
+    finalize_parsed(
+        dir,
+        "dir",
+        basename(dir),
+        vec![],
+        files.len() as i32,
+        None,
+        None,
+    )
 }
 
 pub fn parse_zip_archive(file: &Path, resource_type: &str) -> Result<Option<ParsedResource>, HentaiError> {
@@ -131,16 +198,15 @@ pub fn parse_zip_archive(file: &Path, resource_type: &str) -> Result<Option<Pars
             page_count += 1;
         }
     }
-    if page_count == 0 {
-        return Ok(None);
-    }
-    Ok(Some(ParsedResource {
-        path: file.to_string_lossy().to_string(),
-        resource_type: resource_type.to_string(),
-        title: basename_without_extension(file),
-        authors: vec![],
-        page_count: Some(page_count),
-    }))
+    finalize_parsed(
+        file,
+        resource_type,
+        basename_without_extension(file),
+        vec![],
+        page_count,
+        None,
+        None,
+    )
 }
 
 pub fn parse_file(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
@@ -167,13 +233,15 @@ pub fn parse_rar_archive(file: &Path, resource_type: &str) -> Result<Option<Pars
     let Some(page_count) = page_count else {
         return Ok(None);
     };
-    Ok(Some(ParsedResource {
-        path: file.to_string_lossy().to_string(),
-        resource_type: resource_type.to_string(),
-        title: basename_without_extension(file),
-        authors: vec![],
-        page_count: Some(page_count),
-    }))
+    finalize_parsed(
+        file,
+        resource_type,
+        basename_without_extension(file),
+        vec![],
+        page_count,
+        None,
+        None,
+    )
 }
 
 pub fn parse_sevenz_archive(
@@ -184,13 +252,15 @@ pub fn parse_sevenz_archive(
     let Some(page_count) = page_count else {
         return Ok(None);
     };
-    Ok(Some(ParsedResource {
-        path: file.to_string_lossy().to_string(),
-        resource_type: resource_type.to_string(),
-        title: basename_without_extension(file),
-        authors: vec![],
-        page_count: Some(page_count),
-    }))
+    finalize_parsed(
+        file,
+        resource_type,
+        basename_without_extension(file),
+        vec![],
+        page_count,
+        None,
+        None,
+    )
 }
 
 pub fn parse_pdf(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
@@ -198,13 +268,16 @@ pub fn parse_pdf(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
     let Some(page_count) = page_count else {
         return Ok(None);
     };
-    Ok(Some(ParsedResource {
-        path: file.to_string_lossy().to_string(),
-        resource_type: "pdf".to_string(),
-        title: basename_without_extension(file),
-        authors: vec![],
-        page_count: Some(page_count),
-    }))
+    let (description, published_at) = read_pdf_embedded_meta(file).unwrap_or((None, None));
+    finalize_parsed(
+        file,
+        "pdf",
+        basename_without_extension(file),
+        vec![],
+        page_count,
+        description,
+        published_at,
+    )
 }
 
 pub fn parse_epub(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
@@ -221,23 +294,22 @@ pub fn parse_epub(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
         Ok(c) => c,
         Err(_) => return Ok(None),
     };
-    let (title, authors) = parse_opf_metadata(&opf_content);
+    let meta = parse_opf_metadata(&opf_content);
     let page_count = count_epub_images(&mut archive)?;
-    if page_count == 0 {
-        return Ok(None);
-    }
-    let title = if title.trim().is_empty() {
+    let title = if meta.title.trim().is_empty() {
         basename_without_extension(file)
     } else {
-        title
+        meta.title
     };
-    Ok(Some(ParsedResource {
-        path: file.to_string_lossy().to_string(),
-        resource_type: "epub".to_string(),
+    finalize_parsed(
+        file,
+        "epub",
         title,
-        authors,
-        page_count: Some(page_count),
-    }))
+        meta.authors,
+        page_count,
+        meta.description,
+        meta.published_at,
+    )
 }
 
 fn find_opf_path(archive: &mut ZipArchive<BufReader<File>>) -> Result<String, HentaiError> {
@@ -269,9 +341,18 @@ fn read_zip_entry_string(
     Ok(buf)
 }
 
-fn parse_opf_metadata(opf: &str) -> (String, Vec<String>) {
+struct OpfMetadata {
+    title: String,
+    authors: Vec<String>,
+    description: Option<String>,
+    published_at: Option<i64>,
+}
+
+fn parse_opf_metadata(opf: &str) -> OpfMetadata {
     let mut title = String::new();
     let mut authors = Vec::new();
+    let mut description = None;
+    let mut published_at = None;
     for line in opf.lines() {
         let trimmed = line.trim();
         if trimmed.starts_with("<dc:title") {
@@ -285,9 +366,68 @@ fn parse_opf_metadata(opf: &str) -> (String, Vec<String>) {
                     authors.push(t);
                 }
             }
+        } else if trimmed.starts_with("<dc:description") {
+            if let Some(inner) = extract_xml_text(trimmed) {
+                let t = inner.trim().to_string();
+                if !t.is_empty() {
+                    description = Some(t);
+                }
+            }
+        } else if trimmed.starts_with("<dc:date") {
+            if let Some(inner) = extract_xml_text(trimmed) {
+                published_at = parse_iso_date_prefix_to_ms(inner.trim());
+            }
         }
     }
-    (title, authors)
+    OpfMetadata {
+        title,
+        authors,
+        description,
+        published_at,
+    }
+}
+
+fn parse_iso_date_prefix_to_ms(raw: &str) -> Option<i64> {
+    if raw.len() < 10 {
+        return None;
+    }
+    let date_part = &raw[0..10];
+    let mut parts = date_part.split('-');
+    let year: i32 = parts.next()?.parse().ok()?;
+    let month: u32 = parts.next()?.parse().ok()?;
+    let day: u32 = parts.next()?.parse().ok()?;
+    date_to_utc_ms(year, month, day, 0, 0, 0)
+}
+
+fn date_to_utc_ms(
+    year: i32,
+    month: u32,
+    day: u32,
+    hour: u32,
+    minute: u32,
+    second: u32,
+) -> Option<i64> {
+    let days_from_ce = days_from_civil(year, month, day)?;
+    let secs = days_from_ce as i64 * 86_400
+        + hour as i64 * 3600
+        + minute as i64 * 60
+        + second as i64;
+    UNIX_EPOCH
+        .checked_add(Duration::from_secs(secs.max(0) as u64))
+        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+        .map(|d| d.as_millis() as i64)
+}
+
+fn days_from_civil(year: i32, month: u32, day: u32) -> Option<u32> {
+    if !(1..=12).contains(&month) || !(1..=31).contains(&day) {
+        return None;
+    }
+    let y = if month <= 2 { year - 1 } else { year } as u32;
+    let era = y / 400;
+    let yoe = y - era * 400;
+    let doy = (153 * (if month > 2 { month - 3 } else { month + 9 }) + 2) / 5 + day - 1;
+    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    Some(era * 146097 + doe - 719468)
 }
 
 fn extract_xml_text(line: &str) -> Option<String> {
@@ -320,13 +460,19 @@ fn count_epub_images(archive: &mut ZipArchive<BufReader<File>>) -> Result<i32, H
 }
 
 pub fn parsed_to_comic(parsed: &ParsedResource) -> crate::comic::ComicDto {
+    let now = now_ms();
     crate::comic::ComicDto {
         comic_id: comic_id_for_path(&parsed.path),
         path: parsed.path.clone(),
         resource_type: parsed.resource_type.clone(),
+        resource_size: parsed.resource_size,
+        created_at: now,
+        last_updated_at: now,
         title: parsed.title.clone(),
         content_rating: "unknown".to_string(),
         page_count: parsed.page_count,
+        description: parsed.description.clone(),
+        published_at: parsed.published_at,
         authors: parsed.authors.clone(),
         tags: vec![],
     }
@@ -388,6 +534,7 @@ mod tests {
             .expect("resource");
 
         assert_eq!(parsed.resource_type, "cbz");
-        assert_eq!(parsed.page_count, Some(2));
+        assert_eq!(parsed.page_count, 2);
+        assert!(parsed.resource_size > 0);
     }
 }

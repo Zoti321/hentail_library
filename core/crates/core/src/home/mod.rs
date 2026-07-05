@@ -30,24 +30,24 @@ SELECT
 
 const SQL_COUNTS_HEALTHY: &str = r#"
 SELECT
-  (SELECT COUNT(*) FROM comics WHERE content_rating != ?) AS c_comic,
+  (SELECT COUNT(*) FROM comics c INNER JOIN comic_meta cm ON cm.comic_id = c.comic_id WHERE cm.content_rating != ?) AS c_comic,
   (SELECT COUNT(*) FROM tags) AS c_tag,
   (
     SELECT COUNT(*)
     FROM series s
-    WHERE EXISTS (SELECT 1 FROM series_items si0 WHERE si0.series_name = s.name)
+    WHERE EXISTS (SELECT 1 FROM series_items si0 WHERE si0.series_id = s.series_id)
     AND NOT EXISTS (
       SELECT 1
       FROM series_items si1
-      INNER JOIN comics c1 ON c1.comic_id = si1.comic_id
-      WHERE si1.series_name = s.name AND c1.content_rating = ?
+      INNER JOIN comic_meta cm1 ON cm1.comic_id = si1.comic_id
+      WHERE si1.series_id = s.series_id AND cm1.content_rating = ?
     )
   ) AS c_series,
   (
     SELECT COUNT(*)
     FROM comic_reading_histories h
-    INNER JOIN comics c ON c.comic_id = h.comic_id
-    WHERE c.content_rating != ?
+    INNER JOIN comic_meta cm ON cm.comic_id = h.comic_id
+    WHERE cm.content_rating != ?
   ) AS c_reading
 "#;
 
@@ -61,8 +61,8 @@ LIMIT 5
 const SQL_TOP5_HEALTHY: &str = r#"
 SELECT h.last_read_time, h.comic_id, h.title, h.page_index
 FROM comic_reading_histories h
-INNER JOIN comics c ON c.comic_id = h.comic_id
-WHERE c.content_rating != ?
+INNER JOIN comic_meta cm ON cm.comic_id = h.comic_id
+WHERE cm.content_rating != ?
 ORDER BY h.last_read_time DESC
 LIMIT 5
 "#;

@@ -7,7 +7,7 @@ import '../frb_generated.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
 
 void recordReadingFrb({required ReadingHistoryDto history}) =>
     RustLib.instance.api.crateApiHistoryRecordReadingFrb(history: history);
@@ -16,6 +16,17 @@ ReadingHistoryDto? getReadingByComicIdFrb({required String comicId}) => RustLib
     .instance
     .api
     .crateApiHistoryGetReadingByComicIdFrb(comicId: comicId);
+
+void recordSeriesReadingFrb({required SeriesReadingHistoryDto history}) =>
+    RustLib.instance.api.crateApiHistoryRecordSeriesReadingFrb(
+      history: history,
+    );
+
+SeriesReadingHistoryDto? getSeriesReadingBySeriesIdFrb({
+  required String seriesId,
+}) => RustLib.instance.api.crateApiHistoryGetSeriesReadingBySeriesIdFrb(
+  seriesId: seriesId,
+);
 
 PagedReadingHistoryDto fetchReadingPageFrb({
   required int page,
@@ -84,6 +95,37 @@ class ReadingHistoryDto {
           runtimeType == other.runtimeType &&
           comicId == other.comicId &&
           title == other.title &&
+          lastReadTimeMs == other.lastReadTimeMs &&
+          pageIndex == other.pageIndex;
+}
+
+class SeriesReadingHistoryDto {
+  final String seriesId;
+  final String lastReadComicId;
+  final PlatformInt64 lastReadTimeMs;
+  final int? pageIndex;
+
+  const SeriesReadingHistoryDto({
+    required this.seriesId,
+    required this.lastReadComicId,
+    required this.lastReadTimeMs,
+    this.pageIndex,
+  });
+
+  @override
+  int get hashCode =>
+      seriesId.hashCode ^
+      lastReadComicId.hashCode ^
+      lastReadTimeMs.hashCode ^
+      pageIndex.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesReadingHistoryDto &&
+          runtimeType == other.runtimeType &&
+          seriesId == other.seriesId &&
+          lastReadComicId == other.lastReadComicId &&
           lastReadTimeMs == other.lastReadTimeMs &&
           pageIndex == other.pageIndex;
 }

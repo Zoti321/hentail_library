@@ -1,16 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_page_pagination_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_controller.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
-import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_page_comics_providers.g.dart';
+
+/// 库页内容：默认来自 [libraryCatalogControllerProvider]，搜索页可 override。
+final Provider<AsyncValue<LibraryPageSnapshot>> libraryPageContentProvider =
+    Provider<AsyncValue<LibraryPageSnapshot>>((Ref ref) {
+      return ref.watch(libraryCatalogControllerProvider);
+    });
 
 @Riverpod(keepAlive: true)
 Future<Comic?> libraryComicById(Ref ref, String comicId) {
@@ -32,7 +37,7 @@ Future<List<Comic>> filteredMergeComics(Ref ref, String comicId) async {
   );
   final String query = ref.watch(
     libraryQueryIntentProvider.select(
-      (LibraryQueryIntent s) => s.mergeSearchQuery,
+      (LibraryQueryIntent state) => state.mergeSearchQuery,
     ),
   );
   final List<Comic> comics = await ref.read(comicRepoProvider).getAll();
@@ -48,46 +53,6 @@ Future<List<Comic>> filteredMergeComics(Ref ref, String comicId) async {
       .toList();
 }
 
-/// 漫画主列表：分页读取当前页。
-final Provider<AsyncValue<PagedResult<Comic>>> libraryComicsPageAsyncProvider =
-    Provider<AsyncValue<PagedResult<Comic>>>((Ref ref) {
-      return ref.watch(libraryComicsPageProvider);
-    });
-
-/// 当前页漫画条目（供现有 UI 组件消费）。
-final Provider<AsyncValue<List<Comic>>> libraryDisplayedComicsProvider =
-    Provider<AsyncValue<List<Comic>>>((Ref ref) {
-      final AsyncValue<PagedResult<Comic>> pageAsync = ref.watch(
-        libraryComicsPageProvider,
-      );
-      return pageAsync.when(
-        data: (PagedResult<Comic> page) => AsyncValue.data(page.items),
-        loading: () => const AsyncValue.loading(),
-        error: (Object error, StackTrace stackTrace) =>
-            AsyncValue.error(error, stackTrace),
-        skipLoadingOnReload: true,
-      );
-    });
-
-/// 分页 totalCount 在 reload 期间保持上一帧，避免头部 chip 闪烁为 0。
-int stablePagedTotalCount<T>(AsyncValue<PagedResult<T>> pageAsync) {
-  return pageAsync.when(
-    data: (PagedResult<T> page) => page.totalCount,
-    loading: () => pageAsync.value?.totalCount ?? 0,
-    error: (Object _, StackTrace _) => pageAsync.value?.totalCount ?? 0,
-    skipLoadingOnReload: true,
-  );
-}
-
-final Provider<int> libraryDisplayedComicCountProvider = Provider<int>((
-  Ref ref,
-) {
-  final AsyncValue<PagedResult<Comic>> pageAsync = ref.watch(
-    libraryComicsPageProvider,
-  );
-  return stablePagedTotalCount(pageAsync);
-});
-
 final Provider<bool> libraryHasReceivedFirstEmitProvider = Provider<bool>((
   Ref ref,
 ) {
@@ -102,12 +67,7 @@ final Provider<bool> libraryHasReceivedFirstEmitProvider = Provider<bool>((
 final Provider<VoidCallback> libraryRefreshActionProvider =
     Provider<VoidCallback>((Ref ref) {
       return () {
-        ref.read(comicAggregateProvider.notifier).refreshStream();
-        ref.read(libraryComicsPageIndexProvider.notifier).resetToFirstPage();
-        ref.invalidate(libraryComicsPageProvider);
-        ref.read(librarySeriesPageIndexProvider.notifier).resetToFirstPage();
-        ref.invalidate(librarySeriesPageProvider);
-        ref.read(seriesAggregateProvider.notifier).refreshAllSeries();
+        ref.read(libraryCatalogControllerProvider.notifier).refreshCatalog();
       };
     });
 

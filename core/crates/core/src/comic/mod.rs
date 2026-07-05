@@ -4,7 +4,7 @@ pub mod repository;
 pub mod write;
 
 pub use dto::{
-    ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
+    now_ms, ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
 };
 pub use repository::{
     count_all, fetch_comics_page, find_comic_by_id, load_comics_ordered, read_data_version,

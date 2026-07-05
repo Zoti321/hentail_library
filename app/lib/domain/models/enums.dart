@@ -51,3 +51,29 @@ enum ResourceType {
 }
 
 enum LibraryDisplayTarget { comics, series }
+
+/// 系列连载状态（用户可编辑；sync 不覆盖）。
+enum SerializationStatus {
+  unknown,
+  ongoing,
+  ended,
+  hiatus;
+
+  String get label => switch (this) {
+    SerializationStatus.unknown => '未知',
+    SerializationStatus.ongoing => '连载中',
+    SerializationStatus.ended => '已完结',
+    SerializationStatus.hiatus => '休刊',
+  };
+
+  static SerializationStatus fromRust(String raw) {
+    return switch (raw) {
+      'ongoing' => SerializationStatus.ongoing,
+      'ended' => SerializationStatus.ended,
+      'hiatus' => SerializationStatus.hiatus,
+      _ => SerializationStatus.unknown,
+    };
+  }
+
+  String toRust() => name;
+}

@@ -1,28 +1,13 @@
-mod clustering;
 mod dto;
-mod infer;
-mod orchestrator;
 mod page_query;
 mod repository;
-mod title_mapping;
-mod volume_key;
+mod write;
 
-pub use clustering::SeriesTitleClustering;
-pub use dto::{
-    SeriesFilterDto, SeriesSortOptionDto,
-};
-pub use infer::{
-    AutoSeriesInferService, ComicTitleInput, InferredSeriesFromTitlesResult, InferredSeriesGroup,
-    InferredVolumeEntry,
-};
-pub use orchestrator::{infer_series, InferSeriesResultDto};
+pub use dto::{SeriesFilterDto, SeriesSortOptionDto};
 pub use repository::{
-    assign_comic_exclusive, count_all_series, create_series, delete_series, fetch_series_page,
-    find_series_by_name, get_all_series, load_home_series_comic_order_map,
-    remove_comic_from_series, remove_comics_from_series, remove_orphan_series_items_public,
-    rename_series, search_series_by_keyword, search_series_by_tag_expression,
-    set_series_items_order, watch_all_series, watch_home_series_comic_order_map, PagedSeriesResultDto,
-    SeriesDto, SeriesItemDto,
+    count_all_series, fetch_series_page, find_series_by_id, get_all_series,
+    load_home_series_comic_order_map, search_series_by_keyword, search_series_by_tag_expression,
+    set_series_items_order, watch_all_series, watch_home_series_comic_order_map,
+    PagedSeriesResultDto, SeriesDto, SeriesItemDto,
 };
-pub use title_mapping::{ComicTitleToSeriesItemMapping, MappedSeriesVolume};
-pub use volume_key::VolumeSortKey;
+pub use write::{update_series_user_meta, UpdateSeriesUserMetaDto};

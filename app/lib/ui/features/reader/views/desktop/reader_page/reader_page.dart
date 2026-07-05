@@ -9,29 +9,32 @@ import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widg
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_content.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_top_bar.dart';
-import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/series_reader_drawer.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ReaderPage extends HookConsumerWidget {
   const ReaderPage({
     super.key,
     required this.comicId,
-    required this.readType,
-    this.seriesName,
+    this.seriesId,
     this.keepControlsOpen = false,
+    this.incognito = false,
   });
 
   final String comicId;
-  final String readType;
-  final String? seriesName;
+  final String? seriesId;
   final bool keepControlsOpen;
+  final bool incognito;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ReaderRouteContext routeContext = ReaderRouteContext.normalize(
       comicId: comicId,
-      readType: readType,
-      seriesName: seriesName,
+      seriesId: seriesId,
+      incognito: incognito,
+    );
+    final ReaderViewKey viewKey = readerViewKey(
+      routeContext.comicId,
+      incognito: routeContext.incognito,
     );
 
     if (routeContext.comicId.isEmpty) {
@@ -45,12 +48,39 @@ class ReaderPage extends HookConsumerWidget {
     final AsyncValue<ReaderPageViewModel> viewAsync = ref.watch(
       readerPageViewModelProvider(
         comicId: routeContext.comicId,
-        isSeriesMode: routeContext.isSeriesMode,
-        seriesName: routeContext.seriesName,
+        seriesId: routeContext.seriesId,
+        incognito: routeContext.incognito,
       ),
     );
+    final bool readerReady = viewAsync.hasValue;
+    final ReaderPageViewModel? loadedViewModel = viewAsync.asData?.value;
+    useEffect(
+      () {
+        if (!readerReady || loadedViewModel == null) {
+          return null;
+        }
+        unawaited(
+          ref
+              .read(readingAggregateProvider.notifier)
+              .beginSession(
+                comic: loadedViewModel.viewState.comic,
+                mode: routeContext.session.mode,
+                seriesId: routeContext.seriesId,
+                incognito: routeContext.incognito,
+                initialPageIndex: loadedViewModel.viewState.currentIndex,
+              ),
+        );
+        return null;
+      },
+      <Object?>[
+        routeContext.comicId,
+        routeContext.seriesId,
+        routeContext.incognito,
+        readerReady,
+      ],
+    );
     final ReaderViewNotifier notifier = ref.read(
-      readerViewProvider(routeContext.comicId).notifier,
+      readerViewProvider(viewKey).notifier,
     );
     final ObjectRef<bool> hasAppliedKeepControls = useRef<bool>(false);
     final bool readerWindowFullscreen = ref.watch(
@@ -82,7 +112,7 @@ class ReaderPage extends HookConsumerWidget {
     );
     final ({int currentIndex, int totalPages, bool isVertical})? autoPlayState =
         ref.watch(
-          readerViewProvider(routeContext.comicId).select((
+          readerViewProvider(viewKey).select((
             AsyncValue<ReaderViewState> asyncState,
           ) {
             final ReaderViewState? readerState = asyncState.asData?.value;
@@ -143,7 +173,7 @@ class ReaderPage extends HookConsumerWidget {
         Timer? timer;
         timer = Timer.periodic(interval, (_) {
           final ReaderViewState? currentState = ref
-              .read(readerViewProvider(routeContext.comicId))
+              .read(readerViewProvider(viewKey))
               .asData
               ?.value;
           if (currentState == null) {
@@ -197,9 +227,7 @@ class ReaderPage extends HookConsumerWidget {
             error: (Object e, StackTrace st) => Center(child: Text('$e')),
             data: (ReaderPageViewModel viewModel) {
               final ReaderViewState state = viewModel.viewState;
-              final ReaderNavContextData navContext = viewModel.navContext;
               final int? preferredPageIndex = viewModel.preferredPageIndex;
-              final bool canOpenComicList = navContext.items.length > 1;
               if (state.totalPages == 0) {
                 return const Center(child: Text('暂无图片'));
               }
@@ -222,6 +250,7 @@ class ReaderPage extends HookConsumerWidget {
                     child: ReaderContent(
                       key: ValueKey<String>(routeContext.comicId),
                       comicId: routeContext.comicId,
+                      incognito: routeContext.incognito,
                       initialPage: initialPage,
                       preferredPageIndex: preferredPageIndex,
                       isVertical: readerIsVertical,
@@ -239,15 +268,15 @@ class ReaderPage extends HookConsumerWidget {
                     showControls: state.showControls,
                     isVertical: readerIsVertical,
                     title: state.comic.title,
-                    canOpenComicList: canOpenComicList,
+                    navContext: viewModel.isSeriesRead
+                        ? viewModel.navContext
+                        : null,
+                    session: routeContext.session,
                     onExit: () async {
                       await notifier.executeExitReader(
                         context: context,
                         routeContext: routeContext,
                       );
-                    },
-                    onOpenSeriesList: () {
-                      scaffoldKey.currentState?.openEndDrawer();
                     },
                     onSetHorizontalMode: () {
                       ref
@@ -294,24 +323,6 @@ class ReaderPage extends HookConsumerWidget {
                     },
                   ),
                 ],
-              );
-            },
-          ),
-          endDrawer: SeriesReaderDrawer(
-            navContext:
-                viewAsync.asData?.value.navContext ??
-                ReaderNavContextData(
-                  items: const <ReaderComicListItem>[],
-                  currentIndex: -1,
-                  preferredPageIndex: null,
-                ),
-            comicId: routeContext.comicId,
-            onSelectComic: (String targetComicId) async {
-              scaffoldKey.currentState?.closeEndDrawer();
-              await notifier.executeSelectComic(
-                context: context,
-                routeContext: routeContext,
-                targetComicId: targetComicId,
               );
             },
           ),

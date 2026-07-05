@@ -5,6 +5,7 @@ pub mod orchestrator;
 pub mod parser;
 pub mod plan;
 pub mod scanner;
+pub mod series_rebuild;
 pub mod thumbnail;
 pub mod writer;
 

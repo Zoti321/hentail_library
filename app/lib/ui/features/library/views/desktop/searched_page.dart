@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod/misc.dart' show Override;
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
@@ -45,30 +46,43 @@ class SearchedPage extends ConsumerWidget {
       LibraryDisplayTarget.comics => searchedComicCount,
       LibraryDisplayTarget.series => searchedSeriesCount,
     };
-    final LibraryPageViewModel searchedViewModel = LibraryPageViewModel(
-      comicsAsync: searchedComics,
-      comicsPagination: LibraryComicsPagination(
-        page: 1,
-        totalPages: searchedComicCount > 0 ? 1 : 0,
-        totalCount: searchedComicCount,
-        isLoading: searchedComics.isLoading,
-      ),
-      seriesAsync: searchedSeriesDataAsync.when(
-        data: (LibrarySeriesViewData data) =>
-            AsyncValue.data(data.filteredSeries),
-        loading: () => const AsyncValue.loading(),
-        error: (Object error, StackTrace stackTrace) =>
-            AsyncValue.error(error, stackTrace),
-        skipLoadingOnReload: true,
-      ),
-      displayedComicCount: searchedComicCount,
-      displayedSeriesCount: searchedSeriesCount,
-      displayTarget: displayTarget,
-      filterQuery: trimmedQuery,
-      hasReceivedFirstEmit: true,
-      isComicTableEmpty: searchedComicCount + searchedSeriesCount == 0,
-      showPagination: false,
-    );
+    final AsyncValue<LibraryPageSnapshot> searchCatalogAsync = searchedComics
+        .when(
+          data: (List<Comic> comics) => searchedSeriesDataAsync.when(
+            data: (LibrarySeriesViewData seriesData) => AsyncData(
+              LibraryPageSnapshot(
+                comics: comics,
+                comicsPagination: LibraryPagination(
+                  page: 1,
+                  totalPages: comics.isNotEmpty ? 1 : 0,
+                  totalCount: comics.length,
+                  isLoading: false,
+                ),
+                series: seriesData.filteredSeries,
+                seriesPagination: LibraryPagination(
+                  page: 1,
+                  totalPages: seriesData.filteredSeries.isNotEmpty ? 1 : 0,
+                  totalCount: seriesData.filteredSeries.length,
+                  isLoading: false,
+                ),
+                displayedComicCount: comics.length,
+                displayedSeriesCount: seriesData.filteredSeries.length,
+                displayTarget: displayTarget,
+                filterQuery: trimmedQuery,
+                hasReceivedFirstEmit: true,
+                isComicTableEmpty:
+                    comics.isEmpty && seriesData.filteredSeries.isEmpty,
+                showPagination: false,
+              ),
+            ),
+            loading: () => const AsyncLoading<LibraryPageSnapshot>(),
+            error: (Object error, StackTrace stackTrace) =>
+                AsyncError<LibraryPageSnapshot>(error, stackTrace),
+          ),
+          loading: () => const AsyncLoading<LibraryPageSnapshot>(),
+          error: (Object error, StackTrace stackTrace) =>
+              AsyncError<LibraryPageSnapshot>(error, stackTrace),
+        );
 
     return CustomScrollView(
       slivers: <Widget>[
@@ -143,8 +157,8 @@ class SearchedPage extends ConsumerWidget {
           )
         else ...<Widget>[
           ProviderScope(
-            overrides: [
-              libraryPageViewModelProvider.overrideWithValue(searchedViewModel),
+            overrides: <Override>[
+              libraryPageContentProvider.overrideWithValue(searchCatalogAsync),
             ],
             child: const LibraryBlocksSliverGroup(
               seriesBlock: LibrarySeriesBlock(),

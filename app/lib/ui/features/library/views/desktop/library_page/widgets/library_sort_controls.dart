@@ -4,7 +4,7 @@ import 'package:hentai_library/domain/library/comic_list_query.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_page_view_model_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_sort_notifier.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/library_filter_sort_drawer.dart';

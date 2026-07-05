@@ -8,7 +8,7 @@ use crate::error::HentaiError;
 
 use super::handle::SyncHandle;
 use super::parser::{
-    comic_id_for_path, parse_directory, parse_file, parsed_to_comic,
+    comic_id_for_path, parse_directory, parse_file, parsed_to_comic, read_resource_size,
     read_source_stat,
 };
 
@@ -98,10 +98,12 @@ fn resolve_scan_item(path: &Path, ctx: &ScanContext) -> Result<Option<ScanItem>,
     let comic_id = comic_id_for_path(&path.to_string_lossy());
     if let Some(existing) = ctx.existing_by_id.get(&comic_id) {
         if try_reuse_existing(path, existing, ctx) {
+            let mut comic = existing.clone();
+            refresh_resource_size(path, &mut comic)?;
             return Ok(Some(ScanItem {
                 path: existing.path.clone(),
                 resource_type: existing.resource_type.clone(),
-                comic: existing.clone(),
+                comic,
             }));
         }
     }
@@ -121,6 +123,13 @@ fn resolve_scan_item(path: &Path, ctx: &ScanContext) -> Result<Option<ScanItem>,
     }))
 }
 
+fn refresh_resource_size(path: &Path, comic: &mut ComicDto) -> Result<(), HentaiError> {
+    if let Some(size) = read_resource_size(path, &comic.resource_type)? {
+        comic.resource_size = size;
+    }
+    Ok(())
+}
+
 fn try_reuse_existing(path: &Path, existing: &ComicDto, ctx: &ScanContext) -> bool {
     if existing.path != path.to_string_lossy() {
         return false;
@@ -132,4 +141,65 @@ fn try_reuse_existing(path: &Path, existing: &ComicDto, ctx: &ScanContext) -> bo
         return *cached_ms == modified_ms && *cached_size == size;
     }
     false
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::comic::ComicDto;
+    use crate::sync::handle::create_sync_handle;
+    use std::collections::HashMap;
+    use std::fs::File;
+    use std::io::Write;
+    use tempfile::TempDir;
+    use zip::write::SimpleFileOptions;
+    use zip::ZipWriter;
+
+    #[test]
+    fn reuse_existing_refreshes_stale_resource_size() {
+        let temp = TempDir::new().expect("tempdir");
+        let path = temp.path().join("comic.cbz");
+        let file = File::create(&path).expect("create");
+        let mut zip = ZipWriter::new(file);
+        zip.start_file("01.jpg", SimpleFileOptions::default())
+            .expect("start");
+        zip.write_all(b"fake-jpeg").expect("write");
+        zip.finish().expect("finish");
+
+        let path_str = path.to_string_lossy().to_string();
+        let comic_id = comic_id_for_path(&path_str);
+        let (modified_ms, size) = read_source_stat(&path, "cbz")
+            .expect("stat")
+            .expect("source stat");
+        assert!(size > 0);
+
+        let existing = ComicDto {
+            comic_id: comic_id.clone(),
+            path: path_str,
+            resource_type: "cbz".to_string(),
+            resource_size: 0,
+            created_at: 1,
+            last_updated_at: 1,
+            title: "旧标题".to_string(),
+            content_rating: "unknown".to_string(),
+            page_count: 1,
+            description: None,
+            published_at: None,
+            authors: vec![],
+            tags: vec![],
+        };
+        let ctx = ScanContext {
+            existing_by_id: HashMap::from([(comic_id.clone(), existing)]),
+            thumbnail_stats: HashMap::from([(comic_id, (modified_ms, size))]),
+        };
+
+        let handle = create_sync_handle();
+        let items = scan_roots(&[path], &ctx, &handle).expect("scan");
+        assert_eq!(items.len(), 1);
+        assert!(
+            items[0].comic.resource_size > 0,
+            "expected refreshed resource_size, got {}",
+            items[0].comic.resource_size
+        );
+    }
 }

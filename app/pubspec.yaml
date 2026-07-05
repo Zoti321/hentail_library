@@ -55,6 +55,7 @@ dependencies:
     path: rust_builder
   flutter_rust_bridge: 2.12.0
   shared_preferences: ^2.5.3
+  flutter_svg: ^2.2.0
 
 dev_dependencies:
   flutter_test:
@@ -78,6 +79,7 @@ flutter:
 
   assets:
     - assets/fonts/
+    - assets/icons/
 
   fonts:
     - family: MI_Sans_Regular

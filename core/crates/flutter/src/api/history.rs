@@ -1,9 +1,11 @@
 use hentai_core::{
     self, clear_all_reading as core_clear_all, delete_reading_by_comic_id as core_delete_reading,
     delete_reading_by_comic_ids as core_delete_readings, fetch_reading_page as core_fetch_reading_page,
-    get_reading_by_comic_id as core_get_reading, list_all_reading, record_reading as core_record_reading,
-    watch_reading_histories as core_watch_reading, PagedReadingHistoryDto as CorePagedReading,
-    ReadingHistoryDto as CoreReading,
+    get_reading_by_comic_id as core_get_reading, get_series_reading_by_series_id as core_get_series_reading,
+    list_all_reading, record_reading as core_record_reading,
+    record_series_reading as core_record_series_reading, watch_reading_histories as core_watch_reading,
+    PagedReadingHistoryDto as CorePagedReading, ReadingHistoryDto as CoreReading,
+    SeriesReadingHistoryDto as CoreSeriesReading,
 };
 
 use super::init::HentaiErrorDto;
@@ -21,6 +23,14 @@ pub struct ReadingHistoryDto {
 pub struct PagedReadingHistoryDto {
     pub items: Vec<ReadingHistoryDto>,
     pub total_count: i64,
+}
+
+#[derive(Debug, Clone)]
+pub struct SeriesReadingHistoryDto {
+    pub series_id: String,
+    pub last_read_comic_id: String,
+    pub last_read_time_ms: i64,
+    pub page_index: Option<i32>,
 }
 
 impl From<CoreReading> for ReadingHistoryDto {
@@ -54,6 +64,28 @@ impl From<&ReadingHistoryDto> for CoreReading {
     }
 }
 
+impl From<CoreSeriesReading> for SeriesReadingHistoryDto {
+    fn from(v: CoreSeriesReading) -> Self {
+        Self {
+            series_id: v.series_id,
+            last_read_comic_id: v.last_read_comic_id,
+            last_read_time_ms: v.last_read_time_ms,
+            page_index: v.page_index,
+        }
+    }
+}
+
+impl From<&SeriesReadingHistoryDto> for CoreSeriesReading {
+    fn from(v: &SeriesReadingHistoryDto) -> Self {
+        Self {
+            series_id: v.series_id.clone(),
+            last_read_comic_id: v.last_read_comic_id.clone(),
+            last_read_time_ms: v.last_read_time_ms,
+            page_index: v.page_index,
+        }
+    }
+}
+
 #[flutter_rust_bridge::frb(sync)]
 pub fn record_reading_frb(history: ReadingHistoryDto) -> Result<(), HentaiErrorDto> {
     hentai_core::runtime::block_on(core_record_reading(&(&history).into()))
@@ -66,6 +98,23 @@ pub fn get_reading_by_comic_id_frb(
 ) -> Result<Option<ReadingHistoryDto>, HentaiErrorDto> {
     hentai_core::runtime::block_on(core_get_reading(&comic_id))
         .map(|opt| opt.map(ReadingHistoryDto::from))
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn record_series_reading_frb(
+    history: SeriesReadingHistoryDto,
+) -> Result<(), HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_record_series_reading(&(&history).into()))
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn get_series_reading_by_series_id_frb(
+    series_id: String,
+) -> Result<Option<SeriesReadingHistoryDto>, HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_get_series_reading(&series_id))
+        .map(|opt| opt.map(SeriesReadingHistoryDto::from))
         .map_err(HentaiErrorDto::from)
 }
 

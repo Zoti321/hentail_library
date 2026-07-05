@@ -1,7 +1,5 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/comic_detail_page.dart';
-import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/series_detail_page.dart';
 import 'package:hentai_library/ui/features/shell/views/desktop/history_page.dart';
 import 'package:hentai_library/ui/features/shell/views/desktop/home_page/home_page.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/library_page.dart';
@@ -55,12 +53,7 @@ final GoRouter desktopRouter = GoRouter(
               const SettingsPage(),
         ),
 
-        ...buildSharedContentRoutes(
-          comicDetailBuilder: (BuildContext context, String comicId) =>
-              ComicDetailPage(comicId: comicId),
-          seriesDetailBuilder: (BuildContext context, String seriesName) =>
-              SeriesDetailPage(seriesName: seriesName),
-        ),
+        ...buildSharedContentRoutes(),
       ],
     ),
   ],

@@ -3,19 +3,32 @@ use sea_orm::{
     TransactionTrait,
 };
 
-use crate::comic::dto::ComicDto;
+use crate::comic::dto::{now_ms, ComicDto};
 use crate::comic::repository::load_comics_ordered;
 use crate::db::{connection, map_db_err};
-use crate::entity::{comic_authors, comic_tags, comics, prelude::*};
+use crate::entity::{comic_authors, comic_meta, comic_tags, comics, prelude::*};
 use crate::error::HentaiError;
+use crate::sync::series_rebuild::rebuild_series_from_comics;
 use crate::sync::writer::{replace_comic_authors, replace_comic_tags};
 
 #[derive(Debug, Clone, Default)]
 pub struct UpdateComicUserMetaDto {
     pub title: Option<String>,
     pub content_rating: Option<String>,
+    pub description: Option<String>,
+    pub published_at: Option<i64>,
     pub authors: Option<Vec<String>>,
     pub tags: Option<Vec<String>>,
+}
+
+pub async fn touch_comic<C: ConnectionTrait>(db: &C, comic_id: &str) -> Result<(), HentaiError> {
+    let active = comics::ActiveModel {
+        comic_id: Set(comic_id.to_string()),
+        last_updated_at: Set(now_ms()),
+        ..Default::default()
+    };
+    active.update(db).await.map_err(map_db_err)?;
+    Ok(())
 }
 
 pub async fn delete_comics_by_ids(comic_ids: Vec<String>) -> Result<(), HentaiError> {
@@ -39,6 +52,7 @@ pub async fn delete_comics_by_ids(comic_ids: Vec<String>) -> Result<(), HentaiEr
     ))
     .await
     .map_err(map_db_err)?;
+    rebuild_series_from_comics(&db).await?;
     Ok(())
 }
 
@@ -48,24 +62,44 @@ pub async fn update_comic_user_meta(
 ) -> Result<(), HentaiError> {
     let db = connection()?;
     let txn = db.begin().await.map_err(map_db_err)?;
-    if meta.title.is_some() || meta.content_rating.is_some() {
-        let mut active = comics::ActiveModel {
+    let mut meta_touched = false;
+    if meta.title.is_some()
+        || meta.content_rating.is_some()
+        || meta.description.is_some()
+        || meta.published_at.is_some()
+    {
+        let mut active = comic_meta::ActiveModel {
             comic_id: Set(comic_id.to_string()),
             ..Default::default()
         };
         if let Some(title) = meta.title {
             active.title = Set(title);
+            meta_touched = true;
         }
         if let Some(content_rating) = meta.content_rating {
             active.content_rating = Set(content_rating);
+            meta_touched = true;
+        }
+        if let Some(description) = meta.description {
+            active.description = Set(Some(description));
+            meta_touched = true;
+        }
+        if let Some(published_at) = meta.published_at {
+            active.published_at = Set(Some(published_at));
+            meta_touched = true;
         }
         active.update(&txn).await.map_err(map_db_err)?;
     }
     if let Some(authors) = meta.authors {
         replace_comic_authors(&txn, comic_id, &authors).await?;
+        meta_touched = true;
     }
     if let Some(tags) = meta.tags {
         replace_comic_tags(&txn, comic_id, &tags).await?;
+        meta_touched = true;
+    }
+    if meta_touched {
+        touch_comic(&txn, comic_id).await?;
     }
     txn.commit().await.map_err(map_db_err)?;
     Ok(())
@@ -82,7 +116,9 @@ pub async fn search_comic_ids_by_tag_expression(
     if includes.is_empty() && optional.is_empty() && excludes.is_empty() {
         return Ok(vec![]);
     }
-    let mut sql = String::from("SELECT c.comic_id FROM comics c WHERE 1=1");
+    let mut sql = String::from(
+        "SELECT c.comic_id FROM comics c INNER JOIN comic_meta m ON m.comic_id = c.comic_id WHERE 1=1",
+    );
     let mut values: Vec<sea_orm::Value> = Vec::new();
     for tag in &includes {
         sql.push_str(
