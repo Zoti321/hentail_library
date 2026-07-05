@@ -5,6 +5,20 @@ import 'package:hentai_library/ui/features/library/view_models/library_page_snap
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
 
+/// 重载期间保留上一次 catalog 中的展示计数（分页栏等 UI 使用）。
+int stableCatalogDisplayedCount(
+  AsyncValue<LibraryPageSnapshot> catalogAsync, {
+  required int Function(LibraryPageSnapshot snapshot) readCount,
+}) {
+  return catalogAsync.when(
+    data: readCount,
+    loading: () => catalogAsync.value == null ? 0 : readCount(catalogAsync.value!),
+    error: (Object _, StackTrace _) =>
+        catalogAsync.value == null ? 0 : readCount(catalogAsync.value!),
+    skipLoadingOnReload: true,
+  );
+}
+
 /// 细粒度 UI 选择器：工具条/布局切换等局部组件直接订阅。
 final libraryDisplayTargetProvider = Provider<LibraryDisplayTarget>((Ref ref) {
   return ref.watch(
@@ -24,12 +38,9 @@ final libraryDisplayedComicCountProvider = Provider<int>((Ref ref) {
   final AsyncValue<LibraryPageSnapshot> catalogAsync = ref.watch(
     libraryCatalogControllerProvider,
   );
-  return catalogAsync.when(
-    data: (LibraryPageSnapshot snapshot) => snapshot.displayedComicCount,
-    loading: () => catalogAsync.value?.displayedComicCount ?? 0,
-    error: (Object _, StackTrace _) =>
-        catalogAsync.value?.displayedComicCount ?? 0,
-    skipLoadingOnReload: true,
+  return stableCatalogDisplayedCount(
+    catalogAsync,
+    readCount: (LibraryPageSnapshot snapshot) => snapshot.displayedComicCount,
   );
 });
 
@@ -37,11 +48,8 @@ final libraryDisplayedSeriesCountProvider = Provider<int>((Ref ref) {
   final AsyncValue<LibraryPageSnapshot> catalogAsync = ref.watch(
     libraryCatalogControllerProvider,
   );
-  return catalogAsync.when(
-    data: (LibraryPageSnapshot snapshot) => snapshot.displayedSeriesCount,
-    loading: () => catalogAsync.value?.displayedSeriesCount ?? 0,
-    error: (Object _, StackTrace _) =>
-        catalogAsync.value?.displayedSeriesCount ?? 0,
-    skipLoadingOnReload: true,
+  return stableCatalogDisplayedCount(
+    catalogAsync,
+    readCount: (LibraryPageSnapshot snapshot) => snapshot.displayedSeriesCount,
   );
 });
