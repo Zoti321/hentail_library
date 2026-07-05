@@ -8,7 +8,7 @@ import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 打开阅读器；Series read 需传入 [seriesId]。
 Future<void> openReadSession(
@@ -68,7 +68,7 @@ Future<void> openComicReadSession(
 }
 
 Future<void> navigateToSeriesComicInReader(
-  WidgetRef ref, {
+  Ref ref, {
   required GoRouter router,
   required ReadSessionRouteParams currentSession,
   required String targetComicId,

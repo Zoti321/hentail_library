@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/domain/reading/reader_session_snapshot.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/domain/reading/spread_index.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
-import 'package:hentai_library/ui/features/reader/view_models/reader_window_fullscreen.dart';
+import 'package:hentai_library/ui/features/reader/read_session_launcher.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_fullscreen_controller.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
@@ -40,6 +43,7 @@ abstract class ReaderState with _$ReaderState {
     @Default(false) bool showControls,
     @Default(1) int currentIndex,
     int? totalPagesOverride,
+    @Default(false) bool seriesAdvancePromptPending,
   }) = _ReaderState;
 
   ReaderState._();
@@ -132,7 +136,16 @@ class ReaderController extends _$ReaderController {
   void _updateDataState(ReaderState Function(ReaderState) updater) {
     final current = state.asData?.value;
     if (current == null) return;
-    final ReaderState next = updater(current);
+    ReaderState next = updater(current);
+    if (next.currentIndex != current.currentIndex &&
+        next.seriesAdvancePromptPending &&
+        !SpreadIndex.isOnLastSpread(
+          mode: next.readingMode,
+          totalPages: next.totalPages,
+          currentPageIndex: next.currentIndex,
+        )) {
+      next = next.copyWith(seriesAdvancePromptPending: false);
+    }
     if (next.currentIndex != current.currentIndex) {
       _notifyPageChanged(next.currentIndex);
     }
@@ -165,6 +178,55 @@ class ReaderController extends _$ReaderController {
     });
   }
 
+  Future<void> requestNextPage({
+    ReaderNavContextData? navContext,
+    ReadSessionRouteParams? session,
+    GoRouter? router,
+  }) async {
+    final ReaderState? current = state.asData?.value;
+    if (current == null) {
+      return;
+    }
+    final bool onLastSpread = SpreadIndex.isOnLastSpread(
+      mode: current.readingMode,
+      totalPages: current.totalPages,
+      currentPageIndex: current.currentIndex,
+    );
+    final ReaderComicListItem? nextItem = navContext?.nextItem;
+    if (onLastSpread &&
+        nextItem != null &&
+        session != null &&
+        router != null) {
+      if (!current.seriesAdvancePromptPending) {
+        _updateDataState(
+          (ReaderState s) => s.copyWith(seriesAdvancePromptPending: true),
+        );
+        try {
+          await ref
+              .read(readerPrefetchControllerProvider.notifier)
+              .warmOpenComic(comicId: nextItem.comicId);
+        } catch (_) {
+          // warm-open 失败不阻断提示。
+        }
+        return;
+      }
+      _updateDataState(
+        (ReaderState s) => s.copyWith(seriesAdvancePromptPending: false),
+      );
+      await navigateToSeriesComicInReader(
+        ref,
+        router: router,
+        currentSession: session,
+        targetComicId: nextItem.comicId,
+      );
+      return;
+    }
+    if (onLastSpread) {
+      return;
+    }
+    nextPage();
+  }
+
   void prevPage() {
     _updateDataState((s) {
       final int? prev = SpreadIndex.previousPrimaryPage(
@@ -190,7 +252,12 @@ class ReaderController extends _$ReaderController {
     _updateDataState((s) => s.copyWith(totalPagesOverride: value));
   }
 
-  void handleTapZone(ReaderTapZone zone) {
+  Future<void> handleTapZone(
+    ReaderTapZone zone, {
+    ReaderNavContextData? navContext,
+    ReadSessionRouteParams? session,
+    GoRouter? router,
+  }) async {
     final current = state.asData?.value;
     if (current == null) return;
     if (current.showControls) {
@@ -201,17 +268,35 @@ class ReaderController extends _$ReaderController {
       toggleShowControls();
       return;
     }
-    _handleHorizontalTap(zone);
+    await _handleHorizontalTap(
+      zone,
+      navContext: navContext,
+      session: session,
+      router: router,
+    );
   }
 
-  void _handleHorizontalTap(ReaderTapZone zone) {
+  Future<void> _handleHorizontalTap(
+    ReaderTapZone zone, {
+    ReaderNavContextData? navContext,
+    ReadSessionRouteParams? session,
+    GoRouter? router,
+  }) async {
     if (zone == ReaderTapZone.left) {
       prevPage();
     } else if (zone == ReaderTapZone.right) {
-      nextPage();
+      await requestNextPage(
+        navContext: navContext,
+        session: session,
+        router: router,
+      );
     } else {
       toggleShowControls();
     }
+  }
+
+  Future<void> toggleFullscreen() async {
+    await ref.read(readerFullscreenControllerProvider.notifier).toggleFullscreen();
   }
 
   Future<void> executeSaveProgress({
@@ -238,7 +323,7 @@ class ReaderController extends _$ReaderController {
     required ReaderRouteContext routeContext,
   }) async {
     await ref
-        .read(readerWindowFullscreenProvider.notifier)
+        .read(readerFullscreenControllerProvider.notifier)
         .exitFullscreenIfNeeded();
     if (!routeContext.incognito) {
       final ReaderState? currentState = state.asData?.value;

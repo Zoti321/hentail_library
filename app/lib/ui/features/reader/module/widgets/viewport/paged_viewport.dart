@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -16,12 +18,14 @@ class PagedViewport extends HookConsumerWidget {
     required this.incognito,
     required this.initialPage,
     required this.preferredPageIndex,
+    this.onRequestNextPage,
   });
 
   final String comicId;
   final bool incognito;
   final int initialPage;
   final int? preferredPageIndex;
+  final Future<void> Function()? onRequestNextPage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -135,7 +139,11 @@ class PagedViewport extends HookConsumerWidget {
               readerControllerProvider(viewKey).notifier,
             );
             if (dy > 0) {
-              notifier.nextPage();
+              if (onRequestNextPage != null) {
+                unawaited(onRequestNextPage!());
+              } else {
+                notifier.nextPage();
+              }
             } else {
               notifier.prevPage();
             }

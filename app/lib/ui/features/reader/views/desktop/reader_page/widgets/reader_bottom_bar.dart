@@ -14,15 +14,13 @@ class ReaderBottomBar extends StatefulWidget {
     required this.totalPages,
     required this.readerAutoPlayEnabled,
     required this.readerAutoPlayIntervalSeconds,
-    required this.readerDimLevel,
-    required this.readerWindowFullscreen,
+    required this.readerFullscreen,
     required this.showAutoPlayControls,
     required this.onPrevPage,
     required this.onNextPage,
     required this.onSetIndex,
     required this.onReaderAutoPlayEnabledChanged,
     required this.onReaderAutoPlayIntervalSecondsChanged,
-    required this.onReaderDimLevelChanged,
     required this.onToggleFullscreen,
   });
   final bool showControls;
@@ -30,15 +28,13 @@ class ReaderBottomBar extends StatefulWidget {
   final int totalPages;
   final bool readerAutoPlayEnabled;
   final int readerAutoPlayIntervalSeconds;
-  final double readerDimLevel;
-  final bool readerWindowFullscreen;
+  final bool readerFullscreen;
   final bool showAutoPlayControls;
   final VoidCallback onPrevPage;
-  final VoidCallback onNextPage;
+  final Future<void> Function() onNextPage;
   final ValueChanged<int> onSetIndex;
   final ValueChanged<bool> onReaderAutoPlayEnabledChanged;
   final ValueChanged<int> onReaderAutoPlayIntervalSecondsChanged;
-  final ValueChanged<double> onReaderDimLevelChanged;
   final Future<void> Function() onToggleFullscreen;
 
   @override
@@ -49,8 +45,6 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
   late double _sliderValue;
   bool _isSliding = false;
   final CustomPopupMenuController _intervalMenuController =
-      CustomPopupMenuController();
-  final CustomPopupMenuController _dimMenuController =
       CustomPopupMenuController();
 
   @override
@@ -175,16 +169,14 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                           _buildIntervalMenuButton(cs),
                           const SizedBox(width: 8),
                         ],
-                        _buildDimMenuButton(cs),
-                        const SizedBox(width: 8),
                         GhostButton.icon(
-                          icon: widget.readerWindowFullscreen
+                          icon: widget.readerFullscreen
                               ? LucideIcons.minimize2
                               : LucideIcons.maximize2,
-                          tooltip: widget.readerWindowFullscreen
+                          tooltip: widget.readerFullscreen
                               ? '退出全屏'
                               : '全屏',
-                          semanticLabel: widget.readerWindowFullscreen
+                          semanticLabel: widget.readerFullscreen
                               ? '退出全屏'
                               : '进入全屏',
                           iconSize: 16,
@@ -292,30 +284,6 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
         hoverColor: cs.hentai.readerPanelSubtle,
         overlayColor: cs.hentai.readerPanelSubtle,
         onPressed: () => _intervalMenuController.toggleMenu(),
-      ),
-    );
-  }
-
-  Widget _buildDimMenuButton(ColorScheme cs) {
-    return CustomPopupMenu(
-      controller: _dimMenuController,
-      barrierColor: Colors.transparent,
-      position: PreferredPosition.top,
-      pressType: PressType.singleClick,
-      showArrow: false,
-      verticalMargin: 48,
-      menuBuilder: _buildDimMenu,
-      child: GhostButton.icon(
-        icon: LucideIcons.sunMoon,
-        tooltip: '亮度调整',
-        semanticLabel: '调整阅读亮度',
-        iconSize: 16,
-        size: 30,
-        borderRadius: 8,
-        foregroundColor: cs.hentai.readerTextIconPrimary,
-        hoverColor: cs.hentai.readerPanelSubtle,
-        overlayColor: cs.hentai.readerPanelSubtle,
-        onPressed: () => _dimMenuController.toggleMenu(),
       ),
     );
   }
@@ -437,98 +405,8 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
     );
   }
 
-  Widget _buildDimMenu() {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    const double minBrightnessPercent = 20;
-    const double maxBrightnessPercent = 100;
-    const int brightnessDivisions = 16;
-    double localBrightness =
-        (1 - widget.readerDimLevel).clamp(
-          minBrightnessPercent / 100,
-          maxBrightnessPercent / 100,
-        ) *
-        100;
-    return Container(
-      width: 52,
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cs.hentai.borderSubtle),
-        boxShadow: [
-          BoxShadow(
-            color: cs.hentai.cardShadowHover,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: StatefulBuilder(
-        builder: (BuildContext context, StateSetter setMenuState) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  localBrightness.round().toString(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: cs.hentai.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                SizedBox(
-                  height: 96,
-                  child: RotatedBox(
-                    quarterTurns: 3,
-                    child: SliderTheme(
-                      data: SliderThemeData(
-                        trackHeight: 2.5,
-                        activeTrackColor: cs.hentai.sliderActive,
-                        inactiveTrackColor: cs.hentai.sliderInactive,
-                        thumbColor: cs.hentai.activeButtonBg,
-                        overlayColor: cs.hentai.readerSliderOverlay,
-                        thumbShape: const RoundSliderThumbShape(
-                          enabledThumbRadius: 4,
-                          elevation: 2,
-                        ),
-                        overlayShape: const RoundSliderOverlayShape(
-                          overlayRadius: 6,
-                        ),
-                      ),
-                      child: Slider(
-                        value: localBrightness.clamp(
-                          minBrightnessPercent,
-                          maxBrightnessPercent,
-                        ),
-                        min: minBrightnessPercent,
-                        max: maxBrightnessPercent,
-                        divisions: brightnessDivisions,
-                        onChanged: (double value) {
-                          final double nextBrightness = double.parse(
-                            value.toStringAsFixed(2),
-                          );
-                          final double nextDimLevel =
-                              1 - (nextBrightness / 100);
-                          setMenuState(() {
-                            localBrightness = nextBrightness;
-                          });
-                          widget.onReaderDimLevelChanged(nextDimLevel);
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
   int _buildClampedInterval(int value) {
     return value.clamp(1, 60);
   }
 }
+

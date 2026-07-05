@@ -74,7 +74,7 @@ class _ShellTitleBar extends ConsumerWidget {
       return const AppTitleBar();
     }
 
-    final bool readerFullscreen = ref.watch(readerWindowFullscreenProvider);
+    final bool readerFullscreen = ref.watch(readerFullscreenControllerProvider);
     return readerFullscreen ? const SizedBox.shrink() : const AppTitleBar();
   }
 }

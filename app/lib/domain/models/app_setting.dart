@@ -13,6 +13,7 @@ Map<String, dynamic> _migrateAppSettingJson(Map<String, dynamic> json) {
         : readingModeToJson(kDefaultReadingMode);
   }
   migrated.remove('readerIsVertical');
+  migrated.remove('readerDimLevel');
   return migrated;
 }
 
@@ -22,7 +23,6 @@ abstract class AppSetting with _$AppSetting {
     @Default(3) int version,
     @Default(AppThemePreference.system) AppThemePreference themePreference,
     @Default(false) bool autoScan,
-    @Default(0.0) double readerDimLevel,
     @JsonKey(fromJson: readingModeFromJson, toJson: readingModeToJson)
     @Default(kDefaultReadingMode)
     ReadingMode readingMode,

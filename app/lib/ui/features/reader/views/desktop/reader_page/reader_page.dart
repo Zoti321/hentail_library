@@ -2,12 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/domain/reading/spread_index.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
-import 'package:hentai_library/ui/features/reader/view_models/reader_window_fullscreen.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_fullscreen_controller.dart';
 import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_bottom_bar.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_content.dart';
@@ -87,19 +89,19 @@ class ReaderPage extends HookConsumerWidget {
       readerControllerProvider(viewKey).notifier,
     );
     final ObjectRef<bool> hasAppliedKeepControls = useRef<bool>(false);
-    final bool readerWindowFullscreen = ref.watch(
-      readerWindowFullscreenProvider,
+    final bool readerFullscreen = ref.watch(
+      readerFullscreenControllerProvider,
+    );
+    final bool seriesAdvancePromptPending = ref.watch(
+      readerControllerProvider(viewKey).select(
+        (AsyncValue<ReaderState> asyncState) =>
+            asyncState.asData?.value.seriesAdvancePromptPending ?? false,
+      ),
     );
     final ReadingMode globalReadingMode = ref.watch(
       settingsProvider.select(
         (AsyncValue<AppSetting> value) =>
             value.asData?.value.readingMode ?? kDefaultReadingMode,
-      ),
-    );
-    final double readerDimLevel = ref.watch(
-      settingsProvider.select(
-        (AsyncValue<AppSetting> value) =>
-            value.asData?.value.readerDimLevel ?? 0.0,
       ),
     );
     final bool readerAutoPlayEnabled = ref.watch(
@@ -217,6 +219,21 @@ class ReaderPage extends HookConsumerWidget {
         ref,
       ],
     );
+    useEffect(
+      () {
+        if (!seriesAdvancePromptPending) {
+          return null;
+        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) {
+            return;
+          }
+          showInfoToast(context, '再次翻页将进入下一卷');
+        });
+        return null;
+      },
+      <Object?>[seriesAdvancePromptPending, context],
+    );
 
     return Theme(
       data: theme,
@@ -245,6 +262,15 @@ class ReaderPage extends HookConsumerWidget {
               }
               final int initialPage = state.currentIndex - 1;
               final ReadingMode activeReadingMode = state.readingMode;
+              final ReaderNavContextData? seriesNavContext = viewModel.isSeriesRead
+                  ? viewModel.navContext
+                  : null;
+              final Future<void> Function() requestNextPage = () =>
+                  controller.requestNextPage(
+                    navContext: seriesNavContext,
+                    session: routeContext.session,
+                    router: GoRouter.of(context),
+                  );
               return Stack(
                 children: [
                   GestureDetector(
@@ -258,7 +284,12 @@ class ReaderPage extends HookConsumerWidget {
                         context,
                         details.globalPosition.dx,
                       );
-                      controller.handleTapZone(zone);
+                      controller.handleTapZone(
+                        zone,
+                        navContext: seriesNavContext,
+                        session: routeContext.session,
+                        router: GoRouter.of(context),
+                      );
                     },
                     child: ReaderContent(
                       key: ValueKey<String>(routeContext.comicId),
@@ -267,14 +298,7 @@ class ReaderPage extends HookConsumerWidget {
                       initialPage: initialPage,
                       preferredPageIndex: preferredPageIndex,
                       readingMode: activeReadingMode,
-                    ),
-                  ),
-                  IgnorePointer(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 120),
-                      color: Colors.black.withAlpha(
-                        (readerDimLevel * 255).round(),
-                      ),
+                      onRequestNextPage: requestNextPage,
                     ),
                   ),
                   ReaderTopBar(
@@ -307,11 +331,10 @@ class ReaderPage extends HookConsumerWidget {
                     readerAutoPlayEnabled: readerAutoPlayEnabled,
                     readerAutoPlayIntervalSeconds:
                         readerAutoPlayIntervalSeconds,
-                    readerDimLevel: readerDimLevel,
-                    readerWindowFullscreen: readerWindowFullscreen,
+                    readerFullscreen: readerFullscreen,
                     showAutoPlayControls: activeReadingMode.supportsAutoPlay,
                     onPrevPage: controller.prevPage,
-                    onNextPage: controller.nextPage,
+                    onNextPage: requestNextPage,
                     onSetIndex: controller.setIndex,
                     onReaderAutoPlayEnabledChanged: (bool value) {
                       ref
@@ -323,16 +346,7 @@ class ReaderPage extends HookConsumerWidget {
                           .read(settingsProvider.notifier)
                           .setReaderAutoPlayIntervalSeconds(value);
                     },
-                    onReaderDimLevelChanged: (double value) {
-                      ref
-                          .read(settingsProvider.notifier)
-                          .setReaderDimLevel(value);
-                    },
-                    onToggleFullscreen: () async {
-                      await ref
-                          .read(readerWindowFullscreenProvider.notifier)
-                          .setFullscreen(!readerWindowFullscreen);
-                    },
+                    onToggleFullscreen: controller.toggleFullscreen,
                   ),
                 ],
               );

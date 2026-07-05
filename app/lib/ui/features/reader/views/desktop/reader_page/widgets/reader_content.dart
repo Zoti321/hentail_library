@@ -11,6 +11,7 @@ class ReaderContent extends ConsumerWidget {
     required this.initialPage,
     required this.preferredPageIndex,
     required this.readingMode,
+    this.onRequestNextPage,
   });
 
   final String comicId;
@@ -18,6 +19,7 @@ class ReaderContent extends ConsumerWidget {
   final int initialPage;
   final int? preferredPageIndex;
   final ReadingMode readingMode;
+  final Future<void> Function()? onRequestNextPage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,6 +29,7 @@ class ReaderContent extends ConsumerWidget {
       initialPage: initialPage,
       preferredPageIndex: preferredPageIndex,
       readingMode: readingMode,
+      onRequestNextPage: onRequestNextPage,
     );
   }
 }

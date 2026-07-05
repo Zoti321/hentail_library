@@ -12,6 +12,7 @@ class ReaderViewportHost extends StatelessWidget {
     required this.initialPage,
     required this.preferredPageIndex,
     required this.readingMode,
+    this.onRequestNextPage,
   });
 
   final String comicId;
@@ -19,6 +20,7 @@ class ReaderViewportHost extends StatelessWidget {
   final int initialPage;
   final int? preferredPageIndex;
   final ReadingMode readingMode;
+  final Future<void> Function()? onRequestNextPage;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class ReaderViewportHost extends StatelessWidget {
         readingMode: readingMode,
         initialPage: initialPage,
         preferredPageIndex: preferredPageIndex,
+        onRequestNextPage: onRequestNextPage,
       );
     }
     return PagedViewport(
@@ -43,6 +46,7 @@ class ReaderViewportHost extends StatelessWidget {
       incognito: incognito,
       initialPage: initialPage,
       preferredPageIndex: preferredPageIndex,
+      onRequestNextPage: onRequestNextPage,
     );
   }
 }
