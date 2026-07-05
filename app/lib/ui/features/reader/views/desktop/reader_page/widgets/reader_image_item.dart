@@ -11,10 +11,12 @@ class ReaderImageItem extends ConsumerWidget {
     super.key,
     required this.imageData,
     this.enableCrossfade = false,
+    this.alignment = Alignment.center,
   });
 
   final ReaderPageImageData imageData;
   final bool enableCrossfade;
+  final Alignment alignment;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,14 +25,17 @@ class ReaderImageItem extends ConsumerWidget {
           imageData as ReaderDirPageImageData;
       return ReaderPageFadeIn(
         enabled: enableCrossfade,
-        child: Image.file(
-          dirData.file,
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.high,
-          errorBuilder:
-              (BuildContext context, Object error, StackTrace? stackTrace) {
-                return _buildReaderImagePlaceholder(context);
-              },
+        child: Align(
+          alignment: alignment,
+          child: Image.file(
+            dirData.file,
+            fit: BoxFit.contain,
+            filterQuality: FilterQuality.high,
+            errorBuilder:
+                (BuildContext context, Object error, StackTrace? stackTrace) {
+                  return _buildReaderImagePlaceholder(context);
+                },
+          ),
         ),
       );
     }
@@ -60,15 +65,18 @@ class ReaderImageItem extends ConsumerWidget {
     if (imageBytes != null) {
       return ReaderPageFadeIn(
         enabled: enableCrossfade,
-        child: Image(
-          image: MemoryImage(imageBytes),
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.high,
-          gaplessPlayback: true,
-          errorBuilder:
-              (BuildContext context, Object error, StackTrace? stackTrace) {
-                return _buildReaderImagePlaceholder(context);
-              },
+        child: Align(
+          alignment: alignment,
+          child: Image(
+            image: MemoryImage(imageBytes),
+            fit: BoxFit.contain,
+            filterQuality: FilterQuality.high,
+            gaplessPlayback: true,
+            errorBuilder:
+                (BuildContext context, Object error, StackTrace? stackTrace) {
+                  return _buildReaderImagePlaceholder(context);
+                },
+          ),
         ),
       );
     }

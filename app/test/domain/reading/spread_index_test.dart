@@ -157,4 +157,96 @@ void main() {
       );
     });
   });
+
+  group('SpreadIndex.remapPageForModeSwitch', () {
+    test('dualPage to paged uses max page in spread', () {
+      expect(
+        SpreadIndex.remapPageForModeSwitch(
+          fromMode: ReadingMode.dualPage,
+          toMode: ReadingMode.paged,
+          currentPageIndex: 3,
+          totalPages: 5,
+        ),
+        4,
+      );
+      expect(
+        SpreadIndex.remapPageForModeSwitch(
+          fromMode: ReadingMode.dualPage,
+          toMode: ReadingMode.paged,
+          currentPageIndex: 5,
+          totalPages: 6,
+        ),
+        6,
+      );
+    });
+
+    test('dualPageNoCover to continuousVertical uses max page in spread', () {
+      expect(
+        SpreadIndex.remapPageForModeSwitch(
+          fromMode: ReadingMode.dualPageNoCover,
+          toMode: ReadingMode.continuousVertical,
+          currentPageIndex: 2,
+          totalPages: 4,
+        ),
+        3,
+      );
+    });
+
+    test('single-page spread keeps page when leaving dual mode', () {
+      expect(
+        SpreadIndex.remapPageForModeSwitch(
+          fromMode: ReadingMode.dualPageNoCover,
+          toMode: ReadingMode.paged,
+          currentPageIndex: 1,
+          totalPages: 4,
+        ),
+        1,
+      );
+      expect(
+        SpreadIndex.remapPageForModeSwitch(
+          fromMode: ReadingMode.dualPageNoCover,
+          toMode: ReadingMode.paged,
+          currentPageIndex: 4,
+          totalPages: 4,
+        ),
+        4,
+      );
+    });
+
+    test('paged to dual keeps current page', () {
+      expect(
+        SpreadIndex.remapPageForModeSwitch(
+          fromMode: ReadingMode.paged,
+          toMode: ReadingMode.dualPageNoCover,
+          currentPageIndex: 5,
+          totalPages: 10,
+        ),
+        5,
+      );
+    });
+
+    test('dualPage variants do not remap', () {
+      expect(
+        SpreadIndex.remapPageForModeSwitch(
+          fromMode: ReadingMode.dualPage,
+          toMode: ReadingMode.dualPageNoCover,
+          currentPageIndex: 3,
+          totalPages: 10,
+        ),
+        3,
+      );
+    });
+
+    test('paged to continuousVertical does not remap', () {
+      expect(
+        SpreadIndex.remapPageForModeSwitch(
+          fromMode: ReadingMode.paged,
+          toMode: ReadingMode.continuousVertical,
+          currentPageIndex: 7,
+          totalPages: 20,
+        ),
+        7,
+      );
+    });
+  });
 }

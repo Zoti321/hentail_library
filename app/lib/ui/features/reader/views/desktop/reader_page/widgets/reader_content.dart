@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/features/reader/module/view/reader_viewport_host.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ReaderContent extends ConsumerWidget {
@@ -23,13 +24,35 @@ class ReaderContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ReaderViewportHost(
-      comicId: comicId,
-      incognito: incognito,
-      initialPage: initialPage,
-      preferredPageIndex: preferredPageIndex,
-      readingMode: readingMode,
-      onRequestNextPage: onRequestNextPage,
+    return AnimatedSwitcher(
+      duration: kReaderPageCrossfadeDuration,
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeOut,
+      layoutBuilder: (
+        Widget? currentChild,
+        List<Widget> previousChildren,
+      ) {
+        return Stack(
+          fit: StackFit.expand,
+          alignment: Alignment.center,
+          children: <Widget>[
+            ...previousChildren,
+            if (currentChild != null) currentChild,
+          ],
+        );
+      },
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(opacity: animation, child: child);
+      },
+      child: ReaderViewportHost(
+        key: ValueKey<ReadingMode>(readingMode),
+        comicId: comicId,
+        incognito: incognito,
+        initialPage: initialPage,
+        preferredPageIndex: preferredPageIndex,
+        readingMode: readingMode,
+        onRequestNextPage: onRequestNextPage,
+      ),
     );
   }
 }

@@ -228,10 +228,18 @@ class _DualSpreadPage extends StatelessWidget {
       }
       final bool coverOnRight =
           readingMode == ReadingMode.dualPageNoCover && pageIndex == 1;
+      final Alignment alignment =
+          coverOnRight ? Alignment.centerLeft : Alignment.centerRight;
       return Row(
         children: <Widget>[
           if (coverOnRight) const Expanded(child: SizedBox.shrink()),
-          Expanded(child: ReaderImageItem(imageData: imageData, enableCrossfade: true)),
+          Expanded(
+            child: ReaderImageItem(
+              imageData: imageData,
+              alignment: alignment,
+              enableCrossfade: true,
+            ),
+          ),
           if (!coverOnRight) const Expanded(child: SizedBox.shrink()),
         ],
       );
@@ -243,12 +251,20 @@ class _DualSpreadPage extends StatelessWidget {
         Expanded(
           child: leftImage == null
               ? const SizedBox.shrink()
-              : ReaderImageItem(imageData: leftImage, enableCrossfade: true),
+              : ReaderImageItem(
+                  imageData: leftImage,
+                  alignment: Alignment.centerRight,
+                  enableCrossfade: true,
+                ),
         ),
         Expanded(
           child: rightImage == null
               ? const SizedBox.shrink()
-              : ReaderImageItem(imageData: rightImage, enableCrossfade: true),
+              : ReaderImageItem(
+                  imageData: rightImage,
+                  alignment: Alignment.centerLeft,
+                  enableCrossfade: true,
+                ),
         ),
       ],
     );

@@ -151,7 +151,21 @@ class ReaderController extends _$ReaderController {
   }
 
   void setReadingMode(ReadingMode value) {
-    _updateDataState((s) => s.copyWith(readingMode: value));
+    _updateDataState((ReaderState s) {
+      if (s.readingMode == value) {
+        return s;
+      }
+      final int remappedIndex = SpreadIndex.remapPageForModeSwitch(
+        fromMode: s.readingMode,
+        toMode: value,
+        currentPageIndex: s.currentIndex,
+        totalPages: s.totalPages,
+      );
+      return s.copyWith(
+        readingMode: value,
+        currentIndex: remappedIndex,
+      );
+    });
   }
 
   void nextPage() {
