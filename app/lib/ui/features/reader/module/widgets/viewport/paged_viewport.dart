@@ -2,18 +2,21 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/image/image_quality_policy.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
+import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
+import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_image_item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ReaderPagedContent extends HookConsumerWidget {
-  const ReaderPagedContent({
+class PagedViewport extends HookConsumerWidget {
+  const PagedViewport({
     super.key,
     required this.comicId,
     required this.incognito,
     required this.initialPage,
     required this.preferredPageIndex,
   });
+
   final String comicId;
   final bool incognito;
   final int initialPage;
@@ -21,16 +24,19 @@ class ReaderPagedContent extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ReaderViewKey viewKey = readerViewKey(comicId, incognito: incognito);
+    final ReaderControllerKey viewKey = readerControllerKey(
+      comicId,
+      incognito: incognito,
+    );
     final int currentIndex = ref.watch(
-      readerViewProvider(viewKey).select(
-        (AsyncValue<ReaderViewState> value) =>
+      readerControllerProvider(viewKey).select(
+        (AsyncValue<ReaderState> value) =>
             value.asData?.value.currentIndex ?? 1,
       ),
     );
     final int totalPages = ref.watch(
-      readerViewProvider(viewKey).select(
-        (AsyncValue<ReaderViewState> value) =>
+      readerControllerProvider(viewKey).select(
+        (AsyncValue<ReaderState> value) =>
             value.asData?.value.totalPages ?? 1,
       ),
     );
@@ -67,7 +73,9 @@ class ReaderPagedContent extends HookConsumerWidget {
           if (!context.mounted) {
             return;
           }
-          ref.read(readerViewProvider(viewKey).notifier).setIndex(safeIndex);
+          ref
+              .read(readerControllerProvider(viewKey).notifier)
+              .setIndex(safeIndex);
         });
       }
       return null;
@@ -133,8 +141,8 @@ class ReaderPagedContent extends HookConsumerWidget {
               return;
             }
             lastWheelAt.value = now;
-            final ReaderViewNotifier notifier = ref.read(
-              readerViewProvider(viewKey).notifier,
+            final ReaderController notifier = ref.read(
+              readerControllerProvider(viewKey).notifier,
             );
             if (dy > 0) {
               notifier.nextPage();
@@ -150,7 +158,7 @@ class ReaderPagedContent extends HookConsumerWidget {
                 return;
               }
               ref
-                  .read(readerViewProvider(viewKey).notifier)
+                  .read(readerControllerProvider(viewKey).notifier)
                   .setIndex(index + 1);
             },
             itemCount: imageList.length,

@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
+import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
+import 'package:hentai_library/ui/features/reader/view_models/reader_window_fullscreen.dart';
+import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_bottom_bar.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_content.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
@@ -32,7 +36,7 @@ class ReaderPage extends HookConsumerWidget {
       seriesId: seriesId,
       incognito: incognito,
     );
-    final ReaderViewKey viewKey = readerViewKey(
+    final ReaderControllerKey viewKey = readerControllerKey(
       routeContext.comicId,
       incognito: routeContext.incognito,
     );
@@ -79,17 +83,17 @@ class ReaderPage extends HookConsumerWidget {
         readerReady,
       ],
     );
-    final ReaderViewNotifier notifier = ref.read(
-      readerViewProvider(viewKey).notifier,
+    final ReaderController controller = ref.read(
+      readerControllerProvider(viewKey).notifier,
     );
     final ObjectRef<bool> hasAppliedKeepControls = useRef<bool>(false);
     final bool readerWindowFullscreen = ref.watch(
       readerWindowFullscreenProvider,
     );
-    final bool readerIsVertical = ref.watch(
+    final ReadingMode globalReadingMode = ref.watch(
       settingsProvider.select(
         (AsyncValue<AppSetting> value) =>
-            value.asData?.value.readerIsVertical ?? false,
+            value.asData?.value.readingMode ?? kDefaultReadingMode,
       ),
     );
     final double readerDimLevel = ref.watch(
@@ -110,22 +114,22 @@ class ReaderPage extends HookConsumerWidget {
             value.asData?.value.readerAutoPlayIntervalSeconds ?? 5,
       ),
     );
-    final ({int currentIndex, int totalPages, bool isVertical})? autoPlayState =
-        ref.watch(
-          readerViewProvider(viewKey).select((
-            AsyncValue<ReaderViewState> asyncState,
-          ) {
-            final ReaderViewState? readerState = asyncState.asData?.value;
-            if (readerState == null) {
-              return null;
-            }
-            return (
-              currentIndex: readerState.currentIndex,
-              totalPages: readerState.totalPages,
-              isVertical: readerState.isVertical,
-            );
-          }),
+    final ({int currentIndex, int totalPages, ReadingMode readingMode})?
+    autoPlayState = ref.watch(
+      readerControllerProvider(viewKey).select((
+        AsyncValue<ReaderState> asyncState,
+      ) {
+        final ReaderState? readerState = asyncState.asData?.value;
+        if (readerState == null) {
+          return null;
+        }
+        return (
+          currentIndex: readerState.currentIndex,
+          totalPages: readerState.totalPages,
+          readingMode: readerState.readingMode,
         );
+      }),
+    );
     final GlobalKey<ScaffoldState> scaffoldKey = useMemoized(
       GlobalKey<ScaffoldState>.new,
       <Object?>[],
@@ -143,25 +147,25 @@ class ReaderPage extends HookConsumerWidget {
         return null;
       }
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        notifier.setShowControls(true);
+        controller.setShowControls(true);
       });
       return null;
-    }, <Object?>[keepControlsOpen, viewAsync, notifier]);
+    }, <Object?>[keepControlsOpen, viewAsync, controller]);
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) {
           return;
         }
-        notifier.setIsVertical(readerIsVertical);
+        controller.setReadingMode(globalReadingMode);
       });
       return null;
-    }, <Object?>[readerIsVertical, notifier, context]);
+    }, <Object?>[globalReadingMode, controller, context]);
     useEffect(
       () {
         final bool canStartAutoPlay =
             readerAutoPlayEnabled &&
-            !readerIsVertical &&
             autoPlayState != null &&
+            autoPlayState.readingMode.supportsAutoPlay &&
             autoPlayState.totalPages > 0 &&
             autoPlayState.currentIndex < autoPlayState.totalPages;
         if (!canStartAutoPlay) {
@@ -172,22 +176,22 @@ class ReaderPage extends HookConsumerWidget {
         );
         Timer? timer;
         timer = Timer.periodic(interval, (_) {
-          final ReaderViewState? currentState = ref
-              .read(readerViewProvider(viewKey))
+          final ReaderState? currentState = ref
+              .read(readerControllerProvider(viewKey))
               .asData
               ?.value;
           if (currentState == null) {
             return;
           }
           final bool shouldStop =
-              currentState.isVertical ||
+              !currentState.readingMode.supportsAutoPlay ||
               currentState.totalPages <= 0 ||
               currentState.currentIndex >= currentState.totalPages;
           if (shouldStop) {
             timer?.cancel();
             return;
           }
-          notifier.nextPage();
+          controller.nextPage();
         });
         return () {
           timer?.cancel();
@@ -196,12 +200,12 @@ class ReaderPage extends HookConsumerWidget {
       <Object?>[
         readerAutoPlayEnabled,
         readerAutoPlayIntervalSeconds,
-        readerIsVertical,
+        globalReadingMode,
         autoPlayState?.currentIndex,
         autoPlayState?.totalPages,
-        autoPlayState?.isVertical,
+        autoPlayState?.readingMode,
         routeContext.comicId,
-        notifier,
+        controller,
         ref,
       ],
     );
@@ -214,7 +218,7 @@ class ReaderPage extends HookConsumerWidget {
           if (didPop) {
             return;
           }
-          await notifier.executeExitReader(
+          await controller.executeExitReader(
             context: context,
             routeContext: routeContext,
           );
@@ -226,26 +230,27 @@ class ReaderPage extends HookConsumerWidget {
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (Object e, StackTrace st) => Center(child: Text('$e')),
             data: (ReaderPageViewModel viewModel) {
-              final ReaderViewState state = viewModel.viewState;
+              final ReaderState state = viewModel.viewState;
               final int? preferredPageIndex = viewModel.preferredPageIndex;
               if (state.totalPages == 0) {
                 return const Center(child: Text('暂无图片'));
               }
               final int initialPage = state.currentIndex - 1;
+              final ReadingMode activeReadingMode = state.readingMode;
               return Stack(
                 children: [
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTapUp: (TapUpDetails details) {
-                      if (readerIsVertical) {
-                        notifier.toggleShowControls();
+                      if (activeReadingMode.isContinuousVertical) {
+                        controller.toggleShowControls();
                         return;
                       }
                       final ReaderTapZone zone = _resolveTapZone(
                         context,
                         details.globalPosition.dx,
                       );
-                      notifier.handleTapZone(zone);
+                      controller.handleTapZone(zone);
                     },
                     child: ReaderContent(
                       key: ValueKey<String>(routeContext.comicId),
@@ -253,7 +258,7 @@ class ReaderPage extends HookConsumerWidget {
                       incognito: routeContext.incognito,
                       initialPage: initialPage,
                       preferredPageIndex: preferredPageIndex,
-                      isVertical: readerIsVertical,
+                      readingMode: activeReadingMode,
                     ),
                   ),
                   IgnorePointer(
@@ -266,27 +271,20 @@ class ReaderPage extends HookConsumerWidget {
                   ),
                   ReaderTopBar(
                     showControls: state.showControls,
-                    isVertical: readerIsVertical,
+                    readingMode: activeReadingMode,
                     title: state.comic.title,
                     navContext: viewModel.isSeriesRead
                         ? viewModel.navContext
                         : null,
                     session: routeContext.session,
                     onExit: () async {
-                      await notifier.executeExitReader(
+                      await controller.executeExitReader(
                         context: context,
                         routeContext: routeContext,
                       );
                     },
-                    onSetHorizontalMode: () {
-                      ref
-                          .read(settingsProvider.notifier)
-                          .setReaderIsVertical(false);
-                    },
-                    onSetVerticalMode: () {
-                      ref
-                          .read(settingsProvider.notifier)
-                          .setReaderIsVertical(true);
+                    onReadingModeChanged: (ReadingMode mode) {
+                      ref.read(settingsProvider.notifier).setReadingMode(mode);
                     },
                   ),
                   ReaderBottomBar(
@@ -298,9 +296,9 @@ class ReaderPage extends HookConsumerWidget {
                         readerAutoPlayIntervalSeconds,
                     readerDimLevel: readerDimLevel,
                     readerWindowFullscreen: readerWindowFullscreen,
-                    onPrevPage: notifier.prevPage,
-                    onNextPage: notifier.nextPage,
-                    onSetIndex: notifier.setIndex,
+                    onPrevPage: controller.prevPage,
+                    onNextPage: controller.nextPage,
+                    onSetIndex: controller.setIndex,
                     onReaderAutoPlayEnabledChanged: (bool value) {
                       ref
                           .read(settingsProvider.notifier)

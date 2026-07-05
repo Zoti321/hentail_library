@@ -37,7 +37,7 @@ class SettingsView extends StatelessWidget {
           ),
           const SettingsGroup(
             title: '阅读',
-            children: <Widget>[ReaderAutoPlayIntervalRow()],
+            children: <Widget>[ReaderModeRow(), ReaderAutoPlayIntervalRow()],
           ),
           const SettingsGroup(
             title: '关于',

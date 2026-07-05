@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/reading/read_session.dart';
-import 'package:hentai_library/ui/features/reader/view_models/reader_page_notifier.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
@@ -75,13 +75,13 @@ Future<void> navigateToSeriesComicInReader(
   if (targetComicId == currentSession.comicId) {
     return;
   }
-  final ReaderViewKey viewKey = readerViewKey(
+  final ReaderControllerKey viewKey = readerControllerKey(
     currentSession.comicId,
     incognito: currentSession.incognito,
   );
   if (!currentSession.incognito) {
-    final ReaderViewState? viewState = ref
-        .read(readerViewProvider(viewKey))
+    final ReaderState? viewState = ref
+        .read(readerControllerProvider(viewKey))
         .asData
         ?.value;
     if (viewState != null) {

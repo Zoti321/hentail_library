@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/reading/reader_session_snapshot.dart';
-import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
+import 'package:hentai_library/domain/reading/reading_mode.dart';
+import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/ui/features/reader/view_models/reader_window_fullscreen.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
@@ -11,37 +12,49 @@ import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifie
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'reader_page_notifier.freezed.dart';
-part 'reader_page_notifier.g.dart';
+part 'reader_controller.freezed.dart';
+part 'reader_controller.g.dart';
 
 enum ReaderTapZone { left, center, right }
 
-typedef ReaderViewKey = ({String comicId, bool incognito});
+typedef ReaderControllerKey = ({String comicId, bool incognito});
 
-ReaderViewKey readerViewKey(String comicId, {bool incognito = false}) =>
-    (comicId: comicId, incognito: incognito);
+ReaderControllerKey readerControllerKey(
+  String comicId, {
+  bool incognito = false,
+}) => (comicId: comicId, incognito: incognito);
+
+@Deprecated('Use readerControllerKey')
+typedef ReaderViewKey = ReaderControllerKey;
+
+@Deprecated('Use readerControllerKey')
+ReaderControllerKey readerViewKey(String comicId, {bool incognito = false}) =>
+    readerControllerKey(comicId, incognito: incognito);
 
 @freezed
-abstract class ReaderViewState with _$ReaderViewState {
-  factory ReaderViewState({
+abstract class ReaderState with _$ReaderState {
+  factory ReaderState({
     required Comic comic,
-    @Default(false) bool isVertical,
+    @Default(ReadingMode.paged) ReadingMode readingMode,
     @Default(false) bool showControls,
     @Default(1) int currentIndex,
     int? totalPagesOverride,
-  }) = _ReaderViewState;
+  }) = _ReaderState;
 
-  ReaderViewState._();
+  ReaderState._();
 
   int get totalPages => totalPagesOverride ?? 0;
 }
+
+@Deprecated('Use ReaderState')
+typedef ReaderViewState = ReaderState;
 
 class ReaderPageViewModel {
   const ReaderPageViewModel({
     required this.viewState,
     required this.sessionContext,
   });
-  final ReaderViewState viewState;
+  final ReaderState viewState;
   final ReadSessionContextData sessionContext;
 
   ReaderNavContextData get navContext => sessionContext.navContext;
@@ -57,8 +70,10 @@ AsyncValue<ReaderPageViewModel> readerPageViewModel(
   String? seriesId,
   bool incognito = false,
 }) {
-  final AsyncValue<ReaderViewState> viewAsync = ref.watch(
-    readerViewProvider(readerViewKey(comicId, incognito: incognito)),
+  final AsyncValue<ReaderState> viewAsync = ref.watch(
+    readerControllerProvider(
+      readerControllerKey(comicId, incognito: incognito),
+    ),
   );
   final AsyncValue<ReadSessionContextData> sessionContextAsync = ref.watch(
     readSessionContextForReaderProvider(
@@ -76,7 +91,7 @@ AsyncValue<ReaderPageViewModel> readerPageViewModel(
       sessionContextAsync.stackTrace!,
     );
   }
-  final ReaderViewState? viewState = viewAsync.asData?.value;
+  final ReaderState? viewState = viewAsync.asData?.value;
   final ReadSessionContextData? sessionContext =
       sessionContextAsync.asData?.value;
   if (viewState == null || sessionContext == null) {
@@ -88,35 +103,35 @@ AsyncValue<ReaderPageViewModel> readerPageViewModel(
 }
 
 @riverpod
-class ReaderViewNotifier extends _$ReaderViewNotifier {
+class ReaderController extends _$ReaderController {
   @override
-  Future<ReaderViewState> build(ReaderViewKey key) async {
+  Future<ReaderState> build(ReaderControllerKey key) async {
     final String id = key.comicId;
     final bool incognito = key.incognito;
     final ReaderSessionSnapshot snapshot = await ref.watch(
       readerSessionOpenProvider(comicId: id, incognito: incognito).future,
     );
-    return ReaderViewState(
+    return ReaderState(
       comic: snapshot.comic,
       currentIndex: snapshot.resumePageIndex,
       totalPagesOverride: snapshot.totalPages > 0 ? snapshot.totalPages : null,
     );
   }
 
-  String get _comicId => (ref.$arg as ReaderViewKey).comicId;
+  String get _comicId => (ref.$arg as ReaderControllerKey).comicId;
 
   void _notifyPageChanged(int pageIndex) {
-    final ReaderViewKey key = ref.$arg as ReaderViewKey;
+    final ReaderControllerKey key = ref.$arg as ReaderControllerKey;
     if (key.incognito) {
       return;
     }
     ref.read(readingAggregateProvider.notifier).updatePage(pageIndex);
   }
 
-  void _updateDataState(ReaderViewState Function(ReaderViewState) updater) {
+  void _updateDataState(ReaderState Function(ReaderState) updater) {
     final current = state.asData?.value;
     if (current == null) return;
-    final ReaderViewState next = updater(current);
+    final ReaderState next = updater(current);
     if (next.currentIndex != current.currentIndex) {
       _notifyPageChanged(next.currentIndex);
     }
@@ -131,8 +146,8 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
     _updateDataState((s) => s.copyWith(showControls: value));
   }
 
-  void setIsVertical(bool value) {
-    _updateDataState((s) => s.copyWith(isVertical: value));
+  void setReadingMode(ReadingMode value) {
+    _updateDataState((s) => s.copyWith(readingMode: value));
   }
 
   void nextPage() {
@@ -167,15 +182,11 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
       toggleShowControls();
       return;
     }
-    if (current.isVertical) {
-      _handleVerticalTap();
-    } else {
-      _handleHorizontalTap(zone);
+    if (current.readingMode.isContinuousVertical) {
+      toggleShowControls();
+      return;
     }
-  }
-
-  void _handleVerticalTap() {
-    toggleShowControls();
+    _handleHorizontalTap(zone);
   }
 
   void _handleHorizontalTap(ReaderTapZone zone) {
@@ -194,7 +205,7 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
     if (routeContext.incognito) {
       return;
     }
-    final ReaderViewState? currentState = state.asData?.value;
+    final ReaderState? currentState = state.asData?.value;
     if (currentState != null) {
       ref
           .read(readingAggregateProvider.notifier)
@@ -215,7 +226,7 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
         .read(readerWindowFullscreenProvider.notifier)
         .exitFullscreenIfNeeded();
     if (!routeContext.incognito) {
-      final ReaderViewState? currentState = state.asData?.value;
+      final ReaderState? currentState = state.asData?.value;
       if (currentState != null) {
         ref
             .read(readingAggregateProvider.notifier)

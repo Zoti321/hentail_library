@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_content_switcher.dart';
+import 'package:hentai_library/domain/reading/reading_mode.dart';
+import 'package:hentai_library/ui/features/reader/module/view/reader_viewport_host.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ReaderContent extends ConsumerWidget {
@@ -9,23 +10,23 @@ class ReaderContent extends ConsumerWidget {
     required this.incognito,
     required this.initialPage,
     required this.preferredPageIndex,
-    required this.isVertical,
+    required this.readingMode,
   });
 
   final String comicId;
   final bool incognito;
   final int initialPage;
   final int? preferredPageIndex;
-  final bool isVertical;
+  final ReadingMode readingMode;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ReaderContentSwitcher(
+    return ReaderViewportHost(
       comicId: comicId,
       incognito: incognito,
       initialPage: initialPage,
       preferredPageIndex: preferredPageIndex,
-      isVertical: isVertical,
+      readingMode: readingMode,
     );
   }
 }

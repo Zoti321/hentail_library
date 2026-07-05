@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/reading/read_session.dart';
+import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
@@ -13,22 +14,20 @@ class ReaderTopBar extends StatefulWidget {
   const ReaderTopBar({
     super.key,
     required this.showControls,
-    required this.isVertical,
+    required this.readingMode,
     required this.title,
     required this.session,
     required this.onExit,
-    required this.onSetHorizontalMode,
-    required this.onSetVerticalMode,
+    required this.onReadingModeChanged,
     this.navContext,
   });
   final bool showControls;
-  final bool isVertical;
+  final ReadingMode readingMode;
   final String title;
   final ReadSessionRouteParams session;
   final ReaderNavContextData? navContext;
   final Future<void> Function() onExit;
-  final VoidCallback onSetHorizontalMode;
-  final VoidCallback onSetVerticalMode;
+  final ValueChanged<ReadingMode> onReadingModeChanged;
 
   @override
   State<ReaderTopBar> createState() => _ReaderTopBarState();
@@ -116,9 +115,7 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                       verticalMargin: -14,
                       menuBuilder: _buildReadModeMenu,
                       child: GhostButton.icon(
-                        icon: widget.isVertical
-                            ? LucideIcons.arrowUpDown
-                            : LucideIcons.bookOpen,
+                        icon: _modeIcon(widget.readingMode),
                         tooltip: '阅读模式',
                         semanticLabel: '切换阅读模式',
                         iconSize: 16,
@@ -140,10 +137,19 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
     );
   }
 
+  IconData _modeIcon(ReadingMode mode) {
+    return switch (mode) {
+      ReadingMode.continuousVertical => LucideIcons.arrowUpDown,
+      ReadingMode.paged => LucideIcons.bookOpen,
+      ReadingMode.dualPage || ReadingMode.dualPageNoCover =>
+        LucideIcons.bookCopy,
+    };
+  }
+
   Widget _buildReadModeMenu() {
     final ColorScheme cs = Theme.of(context).colorScheme;
     return Container(
-      width: 212,
+      width: 240,
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(12),
@@ -173,32 +179,65 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                 ),
               ),
             ),
-            _ReadModeMenuItem(
-              icon: LucideIcons.bookOpen,
-              label: '翻页模式',
-              description: '按页切换阅读',
-              isActive: !widget.isVertical,
-              onTap: () {
-                _readModeController.hideMenu();
-                widget.onSetHorizontalMode();
-              },
-            ),
-            const SizedBox(height: 6),
-            _ReadModeMenuItem(
-              icon: LucideIcons.arrowUpDown,
-              label: '长条模式',
-              description: '连续纵向滚动',
-              isActive: widget.isVertical,
-              onTap: () {
-                _readModeController.hideMenu();
-                widget.onSetVerticalMode();
-              },
-            ),
+            for (final _ReadModeOption option in _readModeOptions) ...<Widget>[
+              _ReadModeMenuItem(
+                icon: option.icon,
+                label: option.label,
+                description: option.description,
+                isActive: widget.readingMode == option.mode,
+                onTap: () {
+                  _readModeController.hideMenu();
+                  widget.onReadingModeChanged(option.mode);
+                },
+              ),
+              if (option != _readModeOptions.last) const SizedBox(height: 6),
+            ],
           ],
         ),
       ),
     );
   }
+}
+
+const List<_ReadModeOption> _readModeOptions = <_ReadModeOption>[
+  _ReadModeOption(
+    mode: ReadingMode.paged,
+    icon: LucideIcons.bookOpen,
+    label: '翻页模式',
+    description: '按页切换阅读',
+  ),
+  _ReadModeOption(
+    mode: ReadingMode.continuousVertical,
+    icon: LucideIcons.arrowUpDown,
+    label: '长条模式',
+    description: '连续纵向滚动',
+  ),
+  _ReadModeOption(
+    mode: ReadingMode.dualPage,
+    icon: LucideIcons.bookCopy,
+    label: '双页模式',
+    description: '左右双页阅读',
+  ),
+  _ReadModeOption(
+    mode: ReadingMode.dualPageNoCover,
+    icon: LucideIcons.bookCopy,
+    label: '双页（封面独立）',
+    description: '封面单独一页',
+  ),
+];
+
+class _ReadModeOption {
+  const _ReadModeOption({
+    required this.mode,
+    required this.icon,
+    required this.label,
+    required this.description,
+  });
+
+  final ReadingMode mode;
+  final IconData icon;
+  final String label;
+  final String description;
 }
 
 class _ReaderTopBarTitle extends StatelessWidget {

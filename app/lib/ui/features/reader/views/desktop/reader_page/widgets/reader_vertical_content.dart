@@ -4,7 +4,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/image/image_quality_policy.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
+import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
+import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
 import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_image_item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -22,10 +24,10 @@ class ReaderVerticalContent extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ReaderViewKey viewKey = readerViewKey(comicId, incognito: incognito);
+    final ReaderControllerKey viewKey = readerControllerKey(comicId, incognito: incognito);
     final int currentIndex = ref.watch(
-      readerViewProvider(viewKey).select(
-        (AsyncValue<ReaderViewState> value) =>
+      readerControllerProvider(viewKey).select(
+        (AsyncValue<ReaderState> value) =>
             value.asData?.value.currentIndex ?? 1,
       ),
     );
@@ -37,8 +39,8 @@ class ReaderVerticalContent extends HookConsumerWidget {
     final List<ReaderPageImageData> imageList =
         images ?? const <ReaderPageImageData>[];
 
-    final ReaderViewNotifier notifier = ref.read(
-      readerViewProvider(viewKey).notifier,
+    final ReaderController controller = ref.read(
+      readerControllerProvider(viewKey).notifier,
     );
     final ItemScrollController itemScrollController = useMemoized(
       ItemScrollController.new,
@@ -97,7 +99,7 @@ class ReaderVerticalContent extends HookConsumerWidget {
           if (!context.mounted) {
             return;
           }
-          notifier.setIndex(safeIndex);
+          controller.setIndex(safeIndex);
         });
         return null;
       },
@@ -106,7 +108,7 @@ class ReaderVerticalContent extends HookConsumerWidget {
         preferredPageIndex,
         imageList.length,
         currentIndex,
-        notifier,
+        controller,
       ],
     );
 
@@ -130,7 +132,7 @@ class ReaderVerticalContent extends HookConsumerWidget {
           if (currentIndex == visibleIndexOneBased) {
             return;
           }
-          notifier.setIndex(visibleIndexOneBased);
+          controller.setIndex(visibleIndexOneBased);
         }
 
         itemPositionsListener.itemPositions.addListener(
@@ -152,7 +154,7 @@ class ReaderVerticalContent extends HookConsumerWidget {
         itemPositionsListener,
         imageList.length,
         currentIndex,
-        notifier,
+        controller,
       ],
     );
     useEffect(() {
