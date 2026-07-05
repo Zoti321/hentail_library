@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -56,6 +55,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     final ObjectRef<bool> hasAppliedPreferredPage = useRef<bool>(false);
     final ObjectRef<int?> lastVisibleMainIndex = useRef<int?>(null);
     final ObjectRef<bool> isProgrammaticScroll = useRef<bool>(false);
+    final ObjectRef<int> scrollGeneration = useRef<int>(0);
     final Size viewportSize = MediaQuery.sizeOf(context);
     final int totalPages = imageList.length;
 
@@ -65,27 +65,22 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       centerPageOneBased: currentIndex,
       totalPages: totalPages,
     );
-    Future<void> executeScrollToIndex(int targetIndexOneBased) async {
-      if (!itemScrollController.isAttached) {
+    void executeScrollToIndex(int targetIndexOneBased) {
+      if (!context.mounted || !itemScrollController.isAttached) {
         return;
       }
       isProgrammaticScroll.value = true;
-      try {
-        await itemScrollController.scrollTo(
-          index: targetIndexOneBased - 1,
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          alignment: 0,
-        );
-        lastVisibleMainIndex.value = targetIndexOneBased;
-      } finally {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!context.mounted) {
-            return;
-          }
-          isProgrammaticScroll.value = false;
-        });
-      }
+      itemScrollController.jumpTo(
+        index: targetIndexOneBased - 1,
+        alignment: 0,
+      );
+      lastVisibleMainIndex.value = targetIndexOneBased;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) {
+          return;
+        }
+        isProgrammaticScroll.value = false;
+      });
     }
 
     useEffect(() {
@@ -182,13 +177,20 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       if (shouldSkipInitialTopScroll) {
         return null;
       }
+      final int generation = ++scrollGeneration.value;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!context.mounted) {
+        if (!context.mounted || generation != scrollGeneration.value) {
           return;
         }
-        unawaited(executeScrollToIndex(safeIndex));
+        if (!itemScrollController.isAttached) {
+          return;
+        }
+        executeScrollToIndex(safeIndex);
       });
-      return null;
+      return () {
+        scrollGeneration.value++;
+        isProgrammaticScroll.value = false;
+      };
     }, <Object?>[currentIndex, imageList.length]);
     return Center(
       child: ConstrainedBox(
