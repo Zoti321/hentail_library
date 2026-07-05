@@ -1,5 +1,6 @@
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/reading_history.dart';
+import 'package:hentai_library/domain/models/entity/series_reading_history.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -16,6 +17,7 @@ class ReadingAggregateNotifier extends _$ReadingAggregateNotifier {
     required String comicId,
     required Comic comic,
     required int pageIndex,
+    String? seriesId,
   }) async {
     final Future<void>? inFlightSave = _savingProgressByComic[comicId];
     if (inFlightSave != null) {
@@ -25,6 +27,7 @@ class ReadingAggregateNotifier extends _$ReadingAggregateNotifier {
     final Future<void> saveTask = _persistProgress(
       comic: comic,
       pageIndex: pageIndex,
+      seriesId: seriesId,
     );
     _savingProgressByComic[comicId] = saveTask;
     try {
@@ -37,6 +40,7 @@ class ReadingAggregateNotifier extends _$ReadingAggregateNotifier {
   Future<void> _persistProgress({
     required Comic comic,
     required int pageIndex,
+    String? seriesId,
   }) async {
     final DateTime now = DateTime.now();
     await ref
@@ -49,5 +53,17 @@ class ReadingAggregateNotifier extends _$ReadingAggregateNotifier {
             pageIndex: pageIndex,
           ),
         );
+    final String? resolvedSeriesId = seriesId?.trim();
+    if (resolvedSeriesId == null || resolvedSeriesId.isEmpty) {
+      return;
+    }
+    await ref.read(seriesReadingHistoryRepoProvider).recordSeriesReading(
+      SeriesReadingHistory(
+        seriesId: resolvedSeriesId,
+        lastReadComicId: comic.comicId,
+        lastReadTime: now,
+        pageIndex: pageIndex,
+      ),
+    );
   }
 }

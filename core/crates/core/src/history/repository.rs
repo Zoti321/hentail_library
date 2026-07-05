@@ -4,10 +4,10 @@ use sea_orm::{
 
 use crate::comic::read_data_version;
 use crate::db::{connection, map_db_err};
-use crate::entity::{comic_reading_histories, prelude::*};
+use crate::entity::{comic_reading_histories, prelude::*, series_reading_histories};
 use crate::error::HentaiError;
 
-use super::dto::{PagedReadingHistoryDto, ReadingHistoryDto};
+use super::dto::{PagedReadingHistoryDto, ReadingHistoryDto, SeriesReadingHistoryDto};
 
 pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> {
     let db = connection()?;
@@ -107,6 +107,51 @@ pub async fn clear_all_reading() -> Result<i32, HentaiError> {
     Ok(res.rows_affected as i32)
 }
 
+pub async fn record_series_reading(dto: &SeriesReadingHistoryDto) -> Result<(), HentaiError> {
+    let db = connection()?;
+    let model = series_reading_histories::ActiveModel {
+        series_id: Set(dto.series_id.clone()),
+        last_read_comic_id: Set(dto.last_read_comic_id.clone()),
+        last_read_time: Set(dto.last_read_time_ms),
+        page_index: Set(dto.page_index),
+        ..Default::default()
+    };
+    SeriesReadingHistories::insert(model)
+        .on_conflict(
+            sea_orm::sea_query::OnConflict::column(series_reading_histories::Column::SeriesId)
+                .update_columns([
+                    series_reading_histories::Column::LastReadComicId,
+                    series_reading_histories::Column::LastReadTime,
+                    series_reading_histories::Column::PageIndex,
+                ])
+                .to_owned(),
+        )
+        .exec(&db)
+        .await
+        .map_err(map_db_err)?;
+    Ok(())
+}
+
+pub async fn get_series_reading_by_series_id(
+    series_id: &str,
+) -> Result<Option<SeriesReadingHistoryDto>, HentaiError> {
+    let db = connection()?;
+    let row = SeriesReadingHistories::find_by_id(series_id)
+        .one(&db)
+        .await
+        .map_err(map_db_err)?;
+    Ok(row.map(map_series_reading_row))
+}
+
+pub async fn delete_series_reading_by_series_id(series_id: &str) -> Result<i32, HentaiError> {
+    let db = connection()?;
+    let res = SeriesReadingHistories::delete_by_id(series_id)
+        .exec(&db)
+        .await
+        .map_err(map_db_err)?;
+    Ok(res.rows_affected as i32)
+}
+
 pub async fn watch_reading_histories(
     mut emit: impl FnMut(Vec<ReadingHistoryDto>) -> Result<(), HentaiError>,
 ) -> Result<(), HentaiError> {
@@ -125,6 +170,15 @@ fn map_reading_row(row: comic_reading_histories::Model) -> ReadingHistoryDto {
     ReadingHistoryDto {
         comic_id: row.comic_id,
         title: row.title,
+        last_read_time_ms: row.last_read_time,
+        page_index: row.page_index,
+    }
+}
+
+fn map_series_reading_row(row: series_reading_histories::Model) -> SeriesReadingHistoryDto {
+    SeriesReadingHistoryDto {
+        series_id: row.series_id,
+        last_read_comic_id: row.last_read_comic_id,
         last_read_time_ms: row.last_read_time,
         page_index: row.page_index,
     }

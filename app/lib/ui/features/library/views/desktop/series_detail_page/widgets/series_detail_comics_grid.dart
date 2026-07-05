@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/comic_card.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/library_page_widgets.dart';
+import 'package:hentai_library/ui/features/reader/read_session_launcher.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 
-class SeriesDetailComicsGrid extends StatelessWidget {
+class SeriesDetailComicsGrid extends ConsumerWidget {
   const SeriesDetailComicsGrid({
     super.key,
+    required this.seriesId,
     required this.sortedItems,
     required this.comicsById,
   });
 
+  final String seriesId;
   final List<SeriesItem> sortedItems;
   final Map<String, Comic> comicsById;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final SliverGridDelegate gridDelegate = libraryGridDelegateForTokens(
@@ -64,7 +68,14 @@ class SeriesDetailComicsGrid extends StatelessWidget {
                 pathParameters: <String, String>{'id': comic.comicId},
               );
             },
-            onPlay: () {},
+            onPlay: () {
+              openReadSession(
+                ref,
+                comicId: comic.comicId,
+                seriesId: seriesId,
+                recordStandaloneStart: false,
+              );
+            },
           ),
         );
       },

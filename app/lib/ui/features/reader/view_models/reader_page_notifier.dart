@@ -38,49 +38,53 @@ abstract class ReaderViewState with _$ReaderViewState {
 class ReaderPageViewModel {
   const ReaderPageViewModel({
     required this.viewState,
-    required this.navContext,
-    required this.preferredPageIndex,
+    required this.sessionContext,
   });
   final ReaderViewState viewState;
-  final ReaderNavContextData navContext;
-  final int? preferredPageIndex;
+  final ReadSessionContextData sessionContext;
+
+  ReaderNavContextData get navContext => sessionContext.navContext;
+  int? get preferredPageIndex => sessionContext.preferredPageIndex;
+  bool get isSeriesRead => sessionContext.isSeriesRead;
+  String? get seriesId => sessionContext.seriesId;
 }
 
 @riverpod
 AsyncValue<ReaderPageViewModel> readerPageViewModel(
   Ref ref, {
   required String comicId,
+  String? seriesId,
   bool incognito = false,
 }) {
   final AsyncValue<ReaderViewState> viewAsync = ref.watch(
     readerViewProvider(readerViewKey(comicId, incognito: incognito)),
   );
-  final AsyncValue<ReaderSeriesContextData> seriesContextAsync = ref.watch(
-    readerSeriesContextForReaderProvider(
+  final AsyncValue<ReadSessionContextData> sessionContextAsync = ref.watch(
+    readSessionContextForReaderProvider(
       comicId: comicId,
+      seriesId: seriesId,
       incognito: incognito,
     ),
   );
   if (viewAsync.hasError) {
     return AsyncError(viewAsync.error!, viewAsync.stackTrace!);
   }
-  if (seriesContextAsync.hasError) {
+  if (sessionContextAsync.hasError) {
     return AsyncError(
-      seriesContextAsync.error!,
-      seriesContextAsync.stackTrace!,
+      sessionContextAsync.error!,
+      sessionContextAsync.stackTrace!,
     );
   }
   final ReaderViewState? viewState = viewAsync.asData?.value;
-  final ReaderSeriesContextData? seriesContext =
-      seriesContextAsync.asData?.value;
-  if (viewState == null || seriesContext == null) {
+  final ReadSessionContextData? sessionContext =
+      sessionContextAsync.asData?.value;
+  if (viewState == null || sessionContext == null) {
     return const AsyncLoading();
   }
   return AsyncData(
     ReaderPageViewModel(
       viewState: viewState,
-      navContext: seriesContext.navContext,
-      preferredPageIndex: seriesContext.preferredPageIndex,
+      sessionContext: sessionContext,
     ),
   );
 }
@@ -205,6 +209,7 @@ class ReaderViewNotifier extends _$ReaderViewNotifier {
           comicId: _comicId,
           comic: currentState.comic,
           pageIndex: currentState.currentIndex,
+          seriesId: routeContext.seriesId,
         );
   }
 

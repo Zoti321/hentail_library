@@ -9,6 +9,7 @@ import 'package:hentai_library/ui/features/library/views/desktop/series_detail_p
 import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_cover.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_header.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_info_sections.dart';
+import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/widgets/series_detail_primary_actions.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -76,6 +77,7 @@ class SeriesDetail extends HookConsumerWidget {
                 ),
                 SizedBox(height: tokens.spacing.lg),
                 SeriesDetailComicsGrid(
+                  seriesId: series.id,
                   sortedItems: sortedItems,
                   comicsById: comicsById,
                 ),
@@ -133,6 +135,7 @@ class SeriesDetail extends HookConsumerWidget {
                 series: series,
                 comicsById: comicsById,
               ),
+              SeriesDetailPrimaryActions(series: series),
             ],
           ),
         ),

@@ -15,11 +15,13 @@ class ReaderPage extends HookConsumerWidget {
   const ReaderPage({
     super.key,
     required this.comicId,
+    this.seriesId,
     this.keepControlsOpen = false,
     this.incognito = false,
   });
 
   final String comicId;
+  final String? seriesId;
   final bool keepControlsOpen;
   final bool incognito;
 
@@ -27,6 +29,7 @@ class ReaderPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ReaderRouteContext routeContext = ReaderRouteContext.normalize(
       comicId: comicId,
+      seriesId: seriesId,
       incognito: incognito,
     );
     final ReaderViewKey viewKey = readerViewKey(
@@ -45,6 +48,7 @@ class ReaderPage extends HookConsumerWidget {
     final AsyncValue<ReaderPageViewModel> viewAsync = ref.watch(
       readerPageViewModelProvider(
         comicId: routeContext.comicId,
+        seriesId: routeContext.seriesId,
         incognito: routeContext.incognito,
       ),
     );
@@ -237,6 +241,8 @@ class ReaderPage extends HookConsumerWidget {
                     showControls: state.showControls,
                     isVertical: readerIsVertical,
                     title: state.comic.title,
+                    navContext: viewModel.isSeriesRead ? viewModel.navContext : null,
+                    session: routeContext.session,
                     onExit: () async {
                       await notifier.executeExitReader(
                         context: context,

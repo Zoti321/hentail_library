@@ -45,6 +45,7 @@ pub async fn clear_all_comics(db: &DatabaseConnection) -> Result<i32, HentaiErro
     let txn = db.begin().await.map_err(map_db_err)?;
     for table in [
         "comic_reading_histories",
+        "series_reading_histories",
         "series_items",
         "comics",
     ] {

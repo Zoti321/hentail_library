@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/ui/core/widgets/icons/incognito_read_icon.dart';
 import 'package:hentai_library/ui/providers.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
+import 'package:hentai_library/ui/features/reader/read_session_launcher.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -99,21 +97,6 @@ class ComicDetailPrimaryActions extends HookConsumerWidget {
   }
 
   Future<void> _openReader(WidgetRef ref, {required bool incognito}) async {
-    if (!incognito) {
-      await ref.read(readingHistoryRepoProvider).recordReading(
-            ReadingHistory(
-              comicId: comic.comicId,
-              title: comic.title,
-              lastReadTime: DateTime.now(),
-            ),
-          );
-    }
-    appRouter.pushNamed(
-      ReaderRouteArgs.readerRouteName,
-      queryParameters: ReaderRouteArgs(
-        comicId: comic.comicId,
-        incognito: incognito,
-      ).toQueryParameters(),
-    );
+    await openComicReadSession(ref, comic: comic, incognito: incognito);
   }
 }

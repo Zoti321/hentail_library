@@ -50,9 +50,10 @@ pub use series::{
     SeriesItemDto, SeriesSortOptionDto, UpdateSeriesUserMetaDto,
 };
 pub use history::{
-    PagedReadingHistoryDto, ReadingHistoryDto, clear_all_reading, delete_reading_by_comic_id,
-    delete_reading_by_comic_ids, fetch_reading_page, get_reading_by_comic_id, list_all_reading,
-    record_reading, watch_reading_histories,
+    PagedReadingHistoryDto, ReadingHistoryDto, SeriesReadingHistoryDto, clear_all_reading,
+    delete_reading_by_comic_id, delete_reading_by_comic_ids, delete_series_reading_by_series_id,
+    fetch_reading_page, get_reading_by_comic_id, get_series_reading_by_series_id, list_all_reading,
+    record_reading, record_series_reading, watch_reading_histories,
 };
 pub use home::{
     get_continue_reading_top5, get_home_page_counts, watch_continue_reading_top5,

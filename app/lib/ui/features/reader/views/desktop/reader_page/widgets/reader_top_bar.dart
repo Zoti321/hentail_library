@@ -2,8 +2,11 @@ import 'dart:ui';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_series_nav.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ReaderTopBar extends StatefulWidget {
@@ -12,13 +15,17 @@ class ReaderTopBar extends StatefulWidget {
     required this.showControls,
     required this.isVertical,
     required this.title,
+    required this.session,
     required this.onExit,
     required this.onSetHorizontalMode,
     required this.onSetVerticalMode,
+    this.navContext,
   });
   final bool showControls;
   final bool isVertical;
   final String title;
+  final ReadSessionRouteParams session;
+  final ReaderNavContextData? navContext;
   final Future<void> Function() onExit;
   final VoidCallback onSetHorizontalMode;
   final VoidCallback onSetVerticalMode;
@@ -85,6 +92,11 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
                         await widget.onExit();
                       },
                     ),
+                    if (widget.navContext != null)
+                      ReaderSeriesNav(
+                        navContext: widget.navContext!,
+                        session: widget.session,
+                      ),
                     Expanded(
                       child: _ReaderTopBarTitle(
                         title: widget.title,

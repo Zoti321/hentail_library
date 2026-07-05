@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -2078925901;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 955120104;
 
 // Section: executor
 
@@ -953,6 +953,37 @@ fn wire__crate__api__history__get_reading_by_comic_id_frb_impl(
         },
     )
 }
+fn wire__crate__api__history__get_series_reading_by_series_id_frb_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "get_series_reading_by_series_id_frb",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_series_id = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
+                let output_ok =
+                    crate::api::history::get_series_reading_by_series_id_frb(api_series_id)?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__crate__api__comic__init_app_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1300,6 +1331,37 @@ fn wire__crate__api__history__record_reading_frb_impl(
             deserializer.end();
             transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
                 let output_ok = crate::api::history::record_reading_frb(api_history)?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
+fn wire__crate__api__history__record_series_reading_frb_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "record_series_reading_frb",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_history =
+                <crate::api::history::SeriesReadingHistoryDto>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
+                let output_ok = crate::api::history::record_series_reading_frb(api_history)?;
                 Ok(output_ok)
             })())
         },
@@ -2666,6 +2728,19 @@ impl SseDecode for Option<crate::api::series::SeriesDto> {
     }
 }
 
+impl SseDecode for Option<crate::api::history::SeriesReadingHistoryDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::api::history::SeriesReadingHistoryDto>::sse_decode(
+                deserializer,
+            ));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<Vec<String>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2821,6 +2896,22 @@ impl SseDecode for crate::api::series::SeriesItemDto {
             series_id: var_seriesId,
             comic_id: var_comicId,
             sort_order: var_sortOrder,
+        };
+    }
+}
+
+impl SseDecode for crate::api::history::SeriesReadingHistoryDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_seriesId = <String>::sse_decode(deserializer);
+        let mut var_lastReadComicId = <String>::sse_decode(deserializer);
+        let mut var_lastReadTimeMs = <i64>::sse_decode(deserializer);
+        let mut var_pageIndex = <Option<i32>>::sse_decode(deserializer);
+        return crate::api::history::SeriesReadingHistoryDto {
+            series_id: var_seriesId,
+            last_read_comic_id: var_lastReadComicId,
+            last_read_time_ms: var_lastReadTimeMs,
+            page_index: var_pageIndex,
         };
     }
 }
@@ -3017,58 +3108,58 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        30 => wire__crate__api__comic__init_app_impl(port, ptr, rust_vec_len, data_len),
-        32 => wire__crate__api__sync__library_sync_counts_dto_default_impl(
+        31 => wire__crate__api__comic__init_app_impl(port, ptr, rust_vec_len, data_len),
+        33 => wire__crate__api__sync__library_sync_counts_dto_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        49 => wire__crate__api__sync__sync_library_frb_impl(port, ptr, rust_vec_len, data_len),
-        51 => wire__crate__api__comic__update_comic_user_meta_frb_dto_default_impl(
+        51 => wire__crate__api__sync__sync_library_frb_impl(port, ptr, rust_vec_len, data_len),
+        53 => wire__crate__api__comic__update_comic_user_meta_frb_dto_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        53 => wire__crate__api__series__update_series_user_meta_frb_dto_default_impl(
+        55 => wire__crate__api__series__update_series_user_meta_frb_dto_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        54 => {
+        56 => {
             wire__crate__api__series__watch_all_series_frb_impl(port, ptr, rust_vec_len, data_len)
         }
-        55 => wire__crate__api__author__watch_authors_frb_impl(port, ptr, rust_vec_len, data_len),
-        56 => wire__crate__api__comic__watch_comic_changes_impl(port, ptr, rust_vec_len, data_len),
-        57 => wire__crate__api__home__watch_continue_reading_top5_frb_impl(
+        57 => wire__crate__api__author__watch_authors_frb_impl(port, ptr, rust_vec_len, data_len),
+        58 => wire__crate__api__comic__watch_comic_changes_impl(port, ptr, rust_vec_len, data_len),
+        59 => wire__crate__api__home__watch_continue_reading_top5_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        58 => wire__crate__api__home__watch_home_page_counts_frb_impl(
+        60 => wire__crate__api__home__watch_home_page_counts_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        59 => wire__crate__api__series__watch_home_series_comic_order_map_frb_impl(
+        61 => wire__crate__api__series__watch_home_series_comic_order_map_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        60 => wire__crate__api__path__watch_paths_frb_impl(port, ptr, rust_vec_len, data_len),
-        61 => wire__crate__api__history__watch_reading_histories_frb_impl(
+        62 => wire__crate__api__path__watch_paths_frb_impl(port, ptr, rust_vec_len, data_len),
+        63 => wire__crate__api__history__watch_reading_histories_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        62 => wire__crate__api__tag__watch_tags_frb_impl(port, ptr, rust_vec_len, data_len),
-        63 => wire__crate__api__thumbnail__watch_thumbnail_events_frb_impl(
+        64 => wire__crate__api__tag__watch_tags_frb_impl(port, ptr, rust_vec_len, data_len),
+        65 => wire__crate__api__thumbnail__watch_thumbnail_events_frb_impl(
             port,
             ptr,
             rust_vec_len,
@@ -3141,39 +3232,47 @@ fn pde_ffi_dispatcher_sync_impl(
         29 => {
             wire__crate__api__history__get_reading_by_comic_id_frb_impl(ptr, rust_vec_len, data_len)
         }
-        31 => wire__crate__api__comic__init_db_frb_impl(ptr, rust_vec_len, data_len),
-        33 => wire__crate__api__author__list_all_authors_frb_impl(ptr, rust_vec_len, data_len),
-        34 => wire__crate__api__path__list_all_paths_frb_impl(ptr, rust_vec_len, data_len),
-        35 => wire__crate__api__tag__list_all_tags_frb_impl(ptr, rust_vec_len, data_len),
-        36 => wire__crate__api__series__load_home_series_comic_order_map_frb_impl(
+        30 => wire__crate__api__history__get_series_reading_by_series_id_frb_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        37 => wire__crate__api__reader__load_page_bytes_frb_impl(ptr, rust_vec_len, data_len),
-        38 => wire__crate__api__reader__load_page_list_frb_impl(ptr, rust_vec_len, data_len),
-        39 => wire__crate__api__reader__open_reader_frb_impl(ptr, rust_vec_len, data_len),
-        40 => wire__crate__api__history__record_reading_frb_impl(ptr, rust_vec_len, data_len),
-        41 => wire__crate__api__path__remove_path_frb_impl(ptr, rust_vec_len, data_len),
-        42 => wire__crate__api__author__rename_author_frb_impl(ptr, rust_vec_len, data_len),
-        43 => wire__crate__api__tag__rename_tag_frb_impl(ptr, rust_vec_len, data_len),
-        44 => wire__crate__api__comic__search_by_keyword_frb_impl(ptr, rust_vec_len, data_len),
-        45 => {
+        32 => wire__crate__api__comic__init_db_frb_impl(ptr, rust_vec_len, data_len),
+        34 => wire__crate__api__author__list_all_authors_frb_impl(ptr, rust_vec_len, data_len),
+        35 => wire__crate__api__path__list_all_paths_frb_impl(ptr, rust_vec_len, data_len),
+        36 => wire__crate__api__tag__list_all_tags_frb_impl(ptr, rust_vec_len, data_len),
+        37 => wire__crate__api__series__load_home_series_comic_order_map_frb_impl(
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        38 => wire__crate__api__reader__load_page_bytes_frb_impl(ptr, rust_vec_len, data_len),
+        39 => wire__crate__api__reader__load_page_list_frb_impl(ptr, rust_vec_len, data_len),
+        40 => wire__crate__api__reader__open_reader_frb_impl(ptr, rust_vec_len, data_len),
+        41 => wire__crate__api__history__record_reading_frb_impl(ptr, rust_vec_len, data_len),
+        42 => {
+            wire__crate__api__history__record_series_reading_frb_impl(ptr, rust_vec_len, data_len)
+        }
+        43 => wire__crate__api__path__remove_path_frb_impl(ptr, rust_vec_len, data_len),
+        44 => wire__crate__api__author__rename_author_frb_impl(ptr, rust_vec_len, data_len),
+        45 => wire__crate__api__tag__rename_tag_frb_impl(ptr, rust_vec_len, data_len),
+        46 => wire__crate__api__comic__search_by_keyword_frb_impl(ptr, rust_vec_len, data_len),
+        47 => {
             wire__crate__api__comic__search_by_tag_expression_frb_impl(ptr, rust_vec_len, data_len)
         }
-        46 => {
+        48 => {
             wire__crate__api__series__search_series_by_keyword_frb_impl(ptr, rust_vec_len, data_len)
         }
-        47 => wire__crate__api__series__search_series_by_tag_expression_frb_impl(
+        49 => wire__crate__api__series__search_series_by_tag_expression_frb_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        48 => {
+        50 => {
             wire__crate__api__series__set_series_items_order_frb_impl(ptr, rust_vec_len, data_len)
         }
-        50 => wire__crate__api__comic__update_comic_user_meta_frb_impl(ptr, rust_vec_len, data_len),
-        52 => {
+        52 => wire__crate__api__comic__update_comic_user_meta_frb_impl(ptr, rust_vec_len, data_len),
+        54 => {
             wire__crate__api__series__update_series_user_meta_frb_impl(ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -3631,6 +3730,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::series::SeriesItemDto>
     for crate::api::series::SeriesItemDto
 {
     fn into_into_dart(self) -> crate::api::series::SeriesItemDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::history::SeriesReadingHistoryDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.series_id.into_into_dart().into_dart(),
+            self.last_read_comic_id.into_into_dart().into_dart(),
+            self.last_read_time_ms.into_into_dart().into_dart(),
+            self.page_index.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::history::SeriesReadingHistoryDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::history::SeriesReadingHistoryDto>
+    for crate::api::history::SeriesReadingHistoryDto
+{
+    fn into_into_dart(self) -> crate::api::history::SeriesReadingHistoryDto {
         self
     }
 }
@@ -4259,6 +4381,16 @@ impl SseEncode for Option<crate::api::series::SeriesDto> {
     }
 }
 
+impl SseEncode for Option<crate::api::history::SeriesReadingHistoryDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::api::history::SeriesReadingHistoryDto>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<Vec<String>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4360,6 +4492,16 @@ impl SseEncode for crate::api::series::SeriesItemDto {
         <String>::sse_encode(self.series_id, serializer);
         <String>::sse_encode(self.comic_id, serializer);
         <i32>::sse_encode(self.sort_order, serializer);
+    }
+}
+
+impl SseEncode for crate::api::history::SeriesReadingHistoryDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.series_id, serializer);
+        <String>::sse_encode(self.last_read_comic_id, serializer);
+        <i64>::sse_encode(self.last_read_time_ms, serializer);
+        <Option<i32>>::sse_encode(self.page_index, serializer);
     }
 }
 

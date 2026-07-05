@@ -7,13 +7,11 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
-import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart';
 import 'package:hentai_library/ui/providers.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 
 class MobileComicDetailPage extends ConsumerWidget {
   const MobileComicDetailPage({super.key, required this.comicId});
@@ -159,24 +157,7 @@ class _MobileComicDetailBody extends ConsumerWidget {
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: () async {
-                        await ref
-                            .read(readingHistoryRepoProvider)
-                            .recordReading(
-                              ReadingHistory(
-                                comicId: comic.comicId,
-                                title: comic.title,
-                                lastReadTime: DateTime.now(),
-                              ),
-                            );
-                        if (!context.mounted) {
-                          return;
-                        }
-                        context.pushNamed(
-                          ReaderRouteArgs.readerRouteName,
-                          queryParameters: ReaderRouteArgs(
-                            comicId: comic.comicId,
-                          ).toQueryParameters(),
-                        );
+                        await openComicReadSession(ref, comic: comic);
                       },
                       icon: const Icon(Icons.play_arrow),
                       label: const Text('开始阅读'),

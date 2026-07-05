@@ -67,6 +67,7 @@ List<RouteBase> buildSharedContentRoutes({
         );
         return ReaderPage(
           comicId: args.comicId,
+          seriesId: args.seriesId,
           keepControlsOpen: args.keepControlsOpen,
           incognito: args.incognito,
         );
