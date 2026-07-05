@@ -70,3 +70,13 @@ fn merge_kept_backfills_null_description_from_scan() {
     let merged = merge_kept_scan_with_existing(&scanned, &existing);
     assert_eq!(merged.description.as_deref(), Some("扫描概要"));
 }
+
+#[test]
+fn merge_kept_always_overwrites_resource_size_from_scan() {
+    let mut scanned = comic("id1", "/a/b", "zip", "扫描标题", 5);
+    scanned.resource_size = 4096;
+    let mut existing = comic("id1", "/a/b", "zip", "用户标题", 5);
+    existing.resource_size = 0;
+    let merged = merge_kept_scan_with_existing(&scanned, &existing);
+    assert_eq!(merged.resource_size, 4096);
+}
