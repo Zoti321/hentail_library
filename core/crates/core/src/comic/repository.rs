@@ -56,7 +56,7 @@ pub async fn fetch_comics_page(
         });
     }
     let offset = (effective_page - 1) * page_size;
-    let ids_query = build_ids_page_query(&filter, sort.descending, page_size, offset);
+    let ids_query = build_ids_page_query(&filter, &sort, page_size, offset);
     let comic_ids = query_string_ids(&db, &ids_query).await?;
     let items = load_comics_ordered(&db, comic_ids).await?;
     Ok(PagedComicResultDto {

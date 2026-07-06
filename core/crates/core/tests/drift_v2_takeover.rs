@@ -103,7 +103,7 @@ fn fetch_comics_page_hides_r18_by_default() {
                     exclude_comics_in_any_series: false,
                     ..Default::default()
                 },
-                ComicSortOptionDto { descending: false },
+                ComicSortOptionDto::default(),
             )
             .await
             .expect("page");
@@ -159,7 +159,7 @@ fn fetch_comics_page_excludes_series_members() {
                     exclude_comics_in_any_series: true,
                     ..Default::default()
                 },
-                ComicSortOptionDto { descending: false },
+                ComicSortOptionDto::default(),
             )
             .await
             .expect("page");

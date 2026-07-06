@@ -37,7 +37,10 @@ class ComicRepositoryImpl implements ComicRepository {
       () => rust.fetchComicsPageFrb(
         request: rust.PageRequestDto(page: 1, pageSize: total),
         filter: unrestrictedListFilter(),
-        sort: const rust.ComicSortOptionDto(descending: false),
+        sort: const rust.ComicSortOptionDto(
+          field: rust.ComicSortFieldDto.title,
+          descending: false,
+        ),
       ),
       fallbackMessage: '读取漫画列表失败',
     );

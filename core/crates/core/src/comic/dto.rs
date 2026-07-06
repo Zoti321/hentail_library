@@ -77,8 +77,23 @@ pub struct PageRequestDto {
     pub page_size: i32,
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ComicSortFieldDto {
+    #[default]
+    Title,
+    CreatedAt,
+    LastUpdatedAt,
+    PublishedAt,
+    ReadAt,
+    FileSize,
+    PageCount,
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ComicSortOptionDto {
+    #[serde(default)]
+    pub field: ComicSortFieldDto,
     pub descending: bool,
 }
 

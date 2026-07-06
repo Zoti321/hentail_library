@@ -23,9 +23,10 @@ pub use author::{
     rename_author, watch_authors,
 };
 pub use comic::{
-    ComicDto, ComicFilterDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
-    count_all, delete_comics_by_ids, fetch_comics_page, find_comic_by_id, read_data_version,
-    search_by_keyword, search_by_tag_expression, update_comic_user_meta, UpdateComicUserMetaDto,
+    ComicDto, ComicFilterDto, ComicSortFieldDto, ComicSortOptionDto, PageRequestDto,
+    PagedComicResultDto, count_all, delete_comics_by_ids, fetch_comics_page, find_comic_by_id,
+    read_data_version, search_by_keyword, search_by_tag_expression, update_comic_user_meta,
+    UpdateComicUserMetaDto,
 };
 pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_path_for_key};
 pub use db::{connection, db_config, init_db, init_db_at_path};

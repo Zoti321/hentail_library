@@ -155,6 +155,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicFilterDto dco_decode_comic_filter_dto(dynamic raw);
 
   @protected
+  ComicSortFieldDto dco_decode_comic_sort_field_dto(dynamic raw);
+
+  @protected
   ComicSortOptionDto dco_decode_comic_sort_option_dto(dynamic raw);
 
   @protected
@@ -468,6 +471,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ComicFilterDto sse_decode_comic_filter_dto(SseDeserializer deserializer);
+
+  @protected
+  ComicSortFieldDto sse_decode_comic_sort_field_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   ComicSortOptionDto sse_decode_comic_sort_option_dto(
@@ -862,6 +870,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_comic_filter_dto(
     ComicFilterDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_comic_sort_field_dto(
+    ComicSortFieldDto self,
     SseSerializer serializer,
   );
 
