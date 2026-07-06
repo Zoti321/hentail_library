@@ -734,10 +734,14 @@ fn wire__crate__api__history__fetch_reading_page_frb_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_page = <i32>::sse_decode(&mut deserializer);
             let api_page_size = <i32>::sse_decode(&mut deserializer);
+            let api_keyword = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
-                let output_ok =
-                    crate::api::history::fetch_reading_page_frb(api_page, api_page_size)?;
+                let output_ok = crate::api::history::fetch_reading_page_frb(
+                    api_page,
+                    api_page_size,
+                    api_keyword,
+                )?;
                 Ok(output_ok)
             })())
         },

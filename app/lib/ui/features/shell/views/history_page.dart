@@ -10,7 +10,10 @@ import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/reading_history_card.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/clear_reading_history_confirm_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
+import 'package:hentai_library/ui/features/shell/view_models/history_paged_feed_state.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+const double _kHistoryLoadMoreThreshold = 400;
 
 class HistoryPage extends ConsumerWidget {
   const HistoryPage({super.key});
@@ -18,21 +21,39 @@ class HistoryPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
-    return CustomScrollView(
-      cacheExtent: 1200,
-      slivers: <Widget>[
-        SliverPadding(
-          padding: tokens.layout.contentAreaPadding,
-          sliver: const SliverToBoxAdapter(child: _Header()),
-        ),
-        const SliverToBoxAdapter(child: SizedBox(height: 16)),
-        SliverPadding(
-          padding: EdgeInsets.symmetric(
-            horizontal: tokens.layout.contentHorizontalPadding,
+    return NotificationListener<ScrollNotification>(
+      onNotification: (ScrollNotification notification) {
+        if (notification is! ScrollUpdateNotification) {
+          return false;
+        }
+        final ScrollMetrics metrics = notification.metrics;
+        if (metrics.maxScrollExtent <= 0) {
+          return false;
+        }
+        final bool nearBottom =
+            metrics.pixels >= metrics.maxScrollExtent - _kHistoryLoadMoreThreshold;
+        if (!nearBottom) {
+          return false;
+        }
+        ref.read(historyPagedFeedControllerProvider.notifier).loadMore();
+        return false;
+      },
+      child: CustomScrollView(
+        cacheExtent: 1200,
+        slivers: <Widget>[
+          SliverPadding(
+            padding: tokens.layout.contentAreaPadding,
+            sliver: const SliverToBoxAdapter(child: _Header()),
           ),
-          sliver: const _HistoryListSliver(),
-        ),
-      ],
+          const SliverToBoxAdapter(child: SizedBox(height: 16)),
+          SliverPadding(
+            padding: EdgeInsets.symmetric(
+              horizontal: tokens.layout.contentHorizontalPadding,
+            ),
+            sliver: const _HistoryListSliver(),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -45,8 +66,9 @@ class _Header extends ConsumerWidget {
     final theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final int totalCount = ref.watch(
-      historyFeedViewProvider.select(
-        (HistoryFeedViewData value) => value.totalCount,
+      historyPagedFeedControllerProvider.select(
+        (AsyncValue<HistoryPagedFeedState> value) =>
+            value.asData?.value.totalCount ?? 0,
       ),
     );
 
@@ -82,8 +104,9 @@ class _Header extends ConsumerWidget {
             width: MediaQuery.of(context).size.width * 0.2,
             child: CustomTextField(
               hintText: "搜索历史记录...",
-              onChanged: (String value) =>
-                  ref.read(historySearchQueryProvider.notifier).setQuery(value),
+              onChanged: (String value) => ref
+                  .read(historyPagedFeedControllerProvider.notifier)
+                  .setKeyword(value),
             ),
           ),
           const SizedBox(width: 12),
@@ -115,6 +138,9 @@ class _Header extends ConsumerWidget {
               }
               try {
                 await ref.read(readingHistoryRepoProvider).clearAllHistory();
+                ref
+                    .read(historyPagedFeedControllerProvider.notifier)
+                    .clearAllLocal();
                 if (context.mounted) {
                   showSuccessToast(context, '已清空阅读历史');
                 }
@@ -137,22 +163,17 @@ class _HistoryListSliver extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
-    final bool isLoading = ref.watch(
-      historyFeedViewProvider.select((HistoryFeedViewData d) => d.isLoading),
+    final AsyncValue<HistoryPagedFeedState> feedAsync = ref.watch(
+      historyPagedFeedControllerProvider,
     );
-    if (isLoading) {
-      return const SliverToBoxAdapter(
+    return feedAsync.when(
+      loading: () => const SliverToBoxAdapter(
         child: Padding(
           padding: EdgeInsets.only(top: 48),
           child: Center(child: CircularProgressIndicator()),
         ),
-      );
-    }
-    final bool hasError = ref.watch(
-      historyFeedViewProvider.select((HistoryFeedViewData d) => d.hasError),
-    );
-    if (hasError) {
-      return SliverToBoxAdapter(
+      ),
+      error: (Object _, StackTrace _) => SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.only(top: 48),
           child: Center(
@@ -165,74 +186,83 @@ class _HistoryListSliver extends ConsumerWidget {
             ),
           ),
         ),
-      );
-    }
-    final List<HistoryGridItemDto> merged = ref.watch(
-      historyFeedViewProvider.select((HistoryFeedViewData d) => d.mergedItems),
-    );
-    final String query = ref.watch(historySearchQueryProvider);
-    final String q = query.trim().toLowerCase();
-
-    if (merged.isEmpty) {
-      return SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 48),
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              spacing: 8,
-              children: [
-                Icon(
-                  LucideIcons.bookOpen,
-                  size: 48,
-                  color: theme.colorScheme.hentai.textTertiary,
+      ),
+      data: (HistoryPagedFeedState feed) {
+        if (feed.items.isEmpty) {
+          return SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 48),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 8,
+                  children: [
+                    Icon(
+                      LucideIcons.bookOpen,
+                      size: 48,
+                      color: theme.colorScheme.hentai.textTertiary,
+                    ),
+                    Text(
+                      feed.keyword.isEmpty ? '暂无阅读历史' : '没有匹配的历史记录',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: theme.colorScheme.hentai.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  q.isEmpty ? '暂无阅读历史' : '没有匹配的历史记录',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: theme.colorScheme.hentai.textSecondary,
+              ),
+            ),
+          );
+        }
+
+        return SliverMainAxisGroup(
+          slivers: <Widget>[
+            SliverLayoutBuilder(
+              builder: (BuildContext context, constraints) {
+                final double width = constraints.crossAxisExtent;
+                final int crossAxisCount = _resolveCrossAxisCount(width);
+                return SliverGrid.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    mainAxisExtent: 138,
+                  ),
+                  itemCount: feed.items.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final HistoryGridItemDto item = feed.items[index];
+                    return ReadingHistoryCard(
+                      comicId: item.comicId,
+                      title: item.title,
+                      lastReadTime: item.lastReadTime,
+                      pageIndex: item.pageIndex,
+                      onTap: () => appRouter.pushNamed(
+                        ReaderRouteArgs.readerRouteName,
+                        queryParameters: ReaderRouteArgs(
+                          comicId: item.comicId,
+                        ).toQueryParameters(),
+                      ),
+                      onDelete: () => _handleDeleteComicHistory(
+                        context: context,
+                        ref: ref,
+                        comicId: item.comicId,
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            if (feed.isLoadingMore)
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-
-    return SliverLayoutBuilder(
-      builder: (BuildContext context, constraints) {
-        final double width = constraints.crossAxisExtent;
-        final int crossAxisCount = _resolveCrossAxisCount(width);
-        return SliverGrid.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            mainAxisExtent: 138,
-          ),
-          itemCount: merged.length,
-          itemBuilder: (BuildContext context, int index) {
-            final HistoryGridItemDto item = merged[index];
-            return ReadingHistoryCard(
-              comicId: item.comicId,
-              title: item.title,
-              lastReadTime: item.lastReadTime,
-              pageIndex: item.pageIndex,
-              onTap: () => appRouter.pushNamed(
-                ReaderRouteArgs.readerRouteName,
-                queryParameters: ReaderRouteArgs(
-                  comicId: item.comicId,
-                ).toQueryParameters(),
               ),
-              onDelete: () => _handleDeleteComicHistory(
-                context: context,
-                ref: ref,
-                comicId: item.comicId,
-              ),
-            );
-          },
+          ],
         );
       },
     );
@@ -258,6 +288,7 @@ class _HistoryListSliver extends ConsumerWidget {
   }) async {
     try {
       await ref.read(readingHistoryRepoProvider).deleteByComicId(comicId);
+      ref.read(historyPagedFeedControllerProvider.notifier).removeItem(comicId);
       if (context.mounted) {
         showSuccessToast(context, '已删除记录');
       }

@@ -146,6 +146,7 @@ abstract class RustLibApi extends BaseApi {
   PagedReadingHistoryDto crateApiHistoryFetchReadingPageFrb({
     required int page,
     required int pageSize,
+    String? keyword,
   });
 
   PagedSeriesResultDto crateApiSeriesFetchSeriesPageFrb({
@@ -882,6 +883,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   PagedReadingHistoryDto crateApiHistoryFetchReadingPageFrb({
     required int page,
     required int pageSize,
+    String? keyword,
   }) {
     return handler.executeSync(
       SyncTask(
@@ -889,6 +891,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_i_32(page, serializer);
           sse_encode_i_32(pageSize, serializer);
+          sse_encode_opt_String(keyword, serializer);
           return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 22)!;
         },
         codec: SseCodec(
@@ -896,7 +899,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiHistoryFetchReadingPageFrbConstMeta,
-        argValues: [page, pageSize],
+        argValues: [page, pageSize, keyword],
         apiImpl: this,
       ),
     );
@@ -905,7 +908,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiHistoryFetchReadingPageFrbConstMeta =>
       const TaskConstMeta(
         debugName: "fetch_reading_page_frb",
-        argNames: ["page", "pageSize"],
+        argNames: ["page", "pageSize", "keyword"],
       );
 
   @override

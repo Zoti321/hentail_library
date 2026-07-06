@@ -1,6 +1,7 @@
 use sea_orm::{
     ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder, Set,
 };
+use sea_orm::sea_query::{Expr, Func};
 
 use crate::comic::read_data_version;
 use crate::db::{connection, map_db_err};
@@ -53,7 +54,11 @@ pub async fn list_all_reading() -> Result<Vec<ReadingHistoryDto>, HentaiError> {
     Ok(rows.into_iter().map(map_reading_row).collect())
 }
 
-pub async fn fetch_reading_page(page: i32, page_size: i32) -> Result<PagedReadingHistoryDto, HentaiError> {
+pub async fn fetch_reading_page(
+    page: i32,
+    page_size: i32,
+    keyword: Option<String>,
+) -> Result<PagedReadingHistoryDto, HentaiError> {
     let db = connection()?;
     if page_size <= 0 {
         return Ok(PagedReadingHistoryDto {
@@ -61,7 +66,8 @@ pub async fn fetch_reading_page(page: i32, page_size: i32) -> Result<PagedReadin
             total_count: 0,
         });
     }
-    let paginator = ComicReadingHistories::find()
+    let query = reading_history_list_query(keyword.as_deref());
+    let paginator = query
         .order_by_desc(comic_reading_histories::Column::LastReadTime)
         .paginate(&db, page_size as u64);
     let total_count = paginator.num_items().await.map_err(map_db_err)? as i64;
@@ -74,6 +80,21 @@ pub async fn fetch_reading_page(page: i32, page_size: i32) -> Result<PagedReadin
         items: rows.into_iter().map(map_reading_row).collect(),
         total_count,
     })
+}
+
+fn reading_history_list_query(
+    keyword: Option<&str>,
+) -> sea_orm::Select<ComicReadingHistories> {
+    let mut query = ComicReadingHistories::find();
+    let normalized = keyword.map(str::trim).filter(|value| !value.is_empty());
+    if let Some(keyword) = normalized {
+        let pattern = format!("%{}%", keyword.to_lowercase());
+        query = query.filter(
+            Expr::expr(Func::lower(Expr::col(comic_reading_histories::Column::Title)))
+                .like(pattern),
+        );
+    }
+    query
 }
 
 pub async fn delete_reading_by_comic_id(comic_id: &str) -> Result<i32, HentaiError> {
