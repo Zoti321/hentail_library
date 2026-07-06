@@ -7,7 +7,6 @@ import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/author_management_panel.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/series_management_panel.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/tag_management_panel.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/rename_tag_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
@@ -74,7 +73,6 @@ class _MetadataManagementPageState
                       items: const <CapsuleTabItem>[
                         CapsuleTabItem(label: '作者', icon: LucideIcons.penLine),
                         CapsuleTabItem(label: '标签', icon: LucideIcons.tags),
-                        CapsuleTabItem(label: '系列', icon: LucideIcons.layers),
                       ],
                       selectedIndex: selectedIndex,
                       onSelected: (int index) {
@@ -89,7 +87,7 @@ class _MetadataManagementPageState
                     const SizedBox(width: 24),
                     Expanded(
                       child: Text(
-                        '管理作者、标签与系列',
+                        '管理作者与标签',
                         style: TextStyle(
                           fontSize: 13,
                           color: cs.hentai.textTertiary,
@@ -116,8 +114,6 @@ class _MetadataManagementPageState
         return const AuthorManagementPanel();
       case 1:
         return const TagManagementPanel();
-      case 2:
-        return const SeriesManagementPanel();
       default:
         return const TagManagementPanel();
     }
@@ -130,8 +126,6 @@ class _MetadataManagementPageState
         break;
       case 1:
         await _openAddTagDialog(context);
-        break;
-      case 2:
         break;
       default:
         break;
@@ -184,8 +178,6 @@ int _tabIndexFromQuery(String? tab) {
       return 0;
     case 'tags':
       return 1;
-    case 'series':
-      return 2;
     default:
       return 1;
   }

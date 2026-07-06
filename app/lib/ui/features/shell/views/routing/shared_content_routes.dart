@@ -4,6 +4,7 @@ import 'package:hentai_library/ui/features/library/views/comic_detail_page/comic
 import 'package:hentai_library/ui/features/library/views/series_detail_page/series_detail_page.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/metadata_management_page.dart';
 import 'package:hentai_library/ui/features/reader/reader.dart';
+import 'package:hentai_library/ui/features/shell/views/routing/route_not_found_page.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_page.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 
@@ -69,8 +70,9 @@ List<RouteBase> buildSharedContentRoutes({
     ),
     GoRoute(
       path: '/series',
-      redirect: (BuildContext context, GoRouterState state) =>
-          '/metadata?tab=series',
+      name: '页面不存在',
+      builder: (BuildContext context, GoRouterState state) =>
+          const RouteNotFoundPage(),
     ),
     GoRoute(
       path: '/reader',
