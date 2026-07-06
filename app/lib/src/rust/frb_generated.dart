@@ -76,7 +76,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -964405268;
+  int get rustContentHash => 1861548860;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -273,6 +273,10 @@ abstract class RustLibApi extends BaseApi {
     required List<String> optionalOr,
     required List<String> mustExclude,
   });
+
+  Future<SeriesSortFieldDto> crateApiSeriesSeriesSortFieldDtoDefault();
+
+  Future<SeriesSortOptionDto> crateApiSeriesSeriesSortOptionDtoDefault();
 
   void crateApiSeriesSetSeriesItemsOrderFrb({
     required String seriesId,
@@ -1830,6 +1834,66 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<SeriesSortFieldDto> crateApiSeriesSeriesSortFieldDtoDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 55,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_series_sort_field_dto,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSeriesSeriesSortFieldDtoDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesSeriesSortFieldDtoDefaultConstMeta =>
+      const TaskConstMeta(
+        debugName: "series_sort_field_dto_default",
+        argNames: [],
+      );
+
+  @override
+  Future<SeriesSortOptionDto> crateApiSeriesSeriesSortOptionDtoDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 56,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_series_sort_option_dto,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiSeriesSeriesSortOptionDtoDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesSeriesSortOptionDtoDefaultConstMeta =>
+      const TaskConstMeta(
+        debugName: "series_sort_option_dto_default",
+        argNames: [],
+      );
+
+  @override
   void crateApiSeriesSetSeriesItemsOrderFrb({
     required String seriesId,
     required List<String> orderedComicIds,
@@ -1840,7 +1904,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(seriesId, serializer);
           sse_encode_list_String(orderedComicIds, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 55)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 57)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1880,7 +1944,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 56,
+              funcId: 58,
               port: port_,
             );
           },
@@ -1916,7 +1980,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             meta,
             serializer,
           );
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 57)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1945,7 +2009,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 58,
+            funcId: 60,
             port: port_,
           );
         },
@@ -1976,7 +2040,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 59,
+            funcId: 61,
             port: port_,
           );
         },
@@ -2008,7 +2072,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(seriesId, serializer);
           sse_encode_box_autoadd_update_series_user_meta_dto(meta, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 60)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 62)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -2039,7 +2103,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 61,
+              funcId: 63,
               port: port_,
             );
           },
@@ -2074,7 +2138,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 62,
+              funcId: 64,
               port: port_,
             );
           },
@@ -2106,7 +2170,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 63,
+              funcId: 65,
               port: port_,
             );
           },
@@ -2144,7 +2208,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 64,
+              funcId: 66,
               port: port_,
             );
           },
@@ -2182,7 +2246,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 65,
+              funcId: 67,
               port: port_,
             );
           },
@@ -2221,7 +2285,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 66,
+              funcId: 68,
               port: port_,
             );
           },
@@ -2256,7 +2320,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 67,
+              funcId: 69,
               port: port_,
             );
           },
@@ -2291,7 +2355,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 68,
+              funcId: 70,
               port: port_,
             );
           },
@@ -2326,7 +2390,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 69,
+              funcId: 71,
               port: port_,
             );
           },
@@ -2358,7 +2422,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 70,
+              funcId: 72,
               port: port_,
             );
           },
@@ -3042,12 +3106,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SeriesSortFieldDto dco_decode_series_sort_field_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SeriesSortFieldDto.values[raw as int];
+  }
+
+  @protected
   SeriesSortOptionDto dco_decode_series_sort_option_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 1)
-      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
-    return SeriesSortOptionDto(descending: dco_decode_bool(arr[0]));
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return SeriesSortOptionDto(
+      field: dco_decode_series_sort_field_dto(arr[0]),
+      descending: dco_decode_bool(arr[1]),
+    );
   }
 
   @protected
@@ -4002,12 +4075,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SeriesSortFieldDto sse_decode_series_sort_field_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return SeriesSortFieldDto.values[inner];
+  }
+
+  @protected
   SeriesSortOptionDto sse_decode_series_sort_option_dto(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field = sse_decode_series_sort_field_dto(deserializer);
     var var_descending = sse_decode_bool(deserializer);
-    return SeriesSortOptionDto(descending: var_descending);
+    return SeriesSortOptionDto(field: var_field, descending: var_descending);
   }
 
   @protected
@@ -5015,11 +5098,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_series_sort_field_dto(
+    SeriesSortFieldDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
   void sse_encode_series_sort_option_dto(
     SeriesSortOptionDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_series_sort_field_dto(self.field, serializer);
     sse_encode_bool(self.descending, serializer);
   }
 

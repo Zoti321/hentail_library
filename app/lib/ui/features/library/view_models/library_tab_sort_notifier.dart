@@ -1,5 +1,8 @@
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
-import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/library/library_series_sort_option.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_sort_codec.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,7 +11,7 @@ part 'library_tab_sort_notifier.g.dart';
 
 final LibraryTabSortSettings kDefaultLibraryTabSortSettings = (
   comics: LibraryComicSortOption(),
-  series: LibraryComicSortOption(),
+  series: LibrarySeriesSortOption(),
 );
 
 @Riverpod(keepAlive: true)
@@ -20,12 +23,12 @@ class LibraryTabSortNotifier extends _$LibraryTabSortNotifier {
   Future<LibraryTabSortSettings> build() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return (
-      comics: _decodeSortOption(prefs.getString(_comicsStorageKey)),
-      series: _decodeSortOption(prefs.getString(_seriesStorageKey)),
+      comics: _decodeComicSortOption(prefs.getString(_comicsStorageKey)),
+      series: decodeLibrarySeriesSortOption(prefs.getString(_seriesStorageKey)),
     );
   }
 
-  static LibraryComicSortOption _decodeSortOption(String? raw) {
+  static LibraryComicSortOption _decodeComicSortOption(String? raw) {
     if (raw == null || raw.isEmpty) {
       return kLibraryDefaultSortOption;
     }
@@ -41,50 +44,65 @@ class LibraryTabSortNotifier extends _$LibraryTabSortNotifier {
     return LibraryComicSortOption(field: field, descending: parts[1] == 'true');
   }
 
-  static String _encodeSortOption(LibraryComicSortOption option) {
+  static String _encodeComicSortOption(LibraryComicSortOption option) {
     return '${option.field.name},${option.descending}';
   }
 
-  static bool _isDefaultSort(LibraryComicSortOption option) {
+  static bool _isDefaultComicSort(LibraryComicSortOption option) {
     return option.field == kLibraryDefaultSortOption.field &&
         option.descending == kLibraryDefaultSortOption.descending;
   }
 
-  Future<void> setSortField(
-    LibraryDisplayTarget target,
-    LibraryComicSortField field,
-  ) async {
+  Future<void> setComicSortField(LibraryComicSortField field) async {
     final LibraryTabSortSettings current = await future;
-    final LibraryComicSortOption existing = sortOptionForTarget(
-      current,
-      target,
-    );
+    final LibraryComicSortOption existing = current.comics;
     final LibraryComicSortOption next = existing.field == field
         ? existing.copyWith(descending: !existing.descending)
         : LibraryComicSortOption(field: field, descending: false);
-    await _updateTarget(target, next);
+    await _updateComicSort(next);
   }
 
-  Future<void> _updateTarget(
-    LibraryDisplayTarget target,
-    LibraryComicSortOption option,
-  ) async {
+  Future<void> setSeriesSortField(LibrarySeriesSortField field) async {
     final LibraryTabSortSettings current = await future;
-    final LibraryTabSortSettings updated = copySortForTarget(
+    final LibrarySeriesSortOption existing = current.series;
+    final LibrarySeriesSortOption next = existing.field == field
+        ? existing.copyWith(descending: !existing.descending)
+        : LibrarySeriesSortOption(field: field, descending: false);
+    await _updateSeriesSort(next);
+  }
+
+  Future<void> _updateComicSort(LibraryComicSortOption option) async {
+    final LibraryTabSortSettings current = await future;
+    final LibraryTabSortSettings updated = copyComicSortForTarget(
       current,
-      target,
       option,
     );
     state = AsyncData<LibraryTabSortSettings>(updated);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String storageKey = switch (target) {
-      LibraryDisplayTarget.comics => _comicsStorageKey,
-      LibraryDisplayTarget.series => _seriesStorageKey,
-    };
-    if (_isDefaultSort(option)) {
-      await prefs.remove(storageKey);
+    if (_isDefaultComicSort(option)) {
+      await prefs.remove(_comicsStorageKey);
     } else {
-      await prefs.setString(storageKey, _encodeSortOption(option));
+      await prefs.setString(_comicsStorageKey, _encodeComicSortOption(option));
     }
+    ref.invalidate(libraryComicsCatalogControllerProvider);
+  }
+
+  Future<void> _updateSeriesSort(LibrarySeriesSortOption option) async {
+    final LibraryTabSortSettings current = await future;
+    final LibraryTabSortSettings updated = copySeriesSortForTarget(
+      current,
+      option,
+    );
+    state = AsyncData<LibraryTabSortSettings>(updated);
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (isDefaultLibrarySeriesSort(option)) {
+      await prefs.remove(_seriesStorageKey);
+    } else {
+      await prefs.setString(
+        _seriesStorageKey,
+        encodeLibrarySeriesSortOption(option),
+      );
+    }
+    ref.invalidate(librarySeriesCatalogControllerProvider);
   }
 }

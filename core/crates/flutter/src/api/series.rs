@@ -5,6 +5,7 @@ use hentai_core::{
     update_series_user_meta as core_update_meta, watch_all_series, watch_home_series_comic_order_map,
     PagedSeriesResultDto as CorePagedSeries, SeriesDto as CoreSeries,
     SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
+    SeriesSortFieldDto as CoreSeriesSortField,
     SeriesSortOptionDto as CoreSeriesSort, UpdateSeriesUserMetaDto as CoreUpdateSeriesUserMeta,
 };
 
@@ -39,8 +40,17 @@ pub struct SeriesFilterDto {
     pub require_items: bool,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub enum SeriesSortFieldDto {
+    #[default]
+    Name,
+    ComicCount,
+    Random,
+}
+
+#[derive(Debug, Clone, Default)]
 pub struct SeriesSortOptionDto {
+    pub field: SeriesSortFieldDto,
     pub descending: bool,
 }
 
@@ -130,6 +140,11 @@ impl From<SeriesFilterDto> for CoreSeriesFilter {
 impl From<SeriesSortOptionDto> for CoreSeriesSort {
     fn from(value: SeriesSortOptionDto) -> Self {
         CoreSeriesSort {
+            field: match value.field {
+                SeriesSortFieldDto::Name => CoreSeriesSortField::Name,
+                SeriesSortFieldDto::ComicCount => CoreSeriesSortField::ComicCount,
+                SeriesSortFieldDto::Random => CoreSeriesSortField::Random,
+            },
             descending: value.descending,
         }
     }

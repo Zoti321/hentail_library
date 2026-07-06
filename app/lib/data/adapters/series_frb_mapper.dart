@@ -1,5 +1,5 @@
-import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
+import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
@@ -33,10 +33,18 @@ rust_series.SeriesFilterDto mapLibrarySeriesFilter(LibrarySeriesFilter filter) {
   );
 }
 
-rust_series.SeriesSortOptionDto mapSeriesSortOption(
-  LibraryComicSortOption sortOption,
-) {
-  return rust_series.SeriesSortOptionDto(descending: sortOption.descending);
+rust_series.SeriesSortOptionDto mapSeriesSortOption({
+  required LibrarySeriesSortOption sortOption,
+}) {
+  return rust_series.SeriesSortOptionDto(
+    field: switch (sortOption.field) {
+      LibrarySeriesSortField.name => rust_series.SeriesSortFieldDto.name,
+      LibrarySeriesSortField.comicCount =>
+        rust_series.SeriesSortFieldDto.comicCount,
+      LibrarySeriesSortField.random => rust_series.SeriesSortFieldDto.random,
+    },
+    descending: sortOption.descending,
+  );
 }
 
 PagedResult<Series> mapPagedSeriesResult(

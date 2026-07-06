@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
-import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
@@ -39,11 +39,18 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
         (LibraryQueryIntent intent) => intent.keyword,
       ),
     );
+    final LibraryAgeRestrictionFilter ageRestriction = ref.watch(
+      librarySeriesTabAgeRestrictionFilterProvider,
+    );
+    final LibrarySeriesSortOption sortOption = ref.watch(
+      librarySeriesTabSortOptionProvider,
+    );
+    final int pageSize = ref.watch(librarySeriesTabPageSizeProvider);
     final Object queryKey = (
       keyword,
-      ref.watch(librarySeriesTabAgeRestrictionFilterProvider),
-      ref.watch(librarySeriesTabSortOptionProvider),
-      ref.watch(librarySeriesTabPageSizeProvider),
+      ageRestriction,
+      sortOption,
+      pageSize,
     );
     if (_lastQueryKey != null && _lastQueryKey != queryKey) {
       _pageIndex = 1;
@@ -77,7 +84,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     final LibraryAgeRestrictionFilter ageRestriction = ref.read(
       librarySeriesTabAgeRestrictionFilterProvider,
     );
-    final LibraryComicSortOption sortOption = ref.read(
+    final LibrarySeriesSortOption sortOption = ref.read(
       librarySeriesTabSortOptionProvider,
     );
     final LibrarySeriesFilter filter = _librarySeriesProjection.buildListFilter(

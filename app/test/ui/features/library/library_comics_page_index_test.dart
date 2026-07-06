@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/library/library_comic_filter.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
+import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
@@ -65,7 +66,7 @@ class _FakeSeriesRepo implements SeriesRepository {
   Future<PagedResult<Series>> fetchPage({
     required PageRequest request,
     required LibrarySeriesFilter filter,
-    required LibraryComicSortOption sortOption,
+    required LibrarySeriesSortOption sortOption,
   }) async {
     return PagedResult<Series>(
       items: const <Series>[],

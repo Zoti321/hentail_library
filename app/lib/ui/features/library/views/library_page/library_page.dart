@@ -23,7 +23,6 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   final ScrollController _scrollController = ScrollController();
   double? _headerExtent;
   bool _isEndDrawerOpen = false;
-
   @override
   void initState() {
     super.initState();
