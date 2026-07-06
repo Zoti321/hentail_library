@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
-import 'package:hentai_library/core/image/image_quality_policy.dart';
+import 'package:hentai_library/core/image/image_cache_config.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
@@ -29,7 +29,7 @@ Future<void> main() async {
       debugPrint('Rust init_db 失败: $e\n$st');
     }
 
-    _initImageQualityPolicy();
+    configureGlobalImageCache();
 
     if (isDesktop) {
       await _initWindow();
@@ -45,13 +45,6 @@ Future<void> main() async {
 
     runApp(const MyApp());
   }, handleUncaughtFrbZoneError);
-}
-
-void _initImageQualityPolicy() {
-  final ImageQualityPolicy imageQualityPolicy = configureImageQualityPolicy();
-  final ImageCache imageCache = PaintingBinding.instance.imageCache;
-  imageCache.maximumSize = imageQualityPolicy.imageCacheMaxEntries;
-  imageCache.maximumSizeBytes = imageQualityPolicy.imageCacheMaxBytes;
 }
 
 Future<void> _initWindow() async {

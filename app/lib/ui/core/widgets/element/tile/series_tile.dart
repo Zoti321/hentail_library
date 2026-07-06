@@ -39,11 +39,6 @@ class SeriesTile extends HookConsumerWidget {
               )
         : null;
     final int count = series.items.length;
-    final int coverCacheWidth = AppComicImage.resolveCacheWidth(
-      context: context,
-      logicalWidth: 56 * 3,
-      maxWidth: 768,
-    );
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -82,7 +77,6 @@ class SeriesTile extends HookConsumerWidget {
                     filePath: coverData?.filePath,
                     memoryBytes: coverData?.memoryBytes,
                     fit: BoxFit.cover,
-                    cacheWidth: coverCacheWidth,
                     placeholder: Icon(
                       Icons.broken_image,
                       color: theme.colorScheme.hentai.iconSecondary,

@@ -43,10 +43,6 @@ class SeriesItemComicTile extends ConsumerWidget {
         .watch(comicCoverDisplayProvider(comicId: item.comicId))
         .maybeWhen(data: (ComicCoverDisplayData? v) => v, orElse: () => null);
     final String title = titleForComic(ref, item.comicId);
-    final int rowThumbCacheWidth = AppComicImage.resolveCacheWidth(
-      context: context,
-      logicalWidth: thumbnailWidth,
-    );
     return Material(
       color: colorScheme.surface,
       child: GestureDetector(
@@ -144,7 +140,6 @@ class SeriesItemComicTile extends ConsumerWidget {
                       memoryBytes: coverDisplay?.memoryBytes,
                       filePath: coverDisplay?.filePath,
                       fit: BoxFit.cover,
-                      cacheWidth: rowThumbCacheWidth,
                       filterQuality: FilterQuality.medium,
                       placeholder: const SizedBox.expand(),
                       errorPlaceholder: Center(

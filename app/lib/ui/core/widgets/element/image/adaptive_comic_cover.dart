@@ -24,7 +24,6 @@ class AdaptiveComicCover extends StatelessWidget {
     this.placeholder = const SizedBox.expand(),
     this.errorPlaceholder,
     this.backgroundColor,
-    this.maxCacheWidth,
     this.clipBorderRadius,
     this.showShadow = false,
   });
@@ -37,7 +36,6 @@ class AdaptiveComicCover extends StatelessWidget {
   final Widget placeholder;
   final Widget? errorPlaceholder;
   final Color? backgroundColor;
-  final int? maxCacheWidth;
   final BorderRadius? clipBorderRadius;
   final bool showShadow;
 
@@ -84,18 +82,12 @@ class AdaptiveComicCover extends StatelessWidget {
       aspectRatio: aspectRatio,
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          final int coverCacheWidth = AppComicImage.resolveCacheWidth(
-            context: context,
-            logicalWidth: constraints.maxWidth,
-            maxWidth: maxCacheWidth,
-          );
           return ColoredBox(
             color: _resolveBackgroundColor(),
             child: AppComicImage(
               memoryBytes: coverDisplay?.memoryBytes,
               filePath: coverDisplay?.filePath,
               fit: _effectiveFit,
-              cacheWidth: coverCacheWidth,
               filterQuality: filterQuality,
               placeholder: placeholder,
               errorPlaceholder: errorPlaceholder ?? placeholder,

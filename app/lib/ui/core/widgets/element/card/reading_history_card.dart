@@ -149,15 +149,10 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
     const double coverWidth = 74;
     const double coverHeight = 102;
     const double coverOuterInset = 3;
-    final int cacheWidth = AppComicImage.resolveCacheWidth(
-      context: context,
-      logicalWidth: coverWidth,
-    );
     final Widget image = AppComicImage(
       filePath: coverDisplay?.filePath,
       memoryBytes: coverDisplay?.memoryBytes,
       fit: BoxFit.cover,
-      cacheWidth: cacheWidth,
       placeholder: Center(
         child: Icon(
           LucideIcons.bookOpen,

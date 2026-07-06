@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/image/image_quality_policy.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_image_cache.dart';
+
+/// 阅读器页图解码宽度上限（物理像素）。
+const int kReaderDecodeMaxWidth = 3840;
 
 class AppComicImage extends StatelessWidget {
   const AppComicImage({
@@ -30,32 +33,22 @@ class AppComicImage extends StatelessWidget {
   final FilterQuality filterQuality;
   final bool useReaderImageCache;
 
-  static int resolveCacheWidth({
-    required BuildContext context,
-    required double logicalWidth,
-    int minWidth = 64,
-    int? maxWidth,
-  }) {
-    final double devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
-    final ImageQualityPolicy policy = ImageQualityPolicy.current;
-    final int effectiveMaxWidth = maxWidth ?? policy.coverDecodeMaxWidth;
-    final int rawWidth = (logicalWidth * devicePixelRatio * policy.decodeScale)
-        .round();
-    return rawWidth.clamp(minWidth, effectiveMaxWidth);
-  }
-
-  /// 阅读器页图解码宽度：按槽位逻辑宽与 [ImageQualityPolicy.readerDecodeMaxWidth] 档位约束。
+  /// 阅读器页图解码宽度：按槽位逻辑尺寸与 [kReaderDecodeMaxWidth] 约束。
+  ///
+  /// [BoxFit.contain] 下显示边长取决于宽、高中较大的一侧，故取
+  /// `max(slotLogicalWidth, slotLogicalHeight)` 估算解码像素预算。
   static int resolveReaderCacheWidth({
     required BuildContext context,
     required double slotLogicalWidth,
+    double? slotLogicalHeight,
     int minWidth = 64,
   }) {
-    return resolveCacheWidth(
-      context: context,
-      logicalWidth: slotLogicalWidth,
-      minWidth: minWidth,
-      maxWidth: ImageQualityPolicy.current.readerDecodeMaxWidth,
-    );
+    final double devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
+    final double height =
+        slotLogicalHeight ?? MediaQuery.sizeOf(context).height;
+    final double logicalBase = math.max(slotLogicalWidth, height);
+    final int rawWidth = (logicalBase * devicePixelRatio).round();
+    return rawWidth.clamp(minWidth, kReaderDecodeMaxWidth);
   }
 
   @override

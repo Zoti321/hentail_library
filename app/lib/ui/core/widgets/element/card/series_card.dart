@@ -98,11 +98,6 @@ class _SeriesCardCover extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
-    final int coverCacheWidth = AppComicImage.resolveCacheWidth(
-      context: context,
-      logicalWidth: 320,
-      maxWidth: 1024,
-    );
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOut,
@@ -136,7 +131,6 @@ class _SeriesCardCover extends StatelessWidget {
                     filePath: coverData?.filePath,
                     memoryBytes: coverData?.memoryBytes,
                     fit: BoxFit.cover,
-                    cacheWidth: coverCacheWidth,
                     placeholder: Container(
                       color: cs.hentai.imageFallback,
                       alignment: Alignment.center,

@@ -31,11 +31,6 @@ class ComicTile extends HookConsumerWidget {
         .watch(comicCoverDisplayProvider(comicId: comic.comicId))
         .maybeWhen(data: (ComicCoverDisplayData? v) => v, orElse: () => null);
     final int pageCount = comic.pageCount;
-    final int coverCacheWidth = AppComicImage.resolveCacheWidth(
-      context: context,
-      logicalWidth: 56 * 3,
-      maxWidth: 768,
-    );
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -174,7 +169,6 @@ class ComicTile extends HookConsumerWidget {
                     filePath: coverData?.filePath,
                     memoryBytes: coverData?.memoryBytes,
                     fit: BoxFit.cover,
-                    cacheWidth: coverCacheWidth,
                     placeholder: Icon(
                       Icons.broken_image,
                       color: theme.colorScheme.hentai.iconSecondary,
