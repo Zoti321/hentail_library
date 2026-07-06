@@ -28,8 +28,7 @@ abstract class AppSetting with _$AppSetting {
     @Default(3) int version,
     @Default(AppThemePreference.system) AppThemePreference themePreference,
     @Default(false) bool autoScan,
-    @Default(kDefaultReadingMode)
-    ReadingMode readingMode,
+    @Default(kDefaultReadingMode) ReadingMode readingMode,
     @Default(false) bool readerAutoPlayEnabled,
     @Default(5) int readerAutoPlayIntervalSeconds,
     @Default(true) bool desktopSidebarExpanded,
