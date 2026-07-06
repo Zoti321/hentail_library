@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SettingsGroup extends StatelessWidget {
   const SettingsGroup({super.key, required this.title, required this.children});
@@ -156,65 +154,6 @@ class _SettingsRowState extends State<SettingsRow> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class IntervalAdjuster extends StatelessWidget {
-  const IntervalAdjuster({
-    super.key,
-    required this.value,
-    required this.min,
-    required this.max,
-    required this.onDecrease,
-    required this.onIncrease,
-  });
-
-  final int value;
-  final int min;
-  final int max;
-  final VoidCallback onDecrease;
-  final VoidCallback onIncrease;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final bool canDecrease = value > min;
-    final bool canIncrease = value < max;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        GhostButton.icon(
-          icon: LucideIcons.minus,
-          size: 24,
-          tooltip: '',
-          semanticLabel: '减少自动播放间隔',
-          onPressed: canDecrease ? onDecrease : null,
-          iconSize: 14,
-          borderRadius: 8,
-        ),
-        Container(
-          width: 48,
-          alignment: Alignment.center,
-          child: Text(
-            '$value s',
-            style: TextStyle(
-              fontSize: 12,
-              color: theme.colorScheme.hentai.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        GhostButton.icon(
-          icon: LucideIcons.plus,
-          size: 24,
-          tooltip: '',
-          semanticLabel: '增加自动播放间隔',
-          onPressed: canIncrease ? onIncrease : null,
-          iconSize: 14,
-          borderRadius: 8,
-        ),
-      ],
     );
   }
 }

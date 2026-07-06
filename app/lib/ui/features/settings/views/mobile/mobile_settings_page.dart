@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
-import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/features/settings/state/app_update_controller.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -72,79 +71,6 @@ class MobileSettingsPage extends ConsumerWidget {
                     onChanged: (bool value) {
                       ref.read(settingsProvider.notifier).setAutoScan(value);
                     },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _SectionCard(
-                title: '阅读',
-                children: <Widget>[
-                  ListTile(
-                    title: const Text('默认阅读模式'),
-                    subtitle: Text(settings.readingMode.labelZh),
-                    trailing: DropdownButton<ReadingMode>(
-                      value: settings.readingMode,
-                      underline: const SizedBox.shrink(),
-                      items: ReadingMode.values
-                          .map(
-                            (ReadingMode value) => DropdownMenuItem<ReadingMode>(
-                              value: value,
-                              child: Text(value.labelZh),
-                            ),
-                          )
-                          .toList(growable: false),
-                      onChanged: (ReadingMode? value) {
-                        if (value == null) {
-                          return;
-                        }
-                        ref
-                            .read(settingsProvider.notifier)
-                            .setReadingMode(value);
-                      },
-                    ),
-                  ),
-                  SwitchListTile(
-                    title: const Text('自动播放'),
-                    value: settings.readerAutoPlayEnabled,
-                    onChanged: (bool value) {
-                      ref
-                          .read(settingsProvider.notifier)
-                          .setReaderAutoPlayEnabled(value);
-                    },
-                  ),
-                  ListTile(
-                    title: const Text('自动播放间隔（秒）'),
-                    subtitle: Text(
-                      '${settings.readerAutoPlayIntervalSeconds} 秒',
-                    ),
-                    trailing: SizedBox(
-                      width: 120,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          IconButton(
-                            icon: const Icon(Icons.remove),
-                            onPressed: () {
-                              ref
-                                  .read(settingsProvider.notifier)
-                                  .setReaderAutoPlayIntervalSeconds(
-                                    settings.readerAutoPlayIntervalSeconds - 1,
-                                  );
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.add),
-                            onPressed: () {
-                              ref
-                                  .read(settingsProvider.notifier)
-                                  .setReaderAutoPlayIntervalSeconds(
-                                    settings.readerAutoPlayIntervalSeconds + 1,
-                                  );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                 ],
               ),

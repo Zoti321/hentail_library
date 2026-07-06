@@ -4,7 +4,6 @@ import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_library_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_page_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_page_primitives.dart';
-import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_reader_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/desktop/settings_page/widgets/settings_theme_row.dart';
 
 class SettingsView extends StatelessWidget {
@@ -34,10 +33,6 @@ class SettingsView extends StatelessWidget {
           const SettingsGroup(
             title: '漫画库',
             children: <Widget>[LibraryLocationRow(), AutoScanRow()],
-          ),
-          const SettingsGroup(
-            title: '阅读',
-            children: <Widget>[ReaderModeRow(), ReaderAutoPlayIntervalRow()],
           ),
           const SettingsGroup(
             title: '关于',

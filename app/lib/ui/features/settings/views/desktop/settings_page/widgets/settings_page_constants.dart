@@ -1,8 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 
-const int readerAutoPlayIntervalMin = 1;
-const int readerAutoPlayIntervalMax = 60;
 const double appThemeMenuWidth = 224;
 
 TextStyle buildSettingsPageTitleStyle(ColorScheme colorScheme) {
