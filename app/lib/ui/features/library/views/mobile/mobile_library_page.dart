@@ -15,14 +15,14 @@ class MobileLibraryPage extends ConsumerStatefulWidget {
 class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<LibraryPageSnapshot> catalogAsync = ref.watch(
-      libraryCatalogControllerProvider,
+    final AsyncValue<LibraryComicsCatalogState> catalogAsync = ref.watch(
+      libraryComicsCatalogControllerProvider,
     );
     final ScanLibraryState scanState = ref.watch(scanLibraryControllerProvider);
     final bool isScanning = scanState.running;
-    final LibraryPageSnapshot? snapshot = catalogAsync.value;
+    final LibraryComicsCatalogState? catalog = catalogAsync.value;
     final LibraryPagination pagination =
-        snapshot?.comicsPagination ??
+        catalog?.pagination ??
         const LibraryPagination(
           page: 1,
           totalPages: 0,
@@ -69,8 +69,8 @@ class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
           ),
           Expanded(
             child: catalogAsync.when(
-              data: (LibraryPageSnapshot loadedSnapshot) {
-                final List<Comic> comics = loadedSnapshot.comics;
+              data: (LibraryComicsCatalogState loadedCatalog) {
+                final List<Comic> comics = loadedCatalog.items;
                 if (comics.isEmpty) {
                   return const _LibraryEmptyView();
                 }
@@ -122,7 +122,7 @@ class _MobileLibraryPageState extends ConsumerState<MobileLibraryPage> {
             target: LibraryPaginationTarget.comics,
             page: pagination.page,
             totalPages: pagination.totalPages,
-            isLoading: catalogAsync.isLoading && snapshot == null,
+            isLoading: catalogAsync.isLoading && catalog == null,
           ),
         ],
       ),

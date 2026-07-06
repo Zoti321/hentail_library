@@ -9,7 +9,7 @@ import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_controller.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
@@ -101,18 +101,18 @@ void main() {
     final ProviderContainer container = createContainer();
     addTearDown(container.dispose);
 
-    await container.read(libraryCatalogControllerProvider.future);
-    final LibraryCatalogController controller = container.read(
-      libraryCatalogControllerProvider.notifier,
+    await container.read(libraryComicsCatalogControllerProvider.future);
+    final LibraryComicsCatalogController controller = container.read(
+      libraryComicsCatalogControllerProvider.notifier,
     );
-    controller.setComicsPage(4);
-    expect(controller.comicsPageIndex, 4);
-    await container.read(libraryCatalogControllerProvider.future);
+    controller.setPage(4);
+    expect(controller.pageIndex, 4);
+    await container.read(libraryComicsCatalogControllerProvider.future);
 
     container.read(_comicsSortRevisionProvider.notifier).state = 1;
-    await container.read(libraryCatalogControllerProvider.future);
+    await container.read(libraryComicsCatalogControllerProvider.future);
     expect(
-      container.read(libraryCatalogControllerProvider.notifier).comicsPageIndex,
+      container.read(libraryComicsCatalogControllerProvider.notifier).pageIndex,
       1,
     );
   });
@@ -121,15 +121,15 @@ void main() {
     final ProviderContainer container = createContainer();
     addTearDown(container.dispose);
 
-    await container.read(libraryCatalogControllerProvider.future);
-    container.read(libraryCatalogControllerProvider.notifier).setComicsPage(4);
-    await container.read(libraryCatalogControllerProvider.future);
+    await container.read(libraryComicsCatalogControllerProvider.future);
+    container.read(libraryComicsCatalogControllerProvider.notifier).setPage(4);
+    await container.read(libraryComicsCatalogControllerProvider.future);
     container
         .read(libraryQueryIntentProvider.notifier)
         .setDisplayTarget(LibraryDisplayTarget.series);
-    await container.read(libraryCatalogControllerProvider.future);
+    await container.read(libraryComicsCatalogControllerProvider.future);
     expect(
-      container.read(libraryCatalogControllerProvider.notifier).comicsPageIndex,
+      container.read(libraryComicsCatalogControllerProvider.notifier).pageIndex,
       4,
     );
   });
@@ -140,19 +140,15 @@ void main() {
       final ProviderContainer container = createContainer();
       addTearDown(container.dispose);
 
-      await container.read(libraryCatalogControllerProvider.future);
-      container
-          .read(libraryCatalogControllerProvider.notifier)
-          .setComicsPage(2);
-      await container.read(libraryCatalogControllerProvider.future);
+      await container.read(libraryComicsCatalogControllerProvider.future);
+      container.read(libraryComicsCatalogControllerProvider.notifier).setPage(2);
+      await container.read(libraryComicsCatalogControllerProvider.future);
       await expectLater(() async {
         container.read(_comicsSortRevisionProvider.notifier).state = 1;
-        await container.read(libraryCatalogControllerProvider.future);
+        await container.read(libraryComicsCatalogControllerProvider.future);
       }, returnsNormally);
       expect(
-        container
-            .read(libraryCatalogControllerProvider.notifier)
-            .comicsPageIndex,
+        container.read(libraryComicsCatalogControllerProvider.notifier).pageIndex,
         1,
       );
     },

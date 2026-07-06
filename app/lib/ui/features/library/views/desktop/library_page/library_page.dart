@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_controller.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
+import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_prefetch_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
 import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/core/widgets/responsive_layout/library_blocks_layout.dart';
@@ -67,10 +71,23 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(libraryCatalogPrefetchProvider);
+    ref.listen<LibraryDisplayTarget>(libraryDisplayTargetProvider, (
+      LibraryDisplayTarget? previous,
+      LibraryDisplayTarget next,
+    ) {
+      if (previous == null || previous == next) {
+        return;
+      }
+      _scrollToContentTop();
+      if (_isEndDrawerOpen) {
+        _scaffoldKey.currentState?.closeEndDrawer();
+      }
+    });
     ref.listen<int?>(
-      libraryCatalogControllerProvider.select(
-        (AsyncValue<LibraryPageSnapshot> async) =>
-            async.value?.comicsPagination.page,
+      libraryComicsCatalogControllerProvider.select(
+        (AsyncValue<LibraryComicsCatalogState> async) =>
+            async.value?.pagination.page,
       ),
       (int? previous, int? next) {
         if (previous == null || next == null || previous == next) {
@@ -80,9 +97,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       },
     );
     ref.listen<int?>(
-      libraryCatalogControllerProvider.select(
-        (AsyncValue<LibraryPageSnapshot> async) =>
-            async.value?.seriesPagination.page,
+      librarySeriesCatalogControllerProvider.select(
+        (AsyncValue<LibrarySeriesCatalogState> async) =>
+            async.value?.pagination.page,
       ),
       (int? previous, int? next) {
         if (previous == null || next == null || previous == next) {

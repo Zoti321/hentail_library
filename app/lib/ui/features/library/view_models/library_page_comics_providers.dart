@@ -1,21 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_controller.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_page_comics_providers.g.dart';
-
-/// 库页内容：默认来自 [libraryCatalogControllerProvider]，搜索页可 override。
-final Provider<AsyncValue<LibraryPageSnapshot>> libraryPageContentProvider =
-    Provider<AsyncValue<LibraryPageSnapshot>>((Ref ref) {
-      return ref.watch(libraryCatalogControllerProvider);
-    });
 
 @Riverpod(keepAlive: true)
 Future<Comic?> libraryComicById(Ref ref, String comicId) {
@@ -67,7 +61,8 @@ final Provider<bool> libraryHasReceivedFirstEmitProvider = Provider<bool>((
 final Provider<VoidCallback> libraryRefreshActionProvider =
     Provider<VoidCallback>((Ref ref) {
       return () {
-        ref.read(libraryCatalogControllerProvider.notifier).refreshCatalog();
+        ref.read(libraryComicsCatalogControllerProvider.notifier).refresh();
+        ref.read(librarySeriesCatalogControllerProvider.notifier).refresh();
       };
     });
 

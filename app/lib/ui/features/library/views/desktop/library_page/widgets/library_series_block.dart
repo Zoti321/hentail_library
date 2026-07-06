@@ -5,9 +5,15 @@ class LibrarySeriesBlock extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
+    );
+    if (displayTarget != LibraryDisplayTarget.series) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
     final AppThemeTokens tokens = context.tokens;
-    final AsyncValue<LibraryPageSnapshot> catalogAsync = ref.watch(
-      libraryPageContentProvider,
+    final AsyncValue<LibrarySeriesCatalogState> catalogAsync = ref.watch(
+      librarySeriesCatalogContentProvider,
     );
     if (catalogAsync.hasError) {
       return catalogAsync.when(
@@ -23,18 +29,15 @@ class LibrarySeriesBlock extends ConsumerWidget {
         ),
       );
     }
-    final LibraryPageSnapshot? snapshot = catalogAsync.value;
-    if (snapshot == null) {
+    final LibrarySeriesCatalogState? catalog = catalogAsync.value;
+    if (catalog == null) {
       return const SliverToBoxAdapter(
         child: Center(child: CircularProgressIndicator()),
       );
     }
-    if (snapshot.displayTarget != LibraryDisplayTarget.series) {
-      return const SliverToBoxAdapter(child: SizedBox.shrink());
-    }
-    final List<Series> series = snapshot.series;
-    final String filterQuery = snapshot.filterQuery;
-    final bool showPagination = snapshot.showPagination;
+    final List<Series> series = catalog.items;
+    final String filterQuery = catalog.filterQuery;
+    final bool showPagination = catalog.showPagination;
     return SliverPadding(
       padding: EdgeInsets.symmetric(
         horizontal: tokens.layout.contentHorizontalPadding,

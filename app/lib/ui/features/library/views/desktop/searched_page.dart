@@ -46,42 +46,45 @@ class SearchedPage extends ConsumerWidget {
       LibraryDisplayTarget.comics => searchedComicCount,
       LibraryDisplayTarget.series => searchedSeriesCount,
     };
-    final AsyncValue<LibraryPageSnapshot> searchCatalogAsync = searchedComics
-        .when(
-          data: (List<Comic> comics) => searchedSeriesDataAsync.when(
-            data: (LibrarySeriesViewData seriesData) => AsyncData(
-              LibraryPageSnapshot(
-                comics: comics,
-                comicsPagination: LibraryPagination(
-                  page: 1,
-                  totalPages: comics.isNotEmpty ? 1 : 0,
-                  totalCount: comics.length,
-                  isLoading: false,
-                ),
-                series: seriesData.filteredSeries,
-                seriesPagination: LibraryPagination(
-                  page: 1,
-                  totalPages: seriesData.filteredSeries.isNotEmpty ? 1 : 0,
-                  totalCount: seriesData.filteredSeries.length,
-                  isLoading: false,
-                ),
-                displayedComicCount: comics.length,
-                displayedSeriesCount: seriesData.filteredSeries.length,
-                displayTarget: displayTarget,
-                filterQuery: trimmedQuery,
-                hasReceivedFirstEmit: true,
-                isComicTableEmpty:
-                    comics.isEmpty && seriesData.filteredSeries.isEmpty,
-                showPagination: false,
+    final AsyncValue<LibraryComicsCatalogState> searchComicsCatalogAsync =
+        searchedComics.when(
+          data: (List<Comic> comics) => AsyncData(
+            LibraryComicsCatalogState(
+              items: comics,
+              pagination: LibraryPagination(
+                page: 1,
+                totalPages: comics.isNotEmpty ? 1 : 0,
+                totalCount: comics.length,
+                isLoading: false,
               ),
+              filterQuery: trimmedQuery,
+              hasReceivedFirstEmit: true,
+              isComicTableEmpty: comics.isEmpty,
+              showPagination: false,
             ),
-            loading: () => const AsyncLoading<LibraryPageSnapshot>(),
-            error: (Object error, StackTrace stackTrace) =>
-                AsyncError<LibraryPageSnapshot>(error, stackTrace),
           ),
-          loading: () => const AsyncLoading<LibraryPageSnapshot>(),
+          loading: () => const AsyncLoading<LibraryComicsCatalogState>(),
           error: (Object error, StackTrace stackTrace) =>
-              AsyncError<LibraryPageSnapshot>(error, stackTrace),
+              AsyncError<LibraryComicsCatalogState>(error, stackTrace),
+        );
+    final AsyncValue<LibrarySeriesCatalogState> searchSeriesCatalogAsync =
+        searchedSeriesDataAsync.when(
+          data: (LibrarySeriesViewData seriesData) => AsyncData(
+            LibrarySeriesCatalogState(
+              items: seriesData.filteredSeries,
+              pagination: LibraryPagination(
+                page: 1,
+                totalPages: seriesData.filteredSeries.isNotEmpty ? 1 : 0,
+                totalCount: seriesData.filteredSeries.length,
+                isLoading: false,
+              ),
+              filterQuery: trimmedQuery,
+              showPagination: false,
+            ),
+          ),
+          loading: () => const AsyncLoading<LibrarySeriesCatalogState>(),
+          error: (Object error, StackTrace stackTrace) =>
+              AsyncError<LibrarySeriesCatalogState>(error, stackTrace),
         );
 
     return CustomScrollView(
@@ -158,7 +161,12 @@ class SearchedPage extends ConsumerWidget {
         else ...<Widget>[
           ProviderScope(
             overrides: <Override>[
-              libraryPageContentProvider.overrideWithValue(searchCatalogAsync),
+              libraryComicsCatalogContentProvider.overrideWithValue(
+                searchComicsCatalogAsync,
+              ),
+              librarySeriesCatalogContentProvider.overrideWithValue(
+                searchSeriesCatalogAsync,
+              ),
             ],
             child: const LibraryBlocksSliverGroup(
               seriesBlock: LibrarySeriesBlock(),
