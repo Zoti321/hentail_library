@@ -53,12 +53,15 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
 
   @override
   Future<PagedResult<entity.ReadingHistory>> fetchHistoryPage(
-    PageRequest request,
-  ) async {
+    PageRequest request, {
+    String? keyword,
+  }) async {
+    final String? normalizedKeyword = _normalizeKeyword(keyword);
     final rust.PagedReadingHistoryDto page = guardFrbSync(
       () => rust.fetchReadingPageFrb(
         page: request.page,
         pageSize: request.pageSize,
+        keyword: normalizedKeyword,
       ),
       fallbackMessage: '读取阅读历史失败',
     );
@@ -80,12 +83,21 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
         () => rust.fetchReadingPageFrb(
           page: effectivePage,
           pageSize: request.pageSize,
+          keyword: normalizedKeyword,
         ),
         fallbackMessage: '读取阅读历史失败',
       );
       return mapPagedReadingHistory(adjusted, effectivePage, request.pageSize);
     }
     return mapPagedReadingHistory(page, effectivePage, request.pageSize);
+  }
+
+  String? _normalizeKeyword(String? keyword) {
+    final String? trimmed = keyword?.trim();
+    if (trimmed == null || trimmed.isEmpty) {
+      return null;
+    }
+    return trimmed;
   }
 
   @override

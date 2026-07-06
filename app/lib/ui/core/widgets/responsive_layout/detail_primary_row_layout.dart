@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 
 /// 详情页封面 + 主信息区：窄屏单列、宽屏横排。
@@ -8,7 +9,7 @@ class DetailPrimaryRowLayout extends StatelessWidget {
     required this.cover,
     required this.content,
     this.coverWidth = 220,
-    this.narrowBreakpoint = 600,
+    this.narrowBreakpoint = AppLayoutBreakpoints.compact,
   });
 
   final Widget cover;
@@ -52,7 +53,7 @@ class DetailPrimaryRowLayout extends StatelessWidget {
 double detailContentHorizontalPadding(BuildContext context) {
   final AppThemeTokens tokens = context.tokens;
   final double width = MediaQuery.sizeOf(context).width;
-  if (width < 600) {
+  if (width < AppLayoutBreakpoints.compact) {
     return tokens.spacing.lg;
   }
   return tokens.layout.contentHorizontalPadding;

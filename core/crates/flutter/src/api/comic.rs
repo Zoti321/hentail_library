@@ -39,8 +39,21 @@ pub struct PageRequestDto {
     pub page_size: i32,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum ComicSortFieldDto {
+    #[default]
+    Title,
+    CreatedAt,
+    LastUpdatedAt,
+    PublishedAt,
+    ReadAt,
+    FileSize,
+    PageCount,
+}
+
 #[derive(Debug, Clone)]
 pub struct ComicSortOptionDto {
+    pub field: ComicSortFieldDto,
     pub descending: bool,
 }
 
@@ -99,6 +112,17 @@ impl From<PageRequestDto> for hentai_core::PageRequestDto {
 impl From<ComicSortOptionDto> for hentai_core::ComicSortOptionDto {
     fn from(value: ComicSortOptionDto) -> Self {
         Self {
+            field: match value.field {
+                ComicSortFieldDto::Title => hentai_core::ComicSortFieldDto::Title,
+                ComicSortFieldDto::CreatedAt => hentai_core::ComicSortFieldDto::CreatedAt,
+                ComicSortFieldDto::LastUpdatedAt => {
+                    hentai_core::ComicSortFieldDto::LastUpdatedAt
+                }
+                ComicSortFieldDto::PublishedAt => hentai_core::ComicSortFieldDto::PublishedAt,
+                ComicSortFieldDto::ReadAt => hentai_core::ComicSortFieldDto::ReadAt,
+                ComicSortFieldDto::FileSize => hentai_core::ComicSortFieldDto::FileSize,
+                ComicSortFieldDto::PageCount => hentai_core::ComicSortFieldDto::PageCount,
+            },
             descending: value.descending,
         }
     }

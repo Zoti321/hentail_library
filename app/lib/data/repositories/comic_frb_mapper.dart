@@ -61,7 +61,22 @@ rust.PageRequestDto mapPageRequest(PageRequest request) {
 }
 
 rust.ComicSortOptionDto mapSortOption(LibraryComicSortOption sortOption) {
-  return rust.ComicSortOptionDto(descending: sortOption.descending);
+  return rust.ComicSortOptionDto(
+    field: mapSortField(sortOption.field),
+    descending: sortOption.descending,
+  );
+}
+
+rust.ComicSortFieldDto mapSortField(LibraryComicSortField field) {
+  return switch (field) {
+    LibraryComicSortField.title => rust.ComicSortFieldDto.title,
+    LibraryComicSortField.createdAt => rust.ComicSortFieldDto.createdAt,
+    LibraryComicSortField.lastUpdatedAt => rust.ComicSortFieldDto.lastUpdatedAt,
+    LibraryComicSortField.publishedAt => rust.ComicSortFieldDto.publishedAt,
+    LibraryComicSortField.readAt => rust.ComicSortFieldDto.readAt,
+    LibraryComicSortField.fileSize => rust.ComicSortFieldDto.fileSize,
+    LibraryComicSortField.pageCount => rust.ComicSortFieldDto.pageCount,
+  };
 }
 
 PagedResult<Comic> mapPagedResult(rust.PagedComicResultDto page) {

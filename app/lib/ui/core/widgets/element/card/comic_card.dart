@@ -185,11 +185,6 @@ class ComicCard extends HookConsumerWidget {
   ) {
     final cs = Theme.of(context).colorScheme;
     final tokens = context.tokens;
-    final int coverCacheWidth = AppComicImage.resolveCacheWidth(
-      context: context,
-      logicalWidth: 320,
-      maxWidth: 1024,
-    );
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOut,
@@ -224,7 +219,6 @@ class ComicCard extends HookConsumerWidget {
                     filePath: coverData?.filePath,
                     memoryBytes: coverData?.memoryBytes,
                     fit: BoxFit.cover,
-                    cacheWidth: coverCacheWidth,
                     placeholder: Container(
                       color: cs.hentai.imageFallback,
                       alignment: Alignment.center,

@@ -155,6 +155,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicFilterDto dco_decode_comic_filter_dto(dynamic raw);
 
   @protected
+  ComicSortFieldDto dco_decode_comic_sort_field_dto(dynamic raw);
+
+  @protected
   ComicSortOptionDto dco_decode_comic_sort_option_dto(dynamic raw);
 
   @protected
@@ -188,6 +191,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<HomeContinueReadingDto> dco_decode_list_home_continue_reading_dto(
     dynamic raw,
   );
+
+  @protected
+  List<int> dco_decode_list_prim_i_32_loose(dynamic raw);
+
+  @protected
+  Int32List dco_decode_list_prim_i_32_strict(dynamic raw);
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
@@ -251,6 +260,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PagedSeriesResultDto dco_decode_paged_series_result_dto(dynamic raw);
 
   @protected
+  ReaderPageDto dco_decode_reader_page_dto(dynamic raw);
+
+  @protected
   ReaderPageListDto dco_decode_reader_page_list_dto(dynamic raw);
 
   @protected
@@ -291,6 +303,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ThumbnailPriorityDto dco_decode_thumbnail_priority_dto(dynamic raw);
+
+  @protected
+  BigInt dco_decode_u_64(dynamic raw);
 
   @protected
   int dco_decode_u_8(dynamic raw);
@@ -458,6 +473,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicFilterDto sse_decode_comic_filter_dto(SseDeserializer deserializer);
 
   @protected
+  ComicSortFieldDto sse_decode_comic_sort_field_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ComicSortOptionDto sse_decode_comic_sort_option_dto(
     SseDeserializer deserializer,
   );
@@ -501,6 +521,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<HomeContinueReadingDto> sse_decode_list_home_continue_reading_dto(
     SseDeserializer deserializer,
   );
+
+  @protected
+  List<int> sse_decode_list_prim_i_32_loose(SseDeserializer deserializer);
+
+  @protected
+  Int32List sse_decode_list_prim_i_32_strict(SseDeserializer deserializer);
 
   @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
@@ -578,6 +604,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ReaderPageDto sse_decode_reader_page_dto(SseDeserializer deserializer);
+
+  @protected
   ReaderPageListDto sse_decode_reader_page_list_dto(
     SseDeserializer deserializer,
   );
@@ -638,6 +667,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ThumbnailPriorityDto sse_decode_thumbnail_priority_dto(
     SseDeserializer deserializer,
   );
+
+  @protected
+  BigInt sse_decode_u_64(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_8(SseDeserializer deserializer);
@@ -842,6 +874,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_comic_sort_field_dto(
+    ComicSortFieldDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_comic_sort_option_dto(
     ComicSortOptionDto self,
     SseSerializer serializer,
@@ -892,6 +930,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_home_continue_reading_dto(
     List<HomeContinueReadingDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_prim_i_32_loose(
+    List<int> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_prim_i_32_strict(
+    Int32List self,
     SseSerializer serializer,
   );
 
@@ -995,6 +1045,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_reader_page_dto(ReaderPageDto self, SseSerializer serializer);
+
+  @protected
   void sse_encode_reader_page_list_dto(
     ReaderPageListDto self,
     SseSerializer serializer,
@@ -1071,6 +1124,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     ThumbnailPriorityDto self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_u_64(BigInt self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_8(int self, SseSerializer serializer);

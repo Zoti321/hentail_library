@@ -1,6 +1,6 @@
 use sea_orm::Value;
 
-use super::dto::ComicFilterDto;
+use super::dto::{ComicFilterDto, ComicSortFieldDto, ComicSortOptionDto};
 
 pub struct PageSqlQuery {
     pub sql: String,
@@ -22,24 +22,48 @@ pub fn build_count_query(filter: &ComicFilterDto) -> PageSqlQuery {
 
 pub fn build_ids_page_query(
     filter: &ComicFilterDto,
-    sort_descending: bool,
+    sort: &ComicSortOptionDto,
     limit: i32,
     offset: i32,
 ) -> PageSqlQuery {
     let mut values = Vec::new();
     let where_clause = build_where_clause(filter, &mut values);
-    let order = if sort_descending { "DESC" } else { "ASC" };
+    let sort_join = sort_join_clause(sort.field);
+    let order_by = build_order_by_clause(sort);
     values.push(Value::Int(Some(limit)));
     values.push(Value::Int(Some(offset)));
     PageSqlQuery {
         sql: format!(
-            "SELECT c.comic_id AS comic_id FROM comics c {COMIC_META_JOIN} \
+            "SELECT c.comic_id AS comic_id FROM comics c {COMIC_META_JOIN}{sort_join} \
              WHERE {where_clause} \
-             ORDER BY lower(m.title) {order} \
+             ORDER BY {order_by} \
              LIMIT ? OFFSET ?"
         ),
         values,
     }
+}
+
+fn sort_join_clause(field: ComicSortFieldDto) -> &'static str {
+    match field {
+        ComicSortFieldDto::ReadAt => {
+            " LEFT JOIN comic_reading_histories rh ON rh.comic_id = c.comic_id"
+        }
+        _ => "",
+    }
+}
+
+fn build_order_by_clause(sort: &ComicSortOptionDto) -> String {
+    let direction = if sort.descending { "DESC" } else { "ASC" };
+    let primary = match sort.field {
+        ComicSortFieldDto::Title => format!("lower(m.title) {direction}"),
+        ComicSortFieldDto::CreatedAt => format!("c.created_at {direction}"),
+        ComicSortFieldDto::LastUpdatedAt => format!("c.last_updated_at {direction}"),
+        ComicSortFieldDto::PublishedAt => format!("m.published_at {direction} NULLS LAST"),
+        ComicSortFieldDto::ReadAt => format!("rh.last_read_time {direction} NULLS LAST"),
+        ComicSortFieldDto::FileSize => format!("c.resource_size {direction}"),
+        ComicSortFieldDto::PageCount => format!("m.page_count {direction}"),
+    };
+    format!("{primary}, lower(m.title) ASC")
 }
 
 fn build_where_clause(filter: &ComicFilterDto, values: &mut Vec<Value>) -> String {
@@ -118,4 +142,54 @@ fn placeholders(count: usize) -> String {
 
 fn push_sqlite_text(values: &mut Vec<Value>, text: String) {
     values.push(Value::String(Some(Box::new(text))));
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn order_by_read_at_joins_history_and_nulls_last() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto::default(),
+            &ComicSortOptionDto {
+                field: ComicSortFieldDto::ReadAt,
+                descending: true,
+            },
+            20,
+            0,
+        );
+        assert!(sql.sql.contains("LEFT JOIN comic_reading_histories rh"));
+        assert!(sql.sql.contains("ORDER BY rh.last_read_time DESC NULLS LAST"));
+        assert!(sql.sql.contains(", lower(m.title) ASC"));
+    }
+
+    #[test]
+    fn order_by_page_count_asc() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto::default(),
+            &ComicSortOptionDto {
+                field: ComicSortFieldDto::PageCount,
+                descending: false,
+            },
+            10,
+            5,
+        );
+        assert!(sql.sql.contains("ORDER BY m.page_count ASC, lower(m.title) ASC"));
+        assert!(!sql.sql.contains("comic_reading_histories"));
+    }
+
+    #[test]
+    fn order_by_published_at_nulls_last() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto::default(),
+            &ComicSortOptionDto {
+                field: ComicSortFieldDto::PublishedAt,
+                descending: false,
+            },
+            10,
+            0,
+        );
+        assert!(sql.sql.contains("ORDER BY m.published_at ASC NULLS LAST"));
+    }
 }

@@ -6,7 +6,9 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:window_manager/window_manager.dart';
 
 class AppTitleBar extends StatefulWidget {
-  const AppTitleBar({super.key});
+  const AppTitleBar({super.key, this.onOpenNavigation});
+
+  final VoidCallback? onOpenNavigation;
 
   @override
   State<AppTitleBar> createState() => _AppTitleBarState();
@@ -52,8 +54,20 @@ class _AppTitleBarState extends State<AppTitleBar> with WindowListener {
           Expanded(
             child: DragToMoveArea(
               child: Row(
-                children: [
+                children: <Widget>[
                   const SizedBox(width: 16),
+                  if (widget.onOpenNavigation != null) ...<Widget>[
+                    GhostButton.icon(
+                      icon: LucideIcons.menu,
+                      semanticLabel: '打开导航菜单',
+                      size: 24,
+                      borderRadius: 4,
+                      tooltip: '',
+                      overlayColor: cs.primary.withAlpha(14),
+                      onPressed: widget.onOpenNavigation,
+                    ),
+                    const SizedBox(width: 4),
+                  ],
                   GhostButton.icon(
                     icon: LucideIcons.arrowLeft,
                     semanticLabel: "返回",

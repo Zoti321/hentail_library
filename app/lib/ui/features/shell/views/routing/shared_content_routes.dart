@@ -1,10 +1,10 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/ui/features/library/views/desktop/comic_detail_page/comic_detail_page.dart';
-import 'package:hentai_library/ui/features/library/views/desktop/series_detail_page/series_detail_page.dart';
-import 'package:hentai_library/ui/features/metadata/views/desktop/metadata_page/metadata_management_page.dart';
-import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/reader_page.dart';
-import 'package:hentai_library/ui/features/shell/views/desktop/selected_paths_page/selected_paths_page.dart';
+import 'package:hentai_library/ui/features/library/views/comic_detail_page/comic_detail_page.dart';
+import 'package:hentai_library/ui/features/library/views/series_detail_page/series_detail_page.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/metadata_management_page.dart';
+import 'package:hentai_library/ui/features/reader/reader.dart';
+import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_page.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 
 typedef ComicDetailBuilder =

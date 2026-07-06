@@ -6,11 +6,9 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 abstract final class AppNavigation {
   static const String navIdHome = 'home';
   static const String navIdLibrary = 'library';
-  static const String navIdManage = 'manage';
   static const String navIdMetadata = 'metadata';
   static const String navIdHistory = 'history';
   static const String navIdSettings = 'settings';
-  static const String navIdMore = 'more';
 
   static List<NavItemData> get desktopMainNavItems => <NavItemData>[
     const (id: navIdHome, label: '首页', icon: LucideIcons.house),
@@ -22,6 +20,39 @@ abstract final class AppNavigation {
   static List<NavItemData> get desktopSystemNavItems => <NavItemData>[
     const (id: navIdSettings, label: '设置', icon: LucideIcons.settings),
   ];
+
+  static String pageTitleForPath(String path) {
+    if (path.startsWith('/reader')) {
+      return '阅读';
+    }
+    if (path.startsWith('/comic/')) {
+      return '漫画详情';
+    }
+    if (path.startsWith('/series/')) {
+      return '系列详情';
+    }
+    switch (path) {
+      case '/home':
+        return '首页';
+      case '/local':
+        return '漫画库';
+      case '/paths':
+        return '库路径';
+      case '/searched':
+        return '搜索结果';
+      case '/metadata':
+      case '/tags':
+      case '/authors':
+      case '/series':
+        return '资料';
+      case '/history':
+        return '历史';
+      case '/settings':
+        return '设置';
+      default:
+        return 'hentai library';
+    }
+  }
 
   /// 与 [DesktopSidebar] 菜单 id 对应；`/paths` 无对应项时用空字符串（不高亮）。
   static String activeNavIdForPath(String path) {
@@ -54,32 +85,6 @@ abstract final class AppNavigation {
     }
   }
 
-  /// 底栏用：标签 / 系列管理 / 选中路径 归入「更多」高亮。
-  static String mobileBarNavIdForPath(String path) {
-    if (path == '/local') {
-      return navIdLibrary;
-    }
-    if (path == '/history') {
-      return navIdHistory;
-    }
-    if (path == '/settings') {
-      return navIdSettings;
-    }
-    if (path == '/manage' ||
-        path == '/paths' ||
-        path == '/metadata' ||
-        path == '/tags' ||
-        path == '/authors' ||
-        path == '/series' ||
-        path.startsWith('/series/')) {
-      return navIdManage;
-    }
-    if (path.startsWith('/comic/')) {
-      return navIdLibrary;
-    }
-    return navIdLibrary;
-  }
-
   static void goToNavId(BuildContext context, String id) {
     switch (id) {
       case navIdHome:
@@ -87,9 +92,6 @@ abstract final class AppNavigation {
         break;
       case navIdLibrary:
         context.go('/local');
-        break;
-      case navIdManage:
-        context.go('/manage');
         break;
       case navIdMetadata:
         context.go('/metadata');
@@ -99,8 +101,6 @@ abstract final class AppNavigation {
         break;
       case navIdSettings:
         context.go('/settings');
-        break;
-      case navIdMore:
         break;
       default:
         break;

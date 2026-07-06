@@ -24,7 +24,7 @@ extension LibraryComicSortFieldX on LibraryComicSortField {
     LibraryComicSortField.pageCount => '页数',
   };
 
-  bool get isImplemented => this == LibraryComicSortField.title;
+  bool get isImplemented => true;
 }
 
 @freezed

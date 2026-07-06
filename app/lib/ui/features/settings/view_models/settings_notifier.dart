@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:hentai_library/domain/models/models.dart'
     show AppSetting, AppThemePreference;
+import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -9,24 +10,11 @@ part 'settings_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
 class SettingsNotifier extends _$SettingsNotifier {
-  static const double _readerDimLevelMin = 0.0;
-  static const double _readerDimLevelMax = 0.8;
   static const int _readerAutoPlayIntervalMin = 1;
   static const int _readerAutoPlayIntervalMax = 60;
-  static const Duration _readerDimLevelPersistDebounce = Duration(
-    milliseconds: 400,
-  );
-  Timer? _readerDimLevelPersistDebounceTimer;
-  bool _hasPendingReaderDimPersist = false;
 
   @override
   Future<AppSetting> build() async {
-    ref.onDispose(() {
-      _readerDimLevelPersistDebounceTimer?.cancel();
-      if (_hasPendingReaderDimPersist) {
-        unawaited(_persistReaderDimLevelIfNeeded());
-      }
-    });
     return ref.read(appSettingRepoProvider).load();
   }
 
@@ -68,29 +56,10 @@ class SettingsNotifier extends _$SettingsNotifier {
     await updateSettings(current.copyWith(dismissedUpdateVersion: value));
   }
 
-  Future<void> setReaderDimLevel(double value) async {
+  Future<void> setReadingMode(ReadingMode value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
-    final double normalizedValue = value.clamp(
-      _readerDimLevelMin,
-      _readerDimLevelMax,
-    );
-    final AppSetting newSetting = current.copyWith(
-      readerDimLevel: normalizedValue,
-    );
-    state = AsyncData(newSetting);
-    _hasPendingReaderDimPersist = true;
-    _readerDimLevelPersistDebounceTimer?.cancel();
-    _readerDimLevelPersistDebounceTimer = Timer(
-      _readerDimLevelPersistDebounce,
-      () => unawaited(_persistReaderDimLevelIfNeeded()),
-    );
-  }
-
-  Future<void> setReaderIsVertical(bool value) async {
-    final AppSetting? current = state.asData?.value;
-    if (current == null) return;
-    final AppSetting newSetting = current.copyWith(readerIsVertical: value);
+    final AppSetting newSetting = current.copyWith(readingMode: value);
     state = AsyncData(newSetting);
     try {
       await ref.read(appSettingRepoProvider).save(newSetting);
@@ -147,29 +116,5 @@ class SettingsNotifier extends _$SettingsNotifier {
 
   Future<void> resetToDefaults() async {
     await updateSettings(AppSetting());
-  }
-
-  Future<void> _persistReaderDimLevelIfNeeded() async {
-    if (!_hasPendingReaderDimPersist) {
-      return;
-    }
-    if (state.isLoading) {
-      _readerDimLevelPersistDebounceTimer?.cancel();
-      _readerDimLevelPersistDebounceTimer = Timer(
-        const Duration(milliseconds: 100),
-        () => unawaited(_persistReaderDimLevelIfNeeded()),
-      );
-      return;
-    }
-    final AppSetting? current = state.asData?.value;
-    if (current == null) {
-      return;
-    }
-    _hasPendingReaderDimPersist = false;
-    try {
-      await ref.read(appSettingRepoProvider).save(current);
-    } catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
-    }
   }
 }

@@ -122,8 +122,9 @@ pub fn get_series_reading_by_series_id_frb(
 pub fn fetch_reading_page_frb(
     page: i32,
     page_size: i32,
+    keyword: Option<String>,
 ) -> Result<PagedReadingHistoryDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_fetch_reading_page(page, page_size))
+    hentai_core::runtime::block_on(core_fetch_reading_page(page, page_size, keyword))
         .map(PagedReadingHistoryDto::from)
         .map_err(HentaiErrorDto::from)
 }

@@ -1,13 +1,16 @@
 export 'view_models/comic_detail_series_nav_provider.dart';
 export 'view_models/library_age_restriction_notifier.dart';
-export 'view_models/library_catalog_controller.dart';
+export 'view_models/library_catalog_prefetch_notifier.dart';
 export 'view_models/library_catalog_selectors.dart';
+export 'view_models/library_catalog_state.dart';
+export 'view_models/library_comics_catalog_controller.dart';
 export 'view_models/library_page_comics_providers.dart';
 export 'view_models/library_page_series_providers.dart';
 export 'view_models/library_page_snapshot.dart';
 export 'view_models/library_query_intent.dart';
 export 'view_models/library_query_intent_notifier.dart';
 export 'view_models/library_search_page_providers.dart';
+export 'view_models/library_series_catalog_controller.dart';
 export 'view_models/library_tab_filter_sort_providers.dart';
 export 'view_models/library_tab_page_size_notifier.dart';
 export 'view_models/library_tab_page_size_providers.dart';

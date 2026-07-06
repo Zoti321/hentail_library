@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_controller.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum LibraryPaginationPlacement { top, bottom }
@@ -29,16 +30,13 @@ class LibraryPaginationBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (isLoading || totalPages <= 1) {
+    if (totalPages <= 1) {
       return const SizedBox.shrink();
     }
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final bool canGoPrevious = !isLoading && page > 1;
     final bool canGoNext = !isLoading && page < totalPages;
-    final LibraryCatalogController controller = ref.read(
-      libraryCatalogControllerProvider.notifier,
-    );
     return Padding(
       padding: _paddingForPlacement(tokens),
       child: Row(
@@ -50,9 +48,13 @@ class LibraryPaginationBar extends ConsumerWidget {
             onPressed: canGoPrevious
                 ? () => switch (target) {
                     LibraryPaginationTarget.comics =>
-                      controller.goToComicsFirstPage(),
+                      ref
+                          .read(libraryComicsCatalogControllerProvider.notifier)
+                          .goToFirstPage(),
                     LibraryPaginationTarget.series =>
-                      controller.goToSeriesFirstPage(),
+                      ref
+                          .read(librarySeriesCatalogControllerProvider.notifier)
+                          .goToFirstPage(),
                   }
                 : null,
           ),
@@ -62,9 +64,13 @@ class LibraryPaginationBar extends ConsumerWidget {
             onPressed: canGoPrevious
                 ? () => switch (target) {
                     LibraryPaginationTarget.comics =>
-                      controller.goToComicsPreviousPage(),
+                      ref
+                          .read(libraryComicsCatalogControllerProvider.notifier)
+                          .goToPreviousPage(),
                     LibraryPaginationTarget.series =>
-                      controller.goToSeriesPreviousPage(),
+                      ref
+                          .read(librarySeriesCatalogControllerProvider.notifier)
+                          .goToPreviousPage(),
                   }
                 : null,
           ),
@@ -83,9 +89,13 @@ class LibraryPaginationBar extends ConsumerWidget {
             onPressed: canGoNext
                 ? () => switch (target) {
                     LibraryPaginationTarget.comics =>
-                      controller.goToComicsNextPage(totalPages),
+                      ref
+                          .read(libraryComicsCatalogControllerProvider.notifier)
+                          .goToNextPage(totalPages),
                     LibraryPaginationTarget.series =>
-                      controller.goToSeriesNextPage(totalPages),
+                      ref
+                          .read(librarySeriesCatalogControllerProvider.notifier)
+                          .goToNextPage(totalPages),
                   }
                 : null,
           ),
@@ -95,9 +105,13 @@ class LibraryPaginationBar extends ConsumerWidget {
             onPressed: canGoNext
                 ? () => switch (target) {
                     LibraryPaginationTarget.comics =>
-                      controller.goToComicsLastPage(totalPages),
+                      ref
+                          .read(libraryComicsCatalogControllerProvider.notifier)
+                          .goToLastPage(totalPages),
                     LibraryPaginationTarget.series =>
-                      controller.goToSeriesLastPage(totalPages),
+                      ref
+                          .read(librarySeriesCatalogControllerProvider.notifier)
+                          .goToLastPage(totalPages),
                   }
                 : null,
           ),
@@ -131,28 +145,41 @@ class LibraryPaginationBarSliver extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<LibraryPageSnapshot> catalogAsync = ref.watch(
-      libraryPageContentProvider,
-    );
-    final LibraryPageSnapshot? snapshot = catalogAsync.value;
-    if (snapshot == null) {
-      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    switch (target) {
+      case LibraryPaginationTarget.comics:
+        final AsyncValue<LibraryComicsCatalogState> catalogAsync = ref.watch(
+          libraryComicsCatalogContentProvider,
+        );
+        final LibraryComicsCatalogState? catalog = catalogAsync.value;
+        if (catalog == null || catalog.pagination.totalPages <= 1) {
+          return const SliverToBoxAdapter(child: SizedBox.shrink());
+        }
+        return SliverToBoxAdapter(
+          child: LibraryPaginationBar(
+            target: target,
+            page: catalog.pagination.page,
+            totalPages: catalog.pagination.totalPages,
+            isLoading: catalogAsync.isLoading,
+            placement: placement,
+          ),
+        );
+      case LibraryPaginationTarget.series:
+        final AsyncValue<LibrarySeriesCatalogState> catalogAsync = ref.watch(
+          librarySeriesCatalogContentProvider,
+        );
+        final LibrarySeriesCatalogState? catalog = catalogAsync.value;
+        if (catalog == null || catalog.pagination.totalPages <= 1) {
+          return const SliverToBoxAdapter(child: SizedBox.shrink());
+        }
+        return SliverToBoxAdapter(
+          child: LibraryPaginationBar(
+            target: target,
+            page: catalog.pagination.page,
+            totalPages: catalog.pagination.totalPages,
+            isLoading: catalogAsync.isLoading,
+            placement: placement,
+          ),
+        );
     }
-    final LibraryPagination pagination = switch (target) {
-      LibraryPaginationTarget.comics => snapshot.comicsPagination,
-      LibraryPaginationTarget.series => snapshot.seriesPagination,
-    };
-    if (pagination.totalPages <= 1) {
-      return const SliverToBoxAdapter(child: SizedBox.shrink());
-    }
-    return SliverToBoxAdapter(
-      child: LibraryPaginationBar(
-        target: target,
-        page: pagination.page,
-        totalPages: pagination.totalPages,
-        isLoading: catalogAsync.isLoading,
-        placement: placement,
-      ),
-    );
   }
 }

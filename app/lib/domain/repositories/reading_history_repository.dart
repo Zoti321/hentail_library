@@ -10,8 +10,9 @@ abstract class ReadingHistoryRepository {
   Stream<List<entity.ReadingHistory>> watchAllHistory();
 
   Future<PagedResult<entity.ReadingHistory>> fetchHistoryPage(
-    PageRequest request,
-  );
+    PageRequest request, {
+    String? keyword,
+  });
 
   Future<void> deleteByComicId(String comicId);
 

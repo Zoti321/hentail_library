@@ -1,7 +1,26 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hentai_library/domain/reading/reading_mode.dart';
 
 part 'app_setting.freezed.dart';
 part 'app_setting.g.dart';
+
+Map<String, dynamic> _migrateAppSettingJson(Map<String, dynamic> json) {
+  final Map<String, dynamic> migrated = Map<String, dynamic>.from(json);
+  if (migrated.containsKey('readingMode')) {
+    migrated['readingMode'] = readingModeToJson(
+      readingModeFromJson(migrated['readingMode']),
+    );
+  }
+  if (!migrated.containsKey('readingMode') &&
+      migrated.containsKey('readerIsVertical')) {
+    migrated['readingMode'] = migrated['readerIsVertical'] == true
+        ? readingModeToJson(ReadingMode.continuousVertical)
+        : readingModeToJson(kDefaultReadingMode);
+  }
+  migrated.remove('readerIsVertical');
+  migrated.remove('readerDimLevel');
+  return migrated;
+}
 
 @freezed
 abstract class AppSetting with _$AppSetting {
@@ -9,8 +28,7 @@ abstract class AppSetting with _$AppSetting {
     @Default(3) int version,
     @Default(AppThemePreference.system) AppThemePreference themePreference,
     @Default(false) bool autoScan,
-    @Default(0.0) double readerDimLevel,
-    @Default(false) bool readerIsVertical,
+    @Default(kDefaultReadingMode) ReadingMode readingMode,
     @Default(false) bool readerAutoPlayEnabled,
     @Default(5) int readerAutoPlayIntervalSeconds,
     @Default(true) bool desktopSidebarExpanded,
@@ -23,7 +41,7 @@ abstract class AppSetting with _$AppSetting {
   }) = _AppSetting;
 
   factory AppSetting.fromJson(Map<String, dynamic> json) =>
-      _$AppSettingFromJson(json);
+      _$AppSettingFromJson(_migrateAppSettingJson(json));
 }
 
 /// 应用外观：浅色 / 深色 / 跟随系统。

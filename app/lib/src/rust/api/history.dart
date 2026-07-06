@@ -31,9 +31,11 @@ SeriesReadingHistoryDto? getSeriesReadingBySeriesIdFrb({
 PagedReadingHistoryDto fetchReadingPageFrb({
   required int page,
   required int pageSize,
+  String? keyword,
 }) => RustLib.instance.api.crateApiHistoryFetchReadingPageFrb(
   page: page,
   pageSize: pageSize,
+  keyword: keyword,
 );
 
 int deleteReadingByComicIdFrb({required String comicId}) => RustLib.instance.api
