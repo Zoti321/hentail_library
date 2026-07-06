@@ -3,7 +3,7 @@ import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/entity/series_reading_history.dart';
 import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_detail_series_nav_provider.dart';
-import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_route_context.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

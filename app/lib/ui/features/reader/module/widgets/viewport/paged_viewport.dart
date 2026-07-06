@@ -8,7 +8,7 @@ import 'package:hentai_library/ui/features/reader/module/session/reader_session_
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
-import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_image_item.dart';
+import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_image_item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class PagedViewport extends HookConsumerWidget {

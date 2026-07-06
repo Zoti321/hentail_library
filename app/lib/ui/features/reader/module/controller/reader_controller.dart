@@ -10,7 +10,7 @@ import 'package:hentai_library/ui/features/reader/module/session/reader_session_
 import 'package:hentai_library/ui/features/reader/module/controller/reader_series_navigation.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_fullscreen_controller.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
-import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_route_context.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';

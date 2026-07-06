@@ -10,7 +10,7 @@ import 'package:hentai_library/domain/reading/spread_index.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
-import 'package:hentai_library/ui/features/reader/views/desktop/reader_page/widgets/reader_image_item.dart';
+import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_image_item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class DualPageViewport extends HookConsumerWidget {

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
-import 'package:hentai_library/ui/features/library/views/desktop/library_page/widgets/library_sort_controls.dart';
+import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_sort_controls.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
