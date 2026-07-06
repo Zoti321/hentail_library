@@ -5,11 +5,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// 非桌面平台顶栏：SafeArea + 可选汉堡菜单 + 页面标题。
 class AppShellHeader extends StatelessWidget {
-  const AppShellHeader({
-    super.key,
-    required this.title,
-    this.onMenuPressed,
-  });
+  const AppShellHeader({super.key, required this.title, this.onMenuPressed});
 
   final String title;
   final VoidCallback? onMenuPressed;

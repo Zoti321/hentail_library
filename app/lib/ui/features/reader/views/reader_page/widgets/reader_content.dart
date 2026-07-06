@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/features/reader/module/view/reader_viewport_host.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
@@ -28,10 +28,7 @@ class ReaderContent extends ConsumerWidget {
       duration: kReaderPageCrossfadeDuration,
       switchInCurve: Curves.easeOut,
       switchOutCurve: Curves.easeOut,
-      layoutBuilder: (
-        Widget? currentChild,
-        List<Widget> previousChildren,
-      ) {
+      layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
         return Stack(
           fit: StackFit.expand,
           alignment: Alignment.center,

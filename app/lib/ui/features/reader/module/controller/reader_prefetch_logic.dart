@@ -45,17 +45,19 @@ Map<String, Uint8List> evictPrefetchOutsideWindow({
   final Set<String> keepKeys = keepPagesOneBased
       .map((int page) => readerPrefetchCacheKey(comicId, page - 1))
       .toSet();
-  final Map<String, Uint8List> comicEntries = Map<String, Uint8List>.fromEntries(
-    cache.entries.where(
-      (MapEntry<String, Uint8List> entry) =>
-          entry.key.startsWith('$comicId:') && keepKeys.contains(entry.key),
-    ),
-  );
+  final Map<String, Uint8List> comicEntries =
+      Map<String, Uint8List>.fromEntries(
+        cache.entries.where(
+          (MapEntry<String, Uint8List> entry) =>
+              entry.key.startsWith('$comicId:') && keepKeys.contains(entry.key),
+        ),
+      );
   if (comicEntries.length <= maxEntriesPerComic) {
     return <String, Uint8List>{
       ...Map<String, Uint8List>.fromEntries(
         cache.entries.where(
-          (MapEntry<String, Uint8List> entry) => !entry.key.startsWith('$comicId:'),
+          (MapEntry<String, Uint8List> entry) =>
+              !entry.key.startsWith('$comicId:'),
         ),
       ),
       ...comicEntries,
@@ -73,7 +75,8 @@ Map<String, Uint8List> evictPrefetchOutsideWindow({
   return <String, Uint8List>{
     ...Map<String, Uint8List>.fromEntries(
       cache.entries.where(
-        (MapEntry<String, Uint8List> entry) => !entry.key.startsWith('$comicId:'),
+        (MapEntry<String, Uint8List> entry) =>
+            !entry.key.startsWith('$comicId:'),
       ),
     ),
     ...trimmed,

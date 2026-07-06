@@ -47,12 +47,14 @@ class LibraryPaginationBar extends ConsumerWidget {
             tooltip: '首页',
             onPressed: canGoPrevious
                 ? () => switch (target) {
-                    LibraryPaginationTarget.comics => ref
-                        .read(libraryComicsCatalogControllerProvider.notifier)
-                        .goToFirstPage(),
-                    LibraryPaginationTarget.series => ref
-                        .read(librarySeriesCatalogControllerProvider.notifier)
-                        .goToFirstPage(),
+                    LibraryPaginationTarget.comics =>
+                      ref
+                          .read(libraryComicsCatalogControllerProvider.notifier)
+                          .goToFirstPage(),
+                    LibraryPaginationTarget.series =>
+                      ref
+                          .read(librarySeriesCatalogControllerProvider.notifier)
+                          .goToFirstPage(),
                   }
                 : null,
           ),
@@ -61,12 +63,14 @@ class LibraryPaginationBar extends ConsumerWidget {
             tooltip: '上一页',
             onPressed: canGoPrevious
                 ? () => switch (target) {
-                    LibraryPaginationTarget.comics => ref
-                        .read(libraryComicsCatalogControllerProvider.notifier)
-                        .goToPreviousPage(),
-                    LibraryPaginationTarget.series => ref
-                        .read(librarySeriesCatalogControllerProvider.notifier)
-                        .goToPreviousPage(),
+                    LibraryPaginationTarget.comics =>
+                      ref
+                          .read(libraryComicsCatalogControllerProvider.notifier)
+                          .goToPreviousPage(),
+                    LibraryPaginationTarget.series =>
+                      ref
+                          .read(librarySeriesCatalogControllerProvider.notifier)
+                          .goToPreviousPage(),
                   }
                 : null,
           ),
@@ -84,12 +88,14 @@ class LibraryPaginationBar extends ConsumerWidget {
             tooltip: '下一页',
             onPressed: canGoNext
                 ? () => switch (target) {
-                    LibraryPaginationTarget.comics => ref
-                        .read(libraryComicsCatalogControllerProvider.notifier)
-                        .goToNextPage(totalPages),
-                    LibraryPaginationTarget.series => ref
-                        .read(librarySeriesCatalogControllerProvider.notifier)
-                        .goToNextPage(totalPages),
+                    LibraryPaginationTarget.comics =>
+                      ref
+                          .read(libraryComicsCatalogControllerProvider.notifier)
+                          .goToNextPage(totalPages),
+                    LibraryPaginationTarget.series =>
+                      ref
+                          .read(librarySeriesCatalogControllerProvider.notifier)
+                          .goToNextPage(totalPages),
                   }
                 : null,
           ),
@@ -98,12 +104,14 @@ class LibraryPaginationBar extends ConsumerWidget {
             tooltip: '末页',
             onPressed: canGoNext
                 ? () => switch (target) {
-                    LibraryPaginationTarget.comics => ref
-                        .read(libraryComicsCatalogControllerProvider.notifier)
-                        .goToLastPage(totalPages),
-                    LibraryPaginationTarget.series => ref
-                        .read(librarySeriesCatalogControllerProvider.notifier)
-                        .goToLastPage(totalPages),
+                    LibraryPaginationTarget.comics =>
+                      ref
+                          .read(libraryComicsCatalogControllerProvider.notifier)
+                          .goToLastPage(totalPages),
+                    LibraryPaginationTarget.series =>
+                      ref
+                          .read(librarySeriesCatalogControllerProvider.notifier)
+                          .goToLastPage(totalPages),
                   }
                 : null,
           ),

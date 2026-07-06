@@ -34,11 +34,13 @@ class _ReaderSeriesNavState extends ConsumerState<ReaderSeriesNav> {
     if (targetComicId == widget.session.comicId) {
       return;
     }
-    await ref.read(readerSeriesNavigationProvider.notifier).switchComic(
-      router: GoRouter.of(context),
-      currentSession: widget.session,
-      targetComicId: targetComicId,
-    );
+    await ref
+        .read(readerSeriesNavigationProvider.notifier)
+        .switchComic(
+          router: GoRouter.of(context),
+          currentSession: widget.session,
+          targetComicId: targetComicId,
+        );
   }
 
   @override

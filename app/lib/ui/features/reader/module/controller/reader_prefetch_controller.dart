@@ -107,9 +107,7 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
     required ReaderPageImageData imageData,
   }) async {
     if (imageData is ReaderDirPageImageData) {
-      return buildReaderImageProvider(
-        filePath: imageData.file.path,
-      );
+      return buildReaderImageProvider(filePath: imageData.file.path);
     }
     if (imageData is! ReaderArchivePageImageData) {
       return null;
@@ -121,12 +119,8 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
       ).future,
     );
     return page.when(
-      filePath: (String path) => buildReaderImageProvider(
-        filePath: path,
-      ),
-      bytes: (Uint8List data) => buildReaderImageProvider(
-        memoryBytes: data,
-      ),
+      filePath: (String path) => buildReaderImageProvider(filePath: path),
+      bytes: (Uint8List data) => buildReaderImageProvider(memoryBytes: data),
     );
   }
 

@@ -141,14 +141,18 @@ void main() {
       addTearDown(container.dispose);
 
       await container.read(libraryComicsCatalogControllerProvider.future);
-      container.read(libraryComicsCatalogControllerProvider.notifier).setPage(2);
+      container
+          .read(libraryComicsCatalogControllerProvider.notifier)
+          .setPage(2);
       await container.read(libraryComicsCatalogControllerProvider.future);
       await expectLater(() async {
         container.read(_comicsSortRevisionProvider.notifier).state = 1;
         await container.read(libraryComicsCatalogControllerProvider.future);
       }, returnsNormally);
       expect(
-        container.read(libraryComicsCatalogControllerProvider.notifier).pageIndex,
+        container
+            .read(libraryComicsCatalogControllerProvider.notifier)
+            .pageIndex,
         1,
       );
     },

@@ -61,7 +61,9 @@ void useReaderPrefetchWindow({
       slotLogicalWidth,
       MediaQuery.devicePixelRatioOf(context),
       Object.hashAll(extraPageIndexesOneBased),
-      Object.hashAll(imageList.map((ReaderPageImageData data) => data.hashCode)),
+      Object.hashAll(
+        imageList.map((ReaderPageImageData data) => data.hashCode),
+      ),
     ],
   );
 }

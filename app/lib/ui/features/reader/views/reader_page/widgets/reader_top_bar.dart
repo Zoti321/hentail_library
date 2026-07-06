@@ -141,8 +141,8 @@ class _ReaderTopBarState extends State<ReaderTopBar> {
     return switch (mode) {
       ReadingMode.continuousVertical => LucideIcons.arrowUpDown,
       ReadingMode.paged => LucideIcons.bookOpen,
-      ReadingMode.dualPage || ReadingMode.dualPageNoCover =>
-        LucideIcons.bookCopy,
+      ReadingMode.dualPage ||
+      ReadingMode.dualPageNoCover => LucideIcons.bookCopy,
     };
   }
 

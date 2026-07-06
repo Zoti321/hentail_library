@@ -22,7 +22,9 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
 
   @override
   Future<HistoryPagedFeedState> build() async {
-    _keywordDebounce ??= DebouncedActionRunner(duration: _kHistoryKeywordDebounce);
+    _keywordDebounce ??= DebouncedActionRunner(
+      duration: _kHistoryKeywordDebounce,
+    );
     ref.onDispose(() => _keywordDebounce?.dispose());
     return _loadPage(page: 1);
   }

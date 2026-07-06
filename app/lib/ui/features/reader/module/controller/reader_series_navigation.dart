@@ -39,9 +39,9 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
       await ref.read(readingAggregateProvider.notifier).endSession();
     }
     await ref.read(readerSessionServiceProvider).close(currentSession.comicId);
-    ref.read(readerPrefetchControllerProvider.notifier).clearComic(
-      currentSession.comicId,
-    );
+    ref
+        .read(readerPrefetchControllerProvider.notifier)
+        .clearComic(currentSession.comicId);
     try {
       await ref
           .read(readerPrefetchControllerProvider.notifier)

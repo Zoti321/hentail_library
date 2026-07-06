@@ -6,10 +6,7 @@ void main() {
   group('SpreadIndex.totalSpreads', () {
     test('paged equals page count', () {
       expect(
-        SpreadIndex.totalSpreads(
-          mode: ReadingMode.paged,
-          totalPages: 5,
-        ),
+        SpreadIndex.totalSpreads(mode: ReadingMode.paged, totalPages: 5),
         5,
       );
     });

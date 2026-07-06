@@ -74,10 +74,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
         return;
       }
       isProgrammaticScroll.value = true;
-      itemScrollController.jumpTo(
-        index: targetIndexOneBased - 1,
-        alignment: 0,
-      );
+      itemScrollController.jumpTo(index: targetIndexOneBased - 1, alignment: 0);
       lastVisibleMainIndex.value = targetIndexOneBased;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) {

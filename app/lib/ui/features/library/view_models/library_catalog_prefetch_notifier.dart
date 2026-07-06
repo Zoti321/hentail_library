@@ -68,10 +68,12 @@ class LibraryCatalogPrefetch extends _$LibraryCatalogPrefetch {
 
   void _ensureTargetTabSubscribed(LibraryDisplayTarget target) {
     final AsyncValue<Object?> catalogAsync = switch (target) {
-      LibraryDisplayTarget.comics =>
-        ref.read(libraryComicsCatalogControllerProvider),
-      LibraryDisplayTarget.series =>
-        ref.read(librarySeriesCatalogControllerProvider),
+      LibraryDisplayTarget.comics => ref.read(
+        libraryComicsCatalogControllerProvider,
+      ),
+      LibraryDisplayTarget.series => ref.read(
+        librarySeriesCatalogControllerProvider,
+      ),
     };
     if (catalogAsync.hasValue) {
       return;

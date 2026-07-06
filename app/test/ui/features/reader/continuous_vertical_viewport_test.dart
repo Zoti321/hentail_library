@@ -16,10 +16,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 const String _testComicId = 'test-comic';
-const ReaderControllerKey _viewKey = (
-  comicId: _testComicId,
-  incognito: false,
-);
+const ReaderControllerKey _viewKey = (comicId: _testComicId, incognito: false);
 
 void main() {
   testWidgets(
@@ -87,10 +84,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       final bool scrollControllerAssertion = errors.any(
-        (FlutterErrorDetails details) =>
-            details.exceptionAsString().contains(
-              'ScrollController not attached to any scroll views',
-            ),
+        (FlutterErrorDetails details) => details.exceptionAsString().contains(
+          'ScrollController not attached to any scroll views',
+        ),
       );
       expect(scrollControllerAssertion, isFalse);
     },
@@ -144,10 +140,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
 
       final bool scrollControllerAssertion = errors.any(
-        (FlutterErrorDetails details) =>
-            details.exceptionAsString().contains(
-              'ScrollController not attached to any scroll views',
-            ),
+        (FlutterErrorDetails details) => details.exceptionAsString().contains(
+          'ScrollController not attached to any scroll views',
+        ),
       );
       expect(scrollControllerAssertion, isFalse);
     },
@@ -157,10 +152,8 @@ void main() {
 List<Override> _viewportTestOverrides() {
   final List<ReaderPageImageData> images = List<ReaderPageImageData>.generate(
     100,
-    (int index) => ReaderArchivePageImageData(
-      comicId: _testComicId,
-      pageIndex: index,
-    ),
+    (int index) =>
+        ReaderArchivePageImageData(comicId: _testComicId, pageIndex: index),
   );
 
   return <Override>[
@@ -168,17 +161,18 @@ List<Override> _viewportTestOverrides() {
     readerPrefetchControllerProvider.overrideWith(
       _FakeReaderPrefetchController.new,
     ),
-    comicImagesProvider(comicId: _testComicId).overrideWith(
-      (Ref ref) async => images,
-    ),
+    comicImagesProvider(
+      comicId: _testComicId,
+    ).overrideWith((Ref ref) async => images),
     ...List<Override>.generate(
       100,
-      (int index) => comicReaderPageProvider(
-        comicId: _testComicId,
-        pageIndex: index,
-      ).overrideWith(
-        (Ref ref) async => ReaderPageDto.bytes(data: Uint8List(0)),
-      ),
+      (int index) =>
+          comicReaderPageProvider(
+            comicId: _testComicId,
+            pageIndex: index,
+          ).overrideWith(
+            (Ref ref) async => ReaderPageDto.bytes(data: Uint8List(0)),
+          ),
     ),
   ];
 }

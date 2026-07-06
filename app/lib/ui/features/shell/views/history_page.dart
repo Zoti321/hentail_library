@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
@@ -31,7 +31,8 @@ class HistoryPage extends ConsumerWidget {
           return false;
         }
         final bool nearBottom =
-            metrics.pixels >= metrics.maxScrollExtent - _kHistoryLoadMoreThreshold;
+            metrics.pixels >=
+            metrics.maxScrollExtent - _kHistoryLoadMoreThreshold;
         if (!nearBottom) {
           return false;
         }

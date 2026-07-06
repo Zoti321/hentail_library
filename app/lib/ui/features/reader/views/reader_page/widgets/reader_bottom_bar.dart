@@ -173,9 +173,7 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                           icon: widget.readerFullscreen
                               ? LucideIcons.minimize2
                               : LucideIcons.maximize2,
-                          tooltip: widget.readerFullscreen
-                              ? '退出全屏'
-                              : '全屏',
+                          tooltip: widget.readerFullscreen ? '退出全屏' : '全屏',
                           semanticLabel: widget.readerFullscreen
                               ? '退出全屏'
                               : '进入全屏',
@@ -230,9 +228,7 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                   ? LucideIcons.pause
                   : LucideIcons.play,
               tooltip: widget.readerAutoPlayEnabled ? '关闭自动播放' : '开启自动播放',
-              semanticLabel: widget.readerAutoPlayEnabled
-                  ? '关闭自动播放'
-                  : '开启自动播放',
+              semanticLabel: widget.readerAutoPlayEnabled ? '关闭自动播放' : '开启自动播放',
               iconSize: 14,
               size: 28,
               borderRadius: 999,
@@ -409,4 +405,3 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
     return value.clamp(1, 60);
   }
 }
-

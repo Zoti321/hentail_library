@@ -41,8 +41,7 @@ class PagedViewport extends HookConsumerWidget {
     );
     final int totalPages = ref.watch(
       readerControllerProvider(viewKey).select(
-        (AsyncValue<ReaderState> value) =>
-            value.asData?.value.totalPages ?? 1,
+        (AsyncValue<ReaderState> value) => value.asData?.value.totalPages ?? 1,
       ),
     );
     final images = ref

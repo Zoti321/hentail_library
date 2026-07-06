@@ -28,17 +28,13 @@ class SpreadIndex {
     if (totalPages <= 0 || spreadIndex < 0) {
       return const <int>[];
     }
-    final int maxSpread = totalSpreads(
-      mode: mode,
-      totalPages: totalPages,
-    );
+    final int maxSpread = totalSpreads(mode: mode, totalPages: totalPages);
     if (spreadIndex >= maxSpread) {
       return const <int>[];
     }
     return switch (mode) {
-      ReadingMode.paged || ReadingMode.continuousVertical => <int>[
-        spreadIndex + 1,
-      ],
+      ReadingMode.paged ||
+      ReadingMode.continuousVertical => <int>[spreadIndex + 1],
       ReadingMode.dualPage => _dualPageSpread(
         totalPages: totalPages,
         spreadIndex: spreadIndex,

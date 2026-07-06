@@ -234,8 +234,9 @@ class _DualSpreadPage extends StatelessWidget {
       }
       final bool coverOnRight =
           readingMode == ReadingMode.dualPageNoCover && pageIndex == 1;
-      final Alignment alignment =
-          coverOnRight ? Alignment.centerLeft : Alignment.centerRight;
+      final Alignment alignment = coverOnRight
+          ? Alignment.centerLeft
+          : Alignment.centerRight;
       return Row(
         children: <Widget>[
           if (coverOnRight) const Expanded(child: SizedBox.shrink()),

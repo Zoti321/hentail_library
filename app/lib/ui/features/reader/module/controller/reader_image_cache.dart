@@ -34,10 +34,7 @@ ImageProvider<Object>? buildReaderImageProvider({
     return ResizeImage.resizeIfNeeded(
       cacheWidth,
       cacheHeight,
-      ExtendedMemoryImageProvider(
-        bytes,
-        imageCacheName: kReaderImageCacheName,
-      ),
+      ExtendedMemoryImageProvider(bytes, imageCacheName: kReaderImageCacheName),
     );
   }
   final String? resolvedPath = filePath?.trim();

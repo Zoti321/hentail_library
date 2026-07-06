@@ -85,9 +85,7 @@ class ReaderPage extends HookConsumerWidget {
       readerControllerProvider(viewKey).notifier,
     );
     final ObjectRef<bool> hasAppliedKeepControls = useRef<bool>(false);
-    final bool readerFullscreen = ref.watch(
-      readerFullscreenControllerProvider,
-    );
+    final bool readerFullscreen = ref.watch(readerFullscreenControllerProvider);
     final bool seriesAdvancePromptPending = ref.watch(
       readerControllerProvider(viewKey).select(
         (AsyncValue<ReaderState> asyncState) =>
@@ -215,21 +213,18 @@ class ReaderPage extends HookConsumerWidget {
         ref,
       ],
     );
-    useEffect(
-      () {
-        if (!seriesAdvancePromptPending) {
-          return null;
-        }
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!context.mounted) {
-            return;
-          }
-          showInfoToast(context, '再次翻页将进入下一卷');
-        });
+    useEffect(() {
+      if (!seriesAdvancePromptPending) {
         return null;
-      },
-      <Object?>[seriesAdvancePromptPending, context],
-    );
+      }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) {
+          return;
+        }
+        showInfoToast(context, '再次翻页将进入下一卷');
+      });
+      return null;
+    }, <Object?>[seriesAdvancePromptPending, context]);
 
     return Theme(
       data: theme,
@@ -258,9 +253,8 @@ class ReaderPage extends HookConsumerWidget {
               }
               final int initialPage = state.currentIndex - 1;
               final ReadingMode activeReadingMode = state.readingMode;
-              final ReaderNavContextData? seriesNavContext = viewModel.isSeriesRead
-                  ? viewModel.navContext
-                  : null;
+              final ReaderNavContextData? seriesNavContext =
+                  viewModel.isSeriesRead ? viewModel.navContext : null;
               final Future<void> Function() requestNextPage = () =>
                   controller.requestNextPage(
                     navContext: seriesNavContext,

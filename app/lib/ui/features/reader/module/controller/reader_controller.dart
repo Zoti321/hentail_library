@@ -161,10 +161,7 @@ class ReaderController extends _$ReaderController {
         currentPageIndex: s.currentIndex,
         totalPages: s.totalPages,
       );
-      return s.copyWith(
-        readingMode: value,
-        currentIndex: remappedIndex,
-      );
+      return s.copyWith(readingMode: value, currentIndex: remappedIndex);
     });
   }
 
@@ -197,10 +194,7 @@ class ReaderController extends _$ReaderController {
       currentPageIndex: current.currentIndex,
     );
     final ReaderComicListItem? nextItem = navContext?.nextItem;
-    if (onLastSpread &&
-        nextItem != null &&
-        session != null &&
-        router != null) {
+    if (onLastSpread && nextItem != null && session != null && router != null) {
       if (!current.seriesAdvancePromptPending) {
         _updateDataState(
           (ReaderState s) => s.copyWith(seriesAdvancePromptPending: true),
@@ -217,11 +211,13 @@ class ReaderController extends _$ReaderController {
       _updateDataState(
         (ReaderState s) => s.copyWith(seriesAdvancePromptPending: false),
       );
-      await ref.read(readerSeriesNavigationProvider.notifier).switchComic(
-        router: router,
-        currentSession: session,
-        targetComicId: nextItem.comicId,
-      );
+      await ref
+          .read(readerSeriesNavigationProvider.notifier)
+          .switchComic(
+            router: router,
+            currentSession: session,
+            targetComicId: nextItem.comicId,
+          );
       return;
     }
     if (onLastSpread) {
@@ -299,7 +295,9 @@ class ReaderController extends _$ReaderController {
   }
 
   Future<void> toggleFullscreen() async {
-    await ref.read(readerFullscreenControllerProvider.notifier).toggleFullscreen();
+    await ref
+        .read(readerFullscreenControllerProvider.notifier)
+        .toggleFullscreen();
   }
 
   Future<void> executeSaveProgress({
