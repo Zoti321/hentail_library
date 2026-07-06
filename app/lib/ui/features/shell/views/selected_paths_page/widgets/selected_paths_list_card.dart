@@ -115,7 +115,7 @@ class _EmptyPaths extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              '暂无路径，请添加文件或文件夹',
+              '暂无路径，请添加文件夹',
               style: TextStyle(
                 fontSize: 13,
                 color: theme.colorScheme.hentai.textTertiary,
