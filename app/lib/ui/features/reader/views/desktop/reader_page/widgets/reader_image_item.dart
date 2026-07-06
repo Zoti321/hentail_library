@@ -24,10 +24,6 @@ class ReaderImageItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final int cacheWidth = AppComicImage.resolveReaderCacheWidth(
-      context: context,
-      slotLogicalWidth: slotLogicalWidth,
-    );
     final Widget placeholder = _buildReaderImagePlaceholder(context);
 
     if (imageData is ReaderDirPageImageData) {
@@ -40,7 +36,6 @@ class ReaderImageItem extends ConsumerWidget {
           child: AppComicImage(
             filePath: dirData.file.path,
             fit: BoxFit.contain,
-            cacheWidth: cacheWidth,
             filterQuality: FilterQuality.high,
             useReaderImageCache: true,
             placeholder: placeholder,
@@ -72,7 +67,6 @@ class ReaderImageItem extends ConsumerWidget {
               filePath: (String path) => AppComicImage(
                 filePath: path,
                 fit: BoxFit.contain,
-                cacheWidth: cacheWidth,
                 filterQuality: FilterQuality.high,
                 useReaderImageCache: true,
                 placeholder: placeholder,
@@ -81,7 +75,6 @@ class ReaderImageItem extends ConsumerWidget {
               bytes: (Uint8List data) => AppComicImage(
                 memoryBytes: data,
                 fit: BoxFit.contain,
-                cacheWidth: cacheWidth,
                 filterQuality: FilterQuality.high,
                 useReaderImageCache: true,
                 placeholder: placeholder,

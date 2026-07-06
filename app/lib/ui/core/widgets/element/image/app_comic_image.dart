@@ -1,13 +1,9 @@
 import 'dart:io';
-import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_image_cache.dart';
-
-/// 阅读器页图解码宽度上限（物理像素）。
-const int kReaderDecodeMaxWidth = 3840;
 
 class AppComicImage extends StatelessWidget {
   const AppComicImage({
@@ -32,24 +28,6 @@ class AppComicImage extends StatelessWidget {
   final Widget? errorPlaceholder;
   final FilterQuality filterQuality;
   final bool useReaderImageCache;
-
-  /// 阅读器页图解码宽度：按槽位逻辑尺寸与 [kReaderDecodeMaxWidth] 约束。
-  ///
-  /// [BoxFit.contain] 下显示边长取决于宽、高中较大的一侧，故取
-  /// `max(slotLogicalWidth, slotLogicalHeight)` 估算解码像素预算。
-  static int resolveReaderCacheWidth({
-    required BuildContext context,
-    required double slotLogicalWidth,
-    double? slotLogicalHeight,
-    int minWidth = 64,
-  }) {
-    final double devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
-    final double height =
-        slotLogicalHeight ?? MediaQuery.sizeOf(context).height;
-    final double logicalBase = math.max(slotLogicalWidth, height);
-    final int rawWidth = (logicalBase * devicePixelRatio).round();
-    return rawWidth.clamp(minWidth, kReaderDecodeMaxWidth);
-  }
 
   @override
   Widget build(BuildContext context) {

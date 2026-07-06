@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:extended_image/extended_image.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_image_cache.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
 
 void main() {
@@ -16,83 +17,14 @@ void main() {
     });
   });
 
-  testWidgets('resolveReaderCacheWidth uses max of width and height', (
-    WidgetTester tester,
-  ) async {
-    late int cacheWidth;
-    await tester.pumpWidget(
-      MaterialApp(
-        home: MediaQuery(
-          data: const MediaQueryData(
-            size: Size(1000, 1400),
-            devicePixelRatio: 2,
-          ),
-          child: Builder(
-            builder: (BuildContext context) {
-              cacheWidth = AppComicImage.resolveReaderCacheWidth(
-                context: context,
-                slotLogicalWidth: readerContinuousSlotLogicalWidth(1000),
-                slotLogicalHeight: 1400,
-              );
-              return const SizedBox.shrink();
-            },
-          ),
-        ),
-      ),
+  test('buildReaderImageProvider skips decode resize for reader pages', () {
+    ensureReaderImageCacheConfigured();
+
+    final ImageProvider<Object>? provider = buildReaderImageProvider(
+      filePath: r'C:\tmp\page.jpg',
     );
 
-    expect(cacheWidth, 2800);
-  });
-
-  testWidgets('resolveReaderCacheWidth clamps to kReaderDecodeMaxWidth', (
-    WidgetTester tester,
-  ) async {
-    late int cacheWidth;
-    await tester.pumpWidget(
-      MaterialApp(
-        home: MediaQuery(
-          data: const MediaQueryData(
-            size: Size(3000, 2400),
-            devicePixelRatio: 2,
-          ),
-          child: Builder(
-            builder: (BuildContext context) {
-              cacheWidth = AppComicImage.resolveReaderCacheWidth(
-                context: context,
-                slotLogicalWidth: readerPagedSlotLogicalWidth(3000),
-                slotLogicalHeight: 2400,
-              );
-              return const SizedBox.shrink();
-            },
-          ),
-        ),
-      ),
-    );
-
-    expect(cacheWidth, kReaderDecodeMaxWidth);
-  });
-
-  testWidgets('resolveReaderCacheWidth uses viewport height by default', (
-    WidgetTester tester,
-  ) async {
-    late int cacheWidth;
-    await tester.pumpWidget(
-      MaterialApp(
-        home: MediaQuery(
-          data: const MediaQueryData(size: Size(1000, 800), devicePixelRatio: 2),
-          child: Builder(
-            builder: (BuildContext context) {
-              cacheWidth = AppComicImage.resolveReaderCacheWidth(
-                context: context,
-                slotLogicalWidth: readerContinuousSlotLogicalWidth(1000),
-              );
-              return const SizedBox.shrink();
-            },
-          ),
-        ),
-      ),
-    );
-
-    expect(cacheWidth, 1600);
+    expect(provider, isA<ExtendedFileImageProvider>());
+    expect(provider, isNot(isA<ResizeImage>()));
   });
 }

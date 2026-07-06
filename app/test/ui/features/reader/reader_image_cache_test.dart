@@ -33,6 +33,17 @@ void main() {
     expect(resize.imageProvider, isA<ExtendedFileImageProvider>());
   });
 
+  test('buildReaderImageProvider without cacheWidth uses native decode', () {
+    ensureReaderImageCacheConfigured();
+
+    final ImageProvider<Object>? provider = buildReaderImageProvider(
+      filePath: r'C:\tmp\page.jpg',
+    );
+
+    expect(provider, isA<ExtendedFileImageProvider>());
+    expect(provider, isNot(isA<ResizeImage>()));
+  });
+
   test('buildReaderImageProvider wraps memory bytes with named cache', () {
     ensureReaderImageCacheConfigured();
 
