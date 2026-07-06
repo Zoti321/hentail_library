@@ -1,8 +1,8 @@
 use hentai_core::{
-    fetch_series_page as core_fetch_page, find_series_by_id as core_find, get_all_series,
-    load_home_series_comic_order_map, search_series_by_keyword, search_series_by_tag_expression,
-    set_series_items_order as core_set_order, update_series_user_meta as core_update_meta,
-    watch_all_series, watch_home_series_comic_order_map,
+    count_all_series, fetch_series_page as core_fetch_page, find_series_by_id as core_find,
+    get_all_series, load_home_series_comic_order_map, search_series_by_keyword,
+    search_series_by_tag_expression, set_series_items_order as core_set_order,
+    update_series_user_meta as core_update_meta, watch_all_series, watch_home_series_comic_order_map,
     PagedSeriesResultDto as CorePagedSeries, SeriesDto as CoreSeries,
     SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
     SeriesSortOptionDto as CoreSeriesSort, UpdateSeriesUserMetaDto as CoreUpdateSeriesUserMeta,
@@ -167,6 +167,11 @@ pub fn get_all_series_frb() -> Result<Vec<SeriesDto>, HentaiErrorDto> {
     hentai_core::runtime::block_on(get_all_series())
         .map(map_series_list)
         .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn count_all_series_frb() -> Result<i64, HentaiErrorDto> {
+    hentai_core::runtime::block_on(count_all_series()).map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]

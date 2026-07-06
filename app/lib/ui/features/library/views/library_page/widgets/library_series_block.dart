@@ -36,7 +36,7 @@ class LibrarySeriesBlock extends ConsumerWidget {
       );
     }
     final List<Series> series = catalog.items;
-    final String filterQuery = catalog.filterQuery;
+    final bool isSeriesTableEmpty = catalog.isSeriesTableEmpty;
     final bool showPagination = catalog.showPagination;
     return SliverPadding(
       padding: EdgeInsets.symmetric(
@@ -51,7 +51,7 @@ class LibrarySeriesBlock extends ConsumerWidget {
             ),
           _LibrarySeriesGridSliver(
             series: series,
-            effectiveQuery: filterQuery,
+            isSeriesTableEmpty: isSeriesTableEmpty,
             isReloading: catalogAsync.isLoading,
           ),
           if (showPagination)
@@ -68,11 +68,11 @@ class LibrarySeriesBlock extends ConsumerWidget {
 class _LibrarySeriesGridSliver extends StatefulWidget {
   const _LibrarySeriesGridSliver({
     required this.series,
-    required this.effectiveQuery,
+    required this.isSeriesTableEmpty,
     this.isReloading = false,
   });
   final List<Series> series;
-  final String effectiveQuery;
+  final bool isSeriesTableEmpty;
   final bool isReloading;
 
   @override
@@ -100,9 +100,11 @@ class _LibrarySeriesGridSliverState extends State<_LibrarySeriesGridSliver> {
         child: Center(child: CircularProgressIndicator()),
       );
     }
-    final String q = widget.effectiveQuery.trim();
     if (widget.series.isEmpty) {
-      return _NoMatchingSeriesSliver(query: q);
+      return _LibraryCatalogEmptySliver(
+        entity: LibraryDisplayTarget.series,
+        isTableEmpty: widget.isSeriesTableEmpty,
+      );
     }
     return SliverGrid.builder(
       gridDelegate: _delegateFor(context),
@@ -118,34 +120,6 @@ class _LibrarySeriesGridSliverState extends State<_LibrarySeriesGridSliver> {
           ),
         );
       },
-    );
-  }
-}
-
-class _NoMatchingSeriesSliver extends StatelessWidget {
-  const _NoMatchingSeriesSliver({this.query = ''});
-  final String query;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final String q = query.trim();
-    final bool hasQuery = q.isNotEmpty;
-    final String message = hasQuery ? '无匹配系列' : '暂无系列';
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 24, bottom: 48),
-        child: Center(
-          child: Text(
-            message,
-            style: TextStyle(
-              fontSize: 13,
-              color: theme.colorScheme.hentai.textTertiary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
     );
   }
 }

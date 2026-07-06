@@ -56,6 +56,9 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
 
     final String keyword = ref.read(libraryQueryIntentProvider).keyword;
     final PagedResult<Series> page = await _fetchPage(keyword);
+    final int tableTotalCount = await ref
+        .read(librarySeriesRepoProvider)
+        .countAll();
 
     return LibrarySeriesCatalogState(
       items: page.items,
@@ -66,6 +69,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
         isLoading: false,
       ),
       filterQuery: keyword,
+      isSeriesTableEmpty: tableTotalCount == 0,
     );
   }
 

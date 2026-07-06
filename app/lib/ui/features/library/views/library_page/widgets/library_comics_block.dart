@@ -36,7 +36,6 @@ class LibraryComicsBlock extends ConsumerWidget {
       );
     }
     final List<Comic> comics = catalog.items;
-    final String filterQuery = catalog.filterQuery;
     final bool isComicTableEmpty = catalog.isComicTableEmpty;
     final bool showPagination = catalog.showPagination;
     return SliverPadding(
@@ -53,7 +52,6 @@ class LibraryComicsBlock extends ConsumerWidget {
           _LibraryComicsGridSliver(
             comics: comics,
             isComicTableEmpty: isComicTableEmpty,
-            effectiveQuery: filterQuery,
             isReloading: catalogAsync.isLoading,
           ),
           if (showPagination)
@@ -71,12 +69,10 @@ class _LibraryComicsGridSliver extends StatefulWidget {
   const _LibraryComicsGridSliver({
     required this.comics,
     required this.isComicTableEmpty,
-    required this.effectiveQuery,
     this.isReloading = false,
   });
   final List<Comic> comics;
   final bool isComicTableEmpty;
-  final String effectiveQuery;
   final bool isReloading;
 
   @override
@@ -104,11 +100,10 @@ class _LibraryComicsGridSliverState extends State<_LibraryComicsGridSliver> {
         child: Center(child: CircularProgressIndicator()),
       );
     }
-    final String q = widget.effectiveQuery.trim();
     if (widget.comics.isEmpty) {
-      return _EmptyLibrarySliver(
-        query: q,
-        showManagePathsEntry: widget.isComicTableEmpty,
+      return _LibraryCatalogEmptySliver(
+        entity: LibraryDisplayTarget.comics,
+        isTableEmpty: widget.isComicTableEmpty,
       );
     }
     return SliverGrid.builder(

@@ -76,6 +76,9 @@ class _FakeSeriesRepo implements SeriesRepository {
   }
 
   @override
+  Future<int> countAll() async => 0;
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 

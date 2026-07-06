@@ -17,6 +17,9 @@ Stream<List<SeriesDto>> watchAllSeriesFrb() =>
 List<SeriesDto> getAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesGetAllSeriesFrb();
 
+PlatformInt64 countAllSeriesFrb() =>
+    RustLib.instance.api.crateApiSeriesCountAllSeriesFrb();
+
 PagedSeriesResultDto fetchSeriesPageFrb({
   required PageRequestDto request,
   required SeriesFilterDto filter,

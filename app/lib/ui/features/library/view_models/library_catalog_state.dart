@@ -29,12 +29,14 @@ class LibrarySeriesCatalogState {
     required this.items,
     required this.pagination,
     required this.filterQuery,
+    required this.isSeriesTableEmpty,
     this.showPagination = true,
   });
 
   final List<Series> items;
   final LibraryPagination pagination;
   final String filterQuery;
+  final bool isSeriesTableEmpty;
   final bool showPagination;
 
   int get displayedCount => pagination.totalCount;

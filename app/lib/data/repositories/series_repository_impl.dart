@@ -32,6 +32,12 @@ class SeriesRepositoryImpl implements SeriesRepository {
   }
 
   @override
+  Future<int> countAll() async => guardFrbSync(
+    () => rust_series.countAllSeriesFrb().toInt(),
+    fallbackMessage: '统计系列数量失败',
+  );
+
+  @override
   Future<PagedResult<Series>> fetchPage({
     required PageRequest request,
     required LibrarySeriesFilter filter,

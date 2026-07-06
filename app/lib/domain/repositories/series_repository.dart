@@ -12,6 +12,8 @@ abstract class SeriesRepository {
 
   Future<List<Series>> getAll();
 
+  Future<int> countAll();
+
   Future<PagedResult<Series>> fetchPage({
     required PageRequest request,
     required LibrarySeriesFilter filter,
