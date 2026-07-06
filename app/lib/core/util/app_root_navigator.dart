@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/desktop_router.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/mobile_router.dart';
+import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart'
+    show appRootNavigatorKey;
 
-GlobalKey<NavigatorState> get appRootNavigatorKey =>
-    isDesktop ? desktopRootNavigatorKey : mobileRootNavigatorKey;
+export 'package:hentai_library/ui/features/shell/views/routing/app_router.dart'
+    show appRootNavigatorKey;
+
+/// 应用根 [NavigatorState]，供 overlay / toast 等使用。
+GlobalKey<NavigatorState> get rootNavigatorKey => appRootNavigatorKey;
