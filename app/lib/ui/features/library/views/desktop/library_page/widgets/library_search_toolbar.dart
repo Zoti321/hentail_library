@@ -347,10 +347,12 @@ class _LibraryPageSizeMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
     return PopupMenuPanelShell(
       width: 120,
       blurRadius: 6,
       shadowOffset: const Offset(0, 4),
+      borderRadius: tokens.radius.xs,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Column(
@@ -462,10 +464,12 @@ class _LibraryOverflowMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
     return PopupMenuPanelShell(
       width: 200,
       blurRadius: 6,
       shadowOffset: const Offset(0, 4),
+      borderRadius: tokens.radius.xs,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
         child: Column(
