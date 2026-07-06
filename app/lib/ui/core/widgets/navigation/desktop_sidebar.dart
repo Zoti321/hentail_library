@@ -11,6 +11,7 @@ class DesktopSidebar extends StatelessWidget {
 
   final String activeId;
   final bool isExpanded;
+  final bool showCollapseToggle;
   final VoidCallback onToggleExpanded;
   final ValueChanged<String> onDestinationSelected;
 
@@ -18,6 +19,7 @@ class DesktopSidebar extends StatelessWidget {
     super.key,
     required this.activeId,
     required this.isExpanded,
+    this.showCollapseToggle = true,
     required this.onToggleExpanded,
     required this.onDestinationSelected,
   });
@@ -43,30 +45,31 @@ class DesktopSidebar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(4, 4, 0, 4),
-              child: GhostButton.icon(
-                icon: isExpanded
-                    ? LucideIcons.panelLeftClose
-                    : LucideIcons.panelLeftOpen,
-                tooltip: '',
-                semanticLabel: isExpanded ? '收起侧边栏' : '展开侧边栏',
-                iconSize: 18,
-                size: 32,
-                borderRadius: 8,
-                foregroundColor: cs.hentai.textSecondary,
-                hoverColor: cs.hentai.sidebarItemHoverBackground,
-                overlayColor: cs.hentai.sidebarItemHoverBackground.withAlpha(
-                  110,
+          if (showCollapseToggle)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(4, 4, 0, 4),
+                child: GhostButton.icon(
+                  icon: isExpanded
+                      ? LucideIcons.panelLeftClose
+                      : LucideIcons.panelLeftOpen,
+                  tooltip: '',
+                  semanticLabel: isExpanded ? '收起侧边栏' : '展开侧边栏',
+                  iconSize: 18,
+                  size: 32,
+                  borderRadius: 8,
+                  foregroundColor: cs.hentai.textSecondary,
+                  hoverColor: cs.hentai.sidebarItemHoverBackground,
+                  overlayColor: cs.hentai.sidebarItemHoverBackground.withAlpha(
+                    110,
+                  ),
+                  delayTooltipThreeSeconds: false,
+                  onPressed: onToggleExpanded,
                 ),
-                delayTooltipThreeSeconds: false,
-                onPressed: onToggleExpanded,
               ),
             ),
-          ),
-          SizedBox(height: 16),
+          if (showCollapseToggle) SizedBox(height: 16),
           // 2. menu section
           ...menuItems.map(
             (item) => _SidebarButton(
