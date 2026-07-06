@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 
 typedef ContextMenuBuilder = Widget Function(VoidCallback onClose);
 
@@ -51,13 +52,11 @@ class ContextMenuContainer extends StatelessWidget {
   const ContextMenuContainer({
     super.key,
     required this.title,
-    required this.leadingIcon,
     required this.child,
     this.width = 236,
   });
 
   final String title;
-  final IconData leadingIcon;
   final Widget child;
   final double width;
 
@@ -65,87 +64,81 @@ class ContextMenuContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
-    final HentaiColorScheme palette = cs.hentai;
-    final double panelRadius = tokens.radius.md + 2;
-    return Container(
+    return PopupMenuPanelShell(
       width: width,
-      decoration: BoxDecoration(
-        color: palette.contextMenuBackground,
-        borderRadius: BorderRadius.circular(panelRadius),
-        border: Border.all(color: palette.contextMenuBorder),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: palette.contextMenuShadow,
-            blurRadius: 20,
-            spreadRadius: -4,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(panelRadius),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(
-                horizontal: tokens.spacing.md + 2,
-                vertical: tokens.spacing.sm + 1,
+      blurRadius: 6,
+      shadowOffset: const Offset(0, 4),
+      borderRadius: tokens.radius.xs,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: cs.hentai.textPrimary,
               ),
-              decoration: BoxDecoration(
-                color: palette.contextMenuBackground,
-                border: Border(
-                  bottom: BorderSide(color: palette.contextMenuSeparator),
-                ),
-              ),
-              child: Row(
-                children: <Widget>[
-                  Icon(
-                    leadingIcon,
-                    size: 14,
-                    color: palette.contextMenuMutedText,
-                  ),
-                  SizedBox(width: tokens.spacing.xs + 2),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: tokens.text.bodySm,
-                        fontWeight: FontWeight.w600,
-                        color: palette.contextMenuText,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            child,
-          ],
-        ),
+          ),
+          child,
+        ],
       ),
     );
   }
 }
 
-class ContextMenuDivider extends StatelessWidget {
-  const ContextMenuDivider({super.key});
+class ContextMenuActionItem extends StatelessWidget {
+  const ContextMenuActionItem({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.isDestructive = false,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool isDestructive;
+
   @override
   Widget build(BuildContext context) {
-    final AppThemeTokens tokens = context.tokens;
-    final HentaiColorScheme palette = Theme.of(context).colorScheme.hentai;
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: tokens.spacing.xs + 1,
-        vertical: tokens.spacing.xs + 1,
-      ),
-      child: Container(
-        width: double.infinity,
-        height: 1,
-        color: palette.contextMenuSeparator,
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final HentaiColorScheme palette = cs.hentai;
+    final Color hoverColor = isDestructive
+        ? palette.contextMenuDanger.withAlpha(26)
+        : cs.primary.withAlpha(10);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        hoverColor: hoverColor,
+        splashColor: hoverColor,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Row(
+            children: <Widget>[
+              Icon(icon, size: 16, color: palette.iconDefault),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: palette.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
