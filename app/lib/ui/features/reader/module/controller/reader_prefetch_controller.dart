@@ -1,8 +1,16 @@
+import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:hentai_library/core/image/image_quality_policy.dart';
+import 'package:flutter/material.dart';
+import 'package:hentai_library/data/adapters/reader_frb_mapper.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_image_cache.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_logic.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
+import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/src/rust/api/reader.dart' as rust;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader_prefetch_controller.g.dart';
@@ -10,24 +18,20 @@ part 'reader_prefetch_controller.g.dart';
 @Riverpod(keepAlive: true)
 class ReaderPrefetchController extends _$ReaderPrefetchController {
   @override
-  Map<String, Uint8List> build() => <String, Uint8List>{};
+  Map<String, int> build() => <String, int>{};
 
-  Uint8List? cachedBytes({
-    required String comicId,
-    required int archivePageIndex,
-  }) {
-    return state[readerPrefetchCacheKey(comicId, archivePageIndex)];
+  int bumpGeneration(String comicId) {
+    final int next = (state[comicId] ?? 0) + 1;
+    state = <String, int>{...state, comicId: next};
+    return next;
   }
 
   void clearComic(String comicId) {
-    if (state.keys.every((String key) => !key.startsWith('$comicId:'))) {
-      return;
+    if (state.containsKey(comicId)) {
+      state = Map<String, int>.from(state)..remove(comicId);
     }
-    state = Map<String, Uint8List>.fromEntries(
-      state.entries.where(
-        (MapEntry<String, Uint8List> entry) => !entry.key.startsWith('$comicId:'),
-      ),
-    );
+    clearReaderImageCache();
+    rust.clearReaderPageCacheFrb(comicId: comicId);
   }
 
   Future<void> warmWindow({
@@ -35,48 +39,100 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
     required int centerPageOneBased,
     required int totalPages,
     Iterable<int> extraPageIndexesOneBased = const <int>[],
-    int? neighborCount,
   }) async {
     if (totalPages <= 0) {
       return;
     }
-    final int windowSize =
-        neighborCount ?? ImageQualityPolicy.current.readerPrecacheNeighborCount;
     final Set<int> targets = computePrefetchWindow(
       centerPageOneBased: centerPageOneBased,
       totalPages: totalPages,
-      neighborCount: windowSize,
+      neighborCount: kReaderPrefetchNeighborCount,
       extraPageIndexesOneBased: extraPageIndexesOneBased,
     );
-    final Map<String, Uint8List> updates = <String, Uint8List>{};
-    await Future.wait(
-      targets.map((int pageOneBased) async {
-        final int archiveIndex = pageOneBased - 1;
-        final String key = readerPrefetchCacheKey(comicId, archiveIndex);
-        if (state.containsKey(key)) {
-          return;
-        }
-        final Uint8List? bytes = await ref.read(
-          comicReaderPageBytesProvider(
-            comicId: comicId,
-            pageIndex: archiveIndex,
-          ).future,
-        );
-        if (bytes != null && bytes.isNotEmpty) {
-          updates[key] = bytes;
-        }
-      }),
-    );
-    if (updates.isEmpty &&
-        !state.keys.any((String key) => key.startsWith('$comicId:'))) {
+    final int generation = bumpGeneration(comicId);
+    final Comic? comic = await ref.read(comicRepoProvider).findById(comicId);
+    if (comic == null || comic.resourceType == ResourceType.dir) {
       return;
     }
-    final Map<String, Uint8List> merged = <String, Uint8List>{...state, ...updates};
-    state = evictPrefetchOutsideWindow(
-      cache: merged,
-      comicId: comicId,
-      keepPagesOneBased: targets,
-      maxEntriesPerComic: windowSize * 2 + 3,
+    unawaited(
+      rust.prefetchReaderPagesFrb(
+        comicId: comic.comicId,
+        path: comic.path,
+        resourceType: mapResourceType(comic.resourceType),
+        pageIndexes: targets
+            .map((int pageOneBased) => pageOneBased - 1)
+            .toList(growable: false),
+        generation: BigInt.from(generation),
+      ),
+    );
+  }
+
+  Future<void> precacheWindow({
+    required BuildContext context,
+    required String comicId,
+    required Set<int> pageIndexesOneBased,
+    required List<ReaderPageImageData> imageList,
+    required int cacheWidth,
+  }) async {
+    if (pageIndexesOneBased.isEmpty || imageList.isEmpty) {
+      return;
+    }
+    final int generation = state[comicId] ?? 0;
+    ensureReaderImageCacheConfigured();
+    for (final int pageOneBased in pageIndexesOneBased) {
+      if ((state[comicId] ?? 0) != generation || !context.mounted) {
+        return;
+      }
+      if (pageOneBased < 1 || pageOneBased > imageList.length) {
+        continue;
+      }
+      final ReaderPageImageData imageData = imageList[pageOneBased - 1];
+      final ImageProvider<Object>? provider = await _resolveReaderImageProvider(
+        imageData: imageData,
+        cacheWidth: cacheWidth,
+      );
+      if (provider == null) {
+        continue;
+      }
+      if ((state[comicId] ?? 0) != generation || !context.mounted) {
+        return;
+      }
+      try {
+        await precacheReaderImage(context: context, provider: provider);
+      } on Object {
+        // 单页预热失败不阻断窗口内其余页。
+      }
+    }
+  }
+
+  Future<ImageProvider<Object>?> _resolveReaderImageProvider({
+    required ReaderPageImageData imageData,
+    required int cacheWidth,
+  }) async {
+    if (imageData is ReaderDirPageImageData) {
+      return buildReaderImageProvider(
+        filePath: imageData.file.path,
+        cacheWidth: cacheWidth,
+      );
+    }
+    if (imageData is! ReaderArchivePageImageData) {
+      return null;
+    }
+    final rust.ReaderPageDto page = await ref.read(
+      comicReaderPageProvider(
+        comicId: imageData.comicId,
+        pageIndex: imageData.pageIndex,
+      ).future,
+    );
+    return page.when(
+      filePath: (String path) => buildReaderImageProvider(
+        filePath: path,
+        cacheWidth: cacheWidth,
+      ),
+      bytes: (Uint8List data) => buildReaderImageProvider(
+        memoryBytes: data,
+        cacheWidth: cacheWidth,
+      ),
     );
   }
 

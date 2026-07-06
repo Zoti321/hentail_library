@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
@@ -61,9 +62,12 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
 
     useReaderPrefetchWindow(
       ref: ref,
+      context: context,
       comicId: comicId,
       centerPageOneBased: currentIndex,
       totalPages: totalPages,
+      slotLogicalWidth: readerContinuousSlotLogicalWidth(viewportSize.width),
+      imageList: imageList,
     );
     void executeScrollToIndex(int targetIndexOneBased) {
       if (!context.mounted || !itemScrollController.isAttached) {
@@ -195,7 +199,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxWidth: (viewportSize.width * 0.8).clamp(480.0, 1600.0).toDouble(),
+          maxWidth: readerContinuousSlotLogicalWidth(viewportSize.width),
         ),
         child: ScrollablePositionedList.builder(
           itemScrollController: itemScrollController,
@@ -206,6 +210,9 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
             final ReaderPageImageData imageData = imageList[index];
             return ReaderImageItem(
               imageData: imageData,
+              slotLogicalWidth: readerContinuousSlotLogicalWidth(
+                MediaQuery.sizeOf(context).width,
+              ),
               enableCrossfade: false,
             );
           },

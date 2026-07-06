@@ -62,9 +62,12 @@ class PagedViewport extends HookConsumerWidget {
 
     useReaderPrefetchWindow(
       ref: ref,
+      context: context,
       comicId: comicId,
       centerPageOneBased: currentIndex,
       totalPages: totalPages,
+      slotLogicalWidth: readerPagedSlotLogicalWidth(viewportSize.width),
+      imageList: imageList,
     );
 
     useEffect(() {
@@ -162,8 +165,12 @@ class PagedViewport extends HookConsumerWidget {
             itemCount: imageList.length,
             itemBuilder: (BuildContext context, int index) {
               final ReaderPageImageData imageData = imageList[index];
+              final double slotLogicalWidth = readerPagedSlotLogicalWidth(
+                MediaQuery.sizeOf(context).width,
+              );
               return ReaderImageItem(
                 imageData: imageData,
+                slotLogicalWidth: slotLogicalWidth,
                 enableCrossfade: true,
               );
             },

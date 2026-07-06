@@ -82,9 +82,12 @@ class DualPageViewport extends HookConsumerWidget {
 
     useReaderPrefetchWindow(
       ref: ref,
+      context: context,
       comicId: comicId,
       centerPageOneBased: currentIndex,
       totalPages: safeTotalPages,
+      slotLogicalWidth: readerDualPageSlotLogicalWidth(viewportSize.width),
+      imageList: imageList,
       extraPageIndexesOneBased: spreadPages,
     );
 
@@ -217,6 +220,9 @@ class _DualSpreadPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double slotLogicalWidth = readerDualPageSlotLogicalWidth(
+      MediaQuery.sizeOf(context).width,
+    );
     if (pages.isEmpty) {
       return const SizedBox.expand();
     }
@@ -236,6 +242,7 @@ class _DualSpreadPage extends StatelessWidget {
           Expanded(
             child: ReaderImageItem(
               imageData: imageData,
+              slotLogicalWidth: slotLogicalWidth,
               alignment: alignment,
               enableCrossfade: true,
             ),
@@ -253,6 +260,7 @@ class _DualSpreadPage extends StatelessWidget {
               ? const SizedBox.shrink()
               : ReaderImageItem(
                   imageData: leftImage,
+                  slotLogicalWidth: slotLogicalWidth,
                   alignment: Alignment.centerRight,
                   enableCrossfade: true,
                 ),
@@ -262,6 +270,7 @@ class _DualSpreadPage extends StatelessWidget {
               ? const SizedBox.shrink()
               : ReaderImageItem(
                   imageData: rightImage,
+                  slotLogicalWidth: slotLogicalWidth,
                   alignment: Alignment.centerLeft,
                   enableCrossfade: true,
                 ),

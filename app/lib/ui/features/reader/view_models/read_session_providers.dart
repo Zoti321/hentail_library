@@ -3,12 +3,14 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/data/adapters/reader_frb_mapper.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/domain/reading/read_session_exceptions.dart';
+import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/domain/reading/read_session_page.dart';
 import 'package:hentai_library/domain/reading/reader_session_snapshot.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
+import 'package:hentai_library/src/rust/api/reader.dart' as rust;
 import 'package:hentai_library/src/rust/api/thumbnail.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
@@ -48,6 +50,33 @@ Future<List<ReaderPageImageData>> comicImages(
       .read(readerSessionServiceProvider)
       .loadPages(comicId);
   return pages.map(_mapReadSessionPageToUi).toList(growable: false);
+}
+
+@Riverpod()
+Future<rust.ReaderPageDto> comicReaderPage(
+  Ref ref, {
+  required String comicId,
+  required int pageIndex,
+}) async {
+  final Comic? comic = await ref.read(comicRepoProvider).findById(comicId);
+  if (comic == null) {
+    throw StateError('漫画不存在: $comicId');
+  }
+  try {
+    return rust.loadReaderPageFrb(
+      comicId: comic.comicId,
+      path: comic.path,
+      resourceType: mapResourceType(comic.resourceType),
+      pageIndex: pageIndex,
+    );
+  } on HentaiErrorDto catch (error, stackTrace) {
+    throw ReadSessionPageLoadException.loadFailed(
+      comicId: comicId,
+      path: comic.path,
+      cause: error,
+      stackTrace: stackTrace,
+    );
+  }
 }
 
 @Riverpod()

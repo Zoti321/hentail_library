@@ -6,8 +6,10 @@
 import '../frb_generated.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
+part 'reader.freezed.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`, `from`
 
 void openReaderFrb({
   required String comicId,
@@ -41,11 +43,50 @@ Uint8List loadPageBytesFrb({
   pageIndex: pageIndex,
 );
 
+Future<ReaderPageDto> loadReaderPageFrb({
+  required String comicId,
+  required String path,
+  required String resourceType,
+  required int pageIndex,
+}) => RustLib.instance.api.crateApiReaderLoadReaderPageFrb(
+  comicId: comicId,
+  path: path,
+  resourceType: resourceType,
+  pageIndex: pageIndex,
+);
+
+Future<void> prefetchReaderPagesFrb({
+  required String comicId,
+  required String path,
+  required String resourceType,
+  required List<int> pageIndexes,
+  required BigInt generation,
+}) => RustLib.instance.api.crateApiReaderPrefetchReaderPagesFrb(
+  comicId: comicId,
+  path: path,
+  resourceType: resourceType,
+  pageIndexes: pageIndexes,
+  generation: generation,
+);
+
+void clearReaderPageCacheFrb({required String comicId}) => RustLib.instance.api
+    .crateApiReaderClearReaderPageCacheFrb(comicId: comicId);
+
 void closeReaderFrb({required String comicId}) =>
     RustLib.instance.api.crateApiReaderCloseReaderFrb(comicId: comicId);
 
 void clearReaderSessionsFrb() =>
     RustLib.instance.api.crateApiReaderClearReaderSessionsFrb();
+
+@freezed
+sealed class ReaderPageDto with _$ReaderPageDto {
+  const ReaderPageDto._();
+
+  const factory ReaderPageDto.filePath({required String path}) =
+      ReaderPageDto_FilePath;
+  const factory ReaderPageDto.bytes({required Uint8List data}) =
+      ReaderPageDto_Bytes;
+}
 
 class ReaderPageListDto {
   final String resourceType;

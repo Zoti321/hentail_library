@@ -1,5 +1,8 @@
 import 'dart:typed_data';
 
+/// 对齐 Komga：稳态预加载邻居页数（单侧）。
+const int kReaderPrefetchNeighborCount = 2;
+
 /// 计算以 [centerPageOneBased] 为中心的预加载页码集合（1-based）。
 Set<int> computePrefetchWindow({
   required int centerPageOneBased,

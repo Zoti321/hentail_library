@@ -338,6 +338,7 @@ class ReaderController extends _$ReaderController {
       await ref.read(readingAggregateProvider.notifier).endSession();
     }
     await closeSession();
+    ref.read(readerPrefetchControllerProvider.notifier).clearComic(_comicId);
     if (!context.mounted) {
       return;
     }

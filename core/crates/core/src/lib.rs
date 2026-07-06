@@ -36,8 +36,9 @@ pub use sync::{
     SyncLibraryRouteDto, cancel_sync, create_sync_handle, sync_library,
 };
 pub use reader::{
-    ReaderPageListDto, clear_reader_sessions, close_reader, load_page_bytes, load_page_list,
-    open_reader,
+    ReaderPageDto, ReaderPageListDto, clear_reader_page_cache, clear_reader_sessions,
+    close_reader, load_page_bytes, load_page_list, load_reader_page, open_reader,
+    prefetch_reader_pages,
 };
 pub use series_id::{
     folder_path_from_comic_path, series_id_from_folder_path, series_name_from_folder_path,

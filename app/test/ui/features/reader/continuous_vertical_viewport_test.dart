@@ -6,9 +6,11 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/view/reader_viewport_host.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/continuous_vertical_viewport.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
+import 'package:hentai_library/src/rust/api/reader.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -163,15 +165,20 @@ List<Override> _viewportTestOverrides() {
 
   return <Override>[
     readerControllerProvider(_viewKey).overrideWith(_TestReaderController.new),
+    readerPrefetchControllerProvider.overrideWith(
+      _FakeReaderPrefetchController.new,
+    ),
     comicImagesProvider(comicId: _testComicId).overrideWith(
       (Ref ref) async => images,
     ),
     ...List<Override>.generate(
       100,
-      (int index) => comicReaderPageBytesProvider(
+      (int index) => comicReaderPageProvider(
         comicId: _testComicId,
         pageIndex: index,
-      ).overrideWith((Ref ref) async => Uint8List(0)),
+      ).overrideWith(
+        (Ref ref) async => ReaderPageDto.bytes(data: Uint8List(0)),
+      ),
     ),
   ];
 }
@@ -196,4 +203,26 @@ class _TestReaderController extends ReaderController {
       totalPagesOverride: 100,
     );
   }
+}
+
+class _FakeReaderPrefetchController extends ReaderPrefetchController {
+  @override
+  Map<String, int> build() => <String, int>{};
+
+  @override
+  Future<void> warmWindow({
+    required String comicId,
+    required int centerPageOneBased,
+    required int totalPages,
+    Iterable<int> extraPageIndexesOneBased = const <int>[],
+  }) async {}
+
+  @override
+  Future<void> precacheWindow({
+    required BuildContext context,
+    required String comicId,
+    required Set<int> pageIndexesOneBased,
+    required List<ReaderPageImageData> imageList,
+    required int cacheWidth,
+  }) async {}
 }
