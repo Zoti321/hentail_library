@@ -24,7 +24,7 @@ class ReaderViewportHost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (readingMode.isContinuousVertical) {
+    if (readingMode.isWebtoon) {
       return ContinuousVerticalViewport(
         comicId: comicId,
         incognito: incognito,

@@ -263,7 +263,7 @@ class ReaderController extends _$ReaderController {
       toggleShowControls();
       return;
     }
-    if (current.readingMode.isContinuousVertical) {
+    if (current.readingMode.isWebtoon) {
       toggleShowControls();
       return;
     }

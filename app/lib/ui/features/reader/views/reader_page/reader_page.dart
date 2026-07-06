@@ -265,7 +265,7 @@ class ReaderPage extends HookConsumerWidget {
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTapUp: (TapUpDetails details) {
-                      if (activeReadingMode.isContinuousVertical) {
+                      if (activeReadingMode.isWebtoon) {
                         controller.toggleShowControls();
                         return;
                       }
@@ -292,11 +292,9 @@ class ReaderPage extends HookConsumerWidget {
                   ),
                   ReaderTopBar(
                     showControls: state.showControls,
-                    readingMode: activeReadingMode,
                     title: state.comic.title,
-                    navContext: viewModel.isSeriesRead
-                        ? viewModel.navContext
-                        : null,
+                    readerFullscreen: readerFullscreen,
+                    navContext: seriesNavContext,
                     session: routeContext.session,
                     onExit: () async {
                       await controller.executeExitReader(
@@ -304,23 +302,13 @@ class ReaderPage extends HookConsumerWidget {
                         routeContext: routeContext,
                       );
                     },
-                    onReadingModeChanged: (ReadingMode mode) {
-                      ref.read(settingsProvider.notifier).setReadingMode(mode);
-                      if (mode.isContinuousVertical && readerAutoPlayEnabled) {
-                        ref
-                            .read(settingsProvider.notifier)
-                            .setReaderAutoPlayEnabled(false);
-                      }
-                    },
+                    onToggleFullscreen: controller.toggleFullscreen,
                   ),
                   ReaderBottomBar(
                     showControls: state.showControls,
                     currentIndex: state.currentIndex,
                     totalPages: state.totalPages,
                     readerAutoPlayEnabled: readerAutoPlayEnabled,
-                    readerAutoPlayIntervalSeconds:
-                        readerAutoPlayIntervalSeconds,
-                    readerFullscreen: readerFullscreen,
                     showAutoPlayControls: activeReadingMode.supportsAutoPlay,
                     onPrevPage: controller.prevPage,
                     onNextPage: requestNextPage,
@@ -330,12 +318,33 @@ class ReaderPage extends HookConsumerWidget {
                           .read(settingsProvider.notifier)
                           .setReaderAutoPlayEnabled(value);
                     },
-                    onReaderAutoPlayIntervalSecondsChanged: (int value) {
-                      ref
-                          .read(settingsProvider.notifier)
-                          .setReaderAutoPlayIntervalSeconds(value);
-                    },
-                    onToggleFullscreen: controller.toggleFullscreen,
+                    onPrevSeriesComic:
+                        seriesNavContext?.previousItem != null
+                        ? () async {
+                            final String targetComicId =
+                                seriesNavContext!.previousItem!.comicId;
+                            await ref
+                                .read(readerSeriesNavigationProvider.notifier)
+                                .switchComic(
+                                  router: GoRouter.of(context),
+                                  currentSession: routeContext.session,
+                                  targetComicId: targetComicId,
+                                );
+                          }
+                        : null,
+                    onNextSeriesComic: seriesNavContext?.nextItem != null
+                        ? () async {
+                            final String targetComicId =
+                                seriesNavContext!.nextItem!.comicId;
+                            await ref
+                                .read(readerSeriesNavigationProvider.notifier)
+                                .switchComic(
+                                  router: GoRouter.of(context),
+                                  currentSession: routeContext.session,
+                                  targetComicId: targetComicId,
+                                );
+                          }
+                        : null,
                   ),
                 ],
               );

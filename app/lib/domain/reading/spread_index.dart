@@ -12,7 +12,7 @@ class SpreadIndex {
       return 0;
     }
     return switch (mode) {
-      ReadingMode.paged || ReadingMode.continuousVertical => totalPages,
+      ReadingMode.paged || ReadingMode.webtoon => totalPages,
       ReadingMode.dualPage => (totalPages + 1) ~/ 2,
       ReadingMode.dualPageNoCover =>
         totalPages == 1 ? 1 : 1 + ((totalPages - 1 + 1) ~/ 2),
@@ -34,7 +34,7 @@ class SpreadIndex {
     }
     return switch (mode) {
       ReadingMode.paged ||
-      ReadingMode.continuousVertical => <int>[spreadIndex + 1],
+      ReadingMode.webtoon => <int>[spreadIndex + 1],
       ReadingMode.dualPage => _dualPageSpread(
         totalPages: totalPages,
         spreadIndex: spreadIndex,
@@ -71,7 +71,7 @@ class SpreadIndex {
       return 0;
     }
     return switch (mode) {
-      ReadingMode.paged || ReadingMode.continuousVertical => pageIndex - 1,
+      ReadingMode.paged || ReadingMode.webtoon => pageIndex - 1,
       ReadingMode.dualPage => (pageIndex - 1) ~/ 2,
       ReadingMode.dualPageNoCover =>
         pageIndex == 1 ? 0 : 1 + ((pageIndex - 2) ~/ 2),

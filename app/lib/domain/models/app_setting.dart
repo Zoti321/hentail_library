@@ -7,14 +7,19 @@ part 'app_setting.g.dart';
 Map<String, dynamic> _migrateAppSettingJson(Map<String, dynamic> json) {
   final Map<String, dynamic> migrated = Map<String, dynamic>.from(json);
   if (migrated.containsKey('readingMode')) {
-    migrated['readingMode'] = readingModeToJson(
-      readingModeFromJson(migrated['readingMode']),
-    );
+    final Object? rawMode = migrated['readingMode'];
+    if (rawMode == 'continuousVertical') {
+      migrated['readingMode'] = readingModeToJson(ReadingMode.webtoon);
+    } else {
+      migrated['readingMode'] = readingModeToJson(
+        readingModeFromJson(rawMode),
+      );
+    }
   }
   if (!migrated.containsKey('readingMode') &&
       migrated.containsKey('readerIsVertical')) {
     migrated['readingMode'] = migrated['readerIsVertical'] == true
-        ? readingModeToJson(ReadingMode.continuousVertical)
+        ? readingModeToJson(ReadingMode.webtoon)
         : readingModeToJson(kDefaultReadingMode);
   }
   migrated.remove('readerIsVertical');

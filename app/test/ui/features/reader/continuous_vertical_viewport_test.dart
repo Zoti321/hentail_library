@@ -47,7 +47,7 @@ void main() {
                 incognito: false,
                 initialPage: 0,
                 preferredPageIndex: null,
-                readingMode: ReadingMode.continuousVertical,
+                readingMode: ReadingMode.webtoon,
               ),
             ),
           ),
@@ -192,7 +192,7 @@ class _TestReaderController extends ReaderController {
         title: 'Test Comic',
         pageCount: 100,
       ),
-      readingMode: ReadingMode.continuousVertical,
+      readingMode: ReadingMode.webtoon,
       currentIndex: 1,
       totalPagesOverride: 100,
     );

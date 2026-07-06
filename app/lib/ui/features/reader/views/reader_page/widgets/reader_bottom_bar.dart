@@ -1,9 +1,7 @@
-import 'dart:ui';
-
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_floating_panel.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ReaderBottomBar extends StatefulWidget {
@@ -13,29 +11,26 @@ class ReaderBottomBar extends StatefulWidget {
     required this.currentIndex,
     required this.totalPages,
     required this.readerAutoPlayEnabled,
-    required this.readerAutoPlayIntervalSeconds,
-    required this.readerFullscreen,
     required this.showAutoPlayControls,
     required this.onPrevPage,
     required this.onNextPage,
     required this.onSetIndex,
     required this.onReaderAutoPlayEnabledChanged,
-    required this.onReaderAutoPlayIntervalSecondsChanged,
-    required this.onToggleFullscreen,
+    this.onPrevSeriesComic,
+    this.onNextSeriesComic,
   });
+
   final bool showControls;
   final int currentIndex;
   final int totalPages;
   final bool readerAutoPlayEnabled;
-  final int readerAutoPlayIntervalSeconds;
-  final bool readerFullscreen;
   final bool showAutoPlayControls;
   final VoidCallback onPrevPage;
   final Future<void> Function() onNextPage;
   final ValueChanged<int> onSetIndex;
   final ValueChanged<bool> onReaderAutoPlayEnabledChanged;
-  final ValueChanged<int> onReaderAutoPlayIntervalSecondsChanged;
-  final Future<void> Function() onToggleFullscreen;
+  final VoidCallback? onPrevSeriesComic;
+  final VoidCallback? onNextSeriesComic;
 
   @override
   State<ReaderBottomBar> createState() => _ReaderBottomBarState();
@@ -44,8 +39,6 @@ class ReaderBottomBar extends StatefulWidget {
 class _ReaderBottomBarState extends State<ReaderBottomBar> {
   late double _sliderValue;
   bool _isSliding = false;
-  final CustomPopupMenuController _intervalMenuController =
-      CustomPopupMenuController();
 
   @override
   void initState() {
@@ -65,6 +58,7 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final double bottomPadding = MediaQuery.of(context).padding.bottom + 32;
+    final double targetWidth = ReaderFloatingPanel.targetBarWidth(context);
     final int safeTotalPages = widget.totalPages > 0 ? widget.totalPages : 1;
     final double sliderValue = _sliderValue.clamp(1, safeTotalPages).toDouble();
     final int displayIndex = _isSliding
@@ -75,126 +69,185 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOutCubic,
       bottom: widget.showControls ? bottomPadding : bottomPadding - 32,
-      left: 16,
-      right: 16,
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 300),
-        opacity: widget.showControls ? 1.0 : 0.0,
-        child: Center(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 820),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: cs.hentai.floatingUiBackground,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: cs.hentai.readerPanelBorder,
-                    width: 1,
-                  ),
-                ),
-                child: Column(
-                  spacing: 8,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      height: 26,
-                      child: SliderTheme(
-                        data: SliderThemeData(
-                          trackHeight: 3,
-                          activeTrackColor: cs.hentai.sliderActive,
-                          inactiveTrackColor: cs.hentai.sliderInactive,
-                          thumbColor: cs.hentai.activeButtonBg,
-                          thumbShape: const RoundSliderThumbShape(
-                            enabledThumbRadius: 7,
-                            elevation: 3,
-                          ),
-                          overlayColor: cs.hentai.readerSliderOverlay,
-                          overlayShape: const RoundSliderOverlayShape(
-                            overlayRadius: 14,
-                          ),
-                          trackShape: const RoundedRectSliderTrackShape(),
-                        ),
-                        child: Slider(
-                          value: sliderValue,
-                          min: 1,
-                          max: safeTotalPages.toDouble(),
-                          onChangeStart: (double value) {
-                            setState(() {
-                              _isSliding = true;
-                              _sliderValue = value;
-                            });
-                          },
-                          onChanged: (double val) {
-                            setState(() {
-                              _sliderValue = val;
-                            });
-                          },
-                          onChangeEnd: (double val) {
-                            final int nextIndex = val.round().clamp(
-                              1,
-                              safeTotalPages,
-                            );
-                            setState(() {
-                              _isSliding = false;
-                              _sliderValue = nextIndex.toDouble();
-                            });
-                            widget.onSetIndex(nextIndex);
-                          },
+      left: 0,
+      right: 0,
+      child: IgnorePointer(
+        ignoring: !widget.showControls,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 300),
+          opacity: widget.showControls ? 1.0 : 0.0,
+          child: Center(
+            child: ReaderFloatingPanel(
+              width: targetWidth,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Column(
+                spacing: 10,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Row(
+                    spacing: 12,
+                    children: <Widget>[
+                      Text(
+                        '$displayIndex',
+                        style: TextStyle(
+                          fontFamily: 'RobotoMono',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: cs.hentai.readerTextIconPrimary,
                         ),
                       ),
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          '$displayIndex / ${widget.totalPages}',
-                          style: TextStyle(
-                            fontFamily: 'RobotoMono',
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: cs.hentai.readerTextIconPrimary,
+                      Expanded(
+                        child: SizedBox(
+                          height: 26,
+                          child: SliderTheme(
+                            data: SliderThemeData(
+                              trackHeight: 3,
+                              activeTrackColor: cs.primary,
+                              inactiveTrackColor: cs.hentai.sliderInactive,
+                              thumbColor: cs.primary,
+                              thumbShape: const RoundSliderThumbShape(
+                                enabledThumbRadius: 7,
+                                elevation: 3,
+                              ),
+                              overlayColor: cs.hentai.readerSliderOverlay,
+                              overlayShape: const RoundSliderOverlayShape(
+                                overlayRadius: 14,
+                              ),
+                              trackShape: const RoundedRectSliderTrackShape(),
+                            ),
+                            child: Slider(
+                              value: sliderValue,
+                              min: 1,
+                              max: safeTotalPages.toDouble(),
+                              onChangeStart: (double value) {
+                                setState(() {
+                                  _isSliding = true;
+                                  _sliderValue = value;
+                                });
+                              },
+                              onChanged: (double val) {
+                                setState(() {
+                                  _sliderValue = val;
+                                });
+                              },
+                              onChangeEnd: (double val) {
+                                final int nextIndex = val.round().clamp(
+                                  1,
+                                  safeTotalPages,
+                                );
+                                setState(() {
+                                  _isSliding = false;
+                                  _sliderValue = nextIndex.toDouble();
+                                });
+                                widget.onSetIndex(nextIndex);
+                              },
+                            ),
                           ),
                         ),
-                        const Spacer(),
-                        _buildNavActionGroup(cs),
-                        const Spacer(),
-
-                        if (widget.showAutoPlayControls) ...<Widget>[
-                          _buildIntervalMenuButton(cs),
-                          const SizedBox(width: 8),
-                        ],
-                        GhostButton.icon(
-                          icon: widget.readerFullscreen
-                              ? LucideIcons.minimize2
-                              : LucideIcons.maximize2,
-                          tooltip: widget.readerFullscreen ? '退出全屏' : '全屏',
-                          semanticLabel: widget.readerFullscreen
-                              ? '退出全屏'
-                              : '进入全屏',
-                          iconSize: 16,
-                          size: 30,
-                          borderRadius: 8,
-                          foregroundColor: cs.hentai.readerTextIconPrimary,
-                          hoverColor: cs.hentai.readerPanelSubtle,
-                          overlayColor: cs.hentai.readerPanelSubtle,
-                          onPressed: () async {
-                            await widget.onToggleFullscreen();
-                          },
+                      ),
+                      Text(
+                        '${widget.totalPages}',
+                        style: TextStyle(
+                          fontFamily: 'RobotoMono',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: cs.hentai.readerTextIconPrimary,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      _buildSideActionGroup(
+                        cs: cs,
+                        children: <Widget>[
+                          GhostButton.icon(
+                            icon: LucideIcons.chevronLeft,
+                            tooltip: '上一卷',
+                            semanticLabel: '系列上一卷',
+                            iconSize: 16,
+                            size: 28,
+                            borderRadius: 8,
+                            foregroundColor: cs.hentai.readerTextIconPrimary,
+                            hoverColor: cs.hentai.readerPanelSubtle,
+                            overlayColor: cs.hentai.readerPanelSubtle,
+                            onPressed: widget.onPrevSeriesComic,
+                          ),
+                          GhostButton.icon(
+                            icon: LucideIcons.chevronsLeft,
+                            tooltip: '首页',
+                            semanticLabel: '跳转到首页',
+                            iconSize: 16,
+                            size: 28,
+                            borderRadius: 8,
+                            foregroundColor: cs.hentai.readerTextIconPrimary,
+                            hoverColor: cs.hentai.readerPanelSubtle,
+                            overlayColor: cs.hentai.readerPanelSubtle,
+                            onPressed: widget.totalPages > 0
+                                ? () => widget.onSetIndex(1)
+                                : null,
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: Center(child: _buildNavActionGroup(cs)),
+                      ),
+                      _buildSideActionGroup(
+                        cs: cs,
+                        children: <Widget>[
+                          GhostButton.icon(
+                            icon: LucideIcons.chevronRight,
+                            tooltip: '下一卷',
+                            semanticLabel: '系列下一卷',
+                            iconSize: 16,
+                            size: 28,
+                            borderRadius: 8,
+                            foregroundColor: cs.hentai.readerTextIconPrimary,
+                            hoverColor: cs.hentai.readerPanelSubtle,
+                            overlayColor: cs.hentai.readerPanelSubtle,
+                            onPressed: widget.onNextSeriesComic,
+                          ),
+                          GhostButton.icon(
+                            icon: LucideIcons.chevronsRight,
+                            tooltip: '尾页',
+                            semanticLabel: '跳转到尾页',
+                            iconSize: 16,
+                            size: 28,
+                            borderRadius: 8,
+                            foregroundColor: cs.hentai.readerTextIconPrimary,
+                            hoverColor: cs.hentai.readerPanelSubtle,
+                            overlayColor: cs.hentai.readerPanelSubtle,
+                            onPressed: widget.totalPages > 0
+                                ? () => widget.onSetIndex(widget.totalPages)
+                                : null,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSideActionGroup({
+    required ColorScheme cs,
+    required List<Widget> children,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      decoration: BoxDecoration(
+        color: cs.hentai.readerPanelSubtle,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 2,
+        children: children,
       ),
     );
   }
@@ -205,11 +258,10 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
       decoration: BoxDecoration(
         color: cs.hentai.readerPanelSubtle,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: cs.hentai.readerPanelSubtleBorder),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: [
+        children: <Widget>[
           GhostButton.icon(
             icon: LucideIcons.chevronLeft,
             tooltip: '上一页',
@@ -258,150 +310,5 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
         ],
       ),
     );
-  }
-
-  Widget _buildIntervalMenuButton(ColorScheme cs) {
-    return CustomPopupMenu(
-      controller: _intervalMenuController,
-      barrierColor: Colors.transparent,
-      position: PreferredPosition.top,
-      pressType: PressType.singleClick,
-      showArrow: false,
-      verticalMargin: 48,
-      menuBuilder: _buildIntervalMenu,
-      child: GhostButton.icon(
-        icon: LucideIcons.timer,
-        tooltip: '自动播放间隔',
-        semanticLabel: '调整自动播放间隔',
-        iconSize: 16,
-        size: 30,
-        borderRadius: 8,
-        foregroundColor: cs.hentai.readerTextIconPrimary,
-        hoverColor: cs.hentai.readerPanelSubtle,
-        overlayColor: cs.hentai.readerPanelSubtle,
-        onPressed: () => _intervalMenuController.toggleMenu(),
-      ),
-    );
-  }
-
-  Widget _buildIntervalMenu() {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    int localInterval = _buildClampedInterval(
-      widget.readerAutoPlayIntervalSeconds,
-    );
-    return Container(
-      width: 232,
-      decoration: BoxDecoration(
-        color: cs.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cs.hentai.borderSubtle),
-        boxShadow: [
-          BoxShadow(
-            color: cs.hentai.cardShadowHover,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-        child: StatefulBuilder(
-          builder: (BuildContext context, StateSetter setMenuState) {
-            final bool canDecrease = localInterval > 1;
-            final bool canIncrease = localInterval < 60;
-            void updateLocalIntervalByStep(int step) {
-              final int nextValue = _buildClampedInterval(localInterval + step);
-              if (nextValue == localInterval) {
-                return;
-              }
-              setMenuState(() {
-                localInterval = nextValue;
-              });
-              widget.onReaderAutoPlayIntervalSecondsChanged(nextValue);
-            }
-
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '自动播放间隔',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: cs.hentai.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '与设置页保持一致，范围 1-60 秒',
-                  style: TextStyle(fontSize: 11, color: cs.hentai.textTertiary),
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: cs.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: cs.hentai.borderSubtle),
-                  ),
-                  child: Row(
-                    children: [
-                      GhostButton.icon(
-                        icon: LucideIcons.minus,
-                        size: 24,
-                        tooltip: '',
-                        semanticLabel: '减少自动播放间隔',
-                        onPressed: canDecrease
-                            ? () => updateLocalIntervalByStep(-1)
-                            : null,
-                        iconSize: 14,
-                        borderRadius: 8,
-                        foregroundColor: cs.hentai.textPrimary,
-                        hoverColor: cs.hentai.readerPanelSubtle,
-                        overlayColor: cs.hentai.readerPanelSubtle,
-                      ),
-                      Expanded(
-                        child: Text(
-                          '$localInterval s',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: cs.hentai.textPrimary,
-                          ),
-                        ),
-                      ),
-                      GhostButton.icon(
-                        icon: LucideIcons.plus,
-                        size: 24,
-                        tooltip: '',
-                        semanticLabel: '增加自动播放间隔',
-                        onPressed: canIncrease
-                            ? () => updateLocalIntervalByStep(1)
-                            : null,
-                        iconSize: 14,
-                        borderRadius: 8,
-                        foregroundColor: cs.hentai.textPrimary,
-                        hoverColor: cs.hentai.readerPanelSubtle,
-                        overlayColor: cs.hentai.readerPanelSubtle,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  int _buildClampedInterval(int value) {
-    return value.clamp(1, 60);
   }
 }
