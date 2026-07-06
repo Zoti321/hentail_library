@@ -6,6 +6,11 @@ part 'app_setting.g.dart';
 
 Map<String, dynamic> _migrateAppSettingJson(Map<String, dynamic> json) {
   final Map<String, dynamic> migrated = Map<String, dynamic>.from(json);
+  if (migrated.containsKey('readingMode')) {
+    migrated['readingMode'] = readingModeToJson(
+      readingModeFromJson(migrated['readingMode']),
+    );
+  }
   if (!migrated.containsKey('readingMode') &&
       migrated.containsKey('readerIsVertical')) {
     migrated['readingMode'] = migrated['readerIsVertical'] == true
@@ -23,7 +28,6 @@ abstract class AppSetting with _$AppSetting {
     @Default(3) int version,
     @Default(AppThemePreference.system) AppThemePreference themePreference,
     @Default(false) bool autoScan,
-    @JsonKey(fromJson: readingModeFromJson, toJson: readingModeToJson)
     @Default(kDefaultReadingMode)
     ReadingMode readingMode,
     @Default(false) bool readerAutoPlayEnabled,

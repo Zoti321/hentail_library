@@ -255,12 +255,11 @@ class ReaderPage extends HookConsumerWidget {
               final ReadingMode activeReadingMode = state.readingMode;
               final ReaderNavContextData? seriesNavContext =
                   viewModel.isSeriesRead ? viewModel.navContext : null;
-              final Future<void> Function() requestNextPage = () =>
-                  controller.requestNextPage(
-                    navContext: seriesNavContext,
-                    session: routeContext.session,
-                    router: GoRouter.of(context),
-                  );
+              Future<void> requestNextPage() => controller.requestNextPage(
+                navContext: seriesNavContext,
+                session: routeContext.session,
+                router: GoRouter.of(context),
+              );
               return Stack(
                 children: [
                   GestureDetector(
