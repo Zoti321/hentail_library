@@ -8,7 +8,7 @@ import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/author_management_panel.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/tag_management_panel.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/rename_tag_dialog.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

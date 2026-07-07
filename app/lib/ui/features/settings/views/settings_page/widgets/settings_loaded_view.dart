@@ -4,7 +4,7 @@ import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_library_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
-import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_theme_row.dart';
+import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/theme_preference_row.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});

@@ -105,12 +105,10 @@ Rules:
 - **Plain data bundle** (no persistence / wire format): prefer `typedef` + record per [Lightweight data shapes](#lightweight-data-shapes).
 - `*Dto` suffix: FRB / JSON / serialization boundaries only — not general UI pass-through types.
 
-### Planned renames (migration reference)
+### Completed renames (reference)
 
-When touching related code, prefer the target name:
-
-| Current | Target |
-|---------|--------|
+| Former | Current |
+|--------|---------|
 | `librarySeriesRepo` | `seriesRepo` |
 | `libraryTagRepo` | `tagRepo` |
 | `libraryAuthorRepo` | `authorRepo` |
