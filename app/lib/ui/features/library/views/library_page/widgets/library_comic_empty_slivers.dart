@@ -1,39 +1,40 @@
 part of 'library_page_widgets.dart';
 
-class _EmptyLibrarySliver extends StatelessWidget {
-  const _EmptyLibrarySliver({
-    this.query = '',
-    this.showManagePathsEntry = false,
+class _LibraryCatalogEmptySliver extends StatelessWidget {
+  const _LibraryCatalogEmptySliver({
+    required this.entity,
+    required this.isTableEmpty,
   });
-  final String query;
-  final bool showManagePathsEntry;
+
+  final LibraryDisplayTarget entity;
+  final bool isTableEmpty;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final String q = query.trim();
-    final bool isSearching = q.isNotEmpty;
-    final String title = isSearching
-        ? AppStrings.libraryNoMatchTitle
-        : AppStrings.libraryEmptyTitle;
-    final String hint = isSearching
-        ? AppStrings.libraryNoMatchHint(q)
-        : AppStrings.libraryEmptyHint;
+    final LibraryEmptyStateContent content = resolveLibraryEmptyStateContent(
+      entity: entity,
+      isTableEmpty: isTableEmpty,
+    );
+    final IconData icon = switch (content.icon) {
+      LibraryEmptyStateIcon.library => LucideIcons.library,
+      LibraryEmptyStateIcon.listFilter => LucideIcons.listFilter,
+    };
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.only(top: 80),
+        padding: const EdgeInsets.only(top: 80, bottom: 48),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             spacing: 12,
-            children: [
+            children: <Widget>[
               Icon(
-                LucideIcons.library,
+                icon,
                 size: 56,
                 color: theme.colorScheme.hentai.textTertiary,
               ),
               Text(
-                title,
+                content.title,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -41,14 +42,14 @@ class _EmptyLibrarySliver extends StatelessWidget {
                 ),
               ),
               Text(
-                hint,
+                content.hint,
                 style: TextStyle(
                   fontSize: 13,
                   color: theme.colorScheme.hentai.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
-              if (showManagePathsEntry)
+              if (content.showManagePathsEntry)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: OutlinedButton.icon(

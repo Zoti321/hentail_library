@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
-import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
-import 'package:hentai_library/ui/providers.dart';
-import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
+import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
+import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_placeholder.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SeriesCard extends HookConsumerWidget {
@@ -30,14 +28,6 @@ class SeriesCard extends HookConsumerWidget {
     final isHover = useState<bool>(false);
     final SeriesItem? coverItem = series.coverItem;
     final String? coverComicId = coverItem?.comicId;
-    final ComicCoverDisplayData? coverData = coverComicId != null
-        ? ref
-              .watch(comicCoverDisplayProvider(comicId: coverComicId))
-              .maybeWhen(
-                data: (ComicCoverDisplayData? v) => v,
-                orElse: () => null,
-              )
-        : null;
     final int count = series.items.length;
     final Widget content = GestureDetector(
       onTap: onTap,
@@ -70,7 +60,10 @@ class SeriesCard extends HookConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: 12,
             children: <Widget>[
-              _SeriesCardCover(coverData: coverData, isHover: isHover.value),
+              _SeriesCardCover(
+                coverComicId: coverComicId,
+                isHover: isHover.value,
+              ),
               _SeriesCardInfo(
                 series: series,
                 count: count,
@@ -89,9 +82,9 @@ class SeriesCard extends HookConsumerWidget {
 }
 
 class _SeriesCardCover extends StatelessWidget {
-  const _SeriesCardCover({required this.coverData, required this.isHover});
+  const _SeriesCardCover({required this.coverComicId, required this.isHover});
 
-  final ComicCoverDisplayData? coverData;
+  final String? coverComicId;
   final bool isHover;
 
   @override
@@ -124,39 +117,12 @@ class _SeriesCardCover extends StatelessWidget {
         borderRadius: BorderRadius.circular(tokens.radius.md),
         child: AspectRatio(
           aspectRatio: 2 / 3,
-          child: Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              AppComicImage(
-                    filePath: coverData?.filePath,
-                    memoryBytes: coverData?.memoryBytes,
-                    fit: BoxFit.cover,
-                    placeholder: Container(
-                      color: cs.hentai.imageFallback,
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.broken_image,
-                        color: cs.hentai.iconSecondary,
-                      ),
-                    ),
-                    errorPlaceholder: Container(
-                      color: cs.hentai.imageFallback,
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.broken_image,
-                        color: cs.hentai.iconSecondary,
-                      ),
-                    ),
-                  )
-                  .animate(target: isHover ? 1 : 0)
-                  .scale(
-                    begin: const Offset(1, 1),
-                    end: const Offset(1.05, 1.05),
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeOutQuad,
-                  ),
-            ],
-          ),
+          child: coverComicId != null
+              ? ComicCoverContent(comicId: coverComicId!, isHover: isHover)
+              : const ComicCoverPlaceholder(
+                  variant: ComicCoverPlaceholderVariant.card,
+                  kind: ComicCoverPlaceholderKind.noCover,
+                ),
         ),
       ),
     );

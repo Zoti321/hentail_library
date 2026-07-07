@@ -2,8 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
-import 'package:hentai_library/ui/features/reader/reader.dart';
+import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
+import 'package:hentai_library/ui/core/dto/comic_cover_state.dart';
+import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -37,9 +38,10 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
-    final ComicCoverDisplayData? coverDisplay = ref
-        .watch(comicCoverDisplayProvider(comicId: widget.comicId))
-        .maybeWhen(data: (ComicCoverDisplayData? v) => v, orElse: () => null);
+    final ComicCoverState coverState = ref.watch(
+      comicCoverProvider(widget.comicId),
+    );
+    final coverDisplay = comicCoverImageOrPrevious(coverState);
 
     final Color cardBackground = _isHovered ? cs.surfaceContainer : cs.surface;
     final Color cardBorderColor = _isHovered
@@ -73,7 +75,7 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
           ),
           child: Row(
             children: [
-              _buildCover(cs, coverDisplay),
+              _buildCover(cs, coverState, coverDisplay),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -145,29 +147,38 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
     );
   }
 
-  Widget _buildCover(ColorScheme cs, ComicCoverDisplayData? coverDisplay) {
+  Widget _buildCover(
+    ColorScheme cs,
+    ComicCoverState coverState,
+    ComicCoverImage? coverDisplay,
+  ) {
     const double coverWidth = 74;
     const double coverHeight = 102;
     const double coverOuterInset = 3;
-    final Widget image = AppComicImage(
-      filePath: coverDisplay?.filePath,
-      memoryBytes: coverDisplay?.memoryBytes,
-      fit: BoxFit.cover,
-      placeholder: Center(
-        child: Icon(
-          LucideIcons.bookOpen,
-          size: 28,
-          color: cs.hentai.textTertiary,
-        ),
-      ),
-      errorPlaceholder: Center(
-        child: Icon(
-          LucideIcons.bookOpen,
-          size: 28,
-          color: cs.hentai.textTertiary,
-        ),
+
+    final Widget historyPlaceholder = Center(
+      child: Icon(
+        LucideIcons.bookOpen,
+        size: 28,
+        color: cs.hentai.textTertiary,
       ),
     );
+
+    final Widget placeholder = switch (coverState) {
+      ComicCoverError() => historyPlaceholder,
+      ComicCoverNoCover() => historyPlaceholder,
+      _ => ColoredBox(color: cs.surfaceContainerHighest),
+    };
+
+    final Widget image = coverDisplay == null
+        ? placeholder
+        : AppComicImage(
+            filePath: coverDisplay.filePath,
+            memoryBytes: coverDisplay.memoryBytes,
+            fit: BoxFit.cover,
+            placeholder: placeholder,
+            errorPlaceholder: historyPlaceholder,
+          );
 
     return Padding(
       padding: const EdgeInsets.all(coverOuterInset),

@@ -11,8 +11,8 @@ import 'package:hentai_library/ui/features/reader/module/controller/reader_serie
 import 'package:hentai_library/ui/features/reader/module/controller/reader_fullscreen_controller.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/domain/reading/read_session_coordinator.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -120,7 +120,7 @@ class ReaderController extends _$ReaderController {
     if (key.incognito) {
       return;
     }
-    ref.read(readingAggregateProvider.notifier).updatePage(pageIndex);
+    ref.read(readSessionCoordinatorProvider).updatePage(pageIndex);
   }
 
   void _updateDataState(ReaderState Function(ReaderState) updater) {
@@ -263,7 +263,7 @@ class ReaderController extends _$ReaderController {
       toggleShowControls();
       return;
     }
-    if (current.readingMode.isContinuousVertical) {
+    if (current.readingMode.isWebtoon) {
       toggleShowControls();
       return;
     }
@@ -307,16 +307,13 @@ class ReaderController extends _$ReaderController {
       return;
     }
     final ReaderState? currentState = state.asData?.value;
+    final ReadSessionCoordinator coordinator = ref.read(
+      readSessionCoordinatorProvider,
+    );
     if (currentState != null) {
-      ref
-          .read(readingAggregateProvider.notifier)
-          .updatePage(currentState.currentIndex);
+      coordinator.updatePage(currentState.currentIndex);
     }
-    await ref.read(readingAggregateProvider.notifier).flushProgress();
-  }
-
-  Future<void> closeSession() async {
-    await ref.read(readerSessionServiceProvider).close(_comicId);
+    await coordinator.flushProgress();
   }
 
   Future<void> executeExitReader({
@@ -326,16 +323,14 @@ class ReaderController extends _$ReaderController {
     await ref
         .read(readerFullscreenControllerProvider.notifier)
         .exitFullscreenIfNeeded();
-    if (!routeContext.incognito) {
-      final ReaderState? currentState = state.asData?.value;
-      if (currentState != null) {
-        ref
-            .read(readingAggregateProvider.notifier)
-            .updatePage(currentState.currentIndex);
-      }
-      await ref.read(readingAggregateProvider.notifier).endSession();
-    }
-    await closeSession();
+    final ReaderState? currentState = state.asData?.value;
+    await ref
+        .read(readSessionCoordinatorProvider)
+        .exitReadSession(
+          comicId: _comicId,
+          incognito: routeContext.incognito,
+          currentPageIndex: currentState?.currentIndex,
+        );
     ref.read(readerPrefetchControllerProvider.notifier).clearComic(_comicId);
     if (!context.mounted) {
       return;

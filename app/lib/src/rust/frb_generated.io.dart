@@ -284,6 +284,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesReadingHistoryDto dco_decode_series_reading_history_dto(dynamic raw);
 
   @protected
+  SeriesSortFieldDto dco_decode_series_sort_field_dto(dynamic raw);
+
+  @protected
   SeriesSortOptionDto dco_decode_series_sort_option_dto(dynamic raw);
 
   @protected
@@ -632,6 +635,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesReadingHistoryDto sse_decode_series_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SeriesSortFieldDto sse_decode_series_sort_field_dto(
     SseDeserializer deserializer,
   );
 
@@ -1080,6 +1088,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_series_reading_history_dto(
     SeriesReadingHistoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_series_sort_field_dto(
+    SeriesSortFieldDto self,
     SseSerializer serializer,
   );
 

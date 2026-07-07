@@ -94,7 +94,7 @@ pub async fn fetch_series_page(
         });
     }
     let offset = (effective_page - 1) * page_size;
-    let ids_query = build_ids_page_query(&filter, sort.descending, page_size, offset);
+    let ids_query = build_ids_page_query(&filter, &sort, page_size, offset);
     let series_ids = query_series_ids(&db, &ids_query).await?;
     let items = load_series_by_ids(&db, series_ids).await?;
     Ok(PagedSeriesResultDto {

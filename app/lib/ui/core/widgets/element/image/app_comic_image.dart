@@ -17,6 +17,7 @@ class AppComicImage extends StatelessWidget {
     this.errorPlaceholder,
     this.filterQuality = FilterQuality.medium,
     this.useReaderImageCache = false,
+    this.onDecodeError,
   });
 
   final String? filePath;
@@ -28,6 +29,7 @@ class AppComicImage extends StatelessWidget {
   final Widget? errorPlaceholder;
   final FilterQuality filterQuality;
   final bool useReaderImageCache;
+  final VoidCallback? onDecodeError;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +58,7 @@ class AppComicImage extends StatelessWidget {
         filterQuality: filterQuality,
         loadStateChanged: (ExtendedImageState state) {
           if (state.extendedImageLoadState == LoadState.failed) {
+            onDecodeError?.call();
             return fallback;
           }
           if (state.extendedImageLoadState == LoadState.loading) {
@@ -79,6 +82,7 @@ class AppComicImage extends StatelessWidget {
       filterQuality: filterQuality,
       loadStateChanged: (ExtendedImageState state) {
         if (state.extendedImageLoadState == LoadState.failed) {
+          onDecodeError?.call();
           return fallback;
         }
         if (state.extendedImageLoadState == LoadState.loading) {
@@ -97,6 +101,7 @@ class AppComicImage extends StatelessWidget {
       filterQuality: filterQuality,
       loadStateChanged: (ExtendedImageState state) {
         if (state.extendedImageLoadState == LoadState.failed) {
+          onDecodeError?.call();
           return fallback;
         }
         if (state.extendedImageLoadState == LoadState.loading) {

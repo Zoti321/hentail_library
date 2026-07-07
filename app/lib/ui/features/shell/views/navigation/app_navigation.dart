@@ -43,8 +43,9 @@ abstract final class AppNavigation {
       case '/metadata':
       case '/tags':
       case '/authors':
-      case '/series':
         return '资料';
+      case '/series':
+        return '页面不存在';
       case '/history':
         return '历史';
       case '/settings':
@@ -68,8 +69,9 @@ abstract final class AppNavigation {
       case '/metadata':
       case '/tags':
       case '/authors':
-      case '/series':
         return navIdMetadata;
+      case '/series':
+        return '';
       case '/history':
         return navIdHistory;
       case '/settings':

@@ -5,7 +5,7 @@ import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
-import 'package:hentai_library/ui/core/dto/history_grid_item_dto.dart';
+import 'package:hentai_library/ui/core/dto/history_grid_item.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/reading_history_card.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/clear_reading_history_confirm_dialog.dart';
@@ -232,7 +232,7 @@ class _HistoryListSliver extends ConsumerWidget {
                   ),
                   itemCount: feed.items.length,
                   itemBuilder: (BuildContext context, int index) {
-                    final HistoryGridItemDto item = feed.items[index];
+                    final HistoryGridItem item = feed.items[index];
                     return ReadingHistoryCard(
                       comicId: item.comicId,
                       title: item.title,

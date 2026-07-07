@@ -12,7 +12,7 @@ import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_f
 import 'package:hentai_library/ui/core/widgets/form/author_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
-import 'package:hentai_library/ui/core/widgets/foundation/my_toggle_switch.dart';
+import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -341,10 +341,7 @@ class _EditMetadataContentRatingSection extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: tokens.spacing.sm),
-                MyToggleSwitch(
-                  checked: isR18,
-                  onChange: () => onChanged(!isR18),
-                ),
+                ToggleSwitch(checked: isR18, onChange: () => onChanged(!isR18)),
               ],
             ),
           ),

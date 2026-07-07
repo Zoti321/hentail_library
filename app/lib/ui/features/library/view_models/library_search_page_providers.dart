@@ -43,9 +43,9 @@ final librarySearchPageSeriesViewDataProvider =
         trimmed,
       );
       final List<Series> matched = tagExpression == null
-          ? await ref.read(librarySeriesRepoProvider).searchByKeyword(trimmed)
+          ? await ref.read(seriesRepoProvider).searchByKeyword(trimmed)
           : await ref
-                .read(librarySeriesRepoProvider)
+                .read(seriesRepoProvider)
                 .searchByTagExpression(
                   mustInclude: tagExpression.mustInclude,
                   optionalOr: tagExpression.optionalOr,

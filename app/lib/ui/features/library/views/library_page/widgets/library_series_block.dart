@@ -36,8 +36,22 @@ class LibrarySeriesBlock extends ConsumerWidget {
       );
     }
     final List<Series> series = catalog.items;
-    final String filterQuery = catalog.filterQuery;
+    final bool isSeriesTableEmpty = catalog.isSeriesTableEmpty;
     final bool showPagination = catalog.showPagination;
+    final LibrarySeriesSortOption sortOption = ref.watch(
+      librarySeriesTabSortOptionProvider,
+    );
+    final LibraryAgeRestrictionFilter ageRestriction = ref.watch(
+      librarySeriesTabAgeRestrictionFilterProvider,
+    );
+    final int pageSize = ref.watch(librarySeriesTabPageSizeProvider);
+    final LibraryCatalogGridSuppressAnimationKey suppressAnimationKey =
+        LibraryCatalogGridSuppressAnimationKey(
+          keyword: catalog.filterQuery,
+          ageRestriction: ageRestriction,
+          page: catalog.pagination.page,
+          pageSize: pageSize,
+        );
     return SliverPadding(
       padding: EdgeInsets.symmetric(
         horizontal: tokens.layout.contentHorizontalPadding,
@@ -51,8 +65,10 @@ class LibrarySeriesBlock extends ConsumerWidget {
             ),
           _LibrarySeriesGridSliver(
             series: series,
-            effectiveQuery: filterQuery,
+            isSeriesTableEmpty: isSeriesTableEmpty,
             isReloading: catalogAsync.isLoading,
+            positionAnimationKey: sortOption,
+            suppressAnimationKey: suppressAnimationKey,
           ),
           if (showPagination)
             const LibraryPaginationBarSliver(
@@ -65,87 +81,49 @@ class LibrarySeriesBlock extends ConsumerWidget {
   }
 }
 
-class _LibrarySeriesGridSliver extends StatefulWidget {
+class _LibrarySeriesGridSliver extends StatelessWidget {
   const _LibrarySeriesGridSliver({
     required this.series,
-    required this.effectiveQuery,
+    required this.isSeriesTableEmpty,
+    required this.positionAnimationKey,
+    required this.suppressAnimationKey,
     this.isReloading = false,
   });
+
   final List<Series> series;
-  final String effectiveQuery;
+  final bool isSeriesTableEmpty;
+  final Object positionAnimationKey;
+  final LibraryCatalogGridSuppressAnimationKey suppressAnimationKey;
   final bool isReloading;
 
   @override
-  State<_LibrarySeriesGridSliver> createState() =>
-      _LibrarySeriesGridSliverState();
-}
-
-class _LibrarySeriesGridSliverState extends State<_LibrarySeriesGridSliver> {
-  AppThemeTokens? _lastTokens;
-  SliverGridDelegate? _cachedDelegate;
-
-  SliverGridDelegate _delegateFor(BuildContext context) {
-    final AppThemeTokens tokens = context.tokens;
-    if (_cachedDelegate != null && _lastTokens == tokens) {
-      return _cachedDelegate!;
-    }
-    _lastTokens = tokens;
-    return _cachedDelegate = libraryGridDelegateForTokens(tokens);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (widget.isReloading && widget.series.isEmpty) {
+    if (isReloading && series.isEmpty) {
       return const SliverToBoxAdapter(
         child: Center(child: CircularProgressIndicator()),
       );
     }
-    final String q = widget.effectiveQuery.trim();
-    if (widget.series.isEmpty) {
-      return _NoMatchingSeriesSliver(query: q);
+    if (series.isEmpty) {
+      return _LibraryCatalogEmptySliver(
+        entity: LibraryDisplayTarget.series,
+        isTableEmpty: isSeriesTableEmpty,
+      );
     }
-    return SliverGrid.builder(
-      gridDelegate: _delegateFor(context),
-      itemCount: widget.series.length,
+    return AnimatedLibraryCatalogGridSliver(
+      itemCount: series.length,
+      positionAnimationKey: positionAnimationKey,
+      suppressAnimationKey: suppressAnimationKey,
       itemBuilder: (BuildContext context, int index) {
-        final Series s = widget.series[index];
+        final Series s = series[index];
         return Center(
+          key: ValueKey<String>('library-series-${s.id}'),
           child: SeriesCard(
-            key: Key('library-series-${s.id}'),
             series: s,
             size: const Size(double.infinity, double.infinity),
             onTap: () => _openSeriesDetail(s),
           ),
         );
       },
-    );
-  }
-}
-
-class _NoMatchingSeriesSliver extends StatelessWidget {
-  const _NoMatchingSeriesSliver({this.query = ''});
-  final String query;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final String q = query.trim();
-    final bool hasQuery = q.isNotEmpty;
-    final String message = hasQuery ? '无匹配系列' : '暂无系列';
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 24, bottom: 48),
-        child: Center(
-          child: Text(
-            message,
-            style: TextStyle(
-              fontSize: 13,
-              color: theme.colorScheme.hentai.textTertiary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
@@ -23,15 +24,32 @@ LibraryAgeRestrictionFilter libraryActiveAgeRestrictionFilter(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-LibraryComicSortOption libraryActiveSortOption(Ref ref) {
+LibraryComicSortOption libraryActiveComicSortOption(Ref ref) {
   final LibraryDisplayTarget target = ref.watch(libraryDisplayTargetProvider);
+  if (target != LibraryDisplayTarget.comics) {
+    return kLibraryDefaultSortOption;
+  }
   final AsyncValue<LibraryTabSortSettings> settingsAsync = ref.watch(
     libraryTabSortProvider,
   );
   return settingsAsync.maybeWhen(
-    data: (LibraryTabSortSettings settings) =>
-        sortOptionForTarget(settings, target),
+    data: (LibraryTabSortSettings settings) => settings.comics,
     orElse: () => kLibraryDefaultSortOption,
+  );
+}
+
+@Riverpod(keepAlive: true)
+LibrarySeriesSortOption libraryActiveSeriesSortOption(Ref ref) {
+  final LibraryDisplayTarget target = ref.watch(libraryDisplayTargetProvider);
+  if (target != LibraryDisplayTarget.series) {
+    return kLibraryDefaultSeriesSortOption;
+  }
+  final AsyncValue<LibraryTabSortSettings> settingsAsync = ref.watch(
+    libraryTabSortProvider,
+  );
+  return settingsAsync.maybeWhen(
+    data: (LibraryTabSortSettings settings) => settings.series,
+    orElse: () => kLibraryDefaultSeriesSortOption,
   );
 }
 
@@ -69,13 +87,13 @@ LibraryAgeRestrictionFilter librarySeriesTabAgeRestrictionFilter(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
-LibraryComicSortOption librarySeriesTabSortOption(Ref ref) {
+LibrarySeriesSortOption librarySeriesTabSortOption(Ref ref) {
   final AsyncValue<LibraryTabSortSettings> settingsAsync = ref.watch(
     libraryTabSortProvider,
   );
   return settingsAsync.maybeWhen(
     data: (LibraryTabSortSettings settings) => settings.series,
-    orElse: () => kLibraryDefaultSortOption,
+    orElse: () => kLibraryDefaultSeriesSortOption,
   );
 }
 

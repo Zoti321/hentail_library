@@ -1,5 +1,5 @@
-import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
+import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
@@ -12,10 +12,12 @@ abstract class SeriesRepository {
 
   Future<List<Series>> getAll();
 
+  Future<int> countAll();
+
   Future<PagedResult<Series>> fetchPage({
     required PageRequest request,
     required LibrarySeriesFilter filter,
-    required LibraryComicSortOption sortOption,
+    required LibrarySeriesSortOption sortOption,
   });
 
   Future<Series?> findById(String seriesId);

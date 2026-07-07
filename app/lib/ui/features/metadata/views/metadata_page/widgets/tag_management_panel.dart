@@ -5,7 +5,7 @@ import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/status_card_shell.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/rename_tag_dialog.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_height.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_shell.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -56,12 +56,11 @@ class TagManagementPanel extends ConsumerWidget {
                 }
                 return LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
-                    final double cardHeight =
-                        MetadataPanelHeightCalculator.calculateCardHeight(
-                          constraints: constraints,
-                          itemCount: filteredTags.length,
-                          config: _TagStyles.listHeightConfig,
-                        );
+                    final double cardHeight = metadataPanelCardHeight(
+                      constraints: constraints,
+                      itemCount: filteredTags.length,
+                      config: _TagStyles.listHeightConfig,
+                    );
                     return Align(
                       alignment: Alignment.topCenter,
                       child: SizedBox(
@@ -114,7 +113,7 @@ class _TagStyles {
     vertical: 48,
   );
   static const MetadataPanelHeightConfig listHeightConfig =
-      MetadataPanelHeightCalculator.defaultConfig;
+      kMetadataPanelHeightDefaultConfig;
 }
 
 class _TagManagementHeader extends ConsumerWidget {

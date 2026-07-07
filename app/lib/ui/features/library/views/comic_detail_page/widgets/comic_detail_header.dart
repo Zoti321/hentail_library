@@ -205,7 +205,10 @@ class _ComicDetailOverflowMenuButtonState
       return;
     }
     try {
-      await ref.read(deleteComicsUseCaseProvider).call(<String>[
+      await ref.read(comicDeletionServiceProvider).deleteComics(<String>[
+        widget.comic.comicId,
+      ]);
+      ref.read(comicCoverCacheManagerProvider.notifier).clearForComics(<String>[
         widget.comic.comicId,
       ]);
       if (!context.mounted) {

@@ -30,13 +30,13 @@ ComicThumbnailRepository comicThumbnailRepo(Ref ref) =>
 ComicRepository comicRepo(Ref ref) => const ComicRepositoryImpl();
 
 @Riverpod(keepAlive: true)
-SeriesRepository librarySeriesRepo(Ref ref) => const SeriesRepositoryImpl();
+SeriesRepository seriesRepo(Ref ref) => const SeriesRepositoryImpl();
 
 @Riverpod(keepAlive: true)
-TagRepository libraryTagRepo(Ref ref) => const TagRepositoryImpl();
+TagRepository tagRepo(Ref ref) => const TagRepositoryImpl();
 
 @Riverpod(keepAlive: true)
-AuthorRepository libraryAuthorRepo(Ref ref) => const AuthorRepositoryImpl();
+AuthorRepository authorRepo(Ref ref) => const AuthorRepositoryImpl();
 
 @Riverpod(keepAlive: true)
 PathRepository pathRepo(Ref ref) => const PathRepositoryImpl();

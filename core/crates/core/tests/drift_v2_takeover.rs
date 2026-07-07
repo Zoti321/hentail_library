@@ -189,7 +189,10 @@ fn fetch_series_page_hides_r18_series_by_default() {
                     require_items: true,
                     ..Default::default()
                 },
-                SeriesSortOptionDto { descending: false },
+                SeriesSortOptionDto {
+                    field: hentai_core::SeriesSortFieldDto::Name,
+                    descending: false,
+                },
             )
             .await
             .expect("page");
@@ -224,7 +227,10 @@ fn fetch_series_page_returns_series_with_items() {
                     require_items: true,
                     ..Default::default()
                 },
-                SeriesSortOptionDto { descending: false },
+                SeriesSortOptionDto {
+                    field: hentai_core::SeriesSortFieldDto::Name,
+                    descending: false,
+                },
             )
             .await
             .expect("page");
@@ -232,6 +238,53 @@ fn fetch_series_page_returns_series_with_items() {
             assert!(page.items.iter().any(|s| s.items.iter().any(|i| {
                 i.comic_id == "af738b6b1b3bbfab9a0fd591459572509d7ef4d5"
             })));
+        });
+    });
+}
+
+#[test]
+fn fetch_series_page_random_order_varies_between_queries() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let db = connection().expect("connection");
+            rebuild_series_from_comics(&db).await.expect("rebuild series");
+            use hentai_core::{
+                fetch_series_page, SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto,
+            };
+            use std::collections::HashSet;
+            let filter = SeriesFilterDto {
+                show_r18: true,
+                require_items: true,
+                ..Default::default()
+            };
+            let mut orders = HashSet::new();
+            for _ in 0..12 {
+                let page = fetch_series_page(
+                    PageRequestDto {
+                        page: 1,
+                        page_size: 50,
+                    },
+                    filter.clone(),
+                    SeriesSortOptionDto {
+                        field: SeriesSortFieldDto::Random,
+                        descending: false,
+                    },
+                )
+                .await
+                .expect("page random");
+                assert!(page.total_count >= 2);
+                let ids: Vec<String> =
+                    page.items.iter().map(|s| s.series_id.clone()).collect();
+                orders.insert(ids);
+            }
+            assert!(
+                orders.len() > 1,
+                "expected RANDOM() to produce varying orders across repeated queries"
+            );
         });
     });
 }

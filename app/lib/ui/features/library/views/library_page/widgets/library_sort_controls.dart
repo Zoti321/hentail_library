@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/library/comic_list_query.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
@@ -22,25 +22,45 @@ class LibrarySortControls extends ConsumerWidget {
     final LibraryDisplayTarget displayTarget = ref.watch(
       libraryDisplayTargetProvider,
     );
-    final List<LibraryComicSortField> fields = switch (displayTarget) {
-      LibraryDisplayTarget.comics => LibraryComicSortField.values,
-      LibraryDisplayTarget.series => const <LibraryComicSortField>[
-        LibraryComicSortField.title,
-      ],
+    return switch (displayTarget) {
+      LibraryDisplayTarget.comics => const _ComicsSortControls(),
+      LibraryDisplayTarget.series => const _SeriesSortControls(),
     };
+  }
+}
+
+class _ComicsSortControls extends ConsumerWidget {
+  const _ComicsSortControls();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: fields
+      children: LibraryComicSortField.values
+          .map((LibraryComicSortField field) => _ComicSortListRow(field: field))
+          .toList(),
+    );
+  }
+}
+
+class _SeriesSortControls extends ConsumerWidget {
+  const _SeriesSortControls();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: kLibrarySeriesSortFields
           .map(
-            (LibraryComicSortField field) => _LibrarySortListRow(field: field),
+            (LibrarySeriesSortField field) => _SeriesSortListRow(field: field),
           )
           .toList(),
     );
   }
 }
 
-class _LibrarySortListRow extends ConsumerWidget {
-  const _LibrarySortListRow({required this.field});
+class _ComicSortListRow extends ConsumerWidget {
+  const _ComicSortListRow({required this.field});
 
   final LibraryComicSortField field;
 
@@ -48,11 +68,8 @@ class _LibrarySortListRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
-    final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
-    );
     final LibraryComicSortOption sortOption = ref.watch(
-      libraryActiveSortOptionProvider,
+      libraryActiveComicSortOptionProvider,
     );
     final bool isSelected = sortOption.field == field;
     final bool isImplemented = field.isImplemented;
@@ -70,7 +87,76 @@ class _LibrarySortListRow extends ConsumerWidget {
             ? () {
                 ref
                     .read(libraryTabSortProvider.notifier)
-                    .setSortField(displayTarget, field);
+                    .setComicSortField(field);
+              }
+            : null,
+        hoverColor: isImplemented ? theme.hoverColor : null,
+        splashColor: isImplemented ? theme.splashColor : null,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            kLibraryFilterSortDrawerContentInset,
+            8,
+            kLibraryFilterSortDrawerContentInset,
+            8,
+          ),
+          child: Row(
+            children: <Widget>[
+              SizedBox(
+                width: kLibrarySortIconSlotWidth,
+                child: isSelected
+                    ? Icon(
+                        isAscending
+                            ? LucideIcons.chevronUp
+                            : LucideIcons.chevronDown,
+                        size: 14,
+                        color: cs.primary,
+                      )
+                    : null,
+              ),
+              const SizedBox(width: kLibrarySortIconLabelGap),
+              Expanded(child: Text(field.label, style: labelStyle)),
+              if (!isImplemented)
+                Text(
+                  '即将推出',
+                  style: TextStyle(fontSize: 11, color: cs.hentai.textTertiary),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SeriesSortListRow extends ConsumerWidget {
+  const _SeriesSortListRow({required this.field});
+
+  final LibrarySeriesSortField field;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final LibrarySeriesSortOption sortOption = ref.watch(
+      libraryActiveSeriesSortOptionProvider,
+    );
+    final bool isSelected = sortOption.field == field;
+    final bool isImplemented = field.isImplemented;
+    final bool isAscending = !sortOption.descending;
+    final TextStyle labelStyle = TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w400,
+      color: isImplemented ? cs.hentai.textSecondary : cs.hentai.textTertiary,
+    );
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: isImplemented
+            ? () {
+                ref
+                    .read(libraryTabSortProvider.notifier)
+                    .setSeriesSortField(field);
               }
             : null,
         hoverColor: isImplemented ? theme.hoverColor : null,

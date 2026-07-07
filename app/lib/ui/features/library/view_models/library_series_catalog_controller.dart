@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
-import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/ui/features/library/view_models/catalog_pagination_engine.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
@@ -12,7 +12,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_query_int
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_series_catalog_controller.g.dart';
@@ -22,10 +22,9 @@ const LibrarySeriesProjection _librarySeriesProjection =
 
 @Riverpod(keepAlive: true)
 class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
-  int _pageIndex = 1;
-  Object? _lastQueryKey;
+  final CatalogPaginationEngine _pagination = CatalogPaginationEngine();
 
-  int get pageIndex => _pageIndex;
+  int get pageIndex => _pagination.pageIndex;
 
   @override
   Future<LibrarySeriesCatalogState> build() async {
@@ -39,23 +38,33 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
         (LibraryQueryIntent intent) => intent.keyword,
       ),
     );
-    final Object queryKey = (
+    _pagination.syncQueryKey((
       keyword,
       ref.watch(librarySeriesTabAgeRestrictionFilterProvider),
       ref.watch(librarySeriesTabSortOptionProvider),
       ref.watch(librarySeriesTabPageSizeProvider),
-    );
-    if (_lastQueryKey != null && _lastQueryKey != queryKey) {
-      _pageIndex = 1;
-    }
-    _lastQueryKey = queryKey;
+    ));
   }
 
   Future<LibrarySeriesCatalogState> _load() async {
-    ref.watch(seriesAggregateProvider);
+    final LibrarySeriesSortOption sortOption = ref.read(
+      librarySeriesTabSortOptionProvider,
+    );
+    // 随机排序每次查询顺序不同；库 revision 被动刷新不应触发重排。
+    if (sortOption.field != LibrarySeriesSortField.random) {
+      ref.watch(
+        libraryRevisionProvider.select(
+          (LibraryRevisionState state) => state.revision,
+        ),
+      );
+    }
+    final LibraryRevisionState revisionState = ref.read(
+      libraryRevisionProvider,
+    );
 
     final String keyword = ref.read(libraryQueryIntentProvider).keyword;
     final PagedResult<Series> page = await _fetchPage(keyword);
+    final int tableTotalCount = await ref.read(seriesRepoProvider).countAll();
 
     return LibrarySeriesCatalogState(
       items: page.items,
@@ -66,6 +75,8 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
         isLoading: false,
       ),
       filterQuery: keyword,
+      isSeriesTableEmpty:
+          revisionState.hasReceivedFirstEmit && tableTotalCount == 0,
     );
   }
 
@@ -73,7 +84,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     final LibraryAgeRestrictionFilter ageRestriction = ref.read(
       librarySeriesTabAgeRestrictionFilterProvider,
     );
-    final LibraryComicSortOption sortOption = ref.read(
+    final LibrarySeriesSortOption sortOption = ref.read(
       librarySeriesTabSortOptionProvider,
     );
     final LibrarySeriesFilter filter = _librarySeriesProjection.buildListFilter(
@@ -81,63 +92,46 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
       keyword: keyword,
     );
     final int pageSize = ref.read(librarySeriesTabPageSizeProvider);
-    final PagedResult<Series> result = await ref
-        .read(librarySeriesRepoProvider)
-        .fetchPage(
-          request: PageRequest(page: _pageIndex, pageSize: pageSize),
-          filter: filter,
-          sortOption: sortOption,
-        );
-    if (result.page != _pageIndex) {
-      _pageIndex = result.page;
-    }
-    return result;
+    return _pagination.fetchPage<Series>(
+      pageSize: pageSize,
+      fetch: (request) => ref
+          .read(seriesRepoProvider)
+          .fetchPage(request: request, filter: filter, sortOption: sortOption),
+    );
   }
 
   void setPage(int page) {
-    if (page < 1 || page == _pageIndex) {
-      return;
+    if (_pagination.setPage(page)) {
+      ref.invalidateSelf();
     }
-    _pageIndex = page;
-    ref.invalidateSelf();
   }
 
   void goToFirstPage() {
-    if (_pageIndex == 1) {
-      return;
+    if (_pagination.goToFirstPage()) {
+      ref.invalidateSelf();
     }
-    _pageIndex = 1;
-    ref.invalidateSelf();
   }
 
   void goToLastPage(int totalPages) {
-    if (totalPages <= 0 || _pageIndex == totalPages) {
-      return;
+    if (_pagination.goToLastPage(totalPages)) {
+      ref.invalidateSelf();
     }
-    _pageIndex = totalPages;
-    ref.invalidateSelf();
   }
 
   void goToPreviousPage() {
-    if (_pageIndex <= 1) {
-      return;
+    if (_pagination.goToPreviousPage()) {
+      ref.invalidateSelf();
     }
-    _pageIndex -= 1;
-    ref.invalidateSelf();
   }
 
   void goToNextPage(int totalPages) {
-    if (totalPages <= 0 || _pageIndex >= totalPages) {
-      return;
+    if (_pagination.goToNextPage(totalPages)) {
+      ref.invalidateSelf();
     }
-    _pageIndex += 1;
-    ref.invalidateSelf();
   }
 
   void refresh() {
-    ref.read(seriesAggregateProvider.notifier).refreshAllSeries();
-    _pageIndex = 1;
-    _lastQueryKey = null;
+    _pagination.refresh();
     ref.invalidateSelf();
   }
 }

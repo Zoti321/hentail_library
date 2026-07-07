@@ -1,0 +1,51 @@
+import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/element/chip/meta_chip.dart';
+import 'package:hentai_library/ui/features/library/views/library_page/widgets/widgets.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+class SearchedPageHeaderSection extends StatelessWidget {
+  const SearchedPageHeaderSection({
+    super.key,
+    required this.query,
+    required this.resultCount,
+    this.showQuotes = true,
+  });
+
+  final String query;
+  final int resultCount;
+  final bool showQuotes;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final String title = showQuotes ? '"$query"的搜索结果' : query;
+    return Padding(
+      padding: tokens.layout.contentAreaPadding.copyWith(
+        top: kLibraryHeaderVerticalPadding,
+        bottom: kLibraryHeaderVerticalPadding,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Flexible(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.w600,
+                color: cs.hentai.textPrimary,
+                letterSpacing: -0.4,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: 12),
+          MetaChip(icon: LucideIcons.search, label: '$resultCount'),
+        ],
+      ),
+    );
+  }
+}

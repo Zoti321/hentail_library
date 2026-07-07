@@ -1,5 +1,6 @@
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 
 typedef LibraryTabAgeRestrictionSettings = ({
@@ -9,7 +10,7 @@ typedef LibraryTabAgeRestrictionSettings = ({
 
 typedef LibraryTabSortSettings = ({
   LibraryComicSortOption comics,
-  LibraryComicSortOption series,
+  LibrarySeriesSortOption series,
 });
 
 LibraryAgeRestrictionFilter ageRestrictionForTarget(
@@ -22,12 +23,22 @@ LibraryAgeRestrictionFilter ageRestrictionForTarget(
   };
 }
 
-LibraryComicSortOption sortOptionForTarget(
+LibraryComicSortOption comicSortOptionForTarget(
   LibraryTabSortSettings settings,
   LibraryDisplayTarget target,
 ) {
   return switch (target) {
     LibraryDisplayTarget.comics => settings.comics,
+    LibraryDisplayTarget.series => kLibraryDefaultSortOption,
+  };
+}
+
+LibrarySeriesSortOption seriesSortOptionForTarget(
+  LibraryTabSortSettings settings,
+  LibraryDisplayTarget target,
+) {
+  return switch (target) {
+    LibraryDisplayTarget.comics => kLibraryDefaultSeriesSortOption,
     LibraryDisplayTarget.series => settings.series,
   };
 }
@@ -43,21 +54,24 @@ LibraryTabAgeRestrictionSettings copyAgeRestrictionForTarget(
   };
 }
 
-LibraryTabSortSettings copySortForTarget(
+LibraryTabSortSettings copyComicSortForTarget(
   LibraryTabSortSettings settings,
-  LibraryDisplayTarget target,
   LibraryComicSortOption value,
 ) {
-  return switch (target) {
-    LibraryDisplayTarget.comics => (comics: value, series: settings.series),
-    LibraryDisplayTarget.series => (comics: settings.comics, series: value),
-  };
+  return (comics: value, series: settings.series);
+}
+
+LibraryTabSortSettings copySeriesSortForTarget(
+  LibraryTabSortSettings settings,
+  LibrarySeriesSortOption value,
+) {
+  return (comics: settings.comics, series: value);
 }
 
 final LibraryComicSortOption kLibraryDefaultSortOption =
     LibraryComicSortOption();
 
-bool isLibraryFilterSortCustomized({
+bool isLibraryComicFilterSortCustomized({
   required LibraryAgeRestrictionFilter ageRestriction,
   required LibraryComicSortOption sortOption,
 }) {
@@ -66,13 +80,28 @@ bool isLibraryFilterSortCustomized({
       sortOption.descending != kLibraryDefaultSortOption.descending;
 }
 
+bool isLibrarySeriesFilterSortCustomized({
+  required LibraryAgeRestrictionFilter ageRestriction,
+  required LibrarySeriesSortOption sortOption,
+}) {
+  return ageRestriction != LibraryAgeRestrictionFilter.unrestricted ||
+      sortOption.field != kLibraryDefaultSeriesSortOption.field ||
+      sortOption.descending != kLibraryDefaultSeriesSortOption.descending;
+}
+
 bool isLibraryFilterSortCustomizedForTarget({
   required LibraryDisplayTarget target,
   required LibraryTabAgeRestrictionSettings ageSettings,
   required LibraryTabSortSettings sortSettings,
 }) {
-  return isLibraryFilterSortCustomized(
-    ageRestriction: ageRestrictionForTarget(ageSettings, target),
-    sortOption: sortOptionForTarget(sortSettings, target),
-  );
+  return switch (target) {
+    LibraryDisplayTarget.comics => isLibraryComicFilterSortCustomized(
+      ageRestriction: ageSettings.comics,
+      sortOption: sortSettings.comics,
+    ),
+    LibraryDisplayTarget.series => isLibrarySeriesFilterSortCustomized(
+      ageRestriction: ageSettings.series,
+      sortOption: sortSettings.series,
+    ),
+  };
 }

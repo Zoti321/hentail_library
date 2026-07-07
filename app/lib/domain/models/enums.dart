@@ -1,5 +1,3 @@
-import 'package:path/path.dart' as p;
-
 /// 内容分级（用户自定义为主）。
 enum ContentRating { unknown, safe, r18 }
 
@@ -32,25 +30,13 @@ enum ResourceType {
   sevenZ,
 
   /// PDF 文档
-  pdf;
-
-  static ResourceType? fromFilePath(String path) {
-    final String ext = p.extension(path).toLowerCase();
-    return switch (ext) {
-      '.zip' => ResourceType.zip,
-      '.cbz' => ResourceType.cbz,
-      '.epub' => ResourceType.epub,
-      '.cbr' => ResourceType.cbr,
-      '.rar' => ResourceType.rar,
-      '.cb7' => ResourceType.cb7,
-      '.7z' => ResourceType.sevenZ,
-      '.pdf' => ResourceType.pdf,
-      _ => null,
-    };
-  }
+  pdf,
 }
 
 enum LibraryDisplayTarget { comics, series }
+
+/// 缩略图生成优先级（Rust 后台队列调度）。
+enum ThumbnailPriority { critical, high, low }
 
 /// 系列连载状态（用户可编辑；sync 不覆盖）。
 enum SerializationStatus {

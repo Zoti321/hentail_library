@@ -2,11 +2,10 @@ import 'dart:async';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
-import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
-import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
-import 'package:hentai_library/ui/features/shell/di/usecases/scan_library_controller.dart';
-import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
+import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/scan_library_controller.dart';
+import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_startup_coordinator_notifier.g.dart';
@@ -19,6 +18,7 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
 
   @override
   bool build() {
+    ref.watch(libraryRevisionProvider);
     ref.watch(thumbnailEventCoordinatorProvider);
     ref.onDispose(() {
       _autoScanScheduleToken++;
@@ -33,17 +33,6 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
         if (!setting.autoScan) return;
         _scheduleStartupAutoScanAtIdle();
       });
-    });
-    ref.listen(scanLibraryControllerProvider, (
-      ScanLibraryState? previous,
-      ScanLibraryState next,
-    ) {
-      final bool wasRunning = previous?.running ?? false;
-      if (!wasRunning || next.running) return;
-      if (next.cancelled) return;
-      if (next.error != null) return;
-      ref.read(comicAggregateProvider.notifier).refreshStream();
-      ref.read(seriesAggregateProvider.notifier).refreshAllSeries();
     });
     return true;
   }

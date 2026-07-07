@@ -9,9 +9,6 @@ import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 
 /// 漫画主表与标签的持久化；读写均经 Rust/SeaORM。
 abstract class ComicRepository {
-  /// 漫画表变更通知（不推送全量数据）。
-  Stream<void> watchChanges();
-
   Future<List<Comic>> getAll();
 
   Future<int> countAll();

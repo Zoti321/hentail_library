@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
+import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
 
@@ -26,9 +26,10 @@ class AdaptiveComicCover extends StatelessWidget {
     this.backgroundColor,
     this.clipBorderRadius,
     this.showShadow = false,
+    this.onDecodeError,
   });
 
-  final ComicCoverDisplayData? coverDisplay;
+  final ComicCoverImage? coverDisplay;
   final double fallbackAspectRatio;
   final double? containerAspectRatio;
   final BoxFit fit;
@@ -38,6 +39,7 @@ class AdaptiveComicCover extends StatelessWidget {
   final Color? backgroundColor;
   final BorderRadius? clipBorderRadius;
   final bool showShadow;
+  final VoidCallback? onDecodeError;
 
   bool get _usesFixedContainer => containerAspectRatio != null;
 
@@ -91,6 +93,7 @@ class AdaptiveComicCover extends StatelessWidget {
               filterQuality: filterQuality,
               placeholder: placeholder,
               errorPlaceholder: errorPlaceholder ?? placeholder,
+              onDecodeError: onDecodeError,
             ),
           );
         },
@@ -125,7 +128,7 @@ class AdaptiveComicCover extends StatelessWidget {
 }
 
 Future<double> resolveCoverAspectRatio({
-  required ComicCoverDisplayData? coverDisplay,
+  required ComicCoverImage? coverDisplay,
   required double fallbackAspectRatio,
 }) async {
   final Uint8List? memoryBytes = coverDisplay?.memoryBytes;
@@ -151,6 +154,3 @@ Future<double> resolveCoverAspectRatio({
     return fallbackAspectRatio;
   }
 }
-
-@Deprecated('Use AdaptiveComicCover instead.')
-typedef AdaptiveCover = AdaptiveComicCover;

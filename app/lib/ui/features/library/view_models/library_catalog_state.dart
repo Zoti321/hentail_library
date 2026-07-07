@@ -2,7 +2,7 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
 
-/// ?? Tab ???????
+/// 漫画 Tab 目录列表状态。
 class LibraryComicsCatalogState {
   const LibraryComicsCatalogState({
     required this.items,
@@ -23,18 +23,20 @@ class LibraryComicsCatalogState {
   int get displayedCount => pagination.totalCount;
 }
 
-/// ?? Tab ???????
+/// 系列 Tab 目录列表状态。
 class LibrarySeriesCatalogState {
   const LibrarySeriesCatalogState({
     required this.items,
     required this.pagination,
     required this.filterQuery,
+    required this.isSeriesTableEmpty,
     this.showPagination = true,
   });
 
   final List<Series> items;
   final LibraryPagination pagination;
   final String filterQuery;
+  final bool isSeriesTableEmpty;
   final bool showPagination;
 
   int get displayedCount => pagination.totalCount;

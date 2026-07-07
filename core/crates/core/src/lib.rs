@@ -49,7 +49,7 @@ pub use series::{
     load_home_series_comic_order_map, search_series_by_keyword, search_series_by_tag_expression,
     set_series_items_order, update_series_user_meta, watch_all_series,
     watch_home_series_comic_order_map, PagedSeriesResultDto, SeriesDto, SeriesFilterDto,
-    SeriesItemDto, SeriesSortOptionDto, UpdateSeriesUserMetaDto,
+    SeriesItemDto, SeriesSortFieldDto, SeriesSortOptionDto, UpdateSeriesUserMetaDto,
 };
 pub use history::{
     PagedReadingHistoryDto, ReadingHistoryDto, SeriesReadingHistoryDto, clear_all_reading,

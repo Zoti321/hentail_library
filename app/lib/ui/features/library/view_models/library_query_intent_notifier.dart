@@ -1,6 +1,6 @@
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
-import 'package:hentai_library/ui/features/shell/view_models/debounced_action_runner.dart';
+import 'package:hentai_library/ui/features/shell/view_models/debouncer.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_query_intent_notifier.g.dart';
@@ -10,17 +10,14 @@ part 'library_query_intent_notifier.g.dart';
 @Riverpod(keepAlive: true)
 class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
   static const _filterDebounceDuration = Duration(milliseconds: 300);
-  static const _mergeSearchDebounceDuration = Duration(milliseconds: 500);
-  late final DebouncedActionRunner _filterQueryDebouncer =
-      DebouncedActionRunner(duration: _filterDebounceDuration);
-  late final DebouncedActionRunner _mergeSearchDebouncer =
-      DebouncedActionRunner(duration: _mergeSearchDebounceDuration);
+  late final Debouncer _filterQueryDebouncer = Debouncer(
+    duration: _filterDebounceDuration,
+  );
 
   @override
   LibraryQueryIntent build() {
     ref.onDispose(() {
       _filterQueryDebouncer.dispose();
-      _mergeSearchDebouncer.dispose();
     });
     return LibraryQueryIntent();
   }
@@ -40,11 +37,5 @@ class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
       keyword: '',
       displayTarget: LibraryDisplayTarget.comics,
     );
-  }
-
-  void setMergeSearchQuery(String value) {
-    _mergeSearchDebouncer.run(() {
-      state = state.copyWith(mergeSearchQuery: value);
-    });
   }
 }

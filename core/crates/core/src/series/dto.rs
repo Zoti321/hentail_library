@@ -35,7 +35,18 @@ fn normalize_query(raw: Option<String>) -> Option<String> {
         .filter(|s| !s.is_empty())
 }
 
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SeriesSortFieldDto {
+    #[default]
+    Name,
+    ComicCount,
+    Random,
+}
+
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct SeriesSortOptionDto {
+    #[serde(default)]
+    pub field: SeriesSortFieldDto,
     pub descending: bool,
 }

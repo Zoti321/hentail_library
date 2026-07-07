@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/providers.dart';
-import 'package:hentai_library/ui/features/shell/views/selected_paths_page/widgets/add_path_popover_btn.dart';
+import 'package:hentai_library/ui/features/shell/views/selected_paths_page/widgets/add_path_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/remove_saved_paths_batch_confirm_dialog.dart';
@@ -121,7 +121,7 @@ class _SelectedPathsHeaderSummary extends StatelessWidget {
         Text('选中路径', style: buildSelectedPathsPageTitleStyle(colorScheme)),
         const SizedBox(height: 8),
         Text(
-          '管理本地漫画根路径（文件或文件夹），支持批量选择',
+          '管理本地漫画根目录，支持批量选择',
           style: TextStyle(
             color: colorScheme.hentai.textTertiary,
             fontSize: 13,
@@ -166,7 +166,7 @@ class _SelectedPathsHeaderActions extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       children: <Widget>[
-        const AddPathPopoverButton(),
+        const AddPathButton(),
         if (hasData && selectedCount > 0)
           TextButton.icon(
             onPressed: isBatchRemoving ? null : () => onRemoveSelected(),

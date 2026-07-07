@@ -177,11 +177,11 @@ void main() {
       );
     });
 
-    test('dualPageNoCover to continuousVertical uses max page in spread', () {
+    test('dualPageNoCover to webtoon uses max page in spread', () {
       expect(
         SpreadIndex.remapPageForModeSwitch(
           fromMode: ReadingMode.dualPageNoCover,
-          toMode: ReadingMode.continuousVertical,
+          toMode: ReadingMode.webtoon,
           currentPageIndex: 2,
           totalPages: 4,
         ),
@@ -234,11 +234,11 @@ void main() {
       );
     });
 
-    test('paged to continuousVertical does not remap', () {
+    test('paged to webtoon does not remap', () {
       expect(
         SpreadIndex.remapPageForModeSwitch(
           fromMode: ReadingMode.paged,
-          toMode: ReadingMode.continuousVertical,
+          toMode: ReadingMode.webtoon,
           currentPageIndex: 7,
           totalPages: 20,
         ),

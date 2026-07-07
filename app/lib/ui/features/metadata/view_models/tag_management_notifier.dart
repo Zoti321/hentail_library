@@ -4,7 +4,7 @@ import 'package:hentai_library/ui/features/shell/di/deps.dart';
 
 /// 全部标签列表（用于标签管理页面）
 final allTagsProvider = FutureProvider<List<Tag>>((ref) async {
-  final tags = await ref.watch(libraryTagRepoProvider).listAll();
+  final tags = await ref.watch(tagRepoProvider).listAll();
   tags.sort((a, b) => a.name.compareTo(b.name));
   return tags;
 });
@@ -84,14 +84,14 @@ class TagActions {
   final Ref _ref;
 
   Future<void> addTag(Tag tag) async {
-    await _ref.read(libraryTagRepoProvider).add(Tag(name: tag.name));
+    await _ref.read(tagRepoProvider).add(Tag(name: tag.name));
     _ref.invalidate(allTagsProvider);
   }
 
   Future<void> deleteTags(List<Tag> tags) async {
     if (tags.isEmpty) return;
     await _ref
-        .read(libraryTagRepoProvider)
+        .read(tagRepoProvider)
         .deleteByNames(tags.map((e) => e.name).toList());
     _ref.invalidate(allTagsProvider);
     _ref.read(tagSelectionProvider.notifier).clear();
@@ -99,7 +99,7 @@ class TagActions {
 
   /// 删除单个标签；若该标签在批量选中集合中，仅从集合中移除该项。
   Future<void> deleteTag(Tag tag) async {
-    await _ref.read(libraryTagRepoProvider).deleteByNames(<String>[tag.name]);
+    await _ref.read(tagRepoProvider).deleteByNames(<String>[tag.name]);
     _ref.invalidate(allTagsProvider);
     _ref.read(tagSelectionProvider.notifier).remove(tag);
   }
@@ -107,7 +107,7 @@ class TagActions {
   Future<void> renameTag(Tag oldTag, String newName) async {
     final trimmed = newName.trim();
     if (trimmed.isEmpty || trimmed == oldTag.name) return;
-    await _ref.read(libraryTagRepoProvider).rename(oldTag.name, trimmed);
+    await _ref.read(tagRepoProvider).rename(oldTag.name, trimmed);
     _ref.invalidate(allTagsProvider);
   }
 }

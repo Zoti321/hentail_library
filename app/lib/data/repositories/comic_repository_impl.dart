@@ -16,12 +16,6 @@ class ComicRepositoryImpl implements ComicRepository {
   const ComicRepositoryImpl();
 
   @override
-  Stream<void> watchChanges() => guardFrbStream(
-    () => rust.watchComicChanges().map((int _) {}),
-    fallbackMessage: '监听漫画变更失败',
-  );
-
-  @override
   Future<int> countAll() async => guardFrbSync(
     () => rust.countAllComicsFrb().toInt(),
     fallbackMessage: '统计漫画数量失败',
