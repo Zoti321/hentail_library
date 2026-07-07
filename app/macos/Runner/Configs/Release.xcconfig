@@ -1,2 +1,6 @@
 #include "../../Flutter/Flutter-Release.xcconfig"
 #include "Warnings.xcconfig"
+
+// Apple Silicon runner / unrar C++ link: ship arm64-only release binaries.
+ARCHS = arm64
+ONLY_ACTIVE_ARCH = YES
