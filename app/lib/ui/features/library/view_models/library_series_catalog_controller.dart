@@ -58,13 +58,13 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
         ),
       );
     }
-    final LibraryRevisionState revisionState = ref.read(libraryRevisionProvider);
+    final LibraryRevisionState revisionState = ref.read(
+      libraryRevisionProvider,
+    );
 
     final String keyword = ref.read(libraryQueryIntentProvider).keyword;
     final PagedResult<Series> page = await _fetchPage(keyword);
-    final int tableTotalCount = await ref
-        .read(seriesRepoProvider)
-        .countAll();
+    final int tableTotalCount = await ref.read(seriesRepoProvider).countAll();
 
     return LibrarySeriesCatalogState(
       items: page.items,
@@ -94,11 +94,9 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     final int pageSize = ref.read(librarySeriesTabPageSizeProvider);
     return _pagination.fetchPage<Series>(
       pageSize: pageSize,
-      fetch: (request) => ref.read(seriesRepoProvider).fetchPage(
-        request: request,
-        filter: filter,
-        sortOption: sortOption,
-      ),
+      fetch: (request) => ref
+          .read(seriesRepoProvider)
+          .fetchPage(request: request, filter: filter, sortOption: sortOption),
     );
   }
 

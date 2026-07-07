@@ -95,9 +95,7 @@ class AuthorActions {
   }
 
   Future<void> deleteAuthor(Author author) async {
-    await _ref.read(authorRepoProvider).deleteByNames(<String>[
-      author.name,
-    ]);
+    await _ref.read(authorRepoProvider).deleteByNames(<String>[author.name]);
     _ref.read(authorSelectionProvider.notifier).remove(author);
   }
 

@@ -32,10 +32,7 @@ final _comicsSortRevisionProvider = NotifierProvider<_ComicsSortRevision, int>(
 class _FakeLibraryRevision extends LibraryRevision {
   @override
   LibraryRevisionState build() {
-    return const LibraryRevisionState(
-      revision: 1,
-      hasReceivedFirstEmit: true,
-    );
+    return const LibraryRevisionState(revision: 1, hasReceivedFirstEmit: true);
   }
 }
 

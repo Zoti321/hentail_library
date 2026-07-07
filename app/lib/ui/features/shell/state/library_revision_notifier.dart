@@ -51,10 +51,7 @@ class LibraryRevision extends _$LibraryRevision {
     _subscription = port.watchRevision().listen(
       (_) => _bumpRevision(),
       onError: (Object error, StackTrace stackTrace) {
-        state = state.copyWith(
-          hasReceivedFirstEmit: true,
-          streamError: error,
-        );
+        state = state.copyWith(hasReceivedFirstEmit: true, streamError: error);
       },
     );
   }

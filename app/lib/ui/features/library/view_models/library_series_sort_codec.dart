@@ -14,10 +14,7 @@ LibrarySeriesSortOption decodeLibrarySeriesSortOption(String? raw) {
   if (field == null) {
     return kLibraryDefaultSeriesSortOption;
   }
-  return LibrarySeriesSortOption(
-    field: field,
-    descending: parts[1] == 'true',
-  );
+  return LibrarySeriesSortOption(field: field, descending: parts[1] == 'true');
 }
 
 String encodeLibrarySeriesSortOption(LibrarySeriesSortOption option) {

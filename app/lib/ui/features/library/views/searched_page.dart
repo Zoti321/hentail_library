@@ -101,9 +101,7 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: <Widget>[
         if (_headerExtent == null)
-          SliverToBoxAdapter(
-            child: header,
-          )
+          SliverToBoxAdapter(child: header)
         else
           SliverPersistentHeader(
             pinned: true,
@@ -136,10 +134,7 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Text(
                         '加载失败：$error',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: cs.error,
-                        ),
+                        style: TextStyle(fontSize: 13, color: cs.error),
                       ),
                     )
                   else if (searchedSeriesCount == 0 && searchedComicCount == 0)
@@ -241,11 +236,7 @@ class _SearchResultsEmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: tokens.spacing.md,
           children: <Widget>[
-            Icon(
-              LucideIcons.searchX,
-              size: 40,
-              color: cs.hentai.textTertiary,
-            ),
+            Icon(LucideIcons.searchX, size: 40, color: cs.hentai.textTertiary),
             Text(
               '无匹配结果',
               style: TextStyle(

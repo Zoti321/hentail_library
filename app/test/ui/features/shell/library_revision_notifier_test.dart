@@ -29,10 +29,7 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      expect(
-        container.read(libraryRevisionProvider).revision,
-        0,
-      );
+      expect(container.read(libraryRevisionProvider).revision, 0);
       expect(
         container.read(libraryRevisionProvider).hasReceivedFirstEmit,
         isFalse,
@@ -52,15 +49,14 @@ void main() {
 
       final Completer<LibraryRevisionState> completer =
           Completer<LibraryRevisionState>();
-      container.listen(
-        libraryRevisionProvider,
-        (LibraryRevisionState? previous, LibraryRevisionState next) {
-          if (next.revision == 1 && !completer.isCompleted) {
-            completer.complete(next);
-          }
-        },
-        fireImmediately: true,
-      );
+      container.listen(libraryRevisionProvider, (
+        LibraryRevisionState? previous,
+        LibraryRevisionState next,
+      ) {
+        if (next.revision == 1 && !completer.isCompleted) {
+          completer.complete(next);
+        }
+      }, fireImmediately: true);
 
       events.add(null);
 
@@ -83,15 +79,14 @@ void main() {
 
       final Completer<LibraryRevisionState> completer =
           Completer<LibraryRevisionState>();
-      container.listen(
-        libraryRevisionProvider,
-        (LibraryRevisionState? previous, LibraryRevisionState next) {
-          if (next.streamError != null && !completer.isCompleted) {
-            completer.complete(next);
-          }
-        },
-        fireImmediately: true,
-      );
+      container.listen(libraryRevisionProvider, (
+        LibraryRevisionState? previous,
+        LibraryRevisionState next,
+      ) {
+        if (next.streamError != null && !completer.isCompleted) {
+          completer.complete(next);
+        }
+      }, fireImmediately: true);
 
       final StateError error = StateError('stream failed');
       events.addError(error);

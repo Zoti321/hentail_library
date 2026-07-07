@@ -23,7 +23,9 @@ class ComicCoverContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.read(comicCoverProvider(comicId).notifier).ensureLoaded(priority: priority);
+    ref
+        .read(comicCoverProvider(comicId).notifier)
+        .ensureLoaded(priority: priority);
     final ComicCoverState state = ref.watch(comicCoverProvider(comicId));
 
     final Widget content = switch (state) {

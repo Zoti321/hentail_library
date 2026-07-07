@@ -19,27 +19,27 @@ void main() {
                   itemCount: itemIds.length,
                   childBuilder:
                       (Widget Function(Widget child, int index) wrapGridChild) {
-                    return GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 8,
-                            crossAxisSpacing: 8,
-                          ),
-                      itemCount: itemIds.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return wrapGridChild(
-                          Center(
-                            key: ValueKey<String>(itemIds[index]),
-                            child: Text(itemIds[index]),
-                          ),
-                          index,
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 8,
+                                crossAxisSpacing: 8,
+                              ),
+                          itemCount: itemIds.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return wrapGridChild(
+                              Center(
+                                key: ValueKey<String>(itemIds[index]),
+                                child: Text(itemIds[index]),
+                              ),
+                              index,
+                            );
+                          },
                         );
                       },
-                    );
-                  },
                 ),
               ),
             ],

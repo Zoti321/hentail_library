@@ -19,8 +19,9 @@ ReaderSessionService readerSessionService(Ref ref) => ReaderSessionService(
 );
 
 @Riverpod(keepAlive: true)
-ReadSessionCoordinator readSessionCoordinator(Ref ref) => ReadSessionCoordinator(
-  sessionService: ref.read(readerSessionServiceProvider),
-  readingHistoryRepo: ref.read(readingHistoryRepoProvider),
-  seriesReadingHistoryRepo: ref.read(seriesReadingHistoryRepoProvider),
-);
+ReadSessionCoordinator readSessionCoordinator(Ref ref) =>
+    ReadSessionCoordinator(
+      sessionService: ref.read(readerSessionServiceProvider),
+      readingHistoryRepo: ref.read(readingHistoryRepoProvider),
+      seriesReadingHistoryRepo: ref.read(seriesReadingHistoryRepoProvider),
+    );

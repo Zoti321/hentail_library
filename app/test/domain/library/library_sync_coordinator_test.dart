@@ -22,7 +22,8 @@ class _ScriptedSyncAdapter extends SyncLibraryFrbAdapter {
   final Future<void> Function({
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
-  }) _run;
+  })
+  _run;
 
   @override
   Future<void> call({
@@ -55,16 +56,18 @@ SyncLibraryProgress _progress({
 
 void main() {
   test('runSync clears reader sessions on thumbnail phase', () async {
-    final _RecordingReaderSessionPort sessionPort = _RecordingReaderSessionPort();
+    final _RecordingReaderSessionPort sessionPort =
+        _RecordingReaderSessionPort();
     var notifyCount = 0;
     final LibrarySyncCoordinator coordinator = LibrarySyncCoordinator(
-      syncAdapter: _ScriptedSyncAdapter(
-        ({required isCancelled, onProgress}) async {
-          onProgress?.call(
-            _progress(phase: SyncLibraryPhase.generatingThumbnails),
-          );
-        },
-      ),
+      syncAdapter: _ScriptedSyncAdapter(({
+        required isCancelled,
+        onProgress,
+      }) async {
+        onProgress?.call(
+          _progress(phase: SyncLibraryPhase.generatingThumbnails),
+        );
+      }),
       readerSessionPort: sessionPort,
       onSyncSucceeded: () => notifyCount++,
     );
@@ -91,18 +94,20 @@ void main() {
   });
 
   test('runSync does not clear sessions for noRootsNoop done route', () async {
-    final _RecordingReaderSessionPort sessionPort = _RecordingReaderSessionPort();
+    final _RecordingReaderSessionPort sessionPort =
+        _RecordingReaderSessionPort();
     final LibrarySyncCoordinator coordinator = LibrarySyncCoordinator(
-      syncAdapter: _ScriptedSyncAdapter(
-        ({required isCancelled, onProgress}) async {
-          onProgress?.call(
-            _progress(
-              phase: SyncLibraryPhase.done,
-              route: SyncLibraryRoute.noRootsNoop,
-            ),
-          );
-        },
-      ),
+      syncAdapter: _ScriptedSyncAdapter(({
+        required isCancelled,
+        onProgress,
+      }) async {
+        onProgress?.call(
+          _progress(
+            phase: SyncLibraryPhase.done,
+            route: SyncLibraryRoute.noRootsNoop,
+          ),
+        );
+      }),
       readerSessionPort: sessionPort,
       onSyncSucceeded: () {},
     );

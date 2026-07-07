@@ -187,7 +187,11 @@ class ThumbnailEventCoordinator extends _$ThumbnailEventCoordinator {
     switch (event) {
       case ThumbnailReady(:final String comicId):
         unawaited(_onThumbnailReady(comicId));
-      case ThumbnailProgress(:final int done, :final int total, :final int failed):
+      case ThumbnailProgress(
+        :final int done,
+        :final int total,
+        :final int failed,
+      ):
         state = ThumbnailBackgroundProgress(
           done: done,
           total: total,

@@ -41,7 +41,9 @@ class _SearchResultHorizontalSectionState
   void didUpdateWidget(covariant SearchResultHorizontalSection oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.itemCount != widget.itemCount) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _updateScrollButtons());
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _updateScrollButtons(),
+      );
     }
   }
 
@@ -116,7 +118,9 @@ class _SearchResultHorizontalSectionState
               semanticLabel: '向左滚动',
               iconSize: 16,
               size: 28,
-              onPressed: _canScrollBack ? () => _scrollByViewport(forward: false) : null,
+              onPressed: _canScrollBack
+                  ? () => _scrollByViewport(forward: false)
+                  : null,
             ),
             GhostButton.icon(
               icon: LucideIcons.chevronRight,
@@ -124,8 +128,9 @@ class _SearchResultHorizontalSectionState
               semanticLabel: '向右滚动',
               iconSize: 16,
               size: 28,
-              onPressed:
-                  _canScrollForward ? () => _scrollByViewport(forward: true) : null,
+              onPressed: _canScrollForward
+                  ? () => _scrollByViewport(forward: true)
+                  : null,
             ),
           ],
         ),

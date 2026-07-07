@@ -11,9 +11,7 @@ Map<String, dynamic> _migrateAppSettingJson(Map<String, dynamic> json) {
     if (rawMode == 'continuousVertical') {
       migrated['readingMode'] = readingModeToJson(ReadingMode.webtoon);
     } else {
-      migrated['readingMode'] = readingModeToJson(
-        readingModeFromJson(rawMode),
-      );
+      migrated['readingMode'] = readingModeToJson(readingModeFromJson(rawMode));
     }
   }
   if (!migrated.containsKey('readingMode') &&

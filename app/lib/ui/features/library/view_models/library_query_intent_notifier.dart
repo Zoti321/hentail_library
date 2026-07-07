@@ -10,8 +10,9 @@ part 'library_query_intent_notifier.g.dart';
 @Riverpod(keepAlive: true)
 class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
   static const _filterDebounceDuration = Duration(milliseconds: 300);
-  late final Debouncer _filterQueryDebouncer =
-      Debouncer(duration: _filterDebounceDuration);
+  late final Debouncer _filterQueryDebouncer = Debouncer(
+    duration: _filterDebounceDuration,
+  );
 
   @override
   LibraryQueryIntent build() {

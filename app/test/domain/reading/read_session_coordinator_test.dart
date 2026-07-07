@@ -186,31 +186,34 @@ void main() {
     expect(sessionService.closedComicIds, <String>['c1']);
   });
 
-  test('prepareSeriesSwitch ends session, closes current, returns plan', () async {
-    await coordinator.beginReadSession(
-      comic: _comic(),
-      mode: ReadSessionMode.series,
-      seriesId: 's1',
-      initialPageIndex: 3,
-    );
-    readingRepo.records.clear();
-
-    final SeriesSwitchPlan plan = await coordinator.prepareSeriesSwitch(
-      currentSession: const ReadSessionRouteParams(
-        comicId: 'c1',
+  test(
+    'prepareSeriesSwitch ends session, closes current, returns plan',
+    () async {
+      await coordinator.beginReadSession(
+        comic: _comic(),
+        mode: ReadSessionMode.series,
         seriesId: 's1',
-      ),
-      targetComicId: 'c2',
-      currentPageIndex: 8,
-    );
+        initialPageIndex: 3,
+      );
+      readingRepo.records.clear();
 
-    expect(readingRepo.records, hasLength(1));
-    expect(readingRepo.records.single.pageIndex, 8);
-    expect(coordinator.hasActiveSession, isFalse);
-    expect(sessionService.closedComicIds, <String>['c1']);
-    expect(plan.closeComicId, 'c1');
-    expect(plan.targetComicId, 'c2');
-    expect(plan.nextSession.comicId, 'c2');
-    expect(plan.nextSession.seriesId, 's1');
-  });
+      final SeriesSwitchPlan plan = await coordinator.prepareSeriesSwitch(
+        currentSession: const ReadSessionRouteParams(
+          comicId: 'c1',
+          seriesId: 's1',
+        ),
+        targetComicId: 'c2',
+        currentPageIndex: 8,
+      );
+
+      expect(readingRepo.records, hasLength(1));
+      expect(readingRepo.records.single.pageIndex, 8);
+      expect(coordinator.hasActiveSession, isFalse);
+      expect(sessionService.closedComicIds, <String>['c1']);
+      expect(plan.closeComicId, 'c1');
+      expect(plan.targetComicId, 'c2');
+      expect(plan.nextSession.comicId, 'c2');
+      expect(plan.nextSession.seriesId, 's1');
+    },
+  );
 }

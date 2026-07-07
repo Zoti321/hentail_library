@@ -43,10 +43,7 @@ class SearchedPageHeaderSection extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          MetaChip(
-            icon: LucideIcons.search,
-            label: '$resultCount',
-          ),
+          MetaChip(icon: LucideIcons.search, label: '$resultCount'),
         ],
       ),
     );

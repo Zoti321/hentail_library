@@ -37,10 +37,7 @@ class _ComicsSortControls extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: LibraryComicSortField.values
-          .map(
-            (LibraryComicSortField field) =>
-                _ComicSortListRow(field: field),
-          )
+          .map((LibraryComicSortField field) => _ComicSortListRow(field: field))
           .toList(),
     );
   }
@@ -55,8 +52,7 @@ class _SeriesSortControls extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: kLibrarySeriesSortFields
           .map(
-            (LibrarySeriesSortField field) =>
-                _SeriesSortListRow(field: field),
+            (LibrarySeriesSortField field) => _SeriesSortListRow(field: field),
           )
           .toList(),
     );

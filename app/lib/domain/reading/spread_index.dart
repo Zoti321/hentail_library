@@ -33,8 +33,7 @@ class SpreadIndex {
       return const <int>[];
     }
     return switch (mode) {
-      ReadingMode.paged ||
-      ReadingMode.webtoon => <int>[spreadIndex + 1],
+      ReadingMode.paged || ReadingMode.webtoon => <int>[spreadIndex + 1],
       ReadingMode.dualPage => _dualPageSpread(
         totalPages: totalPages,
         spreadIndex: spreadIndex,

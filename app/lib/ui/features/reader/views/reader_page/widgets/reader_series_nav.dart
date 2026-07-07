@@ -21,7 +21,9 @@ class ReaderSeriesMenu extends StatelessWidget {
     return ReaderFloatingMenuPanel(
       width: kReaderSeriesMenuWidth,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: kReaderSeriesMenuMaxHeight),
+        constraints: const BoxConstraints(
+          maxHeight: kReaderSeriesMenuMaxHeight,
+        ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(

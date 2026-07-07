@@ -61,10 +61,6 @@ class ReaderFloatingMenuPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ReaderFloatingPanel(
-      width: width,
-      padding: padding,
-      child: child,
-    );
+    return ReaderFloatingPanel(width: width, padding: padding, child: child);
   }
 }

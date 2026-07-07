@@ -1,8 +1,4 @@
-enum LibrarySeriesSortField {
-  name,
-  comicCount,
-  random,
-}
+enum LibrarySeriesSortField { name, comicCount, random }
 
 extension LibrarySeriesSortFieldX on LibrarySeriesSortField {
   String get label => switch (this) {

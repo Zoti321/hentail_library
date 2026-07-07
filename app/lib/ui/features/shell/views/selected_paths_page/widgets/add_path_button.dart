@@ -26,7 +26,8 @@ class _AddPathButtonState extends ConsumerState<AddPathButton> {
     }
     setState(() => isPicking = true);
     try {
-      final String? directoryPath = await FilePicker.platform.getDirectoryPath();
+      final String? directoryPath = await FilePicker.platform
+          .getDirectoryPath();
       if (directoryPath == null || directoryPath.isEmpty) {
         return;
       }

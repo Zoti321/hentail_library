@@ -205,10 +205,7 @@ class ComicCard extends HookConsumerWidget {
         borderRadius: BorderRadius.circular(tokens.radius.md),
         child: AspectRatio(
           aspectRatio: 2 / 3,
-          child: ComicCoverContent(
-            comicId: comic.comicId,
-            isHover: isHover,
-          ),
+          child: ComicCoverContent(comicId: comic.comicId, isHover: isHover),
         ),
       ),
     );

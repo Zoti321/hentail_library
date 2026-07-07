@@ -21,9 +21,7 @@ final Provider<VoidCallback> libraryRefreshActionProvider =
 @Riverpod(keepAlive: true)
 Future<Comic?> libraryComicDetail(Ref ref, String comicId) {
   ref.watch(
-    libraryRevisionProvider.select(
-      (LibraryRevisionState s) => s.revision,
-    ),
+    libraryRevisionProvider.select((LibraryRevisionState s) => s.revision),
   );
   return ref.read(comicRepoProvider).findById(comicId);
 }

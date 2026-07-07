@@ -51,7 +51,9 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
       ),
     );
 
-    final LibraryRevisionState revisionState = ref.read(libraryRevisionProvider);
+    final LibraryRevisionState revisionState = ref.read(
+      libraryRevisionProvider,
+    );
     if (revisionState.streamError != null) {
       throw revisionState.streamError!;
     }
@@ -89,11 +91,13 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     final int pageSize = ref.read(libraryComicsTabPageSizeProvider);
     return _pagination.fetchPage<Comic>(
       pageSize: pageSize,
-      fetch: (request) => ref.read(comicRepoProvider).fetchComicsPage(
-        request: request,
-        filter: filter,
-        sortOption: sortOption,
-      ),
+      fetch: (request) => ref
+          .read(comicRepoProvider)
+          .fetchComicsPage(
+            request: request,
+            filter: filter,
+            sortOption: sortOption,
+          ),
     );
   }
 

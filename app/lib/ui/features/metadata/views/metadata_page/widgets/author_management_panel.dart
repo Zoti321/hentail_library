@@ -58,12 +58,11 @@ class AuthorManagementPanel extends ConsumerWidget {
                 }
                 return LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
-                    final double cardHeight =
-                        metadataPanelCardHeight(
-                          constraints: constraints,
-                          itemCount: filteredAuthors.length,
-                          config: _AuthorStyles.listHeightConfig,
-                        );
+                    final double cardHeight = metadataPanelCardHeight(
+                      constraints: constraints,
+                      itemCount: filteredAuthors.length,
+                      config: _AuthorStyles.listHeightConfig,
+                    );
                     return Align(
                       alignment: Alignment.topCenter,
                       child: SizedBox(

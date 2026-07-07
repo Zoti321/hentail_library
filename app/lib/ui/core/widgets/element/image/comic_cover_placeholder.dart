@@ -35,19 +35,13 @@ class ComicCoverPlaceholder extends StatelessWidget {
       ComicCoverPlaceholderKind.noCover => ColoredBox(
         color: cs.hentai.imageFallback,
         child: Center(
-          child: Icon(
-            LucideIcons.imageOff,
-            color: cs.hentai.iconSecondary,
-          ),
+          child: Icon(LucideIcons.imageOff, color: cs.hentai.iconSecondary),
         ),
       ),
       ComicCoverPlaceholderKind.error => ColoredBox(
         color: cs.hentai.imageFallback,
         child: Center(
-          child: Icon(
-            LucideIcons.circleAlert,
-            color: cs.hentai.textTertiary,
-          ),
+          child: Icon(LucideIcons.circleAlert, color: cs.hentai.textTertiary),
         ),
       ),
     };

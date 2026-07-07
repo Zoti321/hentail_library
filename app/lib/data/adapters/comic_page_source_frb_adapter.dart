@@ -86,7 +86,9 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
         rust.ReaderPageDto_FilePath(:final String path) => ReaderPageFilePath(
           path,
         ),
-        rust.ReaderPageDto_Bytes(:final Uint8List data) => ReaderPageBytes(data),
+        rust.ReaderPageDto_Bytes(:final Uint8List data) => ReaderPageBytes(
+          data,
+        ),
       };
     } on HentaiErrorDto catch (error) {
       throwReaderException(

@@ -49,10 +49,9 @@ Future<ReaderPagePayload> comicReaderPage(
   required String comicId,
   required int pageIndex,
 }) {
-  return ref.read(readerSessionServiceProvider).loadReaderPage(
-    comicId: comicId,
-    archivePageIndex: pageIndex,
-  );
+  return ref
+      .read(readerSessionServiceProvider)
+      .loadReaderPage(comicId: comicId, archivePageIndex: pageIndex);
 }
 
 @Riverpod()

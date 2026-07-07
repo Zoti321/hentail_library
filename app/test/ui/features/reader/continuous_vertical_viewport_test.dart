@@ -166,13 +166,10 @@ List<Override> _viewportTestOverrides() {
     ).overrideWith((Ref ref) async => images),
     ...List<Override>.generate(
       100,
-      (int index) =>
-          comicReaderPageProvider(
-            comicId: _testComicId,
-            pageIndex: index,
-          ).overrideWith(
-            (Ref ref) async => ReaderPageBytes(Uint8List(0)),
-          ),
+      (int index) => comicReaderPageProvider(
+        comicId: _testComicId,
+        pageIndex: index,
+      ).overrideWith((Ref ref) async => ReaderPageBytes(Uint8List(0))),
     ),
   ];
 }

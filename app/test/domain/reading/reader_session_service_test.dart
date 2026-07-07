@@ -240,20 +240,25 @@ void main() {
       expect(sessionPort.closedComicIds, <String>['c1']);
     });
 
-    test('loadReaderPage delegates to page source with archive index', () async {
-      final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
-        pages: <ReadSessionPage>[],
-        readerPagePayload: ReaderPageBytes(Uint8List.fromList(<int>[1, 2, 3])),
-      );
-      final ReaderSessionService service = _service(pageSource: pageSource);
+    test(
+      'loadReaderPage delegates to page source with archive index',
+      () async {
+        final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
+          pages: <ReadSessionPage>[],
+          readerPagePayload: ReaderPageBytes(
+            Uint8List.fromList(<int>[1, 2, 3]),
+          ),
+        );
+        final ReaderSessionService service = _service(pageSource: pageSource);
 
-      final ReaderPagePayload payload = await service.loadReaderPage(
-        comicId: 'c1',
-        archivePageIndex: 2,
-      );
+        final ReaderPagePayload payload = await service.loadReaderPage(
+          comicId: 'c1',
+          archivePageIndex: 2,
+        );
 
-      expect(payload, isA<ReaderPageBytes>());
-    });
+        expect(payload, isA<ReaderPageBytes>());
+      },
+    );
 
     test('loadReaderPage throws when comic is missing', () async {
       final ReaderSessionService service = ReaderSessionService(
@@ -303,7 +308,9 @@ void main() {
         generation: 3,
       );
 
-      expect(pageSource.prefetchedPageIndexes, <List<int>>[<int>[0, 2]]);
+      expect(pageSource.prefetchedPageIndexes, <List<int>>[
+        <int>[0, 2],
+      ]);
     });
 
     test('clearPageCache delegates to page source', () {

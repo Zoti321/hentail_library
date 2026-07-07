@@ -341,10 +341,7 @@ class _EditMetadataContentRatingSection extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: tokens.spacing.sm),
-                ToggleSwitch(
-                  checked: isR18,
-                  onChange: () => onChanged(!isR18),
-                ),
+                ToggleSwitch(checked: isR18, onChange: () => onChanged(!isR18)),
               ],
             ),
           ),

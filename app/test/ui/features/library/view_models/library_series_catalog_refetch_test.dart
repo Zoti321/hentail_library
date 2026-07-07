@@ -15,10 +15,7 @@ import 'package:test/test.dart';
 class _ControllableLibraryRevision extends LibraryRevision {
   @override
   LibraryRevisionState build() {
-    return const LibraryRevisionState(
-      revision: 1,
-      hasReceivedFirstEmit: true,
-    );
+    return const LibraryRevisionState(revision: 1, hasReceivedFirstEmit: true);
   }
 
   void setStreamError(Object error) {
@@ -26,10 +23,7 @@ class _ControllableLibraryRevision extends LibraryRevision {
   }
 
   void bumpRevision() {
-    state = state.copyWith(
-      revision: state.revision + 1,
-      streamError: null,
-    );
+    state = state.copyWith(revision: state.revision + 1, streamError: null);
   }
 }
 
@@ -64,28 +58,33 @@ void main() {
         as _ControllableLibraryRevision;
   }
 
-  test('streamError-only revision updates do not refetch series catalog', () async {
-    final _CountingSeriesRepo repo = _CountingSeriesRepo();
-    final ProviderContainer container = ProviderContainer(
-      overrides: <Override>[
-        seriesRepoProvider.overrideWith((Ref ref) => repo),
-        libraryRevisionProvider.overrideWith(_ControllableLibraryRevision.new),
-        librarySeriesTabSortOptionProvider.overrideWith(
-          (Ref ref) => const LibrarySeriesSortOption(
-            field: LibrarySeriesSortField.random,
+  test(
+    'streamError-only revision updates do not refetch series catalog',
+    () async {
+      final _CountingSeriesRepo repo = _CountingSeriesRepo();
+      final ProviderContainer container = ProviderContainer(
+        overrides: <Override>[
+          seriesRepoProvider.overrideWith((Ref ref) => repo),
+          libraryRevisionProvider.overrideWith(
+            _ControllableLibraryRevision.new,
           ),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
+          librarySeriesTabSortOptionProvider.overrideWith(
+            (Ref ref) => const LibrarySeriesSortOption(
+              field: LibrarySeriesSortField.random,
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
 
-    await container.read(librarySeriesCatalogControllerProvider.future);
-    expect(repo.fetchCount, 1);
+      await container.read(librarySeriesCatalogControllerProvider.future);
+      expect(repo.fetchCount, 1);
 
-    revisionNotifier(container).setStreamError(StateError('stream failed'));
-    await Future<void>.delayed(Duration.zero);
-    expect(repo.fetchCount, 1);
-  });
+      revisionNotifier(container).setStreamError(StateError('stream failed'));
+      await Future<void>.delayed(Duration.zero);
+      expect(repo.fetchCount, 1);
+    },
+  );
 
   test('revision bump does not refetch random sort catalog', () async {
     final _CountingSeriesRepo repo = _CountingSeriesRepo();
@@ -117,9 +116,8 @@ void main() {
         seriesRepoProvider.overrideWith((Ref ref) => repo),
         libraryRevisionProvider.overrideWith(_ControllableLibraryRevision.new),
         librarySeriesTabSortOptionProvider.overrideWith(
-          (Ref ref) => const LibrarySeriesSortOption(
-            field: LibrarySeriesSortField.name,
-          ),
+          (Ref ref) =>
+              const LibrarySeriesSortOption(field: LibrarySeriesSortField.name),
         ),
       ],
     );

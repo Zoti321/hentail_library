@@ -188,7 +188,8 @@ class ReaderSeriesMenuButton extends ConsumerStatefulWidget {
       _ReaderSeriesMenuButtonState();
 }
 
-class _ReaderSeriesMenuButtonState extends ConsumerState<ReaderSeriesMenuButton> {
+class _ReaderSeriesMenuButtonState
+    extends ConsumerState<ReaderSeriesMenuButton> {
   final CustomPopupMenuController _menuController = CustomPopupMenuController();
 
   Future<void> _switchToComic(String targetComicId) async {

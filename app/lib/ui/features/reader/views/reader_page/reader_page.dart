@@ -318,8 +318,7 @@ class ReaderPage extends HookConsumerWidget {
                           .read(settingsProvider.notifier)
                           .setReaderAutoPlayEnabled(value);
                     },
-                    onPrevSeriesComic:
-                        seriesNavContext?.previousItem != null
+                    onPrevSeriesComic: seriesNavContext?.previousItem != null
                         ? () async {
                             final String targetComicId =
                                 seriesNavContext!.previousItem!.comicId;

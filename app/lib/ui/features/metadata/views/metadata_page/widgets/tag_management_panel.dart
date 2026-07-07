@@ -56,12 +56,11 @@ class TagManagementPanel extends ConsumerWidget {
                 }
                 return LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
-                    final double cardHeight =
-                        metadataPanelCardHeight(
-                          constraints: constraints,
-                          itemCount: filteredTags.length,
-                          config: _TagStyles.listHeightConfig,
-                        );
+                    final double cardHeight = metadataPanelCardHeight(
+                      constraints: constraints,
+                      itemCount: filteredTags.length,
+                      config: _TagStyles.listHeightConfig,
+                    );
                     return Align(
                       alignment: Alignment.topCenter,
                       child: SizedBox(

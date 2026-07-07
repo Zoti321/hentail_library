@@ -14,23 +14,13 @@ enum ReadingMode {
 }
 
 /// 顶栏阅读设置 Dialog 中的一级模式。
-enum ReaderModeCategory {
-  paged,
-  webtoon,
-}
+enum ReaderModeCategory { paged, webtoon }
 
 /// 翻页模式下的页面布局（二级选项）。
-enum PagedLayout {
-  single,
-  dual,
-  dualNoCover,
-}
+enum PagedLayout { single, dual, dualNoCover }
 
 /// Webtoon 缩放模式（二级选项，UI 占位）。
-enum WebtoonZoomMode {
-  fitWidth,
-  originalSize,
-}
+enum WebtoonZoomMode { fitWidth, originalSize }
 
 extension ReaderModeCategoryX on ReaderModeCategory {
   String get labelZh => switch (this) {

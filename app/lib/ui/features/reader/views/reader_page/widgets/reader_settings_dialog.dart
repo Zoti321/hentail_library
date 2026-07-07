@@ -139,9 +139,8 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                                       9,
                                       (int index) => index * 5,
                                     ),
-                                    itemLabel: (int value) => value == 0
-                                        ? '无 (0%)'
-                                        : '$value%',
+                                    itemLabel: (int value) =>
+                                        value == 0 ? '无 (0%)' : '$value%',
                                     onChanged: (int? value) {
                                       if (value == null) {
                                         return;
@@ -244,10 +243,7 @@ class _ReaderSettingsDialogHeader extends StatelessWidget {
 }
 
 class _ReaderSettingsSection extends StatelessWidget {
-  const _ReaderSettingsSection({
-    required this.title,
-    required this.children,
-  });
+  const _ReaderSettingsSection({required this.title, required this.children});
 
   final String title;
   final List<Widget> children;

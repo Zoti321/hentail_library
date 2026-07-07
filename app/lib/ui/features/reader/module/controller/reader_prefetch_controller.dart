@@ -48,13 +48,15 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
     );
     final int generation = bumpGeneration(comicId);
     unawaited(
-      ref.read(readerSessionServiceProvider).prefetchPages(
-        comicId: comicId,
-        archivePageIndexes: targets
-            .map((int pageOneBased) => pageOneBased - 1)
-            .toList(growable: false),
-        generation: generation,
-      ),
+      ref
+          .read(readerSessionServiceProvider)
+          .prefetchPages(
+            comicId: comicId,
+            archivePageIndexes: targets
+                .map((int pageOneBased) => pageOneBased - 1)
+                .toList(growable: false),
+            generation: generation,
+          ),
     );
   }
 

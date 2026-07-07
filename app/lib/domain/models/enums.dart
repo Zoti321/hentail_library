@@ -30,7 +30,7 @@ enum ResourceType {
   sevenZ,
 
   /// PDF 文档
-  pdf;
+  pdf,
 }
 
 enum LibraryDisplayTarget { comics, series }
