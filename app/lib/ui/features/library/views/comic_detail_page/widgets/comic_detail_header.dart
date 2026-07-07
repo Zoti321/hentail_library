@@ -205,7 +205,7 @@ class _ComicDetailOverflowMenuButtonState
       return;
     }
     try {
-      await ref.read(deleteComicsUseCaseProvider).call(<String>[
+      await ref.read(comicDeletionServiceProvider).deleteComics(<String>[
         widget.comic.comicId,
       ]);
       ref

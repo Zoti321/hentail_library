@@ -1,6 +1,6 @@
 export 'di/deps.dart';
-export 'di/usecases/usecases.dart';
 export 'state/aggregates.dart';
+export 'state/scan_library_controller.dart';
 export 'view_models/debouncer.dart';
 export 'view_models/history_paged_feed_controller.dart';
 export 'view_models/home_page_dashboard_notifier.dart';

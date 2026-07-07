@@ -118,9 +118,9 @@ class ComicCard extends HookConsumerWidget {
                     return;
                   }
                   try {
-                    await ref.read(deleteComicsUseCaseProvider).call(<String>[
-                      comic.comicId,
-                    ]);
+                    await ref.read(comicDeletionServiceProvider).deleteComics(
+                      <String>[comic.comicId],
+                    );
                     ref
                         .read(comicCoverCacheManagerProvider.notifier)
                         .clearForComics(<String>[comic.comicId]);

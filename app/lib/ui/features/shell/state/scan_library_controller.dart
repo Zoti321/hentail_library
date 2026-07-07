@@ -2,9 +2,10 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/data/adapters/frb_error_mapper.dart';
-import 'package:hentai_library/domain/use_cases/sync_library_types.dart';
+import 'package:hentai_library/domain/library/library_sync_coordinator.dart';
+import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
-import 'package:hentai_library/ui/features/shell/di/usecases/sync_library.dart';
+import 'package:hentai_library/ui/features/shell/di/library_sync.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'scan_library_controller.freezed.dart';
@@ -43,12 +44,14 @@ class ScanLibraryController extends _$ScanLibraryController {
       progress: null,
     );
 
-    final adapter = ref.read(syncLibraryFrbAdapterProvider);
-    _future = adapter
-        .call(
+    final LibrarySyncCoordinator coordinator = ref.read(
+      librarySyncCoordinatorProvider,
+    );
+    _future = coordinator
+        .runSync(
           isCancelled: () => _cancelled,
-          onProgress: (p) {
-            state = state.copyWith(progress: p);
+          onProgress: (SyncLibraryProgress progress) {
+            state = state.copyWith(progress: progress);
           },
         )
         .then((_) {
@@ -73,7 +76,7 @@ class ScanLibraryController extends _$ScanLibraryController {
   void cancel() {
     if (!state.running) return;
     _cancelled = true;
-    ref.read(syncLibraryFrbAdapterProvider).cancelActive();
+    ref.read(librarySyncCoordinatorProvider).cancelActive();
     state = state.copyWith(running: false, cancelled: true);
   }
 

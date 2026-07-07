@@ -1,6 +1,6 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/data/adapters/sync_library_frb_adapter.dart';
-import 'package:hentai_library/domain/use_cases/sync_library_types.dart';
+import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 import 'package:test/test.dart';
 
