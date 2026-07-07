@@ -26,6 +26,7 @@ class AdaptiveComicCover extends StatelessWidget {
     this.backgroundColor,
     this.clipBorderRadius,
     this.showShadow = false,
+    this.onDecodeError,
   });
 
   final ComicCoverDisplayData? coverDisplay;
@@ -38,6 +39,7 @@ class AdaptiveComicCover extends StatelessWidget {
   final Color? backgroundColor;
   final BorderRadius? clipBorderRadius;
   final bool showShadow;
+  final VoidCallback? onDecodeError;
 
   bool get _usesFixedContainer => containerAspectRatio != null;
 
@@ -91,6 +93,7 @@ class AdaptiveComicCover extends StatelessWidget {
               filterQuality: filterQuality,
               placeholder: placeholder,
               errorPlaceholder: errorPlaceholder ?? placeholder,
+              onDecodeError: onDecodeError,
             ),
           );
         },

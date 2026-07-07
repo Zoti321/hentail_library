@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/utils.dart';
@@ -7,13 +6,12 @@ import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
-import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
+import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/comic_context_menu.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
-import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ComicCard extends HookConsumerWidget {
@@ -35,9 +33,6 @@ class ComicCard extends HookConsumerWidget {
     final cs = Theme.of(context).colorScheme;
     final tokens = context.tokens;
     final isHover = useState<bool>(false);
-    final ComicCoverDisplayData? coverData = ref
-        .watch(comicCoverDisplayProvider(comicId: comic.comicId))
-        .maybeWhen(data: (ComicCoverDisplayData? v) => v, orElse: () => null);
 
     return GestureDetector(
       onTap: onTap,
@@ -126,6 +121,9 @@ class ComicCard extends HookConsumerWidget {
                     await ref.read(deleteComicsUseCaseProvider).call(<String>[
                       comic.comicId,
                     ]);
+                    ref
+                        .read(comicCoverCacheManagerProvider.notifier)
+                        .clearForComics(<String>[comic.comicId]);
                     if (context.mounted) {
                       showSuccessToast(context, '已删除漫画');
                     }
@@ -168,7 +166,7 @@ class ComicCard extends HookConsumerWidget {
             spacing: 12,
             children: [
               // 封面图容器
-              _buildCover(context, coverData, isHover.value),
+              _buildCover(context, isHover.value),
               // --- 文本信息区域 ---
               _buildInfoSection(isHover.value, context, comic.pageCount),
             ],
@@ -178,11 +176,7 @@ class ComicCard extends HookConsumerWidget {
     );
   }
 
-  Widget _buildCover(
-    BuildContext context,
-    ComicCoverDisplayData? coverData,
-    bool isHover,
-  ) {
+  Widget _buildCover(BuildContext context, bool isHover) {
     final cs = Theme.of(context).colorScheme;
     final tokens = context.tokens;
     return AnimatedContainer(
@@ -211,39 +205,9 @@ class ComicCard extends HookConsumerWidget {
         borderRadius: BorderRadius.circular(tokens.radius.md),
         child: AspectRatio(
           aspectRatio: 2 / 3,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // 1. 图片 + 缩放动画
-              AppComicImage(
-                    filePath: coverData?.filePath,
-                    memoryBytes: coverData?.memoryBytes,
-                    fit: BoxFit.cover,
-                    placeholder: Container(
-                      color: cs.hentai.imageFallback,
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.broken_image,
-                        color: cs.hentai.iconSecondary,
-                      ),
-                    ),
-                    errorPlaceholder: Container(
-                      color: cs.hentai.imageFallback,
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Icons.broken_image,
-                        color: cs.hentai.iconSecondary,
-                      ),
-                    ),
-                  )
-                  .animate(target: isHover ? 1 : 0)
-                  .scale(
-                    begin: const Offset(1, 1),
-                    end: const Offset(1.05, 1.05),
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeOutQuad,
-                  ),
-            ],
+          child: ComicCoverContent(
+            comicId: comic.comicId,
+            isHover: isHover,
           ),
         ),
       ),
