@@ -35,6 +35,9 @@ enum ResourceType {
 
 enum LibraryDisplayTarget { comics, series }
 
+/// 缩略图生成优先级（Rust 后台队列调度）。
+enum ThumbnailPriority { critical, high, low }
+
 /// 系列连载状态（用户可编辑；sync 不覆盖）。
 enum SerializationStatus {
   unknown,

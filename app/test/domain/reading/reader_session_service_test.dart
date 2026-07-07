@@ -9,6 +9,7 @@ import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/domain/reading/read_session_exceptions.dart';
 import 'package:hentai_library/domain/reading/read_session_page.dart';
+import 'package:hentai_library/domain/reading/reader_page_payload.dart';
 import 'package:hentai_library/domain/reading/reader_session_service.dart';
 import 'package:hentai_library/domain/reading/reader_session_snapshot.dart';
 import 'package:test/test.dart';
@@ -48,10 +49,20 @@ class _FakeReadingHistoryRepository implements ReadingHistoryRepository {
 }
 
 class _FakeComicPageSourcePort implements ComicPageSourcePort {
-  _FakeComicPageSourcePort({required this.pages, this.error});
+  _FakeComicPageSourcePort({
+    required this.pages,
+    this.error,
+    this.readerPagePayload,
+    List<List<int>>? prefetchedPageIndexes,
+    List<String>? clearedComicIds,
+  }) : prefetchedPageIndexes = prefetchedPageIndexes ?? <List<int>>[],
+       clearedComicIds = clearedComicIds ?? <String>[];
 
   final List<ReadSessionPage> pages;
   final Object? error;
+  final ReaderPagePayload? readerPagePayload;
+  final List<List<int>> prefetchedPageIndexes;
+  final List<String> clearedComicIds;
 
   @override
   Future<List<ReadSessionPage>> loadPages(Comic comic) async {
@@ -67,6 +78,31 @@ class _FakeComicPageSourcePort implements ComicPageSourcePort {
     required int pageIndex,
   }) async {
     return null;
+  }
+
+  @override
+  Future<ReaderPagePayload> loadReaderPage({
+    required Comic comic,
+    required int pageIndex,
+  }) async {
+    if (error != null) {
+      throw error!;
+    }
+    return readerPagePayload ?? ReaderPageFilePath('/tmp/page-$pageIndex');
+  }
+
+  @override
+  Future<void> prefetchPages({
+    required Comic comic,
+    required List<int> pageIndexes,
+    required int generation,
+  }) async {
+    prefetchedPageIndexes.add(List<int>.from(pageIndexes));
+  }
+
+  @override
+  void clearPageCache({required String comicId}) {
+    clearedComicIds.add(comicId);
   }
 }
 
@@ -107,13 +143,16 @@ ReaderSessionService _service({
   List<ReadSessionPage>? pages,
   Object? loadError,
   int? storedPageIndex,
+  _FakeComicPageSourcePort? pageSource,
 }) {
   return ReaderSessionService(
     comicRepo: _FakeComicRepository(comic: comic ?? _inputComic()),
-    pageSource: _FakeComicPageSourcePort(
-      pages: pages ?? <ReadSessionPage>[],
-      error: loadError,
-    ),
+    pageSource:
+        pageSource ??
+        _FakeComicPageSourcePort(
+          pages: pages ?? <ReadSessionPage>[],
+          error: loadError,
+        ),
     readingHistoryRepo: _FakeReadingHistoryRepository(
       pageIndex: storedPageIndex,
     ),
@@ -199,6 +238,83 @@ void main() {
       await service.close('c1');
 
       expect(sessionPort.closedComicIds, <String>['c1']);
+    });
+
+    test('loadReaderPage delegates to page source with archive index', () async {
+      final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
+        pages: <ReadSessionPage>[],
+        readerPagePayload: ReaderPageBytes(Uint8List.fromList(<int>[1, 2, 3])),
+      );
+      final ReaderSessionService service = _service(pageSource: pageSource);
+
+      final ReaderPagePayload payload = await service.loadReaderPage(
+        comicId: 'c1',
+        archivePageIndex: 2,
+      );
+
+      expect(payload, isA<ReaderPageBytes>());
+    });
+
+    test('loadReaderPage throws when comic is missing', () async {
+      final ReaderSessionService service = ReaderSessionService(
+        comicRepo: _FakeComicRepository(comic: null),
+        pageSource: _FakeComicPageSourcePort(pages: <ReadSessionPage>[]),
+        readingHistoryRepo: _FakeReadingHistoryRepository(),
+        sessionPort: _FakeReaderSessionPort(),
+      );
+
+      expect(
+        () => service.loadReaderPage(comicId: 'missing', archivePageIndex: 0),
+        throwsA(isA<ReadSessionPageLoadException>()),
+      );
+    });
+
+    test('prefetchPages skips dir comics', () async {
+      final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
+        pages: <ReadSessionPage>[],
+      );
+      final ReaderSessionService service = ReaderSessionService(
+        comicRepo: _FakeComicRepository(
+          comic: _inputComic().copyWith(resourceType: ResourceType.dir),
+        ),
+        pageSource: pageSource,
+        readingHistoryRepo: _FakeReadingHistoryRepository(),
+        sessionPort: _FakeReaderSessionPort(),
+      );
+
+      await service.prefetchPages(
+        comicId: 'c1',
+        archivePageIndexes: <int>[0, 1],
+        generation: 1,
+      );
+
+      expect(pageSource.prefetchedPageIndexes, isEmpty);
+    });
+
+    test('prefetchPages delegates archive indexes to page source', () async {
+      final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
+        pages: <ReadSessionPage>[],
+      );
+      final ReaderSessionService service = _service(pageSource: pageSource);
+
+      await service.prefetchPages(
+        comicId: 'c1',
+        archivePageIndexes: <int>[0, 2],
+        generation: 3,
+      );
+
+      expect(pageSource.prefetchedPageIndexes, <List<int>>[<int>[0, 2]]);
+    });
+
+    test('clearPageCache delegates to page source', () {
+      final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
+        pages: <ReadSessionPage>[],
+      );
+      final ReaderSessionService service = _service(pageSource: pageSource);
+
+      service.clearPageCache(comicId: 'c1');
+
+      expect(pageSource.clearedComicIds, <String>['c1']);
     });
 
     group('page index convention', () {

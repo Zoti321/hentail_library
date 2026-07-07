@@ -1,12 +1,12 @@
 ﻿import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/domain/reading/reader_page_payload.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:hentai_library/src/rust/api/reader.dart';
 
 class ReaderImageItem extends ConsumerWidget {
   const ReaderImageItem({
@@ -49,7 +49,7 @@ class ReaderImageItem extends ConsumerWidget {
     }
     final ReaderArchivePageImageData archiveData =
         imageData as ReaderArchivePageImageData;
-    final AsyncValue<ReaderPageDto> pageAsync = ref.watch(
+    final AsyncValue<ReaderPagePayload> pageAsync = ref.watch(
       comicReaderPageProvider(
         comicId: archiveData.comicId,
         pageIndex: archiveData.pageIndex,
@@ -58,13 +58,13 @@ class ReaderImageItem extends ConsumerWidget {
     return pageAsync.when(
       loading: () => placeholder,
       error: (_, StackTrace _) => placeholder,
-      data: (ReaderPageDto page) {
+      data: (ReaderPagePayload page) {
         return ReaderPageFadeIn(
           enabled: enableCrossfade,
           child: Align(
             alignment: alignment,
-            child: page.when(
-              filePath: (String path) => AppComicImage(
+            child: switch (page) {
+              ReaderPageFilePath(:final String path) => AppComicImage(
                 filePath: path,
                 fit: BoxFit.contain,
                 filterQuality: FilterQuality.high,
@@ -72,7 +72,7 @@ class ReaderImageItem extends ConsumerWidget {
                 placeholder: placeholder,
                 errorPlaceholder: placeholder,
               ),
-              bytes: (Uint8List data) => AppComicImage(
+              ReaderPageBytes(:final Uint8List data) => AppComicImage(
                 memoryBytes: data,
                 fit: BoxFit.contain,
                 filterQuality: FilterQuality.high,
@@ -80,7 +80,7 @@ class ReaderImageItem extends ConsumerWidget {
                 placeholder: placeholder,
                 errorPlaceholder: placeholder,
               ),
-            ),
+            },
           ),
         );
       },

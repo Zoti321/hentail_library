@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:hentai_library/src/rust/api/thumbnail.dart';
+import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/thumbnail/thumbnail_event.dart';
 
 typedef ComicThumbnailRecord = ({
   Uint8List thumbnail,
@@ -13,7 +14,7 @@ abstract class ComicThumbnailRepository {
 
   Future<ComicThumbnailRecord?> ensureByComicId({
     required String comicId,
-    required ThumbnailPriorityDto priority,
+    required ThumbnailPriority priority,
   });
 
   Future<void> upsert({
@@ -24,4 +25,6 @@ abstract class ComicThumbnailRepository {
   });
 
   Future<void> deleteByComicIds(List<String> comicIds);
+
+  Stream<ThumbnailEvent> watchEvents();
 }

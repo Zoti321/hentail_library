@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:hentai_library/src/rust/api/thumbnail.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_state.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
@@ -14,12 +14,12 @@ class ComicCoverContent extends ConsumerWidget {
     super.key,
     required this.comicId,
     this.isHover = false,
-    this.priority = ThumbnailPriorityDto.high,
+    this.priority = ThumbnailPriority.high,
   });
 
   final String comicId;
   final bool isHover;
-  final ThumbnailPriorityDto priority;
+  final ThumbnailPriority priority;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

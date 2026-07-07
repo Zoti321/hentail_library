@@ -2,15 +2,12 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:hentai_library/data/adapters/reader_frb_mapper.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/reading/reader_page_payload.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_image_cache.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_logic.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/src/rust/api/reader.dart' as rust;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'reader_prefetch_controller.g.dart';
@@ -31,7 +28,7 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
       state = Map<String, int>.from(state)..remove(comicId);
     }
     clearReaderImageCache();
-    rust.clearReaderPageCacheFrb(comicId: comicId);
+    ref.read(readerSessionServiceProvider).clearPageCache(comicId: comicId);
   }
 
   Future<void> warmWindow({
@@ -50,19 +47,13 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
       extraPageIndexesOneBased: extraPageIndexesOneBased,
     );
     final int generation = bumpGeneration(comicId);
-    final Comic? comic = await ref.read(comicRepoProvider).findById(comicId);
-    if (comic == null || comic.resourceType == ResourceType.dir) {
-      return;
-    }
     unawaited(
-      rust.prefetchReaderPagesFrb(
-        comicId: comic.comicId,
-        path: comic.path,
-        resourceType: mapResourceType(comic.resourceType),
-        pageIndexes: targets
+      ref.read(readerSessionServiceProvider).prefetchPages(
+        comicId: comicId,
+        archivePageIndexes: targets
             .map((int pageOneBased) => pageOneBased - 1)
             .toList(growable: false),
-        generation: BigInt.from(generation),
+        generation: generation,
       ),
     );
   }
@@ -112,16 +103,20 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
     if (imageData is! ReaderArchivePageImageData) {
       return null;
     }
-    final rust.ReaderPageDto page = await ref.read(
+    final ReaderPagePayload page = await ref.read(
       comicReaderPageProvider(
         comicId: imageData.comicId,
         pageIndex: imageData.pageIndex,
       ).future,
     );
-    return page.when(
-      filePath: (String path) => buildReaderImageProvider(filePath: path),
-      bytes: (Uint8List data) => buildReaderImageProvider(memoryBytes: data),
-    );
+    return switch (page) {
+      ReaderPageFilePath(:final String path) => buildReaderImageProvider(
+        filePath: path,
+      ),
+      ReaderPageBytes(:final Uint8List data) => buildReaderImageProvider(
+        memoryBytes: data,
+      ),
+    };
   }
 
   Future<void> warmOpenComic({

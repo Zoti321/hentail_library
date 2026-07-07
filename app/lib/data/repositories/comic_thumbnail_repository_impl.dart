@@ -1,7 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/data/adapters/thumbnail_frb_mapper.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
+import 'package:hentai_library/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart' as rust;
 
 class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
@@ -26,12 +29,12 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
   @override
   Future<ComicThumbnailRecord?> ensureByComicId({
     required String comicId,
-    required rust.ThumbnailPriorityDto priority,
+    required ThumbnailPriority priority,
   }) async {
     final rust.ComicThumbnailDto? row = guardFrbSync(
       () => rust.ensureThumbnailByComicIdFrb(
         comicId: comicId,
-        priority: priority,
+        priority: mapThumbnailPriority(priority),
       ),
       fallbackMessage: '生成缩略图失败',
     );
@@ -61,5 +64,13 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
       () => rust.deleteThumbnailsByComicIdsFrb(comicIds: comicIds),
       fallbackMessage: '删除缩略图失败',
     );
+  }
+
+  @override
+  Stream<ThumbnailEvent> watchEvents() {
+    return guardFrbStream(
+      rust.watchThumbnailEventsFrb,
+      fallbackMessage: '缩略图事件流失败',
+    ).map(mapThumbnailEvent);
   }
 }

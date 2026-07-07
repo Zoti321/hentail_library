@@ -3,7 +3,8 @@ import 'dart:typed_data';
 
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/src/rust/api/thumbnail.dart';
+import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_state.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
@@ -57,7 +58,7 @@ class ComicCoverThumbnailCache extends _$ComicCoverThumbnailCache {
 class ComicCover extends _$ComicCover {
   String? _comicId;
   bool _loadInFlight = false;
-  ThumbnailPriorityDto _priority = ThumbnailPriorityDto.high;
+  ThumbnailPriority _priority = ThumbnailPriority.high;
 
   @override
   ComicCoverState build(String comicId) {
@@ -72,7 +73,7 @@ class ComicCover extends _$ComicCover {
     return const ComicCoverLoading();
   }
 
-  void ensureLoaded({ThumbnailPriorityDto priority = ThumbnailPriorityDto.high}) {
+  void ensureLoaded({ThumbnailPriority priority = ThumbnailPriority.high}) {
     if (priority.index < _priority.index) {
       _priority = priority;
     }
@@ -167,7 +168,7 @@ class ComicCover extends _$ComicCover {
 
 @Riverpod(keepAlive: true)
 class ThumbnailEventCoordinator extends _$ThumbnailEventCoordinator {
-  StreamSubscription<ThumbnailEventDto>? _subscription;
+  StreamSubscription<ThumbnailEvent>? _subscription;
 
   @override
   ThumbnailBackgroundProgress build() {
@@ -175,15 +176,18 @@ class ThumbnailEventCoordinator extends _$ThumbnailEventCoordinator {
       unawaited(_subscription?.cancel());
       _subscription = null;
     });
-    _subscription ??= watchThumbnailEventsFrb().listen(_onEvent);
+    _subscription ??= ref
+        .read(comicThumbnailRepoProvider)
+        .watchEvents()
+        .listen(_onEvent);
     return const ThumbnailBackgroundProgress();
   }
 
-  void _onEvent(ThumbnailEventDto event) {
+  void _onEvent(ThumbnailEvent event) {
     switch (event) {
-      case ThumbnailEventDto_Ready(:final comicId):
+      case ThumbnailReady(:final String comicId):
         unawaited(_onThumbnailReady(comicId));
-      case ThumbnailEventDto_Progress(:final done, :final total, :final failed):
+      case ThumbnailProgress(:final int done, :final int total, :final int failed):
         state = ThumbnailBackgroundProgress(
           done: done,
           total: total,

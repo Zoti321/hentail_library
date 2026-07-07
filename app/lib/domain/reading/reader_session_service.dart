@@ -1,12 +1,14 @@
 import 'dart:typed_data';
 
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/ports/comic_page_source_port.dart';
 import 'package:hentai_library/domain/ports/reader_session_port.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/domain/reading/read_session_exceptions.dart';
 import 'package:hentai_library/domain/reading/read_session_page.dart';
+import 'package:hentai_library/domain/reading/reader_page_payload.dart';
 import 'package:hentai_library/domain/reading/reader_session_snapshot.dart';
 
 /// 阅读 I/O 编排：显式 open/close、页码约定与 session snapshot。
@@ -75,6 +77,56 @@ class ReaderSessionService {
     required int archivePageIndex,
   }) {
     return _pageSource.loadPageBytes(comic: comic, pageIndex: archivePageIndex);
+  }
+
+  /// [archivePageIndex] 为 0-based 归档页索引。
+  Future<ReaderPagePayload> loadReaderPage({
+    required String comicId,
+    required int archivePageIndex,
+  }) async {
+    final Comic? comic = await _comicRepo.findById(comicId);
+    if (comic == null) {
+      throw ReadSessionPageLoadException.comicNotFound(comicId);
+    }
+    try {
+      return await _pageSource.loadReaderPage(
+        comic: comic,
+        pageIndex: archivePageIndex,
+      );
+    } on ReadSessionPageLoadException {
+      rethrow;
+    } on Object catch (error, stackTrace) {
+      throw ReadSessionPageLoadException.loadFailed(
+        comicId: comic.comicId,
+        path: comic.path,
+        cause: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  /// [archivePageIndexes] 为 0-based 归档页索引；目录漫不预取。
+  Future<void> prefetchPages({
+    required String comicId,
+    required List<int> archivePageIndexes,
+    required int generation,
+  }) async {
+    if (archivePageIndexes.isEmpty) {
+      return;
+    }
+    final Comic? comic = await _comicRepo.findById(comicId);
+    if (comic == null || comic.resourceType == ResourceType.dir) {
+      return;
+    }
+    await _pageSource.prefetchPages(
+      comic: comic,
+      pageIndexes: archivePageIndexes,
+      generation: generation,
+    );
+  }
+
+  void clearPageCache({required String comicId}) {
+    _pageSource.clearPageCache(comicId: comicId);
   }
 
   Future<({Comic comic, List<ReadSessionPage> pages})> _openPages(
