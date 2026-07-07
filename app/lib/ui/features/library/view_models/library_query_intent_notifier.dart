@@ -10,17 +10,13 @@ part 'library_query_intent_notifier.g.dart';
 @Riverpod(keepAlive: true)
 class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
   static const _filterDebounceDuration = Duration(milliseconds: 300);
-  static const _mergeSearchDebounceDuration = Duration(milliseconds: 500);
   late final DebouncedActionRunner _filterQueryDebouncer =
       DebouncedActionRunner(duration: _filterDebounceDuration);
-  late final DebouncedActionRunner _mergeSearchDebouncer =
-      DebouncedActionRunner(duration: _mergeSearchDebounceDuration);
 
   @override
   LibraryQueryIntent build() {
     ref.onDispose(() {
       _filterQueryDebouncer.dispose();
-      _mergeSearchDebouncer.dispose();
     });
     return LibraryQueryIntent();
   }
@@ -40,11 +36,5 @@ class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
       keyword: '',
       displayTarget: LibraryDisplayTarget.comics,
     );
-  }
-
-  void setMergeSearchQuery(String value) {
-    _mergeSearchDebouncer.run(() {
-      state = state.copyWith(mergeSearchQuery: value);
-    });
   }
 }
