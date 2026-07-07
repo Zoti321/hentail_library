@@ -71,3 +71,49 @@ typedef ParsedResource = ({String path, ResourceType type, ComicMeta meta});
 - The type is a domain entity or persisted model (`Comic`, `Series`, UI state objects, etc.)
 
 Do not introduce `freezed` or hand-written classes solely to group two or three fields for a single function return or parse step.
+
+## Naming conventions
+
+### Riverpod providers
+
+Name providers by **layer** and **responsibility**:
+
+| Pattern | Role | Examples |
+|---------|------|----------|
+| `{domain}Repo` | Data repository; shared across features. **No** `library` prefix. | `comicRepo`, `seriesRepo`, `tagRepo` |
+| `{feature}{Noun}` | Feature-scoped state or query | `libraryComicDetail`, `libraryQueryIntent`, `comicCover` |
+| `{feature}{Noun}Controller` | Paged lists, catalogs | `libraryComicsCatalogController` |
+| `{domain}Cache` / `{domain}Coordinator` | Cross-cutting infra | `comicCoverThumbnailCache`, `thumbnailEventCoordinator` |
+
+Rules:
+
+- State types: `{Noun}State` (e.g. `ComicCoverState`). Provider function: `{noun}` → `{noun}Provider`.
+- Notifier class: `{Noun}` — avoid `Manager` / `Runner` unless the type truly orchestrates multiple subsystems.
+- Do **not** prefix repositories with `library` (e.g. prefer `seriesRepo` over `librarySeriesRepo`).
+
+### File ↔ type names
+
+| Location | Rule |
+|----------|------|
+| `ui/core/widgets/**` | **Strict:** file name = primary public type in `snake_case` (`theme_preference_row.dart` ↔ `ThemePreferenceRow`). |
+| `ui/features/**/widgets/**` | **Loose:** feature prefix allowed; stay consistent within the feature. |
+| Barrel files (`widgets.dart`, `providers.dart`) | Export-only; file name need not match a type. |
+
+### UI payload types
+
+- **Stateful UI:** sealed `{Noun}State` consumed by widgets.
+- **Plain data bundle** (no persistence / wire format): prefer `typedef` + record per [Lightweight data shapes](#lightweight-data-shapes).
+- `*Dto` suffix: FRB / JSON / serialization boundaries only — not general UI pass-through types.
+
+### Planned renames (migration reference)
+
+When touching related code, prefer the target name:
+
+| Current | Target |
+|---------|--------|
+| `librarySeriesRepo` | `seriesRepo` |
+| `libraryTagRepo` | `tagRepo` |
+| `libraryAuthorRepo` | `authorRepo` |
+| `settings_theme_row.dart` / `ThemePreferenceRow` | `theme_preference_row.dart` |
+| `rename_tag_dialog.dart` / `TagNameEditorDialog` | `tag_name_editor_dialog.dart` |
+
