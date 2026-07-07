@@ -3,8 +3,8 @@ import 'package:hentai_library/domain/library/library_age_restriction_filter.dar
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/ui/features/library/view_models/catalog_pagination_engine.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
@@ -22,10 +22,9 @@ const LibrarySeriesProjection _librarySeriesProjection =
 
 @Riverpod(keepAlive: true)
 class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
-  int _pageIndex = 1;
-  Object? _lastQueryKey;
+  final CatalogPaginationEngine _pagination = CatalogPaginationEngine();
 
-  int get pageIndex => _pageIndex;
+  int get pageIndex => _pagination.pageIndex;
 
   @override
   Future<LibrarySeriesCatalogState> build() async {
@@ -39,23 +38,12 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
         (LibraryQueryIntent intent) => intent.keyword,
       ),
     );
-    final LibraryAgeRestrictionFilter ageRestriction = ref.watch(
-      librarySeriesTabAgeRestrictionFilterProvider,
-    );
-    final LibrarySeriesSortOption sortOption = ref.watch(
-      librarySeriesTabSortOptionProvider,
-    );
-    final int pageSize = ref.watch(librarySeriesTabPageSizeProvider);
-    final Object queryKey = (
+    _pagination.syncQueryKey((
       keyword,
-      ageRestriction,
-      sortOption,
-      pageSize,
-    );
-    if (_lastQueryKey != null && _lastQueryKey != queryKey) {
-      _pageIndex = 1;
-    }
-    _lastQueryKey = queryKey;
+      ref.watch(librarySeriesTabAgeRestrictionFilterProvider),
+      ref.watch(librarySeriesTabSortOptionProvider),
+      ref.watch(librarySeriesTabPageSizeProvider),
+    ));
   }
 
   Future<LibrarySeriesCatalogState> _load() async {
@@ -93,62 +81,48 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
       keyword: keyword,
     );
     final int pageSize = ref.read(librarySeriesTabPageSizeProvider);
-    final PagedResult<Series> result = await ref
-        .read(seriesRepoProvider)
-        .fetchPage(
-          request: pageRequest(page: _pageIndex, pageSize: pageSize),
-          filter: filter,
-          sortOption: sortOption,
-        );
-    if (result.page != _pageIndex) {
-      _pageIndex = result.page;
-    }
-    return result;
+    return _pagination.fetchPage<Series>(
+      pageSize: pageSize,
+      fetch: (request) => ref.read(seriesRepoProvider).fetchPage(
+        request: request,
+        filter: filter,
+        sortOption: sortOption,
+      ),
+    );
   }
 
   void setPage(int page) {
-    if (page < 1 || page == _pageIndex) {
-      return;
+    if (_pagination.setPage(page)) {
+      ref.invalidateSelf();
     }
-    _pageIndex = page;
-    ref.invalidateSelf();
   }
 
   void goToFirstPage() {
-    if (_pageIndex == 1) {
-      return;
+    if (_pagination.goToFirstPage()) {
+      ref.invalidateSelf();
     }
-    _pageIndex = 1;
-    ref.invalidateSelf();
   }
 
   void goToLastPage(int totalPages) {
-    if (totalPages <= 0 || _pageIndex == totalPages) {
-      return;
+    if (_pagination.goToLastPage(totalPages)) {
+      ref.invalidateSelf();
     }
-    _pageIndex = totalPages;
-    ref.invalidateSelf();
   }
 
   void goToPreviousPage() {
-    if (_pageIndex <= 1) {
-      return;
+    if (_pagination.goToPreviousPage()) {
+      ref.invalidateSelf();
     }
-    _pageIndex -= 1;
-    ref.invalidateSelf();
   }
 
   void goToNextPage(int totalPages) {
-    if (totalPages <= 0 || _pageIndex >= totalPages) {
-      return;
+    if (_pagination.goToNextPage(totalPages)) {
+      ref.invalidateSelf();
     }
-    _pageIndex += 1;
-    ref.invalidateSelf();
   }
 
   void refresh() {
-    _pageIndex = 1;
-    _lastQueryKey = null;
+    _pagination.refresh();
     ref.invalidateSelf();
   }
 }
