@@ -54,7 +54,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
+          ref: main
+          fetch-depth: 0
 
       - name: Verify CI checks and parse version
         id: verify
@@ -64,7 +65,7 @@ jobs:
           DISPATCH_PRERELEASE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease || '' }}
           GITHUB_EVENT_NAME: ${{ github.event_name }}
         run: |
-          export COMMIT_SHA="$(git rev-parse HEAD)"
+          export COMMIT_SHA="$(git rev-parse "${RELEASE_TAG}^{commit}")"
           bash .github/scripts/verify_ci_passed.sh
 
   build-windows:
