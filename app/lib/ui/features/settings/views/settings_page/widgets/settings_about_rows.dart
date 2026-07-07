@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/core/widgets/foundation/my_toggle_switch.dart';
+import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/ui/features/settings/state/app_update_controller.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
@@ -29,7 +29,7 @@ class AutoUpdateRow extends ConsumerWidget {
       ),
       label: '自动更新',
       description: autoUpdate ? '已启用（启动时检查更新）' : '已禁用',
-      action: MyToggleSwitch(
+      action: ToggleSwitch(
         checked: autoUpdate,
         onChange: () =>
             ref.read(settingsProvider.notifier).setAutoUpdate(!autoUpdate),

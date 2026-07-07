@@ -22,9 +22,9 @@ class TagManagementPanel extends ConsumerWidget {
       await showDialog<void>(
         context: context,
         builder: (context) => TagNameEditorDialog(
-          title: '添加标签',
-          labelText: '名称',
-          hintText: '输入标签名称…',
+          title: '????',
+          labelText: '??',
+          hintText: '???????',
           initialValue: '',
           onSubmit: (value) async {
             await ref.read(tagActionsProvider).addTag(Tag(name: value));
@@ -57,7 +57,7 @@ class TagManagementPanel extends ConsumerWidget {
                 return LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
                     final double cardHeight =
-                        MetadataPanelHeightCalculator.calculateCardHeight(
+                        metadataPanelCardHeight(
                           constraints: constraints,
                           itemCount: filteredTags.length,
                           config: _TagStyles.listHeightConfig,
@@ -114,7 +114,7 @@ class _TagStyles {
     vertical: 48,
   );
   static const MetadataPanelHeightConfig listHeightConfig =
-      MetadataPanelHeightCalculator.defaultConfig;
+      kMetadataPanelHeightDefaultConfig;
 }
 
 class _TagManagementHeader extends ConsumerWidget {
@@ -135,7 +135,7 @@ class _TagManagementHeader extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '标签管理',
+                '????',
                 style: TextStyle(
                   fontSize: _TagStyles.titleFontSize,
                   fontWeight: FontWeight.w600,
@@ -145,7 +145,7 @@ class _TagManagementHeader extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                '查看、添加、重命名以及批量删除分类标签',
+                '???????????????????',
                 style: TextStyle(
                   color: cs.hentai.textTertiary,
                   fontSize: _TagStyles.subtitleFontSize,
@@ -163,7 +163,7 @@ class _TagManagementHeader extends ConsumerWidget {
             SizedBox(
               width: MediaQuery.of(context).size.width * 0.2,
               child: CustomTextField(
-                hintText: '搜索标签名称…',
+                hintText: '???????',
                 onChanged: (String value) =>
                     ref.read(tagFilterProvider.notifier).setQuery(value),
               ),
@@ -171,7 +171,7 @@ class _TagManagementHeader extends ConsumerWidget {
             FilledButton.icon(
               onPressed: onAddTag,
               icon: const Icon(LucideIcons.plus, size: 16),
-              label: Text('添加标签 ($shortcutLabel)'),
+              label: Text('???? ($shortcutLabel)'),
               style: FilledButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -197,13 +197,13 @@ class _TagBulkDeleteBar extends ConsumerWidget {
     return Row(
       children: [
         GhostButton.icon(
-          tooltip: '删除已选',
-          semanticLabel: '删除已选',
+          tooltip: '????',
+          semanticLabel: '????',
           icon: LucideIcons.trash2,
           size: 28,
           onPressed: () async {
             if (selectionCount == 0) {
-              showInfoToast(context, '此操作将删除已选中的标签，请先勾选列表中的标签。');
+              showInfoToast(context, '????????????????????????');
               return;
             }
             final bool confirmed =
@@ -233,7 +233,7 @@ String _shortcutLabel(BuildContext context) {
   final TargetPlatform platform = Theme.of(context).platform;
   final bool isApple =
       platform == TargetPlatform.macOS || platform == TargetPlatform.iOS;
-  return isApple ? '⌘N' : 'Ctrl+N';
+  return isApple ? '?N' : 'Ctrl+N';
 }
 
 class _TagListCard extends StatelessWidget {
@@ -302,7 +302,7 @@ class _TagListHeader extends ConsumerWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '全部标签',
+            '????',
             style: TextStyle(
               fontSize: _TagStyles.listHeaderFontSize,
               fontWeight: FontWeight.w600,
@@ -311,7 +311,7 @@ class _TagListHeader extends ConsumerWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            '共 $totalCount 条',
+            '? $totalCount ?',
             style: TextStyle(
               fontSize: _TagStyles.listHeaderFontSize,
               color: cs.hentai.textTertiary,
@@ -320,7 +320,7 @@ class _TagListHeader extends ConsumerWidget {
           if (selectionCount > 0) ...[
             const SizedBox(width: 12),
             Text(
-              '已选 $selectionCount',
+              '?? $selectionCount',
               style: TextStyle(
                 fontSize: _TagStyles.listHeaderFontSize,
                 fontWeight: FontWeight.w600,
@@ -361,7 +361,7 @@ class _TagRow extends ConsumerWidget {
                     : LucideIcons.square,
                 iconSize: 16,
                 size: _TagStyles.iconButtonSize.width,
-                tooltip: isSelected ? '取消选中' : '选中',
+                tooltip: isSelected ? '????' : '??',
                 foregroundColor: isSelected
                     ? cs.primary
                     : cs.hentai.textTertiary,
@@ -388,7 +388,7 @@ class _TagRow extends ConsumerWidget {
                 iconSize: 16,
                 size: _TagStyles.iconButtonSize.width,
                 borderRadius: _TagStyles.iconButtonRadius,
-                tooltip: '重命名',
+                tooltip: '???',
                 delayTooltipThreeSeconds: true,
                 hoverColor: cs.primary.withAlpha(10),
                 overlayColor: cs.primary.withAlpha(14),
@@ -396,9 +396,9 @@ class _TagRow extends ConsumerWidget {
                   await showDialog<void>(
                     context: context,
                     builder: (context) => TagNameEditorDialog(
-                      title: '重命名标签',
-                      labelText: '新名称',
-                      hintText: '输入新的标签名称…',
+                      title: '?????',
+                      labelText: '???',
+                      hintText: '?????????',
                       initialValue: tag.name,
                       shouldCloseOnUnchanged: true,
                       onSubmit: (value) async {
@@ -411,8 +411,8 @@ class _TagRow extends ConsumerWidget {
                 },
               ),
               GhostButton.icon(
-                tooltip: '删除',
-                semanticLabel: '删除',
+                tooltip: '??',
+                semanticLabel: '??',
                 icon: LucideIcons.trash2,
                 iconSize: 16,
                 size: _TagStyles.iconButtonSize.width,
@@ -435,7 +435,7 @@ class _TagRow extends ConsumerWidget {
                   try {
                     await ref.read(tagActionsProvider).deleteTag(tag);
                     if (context.mounted) {
-                      showSuccessToast(context, '已删除标签');
+                      showSuccessToast(context, '?????');
                     }
                   } catch (e) {
                     if (context.mounted) {
@@ -509,7 +509,7 @@ class _TagManagementEmptyState extends StatelessWidget {
           Icon(LucideIcons.tags, size: 32, color: cs.onSurfaceVariant),
           const SizedBox(height: 12),
           Text(
-            '暂无标签',
+            '????',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -518,7 +518,7 @@ class _TagManagementEmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '你可以从这里添加、重命名或删除标签。',
+            '??????????????????',
             style: TextStyle(
               fontSize: _TagStyles.subtitleFontSize,
               color: cs.hentai.textSecondary,

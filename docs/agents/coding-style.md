@@ -114,4 +114,11 @@ Rules:
 | `libraryAuthorRepo` | `authorRepo` |
 | `settings_theme_row.dart` / `ThemePreferenceRow` | `theme_preference_row.dart` |
 | `rename_tag_dialog.dart` / `TagNameEditorDialog` | `tag_name_editor_dialog.dart` |
+| `ComicCoverDisplayData` | `ComicCoverImage`（`comic_cover_image.dart`） |
+| `HistoryGridItemDto`（freezed） | `HistoryGridItem`（typedef record + `historyGridItem()`） |
+| `PageRequest` class | `PageRequest` typedef record + `pageRequest()` |
+| `comicCoverDisplayDataOrPrevious` | `comicCoverImageOrPrevious` |
+| `MyToggleSwitch` / `my_toggle_switch.dart` | `ToggleSwitch` / `toggle_switch.dart` |
+| `DebouncedActionRunner` / `debounced_action_runner.dart` | `Debouncer` / `debouncer.dart` |
+| `MetadataPanelHeightCalculator` | `metadataPanelCardHeight()` + `kMetadataPanelHeightDefaultConfig` |
 

@@ -1,17 +1,17 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 
-class MyToggleSwitch extends StatefulWidget {
-  const MyToggleSwitch({super.key, required this.checked, this.onChange});
+class ToggleSwitch extends StatefulWidget {
+  const ToggleSwitch({super.key, required this.checked, this.onChange});
 
   final bool checked;
   final VoidCallback? onChange;
 
   @override
-  State<MyToggleSwitch> createState() => _MyToggleSwitchState();
+  State<ToggleSwitch> createState() => _ToggleSwitchState();
 }
 
-class _MyToggleSwitchState extends State<MyToggleSwitch> {
+class _ToggleSwitchState extends State<ToggleSwitch> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

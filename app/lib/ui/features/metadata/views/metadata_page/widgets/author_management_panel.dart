@@ -59,7 +59,7 @@ class AuthorManagementPanel extends ConsumerWidget {
                 return LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
                     final double cardHeight =
-                        MetadataPanelHeightCalculator.calculateCardHeight(
+                        metadataPanelCardHeight(
                           constraints: constraints,
                           itemCount: filteredAuthors.length,
                           config: _AuthorStyles.listHeightConfig,
@@ -116,7 +116,7 @@ class _AuthorStyles {
     vertical: 48,
   );
   static const MetadataPanelHeightConfig listHeightConfig =
-      MetadataPanelHeightCalculator.defaultConfig;
+      kMetadataPanelHeightDefaultConfig;
 }
 
 class _AuthorManagementHeader extends ConsumerWidget {

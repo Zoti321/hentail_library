@@ -4,7 +4,7 @@ import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/ui/core/dto/history_grid_item.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/view_models/debounced_action_runner.dart';
+import 'package:hentai_library/ui/features/shell/view_models/debouncer.dart';
 import 'package:hentai_library/ui/features/shell/view_models/history_paged_feed_state.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -18,11 +18,11 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
 
   String _pendingKeyword = '';
   String _effectiveKeyword = '';
-  DebouncedActionRunner? _keywordDebounce;
+  Debouncer? _keywordDebounce;
 
   @override
   Future<HistoryPagedFeedState> build() async {
-    _keywordDebounce ??= DebouncedActionRunner(
+    _keywordDebounce ??= Debouncer(
       duration: _kHistoryKeywordDebounce,
     );
     ref.onDispose(() => _keywordDebounce?.dispose());

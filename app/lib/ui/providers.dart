@@ -5,7 +5,7 @@ export 'features/settings/settings.dart';
 export 'features/shell/di/deps.dart';
 export 'features/shell/di/usecases/usecases.dart';
 export 'features/shell/state/aggregates.dart';
-export 'features/shell/view_models/debounced_action_runner.dart';
+export 'features/shell/view_models/debouncer.dart';
 export 'features/shell/view_models/history_paged_feed_controller.dart';
 export 'features/shell/view_models/home_page_dashboard_notifier.dart';
 export 'features/shell/view_models/selected_paths_page_notifier.dart';

@@ -5,7 +5,7 @@ import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
-import 'package:hentai_library/ui/core/widgets/foundation/my_toggle_switch.dart';
+import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class LibraryLocationRow extends StatelessWidget {
@@ -51,7 +51,7 @@ class AutoScanRow extends ConsumerWidget {
       ),
       label: '自动扫描',
       description: autoScan ? '已启用（启动时扫描选中路径）' : '已禁用',
-      action: MyToggleSwitch(
+      action: ToggleSwitch(
         checked: autoScan,
         onChange: () =>
             ref.read(settingsProvider.notifier).setAutoScan(!autoScan),
