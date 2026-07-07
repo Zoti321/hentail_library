@@ -42,6 +42,9 @@ jobs:
     name: gate
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: .
     outputs:
       version: ${{ steps.verify.outputs.version }}
       prerelease: ${{ steps.verify.outputs.prerelease }}
@@ -245,6 +248,9 @@ jobs:
       - build-android
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: .
     steps:
       - name: Download release artifacts
         uses: actions/download-artifact@v4
