@@ -90,7 +90,7 @@ void main() {
         allSeriesProvider.overrideWith((Ref ref) async => <Series>[]),
         comicAggregateProvider.overrideWith(_FakeComicAggregateNotifier.new),
         comicRepoProvider.overrideWith((Ref ref) => _FakeComicRepo()),
-        librarySeriesRepoProvider.overrideWith((Ref ref) => _FakeSeriesRepo()),
+        seriesRepoProvider.overrideWith((Ref ref) => _FakeSeriesRepo()),
         libraryComicsTabSortOptionProvider.overrideWith((Ref ref) {
           final int revision = ref.watch(_comicsSortRevisionProvider);
           return revision == 0

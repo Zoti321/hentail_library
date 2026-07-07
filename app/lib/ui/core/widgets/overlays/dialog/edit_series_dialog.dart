@@ -64,7 +64,7 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
     setState(() => _saving = true);
     try {
       await ref
-          .read(librarySeriesRepoProvider)
+          .read(seriesRepoProvider)
           .updateUserMeta(
             seriesId: widget.series.id,
             name: name,

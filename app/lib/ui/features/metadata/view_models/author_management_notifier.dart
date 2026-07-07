@@ -4,7 +4,7 @@ import 'package:hentai_library/ui/features/shell/di/deps.dart';
 
 /// 全部作者列表（用于作者管理页面）；监听 Drift `authors` 表变化。
 final allAuthorsProvider = StreamProvider<List<Author>>((ref) {
-  return ref.watch(libraryAuthorRepoProvider).watchAll();
+  return ref.watch(authorRepoProvider).watchAll();
 });
 
 /// 当前选中的作者集合（用于批量删除）
@@ -83,19 +83,19 @@ class AuthorActions {
   final Ref _ref;
 
   Future<void> addAuthor(Author author) async {
-    await _ref.read(libraryAuthorRepoProvider).add(author);
+    await _ref.read(authorRepoProvider).add(author);
   }
 
   Future<void> deleteAuthors(List<Author> authors) async {
     if (authors.isEmpty) return;
     await _ref
-        .read(libraryAuthorRepoProvider)
+        .read(authorRepoProvider)
         .deleteByNames(authors.map((e) => e.name).toList());
     _ref.read(authorSelectionProvider.notifier).clear();
   }
 
   Future<void> deleteAuthor(Author author) async {
-    await _ref.read(libraryAuthorRepoProvider).deleteByNames(<String>[
+    await _ref.read(authorRepoProvider).deleteByNames(<String>[
       author.name,
     ]);
     _ref.read(authorSelectionProvider.notifier).remove(author);
@@ -104,7 +104,7 @@ class AuthorActions {
   Future<void> renameAuthor(Author oldAuthor, String newName) async {
     final trimmed = newName.trim();
     if (trimmed.isEmpty || trimmed == oldAuthor.name) return;
-    await _ref.read(libraryAuthorRepoProvider).rename(oldAuthor.name, trimmed);
+    await _ref.read(authorRepoProvider).rename(oldAuthor.name, trimmed);
   }
 }
 

@@ -6,7 +6,7 @@ part 'series_aggregate_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
 Future<List<Series>> allSeries(Ref ref) async {
-  final List<Series> list = await ref.watch(librarySeriesRepoProvider).getAll();
+  final List<Series> list = await ref.watch(seriesRepoProvider).getAll();
   list.sort((Series a, Series b) => a.name.compareTo(b.name));
   return list;
 }
@@ -19,7 +19,7 @@ Future<Series?> seriesById(Ref ref, String seriesId) {
   if (normalizedId.isEmpty) {
     return Future<Series?>.value(null);
   }
-  return ref.read(librarySeriesRepoProvider).findById(normalizedId);
+  return ref.read(seriesRepoProvider).findById(normalizedId);
 }
 
 @Riverpod(keepAlive: true)

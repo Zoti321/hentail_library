@@ -72,7 +72,7 @@ Future<ReadSessionContextData> readSessionContextForReader(
   Series? series;
   if (normalizedSeriesId != null && normalizedSeriesId.isNotEmpty) {
     series = await ref
-        .read(librarySeriesRepoProvider)
+        .read(seriesRepoProvider)
         .findById(normalizedSeriesId);
   }
 
@@ -133,7 +133,7 @@ Future<String> resolveSeriesReadComicId(
   required String seriesId,
 }) async {
   final Series? series = await ref
-      .read(librarySeriesRepoProvider)
+      .read(seriesRepoProvider)
       .findById(seriesId);
   if (series == null || series.items.isEmpty) {
     return '';

@@ -64,7 +64,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     final String keyword = ref.read(libraryQueryIntentProvider).keyword;
     final PagedResult<Series> page = await _fetchPage(keyword);
     final int tableTotalCount = await ref
-        .read(librarySeriesRepoProvider)
+        .read(seriesRepoProvider)
         .countAll();
 
     return LibrarySeriesCatalogState(
@@ -93,7 +93,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     );
     final int pageSize = ref.read(librarySeriesTabPageSizeProvider);
     final PagedResult<Series> result = await ref
-        .read(librarySeriesRepoProvider)
+        .read(seriesRepoProvider)
         .fetchPage(
           request: PageRequest(page: _pageIndex, pageSize: pageSize),
           filter: filter,
