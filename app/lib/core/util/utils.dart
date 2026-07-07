@@ -1,11 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 // 判断是否为桌面平台
 bool get isDesktop {
@@ -15,41 +12,6 @@ bool get isDesktop {
     TargetPlatform.macOS,
     TargetPlatform.linux,
   ].contains(defaultTargetPlatform);
-}
-
-// 生成漫画哈希id
-String generateComicId(String title, {String? coverUrl, String? description}) {
-  final input = [title, coverUrl, description].whereType<String>().join();
-  final bytes = utf8.encode(input);
-  final digest = sha1.convert(bytes);
-  return digest.toString();
-}
-
-// 生成章节哈希id
-String generateChapterId(
-  String comicTitle,
-  String imageDir,
-  int pageCount,
-  int number,
-) {
-  final input =
-      comicTitle + imageDir + pageCount.toString() + number.toString();
-  final bytes = utf8.encode(input);
-  final digest = sha1.convert(bytes);
-  return digest.toString();
-}
-
-// 在资源管理器打开对应文件夹
-Future<void> openFolder(String path) async {
-  final Uri uri = Uri.file(path);
-
-  // 检查系统是否支持打开该路径
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri);
-  } else {
-    // 也可以尝试直接调用命令行（兜底方案）
-    throw '无法打开文件夹：$path';
-  }
 }
 
 Future<void> showInFileExplorer(String path) async {
