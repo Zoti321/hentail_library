@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_catalog_prefetch_notifier.g.dart';
 
-/// ?? Tab ??????????? Tab?????????????
+/// 当前 Tab 显示时预取另一 Tab 数据，减少切换等待。
 @Riverpod(keepAlive: true)
 class LibraryCatalogPrefetch extends _$LibraryCatalogPrefetch {
   ProviderSubscription<AsyncValue<LibraryComicsCatalogState>>? _comicsSub;

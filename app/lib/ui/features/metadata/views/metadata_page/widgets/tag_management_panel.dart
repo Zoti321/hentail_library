@@ -57,7 +57,7 @@ class TagManagementPanel extends ConsumerWidget {
                 return LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
                     final double cardHeight =
-                        MetadataPanelHeightCalculator.calculateCardHeight(
+                        metadataPanelCardHeight(
                           constraints: constraints,
                           itemCount: filteredTags.length,
                           config: _TagStyles.listHeightConfig,
@@ -114,7 +114,7 @@ class _TagStyles {
     vertical: 48,
   );
   static const MetadataPanelHeightConfig listHeightConfig =
-      MetadataPanelHeightCalculator.defaultConfig;
+      kMetadataPanelHeightDefaultConfig;
 }
 
 class _TagManagementHeader extends ConsumerWidget {
