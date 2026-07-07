@@ -47,7 +47,18 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
   }
 
   Future<LibrarySeriesCatalogState> _load() async {
-    final LibraryRevisionState revisionState = ref.watch(libraryRevisionProvider);
+    final LibrarySeriesSortOption sortOption = ref.read(
+      librarySeriesTabSortOptionProvider,
+    );
+    // 随机排序每次查询顺序不同；库 revision 被动刷新不应触发重排。
+    if (sortOption.field != LibrarySeriesSortField.random) {
+      ref.watch(
+        libraryRevisionProvider.select(
+          (LibraryRevisionState state) => state.revision,
+        ),
+      );
+    }
+    final LibraryRevisionState revisionState = ref.read(libraryRevisionProvider);
 
     final String keyword = ref.read(libraryQueryIntentProvider).keyword;
     final PagedResult<Series> page = await _fetchPage(keyword);
