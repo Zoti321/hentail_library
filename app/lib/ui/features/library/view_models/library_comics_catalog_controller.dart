@@ -95,7 +95,7 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     final PagedResult<Comic> result = await ref
         .read(comicRepoProvider)
         .fetchComicsPage(
-          request: PageRequest(page: _pageIndex, pageSize: pageSize),
+          request: pageRequest(page: _pageIndex, pageSize: pageSize),
           filter: filter,
           sortOption: sortOption,
         );

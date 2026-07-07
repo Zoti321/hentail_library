@@ -24,7 +24,7 @@ class ComicDetailCover extends ConsumerWidget {
     final ComicCoverState state = ref.watch(comicCoverProvider(comicId));
 
     return AdaptiveComicCover(
-      coverDisplay: comicCoverDisplayDataOrPrevious(state),
+      coverDisplay: comicCoverImageOrPrevious(state),
       containerAspectRatio: containerAspectRatio,
       backgroundColor: Colors.white,
       showShadow: true,

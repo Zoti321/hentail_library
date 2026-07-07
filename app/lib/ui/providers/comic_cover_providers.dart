@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart';
-import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
+import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_state.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -66,7 +66,7 @@ class ComicCover extends _$ComicCover {
       comicCoverThumbnailCacheProvider(comicId),
     );
     if (cached != null && cached.isNotEmpty) {
-      return ComicCoverReady(ComicCoverDisplayData.bytes(cached));
+      return ComicCoverReady(ComicCoverImage.bytes(cached));
     }
     Future.microtask(() => ensureLoaded());
     return const ComicCoverLoading();
@@ -88,7 +88,7 @@ class ComicCover extends _$ComicCover {
       return;
     }
     ref.read(comicCoverThumbnailCacheProvider(comicId).notifier).set(bytes);
-    state = ComicCoverReady(ComicCoverDisplayData.bytes(bytes));
+    state = ComicCoverReady(ComicCoverImage.bytes(bytes));
   }
 
   void markDecodeError() {
@@ -112,7 +112,7 @@ class ComicCover extends _$ComicCover {
       return;
     }
 
-    final ComicCoverDisplayData? previous = switch (state) {
+    final ComicCoverImage? previous = switch (state) {
       ComicCoverLoading(:final previous) => previous,
       ComicCoverReady(:final data) => data,
       _ => null,
@@ -149,7 +149,7 @@ class ComicCover extends _$ComicCover {
         return;
       }
       ref.read(comicCoverThumbnailCacheProvider(comicId).notifier).set(bytes);
-      state = ComicCoverReady(ComicCoverDisplayData.bytes(bytes));
+      state = ComicCoverReady(ComicCoverImage.bytes(bytes));
     } on Object catch (error, stackTrace) {
       LogManager.instance.handle(
         error,

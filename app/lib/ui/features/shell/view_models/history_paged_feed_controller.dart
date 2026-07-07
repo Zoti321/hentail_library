@@ -2,7 +2,7 @@ import 'package:hentai_library/domain/models/entity/reading_history.dart'
     as entity;
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/ui/core/dto/history_grid_item_dto.dart';
+import 'package:hentai_library/ui/core/dto/history_grid_item.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/view_models/debounced_action_runner.dart';
 import 'package:hentai_library/ui/features/shell/view_models/history_paged_feed_state.dart';
@@ -47,7 +47,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
       final PagedResult<entity.ReadingHistory> page = await ref
           .read(readingHistoryRepoProvider)
           .fetchHistoryPage(
-            PageRequest(page: nextPage, pageSize: _pageSize),
+            pageRequest(page: nextPage, pageSize: _pageSize),
             keyword: _keywordOrNull(),
           );
       final HistoryPagedFeedState merged = _mergePage(
@@ -85,8 +85,8 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     if (current == null) {
       return;
     }
-    final List<HistoryGridItemDto> items = current.items
-        .where((HistoryGridItemDto item) => item.comicId != comicId)
+    final List<HistoryGridItem> items = current.items
+        .where((HistoryGridItem item) => item.comicId != comicId)
         .toList(growable: false);
     state = AsyncData<HistoryPagedFeedState>(
       current.copyWith(
@@ -99,7 +99,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
   void clearAllLocal() {
     state = AsyncData<HistoryPagedFeedState>(
       HistoryPagedFeedState(
-        items: const <HistoryGridItemDto>[],
+        items: const <HistoryGridItem>[],
         totalCount: 0,
         loadedPage: 0,
         hasReachedEnd: true,
@@ -112,7 +112,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     final PagedResult<entity.ReadingHistory> result = await ref
         .read(readingHistoryRepoProvider)
         .fetchHistoryPage(
-          PageRequest(page: page, pageSize: _pageSize),
+          pageRequest(page: page, pageSize: _pageSize),
           keyword: _keywordOrNull(),
         );
     return _stateFromPage(result, loadedPage: result.page);
@@ -126,7 +126,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     PagedResult<entity.ReadingHistory> page, {
     required int loadedPage,
   }) {
-    final List<HistoryGridItemDto> items = page.items
+    final List<HistoryGridItem> items = page.items
         .map(_mapHistoryItem)
         .toList(growable: false);
     return HistoryPagedFeedState(
@@ -143,10 +143,10 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     required PagedResult<entity.ReadingHistory> page,
     required int loadedPage,
   }) {
-    final List<HistoryGridItemDto> appended = page.items
+    final List<HistoryGridItem> appended = page.items
         .map(_mapHistoryItem)
         .toList(growable: false);
-    final List<HistoryGridItemDto> items = <HistoryGridItemDto>[
+    final List<HistoryGridItem> items = <HistoryGridItem>[
       ...current.items,
       ...appended,
     ];
@@ -159,8 +159,8 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     );
   }
 
-  HistoryGridItemDto _mapHistoryItem(entity.ReadingHistory history) {
-    return HistoryGridItemDto(
+  HistoryGridItem _mapHistoryItem(entity.ReadingHistory history) {
+    return historyGridItem(
       id: 'comic:${history.comicId}',
       title: history.title,
       lastReadTime: history.lastReadTime,

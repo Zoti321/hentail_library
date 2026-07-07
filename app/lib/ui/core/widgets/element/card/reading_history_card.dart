@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
-import 'package:hentai_library/ui/core/dto/comic_cover_display_data.dart';
+import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_state.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
@@ -41,7 +41,7 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
     final ComicCoverState coverState = ref.watch(
       comicCoverProvider(widget.comicId),
     );
-    final coverDisplay = comicCoverDisplayDataOrPrevious(coverState);
+    final coverDisplay = comicCoverImageOrPrevious(coverState);
 
     final Color cardBackground = _isHovered ? cs.surfaceContainer : cs.surface;
     final Color cardBorderColor = _isHovered
@@ -150,7 +150,7 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
   Widget _buildCover(
     ColorScheme cs,
     ComicCoverState coverState,
-    ComicCoverDisplayData? coverDisplay,
+    ComicCoverImage? coverDisplay,
   ) {
     const double coverWidth = 74;
     const double coverHeight = 102;

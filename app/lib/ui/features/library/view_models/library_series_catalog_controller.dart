@@ -95,7 +95,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     final PagedResult<Series> result = await ref
         .read(seriesRepoProvider)
         .fetchPage(
-          request: PageRequest(page: _pageIndex, pageSize: pageSize),
+          request: pageRequest(page: _pageIndex, pageSize: pageSize),
           filter: filter,
           sortOption: sortOption,
         );
