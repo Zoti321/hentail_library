@@ -10,7 +10,7 @@ import 'package:hentai_library/ui/features/reader/module/controller/reader_prefe
 import 'package:hentai_library/ui/features/reader/module/view/reader_viewport_host.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/continuous_vertical_viewport.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
-import 'package:hentai_library/src/rust/api/reader.dart';
+import 'package:hentai_library/domain/reading/reader_page_payload.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -171,7 +171,7 @@ List<Override> _viewportTestOverrides() {
             comicId: _testComicId,
             pageIndex: index,
           ).overrideWith(
-            (Ref ref) async => ReaderPageDto.bytes(data: Uint8List(0)),
+            (Ref ref) async => ReaderPageBytes(Uint8List(0)),
           ),
     ),
   ];

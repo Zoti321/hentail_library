@@ -15,8 +15,8 @@ import 'package:hentai_library/ui/features/library/view_models/library_query_int
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
-import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
-import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/library_series_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
 
@@ -29,12 +29,12 @@ final _comicsSortRevisionProvider = NotifierProvider<_ComicsSortRevision, int>(
   _ComicsSortRevision.new,
 );
 
-class _FakeComicAggregateNotifier extends ComicAggregateNotifier {
+class _FakeLibraryRevision extends LibraryRevision {
   @override
-  ComicAggregateState build() {
-    return const ComicAggregateState(
-      changeGeneration: 1,
-      hasReceivedFirstChange: true,
+  LibraryRevisionState build() {
+    return const LibraryRevisionState(
+      revision: 1,
+      hasReceivedFirstEmit: true,
     );
   }
 }
@@ -88,7 +88,7 @@ void main() {
     return ProviderContainer(
       overrides: <Override>[
         allSeriesProvider.overrideWith((Ref ref) async => <Series>[]),
-        comicAggregateProvider.overrideWith(_FakeComicAggregateNotifier.new),
+        libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
         comicRepoProvider.overrideWith((Ref ref) => _FakeComicRepo()),
         seriesRepoProvider.overrideWith((Ref ref) => _FakeSeriesRepo()),
         libraryComicsTabSortOptionProvider.overrideWith((Ref ref) {

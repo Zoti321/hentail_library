@@ -1,29 +1,24 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_catalog_prefetch_notifier.g.dart';
 
-/// 当前 Tab 显示时预取另一 Tab 数据，减少切换等待。
+/// 对非活跃 Tab 保持 catalog 订阅，使 revision 变化时两 Tab 同步失效。
 @Riverpod(keepAlive: true)
 class LibraryCatalogPrefetch extends _$LibraryCatalogPrefetch {
-  ProviderSubscription<AsyncValue<LibraryComicsCatalogState>>? _comicsSub;
-  ProviderSubscription<AsyncValue<LibrarySeriesCatalogState>>? _seriesSub;
-  bool _inactivePrefetched = false;
+  ProviderSubscription<Object?>? _inactiveSub;
 
   @override
   void build() {
     ref.onDispose(() {
-      _comicsSub?.close();
-      _seriesSub?.close();
+      _inactiveSub?.close();
     });
 
-    final LibraryDisplayTarget target = ref.watch(libraryDisplayTargetProvider);
-    _bindActiveUntilPrefetch(target);
+    _bindInactive(ref.watch(libraryDisplayTargetProvider));
 
     ref.listen(libraryDisplayTargetProvider, (
       LibraryDisplayTarget? previous,
@@ -32,67 +27,21 @@ class LibraryCatalogPrefetch extends _$LibraryCatalogPrefetch {
       if (previous == null || previous == next) {
         return;
       }
-      _inactivePrefetched = false;
-      _bindActiveUntilPrefetch(next);
-      _ensureTargetTabSubscribed(next);
+      _bindInactive(next);
     });
   }
 
-  void _bindActiveUntilPrefetch(LibraryDisplayTarget target) {
-    _comicsSub?.close();
-    _seriesSub?.close();
-
-    if (target == LibraryDisplayTarget.comics) {
-      _comicsSub = ref.listen(libraryComicsCatalogControllerProvider, (
-        AsyncValue<LibraryComicsCatalogState>? previous,
-        AsyncValue<LibraryComicsCatalogState> next,
-      ) {
-        if (!_inactivePrefetched && next.hasValue) {
-          _inactivePrefetched = true;
-          _subscribeSeries();
-        }
-      }, fireImmediately: true);
-      return;
-    }
-
-    _seriesSub = ref.listen(librarySeriesCatalogControllerProvider, (
-      AsyncValue<LibrarySeriesCatalogState>? previous,
-      AsyncValue<LibrarySeriesCatalogState> next,
-    ) {
-      if (!_inactivePrefetched && next.hasValue) {
-        _inactivePrefetched = true;
-        _subscribeComics();
-      }
-    }, fireImmediately: true);
-  }
-
-  void _ensureTargetTabSubscribed(LibraryDisplayTarget target) {
-    final AsyncValue<Object?> catalogAsync = switch (target) {
-      LibraryDisplayTarget.comics => ref.read(
-        libraryComicsCatalogControllerProvider,
-      ),
-      LibraryDisplayTarget.series => ref.read(
+  void _bindInactive(LibraryDisplayTarget active) {
+    _inactiveSub?.close();
+    _inactiveSub = switch (active) {
+      LibraryDisplayTarget.comics => ref.listen(
         librarySeriesCatalogControllerProvider,
+        (_, _) {},
+      ),
+      LibraryDisplayTarget.series => ref.listen(
+        libraryComicsCatalogControllerProvider,
+        (_, _) {},
       ),
     };
-    if (catalogAsync.hasValue) {
-      return;
-    }
-    switch (target) {
-      case LibraryDisplayTarget.comics:
-        _subscribeComics();
-      case LibraryDisplayTarget.series:
-        _subscribeSeries();
-    }
-  }
-
-  void _subscribeComics() {
-    _comicsSub?.close();
-    _comicsSub = ref.listen(libraryComicsCatalogControllerProvider, (_, _) {});
-  }
-
-  void _subscribeSeries() {
-    _seriesSub?.close();
-    _seriesSub = ref.listen(librarySeriesCatalogControllerProvider, (_, _) {});
   }
 }

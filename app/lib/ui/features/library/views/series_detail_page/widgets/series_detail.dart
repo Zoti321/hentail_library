@@ -12,7 +12,7 @@ import 'package:hentai_library/ui/features/library/views/series_detail_page/widg
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_info_sections.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_primary_actions.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SeriesDetail extends HookConsumerWidget {
@@ -27,14 +27,14 @@ class SeriesDetail extends HookConsumerWidget {
     final double horizontalPadding = detailContentHorizontalPadding(context);
     final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
       ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
-    final int changeGeneration = ref.watch(
-      comicAggregateProvider.select(
-        (ComicAggregateState state) => state.changeGeneration,
+    final int libraryRevision = ref.watch(
+      libraryRevisionProvider.select(
+        (LibraryRevisionState state) => state.revision,
       ),
     );
     final Future<List<Comic>> comicsFuture = useMemoized(
       () => ref.read(comicRepoProvider).getAll(),
-      <Object?>[changeGeneration, series.id],
+      <Object?>[libraryRevision, series.id],
     );
     final AsyncSnapshot<List<Comic>> comicsSnapshot = useFuture(comicsFuture);
     final Map<String, Comic> comicsById = comicsByIdFromList(

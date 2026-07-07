@@ -11,7 +11,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_query_int
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/state/comic_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_comics_catalog_controller.g.dart';
@@ -51,14 +51,14 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
 
   Future<LibraryComicsCatalogState> _load() async {
     ref.watch(
-      comicAggregateProvider.select(
-        (ComicAggregateState state) => state.changeGeneration,
+      libraryRevisionProvider.select(
+        (LibraryRevisionState state) => state.revision,
       ),
     );
 
-    final ComicAggregateState aggregateState = ref.read(comicAggregateProvider);
-    if (aggregateState.streamError != null) {
-      throw aggregateState.streamError!;
+    final LibraryRevisionState revisionState = ref.read(libraryRevisionProvider);
+    if (revisionState.streamError != null) {
+      throw revisionState.streamError!;
     }
 
     final String keyword = ref.read(libraryQueryIntentProvider).keyword;
@@ -74,9 +74,9 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
         isLoading: false,
       ),
       filterQuery: keyword,
-      hasReceivedFirstEmit: aggregateState.hasReceivedFirstChange,
+      hasReceivedFirstEmit: revisionState.hasReceivedFirstEmit,
       isComicTableEmpty:
-          aggregateState.hasReceivedFirstChange && tableTotalCount == 0,
+          revisionState.hasReceivedFirstEmit && tableTotalCount == 0,
     );
   }
 
@@ -146,7 +146,6 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
   }
 
   void refresh() {
-    ref.read(comicAggregateProvider.notifier).refreshStream();
     _pageIndex = 1;
     _lastQueryKey = null;
     ref.invalidateSelf();

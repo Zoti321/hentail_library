@@ -12,7 +12,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_query_int
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_series_catalog_controller.g.dart';
@@ -59,7 +59,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
   }
 
   Future<LibrarySeriesCatalogState> _load() async {
-    ref.watch(seriesAggregateProvider);
+    final LibraryRevisionState revisionState = ref.watch(libraryRevisionProvider);
 
     final String keyword = ref.read(libraryQueryIntentProvider).keyword;
     final PagedResult<Series> page = await _fetchPage(keyword);
@@ -76,7 +76,8 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
         isLoading: false,
       ),
       filterQuery: keyword,
-      isSeriesTableEmpty: tableTotalCount == 0,
+      isSeriesTableEmpty:
+          revisionState.hasReceivedFirstEmit && tableTotalCount == 0,
     );
   }
 
@@ -146,7 +147,6 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
   }
 
   void refresh() {
-    ref.read(seriesAggregateProvider.notifier).refreshAllSeries();
     _pageIndex = 1;
     _lastQueryKey = null;
     ref.invalidateSelf();

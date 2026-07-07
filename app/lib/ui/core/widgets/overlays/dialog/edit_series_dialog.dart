@@ -5,7 +5,6 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/state/series_aggregate_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class EditSeriesDialog extends ConsumerStatefulWidget {
@@ -72,7 +71,6 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
             totalCount: totalCount,
             clearTotalCount: clearTotalCount,
           );
-      ref.read(seriesAggregateProvider.notifier).refreshAllSeries();
       if (mounted) {
         showSuccessToast(context, '系列信息已保存');
         Navigator.of(context).pop();
