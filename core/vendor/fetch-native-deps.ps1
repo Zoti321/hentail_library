@@ -32,7 +32,11 @@ if (Test-Path $TempExtract) { Remove-Item $TempExtract -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $TempExtract | Out-Null
 
 if ($Artifact.EndsWith(".tgz")) {
-    tar -xzf $TempArchive -C $TempExtract
+    $WindowsTar = Join-Path $env:SystemRoot "System32/tar.exe"
+    if (-not (Test-Path $WindowsTar)) {
+        throw "未找到 Windows tar.exe，无法解压 $Artifact"
+    }
+    & $WindowsTar -xzf $TempArchive -C $TempExtract
 } else {
     Expand-Archive -Path $TempArchive -DestinationPath $TempExtract -Force
 }

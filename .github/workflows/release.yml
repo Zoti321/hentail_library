@@ -6,12 +6,17 @@ on:
       - "v*"
   workflow_dispatch:
     inputs:
-      tag:
-        description: "Existing tag to rebuild (e.g. v1.2.3 or v1.0.0-beta.1)"
+      version:
+        description: "Semantic version without v prefix (e.g. 0.1.0 or 0.1.0-beta.1)"
         required: true
         type: string
       prerelease:
-        description: "Mark as GitHub prerelease (also auto-detected from beta tags)"
+        description: "Mark as GitHub prerelease"
+        required: false
+        type: boolean
+        default: false
+      publish_release:
+        description: "Create or update GitHub Release (default: artifacts only)"
         required: false
         type: boolean
         default: false
@@ -22,72 +27,64 @@ on:
         default: ""
 
 concurrency:
-  group: release-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
+  group: release-${{ github.event_name == 'workflow_dispatch' && format('manual-{0}', github.run_id) || github.ref }}
   cancel-in-progress: false
-
-permissions:
-  contents: write
-  checks: read
-  pull-requests: read
 
 env:
   FLUTTER_VERSION: "3.38.5"
-
-defaults:
-  run:
-    working-directory: app
+  FRB_CODEGEN_VERSION: "2.12.0"
 
 jobs:
-  gate:
-    name: gate
+  verify:
+    name: verify
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    defaults:
-      run:
-        working-directory: .
-    outputs:
-      version: ${{ steps.verify.outputs.version }}
-      prerelease: ${{ steps.verify.outputs.prerelease }}
-      tag: ${{ steps.verify.outputs.tag }}
-      sha: ${{ steps.verify.outputs.sha }}
+    timeout-minutes: 30
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
-      - name: Verify CI checks and parse version
-        id: verify
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
-          DISPATCH_PRERELEASE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease || '' }}
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
-        run: |
-          export COMMIT_SHA="$(git rev-parse "${RELEASE_TAG}^{commit}")"
-          bash .github/scripts/verify_ci_passed.sh
+      - uses: ./.github/actions/flutter-frb-setup
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
+
+      - name: cargo test
+        run: cargo test --manifest-path core/Cargo.toml
+
+      - name: flutter analyze
+        working-directory: app
+        run: flutter analyze
 
   build-windows:
     name: build-windows
-    needs: gate
+    needs: verify
     runs-on: windows-latest
     timeout-minutes: 60
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.gate.outputs.tag }}
+      - uses: actions/checkout@v4
 
-      - name: Prepare Flutter
-        uses: ./.github/actions/flutter-prepare
+      - name: Parse version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: ./.github/actions/flutter-frb-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          version: ${{ needs.gate.outputs.version }}
-          build-number: ${{ github.run_number }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
 
-      - name: Build Windows release
-        run: flutter build windows --release
+      - name: flutter build windows
+        working-directory: app
+        run: >
+          flutter build windows --release
+          --build-name=${{ steps.version.outputs.name }}
+          --build-number=${{ github.run_number }}
 
       - name: Install Inno Setup
         run: choco install innosetup -y --no-progress
@@ -95,191 +92,265 @@ jobs:
       - name: Build installer
         shell: pwsh
         run: |
-          $version = "${{ needs.gate.outputs.version }}"
+          $version = "${{ steps.version.outputs.name }}"
+          $dist = Join-Path $env:GITHUB_WORKSPACE "dist"
+          New-Item -ItemType Directory -Force -Path $dist | Out-Null
           $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-          & $iscc "/DMyAppVersion=$version" "windows\packaging\installer.iss"
+          if (-not (Test-Path $iscc)) {
+            $iscc = "C:\Program Files\Inno Setup 6\ISCC.exe"
+          }
+          if (-not (Test-Path $iscc)) {
+            throw "ISCC.exe not found after Inno Setup install"
+          }
+          & $iscc `
+            "/DMyAppVersion=$version" `
+            "/DOutputDir=$dist" `
+            "app\windows\packaging\installer.iss"
 
       - name: Package portable zip
         shell: pwsh
         run: |
-          $version = "${{ needs.gate.outputs.version }}"
-          $zip = "hentai_library_${version}_windows_x64_portable.zip"
-          Compress-Archive -Path "build\windows\x64\runner\Release\*" -DestinationPath $zip
+          $version = "${{ steps.version.outputs.name }}"
+          $dist = Join-Path $env:GITHUB_WORKSPACE "dist"
+          $zip = Join-Path $dist "hentai_library_${version}_windows_x64_portable.zip"
+          Compress-Archive -Path "app\build\windows\x64\runner\Release\*" -DestinationPath $zip
 
-      - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: windows-release
+          name: windows
           path: |
-            ../dist_installer/*.exe
-            hentai_library_*_windows_x64_portable.zip
-          if-no-files-found: error
+            dist/hentai_library_*_windows_x64*.zip
+            dist/hentai_library_*Setup*.exe
 
   build-macos:
     name: build-macos
-    needs: gate
+    needs: verify
     runs-on: macos-latest
     timeout-minutes: 60
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.gate.outputs.tag }}
+      - uses: actions/checkout@v4
 
-      - name: Prepare Flutter
-        uses: ./.github/actions/flutter-prepare
+      - name: Parse version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: ./.github/actions/flutter-frb-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          version: ${{ needs.gate.outputs.version }}
-          build-number: ${{ github.run_number }}
-          enable-macos-desktop: "true"
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
 
-      - name: Build macOS release
-        run: flutter build macos --release
+      - name: flutter build macos
+        working-directory: app
+        run: >
+          flutter build macos --release
+          --build-name=${{ steps.version.outputs.name }}
+          --build-number=${{ github.run_number }}
 
-      - name: Create DMG
+      - name: Package macOS DMG
         run: |
-          version="${{ needs.gate.outputs.version }}"
-          app_path="build/macos/Build/Products/Release/hentai_library.app"
-          dmg_name="hentai_library_${version}_macos.dmg"
-          hdiutil create -volname "hentai_library" -srcfolder "$app_path" -ov -format UDZO "$dmg_name"
+          VERSION="${{ steps.version.outputs.name }}"
+          APP="app/build/macos/Build/Products/Release/hentai_library.app"
+          mkdir -p dist
+          hdiutil create -volname "hentai_library" -srcfolder "$APP" -ov -format UDZO \
+            "dist/hentai_library_${VERSION}_macos.dmg"
 
-      - name: Upload macOS artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: macos-release
-          path: hentai_library_*_macos.dmg
-          if-no-files-found: error
+          name: macos
+          path: dist/hentai_library_*_macos.dmg
 
   build-linux:
     name: build-linux
-    needs: gate
+    needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.gate.outputs.tag }}
+      - uses: actions/checkout@v4
+
+      - name: Parse version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Install Linux build dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
 
-      - name: Prepare Flutter
-        uses: ./.github/actions/flutter-prepare
+      - uses: ./.github/actions/flutter-frb-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          version: ${{ needs.gate.outputs.version }}
-          build-number: ${{ github.run_number }}
-          enable-linux-desktop: "true"
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
 
-      - name: Build Linux release
-        run: flutter build linux --release
+      - name: flutter build linux
+        working-directory: app
+        run: >
+          flutter build linux --release
+          --build-name=${{ steps.version.outputs.name }}
+          --build-number=${{ github.run_number }}
 
-      - name: Package tar.gz
+      - name: Package Linux bundle
         run: |
-          version="${{ needs.gate.outputs.version }}"
-          archive="hentai_library_${version}_linux_x64.tar.gz"
-          tar -czf "$archive" -C build/linux/x64/release bundle
+          VERSION="${{ steps.version.outputs.name }}"
+          mkdir -p dist
+          tar -czf "dist/hentai_library_${VERSION}_linux_x64.tar.gz" \
+            -C app/build/linux/x64/release bundle
 
-      - name: Upload Linux artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: linux-release
-          path: hentai_library_*_linux_x64.tar.gz
-          if-no-files-found: error
+          name: linux
+          path: dist/hentai_library_*_linux_x64.tar.gz
 
   build-android:
     name: build-android
-    needs: gate
+    needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.gate.outputs.tag }}
+      - uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
+      - name: Parse version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
-      - name: Prepare Flutter
-        uses: ./.github/actions/flutter-prepare
+      - uses: ./.github/actions/flutter-frb-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          version: ${{ needs.gate.outputs.version }}
-          build-number: ${{ github.run_number }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
 
-      - name: Build Android APK
-        run: flutter build apk --release
-
-      - name: Rename APK
+      - name: Configure Android release signing
+        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          version="${{ needs.gate.outputs.version }}"
-          cp build/app/outputs/flutter-apk/app-release.apk "hentai_library_${version}_android.apk"
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > app/android/upload-keystore.jks
+          printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=upload-keystore.jks\n' \
+            "$ANDROID_KEYSTORE_PASSWORD" "$ANDROID_KEY_PASSWORD" "$ANDROID_KEY_ALIAS" \
+            > app/android/key.properties
 
-      - name: Upload Android artifact
-        uses: actions/upload-artifact@v4
+      - name: Accept Android SDK licenses
+        run: yes | flutter doctor --android-licenses
+
+      - name: flutter build apk
+        working-directory: app
+        run: >
+          flutter build apk --release
+          --target-platform android-arm64
+          --build-name=${{ steps.version.outputs.name }}
+          --build-number=${{ github.run_number }}
+
+      - name: Package Android APK
+        run: |
+          VERSION="${{ steps.version.outputs.name }}"
+          mkdir -p dist
+          cp app/build/app/outputs/flutter-apk/app-release.apk \
+            "dist/hentai_library_${VERSION}_android-arm64.apk"
+
+      - uses: actions/upload-artifact@v4
         with:
-          name: android-release
-          path: hentai_library_*_android.apk
-          if-no-files-found: error
+          name: android
+          path: dist/hentai_library_*_android-arm64.apk
 
   build-ios:
     name: build-ios
     if: false
-    needs: gate
+    needs: verify
     runs-on: macos-latest
     steps:
       - name: Skipped until Apple signing is configured
-        run: echo "iOS release build is not enabled in phase 1."
+        run: echo "iOS release build is not enabled."
 
   release:
     name: release
     needs:
-      - gate
       - build-windows
       - build-macos
       - build-linux
       - build-android
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish_release == true)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: .
+    permissions:
+      contents: write
+      pull-requests: read
     steps:
-      - name: Download release artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
-          path: release-assets
-          pattern: "*-release"
+          path: dist
           merge-multiple: true
 
       - name: List release assets
-        run: find release-assets -type f | sort
+        run: find dist -type f | sort
+
+      - name: Resolve release metadata
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            version="${{ github.event.inputs.version }}"
+            if [ "${{ github.event.inputs.prerelease }}" = "true" ]; then
+              prerelease="true"
+            elif [[ "$version" == *-* ]]; then
+              prerelease="true"
+            else
+              prerelease="false"
+            fi
+          else
+            version="${GITHUB_REF_NAME#v}"
+            tag="${GITHUB_REF_NAME}"
+            if [[ "$version" == *-* ]]; then
+              prerelease="true"
+            else
+              prerelease="false"
+            fi
+          fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="v${version}"
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+          echo "prerelease=${prerelease}" >> "$GITHUB_OUTPUT"
 
       - name: Compose release notes
         id: notes
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tag="${{ needs.gate.outputs.tag }}"
-          sha="${{ needs.gate.outputs.sha }}"
+          tag="${{ steps.meta.outputs.tag }}"
           header="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_notes_header || '' }}"
           generated="$(gh api \
             --method POST \
             "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
             -f "tag_name=${tag}" \
-            -f "target_commitish=${sha}" \
+            -f "target_commitish=${GITHUB_SHA}" \
             --jq .body)"
           {
             echo "body<<RELEASE_BODY"
-            if [[ -n "${header}" ]]; then
+            if [ -n "${header}" ]; then
               printf '%s\n\n%s' "${header}" "${generated}"
             else
               printf '%s' "${generated}"
@@ -290,10 +361,25 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.gate.outputs.tag }}
-          target_commitish: ${{ needs.gate.outputs.sha }}
-          prerelease: ${{ needs.gate.outputs.prerelease == 'true' }}
+          tag_name: ${{ steps.meta.outputs.tag }}
+          prerelease: ${{ steps.meta.outputs.prerelease == 'true' }}
           body: ${{ steps.notes.outputs.body }}
-          files: release-assets/**/*
+          files: dist/**/*
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+  manual-summary:
+    name: manual-summary
+    needs:
+      - build-windows
+      - build-macos
+      - build-linux
+      - build-android
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_release != true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Manual build summary
+        run: |
+          echo "Manual release build completed."
+          echo "Download platform artifacts from this workflow run (Artifacts tab)."
+          echo "No GitHub Release was created."

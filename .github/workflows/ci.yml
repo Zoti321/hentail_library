@@ -12,104 +12,80 @@ concurrency:
 
 env:
   FLUTTER_VERSION: "3.38.5"
-
-defaults:
-  run:
-    working-directory: app
+  FRB_CODEGEN_VERSION: "2.12.0"
 
 jobs:
-  analyze:
-    name: analyze
+  test-rust:
+    name: test-rust
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/flutter-frb-setup
         with:
-          channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          link-rust-builder: "false"
+          run-frb-codegen: "false"
+          run-build-runner: "false"
+          run-pub-get: "false"
 
-      - name: Install dependencies
-        run: flutter pub get
+      - name: Run Rust workspace tests
+        run: cargo test --manifest-path core/Cargo.toml
 
-      - name: Generate code
-        run: dart run build_runner build --delete-conflicting-outputs
+  analyze:
+    name: analyze
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/flutter-frb-setup
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
 
       - name: Verify formatting
+        working-directory: app
         run: dart format --output=none --set-exit-if-changed .
 
       - name: Analyze
+        working-directory: app
         run: flutter analyze
 
   test-unit:
     name: test-unit
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/flutter-frb-setup
         with:
-          channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Generate code
-        run: dart run build_runner build --delete-conflicting-outputs
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
 
       - name: Run unit tests
+        working-directory: app
         run: flutter test test/domain test/core test/project_layout_test.dart
 
   test-widget:
     name: test-widget
     runs-on: ubuntu-latest
     continue-on-error: true
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/flutter-frb-setup
         with:
-          channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Generate code
-        run: dart run build_runner build --delete-conflicting-outputs
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
 
       - name: Run widget smoke test
+        working-directory: app
         run: flutter test test/widget_test.dart
-
-  test-rust:
-    name: test-rust
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    defaults:
-      run:
-        working-directory: core
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Fetch native dependencies
-        run: bash vendor/fetch-native-deps.sh
-
-      - name: Run Rust workspace tests
-        run: cargo test --workspace

@@ -1,0 +1,94 @@
+name: Flutter FRB setup
+description: Install Flutter/Rust, fetch pdfium, link rust_builder, run FRB/build_runner codegen
+
+inputs:
+  flutter-version:
+    description: Flutter SDK version
+    required: true
+  frb-codegen-version:
+    description: flutter_rust_bridge_codegen version
+    required: true
+  working-directory:
+    description: Flutter app working directory
+    default: app
+  link-rust-builder:
+    description: Symlink/junction rust_builder/rust to core/crates/flutter
+    default: "true"
+  fetch-native-deps:
+    description: Download pdfium native libraries into core/vendor
+    default: "true"
+  run-frb-codegen:
+    description: Run flutter_rust_bridge_codegen generate
+    default: "true"
+  run-build-runner:
+    description: Run dart build_runner
+    default: "false"
+  run-pub-get:
+    description: Run flutter pub get
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ inputs.flutter-version }}
+        channel: stable
+        cache: true
+
+    - uses: dtolnay/rust-toolchain@stable
+
+    - uses: Swatinem/rust-cache@v2
+      with:
+        workspaces: core
+
+    - name: Fetch native dependencies (Unix)
+      if: inputs.fetch-native-deps == 'true' && runner.os != 'Windows'
+      shell: bash
+      run: bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh"
+
+    - name: Fetch native dependencies (Windows)
+      if: inputs.fetch-native-deps == 'true' && runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        pwsh -NoProfile -File "${env:GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.ps1"
+
+    - name: Link rust_builder to core crate (Unix)
+      if: inputs.link-rust-builder == 'true' && runner.os != 'Windows'
+      shell: bash
+      run: |
+        rm -rf app/rust_builder/rust
+        ln -s ../../core/crates/flutter app/rust_builder/rust
+
+    - name: Link rust_builder to core crate (Windows)
+      if: inputs.link-rust-builder == 'true' && runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $junction = "app/rust_builder/rust"
+        if (Test-Path $junction) { Remove-Item $junction -Force -Recurse }
+        $target = Resolve-Path "core/crates/flutter"
+        New-Item -ItemType Junction -Path $junction -Target $target | Out-Null
+
+    - uses: taiki-e/cache-cargo-install-action@v2
+      if: inputs.run-frb-codegen == 'true'
+      with:
+        tool: flutter_rust_bridge_codegen
+        tag: ${{ inputs.frb-codegen-version }}
+
+    - name: FRB codegen
+      if: inputs.run-frb-codegen == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: flutter_rust_bridge_codegen generate
+
+    - name: build_runner codegen
+      if: inputs.run-build-runner == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: dart run build_runner build --delete-conflicting-outputs
+
+    - name: flutter pub get
+      if: inputs.run-pub-get == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: flutter pub get

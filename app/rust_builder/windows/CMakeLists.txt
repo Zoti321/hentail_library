@@ -10,9 +10,7 @@ project(${PROJECT_NAME} LANGUAGES CXX)
 
 include("../cargokit/cmake/cargokit.cmake")
 get_filename_component(PLUGIN_ROOT "${CMAKE_CURRENT_LIST_DIR}/.." REALPATH)
-get_filename_component(RUST_CRATE_DIR "${PLUGIN_ROOT}/../../core/crates/flutter" REALPATH)
-file(RELATIVE_PATH RUST_CRATE_REL "${CMAKE_CURRENT_SOURCE_DIR}" "${RUST_CRATE_DIR}")
-apply_cargokit(${PROJECT_NAME} "${RUST_CRATE_REL}" hentai_flutter "")
+apply_cargokit(${PROJECT_NAME} ../rust hentai_flutter "")
 
 # List of absolute paths to libraries that should be bundled with the plugin.
 set(hentai_flutter_bundled_libraries
