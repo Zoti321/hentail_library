@@ -3,15 +3,32 @@ name: Release
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to rebuild (e.g. v1.2.3 or v1.0.0-beta.1)"
+        required: true
+        type: string
+      prerelease:
+        description: "Mark as GitHub prerelease (also auto-detected from beta tags)"
+        required: false
+        type: boolean
+        default: false
+      release_notes_header:
+        description: "Optional text prepended to auto-generated release notes"
+        required: false
+        type: string
+        default: ""
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
   cancel-in-progress: false
 
 permissions:
   contents: write
   checks: read
+  pull-requests: read
 
 env:
   FLUTTER_VERSION: "3.38.5"
@@ -27,15 +44,25 @@ jobs:
     timeout-minutes: 5
     outputs:
       version: ${{ steps.verify.outputs.version }}
+      prerelease: ${{ steps.verify.outputs.prerelease }}
+      tag: ${{ steps.verify.outputs.tag }}
+      sha: ${{ steps.verify.outputs.sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
 
       - name: Verify CI checks and parse version
         id: verify
         env:
           GH_TOKEN: ${{ github.token }}
-        run: bash .github/scripts/verify_ci_passed.sh
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
+          DISPATCH_PRERELEASE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease || '' }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+        run: |
+          export COMMIT_SHA="$(git rev-parse HEAD)"
+          bash .github/scripts/verify_ci_passed.sh
 
   build-windows:
     name: build-windows
@@ -45,26 +72,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          ref: ${{ needs.gate.outputs.tag }}
+
+      - name: Prepare Flutter
+        uses: ./.github/actions/flutter-prepare
+        with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Generate code
-        run: dart run build_runner build --delete-conflicting-outputs
-
-      - name: Apply version from tag
-        shell: pwsh
-        run: |
-          $version = "${{ needs.gate.outputs.version }}"
-          $build = "${{ github.run_number }}"
-          (Get-Content pubspec.yaml) -replace '^version: .*', "version: ${version}+${build}" | Set-Content pubspec.yaml
+          version: ${{ needs.gate.outputs.version }}
+          build-number: ${{ github.run_number }}
 
       - name: Build Windows release
         run: flutter build windows --release
@@ -103,28 +119,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          ref: ${{ needs.gate.outputs.tag }}
+
+      - name: Prepare Flutter
+        uses: ./.github/actions/flutter-prepare
+        with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
-
-      - name: Enable macOS desktop
-        run: flutter config --enable-macos-desktop
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Generate code
-        run: dart run build_runner build --delete-conflicting-outputs
-
-      - name: Apply version from tag
-        run: |
-          version="${{ needs.gate.outputs.version }}"
-          build="${{ github.run_number }}"
-          sed -i '' "s/^version: .*/version: ${version}+${build}/" pubspec.yaml
+          version: ${{ needs.gate.outputs.version }}
+          build-number: ${{ github.run_number }}
+          enable-macos-desktop: "true"
 
       - name: Build macOS release
         run: flutter build macos --release
@@ -151,33 +155,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.gate.outputs.tag }}
 
       - name: Install Linux build dependencies
         run: |
           sudo apt-get update -y
           sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - name: Prepare Flutter
+        uses: ./.github/actions/flutter-prepare
         with:
-          channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
-
-      - name: Enable Linux desktop
-        run: flutter config --enable-linux-desktop
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Generate code
-        run: dart run build_runner build --delete-conflicting-outputs
-
-      - name: Apply version from tag
-        run: |
-          version="${{ needs.gate.outputs.version }}"
-          build="${{ github.run_number }}"
-          sed -i "s/^version: .*/version: ${version}+${build}/" pubspec.yaml
+          version: ${{ needs.gate.outputs.version }}
+          build-number: ${{ github.run_number }}
+          enable-linux-desktop: "true"
 
       - name: Build Linux release
         run: flutter build linux --release
@@ -203,6 +195,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.gate.outputs.tag }}
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -210,24 +204,12 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - name: Prepare Flutter
+        uses: ./.github/actions/flutter-prepare
         with:
-          channel: stable
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Generate code
-        run: dart run build_runner build --delete-conflicting-outputs
-
-      - name: Apply version from tag
-        run: |
-          version="${{ needs.gate.outputs.version }}"
-          build="${{ github.run_number }}"
-          sed -i "s/^version: .*/version: ${version}+${build}/" pubspec.yaml
+          version: ${{ needs.gate.outputs.version }}
+          build-number: ${{ github.run_number }}
 
       - name: Build Android APK
         run: flutter build apk --release
@@ -274,10 +256,37 @@ jobs:
       - name: List release assets
         run: find release-assets -type f | sort
 
+      - name: Compose release notes
+        id: notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ needs.gate.outputs.tag }}"
+          sha="${{ needs.gate.outputs.sha }}"
+          header="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_notes_header || '' }}"
+          generated="$(gh api \
+            --method POST \
+            "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+            -f "tag_name=${tag}" \
+            -f "target_commitish=${sha}" \
+            --jq .body)"
+          {
+            echo "body<<RELEASE_BODY"
+            if [[ -n "${header}" ]]; then
+              printf '%s\n\n%s' "${header}" "${generated}"
+            else
+              printf '%s' "${generated}"
+            fi
+            echo "RELEASE_BODY"
+          } >> "${GITHUB_OUTPUT}"
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          generate_release_notes: true
+          tag_name: ${{ needs.gate.outputs.tag }}
+          target_commitish: ${{ needs.gate.outputs.sha }}
+          prerelease: ${{ needs.gate.outputs.prerelease == 'true' }}
+          body: ${{ steps.notes.outputs.body }}
           files: release-assets/**/*
         env:
           GITHUB_TOKEN: ${{ github.token }}

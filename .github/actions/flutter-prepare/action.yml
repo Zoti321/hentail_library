@@ -1,0 +1,70 @@
+name: Flutter prepare
+description: Fetch native deps, install Flutter, resolve packages, generate code, apply version
+
+inputs:
+  flutter-version:
+    description: Flutter SDK version
+    required: true
+  version:
+    description: Semver without v prefix (e.g. 1.2.3 or 1.0.0-beta.1)
+    required: true
+  build-number:
+    description: Build number suffix for pubspec
+    required: true
+  enable-macos-desktop:
+    description: Run flutter config --enable-macos-desktop
+    required: false
+    default: "false"
+  enable-linux-desktop:
+    description: Run flutter config --enable-linux-desktop
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Fetch native dependencies
+      shell: bash
+      working-directory: core
+      run: bash vendor/fetch-native-deps.sh
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        flutter-version: ${{ inputs.flutter-version }}
+        cache: true
+
+    - name: Enable macOS desktop
+      if: inputs.enable-macos-desktop == 'true'
+      shell: bash
+      working-directory: app
+      run: flutter config --enable-macos-desktop
+
+    - name: Enable Linux desktop
+      if: inputs.enable-linux-desktop == 'true'
+      shell: bash
+      working-directory: app
+      run: flutter config --enable-linux-desktop
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: app
+      run: flutter pub get
+
+    - name: Generate code
+      shell: bash
+      working-directory: app
+      run: dart run build_runner build --delete-conflicting-outputs
+
+    - name: Apply version from tag
+      shell: bash
+      working-directory: app
+      run: |
+        version="${{ inputs.version }}"
+        build="${{ inputs.build-number }}"
+        if [[ "${RUNNER_OS}" == "macOS" ]]; then
+          sed -i '' "s/^version: .*/version: ${version}+${build}/" pubspec.yaml
+        else
+          sed -i "s/^version: .*/version: ${version}+${build}/" pubspec.yaml
+        fi
