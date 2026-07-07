@@ -26,6 +26,8 @@ quick-xml = { version = "0.37", features = ["serialize"] }
 rayon = "1"
 regex = "1"
 sevenz-rust = "0.6"
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 unrar = "0.5"
 pdfium-render = "0.8"
 

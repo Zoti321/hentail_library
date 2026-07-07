@@ -1,5 +1,15 @@
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 mod pdf;
+#[cfg(any(target_os = "android", target_os = "ios"))]
+#[path = "mobile_pdf.rs"]
+mod pdf;
+
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 mod rar;
+#[cfg(any(target_os = "android", target_os = "ios"))]
+#[path = "mobile_rar.rs"]
+mod rar;
+
 mod sevenz;
 
 pub use pdf::{count_pdf_pages, open_pdf_backend, read_pdf_embedded_meta, read_pdf_page, PdfBackend};

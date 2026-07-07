@@ -21,40 +21,52 @@ detect_platform() {
   esac
 }
 
-platform="$(detect_platform)"
-artifact="$(python3 -c "import json; m=json.load(open('$MANIFEST')); print(m['pdfium']['artifacts']['$platform'])")"
-out_dir="$VENDOR_ROOT/$platform"
-mkdir -p "$out_dir"
+fetch_pdfium_for_platform() {
+  local platform="$1"
+  local artifact
+  artifact="$(python3 -c "import json; m=json.load(open('$MANIFEST')); print(m['pdfium']['artifacts']['$platform'])")"
+  local out_dir="$VENDOR_ROOT/$platform"
+  mkdir -p "$out_dir"
 
-url="https://github.com/bblanchon/pdfium-binaries/releases/download/${pdfium_version}/${artifact}"
-tmp_archive="$(mktemp)"
-tmp_extract="$(mktemp -d)"
+  local url="https://github.com/bblanchon/pdfium-binaries/releases/download/${pdfium_version}/${artifact}"
+  local tmp_archive tmp_extract
+  tmp_archive="$(mktemp)"
+  tmp_extract="$(mktemp -d)"
 
-cleanup() {
-  rm -f "$tmp_archive"
-  rm -rf "$tmp_extract"
+  cleanup() {
+    rm -f "$tmp_archive"
+    rm -rf "$tmp_extract"
+  }
+  trap cleanup RETURN
+
+  echo "下载 $url ..."
+  curl -fsSL "$url" -o "$tmp_archive"
+
+  if [[ "$artifact" == *.tgz ]]; then
+    tar -xzf "$tmp_archive" -C "$tmp_extract"
+  else
+    unzip -q "$tmp_archive" -d "$tmp_extract"
+  fi
+
+  local lib_path
+  lib_path="$(find "$tmp_extract" \( -name 'libpdfium.so' -o -name 'libpdfium.dylib' -o -name 'pdfium.dll' \) -print -quit)"
+  if [[ -z "$lib_path" ]]; then
+    echo "解压后未找到 pdfium 动态库 ($platform)" >&2
+    exit 1
+  fi
+
+  case "$(basename "$lib_path")" in
+    libpdfium.so) cp "$lib_path" "$out_dir/libpdfium.so" ;;
+    libpdfium.dylib) cp "$lib_path" "$out_dir/libpdfium.dylib" ;;
+    pdfium.dll) cp "$lib_path" "$out_dir/pdfium.dll" ;;
+  esac
+
+  echo "已写入 $out_dir/$(basename "$lib_path")"
 }
-trap cleanup EXIT
 
-echo "下载 $url ..."
-curl -fsSL "$url" -o "$tmp_archive"
-
-if [[ "$artifact" == *.tgz ]]; then
-  tar -xzf "$tmp_archive" -C "$tmp_extract"
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  fetch_pdfium_for_platform "macos-aarch64"
+  fetch_pdfium_for_platform "macos-x86_64"
 else
-  unzip -q "$tmp_archive" -d "$tmp_extract"
+  fetch_pdfium_for_platform "$(detect_platform)"
 fi
-
-lib_path="$(find "$tmp_extract" \( -name 'libpdfium.so' -o -name 'libpdfium.dylib' -o -name 'pdfium.dll' \) -print -quit)"
-if [[ -z "$lib_path" ]]; then
-  echo "解压后未找到 pdfium 动态库" >&2
-  exit 1
-fi
-
-case "$(basename "$lib_path")" in
-  libpdfium.so) cp "$lib_path" "$out_dir/libpdfium.so" ;;
-  libpdfium.dylib) cp "$lib_path" "$out_dir/libpdfium.dylib" ;;
-  pdfium.dll) cp "$lib_path" "$out_dir/pdfium.dll" ;;
-esac
-
-echo "已写入 $out_dir/$(basename "$lib_path")"

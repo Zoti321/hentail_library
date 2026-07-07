@@ -1,10 +1,17 @@
 use std::env;
 use std::path::{Path, PathBuf};
 
+fn needs_pdfium_vendor(target: &str) -> bool {
+    !target.contains("android") && !target.contains("apple-ios")
+}
+
 fn main() {
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR"));
     let vendor_root = manifest_dir.join("../../vendor");
     let target = env::var("TARGET").expect("TARGET");
+    if !needs_pdfium_vendor(&target) {
+        return;
+    }
     let platform_dir = resolve_vendor_dir(&vendor_root, &target);
 
     if !platform_dir.is_dir() {
