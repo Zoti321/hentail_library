@@ -406,7 +406,6 @@ jobs:
           echo "prerelease=${prerelease}" >> "$GITHUB_OUTPUT"
 
       - name: Compose release notes
-        id: notes
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -419,22 +418,18 @@ jobs:
             -f "target_commitish=${GITHUB_SHA}" \
             --jq .body)"
           ios_notice="> **iOS：** \`ios-arm64-nosign\` 为未签名包，无法直接安装到设备，仅供验证 CI 构建。"
-          {
-            echo "body<<RELEASE_BODY"
-            if [ -n "${header}" ]; then
-              printf '%s\n\n%s\n\n%s' "${header}" "${ios_notice}" "${generated}"
-            else
-              printf '%s\n\n%s' "${ios_notice}" "${generated}"
-            fi
-            echo "RELEASE_BODY"
-          } >> "${GITHUB_OUTPUT}"
+          if [ -n "${header}" ]; then
+            printf '%s\n\n%s\n\n%s' "${header}" "${ios_notice}" "${generated}" > release_body.md
+          else
+            printf '%s\n\n%s' "${ios_notice}" "${generated}" > release_body.md
+          fi
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
           prerelease: ${{ steps.meta.outputs.prerelease == 'true' }}
-          body: ${{ steps.notes.outputs.body }}
+          body_path: release_body.md
           files: dist/**/*
         env:
           GITHUB_TOKEN: ${{ github.token }}
