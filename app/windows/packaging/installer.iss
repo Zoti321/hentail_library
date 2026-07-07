@@ -1,5 +1,10 @@
 #define MyAppName "hentai_library"
-#define MyAppVersion "0.0.1"
+#ifndef MyAppVersion
+  #define MyAppVersion "0.0.1"
+#endif
+#ifndef OutputDir
+  #define OutputDir "..\..\..\dist"
+#endif
 #define MyAppPublisher "hentai_library"
 #define MyAppExeName "hentai_library.exe"
 #define MySourceDir "..\..\build\windows\x64\runner\Release"
@@ -16,7 +21,7 @@ AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-OutputDir=..\..\..\dist
+OutputDir={#OutputDir}
 OutputBaseFilename={#MyAppName}_Setup_{#MyAppVersion}_x64
 Compression=lzma2
 SolidCompression=yes
