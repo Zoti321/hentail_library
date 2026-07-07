@@ -38,7 +38,7 @@ if [[ "${GITHUB_EVENT_NAME:-}" == "workflow_dispatch" ]]; then
 fi
 
 compare_status="$(gh api "repos/${REPO}/compare/${SHA}...main" --jq '.status // "unknown"')"
-if [[ "${compare_status}" != "behind" && "${compare_status}" != "identical" ]]; then
+if [[ "${compare_status}" != "ahead" && "${compare_status}" != "identical" ]]; then
   echo "Commit ${SHA} is not on main branch (compare status: ${compare_status})"
   exit 1
 fi
