@@ -1,9 +1,9 @@
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/reading/read_session.dart';
+import 'package:hentai_library/domain/reading/read_session_coordinator.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_controller.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/state/reading_aggregate_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -22,43 +22,41 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
     if (targetComicId == currentSession.comicId) {
       return;
     }
-    final ReaderControllerKey viewKey = readerControllerKey(
-      currentSession.comicId,
-      incognito: currentSession.incognito,
+    final ReadSessionCoordinator coordinator = ref.read(
+      readSessionCoordinatorProvider,
     );
+    int? currentPageIndex;
     if (!currentSession.incognito) {
-      final ReaderState? viewState = ref
+      final ReaderControllerKey viewKey = readerControllerKey(
+        currentSession.comicId,
+        incognito: currentSession.incognito,
+      );
+      currentPageIndex = ref
           .read(readerControllerProvider(viewKey))
           .asData
-          ?.value;
-      if (viewState != null) {
-        ref
-            .read(readingAggregateProvider.notifier)
-            .updatePage(viewState.currentIndex);
-      }
-      await ref.read(readingAggregateProvider.notifier).endSession();
+          ?.value
+          .currentIndex;
     }
-    await ref.read(readerSessionServiceProvider).close(currentSession.comicId);
+    final SeriesSwitchPlan plan = await coordinator.prepareSeriesSwitch(
+      currentSession: currentSession,
+      targetComicId: targetComicId,
+      currentPageIndex: currentPageIndex,
+    );
     ref
         .read(readerPrefetchControllerProvider.notifier)
-        .clearComic(currentSession.comicId);
+        .clearComic(plan.closeComicId);
     try {
       await ref
           .read(readerPrefetchControllerProvider.notifier)
-          .warmOpenComic(comicId: targetComicId);
+          .warmOpenComic(comicId: plan.targetComicId);
     } catch (_) {
       // warm-open 失败不阻断切卷导航。
     }
-    final ReadSessionRouteParams nextSession = ReadSessionRouteParams(
-      comicId: targetComicId,
-      seriesId: currentSession.seriesId,
-      incognito: currentSession.incognito,
-    );
     router.go(
       Uri(
         path: '/reader',
         queryParameters: ReaderRouteArgs.fromSession(
-          nextSession,
+          plan.nextSession,
         ).toQueryParameters(),
       ).toString(),
     );

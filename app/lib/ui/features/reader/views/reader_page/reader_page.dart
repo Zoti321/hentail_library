@@ -63,8 +63,8 @@ class ReaderPage extends HookConsumerWidget {
         }
         unawaited(
           ref
-              .read(readingAggregateProvider.notifier)
-              .beginSession(
+              .read(readSessionCoordinatorProvider)
+              .beginReadSession(
                 comic: loadedViewModel.viewState.comic,
                 mode: routeContext.session.mode,
                 seriesId: routeContext.seriesId,
