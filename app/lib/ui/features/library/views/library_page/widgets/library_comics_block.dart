@@ -38,6 +38,20 @@ class LibraryComicsBlock extends ConsumerWidget {
     final List<Comic> comics = catalog.items;
     final bool isComicTableEmpty = catalog.isComicTableEmpty;
     final bool showPagination = catalog.showPagination;
+    final LibraryComicSortOption sortOption = ref.watch(
+      libraryComicsTabSortOptionProvider,
+    );
+    final LibraryAgeRestrictionFilter ageRestriction = ref.watch(
+      libraryComicsTabAgeRestrictionFilterProvider,
+    );
+    final int pageSize = ref.watch(libraryComicsTabPageSizeProvider);
+    final LibraryCatalogGridSuppressAnimationKey suppressAnimationKey =
+        LibraryCatalogGridSuppressAnimationKey(
+          keyword: catalog.filterQuery,
+          ageRestriction: ageRestriction,
+          page: catalog.pagination.page,
+          pageSize: pageSize,
+        );
     return SliverPadding(
       padding: EdgeInsets.symmetric(
         horizontal: tokens.layout.contentHorizontalPadding,
@@ -53,6 +67,8 @@ class LibraryComicsBlock extends ConsumerWidget {
             comics: comics,
             isComicTableEmpty: isComicTableEmpty,
             isReloading: catalogAsync.isLoading,
+            positionAnimationKey: sortOption,
+            suppressAnimationKey: suppressAnimationKey,
           ),
           if (showPagination)
             const LibraryPaginationBarSliver(
@@ -65,55 +81,43 @@ class LibraryComicsBlock extends ConsumerWidget {
   }
 }
 
-class _LibraryComicsGridSliver extends StatefulWidget {
+class _LibraryComicsGridSliver extends StatelessWidget {
   const _LibraryComicsGridSliver({
     required this.comics,
     required this.isComicTableEmpty,
+    required this.positionAnimationKey,
+    required this.suppressAnimationKey,
     this.isReloading = false,
   });
+
   final List<Comic> comics;
   final bool isComicTableEmpty;
+  final Object positionAnimationKey;
+  final LibraryCatalogGridSuppressAnimationKey suppressAnimationKey;
   final bool isReloading;
 
   @override
-  State<_LibraryComicsGridSliver> createState() =>
-      _LibraryComicsGridSliverState();
-}
-
-class _LibraryComicsGridSliverState extends State<_LibraryComicsGridSliver> {
-  AppThemeTokens? _lastTokens;
-  SliverGridDelegate? _cachedDelegate;
-
-  SliverGridDelegate _delegateFor(BuildContext context) {
-    final AppThemeTokens tokens = context.tokens;
-    if (_cachedDelegate != null && _lastTokens == tokens) {
-      return _cachedDelegate!;
-    }
-    _lastTokens = tokens;
-    return _cachedDelegate = libraryGridDelegateForTokens(tokens);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (widget.isReloading && widget.comics.isEmpty) {
+    if (isReloading && comics.isEmpty) {
       return const SliverToBoxAdapter(
         child: Center(child: CircularProgressIndicator()),
       );
     }
-    if (widget.comics.isEmpty) {
+    if (comics.isEmpty) {
       return _LibraryCatalogEmptySliver(
         entity: LibraryDisplayTarget.comics,
-        isTableEmpty: widget.isComicTableEmpty,
+        isTableEmpty: isComicTableEmpty,
       );
     }
-    return SliverGrid.builder(
-      gridDelegate: _delegateFor(context),
-      itemCount: widget.comics.length,
+    return AnimatedLibraryCatalogGridSliver(
+      itemCount: comics.length,
+      positionAnimationKey: positionAnimationKey,
+      suppressAnimationKey: suppressAnimationKey,
       itemBuilder: (BuildContext context, int index) {
-        final Comic manga = widget.comics[index];
+        final Comic manga = comics[index];
         return Center(
+          key: ValueKey<String>(manga.comicId),
           child: ComicCard(
-            key: Key(manga.comicId),
             comic: manga,
             size: const Size(double.infinity, double.infinity),
             onTap: () {

@@ -56,6 +56,7 @@ dependencies:
   flutter_rust_bridge: 2.12.0
   shared_preferences: ^2.5.3
   flutter_svg: ^2.2.0
+  flutter_reorderable_grid_view: ^5.7.0
 
 dev_dependencies:
   flutter_test:
