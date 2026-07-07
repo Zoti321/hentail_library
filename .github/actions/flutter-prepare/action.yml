@@ -23,10 +23,17 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
     - name: Fetch native dependencies
       shell: bash
-      working-directory: core
-      run: bash vendor/fetch-native-deps.sh
+      run: |
+        if [[ "${RUNNER_OS}" == "Windows" ]]; then
+          pwsh -NoProfile -File "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.ps1"
+        else
+          bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh"
+        fi
 
     - name: Set up Flutter
       uses: subosito/flutter-action@v2
@@ -38,28 +45,28 @@ runs:
     - name: Enable macOS desktop
       if: inputs.enable-macos-desktop == 'true'
       shell: bash
-      working-directory: app
+      working-directory: ${{ github.workspace }}/app
       run: flutter config --enable-macos-desktop
 
     - name: Enable Linux desktop
       if: inputs.enable-linux-desktop == 'true'
       shell: bash
-      working-directory: app
+      working-directory: ${{ github.workspace }}/app
       run: flutter config --enable-linux-desktop
 
     - name: Install dependencies
       shell: bash
-      working-directory: app
+      working-directory: ${{ github.workspace }}/app
       run: flutter pub get
 
     - name: Generate code
       shell: bash
-      working-directory: app
+      working-directory: ${{ github.workspace }}/app
       run: dart run build_runner build --delete-conflicting-outputs
 
     - name: Apply version from tag
       shell: bash
-      working-directory: app
+      working-directory: ${{ github.workspace }}/app
       run: |
         version="${{ inputs.version }}"
         build="${{ inputs.build-number }}"
