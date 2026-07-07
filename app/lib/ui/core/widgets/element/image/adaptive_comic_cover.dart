@@ -154,6 +154,3 @@ Future<double> resolveCoverAspectRatio({
     return fallbackAspectRatio;
   }
 }
-
-@Deprecated('Use AdaptiveComicCover instead.')
-typedef AdaptiveCover = AdaptiveComicCover;
