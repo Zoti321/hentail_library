@@ -19,6 +19,10 @@
 
 ## 获取依赖
 
+Flutter 本地开发推荐在仓库根目录运行 `scripts/setup-dev.ps1` / `scripts/setup-dev.sh`（含链接 `rust_builder` 与本节下载）。
+
+仅下载 pdfium：
+
 ```bash
 # Linux / macOS / Git Bash
 ./core/vendor/fetch-native-deps.sh

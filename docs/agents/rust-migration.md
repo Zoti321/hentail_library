@@ -10,7 +10,7 @@
 | `core/` | Rust workspace：`crates/core`（业务）、`crates/flutter`（FRB cdylib） |
 | 根目录 | `README.md`、`AGENTS.md`、`CONTEXT.md`、`docs/`、`.github/` |
 
-开发：`cd app && flutter run`；`cd core && cargo test --workspace`。
+开发：clone 后先在仓库根目录执行 `scripts/setup-dev.ps1`（Windows）或 `scripts/setup-dev.sh`（Unix），创建 `app/rust_builder/rust` → `core/crates/flutter` 链接并拉取 pdfium；然后 `cd app && flutter run`、`cd core && cargo test --workspace`。
 
 ## 架构要点
 

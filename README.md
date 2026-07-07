@@ -37,7 +37,30 @@
 
 ## 协作建议
 
-本仓库为 **Monorepo**：Flutter 应用在 `app/`，Rust 核心（迁移中）将位于 `core/`。
+本仓库为 **Monorepo**：Flutter 应用在 `app/`，Rust 核心位于 `core/`。
+
+### 首次 / clone 后初始化
+
+Cargokit 通过 `app/rust_builder/rust` 链接到 `core/crates/flutter` 来编译 Rust；该链接不会提交到 Git，需本地创建一次：
+
+```powershell
+# Windows PowerShell（仓库根目录）
+.\scripts\setup-dev.ps1
+```
+
+```bash
+# Linux / macOS / Git Bash（仓库根目录）
+./scripts/setup-dev.sh
+```
+
+脚本会：
+
+1. 创建 `app/rust_builder/rust` → `core/crates/flutter` 的符号链接（Windows 为 junction）
+2. 下载 pdfium 等原生依赖到 `core/vendor/`
+
+仅需链接、跳过依赖下载时：`.\scripts\setup-dev.ps1 -SkipNativeDeps` 或 `./scripts/setup-dev.sh --skip-native-deps`。
+
+### 日常开发
 
 ```bash
 cd app

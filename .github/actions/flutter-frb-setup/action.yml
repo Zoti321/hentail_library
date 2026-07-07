@@ -56,18 +56,12 @@ runs:
     - name: Link rust_builder to core crate (Unix)
       if: inputs.link-rust-builder == 'true' && runner.os != 'Windows'
       shell: bash
-      run: |
-        rm -rf app/rust_builder/rust
-        ln -s ../../core/crates/flutter app/rust_builder/rust
+      run: bash scripts/link-rust-builder.sh
 
     - name: Link rust_builder to core crate (Windows)
       if: inputs.link-rust-builder == 'true' && runner.os == 'Windows'
       shell: pwsh
-      run: |
-        $junction = "app/rust_builder/rust"
-        if (Test-Path $junction) { Remove-Item $junction -Force -Recurse }
-        $target = Resolve-Path "core/crates/flutter"
-        New-Item -ItemType Junction -Path $junction -Target $target | Out-Null
+      run: pwsh -NoProfile -File scripts/link-rust-builder.ps1
 
     - uses: taiki-e/cache-cargo-install-action@v2
       if: inputs.run-frb-codegen == 'true'
