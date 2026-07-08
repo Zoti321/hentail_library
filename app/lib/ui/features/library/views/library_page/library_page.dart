@@ -140,9 +140,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           layoutTier: layoutTier,
           horizontalPadding: horizontalPadding,
           onOpenFilterSort: _openFilterSortDrawer,
-          onOpenNavigation: layoutTier == LibraryLayoutTier.compact
-              ? openAppShellNavigationDrawer
-              : null,
+          onOpenNavigation: appShellPageNavigationOpener(context),
         );
         final Widget header = KeyedSubtree(
           key: _headerMeasureKey,

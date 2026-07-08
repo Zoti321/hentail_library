@@ -126,9 +126,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           layoutTier: layoutTier,
           horizontalPadding: horizontalPadding,
           onScan: onScan,
-          onOpenNavigation: layoutTier == HomePageLayoutTier.compact
-              ? openAppShellNavigationDrawer
-              : null,
+          onOpenNavigation: appShellPageNavigationOpener(context),
         );
         final Widget header = KeyedSubtree(
           key: _headerMeasureKey,

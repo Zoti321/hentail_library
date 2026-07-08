@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
+import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/navigation/desktop_sidebar.dart';
 import 'package:hentai_library/ui/features/shell/state/scan_library_controller.dart';
 import 'package:hentai_library/ui/features/shell/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/home_page/widgets/home_page_header.dart';
@@ -78,10 +80,35 @@ void main() {
       await _pumpHomePage(tester, const Size(1200, 900));
       expect(tester.widget<Text>(find.text('首页')).style?.fontSize, 26);
     });
+
+    testWidgets(
+      'medium window with sidebar-narrowed content hides header menu',
+      (WidgetTester tester) async {
+        // Window is medium (≥600) so shell uses icon rail, not drawer.
+        // Content area is window − collapsed rail (72) and falls under 600.
+        const Size windowSize = Size(650, 900);
+        const double contentWidth = 650 - DesktopSidebar.collapsedWidth;
+        expect(contentWidth, lessThan(AppLayoutBreakpoints.compact));
+
+        await _pumpHomePage(
+          tester,
+          windowSize,
+          contentWidth: contentWidth,
+        );
+
+        expect(tester.takeException(), isNull);
+        expect(tester.widget<Text>(find.text('首页')).style?.fontSize, 18);
+        _expectMenuIcon(tester, findsNothing);
+      },
+    );
   });
 }
 
-Future<void> _pumpHomePage(WidgetTester tester, Size viewportSize) async {
+Future<void> _pumpHomePage(
+  WidgetTester tester,
+  Size viewportSize, {
+  double? contentWidth,
+}) async {
   tester.view.physicalSize = viewportSize;
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
@@ -91,7 +118,16 @@ Future<void> _pumpHomePage(WidgetTester tester, Size viewportSize) async {
       overrides: _homePageTestOverrides(),
       child: MaterialApp(
         theme: buildAppTheme(Brightness.light),
-        home: const Scaffold(body: HomePage()),
+        home: MediaQuery(
+          data: MediaQueryData(size: viewportSize),
+          child: Scaffold(
+            body: SizedBox(
+              width: contentWidth ?? viewportSize.width,
+              height: viewportSize.height,
+              child: const HomePage(),
+            ),
+          ),
+        ),
       ),
     ),
   );

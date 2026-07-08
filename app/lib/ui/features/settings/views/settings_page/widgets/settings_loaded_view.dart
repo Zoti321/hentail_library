@@ -63,9 +63,7 @@ class _SettingsViewState extends State<SettingsView> {
         final Widget headerSection = SettingsPageHeaderSection(
           layoutTier: layoutTier,
           horizontalPadding: horizontalPadding,
-          onOpenNavigation: layoutTier == SettingsLayoutTier.compact
-              ? openAppShellNavigationDrawer
-              : null,
+          onOpenNavigation: appShellPageNavigationOpener(context),
         );
         final Widget header = KeyedSubtree(
           key: _headerMeasureKey,

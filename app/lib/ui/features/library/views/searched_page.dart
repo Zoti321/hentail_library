@@ -116,18 +116,14 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
             query: '搜索结果',
             resultCount: 0,
             showQuotes: false,
-            onOpenNavigation: layoutTier == LibraryLayoutTier.compact
-                ? openAppShellNavigationDrawer
-                : null,
+            onOpenNavigation: appShellPageNavigationOpener(context),
           )
         : SearchedPageHeaderSection(
             layoutTier: layoutTier,
             horizontalPadding: horizontalPadding,
             query: trimmedQuery,
             resultCount: totalResultCount,
-            onOpenNavigation: layoutTier == LibraryLayoutTier.compact
-                ? openAppShellNavigationDrawer
-                : null,
+            onOpenNavigation: appShellPageNavigationOpener(context),
           );
     final Widget header = KeyedSubtree(
       key: _headerMeasureKey,

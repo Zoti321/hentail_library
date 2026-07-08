@@ -47,10 +47,7 @@ class SelectedPathsPage extends ConsumerWidget {
                 children: <Widget>[
                   SelectedPathsPageHeader(
                     layoutTier: layoutTier,
-                    onOpenNavigation:
-                        layoutTier == SelectedPathsLayoutTier.compact
-                        ? openAppShellNavigationDrawer
-                        : null,
+                    onOpenNavigation: appShellPageNavigationOpener(context),
                   ),
                   asyncState.when(
                     data: (_) => const SelectedPathsListCard(),

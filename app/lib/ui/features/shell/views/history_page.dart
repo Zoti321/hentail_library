@@ -73,9 +73,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
         final Widget headerSection = HistoryPageHeaderSection(
           layoutTier: layoutTier,
           horizontalPadding: horizontalPadding,
-          onOpenNavigation: layoutTier == HistoryLayoutTier.compact
-              ? openAppShellNavigationDrawer
-              : null,
+          onOpenNavigation: appShellPageNavigationOpener(context),
         );
         final Widget header = KeyedSubtree(
           key: _headerMeasureKey,

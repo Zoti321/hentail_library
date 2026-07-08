@@ -148,7 +148,7 @@ class _MetadataManagementPageState
       selectedTabIndex: selectedIndex,
       onTabSelected: _handleTabSelected,
       onAdd: () => _invokeAddForTab(context, selectedIndex),
-      onOpenNavigation: openAppShellNavigationDrawer,
+      onOpenNavigation: appShellPageNavigationOpener(context),
     );
     final Widget header = KeyedSubtree(
       key: _headerMeasureKey,
@@ -218,7 +218,7 @@ class _MetadataManagementPageState
           selectedTabIndex: selectedIndex,
           onTabSelected: _handleTabSelected,
           onAdd: () => _invokeAddForTab(context, selectedIndex),
-          onOpenNavigation: null,
+          onOpenNavigation: appShellPageNavigationOpener(context),
         ),
         Expanded(
           child: Align(
