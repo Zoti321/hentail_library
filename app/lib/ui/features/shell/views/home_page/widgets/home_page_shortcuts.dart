@@ -1,11 +1,17 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/shell/views/home_page/widgets/home_page_constants.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomePageShortcutEntries extends StatelessWidget {
-  const HomePageShortcutEntries({super.key, required this.onScan});
+  const HomePageShortcutEntries({
+    super.key,
+    required this.layoutTier,
+    required this.onScan,
+  });
 
+  final HomePageLayoutTier layoutTier;
   final VoidCallback onScan;
 
   @override
@@ -34,6 +40,7 @@ class HomePageShortcutEntries extends StatelessWidget {
               onTap: () => context.go('/local'),
               colorScheme: colorScheme,
               tokens: tokens,
+              width: shortcutTileWidthFor(layoutTier),
             ),
             _ShortcutTile(
               icon: LucideIcons.history,
@@ -41,6 +48,7 @@ class HomePageShortcutEntries extends StatelessWidget {
               onTap: () => context.go('/history'),
               colorScheme: colorScheme,
               tokens: tokens,
+              width: shortcutTileWidthFor(layoutTier),
             ),
             _ShortcutTile(
               icon: LucideIcons.layers,
@@ -48,6 +56,7 @@ class HomePageShortcutEntries extends StatelessWidget {
               onTap: () => context.go('/metadata?tab=tags'),
               colorScheme: colorScheme,
               tokens: tokens,
+              width: shortcutTileWidthFor(layoutTier),
             ),
             _ShortcutTile(
               icon: LucideIcons.folderTree,
@@ -55,6 +64,7 @@ class HomePageShortcutEntries extends StatelessWidget {
               onTap: () => context.push('/paths'),
               colorScheme: colorScheme,
               tokens: tokens,
+              width: shortcutTileWidthFor(layoutTier),
             ),
             _ShortcutTile(
               icon: LucideIcons.scanSearch,
@@ -62,6 +72,7 @@ class HomePageShortcutEntries extends StatelessWidget {
               onTap: onScan,
               colorScheme: colorScheme,
               tokens: tokens,
+              width: shortcutTileWidthFor(layoutTier),
             ),
             _ShortcutTile(
               icon: LucideIcons.settings,
@@ -69,6 +80,7 @@ class HomePageShortcutEntries extends StatelessWidget {
               onTap: () => context.go('/settings'),
               colorScheme: colorScheme,
               tokens: tokens,
+              width: shortcutTileWidthFor(layoutTier),
             ),
           ],
         ),
@@ -84,6 +96,7 @@ class _ShortcutTile extends StatefulWidget {
     required this.onTap,
     required this.colorScheme,
     required this.tokens,
+    required this.width,
   });
 
   final IconData icon;
@@ -91,6 +104,7 @@ class _ShortcutTile extends StatefulWidget {
   final VoidCallback onTap;
   final ColorScheme colorScheme;
   final AppThemeTokens tokens;
+  final double width;
 
   @override
   State<_ShortcutTile> createState() => _ShortcutTileState();
@@ -120,7 +134,7 @@ class _ShortcutTileState extends State<_ShortcutTile> {
           child: AnimatedContainer(
             duration: duration,
             curve: curve,
-            width: 120,
+            width: widget.width,
             padding: EdgeInsets.fromLTRB(
               tokens.spacing.sm + 2,
               tokens.spacing.md + 2,

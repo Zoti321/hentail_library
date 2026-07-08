@@ -13,8 +13,13 @@ import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomePageContinueReadingSection extends ConsumerWidget {
-  const HomePageContinueReadingSection({super.key, required this.enabled});
+  const HomePageContinueReadingSection({
+    super.key,
+    required this.layoutTier,
+    required this.enabled,
+  });
 
+  final HomePageLayoutTier layoutTier;
   final bool enabled;
 
   @override
@@ -76,6 +81,7 @@ class HomePageContinueReadingSection extends ConsumerWidget {
         SizedBox(
           height: continueReadingStripHeight + 8,
           child: _ContinueReadingBody(
+            layoutTier: layoutTier,
             loading: loading,
             hasError: hasError,
             visible: visible,
@@ -90,6 +96,7 @@ class HomePageContinueReadingSection extends ConsumerWidget {
 
 class _ContinueReadingBody extends StatefulWidget {
   const _ContinueReadingBody({
+    required this.layoutTier,
     required this.loading,
     required this.hasError,
     required this.visible,
@@ -97,6 +104,7 @@ class _ContinueReadingBody extends StatefulWidget {
     required this.colorScheme,
   });
 
+  final HomePageLayoutTier layoutTier;
   final bool loading;
   final bool hasError;
   final List<HistoryGridItem> visible;
@@ -215,7 +223,7 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
         itemBuilder: (BuildContext context, int index) {
           final HistoryGridItem item = widget.visible[index];
           return SizedBox(
-            width: continueReadingItemWidth,
+            width: continueReadingItemWidthFor(widget.layoutTier),
             height: continueReadingStripHeight,
             child: ReadingHistoryCard(
               comicId: item.comicId,

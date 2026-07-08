@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/shell/views/home_page/widgets/home_page_constants.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 TextStyle _buildDesktopPageTitleStyle(ColorScheme colorScheme) {
@@ -14,11 +15,13 @@ TextStyle _buildDesktopPageTitleStyle(ColorScheme colorScheme) {
 class HomePageHeader extends StatelessWidget {
   const HomePageHeader({
     super.key,
+    required this.layoutTier,
     required this.title,
     required this.greetingText,
     required this.onScan,
   });
 
+  final HomePageLayoutTier layoutTier;
   final String title;
   final String greetingText;
   final VoidCallback onScan;
@@ -28,21 +31,30 @@ class HomePageHeader extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme colorScheme = theme.colorScheme;
+    final _HomeHeaderTextBlock textBlock = _HomeHeaderTextBlock(
+      title: title,
+      greetingText: greetingText,
+      colorScheme: colorScheme,
+      tokens: tokens,
+    );
+    final _HomeHeaderActionBlock actionBlock = _HomeHeaderActionBlock(
+      colorScheme: colorScheme,
+      onScan: onScan,
+    );
+    if (layoutTier == HomePageLayoutTier.compact) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          textBlock,
+          SizedBox(height: tokens.spacing.md),
+          actionBlock,
+        ],
+      );
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
-      children: <Widget>[
-        _HomeHeaderTextBlock(
-          title: title,
-          greetingText: greetingText,
-          colorScheme: colorScheme,
-          tokens: tokens,
-        ),
-        _HomeHeaderActionBlock(
-          colorScheme: colorScheme,
-          onScan: onScan,
-        ),
-      ],
+      children: <Widget>[textBlock, actionBlock],
     );
   }
 }

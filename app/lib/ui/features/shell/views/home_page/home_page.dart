@@ -87,12 +87,22 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final double maxWidth = constraints.maxWidth.clamp(
+        final double viewportWidth = constraints.maxWidth;
+        final HomePageLayoutTier layoutTier = homePageLayoutTierForWidth(
+          viewportWidth,
+        );
+        final double horizontalPadding = homeContentHorizontalPadding(
+          layoutTier,
+        );
+        final double maxWidth = (viewportWidth - horizontalPadding * 2).clamp(
           0,
           homeContentMaxWidth,
         );
         return SingleChildScrollView(
-          padding: tokens.layout.contentAreaPadding,
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: tokens.layout.contentAreaPadding.vertical,
+          ),
           child: Align(
             alignment: Alignment.topCenter,
             child: ConstrainedBox(
@@ -101,12 +111,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   HomePageHeader(
+                    layoutTier: layoutTier,
                     title: '首页',
                     greetingText: greetingText,
                     onScan: onScan,
                   ),
                   SizedBox(height: tokens.spacing.xl + 12),
                   HomePageHeroSection(
+                    layoutTier: layoutTier,
                     comicCount: comicCount,
                     isLibraryEmpty: isLibraryEmpty,
                     onScan: onScan,
@@ -114,10 +126,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ),
                   SizedBox(height: tokens.spacing.lg + 8),
                   HomePageContinueReadingSection(
+                    layoutTier: layoutTier,
                     enabled: deferredSectionsReady,
                   ),
                   SizedBox(height: tokens.spacing.xl + 8),
-                  HomePageShortcutEntries(onScan: onScan),
+                  HomePageShortcutEntries(
+                    layoutTier: layoutTier,
+                    onScan: onScan,
+                  ),
                   SizedBox(height: tokens.spacing.xl * 4),
                 ],
               ),
