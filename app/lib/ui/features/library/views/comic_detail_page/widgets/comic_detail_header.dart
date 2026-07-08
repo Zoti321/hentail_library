@@ -113,6 +113,7 @@ class _ComicDetailOverflowMenuButtonState
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
+    final AppThemeTokens tokens = context.tokens;
     return CustomPopupMenu(
       controller: _controller,
       barrierColor: Colors.transparent,
@@ -123,6 +124,7 @@ class _ComicDetailOverflowMenuButtonState
         width: 200,
         blurRadius: 6,
         shadowOffset: const Offset(0, 4),
+        borderRadius: tokens.radius.xs,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(

@@ -169,10 +169,12 @@ class _ComicDetailSeriesMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
     return PopupMenuPanelShell(
       width: kComicDetailSeriesMenuWidth,
       blurRadius: 6,
       shadowOffset: const Offset(0, 4),
+      borderRadius: tokens.radius.xs,
       child: ConstrainedBox(
         constraints: const BoxConstraints(
           maxHeight: kComicDetailSeriesMenuMaxHeight,
