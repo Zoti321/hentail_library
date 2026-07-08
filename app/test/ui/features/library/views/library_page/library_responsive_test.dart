@@ -7,6 +7,7 @@ import 'package:hentai_library/ui/core/widgets/element/chip/meta_chip.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
+import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_sort_drawer.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_page_widgets.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_pinned_header.dart';
@@ -56,6 +57,37 @@ void main() {
       expect(tester.takeException(), isNull);
       final Text title = tester.widget<Text>(find.text('漫画库'));
       expect(title.style?.fontSize, 26);
+    });
+
+    testWidgets('compact filter sort drawer uses wide responsive width', (
+      WidgetTester tester,
+    ) async {
+      const double viewportWidth = 360;
+      tester.view.physicalSize = const Size(viewportWidth, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            theme: buildAppTheme(Brightness.light),
+            home: MediaQuery(
+              data: const MediaQueryData(size: Size(viewportWidth, 800)),
+              child: const Scaffold(
+                body: LibraryFilterSortDrawer(),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final Drawer drawer = tester.widget<Drawer>(find.byType(Drawer));
+      expect(
+        drawer.width,
+        libraryFilterSortDrawerWidthForViewport(viewportWidth),
+      );
+      expect(drawer.width!, greaterThanOrEqualTo(viewportWidth * 0.5));
     });
   });
 

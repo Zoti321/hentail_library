@@ -39,7 +39,10 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
                 const _LegacyLibraryToolbar(),
             ],
           ),
-          LibraryDisplayTargetTabs(showCountBadges: !showCountChips),
+          LibraryDisplayTargetTabs(
+            showCountBadges: !showCountChips,
+            layoutTier: layoutTier,
+          ),
         ],
       ),
     );
@@ -132,9 +135,14 @@ class _LibrarySearchFieldState extends ConsumerState<LibrarySearchField> {
 }
 
 class LibraryDisplayTargetTabs extends ConsumerWidget {
-  const LibraryDisplayTargetTabs({super.key, this.showCountBadges = false});
+  const LibraryDisplayTargetTabs({
+    super.key,
+    this.showCountBadges = false,
+    this.layoutTier = LibraryLayoutTier.expanded,
+  });
 
   final bool showCountBadges;
+  final LibraryLayoutTier layoutTier;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -150,6 +158,7 @@ class LibraryDisplayTargetTabs extends ConsumerWidget {
           label: '漫画',
           isSelected: displayTarget == LibraryDisplayTarget.comics,
           badgeCount: showCountBadges ? comicCount : null,
+          layoutTier: layoutTier,
           onTap: () => ref
               .read(libraryQueryIntentProvider.notifier)
               .setDisplayTarget(LibraryDisplayTarget.comics),
@@ -159,6 +168,7 @@ class LibraryDisplayTargetTabs extends ConsumerWidget {
           label: '系列',
           isSelected: displayTarget == LibraryDisplayTarget.series,
           badgeCount: showCountBadges ? seriesCount : null,
+          layoutTier: layoutTier,
           onTap: () => ref
               .read(libraryQueryIntentProvider.notifier)
               .setDisplayTarget(LibraryDisplayTarget.series),
@@ -174,16 +184,21 @@ class _UnderlineTab extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     this.badgeCount,
+    this.layoutTier = LibraryLayoutTier.expanded,
   });
 
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
   final int? badgeCount;
+  final LibraryLayoutTier layoutTier;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final LibraryTabBadgeMetrics badgeMetrics = libraryTabBadgeMetrics(
+      layoutTier,
+    );
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(4),
@@ -218,9 +233,12 @@ class _UnderlineTab extends StatelessWidget {
             ),
             if (badgeCount != null)
               Positioned(
-                top: -2,
-                right: -10,
-                child: _TabCountBadge(count: badgeCount!),
+                top: badgeMetrics.top,
+                right: badgeMetrics.right,
+                child: _TabCountBadge(
+                  count: badgeCount!,
+                  metrics: badgeMetrics,
+                ),
               ),
           ],
         ),
@@ -230,25 +248,29 @@ class _UnderlineTab extends StatelessWidget {
 }
 
 class _TabCountBadge extends StatelessWidget {
-  const _TabCountBadge({required this.count});
+  const _TabCountBadge({required this.count, required this.metrics});
 
   final int count;
+  final LibraryTabBadgeMetrics metrics;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     return Container(
-      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      constraints: BoxConstraints(
+        minWidth: metrics.minSize,
+        minHeight: metrics.minSize,
+      ),
+      padding: EdgeInsets.symmetric(horizontal: metrics.horizontalPadding),
       decoration: BoxDecoration(
         color: cs.primary,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(metrics.borderRadius),
       ),
       alignment: Alignment.center,
       child: Text(
         '$count',
         style: TextStyle(
-          fontSize: 10,
+          fontSize: metrics.fontSize,
           fontWeight: FontWeight.w600,
           color: cs.onPrimary,
           height: 1.1,
@@ -291,15 +313,17 @@ class _LibraryCompactToolbar extends ConsumerWidget {
           delayTooltipThreeSeconds: true,
           onPressed: onOpenFilterSort,
         ),
-        const _LibraryOverflowMenuButton(),
-        const _LibraryPageSizeMenuButton(),
+        _LibraryOverflowMenuButton(layoutTier: layoutTier),
+        _LibraryPageSizeMenuButton(layoutTier: layoutTier),
       ],
     );
   }
 }
 
 class _LibraryOverflowMenuButton extends ConsumerStatefulWidget {
-  const _LibraryOverflowMenuButton();
+  const _LibraryOverflowMenuButton({this.layoutTier = LibraryLayoutTier.expanded});
+
+  final LibraryLayoutTier layoutTier;
 
   @override
   ConsumerState<_LibraryOverflowMenuButton> createState() =>
@@ -307,7 +331,9 @@ class _LibraryOverflowMenuButton extends ConsumerStatefulWidget {
 }
 
 class _LibraryPageSizeMenuButton extends ConsumerStatefulWidget {
-  const _LibraryPageSizeMenuButton();
+  const _LibraryPageSizeMenuButton({this.layoutTier = LibraryLayoutTier.expanded});
+
+  final LibraryLayoutTier layoutTier;
 
   @override
   ConsumerState<_LibraryPageSizeMenuButton> createState() =>
@@ -333,6 +359,7 @@ class _LibraryPageSizeMenuButtonState
       showArrow: false,
       verticalMargin: -24,
       menuBuilder: () => _LibraryPageSizeMenu(
+        layoutTier: widget.layoutTier,
         activePageSize: activePageSize,
         onSelected: (int pageSize) {
           _controller.hideMenu();
@@ -360,18 +387,21 @@ class _LibraryPageSizeMenuButtonState
 
 class _LibraryPageSizeMenu extends StatelessWidget {
   const _LibraryPageSizeMenu({
+    required this.layoutTier,
     required this.activePageSize,
     required this.onSelected,
   });
 
+  final LibraryLayoutTier layoutTier;
   final int activePageSize;
   final ValueChanged<int> onSelected;
 
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
+    final double viewportWidth = MediaQuery.sizeOf(context).width;
     return PopupMenuPanelShell(
-      width: 120,
+      width: libraryPageSizeMenuWidth(layoutTier, viewportWidth),
       blurRadius: 6,
       shadowOffset: const Offset(0, 4),
       borderRadius: tokens.radius.xs,
@@ -445,6 +475,7 @@ class _LibraryOverflowMenuButtonState
       showArrow: false,
       verticalMargin: -24,
       menuBuilder: () => _LibraryOverflowMenu(
+        layoutTier: widget.layoutTier,
         onRefresh: () {
           _controller.hideMenu();
           ref.read(libraryRefreshActionProvider).call();
@@ -475,11 +506,13 @@ class _LibraryOverflowMenuButtonState
 
 class _LibraryOverflowMenu extends StatelessWidget {
   const _LibraryOverflowMenu({
+    required this.layoutTier,
     required this.onRefresh,
     required this.onScan,
     required this.onDeepScan,
   });
 
+  final LibraryLayoutTier layoutTier;
   final VoidCallback onRefresh;
   final VoidCallback onScan;
   final VoidCallback onDeepScan;
@@ -487,8 +520,9 @@ class _LibraryOverflowMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
+    final double viewportWidth = MediaQuery.sizeOf(context).width;
     return PopupMenuPanelShell(
-      width: 200,
+      width: libraryOverflowMenuWidth(layoutTier, viewportWidth),
       blurRadius: 6,
       shadowOffset: const Offset(0, 4),
       borderRadius: tokens.radius.xs,
