@@ -24,7 +24,8 @@ class ReaderImageItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final Widget placeholder = _buildReaderImagePlaceholder(context);
+    final Widget loadingSurface = _buildReaderLoadingSurface(context);
+    final Widget errorPlaceholder = _buildReaderImageErrorPlaceholder(context);
 
     if (imageData is ReaderDirPageImageData) {
       final ReaderDirPageImageData dirData =
@@ -38,14 +39,14 @@ class ReaderImageItem extends ConsumerWidget {
             fit: BoxFit.contain,
             filterQuality: FilterQuality.high,
             useReaderImageCache: true,
-            placeholder: placeholder,
-            errorPlaceholder: placeholder,
+            loadingPlaceholder: loadingSurface,
+            errorPlaceholder: errorPlaceholder,
           ),
         ),
       );
     }
     if (imageData is! ReaderArchivePageImageData) {
-      return placeholder;
+      return errorPlaceholder;
     }
     final ReaderArchivePageImageData archiveData =
         imageData as ReaderArchivePageImageData;
@@ -56,8 +57,8 @@ class ReaderImageItem extends ConsumerWidget {
       ),
     );
     return pageAsync.when(
-      loading: () => placeholder,
-      error: (_, StackTrace _) => placeholder,
+      loading: () => loadingSurface,
+      error: (_, StackTrace _) => errorPlaceholder,
       data: (ReaderPagePayload page) {
         return ReaderPageFadeIn(
           enabled: enableCrossfade,
@@ -69,16 +70,16 @@ class ReaderImageItem extends ConsumerWidget {
                 fit: BoxFit.contain,
                 filterQuality: FilterQuality.high,
                 useReaderImageCache: true,
-                placeholder: placeholder,
-                errorPlaceholder: placeholder,
+                loadingPlaceholder: loadingSurface,
+                errorPlaceholder: errorPlaceholder,
               ),
               ReaderPageBytes(:final Uint8List data) => AppComicImage(
                 memoryBytes: data,
                 fit: BoxFit.contain,
                 filterQuality: FilterQuality.high,
                 useReaderImageCache: true,
-                placeholder: placeholder,
-                errorPlaceholder: placeholder,
+                loadingPlaceholder: loadingSurface,
+                errorPlaceholder: errorPlaceholder,
               ),
             },
           ),
@@ -87,7 +88,13 @@ class ReaderImageItem extends ConsumerWidget {
     );
   }
 
-  Widget _buildReaderImagePlaceholder(BuildContext context) {
+  Widget _buildReaderLoadingSurface(BuildContext context) {
+    return ColoredBox(
+      color: Theme.of(context).colorScheme.hentai.readerBackground,
+    );
+  }
+
+  Widget _buildReaderImageErrorPlaceholder(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(24),
       child: Icon(
