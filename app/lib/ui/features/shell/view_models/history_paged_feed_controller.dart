@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:hentai_library/core/logging/log_manager.dart';
 import 'package:hentai_library/domain/models/entity/reading_history.dart'
     as entity;
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
@@ -11,6 +14,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'history_paged_feed_controller.g.dart';
 
 const Duration _kHistoryKeywordDebounce = Duration(milliseconds: 300);
+const Duration _kHistoryRefreshDebounce = Duration(milliseconds: 200);
+
+@Riverpod(keepAlive: true)
+Stream<List<entity.ReadingHistory>> readingHistoryChangesStream(Ref ref) {
+  return ref.watch(readingHistoryRepoProvider).watchAllHistory();
+}
 
 @Riverpod(keepAlive: true)
 class HistoryPagedFeedController extends _$HistoryPagedFeedController {
@@ -19,12 +28,32 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
   String _pendingKeyword = '';
   String _effectiveKeyword = '';
   Debouncer? _keywordDebounce;
+  Debouncer? _refreshDebounce;
+  bool _isRefreshing = false;
+  bool _refreshPending = false;
+  int _fetchGeneration = 0;
+  StreamSubscription<List<entity.ReadingHistory>>? _historyChangesSubscription;
 
   @override
   Future<HistoryPagedFeedState> build() async {
     _keywordDebounce ??= Debouncer(duration: _kHistoryKeywordDebounce);
-    ref.onDispose(() => _keywordDebounce?.dispose());
-    return _loadPage(page: 1);
+    _refreshDebounce ??= Debouncer(duration: _kHistoryRefreshDebounce);
+    _historyChangesSubscription ??= ref
+        .read(readingHistoryRepoProvider)
+        .watchAllHistory()
+        .listen((_) => _scheduleSilentRefresh());
+    ref.onDispose(() {
+      _keywordDebounce?.dispose();
+      _refreshDebounce?.dispose();
+      _historyChangesSubscription?.cancel();
+      _historyChangesSubscription = null;
+    });
+    final HistoryPagedFeedState initial = await _loadPage(page: 1);
+    if (_refreshPending) {
+      _refreshPending = false;
+      Future<void>.microtask(_silentRefresh);
+    }
+    return initial;
   }
 
   Future<void> loadMore() async {
@@ -36,6 +65,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
       return;
     }
 
+    final int generation = _fetchGeneration;
     state = AsyncData<HistoryPagedFeedState>(
       current.copyWith(isLoadingMore: true),
     );
@@ -48,6 +78,13 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
             pageRequest(page: nextPage, pageSize: _pageSize),
             keyword: _keywordOrNull(),
           );
+      if (generation != _fetchGeneration) {
+        return;
+      }
+      final HistoryPagedFeedState? latest = state.asData?.value;
+      if (latest == null || latest.isLoadingMore != true) {
+        return;
+      }
       final HistoryPagedFeedState merged = _mergePage(
         current: current,
         page: page,
@@ -57,6 +94,9 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
         merged.copyWith(isLoadingMore: false),
       );
     } catch (_) {
+      if (generation != _fetchGeneration) {
+        return;
+      }
       final HistoryPagedFeedState? latest = state.asData?.value;
       if (latest != null) {
         state = AsyncData<HistoryPagedFeedState>(
@@ -104,6 +144,46 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
         keyword: _effectiveKeyword,
       ),
     );
+  }
+
+  void _scheduleSilentRefresh() {
+    _refreshDebounce?.run(_silentRefresh);
+  }
+
+  Future<void> _silentRefresh() async {
+    final HistoryPagedFeedState? current = state.asData?.value;
+    if (current == null) {
+      _refreshPending = true;
+      return;
+    }
+    if (_isRefreshing) {
+      _refreshPending = true;
+      return;
+    }
+
+    _fetchGeneration++;
+    final int generation = _fetchGeneration;
+    _isRefreshing = true;
+
+    try {
+      final HistoryPagedFeedState refreshed = await _loadPage(page: 1);
+      if (generation != _fetchGeneration) {
+        return;
+      }
+      state = AsyncData<HistoryPagedFeedState>(refreshed);
+    } catch (error, stackTrace) {
+      LogManager.instance.handle(
+        error,
+        stackTrace,
+        '[HISTORY_FEED] 静默刷新阅读历史失败',
+      );
+    } finally {
+      _isRefreshing = false;
+      if (_refreshPending) {
+        _refreshPending = false;
+        _scheduleSilentRefresh();
+      }
+    }
   }
 
   Future<HistoryPagedFeedState> _loadPage({required int page}) async {
