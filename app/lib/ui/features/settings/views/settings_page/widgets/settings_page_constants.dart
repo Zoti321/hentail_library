@@ -9,6 +9,7 @@ TextStyle buildSettingsPageTitleStyle(
   return TextStyle(
     fontSize: settingsPageTitleFontSize(layoutTier),
     fontWeight: FontWeight.w600,
+    letterSpacing: -0.4,
     color: colorScheme.hentai.textPrimary,
   );
 }

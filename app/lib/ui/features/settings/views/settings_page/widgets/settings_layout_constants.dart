@@ -4,6 +4,8 @@ import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 
 const double settingsContentMaxWidth = 1280;
 const double settingsThemeMenuWidthMedium = 224;
+const double kSettingsHeaderVerticalPadding = 6;
+const double kSettingsHeaderShadowGradientHeight = 6;
 
 enum SettingsLayoutTier { compact, medium, expanded }
 

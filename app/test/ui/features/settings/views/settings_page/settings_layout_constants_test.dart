@@ -31,6 +31,11 @@ void main() {
       expect(settingsPageTitleFontSize(SettingsLayoutTier.expanded), 26);
     });
 
+    test('keeps header chrome constants aligned with home/history', () {
+      expect(kSettingsHeaderVerticalPadding, 6);
+      expect(kSettingsHeaderShadowGradientHeight, 6);
+    });
+
     test('toggles compact-only row behaviors', () {
       expect(settingsShowsRowDescription(SettingsLayoutTier.compact), isFalse);
       expect(settingsShowsRowDescription(SettingsLayoutTier.medium), isTrue);
