@@ -4,13 +4,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/ui/providers.dart';
-import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_constants.dart';
+import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ThemePreferenceRow extends ConsumerStatefulWidget {
-  const ThemePreferenceRow({super.key});
+  const ThemePreferenceRow({
+    required this.layoutTier,
+    required this.viewportWidth,
+    super.key,
+  });
+
+  final SettingsLayoutTier layoutTier;
+  final double viewportWidth;
 
   @override
   ConsumerState<ThemePreferenceRow> createState() => _ThemePreferenceRowState();
@@ -37,7 +44,37 @@ class _ThemePreferenceRowState extends ConsumerState<ThemePreferenceRow> {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final double menuWidth = settingsThemeMenuWidth(
+      widget.layoutTier,
+      widget.viewportWidth,
+    );
+    final bool usesChevronAction = settingsThemeRowUsesChevronAction(
+      widget.layoutTier,
+    );
+
+    final Widget menuTrigger = usesChevronAction
+        ? Icon(
+            LucideIcons.chevronRight,
+            size: 16,
+            color: colorScheme.hentai.iconSecondary,
+          )
+        : GhostButton.iconText(
+            icon: LucideIcons.chevronsUpDown,
+            text: preference.labelZh,
+            tooltip: '',
+            semanticLabel: '选择应用主题',
+            iconSize: 14,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            borderRadius: tokens.radius.md,
+            foregroundColor: colorScheme.hentai.textSecondary,
+            hoverColor: colorScheme.hentai.hoverBackground,
+            overlayColor: colorScheme.primary.withAlpha(14),
+            delayTooltipThreeSeconds: false,
+            onPressed: () => menuController.toggleMenu(),
+          );
+
     return SettingsRow(
+      layoutTier: widget.layoutTier,
       icon: Icon(
         LucideIcons.palette,
         size: 20,
@@ -53,23 +90,11 @@ class _ThemePreferenceRowState extends ConsumerState<ThemePreferenceRow> {
         showArrow: false,
         verticalMargin: -24,
         menuBuilder: () => AppThemePreferenceMenuPanel(
+          width: menuWidth,
           current: preference,
           onSelect: applyTheme,
         ),
-        child: GhostButton.iconText(
-          icon: LucideIcons.chevronsUpDown,
-          text: preference.labelZh,
-          tooltip: '',
-          semanticLabel: '选择应用主题',
-          iconSize: 14,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          borderRadius: tokens.radius.md,
-          foregroundColor: colorScheme.hentai.textSecondary,
-          hoverColor: colorScheme.hentai.hoverBackground,
-          overlayColor: colorScheme.primary.withAlpha(14),
-          delayTooltipThreeSeconds: false,
-          onPressed: () => menuController.toggleMenu(),
-        ),
+        child: menuTrigger,
       ),
     );
   }
@@ -77,11 +102,13 @@ class _ThemePreferenceRowState extends ConsumerState<ThemePreferenceRow> {
 
 class AppThemePreferenceMenuPanel extends StatelessWidget {
   const AppThemePreferenceMenuPanel({
-    super.key,
+    required this.width,
     required this.current,
     required this.onSelect,
+    super.key,
   });
 
+  final double width;
   final AppThemePreference current;
   final Future<void> Function(AppThemePreference value) onSelect;
 
@@ -90,7 +117,7 @@ class AppThemePreferenceMenuPanel extends StatelessWidget {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     return Container(
-      width: appThemeMenuWidth,
+      width: width,
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(tokens.radius.lg),

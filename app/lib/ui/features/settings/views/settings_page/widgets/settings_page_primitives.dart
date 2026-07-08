@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
 
 class SettingsGroup extends StatelessWidget {
   const SettingsGroup({super.key, required this.title, required this.children});
@@ -67,6 +68,7 @@ class SettingsGroup extends StatelessWidget {
 class SettingsRow extends StatefulWidget {
   const SettingsRow({
     super.key,
+    required this.layoutTier,
     required this.icon,
     required this.label,
     this.description,
@@ -75,6 +77,7 @@ class SettingsRow extends StatefulWidget {
     this.onRowTap,
   });
 
+  final SettingsLayoutTier layoutTier;
   final Widget icon;
   final String label;
   final String? description;
@@ -130,7 +133,8 @@ class _SettingsRowState extends State<SettingsRow> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      if (widget.description != null) ...<Widget>[
+                      if (settingsShowsRowDescription(widget.layoutTier) &&
+                          widget.description != null) ...<Widget>[
                         const SizedBox(height: 2),
                         Text(
                           widget.description!,

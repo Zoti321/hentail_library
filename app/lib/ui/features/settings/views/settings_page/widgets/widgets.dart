@@ -1,3 +1,4 @@
+export 'settings_layout_constants.dart';
 export 'settings_about_rows.dart';
 export 'settings_library_rows.dart';
 export 'settings_loaded_view.dart';

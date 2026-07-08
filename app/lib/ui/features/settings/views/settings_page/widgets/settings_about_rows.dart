@@ -4,13 +4,16 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/ui/features/settings/state/app_update_controller.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
+import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class AutoUpdateRow extends ConsumerWidget {
-  const AutoUpdateRow({super.key});
+  const AutoUpdateRow({required this.layoutTier, super.key});
+
+  final SettingsLayoutTier layoutTier;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,6 +25,7 @@ class AutoUpdateRow extends ConsumerWidget {
     );
     final ThemeData theme = Theme.of(context);
     return SettingsRow(
+      layoutTier: layoutTier,
       icon: Icon(
         LucideIcons.download,
         size: 20,
@@ -39,7 +43,9 @@ class AutoUpdateRow extends ConsumerWidget {
 }
 
 class AboutVersionRow extends ConsumerWidget {
-  const AboutVersionRow({super.key});
+  const AboutVersionRow({required this.layoutTier, super.key});
+
+  final SettingsLayoutTier layoutTier;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -52,6 +58,7 @@ class AboutVersionRow extends ConsumerWidget {
       orElse: () => '加载中…',
     );
     return SettingsRow(
+      layoutTier: layoutTier,
       icon: Icon(
         LucideIcons.info,
         size: 20,
