@@ -8,22 +8,53 @@ import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/core/dto/history_grid_item.dart';
-import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/reading_history_card.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/clear_reading_history_confirm_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
 import 'package:hentai_library/ui/features/shell/view_models/history_paged_feed_state.dart';
 import 'package:hentai_library/ui/features/shell/views/history_page/history_layout_constants.dart';
+import 'package:hentai_library/ui/features/shell/views/history_page/widgets/history_page_header.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double _kHistoryLoadMoreThreshold = 400;
 
-class HistoryPage extends ConsumerWidget {
+class HistoryPage extends ConsumerStatefulWidget {
   const HistoryPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HistoryPage> createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends ConsumerState<HistoryPage> {
+  final GlobalKey _headerMeasureKey = GlobalKey();
+  double? _headerExtent;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+  }
+
+  void _measureHeaderExtent(Duration _) {
+    final RenderBox? box =
+        _headerMeasureKey.currentContext?.findRenderObject() as RenderBox?;
+    if (!mounted || box == null) {
+      return;
+    }
+    final double height = box.size.height;
+    if (_headerExtent != height) {
+      setState(() => _headerExtent = height);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -37,6 +68,18 @@ class HistoryPage extends ConsumerWidget {
         final double innerMaxWidth = historyInnerContentMaxWidth(
           layoutTier,
           viewportWidth,
+        );
+
+        final Widget headerSection = HistoryPageHeaderSection(
+          layoutTier: layoutTier,
+          horizontalPadding: horizontalPadding,
+          onOpenNavigation: layoutTier == HistoryLayoutTier.compact
+              ? openAppShellNavigationDrawer
+              : null,
+        );
+        final Widget header = KeyedSubtree(
+          key: _headerMeasureKey,
+          child: headerSection,
         );
 
         return NotificationListener<ScrollNotification>(
@@ -59,37 +102,45 @@ class HistoryPage extends ConsumerWidget {
           },
           child: CustomScrollView(
             cacheExtent: 1200,
+            physics: const AlwaysScrollableScrollPhysics(),
             slivers: <Widget>[
+              if (_headerExtent == null)
+                SliverToBoxAdapter(child: header)
+              else
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: HistoryPinnedHeaderDelegate(
+                    extent: _headerExtent!,
+                    child: header,
+                  ),
+                ),
               SliverPadding(
                 padding: EdgeInsets.fromLTRB(
                   horizontalPadding,
-                  tokens.layout.contentAreaPadding.top,
+                  tokens.layout.contentVerticalPadding,
                   horizontalPadding,
-                  0,
+                  tokens.layout.contentAreaPadding.bottom,
                 ),
-                sliver: SliverToBoxAdapter(
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: SizedBox(
-                      width: innerMaxWidth,
-                      child: _Header(
-                        layoutTier: layoutTier,
-                        contentMaxWidth: innerMaxWidth,
-                        onOpenNavigation: layoutTier == HistoryLayoutTier.compact
-                            ? openAppShellNavigationDrawer
-                            : null,
+                sliver: SliverMainAxisGroup(
+                  slivers: <Widget>[
+                    SliverToBoxAdapter(
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: SizedBox(
+                          width: innerMaxWidth,
+                          child: _HistoryBodyLeading(
+                            layoutTier: layoutTier,
+                            contentMaxWidth: innerMaxWidth,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 16)),
-              SliverPadding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                sliver: _HistoryListSliver(
-                  layoutTier: layoutTier,
-                  viewportWidth: viewportWidth,
-                  contentMaxWidth: innerMaxWidth,
+                    _HistoryListSliver(
+                      layoutTier: layoutTier,
+                      viewportWidth: viewportWidth,
+                      contentMaxWidth: innerMaxWidth,
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -100,16 +151,14 @@ class HistoryPage extends ConsumerWidget {
   }
 }
 
-class _Header extends ConsumerWidget {
-  const _Header({
+class _HistoryBodyLeading extends ConsumerWidget {
+  const _HistoryBodyLeading({
     required this.layoutTier,
     required this.contentMaxWidth,
-    this.onOpenNavigation,
   });
 
   final HistoryLayoutTier layoutTier;
   final double contentMaxWidth;
-  final VoidCallback? onOpenNavigation;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -130,37 +179,10 @@ class _Header extends ConsumerWidget {
       searchTier,
       contentMaxWidth,
     );
-    final double titleFontSize = historyPageTitleFontSize(layoutTier);
 
-    final Widget titleSection = Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 6,
       children: <Widget>[
-        if (onOpenNavigation != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: GhostButton.icon(
-              icon: LucideIcons.menu,
-              semanticLabel: '打开导航菜单',
-              tooltip: '',
-              iconSize: 16,
-              size: 32,
-              borderRadius: 8,
-              foregroundColor: theme.colorScheme.hentai.iconDefault,
-              hoverColor: theme.hoverColor,
-              overlayColor: theme.hoverColor,
-              onPressed: onOpenNavigation,
-            ),
-          ),
-        Text(
-          '阅读历史',
-          style: TextStyle(
-            color: theme.colorScheme.hentai.textPrimary,
-            fontSize: titleFontSize,
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.4,
-          ),
-        ),
         Text(
           '$totalCount 条记录 • 最长保留 30 天',
           style: TextStyle(
@@ -169,107 +191,21 @@ class _Header extends ConsumerWidget {
             color: theme.colorScheme.hentai.textTertiary,
           ),
         ),
-      ],
-    );
-    final Widget searchField = SizedBox(
-      width: searchWidth,
-      child: CustomTextField(
-        hintText: '搜索历史记录...',
-        onChanged: (String value) => ref
-            .read(historyPagedFeedControllerProvider.notifier)
-            .setKeyword(value),
-      ),
-    );
-    final Widget clearButton = _buildClearBtn(context, ref, totalCount > 0);
-
-    if (historyHeaderIsVertical(layoutTier)) {
-      return Container(
-        padding: const EdgeInsets.all(2),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            titleSection,
-            const SizedBox(height: 12),
-            searchField,
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: clearButton,
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(2),
-      child: Row(
-        children: <Widget>[
-          titleSection,
-          const Spacer(),
-          searchField,
-          const SizedBox(width: 12),
-          clearButton,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildClearBtn(BuildContext context, WidgetRef ref, bool enabled) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final Future<void> Function()? onPressed = !enabled
-        ? null
-        : () async {
-            final bool confirmed =
-                await showDialog<bool>(
-                  context: context,
-                  builder: (BuildContext context) =>
-                      const ClearReadingHistoryConfirmDialog(),
-                ) ??
-                false;
-            if (!confirmed) {
-              return;
-            }
-            try {
-              await ref.read(readingHistoryRepoProvider).clearAllHistory();
-              ref
+        const SizedBox(height: kHistorySubtitleToSearchSpacing),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+            width: searchWidth,
+            child: CustomTextField(
+              hintText: '搜索历史记录...',
+              onChanged: (String value) => ref
                   .read(historyPagedFeedControllerProvider.notifier)
-                  .clearAllLocal();
-              if (context.mounted) {
-                showSuccessToast(context, '已清空阅读历史');
-              }
-            } catch (e) {
-              if (context.mounted) {
-                showErrorToast(context, e);
-              }
-            }
-          };
-
-    if (historyHeaderUsesIconOnlyClear(layoutTier)) {
-      return GhostButton.icon(
-        icon: LucideIcons.trash2,
-        tooltip: '清空阅读历史',
-        semanticLabel: '清空阅读历史',
-        onPressed: onPressed,
-        iconSize: 16,
-        size: 32,
-        borderRadius: 8,
-        foregroundColor: cs.hentai.warning,
-        hoverColor: cs.error.withAlpha(24),
-        overlayColor: cs.error.withAlpha(20),
-        delayTooltipThreeSeconds: true,
-      );
-    }
-
-    return GhostButton.iconText(
-      icon: LucideIcons.trash2,
-      text: '清空',
-      tooltip: '清空阅读历史',
-      semanticLabel: '清空阅读历史',
-      onPressed: onPressed,
-      foregroundColor: cs.hentai.warning,
-      hoverColor: cs.error.withAlpha(24),
-      overlayColor: cs.error.withAlpha(20),
+                  .setKeyword(value),
+            ),
+          ),
+        ),
+        const SizedBox(height: kHistorySearchToListSpacing),
+      ],
     );
   }
 }

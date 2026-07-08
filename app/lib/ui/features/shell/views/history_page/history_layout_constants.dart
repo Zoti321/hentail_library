@@ -3,6 +3,10 @@ import 'dart:math' as math;
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 
 const double historyContentMaxWidth = 1280;
+const double kHistoryHeaderVerticalPadding = 6;
+const double kHistoryHeaderShadowGradientHeight = 6;
+const double kHistorySubtitleToSearchSpacing = 12;
+const double kHistorySearchToListSpacing = 16;
 
 enum HistoryLayoutTier { compact, medium, expanded }
 
@@ -35,14 +39,6 @@ double historyPageTitleFontSize(HistoryLayoutTier tier) {
     HistoryLayoutTier.medium => 22,
     HistoryLayoutTier.expanded => 26,
   };
-}
-
-bool historyHeaderIsVertical(HistoryLayoutTier tier) {
-  return tier == HistoryLayoutTier.compact;
-}
-
-bool historyHeaderUsesIconOnlyClear(HistoryLayoutTier tier) {
-  return tier == HistoryLayoutTier.compact;
 }
 
 double historyInnerContentMaxWidth(

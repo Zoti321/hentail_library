@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,11 +9,13 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/views/history_page.dart';
 import 'package:hentai_library/ui/features/shell/views/history_page/history_layout_constants.dart';
+import 'package:hentai_library/ui/features/shell/views/history_page/widgets/history_page_header.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
   group('History responsive layout', () {
-    testWidgets('compact page uses vertical header without overflow', (
+    testWidgets('compact page uses icon clear and compact title', (
       WidgetTester tester,
     ) async {
       await _pumpHistoryPage(tester, viewportWidth: 360);
@@ -25,9 +25,11 @@ void main() {
       expect(title.style?.fontSize, 18);
       expect(find.text('清空'), findsNothing);
       expect(find.byTooltip('清空阅读历史'), findsOneWidget);
+      expect(find.byType(HistoryPageHeaderSection), findsOneWidget);
+      _expectMenuIcon(tester, findsOneWidget);
     });
 
-    testWidgets('medium page keeps clear text button and medium title', (
+    testWidgets('medium page keeps icon clear and medium title', (
       WidgetTester tester,
     ) async {
       await _pumpHistoryPage(tester, viewportWidth: 700);
@@ -35,7 +37,9 @@ void main() {
       expect(tester.takeException(), isNull);
       final Text title = tester.widget<Text>(find.text('阅读历史'));
       expect(title.style?.fontSize, 22);
-      expect(find.text('清空'), findsOneWidget);
+      expect(find.text('清空'), findsNothing);
+      expect(find.byTooltip('清空阅读历史'), findsOneWidget);
+      _expectMenuIcon(tester, findsNothing);
     });
 
     testWidgets('expanded page uses expanded title size', (
@@ -46,6 +50,20 @@ void main() {
       expect(tester.takeException(), isNull);
       final Text title = tester.widget<Text>(find.text('阅读历史'));
       expect(title.style?.fontSize, 26);
+    });
+
+    testWidgets('places subtitle and search in body below header', (
+      WidgetTester tester,
+    ) async {
+      await _pumpHistoryPage(tester, viewportWidth: 700);
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.textContaining('条记录'), findsOneWidget);
+      expect(find.text('搜索历史记录...'), findsOneWidget);
+      final Offset title = tester.getTopLeft(find.text('阅读历史'));
+      final Offset subtitle = tester.getTopLeft(find.textContaining('条记录'));
+      expect(subtitle.dy, greaterThan(title.dy));
     });
 
     testWidgets('compact grid renders a single column of history cards', (
@@ -85,6 +103,15 @@ Future<void> _pumpHistoryPage(
     ),
   );
   await tester.pump();
+}
+
+void _expectMenuIcon(WidgetTester tester, Matcher matcher) {
+  expect(
+    find.byWidgetPredicate(
+      (Widget widget) => widget is Icon && widget.icon == LucideIcons.menu,
+    ),
+    matcher,
+  );
 }
 
 List<Override> _historyPageTestOverrides() {

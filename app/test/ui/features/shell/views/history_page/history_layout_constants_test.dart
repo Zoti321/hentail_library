@@ -32,10 +32,11 @@ void main() {
       expect(historyPageTitleFontSize(HistoryLayoutTier.expanded), 26);
     });
 
-    test('toggles compact-only header behaviors', () {
-      expect(historyHeaderIsVertical(HistoryLayoutTier.compact), isTrue);
-      expect(historyHeaderUsesIconOnlyClear(HistoryLayoutTier.compact), isTrue);
-      expect(historyHeaderIsVertical(HistoryLayoutTier.expanded), isFalse);
+    test('keeps header chrome constants aligned with home/metadata', () {
+      expect(kHistoryHeaderVerticalPadding, 6);
+      expect(kHistoryHeaderShadowGradientHeight, 6);
+      expect(kHistorySubtitleToSearchSpacing, 12);
+      expect(kHistorySearchToListSpacing, 16);
     });
   });
 
