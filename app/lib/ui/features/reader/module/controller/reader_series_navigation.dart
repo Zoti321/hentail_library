@@ -52,7 +52,7 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
     } catch (_) {
       // warm-open 失败不阻断切卷导航。
     }
-    router.go(
+    router.pushReplacement(
       Uri(
         path: '/reader',
         queryParameters: ReaderRouteArgs.fromSession(
