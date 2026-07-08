@@ -103,10 +103,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                   HomePageHeader(
                     title: '首页',
                     greetingText: greetingText,
-                    onRefresh: () {
-                      ref.invalidate(homePageCountsStreamProvider);
-                      ref.invalidate(homeContinueReadingTop5StreamProvider);
-                    },
                     onScan: onScan,
                   ),
                   SizedBox(height: tokens.spacing.xl + 12),

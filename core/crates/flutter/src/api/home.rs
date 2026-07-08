@@ -12,7 +12,7 @@ pub struct HomePageCountsDto {
     pub comic_count: i32,
     pub tag_count: i32,
     pub series_count: i32,
-    pub reading_record_count: i32,
+    pub author_count: i32,
 }
 
 #[derive(Debug, Clone)]
@@ -29,7 +29,7 @@ impl From<CoreCounts> for HomePageCountsDto {
             comic_count: v.comic_count,
             tag_count: v.tag_count,
             series_count: v.series_count,
-            reading_record_count: v.reading_record_count,
+            author_count: v.author_count,
         }
     }
 }

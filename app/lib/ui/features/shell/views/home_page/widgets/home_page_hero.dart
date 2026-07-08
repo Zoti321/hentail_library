@@ -223,7 +223,7 @@ class _StatsCards extends ConsumerWidget {
       colorScheme.secondary,
       0.45,
     )!;
-    final Color accentHistory = colorScheme.inversePrimary;
+    final Color accentAuthors = colorScheme.inversePrimary;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool stack = constraints.maxWidth < homeStatsStackBreakpointWidth;
@@ -242,13 +242,13 @@ class _StatsCards extends ConsumerWidget {
                     accentColor: accentLibrary,
                   ),
                   _StatSummaryCard(
-                    label: '阅读记录',
-                    valueText: '${c.readingRecordCount}',
-                    caption: c.readingRecordCount == 0
-                        ? '暂无历史'
-                        : '${c.readingRecordCount} 条',
-                    icon: LucideIcons.history,
-                    accentColor: accentHistory,
+                    label: '作者',
+                    valueText: '${c.authorCount}',
+                    caption: c.authorCount == 0
+                        ? '暂无作者'
+                        : '${c.authorCount} 位',
+                    icon: LucideIcons.penLine,
+                    accentColor: accentAuthors,
                   ),
                   Row(
                     spacing: context.tokens.spacing.md,
@@ -308,13 +308,13 @@ class _StatsCards extends ConsumerWidget {
                 ),
                 Expanded(
                   child: _StatSummaryCard(
-                    label: '阅读记录',
-                    valueText: '${c.readingRecordCount}',
-                    caption: c.readingRecordCount == 0
-                        ? '暂无历史'
-                        : '${c.readingRecordCount} 条',
-                    icon: LucideIcons.history,
-                    accentColor: accentHistory,
+                    label: '作者',
+                    valueText: '${c.authorCount}',
+                    caption: c.authorCount == 0
+                        ? '暂无作者'
+                        : '${c.authorCount} 位',
+                    icon: LucideIcons.penLine,
+                    accentColor: accentAuthors,
                   ),
                 ),
               ],
@@ -334,11 +334,11 @@ class _StatsCards extends ConsumerWidget {
                     accentColor: accentLibrary,
                   ),
                   _StatSummaryCard(
-                    label: '阅读记录',
+                    label: '作者',
                     valueText: '--',
                     caption: '加载中…',
-                    icon: LucideIcons.history,
-                    accentColor: accentHistory,
+                    icon: LucideIcons.penLine,
+                    accentColor: accentAuthors,
                   ),
                   Row(
                     spacing: context.tokens.spacing.md,
@@ -398,11 +398,11 @@ class _StatsCards extends ConsumerWidget {
                 ),
                 Expanded(
                   child: _StatSummaryCard(
-                    label: '阅读记录',
+                    label: '作者',
                     valueText: '--',
                     caption: '加载中…',
-                    icon: LucideIcons.history,
-                    accentColor: accentHistory,
+                    icon: LucideIcons.penLine,
+                    accentColor: accentAuthors,
                   ),
                 ),
               ],
@@ -422,11 +422,11 @@ class _StatsCards extends ConsumerWidget {
                     accentColor: accentLibrary,
                   ),
                   _StatSummaryCard(
-                    label: '阅读记录',
+                    label: '作者',
                     valueText: '--',
                     caption: '加载失败',
-                    icon: LucideIcons.history,
-                    accentColor: accentHistory,
+                    icon: LucideIcons.penLine,
+                    accentColor: accentAuthors,
                   ),
                   Row(
                     spacing: context.tokens.spacing.md,
@@ -486,11 +486,11 @@ class _StatsCards extends ConsumerWidget {
                 ),
                 Expanded(
                   child: _StatSummaryCard(
-                    label: '阅读记录',
+                    label: '作者',
                     valueText: '--',
                     caption: '加载失败',
-                    icon: LucideIcons.history,
-                    accentColor: accentHistory,
+                    icon: LucideIcons.penLine,
+                    accentColor: accentAuthors,
                   ),
                 ),
               ],
@@ -517,7 +517,7 @@ class _StatsCardsPlaceholder extends StatelessWidget {
       colorScheme.secondary,
       0.45,
     )!;
-    final Color accentHistory = colorScheme.inversePrimary;
+    final Color accentAuthors = colorScheme.inversePrimary;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool stack = constraints.maxWidth < homeStatsStackBreakpointWidth;
@@ -534,11 +534,11 @@ class _StatsCardsPlaceholder extends StatelessWidget {
                 accentColor: accentLibrary,
               ),
               _StatSummaryCard(
-                label: '阅读记录',
+                label: '作者',
                 valueText: '--',
                 caption: '加载中…',
-                icon: LucideIcons.history,
-                accentColor: accentHistory,
+                icon: LucideIcons.penLine,
+                accentColor: accentAuthors,
               ),
               Row(
                 spacing: context.tokens.spacing.md,
@@ -598,11 +598,11 @@ class _StatsCardsPlaceholder extends StatelessWidget {
             ),
             Expanded(
               child: _StatSummaryCard(
-                label: '阅读记录',
+                label: '作者',
                 valueText: '--',
                 caption: '加载中…',
-                icon: LucideIcons.history,
-                accentColor: accentHistory,
+                icon: LucideIcons.penLine,
+                accentColor: accentAuthors,
               ),
             ),
           ],

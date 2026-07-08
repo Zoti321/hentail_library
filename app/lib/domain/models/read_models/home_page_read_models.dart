@@ -4,12 +4,12 @@ class HomePageCounts {
     required this.comicCount,
     required this.tagCount,
     required this.seriesCount,
-    required this.readingRecordCount,
+    required this.authorCount,
   });
   final int comicCount;
   final int tagCount;
   final int seriesCount;
-  final int readingRecordCount;
+  final int authorCount;
 }
 
 /// 继续阅读单条候选项（从漫画阅读历史取 Top N）。

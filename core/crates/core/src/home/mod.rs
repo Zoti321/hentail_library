@@ -9,7 +9,7 @@ pub struct HomePageCountsDto {
     pub comic_count: i32,
     pub tag_count: i32,
     pub series_count: i32,
-    pub reading_record_count: i32,
+    pub author_count: i32,
 }
 
 #[derive(Debug, Clone)]
@@ -25,7 +25,7 @@ SELECT
   (SELECT COUNT(*) FROM comics) AS c_comic,
   (SELECT COUNT(*) FROM tags) AS c_tag,
   (SELECT COUNT(*) FROM series) AS c_series,
-  (SELECT COUNT(*) FROM comic_reading_histories) AS c_reading
+  (SELECT COUNT(*) FROM authors) AS c_author
 "#;
 
 const SQL_COUNTS_HEALTHY: &str = r#"
@@ -43,12 +43,7 @@ SELECT
       WHERE si1.series_id = s.series_id AND cm1.content_rating = ?
     )
   ) AS c_series,
-  (
-    SELECT COUNT(*)
-    FROM comic_reading_histories h
-    INNER JOIN comic_meta cm ON cm.comic_id = h.comic_id
-    WHERE cm.content_rating != ?
-  ) AS c_reading
+  (SELECT COUNT(*) FROM authors) AS c_author
 "#;
 
 const SQL_TOP5: &str = r#"
@@ -145,7 +140,7 @@ async fn load_counts(db: &DatabaseConnection, exclude_r18: bool) -> Result<HomeP
         let stmt = Statement::from_sql_and_values(
             db.get_database_backend(),
             SQL_COUNTS_HEALTHY,
-            vec![Value::from("r18"); 3],
+            vec![Value::from("r18"); 2],
         );
         db.query_one(stmt).await.map_err(map_db_err)?
     } else {
@@ -159,6 +154,6 @@ async fn load_counts(db: &DatabaseConnection, exclude_r18: bool) -> Result<HomeP
         comic_count: row.try_get::<i32>("", "c_comic").unwrap_or(0),
         tag_count: row.try_get::<i32>("", "c_tag").unwrap_or(0),
         series_count: row.try_get::<i32>("", "c_series").unwrap_or(0),
-        reading_record_count: row.try_get::<i32>("", "c_reading").unwrap_or(0),
+        author_count: row.try_get::<i32>("", "c_author").unwrap_or(0),
     })
 }
