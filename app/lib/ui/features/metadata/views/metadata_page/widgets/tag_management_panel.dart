@@ -6,15 +6,22 @@ import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/status_card_shell.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_header.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_height.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_shell.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_row_actions.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class TagManagementPanel extends ConsumerWidget {
-  const TagManagementPanel({super.key});
+  const TagManagementPanel({
+    required this.layoutTier,
+    super.key,
+  });
+
+  final MetadataLayoutTier layoutTier;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -36,15 +43,24 @@ class TagManagementPanel extends ConsumerWidget {
     final tagsAsync = ref.watch(allTagsProvider);
     final List<Tag> filteredTags = ref.watch(filteredTagsProvider);
     final AppThemeTokens tokens = context.tokens;
-    final EdgeInsets contentPadding = tokens.layout.contentAreaPadding.copyWith(
-      bottom: tokens.layout.contentVerticalPadding + 24,
-    );
     return Padding(
-      padding: contentPadding,
+      padding: EdgeInsets.only(
+        top: tokens.layout.contentVerticalPadding,
+        bottom: tokens.layout.contentVerticalPadding + 24,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          _TagManagementHeader(onAddTag: openAddTagDialog),
+          MetadataPanelHeader(
+            layoutTier: layoutTier,
+            title: '标签管理',
+            subtitle: '查看、添加、重命名以及批量删除分类标签',
+            searchHint: '搜索标签名称…',
+            addEntityName: '标签',
+            onSearchChanged: (String value) =>
+                ref.read(tagFilterProvider.notifier).setQuery(value),
+            onAdd: openAddTagDialog,
+          ),
           const SizedBox(height: 12),
           const _TagBulkDeleteBar(),
           const SizedBox(height: 20),
@@ -53,6 +69,12 @@ class TagManagementPanel extends ConsumerWidget {
               data: (_) {
                 if (filteredTags.isEmpty) {
                   return const _TagManagementEmptyState();
+                }
+                if (metadataListFillsAvailableHeight(layoutTier)) {
+                  return _TagListCard(
+                    layoutTier: layoutTier,
+                    tags: filteredTags,
+                  );
                 }
                 return LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
@@ -66,7 +88,10 @@ class TagManagementPanel extends ConsumerWidget {
                       child: SizedBox(
                         width: double.infinity,
                         height: cardHeight,
-                        child: _TagListCard(tags: filteredTags),
+                        child: _TagListCard(
+                          layoutTier: layoutTier,
+                          tags: filteredTags,
+                        ),
                       ),
                     );
                   },
@@ -85,9 +110,6 @@ class TagManagementPanel extends ConsumerWidget {
 
 class _TagStyles {
   const _TagStyles._();
-
-  static const double titleFontSize = 26;
-  static const double subtitleFontSize = 13;
 
   static const double listRadius = 12;
   static const EdgeInsets listHeaderPadding = EdgeInsets.symmetric(
@@ -114,74 +136,6 @@ class _TagStyles {
   );
   static const MetadataPanelHeightConfig listHeightConfig =
       kMetadataPanelHeightDefaultConfig;
-}
-
-class _TagManagementHeader extends ConsumerWidget {
-  const _TagManagementHeader({required this.onAddTag});
-
-  final Future<void> Function() onAddTag;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final String shortcutLabel = _shortcutLabel(context);
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '标签管理',
-                style: TextStyle(
-                  fontSize: _TagStyles.titleFontSize,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.4,
-                  color: cs.hentai.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '查看、添加、重命名以及批量删除分类标签',
-                style: TextStyle(
-                  color: cs.hentai.textTertiary,
-                  fontSize: _TagStyles.subtitleFontSize,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.2,
-              child: CustomTextField(
-                hintText: '搜索标签名称…',
-                onChanged: (String value) =>
-                    ref.read(tagFilterProvider.notifier).setQuery(value),
-              ),
-            ),
-            FilledButton.icon(
-              onPressed: onAddTag,
-              icon: const Icon(LucideIcons.plus, size: 16),
-              label: Text('添加标签 ($shortcutLabel)'),
-              style: FilledButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
 }
 
 class _TagBulkDeleteBar extends ConsumerWidget {
@@ -228,16 +182,13 @@ class _TagBulkDeleteBar extends ConsumerWidget {
   }
 }
 
-String _shortcutLabel(BuildContext context) {
-  final TargetPlatform platform = Theme.of(context).platform;
-  final bool isApple =
-      platform == TargetPlatform.macOS || platform == TargetPlatform.iOS;
-  return isApple ? '⌘N' : 'Ctrl+N';
-}
-
 class _TagListCard extends StatelessWidget {
-  const _TagListCard({required this.tags});
+  const _TagListCard({
+    required this.layoutTier,
+    required this.tags,
+  });
 
+  final MetadataLayoutTier layoutTier;
   final List<Tag> tags;
 
   @override
@@ -261,7 +212,11 @@ class _TagListCard extends StatelessWidget {
                             (Set<Tag> selected) => selected.contains(tag),
                           ),
                         );
-                        return _TagRow(tag: tag, isSelected: isSelected);
+                        return _TagRow(
+                          layoutTier: layoutTier,
+                          tag: tag,
+                          isSelected: isSelected,
+                        );
                       },
                 );
               },
@@ -334,8 +289,13 @@ class _TagListHeader extends ConsumerWidget {
 }
 
 class _TagRow extends ConsumerWidget {
-  const _TagRow({required this.tag, required this.isSelected});
+  const _TagRow({
+    required this.layoutTier,
+    required this.tag,
+    required this.isSelected,
+  });
 
+  final MetadataLayoutTier layoutTier;
   final Tag tag;
   final bool isSelected;
 
@@ -371,7 +331,6 @@ class _TagRow extends ConsumerWidget {
                 onPressed: () =>
                     ref.read(tagSelectionProvider.notifier).toggle(tag),
               ),
-
               Expanded(
                 child: Text(
                   tag.name,
@@ -382,16 +341,11 @@ class _TagRow extends ConsumerWidget {
                   ),
                 ),
               ),
-              GhostButton.icon(
-                icon: LucideIcons.squarePen,
-                iconSize: 16,
-                size: _TagStyles.iconButtonSize.width,
-                borderRadius: _TagStyles.iconButtonRadius,
-                tooltip: '重命名',
-                delayTooltipThreeSeconds: true,
-                hoverColor: cs.primary.withAlpha(10),
-                overlayColor: cs.primary.withAlpha(14),
-                onPressed: () async {
+              MetadataPanelRowActions(
+                layoutTier: layoutTier,
+                iconButtonRadius: _TagStyles.iconButtonRadius,
+                iconButtonSize: _TagStyles.iconButtonSize.width,
+                onRename: () async {
                   await showDialog<void>(
                     context: context,
                     builder: (context) => TagNameEditorDialog(
@@ -408,19 +362,7 @@ class _TagRow extends ConsumerWidget {
                     ),
                   );
                 },
-              ),
-              GhostButton.icon(
-                tooltip: '删除',
-                semanticLabel: '删除',
-                icon: LucideIcons.trash2,
-                iconSize: 16,
-                size: _TagStyles.iconButtonSize.width,
-                borderRadius: _TagStyles.iconButtonRadius,
-                foregroundColor: cs.error,
-                hoverColor: cs.primary.withAlpha(10),
-                overlayColor: cs.primary.withAlpha(14),
-                delayTooltipThreeSeconds: true,
-                onPressed: () async {
+                onDelete: () async {
                   final bool confirmed =
                       await showDialog<bool>(
                         context: context,
@@ -484,7 +426,7 @@ class _TagManagementErrorCard extends StatelessWidget {
       child: Text(
         '$error',
         style: TextStyle(
-          fontSize: _TagStyles.subtitleFontSize,
+          fontSize: kMetadataPanelSubtitleFontSize,
           color: theme.colorScheme.hentai.textTertiary,
         ),
       ),
@@ -519,7 +461,7 @@ class _TagManagementEmptyState extends StatelessWidget {
           Text(
             '你可以从这里添加、重命名或删除标签。',
             style: TextStyle(
-              fontSize: _TagStyles.subtitleFontSize,
+              fontSize: kMetadataPanelSubtitleFontSize,
               color: cs.hentai.textSecondary,
             ),
             textAlign: TextAlign.center,

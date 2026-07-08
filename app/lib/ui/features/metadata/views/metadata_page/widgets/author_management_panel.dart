@@ -6,15 +6,22 @@ import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/status_card_shell.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_header.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_height.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_shell.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_row_actions.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AuthorManagementPanel extends ConsumerWidget {
-  const AuthorManagementPanel({super.key});
+  const AuthorManagementPanel({
+    required this.layoutTier,
+    super.key,
+  });
+
+  final MetadataLayoutTier layoutTier;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,15 +45,24 @@ class AuthorManagementPanel extends ConsumerWidget {
     final authorsAsync = ref.watch(allAuthorsProvider);
     final List<Author> filteredAuthors = ref.watch(filteredAuthorsProvider);
     final AppThemeTokens tokens = context.tokens;
-    final EdgeInsets contentPadding = tokens.layout.contentAreaPadding.copyWith(
-      bottom: tokens.layout.contentVerticalPadding + 24,
-    );
     return Padding(
-      padding: contentPadding,
+      padding: EdgeInsets.only(
+        top: tokens.layout.contentVerticalPadding,
+        bottom: tokens.layout.contentVerticalPadding + 24,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          _AuthorManagementHeader(onAddAuthor: openAddAuthorDialog),
+          MetadataPanelHeader(
+            layoutTier: layoutTier,
+            title: '作者管理',
+            subtitle: '查看、添加、重命名以及批量删除作者',
+            searchHint: '搜索作者名称…',
+            addEntityName: '作者',
+            onSearchChanged: (String value) =>
+                ref.read(authorFilterProvider.notifier).setQuery(value),
+            onAdd: openAddAuthorDialog,
+          ),
           const SizedBox(height: 12),
           const _AuthorBulkDeleteBar(),
           const SizedBox(height: 20),
@@ -55,6 +71,12 @@ class AuthorManagementPanel extends ConsumerWidget {
               data: (_) {
                 if (filteredAuthors.isEmpty) {
                   return const _AuthorManagementEmptyState();
+                }
+                if (metadataListFillsAvailableHeight(layoutTier)) {
+                  return _AuthorListCard(
+                    layoutTier: layoutTier,
+                    authors: filteredAuthors,
+                  );
                 }
                 return LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
@@ -68,7 +90,10 @@ class AuthorManagementPanel extends ConsumerWidget {
                       child: SizedBox(
                         width: double.infinity,
                         height: cardHeight,
-                        child: _AuthorListCard(authors: filteredAuthors),
+                        child: _AuthorListCard(
+                          layoutTier: layoutTier,
+                          authors: filteredAuthors,
+                        ),
                       ),
                     );
                   },
@@ -87,9 +112,6 @@ class AuthorManagementPanel extends ConsumerWidget {
 
 class _AuthorStyles {
   const _AuthorStyles._();
-
-  static const double titleFontSize = 26;
-  static const double subtitleFontSize = 13;
 
   static const double listRadius = 12;
   static const EdgeInsets listHeaderPadding = EdgeInsets.symmetric(
@@ -116,74 +138,6 @@ class _AuthorStyles {
   );
   static const MetadataPanelHeightConfig listHeightConfig =
       kMetadataPanelHeightDefaultConfig;
-}
-
-class _AuthorManagementHeader extends ConsumerWidget {
-  const _AuthorManagementHeader({required this.onAddAuthor});
-
-  final Future<void> Function() onAddAuthor;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final String shortcutLabel = _shortcutLabel(context);
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '作者管理',
-                style: TextStyle(
-                  fontSize: _AuthorStyles.titleFontSize,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.4,
-                  color: cs.hentai.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '查看、添加、重命名以及批量删除作者',
-                style: TextStyle(
-                  color: cs.hentai.textTertiary,
-                  fontSize: _AuthorStyles.subtitleFontSize,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.2,
-              child: CustomTextField(
-                hintText: '搜索作者名称…',
-                onChanged: (String value) =>
-                    ref.read(authorFilterProvider.notifier).setQuery(value),
-              ),
-            ),
-            FilledButton.icon(
-              onPressed: onAddAuthor,
-              icon: const Icon(LucideIcons.plus, size: 16),
-              label: Text('添加作者 ($shortcutLabel)'),
-              style: FilledButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
 }
 
 class _AuthorBulkDeleteBar extends ConsumerWidget {
@@ -230,16 +184,13 @@ class _AuthorBulkDeleteBar extends ConsumerWidget {
   }
 }
 
-String _shortcutLabel(BuildContext context) {
-  final TargetPlatform platform = Theme.of(context).platform;
-  final bool isApple =
-      platform == TargetPlatform.macOS || platform == TargetPlatform.iOS;
-  return isApple ? '⌘N' : 'Ctrl+N';
-}
-
 class _AuthorListCard extends StatelessWidget {
-  const _AuthorListCard({required this.authors});
+  const _AuthorListCard({
+    required this.layoutTier,
+    required this.authors,
+  });
 
+  final MetadataLayoutTier layoutTier;
   final List<Author> authors;
 
   @override
@@ -264,6 +215,7 @@ class _AuthorListCard extends StatelessWidget {
                           ),
                         );
                         return _AuthorRow(
+                          layoutTier: layoutTier,
                           author: author,
                           isSelected: isSelected,
                         );
@@ -339,8 +291,13 @@ class _AuthorListHeader extends ConsumerWidget {
 }
 
 class _AuthorRow extends ConsumerWidget {
-  const _AuthorRow({required this.author, required this.isSelected});
+  const _AuthorRow({
+    required this.layoutTier,
+    required this.author,
+    required this.isSelected,
+  });
 
+  final MetadataLayoutTier layoutTier;
   final Author author;
   final bool isSelected;
 
@@ -375,7 +332,6 @@ class _AuthorRow extends ConsumerWidget {
                 onPressed: () =>
                     ref.read(authorSelectionProvider.notifier).toggle(author),
               ),
-
               Expanded(
                 child: Text(
                   author.name,
@@ -386,16 +342,11 @@ class _AuthorRow extends ConsumerWidget {
                   ),
                 ),
               ),
-              GhostButton.icon(
-                icon: LucideIcons.squarePen,
-                iconSize: 16,
-                size: _AuthorStyles.iconButtonSize.width,
-                borderRadius: _AuthorStyles.iconButtonRadius,
-                tooltip: '重命名',
-                delayTooltipThreeSeconds: true,
-                hoverColor: cs.primary.withAlpha(10),
-                overlayColor: cs.primary.withAlpha(14),
-                onPressed: () async {
+              MetadataPanelRowActions(
+                layoutTier: layoutTier,
+                iconButtonRadius: _AuthorStyles.iconButtonRadius,
+                iconButtonSize: _AuthorStyles.iconButtonSize.width,
+                onRename: () async {
                   await showDialog<void>(
                     context: context,
                     builder: (context) => TagNameEditorDialog(
@@ -412,19 +363,7 @@ class _AuthorRow extends ConsumerWidget {
                     ),
                   );
                 },
-              ),
-              GhostButton.icon(
-                tooltip: '删除',
-                semanticLabel: '删除',
-                icon: LucideIcons.trash2,
-                iconSize: 16,
-                size: _AuthorStyles.iconButtonSize.width,
-                borderRadius: _AuthorStyles.iconButtonRadius,
-                foregroundColor: cs.error,
-                hoverColor: cs.primary.withAlpha(10),
-                overlayColor: cs.primary.withAlpha(14),
-                delayTooltipThreeSeconds: true,
-                onPressed: () async {
+                onDelete: () async {
                   final bool confirmed =
                       await showDialog<bool>(
                         context: context,
@@ -488,7 +427,7 @@ class _AuthorManagementErrorCard extends StatelessWidget {
       child: Text(
         '$error',
         style: TextStyle(
-          fontSize: _AuthorStyles.subtitleFontSize,
+          fontSize: kMetadataPanelSubtitleFontSize,
           color: theme.colorScheme.hentai.textTertiary,
         ),
       ),
@@ -523,7 +462,7 @@ class _AuthorManagementEmptyState extends StatelessWidget {
           Text(
             '你可以从这里添加、重命名或删除作者。',
             style: TextStyle(
-              fontSize: _AuthorStyles.subtitleFontSize,
+              fontSize: kMetadataPanelSubtitleFontSize,
               color: cs.hentai.textSecondary,
             ),
             textAlign: TextAlign.center,
