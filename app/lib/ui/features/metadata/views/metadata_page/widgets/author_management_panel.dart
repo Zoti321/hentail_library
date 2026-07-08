@@ -6,80 +6,141 @@ import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/status_card_shell.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_height.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_shell.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_row_actions.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AuthorManagementPanel extends ConsumerWidget {
-  const AuthorManagementPanel({super.key});
+  const AuthorManagementPanel({required this.layoutTier, super.key});
+
+  final MetadataLayoutTier layoutTier;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Future<void> openAddAuthorDialog() async {
-      await showDialog<void>(
-        context: context,
-        builder: (context) => TagNameEditorDialog(
-          title: '添加作者',
-          labelText: '名称',
-          hintText: '输入作者名称…',
-          initialValue: '',
-          onSubmit: (value) async {
-            await ref
-                .read(authorActionsProvider)
-                .addAuthor(Author(name: value));
-          },
-        ),
-      );
-    }
-
+    assert(metadataUsesListCard(layoutTier));
     final authorsAsync = ref.watch(allAuthorsProvider);
     final List<Author> filteredAuthors = ref.watch(filteredAuthorsProvider);
     final AppThemeTokens tokens = context.tokens;
-    final EdgeInsets contentPadding = tokens.layout.contentAreaPadding.copyWith(
-      bottom: tokens.layout.contentVerticalPadding + 24,
-    );
+
     return Padding(
-      padding: contentPadding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          _AuthorManagementHeader(onAddAuthor: openAddAuthorDialog),
-          const SizedBox(height: 12),
-          const _AuthorBulkDeleteBar(),
-          const SizedBox(height: 20),
-          Expanded(
-            child: authorsAsync.when(
-              data: (_) {
-                if (filteredAuthors.isEmpty) {
-                  return const _AuthorManagementEmptyState();
-                }
-                return LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    final double cardHeight = metadataPanelCardHeight(
-                      constraints: constraints,
-                      itemCount: filteredAuthors.length,
-                      config: _AuthorStyles.listHeightConfig,
-                    );
-                    return Align(
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: cardHeight,
-                        child: _AuthorListCard(authors: filteredAuthors),
-                      ),
-                    );
-                  },
-                );
-              },
-              loading: () => const _AuthorManagementLoadingCard(),
-              error: (Object e, StackTrace _) =>
-                  _AuthorManagementErrorCard(error: e),
+      padding: EdgeInsets.only(
+        bottom: tokens.layout.contentVerticalPadding + 24,
+      ),
+      child: authorsAsync.when(
+        data: (_) {
+          if (filteredAuthors.isEmpty) {
+            return const _AuthorManagementEmptyState(inline: false);
+          }
+          return LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final double cardHeight = metadataPanelCardHeight(
+                constraints: constraints,
+                itemCount: filteredAuthors.length,
+                config: _AuthorStyles.listHeightConfig,
+              );
+              return Align(
+                alignment: Alignment.topCenter,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: cardHeight,
+                  child: _AuthorListCard(
+                    layoutTier: layoutTier,
+                    authors: filteredAuthors,
+                  ),
+                ),
+              );
+            },
+          );
+        },
+        loading: () => const _AuthorManagementLoadingState(inline: false),
+        error: (Object e, StackTrace _) =>
+            _AuthorManagementErrorState(error: e, inline: false),
+      ),
+    );
+  }
+}
+
+class AuthorManagementSliverGroup extends ConsumerWidget {
+  const AuthorManagementSliverGroup({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authorsAsync = ref.watch(allAuthorsProvider);
+    final List<Author> filteredAuthors = ref.watch(filteredAuthorsProvider);
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+
+    return authorsAsync.when(
+      data: (_) {
+        if (filteredAuthors.isEmpty) {
+          return SliverPadding(
+            padding: EdgeInsets.only(
+              bottom: tokens.layout.contentVerticalPadding + 24,
             ),
+            sliver: const SliverToBoxAdapter(
+              child: _AuthorManagementEmptyState(inline: true),
+            ),
+          );
+        }
+        return SliverPadding(
+          padding: EdgeInsets.only(
+            bottom: tokens.layout.contentVerticalPadding + 24,
           ),
-        ],
+          sliver: SliverMainAxisGroup(
+            slivers: <Widget>[
+              SliverToBoxAdapter(
+                child: _AuthorListHeader(
+                  totalCount: filteredAuthors.length,
+                  compactStyle: true,
+                ),
+              ),
+              SliverList.separated(
+                itemCount: filteredAuthors.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final Author author = filteredAuthors[index];
+                  return Consumer(
+                    builder:
+                        (BuildContext context, WidgetRef ref, Widget? child) {
+                          final bool isSelected = ref.watch(
+                            authorSelectionProvider.select(
+                              (Set<Author> selected) =>
+                                  selected.contains(author),
+                            ),
+                          );
+                          return _AuthorRow(
+                            layoutTier: MetadataLayoutTier.compact,
+                            author: author,
+                            isSelected: isSelected,
+                          );
+                        },
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) =>
+                    Divider(height: 1, color: cs.hentai.borderSubtle),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => SliverPadding(
+        padding: EdgeInsets.only(
+          bottom: tokens.layout.contentVerticalPadding + 24,
+        ),
+        sliver: const SliverToBoxAdapter(
+          child: _AuthorManagementLoadingState(inline: true),
+        ),
+      ),
+      error: (Object e, StackTrace _) => SliverPadding(
+        padding: EdgeInsets.only(
+          bottom: tokens.layout.contentVerticalPadding + 24,
+        ),
+        sliver: SliverToBoxAdapter(
+          child: _AuthorManagementErrorState(error: e, inline: true),
+        ),
       ),
     );
   }
@@ -87,9 +148,6 @@ class AuthorManagementPanel extends ConsumerWidget {
 
 class _AuthorStyles {
   const _AuthorStyles._();
-
-  static const double titleFontSize = 26;
-  static const double subtitleFontSize = 13;
 
   static const double listRadius = 12;
   static const EdgeInsets listHeaderPadding = EdgeInsets.symmetric(
@@ -118,128 +176,10 @@ class _AuthorStyles {
       kMetadataPanelHeightDefaultConfig;
 }
 
-class _AuthorManagementHeader extends ConsumerWidget {
-  const _AuthorManagementHeader({required this.onAddAuthor});
-
-  final Future<void> Function() onAddAuthor;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final String shortcutLabel = _shortcutLabel(context);
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '作者管理',
-                style: TextStyle(
-                  fontSize: _AuthorStyles.titleFontSize,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.4,
-                  color: cs.hentai.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '查看、添加、重命名以及批量删除作者',
-                style: TextStyle(
-                  color: cs.hentai.textTertiary,
-                  fontSize: _AuthorStyles.subtitleFontSize,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.2,
-              child: CustomTextField(
-                hintText: '搜索作者名称…',
-                onChanged: (String value) =>
-                    ref.read(authorFilterProvider.notifier).setQuery(value),
-              ),
-            ),
-            FilledButton.icon(
-              onPressed: onAddAuthor,
-              icon: const Icon(LucideIcons.plus, size: 16),
-              label: Text('添加作者 ($shortcutLabel)'),
-              style: FilledButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _AuthorBulkDeleteBar extends ConsumerWidget {
-  const _AuthorBulkDeleteBar();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final int selectionCount = ref.watch(
-      authorSelectionProvider.select((Set<Author> s) => s.length),
-    );
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return Row(
-      children: [
-        GhostButton.icon(
-          tooltip: '删除已选',
-          semanticLabel: '删除已选',
-          icon: LucideIcons.trash2,
-          size: 28,
-          onPressed: () async {
-            if (selectionCount == 0) {
-              showInfoToast(context, '此操作将删除已选中的作者，请先勾选列表中的作者。');
-              return;
-            }
-            final bool confirmed =
-                await showDialog<bool>(
-                  context: context,
-                  builder: (BuildContext dialogContext) =>
-                      TagConfirmDeleteDialog(count: selectionCount),
-                ) ??
-                false;
-            if (!confirmed) {
-              return;
-            }
-            final List<Author> authors = ref
-                .read(authorSelectionProvider)
-                .toList(growable: false);
-            await ref.read(authorActionsProvider).deleteAuthors(authors);
-          },
-          delayTooltipThreeSeconds: true,
-          overlayColor: cs.primary.withAlpha(14),
-        ),
-      ],
-    );
-  }
-}
-
-String _shortcutLabel(BuildContext context) {
-  final TargetPlatform platform = Theme.of(context).platform;
-  final bool isApple =
-      platform == TargetPlatform.macOS || platform == TargetPlatform.iOS;
-  return isApple ? '⌘N' : 'Ctrl+N';
-}
-
 class _AuthorListCard extends StatelessWidget {
-  const _AuthorListCard({required this.authors});
+  const _AuthorListCard({required this.layoutTier, required this.authors});
 
+  final MetadataLayoutTier layoutTier;
   final List<Author> authors;
 
   @override
@@ -264,6 +204,7 @@ class _AuthorListCard extends StatelessWidget {
                           ),
                         );
                         return _AuthorRow(
+                          layoutTier: layoutTier,
                           author: author,
                           isSelected: isSelected,
                         );
@@ -281,9 +222,13 @@ class _AuthorListCard extends StatelessWidget {
 }
 
 class _AuthorListHeader extends ConsumerWidget {
-  const _AuthorListHeader({required this.totalCount});
+  const _AuthorListHeader({
+    required this.totalCount,
+    this.compactStyle = false,
+  });
 
   final int totalCount;
+  final bool compactStyle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -294,7 +239,7 @@ class _AuthorListHeader extends ConsumerWidget {
     return Container(
       padding: _AuthorStyles.listHeaderPadding,
       decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
+        color: compactStyle ? Colors.transparent : cs.surfaceContainerHighest,
         border: Border(bottom: BorderSide(color: cs.hentai.borderSubtle)),
       ),
       child: Row(
@@ -339,8 +284,13 @@ class _AuthorListHeader extends ConsumerWidget {
 }
 
 class _AuthorRow extends ConsumerWidget {
-  const _AuthorRow({required this.author, required this.isSelected});
+  const _AuthorRow({
+    required this.layoutTier,
+    required this.author,
+    required this.isSelected,
+  });
 
+  final MetadataLayoutTier layoutTier;
   final Author author;
   final bool isSelected;
 
@@ -375,7 +325,6 @@ class _AuthorRow extends ConsumerWidget {
                 onPressed: () =>
                     ref.read(authorSelectionProvider.notifier).toggle(author),
               ),
-
               Expanded(
                 child: Text(
                   author.name,
@@ -386,16 +335,11 @@ class _AuthorRow extends ConsumerWidget {
                   ),
                 ),
               ),
-              GhostButton.icon(
-                icon: LucideIcons.squarePen,
-                iconSize: 16,
-                size: _AuthorStyles.iconButtonSize.width,
-                borderRadius: _AuthorStyles.iconButtonRadius,
-                tooltip: '重命名',
-                delayTooltipThreeSeconds: true,
-                hoverColor: cs.primary.withAlpha(10),
-                overlayColor: cs.primary.withAlpha(14),
-                onPressed: () async {
+              MetadataPanelRowActions(
+                layoutTier: layoutTier,
+                iconButtonRadius: _AuthorStyles.iconButtonRadius,
+                iconButtonSize: _AuthorStyles.iconButtonSize.width,
+                onRename: () async {
                   await showDialog<void>(
                     context: context,
                     builder: (context) => TagNameEditorDialog(
@@ -412,19 +356,7 @@ class _AuthorRow extends ConsumerWidget {
                     ),
                   );
                 },
-              ),
-              GhostButton.icon(
-                tooltip: '删除',
-                semanticLabel: '删除',
-                icon: LucideIcons.trash2,
-                iconSize: 16,
-                size: _AuthorStyles.iconButtonSize.width,
-                borderRadius: _AuthorStyles.iconButtonRadius,
-                foregroundColor: cs.error,
-                hoverColor: cs.primary.withAlpha(10),
-                overlayColor: cs.primary.withAlpha(14),
-                delayTooltipThreeSeconds: true,
-                onPressed: () async {
+                onDelete: () async {
                   final bool confirmed =
                       await showDialog<bool>(
                         context: context,
@@ -455,81 +387,105 @@ class _AuthorRow extends ConsumerWidget {
   }
 }
 
-class _AuthorManagementLoadingCard extends StatelessWidget {
-  const _AuthorManagementLoadingCard();
+class _AuthorManagementLoadingState extends StatelessWidget {
+  const _AuthorManagementLoadingState({required this.inline});
+
+  final bool inline;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final Widget indicator = CircularProgressIndicator(
+      strokeWidth: 2.2,
+      color: theme.colorScheme.primary,
+    );
+    if (inline) {
+      return Padding(
+        padding: _AuthorStyles.statusLoadingPadding,
+        child: Center(child: indicator),
+      );
+    }
     return StatusCardShell(
       padding: _AuthorStyles.statusLoadingPadding,
       borderRadius: _AuthorStyles.statusCardRadius,
-      child: Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 2.2,
-          color: theme.colorScheme.primary,
-        ),
-      ),
+      child: Center(child: indicator),
     );
   }
 }
 
-class _AuthorManagementErrorCard extends StatelessWidget {
-  const _AuthorManagementErrorCard({required this.error});
+class _AuthorManagementErrorState extends StatelessWidget {
+  const _AuthorManagementErrorState({
+    required this.error,
+    required this.inline,
+  });
 
   final Object error;
+  final bool inline;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final TextStyle style = TextStyle(
+      fontSize: kMetadataPanelSubtitleFontSize,
+      color: theme.colorScheme.hentai.textTertiary,
+    );
+    if (inline) {
+      return Padding(
+        padding: _AuthorStyles.statusErrorPadding,
+        child: Text('$error', style: style),
+      );
+    }
     return StatusCardShell(
       padding: _AuthorStyles.statusErrorPadding,
       borderRadius: _AuthorStyles.statusCardRadius,
-      child: Text(
-        '$error',
-        style: TextStyle(
-          fontSize: _AuthorStyles.subtitleFontSize,
-          color: theme.colorScheme.hentai.textTertiary,
-        ),
-      ),
+      child: Text('$error', style: style),
     );
   }
 }
 
 class _AuthorManagementEmptyState extends StatelessWidget {
-  const _AuthorManagementEmptyState();
+  const _AuthorManagementEmptyState({required this.inline});
+
+  final bool inline;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final Widget content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(LucideIcons.penLine, size: 32, color: cs.onSurfaceVariant),
+        const SizedBox(height: 12),
+        Text(
+          '暂无作者',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: cs.hentai.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '你可以从这里添加、重命名或删除作者。',
+          style: TextStyle(
+            fontSize: kMetadataPanelSubtitleFontSize,
+            color: cs.hentai.textSecondary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+    if (inline) {
+      return Padding(
+        padding: _AuthorStyles.statusEmptyPadding,
+        child: Center(child: content),
+      );
+    }
     return StatusCardShell(
       padding: _AuthorStyles.statusEmptyPadding,
       borderRadius: _AuthorStyles.statusCardRadius,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(LucideIcons.penLine, size: 32, color: cs.onSurfaceVariant),
-          const SizedBox(height: 12),
-          Text(
-            '暂无作者',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: cs.hentai.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '你可以从这里添加、重命名或删除作者。',
-            style: TextStyle(
-              fontSize: _AuthorStyles.subtitleFontSize,
-              color: cs.hentai.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+      child: content,
     );
   }
 }

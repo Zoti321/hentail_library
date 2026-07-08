@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/ui/core/widgets/icons/incognito_read_icon.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/reader/read_session_launcher.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -21,7 +19,7 @@ ButtonStyle comicDetailPrimaryActionStyle(
       vertical: tokens.spacing.sm + 6,
     ),
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(tokens.radius.md),
+      borderRadius: BorderRadius.circular(tokens.radius.xs),
     ),
   );
 }
@@ -41,7 +39,8 @@ ButtonStyle comicDetailIncognitoReadStyle(
       vertical: tokens.spacing.sm + 6,
     ),
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(tokens.radius.md),
+      borderRadius: BorderRadius.circular(tokens.radius.xs),
+      side: BorderSide(color: cs.hentai.borderSubtle),
     ),
   );
 }
@@ -55,7 +54,6 @@ class ComicDetailPrimaryActions extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = theme.colorScheme;
     final ButtonStyle primaryStyle = comicDetailPrimaryActionStyle(
       theme,
       tokens,
@@ -84,7 +82,7 @@ class ComicDetailPrimaryActions extends HookConsumerWidget {
           button: true,
           child: ElevatedButton.icon(
             onPressed: () => _openReader(ref, incognito: true),
-            icon: IncognitoReadIcon(size: 16, color: cs.hentai.textPrimary),
+            icon: const Icon(LucideIcons.hatGlasses, size: 16),
             label: const Text('阅读'),
             style: incognitoStyle,
           ),

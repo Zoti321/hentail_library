@@ -25,25 +25,6 @@ Future<void> openReadSession(
   );
 }
 
-Future<void> openSeriesReadSession(
-  WidgetRef ref, {
-  required String seriesId,
-  bool incognito = false,
-}) async {
-  final String comicId = await ref.read(
-    resolveSeriesReadComicIdProvider(seriesId: seriesId).future,
-  );
-  if (comicId.isEmpty) {
-    return;
-  }
-  await openReadSession(
-    ref,
-    comicId: comicId,
-    seriesId: seriesId,
-    incognito: incognito,
-  );
-}
-
 Future<void> openComicReadSession(
   WidgetRef ref, {
   required Comic comic,

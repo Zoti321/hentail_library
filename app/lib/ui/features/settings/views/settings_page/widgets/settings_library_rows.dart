@@ -4,24 +4,27 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
+import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
 import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class LibraryLocationRow extends StatelessWidget {
-  const LibraryLocationRow({super.key});
+  const LibraryLocationRow({required this.layoutTier, super.key});
+
+  final SettingsLayoutTier layoutTier;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return SettingsRow(
+      layoutTier: layoutTier,
       icon: Icon(
         LucideIcons.folderSearch,
         size: 20,
         color: theme.colorScheme.hentai.iconDefault,
       ),
       label: '库位置',
-      description: '管理扫描路径',
       onRowTap: () => context.push('/paths'),
       action: Icon(
         LucideIcons.chevronRight,
@@ -33,7 +36,9 @@ class LibraryLocationRow extends StatelessWidget {
 }
 
 class AutoScanRow extends ConsumerWidget {
-  const AutoScanRow({super.key});
+  const AutoScanRow({required this.layoutTier, super.key});
+
+  final SettingsLayoutTier layoutTier;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -44,13 +49,13 @@ class AutoScanRow extends ConsumerWidget {
     );
     final ThemeData theme = Theme.of(context);
     return SettingsRow(
+      layoutTier: layoutTier,
       icon: Icon(
         LucideIcons.refreshCw,
         size: 20,
         color: theme.colorScheme.hentai.iconDefault,
       ),
       label: '自动扫描',
-      description: autoScan ? '已启用（启动时扫描选中路径）' : '已禁用',
       action: ToggleSwitch(
         checked: autoScan,
         onChange: () =>

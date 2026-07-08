@@ -45,7 +45,7 @@ List<RouteBase> buildSharedContentRoutes({
     ),
     GoRoute(
       path: '/metadata',
-      name: '资料管理',
+      name: '管理',
       builder: (context, state) => const MetadataManagementPage(),
     ),
     GoRoute(

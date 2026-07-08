@@ -1,8 +1,7 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_controls.dart';
+import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_sort_controls.dart';
 
 /// 抽屉分区标题等内容相对左缘的内边距。
@@ -12,7 +11,9 @@ class LibraryFilterSortDrawer extends StatelessWidget {
   const LibraryFilterSortDrawer({super.key});
 
   static double widthFor(BuildContext context) {
-    return math.min(360, MediaQuery.sizeOf(context).width * 0.3);
+    return libraryFilterSortDrawerWidthForViewport(
+      MediaQuery.sizeOf(context).width,
+    );
   }
 
   @override

@@ -34,7 +34,7 @@ class HomePageRepositoryImpl implements HomePageRepository {
       comicCount: dto.comicCount,
       tagCount: dto.tagCount,
       seriesCount: dto.seriesCount,
-      readingRecordCount: dto.readingRecordCount,
+      authorCount: dto.authorCount,
     );
   }
 

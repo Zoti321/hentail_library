@@ -66,13 +66,13 @@ class HomePageCountsDto {
   final int comicCount;
   final int tagCount;
   final int seriesCount;
-  final int readingRecordCount;
+  final int authorCount;
 
   const HomePageCountsDto({
     required this.comicCount,
     required this.tagCount,
     required this.seriesCount,
-    required this.readingRecordCount,
+    required this.authorCount,
   });
 
   @override
@@ -80,7 +80,7 @@ class HomePageCountsDto {
       comicCount.hashCode ^
       tagCount.hashCode ^
       seriesCount.hashCode ^
-      readingRecordCount.hashCode;
+      authorCount.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -90,5 +90,5 @@ class HomePageCountsDto {
           comicCount == other.comicCount &&
           tagCount == other.tagCount &&
           seriesCount == other.seriesCount &&
-          readingRecordCount == other.readingRecordCount;
+          authorCount == other.authorCount;
 }

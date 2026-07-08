@@ -23,6 +23,7 @@ import 'package:hentai_library/ui/core/widgets/element/card/series_card.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
 import 'package:hentai_library/ui/core/widgets/pagination/library_pagination_bar.dart';
+import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/library_empty_state.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_catalog_grid_animation.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';

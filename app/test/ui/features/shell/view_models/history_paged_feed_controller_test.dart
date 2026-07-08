@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/reading_history.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
@@ -15,6 +17,19 @@ class _FakeReadingHistoryRepo implements ReadingHistoryRepository {
   final Map<String, List<PagedResult<ReadingHistory>>> pagesByKey;
   final List<PageRequest> requests = <PageRequest>[];
   final List<String?> keywords = <String?>[];
+  final StreamController<List<ReadingHistory>> _changesController =
+      StreamController<List<ReadingHistory>>.broadcast();
+  bool failNextFetch = false;
+  Completer<PagedResult<ReadingHistory>>? pageTwoCompleter;
+
+  void emitHistoryChange([
+    List<ReadingHistory> histories = const <ReadingHistory>[],
+  ]) {
+    _changesController.add(histories);
+  }
+
+  @override
+  Stream<List<ReadingHistory>> watchAllHistory() => _changesController.stream;
 
   @override
   Future<PagedResult<ReadingHistory>> fetchHistoryPage(
@@ -23,6 +38,13 @@ class _FakeReadingHistoryRepo implements ReadingHistoryRepository {
   }) async {
     requests.add(request);
     keywords.add(keyword);
+    if (failNextFetch) {
+      failNextFetch = false;
+      throw Exception('fetch failed');
+    }
+    if (request.page == 2 && pageTwoCompleter != null) {
+      return pageTwoCompleter!.future;
+    }
     final String key = _pageKey(request.page, keyword);
     final List<PagedResult<ReadingHistory>>? pages = pagesByKey[key];
     if (pages == null || pages.isEmpty) {
@@ -178,5 +200,84 @@ void main() {
     expect(state()?.items, isEmpty);
     expect(state()?.totalCount, 0);
     expect(state()?.hasReachedEnd, isTrue);
+  });
+
+  test(
+    'silent refresh reloads first page when history stream changes',
+    () async {
+      await container.read(historyPagedFeedControllerProvider.future);
+      expect(repo.requests, hasLength(1));
+
+      repo.pagesByKey['1:'] = <PagedResult<ReadingHistory>>[
+        _page(
+          page: 1,
+          totalCount: 4,
+          items: <ReadingHistory>[
+            _history(comicId: 'c9', title: 'Newest', lastReadTimeMs: 9000),
+            _history(comicId: 'c1', title: 'Alpha', lastReadTimeMs: 3000),
+          ],
+        ),
+      ];
+      repo.emitHistoryChange();
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+      await Future<void>.delayed(Duration.zero);
+
+      expect(state()?.items.first.comicId, 'c9');
+      expect(state()?.totalCount, 4);
+      expect(state()?.loadedPage, 1);
+      expect(repo.requests.length, greaterThanOrEqualTo(2));
+      expect(repo.requests.last.page, 1);
+    },
+  );
+
+  test('silent refresh discards stale loadMore result', () async {
+    final Completer<PagedResult<ReadingHistory>> pageTwoCompleter =
+        Completer<PagedResult<ReadingHistory>>();
+    repo.pageTwoCompleter = pageTwoCompleter;
+
+    await container.read(historyPagedFeedControllerProvider.future);
+    final Future<void> loadMoreFuture = notifier().loadMore();
+
+    repo.pagesByKey['1:'] = <PagedResult<ReadingHistory>>[
+      _page(
+        page: 1,
+        totalCount: 4,
+        items: <ReadingHistory>[
+          _history(comicId: 'c9', title: 'Newest', lastReadTimeMs: 9000),
+          _history(comicId: 'c1', title: 'Alpha', lastReadTimeMs: 3000),
+        ],
+      ),
+    ];
+    repo.emitHistoryChange();
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    await Future<void>.delayed(Duration.zero);
+
+    pageTwoCompleter.complete(
+      _page(
+        page: 2,
+        totalCount: 3,
+        items: <ReadingHistory>[
+          _history(comicId: 'c3', title: 'Gamma', lastReadTimeMs: 1000),
+        ],
+      ),
+    );
+    await loadMoreFuture;
+    await Future<void>.delayed(Duration.zero);
+
+    expect(state()?.items.first.comicId, 'c9');
+    expect(state()?.loadedPage, 1);
+    expect(state()?.items, hasLength(2));
+  });
+
+  test('silent refresh keeps stale data when fetch fails', () async {
+    await container.read(historyPagedFeedControllerProvider.future);
+    final HistoryPagedFeedState? before = state();
+
+    repo.failNextFetch = true;
+    repo.emitHistoryChange();
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    await Future<void>.delayed(Duration.zero);
+
+    expect(state(), equals(before));
   });
 }

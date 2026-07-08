@@ -2776,7 +2776,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       comicCount: dco_decode_i_32(arr[0]),
       tagCount: dco_decode_i_32(arr[1]),
       seriesCount: dco_decode_i_32(arr[2]),
-      readingRecordCount: dco_decode_i_32(arr[3]),
+      authorCount: dco_decode_i_32(arr[3]),
     );
   }
 
@@ -3630,12 +3630,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_comicCount = sse_decode_i_32(deserializer);
     var var_tagCount = sse_decode_i_32(deserializer);
     var var_seriesCount = sse_decode_i_32(deserializer);
-    var var_readingRecordCount = sse_decode_i_32(deserializer);
+    var var_authorCount = sse_decode_i_32(deserializer);
     return HomePageCountsDto(
       comicCount: var_comicCount,
       tagCount: var_tagCount,
       seriesCount: var_seriesCount,
-      readingRecordCount: var_readingRecordCount,
+      authorCount: var_authorCount,
     );
   }
 
@@ -4702,7 +4702,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.comicCount, serializer);
     sse_encode_i_32(self.tagCount, serializer);
     sse_encode_i_32(self.seriesCount, serializer);
-    sse_encode_i_32(self.readingRecordCount, serializer);
+    sse_encode_i_32(self.authorCount, serializer);
   }
 
   @protected

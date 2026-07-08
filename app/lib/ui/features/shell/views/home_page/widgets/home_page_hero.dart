@@ -10,12 +10,14 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 class HomePageHeroSection extends ConsumerWidget {
   const HomePageHeroSection({
     super.key,
+    required this.layoutTier,
     required this.comicCount,
     required this.isLibraryEmpty,
     required this.onScan,
     required this.enableHeavyStats,
   });
 
+  final HomePageLayoutTier layoutTier;
   final int comicCount;
   final bool isLibraryEmpty;
   final VoidCallback onScan;
@@ -24,18 +26,22 @@ class HomePageHeroSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (isLibraryEmpty) {
-      return _EmptyLibraryHero(onScan: onScan);
+      return _EmptyLibraryHero(layoutTier: layoutTier, onScan: onScan);
     }
     if (!enableHeavyStats) {
-      return _StatsCardsPlaceholder(comicCount: comicCount);
+      return _StatsCardsPlaceholder(
+        layoutTier: layoutTier,
+        comicCount: comicCount,
+      );
     }
-    return _StatsCards(comicCount: comicCount);
+    return _StatsCards(layoutTier: layoutTier, comicCount: comicCount);
   }
 }
 
 class _EmptyLibraryHero extends StatelessWidget {
-  const _EmptyLibraryHero({required this.onScan});
+  const _EmptyLibraryHero({required this.layoutTier, required this.onScan});
 
+  final HomePageLayoutTier layoutTier;
   final VoidCallback onScan;
 
   @override
@@ -53,6 +59,68 @@ class _EmptyLibraryHero extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     );
+    final Widget iconBadge = DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[accent.withAlpha(36), accent.withAlpha(14)],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: accent.withAlpha(55)),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: accent.withAlpha(28),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Icon(LucideIcons.folderOpen, size: 32, color: accent),
+      ),
+    );
+    final Widget copyBlock = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          '尚未导入漫画',
+          style: TextStyle(
+            fontSize: tokens.text.titleMd,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.3,
+            color: colorScheme.hentai.textPrimary,
+          ),
+        ),
+        SizedBox(height: tokens.spacing.sm),
+        Text(
+          '请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。',
+          style: TextStyle(
+            fontSize: tokens.text.bodySm,
+            color: colorScheme.hentai.textSecondary,
+            height: 1.5,
+          ),
+        ),
+      ],
+    );
+    final Widget introBlock = layoutTier == HomePageLayoutTier.compact
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              iconBadge,
+              SizedBox(height: tokens.spacing.md),
+              copyBlock,
+            ],
+          )
+        : Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              iconBadge,
+              SizedBox(width: tokens.spacing.md + 4),
+              Expanded(child: copyBlock),
+            ],
+          );
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -99,66 +167,7 @@ class _EmptyLibraryHero extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: <Color>[
-                              accent.withAlpha(36),
-                              accent.withAlpha(14),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: accent.withAlpha(55)),
-                          boxShadow: <BoxShadow>[
-                            BoxShadow(
-                              color: accent.withAlpha(28),
-                              blurRadius: 16,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(14),
-                          child: Icon(
-                            LucideIcons.folderOpen,
-                            size: 32,
-                            color: accent,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: tokens.spacing.md + 4),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              '尚未导入漫画',
-                              style: TextStyle(
-                                fontSize: tokens.text.titleMd,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.3,
-                                color: colorScheme.hentai.textPrimary,
-                              ),
-                            ),
-                            SizedBox(height: tokens.spacing.sm),
-                            Text(
-                              '请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。',
-                              style: TextStyle(
-                                fontSize: tokens.text.bodySm,
-                                color: colorScheme.hentai.textSecondary,
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                  introBlock,
                   SizedBox(height: tokens.spacing.lg + 4),
                   Wrap(
                     spacing: tokens.spacing.sm,
@@ -205,9 +214,18 @@ class _EmptyLibraryHero extends StatelessWidget {
   }
 }
 
-class _StatsCards extends ConsumerWidget {
-  const _StatsCards({required this.comicCount});
+typedef _HomeStatCardData = ({
+  String label,
+  String valueText,
+  String caption,
+  IconData icon,
+  Color accentColor,
+});
 
+class _StatsCards extends ConsumerWidget {
+  const _StatsCards({required this.layoutTier, required this.comicCount});
+
+  final HomePageLayoutTier layoutTier;
   final int comicCount;
 
   @override
@@ -216,399 +234,229 @@ class _StatsCards extends ConsumerWidget {
       homePageCountsStreamProvider,
     );
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final Color accentLibrary = colorScheme.primary;
-    final Color accentSeries = colorScheme.secondary;
-    final Color accentTags = Color.lerp(
-      colorScheme.primary,
-      colorScheme.secondary,
-      0.45,
-    )!;
-    final Color accentHistory = colorScheme.inversePrimary;
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final bool stack = constraints.maxWidth < homeStatsStackBreakpointWidth;
-        return homeCounts.when(
-          data: (HomePageCounts c) {
-            if (stack) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                spacing: context.tokens.spacing.md,
-                children: <Widget>[
-                  _StatSummaryCard(
-                    label: '漫画库',
-                    valueText: '${c.comicCount}',
-                    caption: '共 ${c.comicCount} 本',
-                    icon: LucideIcons.bookImage,
-                    accentColor: accentLibrary,
-                  ),
-                  _StatSummaryCard(
-                    label: '阅读记录',
-                    valueText: '${c.readingRecordCount}',
-                    caption: c.readingRecordCount == 0
-                        ? '暂无历史'
-                        : '${c.readingRecordCount} 条',
-                    icon: LucideIcons.history,
-                    accentColor: accentHistory,
-                  ),
-                  Row(
-                    spacing: context.tokens.spacing.md,
-                    children: <Widget>[
-                      Expanded(
-                        child: _StatSummaryCard(
-                          label: '系列',
-                          valueText: '${c.seriesCount}',
-                          caption: '${c.seriesCount} 个',
-                          icon: LucideIcons.library,
-                          accentColor: accentSeries,
-                        ),
-                      ),
-                      Expanded(
-                        child: _StatSummaryCard(
-                          label: '标签',
-                          valueText: '${c.tagCount}',
-                          caption: '${c.tagCount} 个',
-                          icon: LucideIcons.tags,
-                          accentColor: accentTags,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            }
-            return Row(
-              spacing: context.tokens.spacing.md,
-              children: <Widget>[
-                Expanded(
-                  child: _StatSummaryCard(
-                    label: '漫画库',
-                    valueText: '${c.comicCount}',
-                    caption: '共 ${c.comicCount} 本',
-                    icon: LucideIcons.bookImage,
-                    accentColor: accentLibrary,
-                  ),
-                ),
-                Expanded(
-                  child: _StatSummaryCard(
-                    label: '系列',
-                    valueText: '${c.seriesCount}',
-                    caption: '${c.seriesCount} 个系列',
-                    icon: LucideIcons.library,
-                    accentColor: accentSeries,
-                  ),
-                ),
-                Expanded(
-                  child: _StatSummaryCard(
-                    label: '标签',
-                    valueText: '${c.tagCount}',
-                    caption: '${c.tagCount} 个标签',
-                    icon: LucideIcons.tags,
-                    accentColor: accentTags,
-                  ),
-                ),
-                Expanded(
-                  child: _StatSummaryCard(
-                    label: '阅读记录',
-                    valueText: '${c.readingRecordCount}',
-                    caption: c.readingRecordCount == 0
-                        ? '暂无历史'
-                        : '${c.readingRecordCount} 条',
-                    icon: LucideIcons.history,
-                    accentColor: accentHistory,
-                  ),
-                ),
-              ],
-            );
-          },
-          loading: () {
-            if (stack) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                spacing: context.tokens.spacing.md,
-                children: <Widget>[
-                  _StatSummaryCard(
-                    label: '漫画库',
-                    valueText: '$comicCount',
-                    caption: '共 $comicCount 本',
-                    icon: LucideIcons.bookImage,
-                    accentColor: accentLibrary,
-                  ),
-                  _StatSummaryCard(
-                    label: '阅读记录',
-                    valueText: '--',
-                    caption: '加载中…',
-                    icon: LucideIcons.history,
-                    accentColor: accentHistory,
-                  ),
-                  Row(
-                    spacing: context.tokens.spacing.md,
-                    children: <Widget>[
-                      Expanded(
-                        child: _StatSummaryCard(
-                          label: '系列',
-                          valueText: '--',
-                          caption: '加载中…',
-                          icon: LucideIcons.library,
-                          accentColor: accentSeries,
-                        ),
-                      ),
-                      Expanded(
-                        child: _StatSummaryCard(
-                          label: '标签',
-                          valueText: '--',
-                          caption: '加载中…',
-                          icon: LucideIcons.tags,
-                          accentColor: accentTags,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            }
-            return Row(
-              spacing: context.tokens.spacing.md,
-              children: <Widget>[
-                Expanded(
-                  child: _StatSummaryCard(
-                    label: '漫画库',
-                    valueText: '$comicCount',
-                    caption: '共 $comicCount 本',
-                    icon: LucideIcons.bookImage,
-                    accentColor: accentLibrary,
-                  ),
-                ),
-                Expanded(
-                  child: _StatSummaryCard(
-                    label: '系列',
-                    valueText: '--',
-                    caption: '加载中…',
-                    icon: LucideIcons.library,
-                    accentColor: accentSeries,
-                  ),
-                ),
-                Expanded(
-                  child: _StatSummaryCard(
-                    label: '标签',
-                    valueText: '--',
-                    caption: '加载中…',
-                    icon: LucideIcons.tags,
-                    accentColor: accentTags,
-                  ),
-                ),
-                Expanded(
-                  child: _StatSummaryCard(
-                    label: '阅读记录',
-                    valueText: '--',
-                    caption: '加载中…',
-                    icon: LucideIcons.history,
-                    accentColor: accentHistory,
-                  ),
-                ),
-              ],
-            );
-          },
-          error: (Object error, StackTrace stackTrace) {
-            if (stack) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                spacing: context.tokens.spacing.md,
-                children: <Widget>[
-                  _StatSummaryCard(
-                    label: '漫画库',
-                    valueText: '$comicCount',
-                    caption: '共 $comicCount 本',
-                    icon: LucideIcons.bookImage,
-                    accentColor: accentLibrary,
-                  ),
-                  _StatSummaryCard(
-                    label: '阅读记录',
-                    valueText: '--',
-                    caption: '加载失败',
-                    icon: LucideIcons.history,
-                    accentColor: accentHistory,
-                  ),
-                  Row(
-                    spacing: context.tokens.spacing.md,
-                    children: <Widget>[
-                      Expanded(
-                        child: _StatSummaryCard(
-                          label: '系列',
-                          valueText: '--',
-                          caption: '加载失败',
-                          icon: LucideIcons.library,
-                          accentColor: accentSeries,
-                        ),
-                      ),
-                      Expanded(
-                        child: _StatSummaryCard(
-                          label: '标签',
-                          valueText: '--',
-                          caption: '加载失败',
-                          icon: LucideIcons.tags,
-                          accentColor: accentTags,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            }
-            return Row(
-              spacing: context.tokens.spacing.md,
-              children: <Widget>[
-                Expanded(
-                  child: _StatSummaryCard(
-                    label: '漫画库',
-                    valueText: '$comicCount',
-                    caption: '共 $comicCount 本',
-                    icon: LucideIcons.bookImage,
-                    accentColor: accentLibrary,
-                  ),
-                ),
-                Expanded(
-                  child: _StatSummaryCard(
-                    label: '系列',
-                    valueText: '--',
-                    caption: '加载失败',
-                    icon: LucideIcons.library,
-                    accentColor: accentSeries,
-                  ),
-                ),
-                Expanded(
-                  child: _StatSummaryCard(
-                    label: '标签',
-                    valueText: '--',
-                    caption: '加载失败',
-                    icon: LucideIcons.tags,
-                    accentColor: accentTags,
-                  ),
-                ),
-                Expanded(
-                  child: _StatSummaryCard(
-                    label: '阅读记录',
-                    valueText: '--',
-                    caption: '加载失败',
-                    icon: LucideIcons.history,
-                    accentColor: accentHistory,
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
+    final _HomeStatAccentColors accents = _HomeStatAccentColors(colorScheme);
+    return homeCounts.when(
+      data: (HomePageCounts c) => _HomeStatsCardLayout(
+        layoutTier: layoutTier,
+        comicCard: _buildStatCard(context, (
+          label: '漫画库',
+          valueText: '${c.comicCount}',
+          caption: '共 ${c.comicCount} 本',
+          icon: LucideIcons.bookImage,
+          accentColor: accents.library,
+        )),
+        seriesCard: _buildStatCard(context, (
+          label: '系列',
+          valueText: '${c.seriesCount}',
+          caption: '${c.seriesCount} 个系列',
+          icon: LucideIcons.library,
+          accentColor: accents.series,
+        )),
+        tagsCard: _buildStatCard(context, (
+          label: '标签',
+          valueText: '${c.tagCount}',
+          caption: '${c.tagCount} 个标签',
+          icon: LucideIcons.tags,
+          accentColor: accents.tags,
+        )),
+        authorCard: _buildStatCard(context, (
+          label: '作者',
+          valueText: '${c.authorCount}',
+          caption: c.authorCount == 0 ? '暂无作者' : '${c.authorCount} 位',
+          icon: LucideIcons.penLine,
+          accentColor: accents.authors,
+        )),
+      ),
+      loading: () => _HomeStatsCardLayout(
+        layoutTier: layoutTier,
+        comicCard: _buildStatCard(context, (
+          label: '漫画库',
+          valueText: '$comicCount',
+          caption: '共 $comicCount 本',
+          icon: LucideIcons.bookImage,
+          accentColor: accents.library,
+        )),
+        seriesCard: _buildStatCard(context, (
+          label: '系列',
+          valueText: '--',
+          caption: '加载中…',
+          icon: LucideIcons.library,
+          accentColor: accents.series,
+        )),
+        tagsCard: _buildStatCard(context, (
+          label: '标签',
+          valueText: '--',
+          caption: '加载中…',
+          icon: LucideIcons.tags,
+          accentColor: accents.tags,
+        )),
+        authorCard: _buildStatCard(context, (
+          label: '作者',
+          valueText: '--',
+          caption: '加载中…',
+          icon: LucideIcons.penLine,
+          accentColor: accents.authors,
+        )),
+      ),
+      error: (Object error, StackTrace stackTrace) => _HomeStatsCardLayout(
+        layoutTier: layoutTier,
+        comicCard: _buildStatCard(context, (
+          label: '漫画库',
+          valueText: '$comicCount',
+          caption: '共 $comicCount 本',
+          icon: LucideIcons.bookImage,
+          accentColor: accents.library,
+        )),
+        seriesCard: _buildStatCard(context, (
+          label: '系列',
+          valueText: '--',
+          caption: '加载失败',
+          icon: LucideIcons.library,
+          accentColor: accents.series,
+        )),
+        tagsCard: _buildStatCard(context, (
+          label: '标签',
+          valueText: '--',
+          caption: '加载失败',
+          icon: LucideIcons.tags,
+          accentColor: accents.tags,
+        )),
+        authorCard: _buildStatCard(context, (
+          label: '作者',
+          valueText: '--',
+          caption: '加载失败',
+          icon: LucideIcons.penLine,
+          accentColor: accents.authors,
+        )),
+      ),
     );
   }
 }
 
 class _StatsCardsPlaceholder extends StatelessWidget {
-  const _StatsCardsPlaceholder({required this.comicCount});
+  const _StatsCardsPlaceholder({
+    required this.layoutTier,
+    required this.comicCount,
+  });
 
+  final HomePageLayoutTier layoutTier;
   final int comicCount;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final Color accentLibrary = colorScheme.primary;
-    final Color accentSeries = colorScheme.secondary;
-    final Color accentTags = Color.lerp(
-      colorScheme.primary,
-      colorScheme.secondary,
-      0.45,
-    )!;
-    final Color accentHistory = colorScheme.inversePrimary;
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final bool stack = constraints.maxWidth < homeStatsStackBreakpointWidth;
-        if (stack) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: context.tokens.spacing.md,
-            children: <Widget>[
-              _StatSummaryCard(
-                label: '漫画库',
-                valueText: '$comicCount',
-                caption: '共 $comicCount 本',
-                icon: LucideIcons.bookImage,
-                accentColor: accentLibrary,
-              ),
-              _StatSummaryCard(
-                label: '阅读记录',
-                valueText: '--',
-                caption: '加载中…',
-                icon: LucideIcons.history,
-                accentColor: accentHistory,
-              ),
-              Row(
-                spacing: context.tokens.spacing.md,
-                children: <Widget>[
-                  Expanded(
-                    child: _StatSummaryCard(
-                      label: '系列',
-                      valueText: '--',
-                      caption: '加载中…',
-                      icon: LucideIcons.library,
-                      accentColor: accentSeries,
-                    ),
-                  ),
-                  Expanded(
-                    child: _StatSummaryCard(
-                      label: '标签',
-                      valueText: '--',
-                      caption: '加载中…',
-                      icon: LucideIcons.tags,
-                      accentColor: accentTags,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-        }
-        return Row(
-          spacing: context.tokens.spacing.md,
-          children: <Widget>[
-            Expanded(
-              child: _StatSummaryCard(
-                label: '漫画库',
-                valueText: '$comicCount',
-                caption: '共 $comicCount 本',
-                icon: LucideIcons.bookImage,
-                accentColor: accentLibrary,
-              ),
-            ),
-            Expanded(
-              child: _StatSummaryCard(
-                label: '系列',
-                valueText: '--',
-                caption: '加载中…',
-                icon: LucideIcons.library,
-                accentColor: accentSeries,
-              ),
-            ),
-            Expanded(
-              child: _StatSummaryCard(
-                label: '标签',
-                valueText: '--',
-                caption: '加载中…',
-                icon: LucideIcons.tags,
-                accentColor: accentTags,
-              ),
-            ),
-            Expanded(
-              child: _StatSummaryCard(
-                label: '阅读记录',
-                valueText: '--',
-                caption: '加载中…',
-                icon: LucideIcons.history,
-                accentColor: accentHistory,
-              ),
-            ),
-          ],
-        );
-      },
+    final _HomeStatAccentColors accents = _HomeStatAccentColors(colorScheme);
+    return _HomeStatsCardLayout(
+      layoutTier: layoutTier,
+      comicCard: _buildStatCard(context, (
+        label: '漫画库',
+        valueText: '$comicCount',
+        caption: '共 $comicCount 本',
+        icon: LucideIcons.bookImage,
+        accentColor: accents.library,
+      )),
+      seriesCard: _buildStatCard(context, (
+        label: '系列',
+        valueText: '--',
+        caption: '加载中…',
+        icon: LucideIcons.library,
+        accentColor: accents.series,
+      )),
+      tagsCard: _buildStatCard(context, (
+        label: '标签',
+        valueText: '--',
+        caption: '加载中…',
+        icon: LucideIcons.tags,
+        accentColor: accents.tags,
+      )),
+      authorCard: _buildStatCard(context, (
+        label: '作者',
+        valueText: '--',
+        caption: '加载中…',
+        icon: LucideIcons.penLine,
+        accentColor: accents.authors,
+      )),
     );
+  }
+}
+
+class _HomeStatAccentColors {
+  _HomeStatAccentColors(ColorScheme colorScheme)
+    : library = colorScheme.primary,
+      series = colorScheme.secondary,
+      tags = Color.lerp(colorScheme.primary, colorScheme.secondary, 0.45)!,
+      authors = colorScheme.inversePrimary;
+
+  final Color library;
+  final Color series;
+  final Color tags;
+  final Color authors;
+}
+
+Widget _buildStatCard(BuildContext context, _HomeStatCardData data) {
+  return _StatSummaryCard(
+    label: data.label,
+    valueText: data.valueText,
+    caption: data.caption,
+    icon: data.icon,
+    accentColor: data.accentColor,
+  );
+}
+
+class _HomeStatsCardLayout extends StatelessWidget {
+  const _HomeStatsCardLayout({
+    required this.layoutTier,
+    required this.comicCard,
+    required this.seriesCard,
+    required this.tagsCard,
+    required this.authorCard,
+  });
+
+  final HomePageLayoutTier layoutTier;
+  final Widget comicCard;
+  final Widget seriesCard;
+  final Widget tagsCard;
+  final Widget authorCard;
+
+  @override
+  Widget build(BuildContext context) {
+    final double gap = context.tokens.spacing.md;
+    return switch (layoutTier) {
+      HomePageLayoutTier.compact => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: gap,
+        children: <Widget>[comicCard, authorCard, seriesCard, tagsCard],
+      ),
+      HomePageLayoutTier.medium => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: gap,
+        children: <Widget>[
+          Row(
+            spacing: gap,
+            children: <Widget>[
+              Expanded(child: comicCard),
+              Expanded(child: seriesCard),
+            ],
+          ),
+          Row(
+            spacing: gap,
+            children: <Widget>[
+              Expanded(child: authorCard),
+              Expanded(child: tagsCard),
+            ],
+          ),
+        ],
+      ),
+      HomePageLayoutTier.expanded => Row(
+        spacing: gap,
+        children: <Widget>[
+          Expanded(child: comicCard),
+          Expanded(child: seriesCard),
+          Expanded(child: tagsCard),
+          Expanded(child: authorCard),
+        ],
+      ),
+    };
   }
 }
 

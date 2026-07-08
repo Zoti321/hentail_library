@@ -9,6 +9,7 @@ import 'package:hentai_library/ui/features/reader/module/controller/reader_prefe
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_series_navigation.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_fullscreen_controller.dart';
+import 'package:hentai_library/ui/features/reader/reader_exit_location.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_route_context.dart';
 import 'package:hentai_library/domain/reading/read_session_coordinator.dart';
@@ -336,10 +337,19 @@ class ReaderController extends _$ReaderController {
       return;
     }
     final GoRouter router = GoRouter.of(context);
+    if (routeContext.isSeriesRead) {
+      router.go(
+        resolveReaderExitLocation(
+          comicId: routeContext.comicId,
+          seriesId: routeContext.seriesId,
+        ),
+      );
+      return;
+    }
     if (router.canPop()) {
       router.pop();
       return;
     }
-    router.go('/home');
+    router.go(resolveReaderExitLocation(comicId: routeContext.comicId));
   }
 }

@@ -14,6 +14,7 @@ class AppComicImage extends StatelessWidget {
     this.cacheWidth,
     this.cacheHeight,
     this.placeholder,
+    this.loadingPlaceholder,
     this.errorPlaceholder,
     this.filterQuality = FilterQuality.medium,
     this.useReaderImageCache = false,
@@ -25,7 +26,12 @@ class AppComicImage extends StatelessWidget {
   final BoxFit fit;
   final int? cacheWidth;
   final int? cacheHeight;
+
+  /// Fallback for loading when [loadingPlaceholder] is null.
   final Widget? placeholder;
+
+  /// Shown while the image is loading. Falls back to [placeholder].
+  final Widget? loadingPlaceholder;
   final Widget? errorPlaceholder;
   final FilterQuality filterQuality;
   final bool useReaderImageCache;
@@ -41,7 +47,7 @@ class AppComicImage extends StatelessWidget {
         cacheHeight: cacheHeight,
       );
       if (provider == null) {
-        return _buildPlaceholder();
+        return _buildErrorPlaceholder();
       }
       return _buildExtendedImage(provider);
     }
@@ -62,7 +68,7 @@ class AppComicImage extends StatelessWidget {
             return fallback;
           }
           if (state.extendedImageLoadState == LoadState.loading) {
-            return _buildPlaceholder();
+            return _buildLoadingPlaceholder();
           }
           return null;
         },
@@ -71,7 +77,7 @@ class AppComicImage extends StatelessWidget {
 
     final String? resolvedPath = filePath;
     if (resolvedPath == null || resolvedPath.trim().isEmpty) {
-      return _buildPlaceholder();
+      return _buildErrorPlaceholder();
     }
     final Widget fallback = _buildErrorPlaceholder();
     return ExtendedImage.file(
@@ -86,7 +92,7 @@ class AppComicImage extends StatelessWidget {
           return fallback;
         }
         if (state.extendedImageLoadState == LoadState.loading) {
-          return _buildPlaceholder();
+          return _buildLoadingPlaceholder();
         }
         return null;
       },
@@ -105,18 +111,18 @@ class AppComicImage extends StatelessWidget {
           return fallback;
         }
         if (state.extendedImageLoadState == LoadState.loading) {
-          return _buildPlaceholder();
+          return _buildLoadingPlaceholder();
         }
         return null;
       },
     );
   }
 
-  Widget _buildPlaceholder() {
-    return placeholder ?? const SizedBox.expand();
+  Widget _buildLoadingPlaceholder() {
+    return loadingPlaceholder ?? placeholder ?? const SizedBox.expand();
   }
 
   Widget _buildErrorPlaceholder() {
-    return errorPlaceholder ?? _buildPlaceholder();
+    return errorPlaceholder ?? placeholder ?? const SizedBox.expand();
   }
 }

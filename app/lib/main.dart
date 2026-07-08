@@ -9,6 +9,7 @@ import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/frb_zone_guard.dart';
 import 'package:hentai_library/src/rust/api/comic.dart';
 import 'package:hentai_library/src/rust/frb_generated.dart';
+import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/features/shell/views/app.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
@@ -55,7 +56,12 @@ Future<void> _initWindow() async {
       TitleBarStyle.hidden,
       windowButtonVisibility: true,
     );
-    await windowManager.setMinimumSize(Size(1024, 576));
+    await windowManager.setMinimumSize(
+      const Size(
+        AppLayoutBreakpoints.minWindowWidth,
+        AppLayoutBreakpoints.minWindowHeight,
+      ),
+    );
     await windowManager.center();
     await windowManager.show();
     await windowManager.setPreventClose(true);

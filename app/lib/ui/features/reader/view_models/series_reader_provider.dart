@@ -1,6 +1,5 @@
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
-import 'package:hentai_library/domain/models/entity/series_reading_history.dart';
 import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_detail_series_nav_provider.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_route_context.dart';
@@ -122,27 +121,6 @@ Future<ReadSessionContextData> readSessionContextForReader(
     ),
     preferredPageIndex: preferredPageIndex,
   );
-}
-
-/// 从系列详情发起 Series read 时，解析应打开的 Comic。
-@riverpod
-Future<String> resolveSeriesReadComicId(
-  Ref ref, {
-  required String seriesId,
-}) async {
-  final Series? series = await ref.read(seriesRepoProvider).findById(seriesId);
-  if (series == null || series.items.isEmpty) {
-    return '';
-  }
-  final SeriesReadingHistory? history = await ref
-      .read(seriesReadingHistoryRepoProvider)
-      .getBySeriesId(seriesId);
-  if (history != null && series.containsComic(history.lastReadComicId)) {
-    return history.lastReadComicId;
-  }
-  final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
-    ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
-  return sortedItems.first.comicId;
 }
 
 /// 漫画详情页发起 Series read 时，解析 seriesId（仅当漫画唯一属于一个系列）。

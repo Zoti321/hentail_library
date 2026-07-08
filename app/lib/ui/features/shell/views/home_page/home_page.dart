@@ -4,6 +4,7 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/home_page/widgets/widgets.dart';
+import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/scan_progress_dialog.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -14,6 +15,8 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+  final GlobalKey _headerMeasureKey = GlobalKey();
+  double? _headerExtent;
   bool deferredSectionsReady = false;
 
   @override
@@ -25,6 +28,25 @@ class _HomePageState extends ConsumerState<HomePage> {
       }
       setState(() => deferredSectionsReady = true);
     });
+    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+  }
+
+  void _measureHeaderExtent(Duration _) {
+    final RenderBox? box =
+        _headerMeasureKey.currentContext?.findRenderObject() as RenderBox?;
+    if (!mounted || box == null) {
+      return;
+    }
+    final double height = box.size.height;
+    if (_headerExtent != height) {
+      setState(() => _headerExtent = height);
+    }
   }
 
   void onTapScanLibrary(BuildContext context, WidgetRef ref) {
@@ -69,6 +91,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final AsyncValue<HomePageCounts> homePageCounts = ref.watch(
       homePageCountsStreamProvider,
     );
@@ -87,46 +110,82 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final double maxWidth = constraints.maxWidth.clamp(
+        final double viewportWidth = constraints.maxWidth;
+        final HomePageLayoutTier layoutTier = homePageLayoutTierForWidth(
+          viewportWidth,
+        );
+        final double horizontalPadding = homeContentHorizontalPadding(
+          layoutTier,
+        );
+        final double maxWidth = (viewportWidth - horizontalPadding * 2).clamp(
           0,
           homeContentMaxWidth,
         );
-        return SingleChildScrollView(
-          padding: tokens.layout.contentAreaPadding,
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: maxWidth),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  HomePageHeader(
-                    title: '首页',
-                    greetingText: greetingText,
-                    onRefresh: () {
-                      ref.invalidate(homePageCountsStreamProvider);
-                      ref.invalidate(homeContinueReadingTop5StreamProvider);
-                    },
-                    onScan: onScan,
+
+        final Widget headerSection = HomePageHeaderSection(
+          layoutTier: layoutTier,
+          horizontalPadding: horizontalPadding,
+          onScan: onScan,
+          onOpenNavigation: appShellPageNavigationOpener(context),
+        );
+        final Widget header = KeyedSubtree(
+          key: _headerMeasureKey,
+          child: headerSection,
+        );
+
+        return CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: <Widget>[
+            if (_headerExtent == null)
+              SliverToBoxAdapter(child: header)
+            else
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: HomePinnedHeaderDelegate(
+                  extent: _headerExtent!,
+                  child: header,
+                ),
+              ),
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                tokens.layout.contentVerticalPadding,
+                horizontalPadding,
+                tokens.layout.contentAreaPadding.bottom,
+              ),
+              sliver: SliverToBoxAdapter(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: maxWidth),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          greetingText,
+                          style: homePageSubtitleStyle(colorScheme),
+                        ),
+                        SizedBox(height: tokens.spacing.xl + 12),
+                        HomePageHeroSection(
+                          layoutTier: layoutTier,
+                          comicCount: comicCount,
+                          isLibraryEmpty: isLibraryEmpty,
+                          onScan: onScan,
+                          enableHeavyStats: deferredSectionsReady,
+                        ),
+                        SizedBox(height: tokens.spacing.lg + 8),
+                        HomePageContinueReadingSection(
+                          layoutTier: layoutTier,
+                          enabled: deferredSectionsReady,
+                        ),
+                        SizedBox(height: tokens.spacing.xl + 8),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: tokens.spacing.xl + 12),
-                  HomePageHeroSection(
-                    comicCount: comicCount,
-                    isLibraryEmpty: isLibraryEmpty,
-                    onScan: onScan,
-                    enableHeavyStats: deferredSectionsReady,
-                  ),
-                  SizedBox(height: tokens.spacing.lg + 8),
-                  HomePageContinueReadingSection(
-                    enabled: deferredSectionsReady,
-                  ),
-                  SizedBox(height: tokens.spacing.xl + 8),
-                  HomePageShortcutEntries(onScan: onScan),
-                  SizedBox(height: tokens.spacing.xl * 4),
-                ],
+                ),
               ),
             ),
-          ),
+          ],
         );
       },
     );

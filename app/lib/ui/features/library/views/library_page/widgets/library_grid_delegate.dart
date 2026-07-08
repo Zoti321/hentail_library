@@ -1,32 +1,36 @@
 part of 'library_page_widgets.dart';
 
-const double _kLibraryGridMaxCrossAxisExtent = 200;
-const double _kLibraryGridCrossAxisSpacing = 16;
-const double _kLibraryGridMainAxisSpacing = 16;
-
-double libraryGridMainAxisExtentFromTokens(AppThemeTokens tokens) {
-  final double pad = tokens.spacing.sm;
-  final double innerWidth = _kLibraryGridMaxCrossAxisExtent - 2 * pad;
-  final double coverHeight = innerWidth * 3 / 2;
-  const double coverToInfoGap = 12;
+double libraryGridMainAxisExtentFromTokens(
+  AppThemeTokens tokens,
+  LibraryLayoutTier layoutTier,
+) {
+  final double maxCrossAxisExtent = libraryGridMaxCrossAxisExtent(layoutTier);
+  // CatalogCoverCardShell: 2:3 cover flush to card width (no side padding).
+  final double coverHeight = maxCrossAxisExtent * 3 / 2;
+  final double coverToInfoGap = tokens.spacing.md;
   final double titleLineHeight = tokens.text.bodyMd * 1.25;
   const double infoColumnSpacing = 6;
   final double metaLineHeight = tokens.text.labelXs - 1;
-  return (2 * pad +
-              coverHeight +
+  final double infoBottomPad = tokens.spacing.sm;
+  return (coverHeight +
               coverToInfoGap +
               titleLineHeight +
               infoColumnSpacing +
-              metaLineHeight)
+              metaLineHeight +
+              infoBottomPad)
           .ceil() +
       16;
 }
 
-SliverGridDelegate libraryGridDelegateForTokens(AppThemeTokens tokens) {
+SliverGridDelegate libraryGridDelegateForTokens(
+  AppThemeTokens tokens,
+  LibraryLayoutTier layoutTier,
+) {
+  final double spacing = libraryGridSpacing(layoutTier);
   return SliverGridDelegateWithMaxCrossAxisExtent(
-    maxCrossAxisExtent: _kLibraryGridMaxCrossAxisExtent,
-    mainAxisExtent: libraryGridMainAxisExtentFromTokens(tokens),
-    crossAxisSpacing: _kLibraryGridCrossAxisSpacing,
-    mainAxisSpacing: _kLibraryGridMainAxisSpacing,
+    maxCrossAxisExtent: libraryGridMaxCrossAxisExtent(layoutTier),
+    mainAxisExtent: libraryGridMainAxisExtentFromTokens(tokens, layoutTier),
+    crossAxisSpacing: spacing,
+    mainAxisSpacing: spacing,
   );
 }

@@ -2766,12 +2766,12 @@ impl SseDecode for crate::api::home::HomePageCountsDto {
         let mut var_comicCount = <i32>::sse_decode(deserializer);
         let mut var_tagCount = <i32>::sse_decode(deserializer);
         let mut var_seriesCount = <i32>::sse_decode(deserializer);
-        let mut var_readingRecordCount = <i32>::sse_decode(deserializer);
+        let mut var_authorCount = <i32>::sse_decode(deserializer);
         return crate::api::home::HomePageCountsDto {
             comic_count: var_comicCount,
             tag_count: var_tagCount,
             series_count: var_seriesCount,
-            reading_record_count: var_readingRecordCount,
+            author_count: var_authorCount,
         };
     }
 }
@@ -3856,7 +3856,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::home::HomePageCountsDto {
             self.comic_count.into_into_dart().into_dart(),
             self.tag_count.into_into_dart().into_dart(),
             self.series_count.into_into_dart().into_dart(),
-            self.reading_record_count.into_into_dart().into_dart(),
+            self.author_count.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4661,7 +4661,7 @@ impl SseEncode for crate::api::home::HomePageCountsDto {
         <i32>::sse_encode(self.comic_count, serializer);
         <i32>::sse_encode(self.tag_count, serializer);
         <i32>::sse_encode(self.series_count, serializer);
-        <i32>::sse_encode(self.reading_record_count, serializer);
+        <i32>::sse_encode(self.author_count, serializer);
     }
 }
 
