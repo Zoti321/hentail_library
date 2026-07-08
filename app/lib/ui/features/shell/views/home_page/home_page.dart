@@ -15,6 +15,8 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+  final GlobalKey _headerMeasureKey = GlobalKey();
+  double? _headerExtent;
   bool deferredSectionsReady = false;
 
   @override
@@ -26,6 +28,25 @@ class _HomePageState extends ConsumerState<HomePage> {
       }
       setState(() => deferredSectionsReady = true);
     });
+    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+  }
+
+  void _measureHeaderExtent(Duration _) {
+    final RenderBox? box =
+        _headerMeasureKey.currentContext?.findRenderObject() as RenderBox?;
+    if (!mounted || box == null) {
+      return;
+    }
+    final double height = box.size.height;
+    if (_headerExtent != height) {
+      setState(() => _headerExtent = height);
+    }
   }
 
   void onTapScanLibrary(BuildContext context, WidgetRef ref) {
@@ -70,6 +91,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final AsyncValue<HomePageCounts> homePageCounts = ref.watch(
       homePageCountsStreamProvider,
     );
@@ -99,45 +121,73 @@ class _HomePageState extends ConsumerState<HomePage> {
           0,
           homeContentMaxWidth,
         );
-        return SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: horizontalPadding,
-            vertical: tokens.layout.contentAreaPadding.vertical,
-          ),
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: maxWidth),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  HomePageHeader(
-                    layoutTier: layoutTier,
-                    title: '首页',
-                    greetingText: greetingText,
-                    onScan: onScan,
-                    onOpenNavigation: layoutTier == HomePageLayoutTier.compact
-                        ? openAppShellNavigationDrawer
-                        : null,
+
+        final Widget headerSection = HomePageHeaderSection(
+          layoutTier: layoutTier,
+          horizontalPadding: horizontalPadding,
+          onScan: onScan,
+          onOpenNavigation: layoutTier == HomePageLayoutTier.compact
+              ? openAppShellNavigationDrawer
+              : null,
+        );
+        final Widget header = KeyedSubtree(
+          key: _headerMeasureKey,
+          child: headerSection,
+        );
+
+        return CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: <Widget>[
+            if (_headerExtent == null)
+              SliverToBoxAdapter(child: header)
+            else
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: HomePinnedHeaderDelegate(
+                  extent: _headerExtent!,
+                  child: header,
+                ),
+              ),
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                tokens.layout.contentVerticalPadding,
+                horizontalPadding,
+                tokens.layout.contentAreaPadding.bottom,
+              ),
+              sliver: SliverToBoxAdapter(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: maxWidth),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          greetingText,
+                          style: homePageSubtitleStyle(colorScheme),
+                        ),
+                        SizedBox(height: tokens.spacing.xl + 12),
+                        HomePageHeroSection(
+                          layoutTier: layoutTier,
+                          comicCount: comicCount,
+                          isLibraryEmpty: isLibraryEmpty,
+                          onScan: onScan,
+                          enableHeavyStats: deferredSectionsReady,
+                        ),
+                        SizedBox(height: tokens.spacing.lg + 8),
+                        HomePageContinueReadingSection(
+                          layoutTier: layoutTier,
+                          enabled: deferredSectionsReady,
+                        ),
+                        SizedBox(height: tokens.spacing.xl + 8),
+                      ],
+                    ),
                   ),
-                  SizedBox(height: tokens.spacing.xl + 12),
-                  HomePageHeroSection(
-                    layoutTier: layoutTier,
-                    comicCount: comicCount,
-                    isLibraryEmpty: isLibraryEmpty,
-                    onScan: onScan,
-                    enableHeavyStats: deferredSectionsReady,
-                  ),
-                  SizedBox(height: tokens.spacing.lg + 8),
-                  HomePageContinueReadingSection(
-                    layoutTier: layoutTier,
-                    enabled: deferredSectionsReady,
-                  ),
-                  SizedBox(height: tokens.spacing.xl + 8),
-                ],
+                ),
               ),
             ),
-          ),
+          ],
         );
       },
     );

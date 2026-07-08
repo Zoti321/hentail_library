@@ -27,6 +27,14 @@ double homeContentHorizontalPadding(HomePageLayoutTier tier) {
   };
 }
 
+double homePageTitleFontSize(HomePageLayoutTier tier) {
+  return switch (tier) {
+    HomePageLayoutTier.compact => 18,
+    HomePageLayoutTier.medium => 22,
+    HomePageLayoutTier.expanded => 26,
+  };
+}
+
 double continueReadingItemWidthFor(HomePageLayoutTier tier) {
   return switch (tier) {
     HomePageLayoutTier.compact => continueReadingItemWidthCompact,

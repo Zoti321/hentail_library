@@ -34,5 +34,11 @@ void main() {
         continueReadingItemWidthCompact,
       );
     });
+
+    test('uses tiered title sizes aligned with library/metadata', () {
+      expect(homePageTitleFontSize(HomePageLayoutTier.compact), 18);
+      expect(homePageTitleFontSize(HomePageLayoutTier.medium), 22);
+      expect(homePageTitleFontSize(HomePageLayoutTier.expanded), 26);
+    });
   });
 }

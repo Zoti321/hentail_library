@@ -7,18 +7,19 @@ import 'package:hentai_library/ui/features/shell/state/scan_library_controller.d
 import 'package:hentai_library/ui/features/shell/view_models/home_page_dashboard_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/home_page/widgets/home_page_header.dart';
 import 'package:hentai_library/ui/features/shell/views/home_page/home_page.dart';
-import 'package:hentai_library/ui/features/shell/views/home_page/widgets/home_page_constants.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
   group('HomePage responsive layout', () {
-    testWidgets('compact width uses stacked header and single-column stats', (
+    testWidgets('compact width uses row header and single-column stats', (
       WidgetTester tester,
     ) async {
       await _pumpHomePage(tester, const Size(360, 900));
 
       expect(tester.takeException(), isNull);
-      _expectHeaderStacked(tester);
+      _expectHeaderRow(tester);
+      _expectMenuIcon(tester, findsOneWidget);
       _expectStatsSingleColumn(tester);
     });
 
@@ -27,6 +28,7 @@ void main() {
 
       expect(tester.takeException(), isNull);
       _expectHeaderRow(tester);
+      _expectMenuIcon(tester, findsNothing);
       _expectStatsGrid2x2(tester);
     });
 
@@ -37,6 +39,7 @@ void main() {
 
       expect(tester.takeException(), isNull);
       _expectHeaderRow(tester);
+      _expectMenuIcon(tester, findsNothing);
       _expectStatsSingleRow(tester);
     });
 
@@ -48,6 +51,32 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.text('快捷入口'), findsNothing);
+    });
+
+    testWidgets('moves greeting subtitle into body below header', (
+      WidgetTester tester,
+    ) async {
+      await _pumpHomePage(tester, const Size(700, 900));
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(HomePageHeaderSection), findsOneWidget);
+      expect(find.textContaining('，读者'), findsOneWidget);
+      final Offset title = tester.getTopLeft(find.text('首页'));
+      final Offset greeting = tester.getTopLeft(find.textContaining('，读者'));
+      expect(greeting.dy, greaterThan(title.dy));
+    });
+
+    testWidgets('uses responsive title sizes by breakpoint', (
+      WidgetTester tester,
+    ) async {
+      await _pumpHomePage(tester, const Size(360, 900));
+      expect(tester.widget<Text>(find.text('首页')).style?.fontSize, 18);
+
+      await _pumpHomePage(tester, const Size(700, 900));
+      expect(tester.widget<Text>(find.text('首页')).style?.fontSize, 22);
+
+      await _pumpHomePage(tester, const Size(1200, 900));
+      expect(tester.widget<Text>(find.text('首页')).style?.fontSize, 26);
     });
   });
 }
@@ -102,22 +131,26 @@ Offset _labelOffset(WidgetTester tester, String label) {
 Offset _headerScanButtonOffset(WidgetTester tester) {
   return tester.getTopLeft(
     find.descendant(
-      of: find.byType(HomePageHeader),
+      of: find.byType(HomePageHeaderToolbar),
       matching: find.text('扫描漫画库'),
     ),
   );
 }
 
-void _expectHeaderStacked(WidgetTester tester) {
-  final Offset title = _labelOffset(tester, '首页');
-  final Offset scanAction = _headerScanButtonOffset(tester);
-  expect(scanAction.dy, greaterThan(title.dy + 24));
+void _expectMenuIcon(WidgetTester tester, Matcher matcher) {
+  expect(
+    find.byWidgetPredicate(
+      (Widget widget) => widget is Icon && widget.icon == LucideIcons.menu,
+    ),
+    matcher,
+  );
 }
 
 void _expectHeaderRow(WidgetTester tester) {
   final Offset title = _labelOffset(tester, '首页');
   final Offset scanAction = _headerScanButtonOffset(tester);
   expect(scanAction.dx, greaterThan(title.dx + 40));
+  expect((scanAction.dy - title.dy).abs(), lessThan(24));
 }
 
 void _expectStatsSingleColumn(WidgetTester tester) {
