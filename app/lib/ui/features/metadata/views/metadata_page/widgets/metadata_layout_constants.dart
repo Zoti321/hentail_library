@@ -4,6 +4,9 @@ import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/layout/content_search_width.dart';
 
 const double metadataContentMaxWidth = 1280;
+const double kMetadataPanelSubtitleFontSize = 13;
+const double kMetadataHeaderVerticalPadding = 6;
+const double kMetadataSearchToListSpacing = 16;
 
 enum MetadataLayoutTier { compact, medium, expanded }
 
@@ -25,7 +28,7 @@ double metadataContentHorizontalPadding(MetadataLayoutTier tier) {
   };
 }
 
-double metadataPanelTitleFontSize(MetadataLayoutTier tier) {
+double metadataPageTitleFontSize(MetadataLayoutTier tier) {
   return switch (tier) {
     MetadataLayoutTier.compact => 18,
     MetadataLayoutTier.medium => 22,
@@ -33,16 +36,12 @@ double metadataPanelTitleFontSize(MetadataLayoutTier tier) {
   };
 }
 
-bool metadataShowsPageSubtitle(MetadataLayoutTier tier) {
+bool metadataUsesPageScroll(MetadataLayoutTier tier) {
+  return tier == MetadataLayoutTier.compact;
+}
+
+bool metadataUsesListCard(MetadataLayoutTier tier) {
   return tier != MetadataLayoutTier.compact;
-}
-
-bool metadataPanelHeaderIsVertical(MetadataLayoutTier tier) {
-  return tier == MetadataLayoutTier.compact;
-}
-
-bool metadataListFillsAvailableHeight(MetadataLayoutTier tier) {
-  return tier == MetadataLayoutTier.compact;
 }
 
 bool metadataRowUsesOverflowMenu(MetadataLayoutTier tier) {
@@ -78,13 +77,10 @@ double metadataSearchFieldWidth(
   );
 }
 
-String metadataAddButtonLabel(
-  MetadataLayoutTier tier,
-  String entityName,
-  String shortcutLabel,
-) {
-  if (tier == MetadataLayoutTier.compact) {
-    return '添加$entityName';
-  }
-  return '添加$entityName ($shortcutLabel)';
+String metadataAddEntityTooltip(int tabIndex) {
+  return switch (tabIndex) {
+    0 => '添加作者',
+    1 => '添加标签',
+    _ => '添加',
+  };
 }

@@ -13,7 +13,7 @@ abstract final class AppNavigation {
   static List<NavItemData> get desktopMainNavItems => <NavItemData>[
     const (id: navIdHome, label: '首页', icon: LucideIcons.house),
     const (id: navIdLibrary, label: '漫画库', icon: LucideIcons.library),
-    const (id: navIdMetadata, label: '资料', icon: LucideIcons.layers),
+    const (id: navIdMetadata, label: '管理', icon: LucideIcons.layers),
     const (id: navIdHistory, label: '历史', icon: LucideIcons.history),
   ];
 
@@ -43,7 +43,7 @@ abstract final class AppNavigation {
       case '/metadata':
       case '/tags':
       case '/authors':
-        return '资料';
+        return '管理';
       case '/series':
         return '页面不存在';
       case '/history':

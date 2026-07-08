@@ -26,16 +26,16 @@ void main() {
       expect(metadataContentHorizontalPadding(MetadataLayoutTier.medium), 28);
       expect(metadataContentHorizontalPadding(MetadataLayoutTier.expanded), 48);
 
-      expect(metadataPanelTitleFontSize(MetadataLayoutTier.compact), 18);
-      expect(metadataPanelTitleFontSize(MetadataLayoutTier.medium), 22);
-      expect(metadataPanelTitleFontSize(MetadataLayoutTier.expanded), 26);
+      expect(metadataPageTitleFontSize(MetadataLayoutTier.compact), 18);
+      expect(metadataPageTitleFontSize(MetadataLayoutTier.medium), 22);
+      expect(metadataPageTitleFontSize(MetadataLayoutTier.expanded), 26);
     });
 
     test('toggles compact-only layout behaviors', () {
-      expect(metadataShowsPageSubtitle(MetadataLayoutTier.compact), isFalse);
-      expect(metadataShowsPageSubtitle(MetadataLayoutTier.medium), isTrue);
-      expect(metadataPanelHeaderIsVertical(MetadataLayoutTier.compact), isTrue);
-      expect(metadataListFillsAvailableHeight(MetadataLayoutTier.compact), isTrue);
+      expect(metadataUsesPageScroll(MetadataLayoutTier.compact), isTrue);
+      expect(metadataUsesPageScroll(MetadataLayoutTier.expanded), isFalse);
+      expect(metadataUsesListCard(MetadataLayoutTier.compact), isFalse);
+      expect(metadataUsesListCard(MetadataLayoutTier.expanded), isTrue);
       expect(metadataRowUsesOverflowMenu(MetadataLayoutTier.compact), isTrue);
       expect(metadataRowUsesOverflowMenu(MetadataLayoutTier.expanded), isFalse);
     });
@@ -62,24 +62,10 @@ void main() {
     });
   });
 
-  group('metadataAddButtonLabel', () {
-    test('hides shortcut hint on compact', () {
-      expect(
-        metadataAddButtonLabel(
-          MetadataLayoutTier.compact,
-          '作者',
-          'Ctrl+N',
-        ),
-        '添加作者',
-      );
-      expect(
-        metadataAddButtonLabel(
-          MetadataLayoutTier.expanded,
-          '标签',
-          'Ctrl+N',
-        ),
-        '添加标签 (Ctrl+N)',
-      );
+  group('metadataAddEntityTooltip', () {
+    test('returns entity-specific add labels', () {
+      expect(metadataAddEntityTooltip(0), '添加作者');
+      expect(metadataAddEntityTooltip(1), '添加标签');
     });
   });
 }

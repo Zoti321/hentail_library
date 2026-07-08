@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_scroll_to_top_button.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/author_management_panel.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_content_search.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_page_header.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/tag_management_panel.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
-import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class MetadataManagementPage extends ConsumerStatefulWidget {
   const MetadataManagementPage({super.key});
@@ -28,12 +28,50 @@ class _MetadataAddIntent extends Intent {
 class _MetadataManagementPageState
     extends ConsumerState<MetadataManagementPage> {
   final Set<int> _visitedTabIndexes = <int>{};
+  final GlobalKey _headerMeasureKey = GlobalKey();
+  final ScrollController _scrollController = ScrollController();
   int? _selectedTabIndex;
+  double? _headerExtent;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+  }
+
+  void _measureHeaderExtent(Duration _) {
+    final RenderBox? box =
+        _headerMeasureKey.currentContext?.findRenderObject() as RenderBox?;
+    if (!mounted || box == null) {
+      return;
+    }
+    final double height = box.size.height;
+    if (_headerExtent != height) {
+      setState(() => _headerExtent = height);
+    }
+  }
+
+  void _scrollToContentTop() {
+    if (!_scrollController.hasClients) {
+      return;
+    }
+    _scrollController.jumpTo(0);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     final String? tabParam = GoRouterState.of(
       context,
     ).uri.queryParameters['tab'];
@@ -75,74 +113,20 @@ class _MetadataManagementPageState
                 viewportWidth,
               );
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      tokens.layout.contentAreaPadding.top,
-                      horizontalPadding,
-                      0,
-                    ),
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(
-                        width: innerMaxWidth,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            CapsuleTabBar(
-                              items: const <CapsuleTabItem>[
-                                CapsuleTabItem(
-                                  label: '作者',
-                                  icon: LucideIcons.penLine,
-                                ),
-                                CapsuleTabItem(
-                                  label: '标签',
-                                  icon: LucideIcons.tags,
-                                ),
-                              ],
-                              selectedIndex: selectedIndex,
-                              onSelected: (int index) {
-                                if (_selectedTabIndex == index) {
-                                  return;
-                                }
-                                setState(() {
-                                  _selectedTabIndex = index;
-                                });
-                              },
-                            ),
-                            if (metadataShowsPageSubtitle(layoutTier)) ...<Widget>[
-                              const SizedBox(width: 24),
-                              Expanded(
-                                child: Text(
-                                  '管理作者与标签',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: cs.hentai.textTertiary,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(
-                        width: innerMaxWidth,
-                        child: _buildSelectedTabPanel(
-                          selectedIndex,
-                          layoutTier: layoutTier,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              if (metadataUsesPageScroll(layoutTier)) {
+                return _buildCompactPage(
+                  layoutTier: layoutTier,
+                  horizontalPadding: horizontalPadding,
+                  innerMaxWidth: innerMaxWidth,
+                  selectedIndex: selectedIndex,
+                );
+              }
+
+              return _buildWidePage(
+                layoutTier: layoutTier,
+                horizontalPadding: horizontalPadding,
+                innerMaxWidth: innerMaxWidth,
+                selectedIndex: selectedIndex,
               );
             },
           ),
@@ -151,21 +135,129 @@ class _MetadataManagementPageState
     );
   }
 
-  Widget _buildSelectedTabPanel(
-    int selectedIndex, {
+  Widget _buildCompactPage({
     required MetadataLayoutTier layoutTier,
+    required double horizontalPadding,
+    required double innerMaxWidth,
+    required int selectedIndex,
   }) {
-    if (!_visitedTabIndexes.contains(selectedIndex)) {
-      return const SizedBox.shrink();
+    final Widget headerSection = MetadataPageHeaderSection(
+      layoutTier: layoutTier,
+      horizontalPadding: horizontalPadding,
+      selectedTabIndex: selectedIndex,
+      onTabSelected: _handleTabSelected,
+      onAdd: () => _invokeAddForTab(context, selectedIndex),
+    );
+    final Widget header = KeyedSubtree(
+      key: _headerMeasureKey,
+      child: headerSection,
+    );
+
+    return Stack(
+      children: <Widget>[
+        CustomScrollView(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: <Widget>[
+            if (_headerExtent == null)
+              SliverToBoxAdapter(child: header)
+            else
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: MetadataPinnedHeaderDelegate(
+                  extent: _headerExtent!,
+                  child: header,
+                ),
+              ),
+            SliverToBoxAdapter(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: SizedBox(
+                  width: innerMaxWidth,
+                  child: MetadataContentSearch(
+                    layoutTier: layoutTier,
+                    selectedTabIndex: selectedIndex,
+                    contentMaxWidth: innerMaxWidth,
+                  ),
+                ),
+              ),
+            ),
+            if (_visitedTabIndexes.contains(selectedIndex))
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                sliver: switch (selectedIndex) {
+                  0 => const AuthorManagementSliverGroup(),
+                  1 => const TagManagementSliverGroup(),
+                  _ => const TagManagementSliverGroup(),
+                },
+              ),
+          ],
+        ),
+        LibraryScrollToTopButton(
+          scrollController: _scrollController,
+          isDrawerOpen: false,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWidePage({
+    required MetadataLayoutTier layoutTier,
+    required double horizontalPadding,
+    required double innerMaxWidth,
+    required int selectedIndex,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        MetadataPageHeaderSection(
+          layoutTier: layoutTier,
+          horizontalPadding: horizontalPadding,
+          selectedTabIndex: selectedIndex,
+          onTabSelected: _handleTabSelected,
+          onAdd: () => _invokeAddForTab(context, selectedIndex),
+        ),
+        Expanded(
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              width: innerMaxWidth,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  MetadataContentSearch(
+                    layoutTier: layoutTier,
+                    selectedTabIndex: selectedIndex,
+                    contentMaxWidth: innerMaxWidth,
+                  ),
+                  Expanded(
+                    child: _visitedTabIndexes.contains(selectedIndex)
+                        ? switch (selectedIndex) {
+                            0 => AuthorManagementPanel(
+                              layoutTier: layoutTier,
+                            ),
+                            1 => TagManagementPanel(layoutTier: layoutTier),
+                            _ => TagManagementPanel(layoutTier: layoutTier),
+                          }
+                        : const SizedBox.shrink(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _handleTabSelected(int index) {
+    if (_selectedTabIndex == index) {
+      return;
     }
-    switch (selectedIndex) {
-      case 0:
-        return AuthorManagementPanel(layoutTier: layoutTier);
-      case 1:
-        return TagManagementPanel(layoutTier: layoutTier);
-      default:
-        return TagManagementPanel(layoutTier: layoutTier);
-    }
+    setState(() {
+      _selectedTabIndex = index;
+    });
+    _scrollToContentTop();
   }
 
   Future<void> _invokeAddForTab(BuildContext context, int tabIndex) async {

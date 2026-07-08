@@ -1,3 +1,4 @@
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -5,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/metadata_management_page.dart';
@@ -15,23 +17,33 @@ import 'package:riverpod/misc.dart' show Override;
 
 void main() {
   group('Metadata responsive layout', () {
-    testWidgets('compact page hides top subtitle without overflow', (
+    testWidgets('compact page shows header title and underline tabs', (
       WidgetTester tester,
     ) async {
       await _pumpMetadataPage(tester, viewportWidth: 360);
 
       expect(tester.takeException(), isNull);
+      expect(find.text('管理'), findsOneWidget);
       expect(find.text('管理作者与标签'), findsNothing);
+      expect(find.byType(CapsuleTabBar), findsNothing);
+      expect(find.text('作者'), findsOneWidget);
+      expect(find.text('标签'), findsOneWidget);
     });
 
-    testWidgets('medium page shows top subtitle', (WidgetTester tester) async {
-      await _pumpMetadataPage(tester, viewportWidth: 700);
+    testWidgets('expanded page uses capsule tabs and add icon tooltip', (
+      WidgetTester tester,
+    ) async {
+      await _pumpMetadataPage(tester, viewportWidth: 1200);
 
       expect(tester.takeException(), isNull);
-      expect(find.text('管理作者与标签'), findsOneWidget);
+      expect(find.text('管理'), findsOneWidget);
+      expect(find.byType(CapsuleTabBar), findsOneWidget);
+      expect(find.text('管理作者与标签'), findsNothing);
+      expect(find.byTooltip('添加作者'), findsOneWidget);
+      expect(find.textContaining('Ctrl+N'), findsNothing);
     });
 
-    testWidgets('compact author panel uses vertical header and overflow actions', (
+    testWidgets('compact author panel uses overflow actions without bulk delete', (
       WidgetTester tester,
     ) async {
       await _pumpAuthorPanel(
@@ -41,16 +53,14 @@ void main() {
       );
 
       expect(tester.takeException(), isNull);
-      final Text title = tester.widget<Text>(find.text('作者管理'));
-      expect(title.style?.fontSize, 18);
-      expect(find.textContaining('Ctrl+N'), findsNothing);
-      expect(
-        find.byWidgetPredicate((Widget widget) => widget is PopupMenuButton),
-        findsNWidgets(2),
-      );
+      expect(find.text('作者管理'), findsNothing);
+      expect(find.byTooltip('删除已选'), findsNothing);
+      expect(find.byTooltip('更多操作'), findsNWidgets(2));
+      expect(find.byType(CustomPopupMenu), findsNWidgets(2));
+      expect(find.byType(PopupMenuButton), findsNothing);
     });
 
-    testWidgets('expanded author panel keeps full add button label', (
+    testWidgets('expanded author panel keeps row actions in card layout', (
       WidgetTester tester,
     ) async {
       await _pumpAuthorPanel(
@@ -60,13 +70,13 @@ void main() {
       );
 
       expect(tester.takeException(), isNull);
-      final Text title = tester.widget<Text>(find.text('作者管理'));
-      expect(title.style?.fontSize, 26);
-      expect(find.textContaining('Ctrl+N'), findsOneWidget);
+      expect(find.text('作者管理'), findsNothing);
+      expect(find.byTooltip('删除已选'), findsNothing);
       expect(
         find.byWidgetPredicate((Widget widget) => widget is PopupMenuButton),
         findsNothing,
       );
+      expect(find.byType(CustomPopupMenu), findsNothing);
       expect(find.byTooltip('重命名'), findsNWidgets(2));
     });
   });
@@ -122,7 +132,11 @@ Future<void> _pumpAuthorPanel(
           body: SizedBox(
             width: metadataInnerContentMaxWidth(layoutTier, viewportWidth),
             height: 800,
-            child: AuthorManagementPanel(layoutTier: layoutTier),
+            child: layoutTier == MetadataLayoutTier.compact
+                ? const CustomScrollView(
+                    slivers: <Widget>[AuthorManagementSliverGroup()],
+                  )
+                : AuthorManagementPanel(layoutTier: layoutTier),
           ),
         ),
       ),

@@ -7,7 +7,6 @@ import 'package:hentai_library/ui/core/widgets/chrome/status_card_shell.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_header.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_height.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_shell.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_row_actions.dart';
@@ -25,84 +24,125 @@ class TagManagementPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Future<void> openAddTagDialog() async {
-      await showDialog<void>(
-        context: context,
-        builder: (context) => TagNameEditorDialog(
-          title: '添加标签',
-          labelText: '名称',
-          hintText: '输入标签名称…',
-          initialValue: '',
-          onSubmit: (value) async {
-            await ref.read(tagActionsProvider).addTag(Tag(name: value));
-          },
-        ),
-      );
-    }
-
+    assert(metadataUsesListCard(layoutTier));
     final tagsAsync = ref.watch(allTagsProvider);
     final List<Tag> filteredTags = ref.watch(filteredTagsProvider);
     final AppThemeTokens tokens = context.tokens;
+
     return Padding(
       padding: EdgeInsets.only(
-        top: tokens.layout.contentVerticalPadding,
         bottom: tokens.layout.contentVerticalPadding + 24,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          MetadataPanelHeader(
-            layoutTier: layoutTier,
-            title: '标签管理',
-            subtitle: '查看、添加、重命名以及批量删除分类标签',
-            searchHint: '搜索标签名称…',
-            addEntityName: '标签',
-            onSearchChanged: (String value) =>
-                ref.read(tagFilterProvider.notifier).setQuery(value),
-            onAdd: openAddTagDialog,
-          ),
-          const SizedBox(height: 12),
-          const _TagBulkDeleteBar(),
-          const SizedBox(height: 20),
-          Expanded(
-            child: tagsAsync.when(
-              data: (_) {
-                if (filteredTags.isEmpty) {
-                  return const _TagManagementEmptyState();
-                }
-                if (metadataListFillsAvailableHeight(layoutTier)) {
-                  return _TagListCard(
+      child: tagsAsync.when(
+        data: (_) {
+          if (filteredTags.isEmpty) {
+            return const _TagManagementEmptyState(inline: false);
+          }
+          return LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final double cardHeight = metadataPanelCardHeight(
+                constraints: constraints,
+                itemCount: filteredTags.length,
+                config: _TagStyles.listHeightConfig,
+              );
+              return Align(
+                alignment: Alignment.topCenter,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: cardHeight,
+                  child: _TagListCard(
                     layoutTier: layoutTier,
                     tags: filteredTags,
-                  );
-                }
-                return LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
-                    final double cardHeight = metadataPanelCardHeight(
-                      constraints: constraints,
-                      itemCount: filteredTags.length,
-                      config: _TagStyles.listHeightConfig,
-                    );
-                    return Align(
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: cardHeight,
-                        child: _TagListCard(
-                          layoutTier: layoutTier,
-                          tags: filteredTags,
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-              loading: () => const _TagManagementLoadingCard(),
-              error: (Object e, StackTrace _) =>
-                  _TagManagementErrorCard(error: e),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+        loading: () => const _TagManagementLoadingState(inline: false),
+        error: (Object e, StackTrace _) =>
+            _TagManagementErrorState(error: e, inline: false),
+      ),
+    );
+  }
+}
+
+class TagManagementSliverGroup extends ConsumerWidget {
+  const TagManagementSliverGroup({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tagsAsync = ref.watch(allTagsProvider);
+    final List<Tag> filteredTags = ref.watch(filteredTagsProvider);
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+
+    return tagsAsync.when(
+      data: (_) {
+        if (filteredTags.isEmpty) {
+          return SliverPadding(
+            padding: EdgeInsets.only(
+              bottom: tokens.layout.contentVerticalPadding + 24,
             ),
+            sliver: const SliverToBoxAdapter(
+              child: _TagManagementEmptyState(inline: true),
+            ),
+          );
+        }
+        return SliverPadding(
+          padding: EdgeInsets.only(
+            bottom: tokens.layout.contentVerticalPadding + 24,
           ),
-        ],
+          sliver: SliverMainAxisGroup(
+            slivers: <Widget>[
+              SliverToBoxAdapter(
+                child: _TagListHeader(
+                  totalCount: filteredTags.length,
+                  compactStyle: true,
+                ),
+              ),
+              SliverList.separated(
+                itemCount: filteredTags.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final Tag tag = filteredTags[index];
+                  return Consumer(
+                    builder:
+                        (BuildContext context, WidgetRef ref, Widget? child) {
+                          final bool isSelected = ref.watch(
+                            tagSelectionProvider.select(
+                              (Set<Tag> selected) => selected.contains(tag),
+                            ),
+                          );
+                          return _TagRow(
+                            layoutTier: MetadataLayoutTier.compact,
+                            tag: tag,
+                            isSelected: isSelected,
+                          );
+                        },
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) =>
+                    Divider(height: 1, color: cs.hentai.borderSubtle),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => SliverPadding(
+        padding: EdgeInsets.only(
+          bottom: tokens.layout.contentVerticalPadding + 24,
+        ),
+        sliver: const SliverToBoxAdapter(
+          child: _TagManagementLoadingState(inline: true),
+        ),
+      ),
+      error: (Object e, StackTrace _) => SliverPadding(
+        padding: EdgeInsets.only(
+          bottom: tokens.layout.contentVerticalPadding + 24,
+        ),
+        sliver: SliverToBoxAdapter(
+          child: _TagManagementErrorState(error: e, inline: true),
+        ),
       ),
     );
   }
@@ -136,50 +176,6 @@ class _TagStyles {
   );
   static const MetadataPanelHeightConfig listHeightConfig =
       kMetadataPanelHeightDefaultConfig;
-}
-
-class _TagBulkDeleteBar extends ConsumerWidget {
-  const _TagBulkDeleteBar();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final int selectionCount = ref.watch(
-      tagSelectionProvider.select((Set<Tag> s) => s.length),
-    );
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return Row(
-      children: [
-        GhostButton.icon(
-          tooltip: '删除已选',
-          semanticLabel: '删除已选',
-          icon: LucideIcons.trash2,
-          size: 28,
-          onPressed: () async {
-            if (selectionCount == 0) {
-              showInfoToast(context, '此操作将删除已选中的标签，请先勾选列表中的标签。');
-              return;
-            }
-            final bool confirmed =
-                await showDialog<bool>(
-                  context: context,
-                  builder: (BuildContext dialogContext) =>
-                      TagConfirmDeleteDialog(count: selectionCount),
-                ) ??
-                false;
-            if (!confirmed) {
-              return;
-            }
-            final List<Tag> tags = ref
-                .read(tagSelectionProvider)
-                .toList(growable: false);
-            await ref.read(tagActionsProvider).deleteTags(tags);
-          },
-          delayTooltipThreeSeconds: true,
-          overlayColor: cs.primary.withAlpha(14),
-        ),
-      ],
-    );
-  }
 }
 
 class _TagListCard extends StatelessWidget {
@@ -231,9 +227,13 @@ class _TagListCard extends StatelessWidget {
 }
 
 class _TagListHeader extends ConsumerWidget {
-  const _TagListHeader({required this.totalCount});
+  const _TagListHeader({
+    required this.totalCount,
+    this.compactStyle = false,
+  });
 
   final int totalCount;
+  final bool compactStyle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -244,7 +244,7 @@ class _TagListHeader extends ConsumerWidget {
     return Container(
       padding: _TagStyles.listHeaderPadding,
       decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
+        color: compactStyle ? Colors.transparent : cs.surfaceContainerHighest,
         border: Border(bottom: BorderSide(color: cs.hentai.borderSubtle)),
       ),
       child: Row(
@@ -393,81 +393,105 @@ class _TagRow extends ConsumerWidget {
   }
 }
 
-class _TagManagementLoadingCard extends StatelessWidget {
-  const _TagManagementLoadingCard();
+class _TagManagementLoadingState extends StatelessWidget {
+  const _TagManagementLoadingState({required this.inline});
+
+  final bool inline;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final Widget indicator = CircularProgressIndicator(
+      strokeWidth: 2.2,
+      color: theme.colorScheme.primary,
+    );
+    if (inline) {
+      return Padding(
+        padding: _TagStyles.statusLoadingPadding,
+        child: Center(child: indicator),
+      );
+    }
     return StatusCardShell(
       padding: _TagStyles.statusLoadingPadding,
       borderRadius: _TagStyles.statusCardRadius,
-      child: Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 2.2,
-          color: theme.colorScheme.primary,
-        ),
-      ),
+      child: Center(child: indicator),
     );
   }
 }
 
-class _TagManagementErrorCard extends StatelessWidget {
-  const _TagManagementErrorCard({required this.error});
+class _TagManagementErrorState extends StatelessWidget {
+  const _TagManagementErrorState({
+    required this.error,
+    required this.inline,
+  });
 
   final Object error;
+  final bool inline;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final TextStyle style = TextStyle(
+      fontSize: kMetadataPanelSubtitleFontSize,
+      color: theme.colorScheme.hentai.textTertiary,
+    );
+    if (inline) {
+      return Padding(
+        padding: _TagStyles.statusErrorPadding,
+        child: Text('$error', style: style),
+      );
+    }
     return StatusCardShell(
       padding: _TagStyles.statusErrorPadding,
       borderRadius: _TagStyles.statusCardRadius,
-      child: Text(
-        '$error',
-        style: TextStyle(
-          fontSize: kMetadataPanelSubtitleFontSize,
-          color: theme.colorScheme.hentai.textTertiary,
-        ),
-      ),
+      child: Text('$error', style: style),
     );
   }
 }
 
 class _TagManagementEmptyState extends StatelessWidget {
-  const _TagManagementEmptyState();
+  const _TagManagementEmptyState({required this.inline});
+
+  final bool inline;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final Widget content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(LucideIcons.tags, size: 32, color: cs.onSurfaceVariant),
+        const SizedBox(height: 12),
+        Text(
+          '暂无标签',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: cs.hentai.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '你可以从这里添加、重命名或删除标签。',
+          style: TextStyle(
+            fontSize: kMetadataPanelSubtitleFontSize,
+            color: cs.hentai.textSecondary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+    if (inline) {
+      return Padding(
+        padding: _TagStyles.statusEmptyPadding,
+        child: Center(child: content),
+      );
+    }
     return StatusCardShell(
       padding: _TagStyles.statusEmptyPadding,
       borderRadius: _TagStyles.statusCardRadius,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(LucideIcons.tags, size: 32, color: cs.onSurfaceVariant),
-          const SizedBox(height: 12),
-          Text(
-            '暂无标签',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: cs.hentai.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '你可以从这里添加、重命名或删除标签。',
-            style: TextStyle(
-              fontSize: kMetadataPanelSubtitleFontSize,
-              color: cs.hentai.textSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+      child: content,
     );
   }
 }
