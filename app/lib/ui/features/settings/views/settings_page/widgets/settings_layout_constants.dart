@@ -35,10 +35,6 @@ double settingsPageTitleFontSize(SettingsLayoutTier tier) {
   };
 }
 
-bool settingsShowsRowDescription(SettingsLayoutTier tier) {
-  return tier != SettingsLayoutTier.compact;
-}
-
 bool settingsThemeRowUsesChevronAction(SettingsLayoutTier tier) {
   return tier == SettingsLayoutTier.compact;
 }

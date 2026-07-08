@@ -25,7 +25,6 @@ class LibraryLocationRow extends StatelessWidget {
         color: theme.colorScheme.hentai.iconDefault,
       ),
       label: '库位置',
-      description: '管理扫描路径',
       onRowTap: () => context.push('/paths'),
       action: Icon(
         LucideIcons.chevronRight,
@@ -57,7 +56,6 @@ class AutoScanRow extends ConsumerWidget {
         color: theme.colorScheme.hentai.iconDefault,
       ),
       label: '自动扫描',
-      description: autoScan ? '已启用（启动时扫描选中路径）' : '已禁用',
       action: ToggleSwitch(
         checked: autoScan,
         onChange: () =>

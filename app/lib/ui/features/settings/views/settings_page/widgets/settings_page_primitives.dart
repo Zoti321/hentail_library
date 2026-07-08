@@ -133,8 +133,7 @@ class _SettingsRowState extends State<SettingsRow> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      if (settingsShowsRowDescription(widget.layoutTier) &&
-                          widget.description != null) ...<Widget>[
+                      if (widget.description != null) ...<Widget>[
                         const SizedBox(height: 2),
                         Text(
                           widget.description!,

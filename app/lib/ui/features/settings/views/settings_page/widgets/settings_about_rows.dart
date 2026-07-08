@@ -32,7 +32,6 @@ class AutoUpdateRow extends ConsumerWidget {
         color: theme.colorScheme.hentai.iconDefault,
       ),
       label: '自动更新',
-      description: autoUpdate ? '已启用（启动时检查更新）' : '已禁用',
       action: ToggleSwitch(
         checked: autoUpdate,
         onChange: () =>

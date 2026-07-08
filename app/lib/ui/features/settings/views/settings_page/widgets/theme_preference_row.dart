@@ -81,7 +81,6 @@ class _ThemePreferenceRowState extends ConsumerState<ThemePreferenceRow> {
         color: colorScheme.hentai.iconDefault,
       ),
       label: '应用主题',
-      description: '可跟随系统或固定浅色、深色；当前：${preference.labelZh}',
       onRowTap: () => menuController.showMenu(),
       action: CustomPopupMenu(
         controller: menuController,

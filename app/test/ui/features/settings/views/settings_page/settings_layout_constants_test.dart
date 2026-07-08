@@ -36,9 +36,7 @@ void main() {
       expect(kSettingsHeaderShadowGradientHeight, 6);
     });
 
-    test('toggles compact-only row behaviors', () {
-      expect(settingsShowsRowDescription(SettingsLayoutTier.compact), isFalse);
-      expect(settingsShowsRowDescription(SettingsLayoutTier.medium), isTrue);
+    test('toggles compact-only theme chevron action', () {
       expect(settingsThemeRowUsesChevronAction(SettingsLayoutTier.compact), isTrue);
       expect(settingsThemeRowUsesChevronAction(SettingsLayoutTier.expanded), isFalse);
     });
