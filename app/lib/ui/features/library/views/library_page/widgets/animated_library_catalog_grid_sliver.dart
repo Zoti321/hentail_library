@@ -3,12 +3,14 @@ part of 'library_page_widgets.dart';
 class AnimatedLibraryCatalogGridSliver extends StatefulWidget {
   const AnimatedLibraryCatalogGridSliver({
     super.key,
+    required this.layoutTier,
     required this.itemCount,
     required this.itemBuilder,
     required this.positionAnimationKey,
     required this.suppressAnimationKey,
   });
 
+  final LibraryLayoutTier layoutTier;
   final int itemCount;
 
   /// 每个格子根节点必须带唯一 [ValueKey]（传给 [ReorderableBuilder] 的外层 widget）。
@@ -26,6 +28,7 @@ class _AnimatedLibraryCatalogGridSliverState
   final GlobalKey _gridViewKey = GlobalKey();
   bool _enableSortFlipAnimation = false;
   AppThemeTokens? _lastTokens;
+  LibraryLayoutTier? _lastLayoutTier;
   SliverGridDelegate? _cachedDelegate;
 
   @override
@@ -35,6 +38,9 @@ class _AnimatedLibraryCatalogGridSliverState
         widget.positionAnimationKey != oldWidget.positionAnimationKey;
     final bool suppressChanged =
         widget.suppressAnimationKey != oldWidget.suppressAnimationKey;
+    if (widget.layoutTier != oldWidget.layoutTier) {
+      _cachedDelegate = null;
+    }
 
     _enableSortFlipAnimation = nextLibraryCatalogSortFlipAnimationEnabled(
       current: _enableSortFlipAnimation,
@@ -45,11 +51,17 @@ class _AnimatedLibraryCatalogGridSliverState
 
   SliverGridDelegate _delegateFor(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    if (_cachedDelegate != null && _lastTokens == tokens) {
+    if (_cachedDelegate != null &&
+        _lastTokens == tokens &&
+        _lastLayoutTier == widget.layoutTier) {
       return _cachedDelegate!;
     }
     _lastTokens = tokens;
-    return _cachedDelegate = libraryGridDelegateForTokens(tokens);
+    _lastLayoutTier = widget.layoutTier;
+    return _cachedDelegate = libraryGridDelegateForTokens(
+      tokens,
+      widget.layoutTier,
+    );
   }
 
   @override

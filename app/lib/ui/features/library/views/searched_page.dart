@@ -6,6 +6,7 @@ import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/comic_card.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/series_card.dart';
+import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/features/library/views/searched_page/widgets/search_result_horizontal_section.dart';
 import 'package:hentai_library/ui/features/library/views/searched_page/widgets/searched_page_header.dart';
@@ -49,6 +50,28 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final LibraryLayoutTier layoutTier = libraryLayoutTierForWidth(
+          constraints.maxWidth,
+        );
+        final double horizontalPadding = libraryContentHorizontalPadding(
+          layoutTier,
+        );
+        return _buildScrollView(
+          context,
+          layoutTier: layoutTier,
+          horizontalPadding: horizontalPadding,
+        );
+      },
+    );
+  }
+
+  Widget _buildScrollView(
+    BuildContext context, {
+    required LibraryLayoutTier layoutTier,
+    required double horizontalPadding,
+  }) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final String trimmedQuery = widget.query.trim();
@@ -81,14 +104,21 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
         searchedComics.hasError || searchedSeriesDataAsync.hasError;
     final Object? error = searchedComics.error ?? searchedSeriesDataAsync.error;
 
-    final double cardHeight = libraryGridMainAxisExtentFromTokens(tokens);
+    final double cardHeight = libraryGridMainAxisExtentFromTokens(
+      tokens,
+      layoutTier,
+    );
     final Widget headerSection = trimmedQuery.isEmpty
         ? SearchedPageHeaderSection(
+            layoutTier: layoutTier,
+            horizontalPadding: horizontalPadding,
             query: '搜索结果',
             resultCount: 0,
             showQuotes: false,
           )
         : SearchedPageHeaderSection(
+            layoutTier: layoutTier,
+            horizontalPadding: horizontalPadding,
             query: trimmedQuery,
             resultCount: totalResultCount,
           );
@@ -112,9 +142,9 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
           ),
         SliverPadding(
           padding: EdgeInsets.fromLTRB(
-            tokens.layout.contentHorizontalPadding,
+            horizontalPadding,
             tokens.layout.contentVerticalPadding + kLibrarySearchToGridSpacing,
-            tokens.layout.contentHorizontalPadding,
+            horizontalPadding,
             tokens.layout.contentVerticalPadding,
           ),
           sliver: SliverToBoxAdapter(

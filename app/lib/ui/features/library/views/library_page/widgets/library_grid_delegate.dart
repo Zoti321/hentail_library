@@ -1,12 +1,12 @@
 part of 'library_page_widgets.dart';
 
-const double _kLibraryGridMaxCrossAxisExtent = 200;
-const double _kLibraryGridCrossAxisSpacing = 16;
-const double _kLibraryGridMainAxisSpacing = 16;
-
-double libraryGridMainAxisExtentFromTokens(AppThemeTokens tokens) {
+double libraryGridMainAxisExtentFromTokens(
+  AppThemeTokens tokens,
+  LibraryLayoutTier layoutTier,
+) {
+  final double maxCrossAxisExtent = libraryGridMaxCrossAxisExtent(layoutTier);
   final double pad = tokens.spacing.sm;
-  final double innerWidth = _kLibraryGridMaxCrossAxisExtent - 2 * pad;
+  final double innerWidth = maxCrossAxisExtent - 2 * pad;
   final double coverHeight = innerWidth * 3 / 2;
   const double coverToInfoGap = 12;
   final double titleLineHeight = tokens.text.bodyMd * 1.25;
@@ -22,11 +22,15 @@ double libraryGridMainAxisExtentFromTokens(AppThemeTokens tokens) {
       16;
 }
 
-SliverGridDelegate libraryGridDelegateForTokens(AppThemeTokens tokens) {
+SliverGridDelegate libraryGridDelegateForTokens(
+  AppThemeTokens tokens,
+  LibraryLayoutTier layoutTier,
+) {
+  final double spacing = libraryGridSpacing(layoutTier);
   return SliverGridDelegateWithMaxCrossAxisExtent(
-    maxCrossAxisExtent: _kLibraryGridMaxCrossAxisExtent,
-    mainAxisExtent: libraryGridMainAxisExtentFromTokens(tokens),
-    crossAxisSpacing: _kLibraryGridCrossAxisSpacing,
-    mainAxisSpacing: _kLibraryGridMainAxisSpacing,
+    maxCrossAxisExtent: libraryGridMaxCrossAxisExtent(layoutTier),
+    mainAxisExtent: libraryGridMainAxisExtentFromTokens(tokens, layoutTier),
+    crossAxisSpacing: spacing,
+    mainAxisSpacing: spacing,
   );
 }

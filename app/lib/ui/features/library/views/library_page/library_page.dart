@@ -7,6 +7,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_catalog_s
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
+import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/core/widgets/responsive_layout/library_blocks_layout.dart';
 
@@ -126,51 +127,72 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       _scrollToContentTop();
     });
 
-    final Widget headerSection = LibraryPageHeaderSection(
-      onOpenFilterSort: _openFilterSortDrawer,
-    );
-    final Widget header = KeyedSubtree(
-      key: _headerMeasureKey,
-      child: headerSection,
-    );
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final LibraryLayoutTier layoutTier = libraryLayoutTierForWidth(
+          constraints.maxWidth,
+        );
+        final double horizontalPadding = libraryContentHorizontalPadding(
+          layoutTier,
+        );
+        final Widget headerSection = LibraryPageHeaderSection(
+          layoutTier: layoutTier,
+          horizontalPadding: horizontalPadding,
+          onOpenFilterSort: _openFilterSortDrawer,
+        );
+        final Widget header = KeyedSubtree(
+          key: _headerMeasureKey,
+          child: headerSection,
+        );
 
-    return Scaffold(
-      key: _scaffoldKey,
-      endDrawer: const LibraryFilterSortDrawer(),
-      onEndDrawerChanged: (bool isOpen) {
-        if (_isEndDrawerOpen != isOpen) {
-          setState(() => _isEndDrawerOpen = isOpen);
-        }
-      },
-      body: Stack(
-        children: <Widget>[
-          CustomScrollView(
-            controller: _scrollController,
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: <Widget>[
-              if (_headerExtent == null)
-                SliverToBoxAdapter(child: header)
-              else
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: LibraryPinnedHeaderDelegate(
-                    extent: _headerExtent!,
-                    child: header,
+        return Scaffold(
+          key: _scaffoldKey,
+          endDrawer: const LibraryFilterSortDrawer(),
+          onEndDrawerChanged: (bool isOpen) {
+            if (_isEndDrawerOpen != isOpen) {
+              setState(() => _isEndDrawerOpen = isOpen);
+            }
+          },
+          body: Stack(
+            children: <Widget>[
+              CustomScrollView(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: <Widget>[
+                  if (_headerExtent == null)
+                    SliverToBoxAdapter(child: header)
+                  else
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: LibraryPinnedHeaderDelegate(
+                        extent: _headerExtent!,
+                        child: header,
+                      ),
+                    ),
+                  LibraryContentSearchSliver(
+                    layoutTier: layoutTier,
+                    horizontalPadding: horizontalPadding,
                   ),
-                ),
-              const LibraryContentSearchSliver(),
-              const LibraryBlocksSliverGroup(
-                seriesBlock: LibrarySeriesBlock(),
-                comicsBlock: LibraryComicsBlock(),
+                  LibraryBlocksSliverGroup(
+                    seriesBlock: LibrarySeriesBlock(
+                      layoutTier: layoutTier,
+                      horizontalPadding: horizontalPadding,
+                    ),
+                    comicsBlock: LibraryComicsBlock(
+                      layoutTier: layoutTier,
+                      horizontalPadding: horizontalPadding,
+                    ),
+                  ),
+                ],
+              ),
+              LibraryScrollToTopButton(
+                scrollController: _scrollController,
+                isDrawerOpen: _isEndDrawerOpen,
               ),
             ],
           ),
-          LibraryScrollToTopButton(
-            scrollController: _scrollController,
-            isDrawerOpen: _isEndDrawerOpen,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

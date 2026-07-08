@@ -1,17 +1,15 @@
 part of 'library_page_widgets.dart';
 
-const double kLibraryHeaderCompactBreakpoint = 768;
 const double kLibrarySearchMaxWidth = 480;
 const double kLibrarySearchToGridSpacing = 16;
 const double kLibraryHeaderVerticalPadding = 10;
 
-bool libraryHeaderShowsCountChips(BuildContext context) {
-  return MediaQuery.sizeOf(context).width >= kLibraryHeaderCompactBreakpoint;
-}
-
-TextStyle _buildLibraryPageTitleStyle(ColorScheme colorScheme) {
+TextStyle libraryPageTitleStyle(
+  ColorScheme colorScheme,
+  LibraryLayoutTier layoutTier,
+) {
   return TextStyle(
-    fontSize: 26,
+    fontSize: libraryPageTitleFontSize(layoutTier),
     fontWeight: FontWeight.w600,
     color: colorScheme.hentai.textPrimary,
     letterSpacing: -0.4,
@@ -19,8 +17,13 @@ TextStyle _buildLibraryPageTitleStyle(ColorScheme colorScheme) {
 }
 
 class LibraryPageHeader extends ConsumerWidget {
-  const LibraryPageHeader({super.key, this.showCountChips = true});
+  const LibraryPageHeader({
+    super.key,
+    required this.layoutTier,
+    this.showCountChips = true,
+  });
 
+  final LibraryLayoutTier layoutTier;
   final bool showCountChips;
 
   @override
@@ -35,7 +38,10 @@ class LibraryPageHeader extends ConsumerWidget {
       children: <Widget>[
         Text(
           AppStrings.libraryTitle,
-          style: _buildLibraryPageTitleStyle(theme.colorScheme),
+          style: libraryPageTitleStyle(
+            theme.colorScheme,
+            layoutTier,
+          ),
         ),
         if (showCountChips) ...<Widget>[
           const SizedBox(width: 12),

@@ -1,13 +1,18 @@
 part of 'library_page_widgets.dart';
 
 class LibraryPageHeaderToolbar extends ConsumerWidget {
-  const LibraryPageHeaderToolbar({super.key, this.onOpenFilterSort});
+  const LibraryPageHeaderToolbar({
+    super.key,
+    required this.layoutTier,
+    this.onOpenFilterSort,
+  });
 
+  final LibraryLayoutTier layoutTier;
   final VoidCallback? onOpenFilterSort;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool showCountChips = libraryHeaderShowsCountChips(context);
+    final bool showCountChips = libraryHeaderShowsCountChips(layoutTier);
     return SizedBox(
       height: 44,
       child: Stack(
@@ -19,11 +24,17 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
               Expanded(
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: LibraryPageHeader(showCountChips: showCountChips),
+                  child: LibraryPageHeader(
+                    layoutTier: layoutTier,
+                    showCountChips: showCountChips,
+                  ),
                 ),
               ),
               if (onOpenFilterSort != null)
-                _LibraryCompactToolbar(onOpenFilterSort: onOpenFilterSort!)
+                _LibraryCompactToolbar(
+                  layoutTier: layoutTier,
+                  onOpenFilterSort: onOpenFilterSort!,
+                )
               else
                 const _LegacyLibraryToolbar(),
             ],
@@ -36,8 +47,15 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
 }
 
 class LibraryContentSearchSliver extends ConsumerWidget {
-  const LibraryContentSearchSliver({super.key, this.initialQuery = ''});
+  const LibraryContentSearchSliver({
+    super.key,
+    required this.layoutTier,
+    required this.horizontalPadding,
+    this.initialQuery = '',
+  });
 
+  final LibraryLayoutTier layoutTier;
+  final double horizontalPadding;
   final String initialQuery;
 
   @override
@@ -45,9 +63,9 @@ class LibraryContentSearchSliver extends ConsumerWidget {
     final AppThemeTokens tokens = context.tokens;
     return SliverPadding(
       padding: EdgeInsets.fromLTRB(
-        tokens.layout.contentHorizontalPadding,
+        horizontalPadding,
         tokens.layout.contentVerticalPadding,
-        tokens.layout.contentHorizontalPadding,
+        horizontalPadding,
         0,
       ),
       sliver: SliverToBoxAdapter(
@@ -241,8 +259,12 @@ class _TabCountBadge extends StatelessWidget {
 }
 
 class _LibraryCompactToolbar extends ConsumerWidget {
-  const _LibraryCompactToolbar({required this.onOpenFilterSort});
+  const _LibraryCompactToolbar({
+    required this.layoutTier,
+    required this.onOpenFilterSort,
+  });
 
+  final LibraryLayoutTier layoutTier;
   final VoidCallback onOpenFilterSort;
 
   @override
@@ -254,7 +276,7 @@ class _LibraryCompactToolbar extends ConsumerWidget {
     );
     return Row(
       mainAxisSize: MainAxisSize.min,
-      spacing: 8,
+      spacing: libraryToolbarActionSpacing(layoutTier),
       children: <Widget>[
         GhostButton.icon(
           icon: LucideIcons.listFilter,

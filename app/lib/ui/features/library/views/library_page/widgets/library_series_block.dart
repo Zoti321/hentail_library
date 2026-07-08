@@ -1,7 +1,14 @@
 part of 'library_page_widgets.dart';
 
 class LibrarySeriesBlock extends ConsumerWidget {
-  const LibrarySeriesBlock({super.key});
+  const LibrarySeriesBlock({
+    super.key,
+    required this.layoutTier,
+    required this.horizontalPadding,
+  });
+
+  final LibraryLayoutTier layoutTier;
+  final double horizontalPadding;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,9 +60,7 @@ class LibrarySeriesBlock extends ConsumerWidget {
           pageSize: pageSize,
         );
     return SliverPadding(
-      padding: EdgeInsets.symmetric(
-        horizontal: tokens.layout.contentHorizontalPadding,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverMainAxisGroup(
         slivers: <Widget>[
           if (showPagination)
@@ -64,6 +69,7 @@ class LibrarySeriesBlock extends ConsumerWidget {
               placement: LibraryPaginationPlacement.top,
             ),
           _LibrarySeriesGridSliver(
+            layoutTier: layoutTier,
             series: series,
             isSeriesTableEmpty: isSeriesTableEmpty,
             isReloading: catalogAsync.isLoading,
@@ -83,6 +89,7 @@ class LibrarySeriesBlock extends ConsumerWidget {
 
 class _LibrarySeriesGridSliver extends StatelessWidget {
   const _LibrarySeriesGridSliver({
+    required this.layoutTier,
     required this.series,
     required this.isSeriesTableEmpty,
     required this.positionAnimationKey,
@@ -90,6 +97,7 @@ class _LibrarySeriesGridSliver extends StatelessWidget {
     this.isReloading = false,
   });
 
+  final LibraryLayoutTier layoutTier;
   final List<Series> series;
   final bool isSeriesTableEmpty;
   final Object positionAnimationKey;
@@ -110,6 +118,7 @@ class _LibrarySeriesGridSliver extends StatelessWidget {
       );
     }
     return AnimatedLibraryCatalogGridSliver(
+      layoutTier: layoutTier,
       itemCount: series.length,
       positionAnimationKey: positionAnimationKey,
       suppressAnimationKey: suppressAnimationKey,
