@@ -46,13 +46,9 @@ class _AppTitleBarState extends State<AppTitleBar> with WindowListener {
       ),
       child: Row(
         children: [
-          Expanded(
+          const Expanded(
             child: DragToMoveArea(
-              child: Row(
-                children: <Widget>[
-                  const SizedBox(width: 16),
-                ],
-              ),
+              child: SizedBox.expand(),
             ),
           ),
           SizedBox(width: 138, height: 36, child: WindowCaption()),
