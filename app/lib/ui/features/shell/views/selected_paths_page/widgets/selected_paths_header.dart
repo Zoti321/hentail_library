@@ -11,9 +11,14 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class SelectedPathsPageHeader extends ConsumerStatefulWidget {
-  const SelectedPathsPageHeader({required this.layoutTier, super.key});
+  const SelectedPathsPageHeader({
+    required this.layoutTier,
+    this.onOpenNavigation,
+    super.key,
+  });
 
   final SelectedPathsLayoutTier layoutTier;
+  final VoidCallback? onOpenNavigation;
 
   @override
   ConsumerState<SelectedPathsPageHeader> createState() =>
@@ -88,6 +93,7 @@ class _SelectedPathsPageHeaderState
       totalCount: totalCount,
       selectedCount: selectedCount,
       colorScheme: theme.colorScheme,
+      onOpenNavigation: widget.onOpenNavigation,
     );
     final Widget actions = _SelectedPathsHeaderActions(
       layoutTier: widget.layoutTier,
@@ -126,18 +132,35 @@ class _SelectedPathsHeaderSummary extends StatelessWidget {
     required this.totalCount,
     required this.selectedCount,
     required this.colorScheme,
+    this.onOpenNavigation,
   });
 
   final SelectedPathsLayoutTier layoutTier;
   final int totalCount;
   final int selectedCount;
   final ColorScheme colorScheme;
+  final VoidCallback? onOpenNavigation;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
+        if (onOpenNavigation != null) ...<Widget>[
+          GhostButton.icon(
+            icon: LucideIcons.menu,
+            semanticLabel: '打开导航菜单',
+            tooltip: '',
+            iconSize: 16,
+            size: 32,
+            borderRadius: 8,
+            foregroundColor: colorScheme.hentai.iconDefault,
+            hoverColor: colorScheme.primary.withAlpha(10),
+            overlayColor: colorScheme.primary.withAlpha(14),
+            onPressed: onOpenNavigation,
+          ),
+          const SizedBox(height: 8),
+        ],
         Text(
           '选中路径',
           style: buildSelectedPathsPageTitleStyle(colorScheme, layoutTier),

@@ -24,6 +24,7 @@ class MetadataPageHeaderSection extends StatelessWidget {
     required this.selectedTabIndex,
     required this.onTabSelected,
     required this.onAdd,
+    this.onOpenNavigation,
     super.key,
   });
 
@@ -32,6 +33,7 @@ class MetadataPageHeaderSection extends StatelessWidget {
   final int selectedTabIndex;
   final ValueChanged<int> onTabSelected;
   final VoidCallback onAdd;
+  final VoidCallback? onOpenNavigation;
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +49,7 @@ class MetadataPageHeaderSection extends StatelessWidget {
         selectedTabIndex: selectedTabIndex,
         onTabSelected: onTabSelected,
         onAdd: onAdd,
+        onOpenNavigation: onOpenNavigation,
       ),
     );
   }
@@ -58,6 +61,7 @@ class MetadataPageHeaderToolbar extends StatelessWidget {
     required this.selectedTabIndex,
     required this.onTabSelected,
     required this.onAdd,
+    this.onOpenNavigation,
     super.key,
   });
 
@@ -65,6 +69,7 @@ class MetadataPageHeaderToolbar extends StatelessWidget {
   final int selectedTabIndex;
   final ValueChanged<int> onTabSelected;
   final VoidCallback onAdd;
+  final VoidCallback? onOpenNavigation;
 
   @override
   Widget build(BuildContext context) {
@@ -80,9 +85,29 @@ class MetadataPageHeaderToolbar extends StatelessWidget {
               Expanded(
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(
-                    '管理',
-                    style: metadataPageTitleStyle(cs, layoutTier),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      if (onOpenNavigation != null) ...<Widget>[
+                        GhostButton.icon(
+                          icon: LucideIcons.menu,
+                          semanticLabel: '打开导航菜单',
+                          tooltip: '',
+                          iconSize: 16,
+                          size: 32,
+                          borderRadius: 8,
+                          foregroundColor: cs.hentai.iconDefault,
+                          hoverColor: Theme.of(context).hoverColor,
+                          overlayColor: Theme.of(context).hoverColor,
+                          onPressed: onOpenNavigation,
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      Text(
+                        '管理',
+                        style: metadataPageTitleStyle(cs, layoutTier),
+                      ),
+                    ],
                   ),
                 ),
               ),

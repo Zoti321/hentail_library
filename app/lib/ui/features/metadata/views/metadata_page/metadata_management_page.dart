@@ -11,6 +11,7 @@ import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_page_header.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/tag_management_panel.dart';
+import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 
 class MetadataManagementPage extends ConsumerStatefulWidget {
@@ -147,6 +148,7 @@ class _MetadataManagementPageState
       selectedTabIndex: selectedIndex,
       onTabSelected: _handleTabSelected,
       onAdd: () => _invokeAddForTab(context, selectedIndex),
+      onOpenNavigation: openAppShellNavigationDrawer,
     );
     final Widget header = KeyedSubtree(
       key: _headerMeasureKey,
@@ -216,6 +218,7 @@ class _MetadataManagementPageState
           selectedTabIndex: selectedIndex,
           onTabSelected: _handleTabSelected,
           onAdd: () => _invokeAddForTab(context, selectedIndex),
+          onOpenNavigation: null,
         ),
         Expanded(
           child: Align(

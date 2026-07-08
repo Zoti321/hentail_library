@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/shell/view_models/selected_paths_page_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_layout_constants.dart';
+import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 
 import 'widgets/widgets.dart';
 
@@ -44,7 +45,13 @@ class SelectedPathsPage extends ConsumerWidget {
                 spacing: 20,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  SelectedPathsPageHeader(layoutTier: layoutTier),
+                  SelectedPathsPageHeader(
+                    layoutTier: layoutTier,
+                    onOpenNavigation:
+                        layoutTier == SelectedPathsLayoutTier.compact
+                        ? openAppShellNavigationDrawer
+                        : null,
+                  ),
                   asyncState.when(
                     data: (_) => const SelectedPathsListCard(),
                     loading: () => const SelectedPathsLoadingCard(),

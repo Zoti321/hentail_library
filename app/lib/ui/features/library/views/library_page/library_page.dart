@@ -9,6 +9,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_series_ca
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/widgets.dart';
+import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/core/widgets/responsive_layout/library_blocks_layout.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
@@ -139,6 +140,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           layoutTier: layoutTier,
           horizontalPadding: horizontalPadding,
           onOpenFilterSort: _openFilterSortDrawer,
+          onOpenNavigation: layoutTier == LibraryLayoutTier.compact
+              ? openAppShellNavigationDrawer
+              : null,
         );
         final Widget header = KeyedSubtree(
           key: _headerMeasureKey,

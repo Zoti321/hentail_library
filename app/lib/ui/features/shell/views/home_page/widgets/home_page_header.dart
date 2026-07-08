@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/shell/views/home_page/widgets/home_page_constants.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -19,12 +20,14 @@ class HomePageHeader extends StatelessWidget {
     required this.title,
     required this.greetingText,
     required this.onScan,
+    this.onOpenNavigation,
   });
 
   final HomePageLayoutTier layoutTier;
   final String title;
   final String greetingText;
   final VoidCallback onScan;
+  final VoidCallback? onOpenNavigation;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +48,21 @@ class HomePageHeader extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          if (onOpenNavigation != null) ...<Widget>[
+            GhostButton.icon(
+              icon: LucideIcons.menu,
+              semanticLabel: '打开导航菜单',
+              tooltip: '',
+              iconSize: 16,
+              size: 32,
+              borderRadius: 8,
+              foregroundColor: colorScheme.hentai.iconDefault,
+              hoverColor: theme.hoverColor,
+              overlayColor: theme.hoverColor,
+              onPressed: onOpenNavigation,
+            ),
+            const SizedBox(height: 8),
+          ],
           textBlock,
           SizedBox(height: tokens.spacing.md),
           actionBlock,

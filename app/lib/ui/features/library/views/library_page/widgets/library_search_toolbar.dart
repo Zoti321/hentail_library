@@ -5,10 +5,12 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
     super.key,
     required this.layoutTier,
     this.onOpenFilterSort,
+    this.onOpenNavigation,
   });
 
   final LibraryLayoutTier layoutTier;
   final VoidCallback? onOpenFilterSort;
+  final VoidCallback? onOpenNavigation;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,9 +26,32 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
               Expanded(
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: LibraryPageHeader(
-                    layoutTier: layoutTier,
-                    showCountChips: showCountChips,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      if (onOpenNavigation != null) ...<Widget>[
+                        GhostButton.icon(
+                          icon: LucideIcons.menu,
+                          semanticLabel: '打开导航菜单',
+                          tooltip: '',
+                          iconSize: 16,
+                          size: 32,
+                          borderRadius: 8,
+                          foregroundColor: Theme.of(context)
+                              .colorScheme
+                              .hentai
+                              .iconDefault,
+                          hoverColor: Theme.of(context).hoverColor,
+                          overlayColor: Theme.of(context).hoverColor,
+                          onPressed: onOpenNavigation,
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      LibraryPageHeader(
+                        layoutTier: layoutTier,
+                        showCountChips: showCountChips,
+                      ),
+                    ],
                   ),
                 ),
               ),

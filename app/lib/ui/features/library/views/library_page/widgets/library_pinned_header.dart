@@ -10,11 +10,13 @@ class LibraryPageHeaderSection extends StatelessWidget {
     required this.layoutTier,
     required this.horizontalPadding,
     this.onOpenFilterSort,
+    this.onOpenNavigation,
   });
 
   final LibraryLayoutTier layoutTier;
   final double horizontalPadding;
   final VoidCallback? onOpenFilterSort;
+  final VoidCallback? onOpenNavigation;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +31,7 @@ class LibraryPageHeaderSection extends StatelessWidget {
       child: LibraryPageHeaderToolbar(
         layoutTier: layoutTier,
         onOpenFilterSort: onOpenFilterSort,
+        onOpenNavigation: onOpenNavigation,
       ),
     );
   }

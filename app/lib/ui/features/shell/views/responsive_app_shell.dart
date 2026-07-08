@@ -12,6 +12,12 @@ import 'package:hentai_library/ui/providers.dart';
 
 enum _ShellLayoutMode { compact, medium, expanded }
 
+final GlobalKey<ScaffoldState> appShellScaffoldKey = GlobalKey<ScaffoldState>();
+
+void openAppShellNavigationDrawer() {
+  appShellScaffoldKey.currentState?.openDrawer();
+}
+
 class ResponsiveAppShell extends ConsumerStatefulWidget {
   const ResponsiveAppShell({super.key, required this.routeChild});
 
@@ -22,14 +28,12 @@ class ResponsiveAppShell extends ConsumerStatefulWidget {
 }
 
 class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   void _onSidebarDestinationSelected(String id) {
     AppNavigation.goToNavId(context, id);
   }
 
   void _openNavigationDrawer() {
-    _scaffoldKey.currentState?.openDrawer();
+    appShellScaffoldKey.currentState?.openDrawer();
   }
 
   _ShellLayoutMode _layoutModeForWidth(double width) {
@@ -84,10 +88,13 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
         final bool showSidebarRail = !isReaderRoute && !useDrawer;
 
         return Scaffold(
-          key: _scaffoldKey,
+          key: appShellScaffoldKey,
           drawer: useDrawer && !isReaderRoute
               ? Drawer(
                   width: DesktopSidebar.expandedWidth,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                   child: _buildSidebar(
                     activeId: sidebarActiveId,
                     isExpanded: true,
@@ -170,9 +177,7 @@ class _ShellTitleBar extends ConsumerWidget {
     }
 
     if (isDesktop) {
-      return AppTitleBar(
-        onOpenNavigation: showNavigationMenu ? onOpenNavigation : null,
-      );
+      return const AppTitleBar();
     }
 
     return AppShellHeader(

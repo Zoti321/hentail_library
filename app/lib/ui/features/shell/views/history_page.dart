@@ -14,6 +14,7 @@ import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/clear_rea
 import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
 import 'package:hentai_library/ui/features/shell/view_models/history_paged_feed_state.dart';
 import 'package:hentai_library/ui/features/shell/views/history_page/history_layout_constants.dart';
+import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double _kHistoryLoadMoreThreshold = 400;
@@ -74,6 +75,9 @@ class HistoryPage extends ConsumerWidget {
                       child: _Header(
                         layoutTier: layoutTier,
                         contentMaxWidth: innerMaxWidth,
+                        onOpenNavigation: layoutTier == HistoryLayoutTier.compact
+                            ? openAppShellNavigationDrawer
+                            : null,
                       ),
                     ),
                   ),
@@ -100,10 +104,12 @@ class _Header extends ConsumerWidget {
   const _Header({
     required this.layoutTier,
     required this.contentMaxWidth,
+    this.onOpenNavigation,
   });
 
   final HistoryLayoutTier layoutTier;
   final double contentMaxWidth;
+  final VoidCallback? onOpenNavigation;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -130,6 +136,22 @@ class _Header extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 6,
       children: <Widget>[
+        if (onOpenNavigation != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: GhostButton.icon(
+              icon: LucideIcons.menu,
+              semanticLabel: '打开导航菜单',
+              tooltip: '',
+              iconSize: 16,
+              size: 32,
+              borderRadius: 8,
+              foregroundColor: theme.colorScheme.hentai.iconDefault,
+              hoverColor: theme.hoverColor,
+              overlayColor: theme.hoverColor,
+              onPressed: onOpenNavigation,
+            ),
+          ),
         Text(
           '阅读历史',
           style: TextStyle(
