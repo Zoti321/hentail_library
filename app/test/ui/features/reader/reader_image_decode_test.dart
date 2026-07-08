@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,11 +19,30 @@ void main() {
     });
   });
 
-  test('buildReaderImageProvider skips decode resize for reader pages', () {
+  test('buildReaderImageProvider returns null for missing file path', () {
     ensureReaderImageCacheConfigured();
 
     final ImageProvider<Object>? provider = buildReaderImageProvider(
-      filePath: r'C:\tmp\page.jpg',
+      filePath: r'C:\hentai_library_tests\missing_reader_page.jpg',
+    );
+
+    expect(provider, isNull);
+  });
+
+  test('buildReaderImageProvider skips decode resize for existing reader pages', () async {
+    ensureReaderImageCacheConfigured();
+    final File file = File(
+      '${Directory.systemTemp.path}/reader_image_decode_test.jpg',
+    );
+    await file.writeAsBytes(const <int>[0xFF, 0xD8, 0xFF]);
+    addTearDown(() {
+      if (file.existsSync()) {
+        file.deleteSync();
+      }
+    });
+
+    final ImageProvider<Object>? provider = buildReaderImageProvider(
+      filePath: file.path,
     );
 
     expect(provider, isA<ExtendedFileImageProvider>());

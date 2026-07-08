@@ -41,6 +41,10 @@ ImageProvider<Object>? buildReaderImageProvider({
   if (resolvedPath == null || resolvedPath.isEmpty) {
     return null;
   }
+  final File file = File(resolvedPath);
+  if (!file.existsSync()) {
+    return null;
+  }
   return ResizeImage.resizeIfNeeded(
     cacheWidth,
     cacheHeight,

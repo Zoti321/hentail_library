@@ -1,4 +1,5 @@
-﻿import 'dart:typed_data';
+﻿import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/reading/reader_page_payload.dart';
@@ -30,6 +31,10 @@ class ReaderImageItem extends ConsumerWidget {
     if (imageData is ReaderDirPageImageData) {
       final ReaderDirPageImageData dirData =
           imageData as ReaderDirPageImageData;
+      final String dirPath = dirData.file.path;
+      if (!_readerImageFileExists(dirPath)) {
+        return errorPlaceholder;
+      }
       return ReaderPageFadeIn(
         enabled: enableCrossfade,
         child: Align(
@@ -60,6 +65,10 @@ class ReaderImageItem extends ConsumerWidget {
       loading: () => loadingSurface,
       error: (_, StackTrace _) => errorPlaceholder,
       data: (ReaderPagePayload page) {
+        if (page is ReaderPageFilePath && !_readerImageFileExists(page.path)) {
+          _scheduleReaderPageReload(ref, archiveData);
+          return loadingSurface;
+        }
         return ReaderPageFadeIn(
           enabled: enableCrossfade,
           child: Align(
@@ -104,4 +113,30 @@ class ReaderImageItem extends ConsumerWidget {
       ),
     );
   }
+}
+
+bool _readerImageFileExists(String path) {
+  final String trimmed = path.trim();
+  if (trimmed.isEmpty) {
+    return false;
+  }
+  try {
+    return File(trimmed).existsSync();
+  } on Object {
+    return false;
+  }
+}
+
+void _scheduleReaderPageReload(
+  WidgetRef ref,
+  ReaderArchivePageImageData archiveData,
+) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    ref.invalidate(
+      comicReaderPageProvider(
+        comicId: archiveData.comicId,
+        pageIndex: archiveData.pageIndex,
+      ),
+    );
+  });
 }
