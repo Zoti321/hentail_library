@@ -43,22 +43,23 @@ void main() {
       expect(find.textContaining('Ctrl+N'), findsNothing);
     });
 
-    testWidgets('compact author panel uses overflow actions without bulk delete', (
-      WidgetTester tester,
-    ) async {
-      await _pumpAuthorPanel(
-        tester,
-        viewportWidth: 360,
-        layoutTier: MetadataLayoutTier.compact,
-      );
+    testWidgets(
+      'compact author panel uses overflow actions without bulk delete',
+      (WidgetTester tester) async {
+        await _pumpAuthorPanel(
+          tester,
+          viewportWidth: 360,
+          layoutTier: MetadataLayoutTier.compact,
+        );
 
-      expect(tester.takeException(), isNull);
-      expect(find.text('作者管理'), findsNothing);
-      expect(find.byTooltip('删除已选'), findsNothing);
-      expect(find.byTooltip('更多操作'), findsNWidgets(2));
-      expect(find.byType(CustomPopupMenu), findsNWidgets(2));
-      expect(find.byType(PopupMenuButton), findsNothing);
-    });
+        expect(tester.takeException(), isNull);
+        expect(find.text('作者管理'), findsNothing);
+        expect(find.byTooltip('删除已选'), findsNothing);
+        expect(find.byTooltip('更多操作'), findsNWidgets(2));
+        expect(find.byType(CustomPopupMenu), findsNWidgets(2));
+        expect(find.byType(PopupMenuButton), findsNothing);
+      },
+    );
 
     testWidgets('expanded author panel keeps row actions in card layout', (
       WidgetTester tester,
@@ -101,9 +102,7 @@ Future<void> _pumpMetadataPage(
             GoRoute(
               path: '/metadata',
               builder: (BuildContext context, GoRouterState state) {
-                return const Scaffold(
-                  body: MetadataManagementPage(),
-                );
+                return const Scaffold(body: MetadataManagementPage());
               },
             ),
           ],
@@ -154,9 +153,7 @@ List<Override> _metadataTestOverrides() {
       ]),
     ),
     allTagsProvider.overrideWith(
-      (Ref ref) => Future<List<Tag>>.value(<Tag>[
-        Tag(name: '标签 A'),
-      ]),
+      (Ref ref) => Future<List<Tag>>.value(<Tag>[Tag(name: '标签 A')]),
     ),
   ];
 }

@@ -30,15 +30,9 @@ void main() {
                 ),
               ),
               actions: <Widget>[
-                TextButton(
-                  onPressed: () {},
-                  child: const Text('稍后提醒'),
-                ),
+                TextButton(onPressed: () {}, child: const Text('稍后提醒')),
                 const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: () {},
-                  child: const Text('立即更新'),
-                ),
+                FilledButton(onPressed: () {}, child: const Text('立即更新')),
               ],
             ),
           ),
@@ -68,20 +62,11 @@ void main() {
               width: 480,
               content: const Text('发布于 2026-07-08'),
               actions: <Widget>[
-                TextButton(
-                  onPressed: () {},
-                  child: const Text('稍后提醒'),
-                ),
+                TextButton(onPressed: () {}, child: const Text('稍后提醒')),
                 const SizedBox(width: 8),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text('查看详情'),
-                ),
+                TextButton(onPressed: () {}, child: const Text('查看详情')),
                 const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: () {},
-                  child: const Text('立即更新'),
-                ),
+                FilledButton(onPressed: () {}, child: const Text('立即更新')),
               ],
             ),
           ),

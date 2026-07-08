@@ -38,10 +38,7 @@ class LibraryPageHeader extends ConsumerWidget {
       children: <Widget>[
         Text(
           AppStrings.libraryTitle,
-          style: libraryPageTitleStyle(
-            theme.colorScheme,
-            layoutTier,
-          ),
+          style: libraryPageTitleStyle(theme.colorScheme, layoutTier),
         ),
         if (showCountChips) ...<Widget>[
           const SizedBox(width: 12),

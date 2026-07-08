@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -46,11 +46,7 @@ class _AppTitleBarState extends State<AppTitleBar> with WindowListener {
       ),
       child: Row(
         children: [
-          const Expanded(
-            child: DragToMoveArea(
-              child: SizedBox.expand(),
-            ),
-          ),
+          const Expanded(child: DragToMoveArea(child: SizedBox.expand())),
           SizedBox(width: 138, height: 36, child: WindowCaption()),
         ],
       ),

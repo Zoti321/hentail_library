@@ -60,10 +60,7 @@ void main() {
         selectedPathsContentMaxWidth,
       );
       expect(
-        selectedPathsInnerContentMaxWidth(
-          SelectedPathsLayoutTier.compact,
-          360,
-        ),
+        selectedPathsInnerContentMaxWidth(SelectedPathsLayoutTier.compact, 360),
         328,
       );
     });

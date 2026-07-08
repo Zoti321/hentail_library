@@ -46,10 +46,7 @@ void main() {
         historyInnerContentMaxWidth(HistoryLayoutTier.expanded, 1600),
         historyContentMaxWidth,
       );
-      expect(
-        historyInnerContentMaxWidth(HistoryLayoutTier.compact, 360),
-        328,
-      );
+      expect(historyInnerContentMaxWidth(HistoryLayoutTier.compact, 360), 328);
     });
   });
 

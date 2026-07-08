@@ -43,7 +43,9 @@ class ComicCard extends ConsumerWidget {
   ) {
     final RenderBox overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox;
-    final Offset relativePosition = overlay.globalToLocal(details.globalPosition);
+    final Offset relativePosition = overlay.globalToLocal(
+      details.globalPosition,
+    );
 
     ComicContextMenu.show(
       context,

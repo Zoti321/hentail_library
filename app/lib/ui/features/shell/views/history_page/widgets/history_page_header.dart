@@ -101,10 +101,7 @@ class HistoryPageHeaderToolbar extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                   ],
-                  Text(
-                    '阅读历史',
-                    style: historyPageTitleStyle(cs, layoutTier),
-                  ),
+                  Text('阅读历史', style: historyPageTitleStyle(cs, layoutTier)),
                 ],
               ),
             ),

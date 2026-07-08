@@ -22,7 +22,9 @@ class _FakeReadingHistoryRepo implements ReadingHistoryRepository {
   bool failNextFetch = false;
   Completer<PagedResult<ReadingHistory>>? pageTwoCompleter;
 
-  void emitHistoryChange([List<ReadingHistory> histories = const <ReadingHistory>[]]) {
+  void emitHistoryChange([
+    List<ReadingHistory> histories = const <ReadingHistory>[],
+  ]) {
     _changesController.add(histories);
   }
 
@@ -200,30 +202,33 @@ void main() {
     expect(state()?.hasReachedEnd, isTrue);
   });
 
-  test('silent refresh reloads first page when history stream changes', () async {
-    await container.read(historyPagedFeedControllerProvider.future);
-    expect(repo.requests, hasLength(1));
+  test(
+    'silent refresh reloads first page when history stream changes',
+    () async {
+      await container.read(historyPagedFeedControllerProvider.future);
+      expect(repo.requests, hasLength(1));
 
-    repo.pagesByKey['1:'] = <PagedResult<ReadingHistory>>[
-      _page(
-        page: 1,
-        totalCount: 4,
-        items: <ReadingHistory>[
-          _history(comicId: 'c9', title: 'Newest', lastReadTimeMs: 9000),
-          _history(comicId: 'c1', title: 'Alpha', lastReadTimeMs: 3000),
-        ],
-      ),
-    ];
-    repo.emitHistoryChange();
-    await Future<void>.delayed(const Duration(milliseconds: 250));
-    await Future<void>.delayed(Duration.zero);
+      repo.pagesByKey['1:'] = <PagedResult<ReadingHistory>>[
+        _page(
+          page: 1,
+          totalCount: 4,
+          items: <ReadingHistory>[
+            _history(comicId: 'c9', title: 'Newest', lastReadTimeMs: 9000),
+            _history(comicId: 'c1', title: 'Alpha', lastReadTimeMs: 3000),
+          ],
+        ),
+      ];
+      repo.emitHistoryChange();
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+      await Future<void>.delayed(Duration.zero);
 
-    expect(state()?.items.first.comicId, 'c9');
-    expect(state()?.totalCount, 4);
-    expect(state()?.loadedPage, 1);
-    expect(repo.requests.length, greaterThanOrEqualTo(2));
-    expect(repo.requests.last.page, 1);
-  });
+      expect(state()?.items.first.comicId, 'c9');
+      expect(state()?.totalCount, 4);
+      expect(state()?.loadedPage, 1);
+      expect(repo.requests.length, greaterThanOrEqualTo(2));
+      expect(repo.requests.last.page, 1);
+    },
+  );
 
   test('silent refresh discards stale loadMore result', () async {
     final Completer<PagedResult<ReadingHistory>> pageTwoCompleter =

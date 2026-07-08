@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -33,10 +33,7 @@ class SelectedPathsPageHeaderSection extends StatelessWidget {
 }
 
 class SelectedPathsPageHeaderToolbar extends StatelessWidget {
-  const SelectedPathsPageHeaderToolbar({
-    super.key,
-    required this.layoutTier,
-  });
+  const SelectedPathsPageHeaderToolbar({super.key, required this.layoutTier});
 
   final SelectedPathsLayoutTier layoutTier;
 

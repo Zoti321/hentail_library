@@ -126,10 +126,7 @@ class _LibrarySeriesGridSliver extends StatelessWidget {
         final Series s = series[index];
         return Center(
           key: ValueKey<String>('library-series-${s.id}'),
-          child: SeriesCard(
-            series: s,
-            onTap: () => _openSeriesDetail(s),
-          ),
+          child: SeriesCard(series: s, onTap: () => _openSeriesDetail(s)),
         );
       },
     );

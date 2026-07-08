@@ -96,9 +96,7 @@ Future<void> _pumpHistoryPage(
       overrides: _historyPageTestOverrides(),
       child: MaterialApp(
         theme: buildAppTheme(Brightness.light),
-        home: const Scaffold(
-          body: HistoryPage(),
-        ),
+        home: const Scaffold(body: HistoryPage()),
       ),
     ),
   );

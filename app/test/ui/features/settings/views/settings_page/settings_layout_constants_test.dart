@@ -37,8 +37,14 @@ void main() {
     });
 
     test('toggles compact-only theme chevron action', () {
-      expect(settingsThemeRowUsesChevronAction(SettingsLayoutTier.compact), isTrue);
-      expect(settingsThemeRowUsesChevronAction(SettingsLayoutTier.expanded), isFalse);
+      expect(
+        settingsThemeRowUsesChevronAction(SettingsLayoutTier.compact),
+        isTrue,
+      );
+      expect(
+        settingsThemeRowUsesChevronAction(SettingsLayoutTier.expanded),
+        isFalse,
+      );
     });
   });
 

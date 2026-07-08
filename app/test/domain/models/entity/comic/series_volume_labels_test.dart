@@ -2,10 +2,7 @@ import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:test/test.dart';
 
-Series _series({
-  int itemCount = 3,
-  int? totalCount,
-}) {
+Series _series({int itemCount = 3, int? totalCount}) {
   return Series(
     id: 'series-1',
     name: 'Test Series',
@@ -13,10 +10,7 @@ Series _series({
     totalCount: totalCount,
     items: List<SeriesItem>.generate(
       itemCount,
-      (int index) => SeriesItem(
-        comicId: 'comic-$index',
-        order: index,
-      ),
+      (int index) => SeriesItem(comicId: 'comic-$index', order: index),
     ),
   );
 }

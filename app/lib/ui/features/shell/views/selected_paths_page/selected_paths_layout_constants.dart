@@ -41,9 +41,11 @@ double selectedPathsInnerContentMaxWidth(
   final double horizontalPadding = selectedPathsContentHorizontalPadding(tier);
   final double paddedWidth = viewportWidth - horizontalPadding * 2;
   return switch (tier) {
-    SelectedPathsLayoutTier.expanded =>
-      math.min(paddedWidth, selectedPathsContentMaxWidth),
-    SelectedPathsLayoutTier.compact || SelectedPathsLayoutTier.medium =>
+    SelectedPathsLayoutTier.expanded => math.min(
       paddedWidth,
+      selectedPathsContentMaxWidth,
+    ),
+    SelectedPathsLayoutTier.compact ||
+    SelectedPathsLayoutTier.medium => paddedWidth,
   };
 }

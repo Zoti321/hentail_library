@@ -25,7 +25,9 @@ void main() {
       _expectStatsSingleColumn(tester);
     });
 
-    testWidgets('medium width uses 2x2 stats grid', (WidgetTester tester) async {
+    testWidgets('medium width uses 2x2 stats grid', (
+      WidgetTester tester,
+    ) async {
       await _pumpHomePage(tester, const Size(700, 900));
 
       expect(tester.takeException(), isNull);
@@ -90,11 +92,7 @@ void main() {
         const double contentWidth = 650 - DesktopSidebar.collapsedWidth;
         expect(contentWidth, lessThan(AppLayoutBreakpoints.compact));
 
-        await _pumpHomePage(
-          tester,
-          windowSize,
-          contentWidth: contentWidth,
-        );
+        await _pumpHomePage(tester, windowSize, contentWidth: contentWidth);
 
         expect(tester.takeException(), isNull);
         expect(tester.widget<Text>(find.text('首页')).style?.fontSize, 18);

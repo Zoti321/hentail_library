@@ -32,8 +32,7 @@ class SeriesCard extends StatelessWidget {
               variant: ComicCoverPlaceholderVariant.card,
               kind: ComicCoverPlaceholderKind.noCover,
             ),
-      info: (bool isHover) =>
-          _SeriesCardInfo(series: series, isHover: isHover),
+      info: (bool isHover) => _SeriesCardInfo(series: series, isHover: isHover),
     );
   }
 }

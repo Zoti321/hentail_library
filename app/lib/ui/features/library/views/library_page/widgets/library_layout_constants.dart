@@ -102,7 +102,10 @@ double libraryOverflowMenuWidth(LibraryLayoutTier tier, double viewportWidth) {
   };
 }
 
-double libraryFilterSortDrawerWidth(LibraryLayoutTier tier, double viewportWidth) {
+double libraryFilterSortDrawerWidth(
+  LibraryLayoutTier tier,
+  double viewportWidth,
+) {
   return switch (tier) {
     LibraryLayoutTier.compact => math.min(
       math.max(viewportWidth * 0.55, 200),

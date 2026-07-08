@@ -35,10 +35,7 @@ class MetadataPanelRowActions extends StatelessWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
 
     if (metadataRowUsesOverflowMenu(layoutTier)) {
-      return _MetadataRowOverflowButton(
-        onRename: onRename,
-        onDelete: onDelete,
-      );
+      return _MetadataRowOverflowButton(onRename: onRename, onDelete: onDelete);
     }
 
     return Row(
@@ -87,7 +84,8 @@ class _MetadataRowOverflowButton extends StatefulWidget {
       _MetadataRowOverflowButtonState();
 }
 
-class _MetadataRowOverflowButtonState extends State<_MetadataRowOverflowButton> {
+class _MetadataRowOverflowButtonState
+    extends State<_MetadataRowOverflowButton> {
   final CustomPopupMenuController _controller = CustomPopupMenuController();
 
   @override

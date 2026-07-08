@@ -29,23 +29,26 @@ void main() {
     expect(provider, isNull);
   });
 
-  test('buildReaderImageProvider skips decode resize for existing reader pages', () async {
-    ensureReaderImageCacheConfigured();
-    final File file = File(
-      '${Directory.systemTemp.path}/reader_image_decode_test.jpg',
-    );
-    await file.writeAsBytes(const <int>[0xFF, 0xD8, 0xFF]);
-    addTearDown(() {
-      if (file.existsSync()) {
-        file.deleteSync();
-      }
-    });
+  test(
+    'buildReaderImageProvider skips decode resize for existing reader pages',
+    () async {
+      ensureReaderImageCacheConfigured();
+      final File file = File(
+        '${Directory.systemTemp.path}/reader_image_decode_test.jpg',
+      );
+      await file.writeAsBytes(const <int>[0xFF, 0xD8, 0xFF]);
+      addTearDown(() {
+        if (file.existsSync()) {
+          file.deleteSync();
+        }
+      });
 
-    final ImageProvider<Object>? provider = buildReaderImageProvider(
-      filePath: file.path,
-    );
+      final ImageProvider<Object>? provider = buildReaderImageProvider(
+        filePath: file.path,
+      );
 
-    expect(provider, isA<ExtendedFileImageProvider>());
-    expect(provider, isNot(isA<ResizeImage>()));
-  });
+      expect(provider, isA<ExtendedFileImageProvider>());
+      expect(provider, isNot(isA<ResizeImage>()));
+    },
+  );
 }

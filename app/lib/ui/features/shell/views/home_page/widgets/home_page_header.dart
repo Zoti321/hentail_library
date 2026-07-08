@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/shell/views/home_page/widgets/home_page_constants.dart';
@@ -20,10 +20,7 @@ TextStyle homePageTitleStyle(
 }
 
 TextStyle homePageSubtitleStyle(ColorScheme colorScheme) {
-  return TextStyle(
-    color: colorScheme.hentai.textTertiary,
-    fontSize: 13,
-  );
+  return TextStyle(color: colorScheme.hentai.textTertiary, fontSize: 13);
 }
 
 /// 粘连 header：左汉堡(仅 compact)+标题，右扫描按钮；通栏背景由 [HomePinnedHeaderDelegate] 提供。

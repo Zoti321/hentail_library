@@ -15,10 +15,7 @@ import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AuthorManagementPanel extends ConsumerWidget {
-  const AuthorManagementPanel({
-    required this.layoutTier,
-    super.key,
-  });
+  const AuthorManagementPanel({required this.layoutTier, super.key});
 
   final MetadataLayoutTier layoutTier;
 
@@ -180,10 +177,7 @@ class _AuthorStyles {
 }
 
 class _AuthorListCard extends StatelessWidget {
-  const _AuthorListCard({
-    required this.layoutTier,
-    required this.authors,
-  });
+  const _AuthorListCard({required this.layoutTier, required this.authors});
 
   final MetadataLayoutTier layoutTier;
   final List<Author> authors;

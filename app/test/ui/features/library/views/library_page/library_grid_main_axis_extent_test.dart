@@ -47,10 +47,7 @@ void main() {
     ) async {
       for (final LibraryLayoutTier tier in LibraryLayoutTier.values) {
         final double width = libraryGridMaxCrossAxisExtent(tier);
-        final double height = libraryGridMainAxisExtentFromTokens(
-          tokens,
-          tier,
-        );
+        final double height = libraryGridMainAxisExtentFromTokens(tokens, tier);
 
         await tester.pumpWidget(
           MaterialApp(
@@ -78,9 +75,7 @@ void main() {
                         ),
                         Text(
                           '0 页',
-                          style: TextStyle(
-                            fontSize: tokens.text.labelXs - 1,
-                          ),
+                          style: TextStyle(fontSize: tokens.text.labelXs - 1),
                         ),
                       ],
                     ),

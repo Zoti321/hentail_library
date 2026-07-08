@@ -238,132 +238,96 @@ class _StatsCards extends ConsumerWidget {
     return homeCounts.when(
       data: (HomePageCounts c) => _HomeStatsCardLayout(
         layoutTier: layoutTier,
-        comicCard: _buildStatCard(
-          context,
-          (
-            label: '漫画库',
-            valueText: '${c.comicCount}',
-            caption: '共 ${c.comicCount} 本',
-            icon: LucideIcons.bookImage,
-            accentColor: accents.library,
-          ),
-        ),
-        seriesCard: _buildStatCard(
-          context,
-          (
-            label: '系列',
-            valueText: '${c.seriesCount}',
-            caption: '${c.seriesCount} 个系列',
-            icon: LucideIcons.library,
-            accentColor: accents.series,
-          ),
-        ),
-        tagsCard: _buildStatCard(
-          context,
-          (
-            label: '标签',
-            valueText: '${c.tagCount}',
-            caption: '${c.tagCount} 个标签',
-            icon: LucideIcons.tags,
-            accentColor: accents.tags,
-          ),
-        ),
-        authorCard: _buildStatCard(
-          context,
-          (
-            label: '作者',
-            valueText: '${c.authorCount}',
-            caption: c.authorCount == 0 ? '暂无作者' : '${c.authorCount} 位',
-            icon: LucideIcons.penLine,
-            accentColor: accents.authors,
-          ),
-        ),
+        comicCard: _buildStatCard(context, (
+          label: '漫画库',
+          valueText: '${c.comicCount}',
+          caption: '共 ${c.comicCount} 本',
+          icon: LucideIcons.bookImage,
+          accentColor: accents.library,
+        )),
+        seriesCard: _buildStatCard(context, (
+          label: '系列',
+          valueText: '${c.seriesCount}',
+          caption: '${c.seriesCount} 个系列',
+          icon: LucideIcons.library,
+          accentColor: accents.series,
+        )),
+        tagsCard: _buildStatCard(context, (
+          label: '标签',
+          valueText: '${c.tagCount}',
+          caption: '${c.tagCount} 个标签',
+          icon: LucideIcons.tags,
+          accentColor: accents.tags,
+        )),
+        authorCard: _buildStatCard(context, (
+          label: '作者',
+          valueText: '${c.authorCount}',
+          caption: c.authorCount == 0 ? '暂无作者' : '${c.authorCount} 位',
+          icon: LucideIcons.penLine,
+          accentColor: accents.authors,
+        )),
       ),
       loading: () => _HomeStatsCardLayout(
         layoutTier: layoutTier,
-        comicCard: _buildStatCard(
-          context,
-          (
-            label: '漫画库',
-            valueText: '$comicCount',
-            caption: '共 $comicCount 本',
-            icon: LucideIcons.bookImage,
-            accentColor: accents.library,
-          ),
-        ),
-        seriesCard: _buildStatCard(
-          context,
-          (
-            label: '系列',
-            valueText: '--',
-            caption: '加载中…',
-            icon: LucideIcons.library,
-            accentColor: accents.series,
-          ),
-        ),
-        tagsCard: _buildStatCard(
-          context,
-          (
-            label: '标签',
-            valueText: '--',
-            caption: '加载中…',
-            icon: LucideIcons.tags,
-            accentColor: accents.tags,
-          ),
-        ),
-        authorCard: _buildStatCard(
-          context,
-          (
-            label: '作者',
-            valueText: '--',
-            caption: '加载中…',
-            icon: LucideIcons.penLine,
-            accentColor: accents.authors,
-          ),
-        ),
+        comicCard: _buildStatCard(context, (
+          label: '漫画库',
+          valueText: '$comicCount',
+          caption: '共 $comicCount 本',
+          icon: LucideIcons.bookImage,
+          accentColor: accents.library,
+        )),
+        seriesCard: _buildStatCard(context, (
+          label: '系列',
+          valueText: '--',
+          caption: '加载中…',
+          icon: LucideIcons.library,
+          accentColor: accents.series,
+        )),
+        tagsCard: _buildStatCard(context, (
+          label: '标签',
+          valueText: '--',
+          caption: '加载中…',
+          icon: LucideIcons.tags,
+          accentColor: accents.tags,
+        )),
+        authorCard: _buildStatCard(context, (
+          label: '作者',
+          valueText: '--',
+          caption: '加载中…',
+          icon: LucideIcons.penLine,
+          accentColor: accents.authors,
+        )),
       ),
       error: (Object error, StackTrace stackTrace) => _HomeStatsCardLayout(
         layoutTier: layoutTier,
-        comicCard: _buildStatCard(
-          context,
-          (
-            label: '漫画库',
-            valueText: '$comicCount',
-            caption: '共 $comicCount 本',
-            icon: LucideIcons.bookImage,
-            accentColor: accents.library,
-          ),
-        ),
-        seriesCard: _buildStatCard(
-          context,
-          (
-            label: '系列',
-            valueText: '--',
-            caption: '加载失败',
-            icon: LucideIcons.library,
-            accentColor: accents.series,
-          ),
-        ),
-        tagsCard: _buildStatCard(
-          context,
-          (
-            label: '标签',
-            valueText: '--',
-            caption: '加载失败',
-            icon: LucideIcons.tags,
-            accentColor: accents.tags,
-          ),
-        ),
-        authorCard: _buildStatCard(
-          context,
-          (
-            label: '作者',
-            valueText: '--',
-            caption: '加载失败',
-            icon: LucideIcons.penLine,
-            accentColor: accents.authors,
-          ),
-        ),
+        comicCard: _buildStatCard(context, (
+          label: '漫画库',
+          valueText: '$comicCount',
+          caption: '共 $comicCount 本',
+          icon: LucideIcons.bookImage,
+          accentColor: accents.library,
+        )),
+        seriesCard: _buildStatCard(context, (
+          label: '系列',
+          valueText: '--',
+          caption: '加载失败',
+          icon: LucideIcons.library,
+          accentColor: accents.series,
+        )),
+        tagsCard: _buildStatCard(context, (
+          label: '标签',
+          valueText: '--',
+          caption: '加载失败',
+          icon: LucideIcons.tags,
+          accentColor: accents.tags,
+        )),
+        authorCard: _buildStatCard(context, (
+          label: '作者',
+          valueText: '--',
+          caption: '加载失败',
+          icon: LucideIcons.penLine,
+          accentColor: accents.authors,
+        )),
       ),
     );
   }
@@ -384,46 +348,34 @@ class _StatsCardsPlaceholder extends StatelessWidget {
     final _HomeStatAccentColors accents = _HomeStatAccentColors(colorScheme);
     return _HomeStatsCardLayout(
       layoutTier: layoutTier,
-      comicCard: _buildStatCard(
-        context,
-        (
-          label: '漫画库',
-          valueText: '$comicCount',
-          caption: '共 $comicCount 本',
-          icon: LucideIcons.bookImage,
-          accentColor: accents.library,
-        ),
-      ),
-      seriesCard: _buildStatCard(
-        context,
-        (
-          label: '系列',
-          valueText: '--',
-          caption: '加载中…',
-          icon: LucideIcons.library,
-          accentColor: accents.series,
-        ),
-      ),
-      tagsCard: _buildStatCard(
-        context,
-        (
-          label: '标签',
-          valueText: '--',
-          caption: '加载中…',
-          icon: LucideIcons.tags,
-          accentColor: accents.tags,
-        ),
-      ),
-      authorCard: _buildStatCard(
-        context,
-        (
-          label: '作者',
-          valueText: '--',
-          caption: '加载中…',
-          icon: LucideIcons.penLine,
-          accentColor: accents.authors,
-        ),
-      ),
+      comicCard: _buildStatCard(context, (
+        label: '漫画库',
+        valueText: '$comicCount',
+        caption: '共 $comicCount 本',
+        icon: LucideIcons.bookImage,
+        accentColor: accents.library,
+      )),
+      seriesCard: _buildStatCard(context, (
+        label: '系列',
+        valueText: '--',
+        caption: '加载中…',
+        icon: LucideIcons.library,
+        accentColor: accents.series,
+      )),
+      tagsCard: _buildStatCard(context, (
+        label: '标签',
+        valueText: '--',
+        caption: '加载中…',
+        icon: LucideIcons.tags,
+        accentColor: accents.tags,
+      )),
+      authorCard: _buildStatCard(context, (
+        label: '作者',
+        valueText: '--',
+        caption: '加载中…',
+        icon: LucideIcons.penLine,
+        accentColor: accents.authors,
+      )),
     );
   }
 }
@@ -432,11 +384,7 @@ class _HomeStatAccentColors {
   _HomeStatAccentColors(ColorScheme colorScheme)
     : library = colorScheme.primary,
       series = colorScheme.secondary,
-      tags = Color.lerp(
-        colorScheme.primary,
-        colorScheme.secondary,
-        0.45,
-      )!,
+      tags = Color.lerp(colorScheme.primary, colorScheme.secondary, 0.45)!,
       authors = colorScheme.inversePrimary;
 
   final Color library;

@@ -46,18 +46,18 @@ double settingsInnerContentMaxWidth(
   final double horizontalPadding = settingsContentHorizontalPadding(tier);
   final double paddedWidth = viewportWidth - horizontalPadding * 2;
   return switch (tier) {
-    SettingsLayoutTier.expanded => math.min(paddedWidth, settingsContentMaxWidth),
+    SettingsLayoutTier.expanded => math.min(
+      paddedWidth,
+      settingsContentMaxWidth,
+    ),
     SettingsLayoutTier.compact || SettingsLayoutTier.medium => paddedWidth,
   };
 }
 
-double settingsThemeMenuWidth(
-  SettingsLayoutTier tier,
-  double viewportWidth,
-) {
+double settingsThemeMenuWidth(SettingsLayoutTier tier, double viewportWidth) {
   return switch (tier) {
     SettingsLayoutTier.compact => math.min(viewportWidth - 32, 200),
-    SettingsLayoutTier.medium || SettingsLayoutTier.expanded =>
-      settingsThemeMenuWidthMedium,
+    SettingsLayoutTier.medium ||
+    SettingsLayoutTier.expanded => settingsThemeMenuWidthMedium,
   };
 }

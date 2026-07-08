@@ -73,9 +73,7 @@ void main() {
             theme: buildAppTheme(Brightness.light),
             home: MediaQuery(
               data: const MediaQueryData(size: Size(viewportWidth, 800)),
-              child: const Scaffold(
-                body: LibraryFilterSortDrawer(),
-              ),
+              child: const Scaffold(body: LibraryFilterSortDrawer()),
             ),
           ),
         ),
@@ -93,24 +91,19 @@ void main() {
 
   group('libraryGridDelegateForTokens', () {
     test('returns tiered grid metrics', () {
-      final AppThemeTokens tokens = buildAppTheme(Brightness.light)
-          .extension<AppThemeTokens>()!;
+      final AppThemeTokens tokens = buildAppTheme(
+        Brightness.light,
+      ).extension<AppThemeTokens>()!;
 
       final SliverGridDelegateWithMaxCrossAxisExtent compactDelegate =
-          libraryGridDelegateForTokens(
-                tokens,
-                LibraryLayoutTier.compact,
-              )
+          libraryGridDelegateForTokens(tokens, LibraryLayoutTier.compact)
               as SliverGridDelegateWithMaxCrossAxisExtent;
       expect(compactDelegate.maxCrossAxisExtent, 168);
       expect(compactDelegate.crossAxisSpacing, 12);
       expect(compactDelegate.mainAxisSpacing, 12);
 
       final SliverGridDelegateWithMaxCrossAxisExtent expandedDelegate =
-          libraryGridDelegateForTokens(
-                tokens,
-                LibraryLayoutTier.expanded,
-              )
+          libraryGridDelegateForTokens(tokens, LibraryLayoutTier.expanded)
               as SliverGridDelegateWithMaxCrossAxisExtent;
       expect(expandedDelegate.maxCrossAxisExtent, 200);
       expect(expandedDelegate.crossAxisSpacing, 16);
@@ -158,7 +151,9 @@ List<Override> _libraryHeaderTestOverrides() {
     libraryDisplayTargetProvider.overrideWith(
       (Ref ref) => LibraryDisplayTarget.comics,
     ),
-    libraryActiveFilterSortIsCustomizedProvider.overrideWith((Ref ref) => false),
+    libraryActiveFilterSortIsCustomizedProvider.overrideWith(
+      (Ref ref) => false,
+    ),
     libraryActivePageSizeProvider.overrideWith((Ref ref) => 20),
   ];
 }

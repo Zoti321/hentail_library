@@ -5,10 +5,7 @@ void main() {
   group('resolveReaderExitLocation', () {
     test('prefers series detail when seriesId is present', () {
       expect(
-        resolveReaderExitLocation(
-          comicId: 'comic-a',
-          seriesId: 'series/1',
-        ),
+        resolveReaderExitLocation(comicId: 'comic-a', seriesId: 'series/1'),
         '/series/${Uri.encodeComponent('series/1')}',
       );
     });

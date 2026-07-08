@@ -37,10 +37,9 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
                           iconSize: 16,
                           size: 32,
                           borderRadius: 8,
-                          foregroundColor: Theme.of(context)
-                              .colorScheme
-                              .hentai
-                              .iconDefault,
+                          foregroundColor: Theme.of(
+                            context,
+                          ).colorScheme.hentai.iconDefault,
                           hoverColor: Theme.of(context).hoverColor,
                           overlayColor: Theme.of(context).hoverColor,
                           onPressed: onOpenNavigation,
@@ -346,7 +345,9 @@ class _LibraryCompactToolbar extends ConsumerWidget {
 }
 
 class _LibraryOverflowMenuButton extends ConsumerStatefulWidget {
-  const _LibraryOverflowMenuButton({this.layoutTier = LibraryLayoutTier.expanded});
+  const _LibraryOverflowMenuButton({
+    this.layoutTier = LibraryLayoutTier.expanded,
+  });
 
   final LibraryLayoutTier layoutTier;
 
@@ -356,7 +357,9 @@ class _LibraryOverflowMenuButton extends ConsumerStatefulWidget {
 }
 
 class _LibraryPageSizeMenuButton extends ConsumerStatefulWidget {
-  const _LibraryPageSizeMenuButton({this.layoutTier = LibraryLayoutTier.expanded});
+  const _LibraryPageSizeMenuButton({
+    this.layoutTier = LibraryLayoutTier.expanded,
+  });
 
   final LibraryLayoutTier layoutTier;
 

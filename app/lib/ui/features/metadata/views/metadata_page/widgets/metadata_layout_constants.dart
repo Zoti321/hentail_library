@@ -67,14 +67,11 @@ double metadataSearchFieldWidth(
   MetadataLayoutTier tier,
   double contentMaxWidth,
 ) {
-  return contentSearchFieldWidth(
-    switch (tier) {
-      MetadataLayoutTier.compact => ContentLayoutTier.compact,
-      MetadataLayoutTier.medium => ContentLayoutTier.medium,
-      MetadataLayoutTier.expanded => ContentLayoutTier.expanded,
-    },
-    contentMaxWidth,
-  );
+  return contentSearchFieldWidth(switch (tier) {
+    MetadataLayoutTier.compact => ContentLayoutTier.compact,
+    MetadataLayoutTier.medium => ContentLayoutTier.medium,
+    MetadataLayoutTier.expanded => ContentLayoutTier.expanded,
+  }, contentMaxWidth);
 }
 
 String metadataAddEntityTooltip(int tabIndex) {

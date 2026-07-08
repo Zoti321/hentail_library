@@ -10,10 +10,7 @@ const double kHistorySearchToListSpacing = 16;
 
 enum HistoryLayoutTier { compact, medium, expanded }
 
-typedef HistoryGridMetrics = ({
-  int crossAxisCount,
-  double mainAxisExtent,
-});
+typedef HistoryGridMetrics = ({int crossAxisCount, double mainAxisExtent});
 
 HistoryLayoutTier historyLayoutTierForWidth(double width) {
   if (AppLayoutBreakpoints.isCompact(width)) {
@@ -60,22 +57,11 @@ HistoryGridMetrics historyGridMetrics(
   final double paddedWidth =
       viewportWidth - historyContentHorizontalPadding(tier) * 2;
   return switch (tier) {
-    HistoryLayoutTier.compact => (
-      crossAxisCount: 1,
-      mainAxisExtent: 120.0,
-    ),
-    HistoryLayoutTier.medium => (
-      crossAxisCount: 2,
-      mainAxisExtent: 132.0,
-    ),
-    HistoryLayoutTier.expanded => paddedWidth >= historyContentMaxWidth
-        ? (
-            crossAxisCount: 4,
-            mainAxisExtent: 138.0,
-          )
-        : (
-            crossAxisCount: 3,
-            mainAxisExtent: 138.0,
-          ),
+    HistoryLayoutTier.compact => (crossAxisCount: 1, mainAxisExtent: 120.0),
+    HistoryLayoutTier.medium => (crossAxisCount: 2, mainAxisExtent: 132.0),
+    HistoryLayoutTier.expanded =>
+      paddedWidth >= historyContentMaxWidth
+          ? (crossAxisCount: 4, mainAxisExtent: 138.0)
+          : (crossAxisCount: 3, mainAxisExtent: 138.0),
   };
 }

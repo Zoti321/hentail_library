@@ -15,10 +15,7 @@ import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class TagManagementPanel extends ConsumerWidget {
-  const TagManagementPanel({
-    required this.layoutTier,
-    super.key,
-  });
+  const TagManagementPanel({required this.layoutTier, super.key});
 
   final MetadataLayoutTier layoutTier;
 
@@ -179,10 +176,7 @@ class _TagStyles {
 }
 
 class _TagListCard extends StatelessWidget {
-  const _TagListCard({
-    required this.layoutTier,
-    required this.tags,
-  });
+  const _TagListCard({required this.layoutTier, required this.tags});
 
   final MetadataLayoutTier layoutTier;
   final List<Tag> tags;
@@ -227,10 +221,7 @@ class _TagListCard extends StatelessWidget {
 }
 
 class _TagListHeader extends ConsumerWidget {
-  const _TagListHeader({
-    required this.totalCount,
-    this.compactStyle = false,
-  });
+  const _TagListHeader({required this.totalCount, this.compactStyle = false});
 
   final int totalCount;
   final bool compactStyle;
@@ -420,10 +411,7 @@ class _TagManagementLoadingState extends StatelessWidget {
 }
 
 class _TagManagementErrorState extends StatelessWidget {
-  const _TagManagementErrorState({
-    required this.error,
-    required this.inline,
-  });
+  const _TagManagementErrorState({required this.error, required this.inline});
 
   final Object error;
   final bool inline;

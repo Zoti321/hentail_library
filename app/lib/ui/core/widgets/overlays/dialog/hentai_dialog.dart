@@ -1,4 +1,4 @@
-﻿import 'dart:math' as math;
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -185,7 +185,9 @@ List<Widget> _normalizeDialogActions(List<Widget> actions) {
   return actions
       .where(
         (Widget action) =>
-            !(action is SizedBox && action.child == null && action.width != null),
+            !(action is SizedBox &&
+                action.child == null &&
+                action.width != null),
       )
       .toList(growable: false);
 }

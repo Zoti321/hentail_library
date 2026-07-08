@@ -107,8 +107,9 @@ class _MetadataManagementPageState
               final MetadataLayoutTier layoutTier = metadataLayoutTierForWidth(
                 viewportWidth,
               );
-              final double horizontalPadding =
-                  metadataContentHorizontalPadding(layoutTier);
+              final double horizontalPadding = metadataContentHorizontalPadding(
+                layoutTier,
+              );
               final double innerMaxWidth = metadataInnerContentMaxWidth(
                 layoutTier,
                 viewportWidth,
@@ -236,9 +237,7 @@ class _MetadataManagementPageState
                   Expanded(
                     child: _visitedTabIndexes.contains(selectedIndex)
                         ? switch (selectedIndex) {
-                            0 => AuthorManagementPanel(
-                              layoutTier: layoutTier,
-                            ),
+                            0 => AuthorManagementPanel(layoutTier: layoutTier),
                             1 => TagManagementPanel(layoutTier: layoutTier),
                             _ => TagManagementPanel(layoutTier: layoutTier),
                           }

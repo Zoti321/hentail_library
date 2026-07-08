@@ -64,7 +64,10 @@ void main() {
     ) async {
       await _pumpSettingsView(tester, viewportWidth: 360);
 
-      expect(settingsThemeRowUsesChevronAction(SettingsLayoutTier.compact), isTrue);
+      expect(
+        settingsThemeRowUsesChevronAction(SettingsLayoutTier.compact),
+        isTrue,
+      );
       expect(find.text('跟随系统'), findsNothing);
     });
 

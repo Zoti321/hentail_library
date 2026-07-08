@@ -47,9 +47,7 @@ class DesktopSidebar extends StatelessWidget {
         children: [
           if (showCollapseToggle) ...<Widget>[
             Align(
-              alignment: isExpanded
-                  ? Alignment.centerLeft
-                  : Alignment.center,
+              alignment: isExpanded ? Alignment.centerLeft : Alignment.center,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: GhostButton.icon(

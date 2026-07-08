@@ -103,10 +103,7 @@ class MetadataPageHeaderToolbar extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                       ],
-                      Text(
-                        '管理',
-                        style: metadataPageTitleStyle(cs, layoutTier),
-                      ),
+                      Text('管理', style: metadataPageTitleStyle(cs, layoutTier)),
                     ],
                   ),
                 ),
