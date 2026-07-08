@@ -26,8 +26,8 @@ class SeriesCard extends StatelessWidget {
     return CatalogCoverCardShell(
       onTap: onTap,
       onSecondaryTapUp: onSecondaryTapUp,
-      cover: (bool isHover) => coverComicId != null
-          ? ComicCoverContent(comicId: coverComicId, isHover: isHover)
+      cover: coverComicId != null
+          ? ComicCoverContent(comicId: coverComicId)
           : const ComicCoverPlaceholder(
               variant: ComicCoverPlaceholderVariant.card,
               kind: ComicCoverPlaceholderKind.noCover,

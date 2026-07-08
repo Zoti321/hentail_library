@@ -27,8 +27,7 @@ class ComicCard extends ConsumerWidget {
       onSecondaryTapUp: (TapUpDetails details) {
         _showContextMenu(context, ref, details);
       },
-      cover: (bool isHover) =>
-          ComicCoverContent(comicId: comic.comicId, isHover: isHover),
+      cover: ComicCoverContent(comicId: comic.comicId),
       info: (bool isHover) => _ComicCardInfo(
         title: comic.title,
         pageCount: comic.pageCount,

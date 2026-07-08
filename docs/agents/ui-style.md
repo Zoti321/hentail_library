@@ -110,17 +110,18 @@ Key semantic groups in `HentaiColorScheme`:
 
 ### Card & list item pattern
 
-Catalog grid cards share `CatalogCoverCardShell` (internal chrome + 2:3 cover frame). Pages use `ComicCard` / `SeriesCard`, not the shell directly.
+Catalog grid cards share `CatalogCoverCardShell` (internal chrome + 2:3 edge-to-edge cover). Pages use `ComicCard` / `SeriesCard`, not the shell directly.
 
 ```
 CatalogCoverCardShell
   border: borderSubtle 1px
-  radius: tokens.radius.lg (12)
+  radius: tokens.radius.xs (4)
   background: cs.surface
-  padding: tokens.spacing.sm
-  hover → cardShadowHover
-  └── cover frame (md radius, 2:3) → ComicCoverContent / placeholder
-  └── title + meta row (MI_Sans; pages via ComicCard / SeriesCard info slot)
+  rest → cardShadow; hover → cardShadowHover
+  clip: same xs radius (cover flush to top/sides; square bottom edge)
+  └── cover (2:3, no hover scale/shadow) → ComicCoverContent / placeholder
+  └── info padding: left/right/bottom sm; gap from cover: spacing.md
+      title + meta (hover → primary title color)
 ```
 
 `MetaChip` / `TagChip`: `surfaceContainerHighest` fill, 8px radius, icon 14px + label 12px w600.
