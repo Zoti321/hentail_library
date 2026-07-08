@@ -3,14 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/shell/view_models/selected_paths_page_notifier.dart';
-import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_layout_constants.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_page.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
   group('Selected paths responsive layout', () {
-    testWidgets('compact page hides subtitle without overflow', (
+    testWidgets('compact page shows back and title without overflow', (
       WidgetTester tester,
     ) async {
       await _pumpSelectedPathsPage(tester, viewportWidth: 360);
@@ -19,10 +18,13 @@ void main() {
       final Text title = tester.widget<Text>(find.text('选中路径'));
       expect(title.style?.fontSize, 18);
       expect(find.text('管理本地漫画根目录，支持批量选择'), findsNothing);
-      expect(find.textContaining('路径 1'), findsOneWidget);
+      expect(find.textContaining('路径 '), findsNothing);
+      expect(find.text('清空选择'), findsNothing);
+      expect(find.byTooltip('返回'), findsOneWidget);
+      expect(find.text('添加路径'), findsOneWidget);
     });
 
-    testWidgets('medium page shows subtitle and medium title', (
+    testWidgets('medium page keeps medium title and add path', (
       WidgetTester tester,
     ) async {
       await _pumpSelectedPathsPage(tester, viewportWidth: 700);
@@ -30,7 +32,8 @@ void main() {
       expect(tester.takeException(), isNull);
       final Text title = tester.widget<Text>(find.text('选中路径'));
       expect(title.style?.fontSize, 22);
-      expect(find.text('管理本地漫画根目录，支持批量选择'), findsOneWidget);
+      expect(find.text('管理本地漫画根目录，支持批量选择'), findsNothing);
+      expect(find.text('添加路径'), findsOneWidget);
     });
 
     testWidgets('expanded page uses expanded title size', (
@@ -41,27 +44,6 @@ void main() {
       expect(tester.takeException(), isNull);
       final Text title = tester.widget<Text>(find.text('选中路径'));
       expect(title.style?.fontSize, 26);
-    });
-
-    testWidgets('compact clear action uses icon-only button', (
-      WidgetTester tester,
-    ) async {
-      await _pumpSelectedPathsPage(tester, viewportWidth: 360);
-
-      expect(
-        selectedPathsHeaderUsesIconOnlyClear(SelectedPathsLayoutTier.compact),
-        isTrue,
-      );
-      expect(find.text('清空选择'), findsNothing);
-      expect(find.byTooltip('清空选择'), findsOneWidget);
-    });
-
-    testWidgets('medium clear action keeps text label', (
-      WidgetTester tester,
-    ) async {
-      await _pumpSelectedPathsPage(tester, viewportWidth: 700);
-
-      expect(find.text('清空选择'), findsOneWidget);
     });
   });
 }
@@ -101,9 +83,6 @@ List<Override> _selectedPathsPageTestOverrides() {
 class _FakeSelectedPathsPageNotifier extends SelectedPathsPageNotifier {
   @override
   Future<SelectedPathsPageState> build() async {
-    return const SelectedPathsPageState(
-      paths: <String>['C:\\comics'],
-      selectedPaths: <String>{'C:\\comics'},
-    );
+    return const SelectedPathsPageState(paths: <String>['C:\\comics']);
   }
 }

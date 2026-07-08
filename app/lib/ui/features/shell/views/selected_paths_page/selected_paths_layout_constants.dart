@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 
 const double selectedPathsContentMaxWidth = 1280;
+const double kSelectedPathsHeaderVerticalPadding = 6;
+const double kSelectedPathsHeaderShadowGradientHeight = 6;
 
 enum SelectedPathsLayoutTier { compact, medium, expanded }
 
@@ -30,18 +32,6 @@ double selectedPathsPageTitleFontSize(SelectedPathsLayoutTier tier) {
     SelectedPathsLayoutTier.medium => 22,
     SelectedPathsLayoutTier.expanded => 26,
   };
-}
-
-bool selectedPathsHeaderIsVertical(SelectedPathsLayoutTier tier) {
-  return tier == SelectedPathsLayoutTier.compact;
-}
-
-bool selectedPathsShowsSubtitle(SelectedPathsLayoutTier tier) {
-  return tier != SelectedPathsLayoutTier.compact;
-}
-
-bool selectedPathsHeaderUsesIconOnlyClear(SelectedPathsLayoutTier tier) {
-  return tier == SelectedPathsLayoutTier.compact;
 }
 
 double selectedPathsInnerContentMaxWidth(

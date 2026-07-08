@@ -48,21 +48,6 @@ void main() {
         26,
       );
     });
-
-    test('toggles compact-only header behaviors', () {
-      expect(selectedPathsHeaderIsVertical(SelectedPathsLayoutTier.compact), isTrue);
-      expect(selectedPathsHeaderIsVertical(SelectedPathsLayoutTier.medium), isFalse);
-      expect(selectedPathsShowsSubtitle(SelectedPathsLayoutTier.compact), isFalse);
-      expect(selectedPathsShowsSubtitle(SelectedPathsLayoutTier.medium), isTrue);
-      expect(
-        selectedPathsHeaderUsesIconOnlyClear(SelectedPathsLayoutTier.compact),
-        isTrue,
-      );
-      expect(
-        selectedPathsHeaderUsesIconOnlyClear(SelectedPathsLayoutTier.expanded),
-        isFalse,
-      );
-    });
   });
 
   group('selectedPathsInnerContentMaxWidth', () {

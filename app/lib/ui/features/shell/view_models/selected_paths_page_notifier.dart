@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io' show FileSystemEntity, FileSystemEntityType;
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/domain/repositories/path_repository.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'selected_paths_page_notifier.freezed.dart';
@@ -13,7 +13,6 @@ part 'selected_paths_page_notifier.g.dart';
 abstract class SelectedPathsPageState with _$SelectedPathsPageState {
   const factory SelectedPathsPageState({
     @Default(<String>[]) List<String> paths,
-    @Default(<String>{}) Set<String> selectedPaths,
     @Default(<String, FileSystemEntityType>{})
     Map<String, FileSystemEntityType> pathTypes,
   }) = _SelectedPathsPageState;
@@ -52,52 +51,18 @@ class SelectedPathsPageNotifier extends _$SelectedPathsPageNotifier {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final paths = await _pathRepo.getAll();
-      final SelectedPathsPageState synced = _syncPathsAndSelection(
-        previous,
-        paths,
-      );
       final Map<String, FileSystemEntityType> nextPathTypes =
           await _resolvePathTypes(
             paths: paths,
-            previousTypes: synced.pathTypes,
+            previousTypes: previous.pathTypes,
           );
-      return synced.copyWith(pathTypes: nextPathTypes);
+      return SelectedPathsPageState(paths: paths, pathTypes: nextPathTypes);
     });
-  }
-
-  void togglePathSelection(String path) {
-    _updateDataState((current) {
-      if (!current.paths.contains(path)) {
-        return current;
-      }
-      final Set<String> nextSelected = <String>{...current.selectedPaths};
-      if (!nextSelected.add(path)) {
-        nextSelected.remove(path);
-      }
-      return current.copyWith(selectedPaths: nextSelected);
-    });
-  }
-
-  /// 按列表顺序移除当前选中路径，成功后清空选择。
-  Future<void> removeSelectedPaths() async {
-    final SelectedPathsPageState? current = state.asData?.value;
-    if (current == null || current.selectedPaths.isEmpty) {
-      return;
-    }
-    final List<String> ordered = current.paths
-        .where((String p) => current.selectedPaths.contains(p))
-        .toList();
-    for (final String p in ordered) {
-      await _pathRepo.remove(p);
-    }
-    _updateDataState(
-      (SelectedPathsPageState c) => c.copyWith(selectedPaths: const <String>{}),
-    );
   }
 
   void _applyPathsFromStream(List<String> paths) {
     final current = _currentOrDefault();
-    state = AsyncData(_syncPathsAndSelection(current, paths));
+    state = AsyncData(_syncPaths(current, paths));
     unawaited(_refreshPathTypes(paths));
   }
 
@@ -105,11 +70,10 @@ class SelectedPathsPageNotifier extends _$SelectedPathsPageNotifier {
     return state.asData?.value ?? const SelectedPathsPageState();
   }
 
-  SelectedPathsPageState _syncPathsAndSelection(
+  SelectedPathsPageState _syncPaths(
     SelectedPathsPageState current,
     List<String> paths,
   ) {
-    final validSelected = current.selectedPaths.where(paths.contains).toSet();
     final Map<String, FileSystemEntityType> nextPathTypes =
         <String, FileSystemEntityType>{};
     for (final String path in paths) {
@@ -118,11 +82,7 @@ class SelectedPathsPageNotifier extends _$SelectedPathsPageNotifier {
         nextPathTypes[path] = cachedType;
       }
     }
-    return current.copyWith(
-      paths: paths,
-      selectedPaths: validSelected,
-      pathTypes: nextPathTypes,
-    );
+    return current.copyWith(paths: paths, pathTypes: nextPathTypes);
   }
 
   void _updateDataState(
