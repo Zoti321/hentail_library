@@ -163,7 +163,7 @@ class LibraryDisplayTargetTabs extends ConsumerWidget {
               .read(libraryQueryIntentProvider.notifier)
               .setDisplayTarget(LibraryDisplayTarget.comics),
         ),
-        const SizedBox(width: 24),
+        const SizedBox(width: 16),
         _UnderlineTab(
           label: '系列',
           isSelected: displayTarget == LibraryDisplayTarget.series,

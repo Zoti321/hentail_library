@@ -140,7 +140,7 @@ class MetadataEntityTabs extends StatelessWidget {
             isSelected: selectedTabIndex == 0,
             onTap: () => onTabSelected(0),
           ),
-          const SizedBox(width: 24),
+          const SizedBox(width: 16),
           _MetadataUnderlineTab(
             label: '标签',
             isSelected: selectedTabIndex == 1,
