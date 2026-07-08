@@ -22,6 +22,7 @@ class HentaiDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final double maxDialogHeight = MediaQuery.sizeOf(context).height - 48;
     // 三层阴影：环境光（与页面分离）+ 主抬升 + 贴边接触阴影，浅色下尤其增强层次感
     final ambient = isDark
         ? Colors.black.withAlpha(52)
@@ -39,6 +40,7 @@ class HentaiDialog extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         child: Container(
           width: width,
+          constraints: BoxConstraints(maxHeight: maxDialogHeight),
           decoration: BoxDecoration(
             color: cs.hentai.cardHover,
             borderRadius: BorderRadius.circular(8),
@@ -85,9 +87,11 @@ class HentaiDialog extends StatelessWidget {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
-                child: content,
+              Flexible(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
+                  child: content,
+                ),
               ),
               Container(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
