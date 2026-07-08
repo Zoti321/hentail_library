@@ -12,7 +12,6 @@ import 'package:hentai_library/ui/features/library/views/searched_page/widgets/s
 import 'package:hentai_library/ui/features/library/views/searched_page/widgets/searched_page_header.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -187,10 +186,6 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                             child: SeriesCard(
                               key: Key('search-series-${item.id}'),
                               series: item,
-                              size: const Size(
-                                kSearchResultCardWidth,
-                                double.infinity,
-                              ),
                               onTap: () {
                                 final String encoded = Uri.encodeComponent(
                                   item.id,
@@ -213,24 +208,12 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                             child: ComicCard(
                               key: Key('search-comic-${comic.comicId}'),
                               comic: comic,
-                              size: const Size(
-                                kSearchResultCardWidth,
-                                double.infinity,
-                              ),
                               onTap: () {
                                 appRouter.pushNamed(
                                   '漫画详情',
                                   pathParameters: <String, String>{
                                     'id': comic.comicId,
                                   },
-                                );
-                              },
-                              onPlay: () {
-                                appRouter.pushNamed(
-                                  ReaderRouteArgs.readerRouteName,
-                                  queryParameters: ReaderRouteArgs(
-                                    comicId: comic.comicId,
-                                  ).toQueryParameters(),
                                 );
                               },
                             ),

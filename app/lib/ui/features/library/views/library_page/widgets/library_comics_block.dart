@@ -128,14 +128,12 @@ class _LibraryComicsGridSliver extends StatelessWidget {
           key: ValueKey<String>(manga.comicId),
           child: ComicCard(
             comic: manga,
-            size: const Size(double.infinity, double.infinity),
             onTap: () {
               appRouter.pushNamed(
                 '漫画详情',
                 pathParameters: <String, String>{'id': manga.comicId},
               );
             },
-            onPlay: () {},
           ),
         );
       },

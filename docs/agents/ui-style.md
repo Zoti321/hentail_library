@@ -110,17 +110,17 @@ Key semantic groups in `HentaiColorScheme`:
 
 ### Card & list item pattern
 
-Representative `ComicCard` structure (reuse for new grid items):
+Catalog grid cards share `CatalogCoverCardShell` (internal chrome + 2:3 cover frame). Pages use `ComicCard` / `SeriesCard`, not the shell directly.
 
 ```
-Container
+CatalogCoverCardShell
   border: borderSubtle 1px
   radius: tokens.radius.lg (12)
   background: cs.surface
   padding: tokens.spacing.sm
   hover → cardShadowHover
-  └── cover (AppComicImage / AdaptiveCover)
-  └── title + meta row (MI_Sans, textSecondary)
+  └── cover frame (md radius, 2:3) → ComicCoverContent / placeholder
+  └── title + meta row (MI_Sans; pages via ComicCard / SeriesCard info slot)
 ```
 
 `MetaChip` / `TagChip`: `surfaceContainerHighest` fill, 8px radius, icon 14px + label 12px w600.
@@ -135,7 +135,7 @@ Container
 |----------|------|----------|
 | Actions | `actions/` | `GhostButton`, `FilterPopupButton`, `SortPopupButton`, `PopupMenuPanelShell` |
 | Chrome | `chrome/` | `AppTitleBar`, `CapsuleTabBar`, `StatusCardShell` |
-| Elements | `element/` | `ComicCard`, `SeriesCard`, `ComicTile`, `SeriesTile`, `MetaChip`, `TagChip`, `ContentRatingChip`, `AppComicImage`, `AdaptiveCover` |
+| Elements | `element/` | `CatalogCoverCardShell` (internal), `ComicCard`, `SeriesCard`, `MetaChip`, `TagChip`, `ContentRatingChip`, `AppComicImage`, `AdaptiveCover` |
 | Feedback | `feedback/` | `custom_toast`, `TerminalSpinner` |
 | Form | `form/` | `FluentTextField`, `CustomTextField`, `DatePicker`, `DatePickerField`, `MultiSelect`, `AuthorLibraryMultiSelectField`, `TagLibraryMultiSelectField` |
 | Foundation | `foundation/` | `MyToggleSwitch` |

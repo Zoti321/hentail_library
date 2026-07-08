@@ -1,223 +1,163 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/utils.dart';
-import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/element/card/catalog_cover_card_shell.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
-import 'package:hentai_library/ui/providers.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
+import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/comic_context_menu.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
+import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
+import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ComicCard extends HookConsumerWidget {
-  final Comic comic;
-  final Size size;
-  final VoidCallback onTap;
-  final VoidCallback onPlay;
+class ComicCard extends ConsumerWidget {
+  const ComicCard({super.key, required this.comic, required this.onTap});
 
-  const ComicCard({
-    super.key,
-    required this.comic,
-    required this.size,
-    required this.onTap,
-    required this.onPlay,
-  });
+  final Comic comic;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cs = Theme.of(context).colorScheme;
-    final tokens = context.tokens;
-    final isHover = useState<bool>(false);
-
-    return GestureDetector(
+    return CatalogCoverCardShell(
       onTap: onTap,
-      onSecondaryTapUp: (details) {
-        final RenderBox overlay =
-            Overlay.of(context).context.findRenderObject() as RenderBox;
-        final Offset relativePosition = overlay.globalToLocal(
-          details.globalPosition,
-        );
-
-        ComicContextMenu.show(
-          context,
-          position: relativePosition,
-          mangaTitle: comic.title,
-          onAction: (action) {
-            switch (action) {
-              case ComicContextAction.read:
-                appRouter.pushNamed(
-                  ReaderRouteArgs.readerRouteName,
-                  queryParameters: ReaderRouteArgs(
-                    comicId: comic.comicId,
-                  ).toQueryParameters(),
-                );
-                break;
-              case ComicContextAction.edit:
-                showDialog(
-                  context: context,
-                  builder: (context) => EditMetadataDialog(
-                    comic: comic,
-                    onSave: (data) async {
-                      await data.applyTo(
-                        ref.read(comicRepoProvider),
-                        comic.comicId,
-                      );
-                    },
-                  ),
-                );
-                break;
-              case ComicContextAction.showInExplorer:
-                showInFileExplorer(comic.path).catchError((
-                  Object error,
-                  StackTrace stackTrace,
-                ) {
-                  debugPrint(
-                    'showInFileExplorer failed for "${comic.path}": $error',
-                  );
-                  if (!context.mounted) {
-                    return;
-                  }
-                  if (error is AppException) {
-                    showErrorToast(context, error);
-                    return;
-                  }
-                  showErrorToast(
-                    context,
-                    AppException(
-                      '无法在文件资源管理器中显示该项目',
-                      cause: error,
-                      stackTrace: stackTrace,
-                    ),
-                  );
-                });
-                break;
-              case ComicContextAction.delete:
-                showDialog<bool>(
-                  context: context,
-                  builder: (BuildContext context) => AlertDialog(
-                    title: const Text('删除漫画？'),
-                    content: Text('将删除「${comic.title}」。此操作不可撤销。'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text('取消'),
-                      ),
-                      FilledButton(
-                        onPressed: () => Navigator.of(context).pop(true),
-                        child: const Text('删除'),
-                      ),
-                    ],
-                  ),
-                ).then((bool? confirmed) async {
-                  if (confirmed != true || !context.mounted) {
-                    return;
-                  }
-                  try {
-                    await ref.read(comicDeletionServiceProvider).deleteComics(
-                      <String>[comic.comicId],
-                    );
-                    ref
-                        .read(comicCoverCacheManagerProvider.notifier)
-                        .clearForComics(<String>[comic.comicId]);
-                    if (context.mounted) {
-                      showSuccessToast(context, '已删除漫画');
-                    }
-                  } catch (err) {
-                    if (context.mounted) {
-                      showErrorToast(context, err);
-                    }
-                  }
-                });
-                break;
-            }
-          },
-        );
-      }, // 右键菜单触发
-
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) => isHover.value = true,
-        onExit: (_) => isHover.value = false,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: EdgeInsets.all(tokens.spacing.sm),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(tokens.radius.lg),
-            color: cs.surface,
-            border: Border.all(color: cs.hentai.borderSubtle),
-            boxShadow: isHover.value
-                ? [
-                    BoxShadow(
-                      color: cs.hentai.cardShadowHover,
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            spacing: 12,
-            children: [
-              // 封面图容器
-              _buildCover(context, isHover.value),
-              // --- 文本信息区域 ---
-              _buildInfoSection(isHover.value, context, comic.pageCount),
-            ],
-          ),
-        ),
+      onSecondaryTapUp: (TapUpDetails details) {
+        _showContextMenu(context, ref, details);
+      },
+      cover: (bool isHover) =>
+          ComicCoverContent(comicId: comic.comicId, isHover: isHover),
+      info: (bool isHover) => _ComicCardInfo(
+        title: comic.title,
+        pageCount: comic.pageCount,
+        isHover: isHover,
       ),
     );
   }
 
-  Widget _buildCover(BuildContext context, bool isHover) {
-    final cs = Theme.of(context).colorScheme;
-    final tokens = context.tokens;
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeOut,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(tokens.radius.md),
-        color: cs.hentai.imagePlaceholder,
-        boxShadow: isHover
-            ? [
-                BoxShadow(
-                  color: cs.hentai.cardShadowHover,
-                  blurRadius: 20,
-                  offset: const Offset(0, 0),
+  void _showContextMenu(
+    BuildContext context,
+    WidgetRef ref,
+    TapUpDetails details,
+  ) {
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+    final Offset relativePosition = overlay.globalToLocal(details.globalPosition);
+
+    ComicContextMenu.show(
+      context,
+      position: relativePosition,
+      mangaTitle: comic.title,
+      onAction: (ComicContextAction action) {
+        switch (action) {
+          case ComicContextAction.read:
+            appRouter.pushNamed(
+              ReaderRouteArgs.readerRouteName,
+              queryParameters: ReaderRouteArgs(
+                comicId: comic.comicId,
+              ).toQueryParameters(),
+            );
+          case ComicContextAction.edit:
+            showDialog<void>(
+              context: context,
+              builder: (BuildContext context) => EditMetadataDialog(
+                comic: comic,
+                onSave: (ComicMetadataForm data) async {
+                  await data.applyTo(
+                    ref.read(comicRepoProvider),
+                    comic.comicId,
+                  );
+                },
+              ),
+            );
+          case ComicContextAction.showInExplorer:
+            showInFileExplorer(comic.path).catchError((
+              Object error,
+              StackTrace stackTrace,
+            ) {
+              debugPrint(
+                'showInFileExplorer failed for "${comic.path}": $error',
+              );
+              if (!context.mounted) {
+                return;
+              }
+              if (error is AppException) {
+                showErrorToast(context, error);
+                return;
+              }
+              showErrorToast(
+                context,
+                AppException(
+                  '无法在文件资源管理器中显示该项目',
+                  cause: error,
+                  stackTrace: stackTrace,
                 ),
-              ]
-            : [
-                BoxShadow(
-                  color: cs.hentai.cardShadow,
-                  blurRadius: 2,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(tokens.radius.md),
-        child: AspectRatio(
-          aspectRatio: 2 / 3,
-          child: ComicCoverContent(comicId: comic.comicId, isHover: isHover),
-        ),
-      ),
+              );
+            });
+          case ComicContextAction.delete:
+            showDialog<bool>(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                title: const Text('删除漫画？'),
+                content: Text('将删除「${comic.title}」。此操作不可撤销。'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('取消'),
+                  ),
+                  FilledButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text('删除'),
+                  ),
+                ],
+              ),
+            ).then((bool? confirmed) async {
+              if (confirmed != true || !context.mounted) {
+                return;
+              }
+              try {
+                await ref.read(comicDeletionServiceProvider).deleteComics(
+                  <String>[comic.comicId],
+                );
+                ref
+                    .read(comicCoverCacheManagerProvider.notifier)
+                    .clearForComics(<String>[comic.comicId]);
+                if (context.mounted) {
+                  showSuccessToast(context, '已删除漫画');
+                }
+              } catch (err) {
+                if (context.mounted) {
+                  showErrorToast(context, err);
+                }
+              }
+            });
+        }
+      },
     );
   }
+}
 
-  Column _buildInfoSection(bool isHover, BuildContext context, int pageCount) {
-    final tokens = context.tokens;
+class _ComicCardInfo extends StatelessWidget {
+  const _ComicCardInfo({
+    required this.title,
+    required this.pageCount,
+    required this.isHover,
+  });
+
+  final String title;
+  final int pageCount;
+  final bool isHover;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 6,
-      children: [
-        // 标题 (带 Hover 变色)
+      children: <Widget>[
         AnimatedDefaultTextStyle(
           duration: const Duration(milliseconds: 200),
           style: TextStyle(
@@ -225,27 +165,16 @@ class ComicCard extends HookConsumerWidget {
             fontWeight: FontWeight.w600,
             fontFamily: 'MI_Sans_Regular',
             height: 1.25,
-            color: isHover
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.hentai.textPrimary,
+            color: isHover ? cs.primary : cs.hentai.textPrimary,
           ),
-          child: Text(
-            comic.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+          child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
         ),
-        // 底部信息栏
-        Row(
-          children: [
-            Text(
-              '$pageCount 页',
-              style: TextStyle(
-                fontSize: tokens.text.labelXs - 1,
-                color: Theme.of(context).colorScheme.hentai.textTertiary,
-              ),
-            ),
-          ],
+        Text(
+          '$pageCount 页',
+          style: TextStyle(
+            fontSize: tokens.text.labelXs - 1,
+            color: cs.hentai.textTertiary,
+          ),
         ),
       ],
     );

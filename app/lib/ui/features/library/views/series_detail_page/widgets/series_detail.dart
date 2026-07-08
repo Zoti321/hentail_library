@@ -84,7 +84,6 @@ class SeriesDetail extends HookConsumerWidget {
                         ),
                         SizedBox(height: tokens.spacing.lg),
                         SeriesDetailComicsGrid(
-                          seriesId: series.id,
                           sortedItems: sortedItems,
                           comicsById: comicsById,
                         ),
