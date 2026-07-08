@@ -18,7 +18,6 @@ class LibrarySeriesBlock extends ConsumerWidget {
     if (displayTarget != LibraryDisplayTarget.series) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
-    final AppThemeTokens tokens = context.tokens;
     final AsyncValue<LibrarySeriesCatalogState> catalogAsync = ref.watch(
       librarySeriesCatalogContentProvider,
     );

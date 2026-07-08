@@ -12,7 +12,6 @@ import 'package:hentai_library/ui/features/metadata/view_models/tag_management_n
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/metadata_management_page.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/author_management_panel.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_row_actions.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {

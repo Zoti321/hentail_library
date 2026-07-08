@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/widgets.dart';
 
 /// 库页可粘连 header：标题、数量 chip、Tab 切换与操作按钮（单行三栏）。
@@ -20,7 +19,6 @@ class LibraryPageHeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppThemeTokens tokens = context.tokens;
     return Padding(
       padding: EdgeInsets.fromLTRB(
         horizontalPadding,
