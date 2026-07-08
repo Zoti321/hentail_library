@@ -29,11 +29,11 @@
 
 | 平台    | 支持情况 |
 | ------- | -------- |
-| Android | ❌       |
-| iOS     | ❌       |
+| Android | ✅       |
+| iOS     | ✅       |
 | Windows | ✅       |
-| macOS   | ❌       |
-| Linux   | ❌       |
+| macOS   | ✅       |
+| Linux   | ✅       |
 
 ## 协作建议
 
