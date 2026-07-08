@@ -14,7 +14,7 @@ import 'package:riverpod/misc.dart' show Override;
 
 void main() {
   group('Settings responsive layout', () {
-    testWidgets('compact page shows version description only without overflow', (
+    testWidgets('compact page shows check-update row without overflow', (
       WidgetTester tester,
     ) async {
       await _pumpSettingsView(tester, viewportWidth: 360);
@@ -26,12 +26,13 @@ void main() {
       expect(find.textContaining('当前：'), findsNothing);
       expect(find.textContaining('已启用'), findsNothing);
       expect(find.textContaining('已禁用'), findsNothing);
-      expect(find.text('v1.0.0'), findsOneWidget);
+      expect(find.text('检查更新'), findsOneWidget);
+      expect(find.text('当前版本 v1.0.0'), findsOneWidget);
       expect(find.byType(SettingsPageHeaderSection), findsOneWidget);
       _expectMenuIcon(tester, findsOneWidget);
     });
 
-    testWidgets('medium page keeps version description and medium title', (
+    testWidgets('medium page keeps check-update row and medium title', (
       WidgetTester tester,
     ) async {
       await _pumpSettingsView(tester, viewportWidth: 700);
@@ -41,7 +42,8 @@ void main() {
       expect(title.style?.fontSize, 22);
       expect(find.text('管理扫描路径'), findsNothing);
       expect(find.textContaining('当前：'), findsNothing);
-      expect(find.text('v1.0.0'), findsOneWidget);
+      expect(find.text('检查更新'), findsOneWidget);
+      expect(find.text('当前版本 v1.0.0'), findsOneWidget);
       _expectMenuIcon(tester, findsNothing);
     });
 
@@ -53,7 +55,8 @@ void main() {
       expect(tester.takeException(), isNull);
       final Text title = tester.widget<Text>(find.text('设置'));
       expect(title.style?.fontSize, 26);
-      expect(find.text('v1.0.0'), findsOneWidget);
+      expect(find.text('检查更新'), findsOneWidget);
+      expect(find.text('当前版本 v1.0.0'), findsOneWidget);
     });
 
     testWidgets('compact theme row hides preference text button', (

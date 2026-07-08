@@ -52,9 +52,9 @@ class AboutVersionRow extends ConsumerWidget {
       packageInfoProvider,
     );
     final ThemeData theme = Theme.of(context);
-    final String versionLabel = packageInfoAsync.maybeWhen(
-      data: (PackageInfo info) => 'v${info.version}',
-      orElse: () => '加载中…',
+    final String versionActionLabel = packageInfoAsync.maybeWhen(
+      data: (PackageInfo info) => '当前版本 v${info.version}',
+      orElse: () => '当前版本 …',
     );
     return SettingsRow(
       layoutTier: layoutTier,
@@ -63,26 +63,23 @@ class AboutVersionRow extends ConsumerWidget {
         size: 20,
         color: theme.colorScheme.hentai.iconDefault,
       ),
-      label: '版本',
-      description: versionLabel,
+      label: '检查更新',
       onRowTap: packageInfoAsync.isLoading
           ? null
           : () => ref
                 .read(appUpdateControllerProvider.notifier)
                 .runManualCheck(context: context),
-      action: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.hentai.inputBackgroundDisabled,
-          borderRadius: BorderRadius.circular(4),
-        ),
+      action: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 180),
         child: Text(
-          '检查更新',
+          versionActionLabel,
           style: TextStyle(
-            fontSize: 11,
+            fontSize: 12,
             color: theme.colorScheme.hentai.textTertiary,
-            fontFamily: 'monospace',
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.end,
         ),
       ),
     );
