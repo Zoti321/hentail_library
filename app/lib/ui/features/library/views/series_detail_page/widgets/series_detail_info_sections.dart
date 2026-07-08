@@ -45,7 +45,7 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
         : series.serializationStatus.label;
     final List<Widget> segments = <Widget>[
       Text(
-        series.volumeCountLabel,
+        series.volumeProgressLabel ?? series.volumeCountLabel,
         style: TextStyle(
           fontSize: tokens.text.bodySm,
           color: cs.hentai.textSecondary,
