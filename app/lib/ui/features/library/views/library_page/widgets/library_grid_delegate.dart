@@ -5,19 +5,19 @@ double libraryGridMainAxisExtentFromTokens(
   LibraryLayoutTier layoutTier,
 ) {
   final double maxCrossAxisExtent = libraryGridMaxCrossAxisExtent(layoutTier);
-  final double pad = tokens.spacing.sm;
-  final double innerWidth = maxCrossAxisExtent - 2 * pad;
-  final double coverHeight = innerWidth * 3 / 2;
-  const double coverToInfoGap = 12;
+  // CatalogCoverCardShell: 2:3 cover flush to card width (no side padding).
+  final double coverHeight = maxCrossAxisExtent * 3 / 2;
+  final double coverToInfoGap = tokens.spacing.md;
   final double titleLineHeight = tokens.text.bodyMd * 1.25;
   const double infoColumnSpacing = 6;
   final double metaLineHeight = tokens.text.labelXs - 1;
-  return (2 * pad +
-              coverHeight +
+  final double infoBottomPad = tokens.spacing.sm;
+  return (coverHeight +
               coverToInfoGap +
               titleLineHeight +
               infoColumnSpacing +
-              metaLineHeight)
+              metaLineHeight +
+              infoBottomPad)
           .ceil() +
       16;
 }
