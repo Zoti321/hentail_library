@@ -25,17 +25,13 @@ void main() {
   });
 
   group('home responsive sizing helpers', () {
-    test('uses tighter padding and tiles in compact tier', () {
+    test('uses tighter padding and continue-reading tiles in compact tier', () {
       expect(homeContentHorizontalPadding(HomePageLayoutTier.compact), 16);
       expect(homeContentHorizontalPadding(HomePageLayoutTier.medium), 28);
       expect(homeContentHorizontalPadding(HomePageLayoutTier.expanded), 48);
       expect(
         continueReadingItemWidthFor(HomePageLayoutTier.compact),
         continueReadingItemWidthCompact,
-      );
-      expect(
-        shortcutTileWidthFor(HomePageLayoutTier.compact),
-        shortcutTileWidthCompact,
       );
     });
   });

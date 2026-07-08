@@ -39,6 +39,16 @@ void main() {
       _expectHeaderRow(tester);
       _expectStatsSingleRow(tester);
     });
+
+    testWidgets('does not render shortcut entries section', (
+      WidgetTester tester,
+    ) async {
+      await _pumpHomePage(tester, const Size(1200, 900));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('快捷入口'), findsNothing);
+    });
   });
 }
 

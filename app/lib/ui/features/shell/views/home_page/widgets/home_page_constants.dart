@@ -4,8 +4,6 @@ const double homeContentMaxWidth = 1280;
 const double continueReadingItemWidth = 304;
 const double continueReadingItemWidthCompact = 272;
 const double continueReadingStripHeight = 138;
-const double shortcutTileWidth = 120;
-const double shortcutTileWidthCompact = 100;
 const double heroStatCardRadius = 16;
 const Duration heroStatCardHoverDuration = Duration(milliseconds: 200);
 
@@ -34,13 +32,5 @@ double continueReadingItemWidthFor(HomePageLayoutTier tier) {
     HomePageLayoutTier.compact => continueReadingItemWidthCompact,
     HomePageLayoutTier.medium => continueReadingItemWidth,
     HomePageLayoutTier.expanded => continueReadingItemWidth,
-  };
-}
-
-double shortcutTileWidthFor(HomePageLayoutTier tier) {
-  return switch (tier) {
-    HomePageLayoutTier.compact => shortcutTileWidthCompact,
-    HomePageLayoutTier.medium => shortcutTileWidth,
-    HomePageLayoutTier.expanded => shortcutTileWidth,
   };
 }

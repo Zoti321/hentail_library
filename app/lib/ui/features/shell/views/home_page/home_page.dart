@@ -130,11 +130,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                     enabled: deferredSectionsReady,
                   ),
                   SizedBox(height: tokens.spacing.xl + 8),
-                  HomePageShortcutEntries(
-                    layoutTier: layoutTier,
-                    onScan: onScan,
-                  ),
-                  SizedBox(height: tokens.spacing.xl * 4),
                 ],
               ),
             ),
