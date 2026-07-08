@@ -2,6 +2,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/shell/view_models/selected_paths_page_notifier.dart';
+import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_layout_constants.dart';
 
 import 'widgets/widgets.dart';
 
@@ -15,21 +16,47 @@ class SelectedPathsPage extends ConsumerWidget {
       selectedPathsPageProvider,
     );
 
-    return SingleChildScrollView(
-      padding: tokens.layout.contentAreaPadding,
-      child: Column(
-        spacing: 20,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          const SelectedPathsPageHeader(),
-          asyncState.when(
-            data: (_) => const SelectedPathsListCard(),
-            loading: () => const SelectedPathsLoadingCard(),
-            error: (Object error, StackTrace _) =>
-                SelectedPathsErrorCard(error: error),
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double viewportWidth = constraints.maxWidth;
+        final SelectedPathsLayoutTier layoutTier =
+            selectedPathsLayoutTierForWidth(viewportWidth);
+        final double horizontalPadding = selectedPathsContentHorizontalPadding(
+          layoutTier,
+        );
+        final double innerMaxWidth = selectedPathsInnerContentMaxWidth(
+          layoutTier,
+          viewportWidth,
+        );
+
+        return SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            horizontalPadding,
+            tokens.layout.contentAreaPadding.top,
+            horizontalPadding,
+            tokens.layout.contentAreaPadding.bottom,
           ),
-        ],
-      ),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: innerMaxWidth),
+              child: Column(
+                spacing: 20,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SelectedPathsPageHeader(layoutTier: layoutTier),
+                  asyncState.when(
+                    data: (_) => const SelectedPathsListCard(),
+                    loading: () => const SelectedPathsLoadingCard(),
+                    error: (Object error, StackTrace _) =>
+                        SelectedPathsErrorCard(error: error),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
