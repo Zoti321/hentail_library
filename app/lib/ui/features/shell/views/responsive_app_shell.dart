@@ -135,6 +135,8 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
                             _buildSidebar(
                               activeId: sidebarActiveId,
                               isExpanded: sidebarExpanded,
+                              showCollapseToggle:
+                                  layoutMode == _ShellLayoutMode.expanded,
                               onToggleExpanded: () {
                                 if (layoutMode == _ShellLayoutMode.expanded) {
                                   ref

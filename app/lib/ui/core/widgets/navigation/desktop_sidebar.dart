@@ -45,19 +45,19 @@ class DesktopSidebar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (showCollapseToggle)
+          if (showCollapseToggle) ...<Widget>[
             Align(
-              alignment: Alignment.centerLeft,
+              alignment: isExpanded
+                  ? Alignment.centerLeft
+                  : Alignment.center,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(4, 4, 0, 4),
+                padding: const EdgeInsets.symmetric(vertical: 4),
                 child: GhostButton.icon(
-                  icon: isExpanded
-                      ? LucideIcons.panelLeftClose
-                      : LucideIcons.panelLeftOpen,
+                  icon: LucideIcons.menu,
                   tooltip: '',
                   semanticLabel: isExpanded ? '收起侧边栏' : '展开侧边栏',
                   iconSize: 18,
-                  size: 32,
+                  size: 36,
                   borderRadius: 8,
                   foregroundColor: cs.hentai.textSecondary,
                   hoverColor: cs.hentai.sidebarItemHoverBackground,
@@ -69,7 +69,8 @@ class DesktopSidebar extends StatelessWidget {
                 ),
               ),
             ),
-          if (showCollapseToggle) SizedBox(height: 16),
+            const SizedBox(height: 16),
+          ],
           // 2. menu section
           ...menuItems.map(
             (item) => _SidebarButton(
