@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_media_type_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_sort_drawer.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -76,7 +78,7 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
             children: LibraryAgeRestrictionFilter.selectableOptions
                 .map(
                   (LibraryAgeRestrictionFilter option) =>
-                      _AgeRestrictionOptionRow(
+                      _FilterCheckboxOptionRow(
                         label: option.label,
                         selected: selected == option,
                         onTap: () {
@@ -95,8 +97,97 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
   }
 }
 
-class _AgeRestrictionOptionRow extends StatelessWidget {
-  const _AgeRestrictionOptionRow({
+/// 库页抽屉筛选控件（漫画 Tab 媒体类型手风琴）。
+class LibraryMediaTypeFilterControls extends ConsumerStatefulWidget {
+  const LibraryMediaTypeFilterControls({super.key});
+
+  @override
+  ConsumerState<LibraryMediaTypeFilterControls> createState() =>
+      _LibraryMediaTypeFilterControlsState();
+}
+
+class _LibraryMediaTypeFilterControlsState
+    extends ConsumerState<LibraryMediaTypeFilterControls> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
+    );
+    if (displayTarget != LibraryDisplayTarget.comics) {
+      return const SizedBox.shrink();
+    }
+
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final LibraryMediaTypeFilterSelection selected = ref.watch(
+      libraryComicsTabMediaTypeFilterProvider,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => setState(() => _expanded = !_expanded),
+            hoverColor: theme.hoverColor,
+            splashColor: theme.splashColor,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                kLibraryFilterSortDrawerContentInset,
+                10,
+                kLibraryFilterSortDrawerContentInset,
+                10,
+              ),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      '媒体类型',
+                      style: TextStyle(
+                        fontSize: tokens.text.bodySm,
+                        fontWeight: FontWeight.w500,
+                        color: cs.hentai.textPrimary,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    _expanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
+                    size: 16,
+                    color: cs.hentai.iconSecondary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        if (_expanded)
+          Column(
+            children: LibraryMediaTypeFilterOption.selectableOptions
+                .map(
+                  (LibraryMediaTypeFilterOption option) =>
+                      _FilterCheckboxOptionRow(
+                        label: option.label,
+                        selected: selected.selected.contains(option),
+                        onTap: () {
+                          ref
+                              .read(libraryMediaTypeFilterProvider.notifier)
+                              .toggleOption(option);
+                        },
+                      ),
+                )
+                .toList(),
+          ),
+      ],
+    );
+  }
+}
+
+class _FilterCheckboxOptionRow extends StatelessWidget {
+  const _FilterCheckboxOptionRow({
     required this.label,
     required this.selected,
     required this.onTap,

@@ -45,6 +45,7 @@ class LibraryFilterSortDrawer extends StatelessWidget {
               ),
               SizedBox(height: tokens.spacing.sm),
               const LibraryFilterControls(),
+              const LibraryMediaTypeFilterControls(),
               SizedBox(height: tokens.spacing.lg),
               Padding(
                 padding: const EdgeInsets.only(

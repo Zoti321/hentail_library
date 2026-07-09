@@ -1,3 +1,4 @@
+import 'package:hentai_library/data/adapters/reader_frb_mapper.dart';
 import 'package:hentai_library/domain/library/library_comic_filter.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
@@ -34,7 +35,7 @@ rust.ComicFilterDto mapLibraryFilter(LibraryComicFilter filter) {
     showR18: filter.showR18,
     query: filter.query,
     resourceTypes:
-        filter.resourceTypes?.map((ResourceType e) => e.name).toList() ??
+        filter.resourceTypes?.map(mapResourceType).toList() ??
         const <String>[],
     contentRatings:
         filter.contentRatings?.map((ContentRating e) => e.name).toList() ??
