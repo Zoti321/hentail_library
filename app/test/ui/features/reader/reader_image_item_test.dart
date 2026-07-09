@@ -8,56 +8,51 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
-  testWidgets(
-    'unmounting before stale archive page reload does not throw',
-    (WidgetTester tester) async {
-      final List<FlutterErrorDetails> errors = <FlutterErrorDetails>[];
-      final void Function(FlutterErrorDetails details)? previousHandler =
-          FlutterError.onError;
-      FlutterError.onError = (FlutterErrorDetails details) {
-        errors.add(details);
-        previousHandler?.call(details);
-      };
-      addTearDown(() {
-        FlutterError.onError = previousHandler;
-      });
+  testWidgets('unmounting before stale archive page reload does not throw', (
+    WidgetTester tester,
+  ) async {
+    final List<FlutterErrorDetails> errors = <FlutterErrorDetails>[];
+    final void Function(FlutterErrorDetails details)? previousHandler =
+        FlutterError.onError;
+    FlutterError.onError = (FlutterErrorDetails details) {
+      errors.add(details);
+      previousHandler?.call(details);
+    };
+    addTearDown(() {
+      FlutterError.onError = previousHandler;
+    });
 
-      const String comicId = 'reader-image-item-test';
-      const int pageIndex = 0;
-      const ReaderArchivePageImageData imageData = ReaderArchivePageImageData(
-        comicId: comicId,
-        pageIndex: pageIndex,
-      );
+    const String comicId = 'reader-image-item-test';
+    const int pageIndex = 0;
+    const ReaderArchivePageImageData imageData = ReaderArchivePageImageData(
+      comicId: comicId,
+      pageIndex: pageIndex,
+    );
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: <Override>[
-            comicReaderPageProvider(
-              comicId: comicId,
-              pageIndex: pageIndex,
-            ).overrideWith(
-              (Ref ref) async => const ReaderPageFilePath(
-                '/definitely/missing/reader-page.jpg',
-              ),
-            ),
-          ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: ReaderImageItem(
-                imageData: imageData,
-                slotLogicalWidth: 400,
-              ),
-            ),
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: <Override>[
+          comicReaderPageProvider(
+            comicId: comicId,
+            pageIndex: pageIndex,
+          ).overrideWith(
+            (Ref ref) async =>
+                const ReaderPageFilePath('/definitely/missing/reader-page.jpg'),
+          ),
+        ],
+        child: const MaterialApp(
+          home: Scaffold(
+            body: ReaderImageItem(imageData: imageData, slotLogicalWidth: 400),
           ),
         ),
-      );
-      await tester.pump();
+      ),
+    );
+    await tester.pump();
 
-      await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump();
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
 
-      expect(tester.takeException(), isNull);
-      expect(errors, isEmpty);
-    },
-  );
+    expect(tester.takeException(), isNull);
+    expect(errors, isEmpty);
+  });
 }

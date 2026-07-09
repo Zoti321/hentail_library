@@ -50,9 +50,9 @@ class _ComicDetailSeriesNavState extends ConsumerState<ComicDetailSeriesNav> {
           return;
         }
         final String seriesList = result.seriesNames.join('、');
-        AppLog.ui('comic_detail').warning(
-          '漫画详情系列导航冲突：comicId=${widget.comicId}，系列=[$seriesList]',
-        );
+        AppLog.ui(
+          'comic_detail',
+        ).warning('漫画详情系列导航冲突：comicId=${widget.comicId}，系列=[$seriesList]');
         if (!context.mounted) {
           return;
         }

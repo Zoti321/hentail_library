@@ -25,12 +25,7 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
 
       return settings;
     } catch (e, st) {
-      logError(
-        AppLog.dataRepo('app_setting'),
-        '加载设置失败，已回退默认值',
-        e,
-        st,
-      );
+      logError(AppLog.dataRepo('app_setting'), '加载设置失败，已回退默认值', e, st);
       return defaultSettings();
     }
   }

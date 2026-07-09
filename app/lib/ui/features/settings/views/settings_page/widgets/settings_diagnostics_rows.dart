@@ -25,9 +25,7 @@ class DiagnosticModeRow extends ConsumerWidget {
         color: theme.colorScheme.hentai.iconDefault,
       ),
       label: '详细诊断',
-      description: enabled
-          ? '已开启：Dart 与 Rust 记录更详细日志'
-          : '临时提高日志详细程度，便于复现问题',
+      description: enabled ? '已开启：Dart 与 Rust 记录更详细日志' : '临时提高日志详细程度，便于复现问题',
       action: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -51,9 +49,8 @@ class DiagnosticModeRow extends ConsumerWidget {
           ],
           ToggleSwitch(
             checked: enabled,
-            onChange: () => ref
-                .read(diagnosticModeProvider.notifier)
-                .setEnabled(!enabled),
+            onChange: () =>
+                ref.read(diagnosticModeProvider.notifier).setEnabled(!enabled),
           ),
         ],
       ),
@@ -79,10 +76,8 @@ class ExportLogsRow extends ConsumerWidget {
       ),
       label: '导出日志',
       description: '打包应用与核心日志，便于问题反馈',
-      onRowTap: () => runLogExportFlow(
-        context,
-        diagnosticVerbose: diagnosticVerbose,
-      ),
+      onRowTap: () =>
+          runLogExportFlow(context, diagnosticVerbose: diagnosticVerbose),
       action: Icon(
         LucideIcons.chevronRight,
         size: 16,

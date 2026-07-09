@@ -18,10 +18,10 @@ void main() {
             LibraryMediaTypeFilterOption.epub,
           });
       expect(selection.isActive, isTrue);
-      expect(
-        selection.comicResourceTypes(),
-        <ResourceType>{ResourceType.pdf, ResourceType.epub},
-      );
+      expect(selection.comicResourceTypes(), <ResourceType>{
+        ResourceType.pdf,
+        ResourceType.epub,
+      });
     });
 
     test('archive option includes all archive resource types', () {
@@ -29,24 +29,19 @@ void main() {
           LibraryMediaTypeFilterSelection({
             LibraryMediaTypeFilterOption.archive,
           });
-      expect(
-        selection.comicResourceTypes(),
-        <ResourceType>{
-          ResourceType.zip,
-          ResourceType.cbz,
-          ResourceType.cbr,
-          ResourceType.rar,
-          ResourceType.cb7,
-          ResourceType.sevenZ,
-        },
-      );
+      expect(selection.comicResourceTypes(), <ResourceType>{
+        ResourceType.zip,
+        ResourceType.cbz,
+        ResourceType.cbr,
+        ResourceType.rar,
+        ResourceType.cb7,
+        ResourceType.sevenZ,
+      });
     });
 
     test('toggling last selected option clears filter', () {
       const LibraryMediaTypeFilterSelection selection =
-          LibraryMediaTypeFilterSelection({
-            LibraryMediaTypeFilterOption.pdf,
-          });
+          LibraryMediaTypeFilterSelection({LibraryMediaTypeFilterOption.pdf});
       final LibraryMediaTypeFilterSelection cleared = selection.withToggled(
         LibraryMediaTypeFilterOption.pdf,
       );
@@ -69,16 +64,15 @@ void main() {
 
     test('fromStorage ignores unknown values', () {
       final LibraryMediaTypeFilterSelection selection =
-          LibraryMediaTypeFilterSelection.fromStorage(
-            <String>['pdf', 'unknown', 'epub'],
-          );
-      expect(
-        selection.selected,
-        <LibraryMediaTypeFilterOption>{
-          LibraryMediaTypeFilterOption.pdf,
-          LibraryMediaTypeFilterOption.epub,
-        },
-      );
+          LibraryMediaTypeFilterSelection.fromStorage(<String>[
+            'pdf',
+            'unknown',
+            'epub',
+          ]);
+      expect(selection.selected, <LibraryMediaTypeFilterOption>{
+        LibraryMediaTypeFilterOption.pdf,
+        LibraryMediaTypeFilterOption.epub,
+      });
     });
   });
 }

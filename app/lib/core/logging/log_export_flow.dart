@@ -43,7 +43,9 @@ Future<void> runLogExportFlow(
     await appLogFileWriter?.flush();
     final Directory appDir = await getApplicationSupportDirectory();
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    final String outputPath = savePath.endsWith('.zip') ? savePath : '$savePath.zip';
+    final String outputPath = savePath.endsWith('.zip')
+        ? savePath
+        : '$savePath.zip';
 
     await const LogExportService().exportToFile(
       outputPath: outputPath,
@@ -79,7 +81,9 @@ class LogExportRedactionDialog extends StatelessWidget {
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           style: TextButton.styleFrom(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
           child: const Text('取消'),
         ),
@@ -87,7 +91,9 @@ class LogExportRedactionDialog extends StatelessWidget {
         OutlinedButton(
           onPressed: () => Navigator.of(context).pop(LogRedactionMode.full),
           style: OutlinedButton.styleFrom(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
           child: const Text('完整日志'),
         ),
@@ -95,7 +101,9 @@ class LogExportRedactionDialog extends StatelessWidget {
         FilledButton(
           onPressed: () => Navigator.of(context).pop(LogRedactionMode.redacted),
           style: FilledButton.styleFrom(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
           child: const Text('脱敏导出'),
         ),

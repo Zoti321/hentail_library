@@ -35,9 +35,7 @@ class AuthorManagementSliverGroup extends ConsumerWidget {
           return _padListSliver(
             tokens,
             SliverToBoxAdapter(
-              child: _centeredListChild(
-                const _AuthorManagementEmptyState(),
-              ),
+              child: _centeredListChild(const _AuthorManagementEmptyState()),
             ),
           );
         }

@@ -35,8 +35,7 @@ rust.ComicFilterDto mapLibraryFilter(LibraryComicFilter filter) {
     showR18: filter.showR18,
     query: filter.query,
     resourceTypes:
-        filter.resourceTypes?.map(mapResourceType).toList() ??
-        const <String>[],
+        filter.resourceTypes?.map(mapResourceType).toList() ?? const <String>[],
     contentRatings:
         filter.contentRatings?.map((ContentRating e) => e.name).toList() ??
         const <String>[],

@@ -22,7 +22,10 @@ void main() {
     test('hashes comic_id values', () {
       const String input = 'reader opened comic_id=my-secret-comic-id';
       final String result = redactLogText(input);
-      expect(result, contains('comic_id=${hashBusinessId('my-secret-comic-id')}'));
+      expect(
+        result,
+        contains('comic_id=${hashBusinessId('my-secret-comic-id')}'),
+      );
       expect(result, isNot(contains('my-secret-comic-id')));
     });
 

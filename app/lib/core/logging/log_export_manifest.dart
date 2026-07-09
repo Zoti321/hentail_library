@@ -29,10 +29,7 @@ Map<String, Object?> buildDiagnosticsManifest({
 
 const bool _isDartDebugMode = !bool.fromEnvironment('dart.vm.product');
 
-String _rustLogLevelLabel(
-  bool diagnosticVerbose, {
-  required bool debugMode,
-}) {
+String _rustLogLevelLabel(bool diagnosticVerbose, {required bool debugMode}) {
   if (diagnosticVerbose) {
     return 'debug';
   }

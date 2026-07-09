@@ -82,10 +82,9 @@ class LogFileWriter {
         return;
       }
       backups.sort(
-        (FileSystemEntity a, FileSystemEntity b) =>
-            (a as File).lastModifiedSync().compareTo(
-              (b as File).lastModifiedSync(),
-            ),
+        (FileSystemEntity a, FileSystemEntity b) => (a as File)
+            .lastModifiedSync()
+            .compareTo((b as File).lastModifiedSync()),
       );
       for (int i = 0; i < backups.length - maxBackupFiles; i++) {
         await (backups[i] as File).delete();

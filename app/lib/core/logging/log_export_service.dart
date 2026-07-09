@@ -15,7 +15,8 @@ class LogExportService {
       return true;
     }
     if (fileName.endsWith('.bak')) {
-      return fileName.startsWith('app_log_') || fileName.startsWith('rust_log_');
+      return fileName.startsWith('app_log_') ||
+          fileName.startsWith('rust_log_');
     }
     return false;
   }

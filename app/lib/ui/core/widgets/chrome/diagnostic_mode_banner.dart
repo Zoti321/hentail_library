@@ -29,11 +29,7 @@ class DiagnosticModeBanner extends ConsumerWidget {
         ),
         child: Row(
           children: <Widget>[
-            Icon(
-              LucideIcons.bug,
-              size: 14,
-              color: colorScheme.primary,
-            ),
+            Icon(LucideIcons.bug, size: 14, color: colorScheme.primary),
             const SizedBox(width: 8),
             Expanded(
               child: Text(

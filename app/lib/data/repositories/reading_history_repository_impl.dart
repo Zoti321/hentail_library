@@ -134,12 +134,7 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
         fallbackMessage: '批量删除阅读历史失败',
       );
     } catch (e, st) {
-      logError(
-        AppLog.dataRepo('reading_history'),
-        '批量删除阅读历史失败',
-        e,
-        st,
-      );
+      logError(AppLog.dataRepo('reading_history'), '批量删除阅读历史失败', e, st);
       if (e is AppException) {
         rethrow;
       }

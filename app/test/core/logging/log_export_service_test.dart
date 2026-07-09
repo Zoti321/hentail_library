@@ -10,15 +10,19 @@ import 'package:test/test.dart';
 void main() {
   group('LogExportService', () {
     test('exportToFile bundles logs and diagnostics.json', () async {
-      final Directory temp = await Directory.systemTemp.createTemp('log_export_');
+      final Directory temp = await Directory.systemTemp.createTemp(
+        'log_export_',
+      );
       addTearDown(() => temp.delete(recursive: true));
 
       final Directory logsDir = Directory(p.join(temp.path, 'logs'));
       await logsDir.create(recursive: true);
-      await File(p.join(logsDir.path, 'app_log.txt')).writeAsString('dart line');
-      await File(p.join(logsDir.path, 'rust_log.txt')).writeAsString(
-        'rust line comic_id=secret',
-      );
+      await File(
+        p.join(logsDir.path, 'app_log.txt'),
+      ).writeAsString('dart line');
+      await File(
+        p.join(logsDir.path, 'rust_log.txt'),
+      ).writeAsString('rust line comic_id=secret');
 
       final String zipPath = p.join(temp.path, 'export.zip');
       const LogExportService service = LogExportService();

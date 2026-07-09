@@ -21,7 +21,9 @@ enum LibraryMediaTypeFilterOption {
 
   Set<ResourceType> get resourceTypes => switch (this) {
     LibraryMediaTypeFilterOption.pdf => const <ResourceType>{ResourceType.pdf},
-    LibraryMediaTypeFilterOption.epub => const <ResourceType>{ResourceType.epub},
+    LibraryMediaTypeFilterOption.epub => const <ResourceType>{
+      ResourceType.epub,
+    },
     LibraryMediaTypeFilterOption.archive => const <ResourceType>{
       ResourceType.zip,
       ResourceType.cbz,
@@ -52,9 +54,7 @@ class LibraryMediaTypeFilterSelection {
       return null;
     }
     return selected
-        .expand(
-          (LibraryMediaTypeFilterOption option) => option.resourceTypes,
-        )
+        .expand((LibraryMediaTypeFilterOption option) => option.resourceTypes)
         .toSet();
   }
 

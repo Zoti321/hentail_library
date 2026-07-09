@@ -35,21 +35,24 @@ String _redactHomeDirectory(String input, String? homeDirectory) {
 String _redactWindowsPaths(String input) {
   return input.replaceAllMapped(
     RegExp(r'[A-Za-z]:\\(?:[^\\/"<>|*?\s]+\\)*[^\\/"<>|*?\s]+'),
-    (Match match) => p.basename(match.group(0)!),
+    (Match match) => _pathBasenameForRedaction(match.group(0)!),
   );
 }
 
 String _redactUnixPaths(String input) {
-  return input.replaceAllMapped(
-    RegExp(r'/(?:[^/\s"<>|*?]+/)+[^/\s"<>|*?]+'),
-    (Match match) {
-      final String value = match.group(0)!;
-      if (value.startsWith('//')) {
-        return value;
-      }
-      return p.basename(value);
-    },
-  );
+  return input.replaceAllMapped(RegExp(r'/(?:[^/\s"<>|*?]+/)+[^/\s"<>|*?]+'), (
+    Match match,
+  ) {
+    final String value = match.group(0)!;
+    if (value.startsWith('//')) {
+      return value;
+    }
+    return _pathBasenameForRedaction(value);
+  });
+}
+
+String _pathBasenameForRedaction(String path) {
+  return p.basename(path.replaceAll(r'\', '/'));
 }
 
 String _redactBusinessIds(String input) {

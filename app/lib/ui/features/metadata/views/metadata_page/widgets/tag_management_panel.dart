@@ -43,10 +43,7 @@ class TagManagementSliverGroup extends ConsumerWidget {
           tokens,
           SliverToBoxAdapter(
             child: _centeredListChild(
-              _TagListCardContent(
-                layoutTier: layoutTier,
-                tags: filteredTags,
-              ),
+              _TagListCardContent(layoutTier: layoutTier, tags: filteredTags),
             ),
           ),
         );
