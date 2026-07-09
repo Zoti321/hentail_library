@@ -127,14 +127,16 @@ Future<void> _pumpAuthorPanel(
       child: MaterialApp(
         theme: buildAppTheme(Brightness.light),
         home: Scaffold(
-          body: SizedBox(
-            width: metadataInnerContentMaxWidth(layoutTier, viewportWidth),
-            height: 800,
-            child: layoutTier == MetadataLayoutTier.compact
-                ? const CustomScrollView(
-                    slivers: <Widget>[AuthorManagementSliverGroup()],
-                  )
-                : AuthorManagementPanel(layoutTier: layoutTier),
+          body: CustomScrollView(
+            slivers: <Widget>[
+              AuthorManagementSliverGroup(
+                layoutTier: layoutTier,
+                contentMaxWidth: metadataInnerContentMaxWidth(
+                  layoutTier,
+                  viewportWidth,
+                ),
+              ),
+            ],
           ),
         ),
       ),

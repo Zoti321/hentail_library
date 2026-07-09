@@ -7,140 +7,78 @@ import 'package:hentai_library/ui/core/widgets/chrome/status_card_shell.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_height.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_shell.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_row_actions.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class TagManagementPanel extends ConsumerWidget {
-  const TagManagementPanel({required this.layoutTier, super.key});
+class TagManagementSliverGroup extends ConsumerWidget {
+  const TagManagementSliverGroup({
+    required this.layoutTier,
+    required this.contentMaxWidth,
+    super.key,
+  });
 
   final MetadataLayoutTier layoutTier;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    assert(metadataUsesListCard(layoutTier));
-    final tagsAsync = ref.watch(allTagsProvider);
-    final List<Tag> filteredTags = ref.watch(filteredTagsProvider);
-    final AppThemeTokens tokens = context.tokens;
-
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: tokens.layout.contentVerticalPadding + 24,
-      ),
-      child: tagsAsync.when(
-        data: (_) {
-          if (filteredTags.isEmpty) {
-            return const _TagManagementEmptyState(inline: false);
-          }
-          return LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              final double cardHeight = metadataPanelCardHeight(
-                constraints: constraints,
-                itemCount: filteredTags.length,
-                config: _TagStyles.listHeightConfig,
-              );
-              return Align(
-                alignment: Alignment.topCenter,
-                child: SizedBox(
-                  width: double.infinity,
-                  height: cardHeight,
-                  child: _TagListCard(
-                    layoutTier: layoutTier,
-                    tags: filteredTags,
-                  ),
-                ),
-              );
-            },
-          );
-        },
-        loading: () => const _TagManagementLoadingState(inline: false),
-        error: (Object e, StackTrace _) =>
-            _TagManagementErrorState(error: e, inline: false),
-      ),
-    );
-  }
-}
-
-class TagManagementSliverGroup extends ConsumerWidget {
-  const TagManagementSliverGroup({super.key});
+  final double contentMaxWidth;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tagsAsync = ref.watch(allTagsProvider);
     final List<Tag> filteredTags = ref.watch(filteredTagsProvider);
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
 
     return tagsAsync.when(
       data: (_) {
         if (filteredTags.isEmpty) {
-          return SliverPadding(
-            padding: EdgeInsets.only(
-              bottom: tokens.layout.contentVerticalPadding + 24,
-            ),
-            sliver: const SliverToBoxAdapter(
-              child: _TagManagementEmptyState(inline: true),
+          return _padListSliver(
+            tokens,
+            SliverToBoxAdapter(
+              child: _centeredListChild(const _TagManagementEmptyState()),
             ),
           );
         }
-        return SliverPadding(
-          padding: EdgeInsets.only(
-            bottom: tokens.layout.contentVerticalPadding + 24,
-          ),
-          sliver: SliverMainAxisGroup(
-            slivers: <Widget>[
-              SliverToBoxAdapter(
-                child: _TagListHeader(
-                  totalCount: filteredTags.length,
-                  compactStyle: true,
-                ),
+        return _padListSliver(
+          tokens,
+          SliverToBoxAdapter(
+            child: _centeredListChild(
+              _TagListCardContent(
+                layoutTier: layoutTier,
+                tags: filteredTags,
               ),
-              SliverList.separated(
-                itemCount: filteredTags.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final Tag tag = filteredTags[index];
-                  return Consumer(
-                    builder:
-                        (BuildContext context, WidgetRef ref, Widget? child) {
-                          final bool isSelected = ref.watch(
-                            tagSelectionProvider.select(
-                              (Set<Tag> selected) => selected.contains(tag),
-                            ),
-                          );
-                          return _TagRow(
-                            layoutTier: MetadataLayoutTier.compact,
-                            tag: tag,
-                            isSelected: isSelected,
-                          );
-                        },
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) =>
-                    Divider(height: 1, color: cs.hentai.borderSubtle),
-              ),
-            ],
+            ),
           ),
         );
       },
-      loading: () => SliverPadding(
-        padding: EdgeInsets.only(
-          bottom: tokens.layout.contentVerticalPadding + 24,
-        ),
-        sliver: const SliverToBoxAdapter(
-          child: _TagManagementLoadingState(inline: true),
+      loading: () => _padListSliver(
+        tokens,
+        SliverToBoxAdapter(
+          child: _centeredListChild(const _TagManagementLoadingState()),
         ),
       ),
-      error: (Object e, StackTrace _) => SliverPadding(
-        padding: EdgeInsets.only(
-          bottom: tokens.layout.contentVerticalPadding + 24,
-        ),
-        sliver: SliverToBoxAdapter(
-          child: _TagManagementErrorState(error: e, inline: true),
+      error: (Object e, StackTrace _) => _padListSliver(
+        tokens,
+        SliverToBoxAdapter(
+          child: _centeredListChild(_TagManagementErrorState(error: e)),
         ),
       ),
+    );
+  }
+
+  Widget _centeredListChild(Widget child) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: SizedBox(width: contentMaxWidth, child: child),
+    );
+  }
+
+  Widget _padListSliver(AppThemeTokens tokens, Widget sliver) {
+    return SliverPadding(
+      padding: EdgeInsets.only(
+        bottom: tokens.layout.contentVerticalPadding + 24,
+      ),
+      sliver: sliver,
     );
   }
 }
@@ -171,49 +109,41 @@ class _TagStyles {
   static const EdgeInsets statusEmptyPadding = EdgeInsets.symmetric(
     vertical: 48,
   );
-  static const MetadataPanelHeightConfig listHeightConfig =
-      kMetadataPanelHeightDefaultConfig;
 }
 
-class _TagListCard extends StatelessWidget {
-  const _TagListCard({required this.layoutTier, required this.tags});
+class _TagListCardContent extends ConsumerWidget {
+  const _TagListCardContent({required this.layoutTier, required this.tags});
 
   final MetadataLayoutTier layoutTier;
   final List<Tag> tags;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     return MetadataPanelListCard(
       radius: _TagStyles.listRadius,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           _TagListHeader(totalCount: tags.length),
-          Expanded(
-            child: ListView.separated(
-              itemCount: tags.length,
-              itemBuilder: (BuildContext context, int index) {
-                final Tag tag = tags[index];
-                return Consumer(
-                  builder:
-                      (BuildContext context, WidgetRef ref, Widget? child) {
-                        final bool isSelected = ref.watch(
-                          tagSelectionProvider.select(
-                            (Set<Tag> selected) => selected.contains(tag),
-                          ),
-                        );
-                        return _TagRow(
-                          layoutTier: layoutTier,
-                          tag: tag,
-                          isSelected: isSelected,
-                        );
-                      },
+          for (int i = 0; i < tags.length; i++) ...<Widget>[
+            if (i > 0) Divider(height: 1, color: cs.hentai.borderSubtle),
+            Consumer(
+              builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                final Tag tag = tags[i];
+                final bool isSelected = ref.watch(
+                  tagSelectionProvider.select(
+                    (Set<Tag> selected) => selected.contains(tag),
+                  ),
+                );
+                return _TagRow(
+                  layoutTier: layoutTier,
+                  tag: tag,
+                  isSelected: isSelected,
                 );
               },
-              separatorBuilder: (BuildContext context, int index) =>
-                  Divider(height: 1, color: cs.hentai.borderSubtle),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -221,10 +151,9 @@ class _TagListCard extends StatelessWidget {
 }
 
 class _TagListHeader extends ConsumerWidget {
-  const _TagListHeader({required this.totalCount, this.compactStyle = false});
+  const _TagListHeader({required this.totalCount});
 
   final int totalCount;
-  final bool compactStyle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -235,7 +164,7 @@ class _TagListHeader extends ConsumerWidget {
     return Container(
       padding: _TagStyles.listHeaderPadding,
       decoration: BoxDecoration(
-        color: compactStyle ? Colors.transparent : cs.surfaceContainerHighest,
+        color: cs.surfaceContainerHighest,
         border: Border(bottom: BorderSide(color: cs.hentai.borderSubtle)),
       ),
       child: Row(
@@ -385,101 +314,80 @@ class _TagRow extends ConsumerWidget {
 }
 
 class _TagManagementLoadingState extends StatelessWidget {
-  const _TagManagementLoadingState({required this.inline});
-
-  final bool inline;
+  const _TagManagementLoadingState();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final Widget indicator = CircularProgressIndicator(
-      strokeWidth: 2.2,
-      color: theme.colorScheme.primary,
-    );
-    if (inline) {
-      return Padding(
-        padding: _TagStyles.statusLoadingPadding,
-        child: Center(child: indicator),
-      );
-    }
     return StatusCardShell(
       padding: _TagStyles.statusLoadingPadding,
       borderRadius: _TagStyles.statusCardRadius,
-      child: Center(child: indicator),
+      child: Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2.2,
+          color: theme.colorScheme.primary,
+        ),
+      ),
     );
   }
 }
 
 class _TagManagementErrorState extends StatelessWidget {
-  const _TagManagementErrorState({required this.error, required this.inline});
+  const _TagManagementErrorState({required this.error});
 
   final Object error;
-  final bool inline;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final TextStyle style = TextStyle(
-      fontSize: kMetadataPanelSubtitleFontSize,
-      color: theme.colorScheme.hentai.textTertiary,
-    );
-    if (inline) {
-      return Padding(
-        padding: _TagStyles.statusErrorPadding,
-        child: Text('$error', style: style),
-      );
-    }
     return StatusCardShell(
       padding: _TagStyles.statusErrorPadding,
       borderRadius: _TagStyles.statusCardRadius,
-      child: Text('$error', style: style),
+      child: Text(
+        '$error',
+        style: TextStyle(
+          fontSize: kMetadataPanelSubtitleFontSize,
+          color: theme.colorScheme.hentai.textTertiary,
+        ),
+      ),
     );
   }
 }
 
 class _TagManagementEmptyState extends StatelessWidget {
-  const _TagManagementEmptyState({required this.inline});
-
-  final bool inline;
+  const _TagManagementEmptyState();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final Widget content = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(LucideIcons.tags, size: 32, color: cs.onSurfaceVariant),
-        const SizedBox(height: 12),
-        Text(
-          '暂无标签',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: cs.hentai.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          '你可以从这里添加、重命名或删除标签。',
-          style: TextStyle(
-            fontSize: kMetadataPanelSubtitleFontSize,
-            color: cs.hentai.textSecondary,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-    if (inline) {
-      return Padding(
-        padding: _TagStyles.statusEmptyPadding,
-        child: Center(child: content),
-      );
-    }
     return StatusCardShell(
       padding: _TagStyles.statusEmptyPadding,
       borderRadius: _TagStyles.statusCardRadius,
-      child: content,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(LucideIcons.tags, size: 32, color: cs.onSurfaceVariant),
+          const SizedBox(height: 12),
+          Text(
+            '暂无标签',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: cs.hentai.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '你可以从这里添加、重命名或删除标签。',
+            style: TextStyle(
+              fontSize: kMetadataPanelSubtitleFontSize,
+              color: cs.hentai.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

@@ -32,10 +32,6 @@ void main() {
     });
 
     test('toggles compact-only layout behaviors', () {
-      expect(metadataUsesPageScroll(MetadataLayoutTier.compact), isTrue);
-      expect(metadataUsesPageScroll(MetadataLayoutTier.expanded), isFalse);
-      expect(metadataUsesListCard(MetadataLayoutTier.compact), isFalse);
-      expect(metadataUsesListCard(MetadataLayoutTier.expanded), isTrue);
       expect(metadataRowUsesOverflowMenu(MetadataLayoutTier.compact), isTrue);
       expect(metadataRowUsesOverflowMenu(MetadataLayoutTier.expanded), isFalse);
     });

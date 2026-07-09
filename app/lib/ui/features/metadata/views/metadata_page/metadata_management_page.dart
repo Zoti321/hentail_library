@@ -115,16 +115,7 @@ class _MetadataManagementPageState
                 viewportWidth,
               );
 
-              if (metadataUsesPageScroll(layoutTier)) {
-                return _buildCompactPage(
-                  layoutTier: layoutTier,
-                  horizontalPadding: horizontalPadding,
-                  innerMaxWidth: innerMaxWidth,
-                  selectedIndex: selectedIndex,
-                );
-              }
-
-              return _buildWidePage(
+              return _buildPage(
                 layoutTier: layoutTier,
                 horizontalPadding: horizontalPadding,
                 innerMaxWidth: innerMaxWidth,
@@ -137,7 +128,7 @@ class _MetadataManagementPageState
     );
   }
 
-  Widget _buildCompactPage({
+  Widget _buildPage({
     required MetadataLayoutTier layoutTier,
     required double horizontalPadding,
     required double innerMaxWidth,
@@ -186,67 +177,25 @@ class _MetadataManagementPageState
               ),
             ),
             if (_visitedTabIndexes.contains(selectedIndex))
-              SliverPadding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                sliver: switch (selectedIndex) {
-                  0 => const AuthorManagementSliverGroup(),
-                  1 => const TagManagementSliverGroup(),
-                  _ => const TagManagementSliverGroup(),
-                },
-              ),
+              switch (selectedIndex) {
+                0 => AuthorManagementSliverGroup(
+                  layoutTier: layoutTier,
+                  contentMaxWidth: innerMaxWidth,
+                ),
+                1 => TagManagementSliverGroup(
+                  layoutTier: layoutTier,
+                  contentMaxWidth: innerMaxWidth,
+                ),
+                _ => TagManagementSliverGroup(
+                  layoutTier: layoutTier,
+                  contentMaxWidth: innerMaxWidth,
+                ),
+              },
           ],
         ),
         LibraryScrollToTopButton(
           scrollController: _scrollController,
           isDrawerOpen: false,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildWidePage({
-    required MetadataLayoutTier layoutTier,
-    required double horizontalPadding,
-    required double innerMaxWidth,
-    required int selectedIndex,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        MetadataPageHeaderSection(
-          layoutTier: layoutTier,
-          horizontalPadding: horizontalPadding,
-          selectedTabIndex: selectedIndex,
-          onTabSelected: _handleTabSelected,
-          onAdd: () => _invokeAddForTab(context, selectedIndex),
-          onOpenNavigation: appShellPageNavigationOpener(context),
-        ),
-        Expanded(
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-              width: innerMaxWidth,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  MetadataContentSearch(
-                    layoutTier: layoutTier,
-                    selectedTabIndex: selectedIndex,
-                    contentMaxWidth: innerMaxWidth,
-                  ),
-                  Expanded(
-                    child: _visitedTabIndexes.contains(selectedIndex)
-                        ? switch (selectedIndex) {
-                            0 => AuthorManagementPanel(layoutTier: layoutTier),
-                            1 => TagManagementPanel(layoutTier: layoutTier),
-                            _ => TagManagementPanel(layoutTier: layoutTier),
-                          }
-                        : const SizedBox.shrink(),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ),
       ],
     );
