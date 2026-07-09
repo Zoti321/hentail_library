@@ -1,5 +1,5 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/domain/repositories/path_repository.dart';
 import 'package:hentai_library/src/rust/api/path.dart' as rust;
@@ -23,7 +23,7 @@ class PathRepositoryImpl implements PathRepository {
         fallbackMessage: '添加路径失败',
       );
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '[PATH_REPO] 添加路径失败，path=$path');
+      logError(AppLog.dataRepo('path'), '添加路径失败，path=$path', e, st);
       if (e is AppException) {
         rethrow;
       }
@@ -39,7 +39,7 @@ class PathRepositoryImpl implements PathRepository {
         fallbackMessage: '移除路径失败',
       );
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '[PATH_REPO] 移除路径失败，path=$path');
+      logError(AppLog.dataRepo('path'), '移除路径失败，path=$path', e, st);
       if (e is AppException) {
         rethrow;
       }

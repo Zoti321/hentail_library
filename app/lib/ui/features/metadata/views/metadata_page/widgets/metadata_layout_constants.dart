@@ -36,14 +36,6 @@ double metadataPageTitleFontSize(MetadataLayoutTier tier) {
   };
 }
 
-bool metadataUsesPageScroll(MetadataLayoutTier tier) {
-  return tier == MetadataLayoutTier.compact;
-}
-
-bool metadataUsesListCard(MetadataLayoutTier tier) {
-  return tier != MetadataLayoutTier.compact;
-}
-
 bool metadataRowUsesOverflowMenu(MetadataLayoutTier tier) {
   return tier == MetadataLayoutTier.compact;
 }

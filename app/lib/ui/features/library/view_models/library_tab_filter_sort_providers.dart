@@ -1,9 +1,11 @@
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_media_type_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_sort_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -98,6 +100,17 @@ LibrarySeriesSortOption librarySeriesTabSortOption(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
+LibraryMediaTypeFilterSelection libraryComicsTabMediaTypeFilter(Ref ref) {
+  final AsyncValue<LibraryMediaTypeFilterSelection> selectionAsync = ref.watch(
+    libraryMediaTypeFilterProvider,
+  );
+  return selectionAsync.maybeWhen(
+    data: (LibraryMediaTypeFilterSelection selection) => selection,
+    orElse: () => const LibraryMediaTypeFilterSelection(),
+  );
+}
+
+@Riverpod(keepAlive: true)
 bool libraryActiveFilterSortIsCustomized(Ref ref) {
   final LibraryDisplayTarget target = ref.watch(libraryDisplayTargetProvider);
   final AsyncValue<LibraryTabAgeRestrictionSettings> ageAsync = ref.watch(
@@ -105,6 +118,9 @@ bool libraryActiveFilterSortIsCustomized(Ref ref) {
   );
   final AsyncValue<LibraryTabSortSettings> sortAsync = ref.watch(
     libraryTabSortProvider,
+  );
+  final LibraryMediaTypeFilterSelection mediaTypeFilter = ref.watch(
+    libraryComicsTabMediaTypeFilterProvider,
   );
   final LibraryTabAgeRestrictionSettings ageSettings = ageAsync.maybeWhen(
     data: (LibraryTabAgeRestrictionSettings settings) => settings,
@@ -117,6 +133,7 @@ bool libraryActiveFilterSortIsCustomized(Ref ref) {
   return isLibraryFilterSortCustomizedForTarget(
     target: target,
     ageSettings: ageSettings,
+    mediaTypeFilter: mediaTypeFilter,
     sortSettings: sortSettings,
   );
 }

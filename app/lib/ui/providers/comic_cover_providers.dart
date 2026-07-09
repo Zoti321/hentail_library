@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/thumbnail/thumbnail_event.dart';
@@ -152,10 +152,11 @@ class ComicCover extends _$ComicCover {
       ref.read(comicCoverThumbnailCacheProvider(comicId).notifier).set(bytes);
       state = ComicCoverReady(ComicCoverImage.bytes(bytes));
     } on Object catch (error, stackTrace) {
-      LogManager.instance.handle(
+      logError(
+        AppLog.ui('comic_cover'),
+        '加载漫画封面失败: comicId=$comicId',
         error,
         stackTrace,
-        '加载漫画封面失败: comicId=$comicId',
       );
       if (ref.mounted) {
         state = ComicCoverError(cause: error);
@@ -212,10 +213,11 @@ class ThumbnailEventCoordinator extends _$ThumbnailEventCoordinator {
       ref.read(comicCoverThumbnailCacheProvider(comicId).notifier).set(bytes);
       ref.read(comicCoverProvider(comicId).notifier).setReady(bytes);
     } on Object catch (error, stackTrace) {
-      LogManager.instance.handle(
+      logError(
+        AppLog.ui('comic_cover'),
+        '缩略图就绪后刷新封面失败: comicId=$comicId',
         error,
         stackTrace,
-        '缩略图就绪后刷新封面失败: comicId=$comicId',
       );
     }
   }

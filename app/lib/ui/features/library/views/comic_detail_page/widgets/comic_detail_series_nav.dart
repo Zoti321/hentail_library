@@ -6,8 +6,8 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_detail_series_nav_provider.dart';
-import 'package:hentai_library/ui/features/shell/di/tools.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -50,10 +50,9 @@ class _ComicDetailSeriesNavState extends ConsumerState<ComicDetailSeriesNav> {
           return;
         }
         final String seriesList = result.seriesNames.join('、');
-        debugPrint('漫画 ${widget.comicId} 同时属于多个系列：$seriesList');
-        ref
-            .read(logManagerProvider)
-            .error('漫画详情系列导航冲突：comicId=${widget.comicId}，系列=[$seriesList]');
+        AppLog.ui(
+          'comic_detail',
+        ).warning('漫画详情系列导航冲突：comicId=${widget.comicId}，系列=[$seriesList]');
         if (!context.mounted) {
           return;
         }

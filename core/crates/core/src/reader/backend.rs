@@ -36,7 +36,9 @@ pub struct EpubBackend {
     pub image_entries: Vec<usize>,
 }
 
+#[tracing::instrument(err, fields(resource_type, path))]
 pub fn open_backend(path: &str, resource_type: &str) -> Result<ReaderBackend, HentaiError> {
+  tracing::debug!(resource_type, "opening reader backend");
   let normalized = normalize_path_for_key(path);
   if normalized.is_empty() {
     return Err(HentaiError::reader_kind_mismatch("path 为空"));

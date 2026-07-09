@@ -9,7 +9,7 @@ import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class ReaderImageItem extends ConsumerWidget {
+class ReaderImageItem extends ConsumerStatefulWidget {
   const ReaderImageItem({
     super.key,
     required this.imageData,
@@ -24,23 +24,37 @@ class ReaderImageItem extends ConsumerWidget {
   final Alignment alignment;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ReaderImageItem> createState() => _ReaderImageItemState();
+}
+
+class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
+  bool _reloadScheduled = false;
+
+  @override
+  void didUpdateWidget(ReaderImageItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.imageData != widget.imageData) {
+      _reloadScheduled = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final Widget loadingSurface = _buildReaderLoadingSurface(context);
     final Widget errorPlaceholder = _buildReaderImageErrorPlaceholder(context);
+    final ReaderPageImageData imageData = widget.imageData;
 
     if (imageData is ReaderDirPageImageData) {
-      final ReaderDirPageImageData dirData =
-          imageData as ReaderDirPageImageData;
-      final String dirPath = dirData.file.path;
+      final String dirPath = imageData.file.path;
       if (!_readerImageFileExists(dirPath)) {
         return errorPlaceholder;
       }
       return ReaderPageFadeIn(
-        enabled: enableCrossfade,
+        enabled: widget.enableCrossfade,
         child: Align(
-          alignment: alignment,
+          alignment: widget.alignment,
           child: AppComicImage(
-            filePath: dirData.file.path,
+            filePath: imageData.file.path,
             fit: BoxFit.contain,
             filterQuality: FilterQuality.high,
             useReaderImageCache: true,
@@ -53,8 +67,7 @@ class ReaderImageItem extends ConsumerWidget {
     if (imageData is! ReaderArchivePageImageData) {
       return errorPlaceholder;
     }
-    final ReaderArchivePageImageData archiveData =
-        imageData as ReaderArchivePageImageData;
+    final ReaderArchivePageImageData archiveData = imageData;
     final AsyncValue<ReaderPagePayload> pageAsync = ref.watch(
       comicReaderPageProvider(
         comicId: archiveData.comicId,
@@ -66,13 +79,13 @@ class ReaderImageItem extends ConsumerWidget {
       error: (_, StackTrace _) => errorPlaceholder,
       data: (ReaderPagePayload page) {
         if (page is ReaderPageFilePath && !_readerImageFileExists(page.path)) {
-          _scheduleReaderPageReload(ref, archiveData);
+          _scheduleReaderPageReload(archiveData);
           return loadingSurface;
         }
         return ReaderPageFadeIn(
-          enabled: enableCrossfade,
+          enabled: widget.enableCrossfade,
           child: Align(
-            alignment: alignment,
+            alignment: widget.alignment,
             child: switch (page) {
               ReaderPageFilePath(:final String path) => AppComicImage(
                 filePath: path,
@@ -95,6 +108,25 @@ class ReaderImageItem extends ConsumerWidget {
         );
       },
     );
+  }
+
+  void _scheduleReaderPageReload(ReaderArchivePageImageData archiveData) {
+    if (_reloadScheduled) {
+      return;
+    }
+    _reloadScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _reloadScheduled = false;
+      if (!mounted) {
+        return;
+      }
+      ref.invalidate(
+        comicReaderPageProvider(
+          comicId: archiveData.comicId,
+          pageIndex: archiveData.pageIndex,
+        ),
+      );
+    });
   }
 
   Widget _buildReaderLoadingSurface(BuildContext context) {
@@ -125,18 +157,4 @@ bool _readerImageFileExists(String path) {
   } on Object {
     return false;
   }
-}
-
-void _scheduleReaderPageReload(
-  WidgetRef ref,
-  ReaderArchivePageImageData archiveData,
-) {
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    ref.invalidate(
-      comicReaderPageProvider(
-        comicId: archiveData.comicId,
-        pageIndex: archiveData.pageIndex,
-      ),
-    );
-  });
 }

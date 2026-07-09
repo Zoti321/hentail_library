@@ -17,6 +17,20 @@ use super::scanner::{ScanContext, scan_roots};
 use super::writer::{apply_scan_replace_plan, clear_all_comics};
 use crate::thumbnail::enqueue_thumbnails_low;
 
+fn return_if_cancelled(handle: &SyncHandle, phase: &str) -> bool {
+    if handle.is_cancelled() {
+        tracing::debug!(phase, "sync cancelled");
+        true
+    } else {
+        false
+    }
+}
+
+fn log_sync_phase(phase: SyncLibraryPhaseDto, route: SyncLibraryRouteDto) {
+    tracing::info!(?phase, ?route, "sync phase");
+}
+
+#[tracing::instrument(skip(emit, handle), err)]
 pub async fn sync_library(
     handle: SyncHandle,
     mut emit: impl FnMut(SyncLibraryProgressDto),
@@ -30,16 +44,18 @@ pub async fn sync_library(
     sync_with_roots(&db, &handle, &effective, emit).await
 }
 
+#[tracing::instrument(skip(emit, handle), err)]
 async fn sync_no_roots(
     db: &sea_orm::DatabaseConnection,
     handle: &SyncHandle,
     mut emit: impl FnMut(SyncLibraryProgressDto),
 ) -> Result<(), HentaiError> {
-    if handle.is_cancelled() {
+    if return_if_cancelled(handle, "no_roots_start") {
         return Ok(());
     }
     let count = count_all_comic_ids(db).await?;
     if count == 0 {
+        log_sync_phase(SyncLibraryPhaseDto::Done, SyncLibraryRouteDto::NoRootsNoop);
         emit(progress(
             SyncLibraryPhaseDto::Done,
             SyncLibraryRouteDto::NoRootsNoop,
@@ -55,6 +71,10 @@ async fn sync_no_roots(
         ));
         return Ok(());
     }
+    log_sync_phase(
+        SyncLibraryPhaseDto::ClearingLibrary,
+        SyncLibraryRouteDto::NoRootsCleared,
+    );
     emit(progress(
         SyncLibraryPhaseDto::ClearingLibrary,
         SyncLibraryRouteDto::NoRootsCleared,
@@ -68,9 +88,10 @@ async fn sync_no_roots(
         None,
         None,
     ));
-    if handle.is_cancelled() {
+    if return_if_cancelled(handle, "clearing_library") {
         return Ok(());
     }
+    log_sync_phase(SyncLibraryPhaseDto::WritingDb, SyncLibraryRouteDto::NoRootsCleared);
     emit(progress(
         SyncLibraryPhaseDto::WritingDb,
         SyncLibraryRouteDto::NoRootsCleared,
@@ -86,6 +107,8 @@ async fn sync_no_roots(
     ));
     let removed = clear_all_comics(db).await?;
     clear_reader_sessions();
+    log_sync_phase(SyncLibraryPhaseDto::Done, SyncLibraryRouteDto::NoRootsCleared);
+    tracing::info!(removed, "sync complete");
     emit(progress(
         SyncLibraryPhaseDto::Done,
         SyncLibraryRouteDto::NoRootsCleared,
@@ -102,6 +125,7 @@ async fn sync_no_roots(
     Ok(())
 }
 
+#[tracing::instrument(skip(emit, roots, handle), err, fields(root_count = roots.len()))]
 async fn sync_with_roots(
     db: &sea_orm::DatabaseConnection,
     handle: &SyncHandle,
@@ -117,6 +141,7 @@ async fn sync_with_roots(
     let mut counts = LibrarySyncCountsDto::default();
     let mut accepted_total = 0i32;
 
+    log_sync_phase(SyncLibraryPhaseDto::Scanning, SyncLibraryRouteDto::WithRoots);
     emit(progress(
         SyncLibraryPhaseDto::Scanning,
         SyncLibraryRouteDto::WithRoots,
@@ -132,7 +157,7 @@ async fn sync_with_roots(
     ));
 
     let scan_items = scan_roots(roots, &ctx, handle)?;
-    if handle.is_cancelled() {
+    if return_if_cancelled(handle, "scanning") {
         return Ok(());
     }
     for item in &scan_items {
@@ -152,10 +177,11 @@ async fn sync_with_roots(
             None,
         ));
     }
-    if handle.is_cancelled() {
+    if return_if_cancelled(handle, "scanning_progress") {
         return Ok(());
     }
 
+    log_sync_phase(SyncLibraryPhaseDto::WritingDb, SyncLibraryRouteDto::WithRoots);
     emit(progress(
         SyncLibraryPhaseDto::WritingDb,
         SyncLibraryRouteDto::WithRoots,
@@ -171,7 +197,7 @@ async fn sync_with_roots(
     ));
 
     let plan = build_scan_replace_plan(db, scan_items).await?;
-    if handle.is_cancelled() {
+    if return_if_cancelled(handle, "writing_db") {
         return Ok(());
     }
     apply_scan_replace_plan(db, &plan).await?;
@@ -187,6 +213,15 @@ async fn sync_with_roots(
         enqueue_thumbnails_low(comic_ids).await?;
     }
 
+    log_sync_phase(SyncLibraryPhaseDto::Done, SyncLibraryRouteDto::WithRoots);
+    tracing::info!(
+        accepted_total,
+        removed = plan.removed_ids.len(),
+        added = plan.added_count,
+        kept = plan.kept_count,
+        thumbnail_total = thumb_total,
+        "sync complete"
+    );
     emit(progress(
         SyncLibraryPhaseDto::Done,
         SyncLibraryRouteDto::WithRoots,

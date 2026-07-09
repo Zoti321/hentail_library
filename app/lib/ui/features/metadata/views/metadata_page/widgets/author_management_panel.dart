@@ -7,141 +7,78 @@ import 'package:hentai_library/ui/core/widgets/chrome/status_card_shell.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_height.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_shell.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_row_actions.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class AuthorManagementPanel extends ConsumerWidget {
-  const AuthorManagementPanel({required this.layoutTier, super.key});
+class AuthorManagementSliverGroup extends ConsumerWidget {
+  const AuthorManagementSliverGroup({
+    required this.layoutTier,
+    required this.contentMaxWidth,
+    super.key,
+  });
 
   final MetadataLayoutTier layoutTier;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    assert(metadataUsesListCard(layoutTier));
-    final authorsAsync = ref.watch(allAuthorsProvider);
-    final List<Author> filteredAuthors = ref.watch(filteredAuthorsProvider);
-    final AppThemeTokens tokens = context.tokens;
-
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: tokens.layout.contentVerticalPadding + 24,
-      ),
-      child: authorsAsync.when(
-        data: (_) {
-          if (filteredAuthors.isEmpty) {
-            return const _AuthorManagementEmptyState(inline: false);
-          }
-          return LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              final double cardHeight = metadataPanelCardHeight(
-                constraints: constraints,
-                itemCount: filteredAuthors.length,
-                config: _AuthorStyles.listHeightConfig,
-              );
-              return Align(
-                alignment: Alignment.topCenter,
-                child: SizedBox(
-                  width: double.infinity,
-                  height: cardHeight,
-                  child: _AuthorListCard(
-                    layoutTier: layoutTier,
-                    authors: filteredAuthors,
-                  ),
-                ),
-              );
-            },
-          );
-        },
-        loading: () => const _AuthorManagementLoadingState(inline: false),
-        error: (Object e, StackTrace _) =>
-            _AuthorManagementErrorState(error: e, inline: false),
-      ),
-    );
-  }
-}
-
-class AuthorManagementSliverGroup extends ConsumerWidget {
-  const AuthorManagementSliverGroup({super.key});
+  final double contentMaxWidth;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authorsAsync = ref.watch(allAuthorsProvider);
     final List<Author> filteredAuthors = ref.watch(filteredAuthorsProvider);
     final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
 
     return authorsAsync.when(
       data: (_) {
         if (filteredAuthors.isEmpty) {
-          return SliverPadding(
-            padding: EdgeInsets.only(
-              bottom: tokens.layout.contentVerticalPadding + 24,
-            ),
-            sliver: const SliverToBoxAdapter(
-              child: _AuthorManagementEmptyState(inline: true),
+          return _padListSliver(
+            tokens,
+            SliverToBoxAdapter(
+              child: _centeredListChild(const _AuthorManagementEmptyState()),
             ),
           );
         }
-        return SliverPadding(
-          padding: EdgeInsets.only(
-            bottom: tokens.layout.contentVerticalPadding + 24,
-          ),
-          sliver: SliverMainAxisGroup(
-            slivers: <Widget>[
-              SliverToBoxAdapter(
-                child: _AuthorListHeader(
-                  totalCount: filteredAuthors.length,
-                  compactStyle: true,
-                ),
+        return _padListSliver(
+          tokens,
+          SliverToBoxAdapter(
+            child: _centeredListChild(
+              _AuthorListCardContent(
+                layoutTier: layoutTier,
+                authors: filteredAuthors,
               ),
-              SliverList.separated(
-                itemCount: filteredAuthors.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final Author author = filteredAuthors[index];
-                  return Consumer(
-                    builder:
-                        (BuildContext context, WidgetRef ref, Widget? child) {
-                          final bool isSelected = ref.watch(
-                            authorSelectionProvider.select(
-                              (Set<Author> selected) =>
-                                  selected.contains(author),
-                            ),
-                          );
-                          return _AuthorRow(
-                            layoutTier: MetadataLayoutTier.compact,
-                            author: author,
-                            isSelected: isSelected,
-                          );
-                        },
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) =>
-                    Divider(height: 1, color: cs.hentai.borderSubtle),
-              ),
-            ],
+            ),
           ),
         );
       },
-      loading: () => SliverPadding(
-        padding: EdgeInsets.only(
-          bottom: tokens.layout.contentVerticalPadding + 24,
-        ),
-        sliver: const SliverToBoxAdapter(
-          child: _AuthorManagementLoadingState(inline: true),
+      loading: () => _padListSliver(
+        tokens,
+        SliverToBoxAdapter(
+          child: _centeredListChild(const _AuthorManagementLoadingState()),
         ),
       ),
-      error: (Object e, StackTrace _) => SliverPadding(
-        padding: EdgeInsets.only(
-          bottom: tokens.layout.contentVerticalPadding + 24,
-        ),
-        sliver: SliverToBoxAdapter(
-          child: _AuthorManagementErrorState(error: e, inline: true),
+      error: (Object e, StackTrace _) => _padListSliver(
+        tokens,
+        SliverToBoxAdapter(
+          child: _centeredListChild(_AuthorManagementErrorState(error: e)),
         ),
       ),
+    );
+  }
+
+  Widget _centeredListChild(Widget child) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: SizedBox(width: contentMaxWidth, child: child),
+    );
+  }
+
+  Widget _padListSliver(AppThemeTokens tokens, Widget sliver) {
+    return SliverPadding(
+      padding: EdgeInsets.only(
+        bottom: tokens.layout.contentVerticalPadding + 24,
+      ),
+      sliver: sliver,
     );
   }
 }
@@ -172,49 +109,44 @@ class _AuthorStyles {
   static const EdgeInsets statusEmptyPadding = EdgeInsets.symmetric(
     vertical: 48,
   );
-  static const MetadataPanelHeightConfig listHeightConfig =
-      kMetadataPanelHeightDefaultConfig;
 }
 
-class _AuthorListCard extends StatelessWidget {
-  const _AuthorListCard({required this.layoutTier, required this.authors});
+class _AuthorListCardContent extends ConsumerWidget {
+  const _AuthorListCardContent({
+    required this.layoutTier,
+    required this.authors,
+  });
 
   final MetadataLayoutTier layoutTier;
   final List<Author> authors;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     return MetadataPanelListCard(
       radius: _AuthorStyles.listRadius,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           _AuthorListHeader(totalCount: authors.length),
-          Expanded(
-            child: ListView.separated(
-              itemCount: authors.length,
-              itemBuilder: (BuildContext context, int index) {
-                final Author author = authors[index];
-                return Consumer(
-                  builder:
-                      (BuildContext context, WidgetRef ref, Widget? child) {
-                        final bool isSelected = ref.watch(
-                          authorSelectionProvider.select(
-                            (Set<Author> selected) => selected.contains(author),
-                          ),
-                        );
-                        return _AuthorRow(
-                          layoutTier: layoutTier,
-                          author: author,
-                          isSelected: isSelected,
-                        );
-                      },
+          for (int i = 0; i < authors.length; i++) ...<Widget>[
+            if (i > 0) Divider(height: 1, color: cs.hentai.borderSubtle),
+            Consumer(
+              builder: (BuildContext context, WidgetRef ref, Widget? child) {
+                final Author author = authors[i];
+                final bool isSelected = ref.watch(
+                  authorSelectionProvider.select(
+                    (Set<Author> selected) => selected.contains(author),
+                  ),
+                );
+                return _AuthorRow(
+                  layoutTier: layoutTier,
+                  author: author,
+                  isSelected: isSelected,
                 );
               },
-              separatorBuilder: (BuildContext context, int index) =>
-                  Divider(height: 1, color: cs.hentai.borderSubtle),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -222,13 +154,9 @@ class _AuthorListCard extends StatelessWidget {
 }
 
 class _AuthorListHeader extends ConsumerWidget {
-  const _AuthorListHeader({
-    required this.totalCount,
-    this.compactStyle = false,
-  });
+  const _AuthorListHeader({required this.totalCount});
 
   final int totalCount;
-  final bool compactStyle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -239,7 +167,7 @@ class _AuthorListHeader extends ConsumerWidget {
     return Container(
       padding: _AuthorStyles.listHeaderPadding,
       decoration: BoxDecoration(
-        color: compactStyle ? Colors.transparent : cs.surfaceContainerHighest,
+        color: cs.surfaceContainerHighest,
         border: Border(bottom: BorderSide(color: cs.hentai.borderSubtle)),
       ),
       child: Row(
@@ -388,104 +316,80 @@ class _AuthorRow extends ConsumerWidget {
 }
 
 class _AuthorManagementLoadingState extends StatelessWidget {
-  const _AuthorManagementLoadingState({required this.inline});
-
-  final bool inline;
+  const _AuthorManagementLoadingState();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final Widget indicator = CircularProgressIndicator(
-      strokeWidth: 2.2,
-      color: theme.colorScheme.primary,
-    );
-    if (inline) {
-      return Padding(
-        padding: _AuthorStyles.statusLoadingPadding,
-        child: Center(child: indicator),
-      );
-    }
     return StatusCardShell(
       padding: _AuthorStyles.statusLoadingPadding,
       borderRadius: _AuthorStyles.statusCardRadius,
-      child: Center(child: indicator),
+      child: Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2.2,
+          color: theme.colorScheme.primary,
+        ),
+      ),
     );
   }
 }
 
 class _AuthorManagementErrorState extends StatelessWidget {
-  const _AuthorManagementErrorState({
-    required this.error,
-    required this.inline,
-  });
+  const _AuthorManagementErrorState({required this.error});
 
   final Object error;
-  final bool inline;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final TextStyle style = TextStyle(
-      fontSize: kMetadataPanelSubtitleFontSize,
-      color: theme.colorScheme.hentai.textTertiary,
-    );
-    if (inline) {
-      return Padding(
-        padding: _AuthorStyles.statusErrorPadding,
-        child: Text('$error', style: style),
-      );
-    }
     return StatusCardShell(
       padding: _AuthorStyles.statusErrorPadding,
       borderRadius: _AuthorStyles.statusCardRadius,
-      child: Text('$error', style: style),
+      child: Text(
+        '$error',
+        style: TextStyle(
+          fontSize: kMetadataPanelSubtitleFontSize,
+          color: theme.colorScheme.hentai.textTertiary,
+        ),
+      ),
     );
   }
 }
 
 class _AuthorManagementEmptyState extends StatelessWidget {
-  const _AuthorManagementEmptyState({required this.inline});
-
-  final bool inline;
+  const _AuthorManagementEmptyState();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final Widget content = Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(LucideIcons.penLine, size: 32, color: cs.onSurfaceVariant),
-        const SizedBox(height: 12),
-        Text(
-          '暂无作者',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: cs.hentai.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          '你可以从这里添加、重命名或删除作者。',
-          style: TextStyle(
-            fontSize: kMetadataPanelSubtitleFontSize,
-            color: cs.hentai.textSecondary,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-    if (inline) {
-      return Padding(
-        padding: _AuthorStyles.statusEmptyPadding,
-        child: Center(child: content),
-      );
-    }
     return StatusCardShell(
       padding: _AuthorStyles.statusEmptyPadding,
       borderRadius: _AuthorStyles.statusCardRadius,
-      child: content,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(LucideIcons.penLine, size: 32, color: cs.onSurfaceVariant),
+          const SizedBox(height: 12),
+          Text(
+            '暂无作者',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: cs.hentai.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '你可以从这里添加、重命名或删除作者。',
+            style: TextStyle(
+              fontSize: kMetadataPanelSubtitleFontSize,
+              color: cs.hentai.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

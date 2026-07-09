@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/data/adapters/frb_error_mapper.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 
@@ -15,5 +16,10 @@ void handleUncaughtFrbZoneError(Object error, StackTrace stackTrace) {
   FlutterError.presentError(
     FlutterErrorDetails(exception: mapped, stack: stackTrace),
   );
-  debugPrint('未处理的 FRB 错误: ${frbErrorMessage(error)}\n$stackTrace');
+  logError(
+    AppLog.dataFrb(),
+    '未处理的 FRB 错误: ${frbErrorMessage(error)}',
+    error,
+    stackTrace,
+  );
 }

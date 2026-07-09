@@ -1,5 +1,5 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/history_frb_mapper.dart';
 import 'package:hentai_library/domain/models/models.dart' as entity;
@@ -19,10 +19,11 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
         fallbackMessage: '记录阅读进度失败',
       );
     } catch (e, st) {
-      LogManager.instance.handle(
+      logError(
+        AppLog.dataRepo('reading_history'),
+        '记录阅读进度失败，comicId=${history.comicId}',
         e,
         st,
-        '[READING_HISTORY_REPO] 记录阅读进度失败，comicId=${history.comicId}',
       );
       if (e is AppException) {
         rethrow;
@@ -108,10 +109,11 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
         fallbackMessage: '删除阅读历史失败',
       );
     } catch (e, st) {
-      LogManager.instance.handle(
+      logError(
+        AppLog.dataRepo('reading_history'),
+        '删除阅读历史失败，comicId=$comicId',
         e,
         st,
-        '[READING_HISTORY_REPO] 删除阅读历史失败，comicId=$comicId',
       );
       if (e is AppException) {
         rethrow;
@@ -132,7 +134,7 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
         fallbackMessage: '批量删除阅读历史失败',
       );
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '[READING_HISTORY_REPO] 批量删除阅读历史失败');
+      logError(AppLog.dataRepo('reading_history'), '批量删除阅读历史失败', e, st);
       if (e is AppException) {
         rethrow;
       }
@@ -148,7 +150,7 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
         fallbackMessage: '清空阅读历史失败',
       );
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '[READING_HISTORY_REPO] 清空阅读历史失败');
+      logError(AppLog.dataRepo('reading_history'), '清空阅读历史失败', e, st);
       if (e is AppException) {
         rethrow;
       }

@@ -26,6 +26,7 @@ pub async fn add_path(raw_path: &str) -> Result<(), HentaiError> {
                 .do_nothing()
                 .to_owned(),
         )
+        .do_nothing()
         .exec(&db)
         .await
         .map_err(map_db_err)?;

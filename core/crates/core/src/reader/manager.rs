@@ -47,12 +47,14 @@ fn store() -> &'static Mutex<SessionStore> {
     STORE.get_or_init(|| Mutex::new(SessionStore::new()))
 }
 
+#[tracing::instrument(err, fields(comic_id, resource_type, path))]
 pub fn open_reader(comic_id: &str, path: &str, resource_type: &str) -> Result<(), HentaiError> {
     let normalized_path = normalize_path_for_key(path);
     let mut store = store().lock().map_err(|e| HentaiError::validation(e.to_string()))?;
     if let Some(existing) = store.sessions.get(comic_id) {
         if existing.normalized_path == normalized_path {
             store.touch(comic_id);
+            tracing::debug!(comic_id, "reader session reused");
             return Ok(());
         }
         store.sessions.remove(comic_id);
@@ -68,6 +70,7 @@ pub fn open_reader(comic_id: &str, path: &str, resource_type: &str) -> Result<()
     );
     store.touch(comic_id);
     store.evict_if_needed();
+    tracing::info!(comic_id, resource_type, "reader opened");
     Ok(())
 }
 

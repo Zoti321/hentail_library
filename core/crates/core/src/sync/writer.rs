@@ -272,6 +272,7 @@ pub async fn replace_comic_authors<C: ConnectionTrait>(
                     .do_nothing()
                     .to_owned(),
             )
+            .do_nothing()
             .exec(db)
             .await
             .map_err(map_db_err)?;
@@ -307,6 +308,7 @@ pub async fn replace_comic_tags<C: ConnectionTrait>(
                     .do_nothing()
                     .to_owned(),
             )
+            .do_nothing()
             .exec(db)
             .await
             .map_err(map_db_err)?;
