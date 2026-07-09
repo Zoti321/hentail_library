@@ -55,3 +55,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | --- | ---- | ---- |
 | [0001](./0001-comic-identity-via-path.md) | Comic 身份锚定磁盘路径 | Accepted |
 | [0002](./0002-rust-core-via-frb.md) | Rust 核心层经 FRB 接管数据与 I/O | Accepted |
+| [0003](./0003-unified-dev-logging.md) | 统一开发期日志（Dart `logging` + Rust `tracing`） | Accepted |
