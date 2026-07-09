@@ -1,29 +1,31 @@
 # Hentai Library
 
-基于 Flutter 的本地漫画/本子阅读与管理应用，聚焦离线阅读体验与个人库管理。
+基于 Flutter 的本地漫画阅读与管理应用，聚焦离线阅读体验与个人库管理。
 
 ## 屏幕截图
 
-![alt](static/screenshot/image_1.png)
-![alt](static/screenshot/image_2.png)
-![alt](static/screenshot/image_3.png)
-![alt](static/screenshot/image_4.png)
+| 漫画库（桌面 / 紧凑） | 设置（桌面 / 紧凑） | 阅读历史（桌面 / 紧凑） |
+| --- | --- | --- |
+| ![漫画库桌面](static/screenshot/image_2.png) | ![设置桌面](static/screenshot/image_3.png) | ![阅读历史桌面](static/screenshot/image_5.png) |
+| ![漫画库紧凑](static/screenshot/image_1.png) | ![设置紧凑](static/screenshot/image_4.png) | ![阅读历史紧凑](static/screenshot/image_6.png) |
 
 ## 核心功能
 
 ### 阅读器
 
-- 资源格式支持: `EPUB`, `ZIP`, `CBZ`
-- 图片格式支持: `JPG`、`PNG`、`WebP`
-- 多阅读模式：卷轴（Webtoon）、翻页
-- 阅读增强：预加载，亮度，自动播放
+- **资源格式**：图片目录、`ZIP` / `CBZ`、`EPUB`、`PDF`；`RAR` / `CBR`、`7Z` / `CB7` 已识别并纳入同步
+- **图片格式**：`JPG`、`PNG`、`WebP`、`BMP`、`GIF`
+- **阅读模式**：单页翻页、双页、双页（封面独立）、Webtoon 纵向卷轴
+- **阅读增强**：相邻页预加载、翻页模式自动播放、全屏阅读、阅读进度与历史记录
+- **系列阅读**：在系列内切换上下卷；支持无痕阅读（不写入历史）
 
 ### 书架与库管理
 
 - 指定路径扫描与导入
-- 自定义元数据(作者,标签,内容分级,首发日期)
+- 自定义元数据（作者、标签、内容分级、首发日期）
 - 创建系列管理相关漫画
 - 自动系列推断
+- 漫画库筛选：年龄限制、媒体类型（PDF / EPUB / 压缩包）、排序
 
 ## 支持平台
 
