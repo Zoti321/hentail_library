@@ -1,5 +1,4 @@
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
-import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/enums.dart';

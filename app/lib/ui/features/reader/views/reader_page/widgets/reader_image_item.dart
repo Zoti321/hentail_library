@@ -45,9 +45,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     final ReaderPageImageData imageData = widget.imageData;
 
     if (imageData is ReaderDirPageImageData) {
-      final ReaderDirPageImageData dirData =
-          imageData as ReaderDirPageImageData;
-      final String dirPath = dirData.file.path;
+      final String dirPath = imageData.file.path;
       if (!_readerImageFileExists(dirPath)) {
         return errorPlaceholder;
       }
@@ -56,7 +54,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
         child: Align(
           alignment: widget.alignment,
           child: AppComicImage(
-            filePath: dirData.file.path,
+            filePath: imageData.file.path,
             fit: BoxFit.contain,
             filterQuality: FilterQuality.high,
             useReaderImageCache: true,
@@ -69,8 +67,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     if (imageData is! ReaderArchivePageImageData) {
       return errorPlaceholder;
     }
-    final ReaderArchivePageImageData archiveData =
-        imageData as ReaderArchivePageImageData;
+    final ReaderArchivePageImageData archiveData = imageData;
     final AsyncValue<ReaderPagePayload> pageAsync = ref.watch(
       comicReaderPageProvider(
         comicId: archiveData.comicId,
