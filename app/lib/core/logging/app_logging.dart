@@ -2,11 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:hentai_library/core/logging/log_file_writer.dart';
 import 'package:logging/logging.dart';
 
+LogFileWriter? _appLogFileWriter;
+
+LogFileWriter? get appLogFileWriter => _appLogFileWriter;
+
 Future<LogFileWriter> configureAppLogging() async {
   Logger.root.level = kDebugMode ? Level.FINE : Level.INFO;
 
   final LogFileWriter fileWriter = LogFileWriter();
   await fileWriter.init();
+  _appLogFileWriter = fileWriter;
 
   Logger.root.onRecord.listen((LogRecord record) {
     _emitConsoleLog(record);

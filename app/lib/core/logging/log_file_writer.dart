@@ -29,6 +29,10 @@ class LogFileWriter {
     _sink?.writeln(_formatRecord(record));
   }
 
+  Future<void> flush() async {
+    await _sink?.flush();
+  }
+
   String _formatRecord(LogRecord record) {
     final StringBuffer buffer = StringBuffer()
       ..write(record.time.toIso8601String())

@@ -116,6 +116,12 @@ class _SettingsViewState extends State<SettingsView> {
                           ],
                         ),
                         SettingsGroup(
+                          title: '诊断与支持',
+                          children: <Widget>[
+                            ExportLogsRow(layoutTier: layoutTier),
+                          ],
+                        ),
+                        SettingsGroup(
                           title: '关于',
                           children: <Widget>[
                             AutoUpdateRow(layoutTier: layoutTier),
