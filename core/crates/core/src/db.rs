@@ -32,6 +32,7 @@ pub fn init_db(app_data_dir: &str, db_file_name: &str) -> Result<(), HentaiError
 pub async fn init_db_async(app_data_dir: &str, db_file_name: &str) -> Result<(), HentaiError> {
     let app_data_dir = app_data_dir.trim();
     let db_file_name = db_file_name.trim();
+    tracing::info!(app_data_dir, db_file_name, "init_db");
     if app_data_dir.is_empty() {
         return Err(HentaiError::validation("app_data_dir 不能为空"));
     }

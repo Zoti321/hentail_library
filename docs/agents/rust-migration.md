@@ -12,6 +12,8 @@
 
 开发：clone 后先在仓库根目录执行 `scripts/setup-dev.ps1`（Windows）或 `scripts/setup-dev.sh`（Unix），创建 `app/rust_builder/rust` → `core/crates/flutter` 链接并拉取 pdfium；然后 `cd app && flutter run`、`cd core && cargo test --workspace`。
 
+**Rust 日志（ADR-0003）**：`tracing` 输出至 stderr；开发时可用 `RUST_LOG=hentai_core=debug flutter run` 调整级别（未设置时 debug 构建默认 `hentai_core=debug`）。
+
 ## 架构要点
 
 - **无 Dart UseCase**：`sync_library`、`infer_series` 等为 Rust 原子 API。
