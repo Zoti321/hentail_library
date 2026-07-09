@@ -12,7 +12,7 @@
 
 开发：clone 后先在仓库根目录执行 `scripts/setup-dev.ps1`（Windows）或 `scripts/setup-dev.sh`（Unix），创建 `app/rust_builder/rust` → `core/crates/flutter` 链接并拉取 pdfium；然后 `cd app && flutter run`、`cd core && cargo test --workspace`。
 
-**Rust 日志（ADR-0003）**：`tracing` 输出至 stderr；开发时可用 `RUST_LOG=hentai_core=debug flutter run` 调整级别（未设置时 debug 构建默认 `hentai_core=debug`）。
+**Rust 日志（ADR-0003 / ADR-0004）**：`tracing` 输出至 stderr，并在 `configure_rust_log_frb` 后写入 `{app_data}/logs/rust_log.txt`（5MB 轮转）。开发时可用 `RUST_LOG=hentai_core=debug flutter run`；`set_diagnostic_logging_frb` 临时调整级别。用户支持流程见 `docs/agents/log-support.md`。
 
 ## 架构要点
 

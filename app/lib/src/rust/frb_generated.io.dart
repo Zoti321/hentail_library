@@ -8,6 +8,7 @@ import 'api/comic.dart';
 import 'api/history.dart';
 import 'api/home.dart';
 import 'api/init.dart';
+import 'api/logging.dart';
 import 'api/path.dart';
 import 'api/reader.dart';
 import 'api/series.dart';
