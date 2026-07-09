@@ -47,6 +47,7 @@ pub async fn add_tag(name: &str) -> Result<(), HentaiError> {
                 .do_nothing()
                 .to_owned(),
         )
+        .do_nothing()
         .exec(&db)
         .await
         .map_err(map_db_err)?;
@@ -79,6 +80,7 @@ pub async fn rename_tag(old_name: &str, new_name: &str) -> Result<(), HentaiErro
                 .do_nothing()
                 .to_owned(),
         )
+        .do_nothing()
         .exec(&txn)
         .await
         .map_err(map_db_err)?;
