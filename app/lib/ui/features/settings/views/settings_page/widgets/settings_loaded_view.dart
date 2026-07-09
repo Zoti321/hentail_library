@@ -118,6 +118,7 @@ class _SettingsViewState extends State<SettingsView> {
                         SettingsGroup(
                           title: '诊断与支持',
                           children: <Widget>[
+                            DiagnosticModeRow(layoutTier: layoutTier),
                             ExportLogsRow(layoutTier: layoutTier),
                           ],
                         ),
