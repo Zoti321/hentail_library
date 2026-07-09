@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_about_rows.dart';
+import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_diagnostics_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_library_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_header.dart';

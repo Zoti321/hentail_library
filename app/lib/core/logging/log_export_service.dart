@@ -73,10 +73,7 @@ class LogExportService {
       ArchiveFile('diagnostics.json', manifestBytes.length, manifestBytes),
     );
 
-    final List<int>? zipBytes = ZipEncoder().encode(archive);
-    if (zipBytes == null) {
-      throw StateError('日志 zip 编码失败');
-    }
+    final List<int> zipBytes = ZipEncoder().encode(archive);
 
     final File outputFile = File(outputPath);
     await outputFile.parent.create(recursive: true);
