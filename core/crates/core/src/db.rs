@@ -29,6 +29,7 @@ pub fn init_db(app_data_dir: &str, db_file_name: &str) -> Result<(), HentaiError
     crate::runtime::block_on(init_db_async(app_data_dir, db_file_name))
 }
 
+#[tracing::instrument(err, fields(app_data_dir, db_file_name))]
 pub async fn init_db_async(app_data_dir: &str, db_file_name: &str) -> Result<(), HentaiError> {
     let app_data_dir = app_data_dir.trim();
     let db_file_name = db_file_name.trim();
@@ -47,7 +48,11 @@ pub async fn init_db_async(app_data_dir: &str, db_file_name: &str) -> Result<(),
     };
 
     let db_file_path = PathBuf::from(app_data_dir).join(file_name);
-    let conn = open_connection(&db_file_path).await.map_err(map_db_err)?;
+    tracing::debug!(path = %db_file_path.display(), "opening database connection");
+    let conn = open_connection(&db_file_path).await.map_err(|err| {
+        tracing::error!(path = %db_file_path.display(), error = %err, "database connection failed");
+        map_db_err(err)
+    })?;
 
     {
         let mut guard = db_config_slot()
@@ -63,6 +68,7 @@ pub async fn init_db_async(app_data_dir: &str, db_file_name: &str) -> Result<(),
             .map_err(|_| HentaiError::db_init_failed("DB 状态锁失败", None))?;
         *guard = Some(conn);
     }
+    tracing::info!(path = %db_file_path.display(), "database initialized");
     Ok(())
 }
 
@@ -109,6 +115,7 @@ pub async fn init_db_at_path(db_file_path: impl AsRef<Path>) -> Result<(), Henta
     Ok(())
 }
 
+#[tracing::instrument(err, skip(db_file_path))]
 async fn open_connection(db_file_path: &Path) -> Result<DatabaseConnection, DbErr> {
     let mut options = ConnectOptions::new(format!(
         "sqlite://{}?mode=rwc",
@@ -124,7 +131,9 @@ async fn open_connection(db_file_path: &Path) -> Result<DatabaseConnection, DbEr
         "PRAGMA foreign_keys = ON".to_string(),
     ))
     .await?;
+    tracing::debug!("checking legacy migration seed");
     seed_drift_v2_if_needed(&conn).await?;
+    tracing::debug!("applying database migrations");
     Migrator::up(&conn, None).await?;
     Ok(conn)
 }

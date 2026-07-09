@@ -6,13 +6,14 @@ use super::backend::{read_epub_page, read_zip_page, ReaderBackend};
 use super::dto::ReaderPageListDto;
 use super::manager::{open_reader, with_session};
 
+#[tracing::instrument(err, fields(comic_id, resource_type, path))]
 pub fn load_page_list(
     comic_id: &str,
     path: &str,
     resource_type: &str,
 ) -> Result<ReaderPageListDto, HentaiError> {
     open_reader(comic_id, path, resource_type)?;
-    with_session(comic_id, |backend| match backend {
+    let list = with_session(comic_id, |backend| match backend {
         ReaderBackend::Dir(dir) => Ok(ReaderPageListDto {
             resource_type: "dir".to_string(),
             page_count: dir.files.len() as i32,
@@ -47,9 +48,17 @@ pub fn load_page_list(
             page_count: pdf.page_count,
             dir_page_paths: vec![],
         }),
-    })
+    })?;
+    tracing::info!(
+        comic_id,
+        page_count = list.page_count,
+        resource_type = %list.resource_type,
+        "reader page list loaded"
+    );
+    Ok(list)
 }
 
+#[tracing::instrument(err, fields(comic_id, resource_type, page_index), skip(path))]
 pub fn load_page_bytes(
     comic_id: &str,
     path: &str,
