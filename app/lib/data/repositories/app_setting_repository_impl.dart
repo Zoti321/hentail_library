@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/domain/repositories/app_setting_repository.dart';
 import 'package:path/path.dart' as p;
@@ -25,7 +25,12 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
 
       return settings;
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '[APP_SETTING_REPO] 加载设置失败，已回退默认值');
+      logError(
+        AppLog.dataRepo('app_setting'),
+        '加载设置失败，已回退默认值',
+        e,
+        st,
+      );
       return defaultSettings();
     }
   }
@@ -37,7 +42,7 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
 
       await file.writeAsString(jsonEncode(setting.toJson()), flush: true);
     } catch (e, st) {
-      LogManager.instance.handle(e, st, '[APP_SETTING_REPO] 保存设置失败');
+      logError(AppLog.dataRepo('app_setting'), '保存设置失败', e, st);
       rethrow;
     }
   }

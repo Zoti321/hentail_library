@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:hentai_library/core/image/image_cache_config.dart';
-import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/core/logging/app_logging.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/frb_zone_guard.dart';
@@ -18,6 +19,12 @@ Future<void> main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
+    try {
+      await configureAppLogging();
+    } catch (e, st) {
+      debugPrint('文件日志初始化失败: $e\n$st');
+    }
+
     await RustLib.init();
 
     try {
@@ -27,21 +34,13 @@ Future<void> main() async {
         fallbackMessage: '数据库初始化失败',
       );
     } catch (e, st) {
-      debugPrint('Rust init_db 失败: $e\n$st');
+      logError(AppLog.dataFrb(), 'Rust init_db 失败', e, st);
     }
 
     configureGlobalImageCache();
 
     if (isDesktop) {
       await _initWindow();
-    }
-
-    LogManager.init();
-    try {
-      final logWriter = LogFileWriter(LogManager.instance);
-      await logWriter.init();
-    } catch (e, st) {
-      LogManager.instance.handle(e, st, '文件日志初始化失败');
     }
 
     runApp(const MyApp());

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/domain/models/entity/reading_history.dart'
     as entity;
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
@@ -172,11 +172,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
       }
       state = AsyncData<HistoryPagedFeedState>(refreshed);
     } catch (error, stackTrace) {
-      LogManager.instance.handle(
-        error,
-        stackTrace,
-        '[HISTORY_FEED] 静默刷新阅读历史失败',
-      );
+      logError(AppLog.ui('history'), '静默刷新阅读历史失败', error, stackTrace);
     } finally {
       _isRefreshing = false;
       if (_refreshPending) {

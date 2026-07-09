@@ -1,5 +1,5 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/core/logging/log_manager.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/history_frb_mapper.dart';
 import 'package:hentai_library/domain/models/entity/series_reading_history.dart';
@@ -20,10 +20,11 @@ class SeriesReadingHistoryRepositoryImpl
         fallbackMessage: '记录系列阅读进度失败',
       );
     } catch (e, st) {
-      LogManager.instance.handle(
+      logError(
+        AppLog.dataRepo('series_reading_history'),
+        '记录系列阅读进度失败，seriesId=${history.seriesId}',
         e,
         st,
-        '[SERIES_READING_HISTORY_REPO] 记录系列阅读进度失败，seriesId=${history.seriesId}',
       );
       if (e is AppException) {
         rethrow;

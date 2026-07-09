@@ -8,7 +8,7 @@ Project-specific conventions for UI widgets and lightweight data shapes. Agents 
 
 | Path | Role |
 |------|------|
-| `app/lib/core/` | Cross-cutting Dart utilities (logging, l10n, path/format helpers). |
+| `app/lib/core/` | Cross-cutting Dart utilities (logging via `package:logging` + `AppLog`, l10n, path/format helpers). |
 | `app/lib/domain/` | Domain models (`models/`). Use cases are removed after Rust migration; library query **projection** (`library/`) may remain for UI filter building. |
 | `app/lib/data/` | Repositories (thin FRB adapters). No Drift, no `services/comic/` after migration. |
 | `app/lib/ui/` | Shared widgets/theme and feature modules. |
