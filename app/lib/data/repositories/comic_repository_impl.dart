@@ -79,6 +79,8 @@ class ComicRepositoryImpl implements ComicRepository {
   Future<void> updateUserMeta(
     String comicId, {
     String? title,
+    String? description,
+    DateTime? publishedAt,
     List<Author>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
@@ -89,6 +91,11 @@ class ComicRepositoryImpl implements ComicRepository {
         meta: rust.UpdateComicUserMetaFrbDto(
           title: title,
           contentRating: contentRating?.name,
+          description: description,
+          publishedAt: publishedAt == null
+              ? null
+              : comicTimestampToMs(publishedAt),
+          clearPublishedAt: publishedAt == null ? true : null,
           authors: authors?.map((Author a) => a.name).toList(),
           tags: tags?.map((Tag t) => t.name).toList(),
         ),

@@ -96,7 +96,8 @@ Key semantic groups in `HentaiColorScheme`:
 - App background: `cs.hentai.winBackground`
 - Primary content panels: `cs.surface` with `borderSubtle` border
 - Sidebar: fixed widths `DesktopSidebar.expandedWidth` (256) / `collapsedWidth` (72)
-- Dialogs: `HentaiDialog` — 8px radius, multi-layer shadow, max width ~420 default
+- Dialogs: `HentaiDialog` — default 8px radius (overridable per dialog), multi-layer shadow, max width ~420 default
+- **Metadata edit dialog** (`EditMetadataDialog`): 720px max width, 4px radius, left side tabs + right scrollable form; narrows with viewport. **TODO:** full-page editor on narrow viewports (Komga-style `fullscreen` breakpoint) — not implemented yet
 - Toasts: `showCustomToast` / `showSuccessToast` / `showErrorToast` — bottom-right, max 380px — **not** `SnackBar` on desktop
 
 ### Interaction patterns
@@ -106,7 +107,7 @@ Key semantic groups in `HentaiColorScheme`:
 - **In-page tabs:** `CapsuleTabBar` (pill container, selected segment tinted with `primary`)
 - **Context actions:** right-click → `*ContextMenu.show` (comic, series, series item)
 - **Confirmations:** `HentaiDialog` or `*ConfirmDialog` under `overlays/dialog/confirm/`
-- **Forms:** `FluentTextField`, `CustomTextField`, `DatePickerField`, `*MultiSelectField`
+- **Forms:** `FluentTextField`, `FluentDatePickerField`, `CustomTextField`, `*MultiSelectField`
 
 ### Card & list item pattern
 

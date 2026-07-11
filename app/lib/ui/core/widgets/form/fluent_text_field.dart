@@ -8,6 +8,7 @@ class FluentTextField extends StatefulWidget {
   final int maxLines;
   final String? hintText;
   final String? labelText;
+  final String? errorText;
   final bool autofocus;
 
   /// When true, reduces vertical padding for single-line fields (dialog forms).
@@ -21,6 +22,7 @@ class FluentTextField extends StatefulWidget {
     this.maxLines = 1,
     this.hintText,
     this.labelText,
+    this.errorText,
     this.autofocus = false,
     this.isDense = false,
   });
@@ -50,6 +52,13 @@ class FluentTextFieldState extends State<FluentTextField> {
     final tokens = context.tokens;
     final isTextarea = widget.maxLines > 1;
     final bool useDense = widget.isDense && !isTextarea;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final bool hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
+    final Color borderColor = hasError
+        ? cs.error
+        : _isFocused
+        ? cs.hentai.inputBorderActive
+        : cs.hentai.inputBorder;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,20 +78,16 @@ class FluentTextFieldState extends State<FluentTextField> {
               vertical: useDense ? 0 : tokens.spacing.xs,
             ),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.hentai.inputBackground,
+              color: cs.hentai.inputBackground,
               borderRadius: BorderRadius.circular(tokens.radius.md),
               border: Border.all(
-                color: _isFocused
-                    ? Theme.of(context).colorScheme.hentai.inputBorderActive
-                    : Theme.of(context).colorScheme.hentai.inputBorder,
+                color: borderColor,
                 width: 1,
               ),
-              boxShadow: _isFocused
+              boxShadow: _isFocused && !hasError
                   ? [
                       BoxShadow(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withOpacity(0.2),
+                        color: cs.primary.withOpacity(0.2),
                         blurRadius: 4,
                         spreadRadius: 0.5,
                       ),
@@ -100,13 +105,13 @@ class FluentTextFieldState extends State<FluentTextField> {
               maxLines: widget.maxLines,
               style: TextStyle(
                 fontSize: tokens.text.bodyMd,
-                color: Theme.of(context).colorScheme.hentai.textPrimary,
+                color: cs.hentai.textPrimary,
                 height: 1.4,
               ),
               decoration: InputDecoration(
                 hintText: widget.hintText,
                 hintStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.hentai.textPlaceholder,
+                  color: cs.hentai.textPlaceholder,
                   fontSize: tokens.text.bodyMd,
                 ),
                 contentPadding: isTextarea
@@ -129,6 +134,17 @@ class FluentTextFieldState extends State<FluentTextField> {
             ),
           ),
         ),
+        if (hasError) ...[
+          SizedBox(height: tokens.spacing.xs),
+          Text(
+            widget.errorText!,
+            style: TextStyle(
+              fontSize: tokens.text.labelXs,
+              color: cs.error,
+              height: 1.3,
+            ),
+          ),
+        ],
       ],
     );
   }

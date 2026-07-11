@@ -17,6 +17,7 @@ pub struct UpdateComicUserMetaDto {
     pub content_rating: Option<String>,
     pub description: Option<String>,
     pub published_at: Option<i64>,
+    pub clear_published_at: Option<bool>,
     pub authors: Option<Vec<String>>,
     pub tags: Option<Vec<String>>,
 }
@@ -67,6 +68,7 @@ pub async fn update_comic_user_meta(
         || meta.content_rating.is_some()
         || meta.description.is_some()
         || meta.published_at.is_some()
+        || meta.clear_published_at == Some(true)
     {
         let mut active = comic_meta::ActiveModel {
             comic_id: Set(comic_id.to_string()),
@@ -81,10 +83,17 @@ pub async fn update_comic_user_meta(
             meta_touched = true;
         }
         if let Some(description) = meta.description {
-            active.description = Set(Some(description));
+            active.description = Set(if description.is_empty() {
+                None
+            } else {
+                Some(description)
+            });
             meta_touched = true;
         }
-        if let Some(published_at) = meta.published_at {
+        if meta.clear_published_at == Some(true) {
+            active.published_at = Set(None);
+            meta_touched = true;
+        } else if let Some(published_at) = meta.published_at {
             active.published_at = Set(Some(published_at));
             meta_touched = true;
         }
