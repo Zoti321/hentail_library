@@ -83,14 +83,12 @@ class ComicDetailHeader extends ConsumerWidget {
   }
 
   void _openEditMetadata(BuildContext context, WidgetRef ref) {
-    showDialog<void>(
+    showEditMetadataDialog(
       context: context,
-      builder: (BuildContext context) => EditMetadataDialog(
-        comic: comic,
-        onSave: (ComicMetadataForm data) async {
-          await data.applyTo(ref.read(comicRepoProvider), comic.comicId);
-        },
-      ),
+      comic: comic,
+      onSave: (ComicMetadataForm data) async {
+        await data.applyTo(ref.read(comicRepoProvider), comic.comicId);
+      },
     );
   }
 }

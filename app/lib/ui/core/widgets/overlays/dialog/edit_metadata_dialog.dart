@@ -31,7 +31,48 @@ const double _kEditMetadataShellChromeReserve = 120;
 
 const double _kEditMetadataBodyMinHeight = 240;
 
+const Duration _kEditMetadataTabTransitionDuration = Duration(milliseconds: 180);
+const Duration _kEditMetadataDialogTransitionDuration = Duration(
+  milliseconds: 200,
+);
+
 enum _EditMetadataTab { general, authorsAndTags }
+
+/// 打开漫画元数据编辑弹窗（淡入 + 轻微缩放，遮罩同步淡入淡出）。
+Future<void> showEditMetadataDialog({
+  required BuildContext context,
+  required Comic comic,
+  required Future<void> Function(ComicMetadataForm) onSave,
+}) {
+  return showGeneralDialog<void>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    barrierColor: Colors.black54,
+    transitionDuration: _kEditMetadataDialogTransitionDuration,
+    pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
+      return EditMetadataDialog(comic: comic, onSave: onSave);
+    },
+    transitionBuilder: (
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child,
+    ) {
+      final Animation<double> curved = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+      );
+      return FadeTransition(
+        opacity: curved,
+        child: ScaleTransition(
+          scale: Tween<double>(begin: 0.96, end: 1).animate(curved),
+          child: child,
+        ),
+      );
+    },
+  );
+}
 
 class EditMetadataDialog extends StatefulHookConsumerWidget {
   const EditMetadataDialog({
@@ -51,6 +92,7 @@ class EditMetadataDialog extends StatefulHookConsumerWidget {
 class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   late final _EditMetadataFormController _controller;
   _EditMetadataTab _selectedTab = _EditMetadataTab.general;
+  int _previousTabIndex = 0;
   bool _saving = false;
 
   static final List<DialogSideTabItem> _sideTabs = <DialogSideTabItem>[
@@ -86,9 +128,59 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     super.dispose();
   }
 
+  void _selectTab(int index) {
+    if (index == _selectedTab.index) {
+      return;
+    }
+    setState(() {
+      _previousTabIndex = _selectedTab.index;
+      _selectedTab = _EditMetadataTab.values[index];
+    });
+  }
+
+  String _tabChildKey(_EditMetadataTab tab) {
+    return switch (tab) {
+      _EditMetadataTab.general => 'general',
+      _EditMetadataTab.authorsAndTags => 'authors-tags',
+    };
+  }
+
+  Widget _buildTabTransition(Widget child, Animation<double> animation) {
+    final bool slideForward = _selectedTab.index > _previousTabIndex;
+    final double direction = slideForward ? 1 : -1;
+    final bool isIncoming =
+        child.key == ValueKey<String>(_tabChildKey(_selectedTab));
+    final Animation<double> curved = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+    );
+    final Animation<Offset> offsetAnimation = isIncoming
+        ? Tween<Offset>(
+            begin: Offset(0.08 * direction, 0),
+            end: Offset.zero,
+          ).animate(curved)
+        : Tween<Offset>(
+            begin: Offset.zero,
+            end: Offset(-0.08 * direction, 0),
+          ).animate(curved);
+
+    return ClipRect(
+      child: SlideTransition(
+        position: offsetAnimation,
+        child: FadeTransition(
+          opacity: isIncoming ? animation : ReverseAnimation(animation),
+          child: child,
+        ),
+      ),
+    );
+  }
+
   Future<void> _handleSave() async {
     if (!_controller.markTitleValidationAttempted()) {
-      setState(() => _selectedTab = _EditMetadataTab.general);
+      setState(() {
+        _previousTabIndex = _selectedTab.index;
+        _selectedTab = _EditMetadataTab.general;
+      });
       return;
     }
     setState(() => _saving = true);
@@ -139,9 +231,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
               items: _sideTabs,
               selectedIndex: selectedTabIndex,
               showDivider: false,
-              onSelected: (int index) {
-                setState(() => _selectedTab = _EditMetadataTab.values[index]);
-              },
+              onSelected: _selectTab,
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -152,9 +242,21 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
                   tokens.spacing.xs,
                 ),
                 child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 180),
+                  duration: _kEditMetadataTabTransitionDuration,
                   switchInCurve: Curves.easeOutCubic,
                   switchOutCurve: Curves.easeOutCubic,
+                  layoutBuilder:
+                      (Widget? currentChild, List<Widget> previousChildren) {
+                        return Stack(
+                          alignment: Alignment.topCenter,
+                          clipBehavior: Clip.hardEdge,
+                          children: <Widget>[
+                            ...previousChildren,
+                            if (currentChild != null) currentChild,
+                          ],
+                        );
+                      },
+                  transitionBuilder: _buildTabTransition,
                   child: switch (_selectedTab) {
                     _EditMetadataTab.general => _EditMetadataGeneralTab(
                       key: const ValueKey<String>('general'),

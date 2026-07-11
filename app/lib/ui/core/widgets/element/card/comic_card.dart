@@ -61,17 +61,15 @@ class ComicCard extends ConsumerWidget {
               ).toQueryParameters(),
             );
           case ComicContextAction.edit:
-            showDialog<void>(
+            showEditMetadataDialog(
               context: context,
-              builder: (BuildContext context) => EditMetadataDialog(
-                comic: comic,
-                onSave: (ComicMetadataForm data) async {
-                  await data.applyTo(
-                    ref.read(comicRepoProvider),
-                    comic.comicId,
-                  );
-                },
-              ),
+              comic: comic,
+              onSave: (ComicMetadataForm data) async {
+                await data.applyTo(
+                  ref.read(comicRepoProvider),
+                  comic.comicId,
+                );
+              },
             );
           case ComicContextAction.showInExplorer:
             showInFileExplorer(comic.path).catchError((

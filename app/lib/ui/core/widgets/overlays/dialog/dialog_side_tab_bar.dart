@@ -61,7 +61,9 @@ class DialogSideTabBar extends StatelessWidget {
               }),
             ),
             if (selectedIndex >= 0 && selectedIndex < items.length)
-              Positioned(
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOutCubic,
                 left: 0,
                 top: selectedIndex * itemHeight,
                 height: itemHeight,
