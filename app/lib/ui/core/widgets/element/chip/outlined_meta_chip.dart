@@ -3,9 +3,16 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 
 /// 描边胶囊 chip，用于详情页作者/标签等元数据展示。
 class OutlinedMetaChip extends StatelessWidget {
-  const OutlinedMetaChip({super.key, required this.text});
+  const OutlinedMetaChip({
+    super.key,
+    required this.text,
+    this.borderColor,
+    this.textColor,
+  });
 
   final String text;
+  final Color? borderColor;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +21,7 @@ class OutlinedMetaChip extends StatelessWidget {
     final TextStyle textStyle = TextStyle(
       fontSize: tokens.text.labelXs,
       height: 1.2,
-      color: cs.hentai.textSecondary,
+      color: textColor ?? cs.hentai.textSecondary,
       fontWeight: FontWeight.w500,
     );
     return Semantics(
@@ -24,7 +31,7 @@ class OutlinedMetaChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: cs.surface,
           borderRadius: BorderRadius.circular(tokens.radius.pill),
-          border: Border.all(color: cs.hentai.borderSubtle),
+          border: Border.all(color: borderColor ?? cs.hentai.borderSubtle),
         ),
         child: Text(
           text,

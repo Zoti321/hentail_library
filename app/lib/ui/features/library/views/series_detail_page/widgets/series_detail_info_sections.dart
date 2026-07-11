@@ -8,19 +8,42 @@ import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.d
 import 'package:hentai_library/ui/core/widgets/element/chip/r18_rating_chip.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_info_sections.dart';
 
-/// 连载状态 chip；[status] 为空时不渲染。
-class SeriesSerializationChip extends StatelessWidget {
-  const SeriesSerializationChip({super.key, this.status});
+/// 休刊状态 chip 描边/文字色（仅系列详情页使用）。
+const Color _kSeriesHiatusChipColor = Color(0xFFF59E0B);
 
-  final String? status;
+/// 与 [OutlinedMetaChip] 纵向占位一致，用于详情页 chip 行固定高度。
+const double _kSeriesDetailChipRowHeight = 28;
+
+Color _serializationChipAccentColor(
+  ColorScheme cs,
+  SerializationStatus status,
+) {
+  return switch (status) {
+    SerializationStatus.ongoing => cs.hentai.success,
+    SerializationStatus.ended => cs.hentai.textTertiary,
+    SerializationStatus.hiatus => _kSeriesHiatusChipColor,
+    SerializationStatus.unknown => cs.hentai.textSecondary,
+  };
+}
+
+/// 连载状态 chip；[status] 为 [SerializationStatus.unknown] 时不渲染。
+class SeriesSerializationChip extends StatelessWidget {
+  const SeriesSerializationChip({super.key, required this.status});
+
+  final SerializationStatus status;
 
   @override
   Widget build(BuildContext context) {
-    final String? label = status?.trim();
-    if (label == null || label.isEmpty) {
+    if (status == SerializationStatus.unknown) {
       return const SizedBox.shrink();
     }
-    return OutlinedMetaChip(text: label);
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final Color accentColor = _serializationChipAccentColor(cs, status);
+    return OutlinedMetaChip(
+      text: status.label,
+      borderColor: accentColor,
+      textColor: accentColor,
+    );
   }
 }
 
@@ -39,29 +62,38 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final bool showR18 = series.hasR18Comic(comicsById: comicsById);
-    final String? serializationLabel =
-        series.serializationStatus == SerializationStatus.unknown
-        ? null
-        : series.serializationStatus.label;
-    final List<Widget> segments = <Widget>[
-      Text(
-        series.volumeProgressLabel ?? series.volumeCountLabel,
-        style: TextStyle(
-          fontSize: tokens.text.bodySm,
-          color: cs.hentai.textSecondary,
-        ),
-      ),
-      SeriesSerializationChip(status: serializationLabel),
+    final bool showSerialization =
+        series.serializationStatus != SerializationStatus.unknown;
+    final List<Widget> chipRowChildren = <Widget>[
+      if (showSerialization)
+        SeriesSerializationChip(status: series.serializationStatus),
+      if (showR18) const R18RatingChip(),
     ];
-    if (showR18) {
-      segments.add(const R18RatingChip());
-    }
 
-    return Wrap(
-      spacing: tokens.spacing.sm,
-      runSpacing: tokens.spacing.xs,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: segments,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: tokens.spacing.xs,
+      children: <Widget>[
+        SizedBox(
+          height: _kSeriesDetailChipRowHeight,
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              spacing: tokens.spacing.sm,
+              children: chipRowChildren,
+            ),
+          ),
+        ),
+        Text(
+          series.volumeProgressLabel ?? series.volumeCountLabel,
+          style: TextStyle(
+            fontSize: tokens.text.bodySm,
+            color: cs.hentai.textSecondary,
+          ),
+        ),
+      ],
     );
   }
 }
