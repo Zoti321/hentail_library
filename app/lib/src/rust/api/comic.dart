@@ -257,7 +257,6 @@ class UpdateComicUserMetaFrbDto {
   final String? contentRating;
   final String? description;
   final PlatformInt64? publishedAt;
-  final bool? clearPublishedAt;
   final List<String>? authors;
   final List<String>? tags;
 
@@ -266,7 +265,6 @@ class UpdateComicUserMetaFrbDto {
     this.contentRating,
     this.description,
     this.publishedAt,
-    this.clearPublishedAt,
     this.authors,
     this.tags,
   });
@@ -280,7 +278,6 @@ class UpdateComicUserMetaFrbDto {
       contentRating.hashCode ^
       description.hashCode ^
       publishedAt.hashCode ^
-      clearPublishedAt.hashCode ^
       authors.hashCode ^
       tags.hashCode;
 
@@ -293,7 +290,6 @@ class UpdateComicUserMetaFrbDto {
           contentRating == other.contentRating &&
           description == other.description &&
           publishedAt == other.publishedAt &&
-          clearPublishedAt == other.clearPublishedAt &&
           authors == other.authors &&
           tags == other.tags;
 }

@@ -3005,17 +3005,6 @@ impl SseDecode for Option<String> {
     }
 }
 
-impl SseDecode for Option<bool> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        if (<bool>::sse_decode(deserializer)) {
-            return Some(<bool>::sse_decode(deserializer));
-        } else {
-            return None;
-        }
-    }
-}
-
 impl SseDecode for Option<crate::api::comic::ComicDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3463,7 +3452,6 @@ impl SseDecode for crate::api::comic::UpdateComicUserMetaFrbDto {
         let mut var_contentRating = <Option<String>>::sse_decode(deserializer);
         let mut var_description = <Option<String>>::sse_decode(deserializer);
         let mut var_publishedAt = <Option<i64>>::sse_decode(deserializer);
-        let mut var_clearPublishedAt = <Option<bool>>::sse_decode(deserializer);
         let mut var_authors = <Option<Vec<String>>>::sse_decode(deserializer);
         let mut var_tags = <Option<Vec<String>>>::sse_decode(deserializer);
         return crate::api::comic::UpdateComicUserMetaFrbDto {
@@ -3471,7 +3459,6 @@ impl SseDecode for crate::api::comic::UpdateComicUserMetaFrbDto {
             content_rating: var_contentRating,
             description: var_description,
             published_at: var_publishedAt,
-            clear_published_at: var_clearPublishedAt,
             authors: var_authors,
             tags: var_tags,
         };
@@ -4459,7 +4446,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::UpdateComicUserMetaFrb
             self.content_rating.into_into_dart().into_dart(),
             self.description.into_into_dart().into_dart(),
             self.published_at.into_into_dart().into_dart(),
-            self.clear_published_at.into_into_dart().into_dart(),
             self.authors.into_into_dart().into_dart(),
             self.tags.into_into_dart().into_dart(),
         ]
@@ -4874,16 +4860,6 @@ impl SseEncode for Option<String> {
     }
 }
 
-impl SseEncode for Option<bool> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.is_some(), serializer);
-        if let Some(value) = self {
-            <bool>::sse_encode(value, serializer);
-        }
-    }
-}
-
 impl SseEncode for Option<crate::api::comic::ComicDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5245,7 +5221,6 @@ impl SseEncode for crate::api::comic::UpdateComicUserMetaFrbDto {
         <Option<String>>::sse_encode(self.content_rating, serializer);
         <Option<String>>::sse_encode(self.description, serializer);
         <Option<i64>>::sse_encode(self.published_at, serializer);
-        <Option<bool>>::sse_encode(self.clear_published_at, serializer);
         <Option<Vec<String>>>::sse_encode(self.authors, serializer);
         <Option<Vec<String>>>::sse_encode(self.tags, serializer);
     }

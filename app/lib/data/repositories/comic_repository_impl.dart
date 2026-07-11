@@ -11,6 +11,9 @@ import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 
+/// Sentinel passed to Rust when the user clears published date.
+const int _kComicPublishedAtClearSentinel = -1;
+
 /// 漫画主表持久化；读写均经 Rust/SeaORM。
 class ComicRepositoryImpl implements ComicRepository {
   const ComicRepositoryImpl();
@@ -93,9 +96,8 @@ class ComicRepositoryImpl implements ComicRepository {
           contentRating: contentRating?.name,
           description: description,
           publishedAt: publishedAt == null
-              ? null
+              ? _kComicPublishedAtClearSentinel
               : comicTimestampToMs(publishedAt),
-          clearPublishedAt: publishedAt == null ? true : null,
           authors: authors?.map((Author a) => a.name).toList(),
           tags: tags?.map((Tag t) => t.name).toList(),
         ),

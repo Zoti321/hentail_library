@@ -180,7 +180,6 @@ pub struct UpdateComicUserMetaFrbDto {
     pub content_rating: Option<String>,
     pub description: Option<String>,
     pub published_at: Option<i64>,
-    pub clear_published_at: Option<bool>,
     pub authors: Option<Vec<String>>,
     pub tags: Option<Vec<String>>,
 }
@@ -203,7 +202,6 @@ pub fn update_comic_user_meta_frb(
             content_rating: meta.content_rating,
             description: meta.description,
             published_at: meta.published_at,
-            clear_published_at: meta.clear_published_at,
             authors: meta.authors,
             tags: meta.tags,
         },
