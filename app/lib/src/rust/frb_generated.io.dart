@@ -300,6 +300,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SyncLibraryRouteDto dco_decode_sync_library_route_dto(dynamic raw);
 
   @protected
+  SyncScanModeDto dco_decode_sync_scan_mode_dto(dynamic raw);
+
+  @protected
   TagPagedNamesDto dco_decode_tag_paged_names_dto(dynamic raw);
 
   @protected
@@ -663,6 +666,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SyncLibraryRouteDto sse_decode_sync_library_route_dto(
     SseDeserializer deserializer,
   );
+
+  @protected
+  SyncScanModeDto sse_decode_sync_scan_mode_dto(SseDeserializer deserializer);
 
   @protected
   TagPagedNamesDto sse_decode_tag_paged_names_dto(SseDeserializer deserializer);
@@ -1119,6 +1125,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_sync_library_route_dto(
     SyncLibraryRouteDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_sync_scan_mode_dto(
+    SyncScanModeDto self,
     SseSerializer serializer,
   );
 

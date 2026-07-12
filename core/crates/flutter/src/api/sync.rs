@@ -1,8 +1,8 @@
 use hentai_core::{
     self, SyncHandle as CoreHandle, SyncLibraryPhaseDto as CorePhase,
     SyncLibraryProgressDto as CoreProgress, SyncLibraryRouteDto as CoreRoute,
-    cancel_sync as core_cancel_sync, create_sync_handle as core_create_sync_handle,
-    sync_library as core_sync_library,
+    SyncScanMode as CoreScanMode, cancel_sync as core_cancel_sync,
+    create_sync_handle as core_create_sync_handle, sync_library as core_sync_library,
 };
 
 use super::init::HentaiErrorDto;
@@ -15,6 +15,12 @@ pub enum SyncLibraryPhaseDto {
     GeneratingThumbnails,
     Done,
     Failed,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SyncScanModeDto {
+    Incremental,
+    Full,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -72,15 +78,23 @@ pub fn cancel_sync_frb(handle: &SyncHandleDto) {
 #[flutter_rust_bridge::frb]
 pub async fn sync_library_frb(
     handle: SyncHandleDto,
+    scan_mode: SyncScanModeDto,
     sink: crate::frb_generated::StreamSink<SyncLibraryProgressDto>,
 ) {
-    if let Err(error) = core_sync_library(handle.inner, |progress| {
+    if let Err(error) = core_sync_library(handle.inner, map_scan_mode(scan_mode), |progress| {
         let _ = sink.add(map_progress(progress));
     })
     .await
     {
         let dto = HentaiErrorDto::from(error);
         let _ = sink.add(failed_progress(dto.message));
+    }
+}
+
+fn map_scan_mode(mode: SyncScanModeDto) -> CoreScanMode {
+    match mode {
+        SyncScanModeDto::Incremental => CoreScanMode::Incremental,
+        SyncScanModeDto::Full => CoreScanMode::Full,
     }
 }
 

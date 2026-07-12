@@ -27,6 +27,7 @@ pub fn scan_roots(
     roots: &[PathBuf],
     ctx: &ScanContext,
     handle: &SyncHandle,
+    force_full_parse: bool,
 ) -> Result<Vec<ScanItem>, HentaiError> {
     let mut candidates: Vec<PathBuf> = Vec::new();
     for root in roots {
@@ -51,7 +52,7 @@ pub fn scan_roots(
             if handle.is_cancelled() {
                 Ok(None)
             } else {
-                resolve_scan_item(path, ctx)
+                resolve_scan_item(path, ctx, force_full_parse)
             }
         })
         .collect();
@@ -94,17 +95,23 @@ fn collect_from_directory(
     Ok(())
 }
 
-fn resolve_scan_item(path: &Path, ctx: &ScanContext) -> Result<Option<ScanItem>, HentaiError> {
+fn resolve_scan_item(
+    path: &Path,
+    ctx: &ScanContext,
+    force_full_parse: bool,
+) -> Result<Option<ScanItem>, HentaiError> {
     let comic_id = comic_id_for_path(&path.to_string_lossy());
-    if let Some(existing) = ctx.existing_by_id.get(&comic_id) {
-        if try_reuse_existing(path, existing, ctx) {
-            let mut comic = existing.clone();
-            refresh_resource_size(path, &mut comic)?;
-            return Ok(Some(ScanItem {
-                path: existing.path.clone(),
-                resource_type: existing.resource_type.clone(),
-                comic,
-            }));
+    if !force_full_parse {
+        if let Some(existing) = ctx.existing_by_id.get(&comic_id) {
+            if try_reuse_existing(path, existing, ctx) {
+                let mut comic = existing.clone();
+                refresh_resource_size(path, &mut comic)?;
+                return Ok(Some(ScanItem {
+                    path: existing.path.clone(),
+                    resource_type: existing.resource_type.clone(),
+                    comic,
+                }));
+            }
         }
     }
     let parsed = if path.is_dir() {
@@ -194,7 +201,7 @@ mod tests {
         };
 
         let handle = create_sync_handle();
-        let items = scan_roots(&[path], &ctx, &handle).expect("scan");
+        let items = scan_roots(&[path], &ctx, &handle, false).expect("scan");
         assert_eq!(items.len(), 1);
         assert!(
             items[0].comic.resource_size > 0,

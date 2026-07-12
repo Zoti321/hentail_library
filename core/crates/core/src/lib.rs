@@ -34,7 +34,7 @@ pub use error::{HentaiError, HentaiErrorCode};
 pub use path::{add_path, list_all_paths, remove_path, watch_paths};
 pub use sync::{
     LibrarySyncCountsDto, SyncHandle, SyncLibraryPhaseDto, SyncLibraryProgressDto,
-    SyncLibraryRouteDto, cancel_sync, create_sync_handle, sync_library,
+    SyncLibraryRouteDto, SyncScanMode, cancel_sync, create_sync_handle, sync_library,
 };
 pub use reader::{
     ReaderPageDto, ReaderPageListDto, clear_reader_page_cache, clear_reader_sessions,

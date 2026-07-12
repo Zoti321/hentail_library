@@ -17,6 +17,8 @@ abstract class ScanLibraryState with _$ScanLibraryState {
     @Default(false) bool running,
     @Default(false) bool cancelled,
     @Default(false) bool runInBackground,
+    @Default(false) bool silent,
+    @Default(ScanMode.incremental) ScanMode scanMode,
     String? error,
     SyncLibraryProgress? progress,
   }) = _ScanLibraryState;
@@ -33,13 +35,18 @@ class ScanLibraryController extends _$ScanLibraryController {
   ScanLibraryState build() => const ScanLibraryState();
 
   /// 幂等启动：若已在运行则直接返回同一个 Future。
-  Future<void> start() {
+  Future<void> start({
+    ScanMode mode = ScanMode.incremental,
+    bool silent = false,
+  }) {
     if (state.running) return _future ?? Future<void>.value();
 
     _cancelled = false;
     state = state.copyWith(
       running: true,
       cancelled: false,
+      silent: silent,
+      scanMode: mode,
       error: null,
       progress: null,
     );
@@ -49,6 +56,7 @@ class ScanLibraryController extends _$ScanLibraryController {
     );
     _future = coordinator
         .runSync(
+          scanMode: mode,
           isCancelled: () => _cancelled,
           onProgress: (SyncLibraryProgress progress) {
             state = state.copyWith(progress: progress);

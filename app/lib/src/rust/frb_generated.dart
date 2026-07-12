@@ -290,6 +290,7 @@ abstract class RustLibApi extends BaseApi {
 
   Stream<SyncLibraryProgressDto> crateApiSyncSyncLibraryFrb({
     required SyncHandleDto handle,
+    required SyncScanModeDto scanMode,
   });
 
   void crateApiComicUpdateComicUserMetaFrb({
@@ -1983,6 +1984,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Stream<SyncLibraryProgressDto> crateApiSyncSyncLibraryFrb({
     required SyncHandleDto handle,
+    required SyncScanModeDto scanMode,
   }) {
     final sink = RustStreamSink<SyncLibraryProgressDto>();
     unawaited(
@@ -1994,6 +1996,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
               handle,
               serializer,
             );
+            sse_encode_sync_scan_mode_dto(scanMode, serializer);
             sse_encode_StreamSink_sync_library_progress_dto_Sse(
               sink,
               serializer,
@@ -2010,7 +2013,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             decodeErrorData: null,
           ),
           constMeta: kCrateApiSyncSyncLibraryFrbConstMeta,
-          argValues: [handle, sink],
+          argValues: [handle, scanMode, sink],
           apiImpl: this,
         ),
       ),
@@ -2020,7 +2023,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiSyncSyncLibraryFrbConstMeta => const TaskConstMeta(
     debugName: "sync_library_frb",
-    argNames: ["handle", "sink"],
+    argNames: ["handle", "scanMode", "sink"],
   );
 
   @override
@@ -3215,6 +3218,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  SyncScanModeDto dco_decode_sync_scan_mode_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SyncScanModeDto.values[raw as int];
+  }
+
+  @protected
   TagPagedNamesDto dco_decode_tag_paged_names_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -4201,6 +4210,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
     return SyncLibraryRouteDto.values[inner];
+  }
+
+  @protected
+  SyncScanModeDto sse_decode_sync_scan_mode_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return SyncScanModeDto.values[inner];
   }
 
   @protected
@@ -5205,6 +5221,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_sync_library_route_dto(
     SyncLibraryRouteDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_sync_scan_mode_dto(
+    SyncScanModeDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs

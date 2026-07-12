@@ -494,39 +494,152 @@ class _LibraryOverflowMenuButtonState
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(scanLibraryControllerProvider, (
+      ScanLibraryState? previous,
+      ScanLibraryState next,
+    ) {
+      if (previous == null || !previous.silent) {
+        return;
+      }
+      if (previous.running && !next.running) {
+        if (next.cancelled) {
+          showCustomToast(
+            context,
+            message: '已取消扫描',
+            type: AppToastType.info,
+          );
+        } else if (next.error != null) {
+          showErrorToast(context, next.error!);
+        } else {
+          showSuccessToast(
+            context,
+            scanSuccessToastMessage(
+              mode: next.scanMode,
+              progress: next.progress,
+            ),
+          );
+        }
+      }
+    });
+
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
+    final ScanLibraryState scanState = ref.watch(scanLibraryControllerProvider);
+    final bool scanning = scanState.running;
+
     return CustomPopupMenu(
       controller: _controller,
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,
       showArrow: false,
       verticalMargin: -24,
-      menuBuilder: () => _LibraryOverflowMenu(
-        layoutTier: widget.layoutTier,
-        onRefresh: () {
-          _controller.hideMenu();
-          ref.read(libraryRefreshActionProvider).call();
-        },
-        onScan: () {
-          _controller.hideMenu();
-        },
-        onDeepScan: () {
-          _controller.hideMenu();
-        },
-      ),
-      child: GhostButton.icon(
-        icon: LucideIcons.ellipsisVertical,
-        tooltip: '更多操作',
-        semanticLabel: '打开更多操作',
-        iconSize: 16,
-        size: 32,
-        borderRadius: 8,
-        foregroundColor: cs.hentai.iconDefault,
-        hoverColor: theme.hoverColor,
-        overlayColor: theme.hoverColor,
-        delayTooltipThreeSeconds: true,
-        onPressed: () => _controller.toggleMenu(),
+      menuBuilder: () {
+        if (scanning) {
+          return _LibraryOverflowScanningMenu(
+            layoutTier: widget.layoutTier,
+            onCancel: () {
+              _controller.hideMenu();
+              ref.read(scanLibraryControllerProvider.notifier).cancel();
+            },
+          );
+        }
+        return _LibraryOverflowMenu(
+          layoutTier: widget.layoutTier,
+          onRefresh: () {
+            _controller.hideMenu();
+            ref.read(libraryRefreshActionProvider).call();
+          },
+          onScan: () {
+            _controller.hideMenu();
+            ref
+                .read(scanLibraryControllerProvider.notifier)
+                .start(silent: true);
+          },
+          onDeepScan: () {
+            _controller.hideMenu();
+            ref
+                .read(scanLibraryControllerProvider.notifier)
+                .start(mode: ScanMode.full, silent: true);
+          },
+        );
+      },
+      child: scanning
+          ? Tooltip(
+              message: scanState.scanMode == ScanMode.full
+                  ? '正在深度扫描…'
+                  : '正在扫描…',
+              child: Semantics(
+                button: true,
+                label: '取消扫描',
+                child: SizedBox(
+                  width: 32,
+                  height: 32,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      hoverColor: theme.hoverColor,
+                      overlayColor: WidgetStateProperty.all(theme.hoverColor),
+                      onTap: () => _controller.toggleMenu(),
+                      child: Center(
+                        child: TerminalSpinner(
+                          size: 16,
+                          color: cs.hentai.iconDefault,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : GhostButton.icon(
+              icon: LucideIcons.ellipsisVertical,
+              tooltip: '更多操作',
+              semanticLabel: '打开更多操作',
+              iconSize: 16,
+              size: 32,
+              borderRadius: 8,
+              foregroundColor: cs.hentai.iconDefault,
+              hoverColor: theme.hoverColor,
+              overlayColor: theme.hoverColor,
+              delayTooltipThreeSeconds: true,
+              onPressed: () => _controller.toggleMenu(),
+            ),
+    );
+  }
+}
+
+class _LibraryOverflowScanningMenu extends StatelessWidget {
+  const _LibraryOverflowScanningMenu({
+    required this.layoutTier,
+    required this.onCancel,
+  });
+
+  final LibraryLayoutTier layoutTier;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    final double viewportWidth = MediaQuery.sizeOf(context).width;
+    return PopupMenuPanelShell(
+      width: libraryOverflowMenuWidth(layoutTier, viewportWidth),
+      blurRadius: 6,
+      shadowOffset: const Offset(0, 4),
+      borderRadius: tokens.radius.xs,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            _LibraryOverflowMenuItem(
+              icon: LucideIcons.x,
+              label: '取消扫描',
+              onTap: onCancel,
+            ),
+          ],
+        ),
       ),
     );
   }

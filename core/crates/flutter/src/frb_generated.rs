@@ -1964,6 +1964,7 @@ fn wire__crate__api__sync__sync_library_frb_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_handle = <SyncHandleDto>::sse_decode(&mut deserializer);
+            let api_scan_mode = <crate::api::sync::SyncScanModeDto>::sse_decode(&mut deserializer);
             let api_sink = <StreamSink<
                 crate::api::sync::SyncLibraryProgressDto,
                 flutter_rust_bridge::for_generated::SseCodec,
@@ -1973,7 +1974,8 @@ fn wire__crate__api__sync__sync_library_frb_impl(
                 transform_result_sse::<_, ()>(
                     (move || async move {
                         let output_ok = Result::<_, ()>::Ok({
-                            crate::api::sync::sync_library_frb(api_handle, api_sink).await;
+                            crate::api::sync::sync_library_frb(api_handle, api_scan_mode, api_sink)
+                                .await;
                         })?;
                         Ok(output_ok)
                     })()
@@ -3369,6 +3371,18 @@ impl SseDecode for crate::api::sync::SyncLibraryRouteDto {
     }
 }
 
+impl SseDecode for crate::api::sync::SyncScanModeDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::sync::SyncScanModeDto::Incremental,
+            1 => crate::api::sync::SyncScanModeDto::Full,
+            _ => unreachable!("Invalid variant for SyncScanModeDto: {}", inner),
+        };
+    }
+}
+
 impl SseDecode for crate::api::tag::TagPagedNamesDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -4359,6 +4373,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::SyncLibraryRouteDto>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::sync::SyncScanModeDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::Incremental => 0.into_dart(),
+            Self::Full => 1.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::sync::SyncScanModeDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::SyncScanModeDto>
+    for crate::api::sync::SyncScanModeDto
+{
+    fn into_into_dart(self) -> crate::api::sync::SyncScanModeDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::tag::TagPagedNamesDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -5134,6 +5169,22 @@ impl SseEncode for crate::api::sync::SyncLibraryRouteDto {
                 crate::api::sync::SyncLibraryRouteDto::NoRootsNoop => 0,
                 crate::api::sync::SyncLibraryRouteDto::NoRootsCleared => 1,
                 crate::api::sync::SyncLibraryRouteDto::WithRoots => 2,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
+    }
+}
+
+impl SseEncode for crate::api::sync::SyncScanModeDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::api::sync::SyncScanModeDto::Incremental => 0,
+                crate::api::sync::SyncScanModeDto::Full => 1,
                 _ => {
                     unimplemented!("");
                 }
