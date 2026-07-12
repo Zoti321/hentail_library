@@ -57,9 +57,3 @@ LibrarySyncCounts emptyLibrarySyncCounts() => (
   sevenZ: 0,
   pdf: 0,
 );
-
-String formatLibrarySyncCounts(LibrarySyncCounts counts) {
-  return 'dir: ${counts.dir}, zip: ${counts.zip}, cbz: ${counts.cbz}, '
-      'epub: ${counts.epub}, cbr: ${counts.cbr}, rar: ${counts.rar}, '
-      'cb7: ${counts.cb7}, 7z: ${counts.sevenZ}, pdf: ${counts.pdf}';
-}
