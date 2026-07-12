@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use sea_orm::{
     ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, PaginatorTrait, QueryFilter,
-    QueryOrder, Set, Statement, TransactionTrait,
+    QueryOrder, Statement, TransactionTrait,
 };
 
 use crate::comic::{read_data_version, search_comic_ids_by_tag_expression, PageRequestDto};

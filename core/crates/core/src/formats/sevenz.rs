@@ -77,7 +77,7 @@ fn read_sevenz_entry(file: &Path, target_name: &str) -> Result<Vec<u8>, HentaiEr
             if entry.name() == target_name {
                 let mut buf = Vec::new();
                 data.read_to_end(&mut buf)
-                    .map_err(|e| sevenz_rust::Error::io(e))?;
+                    .map_err(sevenz_rust::Error::io)?;
                 found = Some(buf);
                 return Ok(false);
             }

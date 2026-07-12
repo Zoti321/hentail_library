@@ -44,7 +44,7 @@ pub fn read_pdf_embedded_meta(file: &Path) -> Result<(Option<String>, Option<i64
         .filter(|s| !s.is_empty());
     let published_at = metadata
         .get(PdfDocumentMetadataTagType::CreationDate)
-        .map(|tag| metadata_tag_text(tag))
+        .map(metadata_tag_text)
         .and_then(|raw| parse_pdf_date_to_ms(&raw));
     Ok((description, published_at))
 }

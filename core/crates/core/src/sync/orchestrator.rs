@@ -33,7 +33,7 @@ fn log_sync_phase(phase: SyncLibraryPhaseDto, route: SyncLibraryRouteDto) {
 #[tracing::instrument(skip(emit, handle), err)]
 pub async fn sync_library(
     handle: SyncHandle,
-    mut emit: impl FnMut(SyncLibraryProgressDto),
+    emit: impl FnMut(SyncLibraryProgressDto),
 ) -> Result<(), HentaiError> {
     let db = connection()?;
     let roots = load_saved_paths(&db).await?;

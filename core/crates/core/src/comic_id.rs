@@ -53,10 +53,10 @@ fn normalize_like_dart_path(path: &str) -> String {
         }
         None => body,
     };
-    if rooted && !has_drive && !result.is_empty() {
-        if !result.starts_with('\\') && !result.starts_with('/') {
-            result.insert(0, '\\');
-        }
+    if rooted && !has_drive && !result.is_empty()
+        && !result.starts_with('\\') && !result.starts_with('/')
+    {
+        result.insert(0, '\\');
     }
     result
 }

@@ -1,12 +1,9 @@
-use sea_orm::{
-    ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, QueryFilter, Set, Statement,
-    TransactionTrait,
-};
+use sea_orm::{ActiveModelTrait, ConnectionTrait, Set, Statement, TransactionTrait};
 
 use crate::comic::dto::{now_ms, ComicDto};
 use crate::comic::repository::load_comics_ordered;
 use crate::db::{connection, map_db_err};
-use crate::entity::{comic_authors, comic_meta, comic_tags, comics, prelude::*};
+use crate::entity::{comic_meta, comics};
 use crate::error::HentaiError;
 use crate::sync::series_rebuild::rebuild_series_from_comics;
 use crate::sync::writer::{replace_comic_authors, replace_comic_tags};

@@ -17,7 +17,6 @@ pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> 
         title: Set(dto.title.clone()),
         last_read_time: Set(dto.last_read_time_ms),
         page_index: Set(dto.page_index),
-        ..Default::default()
     };
     ComicReadingHistories::insert(model)
         .on_conflict(
@@ -135,7 +134,6 @@ pub async fn record_series_reading(dto: &SeriesReadingHistoryDto) -> Result<(), 
         last_read_comic_id: Set(dto.last_read_comic_id.clone()),
         last_read_time: Set(dto.last_read_time_ms),
         page_index: Set(dto.page_index),
-        ..Default::default()
     };
     SeriesReadingHistories::insert(model)
         .on_conflict(

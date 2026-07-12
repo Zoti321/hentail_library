@@ -1,6 +1,6 @@
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder, QuerySelect,
-    Set, TransactionTrait,
+    ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder, QuerySelect, Set,
+    TransactionTrait,
 };
 
 use crate::comic::read_data_version;
@@ -39,7 +39,6 @@ pub async fn add_author(name: &str) -> Result<(), HentaiError> {
     let db = connection()?;
     let active = authors::ActiveModel {
         name: Set(name.to_string()),
-        ..Default::default()
     };
     Authors::insert(active)
         .on_conflict(
@@ -72,7 +71,6 @@ pub async fn rename_author(old_name: &str, new_name: &str) -> Result<(), HentaiE
     let txn = db.begin().await.map_err(map_db_err)?;
     let active = authors::ActiveModel {
         name: Set(new_name.to_string()),
-        ..Default::default()
     };
     Authors::insert(active)
         .on_conflict(

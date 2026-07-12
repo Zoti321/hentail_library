@@ -67,7 +67,6 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
                 name: Set(name),
                 serialization_status: Set("unknown".to_string()),
                 total_count: Set(None),
-                ..Default::default()
             })
             .exec(db)
             .await
@@ -85,7 +84,6 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
                 series_id: Set(series_id.clone()),
                 comic_id: Set(comic_id.clone()),
                 sort_order: Set(sort_order as i32),
-                ..Default::default()
             })
             .exec(db)
             .await

@@ -1,6 +1,6 @@
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, QueryFilter,
-    Set, Statement, TransactionTrait,
+    ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, QueryFilter, Set, Statement,
+    TransactionTrait,
 };
 
 use crate::comic::{now_ms, ComicDto};
@@ -174,7 +174,6 @@ async fn upsert_comics<C: ConnectionTrait>(db: &C, comics_list: &[ComicDto]) -> 
             resource_size: Set(comic.resource_size),
             created_at: Set(created_at),
             last_updated_at: Set(last_updated_at),
-            ..Default::default()
         };
         Comics::insert(comic_active)
             .on_conflict(
@@ -198,7 +197,6 @@ async fn upsert_comics<C: ConnectionTrait>(db: &C, comics_list: &[ComicDto]) -> 
             page_count: Set(comic.page_count),
             description: Set(comic.description.clone()),
             published_at: Set(comic.published_at),
-            ..Default::default()
         };
         ComicMeta::insert(meta_active)
             .on_conflict(
@@ -264,7 +262,6 @@ pub async fn replace_comic_authors<C: ConnectionTrait>(
     for name in unique {
         let author = authors::ActiveModel {
             name: Set(name.clone()),
-            ..Default::default()
         };
         Authors::insert(author)
             .on_conflict(
@@ -279,7 +276,6 @@ pub async fn replace_comic_authors<C: ConnectionTrait>(
         let row = comic_authors::ActiveModel {
             comic_id: Set(comic_id.to_string()),
             author_name: Set(name.clone()),
-            ..Default::default()
         };
         ComicAuthors::insert(row).exec(db).await.map_err(map_db_err)?;
     }
@@ -300,7 +296,6 @@ pub async fn replace_comic_tags<C: ConnectionTrait>(
     for name in unique {
         let tag = tags::ActiveModel {
             name: Set(name.clone()),
-            ..Default::default()
         };
         Tags::insert(tag)
             .on_conflict(
@@ -315,7 +310,6 @@ pub async fn replace_comic_tags<C: ConnectionTrait>(
         let row = comic_tags::ActiveModel {
             comic_id: Set(comic_id.to_string()),
             tag_name: Set(name.clone()),
-            ..Default::default()
         };
         ComicTags::insert(row).exec(db).await.map_err(map_db_err)?;
     }
