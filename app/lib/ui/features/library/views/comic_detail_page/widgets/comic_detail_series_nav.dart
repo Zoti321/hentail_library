@@ -117,7 +117,7 @@ class _ComicDetailSeriesNavControls extends StatelessWidget {
           barrierColor: Colors.transparent,
           pressType: PressType.singleClick,
           showArrow: false,
-          verticalMargin: -24,
+          verticalMargin: -32,
           menuBuilder: () => _ComicDetailSeriesMenu(
             data: data,
             onSelect: (String targetComicId) {
