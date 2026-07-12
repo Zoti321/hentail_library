@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
@@ -11,25 +12,28 @@ class SettingsPageHeaderSection extends StatelessWidget {
     super.key,
     required this.layoutTier,
     required this.horizontalPadding,
+    required this.contentMaxWidth,
     this.onOpenNavigation,
   });
 
   final SettingsLayoutTier layoutTier;
   final double horizontalPadding;
+  final double contentMaxWidth;
   final VoidCallback? onOpenNavigation;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        horizontalPadding,
-        kSettingsHeaderVerticalPadding,
-        horizontalPadding,
-        kSettingsHeaderVerticalPadding,
-      ),
-      child: SettingsPageHeaderToolbar(
-        layoutTier: layoutTier,
-        onOpenNavigation: onOpenNavigation,
+    return PageContentWidthAlign(
+      horizontalPadding: horizontalPadding,
+      maxWidth: contentMaxWidth,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: kSettingsHeaderVerticalPadding,
+        ),
+        child: SettingsPageHeaderToolbar(
+          layoutTier: layoutTier,
+          onOpenNavigation: onOpenNavigation,
+        ),
       ),
     );
   }

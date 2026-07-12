@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -16,11 +17,15 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 class TagManagementSliverGroup extends ConsumerWidget {
   const TagManagementSliverGroup({
     required this.layoutTier,
+    required this.viewportWidth,
+    required this.horizontalPadding,
     required this.contentMaxWidth,
     super.key,
   });
 
   final MetadataLayoutTier layoutTier;
+  final double viewportWidth;
+  final double horizontalPadding;
   final double contentMaxWidth;
 
   @override
@@ -35,14 +40,14 @@ class TagManagementSliverGroup extends ConsumerWidget {
           return _padListSliver(
             tokens,
             SliverToBoxAdapter(
-              child: _centeredListChild(const _TagManagementEmptyState()),
+              child: _alignedListChild(const _TagManagementEmptyState()),
             ),
           );
         }
         return _padListSliver(
           tokens,
           SliverToBoxAdapter(
-            child: _centeredListChild(
+            child: _alignedListChild(
               _TagListCardContent(layoutTier: layoutTier, tags: filteredTags),
             ),
           ),
@@ -51,22 +56,28 @@ class TagManagementSliverGroup extends ConsumerWidget {
       loading: () => _padListSliver(
         tokens,
         SliverToBoxAdapter(
-          child: _centeredListChild(const _TagManagementLoadingState()),
+          child: _alignedListChild(const _TagManagementLoadingState()),
         ),
       ),
       error: (Object e, StackTrace _) => _padListSliver(
         tokens,
         SliverToBoxAdapter(
-          child: _centeredListChild(_TagManagementErrorState(error: e)),
+          child: _alignedListChild(_TagManagementErrorState(error: e)),
         ),
       ),
     );
   }
 
-  Widget _centeredListChild(Widget child) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: SizedBox(width: contentMaxWidth, child: child),
+  Widget _alignedListChild(Widget child) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: pageContentAlignedHorizontalInset(
+          viewportWidth: viewportWidth,
+          horizontalPadding: horizontalPadding,
+          maxWidth: contentMaxWidth,
+        ),
+      ),
+      child: child,
     );
   }
 

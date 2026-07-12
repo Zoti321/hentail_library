@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/shell/views/home_page/widgets/home_page_constants.dart';
@@ -29,28 +30,29 @@ class HomePageHeaderSection extends StatelessWidget {
     super.key,
     required this.layoutTier,
     required this.horizontalPadding,
+    required this.contentMaxWidth,
     required this.onScan,
     this.onOpenNavigation,
   });
 
   final HomePageLayoutTier layoutTier;
   final double horizontalPadding;
+  final double contentMaxWidth;
   final VoidCallback onScan;
   final VoidCallback? onOpenNavigation;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        horizontalPadding,
-        kHomeHeaderVerticalPadding,
-        horizontalPadding,
-        kHomeHeaderVerticalPadding,
-      ),
-      child: HomePageHeaderToolbar(
-        layoutTier: layoutTier,
-        onScan: onScan,
-        onOpenNavigation: onOpenNavigation,
+    return PageContentWidthAlign(
+      horizontalPadding: horizontalPadding,
+      maxWidth: contentMaxWidth,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: kHomeHeaderVerticalPadding),
+        child: HomePageHeaderToolbar(
+          layoutTier: layoutTier,
+          onScan: onScan,
+          onOpenNavigation: onOpenNavigation,
+        ),
       ),
     );
   }

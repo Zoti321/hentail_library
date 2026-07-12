@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -117,14 +118,15 @@ class _HomePageState extends ConsumerState<HomePage> {
         final double horizontalPadding = homeContentHorizontalPadding(
           layoutTier,
         );
-        final double maxWidth = (viewportWidth - horizontalPadding * 2).clamp(
-          0,
-          homeContentMaxWidth,
+        final double innerMaxWidth = homeInnerContentMaxWidth(
+          layoutTier,
+          viewportWidth,
         );
 
         final Widget headerSection = HomePageHeaderSection(
           layoutTier: layoutTier,
           horizontalPadding: horizontalPadding,
+          contentMaxWidth: innerMaxWidth,
           onScan: onScan,
           onOpenNavigation: appShellPageNavigationOpener(context),
         );
@@ -146,41 +148,37 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: header,
                 ),
               ),
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(
-                horizontalPadding,
-                tokens.layout.contentVerticalPadding,
-                horizontalPadding,
-                tokens.layout.contentAreaPadding.bottom,
-              ),
-              sliver: SliverToBoxAdapter(
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: maxWidth),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          greetingText,
-                          style: homePageSubtitleStyle(colorScheme),
-                        ),
-                        SizedBox(height: tokens.spacing.xl + 12),
-                        HomePageHeroSection(
-                          layoutTier: layoutTier,
-                          comicCount: comicCount,
-                          isLibraryEmpty: isLibraryEmpty,
-                          onScan: onScan,
-                          enableHeavyStats: deferredSectionsReady,
-                        ),
-                        SizedBox(height: tokens.spacing.lg + 8),
-                        HomePageContinueReadingSection(
-                          layoutTier: layoutTier,
-                          enabled: deferredSectionsReady,
-                        ),
-                        SizedBox(height: tokens.spacing.xl + 8),
-                      ],
-                    ),
+            SliverToBoxAdapter(
+              child: PageContentWidthAlign(
+                horizontalPadding: horizontalPadding,
+                maxWidth: innerMaxWidth,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: tokens.layout.contentVerticalPadding,
+                    bottom: tokens.layout.contentAreaPadding.bottom,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        greetingText,
+                        style: homePageSubtitleStyle(colorScheme),
+                      ),
+                      SizedBox(height: tokens.spacing.xl + 12),
+                      HomePageHeroSection(
+                        layoutTier: layoutTier,
+                        comicCount: comicCount,
+                        isLibraryEmpty: isLibraryEmpty,
+                        onScan: onScan,
+                        enableHeavyStats: deferredSectionsReady,
+                      ),
+                      SizedBox(height: tokens.spacing.lg + 8),
+                      HomePageContinueReadingSection(
+                        layoutTier: layoutTier,
+                        enabled: deferredSectionsReady,
+                      ),
+                      SizedBox(height: tokens.spacing.xl + 8),
+                    ],
                   ),
                 ),
               ),

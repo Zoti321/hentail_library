@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/shell/view_models/selected_paths_page_notifier.dart';
 
@@ -63,6 +64,7 @@ class _SelectedPathsPageState extends ConsumerState<SelectedPathsPage> {
         final Widget headerSection = SelectedPathsPageHeaderSection(
           layoutTier: layoutTier,
           horizontalPadding: horizontalPadding,
+          contentMaxWidth: innerMaxWidth,
         );
         final Widget header = KeyedSubtree(
           key: _headerMeasureKey,
@@ -82,24 +84,20 @@ class _SelectedPathsPageState extends ConsumerState<SelectedPathsPage> {
                   child: header,
                 ),
               ),
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(
-                horizontalPadding,
-                tokens.layout.contentVerticalPadding,
-                horizontalPadding,
-                tokens.layout.contentAreaPadding.bottom,
-              ),
-              sliver: SliverToBoxAdapter(
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: innerMaxWidth),
-                    child: asyncState.when(
-                      data: (_) => const SelectedPathsListCard(),
-                      loading: () => const SelectedPathsLoadingCard(),
-                      error: (Object error, StackTrace _) =>
-                          SelectedPathsErrorCard(error: error),
-                    ),
+            SliverToBoxAdapter(
+              child: PageContentWidthAlign(
+                horizontalPadding: horizontalPadding,
+                maxWidth: innerMaxWidth,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: tokens.layout.contentVerticalPadding,
+                    bottom: tokens.layout.contentAreaPadding.bottom,
+                  ),
+                  child: asyncState.when(
+                    data: (_) => const SelectedPathsListCard(),
+                    loading: () => const SelectedPathsLoadingCard(),
+                    error: (Object error, StackTrace _) =>
+                        SelectedPathsErrorCard(error: error),
                   ),
                 ),
               ),

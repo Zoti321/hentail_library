@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_about_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_diagnostics_rows.dart';
@@ -64,6 +65,7 @@ class _SettingsViewState extends State<SettingsView> {
         final Widget headerSection = SettingsPageHeaderSection(
           layoutTier: layoutTier,
           horizontalPadding: horizontalPadding,
+          contentMaxWidth: innerMaxWidth,
           onOpenNavigation: appShellPageNavigationOpener(context),
         );
         final Widget header = KeyedSubtree(
@@ -84,54 +86,50 @@ class _SettingsViewState extends State<SettingsView> {
                   child: header,
                 ),
               ),
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(
-                horizontalPadding,
-                tokens.layout.contentVerticalPadding,
-                horizontalPadding,
-                tokens.layout.contentAreaPadding.bottom,
-              ),
-              sliver: SliverToBoxAdapter(
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: innerMaxWidth),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 24,
-                      children: <Widget>[
-                        SettingsGroup(
-                          title: '个性化',
-                          children: <Widget>[
-                            ThemePreferenceRow(
-                              layoutTier: layoutTier,
-                              viewportWidth: viewportWidth,
-                            ),
-                          ],
-                        ),
-                        SettingsGroup(
-                          title: '漫画库',
-                          children: <Widget>[
-                            LibraryLocationRow(layoutTier: layoutTier),
-                            AutoScanRow(layoutTier: layoutTier),
-                          ],
-                        ),
-                        SettingsGroup(
-                          title: '诊断与支持',
-                          children: <Widget>[
-                            DiagnosticModeRow(layoutTier: layoutTier),
-                            ExportLogsRow(layoutTier: layoutTier),
-                          ],
-                        ),
-                        SettingsGroup(
-                          title: '关于',
-                          children: <Widget>[
-                            AutoUpdateRow(layoutTier: layoutTier),
-                            AboutVersionRow(layoutTier: layoutTier),
-                          ],
-                        ),
-                      ],
-                    ),
+            SliverToBoxAdapter(
+              child: PageContentWidthAlign(
+                horizontalPadding: horizontalPadding,
+                maxWidth: innerMaxWidth,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: tokens.layout.contentVerticalPadding,
+                    bottom: tokens.layout.contentAreaPadding.bottom,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 24,
+                    children: <Widget>[
+                      SettingsGroup(
+                        title: '个性化',
+                        children: <Widget>[
+                          ThemePreferenceRow(
+                            layoutTier: layoutTier,
+                            viewportWidth: viewportWidth,
+                          ),
+                        ],
+                      ),
+                      SettingsGroup(
+                        title: '漫画库',
+                        children: <Widget>[
+                          LibraryLocationRow(layoutTier: layoutTier),
+                          AutoScanRow(layoutTier: layoutTier),
+                        ],
+                      ),
+                      SettingsGroup(
+                        title: '诊断与支持',
+                        children: <Widget>[
+                          DiagnosticModeRow(layoutTier: layoutTier),
+                          ExportLogsRow(layoutTier: layoutTier),
+                        ],
+                      ),
+                      SettingsGroup(
+                        title: '关于',
+                        children: <Widget>[
+                          AutoUpdateRow(layoutTier: layoutTier),
+                          AboutVersionRow(layoutTier: layoutTier),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),

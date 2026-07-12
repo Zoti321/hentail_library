@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_layout_constants.dart';
 
 void main() {
@@ -57,7 +58,7 @@ void main() {
           SelectedPathsLayoutTier.expanded,
           1600,
         ),
-        selectedPathsContentMaxWidth,
+        kPageContentMaxWidth,
       );
       expect(
         selectedPathsInnerContentMaxWidth(SelectedPathsLayoutTier.compact, 360),

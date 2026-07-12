@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
@@ -26,11 +27,13 @@ class HistoryPageHeaderSection extends ConsumerWidget {
     super.key,
     required this.layoutTier,
     required this.horizontalPadding,
+    required this.contentMaxWidth,
     this.onOpenNavigation,
   });
 
   final HistoryLayoutTier layoutTier;
   final double horizontalPadding;
+  final double contentMaxWidth;
   final VoidCallback? onOpenNavigation;
 
   @override
@@ -42,17 +45,18 @@ class HistoryPageHeaderSection extends ConsumerWidget {
       ),
     );
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        horizontalPadding,
-        kHistoryHeaderVerticalPadding,
-        horizontalPadding,
-        kHistoryHeaderVerticalPadding,
-      ),
-      child: HistoryPageHeaderToolbar(
-        layoutTier: layoutTier,
-        clearEnabled: totalCount > 0,
-        onOpenNavigation: onOpenNavigation,
+    return PageContentWidthAlign(
+      horizontalPadding: horizontalPadding,
+      maxWidth: contentMaxWidth,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: kHistoryHeaderVerticalPadding,
+        ),
+        child: HistoryPageHeaderToolbar(
+          layoutTier: layoutTier,
+          clearEnabled: totalCount > 0,
+          onOpenNavigation: onOpenNavigation,
+        ),
       ),
     );
   }

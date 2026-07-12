@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_scroll_to_top_button.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/author_management_panel.dart';
@@ -118,6 +119,7 @@ class _MetadataManagementPageState
               return _buildPage(
                 layoutTier: layoutTier,
                 horizontalPadding: horizontalPadding,
+                viewportWidth: viewportWidth,
                 innerMaxWidth: innerMaxWidth,
                 selectedIndex: selectedIndex,
               );
@@ -131,12 +133,14 @@ class _MetadataManagementPageState
   Widget _buildPage({
     required MetadataLayoutTier layoutTier,
     required double horizontalPadding,
+    required double viewportWidth,
     required double innerMaxWidth,
     required int selectedIndex,
   }) {
     final Widget headerSection = MetadataPageHeaderSection(
       layoutTier: layoutTier,
       horizontalPadding: horizontalPadding,
+      contentMaxWidth: innerMaxWidth,
       selectedTabIndex: selectedIndex,
       onTabSelected: _handleTabSelected,
       onAdd: () => _invokeAddForTab(context, selectedIndex),
@@ -164,15 +168,13 @@ class _MetadataManagementPageState
                 ),
               ),
             SliverToBoxAdapter(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: SizedBox(
-                  width: innerMaxWidth,
-                  child: MetadataContentSearch(
-                    layoutTier: layoutTier,
-                    selectedTabIndex: selectedIndex,
-                    contentMaxWidth: innerMaxWidth,
-                  ),
+              child: PageContentWidthAlign(
+                horizontalPadding: horizontalPadding,
+                maxWidth: innerMaxWidth,
+                child: MetadataContentSearch(
+                  layoutTier: layoutTier,
+                  selectedTabIndex: selectedIndex,
+                  contentMaxWidth: innerMaxWidth,
                 ),
               ),
             ),
@@ -180,14 +182,20 @@ class _MetadataManagementPageState
               switch (selectedIndex) {
                 0 => AuthorManagementSliverGroup(
                   layoutTier: layoutTier,
+                  viewportWidth: viewportWidth,
+                  horizontalPadding: horizontalPadding,
                   contentMaxWidth: innerMaxWidth,
                 ),
                 1 => TagManagementSliverGroup(
                   layoutTier: layoutTier,
+                  viewportWidth: viewportWidth,
+                  horizontalPadding: horizontalPadding,
                   contentMaxWidth: innerMaxWidth,
                 ),
                 _ => TagManagementSliverGroup(
                   layoutTier: layoutTier,
+                  viewportWidth: viewportWidth,
+                  horizontalPadding: horizontalPadding,
                   contentMaxWidth: innerMaxWidth,
                 ),
               },

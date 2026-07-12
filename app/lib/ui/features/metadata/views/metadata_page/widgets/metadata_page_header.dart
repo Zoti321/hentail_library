@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
@@ -21,6 +22,7 @@ class MetadataPageHeaderSection extends StatelessWidget {
   const MetadataPageHeaderSection({
     required this.layoutTier,
     required this.horizontalPadding,
+    required this.contentMaxWidth,
     required this.selectedTabIndex,
     required this.onTabSelected,
     required this.onAdd,
@@ -30,6 +32,7 @@ class MetadataPageHeaderSection extends StatelessWidget {
 
   final MetadataLayoutTier layoutTier;
   final double horizontalPadding;
+  final double contentMaxWidth;
   final int selectedTabIndex;
   final ValueChanged<int> onTabSelected;
   final VoidCallback onAdd;
@@ -37,19 +40,20 @@ class MetadataPageHeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        horizontalPadding,
-        kMetadataHeaderVerticalPadding,
-        horizontalPadding,
-        kMetadataHeaderVerticalPadding,
-      ),
-      child: MetadataPageHeaderToolbar(
-        layoutTier: layoutTier,
-        selectedTabIndex: selectedTabIndex,
-        onTabSelected: onTabSelected,
-        onAdd: onAdd,
-        onOpenNavigation: onOpenNavigation,
+    return PageContentWidthAlign(
+      horizontalPadding: horizontalPadding,
+      maxWidth: contentMaxWidth,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: kMetadataHeaderVerticalPadding,
+        ),
+        child: MetadataPageHeaderToolbar(
+          layoutTier: layoutTier,
+          selectedTabIndex: selectedTabIndex,
+          onTabSelected: onTabSelected,
+          onAdd: onAdd,
+          onOpenNavigation: onOpenNavigation,
+        ),
       ),
     );
   }

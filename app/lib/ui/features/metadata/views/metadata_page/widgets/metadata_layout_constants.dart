@@ -1,9 +1,6 @@
-import 'dart:math' as math;
-
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/layout/content_search_width.dart';
-
-const double metadataContentMaxWidth = 1280;
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 const double kMetadataPanelSubtitleFontSize = 13;
 const double kMetadataHeaderVerticalPadding = 6;
 const double kMetadataSearchToListSpacing = 16;
@@ -44,15 +41,11 @@ double metadataInnerContentMaxWidth(
   MetadataLayoutTier tier,
   double viewportWidth,
 ) {
-  final double horizontalPadding = metadataContentHorizontalPadding(tier);
-  final double paddedWidth = viewportWidth - horizontalPadding * 2;
-  return switch (tier) {
-    MetadataLayoutTier.expanded => math.min(
-      paddedWidth,
-      metadataContentMaxWidth,
-    ),
-    MetadataLayoutTier.compact || MetadataLayoutTier.medium => paddedWidth,
-  };
+  return pageInnerContentMaxWidth(
+    viewportWidth: viewportWidth,
+    horizontalPadding: metadataContentHorizontalPadding(tier),
+    capAtMaxWidth: tier == MetadataLayoutTier.expanded,
+  );
 }
 
 double metadataSearchFieldWidth(
