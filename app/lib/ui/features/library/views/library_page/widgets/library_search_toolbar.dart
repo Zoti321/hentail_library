@@ -385,7 +385,7 @@ class _LibraryPageSizeMenuButtonState
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,
       showArrow: false,
-      verticalMargin: -24,
+      verticalMargin: -32,
       menuBuilder: () => _LibraryPageSizeMenu(
         layoutTier: widget.layoutTier,
         activePageSize: activePageSize,
@@ -532,7 +532,7 @@ class _LibraryOverflowMenuButtonState
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,
       showArrow: false,
-      verticalMargin: -24,
+      verticalMargin: -32,
       menuBuilder: () {
         if (scanning) {
           return _LibraryOverflowScanningMenu(
