@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/ui/core/layout/detail_meta_chip_row_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/r18_rating_chip.dart';
@@ -37,9 +38,9 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    final List<Widget> segments = <Widget>[];
+    final List<Widget> statSegments = <Widget>[];
     if (pageLabel != null) {
-      segments.add(
+      statSegments.add(
         Text(
           pageLabel,
           style: TextStyle(
@@ -49,11 +50,8 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
         ),
       );
     }
-    if (showR18) {
-      segments.add(const R18RatingChip());
-    }
     if (publishedLabel != null) {
-      segments.add(
+      statSegments.add(
         Text(
           publishedLabel,
           style: TextStyle(
@@ -64,11 +62,52 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
       );
     }
 
-    return Wrap(
-      spacing: tokens.spacing.sm,
-      runSpacing: tokens.spacing.xs,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: segments,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: tokens.spacing.xs,
+      children: <Widget>[
+        SizedBox(
+          height: kDetailMetaChipRowHeight,
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: showR18 ? const R18RatingChip() : const SizedBox.shrink(),
+          ),
+        ),
+        if (statSegments.isNotEmpty)
+          Wrap(
+            spacing: tokens.spacing.sm,
+            runSpacing: tokens.spacing.xs,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: statSegments,
+          ),
+      ],
+    );
+  }
+}
+
+/// 主信息区概要：无标签纯文本，最多 4 行。
+class ComicDetailDescription extends StatelessWidget {
+  const ComicDetailDescription({super.key, required this.comic});
+
+  final Comic comic;
+
+  @override
+  Widget build(BuildContext context) {
+    final String? text = comic.description?.trim();
+    if (text == null || text.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    return Text(
+      text,
+      maxLines: 4,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        fontSize: tokens.text.bodySm,
+        color: cs.hentai.textSecondary,
+        height: 1.45,
+      ),
     );
   }
 }
@@ -90,11 +129,6 @@ class ComicDetailMetadataBlock extends StatelessWidget {
     }
     if (tags.isNotEmpty) {
       rows.add(LabeledMetaChipRow(label: '标签', items: tags));
-    }
-    if (comic.description != null && comic.description!.trim().isNotEmpty) {
-      rows.add(
-        ComicDetailInfoRow(label: '概要', value: comic.description!.trim()),
-      );
     }
     rows.add(
       ComicDetailInfoRow(

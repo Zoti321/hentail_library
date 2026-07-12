@@ -81,6 +81,7 @@ class ComicDetail extends StatelessWidget {
           ),
           ComicDetailSummaryMetaRow(comic: comic),
           ComicDetailPrimaryActions(comic: comic),
+          ComicDetailDescription(comic: comic),
         ],
       ),
     );

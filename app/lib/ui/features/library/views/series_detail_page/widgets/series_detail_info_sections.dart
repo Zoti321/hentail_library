@@ -3,6 +3,7 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/ui/core/layout/detail_meta_chip_row_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/r18_rating_chip.dart';
@@ -10,9 +11,6 @@ import 'package:hentai_library/ui/features/library/views/comic_detail_page/widge
 
 /// 休刊状态 chip 描边/文字色（仅系列详情页使用）。
 const Color _kSeriesHiatusChipColor = Color(0xFFF59E0B);
-
-/// 与 [OutlinedMetaChip] 纵向占位一致，用于详情页 chip 行固定高度。
-const double _kSeriesDetailChipRowHeight = 28;
 
 Color _serializationChipAccentColor(
   ColorScheme cs,
@@ -75,7 +73,7 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
       spacing: tokens.spacing.xs,
       children: <Widget>[
         SizedBox(
-          height: _kSeriesDetailChipRowHeight,
+          height: kDetailMetaChipRowHeight,
           child: Align(
             alignment: Alignment.bottomLeft,
             child: Row(
