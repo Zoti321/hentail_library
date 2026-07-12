@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/ui/core/widgets/actions/page_size_menu.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_series_dialog.dart';
+import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_providers.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_back_header.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -16,6 +19,7 @@ class SeriesDetailHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
+    final int activePageSize = ref.watch(seriesDetailActivePageSizeProvider);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: cs.surface,
@@ -65,6 +69,15 @@ class SeriesDetailHeader extends ConsumerWidget {
                       builder: (BuildContext context) =>
                           EditSeriesDialog(series: series),
                     );
+                  },
+                ),
+                const Spacer(),
+                PageSizeMenuButton(
+                  activePageSize: activePageSize,
+                  onSelected: (int pageSize) {
+                    ref
+                        .read(seriesDetailPageSizeProvider.notifier)
+                        .setPageSize(pageSize);
                   },
                 ),
               ],

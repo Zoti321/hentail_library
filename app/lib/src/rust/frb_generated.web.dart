@@ -275,6 +275,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesComicOrderEntryDto dco_decode_series_comic_order_entry_dto(dynamic raw);
 
   @protected
+  SeriesComicsMetadataDto dco_decode_series_comics_metadata_dto(dynamic raw);
+
+  @protected
   SeriesDto dco_decode_series_dto(dynamic raw);
 
   @protected
@@ -627,6 +630,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesComicOrderEntryDto sse_decode_series_comic_order_entry_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SeriesComicsMetadataDto sse_decode_series_comics_metadata_dto(
     SseDeserializer deserializer,
   );
 
@@ -1079,6 +1087,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_series_comic_order_entry_dto(
     SeriesComicOrderEntryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_series_comics_metadata_dto(
+    SeriesComicsMetadataDto self,
     SseSerializer serializer,
   );
 

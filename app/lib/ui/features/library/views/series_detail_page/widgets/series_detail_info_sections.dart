@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/layout/detail_meta_chip_row_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -49,23 +47,22 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
   const SeriesDetailSummaryMetaRow({
     super.key,
     required this.series,
-    required this.comicsById,
+    this.hasR18 = false,
   });
 
   final Series series;
-  final Map<String, Comic> comicsById;
+  final bool hasR18;
 
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final bool showR18 = series.hasR18Comic(comicsById: comicsById);
     final bool showSerialization =
         series.serializationStatus != SerializationStatus.unknown;
     final List<Widget> chipRowChildren = <Widget>[
       if (showSerialization)
         SeriesSerializationChip(status: series.serializationStatus),
-      if (showR18) const R18RatingChip(),
+      if (hasR18) const R18RatingChip(),
     ];
 
     return Column(
@@ -96,29 +93,19 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
   }
 }
 
-bool seriesDetailHasMetadataBlock(
-  List<SeriesItem> sortedItems,
-  Map<String, Comic> comicsById,
-) {
-  return _aggregateAuthors(sortedItems, comicsById).isNotEmpty ||
-      _aggregateTags(sortedItems, comicsById).isNotEmpty;
-}
-
 class SeriesDetailMetadataBlock extends StatelessWidget {
   const SeriesDetailMetadataBlock({
     super.key,
-    required this.sortedItems,
-    required this.comicsById,
+    required this.authors,
+    required this.tags,
   });
 
-  final List<SeriesItem> sortedItems;
-  final Map<String, Comic> comicsById;
+  final List<String> authors;
+  final List<String> tags;
 
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    final List<String> authors = _aggregateAuthors(sortedItems, comicsById);
-    final List<String> tags = _aggregateTags(sortedItems, comicsById);
     final List<Widget> rows = <Widget>[];
     if (authors.isNotEmpty) {
       rows.add(LabeledMetaChipRow(label: '作者', items: authors));
@@ -135,50 +122,4 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
       children: rows,
     );
   }
-}
-
-List<String> _aggregateAuthors(
-  List<SeriesItem> sortedItems,
-  Map<String, Comic> comicsById,
-) {
-  final Set<String> seen = <String>{};
-  final List<String> authors = <String>[];
-  for (final SeriesItem item in sortedItems) {
-    final Comic? comic = comicsById[item.comicId];
-    if (comic == null) {
-      continue;
-    }
-    for (final author in comic.authors) {
-      if (seen.add(author.name)) {
-        authors.add(author.name);
-      }
-    }
-  }
-  return authors;
-}
-
-List<String> _aggregateTags(
-  List<SeriesItem> sortedItems,
-  Map<String, Comic> comicsById,
-) {
-  final Set<String> seen = <String>{};
-  final List<String> tags = <String>[];
-  for (final SeriesItem item in sortedItems) {
-    final Comic? comic = comicsById[item.comicId];
-    if (comic == null) {
-      continue;
-    }
-    for (final tag in comic.tags) {
-      if (seen.add(tag.name)) {
-        tags.add(tag.name);
-      }
-    }
-  }
-  return tags;
-}
-
-Map<String, Comic> comicsByIdFromList(List<Comic> comics) {
-  return <String, Comic>{
-    for (final Comic comic in comics) comic.comicId: comic,
-  };
 }
