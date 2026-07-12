@@ -2,17 +2,21 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_detail_series_nav_provider.dart';
+import 'package:hentai_library/ui/features/shell/state/library_series_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double kComicDetailSeriesMenuWidth = 320;
 const double kComicDetailSeriesMenuMaxHeight = 360;
+const double kComicDetailSeriesNavPlaceholderWidth = 104;
+const double kComicDetailSeriesNavPlaceholderHeight = 32;
 
 void goToComicDetailPage(BuildContext context, String comicId) {
   final String encoded = Uri.encodeComponent(comicId);
@@ -34,47 +38,101 @@ class _ComicDetailSeriesNavState extends ConsumerState<ComicDetailSeriesNav> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<AsyncValue<ComicDetailSeriesNavResult>>(
-      comicDetailSeriesNavProvider(widget.comicId),
-      (
-        AsyncValue<ComicDetailSeriesNavResult>? previous,
-        AsyncValue<ComicDetailSeriesNavResult> next,
-      ) {
-        final ComicDetailSeriesNavResult? result = next.asData?.value;
-        if (result is! ComicDetailSeriesNavConflict) {
+    ref.listen<AsyncValue<List<Series>>>(allSeriesProvider, (
+      AsyncValue<List<Series>>? previous,
+      AsyncValue<List<Series>> next,
+    ) {
+      final List<Series>? allSeries = next.asData?.value;
+      if (allSeries == null) {
+        return;
+      }
+      final List<Series> matches = findSeriesListContainingComic(
+        allSeries,
+        widget.comicId,
+      );
+      if (matches.length <= 1) {
+        return;
+      }
+      final List<Series>? previousSeries = previous?.asData?.value;
+      if (previousSeries != null) {
+        final List<Series> previousMatches = findSeriesListContainingComic(
+          previousSeries,
+          widget.comicId,
+        );
+        if (previousMatches.length > 1) {
           return;
         }
-        final ComicDetailSeriesNavResult? previousResult =
-            previous?.asData?.value;
-        if (previousResult is ComicDetailSeriesNavConflict) {
-          return;
-        }
-        final String seriesList = result.seriesNames.join('、');
-        AppLog.ui(
-          'comic_detail',
-        ).warning('漫画详情系列导航冲突：comicId=${widget.comicId}，系列=[$seriesList]');
-        if (!context.mounted) {
-          return;
-        }
-        showErrorToast(context, AppException('系列数据异常：该漫画同时属于多个系列，无法使用系列导航'));
-      },
-    );
+      }
+      final String seriesList = matches.map((Series s) => s.name).join('、');
+      AppLog.ui(
+        'comic_detail',
+      ).warning('漫画详情系列导航冲突：comicId=${widget.comicId}，系列=[$seriesList]');
+      if (!context.mounted) {
+        return;
+      }
+      showErrorToast(context, AppException('系列数据异常：该漫画同时属于多个系列，无法使用系列导航'));
+    });
 
-    final AsyncValue<ComicDetailSeriesNavResult> navAsync = ref.watch(
-      comicDetailSeriesNavProvider(widget.comicId),
+    final AsyncValue<List<Series>> allSeriesAsync = ref.watch(
+      allSeriesProvider,
     );
-    return navAsync.when(
-      data: (ComicDetailSeriesNavResult result) {
-        if (result is! ComicDetailSeriesNavReady) {
+    return allSeriesAsync.when(
+      data: (List<Series> allSeries) => _buildForSeriesList(allSeries),
+      loading: () => const _ComicDetailSeriesNavPlaceholder(),
+      error: (Object _, StackTrace _) => const SizedBox.shrink(),
+      skipLoadingOnReload: true,
+      skipLoadingOnRefresh: true,
+    );
+  }
+
+  Widget _buildForSeriesList(List<Series> allSeries) {
+    final List<Series> matches = findSeriesListContainingComic(
+      allSeries,
+      widget.comicId,
+    );
+    if (matches.isEmpty || matches.length > 1) {
+      return const SizedBox.shrink();
+    }
+
+    final AsyncValue<ComicDetailSeriesNavSeriesData?> seriesNavAsync = ref
+        .watch(comicDetailSeriesNavForSeriesProvider(matches.single.id));
+    return seriesNavAsync.when(
+      data: (ComicDetailSeriesNavSeriesData? seriesData) {
+        if (seriesData == null) {
+          return const SizedBox.shrink();
+        }
+        final int currentIndex = seriesData.items.indexWhere(
+          (ComicDetailSeriesNavItem item) => item.comicId == widget.comicId,
+        );
+        if (currentIndex < 0) {
           return const SizedBox.shrink();
         }
         return _ComicDetailSeriesNavControls(
-          data: result.data,
+          data: ComicDetailSeriesNavData(
+            seriesId: seriesData.seriesId,
+            seriesName: seriesData.seriesName,
+            items: seriesData.items,
+            currentIndex: currentIndex,
+          ),
           menuController: _menuController,
         );
       },
-      loading: () => const SizedBox.shrink(),
+      loading: () => const _ComicDetailSeriesNavPlaceholder(),
       error: (Object _, StackTrace _) => const SizedBox.shrink(),
+      skipLoadingOnReload: true,
+      skipLoadingOnRefresh: true,
+    );
+  }
+}
+
+class _ComicDetailSeriesNavPlaceholder extends StatelessWidget {
+  const _ComicDetailSeriesNavPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      width: kComicDetailSeriesNavPlaceholderWidth,
+      height: kComicDetailSeriesNavPlaceholderHeight,
     );
   }
 }
@@ -115,7 +173,7 @@ class _ComicDetailSeriesNavControls extends StatelessWidget {
         CustomPopupMenu(
           controller: menuController,
           barrierColor: Colors.transparent,
-          pressType: PressType.singleClick,
+          pressType: PressType.longPress,
           showArrow: false,
           verticalMargin: -32,
           menuBuilder: () => _ComicDetailSeriesMenu(
