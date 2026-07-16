@@ -14,63 +14,35 @@ import 'package:hentai_library/ui/core/widgets/form/fluent_date_picker_field.dar
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
+import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
+import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_side_tab_bar.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// 漫画元数据编辑弹窗。
-///
-/// 当前：最大宽度 720px，随 viewport 收缩；左侧 tab + 右侧可滚动表单。
-/// TODO(响应式): 窄屏下改为全页编辑（参考 Komga `EditBooksDialog` 小屏 fullscreen），见 `docs/agents/ui-style.md`。
+/// 漫画元数据编辑：medium/expanded 为 dialog，compact 为全页（[AdaptiveFormSurface]）。
 const double _kEditMetadataDialogWidth = 720;
 const double _kEditMetadataDialogRadius = 4;
 
-/// [HentaiDialog] 标题区与底栏的近似高度，用于限制 body 最大滚动区。
+/// 壳标题区与底栏的近似高度，用于限制 dialog body 最大滚动区。
 const double _kEditMetadataShellChromeReserve = 120;
 
 const double _kEditMetadataBodyMinHeight = 240;
 
 const Duration _kEditMetadataTabTransitionDuration = Duration(milliseconds: 180);
-const Duration _kEditMetadataDialogTransitionDuration = Duration(
-  milliseconds: 200,
-);
 
 enum _EditMetadataTab { general, authorsAndTags }
 
-/// 打开漫画元数据编辑弹窗（淡入 + 轻微缩放，遮罩同步淡入淡出）。
+/// 打开漫画元数据编辑表面。
 Future<void> showEditMetadataDialog({
   required BuildContext context,
   required Comic comic,
   required Future<void> Function(ComicMetadataForm) onSave,
 }) {
-  return showGeneralDialog<void>(
+  return showAdaptiveFormSurfaceWidget<void>(
     context: context,
-    barrierDismissible: true,
-    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-    barrierColor: Colors.black54,
-    transitionDuration: _kEditMetadataDialogTransitionDuration,
-    pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
-      return EditMetadataDialog(comic: comic, onSave: onSave);
-    },
-    transitionBuilder: (
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      Widget child,
-    ) {
-      final Animation<double> curved = CurvedAnimation(
-        parent: animation,
-        curve: Curves.easeOutCubic,
-      );
-      return FadeTransition(
-        opacity: curved,
-        child: ScaleTransition(
-          scale: Tween<double>(begin: 0.96, end: 1).animate(curved),
-          child: child,
-        ),
-      );
-    },
+    surface: EditMetadataDialog(comic: comic, onSave: onSave),
   );
 }
 
@@ -98,6 +70,11 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   static final List<DialogSideTabItem> _sideTabs = <DialogSideTabItem>[
     DialogSideTabItem(label: '常规', icon: LucideIcons.textAlignCenter),
     DialogSideTabItem(label: '作者&标签', icon: LucideIcons.users),
+  ];
+
+  static final List<CapsuleTabItem> _capsuleTabs = <CapsuleTabItem>[
+    CapsuleTabItem(label: '常规', icon: LucideIcons.textAlignCenter),
+    CapsuleTabItem(label: '作者&标签', icon: LucideIcons.users),
   ];
 
   @override
@@ -199,23 +176,93 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     }
   }
 
+  Widget _buildTabPane(AppThemeTokens tokens) {
+    return AnimatedSwitcher(
+      duration: _kEditMetadataTabTransitionDuration,
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeOutCubic,
+      layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+        return Stack(
+          alignment: Alignment.topCenter,
+          clipBehavior: Clip.hardEdge,
+          children: <Widget>[
+            ...previousChildren,
+            if (currentChild != null) currentChild,
+          ],
+        );
+      },
+      transitionBuilder: _buildTabTransition,
+      child: switch (_selectedTab) {
+        _EditMetadataTab.general => _EditMetadataGeneralTab(
+          key: const ValueKey<String>('general'),
+          title: _controller.form.title,
+          titleError: _controller.titleErrorText,
+          description: _controller.form.description ?? '',
+          publishedAt: _controller.form.publishedAt,
+          isR18: _controller.form.isR18,
+          onTitleChanged: _controller.updateTitle,
+          onDescriptionChanged: _controller.updateDescription,
+          onPublishedAtChanged: _controller.updatePublishedAt,
+          onIsR18Changed: _controller.updateIsR18,
+        ),
+        _EditMetadataTab.authorsAndTags => _EditMetadataAuthorsTagsTab(
+          key: const ValueKey<String>('authors-tags'),
+          authors: _controller.form.authors,
+          tags: _controller.form.tags,
+          onAddAuthor: _controller.addAuthor,
+          onRemoveAuthor: _controller.removeAuthor,
+          onAddTag: _controller.addTagByName,
+          onRemoveTag: _controller.removeTagByName,
+        ),
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final int selectedTabIndex = _selectedTab.index;
+    final bool compact = AppLayoutBreakpoints.isCompact(
+      MediaQuery.sizeOf(context).width,
+    );
 
-    return HentaiDialog(
-      title: '编辑元数据',
-      width: _kEditMetadataDialogWidth,
-      borderRadius: _kEditMetadataDialogRadius,
-      scrollableContent: false,
-      contentPadding: EdgeInsets.zero,
-      backgroundColor: cs.surface,
-      showFooterDivider: false,
-      fitContentHeight: true,
-      actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      content: ConstrainedBox(
+    final Widget body;
+    if (compact) {
+      body = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              tokens.spacing.lg,
+              0,
+              tokens.spacing.lg,
+              tokens.spacing.md,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: CapsuleTabBar(
+                items: _capsuleTabs,
+                selectedIndex: selectedTabIndex,
+                onSelected: _selectTab,
+              ),
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                tokens.spacing.lg,
+                0,
+                tokens.spacing.lg,
+                tokens.spacing.xs,
+              ),
+              child: _buildTabPane(tokens),
+            ),
+          ),
+        ],
+      );
+    } else {
+      body = ConstrainedBox(
         constraints: BoxConstraints(
           minHeight: _kEditMetadataBodyMinHeight,
           maxHeight: math.max(
@@ -241,52 +288,25 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
                   18,
                   tokens.spacing.xs,
                 ),
-                child: AnimatedSwitcher(
-                  duration: _kEditMetadataTabTransitionDuration,
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeOutCubic,
-                  layoutBuilder:
-                      (Widget? currentChild, List<Widget> previousChildren) {
-                        return Stack(
-                          alignment: Alignment.topCenter,
-                          clipBehavior: Clip.hardEdge,
-                          children: <Widget>[
-                            ...previousChildren,
-                            if (currentChild != null) currentChild,
-                          ],
-                        );
-                      },
-                  transitionBuilder: _buildTabTransition,
-                  child: switch (_selectedTab) {
-                    _EditMetadataTab.general => _EditMetadataGeneralTab(
-                      key: const ValueKey<String>('general'),
-                      title: _controller.form.title,
-                      titleError: _controller.titleErrorText,
-                      description: _controller.form.description ?? '',
-                      publishedAt: _controller.form.publishedAt,
-                      isR18: _controller.form.isR18,
-                      onTitleChanged: _controller.updateTitle,
-                      onDescriptionChanged: _controller.updateDescription,
-                      onPublishedAtChanged: _controller.updatePublishedAt,
-                      onIsR18Changed: _controller.updateIsR18,
-                    ),
-                    _EditMetadataTab.authorsAndTags =>
-                      _EditMetadataAuthorsTagsTab(
-                        key: const ValueKey<String>('authors-tags'),
-                        authors: _controller.form.authors,
-                        tags: _controller.form.tags,
-                        onAddAuthor: _controller.addAuthor,
-                        onRemoveAuthor: _controller.removeAuthor,
-                        onAddTag: _controller.addTagByName,
-                        onRemoveTag: _controller.removeTagByName,
-                      ),
-                  },
-                ),
+                child: _buildTabPane(tokens),
               ),
             ),
           ],
         ),
-      ),
+      );
+    }
+
+    return AdaptiveFormSurface(
+      title: '编辑元数据',
+      maxDialogWidth: _kEditMetadataDialogWidth,
+      borderRadius: _kEditMetadataDialogRadius,
+      scrollableBody: false,
+      bodyPadding: EdgeInsets.zero,
+      backgroundColor: cs.surface,
+      showFooterDivider: false,
+      fitContentHeight: true,
+      actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      body: body,
       actions: <Widget>[
         TextButton(
           onPressed: _saving ? null : () => Navigator.of(context).pop(),

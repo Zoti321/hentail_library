@@ -64,11 +64,7 @@ class SeriesDetailHeader extends ConsumerWidget {
                   hoverColor: theme.hoverColor,
                   overlayColor: theme.hoverColor,
                   onPressed: () {
-                    showDialog<void>(
-                      context: context,
-                      builder: (BuildContext context) =>
-                          EditSeriesDialog(series: series),
-                    );
+                    showEditSeriesDialog(context: context, series: series);
                   },
                 ),
                 const Spacer(),
