@@ -177,7 +177,9 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
   Widget _buildComicsSection(
     AsyncValue<SeriesDetailComicsCatalogState> catalogAsync,
   ) {
+    // skipLoadingOnReload: revision bump（如阅读进度写入）时保留网格高度，避免 scroll clamp 回顶。
     return catalogAsync.when(
+      skipLoadingOnReload: true,
       data: (SeriesDetailComicsCatalogState catalog) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
