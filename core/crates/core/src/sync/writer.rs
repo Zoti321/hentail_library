@@ -9,6 +9,7 @@ use crate::entity::{
     authors, comic_authors, comic_meta, comic_tags, comic_thumbnails, comics, prelude::*, tags,
 };
 use crate::error::HentaiError;
+use crate::history::normalize_reading_history_titles;
 
 use super::plan::ComicScanReplacePlan;
 use super::series_rebuild::rebuild_series_from_comics;
@@ -32,6 +33,7 @@ pub async fn apply_scan_replace_plan(
             .map_err(map_db_err)?;
     }
     upsert_comics(&txn, &plan.to_upsert).await?;
+    normalize_reading_history_titles(&txn).await?;
     rebuild_series_from_comics(&txn).await?;
     txn.commit().await.map_err(map_db_err)?;
     Ok(())

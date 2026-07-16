@@ -36,6 +36,20 @@ fn merge_kept_preserves_user_metadata_when_source_unchanged() {
 }
 
 #[test]
+fn merge_kept_decodes_html_entities_in_existing_title() {
+    let scanned = comic("id1", "/a/b", "zip", "扫描标题", 10);
+    let existing = comic(
+        "id1",
+        "/a/b",
+        "zip",
+        "Fate╱Stay Night Heaven&#039;s Feel - 卷04",
+        5,
+    );
+    let merged = merge_kept_scan_with_existing(&scanned, &existing);
+    assert_eq!(merged.title, "Fate╱Stay Night Heaven's Feel - 卷04");
+}
+
+#[test]
 fn merge_kept_updates_page_count_when_path_changes() {
     let scanned = comic("id1", "/a/c", "zip", "扫描标题", 10);
     let existing = comic("id1", "/a/b", "zip", "用户标题", 5);

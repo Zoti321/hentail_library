@@ -1,4 +1,5 @@
 use crate::comic::ComicDto;
+use crate::util::decode_basic_html_entities;
 
 fn merge_optional_text(existing: &Option<String>, scanned: &Option<String>) -> Option<String> {
     if existing.is_some() {
@@ -32,7 +33,8 @@ pub fn merge_kept_scan_with_existing(scanned: &ComicDto, existing: &ComicDto) ->
         resource_size: scanned.resource_size,
         created_at: existing.created_at,
         last_updated_at: existing.last_updated_at,
-        title: existing.title.clone(),
+        // 保留用户/既有标题，但幂等清洗 HTML 实体（存量脏标题靠 sync 修好）。
+        title: decode_basic_html_entities(&existing.title),
         content_rating: existing.content_rating.clone(),
         page_count,
         description: merge_optional_text(&existing.description, &scanned.description),

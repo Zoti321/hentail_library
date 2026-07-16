@@ -1,5 +1,6 @@
 use sea_orm::{
-    ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder, Set,
+    ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, PaginatorTrait, QueryFilter,
+    QueryOrder, Set,
 };
 use sea_orm::sea_query::{Expr, Func};
 
@@ -7,6 +8,7 @@ use crate::comic::read_data_version;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_reading_histories, prelude::*, series_reading_histories};
 use crate::error::HentaiError;
+use crate::util::decode_basic_html_entities;
 
 use super::dto::{PagedReadingHistoryDto, ReadingHistoryDto, SeriesReadingHistoryDto};
 
@@ -14,7 +16,7 @@ pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> 
     let db = connection()?;
     let model = comic_reading_histories::ActiveModel {
         comic_id: Set(dto.comic_id.clone()),
-        title: Set(dto.title.clone()),
+        title: Set(decode_basic_html_entities(&dto.title)),
         last_read_time: Set(dto.last_read_time_ms),
         page_index: Set(dto.page_index),
     };
@@ -32,6 +34,28 @@ pub async fn record_reading(dto: &ReadingHistoryDto) -> Result<(), HentaiError> 
         .await
         .map_err(map_db_err)?;
     Ok(())
+}
+
+/// Library sync 时幂等清洗历史标题快照中的 HTML 实体。
+pub async fn normalize_reading_history_titles<C: ConnectionTrait>(
+    db: &C,
+) -> Result<usize, HentaiError> {
+    let rows = ComicReadingHistories::find()
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let mut updated = 0usize;
+    for row in rows {
+        let decoded = decode_basic_html_entities(&row.title);
+        if decoded == row.title {
+            continue;
+        }
+        let mut active: comic_reading_histories::ActiveModel = row.into();
+        active.title = Set(decoded);
+        active.update(db).await.map_err(map_db_err)?;
+        updated += 1;
+    }
+    Ok(updated)
 }
 
 pub async fn get_reading_by_comic_id(comic_id: &str) -> Result<Option<ReadingHistoryDto>, HentaiError> {

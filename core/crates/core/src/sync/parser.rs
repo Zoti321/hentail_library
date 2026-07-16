@@ -468,7 +468,7 @@ pub fn parsed_to_comic(parsed: &ParsedResource) -> crate::comic::ComicDto {
         resource_size: parsed.resource_size,
         created_at: now,
         last_updated_at: now,
-        title: parsed.title.clone(),
+        title: crate::util::decode_basic_html_entities(&parsed.title),
         content_rating: "unknown".to_string(),
         page_count: parsed.page_count,
         description: parsed.description.clone(),
@@ -536,5 +536,20 @@ mod tests {
         assert_eq!(parsed.resource_type, "cbz");
         assert_eq!(parsed.page_count, 2);
         assert!(parsed.resource_size > 0);
+    }
+
+    #[test]
+    fn parsed_to_comic_decodes_html_entities_in_title() {
+        let comic = parsed_to_comic(&ParsedResource {
+            path: "/library/Fate Heaven&#039;s Feel.cbz".to_string(),
+            resource_type: "cbz".to_string(),
+            title: "Fate╱Stay Night Heaven&#039;s Feel - 卷04".to_string(),
+            authors: vec![],
+            page_count: 10,
+            description: None,
+            published_at: None,
+            resource_size: 1024,
+        });
+        assert_eq!(comic.title, "Fate╱Stay Night Heaven's Feel - 卷04");
     }
 }
