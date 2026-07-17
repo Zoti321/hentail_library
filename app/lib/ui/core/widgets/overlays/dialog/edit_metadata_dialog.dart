@@ -30,7 +30,9 @@ const double _kEditMetadataShellChromeReserve = 120;
 
 const double _kEditMetadataBodyMinHeight = 240;
 
-const Duration _kEditMetadataTabTransitionDuration = Duration(milliseconds: 180);
+const Duration _kEditMetadataTabTransitionDuration = Duration(
+  milliseconds: 180,
+);
 
 enum _EditMetadataTab { general, authorsAndTags }
 
@@ -359,11 +361,10 @@ class _EditMetadataFormController extends ChangeNotifier {
 
   ComicMetadataForm get normalizedForm {
     final String trimmedTitle = _form.title.trim();
-    final String? trimmedDescription = _normalizeOptionalText(_form.description);
-    return _form.copyWith(
-      title: trimmedTitle,
-      description: trimmedDescription,
+    final String? trimmedDescription = _normalizeOptionalText(
+      _form.description,
     );
+    return _form.copyWith(title: trimmedTitle, description: trimmedDescription);
   }
 
   bool markTitleValidationAttempted() {

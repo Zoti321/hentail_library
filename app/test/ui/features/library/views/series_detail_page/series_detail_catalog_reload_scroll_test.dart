@@ -38,10 +38,7 @@ class _SeriesDetailCatalogWhenHarness extends StatelessWidget {
           return Column(
             children: <Widget>[
               for (final Comic comic in catalog.items)
-                SizedBox(
-                  height: 120,
-                  child: Text(comic.title),
-                ),
+                SizedBox(height: 120, child: Text(comic.title)),
             ],
           );
         },
@@ -185,10 +182,10 @@ void main() {
       final ScrollController scrollController = ScrollController();
       addTearDown(scrollController.dispose);
 
-      final ValueNotifier<AsyncValue<SeriesDetailComicsCatalogState>> catalogAsync =
-          ValueNotifier<AsyncValue<SeriesDetailComicsCatalogState>>(
-            AsyncData<SeriesDetailComicsCatalogState>(catalog),
-          );
+      final ValueNotifier<AsyncValue<SeriesDetailComicsCatalogState>>
+      catalogAsync = ValueNotifier<AsyncValue<SeriesDetailComicsCatalogState>>(
+        AsyncData<SeriesDetailComicsCatalogState>(catalog),
+      );
       addTearDown(catalogAsync.dispose);
 
       await tester.binding.setSurfaceSize(const Size(400, 600));
@@ -197,22 +194,23 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: ValueListenableBuilder<
-              AsyncValue<SeriesDetailComicsCatalogState>
-            >(
-              valueListenable: catalogAsync,
-              builder:
-                  (
-                    BuildContext context,
-                    AsyncValue<SeriesDetailComicsCatalogState> async,
-                    Widget? _,
-                  ) {
-                    return _SeriesDetailCatalogWhenHarness(
-                      catalogAsync: async,
-                      scrollController: scrollController,
-                    );
-                  },
-            ),
+            body:
+                ValueListenableBuilder<
+                  AsyncValue<SeriesDetailComicsCatalogState>
+                >(
+                  valueListenable: catalogAsync,
+                  builder:
+                      (
+                        BuildContext context,
+                        AsyncValue<SeriesDetailComicsCatalogState> async,
+                        Widget? _,
+                      ) {
+                        return _SeriesDetailCatalogWhenHarness(
+                          catalogAsync: async,
+                          scrollController: scrollController,
+                        );
+                      },
+                ),
           ),
         ),
       );
@@ -242,10 +240,10 @@ void main() {
       final ScrollController scrollController = ScrollController();
       addTearDown(scrollController.dispose);
 
-      final ValueNotifier<AsyncValue<SeriesDetailComicsCatalogState>> catalogAsync =
-          ValueNotifier<AsyncValue<SeriesDetailComicsCatalogState>>(
-            AsyncData<SeriesDetailComicsCatalogState>(catalog),
-          );
+      final ValueNotifier<AsyncValue<SeriesDetailComicsCatalogState>>
+      catalogAsync = ValueNotifier<AsyncValue<SeriesDetailComicsCatalogState>>(
+        AsyncData<SeriesDetailComicsCatalogState>(catalog),
+      );
       addTearDown(catalogAsync.dispose);
 
       await tester.binding.setSurfaceSize(const Size(400, 600));
@@ -254,23 +252,24 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: ValueListenableBuilder<
-              AsyncValue<SeriesDetailComicsCatalogState>
-            >(
-              valueListenable: catalogAsync,
-              builder:
-                  (
-                    BuildContext context,
-                    AsyncValue<SeriesDetailComicsCatalogState> async,
-                    Widget? _,
-                  ) {
-                    return _SeriesDetailCatalogWhenHarness(
-                      catalogAsync: async,
-                      scrollController: scrollController,
-                      skipLoadingOnReload: true,
-                    );
-                  },
-            ),
+            body:
+                ValueListenableBuilder<
+                  AsyncValue<SeriesDetailComicsCatalogState>
+                >(
+                  valueListenable: catalogAsync,
+                  builder:
+                      (
+                        BuildContext context,
+                        AsyncValue<SeriesDetailComicsCatalogState> async,
+                        Widget? _,
+                      ) {
+                        return _SeriesDetailCatalogWhenHarness(
+                          catalogAsync: async,
+                          scrollController: scrollController,
+                          skipLoadingOnReload: true,
+                        );
+                      },
+                ),
           ),
         ),
       );

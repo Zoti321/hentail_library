@@ -24,8 +24,7 @@ class ScanProgressDialog extends ConsumerWidget {
       thumbnailEventCoordinatorProvider,
     );
     final bool syncDone = state.progress?.phase == SyncLibraryPhase.done;
-    final bool showClose =
-        state.error != null || !state.running || syncDone;
+    final bool showClose = state.error != null || !state.running || syncDone;
     final bool showError = state.error != null;
 
     return HentaiDialog(
@@ -38,7 +37,9 @@ class ScanProgressDialog extends ConsumerWidget {
       contentPadding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
       actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       content: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: _kScanProgressBodyMinHeight),
+        constraints: const BoxConstraints(
+          minHeight: _kScanProgressBodyMinHeight,
+        ),
         child: _buildBody(context, state, thumbnailProgress),
       ),
       actions: showClose
@@ -100,7 +101,12 @@ class ScanProgressDialog extends ConsumerWidget {
       return _buildError(context, state.error!);
     }
     if (!state.running || state.progress?.phase == SyncLibraryPhase.done) {
-      return _buildDone(context, state.cancelled, state.progress, thumbnailProgress);
+      return _buildDone(
+        context,
+        state.cancelled,
+        state.progress,
+        thumbnailProgress,
+      );
     }
     return _buildRunning(context, state.progress);
   }
@@ -117,10 +123,7 @@ class ScanProgressDialog extends ConsumerWidget {
           child: progress == null
               ? Text(
                   '准备中…',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: cs.hentai.textPrimary,
-                  ),
+                  style: TextStyle(fontSize: 14, color: cs.hentai.textPrimary),
                 )
               : _buildRunningContent(context, progress),
         ),
@@ -128,7 +131,10 @@ class ScanProgressDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildRunningContent(BuildContext context, SyncLibraryProgress progress) {
+  Widget _buildRunningContent(
+    BuildContext context,
+    SyncLibraryProgress progress,
+  ) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final TextStyle primaryStyle = TextStyle(
       fontSize: 14,

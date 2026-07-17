@@ -132,7 +132,10 @@ ComicDetailSeriesNavResult resolveComicDetailSeriesNavResult(
   String comicId,
   ComicDetailSeriesNavSeriesData? seriesData,
 ) {
-  final List<Series> matches = findSeriesListContainingComic(allSeries, comicId);
+  final List<Series> matches = findSeriesListContainingComic(
+    allSeries,
+    comicId,
+  );
   if (matches.isEmpty) {
     return const ComicDetailSeriesNavNone();
   }

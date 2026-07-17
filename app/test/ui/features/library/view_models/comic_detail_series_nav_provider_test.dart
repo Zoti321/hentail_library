@@ -130,25 +130,31 @@ void main() {
 
   group('resolveComicDetailSeriesNavResult', () {
     test('updates current index without rebuilding series items', () async {
-      final ComicDetailSeriesNavSeriesData seriesData = await container.read(
-        comicDetailSeriesNavForSeriesProvider('series-1').future,
-      ) as ComicDetailSeriesNavSeriesData;
+      final ComicDetailSeriesNavSeriesData seriesData =
+          await container.read(
+                comicDetailSeriesNavForSeriesProvider('series-1').future,
+              )
+              as ComicDetailSeriesNavSeriesData;
 
-      final ComicDetailSeriesNavResult resultA = resolveComicDetailSeriesNavResult(
-        <Series>[series],
-        'comic-a',
-        seriesData,
-      );
-      final ComicDetailSeriesNavResult resultB = resolveComicDetailSeriesNavResult(
-        <Series>[series],
-        'comic-b',
-        seriesData,
-      );
+      final ComicDetailSeriesNavResult resultA =
+          resolveComicDetailSeriesNavResult(
+            <Series>[series],
+            'comic-a',
+            seriesData,
+          );
+      final ComicDetailSeriesNavResult resultB =
+          resolveComicDetailSeriesNavResult(
+            <Series>[series],
+            'comic-b',
+            seriesData,
+          );
 
       expect(resultA, isA<ComicDetailSeriesNavReady>());
       expect(resultB, isA<ComicDetailSeriesNavReady>());
-      final ComicDetailSeriesNavReady readyA = resultA as ComicDetailSeriesNavReady;
-      final ComicDetailSeriesNavReady readyB = resultB as ComicDetailSeriesNavReady;
+      final ComicDetailSeriesNavReady readyA =
+          resultA as ComicDetailSeriesNavReady;
+      final ComicDetailSeriesNavReady readyB =
+          resultB as ComicDetailSeriesNavReady;
       expect(readyA.data.currentIndex, 0);
       expect(readyB.data.currentIndex, 1);
       expect(identical(readyA.data.items, readyB.data.items), isTrue);
@@ -156,25 +162,24 @@ void main() {
   });
 
   group('comicDetailSeriesNavProvider', () {
-    test('reuses cached series data when comic id changes within series', () async {
-      await container.read(comicDetailSeriesNavProvider('comic-a').future);
-      final ComicDetailSeriesNavSeriesData? cachedSeriesData =
-          container.read(comicDetailSeriesNavForSeriesProvider('series-1')).value;
+    test(
+      'reuses cached series data when comic id changes within series',
+      () async {
+        await container.read(comicDetailSeriesNavProvider('comic-a').future);
+        final ComicDetailSeriesNavSeriesData? cachedSeriesData = container
+            .read(comicDetailSeriesNavForSeriesProvider('series-1'))
+            .value;
 
-      final ComicDetailSeriesNavResult result = await container.read(
-        comicDetailSeriesNavProvider('comic-b').future,
-      );
+        final ComicDetailSeriesNavResult result = await container.read(
+          comicDetailSeriesNavProvider('comic-b').future,
+        );
 
-      expect(result, isA<ComicDetailSeriesNavReady>());
-      final ComicDetailSeriesNavReady ready = result as ComicDetailSeriesNavReady;
-      expect(ready.data.currentIndex, 1);
-      expect(
-        identical(
-          ready.data.items,
-          cachedSeriesData?.items,
-        ),
-        isTrue,
-      );
-    });
+        expect(result, isA<ComicDetailSeriesNavReady>());
+        final ComicDetailSeriesNavReady ready =
+            result as ComicDetailSeriesNavReady;
+        expect(ready.data.currentIndex, 1);
+        expect(identical(ready.data.items, cachedSeriesData?.items), isTrue);
+      },
+    );
   });
 }

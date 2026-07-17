@@ -97,7 +97,10 @@ void main() {
       ),
     );
 
-    await tester.enterText(find.byKey(const Key('adaptive-form-field')), '草稿标题');
+    await tester.enterText(
+      find.byKey(const Key('adaptive-form-field')),
+      '草稿标题',
+    );
     expect(find.text('草稿标题'), findsOneWidget);
     expect(find.byKey(AdaptiveFormSurface.dialogChromeKey), findsOneWidget);
 

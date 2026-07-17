@@ -35,10 +35,7 @@ Future<void> showInFileExplorer(String path) async {
     throw ValidationException('无法在文件资源管理器中显示该项目：路径为空');
   }
   if (Platform.isWindows) {
-    await Process.run('explorer.exe', <String>[
-      '/select,',
-      normalizedPath,
-    ]);
+    await Process.run('explorer.exe', <String>['/select,', normalizedPath]);
     return;
   }
   if (Platform.isMacOS) {

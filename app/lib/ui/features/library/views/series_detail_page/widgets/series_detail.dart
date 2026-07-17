@@ -62,7 +62,10 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
         _scrollToGridTop();
       },
     );
-    ref.listen<int>(seriesDetailActivePageSizeProvider, (int? previous, int next) {
+    ref.listen<int>(seriesDetailActivePageSizeProvider, (
+      int? previous,
+      int next,
+    ) {
       if (previous == null || previous == next) {
         return;
       }
@@ -165,10 +168,7 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
               ),
             ),
           ),
-          SeriesDetailSummaryMetaRow(
-            series: widget.series,
-            hasR18: hasR18,
-          ),
+          SeriesDetailSummaryMetaRow(series: widget.series, hasR18: hasR18),
         ],
       ),
     );
@@ -205,10 +205,8 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
           ],
         );
       },
-      loading: () => const SeriesDetailComicsGrid(
-        comics: <Comic>[],
-        isLoading: true,
-      ),
+      loading: () =>
+          const SeriesDetailComicsGrid(comics: <Comic>[], isLoading: true),
       error: (Object error, StackTrace _) => _SeriesDetailComicsError(
         error: error,
         onRetry: () => ref
@@ -224,10 +222,7 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
 }
 
 class _SeriesDetailComicsError extends StatelessWidget {
-  const _SeriesDetailComicsError({
-    required this.error,
-    required this.onRetry,
-  });
+  const _SeriesDetailComicsError({required this.error, required this.onRetry});
 
   final Object error;
   final VoidCallback onRetry;

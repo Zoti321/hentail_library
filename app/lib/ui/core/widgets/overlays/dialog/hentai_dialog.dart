@@ -138,14 +138,8 @@ class HentaiDialog extends StatelessWidget {
 
   Widget _buildBody(BuildContext context) {
     final Widget paddedContent = scrollableContent
-        ? SingleChildScrollView(
-            padding: contentPadding,
-            child: content,
-          )
-        : Padding(
-            padding: contentPadding,
-            child: content,
-          );
+        ? SingleChildScrollView(padding: contentPadding, child: content)
+        : Padding(padding: contentPadding, child: content);
 
     if (!fitContentHeight) {
       return Flexible(child: paddedContent);
@@ -213,12 +207,7 @@ class _HentaiDialogActionsBar extends StatelessWidget {
 
         final EdgeInsetsGeometry effectivePadding =
             padding ??
-            EdgeInsets.fromLTRB(
-              horizontalPadding,
-              12,
-              horizontalPadding,
-              14,
-            );
+            EdgeInsets.fromLTRB(horizontalPadding, 12, horizontalPadding, 14);
 
         return Container(
           padding: effectivePadding,

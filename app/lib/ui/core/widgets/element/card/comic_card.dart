@@ -65,10 +65,7 @@ class ComicCard extends ConsumerWidget {
               context: context,
               comic: comic,
               onSave: (ComicMetadataForm data) async {
-                await data.applyTo(
-                  ref.read(comicRepoProvider),
-                  comic.comicId,
-                );
+                await data.applyTo(ref.read(comicRepoProvider), comic.comicId);
               },
             );
           case ComicContextAction.showInExplorer:

@@ -61,12 +61,16 @@ class SeriesDetailPaginationBar extends ConsumerWidget {
           GhostButton.icon(
             icon: LucideIcons.chevronRight,
             tooltip: '下一页',
-            onPressed: canGoNext ? () => notifier.goToNextPage(totalPages) : null,
+            onPressed: canGoNext
+                ? () => notifier.goToNextPage(totalPages)
+                : null,
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronsRight,
             tooltip: '末页',
-            onPressed: canGoNext ? () => notifier.goToLastPage(totalPages) : null,
+            onPressed: canGoNext
+                ? () => notifier.goToLastPage(totalPages)
+                : null,
           ),
         ],
       ),

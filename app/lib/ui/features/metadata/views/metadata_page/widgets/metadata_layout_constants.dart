@@ -1,6 +1,7 @@
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/layout/content_search_width.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
+
 const double kMetadataPanelSubtitleFontSize = 13;
 const double kMetadataHeaderVerticalPadding = 6;
 const double kMetadataSearchToListSpacing = 16;

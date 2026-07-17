@@ -47,7 +47,9 @@ class HomePageHeaderSection extends StatelessWidget {
       horizontalPadding: horizontalPadding,
       maxWidth: contentMaxWidth,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: kHomeHeaderVerticalPadding),
+        padding: const EdgeInsets.symmetric(
+          vertical: kHomeHeaderVerticalPadding,
+        ),
         child: HomePageHeaderToolbar(
           layoutTier: layoutTier,
           onScan: onScan,

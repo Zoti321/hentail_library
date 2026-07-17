@@ -503,11 +503,7 @@ class _LibraryOverflowMenuButtonState
       }
       if (previous.running && !next.running) {
         if (next.cancelled) {
-          showCustomToast(
-            context,
-            message: '已取消扫描',
-            type: AppToastType.info,
-          );
+          showCustomToast(context, message: '已取消扫描', type: AppToastType.info);
         } else if (next.error != null) {
           showErrorToast(context, next.error!);
         } else {

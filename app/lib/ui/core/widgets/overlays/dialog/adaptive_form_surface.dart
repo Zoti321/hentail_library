@@ -268,7 +268,8 @@ class _AdaptiveFormMorphChrome extends StatelessWidget {
                 minHeight: minHeight,
               ),
               decoration: BoxDecoration(
-                color: backgroundColor ??
+                color:
+                    backgroundColor ??
                     (pageMode ? cs.surface : cs.hentai.cardHover),
                 borderRadius: BorderRadius.circular(radius),
                 border: Border.all(
@@ -331,8 +332,7 @@ class _AdaptiveFormMorphChrome extends StatelessWidget {
                               icon: LucideIcons.arrowLeft,
                               tooltip: '返回',
                               semanticLabel: '返回',
-                              onPressed: () =>
-                                  Navigator.of(context).maybePop(),
+                              onPressed: () => Navigator.of(context).maybePop(),
                             ),
                             SizedBox(width: tokens.spacing.sm),
                           ],
@@ -340,9 +340,7 @@ class _AdaptiveFormMorphChrome extends StatelessWidget {
                             child: Text(
                               title,
                               style: TextStyle(
-                                fontSize: pageMode
-                                    ? tokens.text.titleSm
-                                    : 16,
+                                fontSize: pageMode ? tokens.text.titleSm : 16,
                                 fontWeight: FontWeight.w600,
                                 color: cs.hentai.textPrimary,
                               ),

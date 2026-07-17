@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 
 class FluentTextField extends StatefulWidget {
@@ -53,7 +53,8 @@ class FluentTextFieldState extends State<FluentTextField> {
     final isTextarea = widget.maxLines > 1;
     final bool useDense = widget.isDense && !isTextarea;
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final bool hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
+    final bool hasError =
+        widget.errorText != null && widget.errorText!.isNotEmpty;
     final Color borderColor = hasError
         ? cs.error
         : _isFocused
@@ -80,10 +81,7 @@ class FluentTextFieldState extends State<FluentTextField> {
             decoration: BoxDecoration(
               color: cs.hentai.inputBackground,
               borderRadius: BorderRadius.circular(tokens.radius.md),
-              border: Border.all(
-                color: borderColor,
-                width: 1,
-              ),
+              border: Border.all(color: borderColor, width: 1),
               boxShadow: _isFocused && !hasError
                   ? [
                       BoxShadow(
