@@ -8,6 +8,13 @@ pub enum SyncLibraryPhaseDto {
     Failed,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum SyncScanMode {
+    #[default]
+    Incremental,
+    Full,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SyncLibraryRouteDto {
     NoRootsNoop,

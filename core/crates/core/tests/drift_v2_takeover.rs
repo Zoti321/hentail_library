@@ -243,6 +243,91 @@ fn fetch_series_page_returns_series_with_items() {
 }
 
 #[test]
+fn fetch_series_comics_page_returns_ordered_comics() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let db = connection().expect("connection");
+            rebuild_series_from_comics(&db).await.expect("rebuild series");
+            use hentai_core::{
+                fetch_series_comics_metadata, fetch_series_comics_page, fetch_series_page,
+                PageRequestDto, SeriesFilterDto, SeriesSortOptionDto,
+            };
+            let series_page = fetch_series_page(
+                PageRequestDto {
+                    page: 1,
+                    page_size: 50,
+                },
+                SeriesFilterDto {
+                    show_r18: true,
+                    require_items: true,
+                    ..Default::default()
+                },
+                SeriesSortOptionDto {
+                    field: hentai_core::SeriesSortFieldDto::Name,
+                    descending: false,
+                },
+            )
+            .await
+            .expect("series page");
+            let author_series_id = series_page
+                .items
+                .iter()
+                .find(|s| {
+                    s.items.iter().any(|i| {
+                        i.comic_id == "86408880d30b0de95ca959feb60a3b72dcb1889b"
+                    })
+                })
+                .map(|s| s.series_id.clone())
+                .expect("series with author comic");
+            let author_series = series_page
+                .items
+                .iter()
+                .find(|s| s.series_id == author_series_id)
+                .expect("author series row");
+            let comics_page = fetch_series_comics_page(
+                &author_series_id,
+                PageRequestDto {
+                    page: 1,
+                    page_size: 1,
+                },
+            )
+            .await
+            .expect("comics page");
+            assert_eq!(comics_page.total_count, author_series.items.len() as i64);
+            assert_eq!(comics_page.items.len(), 1);
+            assert_eq!(
+                comics_page.items[0].comic_id,
+                author_series.items[0].comic_id
+            );
+            let metadata = fetch_series_comics_metadata(&author_series_id)
+                .await
+                .expect("metadata");
+            assert_eq!(metadata.authors, vec!["作者A".to_string()]);
+            assert_eq!(metadata.tags, vec!["冒险".to_string()]);
+
+            let r18_series_id = series_page
+                .items
+                .iter()
+                .find(|s| {
+                    s.items.iter().any(|i| {
+                        i.comic_id == "e931fd412112e427f7335e127af79c8b0f87887b"
+                    })
+                })
+                .map(|s| s.series_id.clone())
+                .expect("series with r18 comic");
+            let r18_metadata = fetch_series_comics_metadata(&r18_series_id)
+                .await
+                .expect("r18 metadata");
+            assert!(r18_metadata.has_r18);
+        });
+    });
+}
+
+#[test]
 fn fetch_series_page_random_order_varies_between_queries() {
     with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");

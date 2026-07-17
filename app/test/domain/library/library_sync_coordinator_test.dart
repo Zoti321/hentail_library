@@ -20,6 +20,7 @@ class _ScriptedSyncAdapter extends SyncLibraryFrbAdapter {
   _ScriptedSyncAdapter(this._run);
 
   final Future<void> Function({
+    ScanMode scanMode,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   })
@@ -27,10 +28,15 @@ class _ScriptedSyncAdapter extends SyncLibraryFrbAdapter {
 
   @override
   Future<void> call({
+    ScanMode scanMode = ScanMode.incremental,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   }) {
-    return _run(isCancelled: isCancelled, onProgress: onProgress);
+    return _run(
+      scanMode: scanMode,
+      isCancelled: isCancelled,
+      onProgress: onProgress,
+    );
   }
 }
 
@@ -61,6 +67,7 @@ void main() {
     var notifyCount = 0;
     final LibrarySyncCoordinator coordinator = LibrarySyncCoordinator(
       syncAdapter: _ScriptedSyncAdapter(({
+        ScanMode scanMode = ScanMode.incremental,
         required isCancelled,
         onProgress,
       }) async {
@@ -82,7 +89,11 @@ void main() {
     var notifyCount = 0;
     final LibrarySyncCoordinator coordinator = LibrarySyncCoordinator(
       syncAdapter: _ScriptedSyncAdapter(
-        ({required isCancelled, onProgress}) async {},
+        ({
+          ScanMode scanMode = ScanMode.incremental,
+          required isCancelled,
+          onProgress,
+        }) async {},
       ),
       readerSessionPort: _RecordingReaderSessionPort(),
       onSyncSucceeded: () => notifyCount++,
@@ -98,6 +109,7 @@ void main() {
         _RecordingReaderSessionPort();
     final LibrarySyncCoordinator coordinator = LibrarySyncCoordinator(
       syncAdapter: _ScriptedSyncAdapter(({
+        ScanMode scanMode = ScanMode.incremental,
         required isCancelled,
         onProgress,
       }) async {

@@ -1,15 +1,17 @@
 use hentai_core::{
-    count_all_series, fetch_series_page as core_fetch_page, find_series_by_id as core_find,
+    count_all_series, fetch_series_comics_metadata as core_fetch_series_comics_metadata,
+    fetch_series_comics_page as core_fetch_series_comics_page,
+    fetch_series_page as core_fetch_page, find_series_by_id as core_find,
     get_all_series, load_home_series_comic_order_map, search_series_by_keyword,
     search_series_by_tag_expression, set_series_items_order as core_set_order,
     update_series_user_meta as core_update_meta, watch_all_series, watch_home_series_comic_order_map,
-    PagedSeriesResultDto as CorePagedSeries, SeriesDto as CoreSeries,
-    SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
-    SeriesSortFieldDto as CoreSeriesSortField,
-    SeriesSortOptionDto as CoreSeriesSort, UpdateSeriesUserMetaDto as CoreUpdateSeriesUserMeta,
+    PagedSeriesResultDto as CorePagedSeries, SeriesComicsMetadataDto as CoreSeriesComicsMetadata,
+    SeriesDto as CoreSeries, SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
+    SeriesSortFieldDto as CoreSeriesSortField, SeriesSortOptionDto as CoreSeriesSort,
+    UpdateSeriesUserMetaDto as CoreUpdateSeriesUserMeta,
 };
 
-use super::comic::PageRequestDto;
+use super::comic::{PageRequestDto, PagedComicResultDto};
 use super::init::HentaiErrorDto;
 use super::stream_watch::{emit_or_closed, normalize_watch_result};
 
@@ -68,6 +70,13 @@ pub struct SeriesComicOrderEntryDto {
     pub sort_order: i32,
 }
 
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct SeriesComicsMetadataDto {
+    pub authors: Vec<String>,
+    pub tags: Vec<String>,
+    pub has_r18: bool,
+}
+
 /// 与 core `UpdateSeriesUserMetaDto` 同名，减少 Dart/Rust 双命名。
 #[derive(Debug, Clone, Default)]
 pub struct UpdateSeriesUserMetaDto {
@@ -122,6 +131,16 @@ impl From<CorePagedSeries> for PagedSeriesResultDto {
             total_count: value.total_count,
             page: value.page,
             page_size: value.page_size,
+        }
+    }
+}
+
+impl From<CoreSeriesComicsMetadata> for SeriesComicsMetadataDto {
+    fn from(value: CoreSeriesComicsMetadata) -> Self {
+        Self {
+            authors: value.authors,
+            tags: value.tags,
+            has_r18: value.has_r18,
         }
     }
 }
@@ -204,6 +223,25 @@ pub fn fetch_series_page_frb(
 pub fn find_series_by_id_frb(series_id: String) -> Result<Option<SeriesDto>, HentaiErrorDto> {
     hentai_core::runtime::block_on(core_find(&series_id))
         .map(|opt| opt.map(SeriesDto::from))
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn fetch_series_comics_page_frb(
+    series_id: String,
+    request: PageRequestDto,
+) -> Result<PagedComicResultDto, HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_fetch_series_comics_page(&series_id, request.into()))
+        .map(PagedComicResultDto::from)
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn fetch_series_comics_metadata_frb(
+    series_id: String,
+) -> Result<SeriesComicsMetadataDto, HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_fetch_series_comics_metadata(&series_id))
+        .map(SeriesComicsMetadataDto::from)
         .map_err(HentaiErrorDto::from)
 }
 

@@ -4,7 +4,7 @@ use std::path::Path;
 
 use image::imageops::FilterType;
 use image::{DynamicImage, GenericImageView, Rgba};
-use sea_orm::{ActiveModelTrait, ColumnTrait, DatabaseConnection, EntityTrait, Set};
+use sea_orm::{DatabaseConnection, EntityTrait, Set};
 use zip::ZipArchive;
 
 use crate::comic::ComicDto;
@@ -70,7 +70,6 @@ pub async fn store_thumbnail_for_comic(
         updated_at: Set(now),
         source_modified_ms: Set(Some(modified_ms)),
         source_size: Set(Some(size)),
-        ..Default::default()
     };
     ComicThumbnails::insert(active)
         .on_conflict(

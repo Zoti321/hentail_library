@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/layout/content_search_width.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -73,6 +73,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
         final Widget headerSection = HistoryPageHeaderSection(
           layoutTier: layoutTier,
           horizontalPadding: horizontalPadding,
+          contentMaxWidth: innerMaxWidth,
           onOpenNavigation: appShellPageNavigationOpener(context),
         );
         final Widget header = KeyedSubtree(
@@ -112,34 +113,32 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
                     child: header,
                   ),
                 ),
-              SliverPadding(
-                padding: EdgeInsets.fromLTRB(
-                  horizontalPadding,
-                  tokens.layout.contentVerticalPadding,
-                  horizontalPadding,
-                  tokens.layout.contentAreaPadding.bottom,
-                ),
-                sliver: SliverMainAxisGroup(
-                  slivers: <Widget>[
-                    SliverToBoxAdapter(
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: SizedBox(
-                          width: innerMaxWidth,
-                          child: _HistoryBodyLeading(
-                            layoutTier: layoutTier,
-                            contentMaxWidth: innerMaxWidth,
-                          ),
+              SliverToBoxAdapter(
+                child: PageContentWidthAlign(
+                  horizontalPadding: horizontalPadding,
+                  maxWidth: innerMaxWidth,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      top: tokens.layout.contentVerticalPadding,
+                      bottom: tokens.layout.contentAreaPadding.bottom,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        _HistoryBodyLeading(
+                          layoutTier: layoutTier,
+                          contentMaxWidth: innerMaxWidth,
                         ),
-                      ),
+                      ],
                     ),
-                    _HistoryListSliver(
-                      layoutTier: layoutTier,
-                      viewportWidth: viewportWidth,
-                      contentMaxWidth: innerMaxWidth,
-                    ),
-                  ],
+                  ),
                 ),
+              ),
+              _HistoryListSliver(
+                layoutTier: layoutTier,
+                viewportWidth: viewportWidth,
+                horizontalPadding: horizontalPadding,
+                contentMaxWidth: innerMaxWidth,
               ),
             ],
           ),
@@ -212,16 +211,19 @@ class _HistoryListSliver extends ConsumerWidget {
   const _HistoryListSliver({
     required this.layoutTier,
     required this.viewportWidth,
+    required this.horizontalPadding,
     required this.contentMaxWidth,
   });
 
   final HistoryLayoutTier layoutTier;
   final double viewportWidth;
+  final double horizontalPadding;
   final double contentMaxWidth;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
+    final AppThemeTokens tokens = context.tokens;
     final AsyncValue<HistoryPagedFeedState> feedAsync = ref.watch(
       historyPagedFeedControllerProvider,
     );
@@ -279,49 +281,50 @@ class _HistoryListSliver extends ConsumerWidget {
           layoutTier,
           viewportWidth,
         );
+        final double horizontalInset = pageContentAlignedHorizontalInset(
+          viewportWidth: viewportWidth,
+          horizontalPadding: horizontalPadding,
+          maxWidth: contentMaxWidth,
+        );
 
         return SliverMainAxisGroup(
           slivers: <Widget>[
-            SliverLayoutBuilder(
-              builder: (BuildContext context, SliverConstraints constraints) {
-                final double sideInset =
-                    ((constraints.crossAxisExtent - contentMaxWidth) / 2).clamp(
-                      0,
-                      double.infinity,
-                    );
-                return SliverPadding(
-                  padding: EdgeInsets.symmetric(horizontal: sideInset),
-                  sliver: SliverGrid.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: gridMetrics.crossAxisCount,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      mainAxisExtent: gridMetrics.mainAxisExtent,
-                    ),
-                    itemCount: feed.items.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final HistoryGridItem item = feed.items[index];
-                      return ReadingHistoryCard(
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                horizontalInset,
+                0,
+                horizontalInset,
+                tokens.layout.contentAreaPadding.bottom,
+              ),
+              sliver: SliverGrid.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: gridMetrics.crossAxisCount,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  mainAxisExtent: gridMetrics.mainAxisExtent,
+                ),
+                itemCount: feed.items.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final HistoryGridItem item = feed.items[index];
+                  return ReadingHistoryCard(
+                    comicId: item.comicId,
+                    title: item.title,
+                    lastReadTime: item.lastReadTime,
+                    pageIndex: item.pageIndex,
+                    onTap: () => appRouter.pushNamed(
+                      ReaderRouteArgs.readerRouteName,
+                      queryParameters: ReaderRouteArgs(
                         comicId: item.comicId,
-                        title: item.title,
-                        lastReadTime: item.lastReadTime,
-                        pageIndex: item.pageIndex,
-                        onTap: () => appRouter.pushNamed(
-                          ReaderRouteArgs.readerRouteName,
-                          queryParameters: ReaderRouteArgs(
-                            comicId: item.comicId,
-                          ).toQueryParameters(),
-                        ),
-                        onDelete: () => _handleDeleteComicHistory(
-                          context: context,
-                          ref: ref,
-                          comicId: item.comicId,
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
+                      ).toQueryParameters(),
+                    ),
+                    onDelete: () => _handleDeleteComicHistory(
+                      context: context,
+                      ref: ref,
+                      comicId: item.comicId,
+                    ),
+                  );
+                },
+              ),
             ),
             if (feed.isLoadingMore)
               const SliverToBoxAdapter(

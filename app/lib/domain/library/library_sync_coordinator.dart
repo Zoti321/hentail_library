@@ -17,12 +17,14 @@ class LibrarySyncCoordinator {
   final void Function() _onSyncSucceeded;
 
   Future<void> runSync({
+    ScanMode scanMode = ScanMode.incremental,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   }) async {
     var clearedSessions = false;
     Future<void>? sessionClearTask;
     await _syncAdapter.call(
+      scanMode: scanMode,
       isCancelled: isCancelled,
       onProgress: (SyncLibraryProgress progress) {
         onProgress?.call(progress);

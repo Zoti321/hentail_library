@@ -10,6 +10,13 @@ class HentaiDialog extends StatelessWidget {
     required this.content,
     required this.actions,
     this.width = 420,
+    this.borderRadius = 8,
+    this.scrollableContent = true,
+    this.contentPadding = const EdgeInsets.fromLTRB(18, 0, 18, 16),
+    this.backgroundColor,
+    this.showFooterDivider = true,
+    this.fitContentHeight = false,
+    this.actionsPadding,
     this.cardSurfaceKey,
   });
 
@@ -17,6 +24,25 @@ class HentaiDialog extends StatelessWidget {
   final Widget content;
   final List<Widget> actions;
   final double width;
+  final double borderRadius;
+
+  /// When false, [content] manages its own scroll/layout (e.g. side tabs + pane).
+  final bool scrollableContent;
+
+  /// Padding around [content]. Use [EdgeInsets.zero] when body children manage insets.
+  final EdgeInsetsGeometry contentPadding;
+
+  /// Dialog surface color. Defaults to [ColorScheme.hentai.cardHover].
+  final Color? backgroundColor;
+
+  /// Top border above the action bar.
+  final bool showFooterDivider;
+
+  /// When true, body height follows content between [minContentHeight] and max viewport cap.
+  final bool fitContentHeight;
+
+  /// Optional padding for the action bar. Defaults to 12 top / 14 bottom.
+  final EdgeInsetsGeometry? actionsPadding;
 
   final Key? cardSurfaceKey;
 
@@ -47,13 +73,13 @@ class HentaiDialog extends StatelessWidget {
       insetPadding: const EdgeInsets.all(_dialogInsetPadding),
       child: ClipRRect(
         key: cardSurfaceKey,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(borderRadius),
         child: Container(
           width: effectiveWidth,
           constraints: BoxConstraints(maxHeight: maxDialogHeight),
           decoration: BoxDecoration(
-            color: cs.hentai.cardHover,
-            borderRadius: BorderRadius.circular(8),
+            color: backgroundColor ?? cs.hentai.cardHover,
+            borderRadius: BorderRadius.circular(borderRadius),
             border: Border.all(color: cs.hentai.borderSubtle, width: 1),
             boxShadow: [
               BoxShadow(
@@ -97,25 +123,53 @@ class HentaiDialog extends StatelessWidget {
                   ),
                 ),
               ),
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
-                  child: content,
-                ),
+              _buildBody(context),
+              _HentaiDialogActionsBar(
+                actions: actions,
+                showDivider: showFooterDivider,
+                padding: actionsPadding,
               ),
-              _HentaiDialogActionsBar(actions: actions),
             ],
           ),
         ),
       ),
     );
   }
+
+  Widget _buildBody(BuildContext context) {
+    final Widget paddedContent = scrollableContent
+        ? SingleChildScrollView(padding: contentPadding, child: content)
+        : Padding(padding: contentPadding, child: content);
+
+    if (!fitContentHeight) {
+      return Flexible(child: paddedContent);
+    }
+
+    final double maxBodyHeight = math.max(
+      0,
+      MediaQuery.sizeOf(context).height - 48 - _fitContentChromeReserve,
+    );
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: maxBodyHeight),
+      child: paddedContent,
+    );
+  }
+
+  /// Title + footer approximate height for [fitContentHeight] max body calculation.
+  static const double _fitContentChromeReserve = 120;
 }
 
 class _HentaiDialogActionsBar extends StatelessWidget {
-  const _HentaiDialogActionsBar({required this.actions});
+  const _HentaiDialogActionsBar({
+    required this.actions,
+    required this.showDivider,
+    this.padding,
+  });
 
   final List<Widget> actions;
+  final bool showDivider;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
@@ -151,20 +205,21 @@ class _HentaiDialogActionsBar extends StatelessWidget {
               )
             : theme;
 
+        final EdgeInsetsGeometry effectivePadding =
+            padding ??
+            EdgeInsets.fromLTRB(horizontalPadding, 12, horizontalPadding, 14);
+
         return Container(
-          padding: EdgeInsets.fromLTRB(
-            horizontalPadding,
-            12,
-            horizontalPadding,
-            14,
-          ),
+          padding: effectivePadding,
           decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(
-                color: theme.colorScheme.hentai.borderSubtle,
-                width: 1,
-              ),
-            ),
+            border: showDivider
+                ? Border(
+                    top: BorderSide(
+                      color: theme.colorScheme.hentai.borderSubtle,
+                      width: 1,
+                    ),
+                  )
+                : null,
           ),
           child: Theme(
             data: actionTheme,

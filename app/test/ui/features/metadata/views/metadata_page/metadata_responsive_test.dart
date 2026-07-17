@@ -131,6 +131,8 @@ Future<void> _pumpAuthorPanel(
             slivers: <Widget>[
               AuthorManagementSliverGroup(
                 layoutTier: layoutTier,
+                viewportWidth: viewportWidth,
+                horizontalPadding: metadataContentHorizontalPadding(layoutTier),
                 contentMaxWidth: metadataInnerContentMaxWidth(
                   layoutTier,
                   viewportWidth,

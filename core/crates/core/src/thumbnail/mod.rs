@@ -43,7 +43,7 @@ pub async fn find_thumbnail_by_comic_id(
 
 pub async fn delete_thumbnails_by_comic_ids(comic_ids: Vec<String>) -> Result<(), HentaiError> {
     use crate::db::{connection, map_db_err};
-    use crate::entity::{comic_thumbnails, prelude::*};
+    use crate::entity::comic_thumbnails;
     use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
     if comic_ids.is_empty() {
         return Ok(());

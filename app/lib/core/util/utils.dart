@@ -14,23 +14,29 @@ bool get isDesktop {
   ].contains(defaultTargetPlatform);
 }
 
+/// Whether a `explorer.exe /select` [ProcessResult] should be treated as failure.
+///
+/// On Windows, `explorer.exe` returns exit code 1 even when the folder opens
+/// successfully, so exit code alone is not a reliable signal.
+@visibleForTesting
+bool shouldTreatExplorerSelectAsFailure({
+  required bool isWindows,
+  required int exitCode,
+}) {
+  if (isWindows) {
+    return false;
+  }
+  return exitCode != 0;
+}
+
 Future<void> showInFileExplorer(String path) async {
   final String normalizedPath = path.trim();
   if (normalizedPath.isEmpty) {
     throw ValidationException('无法在文件资源管理器中显示该项目：路径为空');
   }
   if (Platform.isWindows) {
-    final ProcessResult result = await Process.run('explorer.exe', <String>[
-      '/select,',
-      normalizedPath,
-    ]);
-    if (result.exitCode == 0) {
-      return;
-    }
-    throw AppException(
-      '无法在文件资源管理器中显示该项目',
-      cause: 'windows exitCode=${result.exitCode}, stderr=${result.stderr}',
-    );
+    await Process.run('explorer.exe', <String>['/select,', normalizedPath]);
+    return;
   }
   if (Platform.isMacOS) {
     final ProcessResult result = await Process.run('open', <String>[

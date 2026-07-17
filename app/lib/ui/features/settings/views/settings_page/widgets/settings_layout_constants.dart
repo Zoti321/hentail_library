@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 
-const double settingsContentMaxWidth = 1280;
 const double settingsThemeMenuWidthMedium = 224;
 const double kSettingsHeaderVerticalPadding = 6;
 const double kSettingsHeaderShadowGradientHeight = 6;
@@ -43,15 +43,11 @@ double settingsInnerContentMaxWidth(
   SettingsLayoutTier tier,
   double viewportWidth,
 ) {
-  final double horizontalPadding = settingsContentHorizontalPadding(tier);
-  final double paddedWidth = viewportWidth - horizontalPadding * 2;
-  return switch (tier) {
-    SettingsLayoutTier.expanded => math.min(
-      paddedWidth,
-      settingsContentMaxWidth,
-    ),
-    SettingsLayoutTier.compact || SettingsLayoutTier.medium => paddedWidth,
-  };
+  return pageInnerContentMaxWidth(
+    viewportWidth: viewportWidth,
+    horizontalPadding: settingsContentHorizontalPadding(tier),
+    capAtMaxWidth: tier == SettingsLayoutTier.expanded,
+  );
 }
 
 double settingsThemeMenuWidth(SettingsLayoutTier tier, double viewportWidth) {

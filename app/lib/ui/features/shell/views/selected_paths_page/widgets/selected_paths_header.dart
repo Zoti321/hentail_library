@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_layout_constants.dart';
@@ -13,21 +14,24 @@ class SelectedPathsPageHeaderSection extends StatelessWidget {
     super.key,
     required this.layoutTier,
     required this.horizontalPadding,
+    required this.contentMaxWidth,
   });
 
   final SelectedPathsLayoutTier layoutTier;
   final double horizontalPadding;
+  final double contentMaxWidth;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        horizontalPadding,
-        kSelectedPathsHeaderVerticalPadding,
-        horizontalPadding,
-        kSelectedPathsHeaderVerticalPadding,
+    return PageContentWidthAlign(
+      horizontalPadding: horizontalPadding,
+      maxWidth: contentMaxWidth,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: kSelectedPathsHeaderVerticalPadding,
+        ),
+        child: SelectedPathsPageHeaderToolbar(layoutTier: layoutTier),
       ),
-      child: SelectedPathsPageHeaderToolbar(layoutTier: layoutTier),
     );
   }
 }

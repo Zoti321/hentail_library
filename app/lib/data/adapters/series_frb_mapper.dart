@@ -5,6 +5,7 @@ import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 
@@ -22,6 +23,16 @@ Series mapRustSeries(rust_series.SeriesDto dto) {
 
 SeriesItem mapRustSeriesItem(rust_series.SeriesItemDto dto) {
   return SeriesItem(comicId: dto.comicId, order: dto.sortOrder);
+}
+
+SeriesComicsMetadata mapRustSeriesComicsMetadata(
+  rust_series.SeriesComicsMetadataDto dto,
+) {
+  return SeriesComicsMetadata(
+    authors: dto.authors,
+    tags: dto.tags,
+    hasR18: dto.hasR18,
+  );
 }
 
 rust_series.SeriesFilterDto mapLibrarySeriesFilter(LibrarySeriesFilter filter) {

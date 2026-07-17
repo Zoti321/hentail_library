@@ -11,6 +11,7 @@ pub mod writer;
 
 pub use dto::{
     LibrarySyncCountsDto, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto,
+    SyncScanMode,
 };
 pub use handle::{SyncHandle, cancel_sync, create_sync_handle};
 pub use orchestrator::sync_library;

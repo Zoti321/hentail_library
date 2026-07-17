@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
 
 void main() {
@@ -49,7 +50,7 @@ void main() {
     test('caps expanded content width at 1280', () {
       expect(
         metadataInnerContentMaxWidth(MetadataLayoutTier.expanded, 1600),
-        metadataContentMaxWidth,
+        kPageContentMaxWidth,
       );
       expect(
         metadataInnerContentMaxWidth(MetadataLayoutTier.compact, 360),

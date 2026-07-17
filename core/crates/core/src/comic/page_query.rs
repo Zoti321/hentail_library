@@ -134,8 +134,7 @@ fn build_where_clause(filter: &ComicFilterDto, values: &mut Vec<Value>) -> Strin
 }
 
 fn placeholders(count: usize) -> String {
-    std::iter::repeat("?")
-        .take(count)
+    std::iter::repeat_n("?", count)
         .collect::<Vec<_>>()
         .join(",")
 }

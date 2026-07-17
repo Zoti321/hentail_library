@@ -39,13 +39,19 @@ pub fn init_tracing_subscriber() {
             .with_ansi(false)
             .with_target(true);
 
-        tracing_subscriber::registry()
+        // `setup_default_user_utils` / hot restart may already install a global
+        // subscriber; never panic the Flutter isolate during RustLib.init.
+        let result = tracing_subscriber::registry()
             .with(filter_layer)
             .with(stderr_layer)
             .with(file_layer)
-            .init();
-
-        tracing::info!("Rust tracing subscriber initialized");
+            .try_init();
+        match result {
+            Ok(()) => tracing::info!("Rust tracing subscriber initialized"),
+            Err(err) => {
+                eprintln!("Rust tracing subscriber already set, skip re-init: {err}");
+            }
+        }
     });
 }
 

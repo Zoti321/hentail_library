@@ -96,7 +96,10 @@ Key semantic groups in `HentaiColorScheme`:
 - App background: `cs.hentai.winBackground`
 - Primary content panels: `cs.surface` with `borderSubtle` border
 - Sidebar: fixed widths `DesktopSidebar.expandedWidth` (256) / `collapsedWidth` (72)
-- Dialogs: `HentaiDialog` — 8px radius, multi-layer shadow, max width ~420 default
+- Dialogs: `HentaiDialog` — default 8px radius (overridable per dialog), multi-layer shadow, max width ~420 default
+- **Adaptive form surfaces** (`AdaptiveFormSurface` / `showAdaptiveFormSurface`): medium/expanded → centered dialog; compact (`< 600`) → full-page under `AppTitleBar`, with live morph (~200ms `easeOutCubic`) across the breakpoint. Use for multi-field editors; keep confirm/progress dialogs on `HentaiDialog`.
+- **Metadata edit** (`EditMetadataDialog`): 720px max dialog width, 4px radius; side tabs on medium/expanded, `CapsuleTabBar` on compact; presented via `AdaptiveFormSurface`
+- **Series edit** (`EditSeriesDialog`): same adaptive shell (480px max dialog width)
 - Toasts: `showCustomToast` / `showSuccessToast` / `showErrorToast` — bottom-right, max 380px — **not** `SnackBar` on desktop
 
 ### Interaction patterns
@@ -106,7 +109,7 @@ Key semantic groups in `HentaiColorScheme`:
 - **In-page tabs:** `CapsuleTabBar` (pill container, selected segment tinted with `primary`)
 - **Context actions:** right-click → `*ContextMenu.show` (comic, series, series item)
 - **Confirmations:** `HentaiDialog` or `*ConfirmDialog` under `overlays/dialog/confirm/`
-- **Forms:** `FluentTextField`, `CustomTextField`, `DatePickerField`, `*MultiSelectField`
+- **Forms:** `FluentTextField`, `FluentDatePickerField`, `CustomTextField`, `*MultiSelectField`
 
 ### Card & list item pattern
 
@@ -141,7 +144,7 @@ CatalogCoverCardShell
 | Form | `form/` | `FluentTextField`, `CustomTextField`, `DatePicker`, `DatePickerField`, `MultiSelect`, `AuthorLibraryMultiSelectField`, `TagLibraryMultiSelectField` |
 | Foundation | `foundation/` | `MyToggleSwitch` |
 | Navigation | `navigation/` | `DesktopSidebar`, `LibraryReturnBreadcrumb` |
-| Overlays | `overlays/dialog/` | `HentaiDialog`, `AddSeriesDialog`, `EditMetadataDialog`, `ScanProgressDialog`, … |
+| Overlays | `overlays/dialog/` | `HentaiDialog`, `AdaptiveFormSurface`, `EditMetadataDialog`, `EditSeriesDialog`, `ScanProgressDialog`, … |
 | Overlays | `overlays/context_menu/` | `ComicContextMenu`, `SeriesContextMenu`, … |
 | Layout | `responsive_layout/` | `DetailResponsiveLayout`, `LibraryBlocksSliverGroup`, `LibrarySectionSliver` |
 

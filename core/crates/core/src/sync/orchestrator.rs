@@ -6,6 +6,7 @@ use crate::reader::clear_reader_sessions;
 
 use super::dto::{
     LibrarySyncCountsDto, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto,
+    SyncScanMode,
 };
 use super::handle::SyncHandle;
 use super::parser::normalize_roots;
@@ -33,7 +34,8 @@ fn log_sync_phase(phase: SyncLibraryPhaseDto, route: SyncLibraryRouteDto) {
 #[tracing::instrument(skip(emit, handle), err)]
 pub async fn sync_library(
     handle: SyncHandle,
-    mut emit: impl FnMut(SyncLibraryProgressDto),
+    scan_mode: SyncScanMode,
+    emit: impl FnMut(SyncLibraryProgressDto),
 ) -> Result<(), HentaiError> {
     let db = connection()?;
     let roots = load_saved_paths(&db).await?;
@@ -41,7 +43,7 @@ pub async fn sync_library(
     if effective.is_empty() {
         return sync_no_roots(&db, &handle, emit).await;
     }
-    sync_with_roots(&db, &handle, &effective, emit).await
+    sync_with_roots(&db, &handle, &effective, scan_mode, emit).await
 }
 
 #[tracing::instrument(skip(emit, handle), err)]
@@ -130,8 +132,10 @@ async fn sync_with_roots(
     db: &sea_orm::DatabaseConnection,
     handle: &SyncHandle,
     roots: &[PathBuf],
+    scan_mode: SyncScanMode,
     mut emit: impl FnMut(SyncLibraryProgressDto),
 ) -> Result<(), HentaiError> {
+    let force_full_parse = scan_mode == SyncScanMode::Full;
     let existing_by_id = load_existing_comics_map(db).await?;
     let thumbnail_stats = load_thumbnail_stats(db).await?;
     let ctx = ScanContext {
@@ -156,7 +160,7 @@ async fn sync_with_roots(
         None,
     ));
 
-    let scan_items = scan_roots(roots, &ctx, handle)?;
+    let scan_items = scan_roots(roots, &ctx, handle, force_full_parse)?;
     if return_if_cancelled(handle, "scanning") {
         return Ok(());
     }

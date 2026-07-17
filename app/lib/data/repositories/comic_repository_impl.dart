@@ -11,6 +11,9 @@ import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 
+/// Sentinel passed to Rust when the user clears published date.
+const int _kComicPublishedAtClearSentinel = -1;
+
 /// 漫画主表持久化；读写均经 Rust/SeaORM。
 class ComicRepositoryImpl implements ComicRepository {
   const ComicRepositoryImpl();
@@ -79,6 +82,8 @@ class ComicRepositoryImpl implements ComicRepository {
   Future<void> updateUserMeta(
     String comicId, {
     String? title,
+    String? description,
+    DateTime? publishedAt,
     List<Author>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
@@ -89,6 +94,10 @@ class ComicRepositoryImpl implements ComicRepository {
         meta: rust.UpdateComicUserMetaFrbDto(
           title: title,
           contentRating: contentRating?.name,
+          description: description,
+          publishedAt: publishedAt == null
+              ? _kComicPublishedAtClearSentinel
+              : comicTimestampToMs(publishedAt),
           authors: authors?.map((Author a) => a.name).toList(),
           tags: tags?.map((Tag t) => t.name).toList(),
         ),

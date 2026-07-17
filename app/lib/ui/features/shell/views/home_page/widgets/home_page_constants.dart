@@ -1,6 +1,6 @@
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 
-const double homeContentMaxWidth = 1280;
 const double continueReadingItemWidth = 304;
 const double continueReadingItemWidthCompact = 272;
 const double continueReadingStripHeight = 138;
@@ -33,6 +33,14 @@ double homePageTitleFontSize(HomePageLayoutTier tier) {
     HomePageLayoutTier.medium => 22,
     HomePageLayoutTier.expanded => 26,
   };
+}
+
+double homeInnerContentMaxWidth(HomePageLayoutTier tier, double viewportWidth) {
+  return pageInnerContentMaxWidth(
+    viewportWidth: viewportWidth,
+    horizontalPadding: homeContentHorizontalPadding(tier),
+    capAtMaxWidth: tier == HomePageLayoutTier.expanded,
+  );
 }
 
 double continueReadingItemWidthFor(HomePageLayoutTier tier) {

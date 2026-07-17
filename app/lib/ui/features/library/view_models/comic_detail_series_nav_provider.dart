@@ -45,6 +45,18 @@ class ComicDetailSeriesNavData {
       hasNext ? items[currentIndex + 1] : null;
 }
 
+class ComicDetailSeriesNavSeriesData {
+  const ComicDetailSeriesNavSeriesData({
+    required this.seriesId,
+    required this.seriesName,
+    required this.items,
+  });
+
+  final String seriesId;
+  final String seriesName;
+  final List<ComicDetailSeriesNavItem> items;
+}
+
 sealed class ComicDetailSeriesNavResult {
   const ComicDetailSeriesNavResult();
 }
@@ -86,6 +98,83 @@ List<Series> findSeriesListContainingComic(
       .toList();
 }
 
+Future<ComicDetailSeriesNavSeriesData?> buildSeriesNavData(
+  Ref ref,
+  Series series,
+) async {
+  final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
+    ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
+  final ComicRepository repo = ref.read(comicRepoProvider);
+  final List<ComicDetailSeriesNavItem> items = <ComicDetailSeriesNavItem>[];
+  for (int index = 0; index < sortedItems.length; index++) {
+    final SeriesItem item = sortedItems[index];
+    final String title = await resolveComicTitleForDisplay(repo, item.comicId);
+    items.add(
+      ComicDetailSeriesNavItem(
+        displayIndex: index + 1,
+        comicId: item.comicId,
+        title: title,
+      ),
+    );
+  }
+  if (items.isEmpty) {
+    return null;
+  }
+  return ComicDetailSeriesNavSeriesData(
+    seriesId: series.id,
+    seriesName: series.name,
+    items: items,
+  );
+}
+
+ComicDetailSeriesNavResult resolveComicDetailSeriesNavResult(
+  List<Series> allSeries,
+  String comicId,
+  ComicDetailSeriesNavSeriesData? seriesData,
+) {
+  final List<Series> matches = findSeriesListContainingComic(
+    allSeries,
+    comicId,
+  );
+  if (matches.isEmpty) {
+    return const ComicDetailSeriesNavNone();
+  }
+  if (matches.length > 1) {
+    return ComicDetailSeriesNavConflict(
+      matches.map((Series series) => series.name).toList(),
+    );
+  }
+  if (seriesData == null) {
+    return const ComicDetailSeriesNavNone();
+  }
+  final int currentIndex = seriesData.items.indexWhere(
+    (ComicDetailSeriesNavItem item) => item.comicId == comicId,
+  );
+  if (currentIndex < 0) {
+    return const ComicDetailSeriesNavNone();
+  }
+  return ComicDetailSeriesNavReady(
+    ComicDetailSeriesNavData(
+      seriesId: seriesData.seriesId,
+      seriesName: seriesData.seriesName,
+      items: seriesData.items,
+      currentIndex: currentIndex,
+    ),
+  );
+}
+
+@Riverpod(keepAlive: true)
+Future<ComicDetailSeriesNavSeriesData?> comicDetailSeriesNavForSeries(
+  Ref ref,
+  String seriesId,
+) async {
+  final Series? series = await ref.watch(seriesByIdProvider(seriesId).future);
+  if (series == null) {
+    return null;
+  }
+  return buildSeriesNavData(ref, series);
+}
+
 @Riverpod(keepAlive: true)
 Future<ComicDetailSeriesNavResult> comicDetailSeriesNav(
   Ref ref,
@@ -105,34 +194,8 @@ Future<ComicDetailSeriesNavResult> comicDetailSeriesNav(
     );
   }
 
-  final Series series = matches.single;
-  final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
-    ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
-  final ComicRepository repo = ref.read(comicRepoProvider);
-  final List<ComicDetailSeriesNavItem> items = <ComicDetailSeriesNavItem>[];
-  for (int index = 0; index < sortedItems.length; index++) {
-    final SeriesItem item = sortedItems[index];
-    final String title = await resolveComicTitleForDisplay(repo, item.comicId);
-    items.add(
-      ComicDetailSeriesNavItem(
-        displayIndex: index + 1,
-        comicId: item.comicId,
-        title: title,
-      ),
-    );
-  }
-  final int currentIndex = items.indexWhere(
-    (ComicDetailSeriesNavItem item) => item.comicId == comicId,
+  final ComicDetailSeriesNavSeriesData? seriesData = await ref.watch(
+    comicDetailSeriesNavForSeriesProvider(matches.single.id).future,
   );
-  if (currentIndex < 0) {
-    return const ComicDetailSeriesNavNone();
-  }
-  return ComicDetailSeriesNavReady(
-    ComicDetailSeriesNavData(
-      seriesId: series.id,
-      seriesName: series.name,
-      items: items,
-      currentIndex: currentIndex,
-    ),
-  );
+  return resolveComicDetailSeriesNavResult(allSeries, comicId, seriesData);
 }

@@ -27,6 +27,8 @@ abstract class ComicRepository {
   Future<void> updateUserMeta(
     String comicId, {
     String? title,
+    String? description,
+    DateTime? publishedAt,
     List<Author>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,

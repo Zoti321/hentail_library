@@ -1,21 +1,20 @@
-use sea_orm::{
-    ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, QueryFilter, Set, Statement,
-    TransactionTrait,
-};
+use sea_orm::{ActiveModelTrait, ConnectionTrait, Set, Statement, TransactionTrait};
 
 use crate::comic::dto::{now_ms, ComicDto};
 use crate::comic::repository::load_comics_ordered;
 use crate::db::{connection, map_db_err};
-use crate::entity::{comic_authors, comic_meta, comic_tags, comics, prelude::*};
+use crate::entity::{comic_meta, comics};
 use crate::error::HentaiError;
 use crate::sync::series_rebuild::rebuild_series_from_comics;
 use crate::sync::writer::{replace_comic_authors, replace_comic_tags};
+use crate::util::decode_basic_html_entities;
 
 #[derive(Debug, Clone, Default)]
 pub struct UpdateComicUserMetaDto {
     pub title: Option<String>,
     pub content_rating: Option<String>,
     pub description: Option<String>,
+    /// Milliseconds since epoch, or `-1` to clear stored value.
     pub published_at: Option<i64>,
     pub authors: Option<Vec<String>>,
     pub tags: Option<Vec<String>>,
@@ -73,7 +72,7 @@ pub async fn update_comic_user_meta(
             ..Default::default()
         };
         if let Some(title) = meta.title {
-            active.title = Set(title);
+            active.title = Set(decode_basic_html_entities(&title));
             meta_touched = true;
         }
         if let Some(content_rating) = meta.content_rating {
@@ -81,11 +80,19 @@ pub async fn update_comic_user_meta(
             meta_touched = true;
         }
         if let Some(description) = meta.description {
-            active.description = Set(Some(description));
+            active.description = Set(if description.is_empty() {
+                None
+            } else {
+                Some(description)
+            });
             meta_touched = true;
         }
         if let Some(published_at) = meta.published_at {
-            active.published_at = Set(Some(published_at));
+            active.published_at = Set(if published_at < 0 {
+                None
+            } else {
+                Some(published_at)
+            });
             meta_touched = true;
         }
         active.update(&txn).await.map_err(map_db_err)?;

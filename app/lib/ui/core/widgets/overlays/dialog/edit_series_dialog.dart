@@ -3,9 +3,20 @@ import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+/// 打开系列编辑表面：medium/expanded 为 dialog，compact 为全页。
+Future<void> showEditSeriesDialog({
+  required BuildContext context,
+  required Series series,
+}) {
+  return showAdaptiveFormSurfaceWidget<void>(
+    context: context,
+    surface: EditSeriesDialog(series: series),
+  );
+}
 
 class EditSeriesDialog extends ConsumerStatefulWidget {
   const EditSeriesDialog({super.key, required this.series});
@@ -90,10 +101,10 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
-    return HentaiDialog(
+    return AdaptiveFormSurface(
       title: '编辑系列',
-      width: 480,
-      content: Column(
+      maxDialogWidth: 480,
+      body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: tokens.spacing.md,
         children: <Widget>[

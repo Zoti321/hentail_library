@@ -6,8 +6,8 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `failed_progress`, `map_phase`, `map_progress`, `map_route`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`
+// These functions are ignored because they are not marked as `pub`: `failed_progress`, `map_phase`, `map_progress`, `map_route`, `map_scan_mode`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
 
 SyncHandleDto createSyncHandleFrb() =>
     RustLib.instance.api.crateApiSyncCreateSyncHandleFrb();
@@ -17,7 +17,11 @@ void cancelSyncFrb({required SyncHandleDto handle}) =>
 
 Stream<SyncLibraryProgressDto> syncLibraryFrb({
   required SyncHandleDto handle,
-}) => RustLib.instance.api.crateApiSyncSyncLibraryFrb(handle: handle);
+  required SyncScanModeDto scanMode,
+}) => RustLib.instance.api.crateApiSyncSyncLibraryFrb(
+  handle: handle,
+  scanMode: scanMode,
+);
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>
 abstract class SyncHandleDto implements RustOpaqueInterface {}
@@ -149,3 +153,5 @@ class SyncLibraryProgressDto {
 }
 
 enum SyncLibraryRouteDto { noRootsNoop, noRootsCleared, withRoots }
+
+enum SyncScanModeDto { incremental, full }

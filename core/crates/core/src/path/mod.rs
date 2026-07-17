@@ -1,6 +1,4 @@
-use sea_orm::{
-    ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, QueryFilter, Set,
-};
+use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, Set};
 
 use crate::comic::read_data_version;
 use crate::db::{connection, map_db_err};
@@ -18,7 +16,6 @@ pub async fn add_path(raw_path: &str) -> Result<(), HentaiError> {
     let active = saved_paths::ActiveModel {
         raw_path: Set(raw_path.to_string()),
         security_bookmark: Set(None),
-        ..Default::default()
     };
     SavedPaths::insert(active)
         .on_conflict(

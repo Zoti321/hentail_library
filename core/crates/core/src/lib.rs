@@ -34,7 +34,7 @@ pub use error::{HentaiError, HentaiErrorCode};
 pub use path::{add_path, list_all_paths, remove_path, watch_paths};
 pub use sync::{
     LibrarySyncCountsDto, SyncHandle, SyncLibraryPhaseDto, SyncLibraryProgressDto,
-    SyncLibraryRouteDto, cancel_sync, create_sync_handle, sync_library,
+    SyncLibraryRouteDto, SyncScanMode, cancel_sync, create_sync_handle, sync_library,
 };
 pub use reader::{
     ReaderPageDto, ReaderPageListDto, clear_reader_page_cache, clear_reader_sessions,
@@ -45,11 +45,12 @@ pub use series_id::{
     folder_path_from_comic_path, series_id_from_folder_path, series_name_from_folder_path,
 };
 pub use series::{
-    count_all_series, fetch_series_page, find_series_by_id, get_all_series,
-    load_home_series_comic_order_map, search_series_by_keyword, search_series_by_tag_expression,
-    set_series_items_order, update_series_user_meta, watch_all_series,
-    watch_home_series_comic_order_map, PagedSeriesResultDto, SeriesDto, SeriesFilterDto,
-    SeriesItemDto, SeriesSortFieldDto, SeriesSortOptionDto, UpdateSeriesUserMetaDto,
+    count_all_series, fetch_series_comics_metadata, fetch_series_comics_page, fetch_series_page,
+    find_series_by_id, get_all_series, load_home_series_comic_order_map, search_series_by_keyword,
+    search_series_by_tag_expression, set_series_items_order, update_series_user_meta,
+    watch_all_series, watch_home_series_comic_order_map, PagedSeriesResultDto,
+    SeriesComicsMetadataDto, SeriesDto, SeriesFilterDto, SeriesItemDto, SeriesSortFieldDto,
+    SeriesSortOptionDto, UpdateSeriesUserMetaDto,
 };
 pub use history::{
     PagedReadingHistoryDto, ReadingHistoryDto, SeriesReadingHistoryDto, clear_all_reading,

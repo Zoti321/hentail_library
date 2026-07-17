@@ -2,7 +2,8 @@ use std::path::Path;
 use std::sync::Mutex;
 
 use hentai_core::{
-    connection, fetch_reading_page, init_db_at_path, record_reading, ReadingHistoryDto,
+    connection, fetch_reading_page, get_reading_by_comic_id, init_db_at_path, record_reading,
+    ReadingHistoryDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -131,6 +132,31 @@ fn fetch_reading_page_treats_blank_keyword_as_unfiltered() {
                 .expect("page");
             assert_eq!(page.total_count, 5);
             assert_eq!(page.items.len(), 5);
+        });
+    });
+}
+
+#[test]
+fn record_reading_decodes_html_entities_in_title() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        create_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            record_reading(&ReadingHistoryDto {
+                comic_id: "entity-comic".to_string(),
+                title: "Heaven&#039;s Feel".to_string(),
+                last_read_time_ms: 9_000,
+                page_index: Some(2),
+            })
+            .await
+            .expect("record reading");
+
+            let row = get_reading_by_comic_id("entity-comic")
+                .await
+                .expect("load")
+                .expect("row");
+            assert_eq!(row.title, "Heaven's Feel");
         });
     });
 }

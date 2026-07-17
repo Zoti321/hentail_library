@@ -1,8 +1,6 @@
-import 'dart:math' as math;
-
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 
-const double historyContentMaxWidth = 1280;
 const double kHistoryHeaderVerticalPadding = 6;
 const double kHistoryHeaderShadowGradientHeight = 6;
 const double kHistorySubtitleToSearchSpacing = 12;
@@ -42,12 +40,11 @@ double historyInnerContentMaxWidth(
   HistoryLayoutTier tier,
   double viewportWidth,
 ) {
-  final double horizontalPadding = historyContentHorizontalPadding(tier);
-  final double paddedWidth = viewportWidth - horizontalPadding * 2;
-  return switch (tier) {
-    HistoryLayoutTier.expanded => math.min(paddedWidth, historyContentMaxWidth),
-    HistoryLayoutTier.compact || HistoryLayoutTier.medium => paddedWidth,
-  };
+  return pageInnerContentMaxWidth(
+    viewportWidth: viewportWidth,
+    horizontalPadding: historyContentHorizontalPadding(tier),
+    capAtMaxWidth: tier == HistoryLayoutTier.expanded,
+  );
 }
 
 HistoryGridMetrics historyGridMetrics(
@@ -60,7 +57,7 @@ HistoryGridMetrics historyGridMetrics(
     HistoryLayoutTier.compact => (crossAxisCount: 1, mainAxisExtent: 120.0),
     HistoryLayoutTier.medium => (crossAxisCount: 2, mainAxisExtent: 132.0),
     HistoryLayoutTier.expanded =>
-      paddedWidth >= historyContentMaxWidth
+      paddedWidth >= kPageContentMaxWidth
           ? (crossAxisCount: 4, mainAxisExtent: 138.0)
           : (crossAxisCount: 3, mainAxisExtent: 138.0),
   };

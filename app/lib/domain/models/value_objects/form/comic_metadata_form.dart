@@ -10,6 +10,8 @@ part 'comic_metadata_form.freezed.dart';
 abstract class ComicMetadataForm with _$ComicMetadataForm {
   factory ComicMetadataForm({
     required String title,
+    String? description,
+    DateTime? publishedAt,
     @Default(false) bool isR18,
     @Default([]) List<Tag> tags,
     @Default([]) List<Author> authors,
@@ -21,6 +23,8 @@ extension ComicMetadataFormPersistence on ComicMetadataForm {
     return repository.updateUserMeta(
       comicId,
       title: title,
+      description: description ?? '',
+      publishedAt: publishedAt,
       authors: authors,
       contentRating: isR18 ? ContentRating.r18 : ContentRating.safe,
       tags: tags,

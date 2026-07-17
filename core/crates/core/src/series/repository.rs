@@ -2,10 +2,13 @@ use std::collections::HashMap;
 
 use sea_orm::{
     ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, PaginatorTrait, QueryFilter,
-    QueryOrder, Set, Statement, TransactionTrait,
+    QueryOrder, Statement, TransactionTrait,
 };
 
-use crate::comic::{read_data_version, search_comic_ids_by_tag_expression, PageRequestDto};
+use crate::comic::{
+    load_comics_ordered, read_data_version, search_comic_ids_by_tag_expression, PageRequestDto,
+    PagedComicResultDto,
+};
 use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
@@ -36,6 +39,13 @@ pub struct PagedSeriesResultDto {
     pub total_count: i64,
     pub page: i32,
     pub page_size: i32,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct SeriesComicsMetadataDto {
+    pub authors: Vec<String>,
+    pub tags: Vec<String>,
+    pub has_r18: bool,
 }
 
 pub async fn watch_all_series(
@@ -142,6 +152,64 @@ async fn query_series_ids(
         .collect()
 }
 
+pub async fn fetch_series_comics_page(
+    series_id: &str,
+    request: PageRequestDto,
+) -> Result<PagedComicResultDto, HentaiError> {
+    let db = connection()?;
+    if !series_exists(&db, series_id).await? {
+        return Ok(PagedComicResultDto {
+            items: vec![],
+            total_count: 0,
+            page: 1,
+            page_size: request.page_size.max(1),
+        });
+    }
+    let page_size = request.page_size.max(1);
+    let total_count = count_series_items(&db, series_id).await?;
+    let total_pages = if total_count <= 0 {
+        0
+    } else {
+        (total_count + page_size as i64 - 1) / page_size as i64
+    };
+    let mut effective_page = request.page.max(1);
+    if total_pages > 0 && effective_page as i64 > total_pages {
+        effective_page = total_pages as i32;
+    }
+    if total_count <= 0 {
+        return Ok(PagedComicResultDto {
+            items: vec![],
+            total_count: 0,
+            page: 1,
+            page_size,
+        });
+    }
+    let offset = (effective_page - 1) * page_size;
+    let comic_ids =
+        query_series_comic_ids_page(&db, series_id, page_size, offset).await?;
+    let items = load_comics_ordered(&db, comic_ids).await?;
+    Ok(PagedComicResultDto {
+        items,
+        total_count,
+        page: effective_page,
+        page_size,
+    })
+}
+
+pub async fn fetch_series_comics_metadata(
+    series_id: &str,
+) -> Result<SeriesComicsMetadataDto, HentaiError> {
+    let db = connection()?;
+    if !series_exists(&db, series_id).await? {
+        return Ok(SeriesComicsMetadataDto::default());
+    }
+    Ok(SeriesComicsMetadataDto {
+        authors: query_series_author_names(&db, series_id).await?,
+        tags: query_series_tag_names(&db, series_id).await?,
+        has_r18: query_series_has_r18(&db, series_id).await?,
+    })
+}
+
 pub async fn find_series_by_id(series_id: &str) -> Result<Option<SeriesDto>, HentaiError> {
     let db = connection()?;
     let exists = Series::find_by_id(series_id)
@@ -220,6 +288,128 @@ pub async fn search_series_by_tag_expression(
         ids.insert(row.series_id);
     }
     load_series_by_ids(&db, ids.into_iter().collect()).await
+}
+
+async fn series_exists(db: &DatabaseConnection, series_id: &str) -> Result<bool, HentaiError> {
+    Series::find_by_id(series_id)
+        .one(db)
+        .await
+        .map_err(map_db_err)
+        .map(|row| row.is_some())
+}
+
+async fn count_series_items(
+    db: &DatabaseConnection,
+    series_id: &str,
+) -> Result<i64, HentaiError> {
+    let stmt = Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "SELECT COUNT(*) FROM series_items WHERE series_id = ?",
+        vec![sea_orm::Value::String(Some(Box::new(series_id.to_string())))],
+    );
+    let row = db
+        .query_one(stmt)
+        .await
+        .map_err(map_db_err)?
+        .ok_or_else(|| HentaiError::db_query_failed("series item count 无结果", None))?;
+    row.try_get_by_index::<i64>(0)
+        .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+}
+
+async fn query_series_comic_ids_page(
+    db: &DatabaseConnection,
+    series_id: &str,
+    page_size: i32,
+    offset: i32,
+) -> Result<Vec<String>, HentaiError> {
+    let stmt = Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "SELECT comic_id FROM series_items \
+         WHERE series_id = ? \
+         ORDER BY sort_order ASC, comic_id ASC \
+         LIMIT ? OFFSET ?",
+        vec![
+            sea_orm::Value::String(Some(Box::new(series_id.to_string()))),
+            sea_orm::Value::Int(Some(page_size as i32)),
+            sea_orm::Value::Int(Some(offset as i32)),
+        ],
+    );
+    let rows = db.query_all(stmt).await.map_err(map_db_err)?;
+    rows.into_iter()
+        .map(|row| {
+            row.try_get_by_index::<String>(0)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+        })
+        .collect()
+}
+
+async fn query_series_author_names(
+    db: &DatabaseConnection,
+    series_id: &str,
+) -> Result<Vec<String>, HentaiError> {
+    let stmt = Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "SELECT DISTINCT ca.author_name \
+         FROM series_items si \
+         INNER JOIN comic_authors ca ON ca.comic_id = si.comic_id \
+         WHERE si.series_id = ? \
+         ORDER BY ca.author_name ASC",
+        vec![sea_orm::Value::String(Some(Box::new(series_id.to_string())))],
+    );
+    query_string_column(db, stmt).await
+}
+
+async fn query_series_tag_names(
+    db: &DatabaseConnection,
+    series_id: &str,
+) -> Result<Vec<String>, HentaiError> {
+    let stmt = Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "SELECT DISTINCT ct.tag_name \
+         FROM series_items si \
+         INNER JOIN comic_tags ct ON ct.comic_id = si.comic_id \
+         WHERE si.series_id = ? \
+         ORDER BY ct.tag_name ASC",
+        vec![sea_orm::Value::String(Some(Box::new(series_id.to_string())))],
+    );
+    query_string_column(db, stmt).await
+}
+
+async fn query_series_has_r18(
+    db: &DatabaseConnection,
+    series_id: &str,
+) -> Result<bool, HentaiError> {
+    let stmt = Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "SELECT EXISTS( \
+           SELECT 1 \
+           FROM series_items si \
+           INNER JOIN comic_meta cm ON cm.comic_id = si.comic_id \
+           WHERE si.series_id = ? AND cm.content_rating = 'r18' \
+         )",
+        vec![sea_orm::Value::String(Some(Box::new(series_id.to_string())))],
+    );
+    let row = db
+        .query_one(stmt)
+        .await
+        .map_err(map_db_err)?
+        .ok_or_else(|| HentaiError::db_query_failed("series has_r18 无结果", None))?;
+    row.try_get_by_index::<i64>(0)
+        .map(|value| value != 0)
+        .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+}
+
+async fn query_string_column(
+    db: &DatabaseConnection,
+    stmt: Statement,
+) -> Result<Vec<String>, HentaiError> {
+    let rows = db.query_all(stmt).await.map_err(map_db_err)?;
+    rows.into_iter()
+        .map(|row| {
+            row.try_get_by_index::<String>(0)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+        })
+        .collect()
 }
 
 async fn load_all_series(db: &DatabaseConnection) -> Result<Vec<SeriesDto>, HentaiError> {

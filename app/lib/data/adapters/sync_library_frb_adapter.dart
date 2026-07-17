@@ -12,6 +12,7 @@ class SyncLibraryFrbAdapter {
   rust.SyncHandleDto? _activeHandle;
 
   Future<void> call({
+    ScanMode scanMode = ScanMode.incremental,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   }) async {
@@ -19,7 +20,10 @@ class SyncLibraryFrbAdapter {
     _activeHandle = handle;
     try {
       await for (final rust.SyncLibraryProgressDto event in guardFrbStream(
-        () => rust.syncLibraryFrb(handle: handle),
+        () => rust.syncLibraryFrb(
+          handle: handle,
+          scanMode: _mapScanMode(scanMode),
+        ),
         fallbackMessage: '漫画库同步失败',
       )) {
         if (isCancelled()) {
@@ -51,6 +55,13 @@ class SyncLibraryFrbAdapter {
       rust.cancelSyncFrb(handle: handle);
     }
   }
+}
+
+rust.SyncScanModeDto _mapScanMode(ScanMode mode) {
+  return switch (mode) {
+    ScanMode.incremental => rust.SyncScanModeDto.incremental,
+    ScanMode.full => rust.SyncScanModeDto.full,
+  };
 }
 
 SyncLibraryProgress mapRustSyncProgress(rust.SyncLibraryProgressDto dto) {

@@ -118,7 +118,7 @@ impl ThumbnailQueue {
         self.events.subscribe()
     }
 
-    pub async fn stats_snapshot(&self) -> QueueStats {
+    async fn stats_snapshot(&self) -> QueueStats {
         let inner = self.inner.lock().await;
         QueueStats {
             total: inner.stats.total,
@@ -176,10 +176,11 @@ impl ThumbnailQueue {
             });
         }
         self.notify_waiters(comic_id).await;
-        if {
+        let has_pending = {
             let inner = self.inner.lock().await;
             inner.has_pending()
-        } {
+        };
+        if has_pending {
             self.notify_workers.notify_one();
         }
     }

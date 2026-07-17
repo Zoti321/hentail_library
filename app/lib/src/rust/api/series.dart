@@ -9,7 +9,7 @@ import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_series_list`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Stream<List<SeriesDto>> watchAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesWatchAllSeriesFrb();
@@ -32,6 +32,20 @@ PagedSeriesResultDto fetchSeriesPageFrb({
 
 SeriesDto? findSeriesByIdFrb({required String seriesId}) =>
     RustLib.instance.api.crateApiSeriesFindSeriesByIdFrb(seriesId: seriesId);
+
+PagedComicResultDto fetchSeriesComicsPageFrb({
+  required String seriesId,
+  required PageRequestDto request,
+}) => RustLib.instance.api.crateApiSeriesFetchSeriesComicsPageFrb(
+  seriesId: seriesId,
+  request: request,
+);
+
+SeriesComicsMetadataDto fetchSeriesComicsMetadataFrb({
+  required String seriesId,
+}) => RustLib.instance.api.crateApiSeriesFetchSeriesComicsMetadataFrb(
+  seriesId: seriesId,
+);
 
 void updateSeriesUserMetaFrb({
   required String seriesId,
@@ -114,6 +128,33 @@ class SeriesComicOrderEntryDto {
           runtimeType == other.runtimeType &&
           key == other.key &&
           sortOrder == other.sortOrder;
+}
+
+class SeriesComicsMetadataDto {
+  final List<String> authors;
+  final List<String> tags;
+  final bool hasR18;
+
+  const SeriesComicsMetadataDto({
+    required this.authors,
+    required this.tags,
+    required this.hasR18,
+  });
+
+  static Future<SeriesComicsMetadataDto> default_() =>
+      RustLib.instance.api.crateApiSeriesSeriesComicsMetadataDtoDefault();
+
+  @override
+  int get hashCode => authors.hashCode ^ tags.hashCode ^ hasR18.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesComicsMetadataDto &&
+          runtimeType == other.runtimeType &&
+          authors == other.authors &&
+          tags == other.tags &&
+          hasR18 == other.hasR18;
 }
 
 /// FRB 层 DTO：字段与 `hentai_core::SeriesDto` 对齐。

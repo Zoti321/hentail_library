@@ -1,12 +1,15 @@
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/series_frb_mapper.dart';
+import 'package:hentai_library/data/repositories/comic_frb_mapper.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
 import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 
@@ -61,6 +64,30 @@ class SeriesRepositoryImpl implements SeriesRepository {
       fallbackMessage: '读取系列失败',
     );
     return dto == null ? null : mapRustSeries(dto);
+  }
+
+  @override
+  Future<PagedResult<Comic>> fetchComicsPage({
+    required String seriesId,
+    required PageRequest request,
+  }) async {
+    final page = guardFrbSync(
+      () => rust_series.fetchSeriesComicsPageFrb(
+        seriesId: seriesId,
+        request: mapSeriesPageRequest(request),
+      ),
+      fallbackMessage: '读取系列漫画分页失败',
+    );
+    return mapPagedResult(page);
+  }
+
+  @override
+  Future<SeriesComicsMetadata> fetchComicsMetadata(String seriesId) async {
+    final rust_series.SeriesComicsMetadataDto dto = guardFrbSync(
+      () => rust_series.fetchSeriesComicsMetadataFrb(seriesId: seriesId),
+      fallbackMessage: '读取系列漫画元数据失败',
+    );
+    return mapRustSeriesComicsMetadata(dto);
   }
 
   @override
