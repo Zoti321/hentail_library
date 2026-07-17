@@ -125,6 +125,13 @@ SeriesDetailComicsCatalogState _catalogState(List<Comic> comics) {
   );
 }
 
+/// Same reloading shape Riverpod emits after dependency invalidation.
+AsyncValue<T> _asyncReloadingWithPrevious<T>(T previous) {
+  return AsyncLoading<T>()
+  // ignore: invalid_use_of_internal_member
+  .copyWithPrevious(AsyncData<T>(previous), isRefresh: false);
+}
+
 void main() {
   test(
     'dependency reload makes catalog AsyncValue isReloading with previous value',
@@ -163,7 +170,7 @@ void main() {
       final String branch = midReload.when(
         data: (_) => 'data',
         loading: () => 'loading',
-        error: (Object _, StackTrace __) => 'error',
+        error: (Object error, StackTrace stackTrace) => 'error',
       );
       expect(branch, 'loading');
 
@@ -221,11 +228,7 @@ void main() {
       await tester.pump();
       expect(scrollController.offset, 240);
 
-      catalogAsync.value = const AsyncLoading<SeriesDetailComicsCatalogState>()
-          .copyWithPrevious(
-            AsyncData<SeriesDetailComicsCatalogState>(catalog),
-            isRefresh: false,
-          );
+      catalogAsync.value = _asyncReloadingWithPrevious(catalog);
       await tester.pump();
 
       expect(scrollController.offset, 0);
@@ -278,11 +281,7 @@ void main() {
       scrollController.jumpTo(240);
       await tester.pump();
 
-      catalogAsync.value = const AsyncLoading<SeriesDetailComicsCatalogState>()
-          .copyWithPrevious(
-            AsyncData<SeriesDetailComicsCatalogState>(catalog),
-            isRefresh: false,
-          );
+      catalogAsync.value = _asyncReloadingWithPrevious(catalog);
       await tester.pump();
 
       expect(scrollController.offset, 240);
