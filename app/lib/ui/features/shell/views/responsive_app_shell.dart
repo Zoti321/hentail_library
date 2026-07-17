@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
-import 'package:hentai_library/ui/core/widgets/chrome/app_shell_header.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/app_title_bar.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/diagnostic_mode_banner.dart';
 import 'package:hentai_library/ui/core/widgets/navigation/desktop_sidebar.dart';
@@ -42,10 +41,6 @@ class ResponsiveAppShell extends ConsumerStatefulWidget {
 class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
   void _onSidebarDestinationSelected(String id) {
     AppNavigation.goToNavId(context, id);
-  }
-
-  void _openNavigationDrawer() {
-    appShellScaffoldKey.currentState?.openDrawer();
   }
 
   _ShellLayoutMode _layoutModeForWidth(double width) {
@@ -121,12 +116,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
               : null,
           body: Column(
             children: <Widget>[
-              _ShellTitleBar(
-                isReaderRoute: isReaderRoute,
-                path: path,
-                showNavigationMenu: useDrawer && !isReaderRoute,
-                onOpenNavigation: _openNavigationDrawer,
-              ),
+              _ShellTitleBar(isReaderRoute: isReaderRoute),
               const DiagnosticModeBanner(),
               Expanded(
                 child: isReaderRoute
@@ -164,17 +154,9 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
 }
 
 class _ShellTitleBar extends ConsumerWidget {
-  const _ShellTitleBar({
-    required this.isReaderRoute,
-    required this.path,
-    required this.showNavigationMenu,
-    required this.onOpenNavigation,
-  });
+  const _ShellTitleBar({required this.isReaderRoute});
 
   final bool isReaderRoute;
-  final String path;
-  final bool showNavigationMenu;
-  final VoidCallback onOpenNavigation;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -195,9 +177,10 @@ class _ShellTitleBar extends ConsumerWidget {
       return const AppTitleBar();
     }
 
-    return AppShellHeader(
-      title: AppNavigation.pageTitleForPath(path),
-      onMenuPressed: showNavigationMenu ? onOpenNavigation : null,
+    // 移动端各页自带标题与汉堡菜单；此处只占位状态栏，避免双 header。
+    return ColoredBox(
+      color: Theme.of(context).colorScheme.surface,
+      child: const SafeArea(bottom: false, child: SizedBox.shrink()),
     );
   }
 }
