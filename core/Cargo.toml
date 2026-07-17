@@ -6,3 +6,9 @@ members = ["crates/core", "crates/flutter"]
 edition = "2021"
 license = "MIT"
 version = "0.1.0"
+
+# Flutter Android debug packs `libhentai_flutter.so` into the APK. Full debuginfo
+# produced a ~200MB cdylib; dlopen blocked before the first Flutter frame (white splash).
+[profile.dev]
+debug = "line-tables-only"
+strip = "debuginfo"

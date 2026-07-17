@@ -1,11 +1,9 @@
 use sea_orm::{ConnectionTrait, Statement};
 use sea_orm_migration::prelude::*;
 
-/// Creates the Drift v2 base schema for greenfield installs.
-///
-/// Previously this migration was a no-op and assumed an existing Drift DB
-/// (see `seed_drift_v2_if_needed`). Fresh Android/desktop installs then had an
-/// empty SQLite file with no tables.
+/// Ensures the current schema exists for installs that already applied earlier
+/// migrations while `m20240630_000002_drift_v2_seed` was still a no-op
+/// (empty DB, no tables, but seaql_migrations fully populated).
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
@@ -14,9 +12,19 @@ CREATE TABLE IF NOT EXISTS comics (
   comic_id TEXT NOT NULL PRIMARY KEY,
   path TEXT NOT NULL,
   resource_type TEXT NOT NULL,
+  resource_size INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL DEFAULT 0,
+  last_updated_at INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS comic_meta (
+  comic_id TEXT NOT NULL PRIMARY KEY,
   title TEXT NOT NULL,
   content_rating TEXT NOT NULL DEFAULT 'unknown',
-  page_count INTEGER
+  page_count INTEGER NOT NULL CHECK (page_count > 0),
+  description TEXT,
+  published_at INTEGER,
+  FOREIGN KEY(comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS tags (
@@ -57,15 +65,17 @@ CREATE TABLE IF NOT EXISTS series_items (
   comic_id TEXT NOT NULL,
   sort_order INTEGER NOT NULL,
   PRIMARY KEY (series_id, comic_id),
-  UNIQUE(comic_id),
-  FOREIGN KEY(series_id) REFERENCES series(series_id) ON DELETE CASCADE,
-  FOREIGN KEY(comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE
+  UNIQUE (comic_id),
+  FOREIGN KEY (series_id) REFERENCES series(series_id) ON DELETE CASCADE,
+  FOREIGN KEY (comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS comic_thumbnails (
   comic_id TEXT NOT NULL PRIMARY KEY,
   thumbnail BLOB NOT NULL,
   updated_at INTEGER NOT NULL,
+  source_modified_ms INTEGER NOT NULL DEFAULT 0,
+  source_size INTEGER NOT NULL DEFAULT 0,
   FOREIGN KEY(comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE
 );
 
