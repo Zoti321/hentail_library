@@ -12,6 +12,7 @@ class DesktopSidebar extends StatelessWidget {
   final String activeId;
   final bool isExpanded;
   final bool showCollapseToggle;
+  final bool applyDrawerTopInset;
   final VoidCallback onToggleExpanded;
   final ValueChanged<String> onDestinationSelected;
 
@@ -20,6 +21,7 @@ class DesktopSidebar extends StatelessWidget {
     required this.activeId,
     required this.isExpanded,
     this.showCollapseToggle = true,
+    this.applyDrawerTopInset = false,
     required this.onToggleExpanded,
     required this.onDestinationSelected,
   });
@@ -28,6 +30,10 @@ class DesktopSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final double topPadding = applyDrawerTopInset
+        ? MediaQuery.viewPaddingOf(context).top + tokens.spacing.lg
+        : 0;
 
     final List<NavItemData> menuItems = AppNavigation.desktopMainNavItems;
     final List<NavItemData> systemItems = AppNavigation.desktopSystemNavItems;
@@ -41,7 +47,7 @@ class DesktopSidebar extends StatelessWidget {
         color: cs.hentai.sidebarBackground,
         border: Border(right: BorderSide(color: cs.hentai.borderSubtle)),
       ),
-      padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
+      padding: EdgeInsets.fromLTRB(8, topPadding, 8, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
