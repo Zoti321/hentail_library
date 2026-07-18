@@ -13,8 +13,6 @@ import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-const double kSearchResultCardWidth = 200;
-
 class SearchedPage extends ConsumerStatefulWidget {
   const SearchedPage({super.key, required this.query});
 
@@ -102,10 +100,8 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
         searchedComics.hasError || searchedSeriesDataAsync.hasError;
     final Object? error = searchedComics.error ?? searchedSeriesDataAsync.error;
 
-    final double cardHeight = libraryGridMainAxisExtentFromTokens(
-      tokens,
-      layoutTier,
-    );
+    final double cardWidth = libraryGridMaxCrossAxisExtent(layoutTier);
+    final double cardHeight = catalogCoverCardMainAxisExtent(tokens, cardWidth);
     final Widget headerSection = trimmedQuery.isEmpty
         ? SearchedPageHeaderSection(
             layoutTier: layoutTier,
@@ -178,7 +174,7 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                         itemBuilder: (BuildContext context, int index) {
                           final Series item = series[index];
                           return SizedBox(
-                            width: kSearchResultCardWidth,
+                            width: cardWidth,
                             child: SeriesCard(
                               key: Key('search-series-${item.id}'),
                               series: item,
@@ -200,7 +196,7 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                         itemBuilder: (BuildContext context, int index) {
                           final Comic comic = comics[index];
                           return SizedBox(
-                            width: kSearchResultCardWidth,
+                            width: cardWidth,
                             child: ComicCard(
                               key: Key('search-comic-${comic.comicId}'),
                               comic: comic,

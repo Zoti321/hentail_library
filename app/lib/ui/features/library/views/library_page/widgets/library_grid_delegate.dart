@@ -1,12 +1,12 @@
 part of 'library_page_widgets.dart';
 
-double libraryGridMainAxisExtentFromTokens(
+/// Main-axis extent for a flush-cover [CatalogCoverCardShell] at [cardWidth].
+double catalogCoverCardMainAxisExtent(
   AppThemeTokens tokens,
-  LibraryLayoutTier layoutTier,
+  double cardWidth,
 ) {
-  final double maxCrossAxisExtent = libraryGridMaxCrossAxisExtent(layoutTier);
   // CatalogCoverCardShell: 2:3 cover flush to card width (no side padding).
-  final double coverHeight = maxCrossAxisExtent * 3 / 2;
+  final double coverHeight = cardWidth * 3 / 2;
   final double coverToInfoGap = tokens.spacing.md;
   final double titleLineHeight = tokens.text.bodyMd * 1.25;
   const double infoColumnSpacing = 6;
@@ -20,6 +20,16 @@ double libraryGridMainAxisExtentFromTokens(
               infoBottomPad)
           .ceil() +
       16;
+}
+
+double libraryGridMainAxisExtentFromTokens(
+  AppThemeTokens tokens,
+  LibraryLayoutTier layoutTier,
+) {
+  return catalogCoverCardMainAxisExtent(
+    tokens,
+    libraryGridMaxCrossAxisExtent(layoutTier),
+  );
 }
 
 SliverGridDelegate libraryGridDelegateForTokens(
