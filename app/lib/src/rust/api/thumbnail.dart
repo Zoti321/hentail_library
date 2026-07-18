@@ -10,7 +10,7 @@ import 'package:freezed_annotation/freezed_annotation.dart' hide protected;
 part 'thumbnail.freezed.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_event`, `map_priority`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`
 
 ComicThumbnailDto? findThumbnailByComicIdFrb({required String comicId}) =>
     RustLib.instance.api.crateApiThumbnailFindThumbnailByComicIdFrb(
@@ -30,6 +30,43 @@ void deleteThumbnailsByComicIdsFrb({required List<String> comicIds}) => RustLib
     .api
     .crateApiThumbnailDeleteThumbnailsByComicIdsFrb(comicIds: comicIds);
 
+void setComicThumbnailFromPageFrb({
+  required String comicId,
+  required String path,
+  required String resourceType,
+  required int pageIndex,
+}) => RustLib.instance.api.crateApiThumbnailSetComicThumbnailFromPageFrb(
+  comicId: comicId,
+  path: path,
+  resourceType: resourceType,
+  pageIndex: pageIndex,
+);
+
+void setSeriesThumbnailFromPageFrb({
+  required String seriesId,
+  required String comicId,
+  required String path,
+  required String resourceType,
+  required int pageIndex,
+}) => RustLib.instance.api.crateApiThumbnailSetSeriesThumbnailFromPageFrb(
+  seriesId: seriesId,
+  comicId: comicId,
+  path: path,
+  resourceType: resourceType,
+  pageIndex: pageIndex,
+);
+
+SeriesThumbnailDto? findSeriesThumbnailBySeriesIdFrb({
+  required String seriesId,
+}) => RustLib.instance.api.crateApiThumbnailFindSeriesThumbnailBySeriesIdFrb(
+  seriesId: seriesId,
+);
+
+SeriesCoverSourceDto resolveSeriesCoverFrb({required String seriesId}) =>
+    RustLib.instance.api.crateApiThumbnailResolveSeriesCoverFrb(
+      seriesId: seriesId,
+    );
+
 Stream<ThumbnailEventDto> watchThumbnailEventsFrb() =>
     RustLib.instance.api.crateApiThumbnailWatchThumbnailEventsFrb();
 
@@ -37,16 +74,21 @@ class ComicThumbnailDto {
   final Uint8List thumbnail;
   final PlatformInt64 sourceModifiedMs;
   final PlatformInt64 sourceSize;
+  final bool isUserSet;
 
   const ComicThumbnailDto({
     required this.thumbnail,
     required this.sourceModifiedMs,
     required this.sourceSize,
+    required this.isUserSet,
   });
 
   @override
   int get hashCode =>
-      thumbnail.hashCode ^ sourceModifiedMs.hashCode ^ sourceSize.hashCode;
+      thumbnail.hashCode ^
+      sourceModifiedMs.hashCode ^
+      sourceSize.hashCode ^
+      isUserSet.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -55,7 +97,45 @@ class ComicThumbnailDto {
           runtimeType == other.runtimeType &&
           thumbnail == other.thumbnail &&
           sourceModifiedMs == other.sourceModifiedMs &&
-          sourceSize == other.sourceSize;
+          sourceSize == other.sourceSize &&
+          isUserSet == other.isUserSet;
+}
+
+@freezed
+sealed class SeriesCoverSourceDto with _$SeriesCoverSourceDto {
+  const SeriesCoverSourceDto._();
+
+  const factory SeriesCoverSourceDto.customThumbnail({
+    required Uint8List thumbnail,
+  }) = SeriesCoverSourceDto_CustomThumbnail;
+  const factory SeriesCoverSourceDto.fallbackComic({required String comicId}) =
+      SeriesCoverSourceDto_FallbackComic;
+  const factory SeriesCoverSourceDto.missing() = SeriesCoverSourceDto_Missing;
+}
+
+class SeriesThumbnailDto {
+  final Uint8List thumbnail;
+  final String sourceComicId;
+  final int sourcePageIndex;
+
+  const SeriesThumbnailDto({
+    required this.thumbnail,
+    required this.sourceComicId,
+    required this.sourcePageIndex,
+  });
+
+  @override
+  int get hashCode =>
+      thumbnail.hashCode ^ sourceComicId.hashCode ^ sourcePageIndex.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesThumbnailDto &&
+          runtimeType == other.runtimeType &&
+          thumbnail == other.thumbnail &&
+          sourceComicId == other.sourceComicId &&
+          sourcePageIndex == other.sourcePageIndex;
 }
 
 @freezed

@@ -76,7 +76,17 @@ CREATE TABLE IF NOT EXISTS comic_thumbnails (
   updated_at INTEGER NOT NULL,
   source_modified_ms INTEGER NOT NULL DEFAULT 0,
   source_size INTEGER NOT NULL DEFAULT 0,
+  is_user_set INTEGER NOT NULL DEFAULT 0,
   FOREIGN KEY(comic_id) REFERENCES comics(comic_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS series_thumbnails (
+  series_id TEXT NOT NULL PRIMARY KEY,
+  thumbnail BLOB NOT NULL,
+  updated_at INTEGER NOT NULL,
+  source_comic_id TEXT NOT NULL,
+  source_page_index INTEGER NOT NULL,
+  FOREIGN KEY(series_id) REFERENCES series(series_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS saved_paths (

@@ -143,6 +143,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  SeriesThumbnailDto dco_decode_box_autoadd_series_thumbnail_dto(dynamic raw);
+
+  @protected
   UpdateComicUserMetaFrbDto
   dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw);
 
@@ -248,6 +251,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   dco_decode_opt_box_autoadd_series_reading_history_dto(dynamic raw);
 
   @protected
+  SeriesThumbnailDto? dco_decode_opt_box_autoadd_series_thumbnail_dto(
+    dynamic raw,
+  );
+
+  @protected
   List<String>? dco_decode_opt_list_String(dynamic raw);
 
   @protected
@@ -278,6 +286,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesComicsMetadataDto dco_decode_series_comics_metadata_dto(dynamic raw);
 
   @protected
+  SeriesCoverSourceDto dco_decode_series_cover_source_dto(dynamic raw);
+
+  @protected
   SeriesDto dco_decode_series_dto(dynamic raw);
 
   @protected
@@ -294,6 +305,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesSortOptionDto dco_decode_series_sort_option_dto(dynamic raw);
+
+  @protected
+  SeriesThumbnailDto dco_decode_series_thumbnail_dto(dynamic raw);
 
   @protected
   SyncLibraryPhaseDto dco_decode_sync_library_phase_dto(dynamic raw);
@@ -468,6 +482,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  SeriesThumbnailDto sse_decode_box_autoadd_series_thumbnail_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   UpdateComicUserMetaFrbDto
   sse_decode_box_autoadd_update_comic_user_meta_frb_dto(
     SseDeserializer deserializer,
@@ -595,6 +614,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  SeriesThumbnailDto? sse_decode_opt_box_autoadd_series_thumbnail_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
 
   @protected
@@ -639,6 +663,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  SeriesCoverSourceDto sse_decode_series_cover_source_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   SeriesDto sse_decode_series_dto(SseDeserializer deserializer);
 
   @protected
@@ -659,6 +688,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesSortOptionDto sse_decode_series_sort_option_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SeriesThumbnailDto sse_decode_series_thumbnail_dto(
     SseDeserializer deserializer,
   );
 
@@ -878,6 +912,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_series_thumbnail_dto(
+    SeriesThumbnailDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_update_comic_user_meta_frb_dto(
     UpdateComicUserMetaFrbDto self,
     SseSerializer serializer,
@@ -1043,6 +1083,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_series_thumbnail_dto(
+    SeriesThumbnailDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
 
   @protected
@@ -1097,6 +1143,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_series_cover_source_dto(
+    SeriesCoverSourceDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_series_dto(SeriesDto self, SseSerializer serializer);
 
   @protected
@@ -1123,6 +1175,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_series_sort_option_dto(
     SeriesSortOptionDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_series_thumbnail_dto(
+    SeriesThumbnailDto self,
     SseSerializer serializer,
   );
 

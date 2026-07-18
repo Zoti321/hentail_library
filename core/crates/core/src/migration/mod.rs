@@ -7,6 +7,7 @@ mod m20250705_000005_comic_meta_split;
 mod m20250705_000006_folder_series;
 mod m20250705_000007_restore_series_reading_histories;
 mod m20260717_000008_ensure_greenfield_schema;
+mod m20260718_000009_user_set_and_series_thumbnails;
 
 pub struct Migrator;
 
@@ -21,6 +22,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20250705_000006_folder_series::Migration),
             Box::new(m20250705_000007_restore_series_reading_histories::Migration),
             Box::new(m20260717_000008_ensure_greenfield_schema::Migration),
+            Box::new(m20260718_000009_user_set_and_series_thumbnails::Migration),
         ]
     }
 }

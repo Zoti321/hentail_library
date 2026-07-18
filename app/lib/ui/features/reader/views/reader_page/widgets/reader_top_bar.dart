@@ -117,7 +117,11 @@ class ReaderTopBar extends StatelessWidget {
                       showReaderSettingsDialog(context);
                     },
                   ),
-                  const ReaderOverflowMenuButton(),
+                  ReaderOverflowMenuButton(
+                    comicId: session?.comicId ?? '',
+                    seriesId: session?.seriesId,
+                    incognito: session?.incognito ?? false,
+                  ),
                 ],
               ),
             ),
