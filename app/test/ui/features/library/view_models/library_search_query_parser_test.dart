@@ -178,4 +178,152 @@ void main() {
       );
     });
   });
+
+  group('parseLibrarySearchQuery quotes', () {
+    test('quoted multi-word name is a single mustInclude token', () {
+      final LibrarySearchQuery query = parseLibrarySearchQuery(
+        '"John Smith"',
+        knownTagNames: tags,
+        knownAuthorNames: <String>{'John Smith'},
+      );
+
+      expect(
+        query,
+        isA<LibrarySearchMetadataQuery>().having(
+          (LibrarySearchMetadataQuery q) => q.mustInclude,
+          'mustInclude',
+          <String>{'john smith'},
+        ),
+      );
+    });
+
+    test('quoted tokens combine with + as mustInclude', () {
+      final LibrarySearchQuery query = parseLibrarySearchQuery(
+        '"战斗"+"恋爱"',
+        knownTagNames: tags,
+        knownAuthorNames: authors,
+      );
+
+      expect(
+        query,
+        isA<LibrarySearchMetadataQuery>().having(
+          (LibrarySearchMetadataQuery q) => q.mustInclude,
+          'mustInclude',
+          <String>{'战斗', '恋爱'},
+        ),
+      );
+    });
+
+    test('quoted tokens combine with space as optionalOr', () {
+      final LibrarySearchQuery query = parseLibrarySearchQuery(
+        '"战斗" "恋爱"',
+        knownTagNames: tags,
+        knownAuthorNames: authors,
+      );
+
+      expect(
+        query,
+        isA<LibrarySearchMetadataQuery>().having(
+          (LibrarySearchMetadataQuery q) => q.optionalOr,
+          'optionalOr',
+          <String>{'战斗', '恋爱'},
+        ),
+      );
+    });
+
+    test('quoted exclude works', () {
+      final LibrarySearchQuery query = parseLibrarySearchQuery(
+        '战斗-"恋爱"',
+        knownTagNames: tags,
+        knownAuthorNames: authors,
+      );
+
+      expect(
+        query,
+        isA<LibrarySearchMetadataQuery>()
+            .having(
+              (LibrarySearchMetadataQuery q) => q.mustInclude,
+              'mustInclude',
+              <String>{'战斗'},
+            )
+            .having(
+              (LibrarySearchMetadataQuery q) => q.mustExclude,
+              'mustExclude',
+              <String>{'恋爱'},
+            ),
+      );
+    });
+
+    test('escaped quote inside quoted token', () {
+      final LibrarySearchQuery query = parseLibrarySearchQuery(
+        r'"A\"B"',
+        knownTagNames: <String>{r'A"B'},
+        knownAuthorNames: authors,
+      );
+
+      expect(
+        query,
+        isA<LibrarySearchMetadataQuery>().having(
+          (LibrarySearchMetadataQuery q) => q.mustInclude,
+          'mustInclude',
+          <String>{'a"b'},
+        ),
+      );
+    });
+
+    test('unmatched quote falls back to keyword', () {
+      final LibrarySearchQuery query = parseLibrarySearchQuery(
+        '"战斗',
+        knownTagNames: tags,
+        knownAuthorNames: authors,
+      );
+
+      expect(
+        query,
+        isA<LibrarySearchKeywordQuery>().having(
+          (LibrarySearchKeywordQuery q) => q.keyword,
+          'keyword',
+          '"战斗',
+        ),
+      );
+    });
+
+    test('quoted name with hyphen stays one token', () {
+      final LibrarySearchQuery query = parseLibrarySearchQuery(
+        '"foo-bar"',
+        knownTagNames: <String>{'foo-bar'},
+        knownAuthorNames: authors,
+      );
+
+      expect(
+        query,
+        isA<LibrarySearchMetadataQuery>().having(
+          (LibrarySearchMetadataQuery q) => q.mustInclude,
+          'mustInclude',
+          <String>{'foo-bar'},
+        ),
+      );
+    });
+  });
+
+  group('formatLibrarySearchExactMetaQuery', () {
+    test('wraps and escapes', () {
+      expect(formatLibrarySearchExactMetaQuery('战斗'), '"战斗"');
+      expect(formatLibrarySearchExactMetaQuery(r'A"B'), r'"A\"B"');
+      expect(formatLibrarySearchExactMetaQuery(r'A\B'), r'"A\\B"');
+    });
+  });
+
+  group('unwrapFullyQuotedLibrarySearchQuery', () {
+    test('unwraps single quoted query', () {
+      expect(unwrapFullyQuotedLibrarySearchQuery('"战斗"'), '战斗');
+      expect(unwrapFullyQuotedLibrarySearchQuery(r'"A\"B"'), 'A"B');
+    });
+
+    test('returns null when not a single full quote', () {
+      expect(unwrapFullyQuotedLibrarySearchQuery('战斗'), isNull);
+      expect(unwrapFullyQuotedLibrarySearchQuery('"A"+"B"'), isNull);
+      expect(unwrapFullyQuotedLibrarySearchQuery('"战斗'), isNull);
+    });
+  });
 }

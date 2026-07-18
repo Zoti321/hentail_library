@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/meta_chip.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/widgets.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -26,7 +27,9 @@ class SearchedPageHeaderSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
-    final String title = showQuotes ? '"$query"的搜索结果' : query;
+    final String displayQuery =
+        unwrapFullyQuotedLibrarySearchQuery(query) ?? query;
+    final String title = showQuotes ? '"$displayQuery"的搜索结果' : query;
     return Padding(
       padding: EdgeInsets.fromLTRB(
         horizontalPadding,
