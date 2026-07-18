@@ -9,7 +9,6 @@ import 'package:hentai_library/ui/core/widgets/element/card/series_card.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/features/library/views/searched_page/widgets/search_result_horizontal_section.dart';
 import 'package:hentai_library/ui/features/library/views/searched_page/widgets/searched_page_header.dart';
-import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -114,14 +113,12 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
             query: '搜索结果',
             resultCount: 0,
             showQuotes: false,
-            onOpenNavigation: appShellPageNavigationOpener(context),
           )
         : SearchedPageHeaderSection(
             layoutTier: layoutTier,
             horizontalPadding: horizontalPadding,
             query: trimmedQuery,
             resultCount: totalResultCount,
-            onOpenNavigation: appShellPageNavigationOpener(context),
           );
     final Widget header = KeyedSubtree(
       key: _headerMeasureKey,
