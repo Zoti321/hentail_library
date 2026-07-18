@@ -127,28 +127,42 @@ pub async fn search_comic_ids_by_tag_expression(
         "SELECT c.comic_id FROM comics c INNER JOIN comic_meta m ON m.comic_id = c.comic_id WHERE 1=1",
     );
     let mut values: Vec<sea_orm::Value> = Vec::new();
-    for tag in &includes {
+    for name in &includes {
         sql.push_str(
-            " AND EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) = ?)",
+            " AND (\
+               EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) = ?) \
+               OR EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) = ?)\
+             )",
         );
-        values.push(sea_orm::Value::String(Some(Box::new(tag.clone()))));
+        values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
+        values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
     }
     if !optional.is_empty() {
         let placeholders = optional.iter().map(|_| "?").collect::<Vec<_>>().join(",");
         sql.push_str(&format!(
-            " AND EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) IN ({placeholders}))"
+            " AND (\
+               EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) IN ({placeholders})) \
+               OR EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) IN ({placeholders}))\
+             )"
         ));
-        for tag in &optional {
-            values.push(sea_orm::Value::String(Some(Box::new(tag.clone()))));
+        for name in &optional {
+            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
+        }
+        for name in &optional {
+            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
         }
     }
     if !excludes.is_empty() {
         let placeholders = excludes.iter().map(|_| "?").collect::<Vec<_>>().join(",");
         sql.push_str(&format!(
-            " AND NOT EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) IN ({placeholders}))"
+            " AND NOT EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) IN ({placeholders})) \
+              AND NOT EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) IN ({placeholders}))"
         ));
-        for tag in &excludes {
-            values.push(sea_orm::Value::String(Some(Box::new(tag.clone()))));
+        for name in &excludes {
+            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
+        }
+        for name in &excludes {
+            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
         }
     }
     let db = connection()?;

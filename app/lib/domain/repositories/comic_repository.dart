@@ -37,8 +37,8 @@ abstract class ComicRepository {
   /// 关键词搜索（数据库命中），由上层决定是否再应用额外业务过滤。
   Future<List<Comic>> searchByKeyword(String keyword);
 
-  /// 标签表达式搜索（数据库命中），由上层决定是否再应用额外业务过滤。
-  Future<List<Comic>> searchByTagExpression({
+  /// 元数据表达式搜索（每 token 匹配标签名或作者名），由上层决定是否再应用额外业务过滤。
+  Future<List<Comic>> searchByMetadataExpression({
     required Set<String> mustInclude,
     required Set<String> optionalOr,
     required Set<String> mustExclude,

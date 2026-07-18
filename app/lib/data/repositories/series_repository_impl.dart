@@ -138,7 +138,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
   }
 
   @override
-  Future<List<Series>> searchByTagExpression({
+  Future<List<Series>> searchByMetadataExpression({
     required Set<String> mustInclude,
     required Set<String> optionalOr,
     required Set<String> mustExclude,
@@ -152,7 +152,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
           )
           .map(mapRustSeries)
           .toList(),
-      fallbackMessage: '按标签搜索系列失败',
+      fallbackMessage: '按元数据搜索系列失败',
     );
   }
 }
