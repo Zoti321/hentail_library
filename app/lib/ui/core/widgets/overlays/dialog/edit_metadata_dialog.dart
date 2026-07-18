@@ -10,8 +10,8 @@ import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/form/author_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_date_picker_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/fluent_toggle_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
-import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
@@ -382,6 +382,22 @@ class _EditMetadataGeneralTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
+    final bool compact = AppLayoutBreakpoints.isCompact(
+      MediaQuery.sizeOf(context).width,
+    );
+
+    final Widget publishedAtField = FluentDatePickerField(
+      labelText: '发布日期',
+      value: publishedAt,
+      onChanged: onPublishedAtChanged,
+    );
+    final Widget contentRatingField = FluentToggleField(
+      labelText: '年龄限制',
+      value: isR18,
+      onChanged: onIsR18Changed,
+      checkedLabel: 'R18',
+      uncheckedLabel: '全年龄',
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,15 +417,21 @@ class _EditMetadataGeneralTab extends StatelessWidget {
           onChanged: onDescriptionChanged,
           hintText: '添加漫画简介…',
         ),
-        FluentDatePickerField(
-          labelText: '发布日期',
-          value: publishedAt,
-          onChanged: onPublishedAtChanged,
-        ),
-        _EditMetadataContentRatingSection(
-          isR18: isR18,
-          onChanged: onIsR18Changed,
-        ),
+        if (compact)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: tokens.spacing.lg,
+            children: <Widget>[publishedAtField, contentRatingField],
+          )
+        else
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.spacing.md,
+            children: <Widget>[
+              Expanded(flex: 3, child: publishedAtField),
+              Expanded(flex: 2, child: contentRatingField),
+            ],
+          ),
       ],
     );
   }
@@ -454,109 +476,6 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
           selectedNames: tags.map((Tag t) => t.name).toList(),
           onAdd: onAddTag,
           onRemove: onRemoveTag,
-        ),
-      ],
-    );
-  }
-}
-
-class _EditMetadataContentRatingSection extends StatelessWidget {
-  const _EditMetadataContentRatingSection({
-    required this.isR18,
-    required this.onChanged,
-  });
-
-  final bool isR18;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final AppThemeTokens tokens = context.tokens;
-    final Color accent = isR18 ? cs.error : cs.primary;
-    final Color cardBg = isR18
-        ? cs.error.withValues(alpha: 0.06)
-        : cs.primary.withValues(alpha: 0.05);
-    final Color borderColor = isR18
-        ? cs.error.withValues(alpha: 0.28)
-        : cs.hentai.borderSubtle;
-    final Color iconBg = isR18
-        ? cs.error.withValues(alpha: 0.14)
-        : cs.primary.withValues(alpha: 0.12);
-    final String headline = isR18 ? 'R18（成人内容）' : '全年龄';
-    final String subtitle = isR18 ? '含成人向或限制级描写' : '不含成人向限制级内容';
-    final IconData iconData = isR18
-        ? LucideIcons.circleAlert
-        : LucideIcons.shield;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: tokens.spacing.sm,
-      children: <Widget>[
-        const FormLabel('年龄限制'),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: cardBg,
-            borderRadius: BorderRadius.circular(tokens.radius.md),
-            border: Border.all(color: borderColor, width: 1),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: tokens.spacing.md,
-              vertical: tokens.spacing.sm + 2,
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: iconBg,
-                    borderRadius: BorderRadius.circular(tokens.radius.sm),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Icon(iconData, size: 20, color: accent),
-                  ),
-                ),
-                SizedBox(width: tokens.spacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(
-                        headline,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isR18 ? cs.error : cs.hentai.textPrimary,
-                          height: 1.25,
-                        ),
-                      ),
-                      SizedBox(height: tokens.spacing.xs),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 12,
-                          height: 1.3,
-                          color: cs.hentai.textTertiary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: tokens.spacing.sm),
-                ToggleSwitch(checked: isR18, onChange: () => onChanged(!isR18)),
-              ],
-            ),
-          ),
         ),
       ],
     );
