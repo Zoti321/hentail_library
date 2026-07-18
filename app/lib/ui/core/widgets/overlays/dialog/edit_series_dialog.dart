@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/value_objects/form/series_metadata_form.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
@@ -31,16 +32,18 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
   late final TextEditingController _nameController;
   late final TextEditingController _totalCountController;
   late SerializationStatus _serializationStatus;
+  SeriesMetadataFormValidation? _validation;
   bool _saving = false;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.series.name);
-    _totalCountController = TextEditingController(
-      text: widget.series.totalCount?.toString() ?? '',
+    final SeriesMetadataForm initial = SeriesMetadataForm.fromSeries(
+      widget.series,
     );
-    _serializationStatus = widget.series.serializationStatus;
+    _nameController = TextEditingController(text: initial.name);
+    _totalCountController = TextEditingController(text: initial.totalCountText);
+    _serializationStatus = initial.serializationStatus;
   }
 
   @override
@@ -50,41 +53,34 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
     super.dispose();
   }
 
+  SeriesMetadataForm _draftFromControllers() {
+    return SeriesMetadataForm(
+      name: _nameController.text,
+      serializationStatus: _serializationStatus,
+      totalCountText: _totalCountController.text,
+    );
+  }
+
   Future<void> _handleSave() async {
     if (_saving) {
       return;
     }
-    final String name = _nameController.text.trim();
-    if (name.isEmpty) {
-      showInfoToast(context, '系列名称不能为空');
-      return;
-    }
-    final String rawTotal = _totalCountController.text.trim();
-    int? totalCount;
-    var clearTotalCount = false;
-    if (rawTotal.isEmpty) {
-      clearTotalCount = widget.series.totalCount != null;
-    } else {
-      totalCount = int.tryParse(rawTotal);
-      if (totalCount == null || totalCount <= 0) {
-        showInfoToast(context, '漫画总数须为正整数，留空表示不设置');
-        return;
-      }
-    }
     setState(() => _saving = true);
     try {
-      await ref
-          .read(seriesRepoProvider)
-          .updateUserMeta(
+      final SeriesMetadataApplyResult result = await _draftFromControllers()
+          .applyTo(
+            ref.read(seriesRepoProvider),
             seriesId: widget.series.id,
-            name: name,
-            serializationStatus: _serializationStatus,
-            totalCount: totalCount,
-            clearTotalCount: clearTotalCount,
           );
-      if (mounted) {
-        showSuccessToast(context, '系列信息已保存');
-        Navigator.of(context).pop();
+      if (!mounted) {
+        return;
+      }
+      switch (result) {
+        case SeriesMetadataApplyInvalid(:final SeriesMetadataFormValidation validation):
+          setState(() => _validation = validation);
+        case SeriesMetadataApplySucceeded():
+          showSuccessToast(context, '系列信息已保存');
+          Navigator.of(context).pop();
       }
     } catch (error) {
       if (mounted) {
@@ -111,10 +107,21 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
           TextField(
             controller: _nameController,
             enabled: !_saving,
-            decoration: const InputDecoration(
+            onChanged: (_) {
+              if (_validation?.nameError != null) {
+                setState(
+                  () => _validation = SeriesMetadataFormValidation(
+                    nameError: null,
+                    totalCountError: _validation?.totalCountError,
+                  ),
+                );
+              }
+            },
+            decoration: InputDecoration(
               labelText: '系列名称',
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
               isDense: true,
+              errorText: _validation?.nameError,
             ),
           ),
           DropdownButtonFormField<SerializationStatus>(
@@ -146,11 +153,22 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
             controller: _totalCountController,
             enabled: !_saving,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
+            onChanged: (_) {
+              if (_validation?.totalCountError != null) {
+                setState(
+                  () => _validation = SeriesMetadataFormValidation(
+                    nameError: _validation?.nameError,
+                    totalCountError: null,
+                  ),
+                );
+              }
+            },
+            decoration: InputDecoration(
               labelText: '漫画总数',
               hintText: '留空表示不设置',
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
               isDense: true,
+              errorText: _validation?.totalCountError,
             ),
           ),
         ],

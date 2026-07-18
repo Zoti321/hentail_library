@@ -1,11 +1,9 @@
 import 'dart:math' as math;
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
-import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
@@ -64,7 +62,8 @@ class EditMetadataDialog extends StatefulHookConsumerWidget {
 }
 
 class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
-  late final _EditMetadataFormController _controller;
+  late ComicMetadataForm _form;
+  ComicMetadataFormValidation? _validation;
   _EditMetadataTab _selectedTab = _EditMetadataTab.general;
   int _previousTabIndex = 0;
   bool _saving = false;
@@ -82,29 +81,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   @override
   void initState() {
     super.initState();
-    final ComicMetadataForm initialForm = ComicMetadataForm(
-      title: widget.comic.title,
-      description: widget.comic.description,
-      publishedAt: widget.comic.publishedAt,
-      isR18: widget.comic.contentRating == ContentRating.r18,
-      tags: List<Tag>.from(widget.comic.tags),
-      authors: List<Author>.from(widget.comic.authors),
-    );
-    _controller = _EditMetadataFormController(initialForm: initialForm)
-      ..addListener(_handleFormChanged);
-  }
-
-  void _handleFormChanged() {
-    if (!mounted) return;
-    setState(() {});
-  }
-
-  @override
-  void dispose() {
-    _controller
-      ..removeListener(_handleFormChanged)
-      ..dispose();
-    super.dispose();
+    _form = ComicMetadataForm.fromComic(widget.comic);
   }
 
   void _selectTab(int index) {
@@ -154,17 +131,29 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     );
   }
 
+  void _updateForm(ComicMetadataForm Function(ComicMetadataForm) transform) {
+    setState(() => _form = transform(_form));
+  }
+
   Future<void> _handleSave() async {
-    if (!_controller.markTitleValidationAttempted()) {
+    if (_saving) {
+      return;
+    }
+    final ComicMetadataFormValidation validation = _form.validate();
+    if (!validation.isValid) {
       setState(() {
+        _validation = validation;
         _previousTabIndex = _selectedTab.index;
         _selectedTab = _EditMetadataTab.general;
       });
       return;
     }
-    setState(() => _saving = true);
+    setState(() {
+      _validation = null;
+      _saving = true;
+    });
     try {
-      await widget.onSave(_controller.normalizedForm);
+      await widget.onSave(_form.normalized);
       if (mounted) {
         showSuccessToast(context, '已保存');
         Navigator.of(context).pop();
@@ -174,7 +163,9 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
         showErrorToast(context, e);
       }
     } finally {
-      if (mounted) setState(() => _saving = false);
+      if (mounted) {
+        setState(() => _saving = false);
+      }
     }
   }
 
@@ -197,24 +188,45 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       child: switch (_selectedTab) {
         _EditMetadataTab.general => _EditMetadataGeneralTab(
           key: const ValueKey<String>('general'),
-          title: _controller.form.title,
-          titleError: _controller.titleErrorText,
-          description: _controller.form.description ?? '',
-          publishedAt: _controller.form.publishedAt,
-          isR18: _controller.form.isR18,
-          onTitleChanged: _controller.updateTitle,
-          onDescriptionChanged: _controller.updateDescription,
-          onPublishedAtChanged: _controller.updatePublishedAt,
-          onIsR18Changed: _controller.updateIsR18,
+          title: _form.title,
+          titleError: _validation?.titleError,
+          description: _form.description ?? '',
+          publishedAt: _form.publishedAt,
+          isR18: _form.isR18,
+          onTitleChanged: (String value) {
+            setState(() {
+              _form = _form.copyWith(title: value);
+              if (_validation?.titleError != null) {
+                _validation = const ComicMetadataFormValidation();
+              }
+            });
+          },
+          onDescriptionChanged: (String value) {
+            _updateForm((ComicMetadataForm f) => f.copyWith(description: value));
+          },
+          onPublishedAtChanged: (DateTime? value) {
+            _updateForm((ComicMetadataForm f) => f.copyWith(publishedAt: value));
+          },
+          onIsR18Changed: (bool value) {
+            _updateForm((ComicMetadataForm f) => f.copyWith(isR18: value));
+          },
         ),
         _EditMetadataTab.authorsAndTags => _EditMetadataAuthorsTagsTab(
           key: const ValueKey<String>('authors-tags'),
-          authors: _controller.form.authors,
-          tags: _controller.form.tags,
-          onAddAuthor: _controller.addAuthor,
-          onRemoveAuthor: _controller.removeAuthor,
-          onAddTag: _controller.addTagByName,
-          onRemoveTag: _controller.removeTagByName,
+          authors: _form.authors,
+          tags: _form.tags,
+          onAddAuthor: (String name) {
+            _updateForm((ComicMetadataForm f) => f.addAuthor(name));
+          },
+          onRemoveAuthor: (String name) {
+            _updateForm((ComicMetadataForm f) => f.removeAuthor(name));
+          },
+          onAddTag: (String name) {
+            _updateForm((ComicMetadataForm f) => f.addTag(name));
+          },
+          onRemoveTag: (String name) {
+            _updateForm((ComicMetadataForm f) => f.removeTag(name));
+          },
         ),
       },
     );
@@ -340,106 +352,6 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
         ),
       ],
     );
-  }
-}
-
-class _EditMetadataFormController extends ChangeNotifier {
-  _EditMetadataFormController({required ComicMetadataForm initialForm})
-    : _form = initialForm;
-
-  ComicMetadataForm _form;
-  bool _titleValidationAttempted = false;
-
-  ComicMetadataForm get form => _form;
-
-  String? get titleErrorText {
-    if (!_titleValidationAttempted) {
-      return null;
-    }
-    return _form.title.trim().isEmpty ? '漫画标题不能为空' : null;
-  }
-
-  ComicMetadataForm get normalizedForm {
-    final String trimmedTitle = _form.title.trim();
-    final String? trimmedDescription = _normalizeOptionalText(
-      _form.description,
-    );
-    return _form.copyWith(title: trimmedTitle, description: trimmedDescription);
-  }
-
-  bool markTitleValidationAttempted() {
-    _titleValidationAttempted = true;
-    notifyListeners();
-    return _form.title.trim().isNotEmpty;
-  }
-
-  void updateTitle(String value) {
-    _form = _form.copyWith(title: value);
-    notifyListeners();
-  }
-
-  void updateDescription(String value) {
-    _form = _form.copyWith(description: value);
-    notifyListeners();
-  }
-
-  void updatePublishedAt(DateTime? value) {
-    _form = _form.copyWith(publishedAt: value);
-    notifyListeners();
-  }
-
-  void updateIsR18(bool value) {
-    _form = _form.copyWith(isR18: value);
-    notifyListeners();
-  }
-
-  void addAuthor(String name) {
-    final String trimmed = name.trim();
-    if (trimmed.isEmpty) return;
-    if (_form.authors.any((Author a) => a.name == trimmed)) return;
-    _form = _form.copyWith(
-      authors: <Author>[
-        ..._form.authors,
-        Author(name: trimmed),
-      ],
-    );
-    notifyListeners();
-  }
-
-  void removeAuthor(String name) {
-    _form = _form.copyWith(
-      authors: _form.authors.where((Author a) => a.name != name).toList(),
-    );
-    notifyListeners();
-  }
-
-  void addTagByName(String name) {
-    final String trimmed = name.trim();
-    if (trimmed.isEmpty) return;
-    final Tag tag = Tag(name: trimmed);
-    final List<Tag> tags = _form.tags;
-    if (tags.any((Tag t) => t.name == tag.name)) return;
-    _form = _form.copyWith(tags: <Tag>[...tags, tag]);
-    notifyListeners();
-  }
-
-  void removeTagByName(String name) {
-    final Tag? tag = _form.tags.firstWhereOrNull((Tag t) => t.name == name);
-    if (tag == null) return;
-    removeTag(tag);
-  }
-
-  void removeTag(Tag tag) {
-    _form = _form.copyWith(tags: <Tag>[..._form.tags]..remove(tag));
-    notifyListeners();
-  }
-
-  String? _normalizeOptionalText(String? value) {
-    if (value == null) {
-      return null;
-    }
-    final String trimmed = value.trim();
-    return trimmed.isEmpty ? null : trimmed;
   }
 }
 
