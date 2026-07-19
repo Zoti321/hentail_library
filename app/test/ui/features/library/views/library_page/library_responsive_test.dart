@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/chrome/content_switcher_bottom_bar.dart';
+import 'package:hentai_library/ui/core/widgets/element/chip/count_digit_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/meta_chip.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
@@ -16,20 +18,29 @@ import 'package:riverpod/misc.dart' show Override;
 
 void main() {
   group('Library responsive layout', () {
-    testWidgets('compact toolbar fits narrow width without overflow', (
-      WidgetTester tester,
-    ) async {
-      await _pumpHeaderToolbar(
-        tester,
-        viewportWidth: 360,
-        layoutTier: LibraryLayoutTier.compact,
-      );
+    testWidgets(
+      'compact toolbar shows active count chip without header tabs',
+      (WidgetTester tester) async {
+        await _pumpHeaderToolbar(
+          tester,
+          viewportWidth: 360,
+          layoutTier: LibraryLayoutTier.compact,
+        );
 
-      expect(tester.takeException(), isNull);
-      final Text title = tester.widget<Text>(find.text('漫画库'));
-      expect(title.style?.fontSize, 18);
-      expect(find.byType(MetaChip), findsNothing);
-    });
+        expect(tester.takeException(), isNull);
+        final Text title = tester.widget<Text>(find.text('漫画库'));
+        expect(title.style?.fontSize, 18);
+        expect(find.byType(CountDigitChip), findsOneWidget);
+        expect(find.byType(MetaChip), findsNothing);
+        expect(find.text('12'), findsOneWidget);
+        expect(find.text('12 本'), findsNothing);
+        expect(find.text('3 个系列'), findsNothing);
+        expect(find.byType(LibraryDisplayTargetTabs), findsNothing);
+        expect(find.byType(ContentSwitcherBottomBar), findsOneWidget);
+        expect(find.text('漫画'), findsOneWidget);
+        expect(find.text('系列'), findsOneWidget);
+      },
+    );
 
     testWidgets('medium toolbar shows count chips and medium title size', (
       WidgetTester tester,
@@ -44,6 +55,8 @@ void main() {
       final Text title = tester.widget<Text>(find.text('漫画库'));
       expect(title.style?.fontSize, 22);
       expect(find.byType(MetaChip), findsNWidgets(2));
+      expect(find.byType(LibraryDisplayTargetTabs), findsOneWidget);
+      expect(find.byType(ContentSwitcherBottomBar), findsNothing);
     });
 
     testWidgets('expanded toolbar keeps desktop title size', (
@@ -144,6 +157,9 @@ Future<void> _pumpHeaderToolbar(
               onOpenFilterSort: () {},
             ),
           ),
+          bottomNavigationBar: libraryUsesContentSwitcherBottomBar(layoutTier)
+              ? const LibraryDisplayTargetBottomBar()
+              : null,
         ),
       ),
     ),

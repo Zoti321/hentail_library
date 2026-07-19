@@ -140,7 +140,10 @@ class _AuthorListCardContent extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          _AuthorListHeader(totalCount: authors.length),
+          _AuthorListHeader(
+            layoutTier: layoutTier,
+            totalCount: authors.length,
+          ),
           for (int i = 0; i < authors.length; i++) ...<Widget>[
             if (i > 0) Divider(height: 1, color: cs.hentai.borderSubtle),
             Consumer(
@@ -166,8 +169,12 @@ class _AuthorListCardContent extends ConsumerWidget {
 }
 
 class _AuthorListHeader extends ConsumerWidget {
-  const _AuthorListHeader({required this.totalCount});
+  const _AuthorListHeader({
+    required this.layoutTier,
+    required this.totalCount,
+  });
 
+  final MetadataLayoutTier layoutTier;
   final int totalCount;
 
   @override
@@ -177,6 +184,7 @@ class _AuthorListHeader extends ConsumerWidget {
     final int selectionCount = ref.watch(
       authorSelectionProvider.select((Set<Author> s) => s.length),
     );
+    final bool showTotalCount = metadataListHeaderShowsTotalCount(layoutTier);
     return Container(
       padding: _AuthorStyles.listHeaderPadding,
       decoration: BoxDecoration(
@@ -199,14 +207,16 @@ class _AuthorListHeader extends ConsumerWidget {
               color: cs.hentai.textSecondary,
             ),
           ),
-          const SizedBox(width: 12),
-          Text(
-            l10n.metadataTotalCount(totalCount),
-            style: TextStyle(
-              fontSize: _AuthorStyles.listHeaderFontSize,
-              color: cs.hentai.textTertiary,
+          if (showTotalCount) ...[
+            const SizedBox(width: 12),
+            Text(
+              l10n.metadataTotalCount(totalCount),
+              style: TextStyle(
+                fontSize: _AuthorStyles.listHeaderFontSize,
+                color: cs.hentai.textTertiary,
+              ),
             ),
-          ),
+          ],
           if (selectionCount > 0) ...[
             const SizedBox(width: 12),
             Text(

@@ -38,6 +38,22 @@ bool metadataRowUsesOverflowMenu(MetadataLayoutTier tier) {
   return tier == MetadataLayoutTier.compact;
 }
 
+bool metadataHeaderShowsEntityTabs(MetadataLayoutTier tier) {
+  return tier != MetadataLayoutTier.compact;
+}
+
+bool metadataUsesContentSwitcherBottomBar(MetadataLayoutTier tier) {
+  return tier == MetadataLayoutTier.compact;
+}
+
+bool metadataHeaderShowsCountChip(MetadataLayoutTier tier) {
+  return tier == MetadataLayoutTier.compact;
+}
+
+bool metadataListHeaderShowsTotalCount(MetadataLayoutTier tier) {
+  return tier != MetadataLayoutTier.compact;
+}
+
 double metadataInnerContentMaxWidth(
   MetadataLayoutTier tier,
   double viewportWidth,

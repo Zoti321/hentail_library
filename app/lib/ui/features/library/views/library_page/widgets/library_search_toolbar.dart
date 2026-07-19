@@ -15,6 +15,12 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bool showCountChips = libraryHeaderShowsCountChips(layoutTier);
+    final bool showActiveCountChipOnly = libraryHeaderShowsActiveCountChipOnly(
+      layoutTier,
+    );
+    final bool showDisplayTargetTabs = libraryHeaderShowsDisplayTargetTabs(
+      layoutTier,
+    );
     return SizedBox(
       height: 44,
       child: Stack(
@@ -49,6 +55,7 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
                       LibraryPageHeader(
                         layoutTier: layoutTier,
                         showCountChips: showCountChips,
+                        showActiveCountChipOnly: showActiveCountChipOnly,
                       ),
                     ],
                   ),
@@ -63,10 +70,7 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
                 const _LegacyLibraryToolbar(),
             ],
           ),
-          LibraryDisplayTargetTabs(
-            showCountBadges: !showCountChips,
-            layoutTier: layoutTier,
-          ),
+          if (showDisplayTargetTabs) const LibraryDisplayTargetTabs(),
         ],
       ),
     );
@@ -160,22 +164,13 @@ class _LibrarySearchFieldState extends ConsumerState<LibrarySearchField> {
 }
 
 class LibraryDisplayTargetTabs extends ConsumerWidget {
-  const LibraryDisplayTargetTabs({
-    super.key,
-    this.showCountBadges = false,
-    this.layoutTier = LibraryLayoutTier.expanded,
-  });
-
-  final bool showCountBadges;
-  final LibraryLayoutTier layoutTier;
+  const LibraryDisplayTargetTabs({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
       libraryDisplayTargetProvider,
     );
-    final int comicCount = ref.watch(libraryDisplayedComicCountProvider);
-    final int seriesCount = ref.watch(libraryDisplayedSeriesCountProvider);
     final AppLocalizations l10n = context.l10n;
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -183,8 +178,6 @@ class LibraryDisplayTargetTabs extends ConsumerWidget {
         _UnderlineTab(
           label: l10n.libraryTabComics,
           isSelected: displayTarget == LibraryDisplayTarget.comics,
-          badgeCount: showCountBadges ? comicCount : null,
-          layoutTier: layoutTier,
           onTap: () => ref
               .read(libraryQueryIntentProvider.notifier)
               .setDisplayTarget(LibraryDisplayTarget.comics),
@@ -193,8 +186,6 @@ class LibraryDisplayTargetTabs extends ConsumerWidget {
         _UnderlineTab(
           label: l10n.libraryTabSeries,
           isSelected: displayTarget == LibraryDisplayTarget.series,
-          badgeCount: showCountBadges ? seriesCount : null,
-          layoutTier: layoutTier,
           onTap: () => ref
               .read(libraryQueryIntentProvider.notifier)
               .setDisplayTarget(LibraryDisplayTarget.series),
@@ -204,102 +195,76 @@ class LibraryDisplayTargetTabs extends ConsumerWidget {
   }
 }
 
+class LibraryDisplayTargetBottomBar extends ConsumerWidget {
+  const LibraryDisplayTargetBottomBar({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
+    );
+    final AppLocalizations l10n = context.l10n;
+    return ContentSwitcherBottomBar(
+      items: <ContentSwitcherBottomBarItem>[
+        (icon: LucideIcons.bookImage, label: l10n.libraryTabComics),
+        (icon: LucideIcons.bookMarked, label: l10n.libraryTabSeries),
+      ],
+      selectedIndex: displayTarget == LibraryDisplayTarget.comics ? 0 : 1,
+      onSelected: (int index) {
+        ref
+            .read(libraryQueryIntentProvider.notifier)
+            .setDisplayTarget(
+              index == 0
+                  ? LibraryDisplayTarget.comics
+                  : LibraryDisplayTarget.series,
+            );
+      },
+    );
+  }
+}
+
 class _UnderlineTab extends StatelessWidget {
   const _UnderlineTab({
     required this.label,
     required this.isSelected,
     required this.onTap,
-    this.badgeCount,
-    this.layoutTier = LibraryLayoutTier.expanded,
   });
 
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
-  final int? badgeCount;
-  final LibraryLayoutTier layoutTier;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final LibraryTabBadgeMetrics badgeMetrics = libraryTabBadgeMetrics(
-      layoutTier,
-    );
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(4),
       splashFactory: NoSplash.splashFactory,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        child: Stack(
-          clipBehavior: Clip.none,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    color: isSelected ? cs.primary : cs.hentai.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  height: 2,
-                  width: label.length * 14.0,
-                  decoration: BoxDecoration(
-                    color: isSelected ? cs.primary : Colors.transparent,
-                    borderRadius: BorderRadius.circular(1),
-                  ),
-                ),
-              ],
-            ),
-            if (badgeCount != null)
-              Positioned(
-                top: badgeMetrics.top,
-                right: badgeMetrics.right,
-                child: _TabCountBadge(
-                  count: badgeCount!,
-                  metrics: badgeMetrics,
-                ),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? cs.primary : cs.hentai.textSecondary,
               ),
+            ),
+            const SizedBox(height: 6),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              height: 2,
+              width: label.length * 14.0,
+              decoration: BoxDecoration(
+                color: isSelected ? cs.primary : Colors.transparent,
+                borderRadius: BorderRadius.circular(1),
+              ),
+            ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TabCountBadge extends StatelessWidget {
-  const _TabCountBadge({required this.count, required this.metrics});
-
-  final int count;
-  final LibraryTabBadgeMetrics metrics;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return Container(
-      constraints: BoxConstraints(
-        minWidth: metrics.minSize,
-        minHeight: metrics.minSize,
-      ),
-      padding: EdgeInsets.symmetric(horizontal: metrics.horizontalPadding),
-      decoration: BoxDecoration(
-        color: cs.primary,
-        borderRadius: BorderRadius.circular(metrics.borderRadius),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        '$count',
-        style: TextStyle(
-          fontSize: metrics.fontSize,
-          fontWeight: FontWeight.w600,
-          color: cs.onPrimary,
-          height: 1.1,
         ),
       ),
     );

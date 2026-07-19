@@ -35,6 +35,38 @@ void main() {
     test('toggles compact-only layout behaviors', () {
       expect(metadataRowUsesOverflowMenu(MetadataLayoutTier.compact), isTrue);
       expect(metadataRowUsesOverflowMenu(MetadataLayoutTier.expanded), isFalse);
+      expect(
+        metadataHeaderShowsEntityTabs(MetadataLayoutTier.compact),
+        isFalse,
+      );
+      expect(
+        metadataHeaderShowsEntityTabs(MetadataLayoutTier.medium),
+        isTrue,
+      );
+      expect(
+        metadataUsesContentSwitcherBottomBar(MetadataLayoutTier.compact),
+        isTrue,
+      );
+      expect(
+        metadataUsesContentSwitcherBottomBar(MetadataLayoutTier.medium),
+        isFalse,
+      );
+      expect(
+        metadataHeaderShowsCountChip(MetadataLayoutTier.compact),
+        isTrue,
+      );
+      expect(
+        metadataHeaderShowsCountChip(MetadataLayoutTier.medium),
+        isFalse,
+      );
+      expect(
+        metadataListHeaderShowsTotalCount(MetadataLayoutTier.compact),
+        isFalse,
+      );
+      expect(
+        metadataListHeaderShowsTotalCount(MetadataLayoutTier.medium),
+        isTrue,
+      );
     });
   });
 
@@ -56,13 +88,6 @@ void main() {
         metadataInnerContentMaxWidth(MetadataLayoutTier.compact, 360),
         328,
       );
-    });
-  });
-
-  group('metadataAddEntityTooltip', () {
-    test('returns entity-specific add labels', () {
-      expect(metadataAddEntityTooltip(0), '添加作者');
-      expect(metadataAddEntityTooltip(1), '添加标签');
     });
   });
 }

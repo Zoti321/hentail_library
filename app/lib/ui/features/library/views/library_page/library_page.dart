@@ -154,6 +154,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               setState(() => _isEndDrawerOpen = isOpen);
             }
           },
+          bottomNavigationBar: libraryUsesContentSwitcherBottomBar(layoutTier)
+              ? const LibraryDisplayTargetBottomBar()
+              : null,
           body: Stack(
             children: <Widget>[
               CustomScrollView(

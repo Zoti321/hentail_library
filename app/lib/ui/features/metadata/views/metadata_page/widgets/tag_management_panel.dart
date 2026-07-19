@@ -134,7 +134,10 @@ class _TagListCardContent extends ConsumerWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          _TagListHeader(totalCount: tags.length),
+          _TagListHeader(
+            layoutTier: layoutTier,
+            totalCount: tags.length,
+          ),
           for (int i = 0; i < tags.length; i++) ...<Widget>[
             if (i > 0) Divider(height: 1, color: cs.hentai.borderSubtle),
             Consumer(
@@ -160,8 +163,12 @@ class _TagListCardContent extends ConsumerWidget {
 }
 
 class _TagListHeader extends ConsumerWidget {
-  const _TagListHeader({required this.totalCount});
+  const _TagListHeader({
+    required this.layoutTier,
+    required this.totalCount,
+  });
 
+  final MetadataLayoutTier layoutTier;
   final int totalCount;
 
   @override
@@ -171,6 +178,7 @@ class _TagListHeader extends ConsumerWidget {
     final int selectionCount = ref.watch(
       tagSelectionProvider.select((Set<Tag> s) => s.length),
     );
+    final bool showTotalCount = metadataListHeaderShowsTotalCount(layoutTier);
     return Container(
       padding: _TagStyles.listHeaderPadding,
       decoration: BoxDecoration(
@@ -193,14 +201,16 @@ class _TagListHeader extends ConsumerWidget {
               color: cs.hentai.textSecondary,
             ),
           ),
-          const SizedBox(width: 12),
-          Text(
-            l10n.metadataTotalCount(totalCount),
-            style: TextStyle(
-              fontSize: _TagStyles.listHeaderFontSize,
-              color: cs.hentai.textTertiary,
+          if (showTotalCount) ...[
+            const SizedBox(width: 12),
+            Text(
+              l10n.metadataTotalCount(totalCount),
+              style: TextStyle(
+                fontSize: _TagStyles.listHeaderFontSize,
+                color: cs.hentai.textTertiary,
+              ),
             ),
-          ),
+          ],
           if (selectionCount > 0) ...[
             const SizedBox(width: 12),
             Text(

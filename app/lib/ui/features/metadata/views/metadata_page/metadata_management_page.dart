@@ -152,7 +152,7 @@ class _MetadataManagementPageState
       child: headerSection,
     );
 
-    return Stack(
+    final Widget body = Stack(
       children: <Widget>[
         CustomScrollView(
           controller: _scrollController,
@@ -207,6 +207,18 @@ class _MetadataManagementPageState
           isDrawerOpen: false,
         ),
       ],
+    );
+
+    if (!metadataUsesContentSwitcherBottomBar(layoutTier)) {
+      return body;
+    }
+
+    return Scaffold(
+      body: body,
+      bottomNavigationBar: MetadataEntityBottomBar(
+        selectedTabIndex: selectedIndex,
+        onTabSelected: _handleTabSelected,
+      ),
     );
   }
 
