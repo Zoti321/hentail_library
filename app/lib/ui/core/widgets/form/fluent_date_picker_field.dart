@@ -30,14 +30,36 @@ class FluentDatePickerField extends StatelessWidget {
       return;
     }
     final DateTime now = DateTime.now();
+    final AppThemeTokens tokens = context.tokens;
+    final ThemeData baseTheme = Theme.of(context);
     final DateTime? picked = await showDatePicker(
       context: context,
+      locale: const Locale('zh', 'CN'),
       initialDate: value ?? now,
       firstDate: DateTime(1900),
       lastDate: DateTime(now.year + 1, 12, 31),
       helpText: '选择发布日期',
       cancelText: '取消',
       confirmText: '确定',
+      fieldLabelText: '日期',
+      fieldHintText: '年/月/日',
+      errorFormatText: '日期格式无效',
+      errorInvalidText: '日期超出可选范围',
+      builder: (BuildContext context, Widget? child) {
+        // Rely on MaterialApp Global* delegates for MaterialLocalizations.
+        // Do not wrap a fresh Localizations here — its async load races the
+        // first DatePickerDialog frame and throws "No MaterialLocalizations".
+        return Theme(
+          data: baseTheme.copyWith(
+            datePickerTheme: baseTheme.datePickerTheme.copyWith(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(tokens.radius.xs),
+              ),
+            ),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
     if (picked != null) {
       onChanged(DateTime.utc(picked.year, picked.month, picked.day));

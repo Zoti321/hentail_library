@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/core/util/app_theme_mode.dart';
@@ -44,6 +45,15 @@ class _AppRootState extends ConsumerState<_AppRoot> {
 
     return MaterialApp.router(
       locale: const Locale('zh', 'CN'),
+      supportedLocales: const <Locale>[
+        Locale('zh', 'CN'),
+        Locale('en', 'US'),
+      ],
+      localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       title: 'hentai library',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(Brightness.light),
