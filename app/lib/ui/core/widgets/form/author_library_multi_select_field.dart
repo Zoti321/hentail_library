@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
-import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
+import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 const MultiSelectCopy _kAuthorMultiSelectCopy = MultiSelectCopy(
-  selectPrompt: '选择作者…',
+  inputPlaceholder: '选择或输入作者…',
   listLoadFailed: '作者列表加载失败',
-  filterHint: '筛选作者…',
   emptyCatalog: '暂无作者',
+  emptyRemaining: '没有更多可选',
 );
 
-/// 全库作者多选：一行「作者 + 下拉」，触发条展示已选数量；浮层内可滚动列表。
+/// 全库作者多选：字段内 chip + 内联输入；浮层列出未选字典项。
 class AuthorLibraryMultiSelectField extends ConsumerWidget {
   const AuthorLibraryMultiSelectField({
     super.key,
@@ -29,7 +29,7 @@ class AuthorLibraryMultiSelectField extends ConsumerWidget {
   final ValueChanged<String> onAdd;
   final ValueChanged<String> onRemove;
 
-  /// When true, shortens the dropdown trigger bar (e.g. metadata dialog).
+  /// When true, shortens the field chrome (e.g. metadata dialog).
   final bool compactTrigger;
 
   @override

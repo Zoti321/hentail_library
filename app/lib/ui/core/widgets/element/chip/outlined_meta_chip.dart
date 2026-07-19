@@ -6,6 +6,8 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 ///
 /// 传入 [onTap] 时变为可点：click 光标、Semantics button、hover/press 铺底
 ///（对齐 [GhostButton]：`surfaceContainer` + `withAlpha(110)` overlay）。
+///
+/// 传入 [onRemove] 时在文案右侧渲染移除按钮（表单多选字段）。
 class OutlinedMetaChip extends StatelessWidget {
   const OutlinedMetaChip({
     super.key,
@@ -13,12 +15,14 @@ class OutlinedMetaChip extends StatelessWidget {
     this.borderColor,
     this.textColor,
     this.onTap,
+    this.onRemove,
   });
 
   final String text;
   final Color? borderColor;
   final Color? textColor;
   final VoidCallback? onTap;
+  final VoidCallback? onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +32,24 @@ class OutlinedMetaChip extends StatelessWidget {
     final Color effectiveBorder = borderColor ?? cs.hentai.borderSubtle;
     final Color effectiveTextColor = textColor ?? cs.hentai.textSecondary;
 
+    final Widget label = _OutlinedMetaChipLabel(
+      text: text,
+      color: effectiveTextColor,
+    );
+    final Widget content = onRemove == null
+        ? label
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(child: label),
+              SizedBox(width: tokens.spacing.xs),
+              _OutlinedMetaChipRemoveButton(
+                color: effectiveTextColor,
+                onRemove: onRemove!,
+              ),
+            ],
+          );
+
     if (onTap == null) {
       return Semantics(
         label: text,
@@ -35,10 +57,7 @@ class OutlinedMetaChip extends StatelessWidget {
           backgroundColor: cs.surface,
           borderColor: effectiveBorder,
           borderRadius: borderRadius,
-          child: _OutlinedMetaChipLabel(
-            text: text,
-            color: effectiveTextColor,
-          ),
+          child: content,
         ),
       );
     }
@@ -46,9 +65,36 @@ class OutlinedMetaChip extends StatelessWidget {
     return _InteractiveOutlinedMetaChip(
       text: text,
       borderColor: effectiveBorder,
-      textColor: effectiveTextColor,
       borderRadius: borderRadius,
       onTap: onTap!,
+      child: content,
+    );
+  }
+}
+
+class _OutlinedMetaChipRemoveButton extends StatelessWidget {
+  const _OutlinedMetaChipRemoveButton({
+    required this.color,
+    required this.onRemove,
+  });
+
+  final Color color;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 16,
+      height: 16,
+      child: IconButton(
+        tooltip: '',
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints.tightFor(width: 16, height: 16),
+        visualDensity: VisualDensity.compact,
+        splashRadius: 10,
+        onPressed: onRemove,
+        icon: Icon(Icons.close, size: 12, color: color),
+      ),
     );
   }
 }
@@ -57,16 +103,16 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
   const _InteractiveOutlinedMetaChip({
     required this.text,
     required this.borderColor,
-    required this.textColor,
     required this.borderRadius,
     required this.onTap,
+    required this.child,
   });
 
   final String text;
   final Color borderColor;
-  final Color textColor;
   final BorderRadius borderRadius;
   final VoidCallback onTap;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +152,7 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
             borderColor: borderColor,
             borderRadius: borderRadius,
             animate: true,
-            child: _OutlinedMetaChipLabel(text: text, color: textColor),
+            child: child,
           ),
         ),
       ),
