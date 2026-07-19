@@ -1,5 +1,6 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
@@ -28,6 +29,7 @@ class _PageSizeMenuButtonState extends State<PageSizeMenuButton> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
     return CustomPopupMenu(
@@ -46,8 +48,8 @@ class _PageSizeMenuButtonState extends State<PageSizeMenuButton> {
       ),
       child: GhostButton.icon(
         icon: LucideIcons.layoutGrid,
-        tooltip: '每页数量',
-        semanticLabel: '设置每页数量',
+        tooltip: l10n.libraryPageSizeTooltip,
+        semanticLabel: l10n.libraryPageSizeSemantic,
         iconSize: 16,
         size: 32,
         borderRadius: 8,

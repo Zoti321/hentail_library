@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -49,6 +51,7 @@ class _EmptyLibraryHero extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
     final Color accent = colorScheme.primary;
     final BorderSide actionBorderSide = BorderSide(
       color: colorScheme.hentai.borderSubtle,
@@ -85,7 +88,7 @@ class _EmptyLibraryHero extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          '尚未导入漫画',
+          l10n.homeEmptyTitle,
           style: TextStyle(
             fontSize: tokens.text.titleMd,
             fontWeight: FontWeight.w700,
@@ -95,7 +98,7 @@ class _EmptyLibraryHero extends StatelessWidget {
         ),
         SizedBox(height: tokens.spacing.sm),
         Text(
-          '请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。',
+          l10n.homeEmptyHint,
           style: TextStyle(
             fontSize: tokens.text.bodySm,
             color: colorScheme.hentai.textSecondary,
@@ -176,7 +179,7 @@ class _EmptyLibraryHero extends StatelessWidget {
                       FilledButton.icon(
                         onPressed: onScan,
                         icon: const Icon(LucideIcons.scanSearch, size: 18),
-                        label: const Text('扫描漫画库'),
+                        label: Text(l10n.homeScanLibrary),
                         style: FilledButton.styleFrom(
                           backgroundColor: colorScheme.primary,
                           foregroundColor: colorScheme.onPrimary,
@@ -193,13 +196,13 @@ class _EmptyLibraryHero extends StatelessWidget {
                       OutlinedButton.icon(
                         onPressed: () => context.go('/paths'),
                         icon: const Icon(LucideIcons.folderTree, size: 18),
-                        label: const Text('选中路径'),
+                        label: Text(l10n.pathsTitle),
                         style: outlinedActionStyle,
                       ),
                       OutlinedButton.icon(
                         onPressed: () => context.go('/settings'),
                         icon: const Icon(LucideIcons.settings, size: 18),
-                        label: const Text('设置'),
+                        label: Text(l10n.navSettings),
                         style: outlinedActionStyle,
                       ),
                     ],
@@ -234,35 +237,38 @@ class _StatsCards extends ConsumerWidget {
       homePageCountsStreamProvider,
     );
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final AppLocalizations l10n = context.l10n;
     final _HomeStatAccentColors accents = _HomeStatAccentColors(colorScheme);
     return homeCounts.when(
       data: (HomePageCounts c) => _HomeStatsCardLayout(
         layoutTier: layoutTier,
         comicCard: _buildStatCard(context, (
-          label: '漫画库',
+          label: l10n.libraryTitle,
           valueText: '${c.comicCount}',
-          caption: '共 ${c.comicCount} 本',
+          caption: l10n.homeComicTotal(c.comicCount),
           icon: LucideIcons.bookImage,
           accentColor: accents.library,
         )),
         seriesCard: _buildStatCard(context, (
-          label: '系列',
+          label: l10n.homeStatSeries,
           valueText: '${c.seriesCount}',
-          caption: '${c.seriesCount} 个系列',
+          caption: l10n.homeSeriesCount(c.seriesCount),
           icon: LucideIcons.library,
           accentColor: accents.series,
         )),
         tagsCard: _buildStatCard(context, (
-          label: '标签',
+          label: l10n.homeStatTags,
           valueText: '${c.tagCount}',
-          caption: '${c.tagCount} 个标签',
+          caption: l10n.homeTagCount(c.tagCount),
           icon: LucideIcons.tags,
           accentColor: accents.tags,
         )),
         authorCard: _buildStatCard(context, (
-          label: '作者',
+          label: l10n.homeStatAuthors,
           valueText: '${c.authorCount}',
-          caption: c.authorCount == 0 ? '暂无作者' : '${c.authorCount} 位',
+          caption: c.authorCount == 0
+              ? l10n.homeNoAuthors
+              : l10n.homeAuthorCount(c.authorCount),
           icon: LucideIcons.penLine,
           accentColor: accents.authors,
         )),
@@ -270,30 +276,30 @@ class _StatsCards extends ConsumerWidget {
       loading: () => _HomeStatsCardLayout(
         layoutTier: layoutTier,
         comicCard: _buildStatCard(context, (
-          label: '漫画库',
+          label: l10n.libraryTitle,
           valueText: '$comicCount',
-          caption: '共 $comicCount 本',
+          caption: l10n.homeComicTotal(comicCount),
           icon: LucideIcons.bookImage,
           accentColor: accents.library,
         )),
         seriesCard: _buildStatCard(context, (
-          label: '系列',
+          label: l10n.homeStatSeries,
           valueText: '--',
-          caption: '加载中…',
+          caption: l10n.shellLoading,
           icon: LucideIcons.library,
           accentColor: accents.series,
         )),
         tagsCard: _buildStatCard(context, (
-          label: '标签',
+          label: l10n.homeStatTags,
           valueText: '--',
-          caption: '加载中…',
+          caption: l10n.shellLoading,
           icon: LucideIcons.tags,
           accentColor: accents.tags,
         )),
         authorCard: _buildStatCard(context, (
-          label: '作者',
+          label: l10n.homeStatAuthors,
           valueText: '--',
-          caption: '加载中…',
+          caption: l10n.shellLoading,
           icon: LucideIcons.penLine,
           accentColor: accents.authors,
         )),
@@ -301,30 +307,30 @@ class _StatsCards extends ConsumerWidget {
       error: (Object error, StackTrace stackTrace) => _HomeStatsCardLayout(
         layoutTier: layoutTier,
         comicCard: _buildStatCard(context, (
-          label: '漫画库',
+          label: l10n.libraryTitle,
           valueText: '$comicCount',
-          caption: '共 $comicCount 本',
+          caption: l10n.homeComicTotal(comicCount),
           icon: LucideIcons.bookImage,
           accentColor: accents.library,
         )),
         seriesCard: _buildStatCard(context, (
-          label: '系列',
+          label: l10n.homeStatSeries,
           valueText: '--',
-          caption: '加载失败',
+          caption: l10n.shellLoadFailed,
           icon: LucideIcons.library,
           accentColor: accents.series,
         )),
         tagsCard: _buildStatCard(context, (
-          label: '标签',
+          label: l10n.homeStatTags,
           valueText: '--',
-          caption: '加载失败',
+          caption: l10n.shellLoadFailed,
           icon: LucideIcons.tags,
           accentColor: accents.tags,
         )),
         authorCard: _buildStatCard(context, (
-          label: '作者',
+          label: l10n.homeStatAuthors,
           valueText: '--',
-          caption: '加载失败',
+          caption: l10n.shellLoadFailed,
           icon: LucideIcons.penLine,
           accentColor: accents.authors,
         )),
@@ -345,34 +351,35 @@ class _StatsCardsPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final AppLocalizations l10n = context.l10n;
     final _HomeStatAccentColors accents = _HomeStatAccentColors(colorScheme);
     return _HomeStatsCardLayout(
       layoutTier: layoutTier,
       comicCard: _buildStatCard(context, (
-        label: '漫画库',
+        label: l10n.libraryTitle,
         valueText: '$comicCount',
-        caption: '共 $comicCount 本',
+        caption: l10n.homeComicTotal(comicCount),
         icon: LucideIcons.bookImage,
         accentColor: accents.library,
       )),
       seriesCard: _buildStatCard(context, (
-        label: '系列',
+        label: l10n.homeStatSeries,
         valueText: '--',
-        caption: '加载中…',
+        caption: l10n.shellLoading,
         icon: LucideIcons.library,
         accentColor: accents.series,
       )),
       tagsCard: _buildStatCard(context, (
-        label: '标签',
+        label: l10n.homeStatTags,
         valueText: '--',
-        caption: '加载中…',
+        caption: l10n.shellLoading,
         icon: LucideIcons.tags,
         accentColor: accents.tags,
       )),
       authorCard: _buildStatCard(context, (
-        label: '作者',
+        label: l10n.homeStatAuthors,
         valueText: '--',
-        caption: '加载中…',
+        caption: l10n.shellLoading,
         icon: LucideIcons.penLine,
         accentColor: accents.authors,
       )),

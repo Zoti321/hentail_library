@@ -4,6 +4,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
@@ -364,7 +365,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: const Text('重试'),
+                  child: Text(context.l10n.commonRetry),
                 ),
               ],
             ),
@@ -396,6 +397,7 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final AsyncValue<List<T>> asyncItems = ref.watch(itemsProvider);
     return asyncItems.when(
       loading: () => _MultiSelectMenuSizedShell(
@@ -422,14 +424,17 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                '加载失败',
+                l10n.commonLoadFailed,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.hentai.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 8),
-              TextButton(onPressed: onRetry, child: const Text('重试')),
+              TextButton(
+                onPressed: onRetry,
+                child: Text(l10n.commonRetry),
+              ),
             ],
           ),
         ),

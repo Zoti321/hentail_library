@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
@@ -21,11 +22,7 @@ class MetadataContentSearch extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
-    final String hintText = switch (selectedTabIndex) {
-      0 => '搜索作者名称…',
-      1 => '搜索标签名称…',
-      _ => '搜索…',
-    };
+    final String hintText = context.l10n.metadataSearchHint(selectedTabIndex);
     final String query = switch (selectedTabIndex) {
       0 => ref.watch(authorFilterProvider),
       1 => ref.watch(tagFilterProvider),

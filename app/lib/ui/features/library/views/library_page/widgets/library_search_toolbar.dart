@@ -32,7 +32,7 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
                       if (onOpenNavigation != null) ...<Widget>[
                         GhostButton.icon(
                           icon: LucideIcons.menu,
-                          semanticLabel: '打开导航菜单',
+                          semanticLabel: context.l10n.shellOpenNavMenu,
                           tooltip: '',
                           iconSize: 16,
                           size: 32,
@@ -134,13 +134,14 @@ class _LibrarySearchFieldState extends ConsumerState<LibrarySearchField> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     return Align(
       alignment: Alignment.centerLeft,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: kLibrarySearchMaxWidth),
         child: CustomTextField(
           controller: _controller,
-          hintText: '搜索…',
+          hintText: l10n.librarySearchHint,
           onSubmitted: _handleSubmitSearch,
         ),
       ),
@@ -150,7 +151,7 @@ class _LibrarySearchFieldState extends ConsumerState<LibrarySearchField> {
   void _handleSubmitSearch(String value) {
     final String query = value.trim();
     if (query.isEmpty) {
-      showInfoToast(context, '关键词不能为空');
+      showInfoToast(context, context.l10n.librarySearchKeywordEmpty);
       return;
     }
     final String encodedQuery = Uri.encodeQueryComponent(query);
@@ -175,11 +176,12 @@ class LibraryDisplayTargetTabs extends ConsumerWidget {
     );
     final int comicCount = ref.watch(libraryDisplayedComicCountProvider);
     final int seriesCount = ref.watch(libraryDisplayedSeriesCountProvider);
+    final AppLocalizations l10n = context.l10n;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         _UnderlineTab(
-          label: '漫画',
+          label: l10n.libraryTabComics,
           isSelected: displayTarget == LibraryDisplayTarget.comics,
           badgeCount: showCountBadges ? comicCount : null,
           layoutTier: layoutTier,
@@ -189,7 +191,7 @@ class LibraryDisplayTargetTabs extends ConsumerWidget {
         ),
         const SizedBox(width: 16),
         _UnderlineTab(
-          label: '系列',
+          label: l10n.libraryTabSeries,
           isSelected: displayTarget == LibraryDisplayTarget.series,
           badgeCount: showCountBadges ? seriesCount : null,
           layoutTier: layoutTier,
@@ -320,14 +322,15 @@ class _LibraryCompactToolbar extends ConsumerWidget {
     final bool isCustomized = ref.watch(
       libraryActiveFilterSortIsCustomizedProvider,
     );
+    final AppLocalizations l10n = context.l10n;
     return Row(
       mainAxisSize: MainAxisSize.min,
       spacing: libraryToolbarActionSpacing(layoutTier),
       children: <Widget>[
         GhostButton.icon(
           icon: LucideIcons.listFilter,
-          tooltip: '筛选与排序',
-          semanticLabel: '打开筛选与排序',
+          tooltip: l10n.libraryFilterSortTooltip,
+          semanticLabel: l10n.libraryFilterSortSemantic,
           iconSize: 16,
           size: 32,
           borderRadius: 8,
@@ -380,6 +383,7 @@ class _LibraryPageSizeMenuButtonState
       libraryDisplayTargetProvider,
     );
     final int activePageSize = ref.watch(libraryActivePageSizeProvider);
+    final AppLocalizations l10n = context.l10n;
     return CustomPopupMenu(
       controller: _controller,
       barrierColor: Colors.transparent,
@@ -398,8 +402,8 @@ class _LibraryPageSizeMenuButtonState
       ),
       child: GhostButton.icon(
         icon: LucideIcons.layoutGrid,
-        tooltip: '每页数量',
-        semanticLabel: '设置每页数量',
+        tooltip: l10n.libraryPageSizeTooltip,
+        semanticLabel: l10n.libraryPageSizeSemantic,
         iconSize: 16,
         size: 32,
         borderRadius: 8,
@@ -503,13 +507,17 @@ class _LibraryOverflowMenuButtonState
       }
       if (previous.running && !next.running) {
         if (next.cancelled) {
-          showCustomToast(context, message: '已取消扫描', type: AppToastType.info);
+          showCustomToast(
+            context,
+            message: context.l10n.libraryScanCancelledToast,
+            type: AppToastType.info,
+          );
         } else if (next.error != null) {
           showErrorToast(context, next.error!);
         } else {
           showSuccessToast(
             context,
-            scanSuccessToastMessage(
+            context.l10n.libraryScanSuccessToast(
               mode: next.scanMode,
               progress: next.progress,
             ),
@@ -522,6 +530,7 @@ class _LibraryOverflowMenuButtonState
     final ThemeData theme = Theme.of(context);
     final ScanLibraryState scanState = ref.watch(scanLibraryControllerProvider);
     final bool scanning = scanState.running;
+    final AppLocalizations l10n = context.l10n;
 
     return CustomPopupMenu(
       controller: _controller,
@@ -562,11 +571,11 @@ class _LibraryOverflowMenuButtonState
       child: scanning
           ? Tooltip(
               message: scanState.scanMode == ScanMode.full
-                  ? '正在深度扫描…'
-                  : '正在扫描…',
+                  ? l10n.libraryScanningDeep
+                  : l10n.libraryScanning,
               child: Semantics(
                 button: true,
-                label: '取消扫描',
+                label: l10n.libraryCancelScan,
                 child: SizedBox(
                   width: 32,
                   height: 32,
@@ -590,8 +599,8 @@ class _LibraryOverflowMenuButtonState
             )
           : GhostButton.icon(
               icon: LucideIcons.ellipsisVertical,
-              tooltip: '更多操作',
-              semanticLabel: '打开更多操作',
+              tooltip: l10n.libraryMoreActions,
+              semanticLabel: l10n.libraryMoreActionsSemantic,
               iconSize: 16,
               size: 32,
               borderRadius: 8,
@@ -616,6 +625,7 @@ class _LibraryOverflowScanningMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
     final double viewportWidth = MediaQuery.sizeOf(context).width;
     return PopupMenuPanelShell(
@@ -631,7 +641,7 @@ class _LibraryOverflowScanningMenu extends StatelessWidget {
           children: <Widget>[
             _LibraryOverflowMenuItem(
               icon: LucideIcons.x,
-              label: '取消扫描',
+              label: l10n.libraryCancelScan,
               onTap: onCancel,
             ),
           ],
@@ -656,6 +666,7 @@ class _LibraryOverflowMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
     final double viewportWidth = MediaQuery.sizeOf(context).width;
     return PopupMenuPanelShell(
@@ -671,17 +682,17 @@ class _LibraryOverflowMenu extends StatelessWidget {
           children: <Widget>[
             _LibraryOverflowMenuItem(
               icon: LucideIcons.rotateCw,
-              label: '刷新',
+              label: l10n.libraryRefresh,
               onTap: onRefresh,
             ),
             _LibraryOverflowMenuItem(
               icon: LucideIcons.scanSearch,
-              label: '扫描',
+              label: l10n.libraryScan,
               onTap: onScan,
             ),
             _LibraryOverflowMenuItem(
               icon: LucideIcons.scanLine,
-              label: '深度扫描',
+              label: l10n.libraryDeepScan,
               onTap: onDeepScan,
             ),
           ],
@@ -739,6 +750,7 @@ class _LegacyLibraryToolbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
+    final AppLocalizations l10n = context.l10n;
     return Container(
       height: 40,
       decoration: BoxDecoration(
@@ -752,8 +764,8 @@ class _LegacyLibraryToolbar extends ConsumerWidget {
         children: <Widget>[
           GhostButton.icon(
             icon: LucideIcons.rotateCw,
-            tooltip: '刷新',
-            semanticLabel: '刷新',
+            tooltip: l10n.libraryRefresh,
+            semanticLabel: l10n.libraryRefresh,
             iconSize: 16,
             size: 28,
             borderRadius: 6,

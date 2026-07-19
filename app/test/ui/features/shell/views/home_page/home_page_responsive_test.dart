@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -115,6 +116,9 @@ Future<void> _pumpHomePage(
     ProviderScope(
       overrides: _homePageTestOverrides(),
       child: MaterialApp(
+        locale: const Locale('zh'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: buildAppTheme(Brightness.light),
         home: MediaQuery(
           data: MediaQueryData(size: viewportSize),

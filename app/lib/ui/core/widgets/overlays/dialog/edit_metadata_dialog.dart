@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
@@ -68,14 +70,27 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   int _previousTabIndex = 0;
   bool _saving = false;
 
-  static final List<DialogSideTabItem> _sideTabs = <DialogSideTabItem>[
-    DialogSideTabItem(label: '常规', icon: LucideIcons.textAlignCenter),
-    DialogSideTabItem(label: '作者&标签', icon: LucideIcons.users),
-  ];
+  List<DialogSideTabItem> _sideTabs(AppLocalizations l10n) =>
+      <DialogSideTabItem>[
+        DialogSideTabItem(
+          label: l10n.dialogEditMetadataTabGeneral,
+          icon: LucideIcons.textAlignCenter,
+        ),
+        DialogSideTabItem(
+          label: l10n.dialogEditMetadataTabAuthorsTags,
+          icon: LucideIcons.users,
+        ),
+      ];
 
-  static final List<CapsuleTabItem> _capsuleTabs = <CapsuleTabItem>[
-    CapsuleTabItem(label: '常规', icon: LucideIcons.textAlignCenter),
-    CapsuleTabItem(label: '作者&标签', icon: LucideIcons.users),
+  List<CapsuleTabItem> _capsuleTabs(AppLocalizations l10n) => <CapsuleTabItem>[
+    CapsuleTabItem(
+      label: l10n.dialogEditMetadataTabGeneral,
+      icon: LucideIcons.textAlignCenter,
+    ),
+    CapsuleTabItem(
+      label: l10n.dialogEditMetadataTabAuthorsTags,
+      icon: LucideIcons.users,
+    ),
   ];
 
   @override
@@ -155,7 +170,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     try {
       await widget.onSave(_form.normalized);
       if (mounted) {
-        showSuccessToast(context, '已保存');
+        showSuccessToast(context, context.l10n.commonSavedToast);
         Navigator.of(context).pop();
       }
     } catch (e) {
@@ -234,6 +249,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final int selectedTabIndex = _selectedTab.index;
@@ -256,7 +272,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: CapsuleTabBar(
-                items: _capsuleTabs,
+                items: _capsuleTabs(l10n),
                 selectedIndex: selectedTabIndex,
                 onSelected: _selectTab,
               ),
@@ -289,7 +305,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             DialogSideTabBar(
-              items: _sideTabs,
+              items: _sideTabs(l10n),
               selectedIndex: selectedTabIndex,
               showDivider: false,
               onSelected: _selectTab,
@@ -311,7 +327,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     }
 
     return AdaptiveFormSurface(
-      title: '编辑元数据',
+      title: l10n.dialogEditMetadataTitle,
       maxDialogWidth: _kEditMetadataDialogWidth,
       borderRadius: _kEditMetadataDialogRadius,
       scrollableBody: false,
@@ -329,7 +345,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
               borderRadius: BorderRadius.circular(_kEditMetadataDialogRadius),
             ),
           ),
-          child: const Text('取消'),
+          child: Text(l10n.commonCancel),
         ),
         const SizedBox(width: 8),
         FilledButton(
@@ -348,7 +364,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
                     color: cs.onPrimary,
                   ),
                 )
-              : const Text('保存更改'),
+              : Text(l10n.commonSaveChanges),
         ),
       ],
     );
@@ -381,22 +397,23 @@ class _EditMetadataGeneralTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
     final bool compact = AppLayoutBreakpoints.isCompact(
       MediaQuery.sizeOf(context).width,
     );
 
     final Widget publishedAtField = FluentDatePickerField(
-      labelText: '发布日期',
+      labelText: l10n.formPublishedDateLabel,
       value: publishedAt,
       onChanged: onPublishedAtChanged,
     );
     final Widget contentRatingField = FluentToggleField(
-      labelText: '年龄限制',
+      labelText: l10n.formAgeRestrictionLabel,
       value: isR18,
       onChanged: onIsR18Changed,
       checkedLabel: 'R18',
-      uncheckedLabel: '全年龄',
+      uncheckedLabel: l10n.filterAgeAllAges,
     );
 
     return Column(
@@ -404,18 +421,18 @@ class _EditMetadataGeneralTab extends StatelessWidget {
       spacing: tokens.spacing.lg,
       children: <Widget>[
         FluentTextField(
-          labelText: '漫画标题',
+          labelText: l10n.formComicTitleLabel,
           initialValue: title,
           errorText: titleError,
           onChanged: onTitleChanged,
-          hintText: '修改漫画标题',
+          hintText: l10n.formComicTitleHint,
         ),
         FluentTextField(
-          labelText: '概要',
+          labelText: l10n.formComicDescriptionLabel,
           initialValue: description,
           maxLines: 4,
           onChanged: onDescriptionChanged,
-          hintText: '添加漫画简介…',
+          hintText: l10n.formComicDescriptionHint,
         ),
         if (compact)
           Column(
@@ -457,6 +474,7 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
 
     return Column(
@@ -464,14 +482,14 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
       spacing: tokens.spacing.lg,
       children: <Widget>[
         AuthorLibraryMultiSelectField(
-          label: '作者',
+          label: l10n.comicDetailAuthors,
           icon: LucideIcons.penTool,
           selectedNames: authors.map((Author a) => a.name).toList(),
           onAdd: onAddAuthor,
           onRemove: onRemoveAuthor,
         ),
         TagLibraryMultiSelectField(
-          label: '标签',
+          label: l10n.comicDetailTags,
           icon: LucideIcons.tag,
           selectedNames: tags.map((Tag t) => t.name).toList(),
           onAdd: onAddTag,

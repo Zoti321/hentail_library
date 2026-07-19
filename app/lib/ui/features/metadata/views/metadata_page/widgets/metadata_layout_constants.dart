@@ -60,10 +60,3 @@ double metadataSearchFieldWidth(
   }, contentMaxWidth);
 }
 
-String metadataAddEntityTooltip(int tabIndex) {
-  return switch (tabIndex) {
-    0 => '添加作者',
-    1 => '添加标签',
-    _ => '添加',
-  };
-}

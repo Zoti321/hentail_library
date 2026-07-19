@@ -4,6 +4,8 @@ import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_sort_notifier.dart';
@@ -74,6 +76,7 @@ class _ComicSortListRow extends ConsumerWidget {
     final bool isSelected = sortOption.field == field;
     final bool isImplemented = field.isImplemented;
     final bool isAscending = !sortOption.descending;
+    final AppLocalizations l10n = context.l10n;
     final TextStyle labelStyle = TextStyle(
       fontSize: 13,
       fontWeight: FontWeight.w400,
@@ -114,10 +117,12 @@ class _ComicSortListRow extends ConsumerWidget {
                     : null,
               ),
               const SizedBox(width: kLibrarySortIconLabelGap),
-              Expanded(child: Text(field.label, style: labelStyle)),
+              Expanded(
+                child: Text(l10n.libraryComicSortFieldLabel(field), style: labelStyle),
+              ),
               if (!isImplemented)
                 Text(
-                  '即将推出',
+                  l10n.libraryComingSoon,
                   style: TextStyle(fontSize: 11, color: cs.hentai.textTertiary),
                 ),
             ],
@@ -143,6 +148,7 @@ class _SeriesSortListRow extends ConsumerWidget {
     final bool isSelected = sortOption.field == field;
     final bool isImplemented = field.isImplemented;
     final bool isAscending = !sortOption.descending;
+    final AppLocalizations l10n = context.l10n;
     final TextStyle labelStyle = TextStyle(
       fontSize: 13,
       fontWeight: FontWeight.w400,
@@ -183,10 +189,12 @@ class _SeriesSortListRow extends ConsumerWidget {
                     : null,
               ),
               const SizedBox(width: kLibrarySortIconLabelGap),
-              Expanded(child: Text(field.label, style: labelStyle)),
+              Expanded(
+                child: Text(l10n.librarySeriesSortFieldLabel(field), style: labelStyle),
+              ),
               if (!isImplemented)
                 Text(
-                  '即将推出',
+                  l10n.libraryComingSoon,
                   style: TextStyle(fontSize: 11, color: cs.hentai.textTertiary),
                 ),
             ],

@@ -13,6 +13,7 @@ class _LibraryCatalogEmptySliver extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final LibraryEmptyStateContent content = resolveLibraryEmptyStateContent(
+      l10n: context.l10n,
       entity: entity,
       isTableEmpty: isTableEmpty,
     );
@@ -59,7 +60,7 @@ class _LibraryCatalogEmptySliver extends StatelessWidget {
                       size: 16,
                       color: theme.colorScheme.primary,
                     ),
-                    label: const Text('管理扫描路径'),
+                    label: Text(context.l10n.libraryManageScanPaths),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: theme.colorScheme.primary,
                       side: BorderSide(

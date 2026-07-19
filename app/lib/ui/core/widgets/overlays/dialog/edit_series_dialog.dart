@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/form/series_metadata_form.dart';
@@ -79,7 +80,7 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
         case SeriesMetadataApplyInvalid(:final SeriesMetadataFormValidation validation):
           setState(() => _validation = validation);
         case SeriesMetadataApplySucceeded():
-          showSuccessToast(context, '系列信息已保存');
+          showSuccessToast(context, context.l10n.dialogEditSeriesSavedToast);
           Navigator.of(context).pop();
       }
     } catch (error) {
@@ -95,10 +96,11 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
     return AdaptiveFormSurface(
-      title: '编辑系列',
+      title: l10n.dialogEditSeriesTitle,
       maxDialogWidth: 480,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -118,7 +120,7 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
               }
             },
             decoration: InputDecoration(
-              labelText: '系列名称',
+              labelText: l10n.formSeriesNameLabel,
               border: const OutlineInputBorder(),
               isDense: true,
               errorText: _validation?.nameError,
@@ -126,8 +128,8 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
           ),
           DropdownButtonFormField<SerializationStatus>(
             value: _serializationStatus,
-            decoration: const InputDecoration(
-              labelText: '连载状态',
+            decoration: InputDecoration(
+              labelText: l10n.formSeriesSerializationStatusLabel,
               border: OutlineInputBorder(),
               isDense: true,
             ),
@@ -136,7 +138,7 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
                   (SerializationStatus status) =>
                       DropdownMenuItem<SerializationStatus>(
                         value: status,
-                        child: Text(status.label),
+                        child: Text(context.l10n.serializationStatusLabel(status)),
                       ),
                 )
                 .toList(),
@@ -164,8 +166,8 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
               }
             },
             decoration: InputDecoration(
-              labelText: '漫画总数',
-              hintText: '留空表示不设置',
+              labelText: l10n.formSeriesTotalCountLabel,
+              hintText: l10n.formSeriesTotalCountHint,
               border: const OutlineInputBorder(),
               isDense: true,
               errorText: _validation?.totalCountError,
@@ -176,7 +178,7 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
       actions: <Widget>[
         TextButton(
           onPressed: _saving ? null : () => Navigator.of(context).pop(),
-          child: const Text('取消'),
+          child: Text(l10n.commonCancel),
         ),
         const SizedBox(width: 8),
         FilledButton(
@@ -190,7 +192,7 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
                     color: cs.onPrimary,
                   ),
                 )
-              : const Text('保存'),
+              : Text(l10n.commonSave),
         ),
       ],
     );

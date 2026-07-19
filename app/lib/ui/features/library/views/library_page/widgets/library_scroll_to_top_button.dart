@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -87,6 +89,8 @@ class _LibraryScrollToTopButtonState extends State<LibraryScrollToTopButton> {
     final AppThemeTokens tokens = context.tokens;
     final bool visible = _scrollPastShowThreshold && !widget.isDrawerOpen;
 
+    final AppLocalizations l10n = context.l10n;
+
     return Positioned(
       right: tokens.layout.contentHorizontalPadding,
       bottom: kLibraryScrollToTopBottomPadding,
@@ -111,8 +115,8 @@ class _LibraryScrollToTopButtonState extends State<LibraryScrollToTopButton> {
             ),
             child: GhostButton.icon(
               icon: LucideIcons.arrowUp,
-              tooltip: '回到顶部',
-              semanticLabel: '回到顶部',
+              tooltip: l10n.libraryScrollToTop,
+              semanticLabel: l10n.libraryScrollToTop,
               size: 40,
               iconSize: 18,
               borderRadius: tokens.radius.md,

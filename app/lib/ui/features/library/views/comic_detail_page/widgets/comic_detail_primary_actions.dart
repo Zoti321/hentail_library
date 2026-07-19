@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/reader/read_session_launcher.dart';
@@ -62,28 +64,29 @@ class ComicDetailPrimaryActions extends HookConsumerWidget {
       theme,
       tokens,
     );
+    final AppLocalizations l10n = context.l10n;
     return Wrap(
       spacing: tokens.spacing.md,
       runSpacing: tokens.spacing.sm,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: <Widget>[
         Semantics(
-          label: '阅读',
+          label: l10n.comicDetailRead,
           button: true,
           child: ElevatedButton.icon(
             onPressed: () => _openReader(ref, incognito: false),
             icon: const Icon(LucideIcons.bookOpen, size: 16),
-            label: const Text('阅读'),
+            label: Text(l10n.comicDetailRead),
             style: primaryStyle,
           ),
         ),
         Semantics(
-          label: '无痕阅读',
+          label: l10n.comicDetailReadIncognito,
           button: true,
           child: ElevatedButton.icon(
             onPressed: () => _openReader(ref, incognito: true),
             icon: const Icon(LucideIcons.hatGlasses, size: 16),
-            label: const Text('阅读'),
+            label: Text(l10n.comicDetailRead),
             style: incognitoStyle,
           ),
         ),

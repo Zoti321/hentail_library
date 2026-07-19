@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/pagination/library_pagination_bar.dart';
@@ -34,6 +36,7 @@ class SeriesDetailPaginationBar extends ConsumerWidget {
     final SeriesDetailComicsCatalogController notifier = ref.read(
       seriesDetailComicsCatalogControllerProvider(seriesId).notifier,
     );
+    final AppLocalizations l10n = context.l10n;
     return Padding(
       padding: _paddingForPlacement(tokens),
       child: Row(
@@ -41,18 +44,18 @@ class SeriesDetailPaginationBar extends ConsumerWidget {
         children: <Widget>[
           GhostButton.icon(
             icon: LucideIcons.chevronsLeft,
-            tooltip: '首页',
+            tooltip: l10n.seriesDetailPaginationFirst,
             onPressed: canGoPrevious ? notifier.goToFirstPage : null,
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronLeft,
-            tooltip: '上一页',
+            tooltip: l10n.seriesDetailPaginationPrevious,
             onPressed: canGoPrevious ? notifier.goToPreviousPage : null,
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
             child: Text(
-              '第 $page / $totalPages 页',
+              l10n.seriesDetailPaginationPage(page, totalPages),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -60,14 +63,14 @@ class SeriesDetailPaginationBar extends ConsumerWidget {
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronRight,
-            tooltip: '下一页',
+            tooltip: l10n.seriesDetailPaginationNext,
             onPressed: canGoNext
                 ? () => notifier.goToNextPage(totalPages)
                 : null,
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronsRight,
-            tooltip: '末页',
+            tooltip: l10n.seriesDetailPaginationLast,
             onPressed: canGoNext
                 ? () => notifier.goToLastPage(totalPages)
                 : null,

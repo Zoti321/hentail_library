@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/state/diagnostic_mode_notifier.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -15,6 +16,7 @@ class DiagnosticModeBanner extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
+    final l10n = context.l10n;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Material(
       color: colorScheme.primary.withValues(alpha: 0.1),
@@ -33,7 +35,7 @@ class DiagnosticModeBanner extends ConsumerWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                '诊断模式已开启 · 正在记录更详细日志',
+                l10n.diagnosticModeBannerMessage,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -52,7 +54,7 @@ class DiagnosticModeBanner extends ConsumerWidget {
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 visualDensity: VisualDensity.compact,
               ),
-              child: const Text('关闭'),
+              child: Text(l10n.diagnosticModeDisable),
             ),
             TextButton(
               onPressed: () => context.go('/settings'),
@@ -62,7 +64,7 @@ class DiagnosticModeBanner extends ConsumerWidget {
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 visualDensity: VisualDensity.compact,
               ),
-              child: const Text('设置'),
+              child: Text(l10n.navSettings),
             ),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
@@ -172,6 +173,7 @@ class _AuthorListHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     final int selectionCount = ref.watch(
       authorSelectionProvider.select((Set<Author> s) => s.length),
     );
@@ -190,7 +192,7 @@ class _AuthorListHeader extends ConsumerWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '全部作者',
+            l10n.metadataAllAuthors,
             style: TextStyle(
               fontSize: _AuthorStyles.listHeaderFontSize,
               fontWeight: FontWeight.w600,
@@ -199,7 +201,7 @@ class _AuthorListHeader extends ConsumerWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            '共 $totalCount 条',
+            l10n.metadataTotalCount(totalCount),
             style: TextStyle(
               fontSize: _AuthorStyles.listHeaderFontSize,
               color: cs.hentai.textTertiary,
@@ -208,7 +210,7 @@ class _AuthorListHeader extends ConsumerWidget {
           if (selectionCount > 0) ...[
             const SizedBox(width: 12),
             Text(
-              '已选 $selectionCount',
+              l10n.metadataSelectedCount(selectionCount),
               style: TextStyle(
                 fontSize: _AuthorStyles.listHeaderFontSize,
                 fontWeight: FontWeight.w600,
@@ -237,6 +239,7 @@ class _AuthorRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final l10n = context.l10n;
 
     return MetadataPanelRowInteractionShell(
       hoverColor: cs.primary.withAlpha(10),
@@ -254,13 +257,14 @@ class _AuthorRow extends ConsumerWidget {
                     : LucideIcons.square,
                 iconSize: 16,
                 size: _AuthorStyles.iconButtonSize.width,
-                tooltip: '',
+                tooltip: isSelected ? l10n.metadataDeselect : l10n.metadataSelect,
                 foregroundColor: isSelected
                     ? cs.primary
                     : cs.hentai.textTertiary,
                 hoverColor: theme.colorScheme.primary.withAlpha(10),
                 overlayColor: theme.colorScheme.primary.withAlpha(14),
                 borderRadius: 8,
+                delayTooltipThreeSeconds: true,
                 onPressed: () =>
                     ref.read(authorSelectionProvider.notifier).toggle(author),
               ),
@@ -282,9 +286,9 @@ class _AuthorRow extends ConsumerWidget {
                   await showDialog<void>(
                     context: context,
                     builder: (context) => TagNameEditorDialog(
-                      title: '重命名作者',
-                      labelText: '新名称',
-                      hintText: '输入新的作者名称…',
+                      title: l10n.metadataRenameAuthor,
+                      labelText: l10n.metadataNewName,
+                      hintText: l10n.metadataRenameAuthorHint,
                       initialValue: author.name,
                       shouldCloseOnUnchanged: true,
                       onSubmit: (value) async {
@@ -309,7 +313,7 @@ class _AuthorRow extends ConsumerWidget {
                   try {
                     await ref.read(authorActionsProvider).deleteAuthor(author);
                     if (context.mounted) {
-                      showSuccessToast(context, '已删除作者');
+                      showSuccessToast(context, l10n.metadataAuthorDeletedToast);
                     }
                   } catch (e) {
                     if (context.mounted) {
@@ -374,6 +378,7 @@ class _AuthorManagementEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final l10n = context.l10n;
     return StatusCardShell(
       padding: _AuthorStyles.statusEmptyPadding,
       borderRadius: _AuthorStyles.statusCardRadius,
@@ -383,7 +388,7 @@ class _AuthorManagementEmptyState extends StatelessWidget {
           Icon(LucideIcons.penLine, size: 32, color: cs.onSurfaceVariant),
           const SizedBox(height: 12),
           Text(
-            '暂无作者',
+            l10n.metadataAuthorsEmptyTitle,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -392,7 +397,7 @@ class _AuthorManagementEmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '你可以从这里添加、重命名或删除作者。',
+            l10n.metadataAuthorsEmptyHint,
             style: TextStyle(
               fontSize: kMetadataPanelSubtitleFontSize,
               color: cs.hentai.textSecondary,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
@@ -52,6 +53,7 @@ class ComicCard extends ConsumerWidget {
       position: relativePosition,
       mangaTitle: comic.title,
       onAction: (ComicContextAction action) {
+        final l10n = context.l10n;
         switch (action) {
           case ComicContextAction.read:
             appRouter.pushNamed(
@@ -86,7 +88,7 @@ class ComicCard extends ConsumerWidget {
               showErrorToast(
                 context,
                 AppException(
-                  '无法在文件资源管理器中显示该项目',
+                  l10n.comicDetailShowInExplorerFailed,
                   cause: error,
                   stackTrace: stackTrace,
                 ),
@@ -95,20 +97,25 @@ class ComicCard extends ConsumerWidget {
           case ComicContextAction.delete:
             showDialog<bool>(
               context: context,
-              builder: (BuildContext context) => AlertDialog(
-                title: const Text('删除漫画？'),
-                content: Text('将删除「${comic.title}」。此操作不可撤销。'),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    child: const Text('取消'),
+              builder: (BuildContext dialogContext) {
+                final dialogL10n = dialogContext.l10n;
+                return AlertDialog(
+                  title: Text(dialogL10n.comicDetailDeleteTitle),
+                  content: Text(
+                    dialogL10n.comicDetailDeleteConfirm(comic.title),
                   ),
-                  FilledButton(
-                    onPressed: () => Navigator.of(context).pop(true),
-                    child: const Text('删除'),
-                  ),
-                ],
-              ),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.of(dialogContext).pop(false),
+                      child: Text(dialogL10n.comicDetailCancel),
+                    ),
+                    FilledButton(
+                      onPressed: () => Navigator.of(dialogContext).pop(true),
+                      child: Text(dialogL10n.comicDetailDelete),
+                    ),
+                  ],
+                );
+              },
             ).then((bool? confirmed) async {
               if (confirmed != true || !context.mounted) {
                 return;
@@ -121,7 +128,7 @@ class ComicCard extends ConsumerWidget {
                     .read(comicCoverCacheManagerProvider.notifier)
                     .clearForComics(<String>[comic.comicId]);
                 if (context.mounted) {
-                  showSuccessToast(context, '已删除漫画');
+                  showSuccessToast(context, l10n.comicDetailDeletedToast);
                 }
               } catch (err) {
                 if (context.mounted) {
@@ -148,6 +155,7 @@ class _ComicCardInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
     return Column(
@@ -166,7 +174,7 @@ class _ComicCardInfo extends StatelessWidget {
           child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
         ),
         Text(
-          '$pageCount 页',
+          l10n.comicDetailPageCount(pageCount),
           style: TextStyle(
             fontSize: tokens.text.labelXs - 1,
             color: cs.hentai.textTertiary,

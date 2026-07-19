@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -102,11 +104,12 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
 
     final double cardWidth = libraryGridMaxCrossAxisExtent(layoutTier);
     final double cardHeight = catalogCoverCardMainAxisExtent(tokens, cardWidth);
+    final AppLocalizations l10n = context.l10n;
     final Widget headerSection = trimmedQuery.isEmpty
         ? SearchedPageHeaderSection(
             layoutTier: layoutTier,
             horizontalPadding: horizontalPadding,
-            query: '搜索结果',
+            query: l10n.searchResultsTitle,
             resultCount: 0,
             showQuotes: false,
           )
@@ -157,7 +160,7 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Text(
-                        '加载失败：$error',
+                        l10n.searchLoadFailed(error.toString()),
                         style: TextStyle(fontSize: 13, color: cs.error),
                       ),
                     )
@@ -168,7 +171,7 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                   else ...<Widget>[
                     if (searchedSeriesCount > 0)
                       SearchResultHorizontalSection(
-                        title: '系列',
+                        title: l10n.libraryTabSeries,
                         itemCount: series.length,
                         itemHeight: cardHeight,
                         itemBuilder: (BuildContext context, int index) {
@@ -190,7 +193,7 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                       ),
                     if (searchedComicCount > 0)
                       SearchResultHorizontalSection(
-                        title: '漫画',
+                        title: l10n.libraryTabComics,
                         itemCount: comics.length,
                         itemHeight: cardHeight,
                         itemBuilder: (BuildContext context, int index) {
@@ -219,9 +222,9 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
           ),
         ),
         if (trimmedQuery.isEmpty)
-          const SliverFillRemaining(
+          SliverFillRemaining(
             hasScrollBody: false,
-            child: Center(child: Text('请输入关键词后按回车搜索')),
+            child: Center(child: Text(l10n.searchEnterKeyword)),
           ),
       ],
     );
@@ -237,6 +240,7 @@ class _SearchResultsEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final AppLocalizations l10n = context.l10n;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl * 2),
       child: Center(
@@ -246,7 +250,7 @@ class _SearchResultsEmptyState extends StatelessWidget {
           children: <Widget>[
             Icon(LucideIcons.searchX, size: 40, color: cs.hentai.textTertiary),
             Text(
-              '无匹配结果',
+              l10n.libraryNoMatchTitle,
               style: TextStyle(
                 fontSize: tokens.text.bodyMd,
                 color: cs.hentai.textSecondary,
@@ -255,7 +259,7 @@ class _SearchResultsEmptyState extends StatelessWidget {
             TextButton.icon(
               onPressed: onGoToLibrary,
               icon: const Icon(LucideIcons.library, size: 16),
-              label: const Text('返回漫画库'),
+              label: Text(l10n.searchBackToLibrary),
             ),
           ],
         ),

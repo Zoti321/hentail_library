@@ -13,12 +13,6 @@ enum LibraryMediaTypeFilterOption {
         LibraryMediaTypeFilterOption.archive,
       ];
 
-  String get label => switch (this) {
-    LibraryMediaTypeFilterOption.pdf => 'PDF',
-    LibraryMediaTypeFilterOption.epub => 'EPUB',
-    LibraryMediaTypeFilterOption.archive => '压缩包',
-  };
-
   Set<ResourceType> get resourceTypes => switch (this) {
     LibraryMediaTypeFilterOption.pdf => const <ResourceType>{ResourceType.pdf},
     LibraryMediaTypeFilterOption.epub => const <ResourceType>{

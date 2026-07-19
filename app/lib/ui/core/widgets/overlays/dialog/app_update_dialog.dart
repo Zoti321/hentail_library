@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/open_downloaded_file.dart';
 import 'package:hentai_library/domain/models/app_release_info.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -29,19 +30,20 @@ class AppUpdateDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final String publishedLabel = DateFormat(
       'yyyy-MM-dd',
     ).format(release.publishedAt.toLocal());
     return HentaiDialog(
-      title: '发现新版本 v${release.version}',
+      title: l10n.updateNewVersionTitle(release.version),
       width: 480,
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
-            '发布于 $publishedLabel',
+            l10n.updatePublishedOn(publishedLabel),
             style: TextStyle(
               fontSize: 12,
               color: colorScheme.hentai.textTertiary,
@@ -75,7 +77,7 @@ class AppUpdateDialog extends ConsumerWidget {
               Navigator.of(context).pop();
             }
           },
-          child: const Text('稍后提醒'),
+          child: Text(l10n.updateRemindLater),
         ),
         const SizedBox(width: 8),
         TextButton(
@@ -89,7 +91,7 @@ class AppUpdateDialog extends ConsumerWidget {
               }
             }
           },
-          child: const Text('查看详情'),
+          child: Text(l10n.updateViewDetails),
         ),
         const SizedBox(width: 8),
         FilledButton(
@@ -108,7 +110,7 @@ class AppUpdateDialog extends ConsumerWidget {
                 return;
               }
               if (context.mounted) {
-                showInfoToast(context, '请手动下载适合您系统的安装包');
+                showInfoToast(context, l10n.updateManualDownloadToast);
               }
               return;
             }
@@ -117,7 +119,7 @@ class AppUpdateDialog extends ConsumerWidget {
             }
             await showAppUpdateDownloadDialog(context: context, asset: asset);
           },
-          child: const Text('立即更新'),
+          child: Text(l10n.updateNow),
         ),
       ],
     );

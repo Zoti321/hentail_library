@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/common.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -40,6 +41,7 @@ class _MenuContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return ContextMenuContainer(
       title: title,
       child: Padding(
@@ -50,12 +52,12 @@ class _MenuContent extends StatelessWidget {
           children: <Widget>[
             ContextMenuActionItem(
               icon: LucideIcons.info,
-              label: '跳转到详情页',
+              label: l10n.contextMenuGoToDetail,
               onTap: () => handleAction(SeriesItemContextAction.goToDetail),
             ),
             ContextMenuActionItem(
               icon: LucideIcons.externalLink,
-              label: '在文件资源管理器中显示',
+              label: l10n.comicDetailShowInExplorer,
               onTap: () => handleAction(SeriesItemContextAction.showInExplorer),
             ),
           ],

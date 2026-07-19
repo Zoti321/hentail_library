@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/meta_chip.dart';
@@ -29,7 +31,10 @@ class SearchedPageHeaderSection extends StatelessWidget {
     final ColorScheme cs = theme.colorScheme;
     final String displayQuery =
         unwrapFullyQuotedLibrarySearchQuery(query) ?? query;
-    final String title = showQuotes ? '"$displayQuery"的搜索结果' : query;
+    final AppLocalizations l10n = context.l10n;
+    final String title = showQuotes
+        ? l10n.searchResultsForQuery(displayQuery)
+        : query;
     return Padding(
       padding: EdgeInsets.fromLTRB(
         horizontalPadding,
@@ -42,8 +47,8 @@ class SearchedPageHeaderSection extends StatelessWidget {
         children: <Widget>[
           GhostButton.icon(
             icon: LucideIcons.arrowLeft,
-            tooltip: '返回',
-            semanticLabel: '返回',
+            tooltip: l10n.shellBack,
+            semanticLabel: l10n.shellBack,
             iconSize: 16,
             size: 32,
             borderRadius: 8,

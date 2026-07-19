@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -78,6 +79,8 @@ class MetadataPageHeaderToolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+    final String addTooltip = l10n.metadataAddEntityTooltip(selectedTabIndex);
     return SizedBox(
       height: 44,
       child: Stack(
@@ -95,7 +98,7 @@ class MetadataPageHeaderToolbar extends StatelessWidget {
                       if (onOpenNavigation != null) ...<Widget>[
                         GhostButton.icon(
                           icon: LucideIcons.menu,
-                          semanticLabel: '打开导航菜单',
+                          semanticLabel: l10n.shellOpenNavMenu,
                           tooltip: '',
                           iconSize: 16,
                           size: 32,
@@ -107,15 +110,18 @@ class MetadataPageHeaderToolbar extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                       ],
-                      Text('管理', style: metadataPageTitleStyle(cs, layoutTier)),
+                      Text(
+                        l10n.navMetadata,
+                        style: metadataPageTitleStyle(cs, layoutTier),
+                      ),
                     ],
                   ),
                 ),
               ),
               GhostButton.icon(
                 icon: LucideIcons.plus,
-                tooltip: metadataAddEntityTooltip(selectedTabIndex),
-                semanticLabel: metadataAddEntityTooltip(selectedTabIndex),
+                tooltip: addTooltip,
+                semanticLabel: addTooltip,
                 iconSize: 16,
                 size: 32,
                 borderRadius: 8,
@@ -150,25 +156,25 @@ class MetadataEntityTabs extends StatelessWidget {
   final int selectedTabIndex;
   final ValueChanged<int> onTabSelected;
 
-  static const List<CapsuleTabItem> _capsuleItems = <CapsuleTabItem>[
-    CapsuleTabItem(label: '作者', icon: LucideIcons.penLine),
-    CapsuleTabItem(label: '标签', icon: LucideIcons.tags),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final List<CapsuleTabItem> capsuleItems = <CapsuleTabItem>[
+      CapsuleTabItem(label: l10n.metadataTabAuthors, icon: LucideIcons.penLine),
+      CapsuleTabItem(label: l10n.metadataTabTags, icon: LucideIcons.tags),
+    ];
     if (layoutTier == MetadataLayoutTier.compact) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           _MetadataUnderlineTab(
-            label: '作者',
+            label: l10n.metadataTabAuthors,
             isSelected: selectedTabIndex == 0,
             onTap: () => onTabSelected(0),
           ),
           const SizedBox(width: 16),
           _MetadataUnderlineTab(
-            label: '标签',
+            label: l10n.metadataTabTags,
             isSelected: selectedTabIndex == 1,
             onTap: () => onTabSelected(1),
           ),
@@ -177,7 +183,7 @@ class MetadataEntityTabs extends StatelessWidget {
     }
 
     return CapsuleTabBar(
-      items: _capsuleItems,
+      items: capsuleItems,
       selectedIndex: selectedTabIndex,
       onSelected: onTabSelected,
     );

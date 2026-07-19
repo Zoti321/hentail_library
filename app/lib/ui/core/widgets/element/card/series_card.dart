@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -41,6 +43,7 @@ class _SeriesCardInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppLocalizations l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 6,
@@ -61,7 +64,7 @@ class _SeriesCardInfo extends StatelessWidget {
           ),
         ),
         Text(
-          series.volumeCountLabel,
+          l10n.seriesVolumeCountLabel(series.items.length),
           style: TextStyle(
             fontSize: tokens.text.labelXs - 1,
             color: cs.hentai.textTertiary,

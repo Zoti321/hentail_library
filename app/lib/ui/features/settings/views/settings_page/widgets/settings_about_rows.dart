@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/ui/features/settings/state/app_update_controller.dart';
@@ -24,6 +25,7 @@ class AutoUpdateRow extends ConsumerWidget {
       ),
     );
     final ThemeData theme = Theme.of(context);
+    final l10n = context.l10n;
     return SettingsRow(
       layoutTier: layoutTier,
       icon: Icon(
@@ -31,7 +33,7 @@ class AutoUpdateRow extends ConsumerWidget {
         size: 20,
         color: theme.colorScheme.hentai.iconDefault,
       ),
-      label: '自动更新',
+      label: l10n.settingsAutoUpdateLabel,
       action: ToggleSwitch(
         checked: autoUpdate,
         onChange: () =>
@@ -52,9 +54,11 @@ class AboutVersionRow extends ConsumerWidget {
       packageInfoProvider,
     );
     final ThemeData theme = Theme.of(context);
+    final l10n = context.l10n;
     final String versionActionLabel = packageInfoAsync.maybeWhen(
-      data: (PackageInfo info) => '当前版本 v${info.version}',
-      orElse: () => '当前版本 …',
+      data: (PackageInfo info) =>
+          l10n.settingsCurrentVersion(info.version),
+      orElse: () => l10n.settingsCurrentVersionLoading,
     );
     return SettingsRow(
       layoutTier: layoutTier,
@@ -63,7 +67,7 @@ class AboutVersionRow extends ConsumerWidget {
         size: 20,
         color: theme.colorScheme.hentai.iconDefault,
       ),
-      label: '检查更新',
+      label: l10n.settingsCheckForUpdatesLabel,
       onRowTap: packageInfoAsync.isLoading
           ? null
           : () => ref

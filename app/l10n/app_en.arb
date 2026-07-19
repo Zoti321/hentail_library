@@ -1,0 +1,670 @@
+{
+  "@@locale": "en",
+  "libraryTitle": "Library",
+  "libraryEmptyTitle": "No comics yet",
+  "libraryEmptyHint": "Add a path under Selected Paths and scan",
+  "librarySeriesEmptyTitle": "No series yet",
+  "librarySeriesEmptyHint": "Series are created from scan results. Add a path and scan to see them here.",
+  "libraryNoMatchTitle": "No matches",
+  "libraryNoMatchFilterHintComics": "No comics match the current filters",
+  "libraryNoMatchFilterHintSeries": "No series match the current filters",
+  "comicCount": "{count, plural, =0{0 comics} one{1 comic} other{{count} comics}}",
+  "@comicCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsLanguageLabel": "Language",
+  "localePreferenceSystem": "System",
+  "localePreferenceZhCn": "Chinese",
+  "localePreferenceEn": "English",
+  "settingsThemeLabel": "App theme",
+  "themePreferenceSystem": "System",
+  "themePreferenceLight": "Light",
+  "themePreferenceDark": "Dark",
+  "navHome": "Home",
+  "navMetadata": "Manage",
+  "navHistory": "History",
+  "navSettings": "Settings",
+  "pageTitleReader": "Reading",
+  "pageTitleComicDetail": "Comic details",
+  "pageTitleSeriesDetail": "Series details",
+  "pageTitlePaths": "Library paths",
+  "pageTitleSearchResults": "Search results",
+  "pageTitleNotFound": "Page not found",
+  "shellOpenNavMenu": "Open navigation menu",
+  "shellLoadFailed": "Failed to load",
+  "shellLoading": "Loading…",
+  "shellBack": "Back",
+  "shellBackToSettings": "Back to settings",
+  "shellRetry": "Retry",
+  "shellRetrying": "Retrying…",
+  "shellProcessing": "Processing…",
+  "homeTitle": "Home",
+  "homeScanLibrary": "Scan library",
+  "homeGreetingLateNight": "Good evening",
+  "homeGreetingEarlyMorning": "Good morning",
+  "homeGreetingMorning": "Good morning",
+  "homeGreetingNoon": "Good afternoon",
+  "homeGreetingAfternoon": "Good afternoon",
+  "homeGreetingEvening": "Good evening",
+  "homeGreetingLate": "Good night",
+  "homeGreetingReader": "{greeting}, reader",
+  "@homeGreetingReader": {
+    "placeholders": {
+      "greeting": {
+        "type": "String"
+      }
+    }
+  },
+  "homeEmptyTitle": "No comics imported yet",
+  "homeEmptyHint": "Add library folders in Settings and scan. If already configured, check Selected Paths or scan again.",
+  "pathsTitle": "Selected paths",
+  "homeStatSeries": "Series",
+  "homeStatTags": "Tags",
+  "homeStatAuthors": "Authors",
+  "homeComicTotal": "{count, plural, one{1 comic total} other{{count} comics total}}",
+  "@homeComicTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeSeriesCount": "{count, plural, one{1 series} other{{count} series}}",
+  "@homeSeriesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeTagCount": "{count, plural, one{1 tag} other{{count} tags}}",
+  "@homeTagCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeAuthorCount": "{count, plural, one{1 author} other{{count} authors}}",
+  "@homeAuthorCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNoAuthors": "No authors yet",
+  "homeContinueReading": "Continue reading",
+  "homeNoReadingHistory": "No reading history yet, ",
+  "homeGoToLibrary": "Go to library",
+  "historyTitle": "Reading history",
+  "historyClearAction": "Clear reading history",
+  "historyClearedToast": "Reading history cleared",
+  "historyRecordSummary": "{count, plural, one{1 entry · kept for 30 days max} other{{count} entries · kept for 30 days max}}",
+  "@historyRecordSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historySearchHint": "Search history...",
+  "historyEmpty": "No reading history yet",
+  "historyNoMatch": "No matching entries",
+  "historyDeletedToast": "Entry removed",
+  "pathsSavedHeading": "Saved paths",
+  "pathsTotalCount": "{count, plural, one{1 path} other{{count} paths}}",
+  "@pathsTotalCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pathsEmptyHint": "No paths yet. Add a folder.",
+  "pathsAddButton": "Add path",
+  "pathsAddedOneToast": "Path added",
+  "pathsRemovedToast": "Path removed",
+  "pathsRemoveAction": "Remove path",
+  "pathsLoadFailed": "Failed to load paths",
+  "notFoundTitle": "Page not found",
+  "notFoundHint": "This link may be outdated or the page was removed.",
+  "notFoundGoHome": "Back to home",
+  "notFoundGoLibrary": "Go to library",
+  "settingsGroupPersonalization": "Personalization",
+  "settingsGroupLibrary": "Library",
+  "settingsGroupDiagnostics": "Diagnostics & support",
+  "settingsGroupAbout": "About",
+  "settingsDiagnosticModeLabel": "Verbose diagnostics",
+  "settingsDiagnosticModeDescriptionEnabled": "Enabled: Dart and Rust log more detail",
+  "settingsDiagnosticModeDescriptionDisabled": "Temporarily increase log verbosity to help reproduce issues",
+  "settingsDiagnosticModeEnabledBadge": "Enabled",
+  "settingsExportLogsLabel": "Export logs",
+  "settingsExportLogsDescription": "Bundle app and core logs for troubleshooting",
+  "settingsLibraryLocationLabel": "Library paths",
+  "settingsAutoScanLabel": "Auto scan",
+  "settingsAutoUpdateLabel": "Automatic updates",
+  "settingsCurrentVersion": "Current version v{version}",
+  "@settingsCurrentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsCurrentVersionLoading": "Current version …",
+  "settingsCheckForUpdatesLabel": "Check for updates",
+  "settingsUpdateCheckFailed": "Update check failed. Please try again later.",
+  "settingsUpdateUpToDate": "You're on the latest version",
+  "libraryTabComics": "Comics",
+  "libraryTabSeries": "Series",
+  "librarySeriesCount": "{count, plural, one{1 series} other{{count} series}}",
+  "@librarySeriesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryManageScanPaths": "Manage scan paths",
+  "librarySearchHint": "Search…",
+  "librarySearchKeywordEmpty": "Keyword cannot be empty",
+  "libraryFilterSortTooltip": "Filter & sort",
+  "libraryFilterSortSemantic": "Open filter & sort",
+  "libraryPageSizeTooltip": "Items per page",
+  "libraryPageSizeSemantic": "Set items per page",
+  "libraryScanCancelledToast": "Scan cancelled",
+  "libraryScanningDeep": "Deep scanning…",
+  "libraryScanning": "Scanning…",
+  "libraryCancelScan": "Cancel scan",
+  "libraryMoreActions": "More actions",
+  "libraryMoreActionsSemantic": "Open more actions",
+  "libraryRefresh": "Refresh",
+  "libraryScan": "Scan",
+  "libraryDeepScan": "Deep scan",
+  "libraryScrollToTop": "Back to top",
+  "libraryFilterSection": "Filter",
+  "librarySortSection": "Sort",
+  "libraryAgeRestrictionFilter": "Age restriction",
+  "libraryMediaTypeFilter": "Media type",
+  "libraryComingSoon": "Coming soon",
+  "libraryComicSortTitle": "Title",
+  "libraryComicSortCreatedAt": "Date added",
+  "libraryComicSortLastUpdatedAt": "Last updated",
+  "libraryComicSortPublishedAt": "Published date",
+  "libraryComicSortReadAt": "Read date",
+  "libraryComicSortFileSize": "File size",
+  "libraryComicSortPageCount": "Page count",
+  "librarySeriesSortName": "Name",
+  "librarySeriesSortComicCount": "Comic count",
+  "librarySeriesSortRandom": "Random",
+  "filterAgeUnrestricted": "All",
+  "filterAgeAllAges": "All ages",
+  "filterAgeR18Only": "R18 only",
+  "filterMediaTypePdf": "PDF",
+  "filterMediaTypeEpub": "EPUB",
+  "filterMediaTypeArchive": "Archive",
+  "libraryScanComplete": "Scan complete",
+  "libraryDeepScanComplete": "Deep scan complete",
+  "libraryScanCompleteNoRoots": "Scan complete: no scan paths configured",
+  "libraryDeepScanCompleteNoRoots": "Deep scan complete: no scan paths configured",
+  "libraryScanCompleteCleared": "Scan complete: removed {count} items",
+  "@libraryScanCompleteCleared": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryDeepScanCompleteCleared": "Deep scan complete: removed {count} items",
+  "@libraryDeepScanCompleteCleared": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryScanCompleteStats": "Scan complete: added {added}, removed {removed}, kept {kept}",
+  "@libraryScanCompleteStats": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "removed": {
+        "type": "int"
+      },
+      "kept": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryDeepScanCompleteStats": "Deep scan complete: added {added}, removed {removed}, kept {kept}",
+  "@libraryDeepScanCompleteStats": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "removed": {
+        "type": "int"
+      },
+      "kept": {
+        "type": "int"
+      }
+    }
+  },
+  "searchResultsTitle": "Search results",
+  "searchResultsForQuery": "Search results for \"{query}\"",
+  "@searchResultsForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchEnterKeyword": "Enter a keyword and press Enter to search",
+  "searchLoadFailed": "Failed to load: {error}",
+  "@searchLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "searchBackToLibrary": "Back to library",
+  "searchScrollLeft": "Scroll left",
+  "searchScrollRight": "Scroll right",
+  "comicDetailPageCount": "{count, plural, one{1 page} other{{count} pages}}",
+  "@comicDetailPageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "comicDetailAuthors": "Authors",
+  "comicDetailTags": "Tags",
+  "comicDetailResourceFormat": "Format",
+  "comicDetailResourceSize": "Size",
+  "comicDetailResourcePath": "Path",
+  "comicDetailAddedAt": "Added",
+  "comicDetailUpdatedAt": "Updated",
+  "comicDetailRead": "Read",
+  "comicDetailReadIncognito": "Read incognito",
+  "comicDetailEditMetadata": "Edit metadata",
+  "comicDetailShowInExplorer": "Show in file explorer",
+  "comicDetailShowInExplorerFailed": "Could not show this item in File Explorer",
+  "comicDetailDelete": "Delete",
+  "comicDetailDeleteTitle": "Delete comic?",
+  "comicDetailDeleteConfirm": "\"{title}\" will be deleted. This cannot be undone.",
+  "@comicDetailDeleteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "comicDetailCancel": "Cancel",
+  "comicDetailDeletedToast": "Comic deleted",
+  "comicDetailNotFound": "Comic not found or removed",
+  "comicDetailLoadFailedRetry": "Failed to load. Please retry.",
+  "comicDetailGoToLibrary": "Go to library",
+  "comicDetailSeriesNavConflict": "Series data error: this comic belongs to multiple series; series navigation is unavailable.",
+  "comicDetailSeriesPrev": "Previous in series",
+  "comicDetailSeriesPrevSemantic": "Previous in series",
+  "comicDetailSeriesCatalog": "Series catalog",
+  "comicDetailSeriesNext": "Next in series",
+  "comicDetailSeriesNextSemantic": "Next in series",
+  "seriesDetailEdit": "Edit series",
+  "seriesDetailNoComics": "No comics in this series",
+  "seriesDetailComicsLoadFailed": "Failed to load comic list",
+  "seriesDetailUnknown": "Unknown series",
+  "seriesDetailNotFound": "Series not found: \"{name}\"",
+  "@seriesDetailNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "seriesDetailVolumeCount": "{count, plural, one{1 volume} other{{count} volumes}}",
+  "@seriesDetailVolumeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "seriesDetailVolumeProgress": "{current} / {total} volumes",
+  "@seriesDetailVolumeProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "seriesDetailPaginationPage": "Page {page} of {totalPages}",
+  "@seriesDetailPaginationPage": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "totalPages": {
+        "type": "int"
+      }
+    }
+  },
+  "seriesDetailPaginationFirst": "First page",
+  "seriesDetailPaginationPrevious": "Previous page",
+  "seriesDetailPaginationNext": "Next page",
+  "seriesDetailPaginationLast": "Last page",
+  "serializationStatusOngoing": "Ongoing",
+  "serializationStatusEnded": "Completed",
+  "serializationStatusHiatus": "Hiatus",
+  "serializationStatusUnknown": "Unknown",
+  "readerSettingsTitle": "Reading settings",
+  "readerSettingsClose": "Close",
+  "readerSettingsGeneral": "General",
+  "readerSettingsReadingMode": "Reading mode",
+  "readerSettingsAutoPlay": "Auto-play",
+  "readerSettingsPlayInterval": "Play interval",
+  "readerSettingsSecondsSuffix": "sec",
+  "readerSettingsWebtoonMode": "Webtoon mode",
+  "readerSettingsPagedOptions": "Paged reader options",
+  "readerSettingsHorizontalMargin": "Horizontal margin",
+  "readerSettingsMarginNone": "None (0%)",
+  "readerSettingsMarginPercent": "{percent}%",
+  "@readerSettingsMarginPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "readerSettingsZoomMode": "Zoom mode",
+  "readerSettingsPageLayout": "Page layout",
+  "readingModeCategoryPaged": "Paged",
+  "readingModeCategoryWebtoon": "Webtoon",
+  "readingModePaged": "Paged",
+  "readingModeWebtoon": "Webtoon",
+  "readingModeDualPage": "Dual page",
+  "readingModeDualPageNoCover": "Dual page (cover separate)",
+  "readingModePagedSingle": "Single page",
+  "readingModePagedDual": "Dual page",
+  "readingModePagedDualNoCover": "Dual page (cover separate)",
+  "readingModeWebtoonFitWidth": "Fit width",
+  "readingModeWebtoonOriginalSize": "Original size",
+  "readerSetComicCover": "Set current page as comic cover",
+  "readerSetSeriesCover": "Set current page as series cover",
+  "readerMore": "More",
+  "readerMoreSemantic": "More reading options",
+  "readerStateNotReady": "Reader not ready",
+  "readerComicCoverSet": "Set as comic cover",
+  "readerComicCoverSetFailed": "Failed to set comic cover: {error}",
+  "@readerComicCoverSetFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "readerSeriesCoverSet": "Set as series cover",
+  "readerSeriesCoverSetFailed": "Failed to set series cover: {error}",
+  "@readerSeriesCoverSetFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "readerBackSemantic": "Go back",
+  "readerExitFullscreen": "Exit fullscreen",
+  "readerEnterFullscreen": "Fullscreen",
+  "readerExitFullscreenSemantic": "Exit fullscreen",
+  "readerEnterFullscreenSemantic": "Enter fullscreen",
+  "readerOpenSettingsSemantic": "Open reading settings",
+  "readerSeriesCatalog": "Series catalog",
+  "readerPrevVolume": "Previous volume",
+  "readerPrevVolumeSemantic": "Previous volume in series",
+  "readerFirstPage": "First page",
+  "readerFirstPageSemantic": "Go to first page",
+  "readerNextVolume": "Next volume",
+  "readerNextVolumeSemantic": "Next volume in series",
+  "readerLastPage": "Last page",
+  "readerLastPageSemantic": "Go to last page",
+  "readerPrevPage": "Previous page",
+  "readerNextPage": "Next page",
+  "readerDisableAutoPlay": "Disable auto-play",
+  "readerEnableAutoPlay": "Enable auto-play",
+  "readerInvalidParams": "Invalid reader params: missing comic_id",
+  "readerSeriesAdvancePrompt": "Turn the page again to go to the next volume",
+  "readerNoImages": "No images",
+  "metadataTabAuthors": "Authors",
+  "metadataTabTags": "Tags",
+  "metadataAddAuthor": "Add author",
+  "metadataAddTag": "Add tag",
+  "metadataAdd": "Add",
+  "metadataSearchAuthorsHint": "Search authors…",
+  "metadataSearchTagsHint": "Search tags…",
+  "metadataRename": "Rename",
+  "metadataDelete": "Delete",
+  "metadataMoreActions": "More actions",
+  "metadataAllAuthors": "All authors",
+  "metadataAllTags": "All tags",
+  "metadataTotalCount": "{count, plural, one{1 item} other{{count} items}}",
+  "@metadataTotalCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metadataSelectedCount": "{count, plural, one{1 selected} other{{count} selected}}",
+  "@metadataSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metadataSelect": "Select",
+  "metadataDeselect": "Deselect",
+  "metadataRenameAuthor": "Rename author",
+  "metadataRenameTag": "Rename tag",
+  "metadataNewName": "New name",
+  "metadataRenameAuthorHint": "Enter a new author name…",
+  "metadataRenameTagHint": "Enter a new tag name…",
+  "metadataNameLabel": "Name",
+  "metadataAddAuthorHint": "Enter author name…",
+  "metadataAddTagHint": "Enter tag name…",
+  "metadataAuthorDeletedToast": "Author deleted",
+  "metadataTagDeletedToast": "Tag deleted",
+  "metadataAuthorsEmptyTitle": "No authors yet",
+  "metadataAuthorsEmptyHint": "Add, rename, or delete authors here.",
+  "metadataTagsEmptyTitle": "No tags yet",
+  "metadataTagsEmptyHint": "Add, rename, or delete tags here.",
+  "commonCancel": "Cancel",
+  "commonSave": "Save",
+  "commonSaveChanges": "Save changes",
+  "commonClose": "Close",
+  "commonConfirm": "Confirm",
+  "commonDelete": "Delete",
+  "commonRemove": "Remove",
+  "commonClear": "Clear",
+  "commonRetry": "Retry",
+  "commonOk": "OK",
+  "commonLoadFailed": "Failed to load",
+  "commonBack": "Back",
+  "commonSavedToast": "Saved",
+  "dialogEditSeriesTitle": "Edit series",
+  "dialogEditSeriesSavedToast": "Series info saved",
+  "dialogEditMetadataTitle": "Edit metadata",
+  "dialogEditMetadataTabGeneral": "General",
+  "dialogEditMetadataTabAuthorsTags": "Authors & tags",
+  "formSeriesNameLabel": "Series name",
+  "formSeriesSerializationStatusLabel": "Serialization status",
+  "formSeriesTotalCountLabel": "Total volumes",
+  "formSeriesTotalCountHint": "Leave blank to unset",
+  "formComicTitleLabel": "Title",
+  "formComicTitleHint": "Edit comic title",
+  "formComicDescriptionLabel": "Description",
+  "formComicDescriptionHint": "Add a description…",
+  "formPublishedDateLabel": "Published date",
+  "formAgeRestrictionLabel": "Age restriction",
+  "formDatePickerHint": "Select published date",
+  "formDatePickerHelp": "Select published date",
+  "formDateFieldLabel": "Date",
+  "formDateFieldHint": "Year / month / day",
+  "formDateInvalidFormat": "Invalid date format",
+  "formDateOutOfRange": "Date out of range",
+  "formDateClearTooltip": "Clear date",
+  "formAuthorSelectPlaceholder": "Select or enter author…",
+  "formAuthorListLoadFailed": "Failed to load authors",
+  "formAuthorEmptyCatalog": "No authors yet",
+  "formAuthorEmptyRemaining": "No more options",
+  "formTagSelectPlaceholder": "Select or enter tag…",
+  "formTagListLoadFailed": "Failed to load tags",
+  "formTagEmptyCatalog": "No tags yet",
+  "formTagEmptyRemaining": "No more options",
+  "scanDialogTitle": "Scan library",
+  "scanBackgroundAction": "Scan in background",
+  "scanPreparing": "Preparing…",
+  "scanGeneratingThumbnails": "Generating thumbnails…",
+  "scanProgressSimple": "{done} / {total}",
+  "@scanProgressSimple": {
+    "placeholders": {
+      "done": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "scanProgressWithFailed": "{done} / {total} · {failed} failed",
+  "@scanProgressWithFailed": {
+    "placeholders": {
+      "done": {"type": "int"},
+      "total": {"type": "int"},
+      "failed": {"type": "int"}
+    }
+  },
+  "scanSyncing": "Syncing…",
+  "scanWritingDb": "Writing to database…",
+  "scanClearingLibrary": "Clearing library…",
+  "scanScanningFiles": "Scanning files…",
+  "scanComplete": "Sync complete",
+  "scanFailed": "Sync failed",
+  "scanCancelled": "Scan cancelled",
+  "scanBackgroundThumbnails": "Generating thumbnails in background {done} / {total}{failedSuffix}",
+  "@scanBackgroundThumbnails": {
+    "placeholders": {
+      "done": {"type": "int"},
+      "total": {"type": "int"},
+      "failedSuffix": {"type": "String"}
+    }
+  },
+  "scanThumbnailFailedSuffix": " · {count} thumbnails failed",
+  "@scanThumbnailFailedSuffix": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "scanDoneNoRoots": "No valid paths configured; library is empty. Sync finished.",
+  "scanDoneCleared": "Existing comic data cleared.",
+  "scanDoneStats": "Sync complete · removed {removed} · added {added} · kept {kept}{thumbSuffix}",
+  "@scanDoneStats": {
+    "placeholders": {
+      "removed": {"type": "int"},
+      "added": {"type": "int"},
+      "kept": {"type": "int"},
+      "thumbSuffix": {"type": "String"}
+    }
+  },
+  "updateNewVersionTitle": "New version v{version}",
+  "@updateNewVersionTitle": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "updatePublishedOn": "Released {date}",
+  "@updatePublishedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "updateRemindLater": "Remind me later",
+  "updateViewDetails": "View details",
+  "updateNow": "Update now",
+  "updateManualDownloadToast": "Download the installer for your system manually",
+  "updateDownloadingTitle": "Downloading update",
+  "updateDownloadFailed": "Download failed. Please retry.",
+  "confirmDeleteTagsTitle": "Confirm deletion",
+  "confirmDeleteTagsContent": "{count, plural, one{Delete 1 tag and remove it from all comics. This cannot be undone.} other{Delete {count} tags and remove them from all comics. This cannot be undone.}}",
+  "@confirmDeleteTagsContent": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "confirmRemovePathTitle": "Confirm removal",
+  "confirmRemovePathContent": "This path will be removed from the library. This cannot be undone.",
+  "confirmClearHistoryTitle": "Confirm clear",
+  "confirmClearHistoryContent": "All reading history will be cleared. This cannot be undone.",
+  "contextMenuGoToDetail": "Go to details",
+  "breadcrumbReturnLibrary": "Back to library",
+  "breadcrumbReturnLibraryWithTrail": "Back to library, current: {trail}",
+  "@breadcrumbReturnLibraryWithTrail": {
+    "placeholders": {
+      "trail": {"type": "String"}
+    }
+  },
+  "diagnosticModeBannerMessage": "Diagnostic mode on · logging extra detail",
+  "diagnosticModeDisable": "Turn off",
+  "sidebarCollapse": "Collapse sidebar",
+  "sidebarExpand": "Expand sidebar",
+  "filterAdvancedTitle": "Advanced filters",
+  "filterResultCount": "{count, plural, one{1 result} other{{count} results}}",
+  "@filterResultCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "sortAndViewTitle": "Sort & view",
+  "contentRatingUnknown": "Unknown",
+  "contentRatingSafe": "All ages",
+  "contentRatingR18": "NSFW",
+  "relativeTimeJustNow": "Just now",
+  "relativeTimeMinutesAgo": "{count, plural, one{1 minute ago} other{{count} minutes ago}}",
+  "@relativeTimeMinutesAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "relativeTimeHoursAgo": "{count, plural, one{1 hour ago} other{{count} hours ago}}",
+  "@relativeTimeHoursAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "relativeTimeDaysAgo": "{count, plural, one{1 day ago} other{{count} days ago}}",
+  "@relativeTimeDaysAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "readingProgressPage": "Page {page}",
+  "@readingProgressPage": {
+    "placeholders": {
+      "page": {"type": "int"}
+    }
+  },
+  "historyDeleteRecord": "Delete entry",
+  "bootstrapStartupFailed": "Startup failed: {error}",
+  "@bootstrapStartupFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  }
+}

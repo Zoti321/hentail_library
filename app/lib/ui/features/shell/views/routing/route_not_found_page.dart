@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -12,6 +13,7 @@ class RouteNotFoundPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final l10n = context.l10n;
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: tokens.spacing.xl),
@@ -25,7 +27,7 @@ class RouteNotFoundPage extends StatelessWidget {
               color: cs.hentai.textTertiary,
             ),
             Text(
-              '页面不存在',
+              l10n.notFoundTitle,
               style: TextStyle(
                 fontSize: tokens.text.titleSm,
                 fontWeight: FontWeight.w600,
@@ -33,7 +35,7 @@ class RouteNotFoundPage extends StatelessWidget {
               ),
             ),
             Text(
-              '你访问的链接可能已失效，或页面已被移除。',
+              l10n.notFoundHint,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: tokens.text.bodySm,
@@ -47,12 +49,12 @@ class RouteNotFoundPage extends StatelessWidget {
               children: <Widget>[
                 GhostButton.iconText(
                   icon: LucideIcons.house,
-                  text: '返回首页',
+                  text: l10n.notFoundGoHome,
                   onPressed: () => context.go('/home'),
                 ),
                 GhostButton.iconText(
                   icon: LucideIcons.library,
-                  text: '去漫画库',
+                  text: l10n.notFoundGoLibrary,
                   onPressed: () => context.go('/local'),
                 ),
               ],

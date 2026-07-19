@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -43,6 +45,7 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final AsyncValue<AppSetting> settingsAsync = ref.watch(settingsProvider);
@@ -74,6 +77,7 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _ReaderSettingsDialogHeader(
+                l10n: l10n,
                 onClose: () => Navigator.of(context).pop(),
               ),
               Flexible(
@@ -86,14 +90,14 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                       spacing: 16,
                       children: <Widget>[
                         _ReaderSettingsSection(
-                          title: '常规',
+                          title: l10n.readerSettingsGeneral,
                           children: <Widget>[
                             _ReaderSettingsDropdownRow<ReaderModeCategory>(
-                              label: '阅读模式',
+                              label: l10n.readerSettingsReadingMode,
                               value: category,
                               items: ReaderModeCategory.values,
                               itemLabel: (ReaderModeCategory value) =>
-                                  value.labelZh,
+                                  l10n.readerModeCategoryLabel(value),
                               onChanged: (ReaderModeCategory? value) {
                                 if (value == null) {
                                   return;
@@ -112,11 +116,11 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                         ),
                         if (!readingMode.isWebtoon)
                           _ReaderSettingsSection(
-                            title: '自动播放',
+                            title: l10n.readerSettingsAutoPlay,
                             children: <Widget>[
                               _ReaderSettingsNumberRow(
-                                label: '播放间隔',
-                                suffix: '秒',
+                                label: l10n.readerSettingsPlayInterval,
+                                suffix: l10n.readerSettingsSecondsSuffix,
                                 controller: _intervalController,
                                 onCommit: (int value) {
                                   ref
@@ -128,19 +132,19 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                           ),
                         _ReaderSettingsSection(
                           title: readingMode.isWebtoon
-                              ? 'Webtoon 模式'
-                              : '分页阅读器选项',
+                              ? l10n.readerSettingsWebtoonMode
+                              : l10n.readerSettingsPagedOptions,
                           children: readingMode.isWebtoon
                               ? <Widget>[
                                   _ReaderSettingsDropdownRow<int>(
-                                    label: '左右边距',
+                                    label: l10n.readerSettingsHorizontalMargin,
                                     value: _webtoonMarginPercent,
                                     items: List<int>.generate(
                                       9,
                                       (int index) => index * 5,
                                     ),
                                     itemLabel: (int value) =>
-                                        value == 0 ? '无 (0%)' : '$value%',
+                                        l10n.readerWebtoonMarginLabel(value),
                                     onChanged: (int? value) {
                                       if (value == null) {
                                         return;
@@ -151,11 +155,11 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                                     },
                                   ),
                                   _ReaderSettingsDropdownRow<WebtoonZoomMode>(
-                                    label: '缩放模式',
+                                    label: l10n.readerSettingsZoomMode,
                                     value: _webtoonZoomMode,
                                     items: WebtoonZoomMode.values,
                                     itemLabel: (WebtoonZoomMode value) =>
-                                        value.labelZh,
+                                        l10n.webtoonZoomModeLabel(value),
                                     onChanged: (WebtoonZoomMode? value) {
                                       if (value == null) {
                                         return;
@@ -168,11 +172,11 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                                 ]
                               : <Widget>[
                                   _ReaderSettingsDropdownRow<PagedLayout>(
-                                    label: '页面布局',
+                                    label: l10n.readerSettingsPageLayout,
                                     value: pagedLayout,
                                     items: PagedLayout.values,
                                     itemLabel: (PagedLayout value) =>
-                                        value.labelZh,
+                                        l10n.pagedLayoutLabel(value),
                                     onChanged: (PagedLayout? value) {
                                       if (value == null) {
                                         return;
@@ -207,8 +211,12 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
 }
 
 class _ReaderSettingsDialogHeader extends StatelessWidget {
-  const _ReaderSettingsDialogHeader({required this.onClose});
+  const _ReaderSettingsDialogHeader({
+    required this.l10n,
+    required this.onClose,
+  });
 
+  final AppLocalizations l10n;
   final VoidCallback onClose;
 
   @override
@@ -222,12 +230,12 @@ class _ReaderSettingsDialogHeader extends StatelessWidget {
           children: <Widget>[
             IconButton(
               onPressed: onClose,
-              tooltip: '关闭',
+              tooltip: l10n.readerSettingsClose,
               icon: const Icon(LucideIcons.x, size: 18, color: Colors.white),
             ),
-            const Expanded(
+            Expanded(
               child: Text(
-                '阅读设置',
+                l10n.readerSettingsTitle,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
@@ -17,6 +18,7 @@ class LibraryLocationRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final l10n = context.l10n;
     return SettingsRow(
       layoutTier: layoutTier,
       icon: Icon(
@@ -24,7 +26,7 @@ class LibraryLocationRow extends StatelessWidget {
         size: 20,
         color: theme.colorScheme.hentai.iconDefault,
       ),
-      label: '库位置',
+      label: l10n.settingsLibraryLocationLabel,
       onRowTap: () => context.push('/paths'),
       action: Icon(
         LucideIcons.chevronRight,
@@ -48,6 +50,7 @@ class AutoScanRow extends ConsumerWidget {
       ),
     );
     final ThemeData theme = Theme.of(context);
+    final l10n = context.l10n;
     return SettingsRow(
       layoutTier: layoutTier,
       icon: Icon(
@@ -55,7 +58,7 @@ class AutoScanRow extends ConsumerWidget {
         size: 20,
         color: theme.colorScheme.hentai.iconDefault,
       ),
-      label: '自动扫描',
+      label: l10n.settingsAutoScanLabel,
       action: ToggleSwitch(
         checked: autoScan,
         onChange: () =>

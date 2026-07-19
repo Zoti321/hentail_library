@@ -1,5 +1,6 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -20,6 +21,7 @@ class _FilterPopupButtonState extends ConsumerState<FilterPopupButton> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final cs = Theme.of(context).colorScheme;
 
     return CustomPopupMenu(
@@ -31,8 +33,8 @@ class _FilterPopupButtonState extends ConsumerState<FilterPopupButton> {
       menuBuilder: () => _FilterMenu(menuController: controller),
       child: GhostButton.icon(
         icon: LucideIcons.funnel,
-        tooltip: '筛选',
-        semanticLabel: '打开筛选',
+        tooltip: l10n.libraryFilterSection,
+        semanticLabel: l10n.libraryFilterSortSemantic,
         iconSize: 16,
         size: 28,
         borderRadius: 6,
@@ -53,6 +55,7 @@ class _FilterMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     final int displayedComicCount = ref.watch(
       libraryDisplayedComicCountProvider,
@@ -85,7 +88,7 @@ class _FilterMenu extends ConsumerWidget {
               ),
             ),
             child: Text(
-              '高级筛选',
+              l10n.filterAdvancedTitle,
               style: TextStyle(
                 fontSize: context.tokens.text.bodySm,
                 fontWeight: FontWeight.w600,
@@ -97,7 +100,7 @@ class _FilterMenu extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
             color: colorScheme.surfaceContainerHighest,
             child: Text(
-              '$resultCount 个结果',
+              l10n.filterResultCount(resultCount),
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -76,6 +77,7 @@ class HomePageHeaderToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
 
     return SizedBox(
       height: 44,
@@ -91,7 +93,7 @@ class HomePageHeaderToolbar extends StatelessWidget {
                   if (onOpenNavigation != null) ...<Widget>[
                     GhostButton.icon(
                       icon: LucideIcons.menu,
-                      semanticLabel: '打开导航菜单',
+                      semanticLabel: l10n.shellOpenNavMenu,
                       tooltip: '',
                       iconSize: 16,
                       size: 32,
@@ -104,7 +106,7 @@ class HomePageHeaderToolbar extends StatelessWidget {
                     const SizedBox(width: 8),
                   ],
                   Text(
-                    '首页',
+                    l10n.homeTitle,
                     style: homePageTitleStyle(colorScheme, layoutTier),
                   ),
                 ],
@@ -114,7 +116,7 @@ class HomePageHeaderToolbar extends StatelessWidget {
           FilledButton.icon(
             onPressed: onScan,
             icon: const Icon(LucideIcons.scanSearch, size: 18),
-            label: const Text('扫描漫画库'),
+            label: Text(l10n.homeScanLibrary),
             style: FilledButton.styleFrom(
               backgroundColor: colorScheme.primary,
               foregroundColor: colorScheme.onPrimary,

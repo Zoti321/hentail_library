@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -95,6 +97,7 @@ class _SearchResultHorizontalSectionState
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final AppLocalizations l10n = context.l10n;
     final double spacing = widget.itemSpacing ?? tokens.spacing.md;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,8 +117,8 @@ class _SearchResultHorizontalSectionState
             ),
             GhostButton.icon(
               icon: LucideIcons.chevronLeft,
-              tooltip: '向左滚动',
-              semanticLabel: '向左滚动',
+              tooltip: l10n.searchScrollLeft,
+              semanticLabel: l10n.searchScrollLeft,
               iconSize: 16,
               size: 28,
               onPressed: _canScrollBack
@@ -124,8 +127,8 @@ class _SearchResultHorizontalSectionState
             ),
             GhostButton.icon(
               icon: LucideIcons.chevronRight,
-              tooltip: '向右滚动',
-              semanticLabel: '向右滚动',
+              tooltip: l10n.searchScrollRight,
+              semanticLabel: l10n.searchScrollRight,
               iconSize: 16,
               size: 28,
               onPressed: _canScrollForward

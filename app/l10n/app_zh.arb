@@ -1,0 +1,670 @@
+{
+  "@@locale": "zh",
+  "libraryTitle": "漫画库",
+  "libraryEmptyTitle": "暂无漫画",
+  "libraryEmptyHint": "请先在「选中路径」中添加路径并扫描",
+  "librarySeriesEmptyTitle": "暂无系列",
+  "librarySeriesEmptyHint": "系列由扫描结果自动生成，添加路径并扫描后即可出现",
+  "libraryNoMatchTitle": "没有匹配结果",
+  "libraryNoMatchFilterHintComics": "当前筛选条件下没有漫画",
+  "libraryNoMatchFilterHintSeries": "当前筛选条件下没有系列",
+  "comicCount": "{count, plural, =0{0 本} other{{count} 本}}",
+  "@comicCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsLanguageLabel": "界面语言",
+  "localePreferenceSystem": "跟随系统",
+  "localePreferenceZhCn": "中文",
+  "localePreferenceEn": "English",
+  "settingsThemeLabel": "应用主题",
+  "themePreferenceSystem": "跟随系统",
+  "themePreferenceLight": "浅色",
+  "themePreferenceDark": "深色",
+  "navHome": "首页",
+  "navMetadata": "管理",
+  "navHistory": "历史",
+  "navSettings": "设置",
+  "pageTitleReader": "阅读",
+  "pageTitleComicDetail": "漫画详情",
+  "pageTitleSeriesDetail": "系列详情",
+  "pageTitlePaths": "库路径",
+  "pageTitleSearchResults": "搜索结果",
+  "pageTitleNotFound": "页面不存在",
+  "shellOpenNavMenu": "打开导航菜单",
+  "shellLoadFailed": "加载失败",
+  "shellLoading": "加载中…",
+  "shellBack": "返回",
+  "shellBackToSettings": "返回设置",
+  "shellRetry": "重试",
+  "shellRetrying": "重试中…",
+  "shellProcessing": "处理中…",
+  "homeTitle": "首页",
+  "homeScanLibrary": "扫描漫画库",
+  "homeGreetingLateNight": "凌晨好",
+  "homeGreetingEarlyMorning": "早上好",
+  "homeGreetingMorning": "上午好",
+  "homeGreetingNoon": "中午好",
+  "homeGreetingAfternoon": "下午好",
+  "homeGreetingEvening": "晚上好",
+  "homeGreetingLate": "夜深了",
+  "homeGreetingReader": "{greeting}，读者",
+  "@homeGreetingReader": {
+    "placeholders": {
+      "greeting": {
+        "type": "String"
+      }
+    }
+  },
+  "homeEmptyTitle": "尚未导入漫画",
+  "homeEmptyHint": "请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。",
+  "pathsTitle": "选中路径",
+  "homeStatSeries": "系列",
+  "homeStatTags": "标签",
+  "homeStatAuthors": "作者",
+  "homeComicTotal": "共 {count, plural, other{{count} 本}}",
+  "@homeComicTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeSeriesCount": "{count, plural, other{{count} 个系列}}",
+  "@homeSeriesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeTagCount": "{count, plural, other{{count} 个标签}}",
+  "@homeTagCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeAuthorCount": "{count, plural, other{{count} 位}}",
+  "@homeAuthorCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNoAuthors": "暂无作者",
+  "homeContinueReading": "继续阅读",
+  "homeNoReadingHistory": "暂无阅读记录，",
+  "homeGoToLibrary": "去漫画库",
+  "historyTitle": "阅读历史",
+  "historyClearAction": "清空阅读历史",
+  "historyClearedToast": "已清空阅读历史",
+  "historyRecordSummary": "{count, plural, other{{count} 条记录 • 最长保留 30 天}}",
+  "@historyRecordSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "historySearchHint": "搜索历史记录...",
+  "historyEmpty": "暂无阅读历史",
+  "historyNoMatch": "没有匹配的历史记录",
+  "historyDeletedToast": "已删除记录",
+  "pathsSavedHeading": "已保存路径",
+  "pathsTotalCount": "{count, plural, other{共 {count} 项}}",
+  "@pathsTotalCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pathsEmptyHint": "暂无路径，请添加文件夹",
+  "pathsAddButton": "添加路径",
+  "pathsAddedOneToast": "已添加 1 个路径",
+  "pathsRemovedToast": "已移除路径",
+  "pathsRemoveAction": "移除路径",
+  "pathsLoadFailed": "路径加载失败",
+  "notFoundTitle": "页面不存在",
+  "notFoundHint": "你访问的链接可能已失效，或页面已被移除。",
+  "notFoundGoHome": "返回首页",
+  "notFoundGoLibrary": "去漫画库",
+  "settingsGroupPersonalization": "个性化",
+  "settingsGroupLibrary": "漫画库",
+  "settingsGroupDiagnostics": "诊断与支持",
+  "settingsGroupAbout": "关于",
+  "settingsDiagnosticModeLabel": "详细诊断",
+  "settingsDiagnosticModeDescriptionEnabled": "已开启：Dart 与 Rust 记录更详细日志",
+  "settingsDiagnosticModeDescriptionDisabled": "临时提高日志详细程度，便于复现问题",
+  "settingsDiagnosticModeEnabledBadge": "已开启",
+  "settingsExportLogsLabel": "导出日志",
+  "settingsExportLogsDescription": "打包应用与核心日志，便于问题反馈",
+  "settingsLibraryLocationLabel": "库位置",
+  "settingsAutoScanLabel": "自动扫描",
+  "settingsAutoUpdateLabel": "自动更新",
+  "settingsCurrentVersion": "当前版本 v{version}",
+  "@settingsCurrentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsCurrentVersionLoading": "当前版本 …",
+  "settingsCheckForUpdatesLabel": "检查更新",
+  "settingsUpdateCheckFailed": "检查更新失败，请稍后重试",
+  "settingsUpdateUpToDate": "当前已是最新版本",
+  "libraryTabComics": "漫画",
+  "libraryTabSeries": "系列",
+  "librarySeriesCount": "{count, plural, other{{count} 个系列}}",
+  "@librarySeriesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryManageScanPaths": "管理扫描路径",
+  "librarySearchHint": "搜索…",
+  "librarySearchKeywordEmpty": "关键词不能为空",
+  "libraryFilterSortTooltip": "筛选与排序",
+  "libraryFilterSortSemantic": "打开筛选与排序",
+  "libraryPageSizeTooltip": "每页数量",
+  "libraryPageSizeSemantic": "设置每页数量",
+  "libraryScanCancelledToast": "已取消扫描",
+  "libraryScanningDeep": "正在深度扫描…",
+  "libraryScanning": "正在扫描…",
+  "libraryCancelScan": "取消扫描",
+  "libraryMoreActions": "更多操作",
+  "libraryMoreActionsSemantic": "打开更多操作",
+  "libraryRefresh": "刷新",
+  "libraryScan": "扫描",
+  "libraryDeepScan": "深度扫描",
+  "libraryScrollToTop": "回到顶部",
+  "libraryFilterSection": "筛选",
+  "librarySortSection": "排序",
+  "libraryAgeRestrictionFilter": "年龄限制",
+  "libraryMediaTypeFilter": "媒体类型",
+  "libraryComingSoon": "即将推出",
+  "libraryComicSortTitle": "标题",
+  "libraryComicSortCreatedAt": "添加时间",
+  "libraryComicSortLastUpdatedAt": "更新时间",
+  "libraryComicSortPublishedAt": "发布日期",
+  "libraryComicSortReadAt": "阅读日期",
+  "libraryComicSortFileSize": "文件大小",
+  "libraryComicSortPageCount": "页数",
+  "librarySeriesSortName": "名称",
+  "librarySeriesSortComicCount": "漫画数量",
+  "librarySeriesSortRandom": "随机",
+  "filterAgeUnrestricted": "不限",
+  "filterAgeAllAges": "全年龄",
+  "filterAgeR18Only": "R18",
+  "filterMediaTypePdf": "PDF",
+  "filterMediaTypeEpub": "EPUB",
+  "filterMediaTypeArchive": "压缩包",
+  "libraryScanComplete": "扫描完成",
+  "libraryDeepScanComplete": "深度扫描完成",
+  "libraryScanCompleteNoRoots": "扫描完成：未配置扫描路径",
+  "libraryDeepScanCompleteNoRoots": "深度扫描完成：未配置扫描路径",
+  "libraryScanCompleteCleared": "扫描完成：已移除 {count} 项",
+  "@libraryScanCompleteCleared": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryDeepScanCompleteCleared": "深度扫描完成：已移除 {count} 项",
+  "@libraryDeepScanCompleteCleared": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryScanCompleteStats": "扫描完成：新增 {added}，移除 {removed}，保留 {kept}",
+  "@libraryScanCompleteStats": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "removed": {
+        "type": "int"
+      },
+      "kept": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryDeepScanCompleteStats": "深度扫描完成：新增 {added}，移除 {removed}，保留 {kept}",
+  "@libraryDeepScanCompleteStats": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "removed": {
+        "type": "int"
+      },
+      "kept": {
+        "type": "int"
+      }
+    }
+  },
+  "searchResultsTitle": "搜索结果",
+  "searchResultsForQuery": "\"{query}\"的搜索结果",
+  "@searchResultsForQuery": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchEnterKeyword": "请输入关键词后按回车搜索",
+  "searchLoadFailed": "加载失败：{error}",
+  "@searchLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "searchBackToLibrary": "返回漫画库",
+  "searchScrollLeft": "向左滚动",
+  "searchScrollRight": "向右滚动",
+  "comicDetailPageCount": "{count, plural, other{{count} 页}}",
+  "@comicDetailPageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "comicDetailAuthors": "作者",
+  "comicDetailTags": "标签",
+  "comicDetailResourceFormat": "资源格式",
+  "comicDetailResourceSize": "资源大小",
+  "comicDetailResourcePath": "资源路径",
+  "comicDetailAddedAt": "添加时间",
+  "comicDetailUpdatedAt": "更新时间",
+  "comicDetailRead": "阅读",
+  "comicDetailReadIncognito": "无痕阅读",
+  "comicDetailEditMetadata": "编辑元数据",
+  "comicDetailShowInExplorer": "在资源管理器中显示",
+  "comicDetailShowInExplorerFailed": "无法在文件资源管理器中显示该项目",
+  "comicDetailDelete": "删除",
+  "comicDetailDeleteTitle": "删除漫画？",
+  "comicDetailDeleteConfirm": "将删除「{title}」。此操作不可撤销。",
+  "@comicDetailDeleteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "comicDetailCancel": "取消",
+  "comicDetailDeletedToast": "已删除漫画",
+  "comicDetailNotFound": "漫画不存在或已移除",
+  "comicDetailLoadFailedRetry": "加载失败，请重试",
+  "comicDetailGoToLibrary": "前往漫画库",
+  "comicDetailSeriesNavConflict": "系列数据异常：该漫画同时属于多个系列，无法使用系列导航",
+  "comicDetailSeriesPrev": "上一本",
+  "comicDetailSeriesPrevSemantic": "系列上一本",
+  "comicDetailSeriesCatalog": "系列目录",
+  "comicDetailSeriesNext": "下一本",
+  "comicDetailSeriesNextSemantic": "系列下一本",
+  "seriesDetailEdit": "编辑系列",
+  "seriesDetailNoComics": "系列内暂无漫画",
+  "seriesDetailComicsLoadFailed": "漫画列表加载失败",
+  "seriesDetailUnknown": "未知系列",
+  "seriesDetailNotFound": "未找到系列「{name}」",
+  "@seriesDetailNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "seriesDetailVolumeCount": "{count, plural, other{{count} 本}}",
+  "@seriesDetailVolumeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "seriesDetailVolumeProgress": "{current} / 共 {total} 本",
+  "@seriesDetailVolumeProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "seriesDetailPaginationPage": "第 {page} / {totalPages} 页",
+  "@seriesDetailPaginationPage": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "totalPages": {
+        "type": "int"
+      }
+    }
+  },
+  "seriesDetailPaginationFirst": "首页",
+  "seriesDetailPaginationPrevious": "上一页",
+  "seriesDetailPaginationNext": "下一页",
+  "seriesDetailPaginationLast": "末页",
+  "serializationStatusOngoing": "连载中",
+  "serializationStatusEnded": "已完结",
+  "serializationStatusHiatus": "休刊",
+  "serializationStatusUnknown": "未知",
+  "readerSettingsTitle": "阅读设置",
+  "readerSettingsClose": "关闭",
+  "readerSettingsGeneral": "常规",
+  "readerSettingsReadingMode": "阅读模式",
+  "readerSettingsAutoPlay": "自动播放",
+  "readerSettingsPlayInterval": "播放间隔",
+  "readerSettingsSecondsSuffix": "秒",
+  "readerSettingsWebtoonMode": "Webtoon 模式",
+  "readerSettingsPagedOptions": "分页阅读器选项",
+  "readerSettingsHorizontalMargin": "左右边距",
+  "readerSettingsMarginNone": "无 (0%)",
+  "readerSettingsMarginPercent": "{percent}%",
+  "@readerSettingsMarginPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "readerSettingsZoomMode": "缩放模式",
+  "readerSettingsPageLayout": "页面布局",
+  "readingModeCategoryPaged": "翻页",
+  "readingModeCategoryWebtoon": "Webtoon",
+  "readingModePaged": "翻页",
+  "readingModeWebtoon": "Webtoon",
+  "readingModeDualPage": "双页",
+  "readingModeDualPageNoCover": "双页（封面独立）",
+  "readingModePagedSingle": "单页",
+  "readingModePagedDual": "双页",
+  "readingModePagedDualNoCover": "双页（封面独立）",
+  "readingModeWebtoonFitWidth": "适应宽度",
+  "readingModeWebtoonOriginalSize": "原始尺寸",
+  "readerSetComicCover": "将当前页设为漫画封面",
+  "readerSetSeriesCover": "将当前页设为系列封面",
+  "readerMore": "更多",
+  "readerMoreSemantic": "更多阅读选项",
+  "readerStateNotReady": "阅读状态未就绪",
+  "readerComicCoverSet": "已设为漫画封面",
+  "readerComicCoverSetFailed": "设置漫画封面失败：{error}",
+  "@readerComicCoverSetFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "readerSeriesCoverSet": "已设为系列封面",
+  "readerSeriesCoverSetFailed": "设置系列封面失败：{error}",
+  "@readerSeriesCoverSetFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "readerBackSemantic": "返回上一页",
+  "readerExitFullscreen": "退出全屏",
+  "readerEnterFullscreen": "全屏",
+  "readerExitFullscreenSemantic": "退出全屏",
+  "readerEnterFullscreenSemantic": "进入全屏",
+  "readerOpenSettingsSemantic": "打开阅读设置",
+  "readerSeriesCatalog": "系列目录",
+  "readerPrevVolume": "上一卷",
+  "readerPrevVolumeSemantic": "系列上一卷",
+  "readerFirstPage": "首页",
+  "readerFirstPageSemantic": "跳转到首页",
+  "readerNextVolume": "下一卷",
+  "readerNextVolumeSemantic": "系列下一卷",
+  "readerLastPage": "尾页",
+  "readerLastPageSemantic": "跳转到尾页",
+  "readerPrevPage": "上一页",
+  "readerNextPage": "下一页",
+  "readerDisableAutoPlay": "关闭自动播放",
+  "readerEnableAutoPlay": "开启自动播放",
+  "readerInvalidParams": "阅读参数错误：缺少 comic_id",
+  "readerSeriesAdvancePrompt": "再次翻页将进入下一卷",
+  "readerNoImages": "暂无图片",
+  "metadataTabAuthors": "作者",
+  "metadataTabTags": "标签",
+  "metadataAddAuthor": "添加作者",
+  "metadataAddTag": "添加标签",
+  "metadataAdd": "添加",
+  "metadataSearchAuthorsHint": "搜索作者名称…",
+  "metadataSearchTagsHint": "搜索标签名称…",
+  "metadataRename": "重命名",
+  "metadataDelete": "删除",
+  "metadataMoreActions": "更多操作",
+  "metadataAllAuthors": "全部作者",
+  "metadataAllTags": "全部标签",
+  "metadataTotalCount": "{count, plural, other{共 {count} 条}}",
+  "@metadataTotalCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metadataSelectedCount": "已选 {count}",
+  "@metadataSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "metadataSelect": "选中",
+  "metadataDeselect": "取消选中",
+  "metadataRenameAuthor": "重命名作者",
+  "metadataRenameTag": "重命名标签",
+  "metadataNewName": "新名称",
+  "metadataRenameAuthorHint": "输入新的作者名称…",
+  "metadataRenameTagHint": "输入新的标签名称…",
+  "metadataNameLabel": "名称",
+  "metadataAddAuthorHint": "输入作者名称…",
+  "metadataAddTagHint": "输入标签名称…",
+  "metadataAuthorDeletedToast": "已删除作者",
+  "metadataTagDeletedToast": "已删除标签",
+  "metadataAuthorsEmptyTitle": "暂无作者",
+  "metadataAuthorsEmptyHint": "你可以从这里添加、重命名或删除作者。",
+  "metadataTagsEmptyTitle": "暂无标签",
+  "metadataTagsEmptyHint": "你可以从这里添加、重命名或删除标签。",
+  "commonCancel": "取消",
+  "commonSave": "保存",
+  "commonSaveChanges": "保存更改",
+  "commonClose": "关闭",
+  "commonConfirm": "确认",
+  "commonDelete": "删除",
+  "commonRemove": "移除",
+  "commonClear": "清空",
+  "commonRetry": "重试",
+  "commonOk": "确定",
+  "commonLoadFailed": "加载失败",
+  "commonBack": "返回",
+  "commonSavedToast": "已保存",
+  "dialogEditSeriesTitle": "编辑系列",
+  "dialogEditSeriesSavedToast": "系列信息已保存",
+  "dialogEditMetadataTitle": "编辑元数据",
+  "dialogEditMetadataTabGeneral": "常规",
+  "dialogEditMetadataTabAuthorsTags": "作者&标签",
+  "formSeriesNameLabel": "系列名称",
+  "formSeriesSerializationStatusLabel": "连载状态",
+  "formSeriesTotalCountLabel": "漫画总数",
+  "formSeriesTotalCountHint": "留空表示不设置",
+  "formComicTitleLabel": "漫画标题",
+  "formComicTitleHint": "修改漫画标题",
+  "formComicDescriptionLabel": "概要",
+  "formComicDescriptionHint": "添加漫画简介…",
+  "formPublishedDateLabel": "发布日期",
+  "formAgeRestrictionLabel": "年龄限制",
+  "formDatePickerHint": "选择发布日期",
+  "formDatePickerHelp": "选择发布日期",
+  "formDateFieldLabel": "日期",
+  "formDateFieldHint": "年/月/日",
+  "formDateInvalidFormat": "日期格式无效",
+  "formDateOutOfRange": "日期超出可选范围",
+  "formDateClearTooltip": "清空日期",
+  "formAuthorSelectPlaceholder": "选择或输入作者…",
+  "formAuthorListLoadFailed": "作者列表加载失败",
+  "formAuthorEmptyCatalog": "暂无作者",
+  "formAuthorEmptyRemaining": "没有更多可选",
+  "formTagSelectPlaceholder": "选择或输入标签…",
+  "formTagListLoadFailed": "标签列表加载失败",
+  "formTagEmptyCatalog": "暂无标签",
+  "formTagEmptyRemaining": "没有更多可选",
+  "scanDialogTitle": "扫描漫画库",
+  "scanBackgroundAction": "后台扫描",
+  "scanPreparing": "准备中…",
+  "scanGeneratingThumbnails": "正在生成缩略图…",
+  "scanProgressSimple": "{done} / {total}",
+  "@scanProgressSimple": {
+    "placeholders": {
+      "done": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "scanProgressWithFailed": "{done} / {total} · 失败 {failed}",
+  "@scanProgressWithFailed": {
+    "placeholders": {
+      "done": {"type": "int"},
+      "total": {"type": "int"},
+      "failed": {"type": "int"}
+    }
+  },
+  "scanSyncing": "同步中…",
+  "scanWritingDb": "正在写入数据库…",
+  "scanClearingLibrary": "正在清空漫画库…",
+  "scanScanningFiles": "正在扫描文件…",
+  "scanComplete": "同步完成",
+  "scanFailed": "同步失败",
+  "scanCancelled": "已取消扫描",
+  "scanBackgroundThumbnails": "后台生成缩略图 {done} / {total}{failedSuffix}",
+  "@scanBackgroundThumbnails": {
+    "placeholders": {
+      "done": {"type": "int"},
+      "total": {"type": "int"},
+      "failedSuffix": {"type": "String"}
+    }
+  },
+  "scanThumbnailFailedSuffix": " · 缩略图失败 {count}",
+  "@scanThumbnailFailedSuffix": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "scanDoneNoRoots": "未配置有效路径，库中无漫画，同步已完成。",
+  "scanDoneCleared": "已清空现有漫画数据。",
+  "scanDoneStats": "同步完成 · 移除 {removed} · 新增 {added} · 保留 {kept}{thumbSuffix}",
+  "@scanDoneStats": {
+    "placeholders": {
+      "removed": {"type": "int"},
+      "added": {"type": "int"},
+      "kept": {"type": "int"},
+      "thumbSuffix": {"type": "String"}
+    }
+  },
+  "updateNewVersionTitle": "发现新版本 v{version}",
+  "@updateNewVersionTitle": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "updatePublishedOn": "发布于 {date}",
+  "@updatePublishedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "updateRemindLater": "稍后提醒",
+  "updateViewDetails": "查看详情",
+  "updateNow": "立即更新",
+  "updateManualDownloadToast": "请手动下载适合您系统的安装包",
+  "updateDownloadingTitle": "正在下载更新",
+  "updateDownloadFailed": "下载失败，请重试",
+  "confirmDeleteTagsTitle": "确认删除",
+  "confirmDeleteTagsContent": "{count, plural, other{将删除 {count} 个标签，并同时从所有漫画中移除这些标签。此操作不可撤销。}}",
+  "@confirmDeleteTagsContent": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "confirmRemovePathTitle": "确认移除",
+  "confirmRemovePathContent": "将从库中移除该路径。此操作不可撤销。",
+  "confirmClearHistoryTitle": "确认清空",
+  "confirmClearHistoryContent": "将清空全部阅读历史记录。此操作不可撤销。",
+  "contextMenuGoToDetail": "跳转到详情页",
+  "breadcrumbReturnLibrary": "返回漫画库",
+  "breadcrumbReturnLibraryWithTrail": "返回漫画库，当前：{trail}",
+  "@breadcrumbReturnLibraryWithTrail": {
+    "placeholders": {
+      "trail": {"type": "String"}
+    }
+  },
+  "diagnosticModeBannerMessage": "诊断模式已开启 · 正在记录更详细日志",
+  "diagnosticModeDisable": "关闭",
+  "sidebarCollapse": "收起侧边栏",
+  "sidebarExpand": "展开侧边栏",
+  "filterAdvancedTitle": "高级筛选",
+  "filterResultCount": "{count, plural, other{{count} 个结果}}",
+  "@filterResultCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "sortAndViewTitle": "排序与视图",
+  "contentRatingUnknown": "未知",
+  "contentRatingSafe": "全年龄",
+  "contentRatingR18": "NSFW",
+  "relativeTimeJustNow": "刚刚",
+  "relativeTimeMinutesAgo": "{count, plural, other{{count} 分钟前}}",
+  "@relativeTimeMinutesAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "relativeTimeHoursAgo": "{count, plural, other{{count} 小时前}}",
+  "@relativeTimeHoursAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "relativeTimeDaysAgo": "{count, plural, other{{count} 天前}}",
+  "@relativeTimeDaysAgo": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "readingProgressPage": "第 {page} 页",
+  "@readingProgressPage": {
+    "placeholders": {
+      "page": {"type": "int"}
+    }
+  },
+  "historyDeleteRecord": "删除记录",
+  "bootstrapStartupFailed": "启动失败：{error}",
+  "@bootstrapStartupFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  }
+}

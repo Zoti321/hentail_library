@@ -1,12 +1,6 @@
 enum LibrarySeriesSortField { name, comicCount, random }
 
 extension LibrarySeriesSortFieldX on LibrarySeriesSortField {
-  String get label => switch (this) {
-    LibrarySeriesSortField.name => '名称',
-    LibrarySeriesSortField.comicCount => '漫画数量',
-    LibrarySeriesSortField.random => '随机',
-  };
-
   bool get isImplemented => true;
 }
 

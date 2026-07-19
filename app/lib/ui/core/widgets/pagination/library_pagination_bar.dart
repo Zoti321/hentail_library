@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
@@ -33,6 +34,7 @@ class LibraryPaginationBar extends ConsumerWidget {
     if (totalPages <= 1) {
       return const SizedBox.shrink();
     }
+    final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final bool canGoPrevious = !isLoading && page > 1;
@@ -44,7 +46,7 @@ class LibraryPaginationBar extends ConsumerWidget {
         children: <Widget>[
           GhostButton.icon(
             icon: LucideIcons.chevronsLeft,
-            tooltip: '首页',
+            tooltip: l10n.seriesDetailPaginationFirst,
             onPressed: canGoPrevious
                 ? () => switch (target) {
                     LibraryPaginationTarget.comics =>
@@ -60,7 +62,7 @@ class LibraryPaginationBar extends ConsumerWidget {
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronLeft,
-            tooltip: '上一页',
+            tooltip: l10n.seriesDetailPaginationPrevious,
             onPressed: canGoPrevious
                 ? () => switch (target) {
                     LibraryPaginationTarget.comics =>
@@ -77,7 +79,7 @@ class LibraryPaginationBar extends ConsumerWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
             child: Text(
-              '第 $page / $totalPages 页',
+              l10n.seriesDetailPaginationPage(page, totalPages),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -85,7 +87,7 @@ class LibraryPaginationBar extends ConsumerWidget {
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronRight,
-            tooltip: '下一页',
+            tooltip: l10n.seriesDetailPaginationNext,
             onPressed: canGoNext
                 ? () => switch (target) {
                     LibraryPaginationTarget.comics =>
@@ -101,7 +103,7 @@ class LibraryPaginationBar extends ConsumerWidget {
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronsRight,
-            tooltip: '末页',
+            tooltip: l10n.seriesDetailPaginationLast,
             onPressed: canGoNext
                 ? () => switch (target) {
                     LibraryPaginationTarget.comics =>

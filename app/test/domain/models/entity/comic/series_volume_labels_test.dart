@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
-import 'package:test/test.dart';
 
 Series _series({int itemCount = 3, int? totalCount}) {
   return Series(
@@ -17,26 +20,29 @@ Series _series({int itemCount = 3, int? totalCount}) {
 
 void main() {
   group('Series volume labels', () {
-    test('volumeCountLabel always shows actual count only', () {
-      expect(_series(totalCount: null).volumeCountLabel, '3 本书');
-      expect(_series(totalCount: 12).volumeCountLabel, '3 本书');
-      expect(_series(itemCount: 12, totalCount: 10).volumeCountLabel, '12 本书');
-    });
-
-    test('volumeProgressLabel is null without planned total', () {
-      expect(_series(totalCount: null).volumeProgressLabel, isNull);
-      expect(_series(totalCount: 0).volumeProgressLabel, isNull);
-    });
-
-    test('volumeProgressLabel shows progress when planned total exists', () {
-      expect(
-        _series(itemCount: 3, totalCount: 12).volumeProgressLabel,
-        '3 / 共 12 本书',
+    testWidgets('volume count label uses l10n', (WidgetTester tester) async {
+      late AppLocalizations l10n;
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Builder(
+            builder: (BuildContext context) {
+              l10n = context.l10n;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
       );
+      await tester.pumpAndSettle();
+
+      expect(l10n.seriesVolumeCountLabel(_series().items.length), '3 本');
       expect(
-        _series(itemCount: 12, totalCount: 10).volumeProgressLabel,
-        '12 / 共 10 本书',
+        l10n.seriesVolumeProgressLabel(current: 3, total: 12),
+        '3 / 共 12 本',
       );
+      expect(l10n.seriesVolumeProgressLabel(current: 3, total: null), isNull);
     });
   });
 }

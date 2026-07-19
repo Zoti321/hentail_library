@@ -22,20 +22,7 @@ enum PagedLayout { single, dual, dualNoCover }
 /// Webtoon 缩放模式（二级选项，UI 占位）。
 enum WebtoonZoomMode { fitWidth, originalSize }
 
-extension ReaderModeCategoryX on ReaderModeCategory {
-  String get labelZh => switch (this) {
-    ReaderModeCategory.paged => '翻页',
-    ReaderModeCategory.webtoon => 'Webtoon',
-  };
-}
-
 extension PagedLayoutX on PagedLayout {
-  String get labelZh => switch (this) {
-    PagedLayout.single => '单页',
-    PagedLayout.dual => '双页',
-    PagedLayout.dualNoCover => '双页（封面独立）',
-  };
-
   ReadingMode toReadingMode() => switch (this) {
     PagedLayout.single => ReadingMode.paged,
     PagedLayout.dual => ReadingMode.dualPage,
@@ -43,27 +30,7 @@ extension PagedLayoutX on PagedLayout {
   };
 }
 
-extension WebtoonZoomModeX on WebtoonZoomMode {
-  String get labelZh => switch (this) {
-    WebtoonZoomMode.fitWidth => '适应宽度',
-    WebtoonZoomMode.originalSize => '原始尺寸',
-  };
-}
-
 extension ReadingModeX on ReadingMode {
-  String get labelZh {
-    switch (this) {
-      case ReadingMode.paged:
-        return '翻页';
-      case ReadingMode.webtoon:
-        return 'Webtoon';
-      case ReadingMode.dualPage:
-        return '双页';
-      case ReadingMode.dualPageNoCover:
-        return '双页（封面独立）';
-    }
-  }
-
   bool get isWebtoon => this == ReadingMode.webtoon;
 
   bool get isPagedFamily => !isWebtoon;

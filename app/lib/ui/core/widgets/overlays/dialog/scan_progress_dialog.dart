@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/terminal_spinner.dart';
@@ -18,6 +19,7 @@ class ScanProgressDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ScanLibraryState state = ref.watch(scanLibraryControllerProvider);
     final ThumbnailBackgroundProgress thumbnailProgress = ref.watch(
@@ -28,7 +30,7 @@ class ScanProgressDialog extends ConsumerWidget {
     final bool showError = state.error != null;
 
     return HentaiDialog(
-      title: '扫描漫画库',
+      title: l10n.scanDialogTitle,
       width: _kScanProgressDialogWidth,
       borderRadius: _kScanProgressDialogRadius,
       backgroundColor: cs.surface,
@@ -53,7 +55,7 @@ class ScanProgressDialog extends ConsumerWidget {
                     ),
                   ),
                 ),
-                child: Text(showError ? '关闭' : '确定'),
+                child: Text(showError ? l10n.commonClose : l10n.commonOk),
               ),
             ]
           : <Widget>[
@@ -69,7 +71,7 @@ class ScanProgressDialog extends ConsumerWidget {
                     ),
                   ),
                 ),
-                child: const Text('取消'),
+                child: Text(l10n.commonCancel),
               ),
               const SizedBox(width: 8),
               FilledButton(
@@ -86,7 +88,7 @@ class ScanProgressDialog extends ConsumerWidget {
                     ),
                   ),
                 ),
-                child: const Text('后台扫描'),
+                child: Text(l10n.scanBackgroundAction),
               ),
             ],
     );
@@ -112,6 +114,7 @@ class ScanProgressDialog extends ConsumerWidget {
   }
 
   Widget _buildRunning(BuildContext context, SyncLibraryProgress? progress) {
+    final l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
 
     return Row(
@@ -122,7 +125,7 @@ class ScanProgressDialog extends ConsumerWidget {
         Expanded(
           child: progress == null
               ? Text(
-                  '准备中…',
+                  l10n.scanPreparing,
                   style: TextStyle(fontSize: 14, color: cs.hentai.textPrimary),
                 )
               : _buildRunningContent(context, progress),
@@ -135,6 +138,7 @@ class ScanProgressDialog extends ConsumerWidget {
     BuildContext context,
     SyncLibraryProgress progress,
   ) {
+    final l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final TextStyle primaryStyle = TextStyle(
       fontSize: 14,
@@ -161,7 +165,7 @@ class ScanProgressDialog extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Text('正在生成缩略图…', style: primaryStyle),
+          Text(l10n.scanGeneratingThumbnails, style: primaryStyle),
           const SizedBox(height: 12),
           LinearProgressIndicator(
             value: progressValue,
@@ -170,7 +174,11 @@ class ScanProgressDialog extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '$done / $total${failed > 0 ? ' · 失败 $failed' : ''}',
+            l10n.scanDialogProgressCount(
+              done: done,
+              total: total,
+              failed: failed,
+            ),
             style: secondaryStyle,
           ),
           if (path != null && path.isNotEmpty) ...<Widget>[
@@ -186,7 +194,7 @@ class ScanProgressDialog extends ConsumerWidget {
       );
     }
 
-    final String stageLabel = _runningStagePrimaryLabel(progress);
+    final String stageLabel = l10n.scanDialogRunningPhaseLabel(progress);
     final String? detail = _runningStageDetail(progress);
 
     return Column(
@@ -205,26 +213,6 @@ class ScanProgressDialog extends ConsumerWidget {
         ],
       ],
     );
-  }
-
-  String _runningStagePrimaryLabel(SyncLibraryProgress progress) {
-    switch (progress.route) {
-      case SyncLibraryRoute.noRootsNoop:
-        return '同步中…';
-      case SyncLibraryRoute.noRootsCleared:
-        return progress.phase == SyncLibraryPhase.writingDb
-            ? '正在写入数据库…'
-            : '正在清空漫画库…';
-      case SyncLibraryRoute.withRoots:
-        return switch (progress.phase) {
-          SyncLibraryPhase.clearingLibrary => '正在清空漫画库…',
-          SyncLibraryPhase.scanning => '正在扫描文件…',
-          SyncLibraryPhase.writingDb => '正在写入数据库…',
-          SyncLibraryPhase.generatingThumbnails => '正在生成缩略图…',
-          SyncLibraryPhase.done => '同步完成',
-          SyncLibraryPhase.failed => '同步失败',
-        };
-    }
   }
 
   String? _runningStageDetail(SyncLibraryProgress progress) {
@@ -247,6 +235,7 @@ class ScanProgressDialog extends ConsumerWidget {
     SyncLibraryProgress? progress,
     ThumbnailBackgroundProgress thumbnailProgress,
   ) {
+    final l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final TextStyle bodyStyle = TextStyle(
       fontSize: 14,
@@ -258,10 +247,10 @@ class ScanProgressDialog extends ConsumerWidget {
     );
 
     if (cancelled) {
-      return Text('已取消扫描', style: bodyStyle);
+      return Text(l10n.scanCancelled, style: bodyStyle);
     }
 
-    final String label = _doneSummaryLabel(progress);
+    final String label = l10n.scanDialogDoneSummaryLabel(progress);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,38 +260,16 @@ class ScanProgressDialog extends ConsumerWidget {
         if (thumbnailProgress.isActive) ...<Widget>[
           const SizedBox(height: 8),
           Text(
-            '后台生成缩略图 ${thumbnailProgress.done} / ${thumbnailProgress.total}'
-            '${thumbnailProgress.failed > 0 ? ' · 失败 ${thumbnailProgress.failed}' : ''}',
+            l10n.scanBackgroundThumbnails(
+              thumbnailProgress.done,
+              thumbnailProgress.total,
+              l10n.scanDialogThumbnailFailedSuffix(thumbnailProgress.failed),
+            ),
             style: tertiaryStyle,
           ),
         ],
       ],
     );
-  }
-
-  String _doneSummaryLabel(SyncLibraryProgress? progress) {
-    if (progress == null) {
-      return '同步完成';
-    }
-
-    switch (progress.route) {
-      case SyncLibraryRoute.noRootsNoop:
-        return '未配置有效路径，库中无漫画，同步已完成。';
-      case SyncLibraryRoute.noRootsCleared:
-        return '已清空现有漫画数据。';
-      case SyncLibraryRoute.withRoots:
-        final int? removed = progress.removedCount;
-        final int? added = progress.addedCount;
-        final int? kept = progress.keptCount;
-        final int? thumbFailed = progress.thumbnailFailedCount;
-        if (removed != null && added != null && kept != null) {
-          final String thumbSuffix = thumbFailed != null && thumbFailed > 0
-              ? ' · 缩略图失败 $thumbFailed'
-              : '';
-          return '同步完成 · 移除 $removed · 新增 $added · 保留 $kept$thumbSuffix';
-        }
-        return '同步完成';
-    }
   }
 
   Widget _buildError(BuildContext context, String error) {

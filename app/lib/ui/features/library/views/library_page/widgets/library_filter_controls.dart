@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
@@ -34,6 +36,7 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
     final LibraryAgeRestrictionFilter selected = ref.watch(
       libraryActiveAgeRestrictionFilterProvider,
     );
+    final AppLocalizations l10n = context.l10n;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -55,7 +58,7 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
                 children: <Widget>[
                   Expanded(
                     child: Text(
-                      '年龄限制',
+                      l10n.libraryAgeRestrictionFilter,
                       style: TextStyle(
                         fontSize: tokens.text.bodySm,
                         fontWeight: FontWeight.w500,
@@ -79,7 +82,7 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
                 .map(
                   (LibraryAgeRestrictionFilter option) =>
                       _FilterCheckboxOptionRow(
-                        label: option.label,
+                        label: l10n.libraryAgeRestrictionFilterLabel(option),
                         selected: selected == option,
                         onTap: () {
                           ref
@@ -126,6 +129,7 @@ class _LibraryMediaTypeFilterControlsState
       libraryComicsTabMediaTypeFilterProvider,
     );
 
+    final AppLocalizations l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -146,7 +150,7 @@ class _LibraryMediaTypeFilterControlsState
                 children: <Widget>[
                   Expanded(
                     child: Text(
-                      '媒体类型',
+                      l10n.libraryMediaTypeFilter,
                       style: TextStyle(
                         fontSize: tokens.text.bodySm,
                         fontWeight: FontWeight.w500,
@@ -170,7 +174,7 @@ class _LibraryMediaTypeFilterControlsState
                 .map(
                   (LibraryMediaTypeFilterOption option) =>
                       _FilterCheckboxOptionRow(
-                        label: option.label,
+                        label: l10n.libraryMediaTypeFilterLabel(option),
                         selected: selected.selected.contains(option),
                         onTap: () {
                           ref

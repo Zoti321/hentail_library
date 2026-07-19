@@ -29,6 +29,7 @@ class LibraryPageHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
+    final AppLocalizations l10n = context.l10n;
     final int comicCount = ref.watch(libraryDisplayedComicCountProvider);
     final int seriesCount = ref.watch(libraryDisplayedSeriesCountProvider);
 
@@ -37,17 +38,20 @@ class LibraryPageHeader extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Text(
-          AppStrings.libraryTitle,
+          l10n.libraryTitle,
           style: libraryPageTitleStyle(theme.colorScheme, layoutTier),
         ),
         if (showCountChips) ...<Widget>[
           const SizedBox(width: 12),
           MetaChip(
             icon: LucideIcons.library,
-            label: AppStrings.comicCount(comicCount),
+            label: l10n.comicCount(comicCount),
           ),
           const SizedBox(width: 8),
-          MetaChip(icon: LucideIcons.bookMarked, label: '$seriesCount 个系列'),
+          MetaChip(
+            icon: LucideIcons.bookMarked,
+            label: l10n.librarySeriesCount(seriesCount),
+          ),
         ],
       ],
     );

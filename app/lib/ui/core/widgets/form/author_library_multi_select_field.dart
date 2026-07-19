@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-const MultiSelectCopy _kAuthorMultiSelectCopy = MultiSelectCopy(
-  inputPlaceholder: '选择或输入作者…',
-  listLoadFailed: '作者列表加载失败',
-  emptyCatalog: '暂无作者',
-  emptyRemaining: '没有更多可选',
-);
 
 /// 全库作者多选：字段内 chip + 内联输入；浮层列出未选字典项。
 class AuthorLibraryMultiSelectField extends ConsumerWidget {
@@ -34,6 +28,7 @@ class AuthorLibraryMultiSelectField extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     return MultiSelect<Author>(
       label: label,
       icon: icon,
@@ -44,7 +39,12 @@ class AuthorLibraryMultiSelectField extends ConsumerWidget {
       itemsProvider: allAuthorsProvider,
       onRetry: () => ref.invalidate(allAuthorsProvider),
       resolveName: (Author author) => author.name,
-      copy: _kAuthorMultiSelectCopy,
+      copy: MultiSelectCopy(
+        inputPlaceholder: l10n.formAuthorSelectPlaceholder,
+        listLoadFailed: l10n.formAuthorListLoadFailed,
+        emptyCatalog: l10n.formAuthorEmptyCatalog,
+        emptyRemaining: l10n.formAuthorEmptyRemaining,
+      ),
     );
   }
 }

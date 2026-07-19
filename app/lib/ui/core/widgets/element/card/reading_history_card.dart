@@ -1,5 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
@@ -102,7 +103,7 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          _formatLastRead(widget.lastReadTime),
+                          context.l10n.relativeTimeAgo(widget.lastReadTime),
                           style: TextStyle(
                             fontSize: 12,
                             color: cs.hentai.textTertiary,
@@ -110,10 +111,10 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
                         ),
                       ],
                     ),
-                    if (_buildProgressLabel().isNotEmpty) ...[
+                    if (_buildProgressLabel(context).isNotEmpty) ...[
                       const SizedBox(height: 8),
                       Text(
-                        _buildProgressLabel(),
+                        _buildProgressLabel(context),
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -128,8 +129,8 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
                 const SizedBox(width: 6),
                 GhostButton.icon(
                   icon: LucideIcons.trash2,
-                  tooltip: '删除记录',
-                  semanticLabel: '删除记录',
+                  tooltip: context.l10n.historyDeleteRecord,
+                  semanticLabel: context.l10n.historyDeleteRecord,
                   onPressed: widget.onDelete,
                   iconSize: 18,
                   size: 32,
@@ -194,22 +195,11 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
     );
   }
 
-  String _formatLastRead(DateTime time) {
-    final now = DateTime.now();
-    final diff = now.difference(time);
-
-    if (diff.inMinutes < 1) return '刚刚';
-    if (diff.inMinutes < 60) return '${diff.inMinutes} 分钟前';
-    if (diff.inHours < 24) return '${diff.inHours} 小时前';
-    if (diff.inDays < 7) return '${diff.inDays} 天前';
-    return '${time.month}/${time.day}';
-  }
-
-  String _buildProgressLabel() {
+  String _buildProgressLabel(BuildContext context) {
     final int? pageIndex = widget.pageIndex;
     if (pageIndex == null || pageIndex <= 0) {
       return '';
     }
-    return '第 $pageIndex 页';
+    return context.l10n.readingProgressPage(pageIndex);
   }
 }

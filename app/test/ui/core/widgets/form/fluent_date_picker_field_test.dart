@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_date_picker_field.dart';
 
@@ -10,16 +10,9 @@ void main() {
     (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          locale: const Locale('zh', 'CN'),
-          supportedLocales: const <Locale>[
-            Locale('zh', 'CN'),
-            Locale('en', 'US'),
-          ],
-          localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: buildAppTheme(Brightness.light),
           home: Scaffold(
             body: FluentDatePickerField(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/dto/nav_item_data.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -59,8 +60,10 @@ class DesktopSidebar extends HookWidget {
       return null;
     }, <Object?>[isExpanded]);
 
-    final List<NavItemData> menuItems = AppNavigation.desktopMainNavItems;
-    final List<NavItemData> systemItems = AppNavigation.desktopSystemNavItems;
+    final l10n = context.l10n;
+    final List<NavItemData> menuItems = AppNavigation.desktopMainNavItems(l10n);
+    final List<NavItemData> systemItems =
+        AppNavigation.desktopSystemNavItems(l10n);
 
     return AnimatedBuilder(
       animation: expandController,
@@ -95,7 +98,8 @@ class DesktopSidebar extends HookWidget {
                     child: GhostButton.icon(
                       icon: LucideIcons.menu,
                       tooltip: '',
-                      semanticLabel: isExpanded ? '收起侧边栏' : '展开侧边栏',
+                      semanticLabel:
+                          isExpanded ? l10n.sidebarCollapse : l10n.sidebarExpand,
                       iconSize: 18,
                       size: 36,
                       borderRadius: 8,

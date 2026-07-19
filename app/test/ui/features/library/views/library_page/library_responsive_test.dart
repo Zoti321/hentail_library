@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/meta_chip.dart';
@@ -70,6 +71,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
+            locale: const Locale('zh'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             theme: buildAppTheme(Brightness.light),
             home: MediaQuery(
               data: const MediaQueryData(size: Size(viewportWidth, 800)),
@@ -127,6 +131,9 @@ Future<void> _pumpHeaderToolbar(
     ProviderScope(
       overrides: _libraryHeaderTestOverrides(),
       child: MaterialApp(
+        locale: const Locale('zh'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: buildAppTheme(Brightness.light),
         home: Scaffold(
           body: SizedBox(

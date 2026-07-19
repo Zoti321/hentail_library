@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:hentai_library/core/constants/app_update_constants.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/util/app_root_navigator.dart';
 import 'package:hentai_library/core/util/semver_utils.dart';
 import 'package:hentai_library/domain/models/app_release_info.dart';
@@ -43,13 +44,19 @@ class AppUpdateController extends _$AppUpdateController {
           .fetchLatestStableRelease();
       if (latestRelease == null) {
         if (showFeedbackToasts) {
-          _showFeedbackToast('检查更新失败，请稍后重试', uiContext);
+          _showFeedbackToast(
+            uiContext,
+            (AppLocalizations l10n) => l10n.settingsUpdateCheckFailed,
+          );
         }
         return AppUpdateCheckOutcome.failed;
       }
       if (!SemverUtils.isGreaterThan(latestRelease.version, currentVersion)) {
         if (showFeedbackToasts) {
-          _showFeedbackToast('当前已是最新版本', uiContext);
+          _showFeedbackToast(
+            uiContext,
+            (AppLocalizations l10n) => l10n.settingsUpdateUpToDate,
+          );
         }
         return AppUpdateCheckOutcome.upToDate;
       }
@@ -66,7 +73,10 @@ class AppUpdateController extends _$AppUpdateController {
       return AppUpdateCheckOutcome.updateAvailable;
     } catch (_) {
       if (showFeedbackToasts) {
-        _showFeedbackToast('检查更新失败，请稍后重试', uiContext);
+        _showFeedbackToast(
+          uiContext,
+          (AppLocalizations l10n) => l10n.settingsUpdateCheckFailed,
+        );
       }
       return AppUpdateCheckOutcome.failed;
     }
@@ -123,14 +133,15 @@ class AppUpdateController extends _$AppUpdateController {
     }
   }
 
-  void _showFeedbackToast(String message, BuildContext? uiContext) {
-    if (uiContext != null && uiContext.mounted) {
-      showInfoToast(uiContext, message);
-      return;
-    }
-    final BuildContext? rootContext = appRootNavigatorKey.currentContext;
-    if (rootContext != null && rootContext.mounted) {
-      showInfoToast(rootContext, message);
+  void _showFeedbackToast(
+    BuildContext? uiContext,
+    String Function(AppLocalizations l10n) message,
+  ) {
+    final BuildContext? ctx = uiContext != null && uiContext.mounted
+        ? uiContext
+        : appRootNavigatorKey.currentContext;
+    if (ctx != null && ctx.mounted) {
+      showInfoToast(ctx, message(AppLocalizations.of(ctx)));
     }
   }
 }

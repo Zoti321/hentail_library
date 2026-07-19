@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
@@ -166,6 +167,7 @@ class _TagListHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     final int selectionCount = ref.watch(
       tagSelectionProvider.select((Set<Tag> s) => s.length),
     );
@@ -184,7 +186,7 @@ class _TagListHeader extends ConsumerWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '全部标签',
+            l10n.metadataAllTags,
             style: TextStyle(
               fontSize: _TagStyles.listHeaderFontSize,
               fontWeight: FontWeight.w600,
@@ -193,7 +195,7 @@ class _TagListHeader extends ConsumerWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            '共 $totalCount 条',
+            l10n.metadataTotalCount(totalCount),
             style: TextStyle(
               fontSize: _TagStyles.listHeaderFontSize,
               color: cs.hentai.textTertiary,
@@ -202,7 +204,7 @@ class _TagListHeader extends ConsumerWidget {
           if (selectionCount > 0) ...[
             const SizedBox(width: 12),
             Text(
-              '已选 $selectionCount',
+              l10n.metadataSelectedCount(selectionCount),
               style: TextStyle(
                 fontSize: _TagStyles.listHeaderFontSize,
                 fontWeight: FontWeight.w600,
@@ -231,6 +233,7 @@ class _TagRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final l10n = context.l10n;
 
     return MetadataPanelRowInteractionShell(
       hoverColor: cs.primary.withAlpha(10),
@@ -248,7 +251,7 @@ class _TagRow extends ConsumerWidget {
                     : LucideIcons.square,
                 iconSize: 16,
                 size: _TagStyles.iconButtonSize.width,
-                tooltip: isSelected ? '取消选中' : '选中',
+                tooltip: isSelected ? l10n.metadataDeselect : l10n.metadataSelect,
                 foregroundColor: isSelected
                     ? cs.primary
                     : cs.hentai.textTertiary,
@@ -277,9 +280,9 @@ class _TagRow extends ConsumerWidget {
                   await showDialog<void>(
                     context: context,
                     builder: (context) => TagNameEditorDialog(
-                      title: '重命名标签',
-                      labelText: '新名称',
-                      hintText: '输入新的标签名称…',
+                      title: l10n.metadataRenameTag,
+                      labelText: l10n.metadataNewName,
+                      hintText: l10n.metadataRenameTagHint,
                       initialValue: tag.name,
                       shouldCloseOnUnchanged: true,
                       onSubmit: (value) async {
@@ -304,7 +307,7 @@ class _TagRow extends ConsumerWidget {
                   try {
                     await ref.read(tagActionsProvider).deleteTag(tag);
                     if (context.mounted) {
-                      showSuccessToast(context, '已删除标签');
+                      showSuccessToast(context, l10n.metadataTagDeletedToast);
                     }
                   } catch (e) {
                     if (context.mounted) {
@@ -369,6 +372,7 @@ class _TagManagementEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final l10n = context.l10n;
     return StatusCardShell(
       padding: _TagStyles.statusEmptyPadding,
       borderRadius: _TagStyles.statusCardRadius,
@@ -378,7 +382,7 @@ class _TagManagementEmptyState extends StatelessWidget {
           Icon(LucideIcons.tags, size: 32, color: cs.onSurfaceVariant),
           const SizedBox(height: 12),
           Text(
-            '暂无标签',
+            l10n.metadataTagsEmptyTitle,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -387,7 +391,7 @@ class _TagManagementEmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '你可以从这里添加、重命名或删除标签。',
+            l10n.metadataTagsEmptyHint,
             style: TextStyle(
               fontSize: kMetadataPanelSubtitleFontSize,
               color: cs.hentai.textSecondary,

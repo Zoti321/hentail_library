@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -330,8 +331,8 @@ class _AdaptiveFormMorphChrome extends StatelessWidget {
                           if (pageMode) ...<Widget>[
                             GhostButton.icon(
                               icon: LucideIcons.arrowLeft,
-                              tooltip: '返回',
-                              semanticLabel: '返回',
+                              tooltip: context.l10n.commonBack,
+                              semanticLabel: context.l10n.commonBack,
                               onPressed: () => Navigator.of(context).maybePop(),
                             ),
                             SizedBox(width: tokens.spacing.sm),

@@ -25,12 +25,6 @@ enum LibraryAgeRestrictionFilter {
         LibraryAgeRestrictionFilter.r18Only,
       ];
 
-  String get label => switch (this) {
-    LibraryAgeRestrictionFilter.unrestricted => '不限',
-    LibraryAgeRestrictionFilter.allAges => '全年龄',
-    LibraryAgeRestrictionFilter.r18Only => 'R18',
-  };
-
   /// 漫画分页 filter：是否允许 R18（与 `contentRatings` 组合）。
   bool comicShowR18() => this != LibraryAgeRestrictionFilter.allAges;
 

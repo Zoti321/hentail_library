@@ -1,6 +1,8 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/data/adapters/reader_frb_mapper.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -28,6 +30,7 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = context.l10n;
     final CustomPopupMenuController menuController = useMemoized(
       CustomPopupMenuController.new,
     );
@@ -49,19 +52,19 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
           children: <Widget>[
             _ReaderOverflowMenuItem(
               icon: LucideIcons.image,
-              label: '将当前页设为漫画封面',
+              label: l10n.readerSetComicCover,
               onTap: () {
                 menuController.hideMenu();
-                _setComicCover(context, ref);
+                _setComicCover(context, ref, l10n);
               },
             ),
             if (isSeriesRead)
               _ReaderOverflowMenuItem(
                 icon: LucideIcons.images,
-                label: '将当前页设为系列封面',
+                label: l10n.readerSetSeriesCover,
                 onTap: () {
                   menuController.hideMenu();
-                  _setSeriesCover(context, ref);
+                  _setSeriesCover(context, ref, l10n);
                 },
               ),
           ],
@@ -69,8 +72,8 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
       ),
       child: GhostButton.icon(
         icon: LucideIcons.ellipsisVertical,
-        tooltip: '更多',
-        semanticLabel: '更多阅读选项',
+        tooltip: l10n.readerMore,
+        semanticLabel: l10n.readerMoreSemantic,
         iconSize: 16,
         size: 32,
         borderRadius: 8,
@@ -82,11 +85,15 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
     );
   }
 
-  Future<void> _setComicCover(BuildContext context, WidgetRef ref) async {
+  Future<void> _setComicCover(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
     final ReaderState? state = _readerState(ref);
     if (state == null) {
       if (context.mounted) {
-        showCustomToast(context, message: '阅读状态未就绪');
+        showCustomToast(context, message: l10n.readerStateNotReady);
       }
       return;
     }
@@ -107,16 +114,23 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
         ref.read(comicCoverProvider(comic.comicId).notifier).setReady(bytes);
       }
       if (context.mounted) {
-        showCustomToast(context, message: '已设为漫画封面');
+        showCustomToast(context, message: l10n.readerComicCoverSet);
       }
     } on Object catch (error) {
       if (context.mounted) {
-        showCustomToast(context, message: '设置漫画封面失败：$error');
+        showCustomToast(
+          context,
+          message: l10n.readerComicCoverSetFailed('$error'),
+        );
       }
     }
   }
 
-  Future<void> _setSeriesCover(BuildContext context, WidgetRef ref) async {
+  Future<void> _setSeriesCover(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
     final String? sid = seriesId?.trim();
     if (sid == null || sid.isEmpty) {
       return;
@@ -124,7 +138,7 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
     final ReaderState? state = _readerState(ref);
     if (state == null) {
       if (context.mounted) {
-        showCustomToast(context, message: '阅读状态未就绪');
+        showCustomToast(context, message: l10n.readerStateNotReady);
       }
       return;
     }
@@ -140,11 +154,14 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
           );
       ref.invalidate(seriesCoverSourceProvider(sid));
       if (context.mounted) {
-        showCustomToast(context, message: '已设为系列封面');
+        showCustomToast(context, message: l10n.readerSeriesCoverSet);
       }
     } on Object catch (error) {
       if (context.mounted) {
-        showCustomToast(context, message: '设置系列封面失败：$error');
+        showCustomToast(
+          context,
+          message: l10n.readerSeriesCoverSetFailed('$error'),
+        );
       }
     }
   }
