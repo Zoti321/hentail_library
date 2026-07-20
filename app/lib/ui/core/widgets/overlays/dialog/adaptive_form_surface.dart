@@ -6,6 +6,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_actions_bar.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Dialog ↔ compact page 形态切换时长（与桌面短过渡一致）。
@@ -351,7 +352,7 @@ class _AdaptiveFormMorphChrome extends StatelessWidget {
                       ),
                     ),
                     bodySection,
-                    _AdaptiveFormActionsBar(
+                    DialogActionsBar(
                       actions: actions,
                       showDivider: showFooterDivider,
                       padding: actionsPadding,
@@ -363,91 +364,6 @@ class _AdaptiveFormMorphChrome extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _AdaptiveFormActionsBar extends StatelessWidget {
-  const _AdaptiveFormActionsBar({
-    required this.actions,
-    required this.showDivider,
-    this.padding,
-  });
-
-  final List<Widget> actions;
-  final bool showDivider;
-  final EdgeInsetsGeometry? padding;
-
-  static const double _compactActionsBreakpoint = 360;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final bool compactActions =
-            constraints.maxWidth < _compactActionsBreakpoint;
-        final double horizontalPadding = compactActions ? 12 : 16;
-        final double actionSpacing = compactActions ? 4 : 8;
-        final ThemeData theme = Theme.of(context);
-        final ThemeData actionTheme = compactActions
-            ? theme.copyWith(
-                textButtonTheme: TextButtonThemeData(
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 8,
-                    ),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                ),
-                filledButtonTheme: FilledButtonThemeData(
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                ),
-              )
-            : theme;
-
-        final EdgeInsetsGeometry effectivePadding =
-            padding ??
-            EdgeInsets.fromLTRB(horizontalPadding, 12, horizontalPadding, 14);
-
-        return Container(
-          padding: effectivePadding,
-          decoration: BoxDecoration(
-            border: showDivider
-                ? Border(
-                    top: BorderSide(
-                      color: theme.colorScheme.hentai.borderSubtle,
-                      width: 1,
-                    ),
-                  )
-                : null,
-          ),
-          child: Theme(
-            data: actionTheme,
-            child: Wrap(
-              alignment: WrapAlignment.end,
-              spacing: actionSpacing,
-              runSpacing: actionSpacing,
-              children: actions
-                  .where(
-                    (Widget action) =>
-                        !(action is SizedBox &&
-                            action.child == null &&
-                            action.width != null),
-                  )
-                  .toList(growable: false),
-            ),
-          ),
-        );
-      },
     );
   }
 }

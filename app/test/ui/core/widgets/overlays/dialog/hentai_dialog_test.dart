@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_actions_bar.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 
 void main() {
@@ -76,6 +77,35 @@ void main() {
 
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
-    expect(find.byType(Wrap), findsOneWidget);
+
+    final Finder wrapFinder = find.descendant(
+      of: find.byType(DialogActionsBar),
+      matching: find.byType(Wrap),
+    );
+    final Wrap wrap = tester.widget<Wrap>(wrapFinder);
+    expect(wrap.spacing, DialogActionsBar.actionSpacing);
+    expect(wrap.runSpacing, DialogActionsBar.actionSpacing);
+
+    final ThemeData footerTheme = Theme.of(tester.element(wrapFinder));
+    final OutlinedBorder? filledShape = footerTheme
+        .filledButtonTheme
+        .style
+        ?.shape
+        ?.resolve(const <WidgetState>{});
+    final OutlinedBorder? textShape = footerTheme
+        .textButtonTheme
+        .style
+        ?.shape
+        ?.resolve(const <WidgetState>{});
+    expect(filledShape, isA<RoundedRectangleBorder>());
+    expect(textShape, isA<RoundedRectangleBorder>());
+    expect(
+      (filledShape! as RoundedRectangleBorder).borderRadius,
+      BorderRadius.circular(4),
+    );
+    expect(
+      (textShape! as RoundedRectangleBorder).borderRadius,
+      BorderRadius.circular(4),
+    );
   });
 }

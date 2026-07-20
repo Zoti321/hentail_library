@@ -340,21 +340,11 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       actions: <Widget>[
         TextButton(
           onPressed: _saving ? null : () => Navigator.of(context).pop(),
-          style: TextButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(_kEditMetadataDialogRadius),
-            ),
-          ),
           child: Text(l10n.commonCancel),
         ),
         const SizedBox(width: 8),
         FilledButton(
           onPressed: _saving ? null : _handleSave,
-          style: FilledButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(_kEditMetadataDialogRadius),
-            ),
-          ),
           child: _saving
               ? SizedBox(
                   width: 16,
