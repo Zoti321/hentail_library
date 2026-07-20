@@ -136,10 +136,7 @@ class _TagListCardContent extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          _TagListHeader(
-            layoutTier: layoutTier,
-            totalCount: tags.length,
-          ),
+          _TagListHeader(layoutTier: layoutTier, totalCount: tags.length),
           for (int i = 0; i < tags.length; i++) ...<Widget>[
             if (i > 0) Divider(height: 1, color: cs.hentai.borderSubtle),
             _TagRow(layoutTier: layoutTier, tag: tags[i]),
@@ -151,10 +148,7 @@ class _TagListCardContent extends StatelessWidget {
 }
 
 class _TagListHeader extends StatelessWidget {
-  const _TagListHeader({
-    required this.layoutTier,
-    required this.totalCount,
-  });
+  const _TagListHeader({required this.layoutTier, required this.totalCount});
 
   final MetadataLayoutTier layoutTier;
   final int totalCount;
@@ -203,10 +197,7 @@ class _TagListHeader extends StatelessWidget {
 }
 
 class _TagRow extends ConsumerWidget {
-  const _TagRow({
-    required this.layoutTier,
-    required this.tag,
-  });
+  const _TagRow({required this.layoutTier, required this.tag});
 
   final MetadataLayoutTier layoutTier;
   final Tag tag;

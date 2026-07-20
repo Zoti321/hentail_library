@@ -118,7 +118,10 @@ class _ComicSortListRow extends ConsumerWidget {
               ),
               const SizedBox(width: kLibrarySortIconLabelGap),
               Expanded(
-                child: Text(l10n.libraryComicSortFieldLabel(field), style: labelStyle),
+                child: Text(
+                  l10n.libraryComicSortFieldLabel(field),
+                  style: labelStyle,
+                ),
               ),
               if (!isImplemented)
                 Text(
@@ -190,7 +193,10 @@ class _SeriesSortListRow extends ConsumerWidget {
               ),
               const SizedBox(width: kLibrarySortIconLabelGap),
               Expanded(
-                child: Text(l10n.librarySeriesSortFieldLabel(field), style: labelStyle),
+                child: Text(
+                  l10n.librarySeriesSortFieldLabel(field),
+                  style: labelStyle,
+                ),
               ),
               if (!isImplemented)
                 Text(

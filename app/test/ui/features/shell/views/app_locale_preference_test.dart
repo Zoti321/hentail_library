@@ -10,38 +10,35 @@ import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart' show AsyncData;
 
 void main() {
-  testWidgets(
-    'en locale preference sets MaterialApp.locale to en',
-    (WidgetTester tester) async {
-      final MaterialApp app = await _pumpApp(
-        tester,
-        AppSetting(localePreference: AppLocalePreference.en),
-      );
-      expect(app.locale, const Locale('en'));
-    },
-  );
+  testWidgets('en locale preference sets MaterialApp.locale to en', (
+    WidgetTester tester,
+  ) async {
+    final MaterialApp app = await _pumpApp(
+      tester,
+      AppSetting(localePreference: AppLocalePreference.en),
+    );
+    expect(app.locale, const Locale('en'));
+  });
 
-  testWidgets(
-    'zhCn locale preference sets MaterialApp.locale to zh',
-    (WidgetTester tester) async {
-      final MaterialApp app = await _pumpApp(
-        tester,
-        AppSetting(localePreference: AppLocalePreference.zhCn),
-      );
-      expect(app.locale, const Locale('zh'));
-    },
-  );
+  testWidgets('zhCn locale preference sets MaterialApp.locale to zh', (
+    WidgetTester tester,
+  ) async {
+    final MaterialApp app = await _pumpApp(
+      tester,
+      AppSetting(localePreference: AppLocalePreference.zhCn),
+    );
+    expect(app.locale, const Locale('zh'));
+  });
 
-  testWidgets(
-    'system locale preference leaves MaterialApp.locale null',
-    (WidgetTester tester) async {
-      final MaterialApp app = await _pumpApp(
-        tester,
-        AppSetting(localePreference: AppLocalePreference.system),
-      );
-      expect(app.locale, isNull);
-    },
-  );
+  testWidgets('system locale preference leaves MaterialApp.locale null', (
+    WidgetTester tester,
+  ) async {
+    final MaterialApp app = await _pumpApp(
+      tester,
+      AppSetting(localePreference: AppLocalePreference.system),
+    );
+    expect(app.locale, isNull);
+  });
 
   testWidgets(
     'setLocalePreference refreshes MaterialApp.locale without rebuild',

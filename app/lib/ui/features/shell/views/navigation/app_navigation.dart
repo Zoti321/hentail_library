@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/ui/core/dto/nav_item_data.dart';
@@ -14,23 +14,16 @@ abstract final class AppNavigation {
   static List<NavItemData> desktopMainNavItems(AppLocalizations l10n) =>
       <NavItemData>[
         (id: navIdHome, label: l10n.navHome, icon: LucideIcons.house),
-        (
-          id: navIdLibrary,
-          label: l10n.libraryTitle,
-          icon: LucideIcons.library,
-        ),
+        (id: navIdLibrary, label: l10n.libraryTitle, icon: LucideIcons.library),
         (id: navIdMetadata, label: l10n.navMetadata, icon: LucideIcons.layers),
         (id: navIdHistory, label: l10n.navHistory, icon: LucideIcons.history),
       ];
 
-  static List<NavItemData> desktopSystemNavItems(AppLocalizations l10n) =>
-      <NavItemData>[
-        (
-          id: navIdSettings,
-          label: l10n.navSettings,
-          icon: LucideIcons.settings,
-        ),
-      ];
+  static List<NavItemData> desktopSystemNavItems(
+    AppLocalizations l10n,
+  ) => <NavItemData>[
+    (id: navIdSettings, label: l10n.navSettings, icon: LucideIcons.settings),
+  ];
 
   /// 与 [DesktopSidebar] 菜单 id 对应；`/paths` 无对应项时用空字符串（不高亮）。
   static String activeNavIdForPath(String path) {

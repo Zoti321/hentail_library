@@ -262,8 +262,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                                           in widget.selectedNames)
                                         OutlinedMetaChip(
                                           text: name,
-                                          onRemove: () =>
-                                              widget.onRemove(name),
+                                          onRemove: () => widget.onRemove(name),
                                         ),
                                       ConstrainedBox(
                                         constraints: const BoxConstraints(
@@ -431,10 +430,7 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              TextButton(
-                onPressed: onRetry,
-                child: Text(l10n.commonRetry),
-              ),
+              TextButton(onPressed: onRetry, child: Text(l10n.commonRetry)),
             ],
           ),
         ),
@@ -533,9 +529,7 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
                   vertical: tokens.spacing.md,
                 ),
                 child: Text(
-                  allCatalogEmpty
-                      ? copy.emptyCatalog
-                      : copy.emptyRemaining,
+                  allCatalogEmpty ? copy.emptyCatalog : copy.emptyRemaining,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: tokens.text.bodySm,

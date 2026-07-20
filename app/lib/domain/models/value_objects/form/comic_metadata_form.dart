@@ -1,4 +1,4 @@
-﻿import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
@@ -83,7 +83,10 @@ extension ComicMetadataFormOps on ComicMetadataForm {
       return this;
     }
     return copyWith(
-      authors: <Author>[...authors, Author(name: trimmed)],
+      authors: <Author>[
+        ...authors,
+        Author(name: trimmed),
+      ],
     );
   }
 
@@ -101,13 +104,16 @@ extension ComicMetadataFormOps on ComicMetadataForm {
     if (tags.any((Tag t) => t.name == trimmed)) {
       return this;
     }
-    return copyWith(tags: <Tag>[...tags, Tag(name: trimmed)]);
+    return copyWith(
+      tags: <Tag>[
+        ...tags,
+        Tag(name: trimmed),
+      ],
+    );
   }
 
   ComicMetadataForm removeTag(String name) {
-    return copyWith(
-      tags: tags.where((Tag t) => t.name != name).toList(),
-    );
+    return copyWith(tags: tags.where((Tag t) => t.name != name).toList());
   }
 
   /// 非法 → [ComicMetadataApplyInvalid]；合法用 [normalized] 落库 →

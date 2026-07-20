@@ -48,10 +48,7 @@ void main() {
         expect(libraryGridSpacing(LibraryLayoutTier.medium), 14);
         expect(libraryGridSpacing(LibraryLayoutTier.expanded), 16);
 
-        expect(
-          libraryHeaderShowsCountChips(LibraryLayoutTier.compact),
-          isTrue,
-        );
+        expect(libraryHeaderShowsCountChips(LibraryLayoutTier.compact), isTrue);
         expect(libraryHeaderShowsCountChips(LibraryLayoutTier.medium), isTrue);
         expect(
           libraryHeaderShowsActiveCountChipOnly(LibraryLayoutTier.compact),

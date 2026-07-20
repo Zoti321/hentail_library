@@ -92,10 +92,7 @@ void main() {
         .style
         ?.shape
         ?.resolve(const <WidgetState>{});
-    final OutlinedBorder? textShape = footerTheme
-        .textButtonTheme
-        .style
-        ?.shape
+    final OutlinedBorder? textShape = footerTheme.textButtonTheme.style?.shape
         ?.resolve(const <WidgetState>{});
     expect(filledShape, isA<RoundedRectangleBorder>());
     expect(textShape, isA<RoundedRectangleBorder>());

@@ -23,9 +23,7 @@ final class LibrarySearchMetadataQuery extends LibrarySearchQuery {
 
 /// Wraps [name] as a quoted exact metadata token (`"..."`), escaping `\` and `"`.
 String formatLibrarySearchExactMetaQuery(String name) {
-  final String escaped = name
-      .replaceAll(r'\', r'\\')
-      .replaceAll('"', r'\"');
+  final String escaped = name.replaceAll(r'\', r'\\').replaceAll('"', r'\"');
   return '"$escaped"';
 }
 

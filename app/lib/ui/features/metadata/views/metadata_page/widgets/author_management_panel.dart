@@ -32,7 +32,10 @@ class AuthorManagementSliverGroup extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authorsAsync = ref.watch(allAuthorsProvider);
     final List<Author> filteredAuthors = ref.watch(filteredAuthorsProvider);
-    final bool hasSearchQuery = ref.watch(authorFilterProvider).trim().isNotEmpty;
+    final bool hasSearchQuery = ref
+        .watch(authorFilterProvider)
+        .trim()
+        .isNotEmpty;
     final AppThemeTokens tokens = context.tokens;
 
     return authorsAsync.when(
@@ -142,10 +145,7 @@ class _AuthorListCardContent extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          _AuthorListHeader(
-            layoutTier: layoutTier,
-            totalCount: authors.length,
-          ),
+          _AuthorListHeader(layoutTier: layoutTier, totalCount: authors.length),
           for (int i = 0; i < authors.length; i++) ...<Widget>[
             if (i > 0) Divider(height: 1, color: cs.hentai.borderSubtle),
             _AuthorRow(layoutTier: layoutTier, author: authors[i]),
@@ -157,10 +157,7 @@ class _AuthorListCardContent extends StatelessWidget {
 }
 
 class _AuthorListHeader extends StatelessWidget {
-  const _AuthorListHeader({
-    required this.layoutTier,
-    required this.totalCount,
-  });
+  const _AuthorListHeader({required this.layoutTier, required this.totalCount});
 
   final MetadataLayoutTier layoutTier;
   final int totalCount;
@@ -209,10 +206,7 @@ class _AuthorListHeader extends StatelessWidget {
 }
 
 class _AuthorRow extends ConsumerWidget {
-  const _AuthorRow({
-    required this.layoutTier,
-    required this.author,
-  });
+  const _AuthorRow({required this.layoutTier, required this.author});
 
   final MetadataLayoutTier layoutTier;
   final Author author;

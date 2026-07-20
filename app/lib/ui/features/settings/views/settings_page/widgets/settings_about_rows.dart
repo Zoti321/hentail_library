@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -56,8 +56,7 @@ class AboutVersionRow extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final l10n = context.l10n;
     final String versionActionLabel = packageInfoAsync.maybeWhen(
-      data: (PackageInfo info) =>
-          l10n.settingsCurrentVersion(info.version),
+      data: (PackageInfo info) => l10n.settingsCurrentVersion(info.version),
       orElse: () => l10n.settingsCurrentVersionLoading,
     );
     return SettingsRow(

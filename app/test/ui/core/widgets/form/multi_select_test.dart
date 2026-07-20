@@ -9,7 +9,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod/misc.dart' show ProviderListenable;
 
 final _catalogProvider = Provider<AsyncValue<List<String>>>(
-  (Ref ref) => const AsyncData<List<String>>(<String>['alpha', 'beta', 'gamma']),
+  (Ref ref) =>
+      const AsyncData<List<String>>(<String>['alpha', 'beta', 'gamma']),
 );
 
 void main() {
@@ -134,10 +135,7 @@ void main() {
   testWidgets('dropdown matches field width and excludes selected names', (
     WidgetTester tester,
   ) async {
-    await pumpMultiSelect(
-      tester,
-      selectedNames: const <String>['alpha'],
-    );
+    await pumpMultiSelect(tester, selectedNames: const <String>['alpha']);
 
     final Finder fieldSurface = find.byKey(MultiSelect.fieldSurfaceKey);
     final Size fieldSize = tester.getSize(fieldSurface);
@@ -171,7 +169,9 @@ void main() {
     expect(menuSize.width, closeTo(fieldSize.width, 0.5));
   });
 
-  testWidgets('selecting dropdown row calls onAdd', (WidgetTester tester) async {
+  testWidgets('selecting dropdown row calls onAdd', (
+    WidgetTester tester,
+  ) async {
     final List<String> added = <String>[];
 
     await pumpMultiSelect(
@@ -291,7 +291,10 @@ void main() {
 
     expect(added, <String>['new-tag']);
     expect(find.widgetWithText(TextField, 'new-tag'), findsNothing);
-    expect(tester.widget<TextField>(find.byType(TextField)).controller?.text, isEmpty);
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller?.text,
+      isEmpty,
+    );
   });
 
   testWidgets('shows loading and error UI for catalog AsyncValue', (
@@ -341,10 +344,8 @@ void main() {
     var retried = false;
     final Provider<AsyncValue<List<String>>> errorProvider =
         Provider<AsyncValue<List<String>>>(
-          (Ref ref) => AsyncError<List<String>>(
-            Exception('boom'),
-            StackTrace.current,
-          ),
+          (Ref ref) =>
+              AsyncError<List<String>>(Exception('boom'), StackTrace.current),
         );
 
     await tester.pumpWidget(

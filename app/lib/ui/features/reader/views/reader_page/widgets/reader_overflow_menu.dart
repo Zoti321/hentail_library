@@ -35,8 +35,7 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
       CustomPopupMenuController.new,
     );
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final bool isSeriesRead =
-        seriesId != null && seriesId!.trim().isNotEmpty;
+    final bool isSeriesRead = seriesId != null && seriesId!.trim().isNotEmpty;
 
     return CustomPopupMenu(
       controller: menuController,
@@ -100,16 +99,19 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
     try {
       final Comic comic = state.comic;
       final int pageIndex = (state.currentIndex - 1).clamp(0, 1 << 30);
-      await ref.read(comicThumbnailRepoProvider).setComicCoverFromPage(
+      await ref
+          .read(comicThumbnailRepoProvider)
+          .setComicCoverFromPage(
             comicId: comic.comicId,
             path: comic.path,
             resourceType: mapResourceType(comic.resourceType),
             pageIndex: pageIndex,
           );
-      final bytes = (await ref
-              .read(comicThumbnailRepoProvider)
-              .findByComicId(comic.comicId))
-          ?.thumbnail;
+      final bytes =
+          (await ref
+                  .read(comicThumbnailRepoProvider)
+                  .findByComicId(comic.comicId))
+              ?.thumbnail;
       if (bytes != null && bytes.isNotEmpty) {
         ref.read(comicCoverProvider(comic.comicId).notifier).setReady(bytes);
       }
@@ -145,7 +147,9 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
     try {
       final Comic comic = state.comic;
       final int pageIndex = (state.currentIndex - 1).clamp(0, 1 << 30);
-      await ref.read(comicThumbnailRepoProvider).setSeriesCoverFromPage(
+      await ref
+          .read(comicThumbnailRepoProvider)
+          .setSeriesCoverFromPage(
             seriesId: sid,
             comicId: comic.comicId,
             path: comic.path,

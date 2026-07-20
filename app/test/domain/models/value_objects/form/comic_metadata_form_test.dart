@@ -123,7 +123,10 @@ void main() {
     test('removeAuthor / addTag / removeTag', () {
       ComicMetadataForm form = ComicMetadataForm(
         title: 't',
-        authors: <Author>[Author(name: 'A'), Author(name: 'B')],
+        authors: <Author>[
+          Author(name: 'A'),
+          Author(name: 'B'),
+        ],
         tags: <Tag>[Tag(name: 'X')],
       );
       form = form.removeAuthor('A').addTag('Y').removeTag('X');

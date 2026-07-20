@@ -18,29 +18,28 @@ import 'package:riverpod/misc.dart' show Override;
 
 void main() {
   group('Library responsive layout', () {
-    testWidgets(
-      'compact toolbar shows active count chip without header tabs',
-      (WidgetTester tester) async {
-        await _pumpHeaderToolbar(
-          tester,
-          viewportWidth: 360,
-          layoutTier: LibraryLayoutTier.compact,
-        );
+    testWidgets('compact toolbar shows active count chip without header tabs', (
+      WidgetTester tester,
+    ) async {
+      await _pumpHeaderToolbar(
+        tester,
+        viewportWidth: 360,
+        layoutTier: LibraryLayoutTier.compact,
+      );
 
-        expect(tester.takeException(), isNull);
-        final Text title = tester.widget<Text>(find.text('漫画库'));
-        expect(title.style?.fontSize, 18);
-        expect(find.byType(CountDigitChip), findsOneWidget);
-        expect(find.byType(MetaChip), findsNothing);
-        expect(find.text('12'), findsOneWidget);
-        expect(find.text('12 本'), findsNothing);
-        expect(find.text('3 个系列'), findsNothing);
-        expect(find.byType(LibraryDisplayTargetTabs), findsNothing);
-        expect(find.byType(ContentSwitcherBottomBar), findsOneWidget);
-        expect(find.text('漫画'), findsOneWidget);
-        expect(find.text('系列'), findsOneWidget);
-      },
-    );
+      expect(tester.takeException(), isNull);
+      final Text title = tester.widget<Text>(find.text('漫画库'));
+      expect(title.style?.fontSize, 18);
+      expect(find.byType(CountDigitChip), findsOneWidget);
+      expect(find.byType(MetaChip), findsNothing);
+      expect(find.text('12'), findsOneWidget);
+      expect(find.text('12 本'), findsNothing);
+      expect(find.text('3 个系列'), findsNothing);
+      expect(find.byType(LibraryDisplayTargetTabs), findsNothing);
+      expect(find.byType(ContentSwitcherBottomBar), findsOneWidget);
+      expect(find.text('漫画'), findsOneWidget);
+      expect(find.text('系列'), findsOneWidget);
+    });
 
     testWidgets('medium toolbar shows count chips and medium title size', (
       WidgetTester tester,

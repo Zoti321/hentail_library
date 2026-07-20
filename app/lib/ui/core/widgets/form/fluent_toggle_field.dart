@@ -68,9 +68,7 @@ class FluentToggleField extends StatelessWidget {
                       ),
                       SizedBox(width: tokens.spacing.sm),
                       // 只读指示：命中区在外层 InkWell，避免与开关手势双触发。
-                      IgnorePointer(
-                        child: ToggleSwitch(checked: value),
-                      ),
+                      IgnorePointer(child: ToggleSwitch(checked: value)),
                     ],
                   ),
                 ),

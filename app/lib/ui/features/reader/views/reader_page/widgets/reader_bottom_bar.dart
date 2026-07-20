@@ -192,7 +192,9 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                           ),
                         ],
                       ),
-                      Expanded(child: Center(child: _buildNavActionGroup(cs, l10n))),
+                      Expanded(
+                        child: Center(child: _buildNavActionGroup(cs, l10n)),
+                      ),
                       _buildSideActionGroup(
                         cs: cs,
                         children: <Widget>[

@@ -37,8 +37,10 @@ class SeriesDetailCover extends ConsumerWidget {
           coverDisplay: ComicCoverImage.bytes(thumbnail),
           placeholderKind: ComicCoverPlaceholderKind.loading,
         ),
-        SeriesCoverFallbackComic(:final comicId) =>
-          _buildFallbackComicCover(ref, comicId),
+        SeriesCoverFallbackComic(:final comicId) => _buildFallbackComicCover(
+          ref,
+          comicId,
+        ),
         SeriesCoverMissing() => _buildAdaptive(
           coverDisplay: null,
           placeholderKind: ComicCoverPlaceholderKind.noCover,

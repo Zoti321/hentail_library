@@ -75,4 +75,3 @@ double metadataSearchFieldWidth(
     MetadataLayoutTier.expanded => ContentLayoutTier.expanded,
   }, contentMaxWidth);
 }
-

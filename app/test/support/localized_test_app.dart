@@ -5,7 +5,11 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 ///
 /// Prefer spreading these onto an existing MaterialApp rather than nesting
 /// another MaterialApp.
-({List<LocalizationsDelegate<dynamic>> delegates, List<Locale> locales, Locale locale})
+({
+  List<LocalizationsDelegate<dynamic>> delegates,
+  List<Locale> locales,
+  Locale locale,
+})
 localizedTestAppConfig({Locale locale = const Locale('zh')}) {
   return (
     delegates: AppLocalizations.localizationsDelegates,

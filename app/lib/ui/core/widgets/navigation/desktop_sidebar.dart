@@ -62,19 +62,23 @@ class DesktopSidebar extends HookWidget {
 
     final l10n = context.l10n;
     final List<NavItemData> menuItems = AppNavigation.desktopMainNavItems(l10n);
-    final List<NavItemData> systemItems =
-        AppNavigation.desktopSystemNavItems(l10n);
+    final List<NavItemData> systemItems = AppNavigation.desktopSystemNavItems(
+      l10n,
+    );
 
     return AnimatedBuilder(
       animation: expandController,
       builder: (BuildContext context, Widget? child) {
         final double t = expandController.value;
         final double curvedT = _kAnimCurve.transform(t);
-        final double width = collapsedWidth +
-            (expandedWidth - collapsedWidth) * curvedT;
+        final double width =
+            collapsedWidth + (expandedWidth - collapsedWidth) * curvedT;
         final double labelOpacity = _kLabelOpacityInterval.transform(t);
-        final Alignment toggleAlignment =
-            Alignment.lerp(Alignment.center, Alignment.centerLeft, curvedT)!;
+        final Alignment toggleAlignment = Alignment.lerp(
+          Alignment.center,
+          Alignment.centerLeft,
+          curvedT,
+        )!;
         final bool showCollapsedTooltip =
             expandController.status == AnimationStatus.dismissed;
 
@@ -98,8 +102,9 @@ class DesktopSidebar extends HookWidget {
                     child: GhostButton.icon(
                       icon: LucideIcons.menu,
                       tooltip: '',
-                      semanticLabel:
-                          isExpanded ? l10n.sidebarCollapse : l10n.sidebarExpand,
+                      semanticLabel: isExpanded
+                          ? l10n.sidebarCollapse
+                          : l10n.sidebarExpand,
                       iconSize: 18,
                       size: 36,
                       borderRadius: 8,
@@ -200,8 +205,8 @@ class _SidebarButtonState extends State<_SidebarButton> {
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             final double maxWidth = constraints.maxWidth;
-            final double buttonWidth = _kCollapsedButtonSize +
-                (maxWidth - _kCollapsedButtonSize) * t;
+            final double buttonWidth =
+                _kCollapsedButtonSize + (maxWidth - _kCollapsedButtonSize) * t;
             final double horizontalPadding = 12 * t;
             final Alignment align = Alignment.lerp(
               Alignment.center,
@@ -269,8 +274,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
                                   child: AnimatedDefaultTextStyle(
                                     duration: _kChromeAnimDuration,
                                     curve: _kChromeAnimCurve,
-                                    style: theme.textTheme.bodyMedium!
-                                        .copyWith(
+                                    style: theme.textTheme.bodyMedium!.copyWith(
                                       color: textColor,
                                       fontSize: 14,
                                       fontWeight: widget.isActive

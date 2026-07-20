@@ -69,15 +69,14 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
     setState(() => _saving = true);
     try {
       final SeriesMetadataApplyResult result = await _draftFromControllers()
-          .applyTo(
-            ref.read(seriesRepoProvider),
-            seriesId: widget.series.id,
-          );
+          .applyTo(ref.read(seriesRepoProvider), seriesId: widget.series.id);
       if (!mounted) {
         return;
       }
       switch (result) {
-        case SeriesMetadataApplyInvalid(:final SeriesMetadataFormValidation validation):
+        case SeriesMetadataApplyInvalid(
+          :final SeriesMetadataFormValidation validation,
+        ):
           setState(() => _validation = validation);
         case SeriesMetadataApplySucceeded():
           showSuccessToast(context, context.l10n.dialogEditSeriesSavedToast);
@@ -138,7 +137,9 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
                   (SerializationStatus status) =>
                       DropdownMenuItem<SerializationStatus>(
                         value: status,
-                        child: Text(context.l10n.serializationStatusLabel(status)),
+                        child: Text(
+                          context.l10n.serializationStatusLabel(status),
+                        ),
                       ),
                 )
                 .toList(),

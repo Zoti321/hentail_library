@@ -134,7 +134,9 @@ class ComicDetailMetadataBlock extends StatelessWidget {
     final List<String> tags = comic.tags.map((t) => t.name).toList();
     final List<Widget> rows = <Widget>[];
     if (authors.isNotEmpty) {
-      rows.add(LabeledMetaChipRow(label: l10n.comicDetailAuthors, items: authors));
+      rows.add(
+        LabeledMetaChipRow(label: l10n.comicDetailAuthors, items: authors),
+      );
     }
     if (tags.isNotEmpty) {
       rows.add(LabeledMetaChipRow(label: l10n.comicDetailTags, items: tags));
@@ -158,16 +160,26 @@ class ComicDetailMetadataBlock extends StatelessWidget {
         tooltip: comic.path,
       ),
     );
-    final String? createdLabel = formatComicDetailDateTime(context, comic.createdAt);
+    final String? createdLabel = formatComicDetailDateTime(
+      context,
+      comic.createdAt,
+    );
     if (createdLabel != null) {
-      rows.add(ComicDetailInfoRow(label: l10n.comicDetailAddedAt, value: createdLabel));
+      rows.add(
+        ComicDetailInfoRow(label: l10n.comicDetailAddedAt, value: createdLabel),
+      );
     }
     final String? updatedLabel = formatComicDetailDateTime(
       context,
       comic.lastUpdatedAt,
     );
     if (updatedLabel != null) {
-      rows.add(ComicDetailInfoRow(label: l10n.comicDetailUpdatedAt, value: updatedLabel));
+      rows.add(
+        ComicDetailInfoRow(
+          label: l10n.comicDetailUpdatedAt,
+          value: updatedLabel,
+        ),
+      );
     }
 
     return Column(
@@ -230,10 +242,10 @@ class LabeledMetaChipRow extends StatelessWidget {
                     (String item) => OutlinedMetaChip(
                       text: item,
                       onTap: () {
-                        final String query =
-                            formatLibrarySearchExactMetaQuery(item);
-                        final String encoded =
-                            Uri.encodeQueryComponent(query);
+                        final String query = formatLibrarySearchExactMetaQuery(
+                          item,
+                        );
+                        final String encoded = Uri.encodeQueryComponent(query);
                         appRouter.push('/searched?q=$encoded');
                       },
                     ),

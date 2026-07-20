@@ -217,10 +217,14 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
             });
           },
           onDescriptionChanged: (String value) {
-            _updateForm((ComicMetadataForm f) => f.copyWith(description: value));
+            _updateForm(
+              (ComicMetadataForm f) => f.copyWith(description: value),
+            );
           },
           onPublishedAtChanged: (DateTime? value) {
-            _updateForm((ComicMetadataForm f) => f.copyWith(publishedAt: value));
+            _updateForm(
+              (ComicMetadataForm f) => f.copyWith(publishedAt: value),
+            );
           },
           onIsR18Changed: (bool value) {
             _updateForm((ComicMetadataForm f) => f.copyWith(isR18: value));

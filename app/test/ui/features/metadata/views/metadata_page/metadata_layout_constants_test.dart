@@ -39,10 +39,7 @@ void main() {
         metadataHeaderShowsEntityTabs(MetadataLayoutTier.compact),
         isFalse,
       );
-      expect(
-        metadataHeaderShowsEntityTabs(MetadataLayoutTier.medium),
-        isTrue,
-      );
+      expect(metadataHeaderShowsEntityTabs(MetadataLayoutTier.medium), isTrue);
       expect(
         metadataUsesContentSwitcherBottomBar(MetadataLayoutTier.compact),
         isTrue,
@@ -51,14 +48,8 @@ void main() {
         metadataUsesContentSwitcherBottomBar(MetadataLayoutTier.medium),
         isFalse,
       );
-      expect(
-        metadataHeaderShowsCountChip(MetadataLayoutTier.compact),
-        isTrue,
-      );
-      expect(
-        metadataHeaderShowsCountChip(MetadataLayoutTier.medium),
-        isFalse,
-      );
+      expect(metadataHeaderShowsCountChip(MetadataLayoutTier.compact), isTrue);
+      expect(metadataHeaderShowsCountChip(MetadataLayoutTier.medium), isFalse);
       expect(
         metadataListHeaderShowsTotalCount(MetadataLayoutTier.compact),
         isFalse,

@@ -116,7 +116,9 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final List<Widget> rows = <Widget>[];
     if (authors.isNotEmpty) {
-      rows.add(LabeledMetaChipRow(label: l10n.comicDetailAuthors, items: authors));
+      rows.add(
+        LabeledMetaChipRow(label: l10n.comicDetailAuthors, items: authors),
+      );
     }
     if (tags.isNotEmpty) {
       rows.add(LabeledMetaChipRow(label: l10n.comicDetailTags, items: tags));

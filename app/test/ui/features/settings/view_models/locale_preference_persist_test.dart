@@ -10,9 +10,7 @@ void main() {
   test('setLocalePreference persists and reloads as English', () async {
     final _MemoryAppSettingRepository repo = _MemoryAppSettingRepository();
     final ProviderContainer container = ProviderContainer(
-      overrides: <Override>[
-        appSettingRepoProvider.overrideWithValue(repo),
-      ],
+      overrides: <Override>[appSettingRepoProvider.overrideWithValue(repo)],
     );
     addTearDown(container.dispose);
 
@@ -22,9 +20,7 @@ void main() {
         .setLocalePreference(AppLocalePreference.en);
 
     final ProviderContainer reloaded = ProviderContainer(
-      overrides: <Override>[
-        appSettingRepoProvider.overrideWithValue(repo),
-      ],
+      overrides: <Override>[appSettingRepoProvider.overrideWithValue(repo)],
     );
     addTearDown(reloaded.dispose);
 

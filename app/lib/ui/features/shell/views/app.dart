@@ -56,10 +56,7 @@ class _AppRootState extends ConsumerState<_AppRoot> {
     return MaterialApp.router(
       locale: locale,
       // Prefer zh as first entry so unmatched device locales fall back to Chinese.
-      supportedLocales: const <Locale>[
-        Locale('zh'),
-        Locale('en'),
-      ],
+      supportedLocales: const <Locale>[Locale('zh'), Locale('en')],
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       title: 'hentai library',
       debugShowCheckedModeBanner: false,
