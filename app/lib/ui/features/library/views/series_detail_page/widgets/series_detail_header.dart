@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -20,6 +22,7 @@ class SeriesDetailHeader extends ConsumerWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
     final int activePageSize = ref.watch(seriesDetailActivePageSizeProvider);
+    final AppLocalizations l10n = context.l10n;
     return DecoratedBox(
       decoration: BoxDecoration(
         color: cs.surface,
@@ -41,8 +44,8 @@ class SeriesDetailHeader extends ConsumerWidget {
               children: <Widget>[
                 GhostButton.icon(
                   icon: LucideIcons.arrowLeft,
-                  tooltip: '返回',
-                  semanticLabel: '返回',
+                  tooltip: l10n.shellBack,
+                  semanticLabel: l10n.shellBack,
                   iconSize: 16,
                   size: 32,
                   borderRadius: 8,
@@ -55,8 +58,8 @@ class SeriesDetailHeader extends ConsumerWidget {
                 const SizedBox(width: 4),
                 GhostButton.icon(
                   icon: LucideIcons.pencil,
-                  tooltip: '编辑系列',
-                  semanticLabel: '编辑系列',
+                  tooltip: l10n.seriesDetailEdit,
+                  semanticLabel: l10n.seriesDetailEdit,
                   iconSize: 16,
                   size: 32,
                   borderRadius: 8,

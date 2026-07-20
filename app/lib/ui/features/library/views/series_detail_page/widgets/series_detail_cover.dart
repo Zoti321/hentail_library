@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/thumbnail/series_cover_source.dart';
+import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_state.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/adaptive_comic_cover.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_placeholder.dart';
@@ -18,27 +19,37 @@ class SeriesDetailCover extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final SeriesItem? coverItem = series.coverItem;
-    final String? coverComicId = coverItem?.comicId;
+    final AsyncValue<SeriesCoverSource> async = ref.watch(
+      seriesCoverSourceProvider(series.id),
+    );
 
-    if (coverComicId == null) {
-      return AdaptiveComicCover(
+    return async.when(
+      loading: () => _buildAdaptive(
         coverDisplay: null,
-        containerAspectRatio: containerAspectRatio,
-        backgroundColor: Colors.white,
-        showShadow: true,
-        placeholder: const ComicCoverPlaceholder(
-          variant: ComicCoverPlaceholderVariant.detail,
-          kind: ComicCoverPlaceholderKind.noCover,
+        placeholderKind: ComicCoverPlaceholderKind.loading,
+      ),
+      error: (_, _) => _buildAdaptive(
+        coverDisplay: null,
+        placeholderKind: ComicCoverPlaceholderKind.error,
+      ),
+      data: (SeriesCoverSource source) => switch (source) {
+        SeriesCoverCustomThumbnail(:final thumbnail) => _buildAdaptive(
+          coverDisplay: ComicCoverImage.bytes(thumbnail),
+          placeholderKind: ComicCoverPlaceholderKind.loading,
         ),
-        errorPlaceholder: const ComicCoverPlaceholder(
-          variant: ComicCoverPlaceholderVariant.detail,
-          kind: ComicCoverPlaceholderKind.noCover,
+        SeriesCoverFallbackComic(:final comicId) => _buildFallbackComicCover(
+          ref,
+          comicId,
         ),
-        clipBorderRadius: BorderRadius.circular(_cornerRadius),
-      );
-    }
+        SeriesCoverMissing() => _buildAdaptive(
+          coverDisplay: null,
+          placeholderKind: ComicCoverPlaceholderKind.noCover,
+        ),
+      },
+    );
+  }
 
+  Widget _buildFallbackComicCover(WidgetRef ref, String coverComicId) {
     ref
         .read(comicCoverProvider(coverComicId).notifier)
         .ensureLoaded(priority: ThumbnailPriority.critical);
@@ -55,6 +66,27 @@ class SeriesDetailCover extends ConsumerWidget {
       onDecodeError: () {
         ref.read(comicCoverProvider(coverComicId).notifier).markDecodeError();
       },
+    );
+  }
+
+  Widget _buildAdaptive({
+    required ComicCoverImage? coverDisplay,
+    required ComicCoverPlaceholderKind placeholderKind,
+  }) {
+    return AdaptiveComicCover(
+      coverDisplay: coverDisplay,
+      containerAspectRatio: containerAspectRatio,
+      backgroundColor: Colors.white,
+      showShadow: true,
+      placeholder: ComicCoverPlaceholder(
+        variant: ComicCoverPlaceholderVariant.detail,
+        kind: placeholderKind,
+      ),
+      errorPlaceholder: ComicCoverPlaceholder(
+        variant: ComicCoverPlaceholderVariant.detail,
+        kind: placeholderKind,
+      ),
+      clipBorderRadius: BorderRadius.circular(_cornerRadius),
     );
   }
 

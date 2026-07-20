@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/util/app_locale.dart';
 import 'package:hentai_library/core/util/app_theme_mode.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
+import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/settings.dart';
 import 'package:hentai_library/ui/features/shell/state/app_startup_coordinator_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
@@ -41,9 +43,21 @@ class _AppRootState extends ConsumerState<_AppRoot> {
         return themeModeFromPreference(data.value.themePreference);
       }),
     );
+    final Locale? locale = ref.watch(
+      settingsProvider.select((AsyncValue<AppSetting> async) {
+        final AsyncData<AppSetting>? data = async.asData;
+        if (data == null) {
+          return null;
+        }
+        return localeFromPreference(data.value.localePreference);
+      }),
+    );
 
     return MaterialApp.router(
-      locale: const Locale('zh', 'CN'),
+      locale: locale,
+      // Prefer zh as first entry so unmatched device locales fall back to Chinese.
+      supportedLocales: const <Locale>[Locale('zh'), Locale('en')],
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
       title: 'hentai library',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(Brightness.light),

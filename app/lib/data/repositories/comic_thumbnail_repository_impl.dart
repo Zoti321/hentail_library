@@ -4,6 +4,7 @@ import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/thumbnail_frb_mapper.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
+import 'package:hentai_library/domain/thumbnail/series_cover_source.dart';
 import 'package:hentai_library/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart' as rust;
 
@@ -21,8 +22,9 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
     }
     return (
       thumbnail: Uint8List.fromList(row.thumbnail),
-      sourceModifiedMs: row.sourceModifiedMs,
-      sourceSize: row.sourceSize,
+      sourceModifiedMs: row.sourceModifiedMs.toInt(),
+      sourceSize: row.sourceSize.toInt(),
+      isUserSet: row.isUserSet,
     );
   }
 
@@ -45,17 +47,61 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
       thumbnail: Uint8List.fromList(row.thumbnail),
       sourceModifiedMs: row.sourceModifiedMs.toInt(),
       sourceSize: row.sourceSize.toInt(),
+      isUserSet: row.isUserSet,
     );
   }
 
   @override
-  Future<void> upsert({
+  Future<void> setComicCoverFromPage({
     required String comicId,
-    required Uint8List thumbnail,
-    required int sourceModifiedMs,
-    required int sourceSize,
-  }) {
-    throw UnsupportedError('缩略图写入由 Rust sync 负责');
+    required String path,
+    required String resourceType,
+    required int pageIndex,
+  }) async {
+    guardFrbSync(
+      () => rust.setComicThumbnailFromPageFrb(
+        comicId: comicId,
+        path: path,
+        resourceType: resourceType,
+        pageIndex: pageIndex,
+      ),
+      fallbackMessage: '设置漫画封面失败',
+    );
+  }
+
+  @override
+  Future<void> setSeriesCoverFromPage({
+    required String seriesId,
+    required String comicId,
+    required String path,
+    required String resourceType,
+    required int pageIndex,
+  }) async {
+    guardFrbSync(
+      () => rust.setSeriesThumbnailFromPageFrb(
+        seriesId: seriesId,
+        comicId: comicId,
+        path: path,
+        resourceType: resourceType,
+        pageIndex: pageIndex,
+      ),
+      fallbackMessage: '设置系列封面失败',
+    );
+  }
+
+  @override
+  Future<SeriesCoverSource> resolveSeriesCover(String seriesId) async {
+    final rust.SeriesCoverSourceDto dto = guardFrbSync(
+      () => rust.resolveSeriesCoverFrb(seriesId: seriesId),
+      fallbackMessage: '解析系列封面失败',
+    );
+    return switch (dto) {
+      rust.SeriesCoverSourceDto_CustomThumbnail(:final Uint8List thumbnail) =>
+        SeriesCoverCustomThumbnail(Uint8List.fromList(thumbnail)),
+      rust.SeriesCoverSourceDto_FallbackComic(:final String comicId) =>
+        SeriesCoverFallbackComic(comicId),
+      rust.SeriesCoverSourceDto_Missing() => const SeriesCoverMissing(),
+    };
   }
 
   @override

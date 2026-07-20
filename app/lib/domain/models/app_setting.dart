@@ -30,6 +30,7 @@ abstract class AppSetting with _$AppSetting {
   factory AppSetting({
     @Default(3) int version,
     @Default(AppThemePreference.system) AppThemePreference themePreference,
+    @Default(AppLocalePreference.system) AppLocalePreference localePreference,
     @Default(false) bool autoScan,
     @Default(kDefaultReadingMode) ReadingMode readingMode,
     @Default(false) bool readerAutoPlayEnabled,
@@ -58,15 +59,13 @@ enum AppThemePreference {
   dark,
 }
 
-extension AppThemePreferenceX on AppThemePreference {
-  String get labelZh {
-    switch (this) {
-      case AppThemePreference.system:
-        return '跟随系统';
-      case AppThemePreference.light:
-        return '浅色';
-      case AppThemePreference.dark:
-        return '深色';
-    }
-  }
+/// 应用语言：中文 / English / 跟随系统。
+@JsonEnum(alwaysCreate: true)
+enum AppLocalePreference {
+  @JsonValue('system')
+  system,
+  @JsonValue('zh_CN')
+  zhCn,
+  @JsonValue('en')
+  en,
 }

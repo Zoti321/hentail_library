@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -12,6 +14,7 @@ class ComicDetailBackHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
+    final AppLocalizations l10n = context.l10n;
     return DecoratedBox(
       decoration: BoxDecoration(
         color: cs.surface,
@@ -33,8 +36,8 @@ class ComicDetailBackHeader extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: GhostButton.icon(
                 icon: LucideIcons.arrowLeft,
-                tooltip: '返回',
-                semanticLabel: '返回',
+                tooltip: l10n.shellBack,
+                semanticLabel: l10n.shellBack,
                 iconSize: 16,
                 size: 32,
                 borderRadius: 8,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 
@@ -10,15 +11,16 @@ class RemoveSavedPathConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     return HentaiDialog(
-      title: '确认移除',
+      title: l10n.confirmRemovePathTitle,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            '将从库中移除该路径。此操作不可撤销。',
+            l10n.confirmRemovePathContent,
             style: TextStyle(fontSize: 14, color: cs.hentai.textSecondary),
           ),
           const SizedBox(height: 10),
@@ -42,7 +44,7 @@ class RemoveSavedPathConfirmDialog extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          child: const Text('取消'),
+          child: Text(l10n.commonCancel),
         ),
         const SizedBox(width: 8),
         FilledButton(
@@ -52,7 +54,7 @@ class RemoveSavedPathConfirmDialog extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          child: const Text('移除'),
+          child: Text(l10n.commonRemove),
         ),
       ],
     );

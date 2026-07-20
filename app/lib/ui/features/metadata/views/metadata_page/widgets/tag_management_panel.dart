@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
@@ -10,7 +11,6 @@ import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_d
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_shell.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_row_actions.dart';
-import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -32,6 +32,7 @@ class TagManagementSliverGroup extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tagsAsync = ref.watch(allTagsProvider);
     final List<Tag> filteredTags = ref.watch(filteredTagsProvider);
+    final bool hasSearchQuery = ref.watch(tagFilterProvider).trim().isNotEmpty;
     final AppThemeTokens tokens = context.tokens;
 
     return tagsAsync.when(
@@ -40,7 +41,9 @@ class TagManagementSliverGroup extends ConsumerWidget {
           return _padListSliver(
             tokens,
             SliverToBoxAdapter(
-              child: _alignedListChild(const _TagManagementEmptyState()),
+              child: _alignedListChild(
+                _TagManagementEmptyState(hasSearchQuery: hasSearchQuery),
+              ),
             ),
           );
         }
@@ -119,38 +122,24 @@ class _TagStyles {
   );
 }
 
-class _TagListCardContent extends ConsumerWidget {
+class _TagListCardContent extends StatelessWidget {
   const _TagListCardContent({required this.layoutTier, required this.tags});
 
   final MetadataLayoutTier layoutTier;
   final List<Tag> tags;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     return MetadataPanelListCard(
       radius: _TagStyles.listRadius,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          _TagListHeader(totalCount: tags.length),
+          _TagListHeader(layoutTier: layoutTier, totalCount: tags.length),
           for (int i = 0; i < tags.length; i++) ...<Widget>[
             if (i > 0) Divider(height: 1, color: cs.hentai.borderSubtle),
-            Consumer(
-              builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                final Tag tag = tags[i];
-                final bool isSelected = ref.watch(
-                  tagSelectionProvider.select(
-                    (Set<Tag> selected) => selected.contains(tag),
-                  ),
-                );
-                return _TagRow(
-                  layoutTier: layoutTier,
-                  tag: tag,
-                  isSelected: isSelected,
-                );
-              },
-            ),
+            _TagRow(layoutTier: layoutTier, tag: tags[i]),
           ],
         ],
       ),
@@ -158,17 +147,17 @@ class _TagListCardContent extends ConsumerWidget {
   }
 }
 
-class _TagListHeader extends ConsumerWidget {
-  const _TagListHeader({required this.totalCount});
+class _TagListHeader extends StatelessWidget {
+  const _TagListHeader({required this.layoutTier, required this.totalCount});
 
+  final MetadataLayoutTier layoutTier;
   final int totalCount;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final int selectionCount = ref.watch(
-      tagSelectionProvider.select((Set<Tag> s) => s.length),
-    );
+    final l10n = context.l10n;
+    final bool showTotalCount = metadataListHeaderShowsTotalCount(layoutTier);
     return Container(
       padding: _TagStyles.listHeaderPadding,
       decoration: BoxDecoration(
@@ -184,29 +173,20 @@ class _TagListHeader extends ConsumerWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '全部标签',
+            l10n.metadataAllTags,
             style: TextStyle(
               fontSize: _TagStyles.listHeaderFontSize,
               fontWeight: FontWeight.w600,
               color: cs.hentai.textSecondary,
             ),
           ),
-          const SizedBox(width: 12),
-          Text(
-            '共 $totalCount 条',
-            style: TextStyle(
-              fontSize: _TagStyles.listHeaderFontSize,
-              color: cs.hentai.textTertiary,
-            ),
-          ),
-          if (selectionCount > 0) ...[
+          if (showTotalCount) ...[
             const SizedBox(width: 12),
             Text(
-              '已选 $selectionCount',
+              l10n.metadataTotalCount(totalCount),
               style: TextStyle(
                 fontSize: _TagStyles.listHeaderFontSize,
-                fontWeight: FontWeight.w600,
-                color: cs.primary,
+                color: cs.hentai.textTertiary,
               ),
             ),
           ],
@@ -217,105 +197,74 @@ class _TagListHeader extends ConsumerWidget {
 }
 
 class _TagRow extends ConsumerWidget {
-  const _TagRow({
-    required this.layoutTier,
-    required this.tag,
-    required this.isSelected,
-  });
+  const _TagRow({required this.layoutTier, required this.tag});
 
   final MetadataLayoutTier layoutTier;
   final Tag tag;
-  final bool isSelected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
-    return MetadataPanelRowInteractionShell(
-      hoverColor: cs.primary.withAlpha(10),
-      materialColor: cs.surface,
-      child: InkWell(
-        onTap: () => ref.read(tagSelectionProvider.notifier).toggle(tag),
-        child: Padding(
-          padding: _TagStyles.rowPadding,
-          child: Row(
-            spacing: 12,
-            children: [
-              GhostButton.icon(
-                icon: isSelected
-                    ? LucideIcons.squareCheckBig
-                    : LucideIcons.square,
-                iconSize: 16,
-                size: _TagStyles.iconButtonSize.width,
-                tooltip: isSelected ? '取消选中' : '选中',
-                foregroundColor: isSelected
-                    ? cs.primary
-                    : cs.hentai.textTertiary,
-                hoverColor: theme.colorScheme.primary.withAlpha(10),
-                overlayColor: theme.colorScheme.primary.withAlpha(14),
-                borderRadius: 8,
-                delayTooltipThreeSeconds: true,
-                onPressed: () =>
-                    ref.read(tagSelectionProvider.notifier).toggle(tag),
+    return Padding(
+      padding: _TagStyles.rowPadding,
+      child: Row(
+        spacing: 12,
+        children: [
+          Expanded(
+            child: Text(
+              tag.name,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: cs.hentai.textPrimary,
               ),
-              Expanded(
-                child: Text(
-                  tag.name,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: cs.hentai.textPrimary,
-                  ),
-                ),
-              ),
-              MetadataPanelRowActions(
-                layoutTier: layoutTier,
-                iconButtonRadius: _TagStyles.iconButtonRadius,
-                iconButtonSize: _TagStyles.iconButtonSize.width,
-                onRename: () async {
-                  await showDialog<void>(
-                    context: context,
-                    builder: (context) => TagNameEditorDialog(
-                      title: '重命名标签',
-                      labelText: '新名称',
-                      hintText: '输入新的标签名称…',
-                      initialValue: tag.name,
-                      shouldCloseOnUnchanged: true,
-                      onSubmit: (value) async {
-                        await ref
-                            .read(tagActionsProvider)
-                            .renameTag(tag, value);
-                      },
-                    ),
-                  );
-                },
-                onDelete: () async {
-                  final bool confirmed =
-                      await showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext dialogContext) =>
-                            const TagConfirmDeleteDialog(count: 1),
-                      ) ??
-                      false;
-                  if (!confirmed || !context.mounted) {
-                    return;
-                  }
-                  try {
-                    await ref.read(tagActionsProvider).deleteTag(tag);
-                    if (context.mounted) {
-                      showSuccessToast(context, '已删除标签');
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      showErrorToast(context, e);
-                    }
-                  }
-                },
-              ),
-            ],
+            ),
           ),
-        ),
+          MetadataPanelRowActions(
+            layoutTier: layoutTier,
+            iconButtonRadius: _TagStyles.iconButtonRadius,
+            iconButtonSize: _TagStyles.iconButtonSize.width,
+            onRename: () async {
+              await showDialog<void>(
+                context: context,
+                builder: (context) => TagNameEditorDialog(
+                  title: l10n.metadataRenameTag,
+                  labelText: l10n.metadataNewName,
+                  hintText: l10n.metadataRenameTagHint,
+                  initialValue: tag.name,
+                  shouldCloseOnUnchanged: true,
+                  onSubmit: (value) async {
+                    await ref.read(tagActionsProvider).renameTag(tag, value);
+                  },
+                ),
+              );
+            },
+            onDelete: () async {
+              final bool confirmed =
+                  await showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext dialogContext) =>
+                        const TagConfirmDeleteDialog(count: 1),
+                  ) ??
+                  false;
+              if (!confirmed || !context.mounted) {
+                return;
+              }
+              try {
+                await ref.read(tagActionsProvider).deleteTag(tag);
+                if (context.mounted) {
+                  showSuccessToast(context, l10n.metadataTagDeletedToast);
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  showErrorToast(context, e);
+                }
+              }
+            },
+          ),
+        ],
       ),
     );
   }
@@ -363,12 +312,21 @@ class _TagManagementErrorState extends StatelessWidget {
 }
 
 class _TagManagementEmptyState extends StatelessWidget {
-  const _TagManagementEmptyState();
+  const _TagManagementEmptyState({required this.hasSearchQuery});
+
+  final bool hasSearchQuery;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final l10n = context.l10n;
+    final String title = hasSearchQuery
+        ? l10n.metadataTagsNoMatchTitle
+        : l10n.metadataTagsEmptyTitle;
+    final String hint = hasSearchQuery
+        ? l10n.metadataSearchNoMatchHint
+        : l10n.metadataTagsEmptyHint;
     return StatusCardShell(
       padding: _TagStyles.statusEmptyPadding,
       borderRadius: _TagStyles.statusCardRadius,
@@ -378,7 +336,7 @@ class _TagManagementEmptyState extends StatelessWidget {
           Icon(LucideIcons.tags, size: 32, color: cs.onSurfaceVariant),
           const SizedBox(height: 12),
           Text(
-            '暂无标签',
+            title,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -387,7 +345,7 @@ class _TagManagementEmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '你可以从这里添加、重命名或删除标签。',
+            hint,
             style: TextStyle(
               fontSize: kMetadataPanelSubtitleFontSize,
               color: cs.hentai.textSecondary,

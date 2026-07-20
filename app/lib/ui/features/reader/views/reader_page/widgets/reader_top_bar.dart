@@ -1,6 +1,8 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -35,6 +37,7 @@ class ReaderTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final double topPadding = MediaQuery.of(context).padding.top + 24;
     final double targetWidth = ReaderFloatingPanel.targetBarWidth(context);
@@ -59,8 +62,8 @@ class ReaderTopBar extends StatelessWidget {
                 children: <Widget>[
                   GhostButton.icon(
                     icon: LucideIcons.arrowLeft,
-                    tooltip: '返回',
-                    semanticLabel: '返回上一页',
+                    tooltip: l10n.shellBack,
+                    semanticLabel: l10n.readerBackSemantic,
                     iconSize: 16,
                     size: 28,
                     borderRadius: 8,
@@ -86,8 +89,12 @@ class ReaderTopBar extends StatelessWidget {
                     icon: readerFullscreen
                         ? LucideIcons.minimize2
                         : LucideIcons.maximize2,
-                    tooltip: readerFullscreen ? '退出全屏' : '全屏',
-                    semanticLabel: readerFullscreen ? '退出全屏' : '进入全屏',
+                    tooltip: readerFullscreen
+                        ? l10n.readerExitFullscreen
+                        : l10n.readerEnterFullscreen,
+                    semanticLabel: readerFullscreen
+                        ? l10n.readerExitFullscreenSemantic
+                        : l10n.readerEnterFullscreenSemantic,
                     iconSize: 16,
                     size: 32,
                     borderRadius: 8,
@@ -105,8 +112,8 @@ class ReaderTopBar extends StatelessWidget {
                     ),
                   GhostButton.icon(
                     icon: LucideIcons.settings,
-                    tooltip: '阅读设置',
-                    semanticLabel: '打开阅读设置',
+                    tooltip: l10n.readerSettingsTitle,
+                    semanticLabel: l10n.readerOpenSettingsSemantic,
                     iconSize: 16,
                     size: 32,
                     borderRadius: 8,
@@ -117,7 +124,11 @@ class ReaderTopBar extends StatelessWidget {
                       showReaderSettingsDialog(context);
                     },
                   ),
-                  const ReaderOverflowMenuButton(),
+                  ReaderOverflowMenuButton(
+                    comicId: session?.comicId ?? '',
+                    seriesId: session?.seriesId,
+                    incognito: session?.incognito ?? false,
+                  ),
                 ],
               ),
             ),
@@ -207,6 +218,7 @@ class _ReaderSeriesMenuButtonState
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     return CustomPopupMenu(
       controller: _menuController,
@@ -223,8 +235,8 @@ class _ReaderSeriesMenuButtonState
       ),
       child: GhostButton.icon(
         icon: LucideIcons.list,
-        tooltip: '系列目录',
-        semanticLabel: '系列目录',
+        tooltip: l10n.readerSeriesCatalog,
+        semanticLabel: l10n.readerSeriesCatalog,
         iconSize: 16,
         size: 32,
         borderRadius: 8,

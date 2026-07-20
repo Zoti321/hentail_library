@@ -48,29 +48,34 @@ void main() {
         expect(libraryGridSpacing(LibraryLayoutTier.medium), 14);
         expect(libraryGridSpacing(LibraryLayoutTier.expanded), 16);
 
+        expect(libraryHeaderShowsCountChips(LibraryLayoutTier.compact), isTrue);
+        expect(libraryHeaderShowsCountChips(LibraryLayoutTier.medium), isTrue);
         expect(
-          libraryHeaderShowsCountChips(LibraryLayoutTier.compact),
+          libraryHeaderShowsActiveCountChipOnly(LibraryLayoutTier.compact),
+          isTrue,
+        );
+        expect(
+          libraryHeaderShowsActiveCountChipOnly(LibraryLayoutTier.medium),
           isFalse,
         );
-        expect(libraryHeaderShowsCountChips(LibraryLayoutTier.medium), isTrue);
+        expect(
+          libraryHeaderShowsDisplayTargetTabs(LibraryLayoutTier.compact),
+          isFalse,
+        );
+        expect(
+          libraryHeaderShowsDisplayTargetTabs(LibraryLayoutTier.medium),
+          isTrue,
+        );
+        expect(
+          libraryUsesContentSwitcherBottomBar(LibraryLayoutTier.compact),
+          isTrue,
+        );
+        expect(
+          libraryUsesContentSwitcherBottomBar(LibraryLayoutTier.medium),
+          isFalse,
+        );
       },
     );
-  });
-
-  group('libraryTabBadgeMetrics', () {
-    test('uses smaller compact badge offset and size', () {
-      final LibraryTabBadgeMetrics compact = libraryTabBadgeMetrics(
-        LibraryLayoutTier.compact,
-      );
-      final LibraryTabBadgeMetrics expanded = libraryTabBadgeMetrics(
-        LibraryLayoutTier.expanded,
-      );
-
-      expect(compact.top, lessThan(expanded.top));
-      expect(compact.right, lessThan(expanded.right));
-      expect(compact.minSize, lessThan(expanded.minSize));
-      expect(compact.fontSize, lessThan(expanded.fontSize));
-    });
   });
 
   group('library popup menu widths', () {

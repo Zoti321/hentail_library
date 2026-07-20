@@ -38,6 +38,22 @@ bool metadataRowUsesOverflowMenu(MetadataLayoutTier tier) {
   return tier == MetadataLayoutTier.compact;
 }
 
+bool metadataHeaderShowsEntityTabs(MetadataLayoutTier tier) {
+  return tier != MetadataLayoutTier.compact;
+}
+
+bool metadataUsesContentSwitcherBottomBar(MetadataLayoutTier tier) {
+  return tier == MetadataLayoutTier.compact;
+}
+
+bool metadataHeaderShowsCountChip(MetadataLayoutTier tier) {
+  return tier == MetadataLayoutTier.compact;
+}
+
+bool metadataListHeaderShowsTotalCount(MetadataLayoutTier tier) {
+  return tier != MetadataLayoutTier.compact;
+}
+
 double metadataInnerContentMaxWidth(
   MetadataLayoutTier tier,
   double viewportWidth,
@@ -58,12 +74,4 @@ double metadataSearchFieldWidth(
     MetadataLayoutTier.medium => ContentLayoutTier.medium,
     MetadataLayoutTier.expanded => ContentLayoutTier.expanded,
   }, contentMaxWidth);
-}
-
-String metadataAddEntityTooltip(int tabIndex) {
-  return switch (tabIndex) {
-    0 => '添加作者',
-    1 => '添加标签',
-    _ => '添加',
-  };
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/layout/detail_meta_chip_row_layout.dart';
@@ -36,7 +38,7 @@ class SeriesSerializationChip extends StatelessWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final Color accentColor = _serializationChipAccentColor(cs, status);
     return OutlinedMetaChip(
-      text: status.label,
+      text: context.l10n.serializationStatusLabel(status),
       borderColor: accentColor,
       textColor: accentColor,
     );
@@ -57,6 +59,7 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppLocalizations l10n = context.l10n;
     final bool showSerialization =
         series.serializationStatus != SerializationStatus.unknown;
     final List<Widget> chipRowChildren = <Widget>[
@@ -82,7 +85,11 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
           ),
         ),
         Text(
-          series.volumeProgressLabel ?? series.volumeCountLabel,
+          l10n.seriesVolumeProgressLabel(
+                current: series.items.length,
+                total: series.totalCount,
+              ) ??
+              l10n.seriesVolumeCountLabel(series.items.length),
           style: TextStyle(
             fontSize: tokens.text.bodySm,
             color: cs.hentai.textSecondary,
@@ -106,12 +113,15 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
+    final AppLocalizations l10n = context.l10n;
     final List<Widget> rows = <Widget>[];
     if (authors.isNotEmpty) {
-      rows.add(LabeledMetaChipRow(label: '作者', items: authors));
+      rows.add(
+        LabeledMetaChipRow(label: l10n.comicDetailAuthors, items: authors),
+      );
     }
     if (tags.isNotEmpty) {
-      rows.add(LabeledMetaChipRow(label: '标签', items: tags));
+      rows.add(LabeledMetaChipRow(label: l10n.comicDetailTags, items: tags));
     }
     if (rows.isEmpty) {
       return const SizedBox.shrink();

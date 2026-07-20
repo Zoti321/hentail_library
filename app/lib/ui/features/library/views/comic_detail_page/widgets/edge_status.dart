@@ -1,5 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_back_header.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -10,6 +12,7 @@ class ComicDetailLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppLocalizations l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -24,7 +27,7 @@ class ComicDetailLoading extends StatelessWidget {
                 color: cs.primary,
               ),
             ),
-            label: '加载中…',
+            label: l10n.shellLoading,
           ),
         ),
       ],
@@ -39,6 +42,7 @@ class ComicDetailNotFound extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     return Column(
       key: ValueKey<String>(comicId),
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -51,11 +55,11 @@ class ComicDetailNotFound extends StatelessWidget {
               size: 48,
               color: Theme.of(context).colorScheme.hentai.textTertiary,
             ),
-            label: '漫画不存在或已移除',
+            label: l10n.comicDetailNotFound,
             action: TextButton.icon(
               onPressed: () => context.go('/local'),
               icon: const Icon(LucideIcons.library, size: 16),
-              label: const Text('前往漫画库'),
+              label: Text(l10n.comicDetailGoToLibrary),
             ),
           ),
         ),
@@ -79,6 +83,7 @@ class _ComicDetailErrorState extends State<ComicDetailError> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final AppLocalizations l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -90,7 +95,7 @@ class _ComicDetailErrorState extends State<ComicDetailError> {
               size: 48,
               color: theme.colorScheme.hentai.textTertiary,
             ),
-            label: '加载失败，请重试',
+            label: l10n.comicDetailLoadFailedRetry,
             action: TextButton.icon(
               onPressed: retrying
                   ? null
@@ -108,7 +113,7 @@ class _ComicDetailErrorState extends State<ComicDetailError> {
                       ),
                     )
                   : const Icon(LucideIcons.refreshCw, size: 16),
-              label: Text(retrying ? '重试中…' : '重试'),
+              label: Text(retrying ? l10n.shellRetrying : l10n.shellRetry),
             ),
           ),
         ),

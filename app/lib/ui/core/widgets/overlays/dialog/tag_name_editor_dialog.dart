@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
 
@@ -60,6 +61,7 @@ class _TagNameEditorDialogState extends ConsumerState<TagNameEditorDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return HentaiDialog(
       title: widget.title,
       content: FluentTextField(
@@ -81,7 +83,7 @@ class _TagNameEditorDialogState extends ConsumerState<TagNameEditorDialog> {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          child: const Text('取消'),
+          child: Text(l10n.commonCancel),
         ),
         const SizedBox(width: 8),
         FilledButton(
@@ -97,7 +99,7 @@ class _TagNameEditorDialogState extends ConsumerState<TagNameEditorDialog> {
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('保存'),
+              : Text(l10n.commonSave),
         ),
       ],
     );

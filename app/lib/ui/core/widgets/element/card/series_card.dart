@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/catalog_cover_card_shell.dart';
-import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
-import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_placeholder.dart';
+import 'package:hentai_library/ui/core/widgets/element/image/series_cover_content.dart';
 
 class SeriesCard extends StatelessWidget {
   const SeriesCard({
@@ -20,18 +21,13 @@ class SeriesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SeriesItem? coverItem = series.coverItem;
-    final String? coverComicId = coverItem?.comicId;
-
     return CatalogCoverCardShell(
       onTap: onTap,
       onSecondaryTapUp: onSecondaryTapUp,
-      cover: coverComicId != null
-          ? ComicCoverContent(comicId: coverComicId)
-          : const ComicCoverPlaceholder(
-              variant: ComicCoverPlaceholderVariant.card,
-              kind: ComicCoverPlaceholderKind.noCover,
-            ),
+      cover: SeriesCoverContent(
+        seriesId: series.id,
+        priority: ThumbnailPriority.high,
+      ),
       info: (bool isHover) => _SeriesCardInfo(series: series, isHover: isHover),
     );
   }
@@ -47,6 +43,7 @@ class _SeriesCardInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppLocalizations l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 6,
@@ -67,7 +64,7 @@ class _SeriesCardInfo extends StatelessWidget {
           ),
         ),
         Text(
-          series.volumeCountLabel,
+          l10n.seriesVolumeCountLabel(series.items.length),
           style: TextStyle(
             fontSize: tokens.text.labelXs - 1,
             color: cs.hentai.textTertiary,

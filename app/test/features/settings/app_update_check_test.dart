@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/util/semver_utils.dart';
 import 'package:hentai_library/data/services/app_update/app_update_service.dart';
 import 'package:hentai_library/domain/models/app_release_info.dart';
@@ -120,6 +121,9 @@ Widget _buildHarness({required MockAppUpdateService mockService}) {
   return ProviderScope(
     overrides: _overrides(mockService),
     child: MaterialApp(
+      locale: const Locale('zh'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: Builder(
         builder: (BuildContext context) {
           return ElevatedButton(

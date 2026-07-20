@@ -9,6 +9,7 @@ pub struct Model {
     pub updated_at: i64,
     pub source_modified_ms: Option<i64>,
     pub source_size: Option<i64>,
+    pub is_user_set: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

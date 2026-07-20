@@ -1,6 +1,8 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
@@ -70,7 +72,10 @@ class _ComicDetailSeriesNavState extends ConsumerState<ComicDetailSeriesNav> {
       if (!context.mounted) {
         return;
       }
-      showErrorToast(context, AppException('系列数据异常：该漫画同时属于多个系列，无法使用系列导航'));
+      showErrorToast(
+        context,
+        AppException(context.l10n.comicDetailSeriesNavConflict),
+      );
     });
 
     final AsyncValue<List<Series>> allSeriesAsync = ref.watch(
@@ -152,14 +157,15 @@ class _ComicDetailSeriesNavControls extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final ComicDetailSeriesNavItem? previous = data.previousItem;
     final ComicDetailSeriesNavItem? next = data.nextItem;
+    final AppLocalizations l10n = context.l10n;
     return Row(
       mainAxisSize: MainAxisSize.min,
       spacing: 4,
       children: <Widget>[
         GhostButton.icon(
           icon: LucideIcons.chevronLeft,
-          tooltip: '上一本',
-          semanticLabel: '系列上一本',
+          tooltip: l10n.comicDetailSeriesPrev,
+          semanticLabel: l10n.comicDetailSeriesPrevSemantic,
           iconSize: 16,
           size: 32,
           borderRadius: 8,
@@ -188,8 +194,8 @@ class _ComicDetailSeriesNavControls extends StatelessWidget {
           ),
           child: GhostButton.icon(
             icon: LucideIcons.menu,
-            tooltip: '系列目录',
-            semanticLabel: '系列目录',
+            tooltip: l10n.comicDetailSeriesCatalog,
+            semanticLabel: l10n.comicDetailSeriesCatalog,
             iconSize: 16,
             size: 32,
             borderRadius: 8,
@@ -201,8 +207,8 @@ class _ComicDetailSeriesNavControls extends StatelessWidget {
         ),
         GhostButton.icon(
           icon: LucideIcons.chevronRight,
-          tooltip: '下一本',
-          semanticLabel: '系列下一本',
+          tooltip: l10n.comicDetailSeriesNext,
+          semanticLabel: l10n.comicDetailSeriesNextSemantic,
           iconSize: 16,
           size: 32,
           borderRadius: 8,

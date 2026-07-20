@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/status_card_shell.dart';
@@ -52,6 +53,7 @@ class _SelectedPathsErrorCardState
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final l10n = context.l10n;
     return StatusCardShell(
       padding: const EdgeInsets.all(20),
       borderRadius: 14,
@@ -59,7 +61,7 @@ class _SelectedPathsErrorCardState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            '路径加载失败',
+            l10n.pathsLoadFailed,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -87,7 +89,7 @@ class _SelectedPathsErrorCardState
                     ),
                   )
                 : const Icon(LucideIcons.rotateCw, size: 16),
-            label: Text(isRetrying ? '重试中…' : '重试'),
+            label: Text(isRetrying ? l10n.shellRetrying : l10n.shellRetry),
             style: OutlinedButton.styleFrom(
               foregroundColor: theme.colorScheme.onSurface,
               side: BorderSide(color: theme.colorScheme.hentai.borderSubtle),

@@ -1,5 +1,7 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
@@ -33,6 +35,7 @@ class MetadataPanelRowActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     if (metadataRowUsesOverflowMenu(layoutTier)) {
       return _MetadataRowOverflowButton(onRename: onRename, onDelete: onDelete);
@@ -46,15 +49,15 @@ class MetadataPanelRowActions extends StatelessWidget {
           iconSize: 16,
           size: iconButtonSize,
           borderRadius: iconButtonRadius,
-          tooltip: '重命名',
+          tooltip: l10n.metadataRename,
           delayTooltipThreeSeconds: true,
           hoverColor: cs.primary.withAlpha(10),
           overlayColor: cs.primary.withAlpha(14),
           onPressed: onRename,
         ),
         GhostButton.icon(
-          tooltip: '删除',
-          semanticLabel: '删除',
+          tooltip: l10n.metadataDelete,
+          semanticLabel: l10n.metadataDelete,
           icon: LucideIcons.trash2,
           iconSize: 16,
           size: iconButtonSize,
@@ -92,6 +95,7 @@ class _MetadataRowOverflowButtonState
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
+    final l10n = context.l10n;
 
     return CustomPopupMenu(
       controller: _controller,
@@ -111,8 +115,8 @@ class _MetadataRowOverflowButtonState
       ),
       child: GhostButton.icon(
         icon: LucideIcons.ellipsisVertical,
-        tooltip: '更多操作',
-        semanticLabel: '更多操作',
+        tooltip: l10n.metadataMoreActions,
+        semanticLabel: l10n.metadataMoreActions,
         iconSize: 16,
         size: _kMetadataRowOverflowButtonSize,
         borderRadius: 8,
@@ -139,8 +143,9 @@ class _MetadataRowOverflowMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     return PopupMenuPanelShell(
-      width: _metadataRowMenuWidth(context),
+      width: _metadataRowMenuWidth(context, l10n),
       blurRadius: 6,
       shadowOffset: const Offset(0, 4),
       borderRadius: tokens.radius.xs,
@@ -152,12 +157,12 @@ class _MetadataRowOverflowMenu extends StatelessWidget {
           children: <Widget>[
             _MetadataRowMenuItem(
               icon: LucideIcons.squarePen,
-              label: '重命名',
+              label: l10n.metadataRename,
               onTap: onRename,
             ),
             _MetadataRowMenuItem(
               icon: LucideIcons.trash2,
-              label: '删除',
+              label: l10n.metadataDelete,
               foregroundColor: cs.error,
               onTap: onDelete,
             ),
@@ -216,8 +221,11 @@ class _MetadataRowMenuItem extends StatelessWidget {
   }
 }
 
-double _metadataRowMenuWidth(BuildContext context) {
-  const List<String> labels = <String>['重命名', '删除'];
+double _metadataRowMenuWidth(BuildContext context, AppLocalizations l10n) {
+  final List<String> labels = <String>[
+    l10n.metadataRename,
+    l10n.metadataDelete,
+  ];
   const TextStyle textStyle = TextStyle(
     fontSize: 13,
     fontWeight: FontWeight.w500,

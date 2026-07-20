@@ -1,19 +1,19 @@
 import 'dart:math' as math;
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
-import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/form/author_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_date_picker_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/fluent_toggle_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
-import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
@@ -64,47 +64,39 @@ class EditMetadataDialog extends StatefulHookConsumerWidget {
 }
 
 class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
-  late final _EditMetadataFormController _controller;
+  late ComicMetadataForm _form;
+  ComicMetadataFormValidation? _validation;
   _EditMetadataTab _selectedTab = _EditMetadataTab.general;
   int _previousTabIndex = 0;
   bool _saving = false;
 
-  static final List<DialogSideTabItem> _sideTabs = <DialogSideTabItem>[
-    DialogSideTabItem(label: '常规', icon: LucideIcons.textAlignCenter),
-    DialogSideTabItem(label: '作者&标签', icon: LucideIcons.users),
-  ];
+  List<DialogSideTabItem> _sideTabs(AppLocalizations l10n) =>
+      <DialogSideTabItem>[
+        DialogSideTabItem(
+          label: l10n.dialogEditMetadataTabGeneral,
+          icon: LucideIcons.textAlignCenter,
+        ),
+        DialogSideTabItem(
+          label: l10n.dialogEditMetadataTabAuthorsTags,
+          icon: LucideIcons.users,
+        ),
+      ];
 
-  static final List<CapsuleTabItem> _capsuleTabs = <CapsuleTabItem>[
-    CapsuleTabItem(label: '常规', icon: LucideIcons.textAlignCenter),
-    CapsuleTabItem(label: '作者&标签', icon: LucideIcons.users),
+  List<CapsuleTabItem> _capsuleTabs(AppLocalizations l10n) => <CapsuleTabItem>[
+    CapsuleTabItem(
+      label: l10n.dialogEditMetadataTabGeneral,
+      icon: LucideIcons.textAlignCenter,
+    ),
+    CapsuleTabItem(
+      label: l10n.dialogEditMetadataTabAuthorsTags,
+      icon: LucideIcons.users,
+    ),
   ];
 
   @override
   void initState() {
     super.initState();
-    final ComicMetadataForm initialForm = ComicMetadataForm(
-      title: widget.comic.title,
-      description: widget.comic.description,
-      publishedAt: widget.comic.publishedAt,
-      isR18: widget.comic.contentRating == ContentRating.r18,
-      tags: List<Tag>.from(widget.comic.tags),
-      authors: List<Author>.from(widget.comic.authors),
-    );
-    _controller = _EditMetadataFormController(initialForm: initialForm)
-      ..addListener(_handleFormChanged);
-  }
-
-  void _handleFormChanged() {
-    if (!mounted) return;
-    setState(() {});
-  }
-
-  @override
-  void dispose() {
-    _controller
-      ..removeListener(_handleFormChanged)
-      ..dispose();
-    super.dispose();
+    _form = ComicMetadataForm.fromComic(widget.comic);
   }
 
   void _selectTab(int index) {
@@ -154,19 +146,31 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     );
   }
 
+  void _updateForm(ComicMetadataForm Function(ComicMetadataForm) transform) {
+    setState(() => _form = transform(_form));
+  }
+
   Future<void> _handleSave() async {
-    if (!_controller.markTitleValidationAttempted()) {
+    if (_saving) {
+      return;
+    }
+    final ComicMetadataFormValidation validation = _form.validate();
+    if (!validation.isValid) {
       setState(() {
+        _validation = validation;
         _previousTabIndex = _selectedTab.index;
         _selectedTab = _EditMetadataTab.general;
       });
       return;
     }
-    setState(() => _saving = true);
+    setState(() {
+      _validation = null;
+      _saving = true;
+    });
     try {
-      await widget.onSave(_controller.normalizedForm);
+      await widget.onSave(_form.normalized);
       if (mounted) {
-        showSuccessToast(context, '已保存');
+        showSuccessToast(context, context.l10n.commonSavedToast);
         Navigator.of(context).pop();
       }
     } catch (e) {
@@ -174,7 +178,9 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
         showErrorToast(context, e);
       }
     } finally {
-      if (mounted) setState(() => _saving = false);
+      if (mounted) {
+        setState(() => _saving = false);
+      }
     }
   }
 
@@ -197,24 +203,49 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       child: switch (_selectedTab) {
         _EditMetadataTab.general => _EditMetadataGeneralTab(
           key: const ValueKey<String>('general'),
-          title: _controller.form.title,
-          titleError: _controller.titleErrorText,
-          description: _controller.form.description ?? '',
-          publishedAt: _controller.form.publishedAt,
-          isR18: _controller.form.isR18,
-          onTitleChanged: _controller.updateTitle,
-          onDescriptionChanged: _controller.updateDescription,
-          onPublishedAtChanged: _controller.updatePublishedAt,
-          onIsR18Changed: _controller.updateIsR18,
+          title: _form.title,
+          titleError: _validation?.titleError,
+          description: _form.description ?? '',
+          publishedAt: _form.publishedAt,
+          isR18: _form.isR18,
+          onTitleChanged: (String value) {
+            setState(() {
+              _form = _form.copyWith(title: value);
+              if (_validation?.titleError != null) {
+                _validation = const ComicMetadataFormValidation();
+              }
+            });
+          },
+          onDescriptionChanged: (String value) {
+            _updateForm(
+              (ComicMetadataForm f) => f.copyWith(description: value),
+            );
+          },
+          onPublishedAtChanged: (DateTime? value) {
+            _updateForm(
+              (ComicMetadataForm f) => f.copyWith(publishedAt: value),
+            );
+          },
+          onIsR18Changed: (bool value) {
+            _updateForm((ComicMetadataForm f) => f.copyWith(isR18: value));
+          },
         ),
         _EditMetadataTab.authorsAndTags => _EditMetadataAuthorsTagsTab(
           key: const ValueKey<String>('authors-tags'),
-          authors: _controller.form.authors,
-          tags: _controller.form.tags,
-          onAddAuthor: _controller.addAuthor,
-          onRemoveAuthor: _controller.removeAuthor,
-          onAddTag: _controller.addTagByName,
-          onRemoveTag: _controller.removeTagByName,
+          authors: _form.authors,
+          tags: _form.tags,
+          onAddAuthor: (String name) {
+            _updateForm((ComicMetadataForm f) => f.addAuthor(name));
+          },
+          onRemoveAuthor: (String name) {
+            _updateForm((ComicMetadataForm f) => f.removeAuthor(name));
+          },
+          onAddTag: (String name) {
+            _updateForm((ComicMetadataForm f) => f.addTag(name));
+          },
+          onRemoveTag: (String name) {
+            _updateForm((ComicMetadataForm f) => f.removeTag(name));
+          },
         ),
       },
     );
@@ -222,6 +253,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final int selectedTabIndex = _selectedTab.index;
@@ -244,7 +276,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: CapsuleTabBar(
-                items: _capsuleTabs,
+                items: _capsuleTabs(l10n),
                 selectedIndex: selectedTabIndex,
                 onSelected: _selectTab,
               ),
@@ -277,7 +309,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             DialogSideTabBar(
-              items: _sideTabs,
+              items: _sideTabs(l10n),
               selectedIndex: selectedTabIndex,
               showDivider: false,
               onSelected: _selectTab,
@@ -299,7 +331,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     }
 
     return AdaptiveFormSurface(
-      title: '编辑元数据',
+      title: l10n.dialogEditMetadataTitle,
       maxDialogWidth: _kEditMetadataDialogWidth,
       borderRadius: _kEditMetadataDialogRadius,
       scrollableBody: false,
@@ -312,21 +344,11 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       actions: <Widget>[
         TextButton(
           onPressed: _saving ? null : () => Navigator.of(context).pop(),
-          style: TextButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(_kEditMetadataDialogRadius),
-            ),
-          ),
-          child: const Text('取消'),
+          child: Text(l10n.commonCancel),
         ),
         const SizedBox(width: 8),
         FilledButton(
           onPressed: _saving ? null : _handleSave,
-          style: FilledButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(_kEditMetadataDialogRadius),
-            ),
-          ),
           child: _saving
               ? SizedBox(
                   width: 16,
@@ -336,110 +358,10 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
                     color: cs.onPrimary,
                   ),
                 )
-              : const Text('保存更改'),
+              : Text(l10n.commonSaveChanges),
         ),
       ],
     );
-  }
-}
-
-class _EditMetadataFormController extends ChangeNotifier {
-  _EditMetadataFormController({required ComicMetadataForm initialForm})
-    : _form = initialForm;
-
-  ComicMetadataForm _form;
-  bool _titleValidationAttempted = false;
-
-  ComicMetadataForm get form => _form;
-
-  String? get titleErrorText {
-    if (!_titleValidationAttempted) {
-      return null;
-    }
-    return _form.title.trim().isEmpty ? '漫画标题不能为空' : null;
-  }
-
-  ComicMetadataForm get normalizedForm {
-    final String trimmedTitle = _form.title.trim();
-    final String? trimmedDescription = _normalizeOptionalText(
-      _form.description,
-    );
-    return _form.copyWith(title: trimmedTitle, description: trimmedDescription);
-  }
-
-  bool markTitleValidationAttempted() {
-    _titleValidationAttempted = true;
-    notifyListeners();
-    return _form.title.trim().isNotEmpty;
-  }
-
-  void updateTitle(String value) {
-    _form = _form.copyWith(title: value);
-    notifyListeners();
-  }
-
-  void updateDescription(String value) {
-    _form = _form.copyWith(description: value);
-    notifyListeners();
-  }
-
-  void updatePublishedAt(DateTime? value) {
-    _form = _form.copyWith(publishedAt: value);
-    notifyListeners();
-  }
-
-  void updateIsR18(bool value) {
-    _form = _form.copyWith(isR18: value);
-    notifyListeners();
-  }
-
-  void addAuthor(String name) {
-    final String trimmed = name.trim();
-    if (trimmed.isEmpty) return;
-    if (_form.authors.any((Author a) => a.name == trimmed)) return;
-    _form = _form.copyWith(
-      authors: <Author>[
-        ..._form.authors,
-        Author(name: trimmed),
-      ],
-    );
-    notifyListeners();
-  }
-
-  void removeAuthor(String name) {
-    _form = _form.copyWith(
-      authors: _form.authors.where((Author a) => a.name != name).toList(),
-    );
-    notifyListeners();
-  }
-
-  void addTagByName(String name) {
-    final String trimmed = name.trim();
-    if (trimmed.isEmpty) return;
-    final Tag tag = Tag(name: trimmed);
-    final List<Tag> tags = _form.tags;
-    if (tags.any((Tag t) => t.name == tag.name)) return;
-    _form = _form.copyWith(tags: <Tag>[...tags, tag]);
-    notifyListeners();
-  }
-
-  void removeTagByName(String name) {
-    final Tag? tag = _form.tags.firstWhereOrNull((Tag t) => t.name == name);
-    if (tag == null) return;
-    removeTag(tag);
-  }
-
-  void removeTag(Tag tag) {
-    _form = _form.copyWith(tags: <Tag>[..._form.tags]..remove(tag));
-    notifyListeners();
-  }
-
-  String? _normalizeOptionalText(String? value) {
-    if (value == null) {
-      return null;
-    }
-    final String trimmed = value.trim();
-    return trimmed.isEmpty ? null : trimmed;
   }
 }
 
@@ -469,35 +391,58 @@ class _EditMetadataGeneralTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
+    final bool compact = AppLayoutBreakpoints.isCompact(
+      MediaQuery.sizeOf(context).width,
+    );
+
+    final Widget publishedAtField = FluentDatePickerField(
+      labelText: l10n.formPublishedDateLabel,
+      value: publishedAt,
+      onChanged: onPublishedAtChanged,
+    );
+    final Widget contentRatingField = FluentToggleField(
+      labelText: l10n.formAgeRestrictionLabel,
+      value: isR18,
+      onChanged: onIsR18Changed,
+      checkedLabel: 'R18',
+      uncheckedLabel: l10n.filterAgeAllAges,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: tokens.spacing.lg,
       children: <Widget>[
         FluentTextField(
-          labelText: '漫画标题',
+          labelText: l10n.formComicTitleLabel,
           initialValue: title,
           errorText: titleError,
           onChanged: onTitleChanged,
-          hintText: '修改漫画标题',
+          hintText: l10n.formComicTitleHint,
         ),
         FluentTextField(
-          labelText: '概要',
+          labelText: l10n.formComicDescriptionLabel,
           initialValue: description,
           maxLines: 4,
           onChanged: onDescriptionChanged,
-          hintText: '添加漫画简介…',
+          hintText: l10n.formComicDescriptionHint,
         ),
-        FluentDatePickerField(
-          labelText: '发布日期',
-          value: publishedAt,
-          onChanged: onPublishedAtChanged,
-        ),
-        _EditMetadataContentRatingSection(
-          isR18: isR18,
-          onChanged: onIsR18Changed,
-        ),
+        if (compact)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: tokens.spacing.lg,
+            children: <Widget>[publishedAtField, contentRatingField],
+          )
+        else
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.spacing.md,
+            children: <Widget>[
+              Expanded(flex: 3, child: publishedAtField),
+              Expanded(flex: 2, child: contentRatingField),
+            ],
+          ),
       ],
     );
   }
@@ -523,6 +468,7 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
 
     return Column(
@@ -530,121 +476,18 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
       spacing: tokens.spacing.lg,
       children: <Widget>[
         AuthorLibraryMultiSelectField(
-          label: '作者',
+          label: l10n.comicDetailAuthors,
           icon: LucideIcons.penTool,
           selectedNames: authors.map((Author a) => a.name).toList(),
           onAdd: onAddAuthor,
           onRemove: onRemoveAuthor,
         ),
         TagLibraryMultiSelectField(
-          label: '标签',
+          label: l10n.comicDetailTags,
           icon: LucideIcons.tag,
           selectedNames: tags.map((Tag t) => t.name).toList(),
           onAdd: onAddTag,
           onRemove: onRemoveTag,
-        ),
-      ],
-    );
-  }
-}
-
-class _EditMetadataContentRatingSection extends StatelessWidget {
-  const _EditMetadataContentRatingSection({
-    required this.isR18,
-    required this.onChanged,
-  });
-
-  final bool isR18;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final AppThemeTokens tokens = context.tokens;
-    final Color accent = isR18 ? cs.error : cs.primary;
-    final Color cardBg = isR18
-        ? cs.error.withValues(alpha: 0.06)
-        : cs.primary.withValues(alpha: 0.05);
-    final Color borderColor = isR18
-        ? cs.error.withValues(alpha: 0.28)
-        : cs.hentai.borderSubtle;
-    final Color iconBg = isR18
-        ? cs.error.withValues(alpha: 0.14)
-        : cs.primary.withValues(alpha: 0.12);
-    final String headline = isR18 ? 'R18（成人内容）' : '全年龄';
-    final String subtitle = isR18 ? '含成人向或限制级描写' : '不含成人向限制级内容';
-    final IconData iconData = isR18
-        ? LucideIcons.circleAlert
-        : LucideIcons.shield;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: tokens.spacing.sm,
-      children: <Widget>[
-        const FormLabel('年龄限制'),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: cardBg,
-            borderRadius: BorderRadius.circular(tokens.radius.md),
-            border: Border.all(color: borderColor, width: 1),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: tokens.spacing.md,
-              vertical: tokens.spacing.sm + 2,
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: iconBg,
-                    borderRadius: BorderRadius.circular(tokens.radius.sm),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Icon(iconData, size: 20, color: accent),
-                  ),
-                ),
-                SizedBox(width: tokens.spacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text(
-                        headline,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isR18 ? cs.error : cs.hentai.textPrimary,
-                          height: 1.25,
-                        ),
-                      ),
-                      SizedBox(height: tokens.spacing.xs),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 12,
-                          height: 1.3,
-                          color: cs.hentai.textTertiary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: tokens.spacing.sm),
-                ToggleSwitch(checked: isR18, onChange: () => onChanged(!isR18)),
-              ],
-            ),
-          ),
         ),
       ],
     );

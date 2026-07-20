@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 
 class TagConfirmDeleteDialog extends StatelessWidget {
@@ -8,9 +9,10 @@ class TagConfirmDeleteDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return HentaiDialog(
-      title: '确认删除',
-      content: Text('将删除 $count 个标签，并同时从所有漫画中移除这些标签。此操作不可撤销。'),
+      title: l10n.confirmDeleteTagsTitle,
+      content: Text(l10n.confirmDeleteTagsContent(count)),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
@@ -19,7 +21,7 @@ class TagConfirmDeleteDialog extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          child: const Text('取消'),
+          child: Text(l10n.commonCancel),
         ),
         const SizedBox(width: 8),
         FilledButton(
@@ -29,7 +31,7 @@ class TagConfirmDeleteDialog extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          child: const Text('删除'),
+          child: Text(l10n.commonDelete),
         ),
       ],
     );

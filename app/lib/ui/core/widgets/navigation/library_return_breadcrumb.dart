@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -18,6 +19,7 @@ final class LibraryReturnBreadcrumb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final TextStyle linkStyle = TextStyle(
@@ -49,23 +51,27 @@ final class LibraryReturnBreadcrumb extends StatelessWidget {
             children: <Widget>[
               Icon(LucideIcons.library, size: 16, color: cs.primary),
               SizedBox(width: tokens.spacing.sm),
-              Text('漫画库', style: linkStyle),
+              Text(l10n.libraryTitle, style: linkStyle),
             ],
           ),
         ),
       ),
     );
     if (trailingLabel == null || trailingLabel!.isEmpty) {
-      return Semantics(label: '返回漫画库', button: true, child: libraryLink);
+      return Semantics(
+        label: l10n.breadcrumbReturnLibrary,
+        button: true,
+        child: libraryLink,
+      );
     }
     final String trail = trailingLabel!;
     final String tip = trailingTooltip ?? trail;
     return Semantics(
-      label: '返回漫画库，当前：$trail',
+      label: l10n.breadcrumbReturnLibraryWithTrail(trail),
       child: Row(
         children: <Widget>[
           Semantics(
-            label: '返回漫画库',
+            label: l10n.breadcrumbReturnLibrary,
             button: true,
             excludeSemantics: true,
             child: libraryLink,

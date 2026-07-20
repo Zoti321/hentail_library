@@ -9,41 +9,6 @@ final allTagsProvider = FutureProvider<List<Tag>>((ref) async {
   return tags;
 });
 
-/// 当前选中的标签集合（用于批量删除）
-class TagSelectionNotifier extends Notifier<Set<Tag>> {
-  @override
-  Set<Tag> build() => <Tag>{};
-
-  void toggle(Tag tag) {
-    final next = Set<Tag>.from(state);
-    if (next.contains(tag)) {
-      next.remove(tag);
-    } else {
-      next.add(tag);
-    }
-    state = next;
-  }
-
-  void clear() {
-    state = <Tag>{};
-  }
-
-  void remove(Tag tag) {
-    if (!state.contains(tag)) {
-      return;
-    }
-    state = Set<Tag>.from(state)..remove(tag);
-  }
-
-  void selectAll(Iterable<Tag> tags) {
-    state = Set<Tag>.from(tags);
-  }
-}
-
-final tagSelectionProvider = NotifierProvider<TagSelectionNotifier, Set<Tag>>(
-  TagSelectionNotifier.new,
-);
-
 /// 标签搜索关键词
 class TagFilterNotifier extends Notifier<String> {
   @override
@@ -88,20 +53,9 @@ class TagActions {
     _ref.invalidate(allTagsProvider);
   }
 
-  Future<void> deleteTags(List<Tag> tags) async {
-    if (tags.isEmpty) return;
-    await _ref
-        .read(tagRepoProvider)
-        .deleteByNames(tags.map((e) => e.name).toList());
-    _ref.invalidate(allTagsProvider);
-    _ref.read(tagSelectionProvider.notifier).clear();
-  }
-
-  /// 删除单个标签；若该标签在批量选中集合中，仅从集合中移除该项。
   Future<void> deleteTag(Tag tag) async {
     await _ref.read(tagRepoProvider).deleteByNames(<String>[tag.name]);
     _ref.invalidate(allTagsProvider);
-    _ref.read(tagSelectionProvider.notifier).remove(tag);
   }
 
   Future<void> renameTag(Tag oldTag, String newName) async {

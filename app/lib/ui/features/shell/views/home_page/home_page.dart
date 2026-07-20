@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
@@ -66,29 +67,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  String greetingPhraseForNow() {
-    final int hour = DateTime.now().hour;
-    if (hour < 5) {
-      return '凌晨好';
-    }
-    if (hour < 9) {
-      return '早上好';
-    }
-    if (hour < 12) {
-      return '上午好';
-    }
-    if (hour < 14) {
-      return '中午好';
-    }
-    if (hour < 18) {
-      return '下午好';
-    }
-    if (hour < 23) {
-      return '晚上好';
-    }
-    return '夜深了';
-  }
-
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
@@ -104,7 +82,10 @@ class _HomePageState extends ConsumerState<HomePage> {
       data: (HomePageCounts c) => c.comicCount == 0,
       orElse: () => false,
     );
-    final String greetingText = '${greetingPhraseForNow()}，读者';
+    final l10n = context.l10n;
+    final String greetingText = l10n.homeGreetingReader(
+      l10n.homeGreetingPhraseForHour(DateTime.now().hour),
+    );
     void onScan() {
       onTapScanLibrary(context, ref);
     }

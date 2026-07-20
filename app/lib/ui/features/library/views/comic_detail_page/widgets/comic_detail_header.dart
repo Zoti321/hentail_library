@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -25,6 +27,7 @@ class ComicDetailHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
+    final AppLocalizations l10n = context.l10n;
     return DecoratedBox(
       decoration: BoxDecoration(
         color: cs.surface,
@@ -46,8 +49,8 @@ class ComicDetailHeader extends ConsumerWidget {
               children: <Widget>[
                 GhostButton.icon(
                   icon: LucideIcons.arrowLeft,
-                  tooltip: '返回',
-                  semanticLabel: '返回',
+                  tooltip: l10n.shellBack,
+                  semanticLabel: l10n.shellBack,
                   iconSize: 16,
                   size: 32,
                   borderRadius: 8,
@@ -62,8 +65,8 @@ class ComicDetailHeader extends ConsumerWidget {
                 const SizedBox(width: 4),
                 GhostButton.icon(
                   icon: LucideIcons.pencil,
-                  tooltip: '编辑元数据',
-                  semanticLabel: '编辑元数据',
+                  tooltip: l10n.comicDetailEditMetadata,
+                  semanticLabel: l10n.comicDetailEditMetadata,
                   iconSize: 16,
                   size: 32,
                   borderRadius: 8,
@@ -112,6 +115,7 @@ class _ComicDetailOverflowMenuButtonState
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
+    final AppLocalizations l10n = context.l10n;
     return CustomPopupMenu(
       controller: _controller,
       barrierColor: Colors.transparent,
@@ -131,7 +135,7 @@ class _ComicDetailOverflowMenuButtonState
             children: <Widget>[
               _ComicDetailOverflowMenuItem(
                 icon: LucideIcons.folderOpen,
-                label: '在资源管理器中显示',
+                label: l10n.comicDetailShowInExplorer,
                 onTap: () {
                   _controller.hideMenu();
                   showInFileExplorer(widget.comic.path).catchError((
@@ -148,7 +152,7 @@ class _ComicDetailOverflowMenuButtonState
                     showErrorToast(
                       context,
                       AppException(
-                        '无法在文件资源管理器中显示该项目',
+                        l10n.comicDetailShowInExplorerFailed,
                         cause: error,
                         stackTrace: stackTrace,
                       ),
@@ -158,7 +162,7 @@ class _ComicDetailOverflowMenuButtonState
               ),
               _ComicDetailOverflowMenuItem(
                 icon: LucideIcons.trash2,
-                label: '删除',
+                label: l10n.comicDetailDelete,
                 onTap: () {
                   _controller.hideMenu();
                   _confirmDelete(context);
@@ -170,8 +174,8 @@ class _ComicDetailOverflowMenuButtonState
       ),
       child: GhostButton.icon(
         icon: LucideIcons.ellipsisVertical,
-        tooltip: '更多操作',
-        semanticLabel: '打开更多操作',
+        tooltip: l10n.libraryMoreActions,
+        semanticLabel: l10n.libraryMoreActionsSemantic,
         iconSize: 16,
         size: 32,
         borderRadius: 8,
@@ -184,19 +188,20 @@ class _ComicDetailOverflowMenuButtonState
   }
 
   Future<void> _confirmDelete(BuildContext context) async {
+    final AppLocalizations l10n = context.l10n;
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('删除漫画？'),
-        content: Text('将删除「${widget.comic.title}」。此操作不可撤销。'),
+        title: Text(l10n.comicDetailDeleteTitle),
+        content: Text(l10n.comicDetailDeleteConfirm(widget.comic.title)),
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('取消'),
+            child: Text(l10n.comicDetailCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('删除'),
+            child: Text(l10n.comicDetailDelete),
           ),
         ],
       ),
@@ -214,7 +219,7 @@ class _ComicDetailOverflowMenuButtonState
       if (!context.mounted) {
         return;
       }
-      showSuccessToast(context, '已删除漫画');
+      showSuccessToast(context, l10n.comicDetailDeletedToast);
       if (context.canPop()) {
         context.pop();
       } else {

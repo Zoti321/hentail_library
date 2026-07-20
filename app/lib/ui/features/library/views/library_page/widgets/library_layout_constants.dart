@@ -4,15 +4,6 @@ import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 
 enum LibraryLayoutTier { compact, medium, expanded }
 
-typedef LibraryTabBadgeMetrics = ({
-  double top,
-  double right,
-  double minSize,
-  double fontSize,
-  double horizontalPadding,
-  double borderRadius,
-});
-
 LibraryLayoutTier libraryLayoutTierForWidth(double width) {
   if (AppLayoutBreakpoints.isCompact(width)) {
     return LibraryLayoutTier.compact;
@@ -48,7 +39,19 @@ double libraryToolbarActionSpacing(LibraryLayoutTier tier) {
 }
 
 bool libraryHeaderShowsCountChips(LibraryLayoutTier tier) {
+  return true;
+}
+
+bool libraryHeaderShowsActiveCountChipOnly(LibraryLayoutTier tier) {
+  return tier == LibraryLayoutTier.compact;
+}
+
+bool libraryHeaderShowsDisplayTargetTabs(LibraryLayoutTier tier) {
   return tier != LibraryLayoutTier.compact;
+}
+
+bool libraryUsesContentSwitcherBottomBar(LibraryLayoutTier tier) {
+  return tier == LibraryLayoutTier.compact;
 }
 
 double libraryGridMaxCrossAxisExtent(LibraryLayoutTier tier) {
@@ -64,27 +67,6 @@ double libraryGridSpacing(LibraryLayoutTier tier) {
     LibraryLayoutTier.compact => 12,
     LibraryLayoutTier.medium => 14,
     LibraryLayoutTier.expanded => 16,
-  };
-}
-
-LibraryTabBadgeMetrics libraryTabBadgeMetrics(LibraryLayoutTier tier) {
-  return switch (tier) {
-    LibraryLayoutTier.compact => (
-      top: -8,
-      right: -14,
-      minSize: 14,
-      fontSize: 9,
-      horizontalPadding: 3,
-      borderRadius: 7,
-    ),
-    LibraryLayoutTier.medium || LibraryLayoutTier.expanded => (
-      top: -2,
-      right: -10,
-      minSize: 16,
-      fontSize: 10,
-      horizontalPadding: 4,
-      borderRadius: 8,
-    ),
   };
 }
 

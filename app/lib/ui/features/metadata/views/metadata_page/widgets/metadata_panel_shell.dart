@@ -27,30 +27,3 @@ class MetadataPanelListCard extends StatelessWidget {
     );
   }
 }
-
-class MetadataPanelRowInteractionShell extends StatelessWidget {
-  const MetadataPanelRowInteractionShell({
-    required this.hoverColor,
-    required this.materialColor,
-    required this.child,
-    super.key,
-  });
-
-  final Color hoverColor;
-  final Color materialColor;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return Theme(
-      data: theme.copyWith(
-        splashFactory: NoSplash.splashFactory,
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        hoverColor: hoverColor,
-      ),
-      child: Material(color: materialColor, child: child),
-    );
-  }
-}

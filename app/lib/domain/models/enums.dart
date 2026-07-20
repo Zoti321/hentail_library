@@ -45,13 +45,6 @@ enum SerializationStatus {
   ended,
   hiatus;
 
-  String get label => switch (this) {
-    SerializationStatus.unknown => '未知',
-    SerializationStatus.ongoing => '连载中',
-    SerializationStatus.ended => '已完结',
-    SerializationStatus.hiatus => '休刊',
-  };
-
   static SerializationStatus fromRust(String raw) {
     return switch (raw) {
       'ongoing' => SerializationStatus.ongoing,

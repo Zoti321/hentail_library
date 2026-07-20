@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
@@ -42,7 +43,9 @@ class ReaderPage extends HookConsumerWidget {
     if (routeContext.comicId.isEmpty) {
       return Theme(
         data: buildAppTheme(Brightness.dark),
-        child: const Scaffold(body: Center(child: Text('阅读参数错误：缺少 comic_id'))),
+        child: Scaffold(
+          body: Center(child: Text(context.l10n.readerInvalidParams)),
+        ),
       );
     }
 
@@ -221,7 +224,7 @@ class ReaderPage extends HookConsumerWidget {
         if (!context.mounted) {
           return;
         }
-        showInfoToast(context, '再次翻页将进入下一卷');
+        showInfoToast(context, context.l10n.readerSeriesAdvancePrompt);
       });
       return null;
     }, <Object?>[seriesAdvancePromptPending, context]);
@@ -249,7 +252,7 @@ class ReaderPage extends HookConsumerWidget {
               final ReaderState state = viewModel.viewState;
               final int? preferredPageIndex = viewModel.preferredPageIndex;
               if (state.totalPages == 0) {
-                return const Center(child: Text('暂无图片'));
+                return Center(child: Text(context.l10n.readerNoImages));
               }
               final int initialPage = state.currentIndex - 1;
               final ReadingMode activeReadingMode = state.readingMode;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/ui/core/dto/history_grid_item.dart';
@@ -27,12 +28,13 @@ class HomePageContinueReadingSection extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme colorScheme = theme.colorScheme;
+    final l10n = context.l10n;
     if (!enabled) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            '继续阅读',
+            l10n.homeContinueReading,
             style: TextStyle(
               fontSize: tokens.text.titleSm,
               fontWeight: FontWeight.w600,
@@ -70,7 +72,7 @@ class HomePageContinueReadingSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          '继续阅读',
+          l10n.homeContinueReading,
           style: TextStyle(
             fontSize: tokens.text.titleSm,
             fontWeight: FontWeight.w600,
@@ -167,13 +169,14 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     if (widget.loading) {
       return const Center(child: CircularProgressIndicator());
     }
     if (widget.hasError) {
       return Center(
         child: Text(
-          '加载失败',
+          l10n.shellLoadFailed,
           style: TextStyle(
             fontSize: widget.tokens.text.bodySm,
             color: widget.colorScheme.hentai.textSecondary,
@@ -193,7 +196,7 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
             ),
             SizedBox(width: widget.tokens.spacing.sm),
             Text(
-              '暂无阅读记录，',
+              l10n.homeNoReadingHistory,
               style: TextStyle(
                 fontSize: widget.tokens.text.bodySm,
                 color: widget.colorScheme.hentai.textSecondary,
@@ -206,7 +209,7 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('去漫画库'),
+              child: Text(l10n.homeGoToLibrary),
             ),
           ],
         ),

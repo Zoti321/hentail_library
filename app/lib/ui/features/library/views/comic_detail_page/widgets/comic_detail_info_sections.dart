@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/layout/detail_meta_chip_row_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/r18_rating_chip.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/ui/features/reader/reader.dart';
+import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
-/// 容纳「最后修改时间」等最长 label。
+/// 容纳最长 meta label 的固定宽度。
 const double kComicDetailMetaLabelWidth = 88;
-
-final DateFormat _comicDetailDateTimeFormat = DateFormat('yyyy年MM月dd日 HH:mm');
 
 class ComicDetailSummaryMetaRow extends ConsumerWidget {
   const ComicDetailSummaryMetaRow({super.key, required this.comic});
@@ -24,15 +26,21 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppLocalizations l10n = context.l10n;
     final int? pageCount = ref
         .watch(comicImagesProvider(comicId: comic.comicId))
         .maybeWhen(
           data: (List<ReaderPageImageData> refs) => refs.length,
           orElse: () => comic.pageCount,
         );
-    final String? pageLabel = pageCount == 0 ? null : '$pageCount 页';
+    final String? pageLabel = pageCount == 0 || pageCount == null
+        ? null
+        : l10n.comicDetailPageCount(pageCount);
     final bool showR18 = comic.contentRating == ContentRating.r18;
-    final String? publishedLabel = formatComicPublishedDate(comic.publishedAt);
+    final String? publishedLabel = formatComicPublishedDate(
+      context,
+      comic.publishedAt,
+    );
 
     if (pageLabel == null && !showR18 && publishedLabel == null) {
       return const SizedBox.shrink();
@@ -121,37 +129,57 @@ class ComicDetailMetadataBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
+    final AppLocalizations l10n = context.l10n;
     final List<String> authors = comic.authors.map((a) => a.name).toList();
     final List<String> tags = comic.tags.map((t) => t.name).toList();
     final List<Widget> rows = <Widget>[];
     if (authors.isNotEmpty) {
-      rows.add(LabeledMetaChipRow(label: '作者', items: authors));
+      rows.add(
+        LabeledMetaChipRow(label: l10n.comicDetailAuthors, items: authors),
+      );
     }
     if (tags.isNotEmpty) {
-      rows.add(LabeledMetaChipRow(label: '标签', items: tags));
+      rows.add(LabeledMetaChipRow(label: l10n.comicDetailTags, items: tags));
     }
     rows.add(
       ComicDetailInfoRow(
-        label: '资源格式',
+        label: l10n.comicDetailResourceFormat,
         value: comic.resourceType.name.toUpperCase(),
       ),
     );
     rows.add(
       ComicDetailInfoRow(
-        label: '资源大小',
+        label: l10n.comicDetailResourceSize,
         value: formatComicResourceSize(comic.resourceSize),
       ),
     );
     rows.add(
-      ComicDetailInfoRow(label: '资源路径', value: comic.path, tooltip: comic.path),
+      ComicDetailInfoRow(
+        label: l10n.comicDetailResourcePath,
+        value: comic.path,
+        tooltip: comic.path,
+      ),
     );
-    final String? createdLabel = formatComicDetailDateTime(comic.createdAt);
+    final String? createdLabel = formatComicDetailDateTime(
+      context,
+      comic.createdAt,
+    );
     if (createdLabel != null) {
-      rows.add(ComicDetailInfoRow(label: '添加时间', value: createdLabel));
+      rows.add(
+        ComicDetailInfoRow(label: l10n.comicDetailAddedAt, value: createdLabel),
+      );
     }
-    final String? updatedLabel = formatComicDetailDateTime(comic.lastUpdatedAt);
+    final String? updatedLabel = formatComicDetailDateTime(
+      context,
+      comic.lastUpdatedAt,
+    );
     if (updatedLabel != null) {
-      rows.add(ComicDetailInfoRow(label: '更新时间', value: updatedLabel));
+      rows.add(
+        ComicDetailInfoRow(
+          label: l10n.comicDetailUpdatedAt,
+          value: updatedLabel,
+        ),
+      );
     }
 
     return Column(
@@ -210,7 +238,18 @@ class LabeledMetaChipRow extends StatelessWidget {
             child: Row(
               spacing: tokens.spacing.sm,
               children: items
-                  .map((String item) => OutlinedMetaChip(text: item))
+                  .map(
+                    (String item) => OutlinedMetaChip(
+                      text: item,
+                      onTap: () {
+                        final String query = formatLibrarySearchExactMetaQuery(
+                          item,
+                        );
+                        final String encoded = Uri.encodeQueryComponent(query);
+                        appRouter.push('/searched?q=$encoded');
+                      },
+                    ),
+                  )
                   .toList(),
             ),
           ),
@@ -274,16 +313,18 @@ class ComicDetailInfoRow extends StatelessWidget {
   }
 }
 
-String? formatComicPublishedDate(DateTime? date) {
+String? formatComicPublishedDate(BuildContext context, DateTime? date) {
   if (date == null) {
     return null;
   }
-  return DateFormat('yyyy年MM月dd日').format(date.toLocal());
+  final String locale = Localizations.localeOf(context).toString();
+  return DateFormat.yMMMd(locale).format(date.toLocal());
 }
 
-String? formatComicDetailDateTime(DateTime? date) {
+String? formatComicDetailDateTime(BuildContext context, DateTime? date) {
   if (date == null) {
     return null;
   }
-  return _comicDetailDateTimeFormat.format(date.toLocal());
+  final String locale = Localizations.localeOf(context).toString();
+  return DateFormat.yMMMd(locale).add_Hm().format(date.toLocal());
 }

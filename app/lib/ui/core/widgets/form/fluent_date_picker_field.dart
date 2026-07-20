@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
-import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-
-String formatFluentDatePickerLabel(DateTime date) {
-  return DateFormat('yyyy年MM月dd日').format(date.toLocal());
-}
 
 /// 只读日期字段：点击打开 [showDatePicker]，支持清空。
 class FluentDatePickerField extends StatelessWidget {
@@ -15,29 +11,50 @@ class FluentDatePickerField extends StatelessWidget {
     required this.labelText,
     required this.value,
     required this.onChanged,
-    this.hintText = '选择发布日期',
+    this.hintText,
     this.enabled = true,
   });
 
   final String labelText;
   final DateTime? value;
   final ValueChanged<DateTime?> onChanged;
-  final String hintText;
+  final String? hintText;
   final bool enabled;
 
   Future<void> _pickDate(BuildContext context) async {
     if (!enabled) {
       return;
     }
+    final l10n = context.l10n;
+    final Locale locale = Localizations.localeOf(context);
     final DateTime now = DateTime.now();
+    final AppThemeTokens tokens = context.tokens;
+    final ThemeData baseTheme = Theme.of(context);
     final DateTime? picked = await showDatePicker(
       context: context,
+      locale: locale,
       initialDate: value ?? now,
       firstDate: DateTime(1900),
       lastDate: DateTime(now.year + 1, 12, 31),
-      helpText: '选择发布日期',
-      cancelText: '取消',
-      confirmText: '确定',
+      helpText: l10n.formDatePickerHelp,
+      cancelText: l10n.commonCancel,
+      confirmText: l10n.commonOk,
+      fieldLabelText: l10n.formDateFieldLabel,
+      fieldHintText: l10n.formDateFieldHint,
+      errorFormatText: l10n.formDateInvalidFormat,
+      errorInvalidText: l10n.formDateOutOfRange,
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: baseTheme.copyWith(
+            datePickerTheme: baseTheme.datePickerTheme.copyWith(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(tokens.radius.xs),
+              ),
+            ),
+          ),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
     if (picked != null) {
       onChanged(DateTime.utc(picked.year, picked.month, picked.day));
@@ -46,11 +63,16 @@ class FluentDatePickerField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final String effectiveHint = hintText ?? l10n.formDatePickerHint;
     final String? displayText = value == null
         ? null
-        : formatFluentDatePickerLabel(value!);
+        : l10n.formatFluentDatePickerLabel(
+            value!,
+            Localizations.localeOf(context),
+          );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,7 +106,7 @@ class FluentDatePickerField extends StatelessWidget {
                     SizedBox(width: tokens.spacing.sm),
                     Expanded(
                       child: Text(
-                        displayText ?? hintText,
+                        displayText ?? effectiveHint,
                         style: TextStyle(
                           fontSize: tokens.text.bodyMd,
                           color: displayText == null
@@ -96,7 +118,7 @@ class FluentDatePickerField extends StatelessWidget {
                     ),
                     if (value != null && enabled)
                       IconButton(
-                        tooltip: '清空日期',
+                        tooltip: l10n.formDateClearTooltip,
                         onPressed: () => onChanged(null),
                         icon: Icon(
                           LucideIcons.x,

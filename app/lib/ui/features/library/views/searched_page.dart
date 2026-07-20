@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -9,12 +11,9 @@ import 'package:hentai_library/ui/core/widgets/element/card/series_card.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/features/library/views/searched_page/widgets/search_result_horizontal_section.dart';
 import 'package:hentai_library/ui/features/library/views/searched_page/widgets/searched_page_header.dart';
-import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-
-const double kSearchResultCardWidth = 200;
 
 class SearchedPage extends ConsumerStatefulWidget {
   const SearchedPage({super.key, required this.query});
@@ -103,25 +102,22 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
         searchedComics.hasError || searchedSeriesDataAsync.hasError;
     final Object? error = searchedComics.error ?? searchedSeriesDataAsync.error;
 
-    final double cardHeight = libraryGridMainAxisExtentFromTokens(
-      tokens,
-      layoutTier,
-    );
+    final double cardWidth = libraryGridMaxCrossAxisExtent(layoutTier);
+    final double cardHeight = catalogCoverCardMainAxisExtent(tokens, cardWidth);
+    final AppLocalizations l10n = context.l10n;
     final Widget headerSection = trimmedQuery.isEmpty
         ? SearchedPageHeaderSection(
             layoutTier: layoutTier,
             horizontalPadding: horizontalPadding,
-            query: '搜索结果',
+            query: l10n.searchResultsTitle,
             resultCount: 0,
             showQuotes: false,
-            onOpenNavigation: appShellPageNavigationOpener(context),
           )
         : SearchedPageHeaderSection(
             layoutTier: layoutTier,
             horizontalPadding: horizontalPadding,
             query: trimmedQuery,
             resultCount: totalResultCount,
-            onOpenNavigation: appShellPageNavigationOpener(context),
           );
     final Widget header = KeyedSubtree(
       key: _headerMeasureKey,
@@ -164,7 +160,7 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 24),
                       child: Text(
-                        '加载失败：$error',
+                        l10n.searchLoadFailed(error.toString()),
                         style: TextStyle(fontSize: 13, color: cs.error),
                       ),
                     )
@@ -175,13 +171,13 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                   else ...<Widget>[
                     if (searchedSeriesCount > 0)
                       SearchResultHorizontalSection(
-                        title: '系列',
+                        title: l10n.libraryTabSeries,
                         itemCount: series.length,
                         itemHeight: cardHeight,
                         itemBuilder: (BuildContext context, int index) {
                           final Series item = series[index];
                           return SizedBox(
-                            width: kSearchResultCardWidth,
+                            width: cardWidth,
                             child: SeriesCard(
                               key: Key('search-series-${item.id}'),
                               series: item,
@@ -197,13 +193,13 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                       ),
                     if (searchedComicCount > 0)
                       SearchResultHorizontalSection(
-                        title: '漫画',
+                        title: l10n.libraryTabComics,
                         itemCount: comics.length,
                         itemHeight: cardHeight,
                         itemBuilder: (BuildContext context, int index) {
                           final Comic comic = comics[index];
                           return SizedBox(
-                            width: kSearchResultCardWidth,
+                            width: cardWidth,
                             child: ComicCard(
                               key: Key('search-comic-${comic.comicId}'),
                               comic: comic,
@@ -226,9 +222,9 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
           ),
         ),
         if (trimmedQuery.isEmpty)
-          const SliverFillRemaining(
+          SliverFillRemaining(
             hasScrollBody: false,
-            child: Center(child: Text('请输入关键词后按回车搜索')),
+            child: Center(child: Text(l10n.searchEnterKeyword)),
           ),
       ],
     );
@@ -244,6 +240,7 @@ class _SearchResultsEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final AppLocalizations l10n = context.l10n;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl * 2),
       child: Center(
@@ -253,7 +250,7 @@ class _SearchResultsEmptyState extends StatelessWidget {
           children: <Widget>[
             Icon(LucideIcons.searchX, size: 40, color: cs.hentai.textTertiary),
             Text(
-              '无匹配结果',
+              l10n.libraryNoMatchTitle,
               style: TextStyle(
                 fontSize: tokens.text.bodyMd,
                 color: cs.hentai.textSecondary,
@@ -262,7 +259,7 @@ class _SearchResultsEmptyState extends StatelessWidget {
             TextButton.icon(
               onPressed: onGoToLibrary,
               icon: const Icon(LucideIcons.library, size: 16),
-              label: const Text('返回漫画库'),
+              label: Text(l10n.searchBackToLibrary),
             ),
           ],
         ),

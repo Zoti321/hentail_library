@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 
 /// 清空全部阅读历史的确认对话框（与标签/系列删除确认对话框同一套 Fluent 壳层）。
@@ -7,9 +8,10 @@ class ClearReadingHistoryConfirmDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return HentaiDialog(
-      title: '确认清空',
-      content: const Text('将清空全部阅读历史记录。此操作不可撤销。'),
+      title: l10n.confirmClearHistoryTitle,
+      content: Text(l10n.confirmClearHistoryContent),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
@@ -18,7 +20,7 @@ class ClearReadingHistoryConfirmDialog extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          child: const Text('取消'),
+          child: Text(l10n.commonCancel),
         ),
         const SizedBox(width: 8),
         FilledButton(
@@ -28,7 +30,7 @@ class ClearReadingHistoryConfirmDialog extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          child: const Text('清空'),
+          child: Text(l10n.commonClear),
         ),
       ],
     );

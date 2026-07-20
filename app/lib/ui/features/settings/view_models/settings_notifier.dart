@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:hentai_library/domain/models/models.dart'
-    show AppSetting, AppThemePreference;
+    show AppLocalePreference, AppSetting, AppThemePreference;
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -36,6 +36,12 @@ class SettingsNotifier extends _$SettingsNotifier {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
     await updateSettings(current.copyWith(themePreference: value));
+  }
+
+  Future<void> setLocalePreference(AppLocalePreference value) async {
+    final AppSetting? current = state.asData?.value;
+    if (current == null) return;
+    await updateSettings(current.copyWith(localePreference: value));
   }
 
   Future<void> setAutoScan(bool value) async {

@@ -57,6 +57,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
     required String activeId,
     required bool isExpanded,
     bool showCollapseToggle = true,
+    bool applyDrawerTopInset = false,
     required VoidCallback onToggleExpanded,
     required ValueChanged<String> onDestinationSelected,
   }) {
@@ -64,6 +65,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
       activeId: activeId,
       isExpanded: isExpanded,
       showCollapseToggle: showCollapseToggle,
+      applyDrawerTopInset: applyDrawerTopInset,
       onToggleExpanded: onToggleExpanded,
       onDestinationSelected: onDestinationSelected,
     );
@@ -106,6 +108,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
                     activeId: sidebarActiveId,
                     isExpanded: true,
                     showCollapseToggle: false,
+                    applyDrawerTopInset: true,
                     onToggleExpanded: () => Navigator.of(context).pop(),
                     onDestinationSelected: (String id) {
                       Navigator.of(context).pop();

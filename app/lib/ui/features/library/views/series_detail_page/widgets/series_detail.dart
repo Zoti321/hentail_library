@@ -3,6 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/pagination/library_pagination_bar.dart';
 import 'package:hentai_library/ui/core/widgets/responsive_layout/detail_primary_row_layout.dart';
@@ -231,19 +233,20 @@ class _SeriesDetailComicsError extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppLocalizations l10n = context.l10n;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl),
       child: Column(
         spacing: tokens.spacing.sm,
         children: <Widget>[
           Text(
-            '漫画列表加载失败',
+            l10n.seriesDetailComicsLoadFailed,
             style: TextStyle(
               fontSize: tokens.text.bodySm,
               color: cs.hentai.textSecondary,
             ),
           ),
-          TextButton(onPressed: onRetry, child: const Text('重试')),
+          TextButton(onPressed: onRetry, child: Text(l10n.shellRetry)),
         ],
       ),
     );

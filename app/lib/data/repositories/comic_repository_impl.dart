@@ -116,7 +116,7 @@ class ComicRepositoryImpl implements ComicRepository {
   }
 
   @override
-  Future<List<Comic>> searchByTagExpression({
+  Future<List<Comic>> searchByMetadataExpression({
     required Set<String> mustInclude,
     required Set<String> optionalOr,
     required Set<String> mustExclude,
@@ -130,7 +130,7 @@ class ComicRepositoryImpl implements ComicRepository {
           )
           .map(mapRustComic)
           .toList(),
-      fallbackMessage: '按标签搜索漫画失败',
+      fallbackMessage: '按元数据搜索漫画失败',
     );
   }
 }

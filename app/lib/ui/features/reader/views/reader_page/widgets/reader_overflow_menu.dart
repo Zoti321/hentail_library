@@ -1,27 +1,44 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/data/adapters/reader_frb_mapper.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_floating_panel.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
+import 'package:hentai_library/ui/providers/series_cover_providers.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class ReaderOverflowMenuButton extends StatefulWidget {
-  const ReaderOverflowMenuButton({super.key});
+class ReaderOverflowMenuButton extends HookConsumerWidget {
+  const ReaderOverflowMenuButton({
+    super.key,
+    required this.comicId,
+    this.seriesId,
+    this.incognito = false,
+  });
+
+  final String comicId;
+  final String? seriesId;
+  final bool incognito;
 
   @override
-  State<ReaderOverflowMenuButton> createState() =>
-      _ReaderOverflowMenuButtonState();
-}
-
-class _ReaderOverflowMenuButtonState extends State<ReaderOverflowMenuButton> {
-  final CustomPopupMenuController _menuController = CustomPopupMenuController();
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = context.l10n;
+    final CustomPopupMenuController menuController = useMemoized(
+      CustomPopupMenuController.new,
+    );
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final bool isSeriesRead = seriesId != null && seriesId!.trim().isNotEmpty;
+
     return CustomPopupMenu(
-      controller: _menuController,
+      controller: menuController,
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,
       showArrow: false,
@@ -34,28 +51,134 @@ class _ReaderOverflowMenuButtonState extends State<ReaderOverflowMenuButton> {
           children: <Widget>[
             _ReaderOverflowMenuItem(
               icon: LucideIcons.image,
-              label: '将当前页设为漫画/系列封面',
+              label: l10n.readerSetComicCover,
               onTap: () {
-                _menuController.hideMenu();
-                showCustomToast(context, message: '该功能即将推出');
+                menuController.hideMenu();
+                _setComicCover(context, ref, l10n);
               },
             ),
+            if (isSeriesRead)
+              _ReaderOverflowMenuItem(
+                icon: LucideIcons.images,
+                label: l10n.readerSetSeriesCover,
+                onTap: () {
+                  menuController.hideMenu();
+                  _setSeriesCover(context, ref, l10n);
+                },
+              ),
           ],
         ),
       ),
       child: GhostButton.icon(
         icon: LucideIcons.ellipsisVertical,
-        tooltip: '更多',
-        semanticLabel: '更多阅读选项',
+        tooltip: l10n.readerMore,
+        semanticLabel: l10n.readerMoreSemantic,
         iconSize: 16,
         size: 32,
         borderRadius: 8,
         foregroundColor: cs.hentai.readerTextIconPrimary,
         hoverColor: cs.hentai.readerPanelSubtle,
         overlayColor: cs.hentai.readerPanelSubtle,
-        onPressed: () => _menuController.toggleMenu(),
+        onPressed: () => menuController.toggleMenu(),
       ),
     );
+  }
+
+  Future<void> _setComicCover(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    final ReaderState? state = _readerState(ref);
+    if (state == null) {
+      if (context.mounted) {
+        showCustomToast(context, message: l10n.readerStateNotReady);
+      }
+      return;
+    }
+    try {
+      final Comic comic = state.comic;
+      final int pageIndex = (state.currentIndex - 1).clamp(0, 1 << 30);
+      await ref
+          .read(comicThumbnailRepoProvider)
+          .setComicCoverFromPage(
+            comicId: comic.comicId,
+            path: comic.path,
+            resourceType: mapResourceType(comic.resourceType),
+            pageIndex: pageIndex,
+          );
+      final bytes =
+          (await ref
+                  .read(comicThumbnailRepoProvider)
+                  .findByComicId(comic.comicId))
+              ?.thumbnail;
+      if (bytes != null && bytes.isNotEmpty) {
+        ref.read(comicCoverProvider(comic.comicId).notifier).setReady(bytes);
+      }
+      if (context.mounted) {
+        showCustomToast(context, message: l10n.readerComicCoverSet);
+      }
+    } on Object catch (error) {
+      if (context.mounted) {
+        showCustomToast(
+          context,
+          message: l10n.readerComicCoverSetFailed('$error'),
+        );
+      }
+    }
+  }
+
+  Future<void> _setSeriesCover(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    final String? sid = seriesId?.trim();
+    if (sid == null || sid.isEmpty) {
+      return;
+    }
+    final ReaderState? state = _readerState(ref);
+    if (state == null) {
+      if (context.mounted) {
+        showCustomToast(context, message: l10n.readerStateNotReady);
+      }
+      return;
+    }
+    try {
+      final Comic comic = state.comic;
+      final int pageIndex = (state.currentIndex - 1).clamp(0, 1 << 30);
+      await ref
+          .read(comicThumbnailRepoProvider)
+          .setSeriesCoverFromPage(
+            seriesId: sid,
+            comicId: comic.comicId,
+            path: comic.path,
+            resourceType: mapResourceType(comic.resourceType),
+            pageIndex: pageIndex,
+          );
+      ref.invalidate(seriesCoverSourceProvider(sid));
+      if (context.mounted) {
+        showCustomToast(context, message: l10n.readerSeriesCoverSet);
+      }
+    } on Object catch (error) {
+      if (context.mounted) {
+        showCustomToast(
+          context,
+          message: l10n.readerSeriesCoverSetFailed('$error'),
+        );
+      }
+    }
+  }
+
+  ReaderState? _readerState(WidgetRef ref) {
+    return ref
+        .read(
+          readerControllerProvider(
+            readerControllerKey(comicId, incognito: incognito),
+          ),
+        )
+        .asData
+        ?.value;
   }
 }
 

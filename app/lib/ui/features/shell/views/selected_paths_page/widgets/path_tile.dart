@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
@@ -18,6 +19,7 @@ class PathTile extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
+    final l10n = context.l10n;
     final ValueNotifier<bool> isRemoving = useState<bool>(false);
     Future<void> handleRemovePath() async {
       final bool confirmed =
@@ -36,7 +38,7 @@ class PathTile extends HookConsumerWidget {
         if (!context.mounted) {
           return;
         }
-        showSuccessToast(context, '已移除路径');
+        showSuccessToast(context, l10n.pathsRemovedToast);
       } catch (error) {
         if (!context.mounted) {
           return;
@@ -97,8 +99,8 @@ class PathTile extends HookConsumerWidget {
                     )
                   : GhostButton.icon(
                       icon: LucideIcons.trash2,
-                      tooltip: '移除路径',
-                      semanticLabel: '移除路径',
+                      tooltip: l10n.pathsRemoveAction,
+                      semanticLabel: l10n.pathsRemoveAction,
                       iconSize: 16,
                       size: 28,
                       borderRadius: 8,

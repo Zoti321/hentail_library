@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -75,7 +76,8 @@ void main() {
     ) async {
       await _pumpSettingsView(tester, viewportWidth: 700);
 
-      expect(find.text('跟随系统'), findsOneWidget);
+      // Theme + language rows both default to "跟随系统".
+      expect(find.text('跟随系统'), findsNWidgets(2));
     });
   });
 }
@@ -92,6 +94,9 @@ Future<void> _pumpSettingsView(
     ProviderScope(
       overrides: _settingsViewTestOverrides(),
       child: MaterialApp(
+        locale: const Locale('zh'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: buildAppTheme(Brightness.light),
         home: Scaffold(
           body: SizedBox(

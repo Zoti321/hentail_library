@@ -38,6 +38,9 @@ pub async fn thumbnail_needs_generation(
     let Some(cached) = cached else {
         return Ok(true);
     };
+    if cached.is_user_set {
+        return Ok(false);
+    }
     Ok(cached.source_modified_ms != Some(modified_ms)
         || cached.source_size != Some(size))
 }
@@ -70,6 +73,7 @@ pub async fn store_thumbnail_for_comic(
         updated_at: Set(now),
         source_modified_ms: Set(Some(modified_ms)),
         source_size: Set(Some(size)),
+        is_user_set: Set(false),
     };
     ComicThumbnails::insert(active)
         .on_conflict(
@@ -79,6 +83,8 @@ pub async fn store_thumbnail_for_comic(
                     comic_thumbnails::Column::UpdatedAt,
                     comic_thumbnails::Column::SourceModifiedMs,
                     comic_thumbnails::Column::SourceSize,
+                    // Keep existing is_user_set; callers that skip user-set covers
+                    // must not regenerate, but never clear the flag here.
                 ])
                 .to_owned(),
         )
@@ -96,7 +102,7 @@ pub fn generate_thumbnail_jpeg(path: &Path, resource_type: &str) -> Result<Optio
     encode_thumbnail_jpeg(&bytes)
 }
 
-fn encode_thumbnail_jpeg(source_bytes: &[u8]) -> Result<Option<Vec<u8>>, HentaiError> {
+pub fn encode_thumbnail_jpeg(source_bytes: &[u8]) -> Result<Option<Vec<u8>>, HentaiError> {
     let img = image::load_from_memory(source_bytes).map_err(|e| HentaiError::validation(e.to_string()))?;
     let flattened = flatten_alpha_on_white(&img);
     let resized = resize_to_max_long_edge(&flattened, MAX_LONG_EDGE);

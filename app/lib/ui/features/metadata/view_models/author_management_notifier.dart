@@ -7,42 +7,6 @@ final allAuthorsProvider = StreamProvider<List<Author>>((ref) {
   return ref.watch(authorRepoProvider).watchAll();
 });
 
-/// 当前选中的作者集合（用于批量删除）
-class AuthorSelectionNotifier extends Notifier<Set<Author>> {
-  @override
-  Set<Author> build() => <Author>{};
-
-  void toggle(Author author) {
-    final next = Set<Author>.from(state);
-    if (next.contains(author)) {
-      next.remove(author);
-    } else {
-      next.add(author);
-    }
-    state = next;
-  }
-
-  void clear() {
-    state = <Author>{};
-  }
-
-  void remove(Author author) {
-    if (!state.contains(author)) {
-      return;
-    }
-    state = Set<Author>.from(state)..remove(author);
-  }
-
-  void selectAll(Iterable<Author> authors) {
-    state = Set<Author>.from(authors);
-  }
-}
-
-final authorSelectionProvider =
-    NotifierProvider<AuthorSelectionNotifier, Set<Author>>(
-      AuthorSelectionNotifier.new,
-    );
-
 /// 作者搜索关键词
 class AuthorFilterNotifier extends Notifier<String> {
   @override
@@ -86,17 +50,8 @@ class AuthorActions {
     await _ref.read(authorRepoProvider).add(author);
   }
 
-  Future<void> deleteAuthors(List<Author> authors) async {
-    if (authors.isEmpty) return;
-    await _ref
-        .read(authorRepoProvider)
-        .deleteByNames(authors.map((e) => e.name).toList());
-    _ref.read(authorSelectionProvider.notifier).clear();
-  }
-
   Future<void> deleteAuthor(Author author) async {
     await _ref.read(authorRepoProvider).deleteByNames(<String>[author.name]);
-    _ref.read(authorSelectionProvider.notifier).remove(author);
   }
 
   Future<void> renameAuthor(Author oldAuthor, String newName) async {

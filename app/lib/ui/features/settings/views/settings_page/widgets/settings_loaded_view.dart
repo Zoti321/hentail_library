@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_about_rows.dart';
@@ -7,6 +8,7 @@ import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_library_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_header.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
+import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/locale_preference_row.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/theme_preference_row.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 
@@ -48,6 +50,7 @@ class _SettingsViewState extends State<SettingsView> {
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
+    final l10n = context.l10n;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double viewportWidth = constraints.maxWidth;
@@ -100,30 +103,34 @@ class _SettingsViewState extends State<SettingsView> {
                     spacing: 24,
                     children: <Widget>[
                       SettingsGroup(
-                        title: '个性化',
+                        title: l10n.settingsGroupPersonalization,
                         children: <Widget>[
                           ThemePreferenceRow(
+                            layoutTier: layoutTier,
+                            viewportWidth: viewportWidth,
+                          ),
+                          LocalePreferenceRow(
                             layoutTier: layoutTier,
                             viewportWidth: viewportWidth,
                           ),
                         ],
                       ),
                       SettingsGroup(
-                        title: '漫画库',
+                        title: l10n.settingsGroupLibrary,
                         children: <Widget>[
                           LibraryLocationRow(layoutTier: layoutTier),
                           AutoScanRow(layoutTier: layoutTier),
                         ],
                       ),
                       SettingsGroup(
-                        title: '诊断与支持',
+                        title: l10n.settingsGroupDiagnostics,
                         children: <Widget>[
                           DiagnosticModeRow(layoutTier: layoutTier),
                           ExportLogsRow(layoutTier: layoutTier),
                         ],
                       ),
                       SettingsGroup(
-                        title: '关于',
+                        title: l10n.settingsGroupAbout,
                         children: <Widget>[
                           AutoUpdateRow(layoutTier: layoutTier),
                           AboutVersionRow(layoutTier: layoutTier),

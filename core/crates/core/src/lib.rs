@@ -68,6 +68,7 @@ pub use tag::{
 };
 pub use thumbnail::{
     delete_thumbnails_by_comic_ids, ensure_thumbnail, enqueue_thumbnails_low,
-    find_thumbnail_by_comic_id, watch_thumbnail_events, ComicThumbnailDto, ThumbnailEvent,
-    ThumbnailPriority,
+    find_series_thumbnail_by_series_id, find_thumbnail_by_comic_id, resolve_series_cover,
+    set_comic_thumbnail_from_page, set_series_thumbnail_from_page, watch_thumbnail_events,
+    ComicThumbnailDto, SeriesCoverSource, SeriesThumbnailDto, ThumbnailEvent, ThumbnailPriority,
 };

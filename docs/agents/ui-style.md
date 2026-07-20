@@ -109,7 +109,7 @@ Key semantic groups in `HentaiColorScheme`:
 - **In-page tabs:** `CapsuleTabBar` (pill container, selected segment tinted with `primary`)
 - **Context actions:** right-click → `*ContextMenu.show` (comic, series, series item)
 - **Confirmations:** `HentaiDialog` or `*ConfirmDialog` under `overlays/dialog/confirm/`
-- **Forms:** `FluentTextField`, `FluentDatePickerField`, `CustomTextField`, `*MultiSelectField`
+- **Forms:** `FluentTextField`, `FluentDatePickerField`, `FluentToggleField`, `CustomTextField`, `*MultiSelectField`
 
 ### Card & list item pattern
 
@@ -141,7 +141,7 @@ CatalogCoverCardShell
 | Chrome | `chrome/` | `AppTitleBar`, `CapsuleTabBar`, `StatusCardShell` |
 | Elements | `element/` | `CatalogCoverCardShell` (internal), `ComicCard`, `SeriesCard`, `MetaChip`, `TagChip`, `ContentRatingChip`, `AppComicImage`, `AdaptiveCover` |
 | Feedback | `feedback/` | `custom_toast`, `TerminalSpinner` |
-| Form | `form/` | `FluentTextField`, `CustomTextField`, `DatePicker`, `DatePickerField`, `MultiSelect`, `AuthorLibraryMultiSelectField`, `TagLibraryMultiSelectField` |
+| Form | `form/` | `FluentTextField`, `CustomTextField`, `DatePicker`, `DatePickerField`, `FluentToggleField`, `MultiSelect`, `AuthorLibraryMultiSelectField`, `TagLibraryMultiSelectField` |
 | Foundation | `foundation/` | `MyToggleSwitch` |
 | Navigation | `navigation/` | `DesktopSidebar`, `LibraryReturnBreadcrumb` |
 | Overlays | `overlays/dialog/` | `HentaiDialog`, `AdaptiveFormSurface`, `EditMetadataDialog`, `EditSeriesDialog`, `ScanProgressDialog`, … |

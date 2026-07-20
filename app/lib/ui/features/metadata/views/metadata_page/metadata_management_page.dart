@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
@@ -151,7 +152,7 @@ class _MetadataManagementPageState
       child: headerSection,
     );
 
-    return Stack(
+    final Widget body = Stack(
       children: <Widget>[
         CustomScrollView(
           controller: _scrollController,
@@ -207,6 +208,18 @@ class _MetadataManagementPageState
         ),
       ],
     );
+
+    if (!metadataUsesContentSwitcherBottomBar(layoutTier)) {
+      return body;
+    }
+
+    return Scaffold(
+      body: body,
+      bottomNavigationBar: MetadataEntityBottomBar(
+        selectedTabIndex: selectedIndex,
+        onTabSelected: _handleTabSelected,
+      ),
+    );
   }
 
   void _handleTabSelected(int index) {
@@ -233,12 +246,13 @@ class _MetadataManagementPageState
   }
 
   Future<void> _openAddTagDialog(BuildContext context) async {
+    final l10n = context.l10n;
     await showDialog<void>(
       context: context,
       builder: (BuildContext dialogContext) => TagNameEditorDialog(
-        title: '添加标签',
-        labelText: '名称',
-        hintText: '输入标签名称…',
+        title: l10n.metadataAddTag,
+        labelText: l10n.metadataNameLabel,
+        hintText: l10n.metadataAddTagHint,
         initialValue: '',
         onSubmit: (String value) async {
           await ref.read(tagActionsProvider).addTag(Tag(name: value));
@@ -248,12 +262,13 @@ class _MetadataManagementPageState
   }
 
   Future<void> _openAddAuthorDialog(BuildContext context) async {
+    final l10n = context.l10n;
     await showDialog<void>(
       context: context,
       builder: (BuildContext dialogContext) => TagNameEditorDialog(
-        title: '添加作者',
-        labelText: '名称',
-        hintText: '输入作者名称…',
+        title: l10n.metadataAddAuthor,
+        labelText: l10n.metadataNameLabel,
+        hintText: l10n.metadataAddAuthorHint,
         initialValue: '',
         onSubmit: (String value) async {
           await ref.read(authorActionsProvider).addAuthor(Author(name: value));

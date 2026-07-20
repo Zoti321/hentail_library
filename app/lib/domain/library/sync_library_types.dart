@@ -60,21 +60,3 @@ LibrarySyncCounts emptyLibrarySyncCounts() => (
   sevenZ: 0,
   pdf: 0,
 );
-
-/// 静默扫描完成后的 toast 文案（含统计）。
-String scanSuccessToastMessage({
-  required ScanMode mode,
-  required SyncLibraryProgress? progress,
-}) {
-  final String prefix = mode == ScanMode.full ? '深度扫描完成' : '扫描完成';
-  if (progress == null) {
-    return prefix;
-  }
-  return switch (progress.route) {
-    SyncLibraryRoute.noRootsNoop => '$prefix：未配置扫描路径',
-    SyncLibraryRoute.noRootsCleared =>
-      '$prefix：已移除 ${progress.removedCount ?? 0} 项',
-    SyncLibraryRoute.withRoots =>
-      '$prefix：新增 ${progress.addedCount ?? 0}，移除 ${progress.removedCount ?? 0}，保留 ${progress.keptCount ?? 0}',
-  };
-}

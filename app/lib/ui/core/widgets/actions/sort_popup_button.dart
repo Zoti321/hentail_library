@@ -1,5 +1,6 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
@@ -20,6 +21,7 @@ class _SortPopupButtonState extends ConsumerState<SortPopupButton> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     return CustomPopupMenu(
@@ -31,8 +33,8 @@ class _SortPopupButtonState extends ConsumerState<SortPopupButton> {
       menuBuilder: () => _SortMenu(menuController: _controller),
       child: GhostButton.icon(
         icon: LucideIcons.arrowDownWideNarrow,
-        tooltip: '排序',
-        semanticLabel: '打开排序',
+        tooltip: l10n.librarySortSection,
+        semanticLabel: l10n.libraryFilterSortSemantic,
         iconSize: 16,
         size: 28,
         borderRadius: tokens.radius.sm,
@@ -53,6 +55,7 @@ class _SortMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
     return PopupMenuPanelShell(
       width: 320,
@@ -81,7 +84,7 @@ class _SortMenu extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '排序与视图',
+                  l10n.sortAndViewTitle,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

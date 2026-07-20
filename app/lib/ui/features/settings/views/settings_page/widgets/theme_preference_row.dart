@@ -1,12 +1,14 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
-import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
+import 'package:hentai_library/ui/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ThemePreferenceRow extends ConsumerStatefulWidget {
@@ -44,6 +46,7 @@ class _ThemePreferenceRowState extends ConsumerState<ThemePreferenceRow> {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final AppLocalizations l10n = context.l10n;
     final double menuWidth = settingsThemeMenuWidth(
       widget.layoutTier,
       widget.viewportWidth,
@@ -60,9 +63,9 @@ class _ThemePreferenceRowState extends ConsumerState<ThemePreferenceRow> {
           )
         : GhostButton.iconText(
             icon: LucideIcons.chevronsUpDown,
-            text: preference.labelZh,
+            text: l10n.themePreferenceLabel(preference),
             tooltip: '',
-            semanticLabel: '选择应用主题',
+            semanticLabel: l10n.settingsThemeLabel,
             iconSize: 14,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             borderRadius: tokens.radius.md,
@@ -80,7 +83,7 @@ class _ThemePreferenceRowState extends ConsumerState<ThemePreferenceRow> {
         size: 20,
         color: colorScheme.hentai.iconDefault,
       ),
-      label: '应用主题',
+      label: l10n.settingsThemeLabel,
       onRowTap: () => menuController.showMenu(),
       action: CustomPopupMenu(
         controller: menuController,
@@ -115,6 +118,7 @@ class AppThemePreferenceMenuPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final AppLocalizations l10n = context.l10n;
     return Container(
       width: width,
       decoration: BoxDecoration(
@@ -144,7 +148,7 @@ class AppThemePreferenceMenuPanel extends StatelessWidget {
                 ),
               ),
               child: Text(
-                '应用主题',
+                l10n.settingsThemeLabel,
                 style: TextStyle(
                   fontSize: tokens.text.bodySm,
                   fontWeight: FontWeight.w600,
@@ -187,7 +191,7 @@ class AppThemePreferenceMenuPanel extends StatelessWidget {
                               SizedBox(width: tokens.spacing.sm),
                               Expanded(
                                 child: Text(
-                                  option.labelZh,
+                                  l10n.themePreferenceLabel(option),
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,

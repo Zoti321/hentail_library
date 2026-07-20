@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/repositories/path_repository.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -36,7 +37,7 @@ class _AddPathButtonState extends ConsumerState<AddPathButton> {
       if (!mounted) {
         return;
       }
-      showSuccessToast(context, '已添加 1 个路径');
+      showSuccessToast(context, context.l10n.pathsAddedOneToast);
     } catch (error) {
       if (!mounted) {
         return;
@@ -52,6 +53,7 @@ class _AddPathButtonState extends ConsumerState<AddPathButton> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final l10n = context.l10n;
     return FilledButton.icon(
       onPressed: isPicking ? null : addDirectory,
       icon: isPicking
@@ -61,7 +63,7 @@ class _AddPathButtonState extends ConsumerState<AddPathButton> {
               child: CircularProgressIndicator(strokeWidth: 2),
             )
           : const Icon(LucideIcons.plus, size: buttonIconSize),
-      label: Text(isPicking ? '处理中…' : '添加路径'),
+      label: Text(isPicking ? l10n.shellProcessing : l10n.pathsAddButton),
       style: FilledButton.styleFrom(
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,

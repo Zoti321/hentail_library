@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/log_export_flow.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
@@ -17,6 +18,7 @@ class DiagnosticModeRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool enabled = ref.watch(diagnosticModeProvider);
     final ThemeData theme = Theme.of(context);
+    final l10n = context.l10n;
     return SettingsRow(
       layoutTier: layoutTier,
       icon: Icon(
@@ -24,8 +26,10 @@ class DiagnosticModeRow extends ConsumerWidget {
         size: 20,
         color: theme.colorScheme.hentai.iconDefault,
       ),
-      label: '详细诊断',
-      description: enabled ? '已开启：Dart 与 Rust 记录更详细日志' : '临时提高日志详细程度，便于复现问题',
+      label: l10n.settingsDiagnosticModeLabel,
+      description: enabled
+          ? l10n.settingsDiagnosticModeDescriptionEnabled
+          : l10n.settingsDiagnosticModeDescriptionDisabled,
       action: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -37,7 +41,7 @@ class DiagnosticModeRow extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text(
-                '已开启',
+                l10n.settingsDiagnosticModeEnabledBadge,
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
@@ -67,6 +71,7 @@ class ExportLogsRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final bool diagnosticVerbose = ref.watch(diagnosticModeProvider);
+    final l10n = context.l10n;
     return SettingsRow(
       layoutTier: layoutTier,
       icon: Icon(
@@ -74,8 +79,8 @@ class ExportLogsRow extends ConsumerWidget {
         size: 20,
         color: theme.colorScheme.hentai.iconDefault,
       ),
-      label: '导出日志',
-      description: '打包应用与核心日志，便于问题反馈',
+      label: l10n.settingsExportLogsLabel,
+      description: l10n.settingsExportLogsDescription,
       onRowTap: () =>
           runLogExportFlow(context, diagnosticVerbose: diagnosticVerbose),
       action: Icon(

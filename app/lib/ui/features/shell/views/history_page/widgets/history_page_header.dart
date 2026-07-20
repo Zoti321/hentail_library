@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -78,6 +79,7 @@ class HistoryPageHeaderToolbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
+    final l10n = context.l10n;
 
     return SizedBox(
       height: 44,
@@ -93,7 +95,7 @@ class HistoryPageHeaderToolbar extends ConsumerWidget {
                   if (onOpenNavigation != null) ...<Widget>[
                     GhostButton.icon(
                       icon: LucideIcons.menu,
-                      semanticLabel: '打开导航菜单',
+                      semanticLabel: l10n.shellOpenNavMenu,
                       tooltip: '',
                       iconSize: 16,
                       size: 32,
@@ -105,15 +107,18 @@ class HistoryPageHeaderToolbar extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                   ],
-                  Text('阅读历史', style: historyPageTitleStyle(cs, layoutTier)),
+                  Text(
+                    l10n.historyTitle,
+                    style: historyPageTitleStyle(cs, layoutTier),
+                  ),
                 ],
               ),
             ),
           ),
           GhostButton.icon(
             icon: LucideIcons.trash2,
-            tooltip: '清空阅读历史',
-            semanticLabel: '清空阅读历史',
+            tooltip: l10n.historyClearAction,
+            semanticLabel: l10n.historyClearAction,
             onPressed: clearEnabled
                 ? () => _clearAllHistory(context, ref)
                 : null,
@@ -131,6 +136,7 @@ class HistoryPageHeaderToolbar extends ConsumerWidget {
   }
 
   Future<void> _clearAllHistory(BuildContext context, WidgetRef ref) async {
+    final l10n = context.l10n;
     final bool confirmed =
         await showDialog<bool>(
           context: context,
@@ -145,7 +151,7 @@ class HistoryPageHeaderToolbar extends ConsumerWidget {
       await ref.read(readingHistoryRepoProvider).clearAllHistory();
       ref.read(historyPagedFeedControllerProvider.notifier).clearAllLocal();
       if (context.mounted) {
-        showSuccessToast(context, '已清空阅读历史');
+        showSuccessToast(context, l10n.historyClearedToast);
       }
     } catch (e) {
       if (context.mounted) {

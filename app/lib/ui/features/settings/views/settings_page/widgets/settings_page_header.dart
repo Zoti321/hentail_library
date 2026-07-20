@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -53,6 +54,7 @@ class SettingsPageHeaderToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
+    final l10n = context.l10n;
 
     return SizedBox(
       height: 44,
@@ -68,7 +70,7 @@ class SettingsPageHeaderToolbar extends StatelessWidget {
                   if (onOpenNavigation != null) ...<Widget>[
                     GhostButton.icon(
                       icon: LucideIcons.menu,
-                      semanticLabel: '打开导航菜单',
+                      semanticLabel: l10n.shellOpenNavMenu,
                       tooltip: '',
                       iconSize: 16,
                       size: 32,
@@ -81,7 +83,7 @@ class SettingsPageHeaderToolbar extends StatelessWidget {
                     const SizedBox(width: 8),
                   ],
                   Text(
-                    '设置',
+                    l10n.navSettings,
                     style: buildSettingsPageTitleStyle(cs, layoutTier),
                   ),
                 ],

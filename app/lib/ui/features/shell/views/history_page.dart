@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/content_search_width.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -161,6 +162,7 @@ class _HistoryBodyLeading extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
+    final l10n = context.l10n;
     final int totalCount = ref.watch(
       historyPagedFeedControllerProvider.select(
         (AsyncValue<HistoryPagedFeedState> value) =>
@@ -181,7 +183,7 @@ class _HistoryBodyLeading extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          '$totalCount 条记录 • 最长保留 30 天',
+          l10n.historyRecordSummary(totalCount),
           style: TextStyle(
             fontSize: tokens.text.bodySm,
             fontWeight: FontWeight.w400,
@@ -194,7 +196,7 @@ class _HistoryBodyLeading extends ConsumerWidget {
           child: SizedBox(
             width: searchWidth,
             child: CustomTextField(
-              hintText: '搜索历史记录...',
+              hintText: l10n.historySearchHint,
               onChanged: (String value) => ref
                   .read(historyPagedFeedControllerProvider.notifier)
                   .setKeyword(value),
@@ -224,6 +226,7 @@ class _HistoryListSliver extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
+    final l10n = context.l10n;
     final AsyncValue<HistoryPagedFeedState> feedAsync = ref.watch(
       historyPagedFeedControllerProvider,
     );
@@ -239,7 +242,7 @@ class _HistoryListSliver extends ConsumerWidget {
           padding: const EdgeInsets.only(top: 48),
           child: Center(
             child: Text(
-              '加载失败',
+              l10n.shellLoadFailed,
               style: TextStyle(
                 fontSize: 14,
                 color: theme.colorScheme.hentai.textSecondary,
@@ -264,7 +267,9 @@ class _HistoryListSliver extends ConsumerWidget {
                       color: theme.colorScheme.hentai.textTertiary,
                     ),
                     Text(
-                      feed.keyword.isEmpty ? '暂无阅读历史' : '没有匹配的历史记录',
+                      feed.keyword.isEmpty
+                          ? l10n.historyEmpty
+                          : l10n.historyNoMatch,
                       style: TextStyle(
                         fontSize: 14,
                         color: theme.colorScheme.hentai.textSecondary,
@@ -350,7 +355,7 @@ class _HistoryListSliver extends ConsumerWidget {
       await ref.read(readingHistoryRepoProvider).deleteByComicId(comicId);
       ref.read(historyPagedFeedControllerProvider.notifier).removeItem(comicId);
       if (context.mounted) {
-        showSuccessToast(context, '已删除记录');
+        showSuccessToast(context, context.l10n.historyDeletedToast);
       }
     } catch (e) {
       if (context.mounted) {

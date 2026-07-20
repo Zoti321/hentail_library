@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/comic_card.dart';
@@ -37,12 +39,13 @@ class SeriesDetailComicsGrid extends StatelessWidget {
           );
         }
 
+        final AppLocalizations l10n = context.l10n;
         if (comics.isEmpty) {
           return Padding(
             padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl),
             child: Center(
               child: Text(
-                '系列内暂无漫画',
+                l10n.seriesDetailNoComics,
                 style: TextStyle(
                   fontSize: tokens.text.bodySm,
                   color: cs.hentai.textTertiary,

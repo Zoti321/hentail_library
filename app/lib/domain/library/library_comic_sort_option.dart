@@ -14,16 +14,6 @@ enum LibraryComicSortField {
 }
 
 extension LibraryComicSortFieldX on LibraryComicSortField {
-  String get label => switch (this) {
-    LibraryComicSortField.title => '标题',
-    LibraryComicSortField.createdAt => '添加时间',
-    LibraryComicSortField.lastUpdatedAt => '更新时间',
-    LibraryComicSortField.publishedAt => '发布日期',
-    LibraryComicSortField.readAt => '阅读日期',
-    LibraryComicSortField.fileSize => '文件大小',
-    LibraryComicSortField.pageCount => '页数',
-  };
-
   bool get isImplemented => true;
 }
 

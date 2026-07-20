@@ -47,7 +47,7 @@ abstract class SeriesRepository {
 
   Future<List<Series>> searchByKeyword(String keyword);
 
-  Future<List<Series>> searchByTagExpression({
+  Future<List<Series>> searchByMetadataExpression({
     required Set<String> mustInclude,
     required Set<String> optionalOr,
     required Set<String> mustExclude,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_floating_panel.dart';
@@ -56,6 +58,7 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final double bottomPadding = MediaQuery.of(context).padding.bottom + 32;
     final double targetWidth = ReaderFloatingPanel.targetBarWidth(context);
@@ -163,8 +166,8 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                         children: <Widget>[
                           GhostButton.icon(
                             icon: LucideIcons.chevronLeft,
-                            tooltip: '上一卷',
-                            semanticLabel: '系列上一卷',
+                            tooltip: l10n.readerPrevVolume,
+                            semanticLabel: l10n.readerPrevVolumeSemantic,
                             iconSize: 16,
                             size: 28,
                             borderRadius: 8,
@@ -175,8 +178,8 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                           ),
                           GhostButton.icon(
                             icon: LucideIcons.chevronsLeft,
-                            tooltip: '首页',
-                            semanticLabel: '跳转到首页',
+                            tooltip: l10n.readerFirstPage,
+                            semanticLabel: l10n.readerFirstPageSemantic,
                             iconSize: 16,
                             size: 28,
                             borderRadius: 8,
@@ -189,14 +192,16 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                           ),
                         ],
                       ),
-                      Expanded(child: Center(child: _buildNavActionGroup(cs))),
+                      Expanded(
+                        child: Center(child: _buildNavActionGroup(cs, l10n)),
+                      ),
                       _buildSideActionGroup(
                         cs: cs,
                         children: <Widget>[
                           GhostButton.icon(
                             icon: LucideIcons.chevronRight,
-                            tooltip: '下一卷',
-                            semanticLabel: '系列下一卷',
+                            tooltip: l10n.readerNextVolume,
+                            semanticLabel: l10n.readerNextVolumeSemantic,
                             iconSize: 16,
                             size: 28,
                             borderRadius: 8,
@@ -207,8 +212,8 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                           ),
                           GhostButton.icon(
                             icon: LucideIcons.chevronsRight,
-                            tooltip: '尾页',
-                            semanticLabel: '跳转到尾页',
+                            tooltip: l10n.readerLastPage,
+                            semanticLabel: l10n.readerLastPageSemantic,
                             iconSize: 16,
                             size: 28,
                             borderRadius: 8,
@@ -250,7 +255,7 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
     );
   }
 
-  Widget _buildNavActionGroup(ColorScheme cs) {
+  Widget _buildNavActionGroup(ColorScheme cs, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       decoration: BoxDecoration(
@@ -262,8 +267,8 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
         children: <Widget>[
           GhostButton.icon(
             icon: LucideIcons.chevronLeft,
-            tooltip: '上一页',
-            semanticLabel: '上一页',
+            tooltip: l10n.readerPrevPage,
+            semanticLabel: l10n.readerPrevPage,
             iconSize: 16,
             size: 28,
             borderRadius: 999,
@@ -277,8 +282,12 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
               icon: widget.readerAutoPlayEnabled
                   ? LucideIcons.pause
                   : LucideIcons.play,
-              tooltip: widget.readerAutoPlayEnabled ? '关闭自动播放' : '开启自动播放',
-              semanticLabel: widget.readerAutoPlayEnabled ? '关闭自动播放' : '开启自动播放',
+              tooltip: widget.readerAutoPlayEnabled
+                  ? l10n.readerDisableAutoPlay
+                  : l10n.readerEnableAutoPlay,
+              semanticLabel: widget.readerAutoPlayEnabled
+                  ? l10n.readerDisableAutoPlay
+                  : l10n.readerEnableAutoPlay,
               iconSize: 14,
               size: 28,
               borderRadius: 999,
@@ -295,8 +304,8 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
             ),
           GhostButton.icon(
             icon: LucideIcons.chevronRight,
-            tooltip: '下一页',
-            semanticLabel: '下一页',
+            tooltip: l10n.readerNextPage,
+            semanticLabel: l10n.readerNextPage,
             iconSize: 16,
             size: 28,
             borderRadius: 999,

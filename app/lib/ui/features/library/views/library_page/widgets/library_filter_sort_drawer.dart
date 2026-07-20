@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_controls.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_sort_controls.dart';
@@ -20,6 +22,7 @@ class LibraryFilterSortDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final AppLocalizations l10n = context.l10n;
     return Drawer(
       width: widthFor(context),
       backgroundColor: cs.surface,
@@ -35,7 +38,7 @@ class LibraryFilterSortDrawer extends StatelessWidget {
                   left: kLibraryFilterSortDrawerContentInset,
                 ),
                 child: Text(
-                  '筛选',
+                  l10n.libraryFilterSection,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -52,7 +55,7 @@ class LibraryFilterSortDrawer extends StatelessWidget {
                   left: kLibraryFilterSortDrawerContentInset,
                 ),
                 child: Text(
-                  '排序',
+                  l10n.librarySortSection,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,

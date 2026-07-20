@@ -8,7 +8,7 @@ use crate::entity::prelude::*;
 use crate::error::HentaiError;
 
 use super::merge::merge_kept_scan_with_existing;
-use super::parser::{can_generate_thumbnail, read_source_stat};
+use super::parser::can_generate_thumbnail;
 use super::scanner::ScanItem;
 
 pub struct ComicScanReplacePlan {
@@ -118,19 +118,7 @@ async fn needs_thumbnail_generation(
     db: &DatabaseConnection,
     comic: &ComicDto,
 ) -> Result<bool, HentaiError> {
-    let path = std::path::Path::new(&comic.path);
-    let Some((modified_ms, size)) = read_source_stat(path, &comic.resource_type)? else {
-        return Ok(false);
-    };
-    let cached = ComicThumbnails::find_by_id(comic.comic_id.clone())
-        .one(db)
-        .await
-        .map_err(map_db_err)?;
-    let Some(cached) = cached else {
-        return Ok(true);
-    };
-    Ok(cached.source_modified_ms != Some(modified_ms)
-        || cached.source_size != Some(size))
+    crate::thumbnail::thumbnail_needs_generation(db, comic).await
 }
 
 pub async fn load_thumbnail_stats(

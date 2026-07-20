@@ -15,6 +15,12 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bool showCountChips = libraryHeaderShowsCountChips(layoutTier);
+    final bool showActiveCountChipOnly = libraryHeaderShowsActiveCountChipOnly(
+      layoutTier,
+    );
+    final bool showDisplayTargetTabs = libraryHeaderShowsDisplayTargetTabs(
+      layoutTier,
+    );
     return SizedBox(
       height: 44,
       child: Stack(
@@ -32,7 +38,7 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
                       if (onOpenNavigation != null) ...<Widget>[
                         GhostButton.icon(
                           icon: LucideIcons.menu,
-                          semanticLabel: '打开导航菜单',
+                          semanticLabel: context.l10n.shellOpenNavMenu,
                           tooltip: '',
                           iconSize: 16,
                           size: 32,
@@ -49,6 +55,7 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
                       LibraryPageHeader(
                         layoutTier: layoutTier,
                         showCountChips: showCountChips,
+                        showActiveCountChipOnly: showActiveCountChipOnly,
                       ),
                     ],
                   ),
@@ -63,10 +70,7 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
                 const _LegacyLibraryToolbar(),
             ],
           ),
-          LibraryDisplayTargetTabs(
-            showCountBadges: !showCountChips,
-            layoutTier: layoutTier,
-          ),
+          if (showDisplayTargetTabs) const LibraryDisplayTargetTabs(),
         ],
       ),
     );
@@ -134,13 +138,14 @@ class _LibrarySearchFieldState extends ConsumerState<LibrarySearchField> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     return Align(
       alignment: Alignment.centerLeft,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: kLibrarySearchMaxWidth),
         child: CustomTextField(
           controller: _controller,
-          hintText: '搜索…',
+          hintText: l10n.librarySearchHint,
           onSubmitted: _handleSubmitSearch,
         ),
       ),
@@ -150,7 +155,7 @@ class _LibrarySearchFieldState extends ConsumerState<LibrarySearchField> {
   void _handleSubmitSearch(String value) {
     final String query = value.trim();
     if (query.isEmpty) {
-      showInfoToast(context, '关键词不能为空');
+      showInfoToast(context, context.l10n.librarySearchKeywordEmpty);
       return;
     }
     final String encodedQuery = Uri.encodeQueryComponent(query);
@@ -159,40 +164,28 @@ class _LibrarySearchFieldState extends ConsumerState<LibrarySearchField> {
 }
 
 class LibraryDisplayTargetTabs extends ConsumerWidget {
-  const LibraryDisplayTargetTabs({
-    super.key,
-    this.showCountBadges = false,
-    this.layoutTier = LibraryLayoutTier.expanded,
-  });
-
-  final bool showCountBadges;
-  final LibraryLayoutTier layoutTier;
+  const LibraryDisplayTargetTabs({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
       libraryDisplayTargetProvider,
     );
-    final int comicCount = ref.watch(libraryDisplayedComicCountProvider);
-    final int seriesCount = ref.watch(libraryDisplayedSeriesCountProvider);
+    final AppLocalizations l10n = context.l10n;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         _UnderlineTab(
-          label: '漫画',
+          label: l10n.libraryTabComics,
           isSelected: displayTarget == LibraryDisplayTarget.comics,
-          badgeCount: showCountBadges ? comicCount : null,
-          layoutTier: layoutTier,
           onTap: () => ref
               .read(libraryQueryIntentProvider.notifier)
               .setDisplayTarget(LibraryDisplayTarget.comics),
         ),
         const SizedBox(width: 16),
         _UnderlineTab(
-          label: '系列',
+          label: l10n.libraryTabSeries,
           isSelected: displayTarget == LibraryDisplayTarget.series,
-          badgeCount: showCountBadges ? seriesCount : null,
-          layoutTier: layoutTier,
           onTap: () => ref
               .read(libraryQueryIntentProvider.notifier)
               .setDisplayTarget(LibraryDisplayTarget.series),
@@ -202,102 +195,76 @@ class LibraryDisplayTargetTabs extends ConsumerWidget {
   }
 }
 
+class LibraryDisplayTargetBottomBar extends ConsumerWidget {
+  const LibraryDisplayTargetBottomBar({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
+    );
+    final AppLocalizations l10n = context.l10n;
+    return ContentSwitcherBottomBar(
+      items: <ContentSwitcherBottomBarItem>[
+        (icon: LucideIcons.bookImage, label: l10n.libraryTabComics),
+        (icon: LucideIcons.bookMarked, label: l10n.libraryTabSeries),
+      ],
+      selectedIndex: displayTarget == LibraryDisplayTarget.comics ? 0 : 1,
+      onSelected: (int index) {
+        ref
+            .read(libraryQueryIntentProvider.notifier)
+            .setDisplayTarget(
+              index == 0
+                  ? LibraryDisplayTarget.comics
+                  : LibraryDisplayTarget.series,
+            );
+      },
+    );
+  }
+}
+
 class _UnderlineTab extends StatelessWidget {
   const _UnderlineTab({
     required this.label,
     required this.isSelected,
     required this.onTap,
-    this.badgeCount,
-    this.layoutTier = LibraryLayoutTier.expanded,
   });
 
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
-  final int? badgeCount;
-  final LibraryLayoutTier layoutTier;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final LibraryTabBadgeMetrics badgeMetrics = libraryTabBadgeMetrics(
-      layoutTier,
-    );
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(4),
       splashFactory: NoSplash.splashFactory,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        child: Stack(
-          clipBehavior: Clip.none,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    color: isSelected ? cs.primary : cs.hentai.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  height: 2,
-                  width: label.length * 14.0,
-                  decoration: BoxDecoration(
-                    color: isSelected ? cs.primary : Colors.transparent,
-                    borderRadius: BorderRadius.circular(1),
-                  ),
-                ),
-              ],
-            ),
-            if (badgeCount != null)
-              Positioned(
-                top: badgeMetrics.top,
-                right: badgeMetrics.right,
-                child: _TabCountBadge(
-                  count: badgeCount!,
-                  metrics: badgeMetrics,
-                ),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? cs.primary : cs.hentai.textSecondary,
               ),
+            ),
+            const SizedBox(height: 6),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              height: 2,
+              width: label.length * 14.0,
+              decoration: BoxDecoration(
+                color: isSelected ? cs.primary : Colors.transparent,
+                borderRadius: BorderRadius.circular(1),
+              ),
+            ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TabCountBadge extends StatelessWidget {
-  const _TabCountBadge({required this.count, required this.metrics});
-
-  final int count;
-  final LibraryTabBadgeMetrics metrics;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return Container(
-      constraints: BoxConstraints(
-        minWidth: metrics.minSize,
-        minHeight: metrics.minSize,
-      ),
-      padding: EdgeInsets.symmetric(horizontal: metrics.horizontalPadding),
-      decoration: BoxDecoration(
-        color: cs.primary,
-        borderRadius: BorderRadius.circular(metrics.borderRadius),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        '$count',
-        style: TextStyle(
-          fontSize: metrics.fontSize,
-          fontWeight: FontWeight.w600,
-          color: cs.onPrimary,
-          height: 1.1,
         ),
       ),
     );
@@ -320,14 +287,15 @@ class _LibraryCompactToolbar extends ConsumerWidget {
     final bool isCustomized = ref.watch(
       libraryActiveFilterSortIsCustomizedProvider,
     );
+    final AppLocalizations l10n = context.l10n;
     return Row(
       mainAxisSize: MainAxisSize.min,
       spacing: libraryToolbarActionSpacing(layoutTier),
       children: <Widget>[
         GhostButton.icon(
           icon: LucideIcons.listFilter,
-          tooltip: '筛选与排序',
-          semanticLabel: '打开筛选与排序',
+          tooltip: l10n.libraryFilterSortTooltip,
+          semanticLabel: l10n.libraryFilterSortSemantic,
           iconSize: 16,
           size: 32,
           borderRadius: 8,
@@ -380,6 +348,7 @@ class _LibraryPageSizeMenuButtonState
       libraryDisplayTargetProvider,
     );
     final int activePageSize = ref.watch(libraryActivePageSizeProvider);
+    final AppLocalizations l10n = context.l10n;
     return CustomPopupMenu(
       controller: _controller,
       barrierColor: Colors.transparent,
@@ -398,8 +367,8 @@ class _LibraryPageSizeMenuButtonState
       ),
       child: GhostButton.icon(
         icon: LucideIcons.layoutGrid,
-        tooltip: '每页数量',
-        semanticLabel: '设置每页数量',
+        tooltip: l10n.libraryPageSizeTooltip,
+        semanticLabel: l10n.libraryPageSizeSemantic,
         iconSize: 16,
         size: 32,
         borderRadius: 8,
@@ -503,13 +472,17 @@ class _LibraryOverflowMenuButtonState
       }
       if (previous.running && !next.running) {
         if (next.cancelled) {
-          showCustomToast(context, message: '已取消扫描', type: AppToastType.info);
+          showCustomToast(
+            context,
+            message: context.l10n.libraryScanCancelledToast,
+            type: AppToastType.info,
+          );
         } else if (next.error != null) {
           showErrorToast(context, next.error!);
         } else {
           showSuccessToast(
             context,
-            scanSuccessToastMessage(
+            context.l10n.libraryScanSuccessToast(
               mode: next.scanMode,
               progress: next.progress,
             ),
@@ -522,6 +495,7 @@ class _LibraryOverflowMenuButtonState
     final ThemeData theme = Theme.of(context);
     final ScanLibraryState scanState = ref.watch(scanLibraryControllerProvider);
     final bool scanning = scanState.running;
+    final AppLocalizations l10n = context.l10n;
 
     return CustomPopupMenu(
       controller: _controller,
@@ -562,11 +536,11 @@ class _LibraryOverflowMenuButtonState
       child: scanning
           ? Tooltip(
               message: scanState.scanMode == ScanMode.full
-                  ? '正在深度扫描…'
-                  : '正在扫描…',
+                  ? l10n.libraryScanningDeep
+                  : l10n.libraryScanning,
               child: Semantics(
                 button: true,
-                label: '取消扫描',
+                label: l10n.libraryCancelScan,
                 child: SizedBox(
                   width: 32,
                   height: 32,
@@ -590,8 +564,8 @@ class _LibraryOverflowMenuButtonState
             )
           : GhostButton.icon(
               icon: LucideIcons.ellipsisVertical,
-              tooltip: '更多操作',
-              semanticLabel: '打开更多操作',
+              tooltip: l10n.libraryMoreActions,
+              semanticLabel: l10n.libraryMoreActionsSemantic,
               iconSize: 16,
               size: 32,
               borderRadius: 8,
@@ -616,6 +590,7 @@ class _LibraryOverflowScanningMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
     final double viewportWidth = MediaQuery.sizeOf(context).width;
     return PopupMenuPanelShell(
@@ -631,7 +606,7 @@ class _LibraryOverflowScanningMenu extends StatelessWidget {
           children: <Widget>[
             _LibraryOverflowMenuItem(
               icon: LucideIcons.x,
-              label: '取消扫描',
+              label: l10n.libraryCancelScan,
               onTap: onCancel,
             ),
           ],
@@ -656,6 +631,7 @@ class _LibraryOverflowMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
     final double viewportWidth = MediaQuery.sizeOf(context).width;
     return PopupMenuPanelShell(
@@ -671,17 +647,17 @@ class _LibraryOverflowMenu extends StatelessWidget {
           children: <Widget>[
             _LibraryOverflowMenuItem(
               icon: LucideIcons.rotateCw,
-              label: '刷新',
+              label: l10n.libraryRefresh,
               onTap: onRefresh,
             ),
             _LibraryOverflowMenuItem(
               icon: LucideIcons.scanSearch,
-              label: '扫描',
+              label: l10n.libraryScan,
               onTap: onScan,
             ),
             _LibraryOverflowMenuItem(
               icon: LucideIcons.scanLine,
-              label: '深度扫描',
+              label: l10n.libraryDeepScan,
               onTap: onDeepScan,
             ),
           ],
@@ -739,6 +715,7 @@ class _LegacyLibraryToolbar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
+    final AppLocalizations l10n = context.l10n;
     return Container(
       height: 40,
       decoration: BoxDecoration(
@@ -752,8 +729,8 @@ class _LegacyLibraryToolbar extends ConsumerWidget {
         children: <Widget>[
           GhostButton.icon(
             icon: LucideIcons.rotateCw,
-            tooltip: '刷新',
-            semanticLabel: '刷新',
+            tooltip: l10n.libraryRefresh,
+            semanticLabel: l10n.libraryRefresh,
             iconSize: 16,
             size: 28,
             borderRadius: 6,

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/widgets/path_tile.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -11,6 +13,7 @@ class SelectedPathsListCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
+    final l10n = context.l10n;
 
     final List<String> paths = ref.watch(
       selectedPathsPageProvider.select(
@@ -55,7 +58,7 @@ class SelectedPathsListCard extends ConsumerWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '已保存路径',
+                    l10n.pathsSavedHeading,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -64,7 +67,7 @@ class SelectedPathsListCard extends ConsumerWidget {
                   ),
                   const Spacer(),
                   Text(
-                    '共 ${paths.length} 项',
+                    l10n.pathsTotalCount(paths.length),
                     style: TextStyle(
                       fontSize: 12,
                       color: theme.colorScheme.hentai.textTertiary,
@@ -74,7 +77,7 @@ class SelectedPathsListCard extends ConsumerWidget {
               ),
             ),
             if (paths.isEmpty)
-              const _EmptyPaths()
+              _EmptyPaths(l10n: l10n)
             else
               ListView.separated(
                 shrinkWrap: true,
@@ -97,7 +100,9 @@ class SelectedPathsListCard extends ConsumerWidget {
 }
 
 class _EmptyPaths extends StatelessWidget {
-  const _EmptyPaths();
+  const _EmptyPaths({required this.l10n});
+
+  final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +120,7 @@ class _EmptyPaths extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              '暂无路径，请添加文件夹',
+              l10n.pathsEmptyHint,
               style: TextStyle(
                 fontSize: 13,
                 color: theme.colorScheme.hentai.textTertiary,

@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
+import 'package:hentai_library/ui/core/widgets/chrome/content_switcher_bottom_bar.dart';
+import 'package:hentai_library/ui/core/widgets/element/chip/count_digit_chip.dart';
+import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
+import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -59,7 +65,7 @@ class MetadataPageHeaderSection extends StatelessWidget {
   }
 }
 
-class MetadataPageHeaderToolbar extends StatelessWidget {
+class MetadataPageHeaderToolbar extends ConsumerWidget {
   const MetadataPageHeaderToolbar({
     required this.layoutTier,
     required this.selectedTabIndex,
@@ -76,8 +82,12 @@ class MetadataPageHeaderToolbar extends StatelessWidget {
   final VoidCallback? onOpenNavigation;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+    final String addTooltip = l10n.metadataAddEntityTooltip(selectedTabIndex);
+    final bool showEntityTabs = metadataHeaderShowsEntityTabs(layoutTier);
+    final bool showCountChip = metadataHeaderShowsCountChip(layoutTier);
     return SizedBox(
       height: 44,
       child: Stack(
@@ -95,7 +105,7 @@ class MetadataPageHeaderToolbar extends StatelessWidget {
                       if (onOpenNavigation != null) ...<Widget>[
                         GhostButton.icon(
                           icon: LucideIcons.menu,
-                          semanticLabel: '打开导航菜单',
+                          semanticLabel: l10n.shellOpenNavMenu,
                           tooltip: '',
                           iconSize: 16,
                           size: 32,
@@ -107,15 +117,24 @@ class MetadataPageHeaderToolbar extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                       ],
-                      Text('管理', style: metadataPageTitleStyle(cs, layoutTier)),
+                      Text(
+                        l10n.navMetadata,
+                        style: metadataPageTitleStyle(cs, layoutTier),
+                      ),
+                      if (showCountChip) ...<Widget>[
+                        const SizedBox(width: 12),
+                        _MetadataActiveCountChip(
+                          selectedTabIndex: selectedTabIndex,
+                        ),
+                      ],
                     ],
                   ),
                 ),
               ),
               GhostButton.icon(
                 icon: LucideIcons.plus,
-                tooltip: metadataAddEntityTooltip(selectedTabIndex),
-                semanticLabel: metadataAddEntityTooltip(selectedTabIndex),
+                tooltip: addTooltip,
+                semanticLabel: addTooltip,
                 iconSize: 16,
                 size: 32,
                 borderRadius: 8,
@@ -127,107 +146,82 @@ class MetadataPageHeaderToolbar extends StatelessWidget {
               ),
             ],
           ),
-          MetadataEntityTabs(
-            layoutTier: layoutTier,
-            selectedTabIndex: selectedTabIndex,
-            onTabSelected: onTabSelected,
-          ),
+          if (showEntityTabs)
+            MetadataEntityTabs(
+              selectedTabIndex: selectedTabIndex,
+              onTabSelected: onTabSelected,
+            ),
         ],
       ),
+    );
+  }
+}
+
+class _MetadataActiveCountChip extends ConsumerWidget {
+  const _MetadataActiveCountChip({required this.selectedTabIndex});
+
+  final int selectedTabIndex;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final int count = selectedTabIndex == 0
+        ? ref.watch(filteredAuthorsProvider).length
+        : ref.watch(filteredTagsProvider).length;
+    return CountDigitChip(
+      count: count,
+      semanticLabel: l10n.metadataTotalCount(count),
     );
   }
 }
 
 class MetadataEntityTabs extends StatelessWidget {
   const MetadataEntityTabs({
-    required this.layoutTier,
     required this.selectedTabIndex,
     required this.onTabSelected,
     super.key,
   });
 
-  final MetadataLayoutTier layoutTier;
   final int selectedTabIndex;
   final ValueChanged<int> onTabSelected;
 
-  static const List<CapsuleTabItem> _capsuleItems = <CapsuleTabItem>[
-    CapsuleTabItem(label: '作者', icon: LucideIcons.penLine),
-    CapsuleTabItem(label: '标签', icon: LucideIcons.tags),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    if (layoutTier == MetadataLayoutTier.compact) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          _MetadataUnderlineTab(
-            label: '作者',
-            isSelected: selectedTabIndex == 0,
-            onTap: () => onTabSelected(0),
-          ),
-          const SizedBox(width: 16),
-          _MetadataUnderlineTab(
-            label: '标签',
-            isSelected: selectedTabIndex == 1,
-            onTap: () => onTabSelected(1),
-          ),
-        ],
-      );
-    }
-
+    final l10n = context.l10n;
     return CapsuleTabBar(
-      items: _capsuleItems,
+      items: <CapsuleTabItem>[
+        CapsuleTabItem(
+          label: l10n.metadataTabAuthors,
+          icon: LucideIcons.penLine,
+        ),
+        CapsuleTabItem(label: l10n.metadataTabTags, icon: LucideIcons.tags),
+      ],
       selectedIndex: selectedTabIndex,
       onSelected: onTabSelected,
     );
   }
 }
 
-class _MetadataUnderlineTab extends StatelessWidget {
-  const _MetadataUnderlineTab({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
+class MetadataEntityBottomBar extends StatelessWidget {
+  const MetadataEntityBottomBar({
+    required this.selectedTabIndex,
+    required this.onTabSelected,
+    super.key,
   });
 
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
+  final int selectedTabIndex;
+  final ValueChanged<int> onTabSelected;
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
-      splashFactory: NoSplash.splashFactory,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? cs.primary : cs.hentai.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 6),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              height: 2,
-              width: label.length * 14.0,
-              decoration: BoxDecoration(
-                color: isSelected ? cs.primary : Colors.transparent,
-                borderRadius: BorderRadius.circular(1),
-              ),
-            ),
-          ],
-        ),
-      ),
+    final l10n = context.l10n;
+    return ContentSwitcherBottomBar(
+      items: <ContentSwitcherBottomBarItem>[
+        (icon: LucideIcons.penLine, label: l10n.metadataTabAuthors),
+        (icon: LucideIcons.tags, label: l10n.metadataTabTags),
+      ],
+      selectedIndex: selectedTabIndex,
+      onSelected: onTabSelected,
     );
   }
 }
