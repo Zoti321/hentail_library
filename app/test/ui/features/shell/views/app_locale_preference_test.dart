@@ -42,18 +42,7 @@ void main() {
       expect(app.locale, isNull);
     },
   );
-}
 
-Future<MaterialApp> _pumpApp(WidgetTester tester, AppSetting setting) async {
-  tester.view.physicalSize = const Size(1200, 800);
-  tester.view.devicePixelRatio = 1.0;
-  addTearDown(tester.view.resetPhysicalSize);
-
-  await tester.pumpWidget(MyApp(overrides: _overrides(setting)));
-  await tester.pump();
-  await tester.pump(const Duration(seconds: 1));
-
-  return tester.widget(find.byType(MaterialApp));
   testWidgets(
     'setLocalePreference refreshes MaterialApp.locale without rebuild',
     (WidgetTester tester) async {
@@ -98,6 +87,18 @@ Future<MaterialApp> _pumpApp(WidgetTester tester, AppSetting setting) async {
       );
     },
   );
+}
+
+Future<MaterialApp> _pumpApp(WidgetTester tester, AppSetting setting) async {
+  tester.view.physicalSize = const Size(1200, 800);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+
+  await tester.pumpWidget(MyApp(overrides: _overrides(setting)));
+  await tester.pump();
+  await tester.pump(const Duration(seconds: 1));
+
+  return tester.widget(find.byType(MaterialApp));
 }
 
 List<Override> _overrides(AppSetting setting) {
