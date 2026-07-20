@@ -349,6 +349,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAutoScanLabel => 'Auto scan';
 
   @override
+  String get settingsSupportedFormatsLabel => 'Supported formats';
+
+  @override
+  String get settingsSupportedFormatsTitle => 'Supported formats';
+
+  @override
+  String get settingsSupportedFormatsDescription =>
+      'Unchecked formats are removed from the library on the next library sync. Comics already in the library remain readable until then.';
+
+  @override
+  String get settingsSupportedFormatsGroupTitle => 'Format groups';
+
+  @override
+  String get settingsFormatGroupFolder => 'Image folders';
+
+  @override
+  String get settingsFormatGroupPdf => 'PDF';
+
+  @override
+  String get settingsFormatGroupEpub => 'EPUB';
+
+  @override
+  String get settingsFormatGroupArchive => 'Comic archives';
+
+  @override
+  String get settingsDisableAllFormatsConfirmTitle => 'Disable all formats?';
+
+  @override
+  String get settingsDisableAllFormatsConfirmContent =>
+      'After saving, the next library sync will remove every Comic from the library. Continue?';
+
+  @override
   String get settingsAutoUpdateLabel => 'Automatic updates';
 
   @override

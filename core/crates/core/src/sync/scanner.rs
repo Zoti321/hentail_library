@@ -6,6 +6,7 @@ use rayon::prelude::*;
 use crate::comic::ComicDto;
 use crate::error::HentaiError;
 
+use super::format_group::{FormatGroup, resource_type_enabled};
 use super::handle::SyncHandle;
 use super::parser::{
     comic_id_for_path, parse_directory, parse_file, parsed_to_comic, read_resource_size,
@@ -28,6 +29,7 @@ pub fn scan_roots(
     ctx: &ScanContext,
     handle: &SyncHandle,
     force_full_parse: bool,
+    enabled_groups: &[FormatGroup],
 ) -> Result<Vec<ScanItem>, HentaiError> {
     let mut candidates: Vec<PathBuf> = Vec::new();
     for root in roots {
@@ -38,7 +40,7 @@ pub fn scan_roots(
             continue;
         }
         if root.is_dir() {
-            collect_from_directory(root, &mut candidates, handle)?;
+            collect_from_directory(root, &mut candidates, handle, enabled_groups)?;
         } else if root.is_file() {
             candidates.push(root.clone());
         }
@@ -52,7 +54,7 @@ pub fn scan_roots(
             if handle.is_cancelled() {
                 Ok(None)
             } else {
-                resolve_scan_item(path, ctx, force_full_parse)
+                resolve_scan_item(path, ctx, force_full_parse, enabled_groups)
             }
         })
         .collect();
@@ -69,12 +71,15 @@ fn collect_from_directory(
     dir: &Path,
     out: &mut Vec<PathBuf>,
     handle: &SyncHandle,
+    enabled_groups: &[FormatGroup],
 ) -> Result<(), HentaiError> {
     if handle.is_cancelled() {
         return Ok(());
     }
     if let Some(parsed) = parse_directory(dir)? {
-        out.push(PathBuf::from(parsed.path));
+        if resource_type_enabled(&parsed.resource_type, enabled_groups) {
+            out.push(PathBuf::from(parsed.path));
+        }
         return Ok(());
     }
     let entries = std::fs::read_dir(dir).map_err(|e| {
@@ -87,7 +92,7 @@ fn collect_from_directory(
         let entry = entry.map_err(|e| HentaiError::validation(e.to_string()))?;
         let path = entry.path();
         if path.is_dir() {
-            collect_from_directory(&path, out, handle)?;
+            collect_from_directory(&path, out, handle, enabled_groups)?;
         } else if path.is_file() {
             out.push(path);
         }
@@ -99,11 +104,15 @@ fn resolve_scan_item(
     path: &Path,
     ctx: &ScanContext,
     force_full_parse: bool,
+    enabled_groups: &[FormatGroup],
 ) -> Result<Option<ScanItem>, HentaiError> {
     let comic_id = comic_id_for_path(&path.to_string_lossy());
     if !force_full_parse {
         if let Some(existing) = ctx.existing_by_id.get(&comic_id) {
             if try_reuse_existing(path, existing, ctx) {
+                if !resource_type_enabled(&existing.resource_type, enabled_groups) {
+                    return Ok(None);
+                }
                 let mut comic = existing.clone();
                 refresh_resource_size(path, &mut comic)?;
                 return Ok(Some(ScanItem {
@@ -122,6 +131,9 @@ fn resolve_scan_item(
     let Some(parsed) = parsed else {
         return Ok(None);
     };
+    if !resource_type_enabled(&parsed.resource_type, enabled_groups) {
+        return Ok(None);
+    }
     let comic = parsed_to_comic(&parsed);
     Ok(Some(ScanItem {
         path: parsed.path,
@@ -201,12 +213,47 @@ mod tests {
         };
 
         let handle = create_sync_handle();
-        let items = scan_roots(&[path], &ctx, &handle, false).expect("scan");
+        let items = scan_roots(&[path], &ctx, &handle, false, &FormatGroup::ALL).expect("scan");
         assert_eq!(items.len(), 1);
         assert!(
             items[0].comic.resource_size > 0,
             "expected refreshed resource_size, got {}",
             items[0].comic.resource_size
         );
+    }
+
+    #[test]
+    fn scan_roots_skips_resource_types_outside_enabled_format_groups() {
+        let temp = TempDir::new().expect("tempdir");
+        let root = temp.path();
+
+        let folder = root.join("image_comic");
+        std::fs::create_dir(&folder).expect("mkdir");
+        std::fs::write(folder.join("01.jpg"), b"fake-jpeg").expect("write jpg");
+
+        let cbz_path = root.join("archive.cbz");
+        let file = File::create(&cbz_path).expect("create");
+        let mut zip = ZipWriter::new(file);
+        zip.start_file("01.jpg", SimpleFileOptions::default())
+            .expect("start");
+        zip.write_all(b"fake-jpeg").expect("write");
+        zip.finish().expect("finish");
+
+        let ctx = ScanContext {
+            existing_by_id: HashMap::new(),
+            thumbnail_stats: HashMap::new(),
+        };
+        let handle = create_sync_handle();
+        let items = scan_roots(
+            &[root.to_path_buf()],
+            &ctx,
+            &handle,
+            false,
+            &[FormatGroup::Folder],
+        )
+        .expect("scan");
+
+        assert_eq!(items.len(), 1);
+        assert_eq!(items[0].resource_type, "dir");
     }
 }

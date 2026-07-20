@@ -37,6 +37,33 @@ class LibraryLocationRow extends StatelessWidget {
   }
 }
 
+class SupportedFormatsRow extends StatelessWidget {
+  const SupportedFormatsRow({required this.layoutTier, super.key});
+
+  final SettingsLayoutTier layoutTier;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final l10n = context.l10n;
+    return SettingsRow(
+      layoutTier: layoutTier,
+      icon: Icon(
+        LucideIcons.files,
+        size: 20,
+        color: theme.colorScheme.hentai.iconDefault,
+      ),
+      label: l10n.settingsSupportedFormatsLabel,
+      onRowTap: () => context.push('/settings/formats'),
+      action: Icon(
+        LucideIcons.chevronRight,
+        size: 16,
+        color: theme.colorScheme.hentai.iconSecondary,
+      ),
+    );
+  }
+}
+
 class AutoScanRow extends ConsumerWidget {
   const AutoScanRow({required this.layoutTier, super.key});
 

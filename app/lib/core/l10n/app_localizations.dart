@@ -644,6 +644,66 @@ abstract class AppLocalizations {
   /// **'自动扫描'**
   String get settingsAutoScanLabel;
 
+  /// No description provided for @settingsSupportedFormatsLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'支持的格式'**
+  String get settingsSupportedFormatsLabel;
+
+  /// No description provided for @settingsSupportedFormatsTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'支持的格式'**
+  String get settingsSupportedFormatsTitle;
+
+  /// No description provided for @settingsSupportedFormatsDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消勾选的格式会在下次库同步时从库中移除；未同步前已入库的漫画仍可阅读。'**
+  String get settingsSupportedFormatsDescription;
+
+  /// No description provided for @settingsSupportedFormatsGroupTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'格式分组'**
+  String get settingsSupportedFormatsGroupTitle;
+
+  /// No description provided for @settingsFormatGroupFolder.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画文件夹'**
+  String get settingsFormatGroupFolder;
+
+  /// No description provided for @settingsFormatGroupPdf.
+  ///
+  /// In zh, this message translates to:
+  /// **'PDF'**
+  String get settingsFormatGroupPdf;
+
+  /// No description provided for @settingsFormatGroupEpub.
+  ///
+  /// In zh, this message translates to:
+  /// **'EPUB'**
+  String get settingsFormatGroupEpub;
+
+  /// No description provided for @settingsFormatGroupArchive.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画压缩包'**
+  String get settingsFormatGroupArchive;
+
+  /// No description provided for @settingsDisableAllFormatsConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭全部格式？'**
+  String get settingsDisableAllFormatsConfirmTitle;
+
+  /// No description provided for @settingsDisableAllFormatsConfirmContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存后，下次库同步将清空漫画库中的全部 Comic。确定继续？'**
+  String get settingsDisableAllFormatsConfirmContent;
+
   /// No description provided for @settingsAutoUpdateLabel.
   ///
   /// In zh, this message translates to:

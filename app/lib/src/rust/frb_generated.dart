@@ -326,6 +326,7 @@ abstract class RustLibApi extends BaseApi {
   Stream<SyncLibraryProgressDto> crateApiSyncSyncLibraryFrb({
     required SyncHandleDto handle,
     required SyncScanModeDto scanMode,
+    required List<FormatGroupDto> enabledFormatGroups,
   });
 
   void crateApiComicUpdateComicUserMetaFrb({
@@ -2236,6 +2237,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Stream<SyncLibraryProgressDto> crateApiSyncSyncLibraryFrb({
     required SyncHandleDto handle,
     required SyncScanModeDto scanMode,
+    required List<FormatGroupDto> enabledFormatGroups,
   }) {
     final sink = RustStreamSink<SyncLibraryProgressDto>();
     unawaited(
@@ -2248,6 +2250,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
               serializer,
             );
             sse_encode_sync_scan_mode_dto(scanMode, serializer);
+            sse_encode_list_format_group_dto(enabledFormatGroups, serializer);
             sse_encode_StreamSink_sync_library_progress_dto_Sse(
               sink,
               serializer,
@@ -2264,7 +2267,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             decodeErrorData: null,
           ),
           constMeta: kCrateApiSyncSyncLibraryFrbConstMeta,
-          argValues: [handle, scanMode, sink],
+          argValues: [handle, scanMode, enabledFormatGroups, sink],
           apiImpl: this,
         ),
       ),
@@ -2274,7 +2277,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiSyncSyncLibraryFrbConstMeta => const TaskConstMeta(
     debugName: "sync_library_frb",
-    argNames: ["handle", "scanMode", "sink"],
+    argNames: ["handle", "scanMode", "enabledFormatGroups", "sink"],
   );
 
   @override
@@ -3058,6 +3061,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  FormatGroupDto dco_decode_format_group_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return FormatGroupDto.values[raw as int];
+  }
+
+  @protected
   HentaiErrorDto dco_decode_hentai_error_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -3139,6 +3148,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<ComicDto> dco_decode_list_comic_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_comic_dto).toList();
+  }
+
+  @protected
+  List<FormatGroupDto> dco_decode_list_format_group_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_format_group_dto).toList();
   }
 
   @protected
@@ -3982,6 +3997,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  FormatGroupDto sse_decode_format_group_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return FormatGroupDto.values[inner];
+  }
+
+  @protected
   HentaiErrorDto sse_decode_hentai_error_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_code = sse_decode_String(deserializer);
@@ -4087,6 +4109,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <ComicDto>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_comic_dto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<FormatGroupDto> sse_decode_list_format_group_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <FormatGroupDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_format_group_dto(deserializer));
     }
     return ans_;
   }
@@ -5141,6 +5177,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_format_group_dto(
+    FormatGroupDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
   void sse_encode_hentai_error_dto(
     HentaiErrorDto self,
     SseSerializer serializer,
@@ -5222,6 +5267,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_comic_dto(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_format_group_dto(
+    List<FormatGroupDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_format_group_dto(item, serializer);
     }
   }
 

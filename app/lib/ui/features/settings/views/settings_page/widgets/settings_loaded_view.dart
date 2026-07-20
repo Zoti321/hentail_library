@@ -119,6 +119,7 @@ class _SettingsViewState extends State<SettingsView> {
                         title: l10n.settingsGroupLibrary,
                         children: <Widget>[
                           LibraryLocationRow(layoutTier: layoutTier),
+                          SupportedFormatsRow(layoutTier: layoutTier),
                           AutoScanRow(layoutTier: layoutTier),
                         ],
                       ),

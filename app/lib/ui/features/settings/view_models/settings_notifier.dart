@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/models/models.dart'
     show AppLocalePreference, AppSetting, AppThemePreference;
 import 'package:hentai_library/domain/reading/reading_mode.dart';
@@ -48,6 +49,12 @@ class SettingsNotifier extends _$SettingsNotifier {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
     await updateSettings(current.copyWith(autoScan: value));
+  }
+
+  Future<void> setEnabledFormatGroups(List<FormatGroup> value) async {
+    final AppSetting? current = state.asData?.value;
+    if (current == null) return;
+    await updateSettings(current.copyWith(enabledFormatGroups: value));
   }
 
   Future<void> setAutoUpdate(bool value) async {

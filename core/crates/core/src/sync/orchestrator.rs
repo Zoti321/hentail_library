@@ -8,6 +8,7 @@ use super::dto::{
     LibrarySyncCountsDto, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto,
     SyncScanMode,
 };
+use super::format_group::FormatGroup;
 use super::handle::SyncHandle;
 use super::parser::normalize_roots;
 use super::plan::{
@@ -35,6 +36,7 @@ fn log_sync_phase(phase: SyncLibraryPhaseDto, route: SyncLibraryRouteDto) {
 pub async fn sync_library(
     handle: SyncHandle,
     scan_mode: SyncScanMode,
+    enabled_format_groups: &[FormatGroup],
     emit: impl FnMut(SyncLibraryProgressDto),
 ) -> Result<(), HentaiError> {
     let db = connection()?;
@@ -43,7 +45,15 @@ pub async fn sync_library(
     if effective.is_empty() {
         return sync_no_roots(&db, &handle, emit).await;
     }
-    sync_with_roots(&db, &handle, &effective, scan_mode, emit).await
+    sync_with_roots(
+        &db,
+        &handle,
+        &effective,
+        scan_mode,
+        enabled_format_groups,
+        emit,
+    )
+    .await
 }
 
 #[tracing::instrument(skip(emit, handle), err)]
@@ -133,6 +143,7 @@ async fn sync_with_roots(
     handle: &SyncHandle,
     roots: &[PathBuf],
     scan_mode: SyncScanMode,
+    enabled_format_groups: &[FormatGroup],
     mut emit: impl FnMut(SyncLibraryProgressDto),
 ) -> Result<(), HentaiError> {
     let force_full_parse = scan_mode == SyncScanMode::Full;
@@ -160,7 +171,13 @@ async fn sync_with_roots(
         None,
     ));
 
-    let scan_items = scan_roots(roots, &ctx, handle, force_full_parse)?;
+    let scan_items = scan_roots(
+        roots,
+        &ctx,
+        handle,
+        force_full_parse,
+        enabled_format_groups,
+    )?;
     if return_if_cancelled(handle, "scanning") {
         return Ok(());
     }
