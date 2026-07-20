@@ -10,8 +10,8 @@ import 'package:hentai_library/ui/features/library/view_models/library_age_restr
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_media_type_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
+import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_accordion.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_sort_drawer.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// 库页抽屉筛选控件（年龄限制手风琴）。
 class LibraryFilterControls extends ConsumerStatefulWidget {
@@ -66,18 +66,15 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
                       ),
                     ),
                   ),
-                  Icon(
-                    _expanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
-                    size: 16,
-                    color: cs.hentai.iconSecondary,
-                  ),
+                  LibraryFilterAccordionChevron(expanded: _expanded),
                 ],
               ),
             ),
           ),
         ),
-        if (_expanded)
-          Column(
+        LibraryFilterAccordionBody(
+          expanded: _expanded,
+          child: Column(
             children: LibraryAgeRestrictionFilter.selectableOptions
                 .map(
                   (LibraryAgeRestrictionFilter option) =>
@@ -95,6 +92,7 @@ class _LibraryFilterControlsState extends ConsumerState<LibraryFilterControls> {
                 )
                 .toList(),
           ),
+        ),
       ],
     );
   }
@@ -158,18 +156,15 @@ class _LibraryMediaTypeFilterControlsState
                       ),
                     ),
                   ),
-                  Icon(
-                    _expanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
-                    size: 16,
-                    color: cs.hentai.iconSecondary,
-                  ),
+                  LibraryFilterAccordionChevron(expanded: _expanded),
                 ],
               ),
             ),
           ),
         ),
-        if (_expanded)
-          Column(
+        LibraryFilterAccordionBody(
+          expanded: _expanded,
+          child: Column(
             children: LibraryMediaTypeFilterOption.selectableOptions
                 .map(
                   (LibraryMediaTypeFilterOption option) =>
@@ -185,6 +180,7 @@ class _LibraryMediaTypeFilterControlsState
                 )
                 .toList(),
           ),
+        ),
       ],
     );
   }
