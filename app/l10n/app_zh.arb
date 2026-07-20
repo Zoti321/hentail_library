@@ -450,8 +450,7 @@
   "metadataAddAuthor": "添加作者",
   "metadataAddTag": "添加标签",
   "metadataAdd": "添加",
-  "metadataSearchAuthorsHint": "搜索作者名称…",
-  "metadataSearchTagsHint": "搜索标签名称…",
+  "metadataSearchNameHint": "搜索名称…",
   "metadataRename": "重命名",
   "metadataDelete": "删除",
   "metadataMoreActions": "更多操作",
@@ -465,16 +464,6 @@
       }
     }
   },
-  "metadataSelectedCount": "已选 {count}",
-  "@metadataSelectedCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "metadataSelect": "选中",
-  "metadataDeselect": "取消选中",
   "metadataRenameAuthor": "重命名作者",
   "metadataRenameTag": "重命名标签",
   "metadataNewName": "新名称",
@@ -489,6 +478,9 @@
   "metadataAuthorsEmptyHint": "你可以从这里添加、重命名或删除作者。",
   "metadataTagsEmptyTitle": "暂无标签",
   "metadataTagsEmptyHint": "你可以从这里添加、重命名或删除标签。",
+  "metadataAuthorsNoMatchTitle": "未找到匹配的作者",
+  "metadataTagsNoMatchTitle": "未找到匹配的标签",
+  "metadataSearchNoMatchHint": "试试其他关键词，或清空搜索",
   "commonCancel": "取消",
   "commonSave": "保存",
   "commonSaveChanges": "保存更改",

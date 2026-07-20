@@ -905,10 +905,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataAdd => 'Add';
 
   @override
-  String get metadataSearchAuthorsHint => 'Search authors…';
-
-  @override
-  String get metadataSearchTagsHint => 'Search tags…';
+  String get metadataSearchNameHint => 'Search by name…';
 
   @override
   String get metadataRename => 'Rename';
@@ -935,23 +932,6 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
-
-  @override
-  String metadataSelectedCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count selected',
-      one: '1 selected',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get metadataSelect => 'Select';
-
-  @override
-  String get metadataDeselect => 'Deselect';
 
   @override
   String get metadataRenameAuthor => 'Rename author';
@@ -994,6 +974,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get metadataTagsEmptyHint => 'Add, rename, or delete tags here.';
+
+  @override
+  String get metadataAuthorsNoMatchTitle => 'No matching authors';
+
+  @override
+  String get metadataTagsNoMatchTitle => 'No matching tags';
+
+  @override
+  String get metadataSearchNoMatchHint =>
+      'Try another keyword, or clear the search';
 
   @override
   String get commonCancel => 'Cancel';

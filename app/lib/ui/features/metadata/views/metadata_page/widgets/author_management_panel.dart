@@ -11,7 +11,6 @@ import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_d
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_shell.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_row_actions.dart';
-import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -33,6 +32,7 @@ class AuthorManagementSliverGroup extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authorsAsync = ref.watch(allAuthorsProvider);
     final List<Author> filteredAuthors = ref.watch(filteredAuthorsProvider);
+    final bool hasSearchQuery = ref.watch(authorFilterProvider).trim().isNotEmpty;
     final AppThemeTokens tokens = context.tokens;
 
     return authorsAsync.when(
@@ -41,7 +41,9 @@ class AuthorManagementSliverGroup extends ConsumerWidget {
           return _padListSliver(
             tokens,
             SliverToBoxAdapter(
-              child: _alignedListChild(const _AuthorManagementEmptyState()),
+              child: _alignedListChild(
+                _AuthorManagementEmptyState(hasSearchQuery: hasSearchQuery),
+              ),
             ),
           );
         }
@@ -123,7 +125,7 @@ class _AuthorStyles {
   );
 }
 
-class _AuthorListCardContent extends ConsumerWidget {
+class _AuthorListCardContent extends StatelessWidget {
   const _AuthorListCardContent({
     required this.layoutTier,
     required this.authors,
@@ -133,7 +135,7 @@ class _AuthorListCardContent extends ConsumerWidget {
   final List<Author> authors;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     return MetadataPanelListCard(
       radius: _AuthorStyles.listRadius,
@@ -146,21 +148,7 @@ class _AuthorListCardContent extends ConsumerWidget {
           ),
           for (int i = 0; i < authors.length; i++) ...<Widget>[
             if (i > 0) Divider(height: 1, color: cs.hentai.borderSubtle),
-            Consumer(
-              builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                final Author author = authors[i];
-                final bool isSelected = ref.watch(
-                  authorSelectionProvider.select(
-                    (Set<Author> selected) => selected.contains(author),
-                  ),
-                );
-                return _AuthorRow(
-                  layoutTier: layoutTier,
-                  author: author,
-                  isSelected: isSelected,
-                );
-              },
-            ),
+            _AuthorRow(layoutTier: layoutTier, author: authors[i]),
           ],
         ],
       ),
@@ -168,7 +156,7 @@ class _AuthorListCardContent extends ConsumerWidget {
   }
 }
 
-class _AuthorListHeader extends ConsumerWidget {
+class _AuthorListHeader extends StatelessWidget {
   const _AuthorListHeader({
     required this.layoutTier,
     required this.totalCount,
@@ -178,12 +166,9 @@ class _AuthorListHeader extends ConsumerWidget {
   final int totalCount;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final l10n = context.l10n;
-    final int selectionCount = ref.watch(
-      authorSelectionProvider.select((Set<Author> s) => s.length),
-    );
     final bool showTotalCount = metadataListHeaderShowsTotalCount(layoutTier);
     return Container(
       padding: _AuthorStyles.listHeaderPadding,
@@ -217,17 +202,6 @@ class _AuthorListHeader extends ConsumerWidget {
               ),
             ),
           ],
-          if (selectionCount > 0) ...[
-            const SizedBox(width: 12),
-            Text(
-              l10n.metadataSelectedCount(selectionCount),
-              style: TextStyle(
-                fontSize: _AuthorStyles.listHeaderFontSize,
-                fontWeight: FontWeight.w600,
-                color: cs.primary,
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -238,103 +212,76 @@ class _AuthorRow extends ConsumerWidget {
   const _AuthorRow({
     required this.layoutTier,
     required this.author,
-    required this.isSelected,
   });
 
   final MetadataLayoutTier layoutTier;
   final Author author;
-  final bool isSelected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+    final ColorScheme cs = Theme.of(context).colorScheme;
     final l10n = context.l10n;
 
-    return MetadataPanelRowInteractionShell(
-      hoverColor: cs.primary.withAlpha(10),
-      materialColor: cs.surface,
-      child: InkWell(
-        onTap: () => ref.read(authorSelectionProvider.notifier).toggle(author),
-        child: Padding(
-          padding: _AuthorStyles.rowPadding,
-          child: Row(
-            spacing: 12,
-            children: [
-              GhostButton.icon(
-                icon: isSelected
-                    ? LucideIcons.squareCheckBig
-                    : LucideIcons.square,
-                iconSize: 16,
-                size: _AuthorStyles.iconButtonSize.width,
-                tooltip: isSelected ? l10n.metadataDeselect : l10n.metadataSelect,
-                foregroundColor: isSelected
-                    ? cs.primary
-                    : cs.hentai.textTertiary,
-                hoverColor: theme.colorScheme.primary.withAlpha(10),
-                overlayColor: theme.colorScheme.primary.withAlpha(14),
-                borderRadius: 8,
-                delayTooltipThreeSeconds: true,
-                onPressed: () =>
-                    ref.read(authorSelectionProvider.notifier).toggle(author),
+    return Padding(
+      padding: _AuthorStyles.rowPadding,
+      child: Row(
+        spacing: 12,
+        children: [
+          Expanded(
+            child: Text(
+              author.name,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: cs.hentai.textPrimary,
               ),
-              Expanded(
-                child: Text(
-                  author.name,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: cs.hentai.textPrimary,
-                  ),
-                ),
-              ),
-              MetadataPanelRowActions(
-                layoutTier: layoutTier,
-                iconButtonRadius: _AuthorStyles.iconButtonRadius,
-                iconButtonSize: _AuthorStyles.iconButtonSize.width,
-                onRename: () async {
-                  await showDialog<void>(
-                    context: context,
-                    builder: (context) => TagNameEditorDialog(
-                      title: l10n.metadataRenameAuthor,
-                      labelText: l10n.metadataNewName,
-                      hintText: l10n.metadataRenameAuthorHint,
-                      initialValue: author.name,
-                      shouldCloseOnUnchanged: true,
-                      onSubmit: (value) async {
-                        await ref
-                            .read(authorActionsProvider)
-                            .renameAuthor(author, value);
-                      },
-                    ),
-                  );
-                },
-                onDelete: () async {
-                  final bool confirmed =
-                      await showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext dialogContext) =>
-                            const TagConfirmDeleteDialog(count: 1),
-                      ) ??
-                      false;
-                  if (!confirmed || !context.mounted) {
-                    return;
-                  }
-                  try {
-                    await ref.read(authorActionsProvider).deleteAuthor(author);
-                    if (context.mounted) {
-                      showSuccessToast(context, l10n.metadataAuthorDeletedToast);
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      showErrorToast(context, e);
-                    }
-                  }
-                },
-              ),
-            ],
+            ),
           ),
-        ),
+          MetadataPanelRowActions(
+            layoutTier: layoutTier,
+            iconButtonRadius: _AuthorStyles.iconButtonRadius,
+            iconButtonSize: _AuthorStyles.iconButtonSize.width,
+            onRename: () async {
+              await showDialog<void>(
+                context: context,
+                builder: (context) => TagNameEditorDialog(
+                  title: l10n.metadataRenameAuthor,
+                  labelText: l10n.metadataNewName,
+                  hintText: l10n.metadataRenameAuthorHint,
+                  initialValue: author.name,
+                  shouldCloseOnUnchanged: true,
+                  onSubmit: (value) async {
+                    await ref
+                        .read(authorActionsProvider)
+                        .renameAuthor(author, value);
+                  },
+                ),
+              );
+            },
+            onDelete: () async {
+              final bool confirmed =
+                  await showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext dialogContext) =>
+                        const TagConfirmDeleteDialog(count: 1),
+                  ) ??
+                  false;
+              if (!confirmed || !context.mounted) {
+                return;
+              }
+              try {
+                await ref.read(authorActionsProvider).deleteAuthor(author);
+                if (context.mounted) {
+                  showSuccessToast(context, l10n.metadataAuthorDeletedToast);
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  showErrorToast(context, e);
+                }
+              }
+            },
+          ),
+        ],
       ),
     );
   }
@@ -382,13 +329,21 @@ class _AuthorManagementErrorState extends StatelessWidget {
 }
 
 class _AuthorManagementEmptyState extends StatelessWidget {
-  const _AuthorManagementEmptyState();
+  const _AuthorManagementEmptyState({required this.hasSearchQuery});
+
+  final bool hasSearchQuery;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final l10n = context.l10n;
+    final String title = hasSearchQuery
+        ? l10n.metadataAuthorsNoMatchTitle
+        : l10n.metadataAuthorsEmptyTitle;
+    final String hint = hasSearchQuery
+        ? l10n.metadataSearchNoMatchHint
+        : l10n.metadataAuthorsEmptyHint;
     return StatusCardShell(
       padding: _AuthorStyles.statusEmptyPadding,
       borderRadius: _AuthorStyles.statusCardRadius,
@@ -398,7 +353,7 @@ class _AuthorManagementEmptyState extends StatelessWidget {
           Icon(LucideIcons.penLine, size: 32, color: cs.onSurfaceVariant),
           const SizedBox(height: 12),
           Text(
-            l10n.metadataAuthorsEmptyTitle,
+            title,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -407,7 +362,7 @@ class _AuthorManagementEmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            l10n.metadataAuthorsEmptyHint,
+            hint,
             style: TextStyle(
               fontSize: kMetadataPanelSubtitleFontSize,
               color: cs.hentai.textSecondary,

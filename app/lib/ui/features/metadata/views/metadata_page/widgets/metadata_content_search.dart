@@ -22,7 +22,7 @@ class MetadataContentSearch extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
-    final String hintText = context.l10n.metadataSearchHint(selectedTabIndex);
+    final String hintText = context.l10n.metadataSearchNameHint;
     final String query = switch (selectedTabIndex) {
       0 => ref.watch(authorFilterProvider),
       1 => ref.watch(tagFilterProvider),

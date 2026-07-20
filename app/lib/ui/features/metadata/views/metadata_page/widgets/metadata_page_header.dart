@@ -166,8 +166,8 @@ class _MetadataActiveCountChip extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final int count = selectedTabIndex == 0
-        ? ref.watch(allAuthorsProvider).asData?.value.length ?? 0
-        : ref.watch(allTagsProvider).asData?.value.length ?? 0;
+        ? ref.watch(filteredAuthorsProvider).length
+        : ref.watch(filteredTagsProvider).length;
     return CountDigitChip(
       count: count,
       semanticLabel: l10n.metadataTotalCount(count),

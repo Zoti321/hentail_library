@@ -882,10 +882,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataAdd => '添加';
 
   @override
-  String get metadataSearchAuthorsHint => '搜索作者名称…';
-
-  @override
-  String get metadataSearchTagsHint => '搜索标签名称…';
+  String get metadataSearchNameHint => '搜索名称…';
 
   @override
   String get metadataRename => '重命名';
@@ -911,17 +908,6 @@ class AppLocalizationsZh extends AppLocalizations {
     );
     return '$_temp0';
   }
-
-  @override
-  String metadataSelectedCount(int count) {
-    return '已选 $count';
-  }
-
-  @override
-  String get metadataSelect => '选中';
-
-  @override
-  String get metadataDeselect => '取消选中';
 
   @override
   String get metadataRenameAuthor => '重命名作者';
@@ -964,6 +950,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get metadataTagsEmptyHint => '你可以从这里添加、重命名或删除标签。';
+
+  @override
+  String get metadataAuthorsNoMatchTitle => '未找到匹配的作者';
+
+  @override
+  String get metadataTagsNoMatchTitle => '未找到匹配的标签';
+
+  @override
+  String get metadataSearchNoMatchHint => '试试其他关键词，或清空搜索';
 
   @override
   String get commonCancel => '取消';

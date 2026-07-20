@@ -11,7 +11,6 @@ import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_d
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_shell.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_row_actions.dart';
-import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -33,6 +32,7 @@ class TagManagementSliverGroup extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tagsAsync = ref.watch(allTagsProvider);
     final List<Tag> filteredTags = ref.watch(filteredTagsProvider);
+    final bool hasSearchQuery = ref.watch(tagFilterProvider).trim().isNotEmpty;
     final AppThemeTokens tokens = context.tokens;
 
     return tagsAsync.when(
@@ -41,7 +41,9 @@ class TagManagementSliverGroup extends ConsumerWidget {
           return _padListSliver(
             tokens,
             SliverToBoxAdapter(
-              child: _alignedListChild(const _TagManagementEmptyState()),
+              child: _alignedListChild(
+                _TagManagementEmptyState(hasSearchQuery: hasSearchQuery),
+              ),
             ),
           );
         }
@@ -120,14 +122,14 @@ class _TagStyles {
   );
 }
 
-class _TagListCardContent extends ConsumerWidget {
+class _TagListCardContent extends StatelessWidget {
   const _TagListCardContent({required this.layoutTier, required this.tags});
 
   final MetadataLayoutTier layoutTier;
   final List<Tag> tags;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     return MetadataPanelListCard(
       radius: _TagStyles.listRadius,
@@ -140,21 +142,7 @@ class _TagListCardContent extends ConsumerWidget {
           ),
           for (int i = 0; i < tags.length; i++) ...<Widget>[
             if (i > 0) Divider(height: 1, color: cs.hentai.borderSubtle),
-            Consumer(
-              builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                final Tag tag = tags[i];
-                final bool isSelected = ref.watch(
-                  tagSelectionProvider.select(
-                    (Set<Tag> selected) => selected.contains(tag),
-                  ),
-                );
-                return _TagRow(
-                  layoutTier: layoutTier,
-                  tag: tag,
-                  isSelected: isSelected,
-                );
-              },
-            ),
+            _TagRow(layoutTier: layoutTier, tag: tags[i]),
           ],
         ],
       ),
@@ -162,7 +150,7 @@ class _TagListCardContent extends ConsumerWidget {
   }
 }
 
-class _TagListHeader extends ConsumerWidget {
+class _TagListHeader extends StatelessWidget {
   const _TagListHeader({
     required this.layoutTier,
     required this.totalCount,
@@ -172,12 +160,9 @@ class _TagListHeader extends ConsumerWidget {
   final int totalCount;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final l10n = context.l10n;
-    final int selectionCount = ref.watch(
-      tagSelectionProvider.select((Set<Tag> s) => s.length),
-    );
     final bool showTotalCount = metadataListHeaderShowsTotalCount(layoutTier);
     return Container(
       padding: _TagStyles.listHeaderPadding,
@@ -211,17 +196,6 @@ class _TagListHeader extends ConsumerWidget {
               ),
             ),
           ],
-          if (selectionCount > 0) ...[
-            const SizedBox(width: 12),
-            Text(
-              l10n.metadataSelectedCount(selectionCount),
-              style: TextStyle(
-                fontSize: _TagStyles.listHeaderFontSize,
-                fontWeight: FontWeight.w600,
-                color: cs.primary,
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -232,103 +206,74 @@ class _TagRow extends ConsumerWidget {
   const _TagRow({
     required this.layoutTier,
     required this.tag,
-    required this.isSelected,
   });
 
   final MetadataLayoutTier layoutTier;
   final Tag tag;
-  final bool isSelected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+    final ColorScheme cs = Theme.of(context).colorScheme;
     final l10n = context.l10n;
 
-    return MetadataPanelRowInteractionShell(
-      hoverColor: cs.primary.withAlpha(10),
-      materialColor: cs.surface,
-      child: InkWell(
-        onTap: () => ref.read(tagSelectionProvider.notifier).toggle(tag),
-        child: Padding(
-          padding: _TagStyles.rowPadding,
-          child: Row(
-            spacing: 12,
-            children: [
-              GhostButton.icon(
-                icon: isSelected
-                    ? LucideIcons.squareCheckBig
-                    : LucideIcons.square,
-                iconSize: 16,
-                size: _TagStyles.iconButtonSize.width,
-                tooltip: isSelected ? l10n.metadataDeselect : l10n.metadataSelect,
-                foregroundColor: isSelected
-                    ? cs.primary
-                    : cs.hentai.textTertiary,
-                hoverColor: theme.colorScheme.primary.withAlpha(10),
-                overlayColor: theme.colorScheme.primary.withAlpha(14),
-                borderRadius: 8,
-                delayTooltipThreeSeconds: true,
-                onPressed: () =>
-                    ref.read(tagSelectionProvider.notifier).toggle(tag),
+    return Padding(
+      padding: _TagStyles.rowPadding,
+      child: Row(
+        spacing: 12,
+        children: [
+          Expanded(
+            child: Text(
+              tag.name,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: cs.hentai.textPrimary,
               ),
-              Expanded(
-                child: Text(
-                  tag.name,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: cs.hentai.textPrimary,
-                  ),
-                ),
-              ),
-              MetadataPanelRowActions(
-                layoutTier: layoutTier,
-                iconButtonRadius: _TagStyles.iconButtonRadius,
-                iconButtonSize: _TagStyles.iconButtonSize.width,
-                onRename: () async {
-                  await showDialog<void>(
-                    context: context,
-                    builder: (context) => TagNameEditorDialog(
-                      title: l10n.metadataRenameTag,
-                      labelText: l10n.metadataNewName,
-                      hintText: l10n.metadataRenameTagHint,
-                      initialValue: tag.name,
-                      shouldCloseOnUnchanged: true,
-                      onSubmit: (value) async {
-                        await ref
-                            .read(tagActionsProvider)
-                            .renameTag(tag, value);
-                      },
-                    ),
-                  );
-                },
-                onDelete: () async {
-                  final bool confirmed =
-                      await showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext dialogContext) =>
-                            const TagConfirmDeleteDialog(count: 1),
-                      ) ??
-                      false;
-                  if (!confirmed || !context.mounted) {
-                    return;
-                  }
-                  try {
-                    await ref.read(tagActionsProvider).deleteTag(tag);
-                    if (context.mounted) {
-                      showSuccessToast(context, l10n.metadataTagDeletedToast);
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      showErrorToast(context, e);
-                    }
-                  }
-                },
-              ),
-            ],
+            ),
           ),
-        ),
+          MetadataPanelRowActions(
+            layoutTier: layoutTier,
+            iconButtonRadius: _TagStyles.iconButtonRadius,
+            iconButtonSize: _TagStyles.iconButtonSize.width,
+            onRename: () async {
+              await showDialog<void>(
+                context: context,
+                builder: (context) => TagNameEditorDialog(
+                  title: l10n.metadataRenameTag,
+                  labelText: l10n.metadataNewName,
+                  hintText: l10n.metadataRenameTagHint,
+                  initialValue: tag.name,
+                  shouldCloseOnUnchanged: true,
+                  onSubmit: (value) async {
+                    await ref.read(tagActionsProvider).renameTag(tag, value);
+                  },
+                ),
+              );
+            },
+            onDelete: () async {
+              final bool confirmed =
+                  await showDialog<bool>(
+                    context: context,
+                    builder: (BuildContext dialogContext) =>
+                        const TagConfirmDeleteDialog(count: 1),
+                  ) ??
+                  false;
+              if (!confirmed || !context.mounted) {
+                return;
+              }
+              try {
+                await ref.read(tagActionsProvider).deleteTag(tag);
+                if (context.mounted) {
+                  showSuccessToast(context, l10n.metadataTagDeletedToast);
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  showErrorToast(context, e);
+                }
+              }
+            },
+          ),
+        ],
       ),
     );
   }
@@ -376,13 +321,21 @@ class _TagManagementErrorState extends StatelessWidget {
 }
 
 class _TagManagementEmptyState extends StatelessWidget {
-  const _TagManagementEmptyState();
+  const _TagManagementEmptyState({required this.hasSearchQuery});
+
+  final bool hasSearchQuery;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final l10n = context.l10n;
+    final String title = hasSearchQuery
+        ? l10n.metadataTagsNoMatchTitle
+        : l10n.metadataTagsEmptyTitle;
+    final String hint = hasSearchQuery
+        ? l10n.metadataSearchNoMatchHint
+        : l10n.metadataTagsEmptyHint;
     return StatusCardShell(
       padding: _TagStyles.statusEmptyPadding,
       borderRadius: _TagStyles.statusCardRadius,
@@ -392,7 +345,7 @@ class _TagManagementEmptyState extends StatelessWidget {
           Icon(LucideIcons.tags, size: 32, color: cs.onSurfaceVariant),
           const SizedBox(height: 12),
           Text(
-            l10n.metadataTagsEmptyTitle,
+            title,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -401,7 +354,7 @@ class _TagManagementEmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            l10n.metadataTagsEmptyHint,
+            hint,
             style: TextStyle(
               fontSize: kMetadataPanelSubtitleFontSize,
               color: cs.hentai.textSecondary,

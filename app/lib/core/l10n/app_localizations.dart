@@ -1640,17 +1640,11 @@ abstract class AppLocalizations {
   /// **'添加'**
   String get metadataAdd;
 
-  /// No description provided for @metadataSearchAuthorsHint.
+  /// No description provided for @metadataSearchNameHint.
   ///
   /// In zh, this message translates to:
-  /// **'搜索作者名称…'**
-  String get metadataSearchAuthorsHint;
-
-  /// No description provided for @metadataSearchTagsHint.
-  ///
-  /// In zh, this message translates to:
-  /// **'搜索标签名称…'**
-  String get metadataSearchTagsHint;
+  /// **'搜索名称…'**
+  String get metadataSearchNameHint;
 
   /// No description provided for @metadataRename.
   ///
@@ -1687,24 +1681,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'{count, plural, other{共 {count} 条}}'**
   String metadataTotalCount(int count);
-
-  /// No description provided for @metadataSelectedCount.
-  ///
-  /// In zh, this message translates to:
-  /// **'已选 {count}'**
-  String metadataSelectedCount(int count);
-
-  /// No description provided for @metadataSelect.
-  ///
-  /// In zh, this message translates to:
-  /// **'选中'**
-  String get metadataSelect;
-
-  /// No description provided for @metadataDeselect.
-  ///
-  /// In zh, this message translates to:
-  /// **'取消选中'**
-  String get metadataDeselect;
 
   /// No description provided for @metadataRenameAuthor.
   ///
@@ -1789,6 +1765,24 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'你可以从这里添加、重命名或删除标签。'**
   String get metadataTagsEmptyHint;
+
+  /// No description provided for @metadataAuthorsNoMatchTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到匹配的作者'**
+  String get metadataAuthorsNoMatchTitle;
+
+  /// No description provided for @metadataTagsNoMatchTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到匹配的标签'**
+  String get metadataTagsNoMatchTitle;
+
+  /// No description provided for @metadataSearchNoMatchHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'试试其他关键词，或清空搜索'**
+  String get metadataSearchNoMatchHint;
 
   /// No description provided for @commonCancel.
   ///

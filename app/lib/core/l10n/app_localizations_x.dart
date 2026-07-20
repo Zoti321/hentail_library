@@ -450,22 +450,6 @@ extension AppLocalizationsLabelsX on AppLocalizations {
 
 
 
-  String metadataSearchHint(int tabIndex) {
-
-    return switch (tabIndex) {
-
-      0 => metadataSearchAuthorsHint,
-
-      1 => metadataSearchTagsHint,
-
-      _ => librarySearchHint,
-
-    };
-
-  }
-
-
-
   String contentRatingLabel(ContentRating rating) {
 
     return switch (rating) {

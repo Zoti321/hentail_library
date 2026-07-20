@@ -450,8 +450,7 @@
   "metadataAddAuthor": "Add author",
   "metadataAddTag": "Add tag",
   "metadataAdd": "Add",
-  "metadataSearchAuthorsHint": "Search authors…",
-  "metadataSearchTagsHint": "Search tags…",
+  "metadataSearchNameHint": "Search by name…",
   "metadataRename": "Rename",
   "metadataDelete": "Delete",
   "metadataMoreActions": "More actions",
@@ -465,16 +464,6 @@
       }
     }
   },
-  "metadataSelectedCount": "{count, plural, one{1 selected} other{{count} selected}}",
-  "@metadataSelectedCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "metadataSelect": "Select",
-  "metadataDeselect": "Deselect",
   "metadataRenameAuthor": "Rename author",
   "metadataRenameTag": "Rename tag",
   "metadataNewName": "New name",
@@ -489,6 +478,9 @@
   "metadataAuthorsEmptyHint": "Add, rename, or delete authors here.",
   "metadataTagsEmptyTitle": "No tags yet",
   "metadataTagsEmptyHint": "Add, rename, or delete tags here.",
+  "metadataAuthorsNoMatchTitle": "No matching authors",
+  "metadataTagsNoMatchTitle": "No matching tags",
+  "metadataSearchNoMatchHint": "Try another keyword, or clear the search",
   "commonCancel": "Cancel",
   "commonSave": "Save",
   "commonSaveChanges": "Save changes",
