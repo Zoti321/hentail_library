@@ -201,6 +201,7 @@
   "librarySortSection": "Sort",
   "libraryAgeRestrictionFilter": "Age restriction",
   "libraryMediaTypeFilter": "Media type",
+  "librarySerializationStatusFilter": "Serialization status",
   "libraryTagFilter": "Tags",
   "libraryAuthorFilter": "Authors",
   "libraryMetadataFilterClear": "Clear",

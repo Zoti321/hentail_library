@@ -12,6 +12,8 @@ import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 
+import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
+
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 
 import 'package:hentai_library/domain/models/app_setting.dart';
@@ -171,6 +173,18 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       LibraryMediaTypeFilterOption.epub => filterMediaTypeEpub,
 
       LibraryMediaTypeFilterOption.archive => filterMediaTypeArchive,
+    };
+  }
+
+  String librarySerializationStatusFilterLabel(
+    LibrarySerializationStatusFilter option,
+  ) {
+    return switch (option) {
+      LibrarySerializationStatusFilter.unrestricted => filterAgeUnrestricted,
+      LibrarySerializationStatusFilter.ongoing => serializationStatusOngoing,
+      LibrarySerializationStatusFilter.ended => serializationStatusEnded,
+      LibrarySerializationStatusFilter.hiatus => serializationStatusHiatus,
+      LibrarySerializationStatusFilter.unknown => serializationStatusUnknown,
     };
   }
 

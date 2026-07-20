@@ -3445,13 +3445,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SeriesFilterDto dco_decode_series_filter_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return SeriesFilterDto(
       showR18: dco_decode_bool(arr[0]),
       r18Only: dco_decode_bool(arr[1]),
       query: dco_decode_opt_String(arr[2]),
       requireItems: dco_decode_bool(arr[3]),
+      serializationStatus: dco_decode_opt_String(arr[4]),
     );
   }
 
@@ -4516,11 +4517,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_r18Only = sse_decode_bool(deserializer);
     var var_query = sse_decode_opt_String(deserializer);
     var var_requireItems = sse_decode_bool(deserializer);
+    var var_serializationStatus = sse_decode_opt_String(deserializer);
     return SeriesFilterDto(
       showR18: var_showR18,
       r18Only: var_r18Only,
       query: var_query,
       requireItems: var_requireItems,
+      serializationStatus: var_serializationStatus,
     );
   }
 
@@ -5649,6 +5652,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.r18Only, serializer);
     sse_encode_opt_String(self.query, serializer);
     sse_encode_bool(self.requireItems, serializer);
+    sse_encode_opt_String(self.serializationStatus, serializer);
   }
 
   @protected

@@ -3,11 +3,13 @@ import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
+import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_author_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_media_type_filter_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_serialization_status_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tag_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_sort_notifier.dart';
@@ -103,6 +105,19 @@ LibrarySeriesSortOption librarySeriesTabSortOption(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
+LibrarySerializationStatusFilter librarySeriesTabSerializationStatusFilter(
+  Ref ref,
+) {
+  final AsyncValue<LibrarySerializationStatusFilter> settingsAsync = ref.watch(
+    librarySerializationStatusFilterProvider,
+  );
+  return settingsAsync.maybeWhen(
+    data: (LibrarySerializationStatusFilter filter) => filter,
+    orElse: () => LibrarySerializationStatusFilter.unrestricted,
+  );
+}
+
+@Riverpod(keepAlive: true)
 LibraryMediaTypeFilterSelection libraryComicsTabMediaTypeFilter(Ref ref) {
   final AsyncValue<LibraryMediaTypeFilterSelection> selectionAsync = ref.watch(
     libraryMediaTypeFilterProvider,
@@ -153,6 +168,9 @@ bool libraryActiveFilterSortIsCustomized(Ref ref) {
   final LibraryMetadataFilterSelection authorFilter = ref.watch(
     libraryComicsTabAuthorFilterProvider,
   );
+  final LibrarySerializationStatusFilter serializationStatusFilter = ref.watch(
+    librarySeriesTabSerializationStatusFilterProvider,
+  );
   final LibraryTabAgeRestrictionSettings ageSettings = ageAsync.maybeWhen(
     data: (LibraryTabAgeRestrictionSettings settings) => settings,
     orElse: () => kDefaultLibraryTabAgeRestrictionSettings,
@@ -167,6 +185,7 @@ bool libraryActiveFilterSortIsCustomized(Ref ref) {
     mediaTypeFilter: mediaTypeFilter,
     tagFilter: tagFilter,
     authorFilter: authorFilter,
+    serializationStatusFilter: serializationStatusFilter,
     sortSettings: sortSettings,
   );
 }

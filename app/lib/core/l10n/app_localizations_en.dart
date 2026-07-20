@@ -482,6 +482,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryMediaTypeFilter => 'Media type';
 
   @override
+  String get librarySerializationStatusFilter => 'Serialization status';
+
+  @override
   String get libraryTagFilter => 'Tags';
 
   @override

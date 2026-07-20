@@ -109,4 +109,8 @@ class LibraryTabSortNotifier extends _$LibraryTabSortNotifier {
   Future<void> resetComicsSortToDefault() async {
     await _updateComicSort(kLibraryDefaultSortOption);
   }
+
+  Future<void> resetSeriesSortToDefault() async {
+    await _updateSeriesSort(kLibraryDefaultSeriesSortOption);
+  }
 }

@@ -6,6 +6,7 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_filter_reset_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_filter_reset_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_controls.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_metadata_filter_section.dart';
@@ -62,12 +63,24 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    if (isCustomized &&
-                        displayTarget == LibraryDisplayTarget.comics)
+                    if (isCustomized)
                       TextButton(
-                        onPressed: () => ref
-                            .read(libraryComicsFilterResetProvider.notifier)
-                            .resetAll(),
+                        onPressed: () {
+                          switch (displayTarget) {
+                            case LibraryDisplayTarget.comics:
+                              ref
+                                  .read(
+                                    libraryComicsFilterResetProvider.notifier,
+                                  )
+                                  .resetAll();
+                            case LibraryDisplayTarget.series:
+                              ref
+                                  .read(
+                                    librarySeriesFilterResetProvider.notifier,
+                                  )
+                                  .resetAll();
+                          }
+                        },
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           minimumSize: Size.zero,
@@ -84,6 +97,7 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
               SizedBox(height: tokens.spacing.sm),
               const LibraryFilterControls(),
               const LibraryMediaTypeFilterControls(),
+              const LibrarySerializationStatusFilterControls(),
               const LibraryTagFilterControls(),
               const LibraryAuthorFilterControls(),
               SizedBox(height: tokens.spacing.lg),

@@ -884,6 +884,12 @@ abstract class AppLocalizations {
   /// **'媒体类型'**
   String get libraryMediaTypeFilter;
 
+  /// No description provided for @librarySerializationStatusFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'连载状态'**
+  String get librarySerializationStatusFilter;
+
   /// No description provided for @libraryTagFilter.
   ///
   /// In zh, this message translates to:

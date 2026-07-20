@@ -6,6 +6,8 @@ pub struct SeriesFilterDto {
     pub r18_only: bool,
     pub query: Option<String>,
     pub require_items: bool,
+    /// `None` = 不限；`Some` = 精确匹配 `series.serialization_status`。
+    pub serialization_status: Option<String>,
 }
 
 impl Default for SeriesFilterDto {
@@ -15,6 +17,7 @@ impl Default for SeriesFilterDto {
             r18_only: false,
             query: None,
             require_items: true,
+            serialization_status: None,
         }
     }
 }
@@ -26,8 +29,13 @@ impl SeriesFilterDto {
             r18_only: self.r18_only,
             query: normalize_query(self.query),
             require_items: self.require_items,
+            serialization_status: normalize_serialization_status(self.serialization_status),
         }
     }
+}
+
+fn normalize_serialization_status(raw: Option<String>) -> Option<String> {
+    raw.map(|s| s.trim().to_string()).filter(|s| !s.is_empty())
 }
 
 fn normalize_query(raw: Option<String>) -> Option<String> {

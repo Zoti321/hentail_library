@@ -466,6 +466,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryMediaTypeFilter => '媒体类型';
 
   @override
+  String get librarySerializationStatusFilter => '连载状态';
+
+  @override
   String get libraryTagFilter => '标签';
 
   @override

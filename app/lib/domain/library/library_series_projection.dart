@@ -1,4 +1,5 @@
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
 
 /// 库页系列列表投影：intent 与年龄限制 → [LibrarySeriesFilter]。
 class LibrarySeriesFilter {
@@ -7,12 +8,14 @@ class LibrarySeriesFilter {
     required this.r18Only,
     this.query,
     this.requireItems = true,
+    this.serializationStatus,
   });
 
   final bool showR18;
   final bool r18Only;
   final String? query;
   final bool requireItems;
+  final String? serializationStatus;
 }
 
 class LibrarySeriesProjection {
@@ -20,6 +23,8 @@ class LibrarySeriesProjection {
 
   LibrarySeriesFilter buildListFilter({
     required LibraryAgeRestrictionFilter ageRestriction,
+    LibrarySerializationStatusFilter serializationStatusFilter =
+        LibrarySerializationStatusFilter.unrestricted,
     String? keyword,
   }) {
     final String? query = keyword?.trim().isEmpty ?? true
@@ -32,6 +37,7 @@ class LibrarySeriesProjection {
       r18Only: flags.r18Only,
       query: query,
       requireItems: true,
+      serializationStatus: serializationStatusFilter.seriesSerializationStatus(),
     );
   }
 }

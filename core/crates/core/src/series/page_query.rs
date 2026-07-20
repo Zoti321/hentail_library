@@ -87,6 +87,10 @@ fn build_where_clause(filter: &SeriesFilterDto, values: &mut Vec<Value>) -> Stri
         push_sqlite_text(values, format!("%{query}%"));
         push_sqlite_text(values, format!("%{query}%"));
     }
+    if let Some(status) = &filter.serialization_status {
+        parts.push("s.serialization_status = ?".to_string());
+        push_sqlite_text(values, status.clone());
+    }
     parts.join(" AND ")
 }
 

@@ -2,6 +2,7 @@ import 'package:hentai_library/domain/library/library_age_restriction_filter.dar
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
+import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
 import 'package:hentai_library/domain/library/library_tri_state_pick.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
@@ -71,6 +72,31 @@ void main() {
     });
   });
 
+  group('isLibrarySeriesFilterSortCustomized', () {
+    test('default settings are not customized', () {
+      expect(
+        isLibrarySeriesFilterSortCustomized(
+          ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
+          serializationStatusFilter:
+              LibrarySerializationStatusFilter.unrestricted,
+          sortOption: kLibraryDefaultSeriesSortOption,
+        ),
+        isFalse,
+      );
+    });
+
+    test('serialization status filter counts as customized', () {
+      expect(
+        isLibrarySeriesFilterSortCustomized(
+          ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
+          serializationStatusFilter: LibrarySerializationStatusFilter.ongoing,
+          sortOption: kLibraryDefaultSeriesSortOption,
+        ),
+        isTrue,
+      );
+    });
+  });
+
   group('isLibraryFilterSortCustomizedForTarget', () {
     test('series target ignores comics media type filter', () {
       expect(
@@ -82,9 +108,26 @@ void main() {
           }),
           tagFilter: _emptyTagFilter,
           authorFilter: _emptyAuthorFilter,
+          serializationStatusFilter:
+              LibrarySerializationStatusFilter.unrestricted,
           sortSettings: _defaultSortSettings,
         ),
         isFalse,
+      );
+    });
+
+    test('series target counts serialization status filter', () {
+      expect(
+        isLibraryFilterSortCustomizedForTarget(
+          target: LibraryDisplayTarget.series,
+          ageSettings: _defaultAgeSettings,
+          mediaTypeFilter: const LibraryMediaTypeFilterSelection(),
+          tagFilter: _emptyTagFilter,
+          authorFilter: _emptyAuthorFilter,
+          serializationStatusFilter: LibrarySerializationStatusFilter.ended,
+          sortSettings: _defaultSortSettings,
+        ),
+        isTrue,
       );
     });
   });
