@@ -5,6 +5,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/domain/library/library_tri_state_pick.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_sort_drawer.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_tri_state_filter_checkbox.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -108,53 +109,52 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
         ),
         if (expanded.value) ...<Widget>[
           Padding(
-            padding: const EdgeInsets.fromLTRB(
+            padding: EdgeInsets.fromLTRB(
               kLibraryFilterSortDrawerContentInset,
-              0,
-              kLibraryFilterSortDrawerContentInset,
-              8,
-            ),
-            child: _IncludeModeToggle(
-              mode: selection.includeMode,
-              onChanged: onIncludeModeChanged,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              kLibraryFilterSortDrawerContentInset,
-              0,
+              tokens.spacing.sm,
               kLibraryFilterSortDrawerContentInset,
               8,
             ),
-            child: TextField(
-              onChanged: (String value) => searchQuery.value = value,
-              style: TextStyle(fontSize: 13, color: cs.hentai.textPrimary),
-              decoration: InputDecoration(
-                isDense: true,
-                hintText: l10n.libraryMetadataFilterSearchHint,
-                hintStyle: TextStyle(color: cs.hentai.textTertiary),
-                prefixIcon: Icon(
-                  LucideIcons.search,
-                  size: 16,
-                  color: cs.hentai.iconSecondary,
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    onChanged: (String value) => searchQuery.value = value,
+                    style: TextStyle(fontSize: 13, color: cs.hentai.textPrimary),
+                    decoration: InputDecoration(
+                      isDense: true,
+                      hintText: l10n.libraryMetadataFilterSearchHint,
+                      hintStyle: TextStyle(color: cs.hentai.textTertiary),
+                      prefixIcon: Icon(
+                        LucideIcons.search,
+                        size: 16,
+                        color: cs.hentai.iconSecondary,
+                      ),
+                      prefixIconConstraints: const BoxConstraints(
+                        minWidth: 36,
+                        minHeight: 32,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 8,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: cs.outlineVariant),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: cs.outlineVariant),
+                      ),
+                    ),
+                  ),
                 ),
-                prefixIconConstraints: const BoxConstraints(
-                  minWidth: 36,
-                  minHeight: 32,
+                const SizedBox(width: 4),
+                _IncludeModeIconButton(
+                  mode: selection.includeMode,
+                  onChanged: onIncludeModeChanged,
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 8,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: cs.outlineVariant),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: cs.outlineVariant),
-                ),
-              ),
+              ],
             ),
           ),
           if (isLoading)
@@ -236,8 +236,8 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
   }
 }
 
-class _IncludeModeToggle extends StatelessWidget {
-  const _IncludeModeToggle({
+class _IncludeModeIconButton extends StatelessWidget {
+  const _IncludeModeIconButton({
     required this.mode,
     required this.onChanged,
   });
@@ -247,62 +247,27 @@ class _IncludeModeToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
     final AppLocalizations l10n = context.l10n;
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: _IncludeModeChip(
-            label: l10n.libraryMetadataFilterIncludeAny,
-            selected: mode == LibraryMetadataIncludeMode.any,
-            onTap: () => onChanged(LibraryMetadataIncludeMode.any),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: _IncludeModeChip(
-            label: l10n.libraryMetadataFilterIncludeAll,
-            selected: mode == LibraryMetadataIncludeMode.all,
-            onTap: () => onChanged(LibraryMetadataIncludeMode.all),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _IncludeModeChip extends StatelessWidget {
-  const _IncludeModeChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return Material(
-      color: selected ? cs.primary.withAlpha(20) : cs.surfaceContainerHighest,
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                color: selected ? cs.primary : cs.hentai.textSecondary,
-              ),
-            ),
-          ),
-        ),
+    final bool isAll = mode == LibraryMetadataIncludeMode.all;
+    final String label = isAll
+        ? l10n.libraryMetadataFilterIncludeAll
+        : l10n.libraryMetadataFilterIncludeAny;
+    return GhostButton.icon(
+      icon: isAll ? LucideIcons.circleCheck : LucideIcons.circleDashed,
+      tooltip: label,
+      semanticLabel: label,
+      iconSize: 16,
+      size: 32,
+      borderRadius: 8,
+      foregroundColor: isAll ? cs.primary : cs.hentai.iconSecondary,
+      hoverColor: theme.hoverColor,
+      overlayColor: theme.hoverColor,
+      onPressed: () => onChanged(
+        isAll
+            ? LibraryMetadataIncludeMode.any
+            : LibraryMetadataIncludeMode.all,
       ),
     );
   }
