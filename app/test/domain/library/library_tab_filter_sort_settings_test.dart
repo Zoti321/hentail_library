@@ -1,6 +1,8 @@
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
+import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
+import 'package:hentai_library/domain/library/library_tri_state_pick.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
 import 'package:test/test.dart';
@@ -9,6 +11,12 @@ const LibraryTabAgeRestrictionSettings _defaultAgeSettings = (
   comics: LibraryAgeRestrictionFilter.unrestricted,
   series: LibraryAgeRestrictionFilter.unrestricted,
 );
+
+const LibraryMetadataFilterSelection _emptyTagFilter =
+    LibraryMetadataFilterSelection();
+
+const LibraryMetadataFilterSelection _emptyAuthorFilter =
+    LibraryMetadataFilterSelection();
 
 final LibraryTabSortSettings _defaultSortSettings = (
   comics: kLibraryDefaultSortOption,
@@ -24,6 +32,25 @@ void main() {
           mediaTypeFilter: const LibraryMediaTypeFilterSelection({
             LibraryMediaTypeFilterOption.pdf,
           }),
+          tagFilter: _emptyTagFilter,
+          authorFilter: _emptyAuthorFilter,
+          sortOption: kLibraryDefaultSortOption,
+        ),
+        isTrue,
+      );
+    });
+
+    test('tag filter counts as customized', () {
+      expect(
+        isLibraryComicFilterSortCustomized(
+          ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
+          mediaTypeFilter: const LibraryMediaTypeFilterSelection(),
+          tagFilter: LibraryMetadataFilterSelection(
+            picks: <String, LibraryTriStatePick>{
+              '百合': LibraryTriStatePick.include,
+            },
+          ),
+          authorFilter: _emptyAuthorFilter,
           sortOption: kLibraryDefaultSortOption,
         ),
         isTrue,
@@ -35,6 +62,8 @@ void main() {
         isLibraryComicFilterSortCustomized(
           ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
           mediaTypeFilter: const LibraryMediaTypeFilterSelection(),
+          tagFilter: _emptyTagFilter,
+          authorFilter: _emptyAuthorFilter,
           sortOption: kLibraryDefaultSortOption,
         ),
         isFalse,
@@ -51,6 +80,8 @@ void main() {
           mediaTypeFilter: const LibraryMediaTypeFilterSelection({
             LibraryMediaTypeFilterOption.pdf,
           }),
+          tagFilter: _emptyTagFilter,
+          authorFilter: _emptyAuthorFilter,
           sortSettings: _defaultSortSettings,
         ),
         isFalse,

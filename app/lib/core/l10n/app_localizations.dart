@@ -884,6 +884,54 @@ abstract class AppLocalizations {
   /// **'媒体类型'**
   String get libraryMediaTypeFilter;
 
+  /// No description provided for @libraryTagFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'标签'**
+  String get libraryTagFilter;
+
+  /// No description provided for @libraryAuthorFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者'**
+  String get libraryAuthorFilter;
+
+  /// No description provided for @libraryMetadataFilterClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除'**
+  String get libraryMetadataFilterClear;
+
+  /// No description provided for @libraryMetadataFilterSearchHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索…'**
+  String get libraryMetadataFilterSearchHint;
+
+  /// No description provided for @libraryMetadataFilterEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'无匹配项'**
+  String get libraryMetadataFilterEmpty;
+
+  /// No description provided for @libraryMetadataFilterIncludeAny.
+  ///
+  /// In zh, this message translates to:
+  /// **'满足任一'**
+  String get libraryMetadataFilterIncludeAny;
+
+  /// No description provided for @libraryMetadataFilterIncludeAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'满足全部'**
+  String get libraryMetadataFilterIncludeAll;
+
+  /// No description provided for @libraryResetAllFilters.
+  ///
+  /// In zh, this message translates to:
+  /// **'重置全部'**
+  String get libraryResetAllFilters;
+
   /// No description provided for @libraryComingSoon.
   ///
   /// In zh, this message translates to:

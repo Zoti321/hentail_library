@@ -124,11 +124,33 @@ fn build_where_clause(filter: &ComicFilterDto, values: &mut Vec<Value>) -> Strin
             push_sqlite_text(values, tag.clone());
         }
     }
-    if filter.exclude_comics_in_any_series {
+    for author in &filter.authors_all {
         parts.push(
-            "NOT EXISTS (SELECT 1 FROM series_items si WHERE si.comic_id = c.comic_id)"
+            "EXISTS (SELECT 1 FROM comic_authors ca \
+             WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) = ?)"
                 .to_string(),
         );
+        push_sqlite_text(values, author.clone());
+    }
+    if !filter.authors_any.is_empty() {
+        let placeholders = placeholders(filter.authors_any.len());
+        parts.push(format!(
+            "EXISTS (SELECT 1 FROM comic_authors ca \
+             WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) IN ({placeholders}))"
+        ));
+        for author in &filter.authors_any {
+            push_sqlite_text(values, author.clone());
+        }
+    }
+    if !filter.authors_exclude.is_empty() {
+        let placeholders = placeholders(filter.authors_exclude.len());
+        parts.push(format!(
+            "NOT EXISTS (SELECT 1 FROM comic_authors ca \
+             WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) IN ({placeholders}))"
+        ));
+        for author in &filter.authors_exclude {
+            push_sqlite_text(values, author.clone());
+        }
     }
     parts.join(" AND ")
 }
@@ -190,5 +212,20 @@ mod tests {
             0,
         );
         assert!(sql.sql.contains("ORDER BY m.published_at ASC NULLS LAST"));
+    }
+
+    #[test]
+    fn authors_all_filter_joins_comic_authors() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto {
+                authors_all: vec!["artist a".to_string()],
+                ..Default::default()
+            },
+            &ComicSortOptionDto::default(),
+            10,
+            0,
+        );
+        assert!(sql.sql.contains("comic_authors ca"));
+        assert!(sql.sql.contains("lower(ca.author_name) = ?"));
     }
 }

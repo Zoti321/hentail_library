@@ -2980,7 +2980,9 @@ impl SseDecode for crate::api::comic::ComicFilterDto {
         let mut var_tagsAll = <Vec<String>>::sse_decode(deserializer);
         let mut var_tagsAny = <Vec<String>>::sse_decode(deserializer);
         let mut var_tagsExclude = <Vec<String>>::sse_decode(deserializer);
-        let mut var_excludeComicsInAnySeries = <bool>::sse_decode(deserializer);
+        let mut var_authorsAll = <Vec<String>>::sse_decode(deserializer);
+        let mut var_authorsAny = <Vec<String>>::sse_decode(deserializer);
+        let mut var_authorsExclude = <Vec<String>>::sse_decode(deserializer);
         return crate::api::comic::ComicFilterDto {
             show_r18: var_showR18,
             query: var_query,
@@ -2989,7 +2991,9 @@ impl SseDecode for crate::api::comic::ComicFilterDto {
             tags_all: var_tagsAll,
             tags_any: var_tagsAny,
             tags_exclude: var_tagsExclude,
-            exclude_comics_in_any_series: var_excludeComicsInAnySeries,
+            authors_all: var_authorsAll,
+            authors_any: var_authorsAny,
+            authors_exclude: var_authorsExclude,
         };
     }
 }
@@ -4168,9 +4172,9 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicFilterDto {
             self.tags_all.into_into_dart().into_dart(),
             self.tags_any.into_into_dart().into_dart(),
             self.tags_exclude.into_into_dart().into_dart(),
-            self.exclude_comics_in_any_series
-                .into_into_dart()
-                .into_dart(),
+            self.authors_all.into_into_dart().into_dart(),
+            self.authors_any.into_into_dart().into_dart(),
+            self.authors_exclude.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -5162,7 +5166,9 @@ impl SseEncode for crate::api::comic::ComicFilterDto {
         <Vec<String>>::sse_encode(self.tags_all, serializer);
         <Vec<String>>::sse_encode(self.tags_any, serializer);
         <Vec<String>>::sse_encode(self.tags_exclude, serializer);
-        <bool>::sse_encode(self.exclude_comics_in_any_series, serializer);
+        <Vec<String>>::sse_encode(self.authors_all, serializer);
+        <Vec<String>>::sse_encode(self.authors_any, serializer);
+        <Vec<String>>::sse_encode(self.authors_exclude, serializer);
     }
 }
 

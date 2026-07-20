@@ -466,6 +466,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryMediaTypeFilter => '媒体类型';
 
   @override
+  String get libraryTagFilter => '标签';
+
+  @override
+  String get libraryAuthorFilter => '作者';
+
+  @override
+  String get libraryMetadataFilterClear => '清除';
+
+  @override
+  String get libraryMetadataFilterSearchHint => '搜索…';
+
+  @override
+  String get libraryMetadataFilterEmpty => '无匹配项';
+
+  @override
+  String get libraryMetadataFilterIncludeAny => '满足任一';
+
+  @override
+  String get libraryMetadataFilterIncludeAll => '满足全部';
+
+  @override
+  String get libraryResetAllFilters => '重置全部';
+
+  @override
   String get libraryComingSoon => '即将推出';
 
   @override

@@ -13,7 +13,9 @@ pub struct ComicFilterDto {
     pub tags_all: Vec<String>,
     pub tags_any: Vec<String>,
     pub tags_exclude: Vec<String>,
-    pub exclude_comics_in_any_series: bool,
+    pub authors_all: Vec<String>,
+    pub authors_any: Vec<String>,
+    pub authors_exclude: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -95,7 +97,9 @@ impl From<ComicFilterDto> for hentai_core::ComicFilterDto {
             tags_all: value.tags_all,
             tags_any: value.tags_any,
             tags_exclude: value.tags_exclude,
-            exclude_comics_in_any_series: value.exclude_comics_in_any_series,
+            authors_all: value.authors_all,
+            authors_any: value.authors_any,
+            authors_exclude: value.authors_exclude,
         }
     }
 }

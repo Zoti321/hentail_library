@@ -1,6 +1,7 @@
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
+import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 
@@ -75,10 +76,14 @@ final LibraryComicSortOption kLibraryDefaultSortOption =
 bool isLibraryComicFilterSortCustomized({
   required LibraryAgeRestrictionFilter ageRestriction,
   required LibraryMediaTypeFilterSelection mediaTypeFilter,
+  required LibraryMetadataFilterSelection tagFilter,
+  required LibraryMetadataFilterSelection authorFilter,
   required LibraryComicSortOption sortOption,
 }) {
   return ageRestriction != LibraryAgeRestrictionFilter.unrestricted ||
       mediaTypeFilter.isActive ||
+      tagFilter.isActive ||
+      authorFilter.isActive ||
       sortOption.field != kLibraryDefaultSortOption.field ||
       sortOption.descending != kLibraryDefaultSortOption.descending;
 }
@@ -96,12 +101,16 @@ bool isLibraryFilterSortCustomizedForTarget({
   required LibraryDisplayTarget target,
   required LibraryTabAgeRestrictionSettings ageSettings,
   required LibraryMediaTypeFilterSelection mediaTypeFilter,
+  required LibraryMetadataFilterSelection tagFilter,
+  required LibraryMetadataFilterSelection authorFilter,
   required LibraryTabSortSettings sortSettings,
 }) {
   return switch (target) {
     LibraryDisplayTarget.comics => isLibraryComicFilterSortCustomized(
       ageRestriction: ageSettings.comics,
       mediaTypeFilter: mediaTypeFilter,
+      tagFilter: tagFilter,
+      authorFilter: authorFilter,
       sortOption: sortSettings.comics,
     ),
     LibraryDisplayTarget.series => isLibrarySeriesFilterSortCustomized(

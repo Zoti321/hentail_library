@@ -105,4 +105,8 @@ class LibraryTabSortNotifier extends _$LibraryTabSortNotifier {
     }
     ref.invalidate(librarySeriesCatalogControllerProvider);
   }
+
+  Future<void> resetComicsSortToDefault() async {
+    await _updateComicSort(kLibraryDefaultSortOption);
+  }
 }

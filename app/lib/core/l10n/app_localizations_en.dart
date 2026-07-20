@@ -482,6 +482,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryMediaTypeFilter => 'Media type';
 
   @override
+  String get libraryTagFilter => 'Tags';
+
+  @override
+  String get libraryAuthorFilter => 'Authors';
+
+  @override
+  String get libraryMetadataFilterClear => 'Clear';
+
+  @override
+  String get libraryMetadataFilterSearchHint => 'Search…';
+
+  @override
+  String get libraryMetadataFilterEmpty => 'No matches';
+
+  @override
+  String get libraryMetadataFilterIncludeAny => 'Match any';
+
+  @override
+  String get libraryMetadataFilterIncludeAll => 'Match all';
+
+  @override
+  String get libraryResetAllFilters => 'Reset all';
+
+  @override
   String get libraryComingSoon => 'Coming soon';
 
   @override

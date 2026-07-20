@@ -3014,8 +3014,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ComicFilterDto dco_decode_comic_filter_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 10)
+      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
     return ComicFilterDto(
       showR18: dco_decode_bool(arr[0]),
       query: dco_decode_opt_String(arr[1]),
@@ -3024,7 +3024,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       tagsAll: dco_decode_list_String(arr[4]),
       tagsAny: dco_decode_list_String(arr[5]),
       tagsExclude: dco_decode_list_String(arr[6]),
-      excludeComicsInAnySeries: dco_decode_bool(arr[7]),
+      authorsAll: dco_decode_list_String(arr[7]),
+      authorsAny: dco_decode_list_String(arr[8]),
+      authorsExclude: dco_decode_list_String(arr[9]),
     );
   }
 
@@ -3947,7 +3949,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_tagsAll = sse_decode_list_String(deserializer);
     var var_tagsAny = sse_decode_list_String(deserializer);
     var var_tagsExclude = sse_decode_list_String(deserializer);
-    var var_excludeComicsInAnySeries = sse_decode_bool(deserializer);
+    var var_authorsAll = sse_decode_list_String(deserializer);
+    var var_authorsAny = sse_decode_list_String(deserializer);
+    var var_authorsExclude = sse_decode_list_String(deserializer);
     return ComicFilterDto(
       showR18: var_showR18,
       query: var_query,
@@ -3956,7 +3960,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       tagsAll: var_tagsAll,
       tagsAny: var_tagsAny,
       tagsExclude: var_tagsExclude,
-      excludeComicsInAnySeries: var_excludeComicsInAnySeries,
+      authorsAll: var_authorsAll,
+      authorsAny: var_authorsAny,
+      authorsExclude: var_authorsExclude,
     );
   }
 
@@ -5142,7 +5148,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_String(self.tagsAll, serializer);
     sse_encode_list_String(self.tagsAny, serializer);
     sse_encode_list_String(self.tagsExclude, serializer);
-    sse_encode_bool(self.excludeComicsInAnySeries, serializer);
+    sse_encode_list_String(self.authorsAll, serializer);
+    sse_encode_list_String(self.authorsAny, serializer);
+    sse_encode_list_String(self.authorsExclude, serializer);
   }
 
   @protected

@@ -9,7 +9,9 @@ pub struct ComicFilterDto {
     pub tags_all: Vec<String>,
     pub tags_any: Vec<String>,
     pub tags_exclude: Vec<String>,
-    pub exclude_comics_in_any_series: bool,
+    pub authors_all: Vec<String>,
+    pub authors_any: Vec<String>,
+    pub authors_exclude: Vec<String>,
 }
 
 impl Default for ComicFilterDto {
@@ -22,7 +24,9 @@ impl Default for ComicFilterDto {
             tags_all: vec![],
             tags_any: vec![],
             tags_exclude: vec![],
-            exclude_comics_in_any_series: false,
+            authors_all: vec![],
+            authors_any: vec![],
+            authors_exclude: vec![],
         }
     }
 }
@@ -37,7 +41,9 @@ impl ComicFilterDto {
             tags_all: normalize_tags(self.tags_all),
             tags_any: normalize_tags(self.tags_any),
             tags_exclude: normalize_tags(self.tags_exclude),
-            exclude_comics_in_any_series: self.exclude_comics_in_any_series,
+            authors_all: normalize_tags(self.authors_all),
+            authors_any: normalize_tags(self.authors_any),
+            authors_exclude: normalize_tags(self.authors_exclude),
         }
     }
 }

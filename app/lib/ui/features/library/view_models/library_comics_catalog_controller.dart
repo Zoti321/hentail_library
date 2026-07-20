@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/library/comic_list_query.dart';
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
+import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/ui/features/library/view_models/catalog_pagination_engine.dart';
@@ -41,6 +42,8 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
       keyword,
       ref.watch(libraryComicsTabAgeRestrictionFilterProvider),
       ref.watch(libraryComicsTabMediaTypeFilterProvider),
+      ref.watch(libraryComicsTabTagFilterProvider),
+      ref.watch(libraryComicsTabAuthorFilterProvider),
       ref.watch(libraryComicsTabSortOptionProvider),
       ref.watch(libraryComicsTabPageSizeProvider),
     ));
@@ -86,12 +89,20 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     final LibraryMediaTypeFilterSelection mediaTypeFilter = ref.read(
       libraryComicsTabMediaTypeFilterProvider,
     );
+    final LibraryMetadataFilterSelection tagFilter = ref.read(
+      libraryComicsTabTagFilterProvider,
+    );
+    final LibraryMetadataFilterSelection authorFilter = ref.read(
+      libraryComicsTabAuthorFilterProvider,
+    );
     final LibraryComicSortOption sortOption = ref.read(
       libraryComicsTabSortOptionProvider,
     );
     final LibraryComicFilter filter = _libraryComicProjection.buildListFilter(
       ageRestriction: ageRestriction,
       mediaTypeFilter: mediaTypeFilter,
+      tagFilter: tagFilter,
+      authorFilter: authorFilter,
       keyword: keyword,
     );
     final int pageSize = ref.read(libraryComicsTabPageSizeProvider);
