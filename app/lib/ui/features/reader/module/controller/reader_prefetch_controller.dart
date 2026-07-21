@@ -24,6 +24,8 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
   }
 
   void clearComic(String comicId) {
+    // Invalidate Flutter-side prefetch generation before disk clear.
+    bumpGeneration(comicId);
     if (state.containsKey(comicId)) {
       state = Map<String, int>.from(state)..remove(comicId);
     }
