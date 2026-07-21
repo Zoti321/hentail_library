@@ -260,14 +260,19 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
         );
       },
     );
-    if (useOriginalSize) {
-      return pageList;
-    }
-    return Center(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: slotLogicalWidth),
-        child: pageList,
-      ),
+    final Widget viewport = useOriginalSize
+        ? pageList
+        : Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: slotLogicalWidth),
+              child: pageList,
+            ),
+          );
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(
+        context,
+      ).copyWith(scrollbars: false),
+      child: viewport,
     );
   }
 }
