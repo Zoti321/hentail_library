@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/layout/detail_meta_chip_row_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/foundation/horizontal_wheel_scroll_listener.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/r18_rating_chip.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
@@ -203,7 +205,7 @@ String formatComicResourceSize(int bytes) {
   return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
 }
 
-class LabeledMetaChipRow extends StatelessWidget {
+class LabeledMetaChipRow extends HookWidget {
   const LabeledMetaChipRow({
     super.key,
     required this.label,
@@ -217,6 +219,7 @@ class LabeledMetaChipRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final ScrollController scrollController = useScrollController();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -233,24 +236,28 @@ class LabeledMetaChipRow extends StatelessWidget {
         ),
         SizedBox(width: tokens.spacing.lg),
         Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              spacing: tokens.spacing.sm,
-              children: items
-                  .map(
-                    (String item) => OutlinedMetaChip(
-                      text: item,
-                      onTap: () {
-                        final String query = formatLibrarySearchExactMetaQuery(
-                          item,
-                        );
-                        final String encoded = Uri.encodeQueryComponent(query);
-                        appRouter.push('/searched?q=$encoded');
-                      },
-                    ),
-                  )
-                  .toList(),
+          child: HorizontalWheelScrollListener(
+            controller: scrollController,
+            child: SingleChildScrollView(
+              controller: scrollController,
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                spacing: tokens.spacing.sm,
+                children: items
+                    .map(
+                      (String item) => OutlinedMetaChip(
+                        text: item,
+                        onTap: () {
+                          final String query = formatLibrarySearchExactMetaQuery(
+                            item,
+                          );
+                          final String encoded = Uri.encodeQueryComponent(query);
+                          appRouter.push('/searched?q=$encoded');
+                        },
+                      ),
+                    )
+                    .toList(),
+              ),
             ),
           ),
         ),
