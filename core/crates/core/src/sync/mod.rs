@@ -2,6 +2,7 @@ pub mod dto;
 pub mod format_group;
 pub mod handle;
 pub mod merge;
+pub mod migrate;
 pub mod orchestrator;
 pub mod parser;
 pub mod plan;

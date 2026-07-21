@@ -98,6 +98,7 @@ SyncLibraryProgress mapRustSyncProgress(rust.SyncLibraryProgressDto dto) {
     removedCount: dto.removedCount,
     addedCount: dto.addedCount,
     keptCount: dto.keptCount,
+    migratedCount: dto.migratedCount,
     thumbnailTotal: dto.thumbnailTotal,
     thumbnailDone: dto.thumbnailDone,
     thumbnailFailedCount: dto.thumbnailFailedCount,

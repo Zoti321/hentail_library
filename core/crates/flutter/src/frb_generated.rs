@@ -3684,6 +3684,7 @@ impl SseDecode for crate::api::sync::SyncLibraryProgressDto {
         let mut var_removedCount = <Option<i32>>::sse_decode(deserializer);
         let mut var_addedCount = <Option<i32>>::sse_decode(deserializer);
         let mut var_keptCount = <Option<i32>>::sse_decode(deserializer);
+        let mut var_migratedCount = <Option<i32>>::sse_decode(deserializer);
         let mut var_thumbnailTotal = <Option<i32>>::sse_decode(deserializer);
         let mut var_thumbnailDone = <Option<i32>>::sse_decode(deserializer);
         let mut var_thumbnailFailedCount = <Option<i32>>::sse_decode(deserializer);
@@ -3697,6 +3698,7 @@ impl SseDecode for crate::api::sync::SyncLibraryProgressDto {
             removed_count: var_removedCount,
             added_count: var_addedCount,
             kept_count: var_keptCount,
+            migrated_count: var_migratedCount,
             thumbnail_total: var_thumbnailTotal,
             thumbnail_done: var_thumbnailDone,
             thumbnail_failed_count: var_thumbnailFailedCount,
@@ -4808,6 +4810,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::sync::SyncLibraryProgressDto 
             self.removed_count.into_into_dart().into_dart(),
             self.added_count.into_into_dart().into_dart(),
             self.kept_count.into_into_dart().into_dart(),
+            self.migrated_count.into_into_dart().into_dart(),
             self.thumbnail_total.into_into_dart().into_dart(),
             self.thumbnail_done.into_into_dart().into_dart(),
             self.thumbnail_failed_count.into_into_dart().into_dart(),
@@ -5714,6 +5717,7 @@ impl SseEncode for crate::api::sync::SyncLibraryProgressDto {
         <Option<i32>>::sse_encode(self.removed_count, serializer);
         <Option<i32>>::sse_encode(self.added_count, serializer);
         <Option<i32>>::sse_encode(self.kept_count, serializer);
+        <Option<i32>>::sse_encode(self.migrated_count, serializer);
         <Option<i32>>::sse_encode(self.thumbnail_total, serializer);
         <Option<i32>>::sse_encode(self.thumbnail_done, serializer);
         <Option<i32>>::sse_encode(self.thumbnail_failed_count, serializer);

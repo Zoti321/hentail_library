@@ -102,6 +102,7 @@ class SyncLibraryProgressDto {
   final int? removedCount;
   final int? addedCount;
   final int? keptCount;
+  final int? migratedCount;
   final int? thumbnailTotal;
   final int? thumbnailDone;
   final int? thumbnailFailedCount;
@@ -116,6 +117,7 @@ class SyncLibraryProgressDto {
     this.removedCount,
     this.addedCount,
     this.keptCount,
+    this.migratedCount,
     this.thumbnailTotal,
     this.thumbnailDone,
     this.thumbnailFailedCount,
@@ -132,6 +134,7 @@ class SyncLibraryProgressDto {
       removedCount.hashCode ^
       addedCount.hashCode ^
       keptCount.hashCode ^
+      migratedCount.hashCode ^
       thumbnailTotal.hashCode ^
       thumbnailDone.hashCode ^
       thumbnailFailedCount.hashCode ^
@@ -150,6 +153,7 @@ class SyncLibraryProgressDto {
           removedCount == other.removedCount &&
           addedCount == other.addedCount &&
           keptCount == other.keptCount &&
+          migratedCount == other.migratedCount &&
           thumbnailTotal == other.thumbnailTotal &&
           thumbnailDone == other.thumbnailDone &&
           thumbnailFailedCount == other.thumbnailFailedCount &&

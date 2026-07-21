@@ -57,6 +57,7 @@ SyncLibraryProgress _progress({
     removedCount: null,
     addedCount: null,
     keptCount: null,
+    migratedCount: null,
     thumbnailTotal: null,
     thumbnailDone: null,
     thumbnailFailedCount: null,

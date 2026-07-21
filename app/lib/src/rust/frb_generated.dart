@@ -3525,8 +3525,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SyncLibraryProgressDto dco_decode_sync_library_progress_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 12)
-      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
+    if (arr.length != 13)
+      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
     return SyncLibraryProgressDto(
       phase: dco_decode_sync_library_phase_dto(arr[0]),
       route: dco_decode_sync_library_route_dto(arr[1]),
@@ -3536,10 +3536,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       removedCount: dco_decode_opt_box_autoadd_i_32(arr[5]),
       addedCount: dco_decode_opt_box_autoadd_i_32(arr[6]),
       keptCount: dco_decode_opt_box_autoadd_i_32(arr[7]),
-      thumbnailTotal: dco_decode_opt_box_autoadd_i_32(arr[8]),
-      thumbnailDone: dco_decode_opt_box_autoadd_i_32(arr[9]),
-      thumbnailFailedCount: dco_decode_opt_box_autoadd_i_32(arr[10]),
-      errorMessage: dco_decode_opt_String(arr[11]),
+      migratedCount: dco_decode_opt_box_autoadd_i_32(arr[8]),
+      thumbnailTotal: dco_decode_opt_box_autoadd_i_32(arr[9]),
+      thumbnailDone: dco_decode_opt_box_autoadd_i_32(arr[10]),
+      thumbnailFailedCount: dco_decode_opt_box_autoadd_i_32(arr[11]),
+      errorMessage: dco_decode_opt_String(arr[12]),
     );
   }
 
@@ -4616,6 +4617,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_removedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
     var var_addedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
     var var_keptCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_migratedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
     var var_thumbnailTotal = sse_decode_opt_box_autoadd_i_32(deserializer);
     var var_thumbnailDone = sse_decode_opt_box_autoadd_i_32(deserializer);
     var var_thumbnailFailedCount = sse_decode_opt_box_autoadd_i_32(
@@ -4631,6 +4633,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       removedCount: var_removedCount,
       addedCount: var_addedCount,
       keptCount: var_keptCount,
+      migratedCount: var_migratedCount,
       thumbnailTotal: var_thumbnailTotal,
       thumbnailDone: var_thumbnailDone,
       thumbnailFailedCount: var_thumbnailFailedCount,
@@ -5735,6 +5738,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_i_32(self.removedCount, serializer);
     sse_encode_opt_box_autoadd_i_32(self.addedCount, serializer);
     sse_encode_opt_box_autoadd_i_32(self.keptCount, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.migratedCount, serializer);
     sse_encode_opt_box_autoadd_i_32(self.thumbnailTotal, serializer);
     sse_encode_opt_box_autoadd_i_32(self.thumbnailDone, serializer);
     sse_encode_opt_box_autoadd_i_32(self.thumbnailFailedCount, serializer);

@@ -11,6 +11,7 @@ use crate::entity::{
 use crate::error::HentaiError;
 use crate::history::normalize_reading_history_titles;
 
+use super::migrate::ComicMigration;
 use super::plan::ComicScanReplacePlan;
 use super::series_rebuild::rebuild_series_from_comics;
 
@@ -19,6 +20,7 @@ pub async fn apply_scan_replace_plan(
     plan: &ComicScanReplacePlan,
 ) -> Result<(), HentaiError> {
     let txn = db.begin().await.map_err(map_db_err)?;
+    apply_comic_rekeys(&txn, &plan.migrations).await?;
     if !plan.removed_ids.is_empty() {
         delete_comics_side_effects(&txn, &plan.removed_ids).await?;
     }
@@ -36,6 +38,108 @@ pub async fn apply_scan_replace_plan(
     normalize_reading_history_titles(&txn).await?;
     rebuild_series_from_comics(&txn).await?;
     txn.commit().await.map_err(map_db_err)?;
+    Ok(())
+}
+
+async fn apply_comic_rekeys<C: ConnectionTrait>(
+    db: &C,
+    migrations: &[ComicMigration],
+) -> Result<(), HentaiError> {
+    for migration in migrations {
+        apply_comic_rekey(db, migration).await?;
+    }
+    Ok(())
+}
+
+async fn apply_comic_rekey<C: ConnectionTrait>(
+    db: &C,
+    migration: &ComicMigration,
+) -> Result<(), HentaiError> {
+    let from_id = &migration.from_comic_id;
+    let comic = &migration.to_comic;
+    let to_id = &comic.comic_id;
+
+    let comic_active = comics::ActiveModel {
+        comic_id: Set(to_id.clone()),
+        path: Set(comic.path.clone()),
+        resource_type: Set(comic.resource_type.clone()),
+        resource_size: Set(comic.resource_size),
+        created_at: Set(comic.created_at),
+        last_updated_at: Set(comic.last_updated_at),
+    };
+    Comics::insert(comic_active).exec(db).await.map_err(map_db_err)?;
+
+    let meta_active = comic_meta::ActiveModel {
+        comic_id: Set(to_id.clone()),
+        title: Set(comic.title.clone()),
+        content_rating: Set(comic.content_rating.clone()),
+        page_count: Set(comic.page_count),
+        description: Set(comic.description.clone()),
+        published_at: Set(comic.published_at),
+    };
+    ComicMeta::insert(meta_active)
+        .exec(db)
+        .await
+        .map_err(map_db_err)?;
+
+    rekey_comic_child_table(db, "comic_tags", from_id, to_id).await?;
+    rekey_comic_child_table(db, "comic_authors", from_id, to_id).await?;
+    rekey_comic_child_table(db, "comic_reading_histories", from_id, to_id).await?;
+    rekey_comic_child_table(db, "comic_thumbnails", from_id, to_id).await?;
+    rekey_comic_child_table(db, "series_items", from_id, to_id).await?;
+    rekey_reference_column(
+        db,
+        "series_reading_histories",
+        "last_read_comic_id",
+        from_id,
+        to_id,
+    )
+    .await?;
+    rekey_reference_column(db, "series_thumbnails", "source_comic_id", from_id, to_id).await?;
+
+    Comics::delete_by_id(from_id.clone())
+        .exec(db)
+        .await
+        .map_err(map_db_err)?;
+    Ok(())
+}
+
+async fn rekey_comic_child_table<C: ConnectionTrait>(
+    db: &C,
+    table: &str,
+    from_id: &str,
+    to_id: &str,
+) -> Result<(), HentaiError> {
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        format!("UPDATE {table} SET comic_id = ? WHERE comic_id = ?"),
+        [
+            sea_orm::Value::String(Some(Box::new(to_id.to_string()))),
+            sea_orm::Value::String(Some(Box::new(from_id.to_string()))),
+        ],
+    ))
+    .await
+    .map_err(map_db_err)?;
+    Ok(())
+}
+
+async fn rekey_reference_column<C: ConnectionTrait>(
+    db: &C,
+    table: &str,
+    column: &str,
+    from_id: &str,
+    to_id: &str,
+) -> Result<(), HentaiError> {
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        format!("UPDATE {table} SET {column} = ? WHERE {column} = ?"),
+        [
+            sea_orm::Value::String(Some(Box::new(to_id.to_string()))),
+            sea_orm::Value::String(Some(Box::new(from_id.to_string()))),
+        ],
+    ))
+    .await
+    .map_err(map_db_err)?;
     Ok(())
 }
 

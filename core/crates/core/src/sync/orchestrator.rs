@@ -80,6 +80,7 @@ async fn sync_no_roots(
             None,
             None,
             None,
+            None,
         ));
         return Ok(());
     }
@@ -93,6 +94,7 @@ async fn sync_no_roots(
         None,
         0,
         LibrarySyncCountsDto::default(),
+        None,
         None,
         None,
         None,
@@ -116,6 +118,7 @@ async fn sync_no_roots(
         None,
         None,
         None,
+        None,
     ));
     let removed = clear_all_comics(db).await?;
     clear_reader_sessions();
@@ -130,6 +133,7 @@ async fn sync_no_roots(
         Some(removed),
         Some(0),
         Some(0),
+        None,
         None,
         None,
         None,
@@ -169,6 +173,7 @@ async fn sync_with_roots(
         None,
         None,
         None,
+        None,
     ));
 
     let scan_items = scan_roots(
@@ -196,6 +201,7 @@ async fn sync_with_roots(
             None,
             None,
             None,
+            None,
         ));
     }
     if return_if_cancelled(handle, "scanning_progress") {
@@ -209,6 +215,7 @@ async fn sync_with_roots(
         None,
         accepted_total,
         counts.clone(),
+        None,
         None,
         None,
         None,
@@ -240,6 +247,7 @@ async fn sync_with_roots(
         removed = plan.removed_ids.len(),
         added = plan.added_count,
         kept = plan.kept_count,
+        migrated = plan.migrated_count,
         thumbnail_total = thumb_total,
         "sync complete"
     );
@@ -252,6 +260,11 @@ async fn sync_with_roots(
         Some(plan.removed_ids.len() as i32),
         Some(plan.added_count),
         Some(plan.kept_count),
+        if plan.migrated_count > 0 {
+            Some(plan.migrated_count)
+        } else {
+            None
+        },
         if thumb_total > 0 {
             Some(thumb_total)
         } else {
@@ -273,6 +286,7 @@ fn progress(
     removed_count: Option<i32>,
     added_count: Option<i32>,
     kept_count: Option<i32>,
+    migrated_count: Option<i32>,
     thumbnail_total: Option<i32>,
     thumbnail_done: Option<i32>,
     thumbnail_failed_count: Option<i32>,
@@ -286,6 +300,7 @@ fn progress(
         removed_count,
         added_count,
         kept_count,
+        migrated_count,
         thumbnail_total,
         thumbnail_done,
         thumbnail_failed_count,

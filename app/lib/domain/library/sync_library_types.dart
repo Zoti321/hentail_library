@@ -39,6 +39,7 @@ typedef SyncLibraryProgress = ({
   int? removedCount,
   int? addedCount,
   int? keptCount,
+  int? migratedCount,
 
   /// 缩略图预生成进度；非 [SyncLibraryPhase.generatingThumbnails] 时为 null。
   int? thumbnailTotal,

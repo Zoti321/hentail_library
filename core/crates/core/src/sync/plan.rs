@@ -8,6 +8,9 @@ use crate::entity::prelude::*;
 use crate::error::HentaiError;
 
 use super::merge::merge_kept_scan_with_existing;
+use super::migrate::{
+    detect_path_migration_pairs, migrated_id_sets, ComicMigration, ComicMigrationPair,
+};
 use super::parser::can_generate_thumbnail;
 use super::scanner::ScanItem;
 
@@ -15,6 +18,8 @@ pub struct ComicScanReplacePlan {
     pub removed_ids: Vec<String>,
     pub added_count: i32,
     pub kept_count: i32,
+    pub migrated_count: i32,
+    pub migrations: Vec<ComicMigration>,
     pub to_upsert: Vec<ComicDto>,
     pub thumbnail_invalidated_comic_ids: Vec<String>,
     pub thumbnail_generation_targets: Vec<ComicDto>,
@@ -37,10 +42,37 @@ pub async fn build_scan_replace_plan(
         existing.into_iter().map(|c| (c.comic_id.clone(), c)).collect();
     let existing_ids: HashSet<String> = existing_by_id.keys().cloned().collect();
     let id_diff = compute_id_diff(&existing_ids, &scanned_ids);
+    let removed_by_id: HashMap<String, ComicDto> = id_diff
+        .removed_ids
+        .iter()
+        .filter_map(|id| existing_by_id.get(id).map(|comic| (id.clone(), comic.clone())))
+        .collect();
+    let added_by_id: HashMap<String, ComicDto> = id_diff
+        .added_ids
+        .iter()
+        .filter_map(|id| unique.get(id).map(|comic| (id.clone(), comic.clone())))
+        .collect();
+    let migration_pairs = detect_path_migration_pairs(&removed_by_id, &added_by_id);
+    let (migrated_from_ids, migrated_to_ids) = migrated_id_sets(&migration_pairs);
+    let migrations = build_migrations(&migration_pairs, &existing_by_id, &unique);
+    let removed_ids: Vec<String> = id_diff
+        .removed_ids
+        .difference(&migrated_from_ids)
+        .cloned()
+        .collect();
+    let added_ids: HashSet<String> = id_diff
+        .added_ids
+        .difference(&migrated_to_ids)
+        .cloned()
+        .collect();
+    let kept_ids = &id_diff.kept_ids;
     let mut thumbnail_invalidated = Vec::new();
     let mut to_upsert = Vec::new();
     for (id, row) in &unique {
-        if id_diff.added_ids.contains(id) {
+        if migrated_to_ids.contains(id) {
+            continue;
+        }
+        if added_ids.contains(id) {
             to_upsert.push(row.clone());
         } else if let Some(prior) = existing_by_id.get(id) {
             if prior.path != row.path || prior.resource_type != row.resource_type {
@@ -52,15 +84,17 @@ pub async fn build_scan_replace_plan(
     let thumbnail_targets = build_thumbnail_targets(
         db,
         &to_upsert,
-        &id_diff.added_ids,
-        &id_diff.kept_ids,
+        &added_ids,
+        kept_ids,
         &thumbnail_invalidated.iter().cloned().collect(),
     )
     .await?;
     Ok(ComicScanReplacePlan {
-        removed_ids: id_diff.removed_ids.into_iter().collect(),
-        added_count: id_diff.added_ids.len() as i32,
-        kept_count: id_diff.kept_ids.len() as i32,
+        removed_ids,
+        added_count: added_ids.len() as i32,
+        kept_count: kept_ids.len() as i32,
+        migrated_count: migrations.len() as i32,
+        migrations,
         to_upsert,
         thumbnail_invalidated_comic_ids: thumbnail_invalidated,
         thumbnail_generation_targets: thumbnail_targets,
@@ -81,6 +115,26 @@ fn compute_id_diff(existing_ids: &HashSet<String>, scanned_ids: &HashSet<String>
         added_ids: scanned_ids.difference(existing_ids).cloned().collect(),
         kept_ids: existing_ids.intersection(scanned_ids).cloned().collect(),
     }
+}
+
+fn build_migrations(
+    pairs: &[ComicMigrationPair],
+    existing_by_id: &HashMap<String, ComicDto>,
+    scanned_by_id: &HashMap<String, ComicDto>,
+) -> Vec<ComicMigration> {
+    pairs
+        .iter()
+        .filter_map(|pair| {
+            let existing = existing_by_id.get(&pair.from_comic_id)?;
+            let scanned = scanned_by_id.get(&pair.to_comic_id)?;
+            let mut merged = merge_kept_scan_with_existing(scanned, existing);
+            merged.comic_id = scanned.comic_id.clone();
+            Some(ComicMigration {
+                from_comic_id: pair.from_comic_id.clone(),
+                to_comic: merged,
+            })
+        })
+        .collect()
 }
 
 async fn load_all_comics(db: &DatabaseConnection) -> Result<Vec<ComicDto>, HentaiError> {

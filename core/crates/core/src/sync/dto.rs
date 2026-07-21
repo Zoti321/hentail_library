@@ -45,6 +45,7 @@ pub struct SyncLibraryProgressDto {
     pub removed_count: Option<i32>,
     pub added_count: Option<i32>,
     pub kept_count: Option<i32>,
+    pub migrated_count: Option<i32>,
     pub thumbnail_total: Option<i32>,
     pub thumbnail_done: Option<i32>,
     pub thumbnail_failed_count: Option<i32>,
