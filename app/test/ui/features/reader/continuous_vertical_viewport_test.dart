@@ -237,6 +237,142 @@ void main() {
       expect(scrollControllerAssertion, isFalse);
     },
   );
+
+  testWidgets(
+    'mounting continuous viewport at non-first page keeps currentIndex',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(800, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: <Override>[
+            readerControllerProvider(
+              _viewKey,
+            ).overrideWith(_TestReaderControllerAtPage50.new),
+            readerPrefetchControllerProvider.overrideWith(
+              _FakeReaderPrefetchController.new,
+            ),
+            comicImagesProvider(comicId: _testComicId).overrideWith((
+              Ref ref,
+            ) async {
+              return List<ReaderPageImageData>.generate(
+                100,
+                (int index) => ReaderArchivePageImageData(
+                  comicId: _testComicId,
+                  pageIndex: index,
+                ),
+              );
+            }),
+            ...List<Override>.generate(
+              100,
+              (int index) => comicReaderPageProvider(
+                comicId: _testComicId,
+                pageIndex: index,
+              ).overrideWith((Ref ref) async => ReaderPageBytes(Uint8List(0))),
+            ),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: ContinuousVerticalViewport(
+                comicId: _testComicId,
+                incognito: false,
+                preferredPageIndex: null,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final ProviderContainer container = ProviderScope.containerOf(
+        tester.element(find.byType(ContinuousVerticalViewport)),
+      );
+      final int? currentIndex = container
+          .read(readerControllerProvider(_viewKey))
+          .asData
+          ?.value
+          .currentIndex;
+      expect(currentIndex, 50);
+    },
+  );
+
+  testWidgets(
+    'switching from paged to continuous at mid page keeps currentIndex',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(800, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      Widget host(ReadingMode mode) {
+        return ProviderScope(
+          overrides: <Override>[
+            readerControllerProvider(
+              _viewKey,
+            ).overrideWith(_TestReaderControllerAtPage50.new),
+            readerPrefetchControllerProvider.overrideWith(
+              _FakeReaderPrefetchController.new,
+            ),
+            comicImagesProvider(comicId: _testComicId).overrideWith((
+              Ref ref,
+            ) async {
+              return List<ReaderPageImageData>.generate(
+                100,
+                (int index) => ReaderArchivePageImageData(
+                  comicId: _testComicId,
+                  pageIndex: index,
+                ),
+              );
+            }),
+            ...List<Override>.generate(
+              100,
+              (int index) => comicReaderPageProvider(
+                comicId: _testComicId,
+                pageIndex: index,
+              ).overrideWith((Ref ref) async => ReaderPageBytes(Uint8List(0))),
+            ),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: ReaderViewportHost(
+                comicId: _testComicId,
+                incognito: false,
+                initialPage: 49,
+                preferredPageIndex: null,
+                readingMode: mode,
+              ),
+            ),
+          ),
+        );
+      }
+
+      await tester.pumpWidget(host(ReadingMode.paged));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+
+      await tester.pumpWidget(host(ReadingMode.webtoon));
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final ProviderContainer container = ProviderScope.containerOf(
+        tester.element(find.byType(ContinuousVerticalViewport)),
+      );
+      expect(
+        container
+            .read(readerControllerProvider(_viewKey))
+            .asData
+            ?.value
+            .currentIndex,
+        50,
+      );
+    },
+  );
 }
 
 List<Override> _viewportTestOverrides() {
@@ -281,6 +417,28 @@ class _TestReaderController extends ReaderController {
       ),
       readingMode: ReadingMode.webtoon,
       currentIndex: 1,
+      totalPagesOverride: 100,
+    );
+  }
+}
+
+class _TestReaderControllerAtPage50 extends ReaderController {
+  @override
+  Future<ReaderState> build(ReaderControllerKey key) async {
+    final DateTime now = DateTime.utc(2026, 1, 1);
+    return ReaderState(
+      comic: Comic(
+        comicId: key.comicId,
+        path: '/tmp/test.cbz',
+        resourceType: ResourceType.cbz,
+        resourceSize: 1,
+        createdAt: now,
+        lastUpdatedAt: now,
+        title: 'Test Comic',
+        pageCount: 100,
+      ),
+      readingMode: ReadingMode.webtoon,
+      currentIndex: 50,
       totalPagesOverride: 100,
     );
   }
