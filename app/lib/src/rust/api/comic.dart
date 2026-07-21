@@ -73,6 +73,7 @@ class ComicDto {
   final int pageCount;
   final String? description;
   final PlatformInt64? publishedAt;
+  final PlatformInt64? lastReadTimeMs;
   final List<String> authors;
   final List<String> tags;
 
@@ -88,6 +89,7 @@ class ComicDto {
     required this.pageCount,
     this.description,
     this.publishedAt,
+    this.lastReadTimeMs,
     required this.authors,
     required this.tags,
   });
@@ -105,6 +107,7 @@ class ComicDto {
       pageCount.hashCode ^
       description.hashCode ^
       publishedAt.hashCode ^
+      lastReadTimeMs.hashCode ^
       authors.hashCode ^
       tags.hashCode;
 
@@ -124,6 +127,7 @@ class ComicDto {
           pageCount == other.pageCount &&
           description == other.description &&
           publishedAt == other.publishedAt &&
+          lastReadTimeMs == other.lastReadTimeMs &&
           authors == other.authors &&
           tags == other.tags;
 }

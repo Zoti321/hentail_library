@@ -7,7 +7,7 @@ use sea_orm::{
 use sea_orm::sea_query::Expr;
 
 use crate::db::{connection, map_db_err};
-use crate::entity::{comic_authors, comic_meta, comic_tags, comics, prelude::*};
+use crate::entity::{comic_authors, comic_meta, comic_reading_histories, comic_tags, comics, prelude::*};
 use crate::error::HentaiError;
 
 use super::dto::{
@@ -170,6 +170,7 @@ pub async fn load_comics_ordered(
         .collect();
     let tag_map = load_tag_names(db, &comic_ids).await?;
     let author_map = load_author_names(db, &comic_ids).await?;
+    let last_read_map = load_last_read_times(db, &comic_ids).await?;
     let mut result = Vec::with_capacity(comic_ids.len());
     for id in comic_ids {
         let Some(model) = by_id.remove(&id) else {
@@ -190,11 +191,30 @@ pub async fn load_comics_ordered(
             page_count: meta.page_count,
             description: meta.description.clone(),
             published_at: meta.published_at,
+            last_read_time_ms: last_read_map.get(&model.comic_id).copied(),
             authors: author_map.get(&model.comic_id).cloned().unwrap_or_default(),
             tags: tag_map.get(&model.comic_id).cloned().unwrap_or_default(),
         });
     }
     Ok(result)
+}
+
+async fn load_last_read_times(
+    db: &DatabaseConnection,
+    comic_ids: &[String],
+) -> Result<HashMap<String, i64>, HentaiError> {
+    if comic_ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+    let rows = ComicReadingHistories::find()
+        .filter(Expr::col(comic_reading_histories::Column::ComicId).is_in(comic_ids.to_vec()))
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    Ok(rows
+        .into_iter()
+        .map(|row| (row.comic_id, row.last_read_time))
+        .collect())
 }
 
 async fn load_tag_names(

@@ -31,6 +31,7 @@ pub struct ComicDto {
     pub page_count: i32,
     pub description: Option<String>,
     pub published_at: Option<i64>,
+    pub last_read_time_ms: Option<i64>,
     pub authors: Vec<String>,
     pub tags: Vec<String>,
 }
@@ -81,6 +82,7 @@ impl From<hentai_core::ComicDto> for ComicDto {
             page_count: value.page_count,
             description: value.description,
             published_at: value.published_at,
+            last_read_time_ms: value.last_read_time_ms,
             authors: value.authors,
             tags: value.tags,
         }

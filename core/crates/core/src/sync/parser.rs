@@ -473,6 +473,7 @@ pub fn parsed_to_comic(parsed: &ParsedResource) -> crate::comic::ComicDto {
         page_count: parsed.page_count,
         description: parsed.description.clone(),
         published_at: parsed.published_at,
+        last_read_time_ms: None,
         authors: parsed.authors.clone(),
         tags: vec![],
     }

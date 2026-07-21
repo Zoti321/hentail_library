@@ -524,7 +524,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryComicSortPublishedAt => 'Published date';
 
   @override
-  String get libraryComicSortReadAt => 'Read date';
+  String get libraryComicSortReadAt => 'Read time';
 
   @override
   String get libraryComicSortFileSize => 'File size';

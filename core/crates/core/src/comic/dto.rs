@@ -73,6 +73,7 @@ pub struct ComicDto {
     pub page_count: i32,
     pub description: Option<String>,
     pub published_at: Option<i64>,
+    pub last_read_time_ms: Option<i64>,
     pub authors: Vec<String>,
     pub tags: Vec<String>,
 }

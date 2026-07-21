@@ -215,7 +215,7 @@
   "libraryComicSortCreatedAt": "添加时间",
   "libraryComicSortLastUpdatedAt": "更新时间",
   "libraryComicSortPublishedAt": "发布日期",
-  "libraryComicSortReadAt": "阅读日期",
+  "libraryComicSortReadAt": "阅读时间",
   "libraryComicSortFileSize": "文件大小",
   "libraryComicSortPageCount": "页数",
   "librarySeriesSortName": "名称",

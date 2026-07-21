@@ -124,6 +124,7 @@ fn sync_does_not_regenerate_user_set_comic_thumbnail_after_source_change() {
             page_count: 2,
             description: None,
             published_at: None,
+            last_read_time_ms: None,
             authors: vec![],
             tags: vec![],
         };

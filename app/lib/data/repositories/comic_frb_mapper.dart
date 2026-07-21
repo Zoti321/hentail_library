@@ -28,6 +28,9 @@ Comic mapRustComic(rust.ComicDto dto) {
     publishedAt: dto.publishedAt == null
         ? null
         : comicTimestampFromMs(dto.publishedAt!.toInt()),
+    lastReadTime: dto.lastReadTimeMs == null
+        ? null
+        : comicTimestampFromMs(dto.lastReadTimeMs!.toInt()),
   );
 }
 

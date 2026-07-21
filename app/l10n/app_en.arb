@@ -215,7 +215,7 @@
   "libraryComicSortCreatedAt": "Date added",
   "libraryComicSortLastUpdatedAt": "Last updated",
   "libraryComicSortPublishedAt": "Published date",
-  "libraryComicSortReadAt": "Read date",
+  "libraryComicSortReadAt": "Read time",
   "libraryComicSortFileSize": "File size",
   "libraryComicSortPageCount": "Page count",
   "librarySeriesSortName": "Name",

@@ -2991,8 +2991,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ComicDto dco_decode_comic_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 13)
-      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
+    if (arr.length != 14)
+      throw Exception('unexpected arr length: expect 14 but see ${arr.length}');
     return ComicDto(
       comicId: dco_decode_String(arr[0]),
       path: dco_decode_String(arr[1]),
@@ -3005,8 +3005,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       pageCount: dco_decode_i_32(arr[8]),
       description: dco_decode_opt_String(arr[9]),
       publishedAt: dco_decode_opt_box_autoadd_i_64(arr[10]),
-      authors: dco_decode_list_String(arr[11]),
-      tags: dco_decode_list_String(arr[12]),
+      lastReadTimeMs: dco_decode_opt_box_autoadd_i_64(arr[11]),
+      authors: dco_decode_list_String(arr[12]),
+      tags: dco_decode_list_String(arr[13]),
     );
   }
 
@@ -3921,6 +3922,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_pageCount = sse_decode_i_32(deserializer);
     var var_description = sse_decode_opt_String(deserializer);
     var var_publishedAt = sse_decode_opt_box_autoadd_i_64(deserializer);
+    var var_lastReadTimeMs = sse_decode_opt_box_autoadd_i_64(deserializer);
     var var_authors = sse_decode_list_String(deserializer);
     var var_tags = sse_decode_list_String(deserializer);
     return ComicDto(
@@ -3935,6 +3937,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       pageCount: var_pageCount,
       description: var_description,
       publishedAt: var_publishedAt,
+      lastReadTimeMs: var_lastReadTimeMs,
       authors: var_authors,
       tags: var_tags,
     );
@@ -5134,6 +5137,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.pageCount, serializer);
     sse_encode_opt_String(self.description, serializer);
     sse_encode_opt_box_autoadd_i_64(self.publishedAt, serializer);
+    sse_encode_opt_box_autoadd_i_64(self.lastReadTimeMs, serializer);
     sse_encode_list_String(self.authors, serializer);
     sse_encode_list_String(self.tags, serializer);
   }

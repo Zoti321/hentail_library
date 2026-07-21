@@ -2950,6 +2950,7 @@ impl SseDecode for crate::api::comic::ComicDto {
         let mut var_pageCount = <i32>::sse_decode(deserializer);
         let mut var_description = <Option<String>>::sse_decode(deserializer);
         let mut var_publishedAt = <Option<i64>>::sse_decode(deserializer);
+        let mut var_lastReadTimeMs = <Option<i64>>::sse_decode(deserializer);
         let mut var_authors = <Vec<String>>::sse_decode(deserializer);
         let mut var_tags = <Vec<String>>::sse_decode(deserializer);
         return crate::api::comic::ComicDto {
@@ -2964,6 +2965,7 @@ impl SseDecode for crate::api::comic::ComicDto {
             page_count: var_pageCount,
             description: var_description,
             published_at: var_publishedAt,
+            last_read_time_ms: var_lastReadTimeMs,
             authors: var_authors,
             tags: var_tags,
         };
@@ -4149,6 +4151,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicDto {
             self.page_count.into_into_dart().into_dart(),
             self.description.into_into_dart().into_dart(),
             self.published_at.into_into_dart().into_dart(),
+            self.last_read_time_ms.into_into_dart().into_dart(),
             self.authors.into_into_dart().into_dart(),
             self.tags.into_into_dart().into_dart(),
         ]
@@ -5154,6 +5157,7 @@ impl SseEncode for crate::api::comic::ComicDto {
         <i32>::sse_encode(self.page_count, serializer);
         <Option<String>>::sse_encode(self.description, serializer);
         <Option<i64>>::sse_encode(self.published_at, serializer);
+        <Option<i64>>::sse_encode(self.last_read_time_ms, serializer);
         <Vec<String>>::sse_encode(self.authors, serializer);
         <Vec<String>>::sse_encode(self.tags, serializer);
     }

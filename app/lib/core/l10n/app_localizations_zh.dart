@@ -508,7 +508,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryComicSortPublishedAt => '发布日期';
 
   @override
-  String get libraryComicSortReadAt => '阅读日期';
+  String get libraryComicSortReadAt => '阅读时间';
 
   @override
   String get libraryComicSortFileSize => '文件大小';

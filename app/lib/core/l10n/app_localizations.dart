@@ -971,7 +971,7 @@ abstract class AppLocalizations {
   /// No description provided for @libraryComicSortReadAt.
   ///
   /// In zh, this message translates to:
-  /// **'阅读日期'**
+  /// **'阅读时间'**
   String get libraryComicSortReadAt;
 
   /// No description provided for @libraryComicSortFileSize.

@@ -204,6 +204,7 @@ mod tests {
             page_count: 1,
             description: None,
             published_at: None,
+            last_read_time_ms: None,
             authors: vec![],
             tags: vec![],
         };
