@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use unrar::Archive;
+use unrar_ng::Archive;
 
 use crate::error::HentaiError;
 
