@@ -4,10 +4,6 @@ mod pdf;
 #[path = "mobile_pdf.rs"]
 mod pdf;
 
-#[cfg(not(any(target_os = "android", target_os = "ios")))]
-mod rar;
-#[cfg(any(target_os = "android", target_os = "ios"))]
-#[path = "mobile_rar.rs"]
 mod rar;
 
 mod sevenz;
