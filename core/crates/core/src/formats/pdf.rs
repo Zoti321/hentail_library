@@ -32,12 +32,23 @@ pub fn count_pdf_pages(file: &Path) -> Result<Option<i32>, HentaiError> {
     Ok(Some(count as i32))
 }
 
-pub fn read_pdf_embedded_meta(file: &Path) -> Result<(Option<String>, Option<i64>), HentaiError> {
+pub fn read_pdf_embedded_meta(
+    file: &Path,
+) -> Result<(Option<String>, Vec<String>, Option<String>, Option<i64>), HentaiError> {
     let pdfium = bind_pdfium()?;
     let document = pdfium
         .load_pdf_from_file(file, None)
         .map_err(|e| map_archive_err("pdf 打开失败", e))?;
     let metadata = document.metadata();
+    let title = metadata
+        .get(PdfDocumentMetadataTagType::Title)
+        .map(metadata_tag_text)
+        .filter(|s| !s.is_empty());
+    let authors = metadata
+        .get(PdfDocumentMetadataTagType::Author)
+        .map(metadata_tag_text)
+        .map(split_pdf_authors)
+        .unwrap_or_default();
     let description = metadata
         .get(PdfDocumentMetadataTagType::Subject)
         .map(metadata_tag_text)
@@ -46,11 +57,19 @@ pub fn read_pdf_embedded_meta(file: &Path) -> Result<(Option<String>, Option<i64
         .get(PdfDocumentMetadataTagType::CreationDate)
         .map(metadata_tag_text)
         .and_then(|raw| parse_pdf_date_to_ms(&raw));
-    Ok((description, published_at))
+    Ok((title, authors, description, published_at))
 }
 
 fn metadata_tag_text(tag: PdfDocumentMetadataTag) -> String {
     tag.value().trim().to_string()
+}
+
+fn split_pdf_authors(raw: String) -> Vec<String> {
+    raw.split([',', ';'])
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .map(ToString::to_string)
+        .collect()
 }
 
 fn parse_pdf_date_to_ms(raw: &str) -> Option<i64> {
@@ -146,4 +165,32 @@ pub fn read_pdf_page(backend: &PdfBackend, page_index: usize) -> Result<Vec<u8>,
         .encode_image(&image)
         .map_err(|e| HentaiError::reader_invalid_content(format!("pdf 编码 JPEG 失败: {e}")))?;
     Ok(buffer)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{date_to_utc_ms, parse_pdf_date_to_ms};
+
+    #[test]
+    fn parse_pdf_date_reads_standard_prefix() {
+        let ms = parse_pdf_date_to_ms("D:20240615120000").expect("date");
+        assert_eq!(ms, date_to_utc_ms(2024, 6, 15, 12, 0, 0).unwrap());
+    }
+
+    #[test]
+    fn parse_pdf_date_reads_date_only() {
+        let ms = parse_pdf_date_to_ms("D:20240101").expect("date");
+        assert_eq!(ms, date_to_utc_ms(2024, 1, 1, 0, 0, 0).unwrap());
+    }
+
+    #[test]
+    fn parse_pdf_date_ignores_timezone_suffix() {
+        let ms = parse_pdf_date_to_ms("D:20240615120000+08'00'").expect("date");
+        assert_eq!(ms, date_to_utc_ms(2024, 6, 15, 12, 0, 0).unwrap());
+    }
+
+    #[test]
+    fn parse_pdf_date_rejects_too_short() {
+        assert!(parse_pdf_date_to_ms("D:2024").is_none());
+    }
 }

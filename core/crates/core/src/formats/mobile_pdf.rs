@@ -15,8 +15,10 @@ pub fn count_pdf_pages(_file: &Path) -> Result<Option<i32>, HentaiError> {
     Ok(None)
 }
 
-pub fn read_pdf_embedded_meta(_file: &Path) -> Result<(Option<String>, Option<i64>), HentaiError> {
-    Ok((None, None))
+pub fn read_pdf_embedded_meta(
+    _file: &Path,
+) -> Result<(Option<String>, Vec<String>, Option<String>, Option<i64>), HentaiError> {
+    Ok((None, vec![], None, None))
 }
 
 pub fn open_pdf_backend(_file: &Path) -> Result<PdfBackend, HentaiError> {

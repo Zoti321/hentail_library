@@ -3,6 +3,8 @@ use std::io::{BufReader, Read};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, UNIX_EPOCH};
 
+use quick_xml::events::Event;
+use quick_xml::Reader;
 use zip::ZipArchive;
 
 use crate::comic::now_ms;
@@ -180,13 +182,21 @@ pub fn parse_zip_archive(file: &Path, resource_type: &str) -> Result<Option<Pars
         Err(_) => return Ok(None),
     };
     let mut page_count = 0i32;
+    let mut comic_info_xml: Option<String> = None;
     for i in 0..archive.len() {
-        let entry = match archive.by_index(i) {
+        let mut entry = match archive.by_index(i) {
             Ok(entry) => entry,
             Err(_) => return Ok(None),
         };
         let name = entry.name().replace('\\', "/");
         if entry.is_dir() || name.ends_with('/') {
+            continue;
+        }
+        if is_comic_info_entry(&name) {
+            let mut buf = String::new();
+            if entry.read_to_string(&mut buf).is_ok() {
+                comic_info_xml = Some(buf);
+            }
             continue;
         }
         let ext = Path::new(&name)
@@ -198,15 +208,116 @@ pub fn parse_zip_archive(file: &Path, resource_type: &str) -> Result<Option<Pars
             page_count += 1;
         }
     }
+    let meta = comic_info_xml
+        .as_deref()
+        .map(parse_comic_info_xml)
+        .unwrap_or_default();
+    let title = if meta.title.trim().is_empty() {
+        basename_without_extension(file)
+    } else {
+        meta.title
+    };
     finalize_parsed(
         file,
         resource_type,
-        basename_without_extension(file),
-        vec![],
+        title,
+        meta.authors,
         page_count,
-        None,
-        None,
+        meta.description,
+        meta.published_at,
     )
+}
+
+fn is_comic_info_entry(name: &str) -> bool {
+    name.rsplit('/')
+        .next()
+        .is_some_and(|base| base.eq_ignore_ascii_case("ComicInfo.xml"))
+}
+
+#[derive(Debug, Default)]
+struct ComicInfoMetadata {
+    title: String,
+    authors: Vec<String>,
+    description: Option<String>,
+    published_at: Option<i64>,
+    year: Option<i32>,
+    month: Option<u32>,
+    day: Option<u32>,
+}
+
+fn parse_comic_info_xml(xml: &str) -> ComicInfoMetadata {
+    let mut reader = Reader::from_str(xml);
+    reader.config_mut().trim_text(true);
+    let mut buf = Vec::new();
+    let mut meta = ComicInfoMetadata::default();
+    let mut current_field: Option<&'static str> = None;
+
+    loop {
+        match reader.read_event_into(&mut buf) {
+            Ok(Event::Start(e)) => {
+                let local = String::from_utf8_lossy(e.local_name().as_ref()).into_owned();
+                current_field = match local.as_str() {
+                    "Title" => Some("title"),
+                    "Writer" | "Penciller" | "Colorist" | "Letterer" | "CoverArtist" => {
+                        Some("author")
+                    }
+                    "Summary" => Some("summary"),
+                    "Year" => Some("year"),
+                    "Month" => Some("month"),
+                    "Day" => Some("day"),
+                    _ => None,
+                };
+            }
+            Ok(Event::Text(e)) => {
+                let text = e
+                    .unescape()
+                    .map(|s| s.into_owned())
+                    .unwrap_or_default()
+                    .trim()
+                    .to_string();
+                if text.is_empty() {
+                    buf.clear();
+                    continue;
+                }
+                match current_field {
+                    Some("title") => meta.title = text,
+                    Some("author") => extend_authors(&mut meta.authors, &text),
+                    Some("summary") => meta.description = Some(text),
+                    Some("year") => meta.year = text.parse().ok(),
+                    Some("month") => meta.month = text.parse().ok(),
+                    Some("day") => meta.day = text.parse().ok(),
+                    _ => {}
+                }
+            }
+            Ok(Event::End(_)) => current_field = None,
+            Ok(Event::Eof) => break,
+            Err(_) => break,
+            _ => {}
+        }
+        buf.clear();
+    }
+
+    meta.published_at = comic_info_date_to_ms(meta.year, meta.month, meta.day);
+    meta
+}
+
+fn extend_authors(authors: &mut Vec<String>, raw: &str) {
+    for part in raw.split([',', ';']) {
+        let name = part.trim();
+        if name.is_empty() {
+            continue;
+        }
+        if !authors.iter().any(|a| a == name) {
+            authors.push(name.to_string());
+        }
+    }
+}
+
+fn comic_info_date_to_ms(year: Option<i32>, month: Option<u32>, day: Option<u32>) -> Option<i64> {
+    let year = year?;
+    let month = month?;
+    let day = day?;
+    date_to_utc_ms(year, month, day, 0, 0, 0)
 }
 
 pub fn parse_file(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
@@ -268,12 +379,13 @@ pub fn parse_pdf(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
     let Some(page_count) = page_count else {
         return Ok(None);
     };
-    let (description, published_at) = read_pdf_embedded_meta(file).unwrap_or((None, None));
+    let (title, authors, description, published_at) =
+        read_pdf_embedded_meta(file).unwrap_or((None, vec![], None, None));
     finalize_parsed(
         file,
         "pdf",
-        basename_without_extension(file),
-        vec![],
+        title.unwrap_or_else(|| basename_without_extension(file)),
+        authors,
         page_count,
         description,
         published_at,
@@ -361,10 +473,7 @@ fn parse_opf_metadata(opf: &str) -> OpfMetadata {
             }
         } else if trimmed.starts_with("<dc:creator") {
             if let Some(inner) = extract_xml_text(trimmed) {
-                let t = inner.trim().to_string();
-                if !t.is_empty() {
-                    authors.push(t);
-                }
+                extend_authors(&mut authors, inner.trim());
             }
         } else if trimmed.starts_with("<dc:description") {
             if let Some(inner) = extract_xml_text(trimmed) {
@@ -552,5 +661,71 @@ mod tests {
             resource_size: 1024,
         });
         assert_eq!(comic.title, "Fate╱Stay Night Heaven's Feel - 卷04");
+    }
+
+    #[test]
+    fn parse_comic_info_xml_reads_standard_fields() {
+        let meta = parse_comic_info_xml(
+            r#"<?xml version="1.0"?>
+<ComicInfo>
+  <Title>标题</Title>
+  <Writer>作者A, 作者B</Writer>
+  <Summary>概要</Summary>
+  <Year>2022</Year>
+  <Month>3</Month>
+  <Day>9</Day>
+</ComicInfo>"#,
+        );
+        assert_eq!(meta.title, "标题");
+        assert_eq!(meta.authors, vec!["作者A", "作者B"]);
+        assert_eq!(meta.description.as_deref(), Some("概要"));
+        assert_eq!(meta.published_at, Some(date_to_utc_ms(2022, 3, 9, 0, 0, 0).unwrap()));
+    }
+
+    #[test]
+    fn parse_comic_info_xml_year_only_keeps_published_at_empty() {
+        let meta = parse_comic_info_xml(
+            r#"<ComicInfo><Year>2020</Year></ComicInfo>"#,
+        );
+        assert_eq!(meta.published_at, None);
+    }
+
+    #[test]
+    fn parse_comic_info_xml_deduplicates_authors() {
+        let meta = parse_comic_info_xml(
+            r#"<ComicInfo>
+  <Writer>同人</Writer>
+  <Penciller>同人</Penciller>
+</ComicInfo>"#,
+        );
+        assert_eq!(meta.authors, vec!["同人"]);
+    }
+
+    #[test]
+    fn parse_comic_info_xml_excludes_translator_from_authors() {
+        let meta = parse_comic_info_xml(
+            r#"<ComicInfo>
+  <Writer>作者</Writer>
+  <Translator>译者</Translator>
+</ComicInfo>"#,
+        );
+        assert_eq!(meta.authors, vec!["作者"]);
+    }
+
+    #[test]
+    fn parse_opf_metadata_splits_creator_separators_and_deduplicates() {
+        let meta = parse_opf_metadata(
+            r#"<?xml version="1.0"?>
+<package>
+  <metadata>
+    <dc:creator>作者A, 作者B</dc:creator>
+    <dc:creator>作者B; 作者C</dc:creator>
+  </metadata>
+</package>"#,
+        );
+        assert_eq!(
+            meta.authors,
+            vec!["作者A", "作者B", "作者C"]
+        );
     }
 }
