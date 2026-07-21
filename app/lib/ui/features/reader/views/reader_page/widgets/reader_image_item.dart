@@ -16,12 +16,14 @@ class ReaderImageItem extends ConsumerStatefulWidget {
     required this.slotLogicalWidth,
     this.enableCrossfade = false,
     this.alignment = Alignment.center,
+    this.fit = BoxFit.contain,
   });
 
   final ReaderPageImageData imageData;
   final double slotLogicalWidth;
   final bool enableCrossfade;
   final Alignment alignment;
+  final BoxFit fit;
 
   @override
   ConsumerState<ReaderImageItem> createState() => _ReaderImageItemState();
@@ -55,7 +57,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
           alignment: widget.alignment,
           child: AppComicImage(
             filePath: imageData.file.path,
-            fit: BoxFit.contain,
+            fit: widget.fit,
             filterQuality: FilterQuality.high,
             useReaderImageCache: true,
             loadingPlaceholder: loadingSurface,
@@ -89,7 +91,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
             child: switch (page) {
               ReaderPageFilePath(:final String path) => AppComicImage(
                 filePath: path,
-                fit: BoxFit.contain,
+                fit: widget.fit,
                 filterQuality: FilterQuality.high,
                 useReaderImageCache: true,
                 loadingPlaceholder: loadingSurface,
@@ -97,7 +99,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
               ),
               ReaderPageBytes(:final Uint8List data) => AppComicImage(
                 memoryBytes: data,
-                fit: BoxFit.contain,
+                fit: widget.fit,
                 filterQuality: FilterQuality.high,
                 useReaderImageCache: true,
                 loadingPlaceholder: loadingSurface,

@@ -37,6 +37,8 @@ abstract class AppSetting with _$AppSetting {
     @Default(AppLocalePreference.system) AppLocalePreference localePreference,
     @Default(false) bool autoScan,
     @Default(kDefaultReadingMode) ReadingMode readingMode,
+    @Default(kDefaultWebtoonMarginPercent) int webtoonMarginPercent,
+    @Default(kDefaultWebtoonZoomMode) WebtoonZoomMode webtoonZoomMode,
     @Default(false) bool readerAutoPlayEnabled,
     @Default(5) int readerAutoPlayIntervalSeconds,
     @Default(true) bool desktopSidebarExpanded,

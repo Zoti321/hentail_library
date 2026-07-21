@@ -19,8 +19,23 @@ enum ReaderModeCategory { paged, webtoon }
 /// 翻页模式下的页面布局（二级选项）。
 enum PagedLayout { single, dual, dualNoCover }
 
-/// Webtoon 缩放模式（二级选项，UI 占位）。
+/// Scroll layout 缩放模式（二级选项）。
 enum WebtoonZoomMode { fitWidth, originalSize }
+
+const WebtoonZoomMode kDefaultWebtoonZoomMode = WebtoonZoomMode.fitWidth;
+
+/// 左右边距占视口宽度的百分比（两侧合计）；仅 [WebtoonZoomMode.fitWidth] 生效。
+const int kDefaultWebtoonMarginPercent = 20;
+const int kWebtoonMarginPercentMax = 40;
+const int kWebtoonMarginPercentStep = 5;
+
+int normalizeWebtoonMarginPercent(int value) {
+  final int clamped = value.clamp(0, kWebtoonMarginPercentMax);
+  final int stepped =
+      ((clamped / kWebtoonMarginPercentStep).round() * kWebtoonMarginPercentStep)
+          .clamp(0, kWebtoonMarginPercentMax);
+  return stepped;
+}
 
 extension PagedLayoutX on PagedLayout {
   ReadingMode toReadingMode() => switch (this) {

@@ -2,12 +2,15 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/domain/models/app_setting.dart';
+import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_image_item.dart';
+import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -59,6 +62,17 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     final ObjectRef<int> scrollGeneration = useRef<int>(0);
     final Size viewportSize = MediaQuery.sizeOf(context);
     final int totalPages = imageList.length;
+    final AppSetting? settings = ref.watch(settingsProvider).asData?.value;
+    final int marginPercent =
+        settings?.webtoonMarginPercent ?? kDefaultWebtoonMarginPercent;
+    final WebtoonZoomMode zoomMode =
+        settings?.webtoonZoomMode ?? kDefaultWebtoonZoomMode;
+    final double slotLogicalWidth = zoomMode == WebtoonZoomMode.fitWidth
+        ? readerContinuousSlotLogicalWidth(
+            viewportSize.width,
+            marginPercent: marginPercent,
+          )
+        : viewportSize.width;
 
     useReaderPrefetchWindow(
       ref: ref,
@@ -66,7 +80,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       comicId: comicId,
       centerPageOneBased: currentIndex,
       totalPages: totalPages,
-      slotLogicalWidth: readerContinuousSlotLogicalWidth(viewportSize.width),
+      slotLogicalWidth: slotLogicalWidth,
       imageList: imageList,
     );
     void executeScrollToIndex(int targetIndexOneBased) {
@@ -193,27 +207,39 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
         isProgrammaticScroll.value = false;
       };
     }, <Object?>[currentIndex, imageList.length]);
+    final bool useOriginalSize = zoomMode == WebtoonZoomMode.originalSize;
+    final Widget pageList = ScrollablePositionedList.builder(
+      itemScrollController: itemScrollController,
+      itemPositionsListener: itemPositionsListener,
+      physics: const ClampingScrollPhysics(),
+      itemCount: imageList.length,
+      itemBuilder: (BuildContext context, int index) {
+        final ReaderPageImageData imageData = imageList[index];
+        final Widget page = ReaderImageItem(
+          imageData: imageData,
+          slotLogicalWidth: slotLogicalWidth,
+          enableCrossfade: false,
+          fit: useOriginalSize ? BoxFit.none : BoxFit.contain,
+        );
+        if (!useOriginalSize) {
+          return page;
+        }
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: viewportSize.width),
+            child: page,
+          ),
+        );
+      },
+    );
+    if (useOriginalSize) {
+      return pageList;
+    }
     return Center(
       child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: readerContinuousSlotLogicalWidth(viewportSize.width),
-        ),
-        child: ScrollablePositionedList.builder(
-          itemScrollController: itemScrollController,
-          itemPositionsListener: itemPositionsListener,
-          physics: const ClampingScrollPhysics(),
-          itemCount: imageList.length,
-          itemBuilder: (BuildContext context, int index) {
-            final ReaderPageImageData imageData = imageList[index];
-            return ReaderImageItem(
-              imageData: imageData,
-              slotLogicalWidth: readerContinuousSlotLogicalWidth(
-                MediaQuery.sizeOf(context).width,
-              ),
-              enableCrossfade: false,
-            );
-          },
-        ),
+        constraints: BoxConstraints(maxWidth: slotLogicalWidth),
+        child: pageList,
       ),
     );
   }
