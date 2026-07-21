@@ -7,6 +7,7 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_state.dart';
+import 'package:hentai_library/ui/providers/comic_cover_load_gate.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -121,36 +122,38 @@ class ComicCover extends _$ComicCover {
     state = ComicCoverLoading(previous: previous);
     _loadInFlight = true;
     try {
-      final Comic? comic = await ref.read(comicRepoProvider).findById(comicId);
-      if (!ref.mounted) {
-        return;
-      }
-      if (comic == null) {
-        state = const ComicCoverNoCover();
-        return;
-      }
+      await ComicCoverLoadGate.run(() async {
+        final Comic? comic = await ref.read(comicRepoProvider).findById(comicId);
+        if (!ref.mounted) {
+          return;
+        }
+        if (comic == null) {
+          state = const ComicCoverNoCover();
+          return;
+        }
 
-      final repo = ref.read(comicThumbnailRepoProvider);
-      Uint8List? bytes = (await repo.findByComicId(comicId))?.thumbnail;
-      if (!ref.mounted) {
-        return;
-      }
-      if (bytes == null || bytes.isEmpty) {
-        final ensured = await repo.ensureByComicId(
-          comicId: comicId,
-          priority: _priority,
-        );
-        bytes = ensured?.thumbnail;
-      }
-      if (!ref.mounted) {
-        return;
-      }
-      if (bytes == null || bytes.isEmpty) {
-        state = const ComicCoverNoCover();
-        return;
-      }
-      ref.read(comicCoverThumbnailCacheProvider(comicId).notifier).set(bytes);
-      state = ComicCoverReady(ComicCoverImage.bytes(bytes));
+        final repo = ref.read(comicThumbnailRepoProvider);
+        Uint8List? bytes = (await repo.findByComicId(comicId))?.thumbnail;
+        if (!ref.mounted) {
+          return;
+        }
+        if (bytes == null || bytes.isEmpty) {
+          final ensured = await repo.ensureByComicId(
+            comicId: comicId,
+            priority: _priority,
+          );
+          bytes = ensured?.thumbnail;
+        }
+        if (!ref.mounted) {
+          return;
+        }
+        if (bytes == null || bytes.isEmpty) {
+          state = const ComicCoverNoCover();
+          return;
+        }
+        ref.read(comicCoverThumbnailCacheProvider(comicId).notifier).set(bytes);
+        state = ComicCoverReady(ComicCoverImage.bytes(bytes));
+      });
     } on Object catch (error, stackTrace) {
       logError(
         AppLog.ui('comic_cover'),

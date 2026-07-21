@@ -8,8 +8,8 @@ import 'package:hentai_library/ui/features/library/views/library_page/widgets/li
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_page_widgets.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 
-class SeriesDetailComicsGrid extends StatelessWidget {
-  const SeriesDetailComicsGrid({
+class SeriesDetailComicsGridSliver extends StatelessWidget {
+  const SeriesDetailComicsGridSliver({
     super.key,
     required this.comics,
     this.isLoading = false,
@@ -33,48 +33,53 @@ class SeriesDetailComicsGrid extends StatelessWidget {
         );
 
         if (isLoading && comics.isEmpty) {
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl),
-            child: const Center(child: CircularProgressIndicator()),
+          return SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl),
+              child: const Center(child: CircularProgressIndicator()),
+            ),
           );
         }
 
         final AppLocalizations l10n = context.l10n;
         if (comics.isEmpty) {
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl),
-            child: Center(
-              child: Text(
-                l10n.seriesDetailNoComics,
-                style: TextStyle(
-                  fontSize: tokens.text.bodySm,
-                  color: cs.hentai.textTertiary,
+          return SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl),
+              child: Center(
+                child: Text(
+                  l10n.seriesDetailNoComics,
+                  style: TextStyle(
+                    fontSize: tokens.text.bodySm,
+                    color: cs.hentai.textTertiary,
+                  ),
                 ),
               ),
             ),
           );
         }
 
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
+        return SliverGrid(
           gridDelegate: gridDelegate,
-          itemCount: comics.length,
-          itemBuilder: (BuildContext context, int index) {
-            final Comic comic = comics[index];
-            return Center(
-              child: ComicCard(
-                key: Key(comic.comicId),
-                comic: comic,
-                onTap: () {
-                  appRouter.pushNamed(
-                    '漫画详情',
-                    pathParameters: <String, String>{'id': comic.comicId},
-                  );
-                },
-              ),
-            );
-          },
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              final Comic comic = comics[index];
+              return Center(
+                child: ComicCard(
+                  key: Key(comic.comicId),
+                  comic: comic,
+                  gridIndex: index,
+                  onTap: () {
+                    appRouter.pushNamed(
+                      '漫画详情',
+                      pathParameters: <String, String>{'id': comic.comicId},
+                    );
+                  },
+                ),
+              );
+            },
+            childCount: comics.length,
+          ),
         );
       },
     );

@@ -16,10 +16,16 @@ import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ComicCard extends ConsumerWidget {
-  const ComicCard({super.key, required this.comic, required this.onTap});
+  const ComicCard({
+    super.key,
+    required this.comic,
+    required this.onTap,
+    this.gridIndex,
+  });
 
   final Comic comic;
   final VoidCallback onTap;
+  final int? gridIndex;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,7 +34,7 @@ class ComicCard extends ConsumerWidget {
       onSecondaryTapUp: (TapUpDetails details) {
         _showContextMenu(context, ref, details);
       },
-      cover: ComicCoverContent(comicId: comic.comicId),
+      cover: ComicCoverContent(comicId: comic.comicId, gridIndex: gridIndex),
       info: (bool isHover) => _ComicCardInfo(
         title: comic.title,
         pageCount: comic.pageCount,

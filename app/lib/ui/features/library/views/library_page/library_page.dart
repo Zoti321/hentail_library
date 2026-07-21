@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_prefetch_notifier.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_cover_viewport_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_inactive_subscription.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_revision_coordinator.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
@@ -21,19 +24,117 @@ class LibraryPage extends ConsumerStatefulWidget {
 class _LibraryPageState extends ConsumerState<LibraryPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey _headerMeasureKey = GlobalKey();
+  final GlobalKey _catalogBlocksKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
   double? _headerExtent;
+  double? _catalogGridContentStartOffset;
   bool _isEndDrawerOpen = false;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
+    _scrollController.addListener(_scheduleCoverViewportUpdate);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_scheduleCoverViewportUpdate);
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scheduleCoverViewportUpdate() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _updateCoverViewport();
+    });
+  }
+
+  void _measureCatalogGridStartOffset() {
+    final BuildContext? gridContext = _catalogBlocksKey.currentContext;
+    final ScrollableState? scrollable = gridContext == null
+        ? null
+        : Scrollable.maybeOf(gridContext);
+    final RenderBox? gridBox = gridContext?.findRenderObject() as RenderBox?;
+    final RenderObject? scrollableRender =
+        scrollable?.context.findRenderObject();
+    if (gridBox == null ||
+        scrollable == null ||
+        scrollableRender is! RenderBox) {
+      return;
+    }
+    final double gridTopInViewport = scrollableRender
+        .globalToLocal(gridBox.localToGlobal(Offset.zero))
+        .dy;
+    _catalogGridContentStartOffset =
+        scrollable.position.pixels + gridTopInViewport;
+  }
+
+  void _updateCoverViewport() {
+    if (_catalogGridContentStartOffset == null) {
+      _measureCatalogGridStartOffset();
+    }
+    final double? gridStart = _catalogGridContentStartOffset;
+    if (gridStart == null || !_scrollController.hasClients) {
+      return;
+    }
+
+    final LibraryDisplayTarget target = ref.read(libraryDisplayTargetProvider);
+    final int itemCount = switch (target) {
+      LibraryDisplayTarget.comics =>
+        ref.read(libraryComicsCatalogContentProvider).value?.items.length ?? 0,
+      LibraryDisplayTarget.series =>
+        ref.read(librarySeriesCatalogContentProvider).value?.items.length ?? 0,
+    };
+    if (itemCount <= 0) {
+      ref.read(libraryCatalogCoverViewportProvider.notifier).clear();
+      return;
+    }
+
+    final double viewportWidth = MediaQuery.sizeOf(context).width;
+    final double viewportHeight = MediaQuery.sizeOf(context).height;
+    final LibraryLayoutTier layoutTier = libraryLayoutTierForWidth(
+      viewportWidth,
+    );
+    final AppThemeTokens tokens = context.tokens;
+    final BuildContext? gridContext = _catalogBlocksKey.currentContext;
+    final ScrollableState? scrollable = gridContext == null
+        ? null
+        : Scrollable.maybeOf(gridContext);
+    final RenderBox? gridBox = gridContext?.findRenderObject() as RenderBox?;
+    final RenderObject? scrollableRender =
+        scrollable?.context.findRenderObject();
+    if (gridBox == null ||
+        scrollable == null ||
+        scrollableRender is! RenderBox) {
+      return;
+    }
+
+    final double gridTopInViewport = scrollableRender
+        .globalToLocal(gridBox.localToGlobal(Offset.zero))
+        .dy;
+    final double gridContentOffset = scrollable.position.pixels + gridTopInViewport;
+    final int crossAxisCount = libraryGridCrossAxisCount(
+      viewportWidth,
+      layoutTier,
+    );
+    final double rowExtent = libraryCatalogGridRowExtent(tokens, layoutTier);
+    final double rowSpacing = libraryGridSpacing(layoutTier);
+    final ({int startIndex, int endIndex}) range = visibleCatalogGridIndexRange(
+      scrollPixels: gridContentOffset,
+      viewportHeight: viewportHeight,
+      gridStartScrollOffset: gridStart,
+      itemCount: itemCount,
+      rowExtent: rowExtent - rowSpacing,
+      rowSpacing: rowSpacing,
+      crossAxisCount: crossAxisCount,
+    );
+    ref.read(libraryCatalogCoverViewportProvider.notifier).updateRange(
+      startIndex: range.startIndex,
+      endIndex: range.endIndex,
+    );
   }
 
   @override
@@ -51,6 +152,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     final double height = box.size.height;
     if (_headerExtent != height) {
       setState(() => _headerExtent = height);
+      _catalogGridContentStartOffset = null;
+      _scheduleCoverViewportUpdate();
     }
   }
 
@@ -71,7 +174,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(libraryCatalogPrefetchProvider);
+    ref.watch(libraryCatalogRevisionCoordinatorProvider);
+    ref.watch(libraryCatalogInactiveSubscriptionProvider);
     ref.listen<LibraryDisplayTarget>(libraryDisplayTargetProvider, (
       LibraryDisplayTarget? previous,
       LibraryDisplayTarget next,
@@ -80,6 +184,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         return;
       }
       _scrollToContentTop();
+      _catalogGridContentStartOffset = null;
+      _scheduleCoverViewportUpdate();
       if (_isEndDrawerOpen) {
         _scaffoldKey.currentState?.closeEndDrawer();
       }
@@ -94,6 +200,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           return;
         }
         _scrollToContentTop();
+      _catalogGridContentStartOffset = null;
+      _scheduleCoverViewportUpdate();
       },
     );
     ref.listen<int?>(
@@ -106,6 +214,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           return;
         }
         _scrollToContentTop();
+      _catalogGridContentStartOffset = null;
+      _scheduleCoverViewportUpdate();
       },
     );
     ref.listen<int>(libraryComicsTabPageSizeProvider, (
@@ -116,6 +226,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         return;
       }
       _scrollToContentTop();
+      _catalogGridContentStartOffset = null;
+      _scheduleCoverViewportUpdate();
     });
     ref.listen<int>(librarySeriesTabPageSizeProvider, (
       int? previous,
@@ -125,6 +237,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         return;
       }
       _scrollToContentTop();
+      _catalogGridContentStartOffset = null;
+      _scheduleCoverViewportUpdate();
     });
 
     return LayoutBuilder(
@@ -159,10 +273,18 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               : null,
           body: Stack(
             children: <Widget>[
-              CustomScrollView(
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: <Widget>[
+              NotificationListener<ScrollNotification>(
+                onNotification: (ScrollNotification notification) {
+                  if (notification is ScrollUpdateNotification ||
+                      notification is ScrollMetricsNotification) {
+                    _scheduleCoverViewportUpdate();
+                  }
+                  return false;
+                },
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: <Widget>[
                   if (_headerExtent == null)
                     SliverToBoxAdapter(child: header)
                   else
@@ -178,16 +300,18 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     horizontalPadding: horizontalPadding,
                   ),
                   LibraryBlocksSliverGroup(
+                    key: _catalogBlocksKey,
                     seriesBlock: LibrarySeriesBlock(
-                      layoutTier: layoutTier,
-                      horizontalPadding: horizontalPadding,
+                        layoutTier: layoutTier,
+                        horizontalPadding: horizontalPadding,
+                      ),
+                      comicsBlock: LibraryComicsBlock(
+                        layoutTier: layoutTier,
+                        horizontalPadding: horizontalPadding,
+                      ),
                     ),
-                    comicsBlock: LibraryComicsBlock(
-                      layoutTier: layoutTier,
-                      horizontalPadding: horizontalPadding,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               LibraryScrollToTopButton(
                 scrollController: _scrollController,

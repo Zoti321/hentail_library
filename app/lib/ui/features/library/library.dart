@@ -1,6 +1,7 @@
 export 'view_models/comic_detail_series_nav_provider.dart';
 export 'view_models/library_age_restriction_notifier.dart';
-export 'view_models/library_catalog_prefetch_notifier.dart';
+export 'view_models/library_catalog_revision_coordinator.dart';
+export 'view_models/library_catalog_inactive_subscription.dart';
 export 'view_models/library_catalog_selectors.dart';
 export 'view_models/library_catalog_state.dart';
 export 'view_models/library_comics_catalog_controller.dart';

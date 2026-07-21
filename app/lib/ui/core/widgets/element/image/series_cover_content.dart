@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/image/image_decode_cache_size.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/thumbnail/series_cover_source.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
@@ -13,10 +14,12 @@ class SeriesCoverContent extends ConsumerWidget {
     super.key,
     required this.seriesId,
     this.priority = ThumbnailPriority.high,
+    this.gridIndex,
   });
 
   final String seriesId;
   final ThumbnailPriority priority;
+  final int? gridIndex;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,21 +36,33 @@ class SeriesCoverContent extends ConsumerWidget {
         kind: ComicCoverPlaceholderKind.error,
       ),
       data: (SeriesCoverSource source) => switch (source) {
-        SeriesCoverCustomThumbnail(:final thumbnail) => AppComicImage(
-          memoryBytes: thumbnail,
-          fit: BoxFit.cover,
-          placeholder: const ComicCoverPlaceholder(
-            variant: ComicCoverPlaceholderVariant.card,
-            kind: ComicCoverPlaceholderKind.loading,
-          ),
-          errorPlaceholder: const ComicCoverPlaceholder(
-            variant: ComicCoverPlaceholderVariant.card,
-            kind: ComicCoverPlaceholderKind.error,
-          ),
+        SeriesCoverCustomThumbnail(:final thumbnail) => LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final ImageDecodeCacheSize cacheSize = decodeCacheSizeForContext(
+              context,
+              logicalWidth: constraints.maxWidth,
+              logicalHeight: constraints.maxHeight,
+            );
+            return AppComicImage(
+              memoryBytes: thumbnail,
+              fit: BoxFit.cover,
+              cacheWidth: cacheSize.cacheWidth,
+              cacheHeight: cacheSize.cacheHeight,
+              placeholder: const ComicCoverPlaceholder(
+                variant: ComicCoverPlaceholderVariant.card,
+                kind: ComicCoverPlaceholderKind.loading,
+              ),
+              errorPlaceholder: const ComicCoverPlaceholder(
+                variant: ComicCoverPlaceholderVariant.card,
+                kind: ComicCoverPlaceholderKind.error,
+              ),
+            );
+          },
         ),
         SeriesCoverFallbackComic(:final comicId) => ComicCoverContent(
           comicId: comicId,
           priority: priority,
+          gridIndex: gridIndex,
         ),
         SeriesCoverMissing() => const ComicCoverPlaceholder(
           variant: ComicCoverPlaceholderVariant.card,

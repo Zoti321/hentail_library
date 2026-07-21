@@ -13,11 +13,13 @@ class SeriesCard extends StatelessWidget {
     required this.series,
     this.onTap,
     this.onSecondaryTapUp,
+    this.gridIndex,
   });
 
   final Series series;
   final VoidCallback? onTap;
   final GestureTapUpCallback? onSecondaryTapUp;
+  final int? gridIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +29,7 @@ class SeriesCard extends StatelessWidget {
       cover: SeriesCoverContent(
         seriesId: series.id,
         priority: ThumbnailPriority.high,
+        gridIndex: gridIndex,
       ),
       info: (bool isHover) => _SeriesCardInfo(series: series, isHover: isHover),
     );

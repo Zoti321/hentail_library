@@ -5,7 +5,9 @@ import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/catalog_pagination_engine.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_revision_coordinator.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
@@ -51,9 +53,7 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
 
   Future<LibraryComicsCatalogState> _load() async {
     ref.watch(
-      libraryRevisionProvider.select(
-        (LibraryRevisionState state) => state.revision,
-      ),
+      libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
     );
 
     final LibraryRevisionState revisionState = ref.read(

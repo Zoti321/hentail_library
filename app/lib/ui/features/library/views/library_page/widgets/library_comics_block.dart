@@ -127,6 +127,7 @@ class _LibraryComicsGridSliver extends StatelessWidget {
           key: ValueKey<String>(manga.comicId),
           child: ComicCard(
             comic: manga,
+            gridIndex: index,
             onTap: () {
               appRouter.pushNamed(
                 '漫画详情',

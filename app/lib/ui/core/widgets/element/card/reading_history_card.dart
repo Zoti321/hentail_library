@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/image/image_decode_cache_size.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -156,6 +157,11 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
     const double coverWidth = 74;
     const double coverHeight = 102;
     const double coverOuterInset = 3;
+    final ImageDecodeCacheSize cacheSize = decodeCacheSizeForContext(
+      context,
+      logicalWidth: coverWidth,
+      logicalHeight: coverHeight,
+    );
 
     final Widget historyPlaceholder = Center(
       child: Icon(
@@ -177,6 +183,8 @@ class _ReadingHistoryCardState extends ConsumerState<ReadingHistoryCard> {
             filePath: coverDisplay.filePath,
             memoryBytes: coverDisplay.memoryBytes,
             fit: BoxFit.cover,
+            cacheWidth: cacheSize.cacheWidth,
+            cacheHeight: cacheSize.cacheHeight,
             placeholder: placeholder,
             errorPlaceholder: historyPlaceholder,
           );
