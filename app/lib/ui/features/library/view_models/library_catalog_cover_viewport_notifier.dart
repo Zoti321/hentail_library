@@ -1,11 +1,37 @@
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_catalog_cover_viewport_notifier.g.dart';
+
+/// Content scroll offset of [key]'s render object within its [Scrollable].
+///
+/// Works for both [RenderBox] and [RenderSliver] (e.g. [SliverMainAxisGroup]
+/// behind [LibraryBlocksSliverGroup]) via [RenderObject.getTransformTo] —
+/// never cast the keyed render object to [RenderBox].
+double? measureScrollableKeyedContentOffset(GlobalKey key) {
+  final BuildContext? targetContext = key.currentContext;
+  final ScrollableState? scrollable = targetContext == null
+      ? null
+      : Scrollable.maybeOf(targetContext);
+  final RenderObject? targetRender = targetContext?.findRenderObject();
+  final RenderObject? scrollableRender = scrollable?.context.findRenderObject();
+  if (targetRender == null ||
+      scrollable == null ||
+      scrollableRender is! RenderBox) {
+    return null;
+  }
+  final double topInViewport = MatrixUtils.transformPoint(
+    targetRender.getTransformTo(scrollableRender),
+    Offset.zero,
+  ).dy;
+  return scrollable.position.pixels + topInViewport;
+}
 
 /// 库页网格中应使用 [ThumbnailPriority.high] 加载封面的索引集合。
 @Riverpod(keepAlive: true)
