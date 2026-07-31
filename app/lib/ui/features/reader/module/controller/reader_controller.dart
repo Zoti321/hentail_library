@@ -40,6 +40,7 @@ abstract class ReaderState with _$ReaderState {
     @Default(1) int currentIndex,
     int? totalPagesOverride,
     @Default(false) bool seriesAdvancePromptPending,
+    @Default(false) bool autoPlayEnabled,
   }) = _ReaderState;
 
   ReaderState._();
@@ -177,6 +178,10 @@ class ReaderController extends _$ReaderController {
     _updateDataState((s) => s.copyWith(showControls: value));
   }
 
+  void setAutoPlayEnabled(bool value) {
+    _updateDataState((ReaderState s) => s.copyWith(autoPlayEnabled: value));
+  }
+
   void setReadingMode(ReadingMode value) {
     _updateDataState((ReaderState s) {
       if (s.readingMode == value) {
@@ -188,7 +193,11 @@ class ReaderController extends _$ReaderController {
         currentPageIndex: s.currentIndex,
         totalPages: s.totalPages,
       );
-      return s.copyWith(readingMode: value, currentIndex: remappedIndex);
+      return s.copyWith(
+        readingMode: value,
+        currentIndex: remappedIndex,
+        autoPlayEnabled: value.supportsAutoPlay ? s.autoPlayEnabled : false,
+      );
     });
   }
 

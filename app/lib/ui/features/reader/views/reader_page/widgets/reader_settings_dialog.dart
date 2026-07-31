@@ -231,12 +231,6 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
   Future<void> _applyReadingMode(ReadingMode mode) async {
     final SettingsNotifier notifier = ref.read(settingsProvider.notifier);
     await notifier.setReadingMode(mode);
-    if (mode.isWebtoon) {
-      final AppSetting? current = ref.read(settingsProvider).asData?.value;
-      if (current?.readerAutoPlayEnabled == true) {
-        await notifier.setReaderAutoPlayEnabled(false);
-      }
-    }
   }
 }
 

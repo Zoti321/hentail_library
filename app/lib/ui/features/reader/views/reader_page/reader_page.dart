@@ -96,9 +96,9 @@ class ReaderPage extends HookConsumerWidget {
       ),
     );
     final bool readerAutoPlayEnabled = ref.watch(
-      settingsProvider.select(
-        (AsyncValue<AppSetting> value) =>
-            value.asData?.value.readerAutoPlayEnabled ?? false,
+      readerControllerProvider(viewKey).select(
+        (AsyncValue<ReaderState> asyncState) =>
+            asyncState.asData?.value.autoPlayEnabled ?? false,
       ),
     );
     final int readerAutoPlayIntervalSeconds = ref.watch(
@@ -301,9 +301,7 @@ class ReaderPage extends HookConsumerWidget {
                     onNextPage: requestNextPage,
                     onSetIndex: controller.setIndex,
                     onReaderAutoPlayEnabledChanged: (bool value) {
-                      ref
-                          .read(settingsProvider.notifier)
-                          .setReaderAutoPlayEnabled(value);
+                      controller.setAutoPlayEnabled(value);
                     },
                     showSeriesComicNav: seriesNavContext != null,
                     onPrevSeriesComic: seriesNavContext?.previousItem != null

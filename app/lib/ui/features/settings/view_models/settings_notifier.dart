@@ -107,20 +107,6 @@ class SettingsNotifier extends _$SettingsNotifier {
     }
   }
 
-  Future<void> setReaderAutoPlayEnabled(bool value) async {
-    final AppSetting? current = state.asData?.value;
-    if (current == null) return;
-    final AppSetting newSetting = current.copyWith(
-      readerAutoPlayEnabled: value,
-    );
-    state = AsyncData(newSetting);
-    try {
-      await ref.read(appSettingRepoProvider).save(newSetting);
-    } catch (error, stackTrace) {
-      state = AsyncError(error, stackTrace);
-    }
-  }
-
   Future<void> setReaderAutoPlayIntervalSeconds(int value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
