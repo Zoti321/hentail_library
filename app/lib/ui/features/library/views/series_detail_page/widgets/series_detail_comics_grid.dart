@@ -70,7 +70,7 @@ class SeriesDetailComicsGridSliver extends StatelessWidget {
             gridIndex: index,
             onTap: () {
               appRouter.pushNamed(
-                '????',
+                '漫画详情',
                 pathParameters: <String, String>{'id': comic.comicId},
               );
             },
