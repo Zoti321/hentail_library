@@ -16,6 +16,7 @@ import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/domain/reading/read_session_coordinator.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/features/shell/views/routing/series_detail_route_page.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -378,6 +379,7 @@ class ReaderController extends _$ReaderController {
           comicId: routeContext.comicId,
           seriesId: routeContext.seriesId,
         ),
+        extra: const SeriesDetailEnterFromReader(),
       );
       return;
     }
