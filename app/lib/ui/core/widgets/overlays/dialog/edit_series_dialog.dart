@@ -75,7 +75,9 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
     }
   }
 
-  void _updateForm(SeriesMetadataForm Function(SeriesMetadataForm form) update) {
+  void _updateForm(
+    SeriesMetadataForm Function(SeriesMetadataForm form) update,
+  ) {
     setState(() => _form = update(_form));
   }
 
@@ -97,7 +99,9 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
             errorText: _validation?.nameError,
             enabled: !_saving,
             onChanged: (String value) {
-              _updateForm((SeriesMetadataForm form) => form.copyWith(name: value));
+              _updateForm(
+                (SeriesMetadataForm form) => form.copyWith(name: value),
+              );
               if (_validation?.nameError != null) {
                 setState(
                   () => _validation = _validation!.copyWith(nameError: null),
@@ -130,11 +134,14 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
             keyboardType: TextInputType.number,
             onChanged: (String value) {
               _updateForm(
-                (SeriesMetadataForm form) => form.copyWith(totalCountText: value),
+                (SeriesMetadataForm form) =>
+                    form.copyWith(totalCountText: value),
               );
               if (_validation?.totalCountError != null) {
                 setState(
-                  () => _validation = _validation!.copyWith(totalCountError: null),
+                  () => _validation = _validation!.copyWith(
+                    totalCountError: null,
+                  ),
                 );
               }
             },

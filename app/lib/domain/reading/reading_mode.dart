@@ -32,7 +32,8 @@ const int kWebtoonMarginPercentStep = 5;
 int normalizeWebtoonMarginPercent(int value) {
   final int clamped = value.clamp(0, kWebtoonMarginPercentMax);
   final int stepped =
-      ((clamped / kWebtoonMarginPercentStep).round() * kWebtoonMarginPercentStep)
+      ((clamped / kWebtoonMarginPercentStep).round() *
+              kWebtoonMarginPercentStep)
           .clamp(0, kWebtoonMarginPercentMax);
   return stepped;
 }

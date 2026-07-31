@@ -52,9 +52,7 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
   }
 
   Future<LibraryComicsCatalogState> _load() async {
-    ref.watch(
-      libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
-    );
+    ref.watch(libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics));
 
     final LibraryRevisionState revisionState = ref.read(
       libraryRevisionProvider,

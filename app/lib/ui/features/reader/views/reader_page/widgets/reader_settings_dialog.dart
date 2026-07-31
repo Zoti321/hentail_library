@@ -308,10 +308,7 @@ class _ReaderSettingsDropdownRow<T> extends StatelessWidget {
     return Row(
       children: <Widget>[
         Expanded(
-          child: Text(
-            label,
-            style: TextStyle(fontSize: 13, color: labelColor),
-          ),
+          child: Text(label, style: TextStyle(fontSize: 13, color: labelColor)),
         ),
         SizedBox(
           width: 180,

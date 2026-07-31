@@ -90,10 +90,7 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
                       ),
                       child: Text(
                         l10n.libraryMetadataFilterClear,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: cs.primary,
-                        ),
+                        style: TextStyle(fontSize: 12, color: cs.primary),
                       ),
                     ),
                   LibraryFilterAccordionChevron(expanded: expanded.value),
@@ -197,8 +194,9 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
                     itemCount: filteredNames.length,
                     itemBuilder: (BuildContext context, int index) {
                       final String name = filteredNames[index];
-                      final LibraryTriStatePick state =
-                          selection.pickStateFor(name);
+                      final LibraryTriStatePick state = selection.pickStateFor(
+                        name,
+                      );
                       return Material(
                         color: Colors.transparent,
                         child: InkWell(
@@ -245,10 +243,7 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
 }
 
 class _IncludeModeIconButton extends StatelessWidget {
-  const _IncludeModeIconButton({
-    required this.mode,
-    required this.onChanged,
-  });
+  const _IncludeModeIconButton({required this.mode, required this.onChanged});
 
   final LibraryMetadataIncludeMode mode;
   final LibraryMetadataIncludeModeChanged onChanged;
@@ -273,9 +268,7 @@ class _IncludeModeIconButton extends StatelessWidget {
       hoverColor: theme.hoverColor,
       overlayColor: theme.hoverColor,
       onPressed: () => onChanged(
-        isAll
-            ? LibraryMetadataIncludeMode.any
-            : LibraryMetadataIncludeMode.all,
+        isAll ? LibraryMetadataIncludeMode.any : LibraryMetadataIncludeMode.all,
       ),
     );
   }

@@ -10,7 +10,8 @@ part 'library_tag_filter_notifier.g.dart';
 class LibraryTagFilterNotifier extends _$LibraryTagFilterNotifier {
   static const String _includeStorageKey = 'library_tag_filter_include';
   static const String _excludeStorageKey = 'library_tag_filter_exclude';
-  static const String _includeModeStorageKey = 'library_tag_filter_include_mode';
+  static const String _includeModeStorageKey =
+      'library_tag_filter_include_mode';
 
   @override
   Future<LibraryMetadataFilterSelection> build() async {

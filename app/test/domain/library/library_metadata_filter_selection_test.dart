@@ -5,18 +5,9 @@ import 'package:test/test.dart';
 void main() {
   group('LibraryTriStatePick', () {
     test('cycles neutral → include → exclude → neutral', () {
-      expect(
-        LibraryTriStatePick.neutral.next,
-        LibraryTriStatePick.include,
-      );
-      expect(
-        LibraryTriStatePick.include.next,
-        LibraryTriStatePick.exclude,
-      );
-      expect(
-        LibraryTriStatePick.exclude.next,
-        LibraryTriStatePick.neutral,
-      );
+      expect(LibraryTriStatePick.neutral.next, LibraryTriStatePick.include);
+      expect(LibraryTriStatePick.include.next, LibraryTriStatePick.exclude);
+      expect(LibraryTriStatePick.exclude.next, LibraryTriStatePick.neutral);
     });
 
     test('maps to Checkbox values: unchecked / checked / indeterminate', () {
@@ -30,16 +21,19 @@ void main() {
     test('toggling cycles pick state for a name', () {
       const LibraryMetadataFilterSelection selection =
           LibraryMetadataFilterSelection();
-      final LibraryMetadataFilterSelection afterFirst =
-          selection.withToggled('百合');
+      final LibraryMetadataFilterSelection afterFirst = selection.withToggled(
+        '百合',
+      );
       expect(afterFirst.pickStateFor('百合'), LibraryTriStatePick.include);
 
-      final LibraryMetadataFilterSelection afterSecond =
-          afterFirst.withToggled('百合');
+      final LibraryMetadataFilterSelection afterSecond = afterFirst.withToggled(
+        '百合',
+      );
       expect(afterSecond.pickStateFor('百合'), LibraryTriStatePick.exclude);
 
-      final LibraryMetadataFilterSelection afterThird =
-          afterSecond.withToggled('百合');
+      final LibraryMetadataFilterSelection afterThird = afterSecond.withToggled(
+        '百合',
+      );
       expect(afterThird.pickStateFor('百合'), LibraryTriStatePick.neutral);
     });
 
@@ -56,10 +50,7 @@ void main() {
       expect(selection.isActive, isTrue);
       expect(selection.includeNames(), <String>{'百合', '校园'});
       expect(selection.excludeNames(), <String>{'R18'});
-      expect(
-        selection.toFilterSets().all,
-        <String>{'百合', '校园'},
-      );
+      expect(selection.toFilterSets().all, <String>{'百合', '校园'});
       expect(selection.toFilterSets().any, isEmpty);
       expect(selection.toFilterSets().exclude, <String>{'R18'});
     });

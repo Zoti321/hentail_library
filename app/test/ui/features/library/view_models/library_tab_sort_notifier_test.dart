@@ -23,8 +23,9 @@ void main() {
           .read(libraryTabSortProvider.notifier)
           .setComicSortField(LibraryComicSortField.readAt);
 
-      LibraryComicSortOption sort =
-          (await container.read(libraryTabSortProvider.future)).comics;
+      LibraryComicSortOption sort = (await container.read(
+        libraryTabSortProvider.future,
+      )).comics;
       expect(sort.field, LibraryComicSortField.readAt);
       expect(sort.descending, isTrue);
 
@@ -50,8 +51,9 @@ void main() {
           .read(libraryTabSortProvider.notifier)
           .setComicSortField(LibraryComicSortField.createdAt);
 
-      final LibraryComicSortOption sort =
-          (await container.read(libraryTabSortProvider.future)).comics;
+      final LibraryComicSortOption sort = (await container.read(
+        libraryTabSortProvider.future,
+      )).comics;
       expect(sort.field, LibraryComicSortField.createdAt);
       expect(sort.descending, isFalse);
     },

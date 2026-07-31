@@ -37,7 +37,8 @@ class LibrarySeriesProjection {
       r18Only: flags.r18Only,
       query: query,
       requireItems: true,
-      serializationStatus: serializationStatusFilter.seriesSerializationStatus(),
+      serializationStatus: serializationStatusFilter
+          .seriesSerializationStatus(),
     );
   }
 }

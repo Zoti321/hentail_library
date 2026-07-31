@@ -185,10 +185,7 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
     );
   }
 
-  List<Widget> _buildLeadingSideActions(
-    ColorScheme cs,
-    AppLocalizations l10n,
-  ) {
+  List<Widget> _buildLeadingSideActions(ColorScheme cs, AppLocalizations l10n) {
     return <Widget>[
       if (widget.showSeriesComicNav)
         GhostButton.icon(

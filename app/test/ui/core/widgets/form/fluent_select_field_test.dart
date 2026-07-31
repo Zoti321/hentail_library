@@ -21,11 +21,11 @@ void main() {
                 labelText: 'Status',
                 value: selected,
                 items: _TestOption.values,
-                itemLabel: ( _TestOption option) => switch (option) {
+                itemLabel: (_TestOption option) => switch (option) {
                   _TestOption.alpha => 'Alpha',
                   _TestOption.beta => 'Beta',
                 },
-                onChanged: ( _TestOption? value) {
+                onChanged: (_TestOption? value) {
                   if (value == null) {
                     return;
                   }

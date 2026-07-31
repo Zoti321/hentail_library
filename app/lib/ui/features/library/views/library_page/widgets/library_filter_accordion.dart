@@ -22,19 +22,14 @@ class LibraryFilterAccordionBody extends StatelessWidget {
       duration: kLibraryFilterAccordionDuration,
       curve: kLibraryFilterAccordionCurve,
       alignment: Alignment.topCenter,
-      child: expanded
-          ? child
-          : const SizedBox.shrink(),
+      child: expanded ? child : const SizedBox.shrink(),
     );
   }
 }
 
 /// 筛选手风琴 chevron：固定向下图标，展开时旋转半圈朝上。
 class LibraryFilterAccordionChevron extends StatelessWidget {
-  const LibraryFilterAccordionChevron({
-    super.key,
-    required this.expanded,
-  });
+  const LibraryFilterAccordionChevron({super.key, required this.expanded});
 
   final bool expanded;
 

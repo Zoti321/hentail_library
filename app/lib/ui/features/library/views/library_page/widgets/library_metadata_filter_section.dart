@@ -25,12 +25,12 @@ class LibraryTagFilterControls extends ConsumerWidget {
     }
 
     final AsyncValue<List<Tag>> tagsAsync = ref.watch(allTagsProvider);
-    final LibraryMetadataFilterSelection selection = ref.watch(
-      libraryTagFilterProvider,
-    ).maybeWhen(
-      data: (LibraryMetadataFilterSelection value) => value,
-      orElse: () => const LibraryMetadataFilterSelection(),
-    );
+    final LibraryMetadataFilterSelection selection = ref
+        .watch(libraryTagFilterProvider)
+        .maybeWhen(
+          data: (LibraryMetadataFilterSelection value) => value,
+          orElse: () => const LibraryMetadataFilterSelection(),
+        );
     final List<String> names = tagsAsync.maybeWhen(
       data: (List<Tag> tags) =>
           tags.map((Tag tag) => tag.name).toList()..sort(),
@@ -43,8 +43,9 @@ class LibraryTagFilterControls extends ConsumerWidget {
       selection: selection,
       isLoading: tagsAsync.isLoading,
       onToggle: ref.read(libraryTagFilterProvider.notifier).toggle,
-      onIncludeModeChanged:
-          ref.read(libraryTagFilterProvider.notifier).setIncludeMode,
+      onIncludeModeChanged: ref
+          .read(libraryTagFilterProvider.notifier)
+          .setIncludeMode,
       onClear: ref.read(libraryTagFilterProvider.notifier).clear,
     );
   }
@@ -63,12 +64,12 @@ class LibraryAuthorFilterControls extends ConsumerWidget {
     }
 
     final AsyncValue<List<Author>> authorsAsync = ref.watch(allAuthorsProvider);
-    final LibraryMetadataFilterSelection selection = ref.watch(
-      libraryAuthorFilterProvider,
-    ).maybeWhen(
-      data: (LibraryMetadataFilterSelection value) => value,
-      orElse: () => const LibraryMetadataFilterSelection(),
-    );
+    final LibraryMetadataFilterSelection selection = ref
+        .watch(libraryAuthorFilterProvider)
+        .maybeWhen(
+          data: (LibraryMetadataFilterSelection value) => value,
+          orElse: () => const LibraryMetadataFilterSelection(),
+        );
     final List<String> names = authorsAsync.maybeWhen(
       data: (List<Author> authors) =>
           authors.map((Author author) => author.name).toList()..sort(),
@@ -81,8 +82,9 @@ class LibraryAuthorFilterControls extends ConsumerWidget {
       selection: selection,
       isLoading: authorsAsync.isLoading,
       onToggle: ref.read(libraryAuthorFilterProvider.notifier).toggle,
-      onIncludeModeChanged:
-          ref.read(libraryAuthorFilterProvider.notifier).setIncludeMode,
+      onIncludeModeChanged: ref
+          .read(libraryAuthorFilterProvider.notifier)
+          .setIncludeMode,
       onClear: ref.read(libraryAuthorFilterProvider.notifier).clear,
     );
   }

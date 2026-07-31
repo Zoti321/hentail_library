@@ -17,42 +17,48 @@ void main() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
   });
 
-  test('series resetAll clears serialization, age restriction, and sort', () async {
-    final ProviderContainer container = ProviderContainer();
-    addTearDown(container.dispose);
+  test(
+    'series resetAll clears serialization, age restriction, and sort',
+    () async {
+      final ProviderContainer container = ProviderContainer();
+      addTearDown(container.dispose);
 
-    await container.read(librarySerializationStatusFilterProvider.future);
-    await container.read(libraryAgeRestrictionFilterProvider.future);
-    await container.read(libraryTabSortProvider.future);
+      await container.read(librarySerializationStatusFilterProvider.future);
+      await container.read(libraryAgeRestrictionFilterProvider.future);
+      await container.read(libraryTabSortProvider.future);
 
-    await container
-        .read(librarySerializationStatusFilterProvider.notifier)
-        .setFilter(LibrarySerializationStatusFilter.ongoing);
-    await container
-        .read(libraryAgeRestrictionFilterProvider.notifier)
-        .setFilter(
-          LibraryDisplayTarget.series,
-          LibraryAgeRestrictionFilter.r18Only,
-        );
-    await container
-        .read(libraryTabSortProvider.notifier)
-        .setSeriesSortField(LibrarySeriesSortField.comicCount);
+      await container
+          .read(librarySerializationStatusFilterProvider.notifier)
+          .setFilter(LibrarySerializationStatusFilter.ongoing);
+      await container
+          .read(libraryAgeRestrictionFilterProvider.notifier)
+          .setFilter(
+            LibraryDisplayTarget.series,
+            LibraryAgeRestrictionFilter.r18Only,
+          );
+      await container
+          .read(libraryTabSortProvider.notifier)
+          .setSeriesSortField(LibrarySeriesSortField.comicCount);
 
-    await container
-        .read(librarySeriesFilterResetProvider.notifier)
-        .resetAll();
+      await container
+          .read(librarySeriesFilterResetProvider.notifier)
+          .resetAll();
 
-    expect(
-      await container.read(librarySerializationStatusFilterProvider.future),
-      LibrarySerializationStatusFilter.unrestricted,
-    );
-    expect(
-      (await container.read(libraryAgeRestrictionFilterProvider.future)).series,
-      LibraryAgeRestrictionFilter.unrestricted,
-    );
-    final LibrarySeriesSortOption sort =
-        (await container.read(libraryTabSortProvider.future)).series;
-    expect(sort.field, kLibraryDefaultSeriesSortOption.field);
-    expect(sort.descending, kLibraryDefaultSeriesSortOption.descending);
-  });
+      expect(
+        await container.read(librarySerializationStatusFilterProvider.future),
+        LibrarySerializationStatusFilter.unrestricted,
+      );
+      expect(
+        (await container.read(
+          libraryAgeRestrictionFilterProvider.future,
+        )).series,
+        LibraryAgeRestrictionFilter.unrestricted,
+      );
+      final LibrarySeriesSortOption sort = (await container.read(
+        libraryTabSortProvider.future,
+      )).series;
+      expect(sort.field, kLibraryDefaultSeriesSortOption.field);
+      expect(sort.descending, kLibraryDefaultSeriesSortOption.descending);
+    },
+  );
 }

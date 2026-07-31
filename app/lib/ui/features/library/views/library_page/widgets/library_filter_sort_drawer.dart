@@ -33,7 +33,9 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
     final LibraryDisplayTarget displayTarget = ref.watch(
       libraryDisplayTargetProvider,
     );
-    final bool isCustomized = ref.watch(libraryActiveFilterSortIsCustomizedProvider);
+    final bool isCustomized = ref.watch(
+      libraryActiveFilterSortIsCustomizedProvider,
+    );
     return Drawer(
       width: widthFor(context),
       backgroundColor: cs.surface,

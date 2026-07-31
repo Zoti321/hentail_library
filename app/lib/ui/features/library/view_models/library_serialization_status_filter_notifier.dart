@@ -7,8 +7,7 @@ part 'library_serialization_status_filter_notifier.g.dart';
 @Riverpod(keepAlive: true)
 class LibrarySerializationStatusFilterNotifier
     extends _$LibrarySerializationStatusFilterNotifier {
-  static const String _storageKey =
-      LibrarySerializationStatusFilter.storageKey;
+  static const String _storageKey = LibrarySerializationStatusFilter.storageKey;
 
   @override
   Future<LibrarySerializationStatusFilter> build() async {

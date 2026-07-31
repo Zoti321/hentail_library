@@ -48,9 +48,6 @@ class HorizontalWheelScrollListener extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
-      onPointerSignal: _handlePointerSignal,
-      child: child,
-    );
+    return Listener(onPointerSignal: _handlePointerSignal, child: child);
   }
 }

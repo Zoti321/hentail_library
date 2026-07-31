@@ -248,10 +248,11 @@ class LabeledMetaChipRow extends HookWidget {
                       (String item) => OutlinedMetaChip(
                         text: item,
                         onTap: () {
-                          final String query = formatLibrarySearchExactMetaQuery(
-                            item,
+                          final String query =
+                              formatLibrarySearchExactMetaQuery(item);
+                          final String encoded = Uri.encodeQueryComponent(
+                            query,
                           );
-                          final String encoded = Uri.encodeQueryComponent(query);
                           appRouter.push('/searched?q=$encoded');
                         },
                       ),

@@ -9,26 +9,11 @@ import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader
 void main() {
   group('reader viewport slot widths', () {
     test('continuous fitWidth slot uses margin percent without clamp', () {
-      expect(
-        readerContinuousSlotLogicalWidth(1000, marginPercent: 0),
-        1000,
-      );
-      expect(
-        readerContinuousSlotLogicalWidth(1000, marginPercent: 20),
-        800,
-      );
-      expect(
-        readerContinuousSlotLogicalWidth(1000, marginPercent: 40),
-        600,
-      );
-      expect(
-        readerContinuousSlotLogicalWidth(400, marginPercent: 20),
-        320,
-      );
-      expect(
-        readerContinuousSlotLogicalWidth(3000, marginPercent: 20),
-        2400,
-      );
+      expect(readerContinuousSlotLogicalWidth(1000, marginPercent: 0), 1000);
+      expect(readerContinuousSlotLogicalWidth(1000, marginPercent: 20), 800);
+      expect(readerContinuousSlotLogicalWidth(1000, marginPercent: 40), 600);
+      expect(readerContinuousSlotLogicalWidth(400, marginPercent: 20), 320);
+      expect(readerContinuousSlotLogicalWidth(3000, marginPercent: 20), 2400);
     });
 
     test('dual page slot is half viewport width', () {

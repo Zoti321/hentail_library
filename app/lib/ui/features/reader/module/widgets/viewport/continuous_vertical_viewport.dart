@@ -59,6 +59,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     final ObjectRef<bool> hasAppliedPreferredPage = useRef<bool>(false);
     final ObjectRef<int?> lastVisibleMainIndex = useRef<int?>(null);
     final ObjectRef<bool> isProgrammaticScroll = useRef<bool>(false);
+
     /// 挂载/程序化对齐完成前，忽略可见页回写，避免先停在顶部把页码打成 1。
     final ObjectRef<bool> suppressVisibleIndexSync = useRef<bool>(true);
     final ObjectRef<int> scrollGeneration = useRef<int>(0);
@@ -269,9 +270,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
             ),
           );
     return ScrollConfiguration(
-      behavior: ScrollConfiguration.of(
-        context,
-      ).copyWith(scrollbars: false),
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: viewport,
     );
   }

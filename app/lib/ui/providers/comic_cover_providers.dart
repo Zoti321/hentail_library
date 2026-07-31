@@ -123,7 +123,9 @@ class ComicCover extends _$ComicCover {
     _loadInFlight = true;
     try {
       await ComicCoverLoadGate.run(() async {
-        final Comic? comic = await ref.read(comicRepoProvider).findById(comicId);
+        final Comic? comic = await ref
+            .read(comicRepoProvider)
+            .findById(comicId);
         if (!ref.mounted) {
           return;
         }

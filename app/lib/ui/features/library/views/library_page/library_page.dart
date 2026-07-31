@@ -58,8 +58,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         ? null
         : Scrollable.maybeOf(gridContext);
     final RenderBox? gridBox = gridContext?.findRenderObject() as RenderBox?;
-    final RenderObject? scrollableRender =
-        scrollable?.context.findRenderObject();
+    final RenderObject? scrollableRender = scrollable?.context
+        .findRenderObject();
     if (gridBox == null ||
         scrollable == null ||
         scrollableRender is! RenderBox) {
@@ -104,8 +104,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         ? null
         : Scrollable.maybeOf(gridContext);
     final RenderBox? gridBox = gridContext?.findRenderObject() as RenderBox?;
-    final RenderObject? scrollableRender =
-        scrollable?.context.findRenderObject();
+    final RenderObject? scrollableRender = scrollable?.context
+        .findRenderObject();
     if (gridBox == null ||
         scrollable == null ||
         scrollableRender is! RenderBox) {
@@ -115,7 +115,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     final double gridTopInViewport = scrollableRender
         .globalToLocal(gridBox.localToGlobal(Offset.zero))
         .dy;
-    final double gridContentOffset = scrollable.position.pixels + gridTopInViewport;
+    final double gridContentOffset =
+        scrollable.position.pixels + gridTopInViewport;
     final int crossAxisCount = libraryGridCrossAxisCount(
       viewportWidth,
       layoutTier,
@@ -131,10 +132,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       rowSpacing: rowSpacing,
       crossAxisCount: crossAxisCount,
     );
-    ref.read(libraryCatalogCoverViewportProvider.notifier).updateRange(
-      startIndex: range.startIndex,
-      endIndex: range.endIndex,
-    );
+    ref
+        .read(libraryCatalogCoverViewportProvider.notifier)
+        .updateRange(startIndex: range.startIndex, endIndex: range.endIndex);
   }
 
   @override
@@ -200,8 +200,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           return;
         }
         _scrollToContentTop();
-      _catalogGridContentStartOffset = null;
-      _scheduleCoverViewportUpdate();
+        _catalogGridContentStartOffset = null;
+        _scheduleCoverViewportUpdate();
       },
     );
     ref.listen<int?>(
@@ -214,8 +214,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           return;
         }
         _scrollToContentTop();
-      _catalogGridContentStartOffset = null;
-      _scheduleCoverViewportUpdate();
+        _catalogGridContentStartOffset = null;
+        _scheduleCoverViewportUpdate();
       },
     );
     ref.listen<int>(libraryComicsTabPageSizeProvider, (
@@ -285,23 +285,23 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                   controller: _scrollController,
                   physics: const AlwaysScrollableScrollPhysics(),
                   slivers: <Widget>[
-                  if (_headerExtent == null)
-                    SliverToBoxAdapter(child: header)
-                  else
-                    SliverPersistentHeader(
-                      pinned: true,
-                      delegate: LibraryPinnedHeaderDelegate(
-                        extent: _headerExtent!,
-                        child: header,
+                    if (_headerExtent == null)
+                      SliverToBoxAdapter(child: header)
+                    else
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: LibraryPinnedHeaderDelegate(
+                          extent: _headerExtent!,
+                          child: header,
+                        ),
                       ),
+                    LibraryContentSearchSliver(
+                      layoutTier: layoutTier,
+                      horizontalPadding: horizontalPadding,
                     ),
-                  LibraryContentSearchSliver(
-                    layoutTier: layoutTier,
-                    horizontalPadding: horizontalPadding,
-                  ),
-                  LibraryBlocksSliverGroup(
-                    key: _catalogBlocksKey,
-                    seriesBlock: LibrarySeriesBlock(
+                    LibraryBlocksSliverGroup(
+                      key: _catalogBlocksKey,
+                      seriesBlock: LibrarySeriesBlock(
                         layoutTier: layoutTier,
                         horizontalPadding: horizontalPadding,
                       ),

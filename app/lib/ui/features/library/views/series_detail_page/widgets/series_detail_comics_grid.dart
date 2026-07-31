@@ -61,25 +61,25 @@ class SeriesDetailComicsGridSliver extends StatelessWidget {
 
         return SliverGrid(
           gridDelegate: gridDelegate,
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              final Comic comic = comics[index];
-              return Center(
-                child: ComicCard(
-                  key: Key(comic.comicId),
-                  comic: comic,
-                  gridIndex: index,
-                  onTap: () {
-                    appRouter.pushNamed(
-                      '漫画详情',
-                      pathParameters: <String, String>{'id': comic.comicId},
-                    );
-                  },
-                ),
-              );
-            },
-            childCount: comics.length,
-          ),
+          delegate: SliverChildBuilderDelegate((
+            BuildContext context,
+            int index,
+          ) {
+            final Comic comic = comics[index];
+            return Center(
+              child: ComicCard(
+                key: Key(comic.comicId),
+                comic: comic,
+                gridIndex: index,
+                onTap: () {
+                  appRouter.pushNamed(
+                    '漫画详情',
+                    pathParameters: <String, String>{'id': comic.comicId},
+                  );
+                },
+              ),
+            );
+          }, childCount: comics.length),
         );
       },
     );

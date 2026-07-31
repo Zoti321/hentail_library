@@ -26,9 +26,7 @@ class LibraryComicsFilterResetNotifier
     await ref.read(libraryMediaTypeFilterProvider.notifier).clearAll();
     await ref.read(libraryTagFilterProvider.notifier).clear();
     await ref.read(libraryAuthorFilterProvider.notifier).clear();
-    await ref
-        .read(libraryTabSortProvider.notifier)
-        .resetComicsSortToDefault();
+    await ref.read(libraryTabSortProvider.notifier).resetComicsSortToDefault();
     ref.invalidate(libraryComicsCatalogControllerProvider);
   }
 }

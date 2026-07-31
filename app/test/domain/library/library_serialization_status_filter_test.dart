@@ -14,28 +14,32 @@ void main() {
       );
     });
 
-    test('seriesSerializationStatus maps selectable options to rust strings', () {
-      expect(
-        LibrarySerializationStatusFilter.unrestricted.seriesSerializationStatus(),
-        isNull,
-      );
-      expect(
-        LibrarySerializationStatusFilter.ongoing.seriesSerializationStatus(),
-        'ongoing',
-      );
-      expect(
-        LibrarySerializationStatusFilter.ended.seriesSerializationStatus(),
-        'ended',
-      );
-      expect(
-        LibrarySerializationStatusFilter.hiatus.seriesSerializationStatus(),
-        'hiatus',
-      );
-      expect(
-        LibrarySerializationStatusFilter.unknown.seriesSerializationStatus(),
-        'unknown',
-      );
-    });
+    test(
+      'seriesSerializationStatus maps selectable options to rust strings',
+      () {
+        expect(
+          LibrarySerializationStatusFilter.unrestricted
+              .seriesSerializationStatus(),
+          isNull,
+        );
+        expect(
+          LibrarySerializationStatusFilter.ongoing.seriesSerializationStatus(),
+          'ongoing',
+        );
+        expect(
+          LibrarySerializationStatusFilter.ended.seriesSerializationStatus(),
+          'ended',
+        );
+        expect(
+          LibrarySerializationStatusFilter.hiatus.seriesSerializationStatus(),
+          'hiatus',
+        );
+        expect(
+          LibrarySerializationStatusFilter.unknown.seriesSerializationStatus(),
+          'unknown',
+        );
+      },
+    );
 
     test('selectableOptions excludes unrestricted', () {
       expect(

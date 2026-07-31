@@ -96,91 +96,87 @@ void main() {
     },
   );
 
-  testWidgets(
-    'fitWidth margin change updates continuous content max width',
-    (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1000, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
+  testWidgets('fitWidth margin change updates continuous content max width', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1000, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
 
-      final _MemoryAppSettingRepository repo = _MemoryAppSettingRepository(
-        AppSetting(webtoonMarginPercent: 20),
-      );
+    final _MemoryAppSettingRepository repo = _MemoryAppSettingRepository(
+      AppSetting(webtoonMarginPercent: 20),
+    );
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: <Override>[
-            appSettingRepoProvider.overrideWithValue(repo),
-            ..._viewportTestOverrides(),
-          ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: ContinuousVerticalViewport(
-                comicId: _testComicId,
-                incognito: false,
-                preferredPageIndex: null,
-              ),
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: <Override>[
+          appSettingRepoProvider.overrideWithValue(repo),
+          ..._viewportTestOverrides(),
+        ],
+        child: const MaterialApp(
+          home: Scaffold(
+            body: ContinuousVerticalViewport(
+              comicId: _testComicId,
+              incognito: false,
+              preferredPageIndex: null,
             ),
           ),
         ),
-      );
-      await tester.pumpAndSettle();
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      expect(_continuousContentMaxWidth(tester), 800);
+    expect(_continuousContentMaxWidth(tester), 800);
 
-      final ProviderContainer container = ProviderScope.containerOf(
-        tester.element(find.byType(ContinuousVerticalViewport)),
-      );
-      await container
-          .read(settingsProvider.notifier)
-          .setWebtoonMarginPercent(0);
-      await tester.pumpAndSettle();
+    final ProviderContainer container = ProviderScope.containerOf(
+      tester.element(find.byType(ContinuousVerticalViewport)),
+    );
+    await container.read(settingsProvider.notifier).setWebtoonMarginPercent(0);
+    await tester.pumpAndSettle();
 
-      expect(_continuousContentMaxWidth(tester), 1000);
-    },
-  );
+    expect(_continuousContentMaxWidth(tester), 1000);
+  });
 
-  testWidgets(
-    'originalSize ignores margin and enables horizontal scrolling',
-    (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1000, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
+  testWidgets('originalSize ignores margin and enables horizontal scrolling', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1000, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
 
-      final _MemoryAppSettingRepository repo = _MemoryAppSettingRepository(
-        AppSetting(
-          webtoonMarginPercent: 40,
-          webtoonZoomMode: WebtoonZoomMode.originalSize,
-        ),
-      );
+    final _MemoryAppSettingRepository repo = _MemoryAppSettingRepository(
+      AppSetting(
+        webtoonMarginPercent: 40,
+        webtoonZoomMode: WebtoonZoomMode.originalSize,
+      ),
+    );
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: <Override>[
-            appSettingRepoProvider.overrideWithValue(repo),
-            ..._viewportTestOverrides(),
-          ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: ContinuousVerticalViewport(
-                comicId: _testComicId,
-                incognito: false,
-                preferredPageIndex: null,
-              ),
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: <Override>[
+          appSettingRepoProvider.overrideWithValue(repo),
+          ..._viewportTestOverrides(),
+        ],
+        child: const MaterialApp(
+          home: Scaffold(
+            body: ContinuousVerticalViewport(
+              comicId: _testComicId,
+              incognito: false,
+              preferredPageIndex: null,
             ),
           ),
         ),
-      );
-      await tester.pumpAndSettle();
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      expect(
-        _hasBoundedMaxWidth(tester, 600),
-        isFalse,
-        reason: 'originalSize must not apply 40% margin slot width',
-      );
-      expect(_hasHorizontalScrollable(tester), isTrue);
-    },
-  );
+    expect(
+      _hasBoundedMaxWidth(tester, 600),
+      isFalse,
+      reason: 'originalSize must not apply 40% margin slot width',
+    );
+    expect(_hasHorizontalScrollable(tester), isTrue);
+  });
 
   testWidgets(
     'unmounting during far-index programmatic scroll does not throw',
@@ -478,19 +474,23 @@ double _continuousContentMaxWidth(WidgetTester tester) {
 }
 
 bool _hasBoundedMaxWidth(WidgetTester tester, double maxWidth) {
-  return tester.widgetList<ConstrainedBox>(find.byType(ConstrainedBox)).any(
-    (ConstrainedBox box) =>
-        box.constraints.hasBoundedWidth &&
-        box.constraints.maxWidth == maxWidth,
-  );
+  return tester
+      .widgetList<ConstrainedBox>(find.byType(ConstrainedBox))
+      .any(
+        (ConstrainedBox box) =>
+            box.constraints.hasBoundedWidth &&
+            box.constraints.maxWidth == maxWidth,
+      );
 }
 
 bool _hasHorizontalScrollable(WidgetTester tester) {
-  return tester.widgetList<Scrollable>(find.byType(Scrollable)).any(
-    (Scrollable scrollable) =>
-        scrollable.axisDirection == AxisDirection.right ||
-        scrollable.axisDirection == AxisDirection.left,
-  );
+  return tester
+      .widgetList<Scrollable>(find.byType(Scrollable))
+      .any(
+        (Scrollable scrollable) =>
+            scrollable.axisDirection == AxisDirection.right ||
+            scrollable.axisDirection == AxisDirection.left,
+      );
 }
 
 class _MemoryAppSettingRepository implements AppSettingRepository {

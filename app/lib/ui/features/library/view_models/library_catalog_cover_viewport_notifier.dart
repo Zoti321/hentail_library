@@ -21,9 +21,7 @@ class LibraryCatalogCoverViewport extends _$LibraryCatalogCoverViewport {
       state = const <int>{};
       return;
     }
-    final Set<int> next = <int>{
-      for (int i = startIndex; i <= endIndex; i++) i,
-    };
+    final Set<int> next = <int>{for (int i = startIndex; i <= endIndex; i++) i};
     if (setEquals(next, state)) {
       return;
     }
@@ -40,19 +38,13 @@ class LibraryCatalogCoverViewport extends _$LibraryCatalogCoverViewport {
 
 int libraryGridCrossAxisCount(double viewportWidth, LibraryLayoutTier tier) {
   final double horizontalPadding = libraryContentHorizontalPadding(tier);
-  final double innerWidth = math.max(
-    0,
-    viewportWidth - horizontalPadding * 2,
-  );
+  final double innerWidth = math.max(0, viewportWidth - horizontalPadding * 2);
   final double maxExtent = libraryGridMaxCrossAxisExtent(tier);
   final double spacing = libraryGridSpacing(tier);
   if (innerWidth <= 0) {
     return 1;
   }
-  return math.max(
-    1,
-    ((innerWidth + spacing) / (maxExtent + spacing)).floor(),
-  );
+  return math.max(1, ((innerWidth + spacing) / (maxExtent + spacing)).floor());
 }
 
 /// 根据滚动偏移估算当前可见（含缓冲行）的网格索引范围。
@@ -98,12 +90,12 @@ double libraryCatalogGridRowExtent(
   final double infoBottomPad = tokens.spacing.sm;
   final double cardMainAxis =
       (coverHeight +
-                  coverToInfoGap +
-                  titleLineHeight +
-                  infoColumnSpacing +
-                  metaLineHeight +
-                  infoBottomPad)
-              .ceil() +
-          16;
+              coverToInfoGap +
+              titleLineHeight +
+              infoColumnSpacing +
+              metaLineHeight +
+              infoBottomPad)
+          .ceil() +
+      16;
   return cardMainAxis + libraryGridSpacing(tier);
 }

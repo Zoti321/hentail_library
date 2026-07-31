@@ -257,21 +257,19 @@ class _LibrarySerializationStatusFilterControlsState
           child: Column(
             children: LibrarySerializationStatusFilter.selectableOptions
                 .map(
-                  (LibrarySerializationStatusFilter option) =>
-                      _FilterCheckboxOptionRow(
-                        label: l10n.librarySerializationStatusFilterLabel(
-                          option,
-                        ),
-                        selected: selected == option,
-                        onTap: () {
-                          ref
-                              .read(
-                                librarySerializationStatusFilterProvider
-                                    .notifier,
-                              )
-                              .toggleFilterOption(option);
-                        },
-                      ),
+                  (
+                    LibrarySerializationStatusFilter option,
+                  ) => _FilterCheckboxOptionRow(
+                    label: l10n.librarySerializationStatusFilterLabel(option),
+                    selected: selected == option,
+                    onTap: () {
+                      ref
+                          .read(
+                            librarySerializationStatusFilterProvider.notifier,
+                          )
+                          .toggleFilterOption(option);
+                    },
+                  ),
                 )
                 .toList(),
           ),

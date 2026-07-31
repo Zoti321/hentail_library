@@ -16,8 +16,9 @@ class LibraryMetadataFilterSelection {
   final Map<String, LibraryTriStatePick> picks;
   final LibraryMetadataIncludeMode includeMode;
 
-  bool get isActive =>
-      picks.values.any((LibraryTriStatePick state) => state != LibraryTriStatePick.neutral);
+  bool get isActive => picks.values.any(
+    (LibraryTriStatePick state) => state != LibraryTriStatePick.neutral,
+  );
 
   LibraryTriStatePick pickStateFor(String name) =>
       picks[name] ?? LibraryTriStatePick.neutral;
@@ -82,10 +83,7 @@ class LibraryMetadataFilterSelection {
     if (includeMode == mode) {
       return this;
     }
-    return LibraryMetadataFilterSelection(
-      picks: picks,
-      includeMode: mode,
-    );
+    return LibraryMetadataFilterSelection(picks: picks, includeMode: mode);
   }
 
   LibraryMetadataFilterSelection cleared() =>
@@ -96,7 +94,8 @@ class LibraryMetadataFilterSelection {
     List<String>? excludeNames,
     String? includeModeName,
   }) {
-    final Map<String, LibraryTriStatePick> picks = <String, LibraryTriStatePick>{};
+    final Map<String, LibraryTriStatePick> picks =
+        <String, LibraryTriStatePick>{};
     for (final String name in includeNames ?? const <String>[]) {
       final String trimmed = name.trim();
       if (trimmed.isNotEmpty) {
@@ -115,11 +114,9 @@ class LibraryMetadataFilterSelection {
     );
   }
 
-  List<String> includeNamesToStorage() =>
-      includeNames().toList()..sort();
+  List<String> includeNamesToStorage() => includeNames().toList()..sort();
 
-  List<String> excludeNamesToStorage() =>
-      excludeNames().toList()..sort();
+  List<String> excludeNamesToStorage() => excludeNames().toList()..sort();
 
   @override
   bool operator ==(Object other) {
@@ -130,10 +127,7 @@ class LibraryMetadataFilterSelection {
   }
 
   @override
-  int get hashCode => Object.hash(
-    _mapHash(picks),
-    includeMode,
-  );
+  int get hashCode => Object.hash(_mapHash(picks), includeMode);
 
   static bool _mapEquals(
     Map<String, LibraryTriStatePick> a,
@@ -153,7 +147,8 @@ class LibraryMetadataFilterSelection {
   static int _mapHash(Map<String, LibraryTriStatePick> map) {
     return Object.hashAll(
       map.entries.map(
-        (MapEntry<String, LibraryTriStatePick> e) => Object.hash(e.key, e.value),
+        (MapEntry<String, LibraryTriStatePick> e) =>
+            Object.hash(e.key, e.value),
       ),
     );
   }

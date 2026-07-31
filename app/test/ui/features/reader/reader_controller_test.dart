@@ -77,26 +77,31 @@ ProviderContainer _createContainer({
   );
 }
 
-ReaderController _controller(ProviderContainer container, ReaderControllerKey key) =>
-    container.read(readerControllerProvider(key).notifier);
+ReaderController _controller(
+  ProviderContainer container,
+  ReaderControllerKey key,
+) => container.read(readerControllerProvider(key).notifier);
 
 ReaderState? _state(ProviderContainer container, ReaderControllerKey key) =>
     container.read(readerControllerProvider(key)).asData?.value;
 
 void main() {
   group('reading mode from AppSetting', () {
-    test('opens with readingMode from AppSetting (not default paged)', () async {
-      final ProviderContainer container = _createContainer(
-        initialSetting: AppSetting(readingMode: ReadingMode.webtoon),
-      );
-      addTearDown(container.dispose);
+    test(
+      'opens with readingMode from AppSetting (not default paged)',
+      () async {
+        final ProviderContainer container = _createContainer(
+          initialSetting: AppSetting(readingMode: ReadingMode.webtoon),
+        );
+        addTearDown(container.dispose);
 
-      final ReaderState state = await container.read(
-        readerControllerProvider(_key).future,
-      );
+        final ReaderState state = await container.read(
+          readerControllerProvider(_key).future,
+        );
 
-      expect(state.readingMode, ReadingMode.webtoon);
-    });
+        expect(state.readingMode, ReadingMode.webtoon);
+      },
+    );
 
     test('syncs readingMode when AppSetting changes', () async {
       final ProviderContainer container = _createContainer(

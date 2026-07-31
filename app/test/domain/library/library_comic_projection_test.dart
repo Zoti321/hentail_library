@@ -81,18 +81,14 @@ void main() {
           includeMode: LibraryMetadataIncludeMode.any,
         ),
       );
-      expect(
-        filter.tagsAll,
-        <LibraryTagPick>{
-          const LibraryTagPick(name: '百合'),
-          const LibraryTagPick(name: '校园'),
-        },
-      );
+      expect(filter.tagsAll, <LibraryTagPick>{
+        const LibraryTagPick(name: '百合'),
+        const LibraryTagPick(name: '校园'),
+      });
       expect(filter.tagsAny, isNull);
-      expect(
-        filter.authorsAny,
-        <LibraryAuthorPick>{const LibraryAuthorPick(name: '画师A')},
-      );
+      expect(filter.authorsAny, <LibraryAuthorPick>{
+        const LibraryAuthorPick(name: '画师A'),
+      });
       expect(filter.authorsAll, isNull);
     });
 
@@ -107,10 +103,9 @@ void main() {
         ),
         authorFilter: emptyMetadataFilter,
       );
-      expect(
-        filter.tagsExclude,
-        <LibraryTagPick>{const LibraryTagPick(name: 'R18')},
-      );
+      expect(filter.tagsExclude, <LibraryTagPick>{
+        const LibraryTagPick(name: 'R18'),
+      });
     });
   });
 }

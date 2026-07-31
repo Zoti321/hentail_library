@@ -51,9 +51,7 @@ class _SupportedFormatsSettingsPageState
       final List<FormatGroup> ordered = FormatGroup.all
           .where(draft.contains)
           .toList(growable: false);
-      await ref
-          .read(settingsProvider.notifier)
-          .setEnabledFormatGroups(ordered);
+      await ref.read(settingsProvider.notifier).setEnabledFormatGroups(ordered);
       if (!mounted) return;
       setState(() {
         _draft = null;
@@ -94,8 +92,10 @@ class _SupportedFormatsSettingsPageState
           error: (Object error, StackTrace _) => Center(child: Text('$error')),
           data: (AppSetting setting) {
             final Set<FormatGroup> draft = _draftOrLoaded(setting);
-            final bool dirty =
-                !_setEquals(draft, setting.enabledFormatGroups.toSet());
+            final bool dirty = !_setEquals(
+              draft,
+              setting.enabledFormatGroups.toSet(),
+            );
 
             return CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -120,8 +120,10 @@ class _SupportedFormatsSettingsPageState
                               foregroundColor: cs.hentai.iconDefault,
                               hoverColor: theme.hoverColor,
                               overlayColor: theme.hoverColor,
-                              onPressed: () => SelectedPathsPageHeaderToolbar
-                                  .popOrGoSettings(context),
+                              onPressed: () =>
+                                  SelectedPathsPageHeaderToolbar.popOrGoSettings(
+                                    context,
+                                  ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
