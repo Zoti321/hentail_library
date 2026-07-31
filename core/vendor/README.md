@@ -13,7 +13,11 @@
 | `macos-x86_64` | `x86_64-apple-darwin` | `libpdfium.dylib` |
 | `macos-aarch64` | `aarch64-apple-darwin` | `libpdfium.dylib` |
 
-**RAR/CBR**：经 `unrar` crate 静态编译 rarlab 解压库（仅 list/extract，无压缩 API）。
+**RAR/CBR**：经 `unrar-ng` crate 静态编译 rarlab 解压库（仅 list/extract，无压缩 API）；Android / iOS 与桌面共用同一实现。
+
+上游 `unrar-ng-sys` 的 `build.rs` 用 host `cfg(windows)` 选择 Windows 专用源文件，导致在 Windows 上交叉编译 Android 时误编 `isnt.cpp` / `motw.cpp`。本仓库以 `[patch.crates-io]` 使用 `core/vendor/crates/unrar-ng-sys`（按 **target OS** 选源，并为 Android 提供 `lutimes` 回退）。
+
+交叉编译验收：`aarch64-linux-android` 的 `cargo check -p hentai-core` 已在 Windows + NDK 上通过；`aarch64-apple-ios` 需在 Mac 上补验。
 
 **7z/CB7**：`sevenz-rust` 纯 Rust，无需本目录。
 

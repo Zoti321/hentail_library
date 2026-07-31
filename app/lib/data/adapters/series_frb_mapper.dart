@@ -41,6 +41,7 @@ rust_series.SeriesFilterDto mapLibrarySeriesFilter(LibrarySeriesFilter filter) {
     r18Only: filter.r18Only,
     query: filter.query,
     requireItems: filter.requireItems,
+    serializationStatus: filter.serializationStatus,
   );
 }
 

@@ -36,6 +36,14 @@ _Avoid_: 同步、刷新（太泛，未体现镜像语义）
 
 _Scan_ 与 _Library sync_ 在用户触发的场景中指同一操作；领域文档与 issue 优先使用 Library sync。
 
+**Supported resource formats**:
+用户可配置的、Library sync 会收录的 Resource 格式范围；按 Format group 勾选（漫画文件夹 / PDF / EPUB / 漫画压缩包）。偏好存于应用设置，每次 Library sync 传入 core；未启用分组下的 Resource 不进入扫描结果，库中对应 Comic 在该次 sync 按 orphan 删除。默认四组全开；取消勾选仅在下次 sync 生效，此前已入库 Comic 仍可展示与阅读。
+_Avoid_: 媒体类型（库页浏览筛选用语）、导入格式
+
+**Format group**:
+Supported resource formats 的勾选单位：`folder`（`dir`）、`pdf`、`epub`、`archive`（zip/cbz/rar/cbr/7z/cb7）。分组到 `resource_type` 的展开由 core 维护。
+_Avoid_: 扩展名列表（用户设置层用分组）
+
 ### Organization & metadata
 
 **Series**:

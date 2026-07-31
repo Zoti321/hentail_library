@@ -5,6 +5,7 @@ import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/value_objects/library_author_pick.dart';
 import 'package:hentai_library/domain/models/value_objects/library_tag_pick.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
@@ -27,6 +28,9 @@ Comic mapRustComic(rust.ComicDto dto) {
     publishedAt: dto.publishedAt == null
         ? null
         : comicTimestampFromMs(dto.publishedAt!.toInt()),
+    lastReadTime: dto.lastReadTimeMs == null
+        ? null
+        : comicTimestampFromMs(dto.lastReadTimeMs!.toInt()),
   );
 }
 
@@ -42,7 +46,9 @@ rust.ComicFilterDto mapLibraryFilter(LibraryComicFilter filter) {
     tagsAll: _mapTagPicks(filter.tagsAll),
     tagsAny: _mapTagPicks(filter.tagsAny),
     tagsExclude: _mapTagPicks(filter.tagsExclude),
-    excludeComicsInAnySeries: filter.comicIdsExcludedBySeriesMembership != null,
+    authorsAll: _mapAuthorPicks(filter.authorsAll),
+    authorsAny: _mapAuthorPicks(filter.authorsAny),
+    authorsExclude: _mapAuthorPicks(filter.authorsExclude),
   );
 }
 
@@ -52,6 +58,16 @@ List<String> _mapTagPicks(Set<LibraryTagPick>? picks) {
   }
   return picks
       .map((LibraryTagPick pick) => pick.name.trim().toLowerCase())
+      .where((String name) => name.isNotEmpty)
+      .toList();
+}
+
+List<String> _mapAuthorPicks(Set<LibraryAuthorPick>? picks) {
+  if (picks == null || picks.isEmpty) {
+    return const <String>[];
+  }
+  return picks
+      .map((LibraryAuthorPick pick) => pick.name.trim().toLowerCase())
       .where((String name) => name.isNotEmpty)
       .toList();
 }
@@ -96,6 +112,8 @@ rust.ComicFilterDto unrestrictedListFilter() {
     tagsAll: <String>[],
     tagsAny: <String>[],
     tagsExclude: <String>[],
-    excludeComicsInAnySeries: false,
+    authorsAll: <String>[],
+    authorsAny: <String>[],
+    authorsExclude: <String>[],
   );
 }

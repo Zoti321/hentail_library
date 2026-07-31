@@ -5,11 +5,12 @@ import 'package:hentai_library/ui/features/library/view_models/library_comics_ca
 import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'library_catalog_prefetch_notifier.g.dart';
+part 'library_catalog_inactive_subscription.g.dart';
 
-/// 对非活跃 Tab 保持 catalog 订阅，使 revision 变化时两 Tab 同步失效。
+/// 对非活跃 Tab 保持 catalog 订阅，使切 Tab 时无需冷启动。
 @Riverpod(keepAlive: true)
-class LibraryCatalogPrefetch extends _$LibraryCatalogPrefetch {
+class LibraryCatalogInactiveSubscription
+    extends _$LibraryCatalogInactiveSubscription {
   ProviderSubscription<Object?>? _inactiveSub;
 
   @override

@@ -22,6 +22,7 @@ abstract class Comic with _$Comic {
     required int pageCount,
     String? description,
     DateTime? publishedAt,
+    DateTime? lastReadTime,
   }) = _Comic;
 
   Comic._();

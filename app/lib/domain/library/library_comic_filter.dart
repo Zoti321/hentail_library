@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/value_objects/library_author_pick.dart';
 import 'package:hentai_library/domain/models/value_objects/library_tag_pick.dart';
 
 part 'library_comic_filter.freezed.dart';
@@ -16,16 +17,14 @@ abstract class LibraryComicFilter with _$LibraryComicFilter {
     Set<LibraryTagPick>? tagsAll,
     Set<LibraryTagPick>? tagsAny,
     Set<LibraryTagPick>? tagsExclude,
-    Set<String>? comicIdsExcludedBySeriesMembership,
+    Set<LibraryAuthorPick>? authorsAll,
+    Set<LibraryAuthorPick>? authorsAny,
+    Set<LibraryAuthorPick>? authorsExclude,
   }) = _LibraryComicFilter;
 
   LibraryComicFilter._();
 
   bool matches(Comic comic) {
-    if (comicIdsExcludedBySeriesMembership != null &&
-        comicIdsExcludedBySeriesMembership!.contains(comic.comicId)) {
-      return false;
-    }
     if (query != null && query!.trim().isNotEmpty) {
       final q = query!.toLowerCase();
       final inTitle = comic.title.toLowerCase().contains(q);
@@ -51,6 +50,15 @@ abstract class LibraryComicFilter with _$LibraryComicFilter {
     }
     if (tagsExclude != null && tagsExclude!.isNotEmpty) {
       if (tagsExclude!.any((p) => p.matchesComic(comic))) return false;
+    }
+    if (authorsAll != null && authorsAll!.isNotEmpty) {
+      if (!authorsAll!.every((p) => p.matchesComic(comic))) return false;
+    }
+    if (authorsAny != null && authorsAny!.isNotEmpty) {
+      if (!authorsAny!.any((p) => p.matchesComic(comic))) return false;
+    }
+    if (authorsExclude != null && authorsExclude!.isNotEmpty) {
+      if (authorsExclude!.any((p) => p.matchesComic(comic))) return false;
     }
     return true;
   }

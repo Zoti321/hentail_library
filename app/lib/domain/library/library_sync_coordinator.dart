@@ -1,4 +1,5 @@
 import 'package:hentai_library/data/adapters/sync_library_frb_adapter.dart';
+import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:hentai_library/domain/ports/reader_session_port.dart';
 
@@ -18,6 +19,7 @@ class LibrarySyncCoordinator {
 
   Future<void> runSync({
     ScanMode scanMode = ScanMode.incremental,
+    List<FormatGroup> enabledFormatGroups = FormatGroup.all,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   }) async {
@@ -25,6 +27,7 @@ class LibrarySyncCoordinator {
     Future<void>? sessionClearTask;
     await _syncAdapter.call(
       scanMode: scanMode,
+      enabledFormatGroups: enabledFormatGroups,
       isCancelled: isCancelled,
       onProgress: (SyncLibraryProgress progress) {
         onProgress?.call(progress);

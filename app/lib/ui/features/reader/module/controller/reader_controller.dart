@@ -12,7 +12,9 @@ import 'package:hentai_library/ui/features/reader/module/controller/reader_fulls
 import 'package:hentai_library/ui/features/reader/reader_exit_location.dart';
 import 'package:hentai_library/ui/features/reader/view_models/series_reader_provider.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_route_context.dart';
+import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/domain/reading/read_session_coordinator.dart';
+import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -107,11 +109,35 @@ class ReaderController extends _$ReaderController {
     final ReaderSessionSnapshot snapshot = await ref.watch(
       readerSessionOpenProvider(comicId: id, incognito: incognito).future,
     );
+    final ReadingMode initialMode = await _resolveInitialReadingMode();
+    ref.listen<AsyncValue<AppSetting>>(settingsProvider, (
+      AsyncValue<AppSetting>? previous,
+      AsyncValue<AppSetting> next,
+    ) {
+      final ReadingMode? mode = next.asData?.value.readingMode;
+      if (mode == null) {
+        return;
+      }
+      setReadingMode(mode);
+    });
     return ReaderState(
       comic: snapshot.comic,
+      readingMode: initialMode,
       currentIndex: snapshot.resumePageIndex,
       totalPagesOverride: snapshot.totalPages > 0 ? snapshot.totalPages : null,
     );
+  }
+
+  Future<ReadingMode> _resolveInitialReadingMode() async {
+    final AppSetting? ready = ref.read(settingsProvider).asData?.value;
+    if (ready != null) {
+      return ready.readingMode;
+    }
+    try {
+      return (await ref.read(settingsProvider.future)).readingMode;
+    } catch (_) {
+      return kDefaultReadingMode;
+    }
   }
 
   String get _comicId => (ref.$arg as ReaderControllerKey).comicId;

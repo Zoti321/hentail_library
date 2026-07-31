@@ -10,6 +10,8 @@ class FluentTextField extends StatefulWidget {
   final String? labelText;
   final String? errorText;
   final bool autofocus;
+  final bool enabled;
+  final TextInputType? keyboardType;
 
   /// When true, reduces vertical padding for single-line fields (dialog forms).
   final bool isDense;
@@ -24,6 +26,8 @@ class FluentTextField extends StatefulWidget {
     this.labelText,
     this.errorText,
     this.autofocus = false,
+    this.enabled = true,
+    this.keyboardType,
     this.isDense = false,
   });
 
@@ -55,11 +59,15 @@ class FluentTextFieldState extends State<FluentTextField> {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final bool hasError =
         widget.errorText != null && widget.errorText!.isNotEmpty;
+    final bool showActiveBorder = widget.enabled && _isFocused && !hasError;
     final Color borderColor = hasError
         ? cs.error
-        : _isFocused
+        : showActiveBorder
         ? cs.hentai.inputBorderActive
         : cs.hentai.inputBorder;
+    final Color textColor = widget.enabled
+        ? cs.hentai.textPrimary
+        : cs.hentai.textSecondary;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +90,7 @@ class FluentTextFieldState extends State<FluentTextField> {
               color: cs.hentai.inputBackground,
               borderRadius: BorderRadius.circular(tokens.radius.md),
               border: Border.all(color: borderColor, width: 1),
-              boxShadow: _isFocused && !hasError
+              boxShadow: showActiveBorder
                   ? [
                       BoxShadow(
                         color: cs.primary.withOpacity(0.2),
@@ -95,6 +103,8 @@ class FluentTextFieldState extends State<FluentTextField> {
             child: TextField(
               controller: _controller,
               autofocus: widget.autofocus,
+              enabled: widget.enabled,
+              keyboardType: widget.keyboardType,
               onChanged: widget.onChanged,
               onSubmitted: widget.onSubmitted,
               textInputAction: widget.maxLines > 1
@@ -103,7 +113,7 @@ class FluentTextFieldState extends State<FluentTextField> {
               maxLines: widget.maxLines,
               style: TextStyle(
                 fontSize: tokens.text.bodyMd,
-                color: cs.hentai.textPrimary,
+                color: textColor,
                 height: 1.4,
               ),
               decoration: InputDecoration(

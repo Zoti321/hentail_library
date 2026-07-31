@@ -335,6 +335,38 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsAutoScanLabel => '自动扫描';
 
   @override
+  String get settingsSupportedFormatsLabel => '支持的格式';
+
+  @override
+  String get settingsSupportedFormatsTitle => '支持的格式';
+
+  @override
+  String get settingsSupportedFormatsDescription =>
+      '取消勾选的格式会在下次库同步时从库中移除；未同步前已入库的漫画仍可阅读。';
+
+  @override
+  String get settingsSupportedFormatsGroupTitle => '格式分组';
+
+  @override
+  String get settingsFormatGroupFolder => '漫画文件夹';
+
+  @override
+  String get settingsFormatGroupPdf => 'PDF';
+
+  @override
+  String get settingsFormatGroupEpub => 'EPUB';
+
+  @override
+  String get settingsFormatGroupArchive => '漫画压缩包';
+
+  @override
+  String get settingsDisableAllFormatsConfirmTitle => '关闭全部格式？';
+
+  @override
+  String get settingsDisableAllFormatsConfirmContent =>
+      '保存后，下次库同步将清空漫画库中的全部 Comic。确定继续？';
+
+  @override
   String get settingsAutoUpdateLabel => '自动更新';
 
   @override
@@ -434,6 +466,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryMediaTypeFilter => '媒体类型';
 
   @override
+  String get librarySerializationStatusFilter => '连载状态';
+
+  @override
+  String get libraryTagFilter => '标签';
+
+  @override
+  String get libraryAuthorFilter => '作者';
+
+  @override
+  String get libraryMetadataFilterClear => '清除';
+
+  @override
+  String get libraryMetadataFilterSearchHint => '搜索…';
+
+  @override
+  String get libraryMetadataFilterEmpty => '无匹配项';
+
+  @override
+  String get libraryMetadataFilterIncludeAny => '满足任一';
+
+  @override
+  String get libraryMetadataFilterIncludeAll => '满足全部';
+
+  @override
+  String get libraryResetAllFilters => '重置全部';
+
+  @override
   String get libraryComingSoon => '即将推出';
 
   @override
@@ -449,7 +508,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryComicSortPublishedAt => '发布日期';
 
   @override
-  String get libraryComicSortReadAt => '阅读日期';
+  String get libraryComicSortReadAt => '阅读时间';
 
   @override
   String get libraryComicSortFileSize => '文件大小';

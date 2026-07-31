@@ -1,6 +1,7 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/frb_error_mapper.dart';
+import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/sync.dart' as rust;
@@ -13,6 +14,7 @@ class SyncLibraryFrbAdapter {
 
   Future<void> call({
     ScanMode scanMode = ScanMode.incremental,
+    List<FormatGroup> enabledFormatGroups = FormatGroup.all,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   }) async {
@@ -23,6 +25,9 @@ class SyncLibraryFrbAdapter {
         () => rust.syncLibraryFrb(
           handle: handle,
           scanMode: _mapScanMode(scanMode),
+          enabledFormatGroups: enabledFormatGroups
+              .map(_mapFormatGroup)
+              .toList(growable: false),
         ),
         fallbackMessage: '漫画库同步失败',
       )) {
@@ -64,6 +69,15 @@ rust.SyncScanModeDto _mapScanMode(ScanMode mode) {
   };
 }
 
+rust.FormatGroupDto _mapFormatGroup(FormatGroup group) {
+  return switch (group) {
+    FormatGroup.folder => rust.FormatGroupDto.folder,
+    FormatGroup.pdf => rust.FormatGroupDto.pdf,
+    FormatGroup.epub => rust.FormatGroupDto.epub,
+    FormatGroup.archive => rust.FormatGroupDto.archive,
+  };
+}
+
 SyncLibraryProgress mapRustSyncProgress(rust.SyncLibraryProgressDto dto) {
   return (
     phase: _mapPhase(dto.phase),
@@ -84,6 +98,7 @@ SyncLibraryProgress mapRustSyncProgress(rust.SyncLibraryProgressDto dto) {
     removedCount: dto.removedCount,
     addedCount: dto.addedCount,
     keptCount: dto.keptCount,
+    migratedCount: dto.migratedCount,
     thumbnailTotal: dto.thumbnailTotal,
     thumbnailDone: dto.thumbnailDone,
     thumbnailFailedCount: dto.thumbnailFailedCount,

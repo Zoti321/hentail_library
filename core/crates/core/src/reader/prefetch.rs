@@ -52,5 +52,7 @@ pub fn prefetch_reader_pages(
 }
 
 pub fn clear_reader_page_cache(comic_id: &str) -> Result<(), HentaiError> {
+    // Cancel in-flight prefetch writers before deleting the cache tree.
+    set_prefetch_generation(comic_id, u64::MAX);
     ReaderCache::app()?.clear_comic(comic_id)
 }

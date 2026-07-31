@@ -95,12 +95,6 @@ class ReaderPage extends HookConsumerWidget {
             asyncState.asData?.value.seriesAdvancePromptPending ?? false,
       ),
     );
-    final ReadingMode globalReadingMode = ref.watch(
-      settingsProvider.select(
-        (AsyncValue<AppSetting> value) =>
-            value.asData?.value.readingMode ?? kDefaultReadingMode,
-      ),
-    );
     final bool readerAutoPlayEnabled = ref.watch(
       settingsProvider.select(
         (AsyncValue<AppSetting> value) =>
@@ -150,15 +144,6 @@ class ReaderPage extends HookConsumerWidget {
       });
       return null;
     }, <Object?>[keepControlsOpen, viewAsync, controller]);
-    useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!context.mounted) {
-          return;
-        }
-        controller.setReadingMode(globalReadingMode);
-      });
-      return null;
-    }, <Object?>[globalReadingMode, controller, context]);
     useEffect(
       () {
         final bool canStartAutoPlay =
@@ -207,7 +192,6 @@ class ReaderPage extends HookConsumerWidget {
       <Object?>[
         readerAutoPlayEnabled,
         readerAutoPlayIntervalSeconds,
-        globalReadingMode,
         autoPlayState?.currentIndex,
         autoPlayState?.totalPages,
         autoPlayState?.readingMode,
@@ -321,6 +305,7 @@ class ReaderPage extends HookConsumerWidget {
                           .read(settingsProvider.notifier)
                           .setReaderAutoPlayEnabled(value);
                     },
+                    showSeriesComicNav: seriesNavContext != null,
                     onPrevSeriesComic: seriesNavContext?.previousItem != null
                         ? () async {
                             final String targetComicId =

@@ -41,12 +41,12 @@ A **Resource** is a file or directory on disk that can become a **Comic** after 
 | Image directory | _(folder)_ | Loose images | Supported |
 | ZIP archive | `.zip` | Comic archive (images inside) | Supported |
 | CBZ | `.cbz` | Comic archive (ZIP convention) | Supported |
-| RAR archive | `.rar` | Comic archive | **Planned** |
-| CBR | `.cbr` | Comic archive (RAR convention) | **Planned** |
-| 7z archive | `.7z` | Comic archive | **Planned** |
-| CB7 | `.cb7` | Comic archive (7z convention) | **Planned** |
+| RAR archive | `.rar` | Comic archive | Supported |
+| CBR | `.cbr` | Comic archive (RAR convention) | Supported |
+| 7z archive | `.7z` | Comic archive | Supported |
+| CB7 | `.cb7` | Comic archive (7z convention) | Supported |
 | EPUB | `.epub` | Structured ebook (comic EPUBs) | Supported |
-| PDF | `.pdf` | Document | **Planned** |
+| PDF | `.pdf` | Document | Supported (desktop; mobile stub) |
 
 “Comic archive” means a compressed file whose readable pages are **images** (typical scanlation / doujin layout). Archives are not treated as opaque blobs — the app extracts or streams page images for the reader.
 
@@ -60,12 +60,13 @@ EPUB and PDF are supported as first-class comic carriers when content is comic-l
 | `zip` | Yes | Yes | |
 | `cbz` | Yes | Yes | Same pipeline as zip |
 | `epub` | Yes | Yes | Comic-oriented EPUB handling |
-| `cbr` | Recognized only | No | Enum placeholder; not parsed |
-| `rar` | Recognized only | No | Enum placeholder; not parsed |
-| `pdf` | — | — | Not in `ResourceType` yet |
-| `7z` / `cb7` | — | — | Not in `ResourceType` yet |
+| `cbr` | Yes | Yes | Same pipeline as rar (`unrar-ng` / rarlab); desktop + mobile |
+| `rar` | Yes | Yes | Desktop + mobile via `unrar-ng` |
+| `cb7` | Yes | Yes | Same pipeline as sevenz |
+| `sevenz` | Yes | Yes | Via `sevenz-rust` |
+| `pdf` | Yes* | Yes* | Desktop via pdfium; Android/iOS still stub |
 
-**Planned:** Core scan/read/DB logic migrates to Rust (`core/`) via FRB; see `docs/agents/rust-migration.md` and ADR-0002. Target: in-place SQLite takeover, incremental Library sync, and full support for rar/cbr, 7z/cb7, pdf.
+**Planned:** Remaining gap is **PDF on mobile** (pdfium vendor / linking). Core scan/read/DB already lives in Rust (`core/`) via FRB; see `docs/agents/rust-migration.md` and ADR-0002.
 
 When adding format support during migration, extend `ResourceType`, implement parser and `PageSource` in Rust, expose via FRB; update Library sync progress counts for new types.
 
@@ -78,6 +79,6 @@ When adding format support during migration, extend `ResourceType`, implement pa
 ## Agent guidance
 
 - Describe the product as a **local comic library**, not a generic file manager or ebook app.
-- Treat **rar/cbr, 7z/cb7, pdf** as **planned** — do not assume they work; do not remove placeholders without implementing parsers.
+- Treat **rar/cbr, 7z/cb7** as supported. **PDF on mobile** is still a stub — do not assume it works on Android/iOS.
 - Prefer **Comic** / **Resource** / **Library sync** terms from `CONTEXT.md` in issues and PRs.
 - New reader or scan features should fit the existing Resource → Comic → Reader pipeline rather than one-off per-format UI forks.

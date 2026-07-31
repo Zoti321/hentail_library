@@ -170,6 +170,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicThumbnailDto dco_decode_comic_thumbnail_dto(dynamic raw);
 
   @protected
+  FormatGroupDto dco_decode_format_group_dto(dynamic raw);
+
+  @protected
   HentaiErrorDto dco_decode_hentai_error_dto(dynamic raw);
 
   @protected
@@ -192,6 +195,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ComicDto> dco_decode_list_comic_dto(dynamic raw);
+
+  @protected
+  List<FormatGroupDto> dco_decode_list_format_group_dto(dynamic raw);
 
   @protected
   List<HomeContinueReadingDto> dco_decode_list_home_continue_reading_dto(
@@ -519,6 +525,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  FormatGroupDto sse_decode_format_group_dto(SseDeserializer deserializer);
+
+  @protected
   HentaiErrorDto sse_decode_hentai_error_dto(SseDeserializer deserializer);
 
   @protected
@@ -547,6 +556,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ComicDto> sse_decode_list_comic_dto(SseDeserializer deserializer);
+
+  @protected
+  List<FormatGroupDto> sse_decode_list_format_group_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<HomeContinueReadingDto> sse_decode_list_home_continue_reading_dto(
@@ -957,6 +971,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_format_group_dto(
+    FormatGroupDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_hentai_error_dto(
     HentaiErrorDto self,
     SseSerializer serializer,
@@ -991,6 +1011,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_list_comic_dto(List<ComicDto> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_format_group_dto(
+    List<FormatGroupDto> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_home_continue_reading_dto(

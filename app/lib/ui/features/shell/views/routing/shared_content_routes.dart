@@ -4,9 +4,10 @@ import 'package:hentai_library/ui/features/library/views/comic_detail_page/comic
 import 'package:hentai_library/ui/features/library/views/series_detail_page/series_detail_page.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/metadata_management_page.dart';
 import 'package:hentai_library/ui/features/reader/reader.dart';
+import 'package:hentai_library/ui/features/settings/views/supported_formats_settings_page.dart';
+import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/route_not_found_page.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_page.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 
 typedef ComicDetailBuilder =
     Widget Function(BuildContext context, String comicId);
@@ -42,6 +43,11 @@ List<RouteBase> buildSharedContentRoutes({
       path: '/paths',
       name: '选中路径',
       builder: (context, state) => const SelectedPathsPage(),
+    ),
+    GoRoute(
+      path: '/settings/formats',
+      name: '支持的格式',
+      builder: (context, state) => const SupportedFormatsSettingsPage(),
     ),
     GoRoute(
       path: '/metadata',

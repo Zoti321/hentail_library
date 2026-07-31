@@ -5,6 +5,34 @@ import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 import 'package:test/test.dart';
 
 void main() {
+  test('mapRustSyncProgress maps migrated count on done', () {
+    const rust.SyncLibraryProgressDto dto = rust.SyncLibraryProgressDto(
+      phase: rust.SyncLibraryPhaseDto.done,
+      route: rust.SyncLibraryRouteDto.withRoots,
+      acceptedTotal: 1,
+      counts: rust.LibrarySyncCountsDto(
+        dir: 0,
+        zip: 0,
+        cbz: 1,
+        epub: 0,
+        cbr: 0,
+        rar: 0,
+        cb7: 0,
+        sevenz: 0,
+        pdf: 0,
+      ),
+      removedCount: 0,
+      addedCount: 0,
+      keptCount: 0,
+      migratedCount: 1,
+    );
+
+    final SyncLibraryProgress mapped = mapRustSyncProgress(dto);
+
+    expect(mapped.phase, SyncLibraryPhase.done);
+    expect(mapped.migratedCount, 1);
+  });
+
   test('mapRustSyncProgress maps failed phase and error message', () {
     const rust.SyncLibraryProgressDto dto = rust.SyncLibraryProgressDto(
       phase: rust.SyncLibraryPhaseDto.failed,

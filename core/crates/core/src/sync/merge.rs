@@ -39,6 +39,7 @@ pub fn merge_kept_scan_with_existing(scanned: &ComicDto, existing: &ComicDto) ->
         page_count,
         description: merge_optional_text(&existing.description, &scanned.description),
         published_at: merge_optional_ms(existing.published_at, scanned.published_at),
+        last_read_time_ms: existing.last_read_time_ms.or(scanned.last_read_time_ms),
         authors: existing.authors.clone(),
         tags: existing.tags.clone(),
     }

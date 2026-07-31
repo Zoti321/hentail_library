@@ -27,54 +27,56 @@ class CatalogCoverCardShell extends HookWidget {
     final ValueNotifier<bool> isHover = useState(false);
     final BorderRadius cardRadius = BorderRadius.circular(tokens.radius.xs);
 
-    return GestureDetector(
-      onTap: onTap,
-      onSecondaryTapUp: onSecondaryTapUp,
-      child: MouseRegion(
-        cursor: onTap != null
-            ? SystemMouseCursors.click
-            : SystemMouseCursors.basic,
-        onEnter: (_) => isHover.value = true,
-        onExit: (_) => isHover.value = false,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          decoration: BoxDecoration(
-            borderRadius: cardRadius,
-            color: cs.surface,
-            border: Border.all(color: cs.hentai.borderSubtle),
-            boxShadow: isHover.value
-                ? <BoxShadow>[
-                    BoxShadow(
-                      color: cs.hentai.cardShadowHover,
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+    return RepaintBoundary(
+      child: GestureDetector(
+        onTap: onTap,
+        onSecondaryTapUp: onSecondaryTapUp,
+        child: MouseRegion(
+          cursor: onTap != null
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
+          onEnter: (_) => isHover.value = true,
+          onExit: (_) => isHover.value = false,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              borderRadius: cardRadius,
+              color: cs.surface,
+              border: Border.all(color: cs.hentai.borderSubtle),
+              boxShadow: isHover.value
+                  ? <BoxShadow>[
+                      BoxShadow(
+                        color: cs.hentai.cardShadowHover,
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : <BoxShadow>[
+                      BoxShadow(
+                        color: cs.hentai.cardShadow,
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+            ),
+            child: ClipRRect(
+              borderRadius: cardRadius,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                spacing: tokens.spacing.md,
+                children: <Widget>[
+                  AspectRatio(aspectRatio: 2 / 3, child: cover),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: tokens.spacing.sm,
+                      right: tokens.spacing.sm,
+                      bottom: tokens.spacing.sm,
                     ),
-                  ]
-                : <BoxShadow>[
-                    BoxShadow(
-                      color: cs.hentai.cardShadow,
-                      blurRadius: 2,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
-          ),
-          child: ClipRRect(
-            borderRadius: cardRadius,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              spacing: tokens.spacing.md,
-              children: <Widget>[
-                AspectRatio(aspectRatio: 2 / 3, child: cover),
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: tokens.spacing.sm,
-                    right: tokens.spacing.sm,
-                    bottom: tokens.spacing.sm,
+                    child: info(isHover.value),
                   ),
-                  child: info(isHover.value),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

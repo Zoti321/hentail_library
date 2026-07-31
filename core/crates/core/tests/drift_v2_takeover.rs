@@ -100,7 +100,6 @@ fn fetch_comics_page_hides_r18_by_default() {
                 },
                 ComicFilterDto {
                     show_r18: false,
-                    exclude_comics_in_any_series: false,
                     ..Default::default()
                 },
                 ComicSortOptionDto::default(),
@@ -135,35 +134,6 @@ fn clear_all_comics_removes_comic_reading_histories() {
             let removed = clear_all_comics(&db).await.expect("clear_all_comics");
             assert_eq!(removed, 3);
             assert_eq!(count_comic_reading_histories(&db).await, 0);
-        });
-    });
-}
-
-#[test]
-fn fetch_comics_page_excludes_series_members() {
-    with_global_db(|| {
-        let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
-        let runtime = tokio::runtime::Runtime::new().expect("runtime");
-        runtime.block_on(async {
-            init_db_at_path(&db_path).await.expect("init_db");
-            let db = connection().expect("connection");
-            rebuild_series_from_comics(&db).await.expect("rebuild series");
-            let page = fetch_comics_page(
-                PageRequestDto {
-                    page: 1,
-                    page_size: 50,
-                },
-                ComicFilterDto {
-                    show_r18: true,
-                    exclude_comics_in_any_series: true,
-                    ..Default::default()
-                },
-                ComicSortOptionDto::default(),
-            )
-            .await
-            .expect("page");
-            assert_eq!(page.total_count, 0);
         });
     });
 }

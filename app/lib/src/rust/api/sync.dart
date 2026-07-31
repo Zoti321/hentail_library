@@ -6,8 +6,8 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `failed_progress`, `map_phase`, `map_progress`, `map_route`, `map_scan_mode`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
+// These functions are ignored because they are not marked as `pub`: `failed_progress`, `map_format_group`, `map_phase`, `map_progress`, `map_route`, `map_scan_mode`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
 
 SyncHandleDto createSyncHandleFrb() =>
     RustLib.instance.api.crateApiSyncCreateSyncHandleFrb();
@@ -18,13 +18,17 @@ void cancelSyncFrb({required SyncHandleDto handle}) =>
 Stream<SyncLibraryProgressDto> syncLibraryFrb({
   required SyncHandleDto handle,
   required SyncScanModeDto scanMode,
+  required List<FormatGroupDto> enabledFormatGroups,
 }) => RustLib.instance.api.crateApiSyncSyncLibraryFrb(
   handle: handle,
   scanMode: scanMode,
+  enabledFormatGroups: enabledFormatGroups,
 );
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>
 abstract class SyncHandleDto implements RustOpaqueInterface {}
+
+enum FormatGroupDto { folder, pdf, epub, archive }
 
 class LibrarySyncCountsDto {
   final int dir;
@@ -98,6 +102,7 @@ class SyncLibraryProgressDto {
   final int? removedCount;
   final int? addedCount;
   final int? keptCount;
+  final int? migratedCount;
   final int? thumbnailTotal;
   final int? thumbnailDone;
   final int? thumbnailFailedCount;
@@ -112,6 +117,7 @@ class SyncLibraryProgressDto {
     this.removedCount,
     this.addedCount,
     this.keptCount,
+    this.migratedCount,
     this.thumbnailTotal,
     this.thumbnailDone,
     this.thumbnailFailedCount,
@@ -128,6 +134,7 @@ class SyncLibraryProgressDto {
       removedCount.hashCode ^
       addedCount.hashCode ^
       keptCount.hashCode ^
+      migratedCount.hashCode ^
       thumbnailTotal.hashCode ^
       thumbnailDone.hashCode ^
       thumbnailFailedCount.hashCode ^
@@ -146,6 +153,7 @@ class SyncLibraryProgressDto {
           removedCount == other.removedCount &&
           addedCount == other.addedCount &&
           keptCount == other.keptCount &&
+          migratedCount == other.migratedCount &&
           thumbnailTotal == other.thumbnailTotal &&
           thumbnailDone == other.thumbnailDone &&
           thumbnailFailedCount == other.thumbnailFailedCount &&

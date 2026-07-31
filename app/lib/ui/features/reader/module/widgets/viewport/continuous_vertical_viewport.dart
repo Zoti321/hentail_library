@@ -2,12 +2,15 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/domain/models/app_setting.dart';
+import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_image_item.dart';
+import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -56,9 +59,29 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     final ObjectRef<bool> hasAppliedPreferredPage = useRef<bool>(false);
     final ObjectRef<int?> lastVisibleMainIndex = useRef<int?>(null);
     final ObjectRef<bool> isProgrammaticScroll = useRef<bool>(false);
+
+    /// 挂载/程序化对齐完成前，忽略可见页回写，避免先停在顶部把页码打成 1。
+    final ObjectRef<bool> suppressVisibleIndexSync = useRef<bool>(true);
     final ObjectRef<int> scrollGeneration = useRef<int>(0);
+    final ObjectRef<int?> frozenInitialScrollIndex = useRef<int?>(null);
+    if (imageList.isNotEmpty && frozenInitialScrollIndex.value == null) {
+      frozenInitialScrollIndex.value =
+          currentIndex.clamp(1, imageList.length) - 1;
+    }
+    final int initialScrollIndex = frozenInitialScrollIndex.value ?? 0;
     final Size viewportSize = MediaQuery.sizeOf(context);
     final int totalPages = imageList.length;
+    final AppSetting? settings = ref.watch(settingsProvider).asData?.value;
+    final int marginPercent =
+        settings?.webtoonMarginPercent ?? kDefaultWebtoonMarginPercent;
+    final WebtoonZoomMode zoomMode =
+        settings?.webtoonZoomMode ?? kDefaultWebtoonZoomMode;
+    final double slotLogicalWidth = zoomMode == WebtoonZoomMode.fitWidth
+        ? readerContinuousSlotLogicalWidth(
+            viewportSize.width,
+            marginPercent: marginPercent,
+          )
+        : viewportSize.width;
 
     useReaderPrefetchWindow(
       ref: ref,
@@ -66,7 +89,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       comicId: comicId,
       centerPageOneBased: currentIndex,
       totalPages: totalPages,
-      slotLogicalWidth: readerContinuousSlotLogicalWidth(viewportSize.width),
+      slotLogicalWidth: slotLogicalWidth,
       imageList: imageList,
     );
     void executeScrollToIndex(int targetIndexOneBased) {
@@ -74,6 +97,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
         return;
       }
       isProgrammaticScroll.value = true;
+      suppressVisibleIndexSync.value = true;
       itemScrollController.jumpTo(index: targetIndexOneBased - 1, alignment: 0);
       lastVisibleMainIndex.value = targetIndexOneBased;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -81,7 +105,23 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
           return;
         }
         isProgrammaticScroll.value = false;
+        suppressVisibleIndexSync.value = false;
       });
+    }
+
+    void scheduleScrollToIndex(int targetIndexOneBased, int generation) {
+      void attempt() {
+        if (!context.mounted || generation != scrollGeneration.value) {
+          return;
+        }
+        if (!itemScrollController.isAttached) {
+          WidgetsBinding.instance.addPostFrameCallback((_) => attempt());
+          return;
+        }
+        executeScrollToIndex(targetIndexOneBased);
+      }
+
+      WidgetsBinding.instance.addPostFrameCallback((_) => attempt());
     }
 
     useEffect(() {
@@ -121,7 +161,9 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     useEffect(
       () {
         void handleVisiblePositionChange() {
-          if (isProgrammaticScroll.value || imageList.isEmpty) {
+          if (suppressVisibleIndexSync.value ||
+              isProgrammaticScroll.value ||
+              imageList.isEmpty) {
             return;
           }
           final int? visibleIndex = _resolvePrimaryVisibleIndex(
@@ -167,54 +209,69 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       if (imageList.isEmpty) {
         lastVisibleMainIndex.value = null;
         isProgrammaticScroll.value = false;
+        suppressVisibleIndexSync.value = true;
         return null;
       }
       final int safeIndex = currentIndex.clamp(1, imageList.length);
       if (safeIndex == lastVisibleMainIndex.value) {
+        suppressVisibleIndexSync.value = false;
         return null;
       }
       final bool shouldSkipInitialTopScroll =
           safeIndex == 1 && lastVisibleMainIndex.value == null;
       if (shouldSkipInitialTopScroll) {
+        lastVisibleMainIndex.value = 1;
+        suppressVisibleIndexSync.value = false;
         return null;
       }
+      // 在 jump 完成前先钉住目标页，避免可见页监听回写成 1。
+      suppressVisibleIndexSync.value = true;
+      lastVisibleMainIndex.value = safeIndex;
       final int generation = ++scrollGeneration.value;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!context.mounted || generation != scrollGeneration.value) {
-          return;
-        }
-        if (!itemScrollController.isAttached) {
-          return;
-        }
-        executeScrollToIndex(safeIndex);
-      });
+      scheduleScrollToIndex(safeIndex, generation);
       return () {
         scrollGeneration.value++;
         isProgrammaticScroll.value = false;
       };
     }, <Object?>[currentIndex, imageList.length]);
-    return Center(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: readerContinuousSlotLogicalWidth(viewportSize.width),
-        ),
-        child: ScrollablePositionedList.builder(
-          itemScrollController: itemScrollController,
-          itemPositionsListener: itemPositionsListener,
-          physics: const ClampingScrollPhysics(),
-          itemCount: imageList.length,
-          itemBuilder: (BuildContext context, int index) {
-            final ReaderPageImageData imageData = imageList[index];
-            return ReaderImageItem(
-              imageData: imageData,
-              slotLogicalWidth: readerContinuousSlotLogicalWidth(
-                MediaQuery.sizeOf(context).width,
-              ),
-              enableCrossfade: false,
-            );
-          },
-        ),
-      ),
+    final bool useOriginalSize = zoomMode == WebtoonZoomMode.originalSize;
+    final Widget pageList = ScrollablePositionedList.builder(
+      itemScrollController: itemScrollController,
+      itemPositionsListener: itemPositionsListener,
+      initialScrollIndex: initialScrollIndex,
+      physics: const ClampingScrollPhysics(),
+      itemCount: imageList.length,
+      itemBuilder: (BuildContext context, int index) {
+        final ReaderPageImageData imageData = imageList[index];
+        final Widget page = ReaderImageItem(
+          imageData: imageData,
+          slotLogicalWidth: slotLogicalWidth,
+          enableCrossfade: false,
+          fit: useOriginalSize ? BoxFit.none : BoxFit.contain,
+        );
+        if (!useOriginalSize) {
+          return page;
+        }
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: viewportSize.width),
+            child: page,
+          ),
+        );
+      },
+    );
+    final Widget viewport = useOriginalSize
+        ? pageList
+        : Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: slotLogicalWidth),
+              child: pageList,
+            ),
+          );
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+      child: viewport,
     );
   }
 }

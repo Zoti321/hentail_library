@@ -18,6 +18,7 @@ class ReaderBottomBar extends StatefulWidget {
     required this.onNextPage,
     required this.onSetIndex,
     required this.onReaderAutoPlayEnabledChanged,
+    this.showSeriesComicNav = false,
     this.onPrevSeriesComic,
     this.onNextSeriesComic,
   });
@@ -31,6 +32,7 @@ class ReaderBottomBar extends StatefulWidget {
   final Future<void> Function() onNextPage;
   final ValueChanged<int> onSetIndex;
   final ValueChanged<bool> onReaderAutoPlayEnabledChanged;
+  final bool showSeriesComicNav;
   final VoidCallback? onPrevSeriesComic;
   final VoidCallback? onNextSeriesComic;
 
@@ -163,68 +165,14 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
                     children: <Widget>[
                       _buildSideActionGroup(
                         cs: cs,
-                        children: <Widget>[
-                          GhostButton.icon(
-                            icon: LucideIcons.chevronLeft,
-                            tooltip: l10n.readerPrevVolume,
-                            semanticLabel: l10n.readerPrevVolumeSemantic,
-                            iconSize: 16,
-                            size: 28,
-                            borderRadius: 8,
-                            foregroundColor: cs.hentai.readerTextIconPrimary,
-                            hoverColor: cs.hentai.readerPanelSubtle,
-                            overlayColor: cs.hentai.readerPanelSubtle,
-                            onPressed: widget.onPrevSeriesComic,
-                          ),
-                          GhostButton.icon(
-                            icon: LucideIcons.chevronsLeft,
-                            tooltip: l10n.readerFirstPage,
-                            semanticLabel: l10n.readerFirstPageSemantic,
-                            iconSize: 16,
-                            size: 28,
-                            borderRadius: 8,
-                            foregroundColor: cs.hentai.readerTextIconPrimary,
-                            hoverColor: cs.hentai.readerPanelSubtle,
-                            overlayColor: cs.hentai.readerPanelSubtle,
-                            onPressed: widget.totalPages > 0
-                                ? () => widget.onSetIndex(1)
-                                : null,
-                          ),
-                        ],
+                        children: _buildLeadingSideActions(cs, l10n),
                       ),
                       Expanded(
                         child: Center(child: _buildNavActionGroup(cs, l10n)),
                       ),
                       _buildSideActionGroup(
                         cs: cs,
-                        children: <Widget>[
-                          GhostButton.icon(
-                            icon: LucideIcons.chevronRight,
-                            tooltip: l10n.readerNextVolume,
-                            semanticLabel: l10n.readerNextVolumeSemantic,
-                            iconSize: 16,
-                            size: 28,
-                            borderRadius: 8,
-                            foregroundColor: cs.hentai.readerTextIconPrimary,
-                            hoverColor: cs.hentai.readerPanelSubtle,
-                            overlayColor: cs.hentai.readerPanelSubtle,
-                            onPressed: widget.onNextSeriesComic,
-                          ),
-                          GhostButton.icon(
-                            icon: LucideIcons.chevronsRight,
-                            tooltip: l10n.readerLastPage,
-                            semanticLabel: l10n.readerLastPageSemantic,
-                            iconSize: 16,
-                            size: 28,
-                            borderRadius: 8,
-                            foregroundColor: cs.hentai.readerTextIconPrimary,
-                            hoverColor: cs.hentai.readerPanelSubtle,
-                            overlayColor: cs.hentai.readerPanelSubtle,
-                            onPressed: widget.totalPages > 0
-                                ? () => widget.onSetIndex(widget.totalPages)
-                                : null,
-                          ),
-                        ],
+                        children: _buildTrailingSideActions(cs, l10n),
                       ),
                     ],
                   ),
@@ -235,6 +183,71 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
         ),
       ),
     );
+  }
+
+  List<Widget> _buildLeadingSideActions(ColorScheme cs, AppLocalizations l10n) {
+    return <Widget>[
+      if (widget.showSeriesComicNav)
+        GhostButton.icon(
+          icon: LucideIcons.skipBack,
+          tooltip: l10n.readerPrevVolume,
+          semanticLabel: l10n.readerPrevVolumeSemantic,
+          iconSize: 16,
+          size: 28,
+          borderRadius: 8,
+          foregroundColor: cs.hentai.readerTextIconPrimary,
+          hoverColor: cs.hentai.readerPanelSubtle,
+          overlayColor: cs.hentai.readerPanelSubtle,
+          onPressed: widget.onPrevSeriesComic,
+        ),
+      GhostButton.icon(
+        icon: LucideIcons.chevronsLeft,
+        tooltip: l10n.readerFirstPage,
+        semanticLabel: l10n.readerFirstPageSemantic,
+        iconSize: 16,
+        size: 28,
+        borderRadius: 8,
+        foregroundColor: cs.hentai.readerTextIconPrimary,
+        hoverColor: cs.hentai.readerPanelSubtle,
+        overlayColor: cs.hentai.readerPanelSubtle,
+        onPressed: widget.totalPages > 0 ? () => widget.onSetIndex(1) : null,
+      ),
+    ];
+  }
+
+  List<Widget> _buildTrailingSideActions(
+    ColorScheme cs,
+    AppLocalizations l10n,
+  ) {
+    return <Widget>[
+      GhostButton.icon(
+        icon: LucideIcons.chevronsRight,
+        tooltip: l10n.readerLastPage,
+        semanticLabel: l10n.readerLastPageSemantic,
+        iconSize: 16,
+        size: 28,
+        borderRadius: 8,
+        foregroundColor: cs.hentai.readerTextIconPrimary,
+        hoverColor: cs.hentai.readerPanelSubtle,
+        overlayColor: cs.hentai.readerPanelSubtle,
+        onPressed: widget.totalPages > 0
+            ? () => widget.onSetIndex(widget.totalPages)
+            : null,
+      ),
+      if (widget.showSeriesComicNav)
+        GhostButton.icon(
+          icon: LucideIcons.skipForward,
+          tooltip: l10n.readerNextVolume,
+          semanticLabel: l10n.readerNextVolumeSemantic,
+          iconSize: 16,
+          size: 28,
+          borderRadius: 8,
+          foregroundColor: cs.hentai.readerTextIconPrimary,
+          hoverColor: cs.hentai.readerPanelSubtle,
+          overlayColor: cs.hentai.readerPanelSubtle,
+          onPressed: widget.onNextSeriesComic,
+        ),
+    ];
   }
 
   Widget _buildSideActionGroup({

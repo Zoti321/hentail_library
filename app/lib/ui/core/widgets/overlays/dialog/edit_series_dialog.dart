@@ -5,6 +5,8 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/form/series_metadata_form.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/core/widgets/form/fluent_select_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -30,36 +32,14 @@ class EditSeriesDialog extends ConsumerStatefulWidget {
 }
 
 class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
-  late final TextEditingController _nameController;
-  late final TextEditingController _totalCountController;
-  late SerializationStatus _serializationStatus;
+  late SeriesMetadataForm _form;
   SeriesMetadataFormValidation? _validation;
   bool _saving = false;
 
   @override
   void initState() {
     super.initState();
-    final SeriesMetadataForm initial = SeriesMetadataForm.fromSeries(
-      widget.series,
-    );
-    _nameController = TextEditingController(text: initial.name);
-    _totalCountController = TextEditingController(text: initial.totalCountText);
-    _serializationStatus = initial.serializationStatus;
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _totalCountController.dispose();
-    super.dispose();
-  }
-
-  SeriesMetadataForm _draftFromControllers() {
-    return SeriesMetadataForm(
-      name: _nameController.text,
-      serializationStatus: _serializationStatus,
-      totalCountText: _totalCountController.text,
-    );
+    _form = SeriesMetadataForm.fromSeries(widget.series);
   }
 
   Future<void> _handleSave() async {
@@ -68,8 +48,10 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
     }
     setState(() => _saving = true);
     try {
-      final SeriesMetadataApplyResult result = await _draftFromControllers()
-          .applyTo(ref.read(seriesRepoProvider), seriesId: widget.series.id);
+      final SeriesMetadataApplyResult result = await _form.applyTo(
+        ref.read(seriesRepoProvider),
+        seriesId: widget.series.id,
+      );
       if (!mounted) {
         return;
       }
@@ -93,6 +75,12 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
     }
   }
 
+  void _updateForm(
+    SeriesMetadataForm Function(SeriesMetadataForm form) update,
+  ) {
+    setState(() => _form = update(_form));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -103,76 +91,60 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
       maxDialogWidth: 480,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: tokens.spacing.md,
+        spacing: tokens.spacing.lg,
         children: <Widget>[
-          TextField(
-            controller: _nameController,
+          FluentTextField(
+            labelText: l10n.formSeriesNameLabel,
+            initialValue: _form.name,
+            errorText: _validation?.nameError,
             enabled: !_saving,
-            onChanged: (_) {
+            onChanged: (String value) {
+              _updateForm(
+                (SeriesMetadataForm form) => form.copyWith(name: value),
+              );
               if (_validation?.nameError != null) {
                 setState(
-                  () => _validation = SeriesMetadataFormValidation(
-                    nameError: null,
-                    totalCountError: _validation?.totalCountError,
-                  ),
+                  () => _validation = _validation!.copyWith(nameError: null),
                 );
               }
             },
-            decoration: InputDecoration(
-              labelText: l10n.formSeriesNameLabel,
-              border: const OutlineInputBorder(),
-              isDense: true,
-              errorText: _validation?.nameError,
-            ),
           ),
-          DropdownButtonFormField<SerializationStatus>(
-            value: _serializationStatus,
-            decoration: InputDecoration(
-              labelText: l10n.formSeriesSerializationStatusLabel,
-              border: OutlineInputBorder(),
-              isDense: true,
-            ),
-            items: SerializationStatus.values
-                .map(
-                  (SerializationStatus status) =>
-                      DropdownMenuItem<SerializationStatus>(
-                        value: status,
-                        child: Text(
-                          context.l10n.serializationStatusLabel(status),
-                        ),
-                      ),
-                )
-                .toList(),
-            onChanged: _saving
-                ? null
-                : (SerializationStatus? value) {
-                    if (value == null) {
-                      return;
-                    }
-                    setState(() => _serializationStatus = value);
-                  },
+          FluentSelectField<SerializationStatus>(
+            labelText: l10n.formSeriesSerializationStatusLabel,
+            value: _form.serializationStatus,
+            items: SerializationStatus.values,
+            itemLabel: l10n.serializationStatusLabel,
+            enabled: !_saving,
+            onChanged: (SerializationStatus? value) {
+              if (value == null) {
+                return;
+              }
+              _updateForm(
+                (SeriesMetadataForm form) =>
+                    form.copyWith(serializationStatus: value),
+              );
+            },
           ),
-          TextField(
-            controller: _totalCountController,
+          FluentTextField(
+            labelText: l10n.formSeriesTotalCountLabel,
+            hintText: l10n.formSeriesTotalCountHint,
+            initialValue: _form.totalCountText,
+            errorText: _validation?.totalCountError,
             enabled: !_saving,
             keyboardType: TextInputType.number,
-            onChanged: (_) {
+            onChanged: (String value) {
+              _updateForm(
+                (SeriesMetadataForm form) =>
+                    form.copyWith(totalCountText: value),
+              );
               if (_validation?.totalCountError != null) {
                 setState(
-                  () => _validation = SeriesMetadataFormValidation(
-                    nameError: _validation?.nameError,
+                  () => _validation = _validation!.copyWith(
                     totalCountError: null,
                   ),
                 );
               }
             },
-            decoration: InputDecoration(
-              labelText: l10n.formSeriesTotalCountLabel,
-              hintText: l10n.formSeriesTotalCountHint,
-              border: const OutlineInputBorder(),
-              isDense: true,
-              errorText: _validation?.totalCountError,
-            ),
           ),
         ],
       ),

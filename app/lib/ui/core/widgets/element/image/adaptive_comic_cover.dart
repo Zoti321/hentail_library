@@ -1,24 +1,15 @@
-import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
 
-/// Adaptive comic cover with two layout modes:
-///
-/// - [containerAspectRatio] is `null`: container follows image aspect ratio
-///   and uses [fit] (default [BoxFit.cover]).
-/// - [containerAspectRatio] is set: fixed container ratio, [BoxFit.contain],
-///   and letterboxing via [backgroundColor] (defaults to white).
+/// Adaptive comic cover with a fixed container aspect ratio and letterboxing.
 class AdaptiveComicCover extends StatelessWidget {
   const AdaptiveComicCover({
     super.key,
     required this.coverDisplay,
+    required this.containerAspectRatio,
     this.fallbackAspectRatio = 2 / 3,
-    this.containerAspectRatio,
     this.fit = BoxFit.cover,
     this.filterQuality = FilterQuality.medium,
     this.placeholder = const SizedBox.expand(),
@@ -30,8 +21,8 @@ class AdaptiveComicCover extends StatelessWidget {
   });
 
   final ComicCoverImage? coverDisplay;
+  final double containerAspectRatio;
   final double fallbackAspectRatio;
-  final double? containerAspectRatio;
   final BoxFit fit;
   final FilterQuality filterQuality;
   final Widget placeholder;
@@ -41,41 +32,17 @@ class AdaptiveComicCover extends StatelessWidget {
   final bool showShadow;
   final VoidCallback? onDecodeError;
 
-  bool get _usesFixedContainer => containerAspectRatio != null;
-
-  BoxFit get _effectiveFit => _usesFixedContainer ? BoxFit.contain : fit;
+  BoxFit get _effectiveFit => BoxFit.contain;
 
   Color _resolveBackgroundColor() {
-    if (backgroundColor != null) {
-      return backgroundColor!;
-    }
-    if (_usesFixedContainer) {
-      return Colors.white;
-    }
-    return Colors.transparent;
+    return backgroundColor ?? Colors.white;
   }
 
   @override
   Widget build(BuildContext context) {
-    final double? fixedAspectRatio = containerAspectRatio;
-    if (fixedAspectRatio != null) {
-      return _wrapChrome(
-        context,
-        _buildAspectRatioCover(context, fixedAspectRatio),
-      );
-    }
-    return FutureBuilder<double>(
-      future: resolveCoverAspectRatio(
-        coverDisplay: coverDisplay,
-        fallbackAspectRatio: fallbackAspectRatio,
-      ),
-      builder: (BuildContext context, AsyncSnapshot<double> snapshot) {
-        final double resolvedAspectRatio = snapshot.data ?? fallbackAspectRatio;
-        return _wrapChrome(
-          context,
-          _buildAspectRatioCover(context, resolvedAspectRatio),
-        );
-      },
+    return _wrapChrome(
+      context,
+      _buildAspectRatioCover(context, containerAspectRatio),
     );
   }
 
@@ -124,33 +91,5 @@ class AdaptiveComicCover extends StatelessWidget {
       ),
       child: result,
     );
-  }
-}
-
-Future<double> resolveCoverAspectRatio({
-  required ComicCoverImage? coverDisplay,
-  required double fallbackAspectRatio,
-}) async {
-  final Uint8List? memoryBytes = coverDisplay?.memoryBytes;
-  final String? filePath = coverDisplay?.filePath;
-  if ((memoryBytes == null || memoryBytes.isEmpty) &&
-      (filePath == null || filePath.isEmpty)) {
-    return fallbackAspectRatio;
-  }
-  try {
-    final Uint8List sourceBytes =
-        memoryBytes ?? await File(filePath!).readAsBytes();
-    if (sourceBytes.isEmpty) {
-      return fallbackAspectRatio;
-    }
-    final ui.Codec codec = await ui.instantiateImageCodec(sourceBytes);
-    final ui.FrameInfo frameInfo = await codec.getNextFrame();
-    final ui.Image image = frameInfo.image;
-    if (image.height == 0) {
-      return fallbackAspectRatio;
-    }
-    return image.width / image.height;
-  } catch (_) {
-    return fallbackAspectRatio;
   }
 }

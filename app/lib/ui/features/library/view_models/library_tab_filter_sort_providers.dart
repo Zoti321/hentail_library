@@ -1,11 +1,16 @@
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
+import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
+import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_author_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_media_type_filter_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_serialization_status_filter_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tag_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_sort_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -100,6 +105,19 @@ LibrarySeriesSortOption librarySeriesTabSortOption(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
+LibrarySerializationStatusFilter librarySeriesTabSerializationStatusFilter(
+  Ref ref,
+) {
+  final AsyncValue<LibrarySerializationStatusFilter> settingsAsync = ref.watch(
+    librarySerializationStatusFilterProvider,
+  );
+  return settingsAsync.maybeWhen(
+    data: (LibrarySerializationStatusFilter filter) => filter,
+    orElse: () => LibrarySerializationStatusFilter.unrestricted,
+  );
+}
+
+@Riverpod(keepAlive: true)
 LibraryMediaTypeFilterSelection libraryComicsTabMediaTypeFilter(Ref ref) {
   final AsyncValue<LibraryMediaTypeFilterSelection> selectionAsync = ref.watch(
     libraryMediaTypeFilterProvider,
@@ -107,6 +125,28 @@ LibraryMediaTypeFilterSelection libraryComicsTabMediaTypeFilter(Ref ref) {
   return selectionAsync.maybeWhen(
     data: (LibraryMediaTypeFilterSelection selection) => selection,
     orElse: () => const LibraryMediaTypeFilterSelection(),
+  );
+}
+
+@Riverpod(keepAlive: true)
+LibraryMetadataFilterSelection libraryComicsTabTagFilter(Ref ref) {
+  final AsyncValue<LibraryMetadataFilterSelection> selectionAsync = ref.watch(
+    libraryTagFilterProvider,
+  );
+  return selectionAsync.maybeWhen(
+    data: (LibraryMetadataFilterSelection selection) => selection,
+    orElse: () => const LibraryMetadataFilterSelection(),
+  );
+}
+
+@Riverpod(keepAlive: true)
+LibraryMetadataFilterSelection libraryComicsTabAuthorFilter(Ref ref) {
+  final AsyncValue<LibraryMetadataFilterSelection> selectionAsync = ref.watch(
+    libraryAuthorFilterProvider,
+  );
+  return selectionAsync.maybeWhen(
+    data: (LibraryMetadataFilterSelection selection) => selection,
+    orElse: () => const LibraryMetadataFilterSelection(),
   );
 }
 
@@ -122,6 +162,15 @@ bool libraryActiveFilterSortIsCustomized(Ref ref) {
   final LibraryMediaTypeFilterSelection mediaTypeFilter = ref.watch(
     libraryComicsTabMediaTypeFilterProvider,
   );
+  final LibraryMetadataFilterSelection tagFilter = ref.watch(
+    libraryComicsTabTagFilterProvider,
+  );
+  final LibraryMetadataFilterSelection authorFilter = ref.watch(
+    libraryComicsTabAuthorFilterProvider,
+  );
+  final LibrarySerializationStatusFilter serializationStatusFilter = ref.watch(
+    librarySeriesTabSerializationStatusFilterProvider,
+  );
   final LibraryTabAgeRestrictionSettings ageSettings = ageAsync.maybeWhen(
     data: (LibraryTabAgeRestrictionSettings settings) => settings,
     orElse: () => kDefaultLibraryTabAgeRestrictionSettings,
@@ -134,6 +183,9 @@ bool libraryActiveFilterSortIsCustomized(Ref ref) {
     target: target,
     ageSettings: ageSettings,
     mediaTypeFilter: mediaTypeFilter,
+    tagFilter: tagFilter,
+    authorFilter: authorFilter,
+    serializationStatusFilter: serializationStatusFilter,
     sortSettings: sortSettings,
   );
 }

@@ -2,9 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
+import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/ui/features/library/view_models/catalog_pagination_engine.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_revision_coordinator.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent.dart';
@@ -41,6 +44,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     _pagination.syncQueryKey((
       keyword,
       ref.watch(librarySeriesTabAgeRestrictionFilterProvider),
+      ref.watch(librarySeriesTabSerializationStatusFilterProvider),
       ref.watch(librarySeriesTabSortOptionProvider),
       ref.watch(librarySeriesTabPageSizeProvider),
     ));
@@ -53,9 +57,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     // 随机排序每次查询顺序不同；库 revision 被动刷新不应触发重排。
     if (sortOption.field != LibrarySeriesSortField.random) {
       ref.watch(
-        libraryRevisionProvider.select(
-          (LibraryRevisionState state) => state.revision,
-        ),
+        libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.series),
       );
     }
     final LibraryRevisionState revisionState = ref.read(
@@ -84,11 +86,15 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     final LibraryAgeRestrictionFilter ageRestriction = ref.read(
       librarySeriesTabAgeRestrictionFilterProvider,
     );
+    final LibrarySerializationStatusFilter serializationStatusFilter = ref.read(
+      librarySeriesTabSerializationStatusFilterProvider,
+    );
     final LibrarySeriesSortOption sortOption = ref.read(
       librarySeriesTabSortOptionProvider,
     );
     final LibrarySeriesFilter filter = _librarySeriesProjection.buildListFilter(
       ageRestriction: ageRestriction,
+      serializationStatusFilter: serializationStatusFilter,
       keyword: keyword,
     );
     final int pageSize = ref.read(librarySeriesTabPageSizeProvider);

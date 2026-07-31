@@ -27,8 +27,6 @@ class ReaderSettingsDialog extends ConsumerStatefulWidget {
 
 class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
   late final TextEditingController _intervalController;
-  int _webtoonMarginPercent = 0;
-  WebtoonZoomMode _webtoonZoomMode = WebtoonZoomMode.fitWidth;
   bool _intervalInitialized = false;
 
   @override
@@ -63,6 +61,9 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
     final ReaderModeCategory category = readingMode.category;
     final PagedLayout pagedLayout =
         readingMode.pagedLayout ?? PagedLayout.single;
+    final int webtoonMarginPercent = settings.webtoonMarginPercent;
+    final WebtoonZoomMode webtoonZoomMode = settings.webtoonZoomMode;
+    final bool marginEnabled = webtoonZoomMode == WebtoonZoomMode.fitWidth;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -138,25 +139,26 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                               ? <Widget>[
                                   _ReaderSettingsDropdownRow<int>(
                                     label: l10n.readerSettingsHorizontalMargin,
-                                    value: _webtoonMarginPercent,
+                                    value: webtoonMarginPercent,
                                     items: List<int>.generate(
                                       9,
                                       (int index) => index * 5,
                                     ),
                                     itemLabel: (int value) =>
                                         l10n.readerWebtoonMarginLabel(value),
+                                    enabled: marginEnabled,
                                     onChanged: (int? value) {
                                       if (value == null) {
                                         return;
                                       }
-                                      setState(() {
-                                        _webtoonMarginPercent = value;
-                                      });
+                                      ref
+                                          .read(settingsProvider.notifier)
+                                          .setWebtoonMarginPercent(value);
                                     },
                                   ),
                                   _ReaderSettingsDropdownRow<WebtoonZoomMode>(
                                     label: l10n.readerSettingsZoomMode,
-                                    value: _webtoonZoomMode,
+                                    value: webtoonZoomMode,
                                     items: WebtoonZoomMode.values,
                                     itemLabel: (WebtoonZoomMode value) =>
                                         l10n.webtoonZoomModeLabel(value),
@@ -164,9 +166,9 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                                       if (value == null) {
                                         return;
                                       }
-                                      setState(() {
-                                        _webtoonZoomMode = value;
-                                      });
+                                      ref
+                                          .read(settingsProvider.notifier)
+                                          .setWebtoonZoomMode(value);
                                     },
                                   ),
                                 ]
@@ -284,6 +286,7 @@ class _ReaderSettingsDropdownRow<T> extends StatelessWidget {
     required this.items,
     required this.itemLabel,
     required this.onChanged,
+    this.enabled = true,
   });
 
   final String label;
@@ -291,20 +294,21 @@ class _ReaderSettingsDropdownRow<T> extends StatelessWidget {
   final List<T> items;
   final String Function(T value) itemLabel;
   final ValueChanged<T?> onChanged;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final Color labelColor = enabled
+        ? cs.hentai.readerTextSecondary
+        : cs.hentai.readerTextSecondary.withValues(alpha: 0.45);
+    final Color valueColor = enabled
+        ? cs.hentai.readerTextIconPrimary
+        : cs.hentai.readerTextIconPrimary.withValues(alpha: 0.45);
     return Row(
       children: <Widget>[
         Expanded(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              color: cs.hentai.readerTextSecondary,
-            ),
-          ),
+          child: Text(label, style: TextStyle(fontSize: 13, color: labelColor)),
         ),
         SizedBox(
           width: 180,
@@ -325,10 +329,7 @@ class _ReaderSettingsDropdownRow<T> extends StatelessWidget {
               ),
             ),
             dropdownColor: cs.hentai.inputBackground,
-            style: TextStyle(
-              fontSize: 13,
-              color: cs.hentai.readerTextIconPrimary,
-            ),
+            style: TextStyle(fontSize: 13, color: valueColor),
             items: items
                 .map(
                   (T item) => DropdownMenuItem<T>(
@@ -337,7 +338,7 @@ class _ReaderSettingsDropdownRow<T> extends StatelessWidget {
                   ),
                 )
                 .toList(),
-            onChanged: onChanged,
+            onChanged: enabled ? onChanged : null,
           ),
         ),
       ],

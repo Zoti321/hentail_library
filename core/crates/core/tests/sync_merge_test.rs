@@ -20,6 +20,7 @@ fn comic(
         page_count,
         description: None,
         published_at: None,
+        last_read_time_ms: None,
         authors: vec!["作者".to_string()],
         tags: vec!["标签".to_string()],
     }

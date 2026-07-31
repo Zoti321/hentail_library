@@ -7,6 +7,11 @@ edition = "2021"
 license = "MIT"
 version = "0.1.0"
 
+# Patch unrar-ng-sys so cross-compiles from Windows use target OS (not host)
+# when selecting Windows-only UnRAR sources; also Android lutimes fallback.
+[patch.crates-io]
+unrar-ng-sys = { path = "vendor/crates/unrar-ng-sys" }
+
 # Flutter Android debug packs `libhentai_flutter.so` into the APK. Full debuginfo
 # produced a ~200MB cdylib; dlopen blocked before the first Flutter frame (white splash).
 [profile.dev]

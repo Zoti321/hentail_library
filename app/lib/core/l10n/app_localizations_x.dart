@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 
+import 'package:hentai_library/domain/library/format_group.dart';
+
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
@@ -9,6 +11,8 @@ import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
+
+import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
 
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 
@@ -169,6 +173,27 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       LibraryMediaTypeFilterOption.epub => filterMediaTypeEpub,
 
       LibraryMediaTypeFilterOption.archive => filterMediaTypeArchive,
+    };
+  }
+
+  String librarySerializationStatusFilterLabel(
+    LibrarySerializationStatusFilter option,
+  ) {
+    return switch (option) {
+      LibrarySerializationStatusFilter.unrestricted => filterAgeUnrestricted,
+      LibrarySerializationStatusFilter.ongoing => serializationStatusOngoing,
+      LibrarySerializationStatusFilter.ended => serializationStatusEnded,
+      LibrarySerializationStatusFilter.hiatus => serializationStatusHiatus,
+      LibrarySerializationStatusFilter.unknown => serializationStatusUnknown,
+    };
+  }
+
+  String formatGroupLabel(FormatGroup group) {
+    return switch (group) {
+      FormatGroup.folder => settingsFormatGroupFolder,
+      FormatGroup.pdf => settingsFormatGroupPdf,
+      FormatGroup.epub => settingsFormatGroupEpub,
+      FormatGroup.archive => settingsFormatGroupArchive,
     };
   }
 

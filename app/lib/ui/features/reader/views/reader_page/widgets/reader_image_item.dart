@@ -2,6 +2,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/image/image_decode_cache_size.dart';
 import 'package:hentai_library/domain/reading/reader_page_payload.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -16,12 +17,14 @@ class ReaderImageItem extends ConsumerStatefulWidget {
     required this.slotLogicalWidth,
     this.enableCrossfade = false,
     this.alignment = Alignment.center,
+    this.fit = BoxFit.contain,
   });
 
   final ReaderPageImageData imageData;
   final double slotLogicalWidth;
   final bool enableCrossfade;
   final Alignment alignment;
+  final BoxFit fit;
 
   @override
   ConsumerState<ReaderImageItem> createState() => _ReaderImageItemState();
@@ -43,6 +46,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     final Widget loadingSurface = _buildReaderLoadingSurface(context);
     final Widget errorPlaceholder = _buildReaderImageErrorPlaceholder(context);
     final ReaderPageImageData imageData = widget.imageData;
+    final int? cacheWidth = _readerDecodeCacheWidth(context);
 
     if (imageData is ReaderDirPageImageData) {
       final String dirPath = imageData.file.path;
@@ -55,9 +59,10 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
           alignment: widget.alignment,
           child: AppComicImage(
             filePath: imageData.file.path,
-            fit: BoxFit.contain,
+            fit: widget.fit,
             filterQuality: FilterQuality.high,
             useReaderImageCache: true,
+            cacheWidth: cacheWidth,
             loadingPlaceholder: loadingSurface,
             errorPlaceholder: errorPlaceholder,
           ),
@@ -89,17 +94,19 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
             child: switch (page) {
               ReaderPageFilePath(:final String path) => AppComicImage(
                 filePath: path,
-                fit: BoxFit.contain,
+                fit: widget.fit,
                 filterQuality: FilterQuality.high,
                 useReaderImageCache: true,
+                cacheWidth: cacheWidth,
                 loadingPlaceholder: loadingSurface,
                 errorPlaceholder: errorPlaceholder,
               ),
               ReaderPageBytes(:final Uint8List data) => AppComicImage(
                 memoryBytes: data,
-                fit: BoxFit.contain,
+                fit: widget.fit,
                 filterQuality: FilterQuality.high,
                 useReaderImageCache: true,
+                cacheWidth: cacheWidth,
                 loadingPlaceholder: loadingSurface,
                 errorPlaceholder: errorPlaceholder,
               ),
@@ -108,6 +115,14 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
         );
       },
     );
+  }
+
+  int? _readerDecodeCacheWidth(BuildContext context) {
+    return decodeCacheSizeForContext(
+      context,
+      logicalWidth: widget.slotLogicalWidth,
+      logicalHeight: widget.slotLogicalWidth,
+    ).cacheWidth;
   }
 
   void _scheduleReaderPageReload(ReaderArchivePageImageData archiveData) {

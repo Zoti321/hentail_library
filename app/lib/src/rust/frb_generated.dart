@@ -326,6 +326,7 @@ abstract class RustLibApi extends BaseApi {
   Stream<SyncLibraryProgressDto> crateApiSyncSyncLibraryFrb({
     required SyncHandleDto handle,
     required SyncScanModeDto scanMode,
+    required List<FormatGroupDto> enabledFormatGroups,
   });
 
   void crateApiComicUpdateComicUserMetaFrb({
@@ -2236,6 +2237,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Stream<SyncLibraryProgressDto> crateApiSyncSyncLibraryFrb({
     required SyncHandleDto handle,
     required SyncScanModeDto scanMode,
+    required List<FormatGroupDto> enabledFormatGroups,
   }) {
     final sink = RustStreamSink<SyncLibraryProgressDto>();
     unawaited(
@@ -2248,6 +2250,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
               serializer,
             );
             sse_encode_sync_scan_mode_dto(scanMode, serializer);
+            sse_encode_list_format_group_dto(enabledFormatGroups, serializer);
             sse_encode_StreamSink_sync_library_progress_dto_Sse(
               sink,
               serializer,
@@ -2264,7 +2267,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             decodeErrorData: null,
           ),
           constMeta: kCrateApiSyncSyncLibraryFrbConstMeta,
-          argValues: [handle, scanMode, sink],
+          argValues: [handle, scanMode, enabledFormatGroups, sink],
           apiImpl: this,
         ),
       ),
@@ -2274,7 +2277,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiSyncSyncLibraryFrbConstMeta => const TaskConstMeta(
     debugName: "sync_library_frb",
-    argNames: ["handle", "scanMode", "sink"],
+    argNames: ["handle", "scanMode", "enabledFormatGroups", "sink"],
   );
 
   @override
@@ -2988,8 +2991,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ComicDto dco_decode_comic_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 13)
-      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
+    if (arr.length != 14)
+      throw Exception('unexpected arr length: expect 14 but see ${arr.length}');
     return ComicDto(
       comicId: dco_decode_String(arr[0]),
       path: dco_decode_String(arr[1]),
@@ -3002,8 +3005,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       pageCount: dco_decode_i_32(arr[8]),
       description: dco_decode_opt_String(arr[9]),
       publishedAt: dco_decode_opt_box_autoadd_i_64(arr[10]),
-      authors: dco_decode_list_String(arr[11]),
-      tags: dco_decode_list_String(arr[12]),
+      lastReadTimeMs: dco_decode_opt_box_autoadd_i_64(arr[11]),
+      authors: dco_decode_list_String(arr[12]),
+      tags: dco_decode_list_String(arr[13]),
     );
   }
 
@@ -3011,8 +3015,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ComicFilterDto dco_decode_comic_filter_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 10)
+      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
     return ComicFilterDto(
       showR18: dco_decode_bool(arr[0]),
       query: dco_decode_opt_String(arr[1]),
@@ -3021,7 +3025,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       tagsAll: dco_decode_list_String(arr[4]),
       tagsAny: dco_decode_list_String(arr[5]),
       tagsExclude: dco_decode_list_String(arr[6]),
-      excludeComicsInAnySeries: dco_decode_bool(arr[7]),
+      authorsAll: dco_decode_list_String(arr[7]),
+      authorsAny: dco_decode_list_String(arr[8]),
+      authorsExclude: dco_decode_list_String(arr[9]),
     );
   }
 
@@ -3055,6 +3061,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       sourceSize: dco_decode_i_64(arr[2]),
       isUserSet: dco_decode_bool(arr[3]),
     );
+  }
+
+  @protected
+  FormatGroupDto dco_decode_format_group_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return FormatGroupDto.values[raw as int];
   }
 
   @protected
@@ -3139,6 +3151,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<ComicDto> dco_decode_list_comic_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_comic_dto).toList();
+  }
+
+  @protected
+  List<FormatGroupDto> dco_decode_list_format_group_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_format_group_dto).toList();
   }
 
   @protected
@@ -3428,13 +3446,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SeriesFilterDto dco_decode_series_filter_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return SeriesFilterDto(
       showR18: dco_decode_bool(arr[0]),
       r18Only: dco_decode_bool(arr[1]),
       query: dco_decode_opt_String(arr[2]),
       requireItems: dco_decode_bool(arr[3]),
+      serializationStatus: dco_decode_opt_String(arr[4]),
     );
   }
 
@@ -3506,8 +3525,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SyncLibraryProgressDto dco_decode_sync_library_progress_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 12)
-      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
+    if (arr.length != 13)
+      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
     return SyncLibraryProgressDto(
       phase: dco_decode_sync_library_phase_dto(arr[0]),
       route: dco_decode_sync_library_route_dto(arr[1]),
@@ -3517,10 +3536,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       removedCount: dco_decode_opt_box_autoadd_i_32(arr[5]),
       addedCount: dco_decode_opt_box_autoadd_i_32(arr[6]),
       keptCount: dco_decode_opt_box_autoadd_i_32(arr[7]),
-      thumbnailTotal: dco_decode_opt_box_autoadd_i_32(arr[8]),
-      thumbnailDone: dco_decode_opt_box_autoadd_i_32(arr[9]),
-      thumbnailFailedCount: dco_decode_opt_box_autoadd_i_32(arr[10]),
-      errorMessage: dco_decode_opt_String(arr[11]),
+      migratedCount: dco_decode_opt_box_autoadd_i_32(arr[8]),
+      thumbnailTotal: dco_decode_opt_box_autoadd_i_32(arr[9]),
+      thumbnailDone: dco_decode_opt_box_autoadd_i_32(arr[10]),
+      thumbnailFailedCount: dco_decode_opt_box_autoadd_i_32(arr[11]),
+      errorMessage: dco_decode_opt_String(arr[12]),
     );
   }
 
@@ -3903,6 +3923,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_pageCount = sse_decode_i_32(deserializer);
     var var_description = sse_decode_opt_String(deserializer);
     var var_publishedAt = sse_decode_opt_box_autoadd_i_64(deserializer);
+    var var_lastReadTimeMs = sse_decode_opt_box_autoadd_i_64(deserializer);
     var var_authors = sse_decode_list_String(deserializer);
     var var_tags = sse_decode_list_String(deserializer);
     return ComicDto(
@@ -3917,6 +3938,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       pageCount: var_pageCount,
       description: var_description,
       publishedAt: var_publishedAt,
+      lastReadTimeMs: var_lastReadTimeMs,
       authors: var_authors,
       tags: var_tags,
     );
@@ -3932,7 +3954,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_tagsAll = sse_decode_list_String(deserializer);
     var var_tagsAny = sse_decode_list_String(deserializer);
     var var_tagsExclude = sse_decode_list_String(deserializer);
-    var var_excludeComicsInAnySeries = sse_decode_bool(deserializer);
+    var var_authorsAll = sse_decode_list_String(deserializer);
+    var var_authorsAny = sse_decode_list_String(deserializer);
+    var var_authorsExclude = sse_decode_list_String(deserializer);
     return ComicFilterDto(
       showR18: var_showR18,
       query: var_query,
@@ -3941,7 +3965,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       tagsAll: var_tagsAll,
       tagsAny: var_tagsAny,
       tagsExclude: var_tagsExclude,
-      excludeComicsInAnySeries: var_excludeComicsInAnySeries,
+      authorsAll: var_authorsAll,
+      authorsAny: var_authorsAny,
+      authorsExclude: var_authorsExclude,
     );
   }
 
@@ -3979,6 +4005,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       sourceSize: var_sourceSize,
       isUserSet: var_isUserSet,
     );
+  }
+
+  @protected
+  FormatGroupDto sse_decode_format_group_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return FormatGroupDto.values[inner];
   }
 
   @protected
@@ -4087,6 +4120,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <ComicDto>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_comic_dto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<FormatGroupDto> sse_decode_list_format_group_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <FormatGroupDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_format_group_dto(deserializer));
     }
     return ans_;
   }
@@ -4474,11 +4521,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_r18Only = sse_decode_bool(deserializer);
     var var_query = sse_decode_opt_String(deserializer);
     var var_requireItems = sse_decode_bool(deserializer);
+    var var_serializationStatus = sse_decode_opt_String(deserializer);
     return SeriesFilterDto(
       showR18: var_showR18,
       r18Only: var_r18Only,
       query: var_query,
       requireItems: var_requireItems,
+      serializationStatus: var_serializationStatus,
     );
   }
 
@@ -4568,6 +4617,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_removedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
     var var_addedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
     var var_keptCount = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_migratedCount = sse_decode_opt_box_autoadd_i_32(deserializer);
     var var_thumbnailTotal = sse_decode_opt_box_autoadd_i_32(deserializer);
     var var_thumbnailDone = sse_decode_opt_box_autoadd_i_32(deserializer);
     var var_thumbnailFailedCount = sse_decode_opt_box_autoadd_i_32(
@@ -4583,6 +4633,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       removedCount: var_removedCount,
       addedCount: var_addedCount,
       keptCount: var_keptCount,
+      migratedCount: var_migratedCount,
       thumbnailTotal: var_thumbnailTotal,
       thumbnailDone: var_thumbnailDone,
       thumbnailFailedCount: var_thumbnailFailedCount,
@@ -5089,6 +5140,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.pageCount, serializer);
     sse_encode_opt_String(self.description, serializer);
     sse_encode_opt_box_autoadd_i_64(self.publishedAt, serializer);
+    sse_encode_opt_box_autoadd_i_64(self.lastReadTimeMs, serializer);
     sse_encode_list_String(self.authors, serializer);
     sse_encode_list_String(self.tags, serializer);
   }
@@ -5106,7 +5158,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_String(self.tagsAll, serializer);
     sse_encode_list_String(self.tagsAny, serializer);
     sse_encode_list_String(self.tagsExclude, serializer);
-    sse_encode_bool(self.excludeComicsInAnySeries, serializer);
+    sse_encode_list_String(self.authorsAll, serializer);
+    sse_encode_list_String(self.authorsAny, serializer);
+    sse_encode_list_String(self.authorsExclude, serializer);
   }
 
   @protected
@@ -5138,6 +5192,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_64(self.sourceModifiedMs, serializer);
     sse_encode_i_64(self.sourceSize, serializer);
     sse_encode_bool(self.isUserSet, serializer);
+  }
+
+  @protected
+  void sse_encode_format_group_dto(
+    FormatGroupDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -5222,6 +5285,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_comic_dto(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_format_group_dto(
+    List<FormatGroupDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_format_group_dto(item, serializer);
     }
   }
 
@@ -5584,6 +5659,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.r18Only, serializer);
     sse_encode_opt_String(self.query, serializer);
     sse_encode_bool(self.requireItems, serializer);
+    sse_encode_opt_String(self.serializationStatus, serializer);
   }
 
   @protected
@@ -5662,6 +5738,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_i_32(self.removedCount, serializer);
     sse_encode_opt_box_autoadd_i_32(self.addedCount, serializer);
     sse_encode_opt_box_autoadd_i_32(self.keptCount, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.migratedCount, serializer);
     sse_encode_opt_box_autoadd_i_32(self.thumbnailTotal, serializer);
     sse_encode_opt_box_autoadd_i_32(self.thumbnailDone, serializer);
     sse_encode_opt_box_autoadd_i_32(self.thumbnailFailedCount, serializer);

@@ -58,7 +58,10 @@ class LibraryTabSortNotifier extends _$LibraryTabSortNotifier {
     final LibraryComicSortOption existing = current.comics;
     final LibraryComicSortOption next = existing.field == field
         ? existing.copyWith(descending: !existing.descending)
-        : LibraryComicSortOption(field: field, descending: false);
+        : LibraryComicSortOption(
+            field: field,
+            descending: field == LibraryComicSortField.readAt,
+          );
     await _updateComicSort(next);
   }
 
@@ -104,5 +107,13 @@ class LibraryTabSortNotifier extends _$LibraryTabSortNotifier {
       );
     }
     ref.invalidate(librarySeriesCatalogControllerProvider);
+  }
+
+  Future<void> resetComicsSortToDefault() async {
+    await _updateComicSort(kLibraryDefaultSortOption);
+  }
+
+  Future<void> resetSeriesSortToDefault() async {
+    await _updateSeriesSort(kLibraryDefaultSeriesSortOption);
   }
 }

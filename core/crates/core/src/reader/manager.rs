@@ -9,6 +9,8 @@ use super::backend::{open_backend, ReaderBackend};
 struct CachedSession {
     normalized_path: String,
     backend: ReaderBackend,
+    /// Whether the first cache-hit reuse has already been logged for this session.
+    reuse_logged: bool,
 }
 
 struct SessionStore {
@@ -35,7 +37,9 @@ impl SessionStore {
                 break;
             };
             self.order.remove(0);
-            self.sessions.remove(&oldest);
+            if self.sessions.remove(&oldest).is_some() {
+                tracing::debug!(comic_id = %oldest, "reader session evicted");
+            }
         }
     }
 }
@@ -51,12 +55,21 @@ fn store() -> &'static Mutex<SessionStore> {
 pub fn open_reader(comic_id: &str, path: &str, resource_type: &str) -> Result<(), HentaiError> {
     let normalized_path = normalize_path_for_key(path);
     let mut store = store().lock().map_err(|e| HentaiError::validation(e.to_string()))?;
-    if let Some(existing) = store.sessions.get(comic_id) {
-        if existing.normalized_path == normalized_path {
-            store.touch(comic_id);
-            tracing::debug!(comic_id, "reader session reused");
-            return Ok(());
+    let can_reuse = store
+        .sessions
+        .get(comic_id)
+        .is_some_and(|existing| existing.normalized_path == normalized_path);
+    if can_reuse {
+        if let Some(existing) = store.sessions.get_mut(comic_id) {
+            if !existing.reuse_logged {
+                existing.reuse_logged = true;
+                tracing::debug!(comic_id, "reader session reused");
+            }
         }
+        store.touch(comic_id);
+        return Ok(());
+    }
+    if store.sessions.contains_key(comic_id) {
         store.sessions.remove(comic_id);
         store.order.retain(|id| id != comic_id);
     }
@@ -66,6 +79,7 @@ pub fn open_reader(comic_id: &str, path: &str, resource_type: &str) -> Result<()
         CachedSession {
             normalized_path,
             backend,
+            reuse_logged: false,
         },
     );
     store.touch(comic_id);
@@ -91,14 +105,20 @@ pub fn close_reader(comic_id: &str) {
     let Ok(mut store) = store().lock() else {
         return;
     };
-    store.sessions.remove(comic_id);
-    store.order.retain(|id| id != comic_id);
+    if store.sessions.remove(comic_id).is_some() {
+        store.order.retain(|id| id != comic_id);
+        tracing::info!(comic_id, "reader closed");
+    }
 }
 
 pub fn clear_reader_sessions() {
     let Ok(mut store) = store().lock() else {
         return;
     };
+    let count = store.sessions.len();
     store.sessions.clear();
     store.order.clear();
+    if count > 0 {
+        tracing::info!(count, "reader sessions cleared");
+    }
 }

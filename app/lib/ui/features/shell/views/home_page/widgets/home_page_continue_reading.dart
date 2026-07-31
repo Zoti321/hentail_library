@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -9,6 +8,7 @@ import 'package:hentai_library/ui/core/dto/history_grid_item.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/home_page/widgets/home_page_constants.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/reading_history_card.dart';
+import 'package:hentai_library/ui/core/widgets/foundation/horizontal_wheel_scroll_listener.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -132,41 +132,6 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
     super.dispose();
   }
 
-  void handlePointerSignal(PointerSignalEvent event) {
-    if (event is! PointerScrollEvent) {
-      return;
-    }
-    if (!continueReadingScrollController.hasClients) {
-      return;
-    }
-    final double currentOffset = continueReadingScrollController.offset;
-    final double minOffset =
-        continueReadingScrollController.position.minScrollExtent;
-    final double maxOffset =
-        continueReadingScrollController.position.maxScrollExtent;
-    final bool isScrollingForward = event.scrollDelta.dy > 0;
-    final bool isAtLeadingEdge = currentOffset <= minOffset;
-    final bool isAtTrailingEdge = currentOffset >= maxOffset;
-    if ((isScrollingForward && isAtTrailingEdge) ||
-        (!isScrollingForward && isAtLeadingEdge)) {
-      return;
-    }
-    GestureBinding.instance.pointerSignalResolver.register(event, (
-      PointerSignalEvent resolvedEvent,
-    ) {
-      final PointerScrollEvent pointerScrollEvent =
-          resolvedEvent as PointerScrollEvent;
-      final double nextOffset =
-          (continueReadingScrollController.offset +
-                  pointerScrollEvent.scrollDelta.dy)
-              .clamp(minOffset, maxOffset);
-      if (nextOffset == continueReadingScrollController.offset) {
-        return;
-      }
-      continueReadingScrollController.jumpTo(nextOffset);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -215,8 +180,8 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
         ),
       );
     }
-    return Listener(
-      onPointerSignal: handlePointerSignal,
+    return HorizontalWheelScrollListener(
+      controller: continueReadingScrollController,
       child: ListView.separated(
         controller: continueReadingScrollController,
         scrollDirection: Axis.horizontal,

@@ -92,51 +92,63 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
       children: <Widget>[
         SeriesDetailHeader(series: widget.series),
         Expanded(
-          child: SingleChildScrollView(
+          child: CustomScrollView(
             controller: _scrollController,
-            padding: EdgeInsets.fromLTRB(
-              horizontalPadding,
-              tokens.spacing.xl,
-              horizontalPadding,
-              tokens.spacing.xl + 8,
-            ),
-            child:
-                Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        _buildPrimarySection(
-                          context,
-                          tokens,
-                          cs,
-                          hasR18: metadata?.hasR18 ?? false,
-                        ),
-                        SizedBox(height: sectionGap),
-                        if (hasMetadata) ...<Widget>[
-                          SeriesDetailMetadataBlock(
-                            authors: metadata!.authors,
-                            tags: metadata.tags,
+            slivers: <Widget>[
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  tokens.spacing.xl,
+                  horizontalPadding,
+                  0,
+                ),
+                sliver: SliverToBoxAdapter(
+                  child:
+                      Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              _buildPrimarySection(
+                                context,
+                                tokens,
+                                cs,
+                                hasR18: metadata?.hasR18 ?? false,
+                              ),
+                              SizedBox(height: sectionGap),
+                              if (hasMetadata) ...<Widget>[
+                                SeriesDetailMetadataBlock(
+                                  authors: metadata!.authors,
+                                  tags: metadata.tags,
+                                ),
+                                SizedBox(height: sectionGap),
+                              ],
+                              Divider(
+                                height: 1,
+                                thickness:
+                                    1 / MediaQuery.devicePixelRatioOf(context),
+                                color: cs.hentai.borderSubtle,
+                              ),
+                              SizedBox(height: tokens.spacing.lg),
+                            ],
+                          )
+                          .animate()
+                          .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
+                          .slideY(
+                            begin: 0.03,
+                            duration: 260.ms,
+                            curve: Curves.easeOutCubic,
                           ),
-                          SizedBox(height: sectionGap),
-                        ],
-                        Divider(
-                          height: 1,
-                          thickness: 1 / MediaQuery.devicePixelRatioOf(context),
-                          color: cs.hentai.borderSubtle,
-                        ),
-                        SizedBox(height: tokens.spacing.lg),
-                        KeyedSubtree(
-                          key: _gridSectionKey,
-                          child: _buildComicsSection(catalogAsync),
-                        ),
-                      ],
-                    )
-                    .animate()
-                    .fadeIn(duration: 260.ms, curve: Curves.easeOutCubic)
-                    .slideY(
-                      begin: 0.03,
-                      duration: 260.ms,
-                      curve: Curves.easeOutCubic,
-                    ),
+                ),
+              ),
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  0,
+                  horizontalPadding,
+                  tokens.spacing.xl + 8,
+                ),
+                sliver: _buildComicsSectionSliver(catalogAsync),
+              ),
+            ],
           ),
         ),
       ],
@@ -176,48 +188,56 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
     );
   }
 
-  Widget _buildComicsSection(
+  Widget _buildComicsSectionSliver(
     AsyncValue<SeriesDetailComicsCatalogState> catalogAsync,
   ) {
     // skipLoadingOnReload: revision bump（如阅读进度写入）时保留网格高度，避免 scroll clamp 回顶。
     return catalogAsync.when(
       skipLoadingOnReload: true,
       data: (SeriesDetailComicsCatalogState catalog) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            SeriesDetailPaginationBar(
-              seriesId: widget.series.id,
-              page: catalog.pagination.page,
-              totalPages: catalog.pagination.totalPages,
-              isLoading: catalogAsync.isLoading,
-              placement: LibraryPaginationPlacement.top,
+        return SliverMainAxisGroup(
+          slivers: <Widget>[
+            SliverToBoxAdapter(
+              key: _gridSectionKey,
+              child: SeriesDetailPaginationBar(
+                seriesId: widget.series.id,
+                page: catalog.pagination.page,
+                totalPages: catalog.pagination.totalPages,
+                isLoading: catalogAsync.isLoading,
+                placement: LibraryPaginationPlacement.top,
+              ),
             ),
-            SeriesDetailComicsGrid(
+            SeriesDetailComicsGridSliver(
               comics: catalog.items,
               isLoading: catalogAsync.isLoading,
             ),
-            SeriesDetailPaginationBar(
-              seriesId: widget.series.id,
-              page: catalog.pagination.page,
-              totalPages: catalog.pagination.totalPages,
-              isLoading: catalogAsync.isLoading,
-              placement: LibraryPaginationPlacement.bottom,
+            SliverToBoxAdapter(
+              child: SeriesDetailPaginationBar(
+                seriesId: widget.series.id,
+                page: catalog.pagination.page,
+                totalPages: catalog.pagination.totalPages,
+                isLoading: catalogAsync.isLoading,
+                placement: LibraryPaginationPlacement.bottom,
+              ),
             ),
           ],
         );
       },
-      loading: () =>
-          const SeriesDetailComicsGrid(comics: <Comic>[], isLoading: true),
-      error: (Object error, StackTrace _) => _SeriesDetailComicsError(
-        error: error,
-        onRetry: () => ref
-            .read(
-              seriesDetailComicsCatalogControllerProvider(
-                widget.series.id,
-              ).notifier,
-            )
-            .refresh(),
+      loading: () => const SeriesDetailComicsGridSliver(
+        comics: <Comic>[],
+        isLoading: true,
+      ),
+      error: (Object error, StackTrace _) => SliverToBoxAdapter(
+        child: _SeriesDetailComicsError(
+          error: error,
+          onRetry: () => ref
+              .read(
+                seriesDetailComicsCatalogControllerProvider(
+                  widget.series.id,
+                ).notifier,
+              )
+              .refresh(),
+        ),
       ),
     );
   }

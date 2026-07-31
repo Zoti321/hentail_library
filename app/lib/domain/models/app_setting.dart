@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 
 part 'app_setting.freezed.dart';
@@ -22,6 +23,9 @@ Map<String, dynamic> _migrateAppSettingJson(Map<String, dynamic> json) {
   }
   migrated.remove('readerIsVertical');
   migrated.remove('readerDimLevel');
+  if (!migrated.containsKey('enabledFormatGroups')) {
+    migrated['enabledFormatGroups'] = formatGroupsToStorage(FormatGroup.all);
+  }
   return migrated;
 }
 
@@ -33,6 +37,8 @@ abstract class AppSetting with _$AppSetting {
     @Default(AppLocalePreference.system) AppLocalePreference localePreference,
     @Default(false) bool autoScan,
     @Default(kDefaultReadingMode) ReadingMode readingMode,
+    @Default(kDefaultWebtoonMarginPercent) int webtoonMarginPercent,
+    @Default(kDefaultWebtoonZoomMode) WebtoonZoomMode webtoonZoomMode,
     @Default(false) bool readerAutoPlayEnabled,
     @Default(5) int readerAutoPlayIntervalSeconds,
     @Default(true) bool desktopSidebarExpanded,
@@ -42,6 +48,12 @@ abstract class AppSetting with _$AppSetting {
 
     /// 用户选择「稍后提醒」所忽略的远程版本号；空字符串表示未忽略。
     @Default('') String dismissedUpdateVersion,
+
+    /// Supported resource formats：下次 Library sync 启用的格式分组。
+    @Default(FormatGroup.all)
+    // ignore: invalid_annotation_target
+    @JsonKey(fromJson: formatGroupsFromStorage, toJson: formatGroupsToStorage)
+    List<FormatGroup> enabledFormatGroups,
   }) = _AppSetting;
 
   factory AppSetting.fromJson(Map<String, dynamic> json) =>

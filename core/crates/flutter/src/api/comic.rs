@@ -13,7 +13,9 @@ pub struct ComicFilterDto {
     pub tags_all: Vec<String>,
     pub tags_any: Vec<String>,
     pub tags_exclude: Vec<String>,
-    pub exclude_comics_in_any_series: bool,
+    pub authors_all: Vec<String>,
+    pub authors_any: Vec<String>,
+    pub authors_exclude: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -29,6 +31,7 @@ pub struct ComicDto {
     pub page_count: i32,
     pub description: Option<String>,
     pub published_at: Option<i64>,
+    pub last_read_time_ms: Option<i64>,
     pub authors: Vec<String>,
     pub tags: Vec<String>,
 }
@@ -79,6 +82,7 @@ impl From<hentai_core::ComicDto> for ComicDto {
             page_count: value.page_count,
             description: value.description,
             published_at: value.published_at,
+            last_read_time_ms: value.last_read_time_ms,
             authors: value.authors,
             tags: value.tags,
         }
@@ -95,7 +99,9 @@ impl From<ComicFilterDto> for hentai_core::ComicFilterDto {
             tags_all: value.tags_all,
             tags_any: value.tags_any,
             tags_exclude: value.tags_exclude,
-            exclude_comics_in_any_series: value.exclude_comics_in_any_series,
+            authors_all: value.authors_all,
+            authors_any: value.authors_any,
+            authors_exclude: value.authors_exclude,
         }
     }
 }

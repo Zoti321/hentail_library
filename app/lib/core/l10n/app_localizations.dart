@@ -644,6 +644,66 @@ abstract class AppLocalizations {
   /// **'自动扫描'**
   String get settingsAutoScanLabel;
 
+  /// No description provided for @settingsSupportedFormatsLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'支持的格式'**
+  String get settingsSupportedFormatsLabel;
+
+  /// No description provided for @settingsSupportedFormatsTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'支持的格式'**
+  String get settingsSupportedFormatsTitle;
+
+  /// No description provided for @settingsSupportedFormatsDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消勾选的格式会在下次库同步时从库中移除；未同步前已入库的漫画仍可阅读。'**
+  String get settingsSupportedFormatsDescription;
+
+  /// No description provided for @settingsSupportedFormatsGroupTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'格式分组'**
+  String get settingsSupportedFormatsGroupTitle;
+
+  /// No description provided for @settingsFormatGroupFolder.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画文件夹'**
+  String get settingsFormatGroupFolder;
+
+  /// No description provided for @settingsFormatGroupPdf.
+  ///
+  /// In zh, this message translates to:
+  /// **'PDF'**
+  String get settingsFormatGroupPdf;
+
+  /// No description provided for @settingsFormatGroupEpub.
+  ///
+  /// In zh, this message translates to:
+  /// **'EPUB'**
+  String get settingsFormatGroupEpub;
+
+  /// No description provided for @settingsFormatGroupArchive.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画压缩包'**
+  String get settingsFormatGroupArchive;
+
+  /// No description provided for @settingsDisableAllFormatsConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭全部格式？'**
+  String get settingsDisableAllFormatsConfirmTitle;
+
+  /// No description provided for @settingsDisableAllFormatsConfirmContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存后，下次库同步将清空漫画库中的全部 Comic。确定继续？'**
+  String get settingsDisableAllFormatsConfirmContent;
+
   /// No description provided for @settingsAutoUpdateLabel.
   ///
   /// In zh, this message translates to:
@@ -824,6 +884,60 @@ abstract class AppLocalizations {
   /// **'媒体类型'**
   String get libraryMediaTypeFilter;
 
+  /// No description provided for @librarySerializationStatusFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'连载状态'**
+  String get librarySerializationStatusFilter;
+
+  /// No description provided for @libraryTagFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'标签'**
+  String get libraryTagFilter;
+
+  /// No description provided for @libraryAuthorFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者'**
+  String get libraryAuthorFilter;
+
+  /// No description provided for @libraryMetadataFilterClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除'**
+  String get libraryMetadataFilterClear;
+
+  /// No description provided for @libraryMetadataFilterSearchHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索…'**
+  String get libraryMetadataFilterSearchHint;
+
+  /// No description provided for @libraryMetadataFilterEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'无匹配项'**
+  String get libraryMetadataFilterEmpty;
+
+  /// No description provided for @libraryMetadataFilterIncludeAny.
+  ///
+  /// In zh, this message translates to:
+  /// **'满足任一'**
+  String get libraryMetadataFilterIncludeAny;
+
+  /// No description provided for @libraryMetadataFilterIncludeAll.
+  ///
+  /// In zh, this message translates to:
+  /// **'满足全部'**
+  String get libraryMetadataFilterIncludeAll;
+
+  /// No description provided for @libraryResetAllFilters.
+  ///
+  /// In zh, this message translates to:
+  /// **'重置全部'**
+  String get libraryResetAllFilters;
+
   /// No description provided for @libraryComingSoon.
   ///
   /// In zh, this message translates to:
@@ -857,7 +971,7 @@ abstract class AppLocalizations {
   /// No description provided for @libraryComicSortReadAt.
   ///
   /// In zh, this message translates to:
-  /// **'阅读日期'**
+  /// **'阅读时间'**
   String get libraryComicSortReadAt;
 
   /// No description provided for @libraryComicSortFileSize.

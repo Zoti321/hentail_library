@@ -2201,6 +2201,8 @@ fn wire__crate__api__sync__sync_library_frb_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_handle = <SyncHandleDto>::sse_decode(&mut deserializer);
             let api_scan_mode = <crate::api::sync::SyncScanModeDto>::sse_decode(&mut deserializer);
+            let api_enabled_format_groups =
+                <Vec<crate::api::sync::FormatGroupDto>>::sse_decode(&mut deserializer);
             let api_sink = <StreamSink<
                 crate::api::sync::SyncLibraryProgressDto,
                 flutter_rust_bridge::for_generated::SseCodec,
@@ -2210,8 +2212,13 @@ fn wire__crate__api__sync__sync_library_frb_impl(
                 transform_result_sse::<_, ()>(
                     (move || async move {
                         let output_ok = Result::<_, ()>::Ok({
-                            crate::api::sync::sync_library_frb(api_handle, api_scan_mode, api_sink)
-                                .await;
+                            crate::api::sync::sync_library_frb(
+                                api_handle,
+                                api_scan_mode,
+                                api_enabled_format_groups,
+                                api_sink,
+                            )
+                            .await;
                         })?;
                         Ok(output_ok)
                     })()
@@ -2943,6 +2950,7 @@ impl SseDecode for crate::api::comic::ComicDto {
         let mut var_pageCount = <i32>::sse_decode(deserializer);
         let mut var_description = <Option<String>>::sse_decode(deserializer);
         let mut var_publishedAt = <Option<i64>>::sse_decode(deserializer);
+        let mut var_lastReadTimeMs = <Option<i64>>::sse_decode(deserializer);
         let mut var_authors = <Vec<String>>::sse_decode(deserializer);
         let mut var_tags = <Vec<String>>::sse_decode(deserializer);
         return crate::api::comic::ComicDto {
@@ -2957,6 +2965,7 @@ impl SseDecode for crate::api::comic::ComicDto {
             page_count: var_pageCount,
             description: var_description,
             published_at: var_publishedAt,
+            last_read_time_ms: var_lastReadTimeMs,
             authors: var_authors,
             tags: var_tags,
         };
@@ -2973,7 +2982,9 @@ impl SseDecode for crate::api::comic::ComicFilterDto {
         let mut var_tagsAll = <Vec<String>>::sse_decode(deserializer);
         let mut var_tagsAny = <Vec<String>>::sse_decode(deserializer);
         let mut var_tagsExclude = <Vec<String>>::sse_decode(deserializer);
-        let mut var_excludeComicsInAnySeries = <bool>::sse_decode(deserializer);
+        let mut var_authorsAll = <Vec<String>>::sse_decode(deserializer);
+        let mut var_authorsAny = <Vec<String>>::sse_decode(deserializer);
+        let mut var_authorsExclude = <Vec<String>>::sse_decode(deserializer);
         return crate::api::comic::ComicFilterDto {
             show_r18: var_showR18,
             query: var_query,
@@ -2982,7 +2993,9 @@ impl SseDecode for crate::api::comic::ComicFilterDto {
             tags_all: var_tagsAll,
             tags_any: var_tagsAny,
             tags_exclude: var_tagsExclude,
-            exclude_comics_in_any_series: var_excludeComicsInAnySeries,
+            authors_all: var_authorsAll,
+            authors_any: var_authorsAny,
+            authors_exclude: var_authorsExclude,
         };
     }
 }
@@ -3028,6 +3041,20 @@ impl SseDecode for crate::api::thumbnail::ComicThumbnailDto {
             source_modified_ms: var_sourceModifiedMs,
             source_size: var_sourceSize,
             is_user_set: var_isUserSet,
+        };
+    }
+}
+
+impl SseDecode for crate::api::sync::FormatGroupDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::api::sync::FormatGroupDto::Folder,
+            1 => crate::api::sync::FormatGroupDto::Pdf,
+            2 => crate::api::sync::FormatGroupDto::Epub,
+            3 => crate::api::sync::FormatGroupDto::Archive,
+            _ => unreachable!("Invalid variant for FormatGroupDto: {}", inner),
         };
     }
 }
@@ -3137,6 +3164,18 @@ impl SseDecode for Vec<crate::api::comic::ComicDto> {
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
             ans_.push(<crate::api::comic::ComicDto>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::sync::FormatGroupDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::sync::FormatGroupDto>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -3538,11 +3577,13 @@ impl SseDecode for crate::api::series::SeriesFilterDto {
         let mut var_r18Only = <bool>::sse_decode(deserializer);
         let mut var_query = <Option<String>>::sse_decode(deserializer);
         let mut var_requireItems = <bool>::sse_decode(deserializer);
+        let mut var_serializationStatus = <Option<String>>::sse_decode(deserializer);
         return crate::api::series::SeriesFilterDto {
             show_r18: var_showR18,
             r18_only: var_r18Only,
             query: var_query,
             require_items: var_requireItems,
+            serialization_status: var_serializationStatus,
         };
     }
 }
@@ -3643,6 +3684,7 @@ impl SseDecode for crate::api::sync::SyncLibraryProgressDto {
         let mut var_removedCount = <Option<i32>>::sse_decode(deserializer);
         let mut var_addedCount = <Option<i32>>::sse_decode(deserializer);
         let mut var_keptCount = <Option<i32>>::sse_decode(deserializer);
+        let mut var_migratedCount = <Option<i32>>::sse_decode(deserializer);
         let mut var_thumbnailTotal = <Option<i32>>::sse_decode(deserializer);
         let mut var_thumbnailDone = <Option<i32>>::sse_decode(deserializer);
         let mut var_thumbnailFailedCount = <Option<i32>>::sse_decode(deserializer);
@@ -3656,6 +3698,7 @@ impl SseDecode for crate::api::sync::SyncLibraryProgressDto {
             removed_count: var_removedCount,
             added_count: var_addedCount,
             kept_count: var_keptCount,
+            migrated_count: var_migratedCount,
             thumbnail_total: var_thumbnailTotal,
             thumbnail_done: var_thumbnailDone,
             thumbnail_failed_count: var_thumbnailFailedCount,
@@ -4110,6 +4153,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicDto {
             self.page_count.into_into_dart().into_dart(),
             self.description.into_into_dart().into_dart(),
             self.published_at.into_into_dart().into_dart(),
+            self.last_read_time_ms.into_into_dart().into_dart(),
             self.authors.into_into_dart().into_dart(),
             self.tags.into_into_dart().into_dart(),
         ]
@@ -4135,9 +4179,9 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicFilterDto {
             self.tags_all.into_into_dart().into_dart(),
             self.tags_any.into_into_dart().into_dart(),
             self.tags_exclude.into_into_dart().into_dart(),
-            self.exclude_comics_in_any_series
-                .into_into_dart()
-                .into_dart(),
+            self.authors_all.into_into_dart().into_dart(),
+            self.authors_any.into_into_dart().into_dart(),
+            self.authors_exclude.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4220,6 +4264,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::thumbnail::ComicThumbnailDto>
     for crate::api::thumbnail::ComicThumbnailDto
 {
     fn into_into_dart(self) -> crate::api::thumbnail::ComicThumbnailDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::sync::FormatGroupDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::Folder => 0.into_dart(),
+            Self::Pdf => 1.into_dart(),
+            Self::Epub => 2.into_dart(),
+            Self::Archive => 3.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::sync::FormatGroupDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::FormatGroupDto>
+    for crate::api::sync::FormatGroupDto
+{
+    fn into_into_dart(self) -> crate::api::sync::FormatGroupDto {
         self
     }
 }
@@ -4580,6 +4647,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::series::SeriesFilterDto {
             self.r18_only.into_into_dart().into_dart(),
             self.query.into_into_dart().into_dart(),
             self.require_items.into_into_dart().into_dart(),
+            self.serialization_status.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4742,6 +4810,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::sync::SyncLibraryProgressDto 
             self.removed_count.into_into_dart().into_dart(),
             self.added_count.into_into_dart().into_dart(),
             self.kept_count.into_into_dart().into_dart(),
+            self.migrated_count.into_into_dart().into_dart(),
             self.thumbnail_total.into_into_dart().into_dart(),
             self.thumbnail_done.into_into_dart().into_dart(),
             self.thumbnail_failed_count.into_into_dart().into_dart(),
@@ -5091,6 +5160,7 @@ impl SseEncode for crate::api::comic::ComicDto {
         <i32>::sse_encode(self.page_count, serializer);
         <Option<String>>::sse_encode(self.description, serializer);
         <Option<i64>>::sse_encode(self.published_at, serializer);
+        <Option<i64>>::sse_encode(self.last_read_time_ms, serializer);
         <Vec<String>>::sse_encode(self.authors, serializer);
         <Vec<String>>::sse_encode(self.tags, serializer);
     }
@@ -5106,7 +5176,9 @@ impl SseEncode for crate::api::comic::ComicFilterDto {
         <Vec<String>>::sse_encode(self.tags_all, serializer);
         <Vec<String>>::sse_encode(self.tags_any, serializer);
         <Vec<String>>::sse_encode(self.tags_exclude, serializer);
-        <bool>::sse_encode(self.exclude_comics_in_any_series, serializer);
+        <Vec<String>>::sse_encode(self.authors_all, serializer);
+        <Vec<String>>::sse_encode(self.authors_any, serializer);
+        <Vec<String>>::sse_encode(self.authors_exclude, serializer);
     }
 }
 
@@ -5146,6 +5218,24 @@ impl SseEncode for crate::api::thumbnail::ComicThumbnailDto {
         <i64>::sse_encode(self.source_modified_ms, serializer);
         <i64>::sse_encode(self.source_size, serializer);
         <bool>::sse_encode(self.is_user_set, serializer);
+    }
+}
+
+impl SseEncode for crate::api::sync::FormatGroupDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::api::sync::FormatGroupDto::Folder => 0,
+                crate::api::sync::FormatGroupDto::Pdf => 1,
+                crate::api::sync::FormatGroupDto::Epub => 2,
+                crate::api::sync::FormatGroupDto::Archive => 3,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
@@ -5223,6 +5313,16 @@ impl SseEncode for Vec<crate::api::comic::ComicDto> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::api::comic::ComicDto>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::sync::FormatGroupDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::sync::FormatGroupDto>::sse_encode(item, serializer);
         }
     }
 }
@@ -5529,6 +5629,7 @@ impl SseEncode for crate::api::series::SeriesFilterDto {
         <bool>::sse_encode(self.r18_only, serializer);
         <Option<String>>::sse_encode(self.query, serializer);
         <bool>::sse_encode(self.require_items, serializer);
+        <Option<String>>::sse_encode(self.serialization_status, serializer);
     }
 }
 
@@ -5616,6 +5717,7 @@ impl SseEncode for crate::api::sync::SyncLibraryProgressDto {
         <Option<i32>>::sse_encode(self.removed_count, serializer);
         <Option<i32>>::sse_encode(self.added_count, serializer);
         <Option<i32>>::sse_encode(self.kept_count, serializer);
+        <Option<i32>>::sse_encode(self.migrated_count, serializer);
         <Option<i32>>::sse_encode(self.thumbnail_total, serializer);
         <Option<i32>>::sse_encode(self.thumbnail_done, serializer);
         <Option<i32>>::sse_encode(self.thumbnail_failed_count, serializer);

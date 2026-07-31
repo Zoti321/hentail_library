@@ -73,6 +73,7 @@ class ComicDto {
   final int pageCount;
   final String? description;
   final PlatformInt64? publishedAt;
+  final PlatformInt64? lastReadTimeMs;
   final List<String> authors;
   final List<String> tags;
 
@@ -88,6 +89,7 @@ class ComicDto {
     required this.pageCount,
     this.description,
     this.publishedAt,
+    this.lastReadTimeMs,
     required this.authors,
     required this.tags,
   });
@@ -105,6 +107,7 @@ class ComicDto {
       pageCount.hashCode ^
       description.hashCode ^
       publishedAt.hashCode ^
+      lastReadTimeMs.hashCode ^
       authors.hashCode ^
       tags.hashCode;
 
@@ -124,6 +127,7 @@ class ComicDto {
           pageCount == other.pageCount &&
           description == other.description &&
           publishedAt == other.publishedAt &&
+          lastReadTimeMs == other.lastReadTimeMs &&
           authors == other.authors &&
           tags == other.tags;
 }
@@ -136,7 +140,9 @@ class ComicFilterDto {
   final List<String> tagsAll;
   final List<String> tagsAny;
   final List<String> tagsExclude;
-  final bool excludeComicsInAnySeries;
+  final List<String> authorsAll;
+  final List<String> authorsAny;
+  final List<String> authorsExclude;
 
   const ComicFilterDto({
     required this.showR18,
@@ -146,7 +152,9 @@ class ComicFilterDto {
     required this.tagsAll,
     required this.tagsAny,
     required this.tagsExclude,
-    required this.excludeComicsInAnySeries,
+    required this.authorsAll,
+    required this.authorsAny,
+    required this.authorsExclude,
   });
 
   @override
@@ -158,7 +166,9 @@ class ComicFilterDto {
       tagsAll.hashCode ^
       tagsAny.hashCode ^
       tagsExclude.hashCode ^
-      excludeComicsInAnySeries.hashCode;
+      authorsAll.hashCode ^
+      authorsAny.hashCode ^
+      authorsExclude.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -172,7 +182,9 @@ class ComicFilterDto {
           tagsAll == other.tagsAll &&
           tagsAny == other.tagsAny &&
           tagsExclude == other.tagsExclude &&
-          excludeComicsInAnySeries == other.excludeComicsInAnySeries;
+          authorsAll == other.authorsAll &&
+          authorsAny == other.authorsAny &&
+          authorsExclude == other.authorsExclude;
 }
 
 enum ComicSortFieldDto {

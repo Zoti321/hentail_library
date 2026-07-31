@@ -349,6 +349,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAutoScanLabel => 'Auto scan';
 
   @override
+  String get settingsSupportedFormatsLabel => 'Supported formats';
+
+  @override
+  String get settingsSupportedFormatsTitle => 'Supported formats';
+
+  @override
+  String get settingsSupportedFormatsDescription =>
+      'Unchecked formats are removed from the library on the next library sync. Comics already in the library remain readable until then.';
+
+  @override
+  String get settingsSupportedFormatsGroupTitle => 'Format groups';
+
+  @override
+  String get settingsFormatGroupFolder => 'Image folders';
+
+  @override
+  String get settingsFormatGroupPdf => 'PDF';
+
+  @override
+  String get settingsFormatGroupEpub => 'EPUB';
+
+  @override
+  String get settingsFormatGroupArchive => 'Comic archives';
+
+  @override
+  String get settingsDisableAllFormatsConfirmTitle => 'Disable all formats?';
+
+  @override
+  String get settingsDisableAllFormatsConfirmContent =>
+      'After saving, the next library sync will remove every Comic from the library. Continue?';
+
+  @override
   String get settingsAutoUpdateLabel => 'Automatic updates';
 
   @override
@@ -450,6 +482,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryMediaTypeFilter => 'Media type';
 
   @override
+  String get librarySerializationStatusFilter => 'Serialization status';
+
+  @override
+  String get libraryTagFilter => 'Tags';
+
+  @override
+  String get libraryAuthorFilter => 'Authors';
+
+  @override
+  String get libraryMetadataFilterClear => 'Clear';
+
+  @override
+  String get libraryMetadataFilterSearchHint => 'Search…';
+
+  @override
+  String get libraryMetadataFilterEmpty => 'No matches';
+
+  @override
+  String get libraryMetadataFilterIncludeAny => 'Match any';
+
+  @override
+  String get libraryMetadataFilterIncludeAll => 'Match all';
+
+  @override
+  String get libraryResetAllFilters => 'Reset all';
+
+  @override
   String get libraryComingSoon => 'Coming soon';
 
   @override
@@ -465,7 +524,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryComicSortPublishedAt => 'Published date';
 
   @override
-  String get libraryComicSortReadAt => 'Read date';
+  String get libraryComicSortReadAt => 'Read time';
 
   @override
   String get libraryComicSortFileSize => 'File size';

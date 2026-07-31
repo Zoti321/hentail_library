@@ -96,10 +96,42 @@ impl ReaderCache {
 
     pub fn clear_comic(&self, comic_id: &str) -> Result<(), HentaiError> {
         let dir = self.root.join(comic_id);
-        if dir.is_dir() {
-            fs::remove_dir_all(dir).map_err(map_io_err)?;
+        if !dir.is_dir() {
+            return Ok(());
         }
-        Ok(())
+
+        for _ in 0..8 {
+            match fs::remove_dir_all(&dir) {
+                Ok(()) => return Ok(()),
+                Err(_) if !dir.exists() => return Ok(()),
+                Err(err) if is_retryable_clear_error(&err) => {
+                    remove_tree_best_effort(&dir);
+                    std::thread::sleep(std::time::Duration::from_millis(1));
+                }
+                Err(err) => return Err(map_io_err(err)),
+            }
+        }
+
+        // Last resort on Windows: rename aside so the comic cache key is gone, then
+        // best-effort delete the trash. Never fail the exit/clear FRB path on 145.
+        let trash = self.root.join(format!(
+            ".trash_{comic_id}_{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_millis())
+                .unwrap_or(0)
+        ));
+        match fs::rename(&dir, &trash) {
+            Ok(()) => {
+                let _ = fs::remove_dir_all(&trash);
+                Ok(())
+            }
+            Err(_) if !dir.exists() => Ok(()),
+            Err(_) => {
+                remove_tree_best_effort(&dir);
+                Ok(())
+            }
+        }
     }
 
     fn comic_cache_dir(&self, comic_id: &str, source_path: &str) -> Result<PathBuf, HentaiError> {
@@ -177,6 +209,41 @@ fn map_io_err(error: std::io::Error) -> HentaiError {
     HentaiError::reader_invalid_content(error.to_string())
 }
 
+fn is_retryable_clear_error(error: &std::io::Error) -> bool {
+    if error.raw_os_error() == Some(145) {
+        return true;
+    }
+    let message = error.to_string();
+    if message.contains("not empty") || message.contains("不是空的") {
+        return true;
+    }
+    matches!(
+        error.kind(),
+        std::io::ErrorKind::DirectoryNotEmpty
+            | std::io::ErrorKind::PermissionDenied
+            | std::io::ErrorKind::Interrupted
+            | std::io::ErrorKind::TimedOut
+            | std::io::ErrorKind::WouldBlock
+    )
+}
+
+fn remove_tree_best_effort(path: &Path) {
+    let Ok(entries) = fs::read_dir(path) else {
+        return;
+    };
+    for entry in entries.flatten() {
+        let child = entry.path();
+        let is_dir = entry.file_type().map(|t| t.is_dir()).unwrap_or(false);
+        if is_dir {
+            remove_tree_best_effort(&child);
+            let _ = fs::remove_dir(&child);
+        } else {
+            let _ = fs::remove_file(&child);
+        }
+    }
+    let _ = fs::remove_dir(path);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -232,5 +299,77 @@ mod tests {
             .cached_page_path("comic-1", &source.to_string_lossy(), 8)
             .expect("lookup8")
             .is_none());
+    }
+
+    #[test]
+    fn clear_comic_succeeds_while_cached_page_file_is_open() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let source = temp.path().join("comic.cbz");
+        fs::write(&source, b"archive-bytes").expect("write source");
+        let cache = ReaderCache::with_root(temp.path().join("reader_cache"));
+        let written = cache
+            .write_page("comic-1", &source.to_string_lossy(), 1, b"\xFF\xD8\xFFone")
+            .expect("write1");
+        cache
+            .write_page("comic-1", &source.to_string_lossy(), 2, b"\xFF\xD8\xFFtwo")
+            .expect("write2");
+
+        // Simulate Flutter still decoding/holding the cached page file on exit.
+        let _held = fs::File::open(&written).expect("hold open");
+
+        let result = cache.clear_comic("comic-1");
+        assert!(
+            result.is_ok(),
+            "clear_comic must tolerate open cache files (got {result:?})"
+        );
+    }
+
+    #[test]
+    fn clear_comic_succeeds_under_concurrent_writers() {
+        use std::sync::atomic::{AtomicBool, Ordering};
+        use std::sync::Arc;
+        use std::thread;
+        use std::time::Duration;
+
+        let temp = tempfile::tempdir().expect("tempdir");
+        let source = temp.path().join("comic.cbz");
+        fs::write(&source, b"archive-bytes").expect("write source");
+        let cache_root = temp.path().join("reader_cache");
+        let source_str = source.to_string_lossy().to_string();
+
+        let stop = Arc::new(AtomicBool::new(false));
+        let mut handles = Vec::new();
+        for worker in 0..4 {
+            let cache_root = cache_root.clone();
+            let source_str = source_str.clone();
+            let stop = Arc::clone(&stop);
+            handles.push(thread::spawn(move || {
+                let cache = ReaderCache::with_root(cache_root);
+                let mut page = worker;
+                while !stop.load(Ordering::Relaxed) {
+                    let _ = cache.write_page(
+                        "comic-1",
+                        &source_str,
+                        page,
+                        b"\xFF\xD8\xFFpage",
+                    );
+                    page = (page + 4) % 200;
+                }
+            }));
+        }
+
+        thread::sleep(Duration::from_millis(20));
+        let cache = ReaderCache::with_root(&cache_root);
+        let result = cache.clear_comic("comic-1");
+        stop.store(true, Ordering::Relaxed);
+        for handle in handles {
+            let _ = handle.join();
+        }
+
+        assert!(
+            result.is_ok(),
+            "clear_comic must not fail under concurrent writers (got {result:?})"
+        );
+        let _ = cache.clear_comic("comic-1");
     }
 }

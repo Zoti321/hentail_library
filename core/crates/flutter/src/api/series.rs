@@ -40,6 +40,7 @@ pub struct SeriesFilterDto {
     pub r18_only: bool,
     pub query: Option<String>,
     pub require_items: bool,
+    pub serialization_status: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -152,6 +153,7 @@ impl From<SeriesFilterDto> for CoreSeriesFilter {
             r18_only: value.r18_only,
             query: value.query,
             require_items: value.require_items,
+            serialization_status: value.serialization_status,
         }
     }
 }

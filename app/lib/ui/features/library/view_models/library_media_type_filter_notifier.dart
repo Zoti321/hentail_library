@@ -27,4 +27,12 @@ class LibraryMediaTypeFilterNotifier extends _$LibraryMediaTypeFilterNotifier {
       await prefs.setStringList(_storageKey, updated.toStorage());
     }
   }
+
+  Future<void> clearAll() async {
+    state = const AsyncData<LibraryMediaTypeFilterSelection>(
+      LibraryMediaTypeFilterSelection(),
+    );
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_storageKey);
+  }
 }
