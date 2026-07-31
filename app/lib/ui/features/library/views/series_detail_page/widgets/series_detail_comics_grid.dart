@@ -20,68 +20,63 @@ class SeriesDetailComicsGridSliver extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final LibraryLayoutTier layoutTier = libraryLayoutTierForWidth(
-          constraints.maxWidth,
-        );
-        final AppThemeTokens tokens = context.tokens;
-        final ColorScheme cs = Theme.of(context).colorScheme;
-        final SliverGridDelegate gridDelegate = libraryGridDelegateForTokens(
-          tokens,
-          layoutTier,
-        );
+    // Must return a sliver. LayoutBuilder is a RenderBox and cannot be a
+    // SliverPadding / SliverMainAxisGroup child.
+    final LibraryLayoutTier layoutTier = libraryLayoutTierForWidth(
+      MediaQuery.sizeOf(context).width,
+    );
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final SliverGridDelegate gridDelegate = libraryGridDelegateForTokens(
+      tokens,
+      layoutTier,
+    );
 
-        if (isLoading && comics.isEmpty) {
-          return SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl),
-              child: const Center(child: CircularProgressIndicator()),
-            ),
-          );
-        }
+    if (isLoading && comics.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl),
+          child: const Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
 
-        final AppLocalizations l10n = context.l10n;
-        if (comics.isEmpty) {
-          return SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl),
-              child: Center(
-                child: Text(
-                  l10n.seriesDetailNoComics,
-                  style: TextStyle(
-                    fontSize: tokens.text.bodySm,
-                    color: cs.hentai.textTertiary,
-                  ),
-                ),
+    final AppLocalizations l10n = context.l10n;
+    if (comics.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl),
+          child: Center(
+            child: Text(
+              l10n.seriesDetailNoComics,
+              style: TextStyle(
+                fontSize: tokens.text.bodySm,
+                color: cs.hentai.textTertiary,
               ),
             ),
-          );
-        }
+          ),
+        ),
+      );
+    }
 
-        return SliverGrid(
-          gridDelegate: gridDelegate,
-          delegate: SliverChildBuilderDelegate((
-            BuildContext context,
-            int index,
-          ) {
-            final Comic comic = comics[index];
-            return Center(
-              child: ComicCard(
-                key: Key(comic.comicId),
-                comic: comic,
-                gridIndex: index,
-                onTap: () {
-                  appRouter.pushNamed(
-                    '漫画详情',
-                    pathParameters: <String, String>{'id': comic.comicId},
-                  );
-                },
-              ),
-            );
-          }, childCount: comics.length),
+    return SliverGrid(
+      gridDelegate: gridDelegate,
+      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+        final Comic comic = comics[index];
+        return Center(
+          child: ComicCard(
+            key: Key(comic.comicId),
+            comic: comic,
+            gridIndex: index,
+            onTap: () {
+              appRouter.pushNamed(
+                '????',
+                pathParameters: <String, String>{'id': comic.comicId},
+              );
+            },
+          ),
         );
-      },
+      }, childCount: comics.length),
     );
   }
 }
