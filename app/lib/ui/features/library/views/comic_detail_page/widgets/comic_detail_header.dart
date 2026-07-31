@@ -11,6 +11,7 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/comic_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_back_header.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_series_nav.dart';
@@ -191,20 +192,8 @@ class _ComicDetailOverflowMenuButtonState
     final AppLocalizations l10n = context.l10n;
     final bool? confirmed = await showDialog<bool>(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: Text(l10n.comicDetailDeleteTitle),
-        content: Text(l10n.comicDetailDeleteConfirm(widget.comic.title)),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.comicDetailCancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.comicDetailDelete),
-          ),
-        ],
-      ),
+      builder: (BuildContext context) =>
+          ComicConfirmDeleteDialog(title: widget.comic.title),
     );
     if (confirmed != true || !context.mounted) {
       return;
