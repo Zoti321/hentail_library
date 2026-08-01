@@ -1092,6 +1092,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dialogEditMetadataTabAuthorsTags => '作者&标签';
 
   @override
+  String get metadataFieldLockTooltip => '锁定：扫描时保留当前值';
+
+  @override
+  String get metadataFieldUnlockTooltip => '解锁：下次扫描可用解析值覆盖';
+
+  @override
   String get formSeriesNameLabel => '系列名称';
 
   @override

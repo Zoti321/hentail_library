@@ -51,6 +51,7 @@ class MultiSelect<T> extends ConsumerStatefulWidget {
     required this.onRetry,
     required this.resolveName,
     required this.copy,
+    this.labelTrailing,
     this.compactTrigger = false,
   });
 
@@ -58,6 +59,7 @@ class MultiSelect<T> extends ConsumerStatefulWidget {
   static const Key menuPanelKey = Key('multi_select_menu_panel');
 
   final String label;
+  final Widget? labelTrailing;
   final IconData icon;
   final List<String> selectedNames;
   final ValueChanged<String> onAdd;
@@ -174,7 +176,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
             SizedBox(width: tokens.spacing.sm),
             Padding(
               padding: EdgeInsets.only(top: tokens.spacing.sm + 2),
-              child: FormLabel(widget.label),
+              child: FormLabel(widget.label, trailing: widget.labelTrailing),
             ),
             SizedBox(width: tokens.spacing.md),
             Expanded(

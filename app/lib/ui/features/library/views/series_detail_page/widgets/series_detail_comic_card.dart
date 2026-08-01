@@ -65,6 +65,7 @@ class SeriesDetailComicCard extends HookConsumerWidget {
       comicId: item.comic.comicId,
       comicTitle: item.comic.title,
       initialSortOrder: item.sortOrder,
+      initialSortOrderLocked: item.sortOrderLocked,
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_number_stepper_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/metadata_lock_button.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
@@ -16,6 +17,7 @@ Future<void> showEditSeriesItemSortOrderDialog({
   required String comicId,
   required String comicTitle,
   required double initialSortOrder,
+  required bool initialSortOrderLocked,
 }) {
   return showDialog<void>(
     context: context,
@@ -24,12 +26,22 @@ Future<void> showEditSeriesItemSortOrderDialog({
       comicId: comicId,
       comicTitle: comicTitle,
       initialSortOrder: initialSortOrder,
-      onSubmit: (double sortOrder) async {
-        await ref.read(seriesRepoProvider).updateSeriesItemSortOrder(
+      initialSortOrderLocked: initialSortOrderLocked,
+      onSubmit: (double sortOrder, bool locked) async {
+        final repo = ref.read(seriesRepoProvider);
+        await repo.updateSeriesItemSortOrder(
           seriesId: seriesId,
           comicId: comicId,
           sortOrder: sortOrder,
         );
+        // Saving sort order always locks; if user wants unlocked, clear after.
+        if (!locked) {
+          await repo.setSeriesItemSortOrderLocked(
+            seriesId: seriesId,
+            comicId: comicId,
+            locked: false,
+          );
+        }
         ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
         ref
             .read(
@@ -48,6 +60,7 @@ class EditSeriesItemSortOrderDialog extends HookConsumerWidget {
     required this.comicId,
     required this.comicTitle,
     required this.initialSortOrder,
+    required this.initialSortOrderLocked,
     required this.onSubmit,
   });
 
@@ -55,12 +68,14 @@ class EditSeriesItemSortOrderDialog extends HookConsumerWidget {
   final String comicId;
   final String comicTitle;
   final double initialSortOrder;
-  final Future<void> Function(double sortOrder) onSubmit;
+  final bool initialSortOrderLocked;
+  final Future<void> Function(double sortOrder, bool locked) onSubmit;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final valueState = useState<String>(_formatInitial(initialSortOrder));
+    final lockedState = useState<bool>(initialSortOrderLocked);
     final errorState = useState<String?>(null);
     final savingState = useState(false);
 
@@ -78,7 +93,7 @@ class EditSeriesItemSortOrderDialog extends HookConsumerWidget {
 
       savingState.value = true;
       try {
-        await onSubmit(parsed);
+        await onSubmit(parsed, lockedState.value);
         if (context.mounted) {
           showSuccessToast(
             context,
@@ -100,6 +115,11 @@ class EditSeriesItemSortOrderDialog extends HookConsumerWidget {
       content: FluentNumberStepperField(
         initialValue: valueState.value,
         labelText: l10n.formSeriesItemSortOrderLabel,
+        labelTrailing: MetadataLockButton(
+          locked: lockedState.value,
+          enabled: !savingState.value,
+          onChanged: (bool locked) => lockedState.value = locked,
+        ),
         errorText: errorState.value,
         autofocus: true,
         isDense: true,
@@ -113,7 +133,9 @@ class EditSeriesItemSortOrderDialog extends HookConsumerWidget {
       ),
       actions: <Widget>[
         TextButton(
-          onPressed: savingState.value ? null : () => Navigator.of(context).pop(),
+          onPressed: savingState.value
+              ? null
+              : () => Navigator.of(context).pop(),
           style: TextButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),

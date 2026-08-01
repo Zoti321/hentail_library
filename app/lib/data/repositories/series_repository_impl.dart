@@ -107,6 +107,22 @@ class SeriesRepositoryImpl implements SeriesRepository {
   }
 
   @override
+  Future<void> setSeriesItemSortOrderLocked({
+    required String seriesId,
+    required String comicId,
+    required bool locked,
+  }) async {
+    guardFrbSync(
+      () => rust_series.setSeriesItemSortOrderLockedFrb(
+        seriesId: seriesId,
+        comicId: comicId,
+        locked: locked,
+      ),
+      fallbackMessage: '更新系列排序锁失败',
+    );
+  }
+
+  @override
   Future<SeriesComicsMetadata> fetchComicsMetadata(String seriesId) async {
     final rust_series.SeriesComicsMetadataDto dto = guardFrbSync(
       () => rust_series.fetchSeriesComicsMetadataFrb(seriesId: seriesId),
@@ -134,6 +150,26 @@ class SeriesRepositoryImpl implements SeriesRepository {
         ),
       ),
       fallbackMessage: '更新系列元数据失败',
+    );
+  }
+
+  @override
+  Future<void> setMetaLocks({
+    required String seriesId,
+    bool? name,
+    bool? serializationStatus,
+    bool? totalCount,
+  }) async {
+    guardFrbSync(
+      () => rust_series.setSeriesMetaLocksFrb(
+        seriesId: seriesId,
+        locks: rust_series.SetSeriesMetaLocksDto(
+          name: name,
+          serializationStatus: serializationStatus,
+          totalCount: totalCount,
+        ),
+      ),
+      fallbackMessage: '更新系列元数据锁失败',
     );
   }
 

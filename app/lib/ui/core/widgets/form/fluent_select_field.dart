@@ -57,6 +57,7 @@ class FluentSelectField<T> extends StatefulWidget {
     required this.itemLabel,
     required this.onChanged,
     this.labelText,
+    this.labelTrailing,
     this.errorText,
     this.enabled = true,
     this.menuStyle,
@@ -72,6 +73,7 @@ class FluentSelectField<T> extends StatefulWidget {
   final String Function(T item) itemLabel;
   final ValueChanged<T?> onChanged;
   final String? labelText;
+  final Widget? labelTrailing;
   final String? errorText;
   final bool enabled;
   final FluentSelectMenuStyle? menuStyle;
@@ -369,7 +371,7 @@ class _FluentSelectFieldState<T> extends State<FluentSelectField<T>> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         if (widget.labelText != null) ...[
-          FormLabel(widget.labelText!),
+          FormLabel(widget.labelText!, trailing: widget.labelTrailing),
           SizedBox(height: tokens.spacing.sm - 2),
         ],
         trigger,

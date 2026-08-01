@@ -4,7 +4,8 @@ use std::sync::Mutex;
 
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::{
-    connection, find_series_by_id, init_db_at_path, update_series_item_sort_order,
+    connection, find_series_by_id, init_db_at_path, set_series_item_sort_order_locked,
+    update_series_item_sort_order,
 };
 use sea_orm::{ConnectionTrait, Database, DatabaseConnection, Statement};
 use tempfile::TempDir;
@@ -182,6 +183,46 @@ fn rebuild_preserves_locked_sort_order_and_renumbers_unlocked() {
             assert!(!by_id.get("c2a").expect("c2a").sort_order_locked);
             assert!((by_id.get("c3").expect("c3").sort_order - 4.0).abs() < f64::EPSILON);
             assert!(!by_id.get("c3").expect("c3").sort_order_locked);
+        });
+    });
+}
+
+#[test]
+fn unlock_sort_order_allows_rebuild_to_renumber() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let db = connection().expect("connection");
+            seed_three_comics(&db).await;
+            rebuild_series_from_comics(&db).await.expect("rebuild");
+
+            let series_id = hentai_core::series_id_from_folder_path("E:/lib/Series");
+            update_series_item_sort_order(&series_id, "c3", 1.5)
+                .await
+                .expect("lock c3");
+
+            set_series_item_sort_order_locked(&series_id, "c3", false)
+                .await
+                .expect("unlock c3");
+
+            rebuild_series_from_comics(&db).await.expect("rebuild again");
+
+            let series = find_series_by_id(&series_id)
+                .await
+                .expect("find")
+                .expect("series exists");
+            let by_id: std::collections::HashMap<&str, &hentai_core::SeriesItemDto> = series
+                .items
+                .iter()
+                .map(|i| (i.comic_id.as_str(), i))
+                .collect();
+            assert!((by_id.get("c3").expect("c3").sort_order - 3.0).abs() < f64::EPSILON);
+            assert!(!by_id.get("c3").expect("c3").sort_order_locked);
+            let ordered: Vec<&str> = series.items.iter().map(|i| i.comic_id.as_str()).collect();
+            assert_eq!(ordered, vec!["c1", "c2", "c3"]);
         });
     });
 }

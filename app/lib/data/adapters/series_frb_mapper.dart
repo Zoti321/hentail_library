@@ -8,6 +8,7 @@ import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/domain/models/value_objects/series_meta_locks.dart';
 import 'package:hentai_library/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
 import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
@@ -20,6 +21,11 @@ Series mapRustSeries(rust_series.SeriesDto dto) {
     folderPath: dto.folderPath,
     serializationStatus: SerializationStatus.fromRust(dto.serializationStatus),
     totalCount: dto.totalCount?.toInt(),
+    locks: SeriesMetaLocks(
+      name: dto.locks.name,
+      serializationStatus: dto.locks.serializationStatus,
+      totalCount: dto.locks.totalCount,
+    ),
     items: dto.items.map(mapRustSeriesItem).toList(),
   );
 }
@@ -97,6 +103,7 @@ PagedResult<SeriesComicPageItem> mapPagedSeriesComicsResult(
           (rust_series.SeriesComicPageItemDto item) => (
             comic: mapRustComic(item.comic),
             sortOrder: item.sortOrder,
+            sortOrderLocked: item.sortOrderLocked,
           ),
         )
         .toList(),

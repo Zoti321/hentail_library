@@ -101,6 +101,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool dco_decode_bool(dynamic raw);
 
   @protected
+  bool dco_decode_box_autoadd_bool(dynamic raw);
+
+  @protected
   ComicDto dco_decode_box_autoadd_comic_dto(dynamic raw);
 
   @protected
@@ -144,6 +147,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesThumbnailDto dco_decode_box_autoadd_series_thumbnail_dto(dynamic raw);
 
   @protected
+  SetComicMetaLocksFrbDto dco_decode_box_autoadd_set_comic_meta_locks_frb_dto(
+    dynamic raw,
+  );
+
+  @protected
+  SetSeriesMetaLocksDto dco_decode_box_autoadd_set_series_meta_locks_dto(
+    dynamic raw,
+  );
+
+  @protected
   UpdateComicUserMetaFrbDto
   dco_decode_box_autoadd_update_comic_user_meta_frb_dto(dynamic raw);
 
@@ -157,6 +170,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ComicFilterDto dco_decode_comic_filter_dto(dynamic raw);
+
+  @protected
+  ComicMetaLocksDto dco_decode_comic_meta_locks_dto(dynamic raw);
 
   @protected
   ComicSortFieldDto dco_decode_comic_sort_field_dto(dynamic raw);
@@ -235,6 +251,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   String? dco_decode_opt_String(dynamic raw);
+
+  @protected
+  bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
 
   @protected
   ComicDto? dco_decode_opt_box_autoadd_comic_dto(dynamic raw);
@@ -318,6 +337,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesItemDto dco_decode_series_item_dto(dynamic raw);
 
   @protected
+  SeriesMetaLocksDto dco_decode_series_meta_locks_dto(dynamic raw);
+
+  @protected
   SeriesReadingContextDto dco_decode_series_reading_context_dto(dynamic raw);
 
   @protected
@@ -328,6 +350,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesThumbnailDto dco_decode_series_thumbnail_dto(dynamic raw);
+
+  @protected
+  SetComicMetaLocksFrbDto dco_decode_set_comic_meta_locks_frb_dto(dynamic raw);
+
+  @protected
+  SetSeriesMetaLocksDto dco_decode_set_series_meta_locks_dto(dynamic raw);
 
   @protected
   SyncLibraryPhaseDto dco_decode_sync_library_phase_dto(dynamic raw);
@@ -450,6 +478,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
+  bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
+
+  @protected
   ComicDto sse_decode_box_autoadd_comic_dto(SseDeserializer deserializer);
 
   @protected
@@ -507,6 +538,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  SetComicMetaLocksFrbDto sse_decode_box_autoadd_set_comic_meta_locks_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SetSeriesMetaLocksDto sse_decode_box_autoadd_set_series_meta_locks_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   UpdateComicUserMetaFrbDto
   sse_decode_box_autoadd_update_comic_user_meta_frb_dto(
     SseDeserializer deserializer,
@@ -522,6 +563,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ComicFilterDto sse_decode_comic_filter_dto(SseDeserializer deserializer);
+
+  @protected
+  ComicMetaLocksDto sse_decode_comic_meta_locks_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   ComicSortFieldDto sse_decode_comic_sort_field_dto(
@@ -618,6 +664,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
+
+  @protected
+  bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
 
   @protected
   ComicDto? sse_decode_opt_box_autoadd_comic_dto(SseDeserializer deserializer);
@@ -723,6 +772,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesItemDto sse_decode_series_item_dto(SseDeserializer deserializer);
 
   @protected
+  SeriesMetaLocksDto sse_decode_series_meta_locks_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   SeriesReadingContextDto sse_decode_series_reading_context_dto(
     SseDeserializer deserializer,
   );
@@ -739,6 +793,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesThumbnailDto sse_decode_series_thumbnail_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SetComicMetaLocksFrbDto sse_decode_set_comic_meta_locks_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SetSeriesMetaLocksDto sse_decode_set_series_meta_locks_dto(
     SseDeserializer deserializer,
   );
 
@@ -889,6 +953,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_comic_dto(
     ComicDto self,
     SseSerializer serializer,
@@ -964,6 +1031,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_set_comic_meta_locks_frb_dto(
+    SetComicMetaLocksFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_set_series_meta_locks_dto(
+    SetSeriesMetaLocksDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_update_comic_user_meta_frb_dto(
     UpdateComicUserMetaFrbDto self,
     SseSerializer serializer,
@@ -981,6 +1060,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_comic_filter_dto(
     ComicFilterDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_comic_meta_locks_dto(
+    ComicMetaLocksDto self,
     SseSerializer serializer,
   );
 
@@ -1109,6 +1194,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_comic_dto(
@@ -1240,6 +1328,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_series_item_dto(SeriesItemDto self, SseSerializer serializer);
 
   @protected
+  void sse_encode_series_meta_locks_dto(
+    SeriesMetaLocksDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_series_reading_context_dto(
     SeriesReadingContextDto self,
     SseSerializer serializer,
@@ -1260,6 +1354,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_series_thumbnail_dto(
     SeriesThumbnailDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_set_comic_meta_locks_frb_dto(
+    SetComicMetaLocksFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_set_series_meta_locks_dto(
+    SetSeriesMetaLocksDto self,
     SseSerializer serializer,
   );
 

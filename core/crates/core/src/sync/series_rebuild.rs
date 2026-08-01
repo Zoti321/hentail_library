@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
 use sea_orm::{
-    ColumnTrait, ConnectionTrait, EntityTrait, QueryFilter, Set,
+    ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, QueryFilter, Set,
 };
 
 use crate::entity::{prelude::*, series, series_items};
@@ -50,16 +50,15 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
             .await
             .map_err(crate::db::map_db_err)?;
 
-        if existing.is_some() {
-            Series::update_many()
-                .col_expr(
-                    series::Column::FolderPath,
-                    sea_orm::sea_query::Expr::value(folder_path.clone()),
-                )
-                .filter(series::Column::SeriesId.eq(series_id.clone()))
-                .exec(db)
-                .await
-                .map_err(crate::db::map_db_err)?;
+        if let Some(existing_row) = existing {
+            let mut active: series::ActiveModel = existing_row.clone().into();
+            active.folder_path = Set(folder_path);
+            // Unlocked name → folder-derived; locked name preserved.
+            // serialization_status / total_count have no scan source → never overwritten.
+            if !existing_row.name_locked {
+                active.name = Set(name);
+            }
+            active.update(db).await.map_err(crate::db::map_db_err)?;
         } else {
             Series::insert(series::ActiveModel {
                 series_id: Set(series_id.clone()),
@@ -67,6 +66,9 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
                 name: Set(name),
                 serialization_status: Set("unknown".to_string()),
                 total_count: Set(None),
+                name_locked: Set(false),
+                serialization_status_locked: Set(false),
+                total_count_locked: Set(false),
             })
             .exec(db)
             .await

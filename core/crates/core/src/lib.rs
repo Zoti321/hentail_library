@@ -23,10 +23,10 @@ pub use author::{
     rename_author, watch_authors,
 };
 pub use comic::{
-    ComicDto, ComicFilterDto, ComicSortFieldDto, ComicSortOptionDto, PageRequestDto,
-    PagedComicResultDto, count_all, delete_comics_by_ids, fetch_comics_page, find_comic_by_id,
-    read_data_version, search_by_keyword, search_by_tag_expression, update_comic_user_meta,
-    UpdateComicUserMetaDto,
+    ComicDto, ComicFilterDto, ComicMetaLocks, ComicSortFieldDto, ComicSortOptionDto,
+    PageRequestDto, PagedComicResultDto, SetComicMetaLocksDto, UpdateComicUserMetaDto, count_all,
+    delete_comics_by_ids, fetch_comics_page, find_comic_by_id, read_data_version,
+    search_by_keyword, search_by_tag_expression, set_comic_meta_locks, update_comic_user_meta,
 };
 pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_path_for_key};
 pub use db::{connection, db_config, init_db, init_db_at_path};
@@ -48,11 +48,12 @@ pub use series::{
     count_all_series, fetch_series_comics_metadata, fetch_series_comics_page, fetch_series_page,
     find_series_by_id, get_all_series, get_series_reading_context_by_comic_id,
     load_home_series_comic_order_map, search_series_by_keyword, search_series_by_tag_expression,
-    set_series_items_order, update_series_item_sort_order, update_series_user_meta,
-    watch_all_series, watch_home_series_comic_order_map, PagedSeriesComicsResultDto,
-    PagedSeriesResultDto, SeriesComicPageItemDto, SeriesComicsMetadataDto, SeriesDto,
-    SeriesFilterDto, SeriesItemDto, SeriesReadingContextDto, SeriesSortFieldDto,
-    SeriesSortOptionDto, UpdateSeriesUserMetaDto,
+    set_series_item_sort_order_locked, set_series_items_order, set_series_meta_locks,
+    update_series_item_sort_order, update_series_user_meta, watch_all_series,
+    watch_home_series_comic_order_map, PagedSeriesComicsResultDto, PagedSeriesResultDto,
+    SeriesComicPageItemDto, SeriesComicsMetadataDto, SeriesDto, SeriesFilterDto, SeriesItemDto,
+    SeriesMetaLocks, SeriesReadingContextDto, SeriesSortFieldDto, SeriesSortOptionDto,
+    SetSeriesMetaLocksDto, UpdateSeriesUserMetaDto,
 };
 pub use history::{
     PagedReadingHistoryDto, ReadingHistoryDto, clear_all_reading, delete_reading_by_comic_id,

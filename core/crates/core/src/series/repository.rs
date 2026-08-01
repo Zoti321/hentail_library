@@ -24,6 +24,13 @@ pub struct SeriesItemDto {
     pub sort_order_locked: bool,
 }
 
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct SeriesMetaLocks {
+    pub name: bool,
+    pub serialization_status: bool,
+    pub total_count: bool,
+}
+
 #[derive(Debug, Clone)]
 pub struct SeriesDto {
     pub series_id: String,
@@ -31,6 +38,7 @@ pub struct SeriesDto {
     pub name: String,
     pub serialization_status: String,
     pub total_count: Option<i32>,
+    pub locks: SeriesMetaLocks,
     pub items: Vec<SeriesItemDto>,
 }
 
@@ -53,6 +61,7 @@ pub struct SeriesComicsMetadataDto {
 pub struct SeriesComicPageItemDto {
     pub comic: ComicDto,
     pub sort_order: f64,
+    pub sort_order_locked: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -211,14 +220,24 @@ pub async fn fetch_series_comics_page(
     let offset = (effective_page - 1) * page_size;
     let id_orders =
         query_series_comic_id_orders_page(&db, series_id, page_size, offset).await?;
-    let comic_ids: Vec<String> = id_orders.iter().map(|(id, _)| id.clone()).collect();
-    let order_by_id: HashMap<String, f64> = id_orders.into_iter().collect();
+    let comic_ids: Vec<String> = id_orders.iter().map(|(id, _, _)| id.clone()).collect();
+    let order_by_id: HashMap<String, (f64, bool)> = id_orders
+        .into_iter()
+        .map(|(id, sort_order, locked)| (id, (sort_order, locked)))
+        .collect();
     let comics = load_comics_ordered(&db, comic_ids).await?;
     let items = comics
         .into_iter()
         .map(|comic| {
-            let sort_order = order_by_id.get(&comic.comic_id).copied().unwrap_or(0.0);
-            SeriesComicPageItemDto { comic, sort_order }
+            let (sort_order, sort_order_locked) = order_by_id
+                .get(&comic.comic_id)
+                .copied()
+                .unwrap_or((0.0, false));
+            SeriesComicPageItemDto {
+                comic,
+                sort_order,
+                sort_order_locked,
+            }
         })
         .collect();
     Ok(PagedSeriesComicsResultDto {
@@ -411,10 +430,10 @@ async fn query_series_comic_id_orders_page(
     series_id: &str,
     page_size: i32,
     offset: i32,
-) -> Result<Vec<(String, f64)>, HentaiError> {
+) -> Result<Vec<(String, f64, bool)>, HentaiError> {
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT comic_id, sort_order FROM series_items \
+        "SELECT comic_id, sort_order, sort_order_locked FROM series_items \
          WHERE series_id = ? \
          ORDER BY sort_order ASC, comic_id ASC \
          LIMIT ? OFFSET ?",
@@ -433,7 +452,10 @@ async fn query_series_comic_id_orders_page(
             let sort_order = row
                 .try_get_by_index::<f64>(1)
                 .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
-            Ok((comic_id, sort_order))
+            let locked_i64 = row
+                .try_get_by_index::<i64>(2)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+            Ok((comic_id, sort_order, locked_i64 != 0))
         })
         .collect()
 }
@@ -559,7 +581,14 @@ async fn load_series_by_ids(
                 name: row.name,
                 serialization_status: row.serialization_status,
                 total_count: row.total_count,
-                items: items_by_series.remove(&row.series_id).unwrap_or_default(),
+                locks: SeriesMetaLocks {
+                    name: row.name_locked,
+                    serialization_status: row.serialization_status_locked,
+                    total_count: row.total_count_locked,
+                },
+                items: items_by_series
+                    .remove(&row.series_id)
+                    .unwrap_or_default(),
             },
         );
     }

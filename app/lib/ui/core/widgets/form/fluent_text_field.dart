@@ -8,6 +8,7 @@ class FluentTextField extends StatefulWidget {
   final int maxLines;
   final String? hintText;
   final String? labelText;
+  final Widget? labelTrailing;
   final String? errorText;
   final bool autofocus;
   final bool enabled;
@@ -24,6 +25,7 @@ class FluentTextField extends StatefulWidget {
     this.maxLines = 1,
     this.hintText,
     this.labelText,
+    this.labelTrailing,
     this.errorText,
     this.autofocus = false,
     this.enabled = true,
@@ -74,7 +76,7 @@ class FluentTextFieldState extends State<FluentTextField> {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (widget.labelText != null) ...[
-          FormLabel(widget.labelText!),
+          FormLabel(widget.labelText!, trailing: widget.labelTrailing),
           SizedBox(
             height: useDense ? tokens.spacing.xs : tokens.spacing.sm - 2,
           ),
@@ -160,19 +162,41 @@ class FluentTextFieldState extends State<FluentTextField> {
 
 class FormLabel extends StatelessWidget {
   final String text;
+  final Widget? trailing;
 
-  const FormLabel(this.text, {super.key});
+  const FormLabel(this.text, {super.key, this.trailing});
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.tokens;
-    return Text(
+    final Text label = Text(
       text.toUpperCase(),
       style: TextStyle(
         fontSize: tokens.text.labelXs,
         fontWeight: FontWeight.w700,
         color: Theme.of(context).colorScheme.hentai.textTertiary,
       ),
+    );
+    if (trailing == null) {
+      return label;
+    }
+    // MultiSelect puts FormLabel in a Row non-flex slot (unbounded max width);
+    // Expanded only works when the incoming width is bounded (e.g. Column forms).
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        if (!constraints.hasBoundedWidth) {
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[label, trailing!],
+          );
+        }
+        return Row(
+          children: <Widget>[
+            Expanded(child: label),
+            trailing!,
+          ],
+        );
+      },
     );
   }
 }

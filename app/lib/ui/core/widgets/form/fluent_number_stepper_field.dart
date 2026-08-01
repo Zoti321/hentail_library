@@ -11,6 +11,7 @@ class FluentNumberStepperField extends HookWidget {
     this.onSubmitted,
     this.hintText,
     this.labelText,
+    this.labelTrailing,
     this.errorText,
     this.autofocus = false,
     this.enabled = true,
@@ -26,6 +27,7 @@ class FluentNumberStepperField extends HookWidget {
   final ValueChanged<String>? onSubmitted;
   final String? hintText;
   final String? labelText;
+  final Widget? labelTrailing;
   final String? errorText;
   final bool autofocus;
   final bool enabled;
@@ -136,7 +138,7 @@ class FluentNumberStepperField extends HookWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         if (labelText != null) ...<Widget>[
-          FormLabel(labelText!),
+          FormLabel(labelText!, trailing: labelTrailing),
           SizedBox(
             height: useDense ? tokens.spacing.xs : tokens.spacing.sm - 2,
           ),

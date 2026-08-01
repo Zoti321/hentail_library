@@ -29,6 +29,7 @@ Komga 等同类产品的常见做法是：用户编辑排序值后，将该条�
 - Library sync / folder series rebuild：
   - **已锁定**成员：保留现有 `sort_order` 与 `sort_order_locked`；
   - **未锁定**成员：仍按文件名自然排序写入 `sort_order`。
+- **`set_series_item_sort_order_locked(seriesId, comicId, locked)`**：可单独解锁；解锁后下次 rebuild 按文件名重编号（见 ADR-0007）。
 
 ### 读取与 UI
 

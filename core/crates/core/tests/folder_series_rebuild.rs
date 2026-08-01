@@ -4,7 +4,8 @@ use std::sync::Mutex;
 
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::{
-    connection, init_db_at_path, update_series_user_meta, UpdateSeriesUserMetaDto,
+    connection, find_series_by_id, init_db_at_path, set_series_meta_locks,
+    update_series_user_meta, SetSeriesMetaLocksDto, UpdateSeriesUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, Database, DatabaseConnection, Statement};
 use tempfile::TempDir;
@@ -207,6 +208,92 @@ fn update_series_user_meta_preserves_fields_on_rebuild() {
             assert_eq!(name, "自定义系列名");
             assert_eq!(status, "ongoing");
             assert_eq!(total, Some(12));
+            let series = find_series_by_id(&series_id)
+                .await
+                .expect("find")
+                .expect("series");
+            assert!(series.locks.name);
+            assert!(series.locks.serialization_status);
+            assert!(series.locks.total_count);
+        });
+    });
+}
+
+#[test]
+fn rebuild_overwrites_unlocked_series_name_from_folder() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let db = connection().expect("connection");
+            db.execute(Statement::from_string(
+                sea_orm::DatabaseBackend::Sqlite,
+                "DELETE FROM series_items; DELETE FROM series; DELETE FROM comic_meta; DELETE FROM comics"
+                    .to_string(),
+            ))
+            .await
+            .expect("clear");
+            db.execute(Statement::from_string(
+                sea_orm::DatabaseBackend::Sqlite,
+                "INSERT INTO comics (comic_id, path, resource_type, resource_size, created_at, last_updated_at) \
+                 VALUES ('c1', 'E:/lib/Series/a.cbz', 'cbz', 1, 1, 1)"
+                    .to_string(),
+            ))
+            .await
+            .expect("seed comic");
+            db.execute(Statement::from_string(
+                sea_orm::DatabaseBackend::Sqlite,
+                "INSERT INTO comic_meta (comic_id, title, content_rating, page_count) \
+                 VALUES ('c1', 'A', 'unknown', 1)"
+                    .to_string(),
+            ))
+            .await
+            .expect("seed meta");
+            rebuild_series_from_comics(&db).await.expect("rebuild");
+
+            let series_id: String = db
+                .query_one(Statement::from_string(
+                    sea_orm::DatabaseBackend::Sqlite,
+                    "SELECT series_id FROM series LIMIT 1".to_string(),
+                ))
+                .await
+                .expect("query")
+                .expect("row")
+                .try_get_by_index(0)
+                .expect("id");
+
+            update_series_user_meta(
+                &series_id,
+                UpdateSeriesUserMetaDto {
+                    name: Some("自定义系列名".to_string()),
+                    ..Default::default()
+                },
+            )
+            .await
+            .expect("update name");
+
+            set_series_meta_locks(
+                &series_id,
+                SetSeriesMetaLocksDto {
+                    name: Some(false),
+                    ..Default::default()
+                },
+            )
+            .await
+            .expect("unlock name");
+
+            rebuild_series_from_comics(&connection().expect("connection"))
+                .await
+                .expect("rebuild again");
+
+            let series = find_series_by_id(&series_id)
+                .await
+                .expect("find")
+                .expect("series");
+            assert_eq!(series.name, "Series");
+            assert!(!series.locks.name);
         });
     });
 }

@@ -107,6 +107,32 @@ class ComicRepositoryImpl implements ComicRepository {
   }
 
   @override
+  Future<void> setMetaLocks(
+    String comicId, {
+    bool? title,
+    bool? description,
+    bool? publishedAt,
+    bool? contentRating,
+    bool? authors,
+    bool? tags,
+  }) async {
+    guardFrbSync(
+      () => rust.setComicMetaLocksFrb(
+        comicId: comicId,
+        locks: rust.SetComicMetaLocksFrbDto(
+          title: title,
+          description: description,
+          publishedAt: publishedAt,
+          contentRating: contentRating,
+          authors: authors,
+          tags: tags,
+        ),
+      ),
+      fallbackMessage: '更新漫画元数据锁失败',
+    );
+  }
+
+  @override
   Future<List<Comic>> searchByKeyword(String keyword) async {
     return guardFrbSync(
       () =>

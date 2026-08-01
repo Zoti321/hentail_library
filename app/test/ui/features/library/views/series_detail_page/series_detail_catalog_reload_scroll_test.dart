@@ -82,7 +82,13 @@ class _DelayedSeriesRepo implements SeriesRepository {
     }
     return PagedResult<SeriesComicPageItem>(
       items: comics
-          .map((Comic comic) => (comic: comic, sortOrder: 0.0))
+          .map(
+            (Comic comic) => (
+              comic: comic,
+              sortOrder: 0.0,
+              sortOrderLocked: false,
+            ),
+          )
           .toList(),
       page: request.page,
       pageSize: request.pageSize,
@@ -119,7 +125,13 @@ Comic _comic(int index) {
 SeriesDetailComicsCatalogState _catalogState(List<Comic> comics) {
   return SeriesDetailComicsCatalogState(
     items: comics
-        .map((Comic comic) => (comic: comic, sortOrder: 0.0))
+        .map(
+            (Comic comic) => (
+              comic: comic,
+              sortOrder: 0.0,
+              sortOrderLocked: false,
+            ),
+          )
         .toList(),
     pagination: LibraryPagination(
       page: 1,

@@ -14,10 +14,12 @@ class AuthorLibraryMultiSelectField extends ConsumerWidget {
     required this.selectedNames,
     required this.onAdd,
     required this.onRemove,
+    this.labelTrailing,
     this.compactTrigger = false,
   });
 
   final String label;
+  final Widget? labelTrailing;
   final IconData icon;
   final List<String> selectedNames;
   final ValueChanged<String> onAdd;
@@ -31,6 +33,7 @@ class AuthorLibraryMultiSelectField extends ConsumerWidget {
     final l10n = context.l10n;
     return MultiSelect<Author>(
       label: label,
+      labelTrailing: labelTrailing,
       icon: icon,
       selectedNames: selectedNames,
       onAdd: onAdd,

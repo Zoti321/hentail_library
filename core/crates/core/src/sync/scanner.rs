@@ -207,6 +207,7 @@ mod tests {
             last_read_time_ms: None,
             authors: vec![],
             tags: vec![],
+            locks: crate::comic::ComicMetaLocks::default(),
         };
         let ctx = ScanContext {
             existing_by_id: HashMap::from([(comic_id.clone(), existing)]),

@@ -7,7 +7,7 @@ import '../frb_generated.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
 
 void initDbFrb({required String appDataDir, required String dbFileName}) =>
     RustLib.instance.api.crateApiComicInitDbFrb(
@@ -45,6 +45,14 @@ void updateComicUserMetaFrb({
   meta: meta,
 );
 
+void setComicMetaLocksFrb({
+  required String comicId,
+  required SetComicMetaLocksFrbDto locks,
+}) => RustLib.instance.api.crateApiComicSetComicMetaLocksFrb(
+  comicId: comicId,
+  locks: locks,
+);
+
 List<ComicDto> searchByTagExpressionFrb({
   required List<String> mustInclude,
   required List<String> optionalOr,
@@ -76,6 +84,7 @@ class ComicDto {
   final PlatformInt64? lastReadTimeMs;
   final List<String> authors;
   final List<String> tags;
+  final ComicMetaLocksDto locks;
 
   const ComicDto({
     required this.comicId,
@@ -92,6 +101,7 @@ class ComicDto {
     this.lastReadTimeMs,
     required this.authors,
     required this.tags,
+    required this.locks,
   });
 
   @override
@@ -109,7 +119,8 @@ class ComicDto {
       publishedAt.hashCode ^
       lastReadTimeMs.hashCode ^
       authors.hashCode ^
-      tags.hashCode;
+      tags.hashCode ^
+      locks.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -129,7 +140,8 @@ class ComicDto {
           publishedAt == other.publishedAt &&
           lastReadTimeMs == other.lastReadTimeMs &&
           authors == other.authors &&
-          tags == other.tags;
+          tags == other.tags &&
+          locks == other.locks;
 }
 
 class ComicFilterDto {
@@ -185,6 +197,45 @@ class ComicFilterDto {
           authorsAll == other.authorsAll &&
           authorsAny == other.authorsAny &&
           authorsExclude == other.authorsExclude;
+}
+
+class ComicMetaLocksDto {
+  final bool title;
+  final bool description;
+  final bool publishedAt;
+  final bool contentRating;
+  final bool authors;
+  final bool tags;
+
+  const ComicMetaLocksDto({
+    required this.title,
+    required this.description,
+    required this.publishedAt,
+    required this.contentRating,
+    required this.authors,
+    required this.tags,
+  });
+
+  @override
+  int get hashCode =>
+      title.hashCode ^
+      description.hashCode ^
+      publishedAt.hashCode ^
+      contentRating.hashCode ^
+      authors.hashCode ^
+      tags.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ComicMetaLocksDto &&
+          runtimeType == other.runtimeType &&
+          title == other.title &&
+          description == other.description &&
+          publishedAt == other.publishedAt &&
+          contentRating == other.contentRating &&
+          authors == other.authors &&
+          tags == other.tags;
 }
 
 enum ComicSortFieldDto {
@@ -262,6 +313,48 @@ class PagedComicResultDto {
           totalCount == other.totalCount &&
           page == other.page &&
           pageSize == other.pageSize;
+}
+
+class SetComicMetaLocksFrbDto {
+  final bool? title;
+  final bool? description;
+  final bool? publishedAt;
+  final bool? contentRating;
+  final bool? authors;
+  final bool? tags;
+
+  const SetComicMetaLocksFrbDto({
+    this.title,
+    this.description,
+    this.publishedAt,
+    this.contentRating,
+    this.authors,
+    this.tags,
+  });
+
+  static Future<SetComicMetaLocksFrbDto> default_() =>
+      RustLib.instance.api.crateApiComicSetComicMetaLocksFrbDtoDefault();
+
+  @override
+  int get hashCode =>
+      title.hashCode ^
+      description.hashCode ^
+      publishedAt.hashCode ^
+      contentRating.hashCode ^
+      authors.hashCode ^
+      tags.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SetComicMetaLocksFrbDto &&
+          runtimeType == other.runtimeType &&
+          title == other.title &&
+          description == other.description &&
+          publishedAt == other.publishedAt &&
+          contentRating == other.contentRating &&
+          authors == other.authors &&
+          tags == other.tags;
 }
 
 class UpdateComicUserMetaFrbDto {

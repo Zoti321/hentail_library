@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/value_objects/series_meta_locks.dart';
 
 part 'series.freezed.dart';
 
@@ -15,6 +16,7 @@ abstract class Series with _$Series {
     @Default(SerializationStatus.unknown)
     SerializationStatus serializationStatus,
     int? totalCount,
+    @Default(SeriesMetaLocks.unlocked) SeriesMetaLocks locks,
     @Default(<SeriesItem>[]) List<SeriesItem> items,
   }) = _Series;
 

@@ -1,4 +1,4 @@
-use hentai_core::comic::ComicDto;
+use hentai_core::comic::{ComicDto, ComicMetaLocks};
 use hentai_core::sync::merge::merge_kept_scan_with_existing;
 
 fn comic(
@@ -23,29 +23,40 @@ fn comic(
         last_read_time_ms: None,
         authors: vec!["作者".to_string()],
         tags: vec!["标签".to_string()],
+        locks: ComicMetaLocks::default(),
     }
 }
 
 #[test]
-fn merge_kept_preserves_user_metadata_when_source_unchanged() {
+fn merge_unlocked_title_takes_scanned_value() {
     let scanned = comic("id1", "/a/b", "zip", "扫描标题", 10);
     let existing = comic("id1", "/a/b", "zip", "用户标题", 5);
     let merged = merge_kept_scan_with_existing(&scanned, &existing);
-    assert_eq!(merged.title, "用户标题");
-    assert_eq!(merged.page_count, 5);
-    assert_eq!(merged.authors, vec!["作者".to_string()]);
+    assert_eq!(merged.title, "扫描标题");
+    assert!(!merged.locks.title);
 }
 
 #[test]
-fn merge_kept_decodes_html_entities_in_existing_title() {
+fn merge_locked_title_preserves_existing() {
     let scanned = comic("id1", "/a/b", "zip", "扫描标题", 10);
-    let existing = comic(
+    let mut existing = comic("id1", "/a/b", "zip", "用户标题", 5);
+    existing.locks.title = true;
+    let merged = merge_kept_scan_with_existing(&scanned, &existing);
+    assert_eq!(merged.title, "用户标题");
+    assert!(merged.locks.title);
+}
+
+#[test]
+fn merge_kept_decodes_html_entities_in_locked_title() {
+    let scanned = comic("id1", "/a/b", "zip", "扫描标题", 10);
+    let mut existing = comic(
         "id1",
         "/a/b",
         "zip",
         "Fate╱Stay Night Heaven&#039;s Feel - 卷04",
         5,
     );
+    existing.locks.title = true;
     let merged = merge_kept_scan_with_existing(&scanned, &existing);
     assert_eq!(merged.title, "Fate╱Stay Night Heaven's Feel - 卷04");
 }
@@ -68,9 +79,30 @@ fn merge_kept_preserves_existing_page_count_when_source_unchanged() {
 }
 
 #[test]
-fn merge_kept_preserves_description_when_set() {
+fn merge_unlocked_description_takes_scanned_when_present() {
     let mut scanned = comic("id1", "/a/b", "zip", "扫描标题", 5);
     scanned.description = Some("扫描概要".to_string());
+    let mut existing = comic("id1", "/a/b", "zip", "用户标题", 5);
+    existing.description = Some("用户概要".to_string());
+    let merged = merge_kept_scan_with_existing(&scanned, &existing);
+    assert_eq!(merged.description.as_deref(), Some("扫描概要"));
+}
+
+#[test]
+fn merge_locked_description_preserves_existing() {
+    let mut scanned = comic("id1", "/a/b", "zip", "扫描标题", 5);
+    scanned.description = Some("扫描概要".to_string());
+    let mut existing = comic("id1", "/a/b", "zip", "用户标题", 5);
+    existing.description = Some("用户概要".to_string());
+    existing.locks.description = true;
+    let merged = merge_kept_scan_with_existing(&scanned, &existing);
+    assert_eq!(merged.description.as_deref(), Some("用户概要"));
+}
+
+#[test]
+fn merge_unlocked_description_keeps_existing_when_scan_empty() {
+    let mut scanned = comic("id1", "/a/b", "zip", "扫描标题", 5);
+    scanned.description = None;
     let mut existing = comic("id1", "/a/b", "zip", "用户标题", 5);
     existing.description = Some("用户概要".to_string());
     let merged = merge_kept_scan_with_existing(&scanned, &existing);
@@ -78,12 +110,49 @@ fn merge_kept_preserves_description_when_set() {
 }
 
 #[test]
-fn merge_kept_backfills_null_description_from_scan() {
+fn merge_unlocked_backfills_null_description_from_scan() {
     let mut scanned = comic("id1", "/a/b", "zip", "扫描标题", 5);
     scanned.description = Some("扫描概要".to_string());
     let existing = comic("id1", "/a/b", "zip", "用户标题", 5);
     let merged = merge_kept_scan_with_existing(&scanned, &existing);
     assert_eq!(merged.description.as_deref(), Some("扫描概要"));
+}
+
+#[test]
+fn merge_unlocked_authors_keep_existing_when_scan_empty() {
+    let mut scanned = comic("id1", "/a/b", "zip", "扫描标题", 5);
+    scanned.authors = vec![];
+    let existing = comic("id1", "/a/b", "zip", "用户标题", 5);
+    let merged = merge_kept_scan_with_existing(&scanned, &existing);
+    assert_eq!(merged.authors, vec!["作者".to_string()]);
+}
+
+#[test]
+fn merge_unlocked_authors_replace_when_scan_non_empty() {
+    let mut scanned = comic("id1", "/a/b", "zip", "扫描标题", 5);
+    scanned.authors = vec!["扫描作者".to_string()];
+    let existing = comic("id1", "/a/b", "zip", "用户标题", 5);
+    let merged = merge_kept_scan_with_existing(&scanned, &existing);
+    assert_eq!(merged.authors, vec!["扫描作者".to_string()]);
+}
+
+#[test]
+fn merge_unlocked_tags_keep_existing_when_scan_empty() {
+    let mut scanned = comic("id1", "/a/b", "zip", "扫描标题", 5);
+    scanned.tags = vec![];
+    let existing = comic("id1", "/a/b", "zip", "用户标题", 5);
+    let merged = merge_kept_scan_with_existing(&scanned, &existing);
+    assert_eq!(merged.tags, vec!["标签".to_string()]);
+}
+
+#[test]
+fn merge_unlocked_content_rating_ignores_unknown_scan() {
+    let mut scanned = comic("id1", "/a/b", "zip", "扫描标题", 5);
+    scanned.content_rating = "unknown".to_string();
+    let mut existing = comic("id1", "/a/b", "zip", "用户标题", 5);
+    existing.content_rating = "r18".to_string();
+    let merged = merge_kept_scan_with_existing(&scanned, &existing);
+    assert_eq!(merged.content_rating, "r18");
 }
 
 #[test]

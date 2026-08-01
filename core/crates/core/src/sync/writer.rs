@@ -76,6 +76,12 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
         page_count: Set(comic.page_count),
         description: Set(comic.description.clone()),
         published_at: Set(comic.published_at),
+        title_locked: Set(comic.locks.title),
+        description_locked: Set(comic.locks.description),
+        published_at_locked: Set(comic.locks.published_at),
+        content_rating_locked: Set(comic.locks.content_rating),
+        authors_locked: Set(comic.locks.authors),
+        tags_locked: Set(comic.locks.tags),
     };
     ComicMeta::insert(meta_active)
         .exec(db)
@@ -294,6 +300,12 @@ async fn upsert_comics<C: ConnectionTrait>(db: &C, comics_list: &[ComicDto]) -> 
             page_count: Set(comic.page_count),
             description: Set(comic.description.clone()),
             published_at: Set(comic.published_at),
+            title_locked: Set(comic.locks.title),
+            description_locked: Set(comic.locks.description),
+            published_at_locked: Set(comic.locks.published_at),
+            content_rating_locked: Set(comic.locks.content_rating),
+            authors_locked: Set(comic.locks.authors),
+            tags_locked: Set(comic.locks.tags),
         };
         ComicMeta::insert(meta_active)
             .on_conflict(
@@ -304,6 +316,12 @@ async fn upsert_comics<C: ConnectionTrait>(db: &C, comics_list: &[ComicDto]) -> 
                         comic_meta::Column::PageCount,
                         comic_meta::Column::Description,
                         comic_meta::Column::PublishedAt,
+                        comic_meta::Column::TitleLocked,
+                        comic_meta::Column::DescriptionLocked,
+                        comic_meta::Column::PublishedAtLocked,
+                        comic_meta::Column::ContentRatingLocked,
+                        comic_meta::Column::AuthorsLocked,
+                        comic_meta::Column::TagsLocked,
                     ])
                     .to_owned(),
             )

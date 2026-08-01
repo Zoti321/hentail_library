@@ -40,6 +40,12 @@ abstract class SeriesRepository {
     required double sortOrder,
   });
 
+  Future<void> setSeriesItemSortOrderLocked({
+    required String seriesId,
+    required String comicId,
+    required bool locked,
+  });
+
   Future<SeriesComicsMetadata> fetchComicsMetadata(String seriesId);
 
   Future<void> updateUserMeta({
@@ -48,6 +54,13 @@ abstract class SeriesRepository {
     SerializationStatus? serializationStatus,
     int? totalCount,
     bool clearTotalCount = false,
+  });
+
+  Future<void> setMetaLocks({
+    required String seriesId,
+    bool? name,
+    bool? serializationStatus,
+    bool? totalCount,
   });
 
   /// 保留底层 API，供后续开放手动排序。

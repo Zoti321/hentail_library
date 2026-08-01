@@ -21,6 +21,7 @@ void main() {
     ValueChanged<String>? onRemove,
     ProviderListenable<AsyncValue<List<String>>>? itemsProvider,
     VoidCallback? onRetry,
+    Widget? labelTrailing,
   }) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -34,6 +35,7 @@ void main() {
               padding: const EdgeInsets.all(24),
               child: MultiSelect<String>(
                 label: '标签',
+                labelTrailing: labelTrailing,
                 icon: LucideIcons.tag,
                 selectedNames: selectedNames,
                 onAdd: onAdd ?? (_) {},
@@ -55,6 +57,42 @@ void main() {
     );
     await tester.pumpAndSettle();
   }
+
+  testWidgets('lays out with labelTrailing without unbounded width errors', (
+    WidgetTester tester,
+  ) async {
+    final List<FlutterErrorDetails> errors = <FlutterErrorDetails>[];
+    final void Function(FlutterErrorDetails)? previous = FlutterError.onError;
+    FlutterError.onError = (FlutterErrorDetails details) {
+      errors.add(details);
+      previous?.call(details);
+    };
+    addTearDown(() {
+      FlutterError.onError = previous;
+    });
+
+    await pumpMultiSelect(
+      tester,
+      labelTrailing: IconButton(
+        onPressed: () {},
+        icon: const Icon(Icons.lock, size: 16),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(
+      errors.where((FlutterErrorDetails e) {
+        final String text = e.toString();
+        return text.contains('unbounded') ||
+            text.contains('was not laid out') ||
+            text.contains('Cannot hit test');
+      }),
+      isEmpty,
+      reason: errors.map((FlutterErrorDetails e) => e.exceptionAsString()).join('\n'),
+    );
+    expect(find.text('标签'), findsOneWidget);
+    expect(find.byIcon(Icons.lock), findsOneWidget);
+  });
 
   testWidgets('shows selected names as removable chips in the field', (
     WidgetTester tester,

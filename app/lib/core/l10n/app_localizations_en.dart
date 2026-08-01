@@ -1117,6 +1117,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dialogEditMetadataTabAuthorsTags => 'Authors & tags';
 
   @override
+  String get metadataFieldLockTooltip => 'Lock: keep this value on scan';
+
+  @override
+  String get metadataFieldUnlockTooltip =>
+      'Unlock: allow scan to overwrite next time';
+
+  @override
   String get formSeriesNameLabel => 'Series name';
 
   @override

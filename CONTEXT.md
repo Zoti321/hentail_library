@@ -31,7 +31,7 @@ _Avoid_: 扫描路径、文件夹、目录（UI 可用，领域术语用 Saved p
 _Avoid_: 导入、索引（未体现与磁盘对齐的删除语义）
 
 **Library sync**:
-让 Library 与当前 Saved path 下磁盘内容对齐的完整操作：包含 Scan，并将结果写入数据库——新增缺失 Comic、更新仍存在的 Comic（保留用户元数据）、删除磁盘上已消失的 Comic。若所有 Saved path 被移除，则清空整个 Library。
+让 Library 与当前 Saved path 下磁盘内容对齐的完整操作：包含 Scan，并将结果写入数据库——新增缺失 Comic、按字段锁合并元数据后更新仍存在的 Comic、删除磁盘上已消失的 Comic。若所有 Saved path 被移除，则清空整个 Library。元数据合并见 Metadata field lock。
 _Avoid_: 同步、刷新（太泛，未体现镜像语义）
 
 _Scan_ 与 _Library sync_ 在用户触发的场景中指同一操作；领域文档与 issue 优先使用 Library sync。
@@ -47,7 +47,7 @@ _Avoid_: 扩展名列表（用户设置层用分组）
 ### Organization & metadata
 
 **Series**:
-库中有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。用户可编辑连载状态与计划总卷数；成员默认顺序由 sync 按文件名自然排序写入。用户可在系列详情手动编辑单本排序值（`SeriesItem.order`，浮点数）；手动保存后会锁定该成员（`sortOrderLocked`），后续 sync 保留锁定项的排序值，未锁定项仍按文件名自然排序更新。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series；不在任何 Series 中的 Comic 仍作为独立条目存在于 Library 中。
+库中有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。用户可编辑连载状态与计划总卷数（各字段可有 Metadata field lock）；成员默认顺序由 sync 按文件名自然排序写入。用户可在系列详情手动编辑单本排序值（`SeriesItem.order`，浮点数）；手动保存后会锁定该成员（`sortOrderLocked`），后续 sync 保留锁定项的排序值，未锁定项仍按文件名自然排序更新；也可解锁排序以在下次 sync 恢复文件名序。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series；不在任何 Series 中的 Comic 仍作为独立条目存在于 Library 中。
 _Avoid_: 合集、专辑、套系
 
 **Folder series**:
@@ -67,12 +67,16 @@ Comic 的内容分级：`unknown`、`safe`、`r18`；主要由用户设定，也
 _Avoid_: 分级、年龄限制
 
 **Comic metadata form**:
-编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag）时的可提交草稿；校验与 normalize、Author/Tag 增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。
+编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag）时的可提交草稿；校验与 normalize、Author/Tag 增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存写入的字段会自动加上 Metadata field lock；表单旁可单独切换锁而不改值。
 _Avoid_: 漫画表单、元数据 DTO
 
 **Series metadata form**:
-编辑 Series 用户元数据（名称、连载状态、计划总卷数）时的可提交草稿；计划总卷数以原始文本持有，空串表示清除、正整数表示设置；校验失败以字段级结果返回，由 UI 在字段下方展示。
+编辑 Series 用户元数据（名称、连载状态、计划总卷数）时的可提交草稿；计划总卷数以原始文本持有，空串表示清除、正整数表示设置；校验失败以字段级结果返回，由 UI 在字段下方展示。保存写入的字段会自动加上 Metadata field lock；表单旁可单独切换锁而不改值。
 _Avoid_: 系列表单、SeriesForm、编辑系列 DTO
+
+**Metadata field lock**:
+Comic / Series 元数据字段上的布尔锁（Komga 式）。未锁定且 Library sync 解析出有值时用扫描结果覆盖；已锁定则保留库内值；扫描空/缺不清除。编辑某字段并保存会自动锁定该字段；也可不改值单独上锁/解锁。解锁不自动触发 sync。详见 ADR-0007。
+_Avoid_: 只读标记、冻结、保护位（口语可用，领域用 Metadata field lock）
 
 **Healthy mode**:
 应用级浏览过滤：开启后库、搜索、历史等视图隐藏 `contentRating == r18` 的 Comic；不修改 Comic 自身的分级。

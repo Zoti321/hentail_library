@@ -14,10 +14,12 @@ class FluentToggleField extends StatelessWidget {
     required this.onChanged,
     required this.checkedLabel,
     required this.uncheckedLabel,
+    this.labelTrailing,
     this.enabled = true,
   });
 
   final String labelText;
+  final Widget? labelTrailing;
   final bool value;
   final ValueChanged<bool> onChanged;
   final String checkedLabel;
@@ -34,7 +36,7 @@ class FluentToggleField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        FormLabel(labelText),
+        FormLabel(labelText, trailing: labelTrailing),
         SizedBox(height: tokens.spacing.sm - 2),
         Material(
           color: Colors.transparent,

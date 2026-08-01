@@ -10,6 +10,9 @@ pub struct Model {
     pub name: String,
     pub serialization_status: String,
     pub total_count: Option<i32>,
+    pub name_locked: bool,
+    pub serialization_status_locked: bool,
+    pub total_count_locked: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
