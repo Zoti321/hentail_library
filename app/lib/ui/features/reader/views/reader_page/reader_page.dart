@@ -18,26 +18,27 @@ class ReaderPage extends HookConsumerWidget {
   const ReaderPage({
     super.key,
     required this.comicId,
-    this.seriesId,
     this.keepControlsOpen = false,
     this.incognito = false,
+    this.startFromFirstPage = false,
   });
 
   final String comicId;
-  final String? seriesId;
   final bool keepControlsOpen;
   final bool incognito;
+  final bool startFromFirstPage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ReaderRouteContext routeContext = ReaderRouteContext.normalize(
       comicId: comicId,
-      seriesId: seriesId,
       incognito: incognito,
+      startFromFirstPage: startFromFirstPage,
     );
     final ReaderControllerKey viewKey = readerControllerKey(
       routeContext.comicId,
       incognito: routeContext.incognito,
+      startFromFirstPage: routeContext.startFromFirstPage,
     );
 
     if (routeContext.comicId.isEmpty) {
@@ -53,8 +54,8 @@ class ReaderPage extends HookConsumerWidget {
     final AsyncValue<ReaderPageViewModel> viewAsync = ref.watch(
       readerPageViewModelProvider(
         comicId: routeContext.comicId,
-        seriesId: routeContext.seriesId,
         incognito: routeContext.incognito,
+        startFromFirstPage: routeContext.startFromFirstPage,
       ),
     );
     final bool readerReady = viewAsync.hasValue;
@@ -69,8 +70,6 @@ class ReaderPage extends HookConsumerWidget {
               .read(readSessionCoordinatorProvider)
               .beginReadSession(
                 comic: loadedViewModel.viewState.comic,
-                mode: routeContext.session.mode,
-                seriesId: routeContext.seriesId,
                 incognito: routeContext.incognito,
                 initialPageIndex: loadedViewModel.viewState.currentIndex,
               ),
@@ -79,8 +78,8 @@ class ReaderPage extends HookConsumerWidget {
       },
       <Object?>[
         routeContext.comicId,
-        routeContext.seriesId,
         routeContext.incognito,
+        routeContext.startFromFirstPage,
         readerReady,
       ],
     );
@@ -241,7 +240,7 @@ class ReaderPage extends HookConsumerWidget {
               final int initialPage = state.currentIndex - 1;
               final ReadingMode activeReadingMode = state.readingMode;
               final ReaderNavContextData? seriesNavContext =
-                  viewModel.isSeriesRead ? viewModel.navContext : null;
+                  viewModel.hasSeriesContext ? viewModel.navContext : null;
               Future<void> requestNextPage() => controller.requestNextPage(
                 navContext: seriesNavContext,
                 session: routeContext.session,
@@ -283,6 +282,7 @@ class ReaderPage extends HookConsumerWidget {
                     readerFullscreen: readerFullscreen,
                     navContext: seriesNavContext,
                     session: routeContext.session,
+                    seriesId: viewModel.seriesId,
                     onExit: () async {
                       await controller.executeExitReader(
                         context: context,

@@ -16,7 +16,6 @@ import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/domain/reading/read_session_coordinator.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/series_detail_route_page.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -25,12 +24,21 @@ part 'reader_controller.g.dart';
 
 enum ReaderTapZone { left, center, right }
 
-typedef ReaderControllerKey = ({String comicId, bool incognito});
+typedef ReaderControllerKey = ({
+  String comicId,
+  bool incognito,
+  bool startFromFirstPage,
+});
 
 ReaderControllerKey readerControllerKey(
   String comicId, {
   bool incognito = false,
-}) => (comicId: comicId, incognito: incognito);
+  bool startFromFirstPage = false,
+}) => (
+  comicId: comicId,
+  incognito: incognito,
+  startFromFirstPage: startFromFirstPage,
+);
 
 @freezed
 abstract class ReaderState with _$ReaderState {
@@ -59,7 +67,7 @@ class ReaderPageViewModel {
 
   ReaderNavContextData get navContext => sessionContext.navContext;
   int? get preferredPageIndex => sessionContext.preferredPageIndex;
-  bool get isSeriesRead => sessionContext.isSeriesRead;
+  bool get hasSeriesContext => sessionContext.hasSeriesContext;
   String? get seriesId => sessionContext.seriesId;
 }
 
@@ -67,19 +75,23 @@ class ReaderPageViewModel {
 AsyncValue<ReaderPageViewModel> readerPageViewModel(
   Ref ref, {
   required String comicId,
-  String? seriesId,
   bool incognito = false,
+  bool startFromFirstPage = false,
 }) {
   final AsyncValue<ReaderState> viewAsync = ref.watch(
     readerControllerProvider(
-      readerControllerKey(comicId, incognito: incognito),
+      readerControllerKey(
+        comicId,
+        incognito: incognito,
+        startFromFirstPage: startFromFirstPage,
+      ),
     ),
   );
   final AsyncValue<ReadSessionContextData> sessionContextAsync = ref.watch(
     readSessionContextForReaderProvider(
       comicId: comicId,
-      seriesId: seriesId,
       incognito: incognito,
+      startFromFirstPage: startFromFirstPage,
     ),
   );
   if (viewAsync.hasError) {
@@ -108,8 +120,13 @@ class ReaderController extends _$ReaderController {
   Future<ReaderState> build(ReaderControllerKey key) async {
     final String id = key.comicId;
     final bool incognito = key.incognito;
+    final bool startFromFirstPage = key.startFromFirstPage;
     final ReaderSessionSnapshot snapshot = await ref.watch(
-      readerSessionOpenProvider(comicId: id, incognito: incognito).future,
+      readerSessionOpenProvider(
+        comicId: id,
+        incognito: incognito,
+        startFromFirstPage: startFromFirstPage,
+      ).future,
     );
     final ReadingMode initialMode = await _resolveInitialReadingMode();
     ref.listen<AsyncValue<AppSetting>>(settingsProvider, (
@@ -373,20 +390,6 @@ class ReaderController extends _$ReaderController {
       return;
     }
     final GoRouter router = GoRouter.of(context);
-    if (routeContext.isSeriesRead) {
-      router.go(
-        resolveReaderExitLocation(
-          comicId: routeContext.comicId,
-          seriesId: routeContext.seriesId,
-        ),
-        extra: const SeriesDetailEnterFromReader(),
-      );
-      return;
-    }
-    if (router.canPop()) {
-      router.pop();
-      return;
-    }
     router.go(resolveReaderExitLocation(comicId: routeContext.comicId));
   }
 }

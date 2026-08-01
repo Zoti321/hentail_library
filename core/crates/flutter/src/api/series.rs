@@ -2,11 +2,13 @@ use hentai_core::{
     count_all_series, fetch_series_comics_metadata as core_fetch_series_comics_metadata,
     fetch_series_comics_page as core_fetch_series_comics_page,
     fetch_series_page as core_fetch_page, find_series_by_id as core_find,
-    get_all_series, load_home_series_comic_order_map, search_series_by_keyword,
+    get_all_series, get_series_reading_context_by_comic_id as core_get_reading_context,
+    load_home_series_comic_order_map, search_series_by_keyword,
     search_series_by_tag_expression, set_series_items_order as core_set_order,
     update_series_user_meta as core_update_meta, watch_all_series, watch_home_series_comic_order_map,
     PagedSeriesResultDto as CorePagedSeries, SeriesComicsMetadataDto as CoreSeriesComicsMetadata,
     SeriesDto as CoreSeries, SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
+    SeriesReadingContextDto as CoreSeriesReadingContext,
     SeriesSortFieldDto as CoreSeriesSortField, SeriesSortOptionDto as CoreSeriesSort,
     UpdateSeriesUserMetaDto as CoreUpdateSeriesUserMeta,
 };
@@ -76,6 +78,15 @@ pub struct SeriesComicsMetadataDto {
     pub authors: Vec<String>,
     pub tags: Vec<String>,
     pub has_r18: bool,
+}
+
+/// ADR-0005：由 comicId 派生的阅读器用系列上下文。
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SeriesReadingContextDto {
+    pub series_id: String,
+    pub series_name: String,
+    pub ordered_comic_ids: Vec<String>,
+    pub current_index: i32,
 }
 
 /// 与 core `UpdateSeriesUserMetaDto` 同名，减少 Dart/Rust 双命名。
@@ -225,6 +236,22 @@ pub fn fetch_series_page_frb(
 pub fn find_series_by_id_frb(series_id: String) -> Result<Option<SeriesDto>, HentaiErrorDto> {
     hentai_core::runtime::block_on(core_find(&series_id))
         .map(|opt| opt.map(SeriesDto::from))
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn get_series_reading_context_by_comic_id_frb(
+    comic_id: String,
+) -> Result<Option<SeriesReadingContextDto>, HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_get_reading_context(&comic_id))
+        .map(|opt| {
+            opt.map(|v: CoreSeriesReadingContext| SeriesReadingContextDto {
+                series_id: v.series_id,
+                series_name: v.series_name,
+                ordered_comic_ids: v.ordered_comic_ids,
+                current_index: v.current_index,
+            })
+        })
         .map_err(HentaiErrorDto::from)
 }
 

@@ -9,7 +9,7 @@ import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_series_list`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Stream<List<SeriesDto>> watchAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesWatchAllSeriesFrb();
@@ -32,6 +32,12 @@ PagedSeriesResultDto fetchSeriesPageFrb({
 
 SeriesDto? findSeriesByIdFrb({required String seriesId}) =>
     RustLib.instance.api.crateApiSeriesFindSeriesByIdFrb(seriesId: seriesId);
+
+SeriesReadingContextDto? getSeriesReadingContextByComicIdFrb({
+  required String comicId,
+}) => RustLib.instance.api.crateApiSeriesGetSeriesReadingContextByComicIdFrb(
+  comicId: comicId,
+);
 
 PagedComicResultDto fetchSeriesComicsPageFrb({
   required String seriesId,
@@ -255,6 +261,38 @@ class SeriesItemDto {
           seriesId == other.seriesId &&
           comicId == other.comicId &&
           sortOrder == other.sortOrder;
+}
+
+/// ADR-0005：由 comicId 派生的阅读器用系列上下文。
+class SeriesReadingContextDto {
+  final String seriesId;
+  final String seriesName;
+  final List<String> orderedComicIds;
+  final int currentIndex;
+
+  const SeriesReadingContextDto({
+    required this.seriesId,
+    required this.seriesName,
+    required this.orderedComicIds,
+    required this.currentIndex,
+  });
+
+  @override
+  int get hashCode =>
+      seriesId.hashCode ^
+      seriesName.hashCode ^
+      orderedComicIds.hashCode ^
+      currentIndex.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesReadingContextDto &&
+          runtimeType == other.runtimeType &&
+          seriesId == other.seriesId &&
+          seriesName == other.seriesName &&
+          orderedComicIds == other.orderedComicIds &&
+          currentIndex == other.currentIndex;
 }
 
 enum SeriesSortFieldDto {

@@ -10,6 +10,7 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
 import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 
@@ -64,6 +65,15 @@ class SeriesRepositoryImpl implements SeriesRepository {
       fallbackMessage: '读取系列失败',
     );
     return dto == null ? null : mapRustSeries(dto);
+  }
+
+  @override
+  Future<SeriesReadingContext?> getReadingContextByComicId(String comicId) async {
+    final rust_series.SeriesReadingContextDto? dto = guardFrbSync(
+      () => rust_series.getSeriesReadingContextByComicIdFrb(comicId: comicId),
+      fallbackMessage: '读取系列阅读上下文失败',
+    );
+    return dto == null ? null : mapRustSeriesReadingContext(dto);
   }
 
   @override

@@ -1,12 +1,10 @@
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/reading_history.dart';
-import 'package:hentai_library/domain/models/entity/series_reading_history.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/domain/reading/read_session_coordinator.dart';
 import 'package:hentai_library/domain/reading/reader_session_service.dart';
 import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
-import 'package:hentai_library/domain/repositories/series_reading_history_repository.dart';
 import 'package:test/test.dart';
 
 class _RecordingReadingHistoryRepo implements ReadingHistoryRepository {
@@ -14,19 +12,6 @@ class _RecordingReadingHistoryRepo implements ReadingHistoryRepository {
 
   @override
   Future<void> recordReading(ReadingHistory history) async {
-    records.add(history);
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-class _RecordingSeriesReadingHistoryRepo
-    implements SeriesReadingHistoryRepository {
-  final List<SeriesReadingHistory> records = <SeriesReadingHistory>[];
-
-  @override
-  Future<void> recordSeriesReading(SeriesReadingHistory history) async {
     records.add(history);
   }
 
@@ -65,68 +50,44 @@ Comic _comic({String id = 'c1', String title = 'Test Comic'}) {
 
 void main() {
   late _RecordingReadingHistoryRepo readingRepo;
-  late _RecordingSeriesReadingHistoryRepo seriesRepo;
   late _RecordingReaderSessionService sessionService;
   late ReadSessionCoordinator coordinator;
 
   setUp(() {
     readingRepo = _RecordingReadingHistoryRepo();
-    seriesRepo = _RecordingSeriesReadingHistoryRepo();
     sessionService = _RecordingReaderSessionService();
     coordinator = ReadSessionCoordinator(
       sessionService: sessionService,
       readingHistoryRepo: readingRepo,
-      seriesReadingHistoryRepo: seriesRepo,
     );
   });
 
   test('incognito beginReadSession is no-op', () async {
     await coordinator.beginReadSession(
       comic: _comic(),
-      mode: ReadSessionMode.standalone,
       incognito: true,
       initialPageIndex: 3,
     );
 
     expect(readingRepo.records, isEmpty);
-    expect(seriesRepo.records, isEmpty);
     expect(coordinator.hasActiveSession, isFalse);
   });
 
-  test('standalone beginReadSession writes comic history', () async {
+  test('beginReadSession writes only comic history', () async {
     await coordinator.beginReadSession(
       comic: _comic(),
-      mode: ReadSessionMode.standalone,
       initialPageIndex: 2,
     );
 
     expect(readingRepo.records, hasLength(1));
     expect(readingRepo.records.single.comicId, 'c1');
     expect(readingRepo.records.single.pageIndex, 2);
-    expect(seriesRepo.records, isEmpty);
     expect(coordinator.hasActiveSession, isTrue);
-  });
-
-  test('series mode writes comic and series history', () async {
-    await coordinator.beginReadSession(
-      comic: _comic(),
-      mode: ReadSessionMode.series,
-      seriesId: 's1',
-      initialPageIndex: 4,
-    );
-
-    expect(readingRepo.records, hasLength(1));
-    expect(readingRepo.records.single.pageIndex, 4);
-    expect(seriesRepo.records, hasLength(1));
-    expect(seriesRepo.records.single.seriesId, 's1');
-    expect(seriesRepo.records.single.lastReadComicId, 'c1');
-    expect(seriesRepo.records.single.pageIndex, 4);
   });
 
   test('updatePage and flushProgress persist latest page', () async {
     await coordinator.beginReadSession(
       comic: _comic(),
-      mode: ReadSessionMode.standalone,
       initialPageIndex: 1,
     );
     readingRepo.records.clear();
@@ -141,7 +102,6 @@ void main() {
   test('endSession clears active session after flush', () async {
     await coordinator.beginReadSession(
       comic: _comic(),
-      mode: ReadSessionMode.standalone,
       initialPageIndex: 3,
     );
     readingRepo.records.clear();
@@ -157,7 +117,6 @@ void main() {
   test('exitReadSession flushes history and closes I/O session', () async {
     await coordinator.beginReadSession(
       comic: _comic(),
-      mode: ReadSessionMode.standalone,
       initialPageIndex: 2,
     );
     readingRepo.records.clear();
@@ -187,21 +146,16 @@ void main() {
   });
 
   test(
-    'prepareSeriesSwitch ends session, closes current, returns plan',
+    'prepareSeriesSwitch returns next session starting from first page',
     () async {
       await coordinator.beginReadSession(
         comic: _comic(),
-        mode: ReadSessionMode.series,
-        seriesId: 's1',
         initialPageIndex: 3,
       );
       readingRepo.records.clear();
 
       final SeriesSwitchPlan plan = await coordinator.prepareSeriesSwitch(
-        currentSession: const ReadSessionRouteParams(
-          comicId: 'c1',
-          seriesId: 's1',
-        ),
+        currentSession: const ReadSessionRouteParams(comicId: 'c1'),
         targetComicId: 'c2',
         currentPageIndex: 8,
       );
@@ -213,7 +167,7 @@ void main() {
       expect(plan.closeComicId, 'c1');
       expect(plan.targetComicId, 'c2');
       expect(plan.nextSession.comicId, 'c2');
-      expect(plan.nextSession.seriesId, 's1');
+      expect(plan.nextSession.startFromFirstPage, isTrue);
     },
   );
 }

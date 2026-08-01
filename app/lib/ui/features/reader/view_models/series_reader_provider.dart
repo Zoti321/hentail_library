@@ -1,6 +1,4 @@
-import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
-import 'package:hentai_library/domain/reading/read_session.dart';
+import 'package:hentai_library/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_detail_series_nav_provider.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_route_context.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
@@ -10,18 +8,16 @@ part 'series_reader_provider.g.dart';
 
 class ReadSessionContextData {
   const ReadSessionContextData({
-    required this.mode,
     required this.seriesId,
     required this.navContext,
     required this.preferredPageIndex,
   });
 
-  final ReadSessionMode mode;
   final String? seriesId;
   final ReaderNavContextData navContext;
   final int? preferredPageIndex;
 
-  bool get isSeriesRead => mode == ReadSessionMode.series;
+  bool get hasSeriesContext => seriesId != null && seriesId!.isNotEmpty;
 }
 
 @riverpod
@@ -35,24 +31,22 @@ Future<int?> comicReadingPageIndexForReader(Ref ref, String comicId) async {
   return history?.pageIndex;
 }
 
-Future<List<ReaderComicListItem>> _buildSeriesNavItems(
+Future<List<ReaderComicListItem>> _buildNavItemsFromContext(
   Ref ref,
-  Series series,
+  SeriesReadingContext context,
 ) async {
-  final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
-    ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
   final List<ReaderComicListItem> items = <ReaderComicListItem>[];
-  for (int index = 0; index < sortedItems.length; index++) {
-    final SeriesItem item = sortedItems[index];
+  for (int index = 0; index < context.orderedComicIds.length; index++) {
+    final String memberId = context.orderedComicIds[index];
     final String title = await resolveComicTitleForDisplay(
       ref.read(comicRepoProvider),
-      item.comicId,
+      memberId,
     );
     items.add(
       ReaderComicListItem(
-        comicId: item.comicId,
+        comicId: memberId,
         title: title,
-        order: item.order,
+        order: index,
       ),
     );
   }
@@ -63,29 +57,28 @@ Future<List<ReaderComicListItem>> _buildSeriesNavItems(
 Future<ReadSessionContextData> readSessionContextForReader(
   Ref ref, {
   required String comicId,
-  String? seriesId,
   bool incognito = false,
+  bool startFromFirstPage = false,
 }) async {
   final String normalizedComicId = comicId.trim();
-  final String? normalizedSeriesId = seriesId?.trim();
-  Series? series;
-  if (normalizedSeriesId != null && normalizedSeriesId.isNotEmpty) {
-    series = await ref.read(seriesRepoProvider).findById(normalizedSeriesId);
-  }
+  final SeriesReadingContext? seriesContext = await ref
+      .read(seriesRepoProvider)
+      .getReadingContextByComicId(normalizedComicId);
 
-  if (series == null) {
+  final int? preferredPageIndex =
+      (incognito || startFromFirstPage)
+      ? null
+      : await ref.watch(
+          comicReadingPageIndexForReaderProvider(normalizedComicId).future,
+        );
+
+  if (seriesContext == null) {
     final comic = await ref.read(comicRepoProvider).findById(normalizedComicId);
     final String fallbackTitle = comicTitleFallbackForDisplay(
       normalizedComicId,
     );
     final String title = comic?.title ?? fallbackTitle;
-    final int? preferredPageIndex = incognito
-        ? null
-        : await ref.watch(
-            comicReadingPageIndexForReaderProvider(normalizedComicId).future,
-          );
     return ReadSessionContextData(
-      mode: ReadSessionMode.standalone,
       seriesId: null,
       navContext: buildReaderNavContextData(
         items: <ReaderComicListItem>[
@@ -102,18 +95,12 @@ Future<ReadSessionContextData> readSessionContextForReader(
     );
   }
 
-  final List<ReaderComicListItem> items = await _buildSeriesNavItems(
+  final List<ReaderComicListItem> items = await _buildNavItemsFromContext(
     ref,
-    series,
+    seriesContext,
   );
-  final int? preferredPageIndex = incognito
-      ? null
-      : await ref.watch(
-          comicReadingPageIndexForReaderProvider(normalizedComicId).future,
-        );
   return ReadSessionContextData(
-    mode: ReadSessionMode.series,
-    seriesId: series.id,
+    seriesId: seriesContext.seriesId,
     navContext: buildReaderNavContextData(
       items: items,
       currentComicId: normalizedComicId,
@@ -121,19 +108,4 @@ Future<ReadSessionContextData> readSessionContextForReader(
     ),
     preferredPageIndex: preferredPageIndex,
   );
-}
-
-/// 漫画详情页发起 Series read 时，解析 seriesId（仅当漫画唯一属于一个系列）。
-@riverpod
-Future<String?> resolveSeriesIdForComicRead(
-  Ref ref, {
-  required String comicId,
-}) async {
-  final ComicDetailSeriesNavResult result = await ref.watch(
-    comicDetailSeriesNavProvider(comicId).future,
-  );
-  if (result is ComicDetailSeriesNavReady) {
-    return result.data.seriesId;
-  }
-  return null;
 }

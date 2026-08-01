@@ -87,14 +87,6 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
     rekey_comic_child_table(db, "comic_reading_histories", from_id, to_id).await?;
     rekey_comic_child_table(db, "comic_thumbnails", from_id, to_id).await?;
     rekey_comic_child_table(db, "series_items", from_id, to_id).await?;
-    rekey_reference_column(
-        db,
-        "series_reading_histories",
-        "last_read_comic_id",
-        from_id,
-        to_id,
-    )
-    .await?;
     rekey_reference_column(db, "series_thumbnails", "source_comic_id", from_id, to_id).await?;
 
     Comics::delete_by_id(from_id.clone())
@@ -151,7 +143,6 @@ pub async fn clear_all_comics(db: &DatabaseConnection) -> Result<i32, HentaiErro
     let txn = db.begin().await.map_err(map_db_err)?;
     for table in [
         "comic_reading_histories",
-        "series_reading_histories",
         "series_items",
         "comics",
     ] {

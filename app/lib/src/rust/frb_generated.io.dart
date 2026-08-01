@@ -131,7 +131,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesFilterDto dco_decode_box_autoadd_series_filter_dto(dynamic raw);
 
   @protected
-  SeriesReadingHistoryDto dco_decode_box_autoadd_series_reading_history_dto(
+  SeriesReadingContextDto dco_decode_box_autoadd_series_reading_context_dto(
     dynamic raw,
   );
 
@@ -251,8 +251,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesDto? dco_decode_opt_box_autoadd_series_dto(dynamic raw);
 
   @protected
-  SeriesReadingHistoryDto?
-  dco_decode_opt_box_autoadd_series_reading_history_dto(dynamic raw);
+  SeriesReadingContextDto?
+  dco_decode_opt_box_autoadd_series_reading_context_dto(dynamic raw);
 
   @protected
   SeriesThumbnailDto? dco_decode_opt_box_autoadd_series_thumbnail_dto(
@@ -302,7 +302,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesItemDto dco_decode_series_item_dto(dynamic raw);
 
   @protected
-  SeriesReadingHistoryDto dco_decode_series_reading_history_dto(dynamic raw);
+  SeriesReadingContextDto dco_decode_series_reading_context_dto(dynamic raw);
 
   @protected
   SeriesSortFieldDto dco_decode_series_sort_field_dto(dynamic raw);
@@ -476,7 +476,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  SeriesReadingHistoryDto sse_decode_box_autoadd_series_reading_history_dto(
+  SeriesReadingContextDto sse_decode_box_autoadd_series_reading_context_dto(
     SseDeserializer deserializer,
   );
 
@@ -620,8 +620,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  SeriesReadingHistoryDto?
-  sse_decode_opt_box_autoadd_series_reading_history_dto(
+  SeriesReadingContextDto?
+  sse_decode_opt_box_autoadd_series_reading_context_dto(
     SseDeserializer deserializer,
   );
 
@@ -689,7 +689,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SeriesItemDto sse_decode_series_item_dto(SseDeserializer deserializer);
 
   @protected
-  SeriesReadingHistoryDto sse_decode_series_reading_history_dto(
+  SeriesReadingContextDto sse_decode_series_reading_context_dto(
     SseDeserializer deserializer,
   );
 
@@ -912,8 +912,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_box_autoadd_series_reading_history_dto(
-    SeriesReadingHistoryDto self,
+  void sse_encode_box_autoadd_series_reading_context_dto(
+    SeriesReadingContextDto self,
     SseSerializer serializer,
   );
 
@@ -1101,8 +1101,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_opt_box_autoadd_series_reading_history_dto(
-    SeriesReadingHistoryDto? self,
+  void sse_encode_opt_box_autoadd_series_reading_context_dto(
+    SeriesReadingContextDto? self,
     SseSerializer serializer,
   );
 
@@ -1185,8 +1185,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_series_item_dto(SeriesItemDto self, SseSerializer serializer);
 
   @protected
-  void sse_encode_series_reading_history_dto(
-    SeriesReadingHistoryDto self,
+  void sse_encode_series_reading_context_dto(
+    SeriesReadingContextDto self,
     SseSerializer serializer,
   );
 

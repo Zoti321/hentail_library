@@ -25,6 +25,7 @@ class ReaderTopBar extends StatelessWidget {
     required this.onToggleFullscreen,
     this.navContext,
     this.session,
+    this.seriesId,
   });
 
   final bool showControls;
@@ -32,6 +33,7 @@ class ReaderTopBar extends StatelessWidget {
   final bool readerFullscreen;
   final ReaderNavContextData? navContext;
   final ReadSessionRouteParams? session;
+  final String? seriesId;
   final Future<void> Function() onExit;
   final Future<void> Function() onToggleFullscreen;
 
@@ -126,7 +128,7 @@ class ReaderTopBar extends StatelessWidget {
                   ),
                   ReaderOverflowMenuButton(
                     comicId: session?.comicId ?? '',
-                    seriesId: session?.seriesId,
+                    seriesId: seriesId,
                     incognito: session?.incognito ?? false,
                   ),
                 ],

@@ -20,7 +20,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 const String _testComicId = 'test-comic';
-const ReaderControllerKey _viewKey = (comicId: _testComicId, incognito: false);
+const ReaderControllerKey _viewKey = (
+  comicId: _testComicId,
+  incognito: false,
+  startFromFirstPage: false,
+);
 
 void main() {
   testWidgets(

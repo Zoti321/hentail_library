@@ -16,7 +16,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 const String _comicId = 'paged-resume-comic';
-const ReaderControllerKey _viewKey = (comicId: _comicId, incognito: false);
+const ReaderControllerKey _viewKey = (
+  comicId: _comicId,
+  incognito: false,
+  startFromFirstPage: false,
+);
 
 void main() {
   testWidgets(

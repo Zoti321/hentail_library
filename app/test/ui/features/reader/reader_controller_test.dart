@@ -14,8 +14,16 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 const String _comicId = 'reader-controller-comic';
-const ReaderControllerKey _key = (comicId: _comicId, incognito: false);
-const ReaderControllerKey _incognitoKey = (comicId: _comicId, incognito: true);
+const ReaderControllerKey _key = (
+  comicId: _comicId,
+  incognito: false,
+  startFromFirstPage: false,
+);
+const ReaderControllerKey _incognitoKey = (
+  comicId: _comicId,
+  incognito: true,
+  startFromFirstPage: false,
+);
 
 Comic _comic({int pageCount = 10}) {
   final DateTime now = DateTime.utc(2026, 1, 1);
@@ -116,6 +124,7 @@ void main() {
       const ReaderControllerKey otherKey = (
         comicId: 'reader-controller-other',
         incognito: false,
+        startFromFirstPage: false,
       );
       final ReaderSessionSnapshot otherSnapshot = ReaderSessionSnapshot(
         comic: Comic(

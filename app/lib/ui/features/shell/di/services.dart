@@ -23,5 +23,4 @@ ReadSessionCoordinator readSessionCoordinator(Ref ref) =>
     ReadSessionCoordinator(
       sessionService: ref.read(readerSessionServiceProvider),
       readingHistoryRepo: ref.read(readingHistoryRepoProvider),
-      seriesReadingHistoryRepo: ref.read(seriesReadingHistoryRepoProvider),
     );

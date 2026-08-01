@@ -7,7 +7,7 @@
 ### Library & resources
 
 **Library**:
-用户在本机维护的全部漫画集合，由扫描导入的 Comic 与手动创建的 Series 组成。
+用户在本机维护的全部漫画集合，由 Library sync 导入的 Comic 与按 Folder series 自动生成的 Series 组成。
 _Avoid_: 书架（UI 语境可用，领域模型中用 Library）
 
 **Comic**:
@@ -80,21 +80,17 @@ _Avoid_: 安全模式、青少年模式、R18 过滤
 
 ### Reading
 
-**Standalone read**:
-在系列上下文之外打开单本 Comic 的阅读会话；进度写入 Reading history。
-_Avoid_: Comic read（易与 Comic 实体混淆）、单本模式
+**Read session**:
+由 comicId 打开的阅读会话；不区分「单本 / 系列」两种模式。进度只写入 Reading history。入口参数仅为 comicId（及无痕等开关），不传 seriesId。退出阅读器一律回到该 Comic 的详情页。详见 ADR-0005。
+_Avoid_: Standalone read、Series read、单本模式、系列模式、Comic read（易与 Comic 实体混淆）
 
-**Series read**:
-在某一 Series 内打开 Comic 的阅读会话；可在系列内切换卷册，进度写入 Series reading history。
-_Avoid_: 连读、系列模式
+**Series reading context**:
+由 comicId 在 core 侧派生的可选系列信息（seriesId、系列名、有序成员 comicId 列表、当前下标）；供阅读器展示位置、上一卷/下一卷与卷列表跳转。不是会话模式，也不持久化进度。无系列归属时为空。卷列表项展示标题由 Flutter 用现有 Comic 标题格式拼出（如 `{序号}-{title}`）。详见 ADR-0005。
+_Avoid_: 系列阅读模式、Series read、系列会话
 
 **Reading history**:
-用户对某 Comic 在 Standalone read 下最近一次阅读的时间与页码记录。
-_Avoid_: 阅读记录、进度（系列级进度见 Series reading history）
-
-**Series reading history**:
-用户在 Series read 下于某个 Series 内的阅读进度（最后读到的 Comic 与页码）。
-_Avoid_: 系列进度
+用户对某 Comic 最近一次阅读的时间与页码记录。从库/详情/历史等重新打开该 Comic 时恢复页码；阅读器内切到同系列另一卷时，先落盘当前 Comic 进度（无痕除外），目标卷从第 1 页打开。无痕 Read session 不读写 Reading history。
+_Avoid_: 阅读记录、系列进度、Series reading history
 
 **Scroll layout**:
 阅读器纵向连续滚动的版式；适用于长条阅读体验。

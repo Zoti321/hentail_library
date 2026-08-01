@@ -57,3 +57,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0002](./0002-rust-core-via-frb.md) | Rust 核心层经 FRB 接管数据与 I/O | Accepted |
 | [0003](./0003-unified-dev-logging.md) | 统一开发期日志（Dart `logging` + Rust `tracing`） | Accepted |
 | [0004](./0004-production-diagnostics.md) | 生产诊断与用户支持（日志导出） | Accepted |
+| [0005](./0005-unified-read-session.md) | 统一 Read session（仅 comicId；废弃系列阅读进度） | Accepted |
