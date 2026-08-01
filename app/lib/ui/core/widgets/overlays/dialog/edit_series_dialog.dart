@@ -127,7 +127,6 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
           ),
           FluentTextField(
             labelText: l10n.formSeriesTotalCountLabel,
-            hintText: l10n.formSeriesTotalCountHint,
             initialValue: _form.totalCountText,
             errorText: _validation?.totalCountError,
             enabled: !_saving,
