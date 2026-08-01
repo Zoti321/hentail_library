@@ -2,8 +2,8 @@ use std::fs;
 use std::io::Write;
 
 use hentai_core::{
-    init_db_at_path, load_page_bytes, load_page_list, load_reader_page, open_reader,
-    ReaderPageDto,
+    close_reader, init_db_at_path, load_page_bytes, load_page_list, load_reader_page, open_reader,
+    HentaiErrorCode, ReaderPageDto,
 };
 
 #[test]
@@ -85,4 +85,48 @@ fn zip_reader_session_reuses_archive_for_multiple_pages() {
     let page1 = load_page_bytes("test-comic", &path, "cbz", 1).expect("page1");
     assert_eq!(page0, b"page-one");
     assert_eq!(page1, b"page-two");
+}
+
+#[test]
+fn load_reader_page_without_open_returns_session_not_open() {
+    let temp = tempfile::tempdir().expect("tempdir");
+    let zip_path = temp.path().join("comic.cbz");
+    {
+        use std::fs::File;
+        let file = File::create(&zip_path).expect("create");
+        let mut zip = zip::ZipWriter::new(file);
+        let options =
+            zip::write::SimpleFileOptions::default().compression_method(zip::CompressionMethod::Stored);
+        zip.start_file("001.jpg", options).expect("start");
+        zip.write_all(b"page-one").expect("write");
+        zip.finish().expect("finish");
+    }
+    let path = zip_path.to_string_lossy().to_string();
+    let err = load_reader_page("no-session", &path, "cbz", 0).expect_err("not open");
+    assert_eq!(err.code, HentaiErrorCode::ReaderSessionNotOpen);
+}
+
+#[test]
+fn close_reader_then_load_reader_page_returns_session_not_open() {
+    let temp = tempfile::tempdir().expect("tempdir");
+    let db_path = temp.path().join("test.sqlite");
+    hentai_core::runtime::block_on(init_db_at_path(&db_path)).expect("init db");
+
+    let zip_path = temp.path().join("comic.cbz");
+    {
+        use std::fs::File;
+        let file = File::create(&zip_path).expect("create");
+        let mut zip = zip::ZipWriter::new(file);
+        let options =
+            zip::write::SimpleFileOptions::default().compression_method(zip::CompressionMethod::Stored);
+        zip.start_file("001.jpg", options).expect("start");
+        zip.write_all(b"\xFF\xD8\xFFpage-one").expect("write");
+        zip.finish().expect("finish");
+    }
+    let path = zip_path.to_string_lossy().to_string();
+    open_reader("closed-comic", &path, "cbz").expect("open");
+    load_reader_page("closed-comic", &path, "cbz", 0).expect("load while open");
+    close_reader("closed-comic");
+    let err = load_reader_page("closed-comic", &path, "cbz", 0).expect_err("after close");
+    assert_eq!(err.code, HentaiErrorCode::ReaderSessionNotOpen);
 }

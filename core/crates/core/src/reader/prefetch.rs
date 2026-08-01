@@ -5,7 +5,6 @@ use crate::error::HentaiError;
 
 use super::cache::ReaderCache;
 use super::page::ensure_archive_page_cached;
-use super::manager::open_reader;
 
 fn generation_store() -> &'static Mutex<HashMap<String, u64>> {
     static STORE: OnceLock<Mutex<HashMap<String, u64>>> = OnceLock::new();
@@ -37,12 +36,12 @@ pub fn prefetch_reader_pages(
         return Ok(());
     }
     set_prefetch_generation(comic_id, generation);
-    open_reader(comic_id, path, resource_type)?;
     let cache = ReaderCache::app()?;
     for &page_index in page_indexes {
         if !is_prefetch_generation_current(comic_id, generation) {
             break;
         }
+        // Best-effort: session-not-open and other page errors are swallowed.
         let _ = ensure_archive_page_cached(comic_id, path, resource_type, page_index, &cache);
     }
     if is_prefetch_generation_current(comic_id, generation) {

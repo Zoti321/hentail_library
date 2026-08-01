@@ -46,13 +46,16 @@ fn load_page_image_bytes(
     resource_type: &str,
     page_index: i32,
 ) -> Result<Vec<u8>, HentaiError> {
+    use crate::reader::manager::with_ephemeral_reader;
     use crate::reader::{load_reader_page, ReaderPageDto};
-    match load_reader_page(comic_id, path, resource_type, page_index)? {
-        ReaderPageDto::FilePath { path: file_path } => {
-            std::fs::read(&file_path).map_err(|e| HentaiError::validation(e.to_string()))
+    with_ephemeral_reader(comic_id, path, resource_type, || {
+        match load_reader_page(comic_id, path, resource_type, page_index)? {
+            ReaderPageDto::FilePath { path: file_path } => {
+                std::fs::read(&file_path).map_err(|e| HentaiError::validation(e.to_string()))
+            }
+            ReaderPageDto::Bytes { data } => Ok(data),
         }
-        ReaderPageDto::Bytes { data } => Ok(data),
-    }
+    })
 }
 
 fn now_ms() -> i64 {
