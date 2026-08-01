@@ -6,6 +6,7 @@ import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/resume_visible_sync_gate.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
@@ -60,13 +61,17 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     final ObjectRef<int?> lastVisibleMainIndex = useRef<int?>(null);
     final ObjectRef<bool> isProgrammaticScroll = useRef<bool>(false);
 
-    /// 挂载/程序化对齐完成前，忽略可见页回写，避免先停在顶部把页码打成 1。
-    final ObjectRef<bool> suppressVisibleIndexSync = useRef<bool>(true);
+    /// Blocks visible→index sync until resume target is actually on screen.
+    final ObjectRef<ResumeVisibleSyncGate> resumeSyncGate =
+        useRef<ResumeVisibleSyncGate>(ResumeVisibleSyncGate());
     final ObjectRef<int> scrollGeneration = useRef<int>(0);
     final ObjectRef<int?> frozenInitialScrollIndex = useRef<int?>(null);
     if (imageList.isNotEmpty && frozenInitialScrollIndex.value == null) {
-      frozenInitialScrollIndex.value =
-          currentIndex.clamp(1, imageList.length) - 1;
+      final int initialOneBased = currentIndex.clamp(1, imageList.length);
+      frozenInitialScrollIndex.value = initialOneBased - 1;
+      resumeSyncGate.value.beginProgrammaticAlign(
+        targetOneBased: initialOneBased,
+      );
     }
     final int initialScrollIndex = frozenInitialScrollIndex.value ?? 0;
     final Size viewportSize = MediaQuery.sizeOf(context);
@@ -97,7 +102,9 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
         return;
       }
       isProgrammaticScroll.value = true;
-      suppressVisibleIndexSync.value = true;
+      resumeSyncGate.value.beginProgrammaticAlign(
+        targetOneBased: targetIndexOneBased,
+      );
       itemScrollController.jumpTo(index: targetIndexOneBased - 1, alignment: 0);
       lastVisibleMainIndex.value = targetIndexOneBased;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -105,7 +112,6 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
           return;
         }
         isProgrammaticScroll.value = false;
-        suppressVisibleIndexSync.value = false;
       });
     }
 
@@ -161,9 +167,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     useEffect(
       () {
         void handleVisiblePositionChange() {
-          if (suppressVisibleIndexSync.value ||
-              isProgrammaticScroll.value ||
-              imageList.isEmpty) {
+          if (isProgrammaticScroll.value || imageList.isEmpty) {
             return;
           }
           final int? visibleIndex = _resolvePrimaryVisibleIndex(
@@ -173,14 +177,20 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
             return;
           }
           final int visibleIndexOneBased = visibleIndex + 1;
-          if (lastVisibleMainIndex.value == visibleIndexOneBased) {
+          final int? applyIndex = resumeSyncGate.value.onVisibleIndex(
+            visibleIndexOneBased,
+          );
+          if (applyIndex == null) {
             return;
           }
-          lastVisibleMainIndex.value = visibleIndexOneBased;
-          if (currentIndex == visibleIndexOneBased) {
+          if (lastVisibleMainIndex.value == applyIndex) {
             return;
           }
-          controller.setIndex(visibleIndexOneBased);
+          lastVisibleMainIndex.value = applyIndex;
+          if (currentIndex == applyIndex) {
+            return;
+          }
+          controller.setIndex(applyIndex);
         }
 
         itemPositionsListener.itemPositions.addListener(
@@ -209,23 +219,21 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       if (imageList.isEmpty) {
         lastVisibleMainIndex.value = null;
         isProgrammaticScroll.value = false;
-        suppressVisibleIndexSync.value = true;
+        resumeSyncGate.value = ResumeVisibleSyncGate();
         return null;
       }
       final int safeIndex = currentIndex.clamp(1, imageList.length);
       if (safeIndex == lastVisibleMainIndex.value) {
-        suppressVisibleIndexSync.value = false;
         return null;
       }
       final bool shouldSkipInitialTopScroll =
           safeIndex == 1 && lastVisibleMainIndex.value == null;
       if (shouldSkipInitialTopScroll) {
         lastVisibleMainIndex.value = 1;
-        suppressVisibleIndexSync.value = false;
+        resumeSyncGate.value.beginProgrammaticAlign(targetOneBased: 1);
         return null;
       }
-      // 在 jump 完成前先钉住目标页，避免可见页监听回写成 1。
-      suppressVisibleIndexSync.value = true;
+      // Nail the target before jump; gate ignores mismatched visible indices.
       lastVisibleMainIndex.value = safeIndex;
       final int generation = ++scrollGeneration.value;
       scheduleScrollToIndex(safeIndex, generation);

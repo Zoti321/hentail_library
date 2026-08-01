@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/resume_visible_sync_gate.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/domain/reading/spread_index.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
@@ -65,6 +66,9 @@ class DualPageViewport extends HookConsumerWidget {
     );
     final ObjectRef<bool> hasAppliedPreferredPage = useRef<bool>(false);
     final ObjectRef<bool> isProgrammaticScroll = useRef<bool>(false);
+    final ObjectRef<int> alignGeneration = useRef<int>(0);
+    final ObjectRef<ResumeVisibleSyncGate> resumeSyncGate =
+        useRef<ResumeVisibleSyncGate>(ResumeVisibleSyncGate());
     final ObjectRef<DateTime?> lastWheelAt = useRef<DateTime?>(null);
     const int wheelThrottleMs = 200;
 
@@ -93,8 +97,21 @@ class DualPageViewport extends HookConsumerWidget {
 
     useEffect(() {
       hasAppliedPreferredPage.value = false;
+      resumeSyncGate.value = ResumeVisibleSyncGate();
+      resumeSyncGate.value.beginProgrammaticAlign(
+        targetOneBased: initialPage + 1,
+      );
       return null;
     }, <Object?>[comicId, preferredPageIndex]);
+    useEffect(() {
+      if (imageList.isEmpty) {
+        return null;
+      }
+      resumeSyncGate.value.beginProgrammaticAlign(
+        targetOneBased: currentIndex,
+      );
+      return null;
+    }, <Object?>[imageList.length]);
     useEffect(() {
       final int? preferred = preferredPageIndex;
       if (preferred == null || hasAppliedPreferredPage.value) {
@@ -116,13 +133,32 @@ class DualPageViewport extends HookConsumerWidget {
       return null;
     }, <Object?>[comicId, preferredPageIndex, totalPages, currentIndex]);
     useEffect(() {
-      if (!pageController.hasClients) {
+      if (!pageController.hasClients || imageList.isEmpty) {
         return null;
       }
       if (pageController.page?.round() == currentSpread) {
+        resumeSyncGate.value.onVisibleIndex(currentIndex);
         return null;
       }
       isProgrammaticScroll.value = true;
+      resumeSyncGate.value.beginProgrammaticAlign(
+        targetOneBased: currentIndex,
+      );
+      final int generation = ++alignGeneration.value;
+      final int? currentPage = pageController.page?.round();
+      if (currentPage != null && (currentPage - currentSpread).abs() > 1) {
+        pageController.jumpToPage(currentSpread);
+        resumeSyncGate.value.onVisibleIndex(currentIndex);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted || generation != alignGeneration.value) {
+            return;
+          }
+          isProgrammaticScroll.value = false;
+        });
+        return () {
+          alignGeneration.value++;
+        };
+      }
       pageController
           .animateToPage(
             currentSpread,
@@ -130,12 +166,16 @@ class DualPageViewport extends HookConsumerWidget {
             curve: Curves.easeInOut,
           )
           .whenComplete(() {
-            if (context.mounted) {
-              isProgrammaticScroll.value = false;
+            if (!context.mounted || generation != alignGeneration.value) {
+              return;
             }
+            resumeSyncGate.value.onVisibleIndex(currentIndex);
+            isProgrammaticScroll.value = false;
           });
-      return null;
-    }, <Object?>[currentSpread, pageController]);
+      return () {
+        alignGeneration.value++;
+      };
+    }, <Object?>[currentSpread, pageController, imageList.length]);
 
     return Center(
       child: ConstrainedBox(
@@ -182,9 +222,15 @@ class DualPageViewport extends HookConsumerWidget {
                 totalPages: safeTotalPages,
                 spreadIndex: spreadIndex,
               );
+              final int? applyIndex = resumeSyncGate.value.onVisibleIndex(
+                primaryPage,
+              );
+              if (applyIndex == null) {
+                return;
+              }
               ref
                   .read(readerControllerProvider(viewKey).notifier)
-                  .setIndex(primaryPage);
+                  .setIndex(applyIndex);
             },
             itemCount: spreadCount,
             itemBuilder: (BuildContext context, int spreadIndex) {
