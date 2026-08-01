@@ -1,14 +1,13 @@
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/series_frb_mapper.dart';
-import 'package:hentai_library/data/repositories/comic_frb_mapper.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
@@ -77,18 +76,34 @@ class SeriesRepositoryImpl implements SeriesRepository {
   }
 
   @override
-  Future<PagedResult<Comic>> fetchComicsPage({
+  Future<PagedResult<SeriesComicPageItem>> fetchComicsPage({
     required String seriesId,
     required PageRequest request,
   }) async {
-    final page = guardFrbSync(
+    final rust_series.PagedSeriesComicsResultDto page = guardFrbSync(
       () => rust_series.fetchSeriesComicsPageFrb(
         seriesId: seriesId,
         request: mapSeriesPageRequest(request),
       ),
       fallbackMessage: '读取系列漫画分页失败',
     );
-    return mapPagedResult(page);
+    return mapPagedSeriesComicsResult(page);
+  }
+
+  @override
+  Future<void> updateSeriesItemSortOrder({
+    required String seriesId,
+    required String comicId,
+    required double sortOrder,
+  }) async {
+    guardFrbSync(
+      () => rust_series.updateSeriesItemSortOrderFrb(
+        seriesId: seriesId,
+        comicId: comicId,
+        sortOrder: sortOrder,
+      ),
+      fallbackMessage: '更新系列排序失败',
+    );
   }
 
   @override

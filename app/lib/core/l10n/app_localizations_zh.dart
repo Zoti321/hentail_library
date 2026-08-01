@@ -694,6 +694,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get seriesDetailEdit => '编辑系列';
 
   @override
+  String get seriesItemEditSortOrder => '编辑排序';
+
+  @override
+  String get dialogEditSeriesItemSortOrderTitle => '编辑排序';
+
+  @override
+  String get formSeriesItemSortOrderLabel => '排序序号';
+
+  @override
+  String get formSeriesItemSortOrderHint => '例如 1 或 1.5';
+
+  @override
+  String get formSeriesItemSortOrderInvalid => '请输入有效数字';
+
+  @override
+  String get dialogEditSeriesItemSortOrderSavedToast => '排序已更新';
+
+  @override
   String get seriesDetailNoComics => '系列内暂无漫画';
 
   @override

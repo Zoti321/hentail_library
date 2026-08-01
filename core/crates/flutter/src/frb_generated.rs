@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -405762663;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1346501546;
 
 // Section: executor
 
@@ -2264,6 +2264,42 @@ fn wire__crate__api__comic__update_comic_user_meta_frb_dto_default_impl(
         },
     )
 }
+fn wire__crate__api__series__update_series_item_sort_order_frb_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "update_series_item_sort_order_frb",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_series_id = <String>::sse_decode(&mut deserializer);
+            let api_comic_id = <String>::sse_decode(&mut deserializer);
+            let api_sort_order = <f64>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
+                let output_ok = crate::api::series::update_series_item_sort_order_frb(
+                    api_series_id,
+                    api_comic_id,
+                    api_sort_order,
+                )?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__crate__api__series__update_series_user_meta_dto_default_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -3014,6 +3050,13 @@ impl SseDecode for crate::api::thumbnail::ComicThumbnailDto {
     }
 }
 
+impl SseDecode for f64 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        deserializer.cursor.read_f64::<NativeEndian>().unwrap()
+    }
+}
+
 impl SseDecode for crate::api::sync::FormatGroupDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3216,6 +3259,20 @@ impl SseDecode for Vec<crate::api::series::SeriesComicOrderEntryDto> {
     }
 }
 
+impl SseDecode for Vec<crate::api::series::SeriesComicPageItemDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::series::SeriesComicPageItemDto>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::api::series::SeriesDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3400,6 +3457,23 @@ impl SseDecode for crate::api::history::PagedReadingHistoryDto {
     }
 }
 
+impl SseDecode for crate::api::series::PagedSeriesComicsResultDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_items =
+            <Vec<crate::api::series::SeriesComicPageItemDto>>::sse_decode(deserializer);
+        let mut var_totalCount = <i64>::sse_decode(deserializer);
+        let mut var_page = <i32>::sse_decode(deserializer);
+        let mut var_pageSize = <i32>::sse_decode(deserializer);
+        return crate::api::series::PagedSeriesComicsResultDto {
+            items: var_items,
+            total_count: var_totalCount,
+            page: var_page,
+            page_size: var_pageSize,
+        };
+    }
+}
+
 impl SseDecode for crate::api::series::PagedSeriesResultDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3470,9 +3544,21 @@ impl SseDecode for crate::api::series::SeriesComicOrderEntryDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_key = <String>::sse_decode(deserializer);
-        let mut var_sortOrder = <i32>::sse_decode(deserializer);
+        let mut var_sortOrder = <f64>::sse_decode(deserializer);
         return crate::api::series::SeriesComicOrderEntryDto {
             key: var_key,
+            sort_order: var_sortOrder,
+        };
+    }
+}
+
+impl SseDecode for crate::api::series::SeriesComicPageItemDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_comic = <crate::api::comic::ComicDto>::sse_decode(deserializer);
+        let mut var_sortOrder = <f64>::sse_decode(deserializer);
+        return crate::api::series::SeriesComicPageItemDto {
+            comic: var_comic,
             sort_order: var_sortOrder,
         };
     }
@@ -3562,11 +3648,13 @@ impl SseDecode for crate::api::series::SeriesItemDto {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_seriesId = <String>::sse_decode(deserializer);
         let mut var_comicId = <String>::sse_decode(deserializer);
-        let mut var_sortOrder = <i32>::sse_decode(deserializer);
+        let mut var_sortOrder = <f64>::sse_decode(deserializer);
+        let mut var_sortOrderLocked = <bool>::sse_decode(deserializer);
         return crate::api::series::SeriesItemDto {
             series_id: var_seriesId,
             comic_id: var_comicId,
             sort_order: var_sortOrder,
+            sort_order_locked: var_sortOrderLocked,
         };
     }
 }
@@ -3876,44 +3964,44 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        69 => wire__crate__api__series__update_series_user_meta_dto_default_impl(
+        70 => wire__crate__api__series__update_series_user_meta_dto_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        71 => {
+        72 => {
             wire__crate__api__series__watch_all_series_frb_impl(port, ptr, rust_vec_len, data_len)
         }
-        72 => wire__crate__api__author__watch_authors_frb_impl(port, ptr, rust_vec_len, data_len),
-        73 => wire__crate__api__comic__watch_comic_changes_impl(port, ptr, rust_vec_len, data_len),
-        74 => wire__crate__api__home__watch_continue_reading_top5_frb_impl(
+        73 => wire__crate__api__author__watch_authors_frb_impl(port, ptr, rust_vec_len, data_len),
+        74 => wire__crate__api__comic__watch_comic_changes_impl(port, ptr, rust_vec_len, data_len),
+        75 => wire__crate__api__home__watch_continue_reading_top5_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        75 => wire__crate__api__home__watch_home_page_counts_frb_impl(
+        76 => wire__crate__api__home__watch_home_page_counts_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        76 => wire__crate__api__series__watch_home_series_comic_order_map_frb_impl(
+        77 => wire__crate__api__series__watch_home_series_comic_order_map_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        77 => wire__crate__api__path__watch_paths_frb_impl(port, ptr, rust_vec_len, data_len),
-        78 => wire__crate__api__history__watch_reading_histories_frb_impl(
+        78 => wire__crate__api__path__watch_paths_frb_impl(port, ptr, rust_vec_len, data_len),
+        79 => wire__crate__api__history__watch_reading_histories_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        79 => wire__crate__api__tag__watch_tags_frb_impl(port, ptr, rust_vec_len, data_len),
-        80 => wire__crate__api__thumbnail__watch_thumbnail_events_frb_impl(
+        80 => wire__crate__api__tag__watch_tags_frb_impl(port, ptr, rust_vec_len, data_len),
+        81 => wire__crate__api__thumbnail__watch_thumbnail_events_frb_impl(
             port,
             ptr,
             rust_vec_len,
@@ -4057,7 +4145,12 @@ fn pde_ffi_dispatcher_sync_impl(
             data_len,
         ),
         67 => wire__crate__api__comic__update_comic_user_meta_frb_impl(ptr, rust_vec_len, data_len),
-        70 => {
+        69 => wire__crate__api__series__update_series_item_sort_order_frb_impl(
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        71 => {
             wire__crate__api__series__update_series_user_meta_frb_impl(ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -4418,6 +4511,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::history::PagedReadingHistoryD
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::series::PagedSeriesComicsResultDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.items.into_into_dart().into_dart(),
+            self.total_count.into_into_dart().into_dart(),
+            self.page.into_into_dart().into_dart(),
+            self.page_size.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::series::PagedSeriesComicsResultDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::series::PagedSeriesComicsResultDto>
+    for crate::api::series::PagedSeriesComicsResultDto
+{
+    fn into_into_dart(self) -> crate::api::series::PagedSeriesComicsResultDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::series::PagedSeriesResultDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -4534,6 +4650,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::series::SeriesComicOrderEntry
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::series::SeriesComicPageItemDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.comic.into_into_dart().into_dart(),
+            self.sort_order.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::series::SeriesComicPageItemDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::series::SeriesComicPageItemDto>
+    for crate::api::series::SeriesComicPageItemDto
+{
+    fn into_into_dart(self) -> crate::api::series::SeriesComicPageItemDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::series::SeriesComicsMetadataDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -4636,6 +4773,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::series::SeriesItemDto {
             self.series_id.into_into_dart().into_dart(),
             self.comic_id.into_into_dart().into_dart(),
             self.sort_order.into_into_dart().into_dart(),
+            self.sort_order_locked.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -5187,6 +5325,13 @@ impl SseEncode for crate::api::thumbnail::ComicThumbnailDto {
     }
 }
 
+impl SseEncode for f64 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        serializer.cursor.write_f64::<NativeEndian>(self).unwrap();
+    }
+}
+
 impl SseEncode for crate::api::sync::FormatGroupDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5343,6 +5488,16 @@ impl SseEncode for Vec<crate::api::series::SeriesComicOrderEntryDto> {
     }
 }
 
+impl SseEncode for Vec<crate::api::series::SeriesComicPageItemDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::series::SeriesComicPageItemDto>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::api::series::SeriesDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5489,6 +5644,16 @@ impl SseEncode for crate::api::history::PagedReadingHistoryDto {
     }
 }
 
+impl SseEncode for crate::api::series::PagedSeriesComicsResultDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<crate::api::series::SeriesComicPageItemDto>>::sse_encode(self.items, serializer);
+        <i64>::sse_encode(self.total_count, serializer);
+        <i32>::sse_encode(self.page, serializer);
+        <i32>::sse_encode(self.page_size, serializer);
+    }
+}
+
 impl SseEncode for crate::api::series::PagedSeriesResultDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -5541,7 +5706,15 @@ impl SseEncode for crate::api::series::SeriesComicOrderEntryDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.key, serializer);
-        <i32>::sse_encode(self.sort_order, serializer);
+        <f64>::sse_encode(self.sort_order, serializer);
+    }
+}
+
+impl SseEncode for crate::api::series::SeriesComicPageItemDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::api::comic::ComicDto>::sse_encode(self.comic, serializer);
+        <f64>::sse_encode(self.sort_order, serializer);
     }
 }
 
@@ -5604,7 +5777,8 @@ impl SseEncode for crate::api::series::SeriesItemDto {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.series_id, serializer);
         <String>::sse_encode(self.comic_id, serializer);
-        <i32>::sse_encode(self.sort_order, serializer);
+        <f64>::sse_encode(self.sort_order, serializer);
+        <bool>::sse_encode(self.sort_order_locked, serializer);
     }
 }
 

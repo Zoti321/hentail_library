@@ -73,17 +73,34 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
             .map_err(crate::db::map_db_err)?;
         }
 
+        let previous_items = SeriesItems::find()
+            .filter(series_items::Column::SeriesId.eq(series_id.clone()))
+            .all(db)
+            .await
+            .map_err(crate::db::map_db_err)?;
+        let locked_orders: HashMap<String, f64> = previous_items
+            .into_iter()
+            .filter(|item| item.sort_order_locked)
+            .map(|item| (item.comic_id, item.sort_order))
+            .collect();
+
         SeriesItems::delete_many()
             .filter(series_items::Column::SeriesId.eq(series_id.clone()))
             .exec(db)
             .await
             .map_err(crate::db::map_db_err)?;
 
-        for (sort_order, (comic_id, _)) in entries.iter().enumerate() {
+        // Komga sortBooks: unlocked → natural-order index (1-based); locked keep value.
+        for (index, (comic_id, _)) in entries.iter().enumerate() {
+            let (sort_order, sort_order_locked) = match locked_orders.get(comic_id) {
+                Some(&locked_order) => (locked_order, true),
+                None => ((index as i32 + 1) as f64, false),
+            };
             SeriesItems::insert(series_items::ActiveModel {
                 series_id: Set(series_id.clone()),
                 comic_id: Set(comic_id.clone()),
-                sort_order: Set(sort_order as i32),
+                sort_order: Set(sort_order),
+                sort_order_locked: Set(sort_order_locked),
             })
             .exec(db)
             .await

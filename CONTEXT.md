@@ -47,7 +47,7 @@ _Avoid_: 扩展名列表（用户设置层用分组）
 ### Organization & metadata
 
 **Series**:
-库中有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。用户可编辑连载状态与计划总卷数；成员顺序由 sync 按文件名自然排序写入。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series；不在任何 Series 中的 Comic 仍作为独立条目存在于 Library 中。
+库中有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。用户可编辑连载状态与计划总卷数；成员默认顺序由 sync 按文件名自然排序写入。用户可在系列详情手动编辑单本排序值（`SeriesItem.order`，浮点数）；手动保存后会锁定该成员（`sortOrderLocked`），后续 sync 保留锁定项的排序值，未锁定项仍按文件名自然排序更新。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series；不在任何 Series 中的 Comic 仍作为独立条目存在于 Library 中。
 _Avoid_: 合集、专辑、套系
 
 **Folder series**:

@@ -74,9 +74,9 @@ Series _testSeries() {
     name: 'Test Series',
     folderPath: '/series',
     items: <SeriesItem>[
-      SeriesItem(comicId: 'comic-a', order: 0),
-      SeriesItem(comicId: 'comic-b', order: 1),
-      SeriesItem(comicId: 'comic-c', order: 2),
+      SeriesItem(comicId: 'comic-a', order: 0.0),
+      SeriesItem(comicId: 'comic-b', order: 1.0),
+      SeriesItem(comicId: 'comic-c', order: 2.0),
     ],
   );
 }

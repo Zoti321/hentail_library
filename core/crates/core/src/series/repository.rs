@@ -6,8 +6,8 @@ use sea_orm::{
 };
 
 use crate::comic::{
-    load_comics_ordered, read_data_version, search_comic_ids_by_tag_expression, PageRequestDto,
-    PagedComicResultDto,
+    load_comics_ordered, read_data_version, search_comic_ids_by_tag_expression, ComicDto,
+    PageRequestDto,
 };
 use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
@@ -20,7 +20,8 @@ use super::page_query::{build_count_query, build_ids_page_query};
 pub struct SeriesItemDto {
     pub series_id: String,
     pub comic_id: String,
-    pub sort_order: i32,
+    pub sort_order: f64,
+    pub sort_order_locked: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -46,6 +47,20 @@ pub struct SeriesComicsMetadataDto {
     pub authors: Vec<String>,
     pub tags: Vec<String>,
     pub has_r18: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct SeriesComicPageItemDto {
+    pub comic: ComicDto,
+    pub sort_order: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct PagedSeriesComicsResultDto {
+    pub items: Vec<SeriesComicPageItemDto>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
 }
 
 /// 由 comicId 派生的阅读器用系列上下文（ADR-0005）。
@@ -164,10 +179,10 @@ async fn query_series_ids(
 pub async fn fetch_series_comics_page(
     series_id: &str,
     request: PageRequestDto,
-) -> Result<PagedComicResultDto, HentaiError> {
+) -> Result<PagedSeriesComicsResultDto, HentaiError> {
     let db = connection()?;
     if !series_exists(&db, series_id).await? {
-        return Ok(PagedComicResultDto {
+        return Ok(PagedSeriesComicsResultDto {
             items: vec![],
             total_count: 0,
             page: 1,
@@ -186,7 +201,7 @@ pub async fn fetch_series_comics_page(
         effective_page = total_pages as i32;
     }
     if total_count <= 0 {
-        return Ok(PagedComicResultDto {
+        return Ok(PagedSeriesComicsResultDto {
             items: vec![],
             total_count: 0,
             page: 1,
@@ -194,10 +209,19 @@ pub async fn fetch_series_comics_page(
         });
     }
     let offset = (effective_page - 1) * page_size;
-    let comic_ids =
-        query_series_comic_ids_page(&db, series_id, page_size, offset).await?;
-    let items = load_comics_ordered(&db, comic_ids).await?;
-    Ok(PagedComicResultDto {
+    let id_orders =
+        query_series_comic_id_orders_page(&db, series_id, page_size, offset).await?;
+    let comic_ids: Vec<String> = id_orders.iter().map(|(id, _)| id.clone()).collect();
+    let order_by_id: HashMap<String, f64> = id_orders.into_iter().collect();
+    let comics = load_comics_ordered(&db, comic_ids).await?;
+    let items = comics
+        .into_iter()
+        .map(|comic| {
+            let sort_order = order_by_id.get(&comic.comic_id).copied().unwrap_or(0.0);
+            SeriesComicPageItemDto { comic, sort_order }
+        })
+        .collect();
+    Ok(PagedSeriesComicsResultDto {
         items,
         total_count,
         page: effective_page,
@@ -279,7 +303,7 @@ pub async fn set_series_items_order(
         SeriesItems::update_many()
             .col_expr(
                 series_items::Column::SortOrder,
-                sea_orm::sea_query::Expr::value(index as i32),
+                sea_orm::sea_query::Expr::value(index as f64),
             )
             .filter(series_items::Column::SeriesId.eq(series_id))
             .filter(series_items::Column::ComicId.eq(comic_id))
@@ -382,15 +406,15 @@ async fn query_all_series_comic_ids(
         .collect()
 }
 
-async fn query_series_comic_ids_page(
+async fn query_series_comic_id_orders_page(
     db: &DatabaseConnection,
     series_id: &str,
     page_size: i32,
     offset: i32,
-) -> Result<Vec<String>, HentaiError> {
+) -> Result<Vec<(String, f64)>, HentaiError> {
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT comic_id FROM series_items \
+        "SELECT comic_id, sort_order FROM series_items \
          WHERE series_id = ? \
          ORDER BY sort_order ASC, comic_id ASC \
          LIMIT ? OFFSET ?",
@@ -403,8 +427,13 @@ async fn query_series_comic_ids_page(
     let rows = db.query_all(stmt).await.map_err(map_db_err)?;
     rows.into_iter()
         .map(|row| {
-            row.try_get_by_index::<String>(0)
-                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+            let comic_id = row
+                .try_get_by_index::<String>(0)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+            let sort_order = row
+                .try_get_by_index::<f64>(1)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+            Ok((comic_id, sort_order))
         })
         .collect()
 }
@@ -516,6 +545,7 @@ async fn load_series_by_ids(
                 series_id: item.series_id,
                 comic_id: item.comic_id,
                 sort_order: item.sort_order,
+                sort_order_locked: item.sort_order_locked,
             });
     }
     let mut by_id: HashMap<String, SeriesDto> = HashMap::new();
@@ -539,7 +569,7 @@ async fn load_series_by_ids(
         .collect())
 }
 
-pub async fn load_home_series_comic_order_map() -> Result<HashMap<String, i32>, HentaiError> {
+pub async fn load_home_series_comic_order_map() -> Result<HashMap<String, f64>, HentaiError> {
     let db = connection()?;
     let rows = SeriesItems::find().all(&db).await.map_err(map_db_err)?;
     let mut map = HashMap::new();
@@ -550,7 +580,7 @@ pub async fn load_home_series_comic_order_map() -> Result<HashMap<String, i32>, 
 }
 
 pub async fn watch_home_series_comic_order_map(
-    mut emit: impl FnMut(HashMap<String, i32>) -> Result<(), HentaiError>,
+    mut emit: impl FnMut(HashMap<String, f64>) -> Result<(), HentaiError>,
 ) -> Result<(), HentaiError> {
     let mut last = read_data_version().await?;
     emit(load_home_series_comic_order_map().await?)?;

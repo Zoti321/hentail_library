@@ -1,3 +1,4 @@
+import 'package:hentai_library/data/repositories/comic_frb_mapper.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
@@ -5,6 +6,7 @@ import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
@@ -23,7 +25,11 @@ Series mapRustSeries(rust_series.SeriesDto dto) {
 }
 
 SeriesItem mapRustSeriesItem(rust_series.SeriesItemDto dto) {
-  return SeriesItem(comicId: dto.comicId, order: dto.sortOrder);
+  return SeriesItem(
+    comicId: dto.comicId,
+    order: dto.sortOrder,
+    sortOrderLocked: dto.sortOrderLocked,
+  );
 }
 
 SeriesReadingContext mapRustSeriesReadingContext(
@@ -76,6 +82,24 @@ PagedResult<Series> mapPagedSeriesResult(
 ) {
   return PagedResult<Series>(
     items: page.items.map(mapRustSeries).toList(),
+    totalCount: page.totalCount.toInt(),
+    page: page.page,
+    pageSize: page.pageSize,
+  );
+}
+
+PagedResult<SeriesComicPageItem> mapPagedSeriesComicsResult(
+  rust_series.PagedSeriesComicsResultDto page,
+) {
+  return PagedResult<SeriesComicPageItem>(
+    items: page.items
+        .map(
+          (rust_series.SeriesComicPageItemDto item) => (
+            comic: mapRustComic(item.comic),
+            sortOrder: item.sortOrder,
+          ),
+        )
+        .toList(),
     totalCount: page.totalCount.toInt(),
     page: page.page,
     pageSize: page.pageSize,

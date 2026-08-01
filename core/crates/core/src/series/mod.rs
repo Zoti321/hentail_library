@@ -9,7 +9,9 @@ pub use repository::{
     find_series_by_id, get_all_series, get_series_reading_context_by_comic_id,
     load_home_series_comic_order_map, search_series_by_keyword, search_series_by_tag_expression,
     set_series_items_order, watch_all_series, watch_home_series_comic_order_map,
-    PagedSeriesResultDto, SeriesComicsMetadataDto, SeriesDto, SeriesItemDto,
-    SeriesReadingContextDto,
+    PagedSeriesComicsResultDto, PagedSeriesResultDto, SeriesComicPageItemDto,
+    SeriesComicsMetadataDto, SeriesDto, SeriesItemDto, SeriesReadingContextDto,
 };
-pub use write::{update_series_user_meta, UpdateSeriesUserMetaDto};
+pub use write::{
+    update_series_item_sort_order, update_series_user_meta, UpdateSeriesUserMetaDto,
+};

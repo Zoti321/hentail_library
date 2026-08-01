@@ -9,7 +9,7 @@ import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_series_list`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Stream<List<SeriesDto>> watchAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesWatchAllSeriesFrb();
@@ -39,7 +39,7 @@ SeriesReadingContextDto? getSeriesReadingContextByComicIdFrb({
   comicId: comicId,
 );
 
-PagedComicResultDto fetchSeriesComicsPageFrb({
+PagedSeriesComicsResultDto fetchSeriesComicsPageFrb({
   required String seriesId,
   required PageRequestDto request,
 }) => RustLib.instance.api.crateApiSeriesFetchSeriesComicsPageFrb(
@@ -69,6 +69,16 @@ void setSeriesItemsOrderFrb({
   orderedComicIds: orderedComicIds,
 );
 
+void updateSeriesItemSortOrderFrb({
+  required String seriesId,
+  required String comicId,
+  required double sortOrder,
+}) => RustLib.instance.api.crateApiSeriesUpdateSeriesItemSortOrderFrb(
+  seriesId: seriesId,
+  comicId: comicId,
+  sortOrder: sortOrder,
+);
+
 List<SeriesDto> searchSeriesByKeywordFrb({required String keyword}) => RustLib
     .instance
     .api
@@ -89,6 +99,34 @@ List<SeriesComicOrderEntryDto> loadHomeSeriesComicOrderMapFrb() =>
 
 Stream<List<SeriesComicOrderEntryDto>> watchHomeSeriesComicOrderMapFrb() =>
     RustLib.instance.api.crateApiSeriesWatchHomeSeriesComicOrderMapFrb();
+
+class PagedSeriesComicsResultDto {
+  final List<SeriesComicPageItemDto> items;
+  final PlatformInt64 totalCount;
+  final int page;
+  final int pageSize;
+
+  const PagedSeriesComicsResultDto({
+    required this.items,
+    required this.totalCount,
+    required this.page,
+    required this.pageSize,
+  });
+
+  @override
+  int get hashCode =>
+      items.hashCode ^ totalCount.hashCode ^ page.hashCode ^ pageSize.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PagedSeriesComicsResultDto &&
+          runtimeType == other.runtimeType &&
+          items == other.items &&
+          totalCount == other.totalCount &&
+          page == other.page &&
+          pageSize == other.pageSize;
+}
 
 class PagedSeriesResultDto {
   final List<SeriesDto> items;
@@ -120,7 +158,7 @@ class PagedSeriesResultDto {
 
 class SeriesComicOrderEntryDto {
   final String key;
-  final int sortOrder;
+  final double sortOrder;
 
   const SeriesComicOrderEntryDto({required this.key, required this.sortOrder});
 
@@ -133,6 +171,24 @@ class SeriesComicOrderEntryDto {
       other is SeriesComicOrderEntryDto &&
           runtimeType == other.runtimeType &&
           key == other.key &&
+          sortOrder == other.sortOrder;
+}
+
+class SeriesComicPageItemDto {
+  final ComicDto comic;
+  final double sortOrder;
+
+  const SeriesComicPageItemDto({required this.comic, required this.sortOrder});
+
+  @override
+  int get hashCode => comic.hashCode ^ sortOrder.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesComicPageItemDto &&
+          runtimeType == other.runtimeType &&
+          comic == other.comic &&
           sortOrder == other.sortOrder;
 }
 
@@ -242,16 +298,22 @@ class SeriesFilterDto {
 class SeriesItemDto {
   final String seriesId;
   final String comicId;
-  final int sortOrder;
+  final double sortOrder;
+  final bool sortOrderLocked;
 
   const SeriesItemDto({
     required this.seriesId,
     required this.comicId,
     required this.sortOrder,
+    required this.sortOrderLocked,
   });
 
   @override
-  int get hashCode => seriesId.hashCode ^ comicId.hashCode ^ sortOrder.hashCode;
+  int get hashCode =>
+      seriesId.hashCode ^
+      comicId.hashCode ^
+      sortOrder.hashCode ^
+      sortOrderLocked.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -260,7 +322,8 @@ class SeriesItemDto {
           runtimeType == other.runtimeType &&
           seriesId == other.seriesId &&
           comicId == other.comicId &&
-          sortOrder == other.sortOrder;
+          sortOrder == other.sortOrder &&
+          sortOrderLocked == other.sortOrderLocked;
 }
 
 /// ADR-0005：由 comicId 派生的阅读器用系列上下文。

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/ui/features/library/view_models/catalog_pagination_engine.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
@@ -41,7 +41,8 @@ class SeriesDetailComicsCatalogController
     );
 
     final int pageSize = ref.read(seriesDetailActivePageSizeProvider);
-    final PagedResult<Comic> page = await _pagination.fetchPage<Comic>(
+    final PagedResult<SeriesComicPageItem> page =
+        await _pagination.fetchPage<SeriesComicPageItem>(
       pageSize: pageSize,
       fetch: (PageRequest request) => ref
           .read(seriesRepoProvider)

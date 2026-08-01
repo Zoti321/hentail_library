@@ -170,6 +170,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicThumbnailDto dco_decode_comic_thumbnail_dto(dynamic raw);
 
   @protected
+  double dco_decode_f_64(dynamic raw);
+
+  @protected
   FormatGroupDto dco_decode_format_group_dto(dynamic raw);
 
   @protected
@@ -218,6 +221,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<SeriesComicOrderEntryDto> dco_decode_list_series_comic_order_entry_dto(
+    dynamic raw,
+  );
+
+  @protected
+  List<SeriesComicPageItemDto> dco_decode_list_series_comic_page_item_dto(
     dynamic raw,
   );
 
@@ -274,6 +282,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PagedReadingHistoryDto dco_decode_paged_reading_history_dto(dynamic raw);
 
   @protected
+  PagedSeriesComicsResultDto dco_decode_paged_series_comics_result_dto(
+    dynamic raw,
+  );
+
+  @protected
   PagedSeriesResultDto dco_decode_paged_series_result_dto(dynamic raw);
 
   @protected
@@ -287,6 +300,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesComicOrderEntryDto dco_decode_series_comic_order_entry_dto(dynamic raw);
+
+  @protected
+  SeriesComicPageItemDto dco_decode_series_comic_page_item_dto(dynamic raw);
 
   @protected
   SeriesComicsMetadataDto dco_decode_series_comics_metadata_dto(dynamic raw);
@@ -525,6 +541,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  double sse_decode_f_64(SseDeserializer deserializer);
+
+  @protected
   FormatGroupDto sse_decode_format_group_dto(SseDeserializer deserializer);
 
   @protected
@@ -583,6 +602,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<SeriesComicOrderEntryDto> sse_decode_list_series_comic_order_entry_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<SeriesComicPageItemDto> sse_decode_list_series_comic_page_item_dto(
     SseDeserializer deserializer,
   );
 
@@ -649,6 +673,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  PagedSeriesComicsResultDto sse_decode_paged_series_comics_result_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   PagedSeriesResultDto sse_decode_paged_series_result_dto(
     SseDeserializer deserializer,
   );
@@ -668,6 +697,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesComicOrderEntryDto sse_decode_series_comic_order_entry_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SeriesComicPageItemDto sse_decode_series_comic_page_item_dto(
     SseDeserializer deserializer,
   );
 
@@ -971,6 +1005,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_f_64(double self, SseSerializer serializer);
+
+  @protected
   void sse_encode_format_group_dto(
     FormatGroupDto self,
     SseSerializer serializer,
@@ -1051,6 +1088,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_series_comic_order_entry_dto(
     List<SeriesComicOrderEntryDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_series_comic_page_item_dto(
+    List<SeriesComicPageItemDto> self,
     SseSerializer serializer,
   );
 
@@ -1136,6 +1179,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_paged_series_comics_result_dto(
+    PagedSeriesComicsResultDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_paged_series_result_dto(
     PagedSeriesResultDto self,
     SseSerializer serializer,
@@ -1159,6 +1208,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_series_comic_order_entry_dto(
     SeriesComicOrderEntryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_series_comic_page_item_dto(
+    SeriesComicPageItemDto self,
     SseSerializer serializer,
   );
 

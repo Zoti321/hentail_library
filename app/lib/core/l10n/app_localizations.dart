@@ -1298,6 +1298,42 @@ abstract class AppLocalizations {
   /// **'编辑系列'**
   String get seriesDetailEdit;
 
+  /// No description provided for @seriesItemEditSortOrder.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑排序'**
+  String get seriesItemEditSortOrder;
+
+  /// No description provided for @dialogEditSeriesItemSortOrderTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑排序'**
+  String get dialogEditSeriesItemSortOrderTitle;
+
+  /// No description provided for @formSeriesItemSortOrderLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'排序序号'**
+  String get formSeriesItemSortOrderLabel;
+
+  /// No description provided for @formSeriesItemSortOrderHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'例如 1 或 1.5'**
+  String get formSeriesItemSortOrderHint;
+
+  /// No description provided for @formSeriesItemSortOrderInvalid.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入有效数字'**
+  String get formSeriesItemSortOrderInvalid;
+
+  /// No description provided for @dialogEditSeriesItemSortOrderSavedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'排序已更新'**
+  String get dialogEditSeriesItemSortOrderSavedToast;
+
   /// No description provided for @seriesDetailNoComics.
   ///
   /// In zh, this message translates to:

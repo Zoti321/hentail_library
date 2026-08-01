@@ -5,7 +5,9 @@ use hentai_core::{
     get_all_series, get_series_reading_context_by_comic_id as core_get_reading_context,
     load_home_series_comic_order_map, search_series_by_keyword,
     search_series_by_tag_expression, set_series_items_order as core_set_order,
+    update_series_item_sort_order as core_update_item_sort_order,
     update_series_user_meta as core_update_meta, watch_all_series, watch_home_series_comic_order_map,
+    PagedSeriesComicsResultDto as CorePagedSeriesComics,
     PagedSeriesResultDto as CorePagedSeries, SeriesComicsMetadataDto as CoreSeriesComicsMetadata,
     SeriesDto as CoreSeries, SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
     SeriesReadingContextDto as CoreSeriesReadingContext,
@@ -13,7 +15,7 @@ use hentai_core::{
     UpdateSeriesUserMetaDto as CoreUpdateSeriesUserMeta,
 };
 
-use super::comic::{PageRequestDto, PagedComicResultDto};
+use super::comic::{ComicDto, PageRequestDto};
 use super::init::HentaiErrorDto;
 use super::stream_watch::{emit_or_closed, normalize_watch_result};
 
@@ -22,7 +24,8 @@ use super::stream_watch::{emit_or_closed, normalize_watch_result};
 pub struct SeriesItemDto {
     pub series_id: String,
     pub comic_id: String,
-    pub sort_order: i32,
+    pub sort_order: f64,
+    pub sort_order_locked: bool,
 }
 
 /// FRB 层 DTO：字段与 `hentai_core::SeriesDto` 对齐。
@@ -70,7 +73,21 @@ pub struct PagedSeriesResultDto {
 #[derive(Debug, Clone)]
 pub struct SeriesComicOrderEntryDto {
     pub key: String,
-    pub sort_order: i32,
+    pub sort_order: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct SeriesComicPageItemDto {
+    pub comic: ComicDto,
+    pub sort_order: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct PagedSeriesComicsResultDto {
+    pub items: Vec<SeriesComicPageItemDto>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -114,6 +131,7 @@ macro_rules! map_series_dto {
                     series_id: i.series_id,
                     comic_id: i.comic_id,
                     sort_order: i.sort_order,
+                    sort_order_locked: i.sort_order_locked,
                 })
                 .collect(),
         }
@@ -126,6 +144,25 @@ impl From<CoreItem> for SeriesItemDto {
             series_id: v.series_id,
             comic_id: v.comic_id,
             sort_order: v.sort_order,
+            sort_order_locked: v.sort_order_locked,
+        }
+    }
+}
+
+impl From<CorePagedSeriesComics> for PagedSeriesComicsResultDto {
+    fn from(value: CorePagedSeriesComics) -> Self {
+        Self {
+            items: value
+                .items
+                .into_iter()
+                .map(|item| SeriesComicPageItemDto {
+                    comic: ComicDto::from(item.comic),
+                    sort_order: item.sort_order,
+                })
+                .collect(),
+            total_count: value.total_count,
+            page: value.page,
+            page_size: value.page_size,
         }
     }
 }
@@ -259,9 +296,9 @@ pub fn get_series_reading_context_by_comic_id_frb(
 pub fn fetch_series_comics_page_frb(
     series_id: String,
     request: PageRequestDto,
-) -> Result<PagedComicResultDto, HentaiErrorDto> {
+) -> Result<PagedSeriesComicsResultDto, HentaiErrorDto> {
     hentai_core::runtime::block_on(core_fetch_series_comics_page(&series_id, request.into()))
-        .map(PagedComicResultDto::from)
+        .map(PagedSeriesComicsResultDto::from)
         .map_err(HentaiErrorDto::from)
 }
 
@@ -290,6 +327,20 @@ pub fn set_series_items_order_frb(
 ) -> Result<(), HentaiErrorDto> {
     hentai_core::runtime::block_on(core_set_order(&series_id, ordered_comic_ids))
         .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn update_series_item_sort_order_frb(
+    series_id: String,
+    comic_id: String,
+    sort_order: f64,
+) -> Result<(), HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_update_item_sort_order(
+        &series_id,
+        &comic_id,
+        sort_order,
+    ))
+    .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]

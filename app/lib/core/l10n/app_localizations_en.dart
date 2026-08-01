@@ -715,6 +715,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get seriesDetailEdit => 'Edit series';
 
   @override
+  String get seriesItemEditSortOrder => 'Edit sort order';
+
+  @override
+  String get dialogEditSeriesItemSortOrderTitle => 'Edit sort order';
+
+  @override
+  String get formSeriesItemSortOrderLabel => 'Sort number';
+
+  @override
+  String get formSeriesItemSortOrderHint => 'e.g. 1 or 1.5';
+
+  @override
+  String get formSeriesItemSortOrderInvalid => 'Enter a valid number';
+
+  @override
+  String get dialogEditSeriesItemSortOrderSavedToast => 'Sort order updated';
+
+  @override
   String get seriesDetailNoComics => 'No comics in this series';
 
   @override

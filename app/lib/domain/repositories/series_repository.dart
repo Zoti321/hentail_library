@@ -6,6 +6,7 @@ import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/domain/reading/series_reading_context.dart';
 
@@ -28,9 +29,15 @@ abstract class SeriesRepository {
   /// 按 comicId 派生 Series reading context；无归属返回 null。
   Future<SeriesReadingContext?> getReadingContextByComicId(String comicId);
 
-  Future<PagedResult<Comic>> fetchComicsPage({
+  Future<PagedResult<SeriesComicPageItem>> fetchComicsPage({
     required String seriesId,
     required PageRequest request,
+  });
+
+  Future<void> updateSeriesItemSortOrder({
+    required String seriesId,
+    required String comicId,
+    required double sortOrder,
   });
 
   Future<SeriesComicsMetadata> fetchComicsMetadata(String seriesId);
