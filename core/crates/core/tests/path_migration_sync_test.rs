@@ -93,7 +93,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
             };
 
             let first_scan = scan_roots(
-                &[root.clone()],
+                std::slice::from_ref(&root),
                 &empty_ctx,
                 &handle,
                 true,
@@ -132,7 +132,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
             let new_id = comic_id_from_path(&new_path.to_string_lossy());
 
             let second_scan = scan_roots(
-                &[root.clone()],
+                std::slice::from_ref(&root),
                 &empty_ctx,
                 &handle,
                 true,
@@ -204,7 +204,7 @@ fn ambiguous_same_fingerprint_moves_do_not_migrate() {
             };
 
             let first_scan = scan_roots(
-                &[root.clone()],
+                std::slice::from_ref(&root),
                 &empty_ctx,
                 &handle,
                 true,
@@ -243,7 +243,7 @@ fn ambiguous_same_fingerprint_moves_do_not_migrate() {
             std::fs::rename(&second_path, root.join("moved_b.cbz")).expect("rename b");
 
             let second_scan = scan_roots(
-                &[root.clone()],
+                std::slice::from_ref(&root),
                 &empty_ctx,
                 &handle,
                 true,

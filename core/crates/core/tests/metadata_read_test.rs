@@ -77,11 +77,12 @@ fn write_minimal_pdf_with_metadata(
     let info_obj = format!(
         "<< /Title ({title}) /Author ({author}) /Subject ({subject}) /CreationDate ({creation_date}) >>"
     );
-    let mut objects: Vec<String> = Vec::new();
-    objects.push("<< /Type /Catalog /Pages 2 0 R >>".to_string());
-    objects.push("<< /Type /Pages /Kids [3 0 R] /Count 1 >>".to_string());
-    objects.push("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] >>".to_string());
-    objects.push(info_obj);
+    let objects: Vec<String> = vec![
+        "<< /Type /Catalog /Pages 2 0 R >>".to_string(),
+        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>".to_string(),
+        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] >>".to_string(),
+        info_obj,
+    ];
 
     let mut pdf = String::from("%PDF-1.4\n");
     let mut offsets: Vec<usize> = vec![0];

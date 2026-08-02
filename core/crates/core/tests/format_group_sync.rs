@@ -92,7 +92,7 @@ fn disabling_archive_format_group_removes_existing_archive_comic_on_resync() {
             };
 
             let first_scan = scan_roots(
-                &[root.clone()],
+                std::slice::from_ref(&root),
                 &empty_ctx,
                 &handle,
                 true,
@@ -123,7 +123,7 @@ fn disabling_archive_format_group_removes_existing_archive_comic_on_resync() {
             );
 
             let second_scan = scan_roots(
-                &[root.clone()],
+                std::slice::from_ref(&root),
                 &empty_ctx,
                 &handle,
                 true,

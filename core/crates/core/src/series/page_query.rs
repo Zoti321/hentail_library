@@ -109,7 +109,6 @@ mod tests {
             &SeriesSortOptionDto {
                 field: SeriesSortFieldDto::Random,
                 descending: true,
-                ..Default::default()
             },
             20,
             0,
@@ -125,7 +124,6 @@ mod tests {
             &SeriesSortOptionDto {
                 field: SeriesSortFieldDto::ComicCount,
                 descending: true,
-                ..Default::default()
             },
             10,
             0,

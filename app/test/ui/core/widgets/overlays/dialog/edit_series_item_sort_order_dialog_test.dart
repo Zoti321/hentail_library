@@ -6,7 +6,8 @@ import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_series_item_
 
 Future<void> _openDialog(
   WidgetTester tester, {
-  required Future<void> Function(double sortOrder) onSubmit,
+  required Future<void> Function(double sortOrder, bool locked) onSubmit,
+  bool initialSortOrderLocked = false,
 }) async {
   await tester.pumpWidget(
     MaterialApp(
@@ -27,6 +28,7 @@ Future<void> _openDialog(
                     comicId: 'comic-1',
                     comicTitle: 'Test Comic',
                     initialSortOrder: 1,
+                    initialSortOrderLocked: initialSortOrderLocked,
                     onSubmit: onSubmit,
                   ),
                 );
@@ -48,7 +50,7 @@ void main() {
   ) async {
     var saveCount = 0;
 
-    Future<void> onSubmit(double sortOrder) async {
+    Future<void> onSubmit(double sortOrder, bool locked) async {
       saveCount += 1;
     }
 

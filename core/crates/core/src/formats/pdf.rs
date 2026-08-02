@@ -32,9 +32,14 @@ pub fn count_pdf_pages(file: &Path) -> Result<Option<i32>, HentaiError> {
     Ok(Some(count as i32))
 }
 
-pub fn read_pdf_embedded_meta(
-    file: &Path,
-) -> Result<(Option<String>, Vec<String>, Option<String>, Option<i64>), HentaiError> {
+type PdfEmbeddedMeta = (
+    Option<String>,
+    Vec<String>,
+    Option<String>,
+    Option<i64>,
+);
+
+pub fn read_pdf_embedded_meta(file: &Path) -> Result<PdfEmbeddedMeta, HentaiError> {
     let pdfium = bind_pdfium()?;
     let document = pdfium
         .load_pdf_from_file(file, None)

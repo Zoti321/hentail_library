@@ -439,8 +439,8 @@ async fn query_series_comic_id_orders_page(
          LIMIT ? OFFSET ?",
         vec![
             sea_orm::Value::String(Some(Box::new(series_id.to_string()))),
-            sea_orm::Value::Int(Some(page_size as i32)),
-            sea_orm::Value::Int(Some(offset as i32)),
+            sea_orm::Value::Int(Some(page_size)),
+            sea_orm::Value::Int(Some(offset)),
         ],
     );
     let rows = db.query_all(stmt).await.map_err(map_db_err)?;
