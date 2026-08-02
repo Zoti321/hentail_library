@@ -33,7 +33,8 @@ Komga 的模型是：字段级锁；编辑自动上锁；未锁定且刷新源�
 
 ### 写入与 API
 
-- `update_comic_user_meta` / `update_series_user_meta`：本次写入的字段自动 `*_locked = true`。
+- `update_comic_user_meta` / `update_series_user_meta`：本次写入的字段（`Some` / 显式 clear）自动 `*_locked = true`。
+- Comic / Series metadata form 保存时只提交相对打开时**值变化**的字段；未改不写、不加锁；全部未改则不调用 update。
 - `set_comic_meta_locks` / `set_series_meta_locks`：按字段 Optional 补丁只改锁。
 - `set_series_item_sort_order_locked`：设置排序锁（含解锁）。
 - 读路径 DTO 带回各锁标志；UI 在编辑表单旁提供锁开关。

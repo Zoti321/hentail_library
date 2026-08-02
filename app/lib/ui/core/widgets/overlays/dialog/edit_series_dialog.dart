@@ -92,7 +92,7 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
     try {
       final SeriesMetadataApplyResult result = await _form.applyTo(
         ref.read(seriesRepoProvider),
-        seriesId: widget.series.id,
+        widget.series,
       );
       if (!mounted) {
         return;

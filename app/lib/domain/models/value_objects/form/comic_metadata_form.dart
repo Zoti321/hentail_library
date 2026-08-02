@@ -116,11 +116,11 @@ extension ComicMetadataFormOps on ComicMetadataForm {
     return copyWith(tags: tags.where((Tag t) => t.name != name).toList());
   }
 
-  /// 非法 → [ComicMetadataApplyInvalid]；合法用 [normalized] 落库 →
-  /// [ComicMetadataApplySucceeded]。`isR18` → Content rating。
+  /// 非法 → [ComicMetadataApplyInvalid]；相对 [original] 仅提交值变化字段 →
+  /// [ComicMetadataApplySucceeded]。无变化时不调仓储。`isR18` → Content rating。
   Future<ComicMetadataApplyResult> applyTo(
     ComicRepository repository,
-    String comicId,
+    Comic original,
   ) async {
     final ComicMetadataForm ready = normalized;
     final ComicMetadataFormValidation validation = ready.validate();
@@ -128,14 +128,64 @@ extension ComicMetadataFormOps on ComicMetadataForm {
       return ComicMetadataApplyInvalid(validation);
     }
 
+    final String? title = ready.title != original.title ? ready.title : null;
+    final String? description =
+        ready.description != original.description ? (ready.description ?? '') : null;
+
+    final DateTime? publishedAt;
+    final bool clearPublishedAt;
+    if (ready.publishedAt == original.publishedAt) {
+      publishedAt = null;
+      clearPublishedAt = false;
+    } else if (ready.publishedAt == null) {
+      publishedAt = null;
+      clearPublishedAt = true;
+    } else {
+      publishedAt = ready.publishedAt;
+      clearPublishedAt = false;
+    }
+
+    final bool originalIsR18 = original.contentRating == ContentRating.r18;
+    final ContentRating? contentRating = ready.isR18 != originalIsR18
+        ? (ready.isR18 ? ContentRating.r18 : ContentRating.safe)
+        : null;
+
+    final List<Author>? authors =
+        !_sameOrderedNames(
+          ready.authors.map((Author a) => a.name),
+          original.authors.map((Author a) => a.name),
+        )
+        ? ready.authors
+        : null;
+    final List<Tag>? tags =
+        !_sameOrderedNames(
+          ready.tags.map((Tag t) => t.name),
+          original.tags.map((Tag t) => t.name),
+        )
+        ? ready.tags
+        : null;
+
+    final bool hasChanges =
+        title != null ||
+        description != null ||
+        publishedAt != null ||
+        clearPublishedAt ||
+        contentRating != null ||
+        authors != null ||
+        tags != null;
+    if (!hasChanges) {
+      return const ComicMetadataApplySucceeded();
+    }
+
     await repository.updateUserMeta(
-      comicId,
-      title: ready.title,
-      description: ready.description ?? '',
-      publishedAt: ready.publishedAt,
-      authors: ready.authors,
-      contentRating: ready.isR18 ? ContentRating.r18 : ContentRating.safe,
-      tags: ready.tags,
+      original.comicId,
+      title: title,
+      description: description,
+      publishedAt: publishedAt,
+      clearPublishedAt: clearPublishedAt,
+      authors: authors,
+      contentRating: contentRating,
+      tags: tags,
     );
     return const ComicMetadataApplySucceeded();
   }
@@ -147,4 +197,18 @@ String? _normalizeOptionalText(String? value) {
   }
   final String trimmed = value.trim();
   return trimmed.isEmpty ? null : trimmed;
+}
+
+bool _sameOrderedNames(Iterable<String> a, Iterable<String> b) {
+  final List<String> left = a.toList();
+  final List<String> right = b.toList();
+  if (left.length != right.length) {
+    return false;
+  }
+  for (int i = 0; i < left.length; i++) {
+    if (left[i] != right[i]) {
+      return false;
+    }
+  }
+  return true;
 }

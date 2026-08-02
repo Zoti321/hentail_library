@@ -67,15 +67,15 @@ Comic 的内容分级：`unknown`、`safe`、`r18`；主要由用户设定，也
 _Avoid_: 分级、年龄限制
 
 **Comic metadata form**:
-编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag）时的可提交草稿；校验与 normalize、Author/Tag 增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存写入的字段会自动加上 Metadata field lock；表单旁可单独切换锁而不改值。
+编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag）时的可提交草稿；校验与 normalize、Author/Tag 增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
 _Avoid_: 漫画表单、元数据 DTO
 
 **Series metadata form**:
-编辑 Series 用户元数据（名称、连载状态、计划总卷数）时的可提交草稿；计划总卷数以原始文本持有，空串表示清除、正整数表示设置；校验失败以字段级结果返回，由 UI 在字段下方展示。保存写入的字段会自动加上 Metadata field lock；表单旁可单独切换锁而不改值。
+编辑 Series 用户元数据（名称、连载状态、计划总卷数）时的可提交草稿；计划总卷数以原始文本持有，空串表示清除、正整数表示设置；校验失败以字段级结果返回，由 UI 在字段下方展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
 _Avoid_: 系列表单、SeriesForm、编辑系列 DTO
 
 **Metadata field lock**:
-Comic / Series 元数据字段上的布尔锁（Komga 式）。未锁定且 Library sync 解析出有值时用扫描结果覆盖；已锁定则保留库内值；扫描空/缺不清除。编辑某字段并保存会自动锁定该字段；也可不改值单独上锁/解锁。解锁不自动触发 sync。详见 ADR-0007。
+Comic / Series 元数据字段上的布尔锁（Komga 式）。未锁定且 Library sync 解析出有值时用扫描结果覆盖；已锁定则保留库内值；扫描空/缺不清除。编辑某字段并保存会自动锁定该字段（仅变更字段）；也可不改值单独上锁/解锁。解锁不自动触发 sync。详见 ADR-0007。
 _Avoid_: 只读标记、冻结、保护位（口语可用，领域用 Metadata field lock）
 
 **Healthy mode**:

@@ -84,6 +84,7 @@ class ComicRepositoryImpl implements ComicRepository {
     String? title,
     String? description,
     DateTime? publishedAt,
+    bool clearPublishedAt = false,
     List<Author>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
@@ -95,8 +96,10 @@ class ComicRepositoryImpl implements ComicRepository {
           title: title,
           contentRating: contentRating?.name,
           description: description,
-          publishedAt: publishedAt == null
+          publishedAt: clearPublishedAt
               ? _kComicPublishedAtClearSentinel
+              : publishedAt == null
+              ? null
               : comicTimestampToMs(publishedAt),
           authors: authors?.map((Author a) => a.name).toList(),
           tags: tags?.map((Tag t) => t.name).toList(),
