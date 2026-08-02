@@ -54,3 +54,56 @@ cargokit {
     manifestDir = "../rust"
     libname = "hentai_flutter"
 }
+
+// unrar-ng links libc++_shared; ship the NDK .so next to libhentai_flutter.so
+// so dlopen can resolve C++ typeinfo / exception symbols at runtime.
+def androidAbiToNdkTriple = [
+    'armeabi-v7a': 'arm-linux-androideabi',
+    'arm64-v8a'  : 'aarch64-linux-android',
+    'x86'        : 'i686-linux-android',
+    'x86_64'     : 'x86_64-linux-android',
+]
+
+afterEvaluate {
+    def hostPrebuilt = org.apache.tools.ant.taskdefs.condition.Os.isFamily(
+            org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS
+    ) ? 'windows-x86_64' : (org.apache.tools.ant.taskdefs.condition.Os.isFamily(
+            org.apache.tools.ant.taskdefs.condition.Os.FAMILY_MAC
+    ) ? 'darwin-x86_64' : 'linux-x86_64')
+
+    tasks.matching { it.name.startsWith('cargokitCargoBuild') }.configureEach { cargoTask ->
+        cargoTask.doLast {
+            def ndkVersion = cargoTask.ndkVersion
+            def sdkDir = cargoTask.sdkDirectory
+            if (ndkVersion == null || sdkDir == null) {
+                throw new GradleException('cargokit task missing ndkVersion/sdkDirectory; cannot package libc++_shared.so')
+            }
+            def ndkRoot = new File(sdkDir, "ndk/${ndkVersion}")
+            def sysrootLib = new File(
+                    ndkRoot,
+                    "toolchains/llvm/prebuilt/${hostPrebuilt}/sysroot/usr/lib"
+            )
+            androidAbiToNdkTriple.each { abi, triple ->
+                def destDir = new File(cargoTask.outputDir, abi)
+                if (!destDir.isDirectory()) {
+                    return
+                }
+                def src = new File(sysrootLib, "${triple}/libc++_shared.so")
+                if (!src.isFile()) {
+                    // API-level subdirs (e.g. .../27/libc++_shared.so) on newer NDKs
+                    def apiDirs = new File(sysrootLib, triple).listFiles()?.findAll { it.isDirectory() } ?: []
+                    src = apiDirs
+                            .collect { new File(it, 'libc++_shared.so') }
+                            .find { it.isFile() }
+                }
+                if (src == null || !src.isFile()) {
+                    throw new GradleException("libc++_shared.so not found for ${abi} under ${sysrootLib}/${triple}")
+                }
+                copy {
+                    from src
+                    into destDir
+                }
+            }
+        }
+    }
+}
