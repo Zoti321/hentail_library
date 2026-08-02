@@ -75,7 +75,11 @@ fn write_minimal_pdf_with_metadata(
     creation_date: &str,
 ) {
     let info_obj = format!(
-        "<< /Title ({title}) /Author ({author}) /Subject ({subject}) /CreationDate ({creation_date}) >>"
+        "<< /Title {} /Author {} /Subject {} /CreationDate {} >>",
+        pdf_utf16_hex_string(title),
+        pdf_utf16_hex_string(author),
+        pdf_utf16_hex_string(subject),
+        pdf_utf16_hex_string(creation_date),
     );
     let objects: Vec<String> = vec![
         "<< /Type /Catalog /Pages 2 0 R >>".to_string(),
@@ -105,10 +109,26 @@ fn write_minimal_pdf_with_metadata(
     std::fs::write(path, pdf).expect("write pdf");
 }
 
+/// PDF text string as UTF-16BE with BOM (hex string syntax).
+fn pdf_utf16_hex_string(s: &str) -> String {
+    let mut hex = String::from("FEFF");
+    for unit in s.encode_utf16() {
+        hex.push_str(&format!("{unit:04X}"));
+    }
+    format!("<{hex}>")
+}
+
 fn utc_ms(year: i32, month: u32, day: u32) -> i64 {
+    utc_ms_at(year, month, day, 0, 0, 0)
+}
+
+fn utc_ms_at(year: i32, month: u32, day: u32, hour: u32, minute: u32, second: u32) -> i64 {
     use std::time::{Duration, UNIX_EPOCH};
     let days_from_ce = days_from_civil(year, month, day).expect("valid date");
-    let secs = days_from_ce as i64 * 86_400;
+    let secs = days_from_ce as i64 * 86_400
+        + hour as i64 * 3600
+        + minute as i64 * 60
+        + second as i64;
     UNIX_EPOCH
         .checked_add(Duration::from_secs(secs.max(0) as u64))
         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
@@ -285,6 +305,21 @@ fn parse_epub_creator_splits_separators_and_deduplicates() {
 // --- PDF ---
 
 #[test]
+fn parse_pdf_valid_document_has_type_and_page_count() {
+    if !pdfium_available() {
+        eprintln!("SKIP parse_pdf_valid_document_has_type_and_page_count: pdfium 不可用");
+        return;
+    }
+    let temp = TempDir::new().expect("tempdir");
+    let path = temp.path().join("one.pdf");
+    write_minimal_pdf_with_metadata(&path, "t", "a", "s", "D:20240101000000");
+
+    let parsed = parse_file(&path).expect("parse").expect("resource");
+    assert_eq!(parsed.resource_type, "pdf");
+    assert_eq!(parsed.page_count, 1);
+}
+
+#[test]
 fn parse_pdf_reads_embedded_metadata() {
     if !pdfium_available() {
         eprintln!("SKIP parse_pdf_reads_embedded_metadata: pdfium 不可用");
@@ -306,8 +341,60 @@ fn parse_pdf_reads_embedded_metadata() {
     assert_eq!(parsed.title, "PDF 标题");
     assert_eq!(parsed.authors, vec!["作者甲".to_string(), "作者乙".to_string()]);
     assert_eq!(parsed.description.as_deref(), Some("PDF 概要"));
-    assert_eq!(parsed.published_at, Some(utc_ms(2024, 6, 15)));
+    assert_eq!(parsed.published_at, Some(utc_ms_at(2024, 6, 15, 12, 0, 0)));
     assert!(parsed.page_count >= 1);
+}
+
+#[test]
+fn parse_pdf_with_zero_pages_is_not_a_resource() {
+    if !pdfium_available() {
+        eprintln!("SKIP parse_pdf_with_zero_pages_is_not_a_resource: pdfium 不可用");
+        return;
+    }
+    let temp = TempDir::new().expect("tempdir");
+    let path = temp.path().join("empty.pdf");
+    write_minimal_pdf_with_page_count(&path, 0);
+
+    let parsed = parse_file(&path).expect("parse");
+    assert!(parsed.is_none(), "zero-page PDF must not enter the library");
+}
+
+fn write_minimal_pdf_with_page_count(path: &Path, page_count: u32) {
+    let kids = if page_count == 0 {
+        String::new()
+    } else {
+        (0..page_count)
+            .map(|i| format!("{} 0 R", i + 3))
+            .collect::<Vec<_>>()
+            .join(" ")
+    };
+    let mut objects: Vec<String> = vec![
+        "<< /Type /Catalog /Pages 2 0 R >>".to_string(),
+        format!("<< /Type /Pages /Kids [{kids}] /Count {page_count} >>"),
+    ];
+    for _ in 0..page_count {
+        objects.push("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] >>".to_string());
+    }
+
+    let mut pdf = String::from("%PDF-1.4\n");
+    let mut offsets: Vec<usize> = vec![0];
+    for (i, obj) in objects.iter().enumerate() {
+        offsets.push(pdf.len());
+        pdf.push_str(&format!("{} 0 obj\n{}\nendobj\n", i + 1, obj));
+    }
+    let xref_offset = pdf.len();
+    pdf.push_str("xref\n");
+    pdf.push_str(&format!("0 {}\n", objects.len() + 1));
+    pdf.push_str("0000000000 65535 f \n");
+    for offset in offsets.iter().skip(1) {
+        pdf.push_str(&format!("{:010} 00000 n \n", offset));
+    }
+    pdf.push_str(&format!(
+        "trailer\n<< /Size {} /Root 1 0 R >>\nstartxref\n{}\n%%EOF\n",
+        objects.len() + 1,
+        xref_offset
+    ));
+    std::fs::write(path, pdf).expect("write pdf");
 }
 
 #[test]

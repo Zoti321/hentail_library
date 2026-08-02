@@ -38,6 +38,7 @@ fn main() {
 
     println!("cargo:rerun-if-changed={}", vendor_root.join("manifest.json").display());
     println!("cargo:rerun-if-env-changed=TARGET");
+    println!("cargo:rerun-if-env-changed=HENTAI_VENDOR_DIR");
 
     if target.contains("android") {
         // Device load path ≠ host vendor path: verify + link NEEDED, bind by soname at runtime.

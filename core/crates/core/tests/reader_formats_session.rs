@@ -65,6 +65,25 @@ fn pdf_reader_lists_and_reads_first_page_as_jpeg() {
     );
 }
 
+#[test]
+fn pdf_reader_page_out_of_bounds_returns_error() {
+    let temp = tempfile::tempdir().expect("tempdir");
+    let pdf_path = temp.path().join("comic.pdf");
+    write_minimal_one_page_pdf(&pdf_path);
+    let path = pdf_path.to_string_lossy().to_string();
+
+    if open_reader("pdf-oob-probe", &path, "pdf").is_err() {
+        eprintln!("SKIP pdf_reader_page_out_of_bounds_returns_error: pdfium 不可用");
+        return;
+    }
+    close_reader("pdf-oob-probe");
+
+    open_reader("pdf-oob", &path, "pdf").expect("open pdf");
+    let err = load_page_bytes("pdf-oob", &path, "pdf", 1).expect_err("index 1 of 1");
+    assert_eq!(err.code, HentaiErrorCode::ReaderInvalidContent);
+    close_reader("pdf-oob");
+}
+
 fn write_minimal_one_page_pdf(path: &std::path::Path) {
     let objects: Vec<&str> = vec![
         "<< /Type /Catalog /Pages 2 0 R >>",
