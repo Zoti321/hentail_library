@@ -1,6 +1,6 @@
 {
   "pdfium": {
-    "version": "chromium/6721",
+    "version": "chromium/7825",
     "source": "https://github.com/bblanchon/pdfium-binaries/releases",
     "artifacts": {
       "windows-x86_64": "pdfium-win-x64.tgz",
@@ -8,7 +8,11 @@
       "linux-x86_64": "pdfium-linux-x64.tgz",
       "linux-aarch64": "pdfium-linux-arm64.tgz",
       "macos-x86_64": "pdfium-mac-x64.tgz",
-      "macos-aarch64": "pdfium-mac-arm64.tgz"
+      "macos-aarch64": "pdfium-mac-arm64.tgz",
+      "android-arm": "pdfium-android-arm.tgz",
+      "android-arm64": "pdfium-android-arm64.tgz",
+      "android-x86": "pdfium-android-x86.tgz",
+      "android-x64": "pdfium-android-x64.tgz"
     }
   },
   "unrar": {

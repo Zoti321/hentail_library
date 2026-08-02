@@ -57,11 +57,19 @@ cargokit {
 
 // unrar-ng links libc++_shared; ship the NDK .so next to libhentai_flutter.so
 // so dlopen can resolve C++ typeinfo / exception symbols at runtime.
+// PDF uses vendored libpdfium.so (same jniLibs folder, bound by soname at runtime).
 def androidAbiToNdkTriple = [
     'armeabi-v7a': 'arm-linux-androideabi',
     'arm64-v8a'  : 'aarch64-linux-android',
     'x86'        : 'i686-linux-android',
     'x86_64'     : 'x86_64-linux-android',
+]
+
+def androidAbiToPdfiumVendor = [
+    'armeabi-v7a': 'android-arm',
+    'arm64-v8a'  : 'android-arm64',
+    'x86'        : 'android-x86',
+    'x86_64'     : 'android-x64',
 ]
 
 afterEvaluate {
@@ -70,6 +78,8 @@ afterEvaluate {
     ) ? 'windows-x86_64' : (org.apache.tools.ant.taskdefs.condition.Os.isFamily(
             org.apache.tools.ant.taskdefs.condition.Os.FAMILY_MAC
     ) ? 'darwin-x86_64' : 'linux-x86_64')
+
+    def pdfiumVendorRoot = file("${project.projectDir}/../../../core/vendor")
 
     tasks.matching { it.name.startsWith('cargokitCargoBuild') }.configureEach { cargoTask ->
         cargoTask.doLast {
@@ -101,6 +111,18 @@ afterEvaluate {
                 }
                 copy {
                     from src
+                    into destDir
+                }
+
+                def vendorKey = androidAbiToPdfiumVendor[abi]
+                def pdfiumSrc = new File(pdfiumVendorRoot, "${vendorKey}/libpdfium.so")
+                if (!pdfiumSrc.isFile()) {
+                    throw new GradleException(
+                            "libpdfium.so not found for ${abi} at ${pdfiumSrc}. Run: core/vendor/fetch-native-deps --android"
+                    )
+                }
+                copy {
+                    from pdfiumSrc
                     into destDir
                 }
             }

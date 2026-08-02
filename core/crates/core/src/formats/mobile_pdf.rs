@@ -1,3 +1,4 @@
+//! iOS-only PDF stub. Android uses `pdf.rs` + vendored libpdfium.so.
 use std::path::Path;
 
 use crate::error::HentaiError;

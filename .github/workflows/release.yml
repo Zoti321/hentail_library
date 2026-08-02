@@ -240,6 +240,9 @@ jobs:
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
           run-build-runner: "true"
 
+      - name: Fetch Android pdfium
+        run: bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh" --android
+
       - name: Configure Android release signing
         if: env.ANDROID_KEYSTORE_BASE64 != ''
         env:

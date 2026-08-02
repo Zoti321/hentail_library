@@ -40,6 +40,7 @@ fi
 
 if [[ $SKIP_NATIVE_DEPS -eq 0 ]]; then
   bash "$REPO_ROOT/core/vendor/fetch-native-deps.sh"
+  bash "$REPO_ROOT/core/vendor/fetch-native-deps.sh" --android
 fi
 
 echo "开发环境初始化完成。"

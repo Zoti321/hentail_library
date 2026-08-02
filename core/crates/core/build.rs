@@ -2,7 +2,8 @@ use std::env;
 use std::path::{Path, PathBuf};
 
 fn needs_pdfium_vendor(target: &str) -> bool {
-    !target.contains("android") && !target.contains("apple-ios")
+    // iOS remains on the mobile_pdf stub until a dedicated packaging pass.
+    !target.contains("apple-ios")
 }
 
 fn main() {
@@ -16,7 +17,7 @@ fn main() {
 
     if !platform_dir.is_dir() {
         panic!(
-            "缺少原生依赖目录: {}。请先运行 core/vendor/fetch-native-deps（或 fetch-native-deps.ps1）。",
+            "缺少原生依赖目录: {}。请先运行 core/vendor/fetch-native-deps（Android 需加 --android）。",
             platform_dir.display()
         );
     }
@@ -24,7 +25,7 @@ fn main() {
     let pdfium_lib = find_pdfium_library(&platform_dir);
     if pdfium_lib.is_none() {
         panic!(
-            "在 {} 中未找到 pdfium 动态库（pdfium.dll / libpdfium.so）。",
+            "在 {} 中未找到 pdfium 动态库（pdfium.dll / libpdfium.so / libpdfium.dylib）。",
             platform_dir.display()
         );
     }
@@ -34,16 +35,37 @@ fn main() {
         .unwrap_or(platform_dir)
         .display()
         .to_string();
-    println!("cargo:rustc-env=HENTAI_PDFIUM_LIB_DIR={lib_dir}");
+
     println!("cargo:rerun-if-changed={}", vendor_root.join("manifest.json").display());
     println!("cargo:rerun-if-env-changed=TARGET");
+
+    if target.contains("android") {
+        // Device load path ≠ host vendor path: verify + link NEEDED, bind by soname at runtime.
+        println!("cargo:rustc-link-search=native={lib_dir}");
+        println!("cargo:rustc-link-lib=dylib=pdfium");
+        return;
+    }
+
+    println!("cargo:rustc-env=HENTAI_PDFIUM_LIB_DIR={lib_dir}");
 }
 
 fn resolve_vendor_dir(vendor_root: &Path, target: &str) -> PathBuf {
     if let Ok(dir) = env::var("HENTAI_VENDOR_DIR") {
         return PathBuf::from(dir);
     }
-    let folder = if target.contains("windows") {
+    let folder = if target.contains("android") {
+        if target.contains("x86_64") {
+            "android-x64"
+        } else if target.contains("i686") {
+            "android-x86"
+        } else if target.contains("aarch64") {
+            "android-arm64"
+        } else if target.contains("arm") {
+            "android-arm"
+        } else {
+            panic!("不支持的 Android 目标平台 triple: {target}");
+        }
+    } else if target.contains("windows") {
         if target.contains("aarch64") {
             "windows-aarch64"
         } else {

@@ -1,6 +1,6 @@
-#[cfg(not(any(target_os = "android", target_os = "ios")))]
+#[cfg(not(target_os = "ios"))]
 mod pdf;
-#[cfg(any(target_os = "android", target_os = "ios"))]
+#[cfg(target_os = "ios")]
 #[path = "mobile_pdf.rs"]
 mod pdf;
 
