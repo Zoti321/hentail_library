@@ -2042,18 +2042,6 @@ abstract class AppLocalizations {
   /// **'作者&标签'**
   String get dialogEditMetadataTabAuthorsTags;
 
-  /// No description provided for @metadataFieldLockTooltip.
-  ///
-  /// In zh, this message translates to:
-  /// **'锁定：扫描时保留当前值'**
-  String get metadataFieldLockTooltip;
-
-  /// No description provided for @metadataFieldUnlockTooltip.
-  ///
-  /// In zh, this message translates to:
-  /// **'解锁：下次扫描可用解析值覆盖'**
-  String get metadataFieldUnlockTooltip;
-
   /// No description provided for @formSeriesNameLabel.
   ///
   /// In zh, this message translates to:

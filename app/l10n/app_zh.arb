@@ -524,8 +524,6 @@
   "dialogEditMetadataTitle": "编辑元数据",
   "dialogEditMetadataTabGeneral": "常规",
   "dialogEditMetadataTabAuthorsTags": "作者&标签",
-  "metadataFieldLockTooltip": "锁定：扫描时保留当前值",
-  "metadataFieldUnlockTooltip": "解锁：下次扫描可用解析值覆盖",
   "formSeriesNameLabel": "系列名称",
   "formSeriesSerializationStatusLabel": "连载状态",
   "formSeriesTotalCountLabel": "漫画总数",

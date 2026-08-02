@@ -524,8 +524,6 @@
   "dialogEditMetadataTitle": "Edit metadata",
   "dialogEditMetadataTabGeneral": "General",
   "dialogEditMetadataTabAuthorsTags": "Authors & tags",
-  "metadataFieldLockTooltip": "Lock: keep this value on scan",
-  "metadataFieldUnlockTooltip": "Unlock: allow scan to overwrite next time",
   "formSeriesNameLabel": "Series name",
   "formSeriesSerializationStatusLabel": "Serialization status",
   "formSeriesTotalCountLabel": "Total volumes",
