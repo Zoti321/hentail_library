@@ -1328,12 +1328,6 @@ abstract class AppLocalizations {
   /// **'请输入有效数字'**
   String get formSeriesItemSortOrderInvalid;
 
-  /// No description provided for @dialogEditSeriesItemSortOrderSavedToast.
-  ///
-  /// In zh, this message translates to:
-  /// **'排序已更新'**
-  String get dialogEditSeriesItemSortOrderSavedToast;
-
   /// No description provided for @seriesDetailNoComics.
   ///
   /// In zh, this message translates to:
@@ -2012,17 +2006,17 @@ abstract class AppLocalizations {
   /// **'已保存'**
   String get commonSavedToast;
 
+  /// No description provided for @commonSaveFailedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存失败'**
+  String get commonSaveFailedToast;
+
   /// No description provided for @dialogEditSeriesTitle.
   ///
   /// In zh, this message translates to:
   /// **'编辑系列'**
   String get dialogEditSeriesTitle;
-
-  /// No description provided for @dialogEditSeriesSavedToast.
-  ///
-  /// In zh, this message translates to:
-  /// **'系列信息已保存'**
-  String get dialogEditSeriesSavedToast;
 
   /// No description provided for @dialogEditMetadataTitle.
   ///

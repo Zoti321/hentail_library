@@ -140,9 +140,13 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           tags: tags,
         );
       });
-    } catch (error) {
+    } catch (_) {
       if (mounted) {
-        showErrorToast(context, error);
+        showCustomToast(
+          context,
+          message: context.l10n.commonSaveFailedToast,
+          type: AppToastType.error,
+        );
       }
     } finally {
       if (mounted) {
@@ -225,9 +229,13 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
         showSuccessToast(context, context.l10n.commonSavedToast);
         Navigator.of(context).pop();
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
-        showErrorToast(context, e);
+        showCustomToast(
+          context,
+          message: context.l10n.commonSaveFailedToast,
+          type: AppToastType.error,
+        );
       }
     } finally {
       if (mounted) {

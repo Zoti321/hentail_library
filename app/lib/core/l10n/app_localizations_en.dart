@@ -730,9 +730,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get formSeriesItemSortOrderInvalid => 'Enter a valid number';
 
   @override
-  String get dialogEditSeriesItemSortOrderSavedToast => 'Sort order updated';
-
-  @override
   String get seriesDetailNoComics => 'No comics in this series';
 
   @override
@@ -1102,10 +1099,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonSavedToast => 'Saved';
 
   @override
-  String get dialogEditSeriesTitle => 'Edit series';
+  String get commonSaveFailedToast => 'Save failed';
 
   @override
-  String get dialogEditSeriesSavedToast => 'Series info saved';
+  String get dialogEditSeriesTitle => 'Edit series';
 
   @override
   String get dialogEditMetadataTitle => 'Edit metadata';

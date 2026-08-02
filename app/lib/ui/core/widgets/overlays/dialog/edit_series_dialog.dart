@@ -73,9 +73,13 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
           totalCount: totalCount,
         );
       });
-    } catch (error) {
+    } catch (_) {
       if (mounted) {
-        showErrorToast(context, error);
+        showCustomToast(
+          context,
+          message: context.l10n.commonSaveFailedToast,
+          type: AppToastType.error,
+        );
       }
     } finally {
       if (mounted) {
@@ -103,12 +107,16 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
         ):
           setState(() => _validation = validation);
         case SeriesMetadataApplySucceeded():
-          showSuccessToast(context, context.l10n.dialogEditSeriesSavedToast);
+          showSuccessToast(context, context.l10n.commonSavedToast);
           Navigator.of(context).pop();
       }
-    } catch (error) {
+    } catch (_) {
       if (mounted) {
-        showErrorToast(context, error);
+        showCustomToast(
+          context,
+          message: context.l10n.commonSaveFailedToast,
+          type: AppToastType.error,
+        );
       }
     } finally {
       if (mounted) {

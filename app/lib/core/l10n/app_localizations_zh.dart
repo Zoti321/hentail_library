@@ -709,9 +709,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get formSeriesItemSortOrderInvalid => '请输入有效数字';
 
   @override
-  String get dialogEditSeriesItemSortOrderSavedToast => '排序已更新';
-
-  @override
   String get seriesDetailNoComics => '系列内暂无漫画';
 
   @override
@@ -1077,10 +1074,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get commonSavedToast => '已保存';
 
   @override
-  String get dialogEditSeriesTitle => '编辑系列';
+  String get commonSaveFailedToast => '保存失败';
 
   @override
-  String get dialogEditSeriesSavedToast => '系列信息已保存';
+  String get dialogEditSeriesTitle => '编辑系列';
 
   @override
   String get dialogEditMetadataTitle => '编辑元数据';

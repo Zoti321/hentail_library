@@ -95,15 +95,16 @@ class EditSeriesItemSortOrderDialog extends HookConsumerWidget {
       try {
         await onSubmit(parsed, lockedState.value);
         if (context.mounted) {
-          showSuccessToast(
-            context,
-            l10n.dialogEditSeriesItemSortOrderSavedToast,
-          );
+          showSuccessToast(context, l10n.commonSavedToast);
           Navigator.of(context).pop();
         }
-      } catch (error) {
+      } catch (_) {
         if (context.mounted) {
-          showErrorToast(context, error);
+          showCustomToast(
+            context,
+            message: l10n.commonSaveFailedToast,
+            type: AppToastType.error,
+          );
         }
       } finally {
         savingState.value = false;
