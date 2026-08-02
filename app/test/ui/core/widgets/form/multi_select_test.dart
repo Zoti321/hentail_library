@@ -94,6 +94,37 @@ void main() {
     expect(find.byIcon(Icons.lock), findsOneWidget);
   });
 
+  testWidgets(
+    'stacks label row above field with lock right of label, centers icon/label/lock',
+    (WidgetTester tester) async {
+      await pumpMultiSelect(
+        tester,
+        labelTrailing: IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.lock, size: 16),
+        ),
+      );
+
+      final Finder labelFinder = find.text('标签');
+      final Finder iconFinder = find.byIcon(LucideIcons.tag);
+      final Finder lockFinder = find.byIcon(Icons.lock);
+      final Finder fieldFinder = find.byKey(MultiSelect.fieldSurfaceKey);
+
+      final Rect labelRect = tester.getRect(labelFinder);
+      final Rect iconRect = tester.getRect(iconFinder);
+      final Rect lockRect = tester.getRect(lockFinder);
+      final Rect fieldRect = tester.getRect(fieldFinder);
+
+      expect(fieldRect.top, greaterThan(labelRect.bottom));
+      expect(iconRect.right, lessThan(labelRect.left));
+      expect(lockRect.left, greaterThan(labelRect.right));
+
+      final double labelCenterY = labelRect.center.dy;
+      expect((iconRect.center.dy - labelCenterY).abs(), lessThan(2.0));
+      expect((lockRect.center.dy - labelCenterY).abs(), lessThan(2.0));
+    },
+  );
+
   testWidgets('shows selected names as removable chips in the field', (
     WidgetTester tester,
   ) async {
