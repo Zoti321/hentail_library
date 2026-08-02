@@ -4,6 +4,7 @@ export 'features/reader/reader.dart';
 export 'features/settings/settings.dart';
 export 'features/shell/di/deps.dart';
 export 'features/shell/state/aggregates.dart';
+export 'features/shell/state/metadata_refresh_controller.dart';
 export 'features/shell/state/scan_library_controller.dart';
 export 'features/shell/view_models/debouncer.dart';
 export 'features/shell/view_models/history_paged_feed_controller.dart';

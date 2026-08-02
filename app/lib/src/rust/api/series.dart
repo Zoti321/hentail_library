@@ -9,7 +9,7 @@ import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_series_list`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Stream<List<SeriesDto>> watchAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesWatchAllSeriesFrb();
@@ -118,6 +118,12 @@ List<SeriesComicOrderEntryDto> loadHomeSeriesComicOrderMapFrb() =>
 Stream<List<SeriesComicOrderEntryDto>> watchHomeSeriesComicOrderMapFrb() =>
     RustLib.instance.api.crateApiSeriesWatchHomeSeriesComicOrderMapFrb();
 
+Stream<RefreshSeriesProgressFrbDto> refreshSeriesMetadataFrb({
+  required String seriesId,
+}) => RustLib.instance.api.crateApiSeriesRefreshSeriesMetadataFrb(
+  seriesId: seriesId,
+);
+
 class PagedSeriesComicsResultDto {
   final List<SeriesComicPageItemDto> items;
   final PlatformInt64 totalCount;
@@ -172,6 +178,62 @@ class PagedSeriesResultDto {
           totalCount == other.totalCount &&
           page == other.page &&
           pageSize == other.pageSize;
+}
+
+class RefreshSeriesProgressFrbDto {
+  final int current;
+  final int total;
+  final String? comicId;
+  final int succeeded;
+  final int failed;
+
+  const RefreshSeriesProgressFrbDto({
+    required this.current,
+    required this.total,
+    this.comicId,
+    required this.succeeded,
+    required this.failed,
+  });
+
+  @override
+  int get hashCode =>
+      current.hashCode ^
+      total.hashCode ^
+      comicId.hashCode ^
+      succeeded.hashCode ^
+      failed.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RefreshSeriesProgressFrbDto &&
+          runtimeType == other.runtimeType &&
+          current == other.current &&
+          total == other.total &&
+          comicId == other.comicId &&
+          succeeded == other.succeeded &&
+          failed == other.failed;
+}
+
+class RefreshSeriesResultFrbDto {
+  final int succeeded;
+  final int failed;
+
+  const RefreshSeriesResultFrbDto({
+    required this.succeeded,
+    required this.failed,
+  });
+
+  @override
+  int get hashCode => succeeded.hashCode ^ failed.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RefreshSeriesResultFrbDto &&
+          runtimeType == other.runtimeType &&
+          succeeded == other.succeeded &&
+          failed == other.failed;
 }
 
 class SeriesComicOrderEntryDto {

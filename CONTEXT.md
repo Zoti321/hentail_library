@@ -75,8 +75,12 @@ _Avoid_: 漫画表单、元数据 DTO
 _Avoid_: 系列表单、SeriesForm、编辑系列 DTO
 
 **Metadata field lock**:
-Comic / Series 元数据字段上的布尔锁（Komga 式）。未锁定且 Library sync 解析出有值时用扫描结果覆盖；已锁定则保留库内值；扫描空/缺不清除。编辑某字段并保存会自动锁定该字段（仅变更字段）；也可不改值单独上锁/解锁。解锁不自动触发 sync。详见 ADR-0007。
+Comic / Series 元数据字段上的布尔锁（Komga 式）。未锁定且 Library sync 或 Metadata refresh 解析出有值时用扫描结果覆盖；已锁定则保留库内值；扫描空/缺不清除。编辑某字段并保存会自动锁定该字段（仅变更字段）；也可不改值单独上锁/解锁。解锁不自动触发 sync / refresh。详见 ADR-0007。
 _Avoid_: 只读标记、冻结、保护位（口语可用，领域用 Metadata field lock）
+
+**Metadata refresh**:
+对单个 Comic 或 Series 从磁盘 Resource 重解析元数据并按 Metadata field lock 写回的操作（对齐 Komga「Refresh metadata」）。Comic：重解析该 Resource，更新物理字段，不动缩略图。Series：对每个成员执行 Comic 刷新，并在 `name` 未锁定时用文件夹名覆盖；不改连载状态、计划总卷数、成员排序与缩略图；部分成员失败则跳过并汇总。与 Library sync 全局单飞互斥。不是库页工具栏的「刷新」（后者仅重载 UI catalog），也不是全库 Library sync。
+_Avoid_: 刷新、重新扫描、同步（易与 UI catalog refresh / Library sync 混淆）
 
 **Healthy mode**:
 应用级浏览过滤：开启后库、搜索、历史等视图隐藏 `contentRating == r18` 的 Comic；不修改 Comic 自身的分级。

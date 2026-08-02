@@ -263,6 +263,13 @@ pub fn set_comic_meta_locks_frb(
     .map_err(HentaiErrorDto::from)
 }
 
+#[flutter_rust_bridge::frb]
+pub async fn refresh_comic_metadata_frb(comic_id: String) -> Result<(), HentaiErrorDto> {
+    hentai_core::refresh_comic_metadata(&comic_id)
+        .await
+        .map_err(HentaiErrorDto::from)
+}
+
 #[flutter_rust_bridge::frb(sync)]
 pub fn search_by_tag_expression_frb(
     must_include: Vec<String>,

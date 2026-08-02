@@ -660,6 +660,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comicDetailEditMetadata => 'Edit metadata';
 
   @override
+  String get refreshMetadata => 'Refresh metadata';
+
+  @override
+  String get refreshMetadataComicSuccess => 'Metadata refreshed';
+
+  @override
+  String get refreshMetadataComicFailed => 'Failed to refresh metadata';
+
+  @override
+  String get refreshMetadataBusy =>
+      'Library sync or metadata refresh is in progress';
+
+  @override
+  String get refreshMetadataSeriesDialogTitle => 'Refresh series metadata';
+
+  @override
+  String refreshMetadataSeriesProgress(int current, int total) {
+    return 'Refreshing $current/$total';
+  }
+
+  @override
+  String refreshMetadataSeriesDone(int succeeded, int failed) {
+    return 'Done: $succeeded succeeded, $failed failed';
+  }
+
+  @override
   String get comicDetailShowInExplorer => 'Show in file explorer';
 
   @override

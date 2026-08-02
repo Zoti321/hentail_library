@@ -230,7 +230,10 @@ async fn delete_comics_side_effects_batch<C: ConnectionTrait>(
     Ok(())
 }
 
-async fn upsert_comics<C: ConnectionTrait>(db: &C, comics_list: &[ComicDto]) -> Result<(), HentaiError> {
+pub(crate) async fn upsert_comics<C: ConnectionTrait>(
+    db: &C,
+    comics_list: &[ComicDto],
+) -> Result<(), HentaiError> {
     for comic in comics_list {
         if comic.page_count <= 0 {
             continue;

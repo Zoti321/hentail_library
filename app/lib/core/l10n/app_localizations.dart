@@ -1196,6 +1196,48 @@ abstract class AppLocalizations {
   /// **'编辑元数据'**
   String get comicDetailEditMetadata;
 
+  /// No description provided for @refreshMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'刷新元数据'**
+  String get refreshMetadata;
+
+  /// No description provided for @refreshMetadataComicSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'已刷新元数据'**
+  String get refreshMetadataComicSuccess;
+
+  /// No description provided for @refreshMetadataComicFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'刷新元数据失败'**
+  String get refreshMetadataComicFailed;
+
+  /// No description provided for @refreshMetadataBusy.
+  ///
+  /// In zh, this message translates to:
+  /// **'库同步或元数据刷新进行中'**
+  String get refreshMetadataBusy;
+
+  /// No description provided for @refreshMetadataSeriesDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'刷新系列元数据'**
+  String get refreshMetadataSeriesDialogTitle;
+
+  /// No description provided for @refreshMetadataSeriesProgress.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在刷新 {current}/{total}'**
+  String refreshMetadataSeriesProgress(int current, int total);
+
+  /// No description provided for @refreshMetadataSeriesDone.
+  ///
+  /// In zh, this message translates to:
+  /// **'完成：成功 {succeeded}，失败 {failed}'**
+  String refreshMetadataSeriesDone(int succeeded, int failed);
+
   /// No description provided for @comicDetailShowInExplorer.
   ///
   /// In zh, this message translates to:

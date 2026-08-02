@@ -314,6 +314,25 @@
   "comicDetailRead": "Read",
   "comicDetailReadIncognito": "Read incognito",
   "comicDetailEditMetadata": "Edit metadata",
+  "refreshMetadata": "Refresh metadata",
+  "refreshMetadataComicSuccess": "Metadata refreshed",
+  "refreshMetadataComicFailed": "Failed to refresh metadata",
+  "refreshMetadataBusy": "Library sync or metadata refresh is in progress",
+  "refreshMetadataSeriesDialogTitle": "Refresh series metadata",
+  "refreshMetadataSeriesProgress": "Refreshing {current}/{total}",
+  "@refreshMetadataSeriesProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "refreshMetadataSeriesDone": "Done: {succeeded} succeeded, {failed} failed",
+  "@refreshMetadataSeriesDone": {
+    "placeholders": {
+      "succeeded": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "comicDetailShowInExplorer": "Show in file explorer",
   "comicDetailShowInExplorerFailed": "Could not show this item in File Explorer",
   "comicDetailDelete": "Delete",

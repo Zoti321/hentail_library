@@ -641,6 +641,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get comicDetailEditMetadata => '编辑元数据';
 
   @override
+  String get refreshMetadata => '刷新元数据';
+
+  @override
+  String get refreshMetadataComicSuccess => '已刷新元数据';
+
+  @override
+  String get refreshMetadataComicFailed => '刷新元数据失败';
+
+  @override
+  String get refreshMetadataBusy => '库同步或元数据刷新进行中';
+
+  @override
+  String get refreshMetadataSeriesDialogTitle => '刷新系列元数据';
+
+  @override
+  String refreshMetadataSeriesProgress(int current, int total) {
+    return '正在刷新 $current/$total';
+  }
+
+  @override
+  String refreshMetadataSeriesDone(int succeeded, int failed) {
+    return '完成：成功 $succeeded，失败 $failed';
+  }
+
+  @override
   String get comicDetailShowInExplorer => '在资源管理器中显示';
 
   @override

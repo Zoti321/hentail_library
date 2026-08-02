@@ -33,8 +33,10 @@ pub use db::{connection, db_config, init_db, init_db_at_path};
 pub use error::{HentaiError, HentaiErrorCode};
 pub use path::{add_path, list_all_paths, remove_path, watch_paths};
 pub use sync::{
-    FormatGroup, LibrarySyncCountsDto, SyncHandle, SyncLibraryPhaseDto, SyncLibraryProgressDto,
-    SyncLibraryRouteDto, SyncScanMode, cancel_sync, create_sync_handle, sync_library,
+    FormatGroup, LibrarySyncCountsDto, RefreshSeriesProgressDto, RefreshSeriesResultDto,
+    SyncHandle, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto, SyncScanMode,
+    cancel_sync, create_sync_handle, refresh_comic_metadata, refresh_series_metadata,
+    sync_library, try_acquire_library_write_lock,
 };
 pub use reader::{
     ReaderPageDto, ReaderPageListDto, clear_reader_page_cache, clear_reader_sessions,

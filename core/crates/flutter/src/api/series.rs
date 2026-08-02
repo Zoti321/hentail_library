@@ -447,3 +447,40 @@ pub async fn watch_home_series_comic_order_map_frb(
         .await,
     )
 }
+
+#[derive(Debug, Clone)]
+pub struct RefreshSeriesProgressFrbDto {
+    pub current: i32,
+    pub total: i32,
+    pub comic_id: Option<String>,
+    pub succeeded: i32,
+    pub failed: i32,
+}
+
+#[derive(Debug, Clone)]
+pub struct RefreshSeriesResultFrbDto {
+    pub succeeded: i32,
+    pub failed: i32,
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn refresh_series_metadata_frb(
+    series_id: String,
+    sink: crate::frb_generated::StreamSink<RefreshSeriesProgressFrbDto>,
+) -> Result<RefreshSeriesResultFrbDto, HentaiErrorDto> {
+    let result = hentai_core::refresh_series_metadata(&series_id, |progress| {
+        let _ = sink.add(RefreshSeriesProgressFrbDto {
+            current: progress.current,
+            total: progress.total,
+            comic_id: progress.comic_id,
+            succeeded: progress.succeeded,
+            failed: progress.failed,
+        });
+    })
+    .await
+    .map_err(HentaiErrorDto::from)?;
+    Ok(RefreshSeriesResultFrbDto {
+        succeeded: result.succeeded,
+        failed: result.failed,
+    })
+}

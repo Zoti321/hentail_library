@@ -135,6 +135,15 @@ class _ComicDetailOverflowMenuButtonState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _ComicDetailOverflowMenuItem(
+                icon: LucideIcons.refreshCw,
+                label: l10n.refreshMetadata,
+                enabled: !_isLibraryWriteBusy(ref),
+                onTap: () {
+                  _controller.hideMenu();
+                  _refreshMetadata(context);
+                },
+              ),
+              _ComicDetailOverflowMenuItem(
                 icon: LucideIcons.folderOpen,
                 label: l10n.comicDetailShowInExplorer,
                 onTap: () {
@@ -188,6 +197,29 @@ class _ComicDetailOverflowMenuButtonState
     );
   }
 
+  bool _isLibraryWriteBusy(WidgetRef ref) {
+    return ref.watch(scanLibraryControllerProvider).running ||
+        ref.watch(metadataRefreshControllerProvider).running;
+  }
+
+  Future<void> _refreshMetadata(BuildContext context) async {
+    final AppLocalizations l10n = context.l10n;
+    try {
+      await ref.read(metadataRefreshControllerProvider.notifier).refreshComic(
+            comicId: widget.comic.comicId,
+            title: widget.comic.title,
+          );
+      if (!context.mounted) {
+        return;
+      }
+      showSuccessToast(context, l10n.refreshMetadataComicSuccess);
+    } catch (err) {
+      if (context.mounted) {
+        showErrorToast(context, err);
+      }
+    }
+  }
+
   Future<void> _confirmDelete(BuildContext context) async {
     final AppLocalizations l10n = context.l10n;
     final bool? confirmed = await showDialog<bool>(
@@ -227,25 +259,33 @@ class _ComicDetailOverflowMenuItem extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onTap,
+    this.enabled = true,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final Color fg = enabled
+        ? cs.hentai.iconDefault
+        : cs.hentai.iconDefault.withValues(alpha: 0.38);
+    final Color text = enabled
+        ? cs.hentai.textPrimary
+        : cs.hentai.textPrimary.withValues(alpha: 0.38);
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap,
+        onTap: enabled ? onTap : null,
         hoverColor: cs.primary.withAlpha(10),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           child: Row(
             children: <Widget>[
-              Icon(icon, size: 16, color: cs.hentai.iconDefault),
+              Icon(icon, size: 16, color: fg),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -253,7 +293,7 @@ class _ComicDetailOverflowMenuItem extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: cs.hentai.textPrimary,
+                    color: text,
                   ),
                 ),
               ),
