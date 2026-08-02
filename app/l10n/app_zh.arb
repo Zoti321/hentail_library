@@ -647,7 +647,6 @@
   "confirmRemovePathContent": "将从库中移除该路径。此操作不可撤销。",
   "confirmClearHistoryTitle": "确认清空",
   "confirmClearHistoryContent": "将清空全部阅读历史记录。此操作不可撤销。",
-  "contextMenuGoToDetail": "跳转到详情页",
   "breadcrumbReturnLibrary": "返回漫画库",
   "breadcrumbReturnLibraryWithTrail": "返回漫画库，当前：{trail}",
   "@breadcrumbReturnLibraryWithTrail": {

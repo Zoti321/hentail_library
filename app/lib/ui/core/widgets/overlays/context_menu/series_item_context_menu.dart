@@ -4,7 +4,6 @@ import 'package:hentai_library/ui/core/widgets/overlays/context_menu/common.dart
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum SeriesItemContextAction {
-  goToDetail,
   editSortOrder,
   showInExplorer,
 }
@@ -20,7 +19,7 @@ class SeriesItemContextMenu {
       context,
       position: position,
       width: 236,
-      height: 196,
+      height: 152,
       builder: (VoidCallback onClose) =>
           _MenuContent(title: comicTitle, onClose: onClose, onAction: onAction),
     );
@@ -54,11 +53,6 @@ class _MenuContent extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            ContextMenuActionItem(
-              icon: LucideIcons.info,
-              label: l10n.contextMenuGoToDetail,
-              onTap: () => handleAction(SeriesItemContextAction.goToDetail),
-            ),
             ContextMenuActionItem(
               icon: LucideIcons.pencil,
               label: l10n.seriesItemEditSortOrder,

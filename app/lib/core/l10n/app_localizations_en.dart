@@ -1338,9 +1338,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'All reading history will be cleared. This cannot be undone.';
 
   @override
-  String get contextMenuGoToDetail => 'Go to details';
-
-  @override
   String get breadcrumbReturnLibrary => 'Back to library';
 
   @override

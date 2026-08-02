@@ -12,7 +12,6 @@ import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/series_item_context_menu.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_series_item_sort_order_dialog.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -40,9 +39,11 @@ class SeriesDetailComicCard extends HookConsumerWidget {
     return CatalogCoverCardShell(
       onTap: onTap,
       onSecondaryTapUp: (TapUpDetails details) {
-        _showContextMenu(context, ref, details);
+        _showContextMenu(context, ref, details.globalPosition);
       },
-      onLongPress: () => _showContextMenuAtCenter(context, ref),
+      onLongPressStart: (LongPressStartDetails details) {
+        _showContextMenu(context, ref, details.globalPosition);
+      },
       cover: _SeriesDetailComicCover(
         comicId: comic.comicId,
         gridIndex: gridIndex,
@@ -69,21 +70,7 @@ class SeriesDetailComicCard extends HookConsumerWidget {
     );
   }
 
-  void _showContextMenuAtCenter(BuildContext context, WidgetRef ref) {
-    final RenderBox box = context.findRenderObject()! as RenderBox;
-    final Offset center = box.localToGlobal(box.size.center(Offset.zero));
-    _showContextMenuAt(context, ref, center);
-  }
-
   void _showContextMenu(
-    BuildContext context,
-    WidgetRef ref,
-    TapUpDetails details,
-  ) {
-    _showContextMenuAt(context, ref, details.globalPosition);
-  }
-
-  void _showContextMenuAt(
     BuildContext context,
     WidgetRef ref,
     Offset globalPosition,
@@ -109,11 +96,6 @@ class SeriesDetailComicCard extends HookConsumerWidget {
   ) {
     final l10n = context.l10n;
     switch (action) {
-      case SeriesItemContextAction.goToDetail:
-        appRouter.pushNamed(
-          '漫画详情',
-          pathParameters: <String, String>{'id': item.comic.comicId},
-        );
       case SeriesItemContextAction.editSortOrder:
         _openSortOrderDialog(context, ref);
       case SeriesItemContextAction.showInExplorer:

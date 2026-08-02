@@ -2420,12 +2420,6 @@ abstract class AppLocalizations {
   /// **'将清空全部阅读历史记录。此操作不可撤销。'**
   String get confirmClearHistoryContent;
 
-  /// No description provided for @contextMenuGoToDetail.
-  ///
-  /// In zh, this message translates to:
-  /// **'跳转到详情页'**
-  String get contextMenuGoToDetail;
-
   /// No description provided for @breadcrumbReturnLibrary.
   ///
   /// In zh, this message translates to:

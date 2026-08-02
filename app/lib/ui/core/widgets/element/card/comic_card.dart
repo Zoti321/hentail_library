@@ -33,7 +33,10 @@ class ComicCard extends ConsumerWidget {
     return CatalogCoverCardShell(
       onTap: onTap,
       onSecondaryTapUp: (TapUpDetails details) {
-        _showContextMenu(context, ref, details);
+        _showContextMenu(context, ref, details.globalPosition);
+      },
+      onLongPressStart: (LongPressStartDetails details) {
+        _showContextMenu(context, ref, details.globalPosition);
       },
       cover: ComicCoverContent(comicId: comic.comicId, gridIndex: gridIndex),
       info: (bool isHover) => _ComicCardInfo(
@@ -47,13 +50,11 @@ class ComicCard extends ConsumerWidget {
   void _showContextMenu(
     BuildContext context,
     WidgetRef ref,
-    TapUpDetails details,
+    Offset globalPosition,
   ) {
     final RenderBox overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox;
-    final Offset relativePosition = overlay.globalToLocal(
-      details.globalPosition,
-    );
+    final Offset relativePosition = overlay.globalToLocal(globalPosition);
 
     ComicContextMenu.show(
       context,

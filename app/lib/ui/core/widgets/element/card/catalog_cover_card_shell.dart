@@ -13,14 +13,14 @@ class CatalogCoverCardShell extends HookWidget {
     required this.info,
     this.onTap,
     this.onSecondaryTapUp,
-    this.onLongPress,
+    this.onLongPressStart,
   });
 
   final Widget cover;
   final Widget Function(bool isHover) info;
   final VoidCallback? onTap;
   final GestureTapUpCallback? onSecondaryTapUp;
-  final VoidCallback? onLongPress;
+  final GestureLongPressStartCallback? onLongPressStart;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class CatalogCoverCardShell extends HookWidget {
       child: GestureDetector(
         onTap: onTap,
         onSecondaryTapUp: onSecondaryTapUp,
-        onLongPress: onLongPress,
+        onLongPressStart: onLongPressStart,
         child: MouseRegion(
           cursor: onTap != null
               ? SystemMouseCursors.click

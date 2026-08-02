@@ -647,7 +647,6 @@
   "confirmRemovePathContent": "This path will be removed from the library. This cannot be undone.",
   "confirmClearHistoryTitle": "Confirm clear",
   "confirmClearHistoryContent": "All reading history will be cleared. This cannot be undone.",
-  "contextMenuGoToDetail": "Go to details",
   "breadcrumbReturnLibrary": "Back to library",
   "breadcrumbReturnLibraryWithTrail": "Back to library, current: {trail}",
   "@breadcrumbReturnLibraryWithTrail": {

@@ -1306,9 +1306,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmClearHistoryContent => '将清空全部阅读历史记录。此操作不可撤销。';
 
   @override
-  String get contextMenuGoToDetail => '跳转到详情页';
-
-  @override
   String get breadcrumbReturnLibrary => '返回漫画库';
 
   @override
