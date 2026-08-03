@@ -7,6 +7,7 @@ pub mod db;
 pub mod entity;
 pub mod error;
 pub mod formats;
+pub mod metadata_lock;
 pub mod migration;
 pub mod path;
 pub mod reader;

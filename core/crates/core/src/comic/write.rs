@@ -5,6 +5,7 @@ use crate::comic::repository::load_comics_ordered;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comics};
 use crate::error::HentaiError;
+use crate::metadata_lock::comic_auto_locks;
 use crate::sync::series_rebuild::rebuild_series_from_comics;
 use crate::sync::writer::{replace_comic_authors, replace_comic_tags};
 use crate::util::decode_basic_html_entities;
@@ -79,6 +80,14 @@ pub async fn update_comic_user_meta(
         || meta.published_at.is_some()
         || meta.authors.is_some()
         || meta.tags.is_some();
+    let auto_locks = comic_auto_locks(
+        meta.title.is_some(),
+        meta.description.is_some(),
+        meta.published_at.is_some(),
+        meta.content_rating.is_some(),
+        meta.authors.is_some(),
+        meta.tags.is_some(),
+    );
     if touch_meta_row {
         let mut active = comic_meta::ActiveModel {
             comic_id: Set(comic_id.to_string()),
@@ -86,12 +95,10 @@ pub async fn update_comic_user_meta(
         };
         if let Some(title) = meta.title {
             active.title = Set(decode_basic_html_entities(&title));
-            active.title_locked = Set(true);
             meta_touched = true;
         }
         if let Some(content_rating) = meta.content_rating {
             active.content_rating = Set(content_rating);
-            active.content_rating_locked = Set(true);
             meta_touched = true;
         }
         if let Some(description) = meta.description {
@@ -100,7 +107,6 @@ pub async fn update_comic_user_meta(
             } else {
                 Some(description)
             });
-            active.description_locked = Set(true);
             meta_touched = true;
         }
         if let Some(published_at) = meta.published_at {
@@ -109,19 +115,31 @@ pub async fn update_comic_user_meta(
             } else {
                 Some(published_at)
             });
-            active.published_at_locked = Set(true);
             meta_touched = true;
         }
-        if meta.authors.is_some() {
+        if auto_locks.title {
+            active.title_locked = Set(true);
+        }
+        if auto_locks.description {
+            active.description_locked = Set(true);
+        }
+        if auto_locks.published_at {
+            active.published_at_locked = Set(true);
+        }
+        if auto_locks.content_rating {
+            active.content_rating_locked = Set(true);
+        }
+        if auto_locks.authors {
             active.authors_locked = Set(true);
             meta_touched = true;
         }
-        if meta.tags.is_some() {
+        if auto_locks.tags {
             active.tags_locked = Set(true);
             meta_touched = true;
         }
-        if meta_touched {
+        if meta_touched || auto_locks.any() {
             active.update(&txn).await.map_err(map_db_err)?;
+            meta_touched = true;
         }
     }
     if let Some(authors) = meta.authors {

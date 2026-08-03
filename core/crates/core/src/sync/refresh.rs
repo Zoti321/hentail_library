@@ -8,8 +8,11 @@ use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
 use crate::series_id::series_name_from_folder_path;
 
+use crate::metadata_lock::{
+    merge_kept_scan_with_existing, merge_series_name, series_name_needs_write,
+};
+
 use super::library_lock::try_acquire_library_write_lock;
-use super::merge::merge_kept_scan_with_existing;
 use super::parser::{parse_file, parsed_to_comic};
 use super::writer::upsert_comics;
 
@@ -111,13 +114,15 @@ pub async fn refresh_series_metadata(
         });
     }
 
-    if !series_row.name_locked {
-        let folder_name = series_name_from_folder_path(&series_row.folder_path);
-        if !folder_name.trim().is_empty() && folder_name != series_row.name {
-            let mut active: series::ActiveModel = series_row.into();
-            active.name = Set(folder_name);
-            active.update(&db).await.map_err(map_db_err)?;
-        }
+    let folder_name = series_name_from_folder_path(&series_row.folder_path);
+    if series_name_needs_write(series_row.name_locked, &series_row.name, &folder_name) {
+        let mut active: series::ActiveModel = series_row.clone().into();
+        active.name = Set(merge_series_name(
+            series_row.name_locked,
+            &series_row.name,
+            &folder_name,
+        ));
+        active.update(&db).await.map_err(map_db_err)?;
     }
 
     let result = RefreshSeriesResultDto { succeeded, failed };

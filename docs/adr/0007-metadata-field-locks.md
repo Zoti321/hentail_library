@@ -63,3 +63,4 @@ Komga 的模型是：字段级锁；编辑自动上锁；未锁定且刷新源�
 - `CONTEXT.md` — Comic metadata form / Series metadata form / Library sync
 - ADR-0006 — Series item sort order lock
 - Komga Edit Metadata — field locks
+- Implementation locality: `core/crates/core/src/metadata_lock/` (Comic merge、Series name / sort resolve、user-meta auto-lock)；Library sync / Metadata refresh / comic·series write 共用该 interface

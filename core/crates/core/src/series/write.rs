@@ -3,6 +3,7 @@ use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
 use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
+use crate::metadata_lock::series_auto_locks;
 
 #[derive(Debug, Clone, Default)]
 pub struct UpdateSeriesUserMetaDto {
@@ -38,6 +39,11 @@ pub async fn update_series_user_meta(
         .map_err(map_db_err)?
         .ok_or_else(|| HentaiError::validation(format!("系列不存在: {series_id}")))?;
 
+    let auto_locks = series_auto_locks(
+        meta.name.is_some(),
+        meta.serialization_status.is_some(),
+        meta.total_count.is_some() || meta.clear_total_count,
+    );
     let mut active: series::ActiveModel = existing.into();
     if let Some(name) = meta.name {
         let trimmed = name.trim();
@@ -45,17 +51,22 @@ pub async fn update_series_user_meta(
             return Err(HentaiError::validation("系列名称不能为空".to_string()));
         }
         active.name = Set(trimmed.to_string());
-        active.name_locked = Set(true);
     }
     if let Some(serialization_status) = meta.serialization_status {
         active.serialization_status = Set(serialization_status);
-        active.serialization_status_locked = Set(true);
     }
     if meta.clear_total_count {
         active.total_count = Set(None);
-        active.total_count_locked = Set(true);
     } else if let Some(total_count) = meta.total_count {
         active.total_count = Set(Some(total_count));
+    }
+    if auto_locks.name {
+        active.name_locked = Set(true);
+    }
+    if auto_locks.serialization_status {
+        active.serialization_status_locked = Set(true);
+    }
+    if auto_locks.total_count {
         active.total_count_locked = Set(true);
     }
     active.update(&db).await.map_err(map_db_err)?;

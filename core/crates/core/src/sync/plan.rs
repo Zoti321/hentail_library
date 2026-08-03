@@ -7,7 +7,7 @@ use crate::db::map_db_err;
 use crate::entity::prelude::*;
 use crate::error::HentaiError;
 
-use super::merge::merge_kept_scan_with_existing;
+use crate::metadata_lock::merge_kept_scan_with_existing;
 use super::migrate::{
     detect_path_migration_pairs, migrated_id_sets, ComicMigration, ComicMigrationPair,
 };

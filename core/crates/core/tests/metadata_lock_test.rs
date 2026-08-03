@@ -1,5 +1,8 @@
 use hentai_core::comic::{ComicDto, ComicMetaLocks};
-use hentai_core::sync::merge::merge_kept_scan_with_existing;
+use hentai_core::metadata_lock::{
+    comic_auto_locks, merge_kept_scan_with_existing, merge_series_name,
+    resolve_member_sort_order, series_auto_locks, series_name_needs_write,
+};
 
 fn comic(
     id: &str,
@@ -163,4 +166,62 @@ fn merge_kept_always_overwrites_resource_size_from_scan() {
     existing.resource_size = 0;
     let merged = merge_kept_scan_with_existing(&scanned, &existing);
     assert_eq!(merged.resource_size, 4096);
+}
+
+#[test]
+fn series_name_unlocked_takes_folder_name() {
+    assert_eq!(
+        merge_series_name(false, "旧名", "文件夹名"),
+        "文件夹名"
+    );
+    assert!(series_name_needs_write(false, "旧名", "文件夹名"));
+}
+
+#[test]
+fn series_name_locked_preserves_existing() {
+    assert_eq!(
+        merge_series_name(true, "用户名", "文件夹名"),
+        "用户名"
+    );
+    assert!(!series_name_needs_write(true, "用户名", "文件夹名"));
+}
+
+#[test]
+fn series_name_unlocked_empty_folder_keeps_existing() {
+    assert_eq!(merge_series_name(false, "旧名", "  "), "旧名");
+    assert!(!series_name_needs_write(false, "旧名", "  "));
+}
+
+#[test]
+fn series_name_needs_write_false_when_unchanged() {
+    assert!(!series_name_needs_write(false, "同名", "同名"));
+}
+
+#[test]
+fn member_sort_order_locked_keeps_value() {
+    assert_eq!(
+        resolve_member_sort_order(Some(3.5), 1.0),
+        (3.5, true)
+    );
+}
+
+#[test]
+fn member_sort_order_unlocked_uses_natural_index() {
+    assert_eq!(resolve_member_sort_order(None, 2.0), (2.0, false));
+}
+
+#[test]
+fn comic_auto_locks_only_written_fields() {
+    let locks = comic_auto_locks(true, false, false, true, false, false);
+    assert!(locks.title);
+    assert!(!locks.description);
+    assert!(locks.content_rating);
+    assert!(locks.any());
+}
+
+#[test]
+fn series_auto_locks_includes_clear_total_count() {
+    let locks = series_auto_locks(false, false, true);
+    assert!(locks.total_count);
+    assert!(!locks.name);
 }

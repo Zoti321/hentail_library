@@ -58,11 +58,11 @@ fn merge_list(locked: bool, existing: &[String], scanned: &[String]) -> Vec<Stri
     }
 }
 
-/// 保留漫画扫描合并：更新物理字段，并按字段锁合并元数据。
+/// Keep-path Comic merge for Library sync / Metadata refresh.
 ///
-/// - 已锁定：保留库内值
-/// - 未锁定且扫描有值：用扫描结果覆盖
-/// - 未锁定且扫描空/缺：保留库内值（不清除）
+/// - Locked → keep library value
+/// - Unlocked + scanned present → take scan
+/// - Unlocked + scanned empty/missing → keep library value (do not clear)
 pub fn merge_kept_scan_with_existing(scanned: &ComicDto, existing: &ComicDto) -> ComicDto {
     let source_changed =
         existing.path != scanned.path || existing.resource_type != scanned.resource_type;

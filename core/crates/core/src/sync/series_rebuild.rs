@@ -7,6 +7,7 @@ use sea_orm::{
 
 use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
+use crate::metadata_lock::{merge_series_name, resolve_member_sort_order};
 use crate::series_id::{
     folder_path_from_comic_path, series_id_from_folder_path, series_name_from_folder_path,
 };
@@ -53,11 +54,12 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
         if let Some(existing_row) = existing {
             let mut active: series::ActiveModel = existing_row.clone().into();
             active.folder_path = Set(folder_path);
-            // Unlocked name → folder-derived; locked name preserved.
             // serialization_status / total_count have no scan source → never overwritten.
-            if !existing_row.name_locked {
-                active.name = Set(name);
-            }
+            active.name = Set(merge_series_name(
+                existing_row.name_locked,
+                &existing_row.name,
+                &name,
+            ));
             active.update(db).await.map_err(crate::db::map_db_err)?;
         } else {
             Series::insert(series::ActiveModel {
@@ -92,12 +94,11 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
             .await
             .map_err(crate::db::map_db_err)?;
 
-        // Komga sortBooks: unlocked → natural-order index (1-based); locked keep value.
         for (index, (comic_id, _)) in entries.iter().enumerate() {
-            let (sort_order, sort_order_locked) = match locked_orders.get(comic_id) {
-                Some(&locked_order) => (locked_order, true),
-                None => ((index as i32 + 1) as f64, false),
-            };
+            let (sort_order, sort_order_locked) = resolve_member_sort_order(
+                locked_orders.get(comic_id).copied(),
+                (index as i32 + 1) as f64,
+            );
             SeriesItems::insert(series_items::ActiveModel {
                 series_id: Set(series_id.clone()),
                 comic_id: Set(comic_id.clone()),
