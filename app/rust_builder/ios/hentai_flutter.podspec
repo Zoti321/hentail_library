@@ -33,10 +33,20 @@ A new Flutter FFI plugin project.
     # created by this build step.
     :output_files => ["${BUILT_PRODUCTS_DIR}/libhentai_flutter.a"],
   }
+
+  # unrar-ng ships C++ objects inside the Rust staticlib. force_load must reach the
+  # Runner (user) target under CocoaPods static linkage; -lc++ resolves std:: symbols.
+  # See flutter_rust_bridge#1610 / #3173.
+  rust_lib_ldflags = '$(inherited) -force_load "${BUILT_PRODUCTS_DIR}/libhentai_flutter.a" -lc++ -lc++abi'
+
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     # Flutter.framework does not contain a i386 slice.
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
-    'OTHER_LDFLAGS' => '-force_load ${BUILT_PRODUCTS_DIR}/libhentai_flutter.a -lc++ -lc++abi -lbz2 -llzma',
+    'CLANG_CXX_LIBRARY' => 'libc++',
+    'OTHER_LDFLAGS' => rust_lib_ldflags,
+  }
+  s.user_target_xcconfig = {
+    'OTHER_LDFLAGS' => rust_lib_ldflags,
   }
 end

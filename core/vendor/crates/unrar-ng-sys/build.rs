@@ -17,8 +17,9 @@ fn main() {
         if std::env::var("CARGO_CFG_TARGET_ENV").unwrap_or_default() == "gnu" {
             println!("cargo:rustc-link-lib=pthread");
         }
-    } else if !is_android {
-        // Android uses Bionic; do not force libpthread.
+    } else if !is_android && target_vendor != "apple" {
+        // Android uses Bionic; Apple (iOS/macOS) provides pthread via libSystem —
+        // passing -lpthread breaks iPhoneOS link ("library 'pthread' not found").
         println!("cargo:rustc-link-lib=pthread");
     }
 

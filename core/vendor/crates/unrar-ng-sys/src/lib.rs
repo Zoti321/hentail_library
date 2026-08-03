@@ -319,7 +319,7 @@ const _: () = {
 
 #[link(name = "unrar", kind = "static")]
 #[cfg_attr(all(windows, target_env = "gnu"), link(name = "stdc++", kind = "static", modifiers = "-bundle"))]
-#[cfg_attr(target_os = "macos", link(name = "c++"))]
+#[cfg_attr(any(target_os = "macos", target_os = "ios"), link(name = "c++"))]
 #[cfg_attr(any(target_os = "freebsd", target_os = "openbsd"), link(name = "c++"))]
 #[cfg_attr(any(target_os = "linux", target_os = "netbsd"), link(name = "stdc++"))]
 unsafe extern "C" {
