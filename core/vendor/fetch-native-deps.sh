@@ -99,8 +99,24 @@ else
   done
 fi
 
-# unique
-mapfile -t platforms < <(printf '%s\n' "${platforms[@]}" | awk 'NF && !seen[$0]++')
+# Deduplicate while preserving order (bash 3 compatible — macOS ships 3.2 without mapfile).
+unique_platforms=()
+for key in "${platforms[@]}"; do
+  [[ -z "$key" ]] && continue
+  already=0
+  if ((${#unique_platforms[@]} > 0)); then
+    for existing in "${unique_platforms[@]}"; do
+      if [[ "$existing" == "$key" ]]; then
+        already=1
+        break
+      fi
+    done
+  fi
+  if [[ "$already" -eq 0 ]]; then
+    unique_platforms+=("$key")
+  fi
+done
+platforms=("${unique_platforms[@]}")
 
 for platform in "${platforms[@]}"; do
   fetch_pdfium_for_platform "$platform"
