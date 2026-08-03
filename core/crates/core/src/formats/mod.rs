@@ -1,6 +1,6 @@
-#[cfg(not(any(target_os = "android", target_os = "ios")))]
+#[cfg(not(target_os = "ios"))]
 mod pdf;
-#[cfg(any(target_os = "android", target_os = "ios"))]
+#[cfg(target_os = "ios")]
 #[path = "mobile_pdf.rs"]
 mod pdf;
 
@@ -15,7 +15,7 @@ pub use sevenz::{count_sevenz_images, open_sevenz_backend, read_sevenz_page, Sev
 use std::path::Path;
 
 use crate::error::HentaiError;
-use crate::sync::parser::{basename, is_comic_image_extension};
+use crate::resource::{basename, is_comic_image_extension};
 use crate::util::natural_sort::compare_filename_natural;
 
 pub(crate) fn is_comic_image_name(name: &str) -> bool {

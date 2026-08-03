@@ -84,6 +84,7 @@ class ComicRepositoryImpl implements ComicRepository {
     String? title,
     String? description,
     DateTime? publishedAt,
+    bool clearPublishedAt = false,
     List<Author>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
@@ -95,14 +96,42 @@ class ComicRepositoryImpl implements ComicRepository {
           title: title,
           contentRating: contentRating?.name,
           description: description,
-          publishedAt: publishedAt == null
+          publishedAt: clearPublishedAt
               ? _kComicPublishedAtClearSentinel
+              : publishedAt == null
+              ? null
               : comicTimestampToMs(publishedAt),
           authors: authors?.map((Author a) => a.name).toList(),
           tags: tags?.map((Tag t) => t.name).toList(),
         ),
       ),
       fallbackMessage: '更新漫画元数据失败',
+    );
+  }
+
+  @override
+  Future<void> setMetaLocks(
+    String comicId, {
+    bool? title,
+    bool? description,
+    bool? publishedAt,
+    bool? contentRating,
+    bool? authors,
+    bool? tags,
+  }) async {
+    guardFrbSync(
+      () => rust.setComicMetaLocksFrb(
+        comicId: comicId,
+        locks: rust.SetComicMetaLocksFrbDto(
+          title: title,
+          description: description,
+          publishedAt: publishedAt,
+          contentRating: contentRating,
+          authors: authors,
+          tags: tags,
+        ),
+      ),
+      fallbackMessage: '更新漫画元数据锁失败',
     );
   }
 

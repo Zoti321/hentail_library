@@ -34,34 +34,29 @@ class ReaderNavContextData {
 class ReaderRouteContext {
   const ReaderRouteContext({
     required this.comicId,
-    this.seriesId,
     this.incognito = false,
+    this.startFromFirstPage = false,
   });
 
   final String comicId;
-  final String? seriesId;
   final bool incognito;
+  final bool startFromFirstPage;
 
   ReadSessionRouteParams get session => ReadSessionRouteParams(
     comicId: comicId,
-    seriesId: seriesId,
     incognito: incognito,
+    startFromFirstPage: startFromFirstPage,
   );
-
-  bool get isSeriesRead => session.isSeriesRead;
 
   static ReaderRouteContext normalize({
     required String comicId,
-    String? seriesId,
     bool incognito = false,
+    bool startFromFirstPage = false,
   }) {
-    final String? resolvedSeriesId = seriesId?.trim();
     return ReaderRouteContext(
       comicId: comicId.trim(),
-      seriesId: resolvedSeriesId == null || resolvedSeriesId.isEmpty
-          ? null
-          : resolvedSeriesId,
       incognito: incognito,
+      startFromFirstPage: startFromFirstPage,
     );
   }
 }

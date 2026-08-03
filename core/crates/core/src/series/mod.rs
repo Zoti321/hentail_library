@@ -6,9 +6,13 @@ mod write;
 pub use dto::{SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto};
 pub use repository::{
     count_all_series, fetch_series_comics_metadata, fetch_series_comics_page, fetch_series_page,
-    find_series_by_id, get_all_series, load_home_series_comic_order_map, search_series_by_keyword,
-    search_series_by_tag_expression, set_series_items_order, watch_all_series,
-    watch_home_series_comic_order_map, PagedSeriesResultDto, SeriesComicsMetadataDto, SeriesDto,
-    SeriesItemDto,
+    find_series_by_id, get_all_series, get_series_reading_context_by_comic_id,
+    load_home_series_comic_order_map, search_series_by_keyword, search_series_by_tag_expression,
+    set_series_items_order, watch_all_series, watch_home_series_comic_order_map,
+    PagedSeriesComicsResultDto, PagedSeriesResultDto, SeriesComicPageItemDto,
+    SeriesComicsMetadataDto, SeriesDto, SeriesItemDto, SeriesMetaLocks, SeriesReadingContextDto,
 };
-pub use write::{update_series_user_meta, UpdateSeriesUserMetaDto};
+pub use write::{
+    set_series_item_sort_order_locked, set_series_meta_locks, update_series_item_sort_order,
+    update_series_user_meta, SetSeriesMetaLocksDto, UpdateSeriesUserMetaDto,
+};

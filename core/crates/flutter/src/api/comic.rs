@@ -19,6 +19,16 @@ pub struct ComicFilterDto {
 }
 
 #[derive(Debug, Clone)]
+pub struct ComicMetaLocksDto {
+    pub title: bool,
+    pub description: bool,
+    pub published_at: bool,
+    pub content_rating: bool,
+    pub authors: bool,
+    pub tags: bool,
+}
+
+#[derive(Debug, Clone)]
 pub struct ComicDto {
     pub comic_id: String,
     pub path: String,
@@ -34,6 +44,7 @@ pub struct ComicDto {
     pub last_read_time_ms: Option<i64>,
     pub authors: Vec<String>,
     pub tags: Vec<String>,
+    pub locks: ComicMetaLocksDto,
 }
 
 #[derive(Debug, Clone)]
@@ -85,6 +96,14 @@ impl From<hentai_core::ComicDto> for ComicDto {
             last_read_time_ms: value.last_read_time_ms,
             authors: value.authors,
             tags: value.tags,
+            locks: ComicMetaLocksDto {
+                title: value.locks.title,
+                description: value.locks.description,
+                published_at: value.locks.published_at,
+                content_rating: value.locks.content_rating,
+                authors: value.locks.authors,
+                tags: value.locks.tags,
+            },
         }
     }
 }
@@ -213,6 +232,42 @@ pub fn update_comic_user_meta_frb(
         },
     ))
     .map_err(HentaiErrorDto::from)
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SetComicMetaLocksFrbDto {
+    pub title: Option<bool>,
+    pub description: Option<bool>,
+    pub published_at: Option<bool>,
+    pub content_rating: Option<bool>,
+    pub authors: Option<bool>,
+    pub tags: Option<bool>,
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn set_comic_meta_locks_frb(
+    comic_id: String,
+    locks: SetComicMetaLocksFrbDto,
+) -> Result<(), HentaiErrorDto> {
+    hentai_core::runtime::block_on(hentai_core::set_comic_meta_locks(
+        &comic_id,
+        hentai_core::SetComicMetaLocksDto {
+            title: locks.title,
+            description: locks.description,
+            published_at: locks.published_at,
+            content_rating: locks.content_rating,
+            authors: locks.authors,
+            tags: locks.tags,
+        },
+    ))
+    .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn refresh_comic_metadata_frb(comic_id: String) -> Result<(), HentaiErrorDto> {
+    hentai_core::refresh_comic_metadata(&comic_id)
+        .await
+        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]

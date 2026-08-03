@@ -6,8 +6,8 @@ use sea_orm::{
 };
 
 use crate::comic::{
-    load_comics_ordered, read_data_version, search_comic_ids_by_tag_expression, PageRequestDto,
-    PagedComicResultDto,
+    load_comics_ordered, read_data_version, search_comic_ids_by_tag_expression, ComicDto,
+    PageRequestDto,
 };
 use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
@@ -20,7 +20,15 @@ use super::page_query::{build_count_query, build_ids_page_query};
 pub struct SeriesItemDto {
     pub series_id: String,
     pub comic_id: String,
-    pub sort_order: i32,
+    pub sort_order: f64,
+    pub sort_order_locked: bool,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct SeriesMetaLocks {
+    pub name: bool,
+    pub serialization_status: bool,
+    pub total_count: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -30,6 +38,7 @@ pub struct SeriesDto {
     pub name: String,
     pub serialization_status: String,
     pub total_count: Option<i32>,
+    pub locks: SeriesMetaLocks,
     pub items: Vec<SeriesItemDto>,
 }
 
@@ -46,6 +55,30 @@ pub struct SeriesComicsMetadataDto {
     pub authors: Vec<String>,
     pub tags: Vec<String>,
     pub has_r18: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct SeriesComicPageItemDto {
+    pub comic: ComicDto,
+    pub sort_order: f64,
+    pub sort_order_locked: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct PagedSeriesComicsResultDto {
+    pub items: Vec<SeriesComicPageItemDto>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
+}
+
+/// 由 comicId 派生的阅读器用系列上下文（ADR-0005）。
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SeriesReadingContextDto {
+    pub series_id: String,
+    pub series_name: String,
+    pub ordered_comic_ids: Vec<String>,
+    pub current_index: i32,
 }
 
 pub async fn watch_all_series(
@@ -155,10 +188,10 @@ async fn query_series_ids(
 pub async fn fetch_series_comics_page(
     series_id: &str,
     request: PageRequestDto,
-) -> Result<PagedComicResultDto, HentaiError> {
+) -> Result<PagedSeriesComicsResultDto, HentaiError> {
     let db = connection()?;
     if !series_exists(&db, series_id).await? {
-        return Ok(PagedComicResultDto {
+        return Ok(PagedSeriesComicsResultDto {
             items: vec![],
             total_count: 0,
             page: 1,
@@ -177,7 +210,7 @@ pub async fn fetch_series_comics_page(
         effective_page = total_pages as i32;
     }
     if total_count <= 0 {
-        return Ok(PagedComicResultDto {
+        return Ok(PagedSeriesComicsResultDto {
             items: vec![],
             total_count: 0,
             page: 1,
@@ -185,10 +218,29 @@ pub async fn fetch_series_comics_page(
         });
     }
     let offset = (effective_page - 1) * page_size;
-    let comic_ids =
-        query_series_comic_ids_page(&db, series_id, page_size, offset).await?;
-    let items = load_comics_ordered(&db, comic_ids).await?;
-    Ok(PagedComicResultDto {
+    let id_orders =
+        query_series_comic_id_orders_page(&db, series_id, page_size, offset).await?;
+    let comic_ids: Vec<String> = id_orders.iter().map(|(id, _, _)| id.clone()).collect();
+    let order_by_id: HashMap<String, (f64, bool)> = id_orders
+        .into_iter()
+        .map(|(id, sort_order, locked)| (id, (sort_order, locked)))
+        .collect();
+    let comics = load_comics_ordered(&db, comic_ids).await?;
+    let items = comics
+        .into_iter()
+        .map(|comic| {
+            let (sort_order, sort_order_locked) = order_by_id
+                .get(&comic.comic_id)
+                .copied()
+                .unwrap_or((0.0, false));
+            SeriesComicPageItemDto {
+                comic,
+                sort_order,
+                sort_order_locked,
+            }
+        })
+        .collect();
+    Ok(PagedSeriesComicsResultDto {
         items,
         total_count,
         page: effective_page,
@@ -223,6 +275,43 @@ pub async fn find_series_by_id(series_id: &str) -> Result<Option<SeriesDto>, Hen
     Ok(list.pop())
 }
 
+pub async fn get_series_reading_context_by_comic_id(
+    comic_id: &str,
+) -> Result<Option<SeriesReadingContextDto>, HentaiError> {
+    let comic_id = comic_id.trim();
+    if comic_id.is_empty() {
+        return Ok(None);
+    }
+    let db = connection()?;
+    let membership = SeriesItems::find()
+        .filter(series_items::Column::ComicId.eq(comic_id))
+        .one(&db)
+        .await
+        .map_err(map_db_err)?;
+    let Some(membership) = membership else {
+        return Ok(None);
+    };
+    let series = Series::find_by_id(membership.series_id.clone())
+        .one(&db)
+        .await
+        .map_err(map_db_err)?;
+    let Some(series) = series else {
+        return Ok(None);
+    };
+    let ordered_comic_ids = query_all_series_comic_ids(&db, &series.series_id).await?;
+    let current_index = ordered_comic_ids
+        .iter()
+        .position(|id| id == comic_id)
+        .map(|i| i as i32)
+        .unwrap_or(0);
+    Ok(Some(SeriesReadingContextDto {
+        series_id: series.series_id,
+        series_name: series.name,
+        ordered_comic_ids,
+        current_index,
+    }))
+}
+
 pub async fn set_series_items_order(
     series_id: &str,
     ordered_comic_ids: Vec<String>,
@@ -233,7 +322,7 @@ pub async fn set_series_items_order(
         SeriesItems::update_many()
             .col_expr(
                 series_items::Column::SortOrder,
-                sea_orm::sea_query::Expr::value(index as i32),
+                sea_orm::sea_query::Expr::value(index as f64),
             )
             .filter(series_items::Column::SeriesId.eq(series_id))
             .filter(series_items::Column::ComicId.eq(comic_id))
@@ -316,29 +405,57 @@ async fn count_series_items(
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
 }
 
-async fn query_series_comic_ids_page(
+async fn query_all_series_comic_ids(
     db: &DatabaseConnection,
     series_id: &str,
-    page_size: i32,
-    offset: i32,
 ) -> Result<Vec<String>, HentaiError> {
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "SELECT comic_id FROM series_items \
          WHERE series_id = ? \
-         ORDER BY sort_order ASC, comic_id ASC \
-         LIMIT ? OFFSET ?",
-        vec![
-            sea_orm::Value::String(Some(Box::new(series_id.to_string()))),
-            sea_orm::Value::Int(Some(page_size as i32)),
-            sea_orm::Value::Int(Some(offset as i32)),
-        ],
+         ORDER BY sort_order ASC, comic_id ASC",
+        vec![sea_orm::Value::String(Some(Box::new(series_id.to_string())))],
     );
     let rows = db.query_all(stmt).await.map_err(map_db_err)?;
     rows.into_iter()
         .map(|row| {
             row.try_get_by_index::<String>(0)
                 .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+        })
+        .collect()
+}
+
+async fn query_series_comic_id_orders_page(
+    db: &DatabaseConnection,
+    series_id: &str,
+    page_size: i32,
+    offset: i32,
+) -> Result<Vec<(String, f64, bool)>, HentaiError> {
+    let stmt = Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "SELECT comic_id, sort_order, sort_order_locked FROM series_items \
+         WHERE series_id = ? \
+         ORDER BY sort_order ASC, comic_id ASC \
+         LIMIT ? OFFSET ?",
+        vec![
+            sea_orm::Value::String(Some(Box::new(series_id.to_string()))),
+            sea_orm::Value::Int(Some(page_size)),
+            sea_orm::Value::Int(Some(offset)),
+        ],
+    );
+    let rows = db.query_all(stmt).await.map_err(map_db_err)?;
+    rows.into_iter()
+        .map(|row| {
+            let comic_id = row
+                .try_get_by_index::<String>(0)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+            let sort_order = row
+                .try_get_by_index::<f64>(1)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+            let locked_i64 = row
+                .try_get_by_index::<i64>(2)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+            Ok((comic_id, sort_order, locked_i64 != 0))
         })
         .collect()
 }
@@ -450,6 +567,7 @@ async fn load_series_by_ids(
                 series_id: item.series_id,
                 comic_id: item.comic_id,
                 sort_order: item.sort_order,
+                sort_order_locked: item.sort_order_locked,
             });
     }
     let mut by_id: HashMap<String, SeriesDto> = HashMap::new();
@@ -463,7 +581,14 @@ async fn load_series_by_ids(
                 name: row.name,
                 serialization_status: row.serialization_status,
                 total_count: row.total_count,
-                items: items_by_series.remove(&row.series_id).unwrap_or_default(),
+                locks: SeriesMetaLocks {
+                    name: row.name_locked,
+                    serialization_status: row.serialization_status_locked,
+                    total_count: row.total_count_locked,
+                },
+                items: items_by_series
+                    .remove(&row.series_id)
+                    .unwrap_or_default(),
             },
         );
     }
@@ -473,7 +598,7 @@ async fn load_series_by_ids(
         .collect())
 }
 
-pub async fn load_home_series_comic_order_map() -> Result<HashMap<String, i32>, HentaiError> {
+pub async fn load_home_series_comic_order_map() -> Result<HashMap<String, f64>, HentaiError> {
     let db = connection()?;
     let rows = SeriesItems::find().all(&db).await.map_err(map_db_err)?;
     let mut map = HashMap::new();
@@ -484,7 +609,7 @@ pub async fn load_home_series_comic_order_map() -> Result<HashMap<String, i32>, 
 }
 
 pub async fn watch_home_series_comic_order_map(
-    mut emit: impl FnMut(HashMap<String, i32>) -> Result<(), HentaiError>,
+    mut emit: impl FnMut(HashMap<String, f64>) -> Result<(), HentaiError>,
 ) -> Result<(), HentaiError> {
     let mut last = read_data_version().await?;
     emit(load_home_series_comic_order_map().await?)?;

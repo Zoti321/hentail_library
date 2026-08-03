@@ -53,23 +53,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   }
 
   void _measureCatalogGridStartOffset() {
-    final BuildContext? gridContext = _catalogBlocksKey.currentContext;
-    final ScrollableState? scrollable = gridContext == null
-        ? null
-        : Scrollable.maybeOf(gridContext);
-    final RenderBox? gridBox = gridContext?.findRenderObject() as RenderBox?;
-    final RenderObject? scrollableRender = scrollable?.context
-        .findRenderObject();
-    if (gridBox == null ||
-        scrollable == null ||
-        scrollableRender is! RenderBox) {
-      return;
-    }
-    final double gridTopInViewport = scrollableRender
-        .globalToLocal(gridBox.localToGlobal(Offset.zero))
-        .dy;
-    _catalogGridContentStartOffset =
-        scrollable.position.pixels + gridTopInViewport;
+    _catalogGridContentStartOffset = measureScrollableKeyedContentOffset(
+      _catalogBlocksKey,
+    );
   }
 
   void _updateCoverViewport() {
@@ -99,24 +85,12 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       viewportWidth,
     );
     final AppThemeTokens tokens = context.tokens;
-    final BuildContext? gridContext = _catalogBlocksKey.currentContext;
-    final ScrollableState? scrollable = gridContext == null
-        ? null
-        : Scrollable.maybeOf(gridContext);
-    final RenderBox? gridBox = gridContext?.findRenderObject() as RenderBox?;
-    final RenderObject? scrollableRender = scrollable?.context
-        .findRenderObject();
-    if (gridBox == null ||
-        scrollable == null ||
-        scrollableRender is! RenderBox) {
+    final double? gridContentOffset = measureScrollableKeyedContentOffset(
+      _catalogBlocksKey,
+    );
+    if (gridContentOffset == null) {
       return;
     }
-
-    final double gridTopInViewport = scrollableRender
-        .globalToLocal(gridBox.localToGlobal(Offset.zero))
-        .dy;
-    final double gridContentOffset =
-        scrollable.position.pixels + gridTopInViewport;
     final int crossAxisCount = libraryGridCrossAxisCount(
       viewportWidth,
       layoutTier,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -208,7 +208,8 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
               ),
             ),
             SeriesDetailComicsGridSliver(
-              comics: catalog.items,
+              seriesId: widget.series.id,
+              items: catalog.items,
               isLoading: catalogAsync.isLoading,
             ),
             SliverToBoxAdapter(
@@ -223,8 +224,9 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
           ],
         );
       },
-      loading: () => const SeriesDetailComicsGridSliver(
-        comics: <Comic>[],
+      loading: () => SeriesDetailComicsGridSliver(
+        seriesId: widget.series.id,
+        items: const <SeriesComicPageItem>[],
         isLoading: true,
       ),
       error: (Object error, StackTrace _) => SliverToBoxAdapter(

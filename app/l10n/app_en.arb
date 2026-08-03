@@ -314,6 +314,25 @@
   "comicDetailRead": "Read",
   "comicDetailReadIncognito": "Read incognito",
   "comicDetailEditMetadata": "Edit metadata",
+  "refreshMetadata": "Refresh metadata",
+  "refreshMetadataComicSuccess": "Metadata refreshed",
+  "refreshMetadataComicFailed": "Failed to refresh metadata",
+  "refreshMetadataBusy": "Library sync or metadata refresh is in progress",
+  "refreshMetadataSeriesDialogTitle": "Refresh series metadata",
+  "refreshMetadataSeriesProgress": "Refreshing {current}/{total}",
+  "@refreshMetadataSeriesProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "refreshMetadataSeriesDone": "Done: {succeeded} succeeded, {failed} failed",
+  "@refreshMetadataSeriesDone": {
+    "placeholders": {
+      "succeeded": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "comicDetailShowInExplorer": "Show in file explorer",
   "comicDetailShowInExplorerFailed": "Could not show this item in File Explorer",
   "comicDetailDelete": "Delete",
@@ -338,6 +357,11 @@
   "comicDetailSeriesNext": "Next in series",
   "comicDetailSeriesNextSemantic": "Next in series",
   "seriesDetailEdit": "Edit series",
+  "seriesItemEditSortOrder": "Edit sort order",
+  "dialogEditSeriesItemSortOrderTitle": "Edit sort order",
+  "formSeriesItemSortOrderLabel": "Sort number",
+  "formSeriesItemSortOrderHint": "e.g. 1 or 1.5",
+  "formSeriesItemSortOrderInvalid": "Enter a valid number",
   "seriesDetailNoComics": "No comics in this series",
   "seriesDetailComicsLoadFailed": "Failed to load comic list",
   "seriesDetailUnknown": "Unknown series",
@@ -513,8 +537,8 @@
   "commonLoadFailed": "Failed to load",
   "commonBack": "Back",
   "commonSavedToast": "Saved",
+  "commonSaveFailedToast": "Save failed",
   "dialogEditSeriesTitle": "Edit series",
-  "dialogEditSeriesSavedToast": "Series info saved",
   "dialogEditMetadataTitle": "Edit metadata",
   "dialogEditMetadataTabGeneral": "General",
   "dialogEditMetadataTabAuthorsTags": "Authors & tags",
@@ -623,7 +647,6 @@
   "confirmRemovePathContent": "This path will be removed from the library. This cannot be undone.",
   "confirmClearHistoryTitle": "Confirm clear",
   "confirmClearHistoryContent": "All reading history will be cleared. This cannot be undone.",
-  "contextMenuGoToDetail": "Go to details",
   "breadcrumbReturnLibrary": "Back to library",
   "breadcrumbReturnLibraryWithTrail": "Back to library, current: {trail}",
   "@breadcrumbReturnLibraryWithTrail": {

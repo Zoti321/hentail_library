@@ -21,6 +21,15 @@ detect_platform() {
   esac
 }
 
+pdfium_lib_name() {
+  local platform="$1"
+  case "$platform" in
+    windows-*) echo "pdfium.dll" ;;
+    macos-*) echo "libpdfium.dylib" ;;
+    *) echo "libpdfium.so" ;;
+  esac
+}
+
 fetch_pdfium_for_platform() {
   local platform="$1"
   local artifact
@@ -48,25 +57,51 @@ fetch_pdfium_for_platform() {
     unzip -q "$tmp_archive" -d "$tmp_extract"
   fi
 
-  local lib_path
-  lib_path="$(find "$tmp_extract" \( -name 'libpdfium.so' -o -name 'libpdfium.dylib' -o -name 'pdfium.dll' \) -print -quit)"
+  local want lib_path
+  want="$(pdfium_lib_name "$platform")"
+  lib_path="$(find "$tmp_extract" -name "$want" -print -quit)"
   if [[ -z "$lib_path" ]]; then
-    echo "解压后未找到 pdfium 动态库 ($platform)" >&2
+    echo "解压后未找到 $want ($platform)" >&2
     exit 1
   fi
 
-  case "$(basename "$lib_path")" in
-    libpdfium.so) cp "$lib_path" "$out_dir/libpdfium.so" ;;
-    libpdfium.dylib) cp "$lib_path" "$out_dir/libpdfium.dylib" ;;
-    pdfium.dll) cp "$lib_path" "$out_dir/pdfium.dll" ;;
-  esac
-
-  echo "已写入 $out_dir/$(basename "$lib_path")"
+  cp "$lib_path" "$out_dir/$want"
+  echo "已写入 $out_dir/$want"
 }
 
-if [[ "$(uname -s)" == "Darwin" ]]; then
-  fetch_pdfium_for_platform "macos-aarch64"
-  fetch_pdfium_for_platform "macos-x86_64"
+platforms=()
+if [[ $# -eq 0 ]]; then
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    platforms=("macos-aarch64" "macos-x86_64")
+  else
+    platforms=("$(detect_platform)")
+  fi
 else
-  fetch_pdfium_for_platform "$(detect_platform)"
+  for arg in "$@"; do
+    case "$arg" in
+      --host)
+        platforms+=("$(detect_platform)")
+        ;;
+      --android)
+        platforms+=("android-arm" "android-arm64" "android-x86" "android-x64")
+        ;;
+      --platform=*)
+        IFS=',' read -r -a keys <<< "${arg#--platform=}"
+        for key in "${keys[@]}"; do
+          [[ -n "$key" ]] && platforms+=("$key")
+        done
+        ;;
+      *)
+        echo "未知参数: $arg（支持 --host、--android、--platform=key[,key...]）" >&2
+        exit 1
+        ;;
+    esac
+  done
 fi
+
+# unique
+mapfile -t platforms < <(printf '%s\n' "${platforms[@]}" | awk 'NF && !seen[$0]++')
+
+for platform in "${platforms[@]}"; do
+  fetch_pdfium_for_platform "$platform"
+done

@@ -11,11 +11,13 @@ class FluentDatePickerField extends StatelessWidget {
     required this.labelText,
     required this.value,
     required this.onChanged,
+    this.labelTrailing,
     this.hintText,
     this.enabled = true,
   });
 
   final String labelText;
+  final Widget? labelTrailing;
   final DateTime? value;
   final ValueChanged<DateTime?> onChanged;
   final String? hintText;
@@ -78,7 +80,7 @@ class FluentDatePickerField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        FormLabel(labelText),
+        FormLabel(labelText, trailing: labelTrailing),
         SizedBox(height: tokens.spacing.sm - 2),
         Material(
           color: Colors.transparent,

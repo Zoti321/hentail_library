@@ -37,7 +37,7 @@ regex = "1"
 sevenz-rust = "0.6"
 unrar-ng = "0.7"
 
-[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+[target.'cfg(not(target_os = "ios"))'.dependencies]
 pdfium-render = "0.8"
 
 [dev-dependencies]

@@ -41,6 +41,7 @@ class SeriesSerializationChip extends StatelessWidget {
       text: context.l10n.serializationStatusLabel(status),
       borderColor: accentColor,
       textColor: accentColor,
+      compact: true,
     );
   }
 }
@@ -73,7 +74,7 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
       spacing: tokens.spacing.xs,
       children: <Widget>[
         SizedBox(
-          height: kDetailMetaChipRowHeight,
+          height: kSeriesDetailMetaChipRowHeight,
           child: Align(
             alignment: Alignment.bottomLeft,
             child: Row(

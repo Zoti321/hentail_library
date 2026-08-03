@@ -60,6 +60,17 @@ fn normalize_tags(tags: Vec<String>) -> Vec<String> {
         .collect()
 }
 
+/// Per-field locks for Comic metadata (Komga-style). Default: all unlocked.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ComicMetaLocks {
+    pub title: bool,
+    pub description: bool,
+    pub published_at: bool,
+    pub content_rating: bool,
+    pub authors: bool,
+    pub tags: bool,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComicDto {
     pub comic_id: String,
@@ -76,6 +87,8 @@ pub struct ComicDto {
     pub last_read_time_ms: Option<i64>,
     pub authors: Vec<String>,
     pub tags: Vec<String>,
+    #[serde(default)]
+    pub locks: ComicMetaLocks,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

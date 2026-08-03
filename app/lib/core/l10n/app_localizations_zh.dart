@@ -641,6 +641,31 @@ class AppLocalizationsZh extends AppLocalizations {
   String get comicDetailEditMetadata => '编辑元数据';
 
   @override
+  String get refreshMetadata => '刷新元数据';
+
+  @override
+  String get refreshMetadataComicSuccess => '已刷新元数据';
+
+  @override
+  String get refreshMetadataComicFailed => '刷新元数据失败';
+
+  @override
+  String get refreshMetadataBusy => '库同步或元数据刷新进行中';
+
+  @override
+  String get refreshMetadataSeriesDialogTitle => '刷新系列元数据';
+
+  @override
+  String refreshMetadataSeriesProgress(int current, int total) {
+    return '正在刷新 $current/$total';
+  }
+
+  @override
+  String refreshMetadataSeriesDone(int succeeded, int failed) {
+    return '完成：成功 $succeeded，失败 $failed';
+  }
+
+  @override
   String get comicDetailShowInExplorer => '在资源管理器中显示';
 
   @override
@@ -692,6 +717,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get seriesDetailEdit => '编辑系列';
+
+  @override
+  String get seriesItemEditSortOrder => '编辑排序';
+
+  @override
+  String get dialogEditSeriesItemSortOrderTitle => '编辑排序';
+
+  @override
+  String get formSeriesItemSortOrderLabel => '排序序号';
+
+  @override
+  String get formSeriesItemSortOrderHint => '例如 1 或 1.5';
+
+  @override
+  String get formSeriesItemSortOrderInvalid => '请输入有效数字';
 
   @override
   String get seriesDetailNoComics => '系列内暂无漫画';
@@ -1059,10 +1099,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get commonSavedToast => '已保存';
 
   @override
-  String get dialogEditSeriesTitle => '编辑系列';
+  String get commonSaveFailedToast => '保存失败';
 
   @override
-  String get dialogEditSeriesSavedToast => '系列信息已保存';
+  String get dialogEditSeriesTitle => '编辑系列';
 
   @override
   String get dialogEditMetadataTitle => '编辑元数据';
@@ -1264,9 +1304,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get confirmClearHistoryContent => '将清空全部阅读历史记录。此操作不可撤销。';
-
-  @override
-  String get contextMenuGoToDetail => '跳转到详情页';
 
   @override
   String get breadcrumbReturnLibrary => '返回漫画库';

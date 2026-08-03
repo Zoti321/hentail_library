@@ -5,6 +5,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/form/fluent_select_field.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -13,7 +14,13 @@ Future<void> showReaderSettingsDialog(BuildContext context) {
   return showDialog<void>(
     context: context,
     barrierColor: Colors.black54,
-    builder: (BuildContext context) => const ReaderSettingsDialog(),
+    builder: (BuildContext context) {
+      // 阅读页沉浸式：设置对话框始终深色，不跟随应用浅色主题。
+      return Theme(
+        data: buildAppTheme(Brightness.dark),
+        child: const ReaderSettingsDialog(),
+      );
+    },
   );
 }
 
@@ -44,8 +51,6 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final AppThemeTokens tokens = context.tokens;
     final AsyncValue<AppSetting> settingsAsync = ref.watch(settingsProvider);
     final AppSetting? settings = settingsAsync.asData?.value;
     if (settings == null) {
@@ -65,135 +70,158 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
     final WebtoonZoomMode webtoonZoomMode = settings.webtoonZoomMode;
     final bool marginEnabled = webtoonZoomMode == WebtoonZoomMode.fitWidth;
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(tokens.radius.md),
-        child: SizedBox(
-          width: 420,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              _ReaderSettingsDialogHeader(
-                l10n: l10n,
-                onClose: () => Navigator.of(context).pop(),
-              ),
-              Flexible(
-                child: Material(
-                  color: cs.hentai.readerBackground,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      spacing: 16,
-                      children: <Widget>[
-                        _ReaderSettingsSection(
-                          title: l10n.readerSettingsGeneral,
-                          children: <Widget>[
-                            _ReaderSettingsDropdownRow<ReaderModeCategory>(
-                              label: l10n.readerSettingsReadingMode,
-                              value: category,
-                              items: ReaderModeCategory.values,
-                              itemLabel: (ReaderModeCategory value) =>
-                                  l10n.readerModeCategoryLabel(value),
-                              onChanged: (ReaderModeCategory? value) {
-                                if (value == null) {
-                                  return;
-                                }
-                                final ReadingMode nextMode = switch (value) {
-                                  ReaderModeCategory.paged =>
-                                    readingMode.pagedLayout?.toReadingMode() ??
-                                        ReadingMode.paged,
-                                  ReaderModeCategory.webtoon =>
-                                    ReadingMode.webtoon,
-                                };
-                                _applyReadingMode(nextMode);
-                              },
-                            ),
-                          ],
-                        ),
-                        if (!readingMode.isWebtoon)
+    // 阅读页沉浸式：始终深色，不跟随应用浅色主题。
+    final ThemeData darkTheme = Theme.of(context).brightness == Brightness.dark
+        ? Theme.of(context)
+        : buildAppTheme(Brightness.dark);
+    final ColorScheme darkCs = darkTheme.colorScheme;
+    final AppThemeTokens darkTokens = darkTheme.extension<AppThemeTokens>()!;
+
+    return Theme(
+      data: darkTheme,
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(darkTokens.radius.md),
+          child: SizedBox(
+            width: 420,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _ReaderSettingsDialogHeader(
+                  l10n: l10n,
+                  onClose: () => Navigator.of(context).pop(),
+                ),
+                Flexible(
+                  child: Material(
+                    color: darkCs.hentai.readerBackground,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        spacing: 16,
+                        children: <Widget>[
                           _ReaderSettingsSection(
-                            title: l10n.readerSettingsAutoPlay,
+                            title: l10n.readerSettingsGeneral,
                             children: <Widget>[
-                              _ReaderSettingsNumberRow(
-                                label: l10n.readerSettingsPlayInterval,
-                                suffix: l10n.readerSettingsSecondsSuffix,
-                                controller: _intervalController,
-                                onCommit: (int value) {
-                                  ref
-                                      .read(settingsProvider.notifier)
-                                      .setReaderAutoPlayIntervalSeconds(value);
+                              FluentSelectField<ReaderModeCategory>(
+                                labelText: l10n.readerSettingsReadingMode,
+                                labelLayout: FluentSelectLabelLayout.inline,
+                                value: category,
+                                items: ReaderModeCategory.values,
+                                itemLabel: (ReaderModeCategory value) =>
+                                    l10n.readerModeCategoryLabel(value),
+                                onChanged: (ReaderModeCategory? value) {
+                                  if (value == null) {
+                                    return;
+                                  }
+                                  final ReadingMode nextMode = switch (value) {
+                                    ReaderModeCategory.paged =>
+                                      readingMode.pagedLayout
+                                              ?.toReadingMode() ??
+                                          ReadingMode.paged,
+                                    ReaderModeCategory.webtoon =>
+                                      ReadingMode.webtoon,
+                                  };
+                                  _applyReadingMode(nextMode);
                                 },
                               ),
                             ],
                           ),
-                        _ReaderSettingsSection(
-                          title: readingMode.isWebtoon
-                              ? l10n.readerSettingsWebtoonMode
-                              : l10n.readerSettingsPagedOptions,
-                          children: readingMode.isWebtoon
-                              ? <Widget>[
-                                  _ReaderSettingsDropdownRow<int>(
-                                    label: l10n.readerSettingsHorizontalMargin,
-                                    value: webtoonMarginPercent,
-                                    items: List<int>.generate(
-                                      9,
-                                      (int index) => index * 5,
+                          if (!readingMode.isWebtoon)
+                            _ReaderSettingsSection(
+                              title: l10n.readerSettingsAutoPlay,
+                              children: <Widget>[
+                                _ReaderSettingsNumberRow(
+                                  label: l10n.readerSettingsPlayInterval,
+                                  suffix: l10n.readerSettingsSecondsSuffix,
+                                  controller: _intervalController,
+                                  onCommit: (int value) {
+                                    ref
+                                        .read(settingsProvider.notifier)
+                                        .setReaderAutoPlayIntervalSeconds(
+                                          value,
+                                        );
+                                  },
+                                ),
+                              ],
+                            ),
+                          _ReaderSettingsSection(
+                            title: readingMode.isWebtoon
+                                ? l10n.readerSettingsWebtoonMode
+                                : l10n.readerSettingsPagedOptions,
+                            children: readingMode.isWebtoon
+                                ? <Widget>[
+                                    FluentSelectField<int>(
+                                      labelText:
+                                          l10n.readerSettingsHorizontalMargin,
+                                      labelLayout:
+                                          FluentSelectLabelLayout.inline,
+                                      value: webtoonMarginPercent,
+                                      items: List<int>.generate(
+                                        9,
+                                        (int index) => index * 5,
+                                      ),
+                                      itemLabel: (int value) =>
+                                          l10n.readerWebtoonMarginLabel(value),
+                                      enabled: marginEnabled,
+                                      onChanged: (int? value) {
+                                        if (value == null) {
+                                          return;
+                                        }
+                                        ref
+                                            .read(settingsProvider.notifier)
+                                            .setWebtoonMarginPercent(value);
+                                      },
                                     ),
-                                    itemLabel: (int value) =>
-                                        l10n.readerWebtoonMarginLabel(value),
-                                    enabled: marginEnabled,
-                                    onChanged: (int? value) {
-                                      if (value == null) {
-                                        return;
-                                      }
-                                      ref
-                                          .read(settingsProvider.notifier)
-                                          .setWebtoonMarginPercent(value);
-                                    },
-                                  ),
-                                  _ReaderSettingsDropdownRow<WebtoonZoomMode>(
-                                    label: l10n.readerSettingsZoomMode,
-                                    value: webtoonZoomMode,
-                                    items: WebtoonZoomMode.values,
-                                    itemLabel: (WebtoonZoomMode value) =>
-                                        l10n.webtoonZoomModeLabel(value),
-                                    onChanged: (WebtoonZoomMode? value) {
-                                      if (value == null) {
-                                        return;
-                                      }
-                                      ref
-                                          .read(settingsProvider.notifier)
-                                          .setWebtoonZoomMode(value);
-                                    },
-                                  ),
-                                ]
-                              : <Widget>[
-                                  _ReaderSettingsDropdownRow<PagedLayout>(
-                                    label: l10n.readerSettingsPageLayout,
-                                    value: pagedLayout,
-                                    items: PagedLayout.values,
-                                    itemLabel: (PagedLayout value) =>
-                                        l10n.pagedLayoutLabel(value),
-                                    onChanged: (PagedLayout? value) {
-                                      if (value == null) {
-                                        return;
-                                      }
-                                      _applyReadingMode(value.toReadingMode());
-                                    },
-                                  ),
-                                ],
-                        ),
-                      ],
+                                    FluentSelectField<WebtoonZoomMode>(
+                                      labelText: l10n.readerSettingsZoomMode,
+                                      labelLayout:
+                                          FluentSelectLabelLayout.inline,
+                                      value: webtoonZoomMode,
+                                      items: WebtoonZoomMode.values,
+                                      itemLabel: (WebtoonZoomMode value) =>
+                                          l10n.webtoonZoomModeLabel(value),
+                                      onChanged: (WebtoonZoomMode? value) {
+                                        if (value == null) {
+                                          return;
+                                        }
+                                        ref
+                                            .read(settingsProvider.notifier)
+                                            .setWebtoonZoomMode(value);
+                                      },
+                                    ),
+                                  ]
+                                : <Widget>[
+                                    FluentSelectField<PagedLayout>(
+                                      labelText: l10n.readerSettingsPageLayout,
+                                      labelLayout:
+                                          FluentSelectLabelLayout.inline,
+                                      value: pagedLayout,
+                                      items: PagedLayout.values,
+                                      itemLabel: (PagedLayout value) =>
+                                          l10n.pagedLayoutLabel(value),
+                                      onChanged: (PagedLayout? value) {
+                                        if (value == null) {
+                                          return;
+                                        }
+                                        _applyReadingMode(
+                                          value.toReadingMode(),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -203,12 +231,6 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
   Future<void> _applyReadingMode(ReadingMode mode) async {
     final SettingsNotifier notifier = ref.read(settingsProvider.notifier);
     await notifier.setReadingMode(mode);
-    if (mode.isWebtoon) {
-      final AppSetting? current = ref.read(settingsProvider).asData?.value;
-      if (current?.readerAutoPlayEnabled == true) {
-        await notifier.setReaderAutoPlayEnabled(false);
-      }
-    }
   }
 }
 
@@ -227,12 +249,13 @@ class _ReaderSettingsDialogHeader extends StatelessWidget {
     return Material(
       color: cs.primary,
       child: SizedBox(
-        height: 48,
+        height: 36,
         child: Row(
           children: <Widget>[
             IconButton(
               onPressed: onClose,
-              tooltip: l10n.readerSettingsClose,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints.tightFor(width: 36, height: 36),
               icon: const Icon(LucideIcons.x, size: 18, color: Colors.white),
             ),
             Expanded(
@@ -274,73 +297,6 @@ class _ReaderSettingsSection extends StatelessWidget {
           ),
         ),
         ...children,
-      ],
-    );
-  }
-}
-
-class _ReaderSettingsDropdownRow<T> extends StatelessWidget {
-  const _ReaderSettingsDropdownRow({
-    required this.label,
-    required this.value,
-    required this.items,
-    required this.itemLabel,
-    required this.onChanged,
-    this.enabled = true,
-  });
-
-  final String label;
-  final T value;
-  final List<T> items;
-  final String Function(T value) itemLabel;
-  final ValueChanged<T?> onChanged;
-  final bool enabled;
-
-  @override
-  Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final Color labelColor = enabled
-        ? cs.hentai.readerTextSecondary
-        : cs.hentai.readerTextSecondary.withValues(alpha: 0.45);
-    final Color valueColor = enabled
-        ? cs.hentai.readerTextIconPrimary
-        : cs.hentai.readerTextIconPrimary.withValues(alpha: 0.45);
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Text(label, style: TextStyle(fontSize: 13, color: labelColor)),
-        ),
-        SizedBox(
-          width: 180,
-          child: DropdownButtonFormField<T>(
-            value: value,
-            isExpanded: true,
-            decoration: InputDecoration(
-              isDense: true,
-              filled: true,
-              fillColor: cs.hentai.inputBackground,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 8,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide.none,
-              ),
-            ),
-            dropdownColor: cs.hentai.inputBackground,
-            style: TextStyle(fontSize: 13, color: valueColor),
-            items: items
-                .map(
-                  (T item) => DropdownMenuItem<T>(
-                    value: item,
-                    child: Text(itemLabel(item)),
-                  ),
-                )
-                .toList(),
-            onChanged: enabled ? onChanged : null,
-          ),
-        ),
       ],
     );
   }

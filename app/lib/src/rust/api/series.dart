@@ -9,7 +9,7 @@ import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_series_list`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Stream<List<SeriesDto>> watchAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesWatchAllSeriesFrb();
@@ -33,7 +33,13 @@ PagedSeriesResultDto fetchSeriesPageFrb({
 SeriesDto? findSeriesByIdFrb({required String seriesId}) =>
     RustLib.instance.api.crateApiSeriesFindSeriesByIdFrb(seriesId: seriesId);
 
-PagedComicResultDto fetchSeriesComicsPageFrb({
+SeriesReadingContextDto? getSeriesReadingContextByComicIdFrb({
+  required String comicId,
+}) => RustLib.instance.api.crateApiSeriesGetSeriesReadingContextByComicIdFrb(
+  comicId: comicId,
+);
+
+PagedSeriesComicsResultDto fetchSeriesComicsPageFrb({
   required String seriesId,
   required PageRequestDto request,
 }) => RustLib.instance.api.crateApiSeriesFetchSeriesComicsPageFrb(
@@ -55,12 +61,40 @@ void updateSeriesUserMetaFrb({
   meta: meta,
 );
 
+void setSeriesMetaLocksFrb({
+  required String seriesId,
+  required SetSeriesMetaLocksDto locks,
+}) => RustLib.instance.api.crateApiSeriesSetSeriesMetaLocksFrb(
+  seriesId: seriesId,
+  locks: locks,
+);
+
 void setSeriesItemsOrderFrb({
   required String seriesId,
   required List<String> orderedComicIds,
 }) => RustLib.instance.api.crateApiSeriesSetSeriesItemsOrderFrb(
   seriesId: seriesId,
   orderedComicIds: orderedComicIds,
+);
+
+void updateSeriesItemSortOrderFrb({
+  required String seriesId,
+  required String comicId,
+  required double sortOrder,
+}) => RustLib.instance.api.crateApiSeriesUpdateSeriesItemSortOrderFrb(
+  seriesId: seriesId,
+  comicId: comicId,
+  sortOrder: sortOrder,
+);
+
+void setSeriesItemSortOrderLockedFrb({
+  required String seriesId,
+  required String comicId,
+  required bool locked,
+}) => RustLib.instance.api.crateApiSeriesSetSeriesItemSortOrderLockedFrb(
+  seriesId: seriesId,
+  comicId: comicId,
+  locked: locked,
 );
 
 List<SeriesDto> searchSeriesByKeywordFrb({required String keyword}) => RustLib
@@ -83,6 +117,40 @@ List<SeriesComicOrderEntryDto> loadHomeSeriesComicOrderMapFrb() =>
 
 Stream<List<SeriesComicOrderEntryDto>> watchHomeSeriesComicOrderMapFrb() =>
     RustLib.instance.api.crateApiSeriesWatchHomeSeriesComicOrderMapFrb();
+
+Stream<RefreshSeriesProgressFrbDto> refreshSeriesMetadataFrb({
+  required String seriesId,
+}) => RustLib.instance.api.crateApiSeriesRefreshSeriesMetadataFrb(
+  seriesId: seriesId,
+);
+
+class PagedSeriesComicsResultDto {
+  final List<SeriesComicPageItemDto> items;
+  final PlatformInt64 totalCount;
+  final int page;
+  final int pageSize;
+
+  const PagedSeriesComicsResultDto({
+    required this.items,
+    required this.totalCount,
+    required this.page,
+    required this.pageSize,
+  });
+
+  @override
+  int get hashCode =>
+      items.hashCode ^ totalCount.hashCode ^ page.hashCode ^ pageSize.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PagedSeriesComicsResultDto &&
+          runtimeType == other.runtimeType &&
+          items == other.items &&
+          totalCount == other.totalCount &&
+          page == other.page &&
+          pageSize == other.pageSize;
+}
 
 class PagedSeriesResultDto {
   final List<SeriesDto> items;
@@ -112,9 +180,65 @@ class PagedSeriesResultDto {
           pageSize == other.pageSize;
 }
 
+class RefreshSeriesProgressFrbDto {
+  final int current;
+  final int total;
+  final String? comicId;
+  final int succeeded;
+  final int failed;
+
+  const RefreshSeriesProgressFrbDto({
+    required this.current,
+    required this.total,
+    this.comicId,
+    required this.succeeded,
+    required this.failed,
+  });
+
+  @override
+  int get hashCode =>
+      current.hashCode ^
+      total.hashCode ^
+      comicId.hashCode ^
+      succeeded.hashCode ^
+      failed.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RefreshSeriesProgressFrbDto &&
+          runtimeType == other.runtimeType &&
+          current == other.current &&
+          total == other.total &&
+          comicId == other.comicId &&
+          succeeded == other.succeeded &&
+          failed == other.failed;
+}
+
+class RefreshSeriesResultFrbDto {
+  final int succeeded;
+  final int failed;
+
+  const RefreshSeriesResultFrbDto({
+    required this.succeeded,
+    required this.failed,
+  });
+
+  @override
+  int get hashCode => succeeded.hashCode ^ failed.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RefreshSeriesResultFrbDto &&
+          runtimeType == other.runtimeType &&
+          succeeded == other.succeeded &&
+          failed == other.failed;
+}
+
 class SeriesComicOrderEntryDto {
   final String key;
-  final int sortOrder;
+  final double sortOrder;
 
   const SeriesComicOrderEntryDto({required this.key, required this.sortOrder});
 
@@ -128,6 +252,31 @@ class SeriesComicOrderEntryDto {
           runtimeType == other.runtimeType &&
           key == other.key &&
           sortOrder == other.sortOrder;
+}
+
+class SeriesComicPageItemDto {
+  final ComicDto comic;
+  final double sortOrder;
+  final bool sortOrderLocked;
+
+  const SeriesComicPageItemDto({
+    required this.comic,
+    required this.sortOrder,
+    required this.sortOrderLocked,
+  });
+
+  @override
+  int get hashCode =>
+      comic.hashCode ^ sortOrder.hashCode ^ sortOrderLocked.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesComicPageItemDto &&
+          runtimeType == other.runtimeType &&
+          comic == other.comic &&
+          sortOrder == other.sortOrder &&
+          sortOrderLocked == other.sortOrderLocked;
 }
 
 class SeriesComicsMetadataDto {
@@ -164,6 +313,7 @@ class SeriesDto {
   final String name;
   final String serializationStatus;
   final int? totalCount;
+  final SeriesMetaLocksDto locks;
   final List<SeriesItemDto> items;
 
   const SeriesDto({
@@ -172,6 +322,7 @@ class SeriesDto {
     required this.name,
     required this.serializationStatus,
     this.totalCount,
+    required this.locks,
     required this.items,
   });
 
@@ -182,6 +333,7 @@ class SeriesDto {
       name.hashCode ^
       serializationStatus.hashCode ^
       totalCount.hashCode ^
+      locks.hashCode ^
       items.hashCode;
 
   @override
@@ -194,6 +346,7 @@ class SeriesDto {
           name == other.name &&
           serializationStatus == other.serializationStatus &&
           totalCount == other.totalCount &&
+          locks == other.locks &&
           items == other.items;
 }
 
@@ -236,16 +389,22 @@ class SeriesFilterDto {
 class SeriesItemDto {
   final String seriesId;
   final String comicId;
-  final int sortOrder;
+  final double sortOrder;
+  final bool sortOrderLocked;
 
   const SeriesItemDto({
     required this.seriesId,
     required this.comicId,
     required this.sortOrder,
+    required this.sortOrderLocked,
   });
 
   @override
-  int get hashCode => seriesId.hashCode ^ comicId.hashCode ^ sortOrder.hashCode;
+  int get hashCode =>
+      seriesId.hashCode ^
+      comicId.hashCode ^
+      sortOrder.hashCode ^
+      sortOrderLocked.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -254,7 +413,68 @@ class SeriesItemDto {
           runtimeType == other.runtimeType &&
           seriesId == other.seriesId &&
           comicId == other.comicId &&
-          sortOrder == other.sortOrder;
+          sortOrder == other.sortOrder &&
+          sortOrderLocked == other.sortOrderLocked;
+}
+
+class SeriesMetaLocksDto {
+  final bool name;
+  final bool serializationStatus;
+  final bool totalCount;
+
+  const SeriesMetaLocksDto({
+    required this.name,
+    required this.serializationStatus,
+    required this.totalCount,
+  });
+
+  static Future<SeriesMetaLocksDto> default_() =>
+      RustLib.instance.api.crateApiSeriesSeriesMetaLocksDtoDefault();
+
+  @override
+  int get hashCode =>
+      name.hashCode ^ serializationStatus.hashCode ^ totalCount.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesMetaLocksDto &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          serializationStatus == other.serializationStatus &&
+          totalCount == other.totalCount;
+}
+
+/// ADR-0005：由 comicId 派生的阅读器用系列上下文。
+class SeriesReadingContextDto {
+  final String seriesId;
+  final String seriesName;
+  final List<String> orderedComicIds;
+  final int currentIndex;
+
+  const SeriesReadingContextDto({
+    required this.seriesId,
+    required this.seriesName,
+    required this.orderedComicIds,
+    required this.currentIndex,
+  });
+
+  @override
+  int get hashCode =>
+      seriesId.hashCode ^
+      seriesName.hashCode ^
+      orderedComicIds.hashCode ^
+      currentIndex.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SeriesReadingContextDto &&
+          runtimeType == other.runtimeType &&
+          seriesId == other.seriesId &&
+          seriesName == other.seriesName &&
+          orderedComicIds == other.orderedComicIds &&
+          currentIndex == other.currentIndex;
 }
 
 enum SeriesSortFieldDto {
@@ -285,6 +505,34 @@ class SeriesSortOptionDto {
           runtimeType == other.runtimeType &&
           field == other.field &&
           descending == other.descending;
+}
+
+class SetSeriesMetaLocksDto {
+  final bool? name;
+  final bool? serializationStatus;
+  final bool? totalCount;
+
+  const SetSeriesMetaLocksDto({
+    this.name,
+    this.serializationStatus,
+    this.totalCount,
+  });
+
+  static Future<SetSeriesMetaLocksDto> default_() =>
+      RustLib.instance.api.crateApiSeriesSetSeriesMetaLocksDtoDefault();
+
+  @override
+  int get hashCode =>
+      name.hashCode ^ serializationStatus.hashCode ^ totalCount.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SetSeriesMetaLocksDto &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          serializationStatus == other.serializationStatus &&
+          totalCount == other.totalCount;
 }
 
 /// 与 core `UpdateSeriesUserMetaDto` 同名，减少 Dart/Rust 双命名。

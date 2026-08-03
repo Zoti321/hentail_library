@@ -14,6 +14,7 @@ class OutlinedMetaChip extends StatelessWidget {
     required this.text,
     this.borderColor,
     this.textColor,
+    this.compact = false,
     this.onTap,
     this.onRemove,
   });
@@ -21,6 +22,9 @@ class OutlinedMetaChip extends StatelessWidget {
   final String text;
   final Color? borderColor;
   final Color? textColor;
+
+  /// 为 true 时使用更紧的 padding（`10×4`，对齐 [R18RatingChip]）。
+  final bool compact;
   final VoidCallback? onTap;
   final VoidCallback? onRemove;
 
@@ -31,6 +35,9 @@ class OutlinedMetaChip extends StatelessWidget {
     final BorderRadius borderRadius = BorderRadius.circular(tokens.radius.pill);
     final Color effectiveBorder = borderColor ?? cs.hentai.borderSubtle;
     final Color effectiveTextColor = textColor ?? cs.hentai.textSecondary;
+    final EdgeInsets padding = compact
+        ? const EdgeInsets.symmetric(horizontal: 10, vertical: 4)
+        : const EdgeInsets.symmetric(horizontal: 12, vertical: 6);
 
     final Widget label = _OutlinedMetaChipLabel(
       text: text,
@@ -57,6 +64,7 @@ class OutlinedMetaChip extends StatelessWidget {
           backgroundColor: cs.surface,
           borderColor: effectiveBorder,
           borderRadius: borderRadius,
+          padding: padding,
           child: content,
         ),
       );
@@ -66,6 +74,7 @@ class OutlinedMetaChip extends StatelessWidget {
       text: text,
       borderColor: effectiveBorder,
       borderRadius: borderRadius,
+      padding: padding,
       onTap: onTap!,
       child: content,
     );
@@ -104,6 +113,7 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
     required this.text,
     required this.borderColor,
     required this.borderRadius,
+    required this.padding,
     required this.onTap,
     required this.child,
   });
@@ -111,6 +121,7 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
   final String text;
   final Color borderColor;
   final BorderRadius borderRadius;
+  final EdgeInsets padding;
   final VoidCallback onTap;
   final Widget child;
 
@@ -151,6 +162,7 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
             backgroundColor: backgroundColor,
             borderColor: borderColor,
             borderRadius: borderRadius,
+            padding: padding,
             animate: true,
             child: child,
           ),
@@ -165,6 +177,7 @@ class _OutlinedMetaChipChrome extends StatelessWidget {
     required this.backgroundColor,
     required this.borderColor,
     required this.borderRadius,
+    required this.padding,
     required this.child,
     this.animate = false,
   });
@@ -172,15 +185,12 @@ class _OutlinedMetaChipChrome extends StatelessWidget {
   final Color backgroundColor;
   final Color borderColor;
   final BorderRadius borderRadius;
+  final EdgeInsets padding;
   final Widget child;
   final bool animate;
 
   @override
   Widget build(BuildContext context) {
-    const EdgeInsets padding = EdgeInsets.symmetric(
-      horizontal: 12,
-      vertical: 6,
-    );
     final BoxDecoration decoration = BoxDecoration(
       color: backgroundColor,
       borderRadius: borderRadius,

@@ -314,6 +314,25 @@
   "comicDetailRead": "阅读",
   "comicDetailReadIncognito": "无痕阅读",
   "comicDetailEditMetadata": "编辑元数据",
+  "refreshMetadata": "刷新元数据",
+  "refreshMetadataComicSuccess": "已刷新元数据",
+  "refreshMetadataComicFailed": "刷新元数据失败",
+  "refreshMetadataBusy": "库同步或元数据刷新进行中",
+  "refreshMetadataSeriesDialogTitle": "刷新系列元数据",
+  "refreshMetadataSeriesProgress": "正在刷新 {current}/{total}",
+  "@refreshMetadataSeriesProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "refreshMetadataSeriesDone": "完成：成功 {succeeded}，失败 {failed}",
+  "@refreshMetadataSeriesDone": {
+    "placeholders": {
+      "succeeded": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "comicDetailShowInExplorer": "在资源管理器中显示",
   "comicDetailShowInExplorerFailed": "无法在文件资源管理器中显示该项目",
   "comicDetailDelete": "删除",
@@ -338,6 +357,11 @@
   "comicDetailSeriesNext": "下一本",
   "comicDetailSeriesNextSemantic": "系列下一本",
   "seriesDetailEdit": "编辑系列",
+  "seriesItemEditSortOrder": "编辑排序",
+  "dialogEditSeriesItemSortOrderTitle": "编辑排序",
+  "formSeriesItemSortOrderLabel": "排序序号",
+  "formSeriesItemSortOrderHint": "例如 1 或 1.5",
+  "formSeriesItemSortOrderInvalid": "请输入有效数字",
   "seriesDetailNoComics": "系列内暂无漫画",
   "seriesDetailComicsLoadFailed": "漫画列表加载失败",
   "seriesDetailUnknown": "未知系列",
@@ -513,8 +537,8 @@
   "commonLoadFailed": "加载失败",
   "commonBack": "返回",
   "commonSavedToast": "已保存",
+  "commonSaveFailedToast": "保存失败",
   "dialogEditSeriesTitle": "编辑系列",
-  "dialogEditSeriesSavedToast": "系列信息已保存",
   "dialogEditMetadataTitle": "编辑元数据",
   "dialogEditMetadataTabGeneral": "常规",
   "dialogEditMetadataTabAuthorsTags": "作者&标签",
@@ -623,7 +647,6 @@
   "confirmRemovePathContent": "将从库中移除该路径。此操作不可撤销。",
   "confirmClearHistoryTitle": "确认清空",
   "confirmClearHistoryContent": "将清空全部阅读历史记录。此操作不可撤销。",
-  "contextMenuGoToDetail": "跳转到详情页",
   "breadcrumbReturnLibrary": "返回漫画库",
   "breadcrumbReturnLibraryWithTrail": "返回漫画库，当前：{trail}",
   "@breadcrumbReturnLibraryWithTrail": {

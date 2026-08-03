@@ -3,10 +3,12 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/form/series_metadata_form.dart';
+import 'package:hentai_library/domain/models/value_objects/series_meta_locks.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/metadata_lock_button.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -33,13 +35,59 @@ class EditSeriesDialog extends ConsumerStatefulWidget {
 
 class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
   late SeriesMetadataForm _form;
+  late SeriesMetaLocks _locks;
   SeriesMetadataFormValidation? _validation;
   bool _saving = false;
+  bool _lockBusy = false;
 
   @override
   void initState() {
     super.initState();
     _form = SeriesMetadataForm.fromSeries(widget.series);
+    _locks = widget.series.locks;
+  }
+
+  Future<void> _setLock({
+    bool? name,
+    bool? serializationStatus,
+    bool? totalCount,
+  }) async {
+    if (_lockBusy) {
+      return;
+    }
+    setState(() => _lockBusy = true);
+    try {
+      await ref
+          .read(seriesRepoProvider)
+          .setMetaLocks(
+            seriesId: widget.series.id,
+            name: name,
+            serializationStatus: serializationStatus,
+            totalCount: totalCount,
+          );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _locks = _locks.copyWith(
+          name: name,
+          serializationStatus: serializationStatus,
+          totalCount: totalCount,
+        );
+      });
+    } catch (_) {
+      if (mounted) {
+        showCustomToast(
+          context,
+          message: context.l10n.commonSaveFailedToast,
+          type: AppToastType.error,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _lockBusy = false);
+      }
+    }
   }
 
   Future<void> _handleSave() async {
@@ -50,7 +98,7 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
     try {
       final SeriesMetadataApplyResult result = await _form.applyTo(
         ref.read(seriesRepoProvider),
-        seriesId: widget.series.id,
+        widget.series,
       );
       if (!mounted) {
         return;
@@ -61,12 +109,16 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
         ):
           setState(() => _validation = validation);
         case SeriesMetadataApplySucceeded():
-          showSuccessToast(context, context.l10n.dialogEditSeriesSavedToast);
+          showSuccessToast(context, context.l10n.commonSavedToast);
           Navigator.of(context).pop();
       }
-    } catch (error) {
+    } catch (_) {
       if (mounted) {
-        showErrorToast(context, error);
+        showCustomToast(
+          context,
+          message: context.l10n.commonSaveFailedToast,
+          type: AppToastType.error,
+        );
       }
     } finally {
       if (mounted) {
@@ -86,6 +138,7 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
     final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final bool lockEnabled = !_saving && !_lockBusy;
     return AdaptiveFormSurface(
       title: l10n.dialogEditSeriesTitle,
       maxDialogWidth: 480,
@@ -95,6 +148,11 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
         children: <Widget>[
           FluentTextField(
             labelText: l10n.formSeriesNameLabel,
+            labelTrailing: MetadataLockButton(
+              locked: _locks.name,
+              enabled: lockEnabled,
+              onChanged: (bool locked) => _setLock(name: locked),
+            ),
             initialValue: _form.name,
             errorText: _validation?.nameError,
             enabled: !_saving,
@@ -111,6 +169,11 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
           ),
           FluentSelectField<SerializationStatus>(
             labelText: l10n.formSeriesSerializationStatusLabel,
+            labelTrailing: MetadataLockButton(
+              locked: _locks.serializationStatus,
+              enabled: lockEnabled,
+              onChanged: (bool locked) => _setLock(serializationStatus: locked),
+            ),
             value: _form.serializationStatus,
             items: SerializationStatus.values,
             itemLabel: l10n.serializationStatusLabel,
@@ -127,7 +190,11 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
           ),
           FluentTextField(
             labelText: l10n.formSeriesTotalCountLabel,
-            hintText: l10n.formSeriesTotalCountHint,
+            labelTrailing: MetadataLockButton(
+              locked: _locks.totalCount,
+              enabled: lockEnabled,
+              onChanged: (bool locked) => _setLock(totalCount: locked),
+            ),
             initialValue: _form.totalCountText,
             errorText: _validation?.totalCountError,
             enabled: !_saving,

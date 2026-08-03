@@ -2,16 +2,24 @@ use hentai_core::{
     count_all_series, fetch_series_comics_metadata as core_fetch_series_comics_metadata,
     fetch_series_comics_page as core_fetch_series_comics_page,
     fetch_series_page as core_fetch_page, find_series_by_id as core_find,
-    get_all_series, load_home_series_comic_order_map, search_series_by_keyword,
-    search_series_by_tag_expression, set_series_items_order as core_set_order,
+    get_all_series, get_series_reading_context_by_comic_id as core_get_reading_context,
+    load_home_series_comic_order_map, search_series_by_keyword,
+    search_series_by_tag_expression,
+    set_series_item_sort_order_locked as core_set_item_sort_locked,
+    set_series_items_order as core_set_order,
+    set_series_meta_locks as core_set_meta_locks,
+    update_series_item_sort_order as core_update_item_sort_order,
     update_series_user_meta as core_update_meta, watch_all_series, watch_home_series_comic_order_map,
+    PagedSeriesComicsResultDto as CorePagedSeriesComics,
     PagedSeriesResultDto as CorePagedSeries, SeriesComicsMetadataDto as CoreSeriesComicsMetadata,
     SeriesDto as CoreSeries, SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
+    SeriesReadingContextDto as CoreSeriesReadingContext,
     SeriesSortFieldDto as CoreSeriesSortField, SeriesSortOptionDto as CoreSeriesSort,
+    SetSeriesMetaLocksDto as CoreSetSeriesMetaLocks,
     UpdateSeriesUserMetaDto as CoreUpdateSeriesUserMeta,
 };
 
-use super::comic::{PageRequestDto, PagedComicResultDto};
+use super::comic::{ComicDto, PageRequestDto};
 use super::init::HentaiErrorDto;
 use super::stream_watch::{emit_or_closed, normalize_watch_result};
 
@@ -20,7 +28,15 @@ use super::stream_watch::{emit_or_closed, normalize_watch_result};
 pub struct SeriesItemDto {
     pub series_id: String,
     pub comic_id: String,
-    pub sort_order: i32,
+    pub sort_order: f64,
+    pub sort_order_locked: bool,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct SeriesMetaLocksDto {
+    pub name: bool,
+    pub serialization_status: bool,
+    pub total_count: bool,
 }
 
 /// FRB 层 DTO：字段与 `hentai_core::SeriesDto` 对齐。
@@ -31,6 +47,7 @@ pub struct SeriesDto {
     pub name: String,
     pub serialization_status: String,
     pub total_count: Option<i32>,
+    pub locks: SeriesMetaLocksDto,
     pub items: Vec<SeriesItemDto>,
 }
 
@@ -68,7 +85,22 @@ pub struct PagedSeriesResultDto {
 #[derive(Debug, Clone)]
 pub struct SeriesComicOrderEntryDto {
     pub key: String,
-    pub sort_order: i32,
+    pub sort_order: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct SeriesComicPageItemDto {
+    pub comic: ComicDto,
+    pub sort_order: f64,
+    pub sort_order_locked: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct PagedSeriesComicsResultDto {
+    pub items: Vec<SeriesComicPageItemDto>,
+    pub total_count: i64,
+    pub page: i32,
+    pub page_size: i32,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -76,6 +108,15 @@ pub struct SeriesComicsMetadataDto {
     pub authors: Vec<String>,
     pub tags: Vec<String>,
     pub has_r18: bool,
+}
+
+/// ADR-0005：由 comicId 派生的阅读器用系列上下文。
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SeriesReadingContextDto {
+    pub series_id: String,
+    pub series_name: String,
+    pub ordered_comic_ids: Vec<String>,
+    pub current_index: i32,
 }
 
 /// 与 core `UpdateSeriesUserMetaDto` 同名，减少 Dart/Rust 双命名。
@@ -87,6 +128,13 @@ pub struct UpdateSeriesUserMetaDto {
     pub clear_total_count: bool,
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct SetSeriesMetaLocksDto {
+    pub name: Option<bool>,
+    pub serialization_status: Option<bool>,
+    pub total_count: Option<bool>,
+}
+
 macro_rules! map_series_dto {
     ($core:expr) => {{
         let v = $core;
@@ -96,6 +144,11 @@ macro_rules! map_series_dto {
             name: v.name,
             serialization_status: v.serialization_status,
             total_count: v.total_count,
+            locks: SeriesMetaLocksDto {
+                name: v.locks.name,
+                serialization_status: v.locks.serialization_status,
+                total_count: v.locks.total_count,
+            },
             items: v
                 .items
                 .into_iter()
@@ -103,6 +156,7 @@ macro_rules! map_series_dto {
                     series_id: i.series_id,
                     comic_id: i.comic_id,
                     sort_order: i.sort_order,
+                    sort_order_locked: i.sort_order_locked,
                 })
                 .collect(),
         }
@@ -115,6 +169,26 @@ impl From<CoreItem> for SeriesItemDto {
             series_id: v.series_id,
             comic_id: v.comic_id,
             sort_order: v.sort_order,
+            sort_order_locked: v.sort_order_locked,
+        }
+    }
+}
+
+impl From<CorePagedSeriesComics> for PagedSeriesComicsResultDto {
+    fn from(value: CorePagedSeriesComics) -> Self {
+        Self {
+            items: value
+                .items
+                .into_iter()
+                .map(|item| SeriesComicPageItemDto {
+                    comic: ComicDto::from(item.comic),
+                    sort_order: item.sort_order,
+                    sort_order_locked: item.sort_order_locked,
+                })
+                .collect(),
+            total_count: value.total_count,
+            page: value.page,
+            page_size: value.page_size,
         }
     }
 }
@@ -229,12 +303,28 @@ pub fn find_series_by_id_frb(series_id: String) -> Result<Option<SeriesDto>, Hen
 }
 
 #[flutter_rust_bridge::frb(sync)]
+pub fn get_series_reading_context_by_comic_id_frb(
+    comic_id: String,
+) -> Result<Option<SeriesReadingContextDto>, HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_get_reading_context(&comic_id))
+        .map(|opt| {
+            opt.map(|v: CoreSeriesReadingContext| SeriesReadingContextDto {
+                series_id: v.series_id,
+                series_name: v.series_name,
+                ordered_comic_ids: v.ordered_comic_ids,
+                current_index: v.current_index,
+            })
+        })
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
 pub fn fetch_series_comics_page_frb(
     series_id: String,
     request: PageRequestDto,
-) -> Result<PagedComicResultDto, HentaiErrorDto> {
+) -> Result<PagedSeriesComicsResultDto, HentaiErrorDto> {
     hentai_core::runtime::block_on(core_fetch_series_comics_page(&series_id, request.into()))
-        .map(PagedComicResultDto::from)
+        .map(PagedSeriesComicsResultDto::from)
         .map_err(HentaiErrorDto::from)
 }
 
@@ -257,12 +347,56 @@ pub fn update_series_user_meta_frb(
 }
 
 #[flutter_rust_bridge::frb(sync)]
+pub fn set_series_meta_locks_frb(
+    series_id: String,
+    locks: SetSeriesMetaLocksDto,
+) -> Result<(), HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_set_meta_locks(
+        &series_id,
+        CoreSetSeriesMetaLocks {
+            name: locks.name,
+            serialization_status: locks.serialization_status,
+            total_count: locks.total_count,
+        },
+    ))
+    .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
 pub fn set_series_items_order_frb(
     series_id: String,
     ordered_comic_ids: Vec<String>,
 ) -> Result<(), HentaiErrorDto> {
     hentai_core::runtime::block_on(core_set_order(&series_id, ordered_comic_ids))
         .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn update_series_item_sort_order_frb(
+    series_id: String,
+    comic_id: String,
+    sort_order: f64,
+) -> Result<(), HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_update_item_sort_order(
+        &series_id,
+        &comic_id,
+        sort_order,
+    ))
+    .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn set_series_item_sort_order_locked_frb(
+    series_id: String,
+    comic_id: String,
+    locked: bool,
+) -> Result<(), HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_set_item_sort_locked(
+        &series_id,
+        &comic_id,
+        locked,
+    ))
+    .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]
@@ -312,4 +446,41 @@ pub async fn watch_home_series_comic_order_map_frb(
         })
         .await,
     )
+}
+
+#[derive(Debug, Clone)]
+pub struct RefreshSeriesProgressFrbDto {
+    pub current: i32,
+    pub total: i32,
+    pub comic_id: Option<String>,
+    pub succeeded: i32,
+    pub failed: i32,
+}
+
+#[derive(Debug, Clone)]
+pub struct RefreshSeriesResultFrbDto {
+    pub succeeded: i32,
+    pub failed: i32,
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn refresh_series_metadata_frb(
+    series_id: String,
+    sink: crate::frb_generated::StreamSink<RefreshSeriesProgressFrbDto>,
+) -> Result<RefreshSeriesResultFrbDto, HentaiErrorDto> {
+    let result = hentai_core::refresh_series_metadata(&series_id, |progress| {
+        let _ = sink.add(RefreshSeriesProgressFrbDto {
+            current: progress.current,
+            total: progress.total,
+            comic_id: progress.comic_id,
+            succeeded: progress.succeeded,
+            failed: progress.failed,
+        });
+    })
+    .await
+    .map_err(HentaiErrorDto::from)?;
+    Ok(RefreshSeriesResultFrbDto {
+        succeeded: result.succeeded,
+        failed: result.failed,
+    })
 }

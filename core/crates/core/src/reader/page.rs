@@ -2,7 +2,7 @@ use crate::error::HentaiError;
 
 use super::cache::ReaderCache;
 use super::dto::ReaderPageDto;
-use super::manager::open_reader;
+use super::manager::with_session;
 use super::open::{load_page_bytes, load_page_list};
 
 pub fn load_reader_page(
@@ -11,8 +11,10 @@ pub fn load_reader_page(
     resource_type: &str,
     page_index: i32,
 ) -> Result<ReaderPageDto, HentaiError> {
+    // Hard-error contract: session must be open even when serving disk cache.
+    with_session(comic_id, |_| Ok(()))?;
+
     if resource_type == "dir" {
-        open_reader(comic_id, path, resource_type)?;
         let list = load_page_list(comic_id, path, resource_type)?;
         let index = usize::try_from(page_index).map_err(|_| {
             HentaiError::reader_invalid_content(format!("页索引无效: {page_index}"))
@@ -27,7 +29,6 @@ pub fn load_reader_page(
         return Ok(ReaderPageDto::FilePath { path: file_path });
     }
 
-    open_reader(comic_id, path, resource_type)?;
     let cache = ReaderCache::app()?;
     if let Some(cached_path) = cache.cached_page_path(comic_id, path, page_index)? {
         return Ok(ReaderPageDto::FilePath {

@@ -7,6 +7,7 @@ import 'package:hentai_library/ui/features/reader/reader.dart';
 import 'package:hentai_library/ui/features/settings/views/supported_formats_settings_page.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/route_not_found_page.dart';
+import 'package:hentai_library/ui/features/shell/views/routing/series_detail_route_page.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_page.dart';
 
 typedef ComicDetailBuilder =
@@ -67,11 +68,14 @@ List<RouteBase> buildSharedContentRoutes({
     GoRoute(
       path: '/series/:id',
       name: '系列详情',
-      builder: (context, state) {
+      pageBuilder: (BuildContext context, GoRouterState state) {
         final String seriesId = Uri.decodeComponent(
           state.pathParameters['id']!,
         );
-        return resolvedSeriesDetailBuilder(context, seriesId);
+        return buildSeriesDetailRoutePage(
+          state: state,
+          child: resolvedSeriesDetailBuilder(context, seriesId),
+        );
       },
     ),
     GoRoute(
@@ -89,9 +93,9 @@ List<RouteBase> buildSharedContentRoutes({
         );
         return ReaderPage(
           comicId: args.comicId,
-          seriesId: args.seriesId,
           keepControlsOpen: args.keepControlsOpen,
           incognito: args.incognito,
+          startFromFirstPage: args.startFromFirstPage,
         );
       },
     ),

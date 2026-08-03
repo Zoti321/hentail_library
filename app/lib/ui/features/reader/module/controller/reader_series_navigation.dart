@@ -30,6 +30,7 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
       final ReaderControllerKey viewKey = readerControllerKey(
         currentSession.comicId,
         incognito: currentSession.incognito,
+        startFromFirstPage: currentSession.startFromFirstPage,
       );
       currentPageIndex = ref
           .read(readerControllerProvider(viewKey))

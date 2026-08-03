@@ -73,33 +73,59 @@ extension SeriesMetadataFormOps on SeriesMetadataForm {
     );
   }
 
-  /// 非法 → [SeriesMetadataApplyInvalid]；合法 → `updateUserMeta` 后
-  /// [SeriesMetadataApplySucceeded]。空 [totalCountText] → `clearTotalCount: true`（幂等）。
+  /// 非法 → [SeriesMetadataApplyInvalid]；相对 [original] 仅提交值变化字段 →
+  /// [SeriesMetadataApplySucceeded]。无变化时不调仓储。
   Future<SeriesMetadataApplyResult> applyTo(
-    SeriesRepository repository, {
-    required String seriesId,
-  }) async {
+    SeriesRepository repository,
+    Series original,
+  ) async {
     final SeriesMetadataFormValidation validation = validate();
     if (!validation.isValid) {
       return SeriesMetadataApplyInvalid(validation);
     }
 
     final String trimmedName = name.trim();
+    final String? namePatch = trimmedName != original.name ? trimmedName : null;
+    final SerializationStatus? statusPatch =
+        serializationStatus != original.serializationStatus
+        ? serializationStatus
+        : null;
+
     final String rawTotal = totalCountText.trim();
     final int? totalCount;
     final bool clearTotalCount;
     if (rawTotal.isEmpty) {
-      totalCount = null;
-      clearTotalCount = true;
+      if (original.totalCount != null) {
+        totalCount = null;
+        clearTotalCount = true;
+      } else {
+        totalCount = null;
+        clearTotalCount = false;
+      }
     } else {
-      totalCount = int.parse(rawTotal);
-      clearTotalCount = false;
+      final int parsed = int.parse(rawTotal);
+      if (parsed != original.totalCount) {
+        totalCount = parsed;
+        clearTotalCount = false;
+      } else {
+        totalCount = null;
+        clearTotalCount = false;
+      }
+    }
+
+    final bool hasChanges =
+        namePatch != null ||
+        statusPatch != null ||
+        totalCount != null ||
+        clearTotalCount;
+    if (!hasChanges) {
+      return const SeriesMetadataApplySucceeded();
     }
 
     await repository.updateUserMeta(
-      seriesId: seriesId,
-      name: trimmedName,
-      serializationStatus: serializationStatus,
+      seriesId: original.id,
+      name: namePatch,
+      serializationStatus: statusPatch,
       totalCount: totalCount,
       clearTotalCount: clearTotalCount,
     );

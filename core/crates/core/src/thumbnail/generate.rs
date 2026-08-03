@@ -12,7 +12,7 @@ use crate::db::map_db_err;
 use crate::entity::{comic_thumbnails, prelude::*};
 use crate::error::HentaiError;
 use crate::formats::read_rar_cover_bytes;
-use crate::sync::parser::{
+use crate::resource::{
     basename, basename_without_extension, can_generate_thumbnail, extension_lower,
     is_comic_image_extension, read_source_stat,
 };

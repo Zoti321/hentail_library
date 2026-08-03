@@ -25,10 +25,15 @@ Future<ReaderSessionSnapshot> readerSessionOpen(
   Ref ref, {
   required String comicId,
   bool incognito = false,
+  bool startFromFirstPage = false,
 }) {
   return ref
       .read(readerSessionServiceProvider)
-      .open(comicId: comicId, incognito: incognito);
+      .open(
+        comicId: comicId,
+        incognito: incognito,
+        startFromFirstPage: startFromFirstPage,
+      );
 }
 
 @Riverpod()

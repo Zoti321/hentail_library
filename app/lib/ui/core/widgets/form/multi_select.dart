@@ -51,6 +51,7 @@ class MultiSelect<T> extends ConsumerStatefulWidget {
     required this.onRetry,
     required this.resolveName,
     required this.copy,
+    this.labelTrailing,
     this.compactTrigger = false,
   });
 
@@ -58,6 +59,7 @@ class MultiSelect<T> extends ConsumerStatefulWidget {
   static const Key menuPanelKey = Key('multi_select_menu_panel');
 
   final String label;
+  final Widget? labelTrailing;
   final IconData icon;
   final List<String> selectedNames;
   final ValueChanged<String> onAdd;
@@ -165,177 +167,158 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Padding(
-              padding: EdgeInsets.only(top: tokens.spacing.sm + 2),
-              child: Icon(widget.icon, size: 14, color: cs.hentai.textTertiary),
-            ),
+            Icon(widget.icon, size: 14, color: cs.hentai.textTertiary),
             SizedBox(width: tokens.spacing.sm),
-            Padding(
-              padding: EdgeInsets.only(top: tokens.spacing.sm + 2),
-              child: FormLabel(widget.label),
-            ),
-            SizedBox(width: tokens.spacing.md),
             Expanded(
-              child: LayoutBuilder(
-                builder: (BuildContext context, BoxConstraints constraints) {
-                  _fieldWidth = constraints.maxWidth;
-                  return CustomPopupMenu(
-                    controller: _menuController,
-                    barrierColor: Colors.transparent,
-                    pressType: PressType.singleClick,
-                    showArrow: false,
-                    verticalMargin: 4,
-                    menuBuilder: () => ValueListenableBuilder<List<String>>(
-                      valueListenable: _selectedNamesNotifier,
-                      builder:
-                          (
-                            BuildContext context,
-                            List<String> selectedNames,
-                            Widget? _,
-                          ) {
-                            return _MultiSelectMenuPanel<T>(
-                              key: ValueKey<String>(selectedNames.join('|')),
-                              width: _fieldWidth,
-                              itemsProvider: widget.itemsProvider,
-                              selectedNames: selectedNames,
-                              onAdd: widget.onAdd,
-                              onRetry: widget.onRetry,
-                              resolveName: widget.resolveName,
-                              copy: widget.copy,
-                            );
-                          },
-                    ),
-                    child: CallbackShortcuts(
-                      bindings: <ShortcutActivator, VoidCallback>{
-                        const SingleActivator(LogicalKeyboardKey.escape):
-                            _closeMenu,
-                      },
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            _inputFocusNode.requestFocus();
-                            _openMenu();
-                          },
-                          borderRadius: BorderRadius.circular(tokens.radius.md),
-                          child: AnimatedContainer(
-                            key: MultiSelect.fieldSurfaceKey,
-                            duration: const Duration(milliseconds: 150),
-                            width: double.infinity,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: tokens.spacing.md,
-                              vertical: fieldVerticalPadding,
-                            ),
-                            constraints: BoxConstraints(
-                              minHeight: fieldMinHeight,
-                            ),
-                            decoration: BoxDecoration(
-                              color: cs.surface,
-                              borderRadius: BorderRadius.circular(
-                                tokens.radius.md,
-                              ),
-                              border: Border.all(
-                                color: cs.hentai.borderSubtle,
-                                width: 1.5,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: cs.shadow,
-                                  blurRadius: 1,
-                                  offset: const Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+              child: FormLabel(widget.label, trailing: widget.labelTrailing),
+            ),
+          ],
+        ),
+        SizedBox(height: tokens.spacing.sm - 2),
+        LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            _fieldWidth = constraints.maxWidth;
+            return CustomPopupMenu(
+              controller: _menuController,
+              barrierColor: Colors.transparent,
+              pressType: PressType.singleClick,
+              showArrow: false,
+              verticalMargin: 4,
+              menuBuilder: () => ValueListenableBuilder<List<String>>(
+                valueListenable: _selectedNamesNotifier,
+                builder:
+                    (
+                      BuildContext context,
+                      List<String> selectedNames,
+                      Widget? _,
+                    ) {
+                      return _MultiSelectMenuPanel<T>(
+                        key: ValueKey<String>(selectedNames.join('|')),
+                        width: _fieldWidth,
+                        itemsProvider: widget.itemsProvider,
+                        selectedNames: selectedNames,
+                        onAdd: widget.onAdd,
+                        onRetry: widget.onRetry,
+                        resolveName: widget.resolveName,
+                        copy: widget.copy,
+                      );
+                    },
+              ),
+              child: CallbackShortcuts(
+                bindings: <ShortcutActivator, VoidCallback>{
+                  const SingleActivator(LogicalKeyboardKey.escape): _closeMenu,
+                },
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      _inputFocusNode.requestFocus();
+                      _openMenu();
+                    },
+                    borderRadius: BorderRadius.circular(tokens.radius.md),
+                    child: AnimatedContainer(
+                      key: MultiSelect.fieldSurfaceKey,
+                      duration: const Duration(milliseconds: 150),
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: tokens.spacing.md,
+                        vertical: fieldVerticalPadding,
+                      ),
+                      constraints: BoxConstraints(minHeight: fieldMinHeight),
+                      decoration: BoxDecoration(
+                        color: cs.surface,
+                        borderRadius: BorderRadius.circular(tokens.radius.md),
+                        border: Border.all(
+                          color: cs.hentai.borderSubtle,
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: cs.shadow,
+                            blurRadius: 1,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Wrap(
+                              spacing: tokens.spacing.xs,
+                              runSpacing: tokens.spacing.xs,
+                              crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
-                                Expanded(
-                                  child: Wrap(
-                                    spacing: tokens.spacing.xs,
-                                    runSpacing: tokens.spacing.xs,
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.center,
-                                    children: [
-                                      for (final String name
-                                          in widget.selectedNames)
-                                        OutlinedMetaChip(
-                                          text: name,
-                                          onRemove: () => widget.onRemove(name),
-                                        ),
-                                      ConstrainedBox(
-                                        constraints: const BoxConstraints(
-                                          minWidth: 72,
-                                          maxWidth: 200,
-                                        ),
-                                        child: IntrinsicWidth(
-                                          child: TextField(
-                                            controller: _inputController,
-                                            focusNode: _inputFocusNode,
-                                            onSubmitted: (_) => _submitInput(),
-                                            style: TextStyle(
-                                              fontSize: tokens.text.bodySm,
-                                              height: 1.35,
-                                              color: cs.hentai.textPrimary,
-                                            ),
-                                            decoration: InputDecoration(
-                                              isDense: true,
-                                              border: InputBorder.none,
-                                              hintText:
-                                                  widget.selectedNames.isEmpty
-                                                  ? widget.copy.inputPlaceholder
-                                                  : null,
-                                              hintStyle: TextStyle(
-                                                fontSize: tokens.text.bodySm,
-                                                height: 1.35,
-                                                color:
-                                                    cs.hentai.textPlaceholder,
-                                              ),
-                                              contentPadding: EdgeInsets.zero,
-                                            ),
-                                          ),
-                                        ),
+                                for (final String name in widget.selectedNames)
+                                  OutlinedMetaChip(
+                                    text: name,
+                                    onRemove: () => widget.onRemove(name),
+                                  ),
+                                ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                    minWidth: 72,
+                                    maxWidth: 200,
+                                  ),
+                                  child: IntrinsicWidth(
+                                    child: TextField(
+                                      controller: _inputController,
+                                      focusNode: _inputFocusNode,
+                                      onSubmitted: (_) => _submitInput(),
+                                      style: TextStyle(
+                                        fontSize: tokens.text.bodySm,
+                                        height: 1.35,
+                                        color: cs.hentai.textPrimary,
                                       ),
-                                    ],
+                                      decoration: InputDecoration(
+                                        isDense: true,
+                                        border: InputBorder.none,
+                                        hintText: widget.selectedNames.isEmpty
+                                            ? widget.copy.inputPlaceholder
+                                            : null,
+                                        hintStyle: TextStyle(
+                                          fontSize: tokens.text.bodySm,
+                                          height: 1.35,
+                                          color: cs.hentai.textPlaceholder,
+                                        ),
+                                        contentPadding: EdgeInsets.zero,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                if (itemsAsync.isLoading)
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                      top: tokens.spacing.xs,
-                                    ),
-                                    child: SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: cs.primary,
-                                      ),
-                                    ),
-                                  )
-                                else
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                      top: tokens.spacing.xs,
-                                    ),
-                                    child: Icon(
-                                      LucideIcons.chevronsUpDown,
-                                      size: 15,
-                                      color: cs.hentai.iconSecondary,
-                                    ),
-                                  ),
                               ],
                             ),
                           ),
-                        ),
+                          if (itemsAsync.isLoading)
+                            Padding(
+                              padding: EdgeInsets.only(top: tokens.spacing.xs),
+                              child: SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: cs.primary,
+                                ),
+                              ),
+                            )
+                          else
+                            Padding(
+                              padding: EdgeInsets.only(top: tokens.spacing.xs),
+                              child: Icon(
+                                LucideIcons.chevronsUpDown,
+                                size: 15,
+                                color: cs.hentai.iconSecondary,
+                              ),
+                            ),
+                        ],
                       ),
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
-            ),
-          ],
+            );
+          },
         ),
         if (itemsAsync.hasError)
           Padding(

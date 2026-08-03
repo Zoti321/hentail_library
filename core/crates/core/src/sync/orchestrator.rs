@@ -10,7 +10,8 @@ use super::dto::{
 };
 use super::format_group::FormatGroup;
 use super::handle::SyncHandle;
-use super::parser::normalize_roots;
+use super::library_lock::try_acquire_library_write_lock;
+use crate::resource::normalize_roots;
 use super::plan::{
     build_scan_replace_plan, count_all_comic_ids, load_existing_comics_map, load_saved_paths,
     load_thumbnail_stats,
@@ -39,6 +40,7 @@ pub async fn sync_library(
     enabled_format_groups: &[FormatGroup],
     emit: impl FnMut(SyncLibraryProgressDto),
 ) -> Result<(), HentaiError> {
+    let _guard = try_acquire_library_write_lock()?;
     let db = connection()?;
     let roots = load_saved_paths(&db).await?;
     let effective = normalize_roots(&roots);
@@ -121,6 +123,7 @@ async fn sync_no_roots(
         None,
     ));
     let removed = clear_all_comics(db).await?;
+    // Sole locality for sync-driven session invalidation (do not also clear from Flutter).
     clear_reader_sessions();
     log_sync_phase(SyncLibraryPhaseDto::Done, SyncLibraryRouteDto::NoRootsCleared);
     tracing::info!(removed, "sync complete");
@@ -229,6 +232,7 @@ async fn sync_with_roots(
         return Ok(());
     }
     apply_scan_replace_plan(db, &plan).await?;
+    // Sole locality for sync-driven session invalidation (do not also clear from Flutter).
     clear_reader_sessions();
 
     let thumbnail_targets = plan.thumbnail_generation_targets.clone();

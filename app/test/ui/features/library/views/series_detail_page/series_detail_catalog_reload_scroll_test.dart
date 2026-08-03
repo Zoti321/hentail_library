@@ -7,6 +7,7 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
@@ -37,8 +38,8 @@ class _SeriesDetailCatalogWhenHarness extends StatelessWidget {
         data: (SeriesDetailComicsCatalogState catalog) {
           return Column(
             children: <Widget>[
-              for (final Comic comic in catalog.items)
-                SizedBox(height: 120, child: Text(comic.title)),
+              for (final SeriesComicPageItem item in catalog.items)
+                SizedBox(height: 120, child: Text(item.comic.title)),
             ],
           );
         },
@@ -71,7 +72,7 @@ class _DelayedSeriesRepo implements SeriesRepository {
   int fetchCount = 0;
 
   @override
-  Future<PagedResult<Comic>> fetchComicsPage({
+  Future<PagedResult<SeriesComicPageItem>> fetchComicsPage({
     required String seriesId,
     required PageRequest request,
   }) async {
@@ -79,8 +80,13 @@ class _DelayedSeriesRepo implements SeriesRepository {
     if (fetchCount > 1) {
       await gate.future;
     }
-    return PagedResult<Comic>(
-      items: comics,
+    return PagedResult<SeriesComicPageItem>(
+      items: comics
+          .map(
+            (Comic comic) =>
+                (comic: comic, sortOrder: 0.0, sortOrderLocked: false),
+          )
+          .toList(),
       page: request.page,
       pageSize: request.pageSize,
       totalCount: comics.length,
@@ -115,7 +121,12 @@ Comic _comic(int index) {
 
 SeriesDetailComicsCatalogState _catalogState(List<Comic> comics) {
   return SeriesDetailComicsCatalogState(
-    items: comics,
+    items: comics
+        .map(
+          (Comic comic) =>
+              (comic: comic, sortOrder: 0.0, sortOrderLocked: false),
+        )
+        .toList(),
     pagination: LibraryPagination(
       page: 1,
       totalPages: 1,

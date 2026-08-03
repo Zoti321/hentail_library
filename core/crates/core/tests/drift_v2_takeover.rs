@@ -270,7 +270,7 @@ fn fetch_series_comics_page_returns_ordered_comics() {
             assert_eq!(comics_page.total_count, author_series.items.len() as i64);
             assert_eq!(comics_page.items.len(), 1);
             assert_eq!(
-                comics_page.items[0].comic_id,
+                comics_page.items[0].comic.comic_id,
                 author_series.items[0].comic_id
             );
             let metadata = fetch_series_comics_metadata(&author_series_id)

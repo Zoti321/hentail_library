@@ -216,6 +216,23 @@ void main() {
       expect(snapshot.resumePageIndex, 1);
     });
 
+    test('open uses page 1 when startFromFirstPage', () async {
+      final ReaderSessionService service = _service(
+        pages: <ReadSessionPage>[
+          ReadSessionArchivePage(comicId: 'c1', pageIndex: 0),
+          ReadSessionArchivePage(comicId: 'c1', pageIndex: 1),
+        ],
+        storedPageIndex: 2,
+      );
+
+      final ReaderSessionSnapshot snapshot = await service.open(
+        comicId: 'c1',
+        startFromFirstPage: true,
+      );
+
+      expect(snapshot.resumePageIndex, 1);
+    });
+
     test('wraps port failures as ReadSessionPageLoadException', () async {
       final ReaderSessionService service = _service(
         loadError: StateError('io failed'),

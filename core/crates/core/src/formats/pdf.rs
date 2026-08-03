@@ -13,11 +13,22 @@ pub struct PdfBackend {
 }
 
 fn bind_pdfium() -> Result<Pdfium, HentaiError> {
-    let lib_dir = env!("HENTAI_PDFIUM_LIB_DIR");
-    let lib_path = Pdfium::pdfium_platform_library_name_at_path(lib_dir);
-    let bindings = Pdfium::bind_to_library(lib_path)
-        .map_err(|e| map_archive_err("pdfium 绑定失败", e))?;
-    Ok(Pdfium::new(bindings))
+    #[cfg(target_os = "android")]
+    {
+        // Packaged next to libhentai_flutter.so in jniLibs (also NEEDED).
+        // Do not fall back to system libpdfium — it is older / inaccessible on many APIs.
+        let bindings = Pdfium::bind_to_library("libpdfium.so")
+            .map_err(|e| map_archive_err("pdfium 绑定失败", e))?;
+        return Ok(Pdfium::new(bindings));
+    }
+    #[cfg(not(target_os = "android"))]
+    {
+        let lib_dir = env!("HENTAI_PDFIUM_LIB_DIR");
+        let lib_path = Pdfium::pdfium_platform_library_name_at_path(lib_dir);
+        let bindings = Pdfium::bind_to_library(lib_path)
+            .map_err(|e| map_archive_err("pdfium 绑定失败", e))?;
+        Ok(Pdfium::new(bindings))
+    }
 }
 
 pub fn count_pdf_pages(file: &Path) -> Result<Option<i32>, HentaiError> {
@@ -32,9 +43,14 @@ pub fn count_pdf_pages(file: &Path) -> Result<Option<i32>, HentaiError> {
     Ok(Some(count as i32))
 }
 
-pub fn read_pdf_embedded_meta(
-    file: &Path,
-) -> Result<(Option<String>, Vec<String>, Option<String>, Option<i64>), HentaiError> {
+type PdfEmbeddedMeta = (
+    Option<String>,
+    Vec<String>,
+    Option<String>,
+    Option<i64>,
+);
+
+pub fn read_pdf_embedded_meta(file: &Path) -> Result<PdfEmbeddedMeta, HentaiError> {
     let pdfium = bind_pdfium()?;
     let document = pdfium
         .load_pdf_from_file(file, None)

@@ -9,6 +9,7 @@ import 'package:hentai_library/ui/core/widgets/element/card/catalog_cover_card_s
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/comic_context_menu.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/comic_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
@@ -32,7 +33,10 @@ class ComicCard extends ConsumerWidget {
     return CatalogCoverCardShell(
       onTap: onTap,
       onSecondaryTapUp: (TapUpDetails details) {
-        _showContextMenu(context, ref, details);
+        _showContextMenu(context, ref, details.globalPosition);
+      },
+      onLongPressStart: (LongPressStartDetails details) {
+        _showContextMenu(context, ref, details.globalPosition);
       },
       cover: ComicCoverContent(comicId: comic.comicId, gridIndex: gridIndex),
       info: (bool isHover) => _ComicCardInfo(
@@ -46,13 +50,11 @@ class ComicCard extends ConsumerWidget {
   void _showContextMenu(
     BuildContext context,
     WidgetRef ref,
-    TapUpDetails details,
+    Offset globalPosition,
   ) {
     final RenderBox overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox;
-    final Offset relativePosition = overlay.globalToLocal(
-      details.globalPosition,
-    );
+    final Offset relativePosition = overlay.globalToLocal(globalPosition);
 
     ComicContextMenu.show(
       context,
@@ -73,7 +75,7 @@ class ComicCard extends ConsumerWidget {
               context: context,
               comic: comic,
               onSave: (ComicMetadataForm data) async {
-                await data.applyTo(ref.read(comicRepoProvider), comic.comicId);
+                await data.applyTo(ref.read(comicRepoProvider), comic);
               },
             );
           case ComicContextAction.showInExplorer:
@@ -103,25 +105,8 @@ class ComicCard extends ConsumerWidget {
           case ComicContextAction.delete:
             showDialog<bool>(
               context: context,
-              builder: (BuildContext dialogContext) {
-                final dialogL10n = dialogContext.l10n;
-                return AlertDialog(
-                  title: Text(dialogL10n.comicDetailDeleteTitle),
-                  content: Text(
-                    dialogL10n.comicDetailDeleteConfirm(comic.title),
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () => Navigator.of(dialogContext).pop(false),
-                      child: Text(dialogL10n.comicDetailCancel),
-                    ),
-                    FilledButton(
-                      onPressed: () => Navigator.of(dialogContext).pop(true),
-                      child: Text(dialogL10n.comicDetailDelete),
-                    ),
-                  ],
-                );
-              },
+              builder: (BuildContext dialogContext) =>
+                  ComicConfirmDeleteDialog(title: comic.title),
             ).then((bool? confirmed) async {
               if (confirmed != true || !context.mounted) {
                 return;

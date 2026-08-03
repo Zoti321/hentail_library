@@ -8,6 +8,9 @@ mod m20250705_000006_folder_series;
 mod m20250705_000007_restore_series_reading_histories;
 mod m20260717_000008_ensure_greenfield_schema;
 mod m20260718_000009_user_set_and_series_thumbnails;
+mod m20260801_000010_drop_series_reading_histories;
+mod m20260801_000011_series_item_sort_order_real;
+mod m20260801_000012_metadata_field_locks;
 
 pub struct Migrator;
 
@@ -23,6 +26,9 @@ impl MigratorTrait for Migrator {
             Box::new(m20250705_000007_restore_series_reading_histories::Migration),
             Box::new(m20260717_000008_ensure_greenfield_schema::Migration),
             Box::new(m20260718_000009_user_set_and_series_thumbnails::Migration),
+            Box::new(m20260801_000010_drop_series_reading_histories::Migration),
+            Box::new(m20260801_000011_series_item_sort_order_real::Migration),
+            Box::new(m20260801_000012_metadata_field_locks::Migration),
         ]
     }
 }

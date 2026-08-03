@@ -5,6 +5,7 @@ use crate::comic::repository::load_comics_ordered;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comics};
 use crate::error::HentaiError;
+use crate::metadata_lock::comic_auto_locks;
 use crate::sync::series_rebuild::rebuild_series_from_comics;
 use crate::sync::writer::{replace_comic_authors, replace_comic_tags};
 use crate::util::decode_basic_html_entities;
@@ -18,6 +19,17 @@ pub struct UpdateComicUserMetaDto {
     pub published_at: Option<i64>,
     pub authors: Option<Vec<String>>,
     pub tags: Option<Vec<String>>,
+}
+
+/// Partial patch for Comic metadata field locks (`None` = leave unchanged).
+#[derive(Debug, Clone, Default)]
+pub struct SetComicMetaLocksDto {
+    pub title: Option<bool>,
+    pub description: Option<bool>,
+    pub published_at: Option<bool>,
+    pub content_rating: Option<bool>,
+    pub authors: Option<bool>,
+    pub tags: Option<bool>,
 }
 
 pub async fn touch_comic<C: ConnectionTrait>(db: &C, comic_id: &str) -> Result<(), HentaiError> {
@@ -62,11 +74,21 @@ pub async fn update_comic_user_meta(
     let db = connection()?;
     let txn = db.begin().await.map_err(map_db_err)?;
     let mut meta_touched = false;
-    if meta.title.is_some()
+    let touch_meta_row = meta.title.is_some()
         || meta.content_rating.is_some()
         || meta.description.is_some()
         || meta.published_at.is_some()
-    {
+        || meta.authors.is_some()
+        || meta.tags.is_some();
+    let auto_locks = comic_auto_locks(
+        meta.title.is_some(),
+        meta.description.is_some(),
+        meta.published_at.is_some(),
+        meta.content_rating.is_some(),
+        meta.authors.is_some(),
+        meta.tags.is_some(),
+    );
+    if touch_meta_row {
         let mut active = comic_meta::ActiveModel {
             comic_id: Set(comic_id.to_string()),
             ..Default::default()
@@ -95,7 +117,30 @@ pub async fn update_comic_user_meta(
             });
             meta_touched = true;
         }
-        active.update(&txn).await.map_err(map_db_err)?;
+        if auto_locks.title {
+            active.title_locked = Set(true);
+        }
+        if auto_locks.description {
+            active.description_locked = Set(true);
+        }
+        if auto_locks.published_at {
+            active.published_at_locked = Set(true);
+        }
+        if auto_locks.content_rating {
+            active.content_rating_locked = Set(true);
+        }
+        if auto_locks.authors {
+            active.authors_locked = Set(true);
+            meta_touched = true;
+        }
+        if auto_locks.tags {
+            active.tags_locked = Set(true);
+            meta_touched = true;
+        }
+        if meta_touched || auto_locks.any() {
+            active.update(&txn).await.map_err(map_db_err)?;
+            meta_touched = true;
+        }
     }
     if let Some(authors) = meta.authors {
         replace_comic_authors(&txn, comic_id, &authors).await?;
@@ -108,6 +153,49 @@ pub async fn update_comic_user_meta(
     if meta_touched {
         touch_comic(&txn, comic_id).await?;
     }
+    txn.commit().await.map_err(map_db_err)?;
+    Ok(())
+}
+
+pub async fn set_comic_meta_locks(
+    comic_id: &str,
+    locks: SetComicMetaLocksDto,
+) -> Result<(), HentaiError> {
+    if locks.title.is_none()
+        && locks.description.is_none()
+        && locks.published_at.is_none()
+        && locks.content_rating.is_none()
+        && locks.authors.is_none()
+        && locks.tags.is_none()
+    {
+        return Ok(());
+    }
+    let db = connection()?;
+    let txn = db.begin().await.map_err(map_db_err)?;
+    let mut active = comic_meta::ActiveModel {
+        comic_id: Set(comic_id.to_string()),
+        ..Default::default()
+    };
+    if let Some(v) = locks.title {
+        active.title_locked = Set(v);
+    }
+    if let Some(v) = locks.description {
+        active.description_locked = Set(v);
+    }
+    if let Some(v) = locks.published_at {
+        active.published_at_locked = Set(v);
+    }
+    if let Some(v) = locks.content_rating {
+        active.content_rating_locked = Set(v);
+    }
+    if let Some(v) = locks.authors {
+        active.authors_locked = Set(v);
+    }
+    if let Some(v) = locks.tags {
+        active.tags_locked = Set(v);
+    }
+    active.update(&txn).await.map_err(map_db_err)?;
+    touch_comic(&txn, comic_id).await?;
     txn.commit().await.map_err(map_db_err)?;
     Ok(())
 }

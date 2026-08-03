@@ -14,8 +14,16 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 const String _comicId = 'reader-controller-comic';
-const ReaderControllerKey _key = (comicId: _comicId, incognito: false);
-const ReaderControllerKey _incognitoKey = (comicId: _comicId, incognito: true);
+const ReaderControllerKey _key = (
+  comicId: _comicId,
+  incognito: false,
+  startFromFirstPage: false,
+);
+const ReaderControllerKey _incognitoKey = (
+  comicId: _comicId,
+  incognito: true,
+  startFromFirstPage: false,
+);
 
 Comic _comic({int pageCount = 10}) {
   final DateTime now = DateTime.utc(2026, 1, 1);
@@ -86,6 +94,107 @@ ReaderState? _state(ProviderContainer container, ReaderControllerKey key) =>
     container.read(readerControllerProvider(key)).asData?.value;
 
 void main() {
+  group('auto-play session state', () {
+    test('opens with autoPlayEnabled false', () async {
+      final ProviderContainer container = _createContainer(
+        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+      );
+      addTearDown(container.dispose);
+
+      final ReaderState state = await container.read(
+        readerControllerProvider(_key).future,
+      );
+
+      expect(state.autoPlayEnabled, isFalse);
+    });
+
+    test(
+      'setAutoPlayEnabled(true) keeps auto-play on for same comic',
+      () async {
+        final ProviderContainer container = _createContainer(
+          initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        );
+        addTearDown(container.dispose);
+
+        await container.read(readerControllerProvider(_key).future);
+        _controller(container, _key).setAutoPlayEnabled(true);
+
+        expect(_state(container, _key)?.autoPlayEnabled, isTrue);
+      },
+    );
+
+    test('new comic session starts with auto-play off', () async {
+      const ReaderControllerKey otherKey = (
+        comicId: 'reader-controller-other',
+        incognito: false,
+        startFromFirstPage: false,
+      );
+      final ReaderSessionSnapshot otherSnapshot = ReaderSessionSnapshot(
+        comic: Comic(
+          comicId: otherKey.comicId,
+          path: '/tmp/${otherKey.comicId}.cbz',
+          resourceType: ResourceType.cbz,
+          resourceSize: 1,
+          createdAt: DateTime.utc(2026, 1, 1),
+          lastUpdatedAt: DateTime.utc(2026, 1, 1),
+          title: 'Other Comic',
+          pageCount: 5,
+        ),
+        pages: List<ReadSessionPage>.generate(
+          5,
+          (int index) => ReadSessionArchivePage(
+            comicId: otherKey.comicId,
+            pageIndex: index,
+          ),
+        ),
+        resumePageIndex: 1,
+      );
+      final ProviderContainer container = ProviderContainer(
+        overrides: <Override>[
+          appSettingRepoProvider.overrideWithValue(
+            _MemoryAppSettingRepository(
+              AppSetting(readingMode: ReadingMode.paged),
+            ),
+          ),
+          readerSessionOpenProvider(
+            comicId: _key.comicId,
+            incognito: _key.incognito,
+          ).overrideWith((Ref ref) async => _snapshot()),
+          readerSessionOpenProvider(
+            comicId: otherKey.comicId,
+            incognito: otherKey.incognito,
+          ).overrideWith((Ref ref) async => otherSnapshot),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container.read(readerControllerProvider(_key).future);
+      _controller(container, _key).setAutoPlayEnabled(true);
+
+      final ReaderState otherState = await container.read(
+        readerControllerProvider(otherKey).future,
+      );
+
+      expect(_state(container, _key)?.autoPlayEnabled, isTrue);
+      expect(otherState.autoPlayEnabled, isFalse);
+    });
+
+    test('setReadingMode(webtoon) turns auto-play off', () async {
+      final ProviderContainer container = _createContainer(
+        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+      );
+      addTearDown(container.dispose);
+
+      await container.read(readerControllerProvider(_key).future);
+      final ReaderController controller = _controller(container, _key);
+      controller.setAutoPlayEnabled(true);
+      controller.setReadingMode(ReadingMode.webtoon);
+
+      expect(_state(container, _key)?.autoPlayEnabled, isFalse);
+      expect(_state(container, _key)?.readingMode, ReadingMode.webtoon);
+    });
+  });
+
   group('reading mode from AppSetting', () {
     test(
       'opens with readingMode from AppSetting (not default paged)',

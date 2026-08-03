@@ -76,6 +76,12 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
         page_count: Set(comic.page_count),
         description: Set(comic.description.clone()),
         published_at: Set(comic.published_at),
+        title_locked: Set(comic.locks.title),
+        description_locked: Set(comic.locks.description),
+        published_at_locked: Set(comic.locks.published_at),
+        content_rating_locked: Set(comic.locks.content_rating),
+        authors_locked: Set(comic.locks.authors),
+        tags_locked: Set(comic.locks.tags),
     };
     ComicMeta::insert(meta_active)
         .exec(db)
@@ -87,14 +93,6 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
     rekey_comic_child_table(db, "comic_reading_histories", from_id, to_id).await?;
     rekey_comic_child_table(db, "comic_thumbnails", from_id, to_id).await?;
     rekey_comic_child_table(db, "series_items", from_id, to_id).await?;
-    rekey_reference_column(
-        db,
-        "series_reading_histories",
-        "last_read_comic_id",
-        from_id,
-        to_id,
-    )
-    .await?;
     rekey_reference_column(db, "series_thumbnails", "source_comic_id", from_id, to_id).await?;
 
     Comics::delete_by_id(from_id.clone())
@@ -151,7 +149,6 @@ pub async fn clear_all_comics(db: &DatabaseConnection) -> Result<i32, HentaiErro
     let txn = db.begin().await.map_err(map_db_err)?;
     for table in [
         "comic_reading_histories",
-        "series_reading_histories",
         "series_items",
         "comics",
     ] {
@@ -233,7 +230,10 @@ async fn delete_comics_side_effects_batch<C: ConnectionTrait>(
     Ok(())
 }
 
-async fn upsert_comics<C: ConnectionTrait>(db: &C, comics_list: &[ComicDto]) -> Result<(), HentaiError> {
+pub(crate) async fn upsert_comics<C: ConnectionTrait>(
+    db: &C,
+    comics_list: &[ComicDto],
+) -> Result<(), HentaiError> {
     for comic in comics_list {
         if comic.page_count <= 0 {
             continue;
@@ -303,6 +303,12 @@ async fn upsert_comics<C: ConnectionTrait>(db: &C, comics_list: &[ComicDto]) -> 
             page_count: Set(comic.page_count),
             description: Set(comic.description.clone()),
             published_at: Set(comic.published_at),
+            title_locked: Set(comic.locks.title),
+            description_locked: Set(comic.locks.description),
+            published_at_locked: Set(comic.locks.published_at),
+            content_rating_locked: Set(comic.locks.content_rating),
+            authors_locked: Set(comic.locks.authors),
+            tags_locked: Set(comic.locks.tags),
         };
         ComicMeta::insert(meta_active)
             .on_conflict(
@@ -313,6 +319,12 @@ async fn upsert_comics<C: ConnectionTrait>(db: &C, comics_list: &[ComicDto]) -> 
                         comic_meta::Column::PageCount,
                         comic_meta::Column::Description,
                         comic_meta::Column::PublishedAt,
+                        comic_meta::Column::TitleLocked,
+                        comic_meta::Column::DescriptionLocked,
+                        comic_meta::Column::PublishedAtLocked,
+                        comic_meta::Column::ContentRatingLocked,
+                        comic_meta::Column::AuthorsLocked,
+                        comic_meta::Column::TagsLocked,
                     ])
                     .to_owned(),
             )

@@ -9,6 +9,7 @@ pub enum HentaiErrorCode {
     ReaderKindMismatch,
     ReaderUnsupportedType,
     ReaderInvalidContent,
+    ReaderSessionNotOpen,
 }
 
 #[derive(Debug, Clone, Error)]
@@ -72,6 +73,14 @@ impl HentaiError {
         Self {
             code: HentaiErrorCode::ReaderInvalidContent,
             message: message.into(),
+            context: None,
+        }
+    }
+
+    pub fn reader_session_not_open(comic_id: impl Into<String>) -> Self {
+        Self {
+            code: HentaiErrorCode::ReaderSessionNotOpen,
+            message: format!("阅读会话未打开: {}", comic_id.into()),
             context: None,
         }
     }

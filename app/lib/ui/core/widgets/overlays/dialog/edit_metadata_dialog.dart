@@ -6,6 +6,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
@@ -13,11 +14,13 @@ import 'package:hentai_library/ui/core/widgets/form/author_library_multi_select_
 import 'package:hentai_library/ui/core/widgets/form/fluent_date_picker_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_toggle_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/metadata_lock_button.dart';
 import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_side_tab_bar.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -65,10 +68,12 @@ class EditMetadataDialog extends StatefulHookConsumerWidget {
 
 class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   late ComicMetadataForm _form;
+  late ComicMetaLocks _locks;
   ComicMetadataFormValidation? _validation;
   _EditMetadataTab _selectedTab = _EditMetadataTab.general;
   int _previousTabIndex = 0;
   bool _saving = false;
+  bool _lockBusy = false;
 
   List<DialogSideTabItem> _sideTabs(AppLocalizations l10n) =>
       <DialogSideTabItem>[
@@ -97,6 +102,59 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   void initState() {
     super.initState();
     _form = ComicMetadataForm.fromComic(widget.comic);
+    _locks = widget.comic.locks;
+  }
+
+  Future<void> _setLock({
+    bool? title,
+    bool? description,
+    bool? publishedAt,
+    bool? contentRating,
+    bool? authors,
+    bool? tags,
+  }) async {
+    if (_lockBusy) {
+      return;
+    }
+    setState(() => _lockBusy = true);
+    try {
+      await ref
+          .read(comicRepoProvider)
+          .setMetaLocks(
+            widget.comic.comicId,
+            title: title,
+            description: description,
+            publishedAt: publishedAt,
+            contentRating: contentRating,
+            authors: authors,
+            tags: tags,
+          );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _locks = _locks.copyWith(
+          title: title,
+          description: description,
+          publishedAt: publishedAt,
+          contentRating: contentRating,
+          authors: authors,
+          tags: tags,
+        );
+      });
+    } catch (_) {
+      if (mounted) {
+        showCustomToast(
+          context,
+          message: context.l10n.commonSaveFailedToast,
+          type: AppToastType.error,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _lockBusy = false);
+      }
+    }
   }
 
   void _selectTab(int index) {
@@ -173,9 +231,13 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
         showSuccessToast(context, context.l10n.commonSavedToast);
         Navigator.of(context).pop();
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
-        showErrorToast(context, e);
+        showCustomToast(
+          context,
+          message: context.l10n.commonSaveFailedToast,
+          type: AppToastType.error,
+        );
       }
     } finally {
       if (mounted) {
@@ -208,6 +270,8 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           description: _form.description ?? '',
           publishedAt: _form.publishedAt,
           isR18: _form.isR18,
+          locks: _locks,
+          lockBusy: _lockBusy || _saving,
           onTitleChanged: (String value) {
             setState(() {
               _form = _form.copyWith(title: value);
@@ -229,11 +293,14 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           onIsR18Changed: (bool value) {
             _updateForm((ComicMetadataForm f) => f.copyWith(isR18: value));
           },
+          onLockChanged: _setLock,
         ),
         _EditMetadataTab.authorsAndTags => _EditMetadataAuthorsTagsTab(
           key: const ValueKey<String>('authors-tags'),
           authors: _form.authors,
           tags: _form.tags,
+          locks: _locks,
+          lockBusy: _lockBusy || _saving,
           onAddAuthor: (String name) {
             _updateForm((ComicMetadataForm f) => f.addAuthor(name));
           },
@@ -246,6 +313,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           onRemoveTag: (String name) {
             _updateForm((ComicMetadataForm f) => f.removeTag(name));
           },
+          onLockChanged: _setLock,
         ),
       },
     );
@@ -365,6 +433,16 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   }
 }
 
+typedef _MetaLockChanged =
+    Future<void> Function({
+      bool? title,
+      bool? description,
+      bool? publishedAt,
+      bool? contentRating,
+      bool? authors,
+      bool? tags,
+    });
+
 class _EditMetadataGeneralTab extends StatelessWidget {
   const _EditMetadataGeneralTab({
     super.key,
@@ -373,10 +451,13 @@ class _EditMetadataGeneralTab extends StatelessWidget {
     required this.description,
     required this.publishedAt,
     required this.isR18,
+    required this.locks,
+    required this.lockBusy,
     required this.onTitleChanged,
     required this.onDescriptionChanged,
     required this.onPublishedAtChanged,
     required this.onIsR18Changed,
+    required this.onLockChanged,
   });
 
   final String title;
@@ -384,10 +465,13 @@ class _EditMetadataGeneralTab extends StatelessWidget {
   final String description;
   final DateTime? publishedAt;
   final bool isR18;
+  final ComicMetaLocks locks;
+  final bool lockBusy;
   final ValueChanged<String> onTitleChanged;
   final ValueChanged<String> onDescriptionChanged;
   final ValueChanged<DateTime?> onPublishedAtChanged;
   final ValueChanged<bool> onIsR18Changed;
+  final _MetaLockChanged onLockChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -399,11 +483,21 @@ class _EditMetadataGeneralTab extends StatelessWidget {
 
     final Widget publishedAtField = FluentDatePickerField(
       labelText: l10n.formPublishedDateLabel,
+      labelTrailing: MetadataLockButton(
+        locked: locks.publishedAt,
+        enabled: !lockBusy,
+        onChanged: (bool locked) => onLockChanged(publishedAt: locked),
+      ),
       value: publishedAt,
       onChanged: onPublishedAtChanged,
     );
     final Widget contentRatingField = FluentToggleField(
       labelText: l10n.formAgeRestrictionLabel,
+      labelTrailing: MetadataLockButton(
+        locked: locks.contentRating,
+        enabled: !lockBusy,
+        onChanged: (bool locked) => onLockChanged(contentRating: locked),
+      ),
       value: isR18,
       onChanged: onIsR18Changed,
       checkedLabel: 'R18',
@@ -416,6 +510,11 @@ class _EditMetadataGeneralTab extends StatelessWidget {
       children: <Widget>[
         FluentTextField(
           labelText: l10n.formComicTitleLabel,
+          labelTrailing: MetadataLockButton(
+            locked: locks.title,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(title: locked),
+          ),
           initialValue: title,
           errorText: titleError,
           onChanged: onTitleChanged,
@@ -423,6 +522,11 @@ class _EditMetadataGeneralTab extends StatelessWidget {
         ),
         FluentTextField(
           labelText: l10n.formComicDescriptionLabel,
+          labelTrailing: MetadataLockButton(
+            locked: locks.description,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(description: locked),
+          ),
           initialValue: description,
           maxLines: 4,
           onChanged: onDescriptionChanged,
@@ -453,18 +557,24 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
     super.key,
     required this.authors,
     required this.tags,
+    required this.locks,
+    required this.lockBusy,
     required this.onAddAuthor,
     required this.onRemoveAuthor,
     required this.onAddTag,
     required this.onRemoveTag,
+    required this.onLockChanged,
   });
 
   final List<Author> authors;
   final List<Tag> tags;
+  final ComicMetaLocks locks;
+  final bool lockBusy;
   final ValueChanged<String> onAddAuthor;
   final ValueChanged<String> onRemoveAuthor;
   final ValueChanged<String> onAddTag;
   final ValueChanged<String> onRemoveTag;
+  final _MetaLockChanged onLockChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -477,6 +587,11 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
       children: <Widget>[
         AuthorLibraryMultiSelectField(
           label: l10n.comicDetailAuthors,
+          labelTrailing: MetadataLockButton(
+            locked: locks.authors,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(authors: locked),
+          ),
           icon: LucideIcons.penTool,
           selectedNames: authors.map((Author a) => a.name).toList(),
           onAdd: onAddAuthor,
@@ -484,6 +599,11 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
         ),
         TagLibraryMultiSelectField(
           label: l10n.comicDetailTags,
+          labelTrailing: MetadataLockButton(
+            locked: locks.tags,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(tags: locked),
+          ),
           icon: LucideIcons.tag,
           selectedNames: tags.map((Tag t) => t.name).toList(),
           onAdd: onAddTag,

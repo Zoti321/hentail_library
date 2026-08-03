@@ -1,22 +1,13 @@
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/reading_history.dart';
-import 'package:hentai_library/domain/models/entity/series_reading_history.dart';
 import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/domain/reading/reader_session_service.dart';
 import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
-import 'package:hentai_library/domain/repositories/series_reading_history_repository.dart';
 
 class _ActiveReadingSession {
-  _ActiveReadingSession({
-    required this.comic,
-    required this.mode,
-    required this.seriesId,
-    required this.pageIndex,
-  });
+  _ActiveReadingSession({required this.comic, required this.pageIndex});
 
   final Comic comic;
-  final ReadSessionMode mode;
-  final String? seriesId;
   int pageIndex;
 }
 
@@ -32,14 +23,11 @@ class ReadSessionCoordinator {
   ReadSessionCoordinator({
     required ReaderSessionService sessionService,
     required ReadingHistoryRepository readingHistoryRepo,
-    required SeriesReadingHistoryRepository seriesReadingHistoryRepo,
   }) : _sessionService = sessionService,
-       _readingHistoryRepo = readingHistoryRepo,
-       _seriesReadingHistoryRepo = seriesReadingHistoryRepo;
+       _readingHistoryRepo = readingHistoryRepo;
 
   final ReaderSessionService _sessionService;
   final ReadingHistoryRepository _readingHistoryRepo;
-  final SeriesReadingHistoryRepository _seriesReadingHistoryRepo;
 
   _ActiveReadingSession? _session;
   Future<void>? _flushInFlight;
@@ -48,8 +36,6 @@ class ReadSessionCoordinator {
 
   Future<void> beginReadSession({
     required Comic comic,
-    required ReadSessionMode mode,
-    String? seriesId,
     bool incognito = false,
     int initialPageIndex = 1,
   }) async {
@@ -57,16 +43,11 @@ class ReadSessionCoordinator {
       _session = null;
       return;
     }
-    final String? resolvedSeriesId = _normalizeSeriesId(
-      mode == ReadSessionMode.series ? seriesId : null,
-    );
     if (_session != null && _session!.comic.comicId != comic.comicId) {
       await _flushSession(_session!);
     }
     _session = _ActiveReadingSession(
       comic: comic,
-      mode: mode,
-      seriesId: resolvedSeriesId,
       pageIndex: initialPageIndex.clamp(1, 1 << 30),
     );
     await _flushSession(_session!);
@@ -134,8 +115,8 @@ class ReadSessionCoordinator {
       targetComicId: targetComicId,
       nextSession: ReadSessionRouteParams(
         comicId: targetComicId,
-        seriesId: currentSession.seriesId,
         incognito: currentSession.incognito,
+        startFromFirstPage: true,
       ),
     );
   }
@@ -166,25 +147,5 @@ class ReadSessionCoordinator {
         pageIndex: session.pageIndex,
       ),
     );
-    final String? seriesId = session.seriesId;
-    if (seriesId == null || seriesId.isEmpty) {
-      return;
-    }
-    await _seriesReadingHistoryRepo.recordSeriesReading(
-      SeriesReadingHistory(
-        seriesId: seriesId,
-        lastReadComicId: session.comic.comicId,
-        lastReadTime: now,
-        pageIndex: session.pageIndex,
-      ),
-    );
-  }
-
-  String? _normalizeSeriesId(String? seriesId) {
-    final String? trimmed = seriesId?.trim();
-    if (trimmed == null || trimmed.isEmpty) {
-      return null;
-    }
-    return trimmed;
   }
 }

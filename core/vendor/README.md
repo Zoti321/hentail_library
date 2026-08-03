@@ -12,6 +12,12 @@
 | `linux-aarch64` | `aarch64-unknown-linux-gnu` | `libpdfium.so` |
 | `macos-x86_64` | `x86_64-apple-darwin` | `libpdfium.dylib` |
 | `macos-aarch64` | `aarch64-apple-darwin` | `libpdfium.dylib` |
+| `android-arm` | `armv7-linux-androideabi` | `libpdfium.so` |
+| `android-arm64` | `aarch64-linux-android` | `libpdfium.so` |
+| `android-x86` | `i686-linux-android` | `libpdfium.so` |
+| `android-x64` | `x86_64-linux-android` | `libpdfium.so` |
+
+**PDF / Android**：运行时按 soname 加载 `libpdfium.so`（打进 jniLibs）；`build.rs` 在交叉编译时校验 vendor 并写入 `NEEDED`。iOS 仍为 stub（`mobile_pdf.rs`）。
 
 **RAR/CBR**：经 `unrar-ng` crate 静态编译 rarlab 解压库（仅 list/extract，无压缩 API）；Android / iOS 与桌面共用同一实现。
 
@@ -28,12 +34,18 @@ Flutter 本地开发推荐在仓库根目录运行 `scripts/setup-dev.ps1` / `sc
 仅下载 pdfium：
 
 ```bash
-# Linux / macOS / Git Bash
+# Linux / macOS / Git Bash — 默认当前 host（macOS 拉双架构）
 ./core/vendor/fetch-native-deps.sh
+
+# Android ABI（arm / arm64 / x86 / x64）
+./core/vendor/fetch-native-deps.sh --android
 
 # Windows PowerShell
 ./core/vendor/fetch-native-deps.ps1
+./core/vendor/fetch-native-deps.ps1 --android
 ```
+
+也可 `--platform=android-arm64,android-x64` 精确指定。
 
 脚本从 [bblanchon/pdfium-binaries](https://github.com/bblanchon/pdfium-binaries/releases) 下载与 `manifest.json` 对齐的版本。
 
@@ -42,6 +54,8 @@ Flutter 本地开发推荐在仓库根目录运行 `scripts/setup-dev.ps1` / `sc
 ## Flutter 桌面构建
 
 Windows 构建需将 `pdfium.dll` 复制到可执行文件旁。`app/rust_builder/windows/CMakeLists.txt` 已配置 bundling。
+
+Android 构建由 `app/rust_builder/android/build.gradle` 在 cargokit 之后把对应 ABI 的 `libpdfium.so` 拷入 jniLibs。
 
 ## 环境变量
 

@@ -110,6 +110,10 @@ fn main() {
         // Bionic lacks lutimes on many API levels; our vendored ulinks.cpp
         // falls back when this is defined.
         build.define("UNRAR_NG_ANDROID", None);
+        // cdylib on Android is the final link: without this, libc++ symbols
+        // such as _ZTISt12length_error stay undefined and dlopen fails.
+        // Pair with packaging libc++_shared.so into jniLibs (rust_builder/android).
+        println!("cargo:rustc-link-lib=c++_shared");
     }
 
     let feature_linux_batch_extract_utf8 =

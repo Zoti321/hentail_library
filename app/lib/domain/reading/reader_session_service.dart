@@ -46,10 +46,11 @@ class ReaderSessionService {
   Future<ReaderSessionSnapshot> open({
     required String comicId,
     bool incognito = false,
+    bool startFromFirstPage = false,
   }) async {
     final ({Comic comic, List<ReadSessionPage> pages}) opened =
         await _openPages(comicId);
-    final int resumePageIndex = incognito
+    final int resumePageIndex = (incognito || startFromFirstPage)
         ? 1
         : clampOneBasedResumeIndex(
             storedPageIndex: (await _readingHistoryRepo.getByComicId(

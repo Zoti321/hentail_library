@@ -10,7 +10,7 @@ use crate::error::HentaiError;
 use crate::formats::{
     open_pdf_backend, open_rar_backend, open_sevenz_backend, PdfBackend, RarBackend, SevenZBackend,
 };
-use crate::sync::parser::{basename, extension_lower, is_comic_image_extension};
+use crate::resource::{basename, extension_lower, is_comic_image_extension};
 use crate::util::natural_sort::compare_filename_natural;
 
 pub enum ReaderBackend {

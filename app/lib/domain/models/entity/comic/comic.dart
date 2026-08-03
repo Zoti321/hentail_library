@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/value_objects/comic_meta_locks.dart';
 
 part 'comic.freezed.dart';
 
@@ -23,6 +24,7 @@ abstract class Comic with _$Comic {
     String? description,
     DateTime? publishedAt,
     DateTime? lastReadTime,
+    @Default(ComicMetaLocks.unlocked) ComicMetaLocks locks,
   }) = _Comic;
 
   Comic._();

@@ -11,6 +11,7 @@ class _RecordingComicRepository implements ComicRepository {
   String? title;
   String? description;
   DateTime? publishedAt;
+  bool clearPublishedAt = false;
   List<Author>? authors;
   ContentRating? contentRating;
   List<Tag>? tags;
@@ -22,6 +23,7 @@ class _RecordingComicRepository implements ComicRepository {
     String? title,
     String? description,
     DateTime? publishedAt,
+    bool clearPublishedAt = false,
     List<Author>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
@@ -31,6 +33,7 @@ class _RecordingComicRepository implements ComicRepository {
     this.title = title;
     this.description = description;
     this.publishedAt = publishedAt;
+    this.clearPublishedAt = clearPublishedAt;
     this.authors = authors;
     this.contentRating = contentRating;
     this.tags = tags;
@@ -43,6 +46,7 @@ class _RecordingComicRepository implements ComicRepository {
 Comic _comic({
   String title = '原标题',
   String? description,
+  DateTime? publishedAt,
   ContentRating contentRating = ContentRating.safe,
   List<Author> authors = const <Author>[],
   List<Tag> tags = const <Tag>[],
@@ -57,6 +61,7 @@ Comic _comic({
     lastUpdatedAt: now,
     title: title,
     description: description,
+    publishedAt: publishedAt,
     contentRating: contentRating,
     authors: authors,
     tags: tags,
@@ -140,15 +145,89 @@ void main() {
       final _RecordingComicRepository repo = _RecordingComicRepository();
       final ComicMetadataApplyResult result = await ComicMetadataForm(
         title: '  ',
-      ).applyTo(repo, 'comic-1');
+      ).applyTo(repo, _comic());
 
       expect(result, isA<ComicMetadataApplyInvalid>());
       expect(repo.callCount, 0);
     });
 
-    test('persists normalized fields and content rating', () async {
+    test('only submits changed title field', () async {
+      final _RecordingComicRepository repo = _RecordingComicRepository();
+      final Comic original = _comic(title: '原标题', description: '简介');
+      final ComicMetadataApplyResult result = await ComicMetadataForm.fromComic(
+        original,
+      ).copyWith(title: '新标题').applyTo(repo, original);
+
+      expect(result, isA<ComicMetadataApplySucceeded>());
+      expect(repo.callCount, 1);
+      expect(repo.comicId, 'comic-1');
+      expect(repo.title, '新标题');
+      expect(repo.description, isNull);
+      expect(repo.publishedAt, isNull);
+      expect(repo.clearPublishedAt, isFalse);
+      expect(repo.authors, isNull);
+      expect(repo.contentRating, isNull);
+      expect(repo.tags, isNull);
+    });
+
+    test('skips repository when nothing changed', () async {
+      final _RecordingComicRepository repo = _RecordingComicRepository();
+      final Comic original = _comic(description: '简介');
+      final ComicMetadataApplyResult result = await ComicMetadataForm.fromComic(
+        original,
+      ).applyTo(repo, original);
+
+      expect(result, isA<ComicMetadataApplySucceeded>());
+      expect(repo.callCount, 0);
+    });
+
+    test('clears publishedAt only when it changed to empty', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();
       final DateTime published = DateTime.utc(2020, 5, 1);
+      final Comic original = _comic(publishedAt: published);
+      final ComicMetadataApplyResult result = await ComicMetadataForm.fromComic(
+        original,
+      ).copyWith(publishedAt: null).applyTo(repo, original);
+
+      expect(result, isA<ComicMetadataApplySucceeded>());
+      expect(repo.callCount, 1);
+      expect(repo.publishedAt, isNull);
+      expect(repo.clearPublishedAt, isTrue);
+      expect(repo.title, isNull);
+    });
+
+    test('only submits authors when ordered names change', () async {
+      final _RecordingComicRepository repo = _RecordingComicRepository();
+      final Comic original = _comic(
+        authors: <Author>[
+          Author(name: 'A'),
+          Author(name: 'B'),
+        ],
+      );
+      final ComicMetadataApplyResult result =
+          await ComicMetadataForm.fromComic(original)
+              .copyWith(
+                authors: <Author>[
+                  Author(name: 'B'),
+                  Author(name: 'A'),
+                ],
+              )
+              .applyTo(repo, original);
+
+      expect(result, isA<ComicMetadataApplySucceeded>());
+      expect(repo.callCount, 1);
+      expect(repo.authors?.map((Author a) => a.name).toList(), <String>[
+        'B',
+        'A',
+      ]);
+      expect(repo.title, isNull);
+      expect(repo.tags, isNull);
+    });
+
+    test('persists all fields that differ from original', () async {
+      final _RecordingComicRepository repo = _RecordingComicRepository();
+      final DateTime published = DateTime.utc(2020, 5, 1);
+      final Comic original = _comic();
       final ComicMetadataApplyResult result = await ComicMetadataForm(
         title: ' 新标题 ',
         description: ' 概要 ',
@@ -156,7 +235,7 @@ void main() {
         isR18: true,
         authors: <Author>[Author(name: 'A')],
         tags: <Tag>[Tag(name: 'T')],
-      ).applyTo(repo, 'comic-1');
+      ).applyTo(repo, original);
 
       expect(result, isA<ComicMetadataApplySucceeded>());
       expect(repo.callCount, 1);
@@ -164,14 +243,18 @@ void main() {
       expect(repo.title, '新标题');
       expect(repo.description, '概要');
       expect(repo.publishedAt, published);
+      expect(repo.clearPublishedAt, isFalse);
       expect(repo.contentRating, ContentRating.r18);
       expect(repo.authors, <Author>[Author(name: 'A')]);
       expect(repo.tags, <Tag>[Tag(name: 'T')]);
     });
 
-    test('isR18 false maps to safe content rating', () async {
+    test('isR18 false maps to safe when original was r18', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();
-      await ComicMetadataForm(title: 't', isR18: false).applyTo(repo, 'id');
+      final Comic original = _comic(contentRating: ContentRating.r18);
+      await ComicMetadataForm.fromComic(
+        original,
+      ).copyWith(isR18: false).applyTo(repo, original);
       expect(repo.contentRating, ContentRating.safe);
     });
   });

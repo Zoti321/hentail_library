@@ -1196,6 +1196,48 @@ abstract class AppLocalizations {
   /// **'编辑元数据'**
   String get comicDetailEditMetadata;
 
+  /// No description provided for @refreshMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'刷新元数据'**
+  String get refreshMetadata;
+
+  /// No description provided for @refreshMetadataComicSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'已刷新元数据'**
+  String get refreshMetadataComicSuccess;
+
+  /// No description provided for @refreshMetadataComicFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'刷新元数据失败'**
+  String get refreshMetadataComicFailed;
+
+  /// No description provided for @refreshMetadataBusy.
+  ///
+  /// In zh, this message translates to:
+  /// **'库同步或元数据刷新进行中'**
+  String get refreshMetadataBusy;
+
+  /// No description provided for @refreshMetadataSeriesDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'刷新系列元数据'**
+  String get refreshMetadataSeriesDialogTitle;
+
+  /// No description provided for @refreshMetadataSeriesProgress.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在刷新 {current}/{total}'**
+  String refreshMetadataSeriesProgress(int current, int total);
+
+  /// No description provided for @refreshMetadataSeriesDone.
+  ///
+  /// In zh, this message translates to:
+  /// **'完成：成功 {succeeded}，失败 {failed}'**
+  String refreshMetadataSeriesDone(int succeeded, int failed);
+
   /// No description provided for @comicDetailShowInExplorer.
   ///
   /// In zh, this message translates to:
@@ -1297,6 +1339,36 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'编辑系列'**
   String get seriesDetailEdit;
+
+  /// No description provided for @seriesItemEditSortOrder.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑排序'**
+  String get seriesItemEditSortOrder;
+
+  /// No description provided for @dialogEditSeriesItemSortOrderTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑排序'**
+  String get dialogEditSeriesItemSortOrderTitle;
+
+  /// No description provided for @formSeriesItemSortOrderLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'排序序号'**
+  String get formSeriesItemSortOrderLabel;
+
+  /// No description provided for @formSeriesItemSortOrderHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'例如 1 或 1.5'**
+  String get formSeriesItemSortOrderHint;
+
+  /// No description provided for @formSeriesItemSortOrderInvalid.
+  ///
+  /// In zh, this message translates to:
+  /// **'请输入有效数字'**
+  String get formSeriesItemSortOrderInvalid;
 
   /// No description provided for @seriesDetailNoComics.
   ///
@@ -1976,17 +2048,17 @@ abstract class AppLocalizations {
   /// **'已保存'**
   String get commonSavedToast;
 
+  /// No description provided for @commonSaveFailedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存失败'**
+  String get commonSaveFailedToast;
+
   /// No description provided for @dialogEditSeriesTitle.
   ///
   /// In zh, this message translates to:
   /// **'编辑系列'**
   String get dialogEditSeriesTitle;
-
-  /// No description provided for @dialogEditSeriesSavedToast.
-  ///
-  /// In zh, this message translates to:
-  /// **'系列信息已保存'**
-  String get dialogEditSeriesSavedToast;
 
   /// No description provided for @dialogEditMetadataTitle.
   ///
@@ -2347,12 +2419,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'将清空全部阅读历史记录。此操作不可撤销。'**
   String get confirmClearHistoryContent;
-
-  /// No description provided for @contextMenuGoToDetail.
-  ///
-  /// In zh, this message translates to:
-  /// **'跳转到详情页'**
-  String get contextMenuGoToDetail;
 
   /// No description provided for @breadcrumbReturnLibrary.
   ///

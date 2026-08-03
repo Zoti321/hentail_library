@@ -127,6 +127,7 @@ fn sync_does_not_regenerate_user_set_comic_thumbnail_after_source_change() {
             last_read_time_ms: None,
             authors: vec![],
             tags: vec![],
+            locks: hentai_core::ComicMetaLocks::default(),
         };
 
         let needs = runtime

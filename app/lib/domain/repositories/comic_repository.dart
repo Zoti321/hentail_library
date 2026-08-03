@@ -23,15 +23,28 @@ abstract class ComicRepository {
 
   Future<void> deleteByIds(List<String> comicIds);
 
-  /// 用户编辑覆盖解析值：title/authors/contentRating/tags 等。
+  /// 用户编辑覆盖解析值：仅传入的字段会写入并加锁；`null` 表示省略。
+  /// 清空发布日时传 [clearPublishedAt]（勿与 [publishedAt] 同传）。
   Future<void> updateUserMeta(
     String comicId, {
     String? title,
     String? description,
     DateTime? publishedAt,
+    bool clearPublishedAt = false,
     List<Author>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
+  });
+
+  /// 按字段设置元数据锁（不改值）；`null` 表示该字段不变。
+  Future<void> setMetaLocks(
+    String comicId, {
+    bool? title,
+    bool? description,
+    bool? publishedAt,
+    bool? contentRating,
+    bool? authors,
+    bool? tags,
   });
 
   /// 关键词搜索（数据库命中），由上层决定是否再应用额外业务过滤。

@@ -660,6 +660,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comicDetailEditMetadata => 'Edit metadata';
 
   @override
+  String get refreshMetadata => 'Refresh metadata';
+
+  @override
+  String get refreshMetadataComicSuccess => 'Metadata refreshed';
+
+  @override
+  String get refreshMetadataComicFailed => 'Failed to refresh metadata';
+
+  @override
+  String get refreshMetadataBusy =>
+      'Library sync or metadata refresh is in progress';
+
+  @override
+  String get refreshMetadataSeriesDialogTitle => 'Refresh series metadata';
+
+  @override
+  String refreshMetadataSeriesProgress(int current, int total) {
+    return 'Refreshing $current/$total';
+  }
+
+  @override
+  String refreshMetadataSeriesDone(int succeeded, int failed) {
+    return 'Done: $succeeded succeeded, $failed failed';
+  }
+
+  @override
   String get comicDetailShowInExplorer => 'Show in file explorer';
 
   @override
@@ -713,6 +739,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get seriesDetailEdit => 'Edit series';
+
+  @override
+  String get seriesItemEditSortOrder => 'Edit sort order';
+
+  @override
+  String get dialogEditSeriesItemSortOrderTitle => 'Edit sort order';
+
+  @override
+  String get formSeriesItemSortOrderLabel => 'Sort number';
+
+  @override
+  String get formSeriesItemSortOrderHint => 'e.g. 1 or 1.5';
+
+  @override
+  String get formSeriesItemSortOrderInvalid => 'Enter a valid number';
 
   @override
   String get seriesDetailNoComics => 'No comics in this series';
@@ -1084,10 +1125,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonSavedToast => 'Saved';
 
   @override
-  String get dialogEditSeriesTitle => 'Edit series';
+  String get commonSaveFailedToast => 'Save failed';
 
   @override
-  String get dialogEditSeriesSavedToast => 'Series info saved';
+  String get dialogEditSeriesTitle => 'Edit series';
 
   @override
   String get dialogEditMetadataTitle => 'Edit metadata';
@@ -1295,9 +1336,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get confirmClearHistoryContent =>
       'All reading history will be cleared. This cannot be undone.';
-
-  @override
-  String get contextMenuGoToDetail => 'Go to details';
 
   @override
   String get breadcrumbReturnLibrary => 'Back to library';

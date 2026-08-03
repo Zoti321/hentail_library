@@ -1,12 +1,13 @@
 import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/domain/reading/series_reading_context.dart';
 
 /// Series 仓储：文件夹 sync 自动生成；用户可编辑连载状态与计划总卷数。
 abstract class SeriesRepository {
@@ -24,9 +25,24 @@ abstract class SeriesRepository {
 
   Future<Series?> findById(String seriesId);
 
-  Future<PagedResult<Comic>> fetchComicsPage({
+  /// 按 comicId 派生 Series reading context；无归属返回 null。
+  Future<SeriesReadingContext?> getReadingContextByComicId(String comicId);
+
+  Future<PagedResult<SeriesComicPageItem>> fetchComicsPage({
     required String seriesId,
     required PageRequest request,
+  });
+
+  Future<void> updateSeriesItemSortOrder({
+    required String seriesId,
+    required String comicId,
+    required double sortOrder,
+  });
+
+  Future<void> setSeriesItemSortOrderLocked({
+    required String seriesId,
+    required String comicId,
+    required bool locked,
   });
 
   Future<SeriesComicsMetadata> fetchComicsMetadata(String seriesId);
@@ -37,6 +53,13 @@ abstract class SeriesRepository {
     SerializationStatus? serializationStatus,
     int? totalCount,
     bool clearTotalCount = false,
+  });
+
+  Future<void> setMetaLocks({
+    required String seriesId,
+    bool? name,
+    bool? serializationStatus,
+    bool? totalCount,
   });
 
   /// 保留底层 API，供后续开放手动排序。

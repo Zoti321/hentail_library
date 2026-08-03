@@ -10,6 +10,12 @@ pub struct Model {
     pub page_count: i32,
     pub description: Option<String>,
     pub published_at: Option<i64>,
+    pub title_locked: bool,
+    pub description_locked: bool,
+    pub published_at_locked: bool,
+    pub content_rating_locked: bool,
+    pub authors_locked: bool,
+    pub tags_locked: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

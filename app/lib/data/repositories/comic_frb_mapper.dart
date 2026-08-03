@@ -5,6 +5,7 @@ import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/domain/models/value_objects/library_author_pick.dart';
 import 'package:hentai_library/domain/models/value_objects/library_tag_pick.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
@@ -31,6 +32,14 @@ Comic mapRustComic(rust.ComicDto dto) {
     lastReadTime: dto.lastReadTimeMs == null
         ? null
         : comicTimestampFromMs(dto.lastReadTimeMs!.toInt()),
+    locks: ComicMetaLocks(
+      title: dto.locks.title,
+      description: dto.locks.description,
+      publishedAt: dto.locks.publishedAt,
+      contentRating: dto.locks.contentRating,
+      authors: dto.locks.authors,
+      tags: dto.locks.tags,
+    ),
   );
 }
 

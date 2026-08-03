@@ -14,6 +14,7 @@ if (-not $SkipRustLink) {
 
 if (-not $SkipNativeDeps) {
     & (Join-Path $RepoRoot "core\vendor\fetch-native-deps.ps1")
+    & (Join-Path $RepoRoot "core\vendor\fetch-native-deps.ps1") --android
 }
 
 Write-Host "Dev setup complete."

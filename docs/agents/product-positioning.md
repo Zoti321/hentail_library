@@ -46,7 +46,7 @@ A **Resource** is a file or directory on disk that can become a **Comic** after 
 | 7z archive | `.7z` | Comic archive | Supported |
 | CB7 | `.cb7` | Comic archive (7z convention) | Supported |
 | EPUB | `.epub` | Structured ebook (comic EPUBs) | Supported |
-| PDF | `.pdf` | Document | Supported (desktop; mobile stub) |
+| PDF | `.pdf` | Document | Supported (desktop + Android; iOS stub) |
 
 “Comic archive” means a compressed file whose readable pages are **images** (typical scanlation / doujin layout). Archives are not treated as opaque blobs — the app extracts or streams page images for the reader.
 
@@ -64,9 +64,9 @@ EPUB and PDF are supported as first-class comic carriers when content is comic-l
 | `rar` | Yes | Yes | Desktop + mobile via `unrar-ng` |
 | `cb7` | Yes | Yes | Same pipeline as sevenz |
 | `sevenz` | Yes | Yes | Via `sevenz-rust` |
-| `pdf` | Yes* | Yes* | Desktop via pdfium; Android/iOS still stub |
+| `pdf` | Yes* | Yes* | Desktop + Android via pdfium; iOS still stub |
 
-**Planned:** Remaining gap is **PDF on mobile** (pdfium vendor / linking). Core scan/read/DB already lives in Rust (`core/`) via FRB; see `docs/agents/rust-migration.md` and ADR-0002.
+**Planned:** Remaining gap is **PDF on iOS** (pdfium vendor / packaging). Core scan/read/DB already lives in Rust (`core/`) via FRB; see `docs/agents/rust-migration.md` and ADR-0002.
 
 When adding format support during migration, extend `ResourceType`, implement parser and `PageSource` in Rust, expose via FRB; update Library sync progress counts for new types.
 
@@ -79,6 +79,6 @@ When adding format support during migration, extend `ResourceType`, implement pa
 ## Agent guidance
 
 - Describe the product as a **local comic library**, not a generic file manager or ebook app.
-- Treat **rar/cbr, 7z/cb7** as supported. **PDF on mobile** is still a stub — do not assume it works on Android/iOS.
+- Treat **rar/cbr, 7z/cb7** as supported. **PDF on iOS** is still a stub — do not assume it works on iOS; Android uses vendored pdfium.
 - Prefer **Comic** / **Resource** / **Library sync** terms from `CONTEXT.md` in issues and PRs.
 - New reader or scan features should fit the existing Resource → Comic → Reader pipeline rather than one-off per-format UI forks.

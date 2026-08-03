@@ -4,7 +4,7 @@ use crate::formats::{read_pdf_page, read_rar_page, read_sevenz_page};
 
 use super::backend::{read_epub_page, read_zip_page, ReaderBackend};
 use super::dto::ReaderPageListDto;
-use super::manager::{open_reader, with_session};
+use super::manager::with_session;
 
 #[tracing::instrument(err, fields(comic_id, resource_type, path))]
 pub fn load_page_list(
@@ -12,7 +12,8 @@ pub fn load_page_list(
     path: &str,
     resource_type: &str,
 ) -> Result<ReaderPageListDto, HentaiError> {
-    open_reader(comic_id, path, resource_type)?;
+    // `path` kept for API/tracing; page list comes from the open session backend.
+    let _ = path;
     let list = with_session(comic_id, |backend| match backend {
         ReaderBackend::Dir(dir) => Ok(ReaderPageListDto {
             resource_type: "dir".to_string(),
@@ -70,7 +71,7 @@ pub fn load_page_bytes(
             "目录资源请通过 dir_page_paths 读取文件",
         ));
     }
-    open_reader(comic_id, path, resource_type)?;
+    let _ = path; // kept for API symmetry with open/list; bytes come from session
     let page_index = usize::try_from(page_index).map_err(|_| {
         HentaiError::reader_invalid_content(format!("页索引无效: {page_index}"))
     })?;
