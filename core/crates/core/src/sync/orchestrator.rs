@@ -123,6 +123,7 @@ async fn sync_no_roots(
         None,
     ));
     let removed = clear_all_comics(db).await?;
+    // Sole locality for sync-driven session invalidation (do not also clear from Flutter).
     clear_reader_sessions();
     log_sync_phase(SyncLibraryPhaseDto::Done, SyncLibraryRouteDto::NoRootsCleared);
     tracing::info!(removed, "sync complete");
@@ -231,6 +232,7 @@ async fn sync_with_roots(
         return Ok(());
     }
     apply_scan_replace_plan(db, &plan).await?;
+    // Sole locality for sync-driven session invalidation (do not also clear from Flutter).
     clear_reader_sessions();
 
     let thumbnail_targets = plan.thumbnail_generation_targets.clone();

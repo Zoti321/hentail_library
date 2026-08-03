@@ -1,3 +1,11 @@
+//! Library maintenance: Library sync + Metadata refresh behind one write lock.
+//!
+//! - [`sync_library`] / [`refresh_comic_metadata`] / [`refresh_series_metadata`]
+//!   are the public entry points (also exposed via FRB).
+//! - [`library_lock`] enforces global single-flight across those operations.
+//! - Reader sessions are cleared inside the sync orchestrator after DB writes;
+//!   Flutter must not duplicate that invalidation.
+
 pub mod dto;
 pub mod format_group;
 pub mod handle;

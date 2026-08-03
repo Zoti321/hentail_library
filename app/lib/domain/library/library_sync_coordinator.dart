@@ -1,20 +1,19 @@
 import 'package:hentai_library/data/adapters/sync_library_frb_adapter.dart';
 import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
-import 'package:hentai_library/domain/ports/reader_session_port.dart';
 
-/// Library sync I/O 与阅读会话 / revision 通知编排。
+/// UI-side helper: FRB Library sync + catalog revision bump.
+///
+/// Write-lock mutual exclusion with Metadata refresh, and reader-session
+/// invalidation after DB writes, live in Rust `hentai_core::sync` — not here.
 class LibrarySyncCoordinator {
   const LibrarySyncCoordinator({
     required SyncLibraryFrbAdapter syncAdapter,
-    required ReaderSessionPort readerSessionPort,
     required void Function() onSyncSucceeded,
   }) : _syncAdapter = syncAdapter,
-       _readerSessionPort = readerSessionPort,
        _onSyncSucceeded = onSyncSucceeded;
 
   final SyncLibraryFrbAdapter _syncAdapter;
-  final ReaderSessionPort _readerSessionPort;
   final void Function() _onSyncSucceeded;
 
   Future<void> runSync({
@@ -23,23 +22,12 @@ class LibrarySyncCoordinator {
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   }) async {
-    var clearedSessions = false;
-    Future<void>? sessionClearTask;
     await _syncAdapter.call(
       scanMode: scanMode,
       enabledFormatGroups: enabledFormatGroups,
       isCancelled: isCancelled,
-      onProgress: (SyncLibraryProgress progress) {
-        onProgress?.call(progress);
-        if (!clearedSessions && _shouldClearReaderSessions(progress)) {
-          clearedSessions = true;
-          sessionClearTask = _readerSessionPort.clear();
-        }
-      },
+      onProgress: onProgress,
     );
-    if (sessionClearTask != null) {
-      await sessionClearTask;
-    }
     if (!isCancelled()) {
       _onSyncSucceeded();
     }
@@ -47,11 +35,5 @@ class LibrarySyncCoordinator {
 
   void cancelActive() {
     _syncAdapter.cancelActive();
-  }
-
-  static bool _shouldClearReaderSessions(SyncLibraryProgress progress) {
-    return progress.phase == SyncLibraryPhase.generatingThumbnails ||
-        (progress.phase == SyncLibraryPhase.done &&
-            progress.route != SyncLibraryRoute.noRootsNoop);
   }
 }

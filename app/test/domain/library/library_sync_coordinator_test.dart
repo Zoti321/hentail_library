@@ -2,20 +2,7 @@ import 'package:hentai_library/data/adapters/sync_library_frb_adapter.dart';
 import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/library/library_sync_coordinator.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
-import 'package:hentai_library/domain/ports/reader_session_port.dart';
 import 'package:test/test.dart';
-
-class _RecordingReaderSessionPort implements ReaderSessionPort {
-  int clearCount = 0;
-
-  @override
-  Future<void> clear() async {
-    clearCount++;
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
 
 class _ScriptedSyncAdapter extends SyncLibraryFrbAdapter {
   _ScriptedSyncAdapter(this._run);
@@ -44,54 +31,8 @@ class _ScriptedSyncAdapter extends SyncLibraryFrbAdapter {
   }
 }
 
-SyncLibraryProgress _progress({
-  required SyncLibraryPhase phase,
-  SyncLibraryRoute route = SyncLibraryRoute.withRoots,
-}) {
-  return (
-    phase: phase,
-    route: route,
-    currentPath: null,
-    acceptedTotal: 0,
-    counts: emptyLibrarySyncCounts(),
-    removedCount: null,
-    addedCount: null,
-    keptCount: null,
-    migratedCount: null,
-    thumbnailTotal: null,
-    thumbnailDone: null,
-    thumbnailFailedCount: null,
-    errorMessage: null,
-  );
-}
-
 void main() {
-  test('runSync clears reader sessions on thumbnail phase', () async {
-    final _RecordingReaderSessionPort sessionPort =
-        _RecordingReaderSessionPort();
-    var notifyCount = 0;
-    final LibrarySyncCoordinator coordinator = LibrarySyncCoordinator(
-      syncAdapter: _ScriptedSyncAdapter(({
-        ScanMode scanMode = ScanMode.incremental,
-        List<FormatGroup> enabledFormatGroups = FormatGroup.all,
-        required isCancelled,
-        onProgress,
-      }) async {
-        onProgress?.call(
-          _progress(phase: SyncLibraryPhase.generatingThumbnails),
-        );
-      }),
-      readerSessionPort: sessionPort,
-      onSyncSucceeded: () => notifyCount++,
-    );
-
-    await coordinator.runSync(isCancelled: () => false);
-
-    expect(sessionPort.clearCount, 1);
-    expect(notifyCount, 1);
-  });
-
-  test('runSync skips notifyExternalChange when cancelled', () async {
+  test('runSync notifies catalog revision when not cancelled', () async {
     var notifyCount = 0;
     final LibrarySyncCoordinator coordinator = LibrarySyncCoordinator(
       syncAdapter: _ScriptedSyncAdapter(
@@ -102,7 +43,25 @@ void main() {
           onProgress,
         }) async {},
       ),
-      readerSessionPort: _RecordingReaderSessionPort(),
+      onSyncSucceeded: () => notifyCount++,
+    );
+
+    await coordinator.runSync(isCancelled: () => false);
+
+    expect(notifyCount, 1);
+  });
+
+  test('runSync skips catalog revision when cancelled', () async {
+    var notifyCount = 0;
+    final LibrarySyncCoordinator coordinator = LibrarySyncCoordinator(
+      syncAdapter: _ScriptedSyncAdapter(
+        ({
+          ScanMode scanMode = ScanMode.incremental,
+          List<FormatGroup> enabledFormatGroups = FormatGroup.all,
+          required isCancelled,
+          onProgress,
+        }) async {},
+      ),
       onSyncSucceeded: () => notifyCount++,
     );
 
@@ -111,9 +70,8 @@ void main() {
     expect(notifyCount, 0);
   });
 
-  test('runSync does not clear sessions for noRootsNoop done route', () async {
-    final _RecordingReaderSessionPort sessionPort =
-        _RecordingReaderSessionPort();
+  test('runSync forwards progress to the UI callback', () async {
+    SyncLibraryProgress? seen;
     final LibrarySyncCoordinator coordinator = LibrarySyncCoordinator(
       syncAdapter: _ScriptedSyncAdapter(({
         ScanMode scanMode = ScanMode.incremental,
@@ -121,19 +79,31 @@ void main() {
         required isCancelled,
         onProgress,
       }) async {
-        onProgress?.call(
-          _progress(
-            phase: SyncLibraryPhase.done,
-            route: SyncLibraryRoute.noRootsNoop,
-          ),
-        );
+        onProgress?.call((
+          phase: SyncLibraryPhase.done,
+          route: SyncLibraryRoute.withRoots,
+          currentPath: null,
+          acceptedTotal: 1,
+          counts: emptyLibrarySyncCounts(),
+          removedCount: null,
+          addedCount: null,
+          keptCount: null,
+          migratedCount: null,
+          thumbnailTotal: null,
+          thumbnailDone: null,
+          thumbnailFailedCount: null,
+          errorMessage: null,
+        ));
       }),
-      readerSessionPort: sessionPort,
       onSyncSucceeded: () {},
     );
 
-    await coordinator.runSync(isCancelled: () => false);
+    await coordinator.runSync(
+      isCancelled: () => false,
+      onProgress: (SyncLibraryProgress progress) => seen = progress,
+    );
 
-    expect(sessionPort.clearCount, 0);
+    expect(seen?.phase, SyncLibraryPhase.done);
+    expect(seen?.acceptedTotal, 1);
   });
 }

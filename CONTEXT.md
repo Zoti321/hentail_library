@@ -31,7 +31,7 @@ _Avoid_: 扫描路径、文件夹、目录（UI 可用，领域术语用 Saved p
 _Avoid_: 导入、索引（未体现与磁盘对齐的删除语义）
 
 **Library sync**:
-让 Library 与当前 Saved path 下磁盘内容对齐的完整操作：包含 Scan，并将结果写入数据库——新增缺失 Comic、按字段锁合并元数据后更新仍存在的 Comic、删除磁盘上已消失的 Comic。若所有 Saved path 被移除，则清空整个 Library。元数据合并见 Metadata field lock。
+让 Library 与当前 Saved path 下磁盘内容对齐的完整操作：包含 Scan，并将结果写入数据库——新增缺失 Comic、按字段锁合并元数据后更新仍存在的 Comic、删除磁盘上已消失的 Comic。若所有 Saved path 被移除，则清空整个 Library。元数据合并见 Metadata field lock。写库后由 core 使阅读会话失效；与 Metadata refresh 共用库级写锁（全局单飞）。
 _Avoid_: 同步、刷新（太泛，未体现镜像语义）
 
 _Scan_ 与 _Library sync_ 在用户触发的场景中指同一操作；领域文档与 issue 优先使用 Library sync。
@@ -79,7 +79,7 @@ Comic / Series 元数据字段上的布尔锁（Komga 式）。未锁定且 Libr
 _Avoid_: 只读标记、冻结、保护位（口语可用，领域用 Metadata field lock）
 
 **Metadata refresh**:
-对单个 Comic 或 Series 从磁盘 Resource 重解析元数据并按 Metadata field lock 写回的操作（对齐 Komga「Refresh metadata」）。Comic：重解析该 Resource，更新物理字段，不动缩略图。Series：对每个成员执行 Comic 刷新，并在 `name` 未锁定时用文件夹名覆盖；不改连载状态、计划总卷数、成员排序与缩略图；部分成员失败则跳过并汇总。与 Library sync 全局单飞互斥。不是库页工具栏的「刷新」（后者仅重载 UI catalog），也不是全库 Library sync。
+对单个 Comic 或 Series 从磁盘 Resource 重解析元数据并按 Metadata field lock 写回的操作（对齐 Komga「Refresh metadata」）。Comic：重解析该 Resource，更新物理字段，不动缩略图。Series：对每个成员执行 Comic 刷新，并在 `name` 未锁定时用文件夹名覆盖；不改连载状态、计划总卷数、成员排序与缩略图；部分成员失败则跳过并汇总。与 Library sync 共用 core 库级写锁（全局单飞）；互斥不在 Flutter 编排层重复实现。不是库页工具栏的「刷新」（后者仅重载 UI catalog），也不是全库 Library sync。
 _Avoid_: 刷新、重新扫描、同步（易与 UI catalog refresh / Library sync 混淆）
 
 **Healthy mode**:
