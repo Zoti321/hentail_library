@@ -5,7 +5,8 @@ import 'package:hentai_library/domain/models/value_objects/series_comic_page_ite
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_comics_grid.dart';
 
-Future<void> _pumpGridSliver(  WidgetTester tester, {
+Future<void> _pumpGridSliver(
+  WidgetTester tester, {
   required List<SeriesComicPageItem> items,
   bool isLoading = false,
 }) async {

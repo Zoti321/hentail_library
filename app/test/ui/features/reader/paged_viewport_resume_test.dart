@@ -41,20 +41,16 @@ void main() {
             readerControllerProvider(
               _viewKey,
             ).overrideWith(() => _PagedReaderController(resumePage, pageCount)),
-            readerPrefetchControllerProvider.overrideWith(
-              _FakePrefetch.new,
-            ),
-            comicImagesProvider(comicId: _comicId).overrideWith(
-              (Ref ref) => imagesCompleter.future,
-            ),
+            readerPrefetchControllerProvider.overrideWith(_FakePrefetch.new),
+            comicImagesProvider(
+              comicId: _comicId,
+            ).overrideWith((Ref ref) => imagesCompleter.future),
             ...List<Override>.generate(
               pageCount,
               (int index) => comicReaderPageProvider(
                 comicId: _comicId,
                 pageIndex: index,
-              ).overrideWith(
-                (Ref ref) async => ReaderPageBytes(Uint8List(0)),
-              ),
+              ).overrideWith((Ref ref) async => ReaderPageBytes(Uint8List(0))),
             ),
           ],
           child: const MaterialApp(
@@ -76,10 +72,8 @@ void main() {
       imagesCompleter.complete(
         List<ReaderPageImageData>.generate(
           pageCount,
-          (int index) => ReaderArchivePageImageData(
-            comicId: _comicId,
-            pageIndex: index,
-          ),
+          (int index) =>
+              ReaderArchivePageImageData(comicId: _comicId, pageIndex: index),
         ),
       );
       await tester.pump();
@@ -115,13 +109,12 @@ void main() {
 
       const int resumePage = 54;
       const int pageCount = 80;
-      final List<ReaderPageImageData> images = List<ReaderPageImageData>.generate(
-        pageCount,
-        (int index) => ReaderArchivePageImageData(
-          comicId: _comicId,
-          pageIndex: index,
-        ),
-      );
+      final List<ReaderPageImageData> images =
+          List<ReaderPageImageData>.generate(
+            pageCount,
+            (int index) =>
+                ReaderArchivePageImageData(comicId: _comicId, pageIndex: index),
+          );
 
       await tester.pumpWidget(
         ProviderScope(
@@ -138,9 +131,7 @@ void main() {
               (int index) => comicReaderPageProvider(
                 comicId: _comicId,
                 pageIndex: index,
-              ).overrideWith(
-                (Ref ref) async => ReaderPageBytes(Uint8List(0)),
-              ),
+              ).overrideWith((Ref ref) async => ReaderPageBytes(Uint8List(0))),
             ),
           ],
           child: const MaterialApp(

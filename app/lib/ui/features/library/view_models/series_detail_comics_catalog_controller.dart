@@ -41,13 +41,13 @@ class SeriesDetailComicsCatalogController
     );
 
     final int pageSize = ref.read(seriesDetailActivePageSizeProvider);
-    final PagedResult<SeriesComicPageItem> page =
-        await _pagination.fetchPage<SeriesComicPageItem>(
-      pageSize: pageSize,
-      fetch: (PageRequest request) => ref
-          .read(seriesRepoProvider)
-          .fetchComicsPage(seriesId: seriesId, request: request),
-    );
+    final PagedResult<SeriesComicPageItem> page = await _pagination
+        .fetchPage<SeriesComicPageItem>(
+          pageSize: pageSize,
+          fetch: (PageRequest request) => ref
+              .read(seriesRepoProvider)
+              .fetchComicsPage(seriesId: seriesId, request: request),
+        );
 
     return SeriesDetailComicsCatalogState(
       items: page.items,

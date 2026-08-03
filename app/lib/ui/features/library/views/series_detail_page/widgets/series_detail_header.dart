@@ -195,10 +195,7 @@ class _SeriesDetailOverflowMenuButtonState
   Future<void> _refreshMetadata(BuildContext context) async {
     final Future<void> future = ref
         .read(metadataRefreshControllerProvider.notifier)
-        .refreshSeries(
-          seriesId: widget.series.id,
-          name: widget.series.name,
-        )
+        .refreshSeries(seriesId: widget.series.id, name: widget.series.name)
         .then<void>((_) {});
     if (!context.mounted) {
       return;

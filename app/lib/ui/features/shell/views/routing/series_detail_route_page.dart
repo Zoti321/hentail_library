@@ -56,9 +56,5 @@ Page<void> buildSeriesDetailRoutePage({
           },
     );
   }
-  return MaterialPage<void>(
-    key: state.pageKey,
-    name: state.name,
-    child: child,
-  );
+  return MaterialPage<void>(key: state.pageKey, name: state.name, child: child);
 }

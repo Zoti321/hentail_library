@@ -67,7 +67,9 @@ class SeriesRepositoryImpl implements SeriesRepository {
   }
 
   @override
-  Future<SeriesReadingContext?> getReadingContextByComicId(String comicId) async {
+  Future<SeriesReadingContext?> getReadingContextByComicId(
+    String comicId,
+  ) async {
     final rust_series.SeriesReadingContextDto? dto = guardFrbSync(
       () => rust_series.getSeriesReadingContextByComicIdFrb(comicId: comicId),
       fallbackMessage: '读取系列阅读上下文失败',

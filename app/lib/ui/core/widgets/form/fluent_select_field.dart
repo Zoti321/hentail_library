@@ -159,8 +159,7 @@ class _FluentSelectFieldState<T> extends State<FluentSelectField<T>> {
     final AppThemeTokens tokens = context.tokens;
     final FluentSelectMenuStyle? style = widget.menuStyle;
     final double menuGap = style?.menuGap ?? tokens.spacing.xs;
-    final double menuBorderRadius =
-        style?.menuBorderRadius ?? tokens.radius.xs;
+    final double menuBorderRadius = style?.menuBorderRadius ?? tokens.radius.xs;
     final EdgeInsetsGeometry menuPadding =
         style?.menuPadding ?? EdgeInsets.all(tokens.spacing.xs);
     final EdgeInsetsGeometry itemPadding =
@@ -345,10 +344,7 @@ class _FluentSelectFieldState<T> extends State<FluentSelectField<T>> {
             children: <Widget>[
               if (widget.labelText != null)
                 Expanded(child: _buildInlineLabel(tokens, cs)),
-              SizedBox(
-                width: widget.inlineTriggerWidth,
-                child: trigger,
-              ),
+              SizedBox(width: widget.inlineTriggerWidth, child: trigger),
             ],
           ),
           if (hasError) ...[

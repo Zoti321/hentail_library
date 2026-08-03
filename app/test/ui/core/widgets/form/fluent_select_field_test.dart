@@ -200,7 +200,10 @@ void main() {
       find.byKey(FluentSelectField.triggerKey),
     );
 
-    expect(labelRect.center.dy, moreOrLessEquals(triggerRect.center.dy, epsilon: 6));
+    expect(
+      labelRect.center.dy,
+      moreOrLessEquals(triggerRect.center.dy, epsilon: 6),
+    );
     expect(labelRect.right, lessThanOrEqualTo(triggerRect.left + 0.5));
     expect(triggerRect.width, moreOrLessEquals(180, epsilon: 0.5));
   });
@@ -253,7 +256,10 @@ void main() {
     final Rect menuRect = tester.getRect(
       find.byKey(FluentSelectField.menuPanelKey),
     );
-    expect(menuRect.height, lessThanOrEqualTo(kFluentSelectMenuMaxHeight + 0.5));
+    expect(
+      menuRect.height,
+      lessThanOrEqualTo(kFluentSelectMenuMaxHeight + 0.5),
+    );
 
     await tester.scrollUntilVisible(
       find.text('Item 39'),

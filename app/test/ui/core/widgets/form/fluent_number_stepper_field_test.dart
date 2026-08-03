@@ -82,7 +82,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final Size unfocused = tester.getSize(find.byType(FluentNumberStepperField));
+    final Size unfocused = tester.getSize(
+      find.byType(FluentNumberStepperField),
+    );
     expect(find.byKey(FluentNumberStepperField.incrementKey), findsOneWidget);
 
     await tester.tap(find.byType(TextField));

@@ -13,7 +13,8 @@ Series _series({int itemCount = 3, int? totalCount}) {
     totalCount: totalCount,
     items: List<SeriesItem>.generate(
       itemCount,
-      (int index) => SeriesItem(comicId: 'comic-$index', order: index.toDouble()),
+      (int index) =>
+          SeriesItem(comicId: 'comic-$index', order: index.toDouble()),
     ),
   );
 }

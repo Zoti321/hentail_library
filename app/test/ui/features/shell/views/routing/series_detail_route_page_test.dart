@@ -33,7 +33,8 @@ void main() {
     );
 
     expect(page, isA<CustomTransitionPage<void>>());
-    final CustomTransitionPage<void> custom = page as CustomTransitionPage<void>;
+    final CustomTransitionPage<void> custom =
+        page as CustomTransitionPage<void>;
     expect(
       custom.transitionDuration,
       kSeriesDetailFromReaderTransitionDuration,

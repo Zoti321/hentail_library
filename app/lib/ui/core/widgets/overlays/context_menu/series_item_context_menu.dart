@@ -3,10 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/common.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-enum SeriesItemContextAction {
-  editSortOrder,
-  showInExplorer,
-}
+enum SeriesItemContextAction { editSortOrder, showInExplorer }
 
 class SeriesItemContextMenu {
   static void show(

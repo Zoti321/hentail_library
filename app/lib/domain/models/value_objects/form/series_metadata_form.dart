@@ -85,9 +85,7 @@ extension SeriesMetadataFormOps on SeriesMetadataForm {
     }
 
     final String trimmedName = name.trim();
-    final String? namePatch = trimmedName != original.name
-        ? trimmedName
-        : null;
+    final String? namePatch = trimmedName != original.name ? trimmedName : null;
     final SerializationStatus? statusPatch =
         serializationStatus != original.serializationStatus
         ? serializationStatus

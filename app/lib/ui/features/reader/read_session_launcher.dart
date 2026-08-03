@@ -29,9 +29,5 @@ Future<void> openComicReadSession(
   required Comic comic,
   bool incognito = false,
 }) async {
-  await openReadSession(
-    ref,
-    comicId: comic.comicId,
-    incognito: incognito,
-  );
+  await openReadSession(ref, comicId: comic.comicId, incognito: incognito);
 }

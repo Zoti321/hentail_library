@@ -205,7 +205,9 @@ class _ComicDetailOverflowMenuButtonState
   Future<void> _refreshMetadata(BuildContext context) async {
     final AppLocalizations l10n = context.l10n;
     try {
-      await ref.read(metadataRefreshControllerProvider.notifier).refreshComic(
+      await ref
+          .read(metadataRefreshControllerProvider.notifier)
+          .refreshComic(
             comicId: widget.comic.comicId,
             title: widget.comic.title,
           );

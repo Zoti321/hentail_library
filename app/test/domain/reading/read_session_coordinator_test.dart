@@ -74,10 +74,7 @@ void main() {
   });
 
   test('beginReadSession writes only comic history', () async {
-    await coordinator.beginReadSession(
-      comic: _comic(),
-      initialPageIndex: 2,
-    );
+    await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 2);
 
     expect(readingRepo.records, hasLength(1));
     expect(readingRepo.records.single.comicId, 'c1');
@@ -86,10 +83,7 @@ void main() {
   });
 
   test('updatePage and flushProgress persist latest page', () async {
-    await coordinator.beginReadSession(
-      comic: _comic(),
-      initialPageIndex: 1,
-    );
+    await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 1);
     readingRepo.records.clear();
 
     coordinator.updatePage(7);
@@ -100,10 +94,7 @@ void main() {
   });
 
   test('endSession clears active session after flush', () async {
-    await coordinator.beginReadSession(
-      comic: _comic(),
-      initialPageIndex: 3,
-    );
+    await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 3);
     readingRepo.records.clear();
 
     coordinator.updatePage(5);
@@ -115,10 +106,7 @@ void main() {
   });
 
   test('exitReadSession flushes history and closes I/O session', () async {
-    await coordinator.beginReadSession(
-      comic: _comic(),
-      initialPageIndex: 2,
-    );
+    await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 2);
     readingRepo.records.clear();
 
     coordinator.updatePage(6);
@@ -148,10 +136,7 @@ void main() {
   test(
     'prepareSeriesSwitch returns next session starting from first page',
     () async {
-      await coordinator.beginReadSession(
-        comic: _comic(),
-        initialPageIndex: 3,
-      );
+      await coordinator.beginReadSession(comic: _comic(), initialPageIndex: 3);
       readingRepo.records.clear();
 
       final SeriesSwitchPlan plan = await coordinator.prepareSeriesSwitch(

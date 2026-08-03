@@ -108,17 +108,20 @@ void main() {
       expect(state.autoPlayEnabled, isFalse);
     });
 
-    test('setAutoPlayEnabled(true) keeps auto-play on for same comic', () async {
-      final ProviderContainer container = _createContainer(
-        initialSetting: AppSetting(readingMode: ReadingMode.paged),
-      );
-      addTearDown(container.dispose);
+    test(
+      'setAutoPlayEnabled(true) keeps auto-play on for same comic',
+      () async {
+        final ProviderContainer container = _createContainer(
+          initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        );
+        addTearDown(container.dispose);
 
-      await container.read(readerControllerProvider(_key).future);
-      _controller(container, _key).setAutoPlayEnabled(true);
+        await container.read(readerControllerProvider(_key).future);
+        _controller(container, _key).setAutoPlayEnabled(true);
 
-      expect(_state(container, _key)?.autoPlayEnabled, isTrue);
-    });
+        expect(_state(container, _key)?.autoPlayEnabled, isTrue);
+      },
+    );
 
     test('new comic session starts with auto-play off', () async {
       const ReaderControllerKey otherKey = (

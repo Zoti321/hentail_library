@@ -86,9 +86,7 @@ class PagedViewport extends HookConsumerWidget {
         return null;
       }
       // itemCount 0→N can reset PageView; hold sync until resume target shows.
-      resumeSyncGate.value.beginProgrammaticAlign(
-        targetOneBased: currentIndex,
-      );
+      resumeSyncGate.value.beginProgrammaticAlign(targetOneBased: currentIndex);
       return null;
     }, <Object?>[imageList.length]);
     useEffect(() {
@@ -124,9 +122,7 @@ class PagedViewport extends HookConsumerWidget {
         return null;
       }
       isProgrammaticScroll.value = true;
-      resumeSyncGate.value.beginProgrammaticAlign(
-        targetOneBased: currentIndex,
-      );
+      resumeSyncGate.value.beginProgrammaticAlign(targetOneBased: currentIndex);
       final int generation = ++alignGeneration.value;
       // Large resume deltas: jump to avoid scrubbing intermediate onPageChanged.
       if ((currentPage - targetPage).abs() > 1) {

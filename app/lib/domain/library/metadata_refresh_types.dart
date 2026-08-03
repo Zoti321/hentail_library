@@ -6,7 +6,4 @@ typedef RefreshSeriesProgress = ({
   int failed,
 });
 
-typedef RefreshSeriesResult = ({
-  int succeeded,
-  int failed,
-});
+typedef RefreshSeriesResult = ({int succeeded, int failed});

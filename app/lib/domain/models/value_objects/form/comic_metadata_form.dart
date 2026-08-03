@@ -129,8 +129,9 @@ extension ComicMetadataFormOps on ComicMetadataForm {
     }
 
     final String? title = ready.title != original.title ? ready.title : null;
-    final String? description =
-        ready.description != original.description ? (ready.description ?? '') : null;
+    final String? description = ready.description != original.description
+        ? (ready.description ?? '')
+        : null;
 
     final DateTime? publishedAt;
     final bool clearPublishedAt;

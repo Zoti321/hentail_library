@@ -107,9 +107,7 @@ class DualPageViewport extends HookConsumerWidget {
       if (imageList.isEmpty) {
         return null;
       }
-      resumeSyncGate.value.beginProgrammaticAlign(
-        targetOneBased: currentIndex,
-      );
+      resumeSyncGate.value.beginProgrammaticAlign(targetOneBased: currentIndex);
       return null;
     }, <Object?>[imageList.length]);
     useEffect(() {
@@ -141,9 +139,7 @@ class DualPageViewport extends HookConsumerWidget {
         return null;
       }
       isProgrammaticScroll.value = true;
-      resumeSyncGate.value.beginProgrammaticAlign(
-        targetOneBased: currentIndex,
-      );
+      resumeSyncGate.value.beginProgrammaticAlign(targetOneBased: currentIndex);
       final int generation = ++alignGeneration.value;
       final int? currentPage = pageController.page?.round();
       if (currentPage != null && (currentPage - currentSpread).abs() > 1) {

@@ -118,15 +118,17 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     }
     setState(() => _lockBusy = true);
     try {
-      await ref.read(comicRepoProvider).setMetaLocks(
-        widget.comic.comicId,
-        title: title,
-        description: description,
-        publishedAt: publishedAt,
-        contentRating: contentRating,
-        authors: authors,
-        tags: tags,
-      );
+      await ref
+          .read(comicRepoProvider)
+          .setMetaLocks(
+            widget.comic.comicId,
+            title: title,
+            description: description,
+            publishedAt: publishedAt,
+            contentRating: contentRating,
+            authors: authors,
+            tags: tags,
+          );
       if (!mounted) {
         return;
       }

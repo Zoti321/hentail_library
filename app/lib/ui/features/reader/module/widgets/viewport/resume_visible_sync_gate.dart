@@ -5,9 +5,7 @@
 /// (e.g. 54→38→25 across opens). Keep suppress until the resume target is
 /// observed within ±1 (or [alignTimeout] elapses).
 class ResumeVisibleSyncGate {
-  ResumeVisibleSyncGate({
-    this.alignTimeout = const Duration(seconds: 2),
-  });
+  ResumeVisibleSyncGate({this.alignTimeout = const Duration(seconds: 2)});
 
   final Duration alignTimeout;
 
@@ -17,10 +15,7 @@ class ResumeVisibleSyncGate {
 
   bool get isSuppressed => _suppressed;
 
-  void beginProgrammaticAlign({
-    required int targetOneBased,
-    DateTime? now,
-  }) {
+  void beginProgrammaticAlign({required int targetOneBased, DateTime? now}) {
     _suppressed = true;
     _targetOneBased = targetOneBased;
     _alignStartedAt = now ?? DateTime.now();

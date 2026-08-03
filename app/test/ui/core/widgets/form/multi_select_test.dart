@@ -88,7 +88,9 @@ void main() {
             text.contains('Cannot hit test');
       }),
       isEmpty,
-      reason: errors.map((FlutterErrorDetails e) => e.exceptionAsString()).join('\n'),
+      reason: errors
+          .map((FlutterErrorDetails e) => e.exceptionAsString())
+          .join('\n'),
     );
     expect(find.text('标签'), findsOneWidget);
     expect(find.byIcon(Icons.lock), findsOneWidget);

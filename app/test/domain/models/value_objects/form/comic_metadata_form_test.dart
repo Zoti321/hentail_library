@@ -154,10 +154,9 @@ void main() {
     test('only submits changed title field', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();
       final Comic original = _comic(title: '原标题', description: '简介');
-      final ComicMetadataApplyResult result =
-          await ComicMetadataForm.fromComic(
-            original,
-          ).copyWith(title: '新标题').applyTo(repo, original);
+      final ComicMetadataApplyResult result = await ComicMetadataForm.fromComic(
+        original,
+      ).copyWith(title: '新标题').applyTo(repo, original);
 
       expect(result, isA<ComicMetadataApplySucceeded>());
       expect(repo.callCount, 1);
@@ -186,10 +185,9 @@ void main() {
       final _RecordingComicRepository repo = _RecordingComicRepository();
       final DateTime published = DateTime.utc(2020, 5, 1);
       final Comic original = _comic(publishedAt: published);
-      final ComicMetadataApplyResult result =
-          await ComicMetadataForm.fromComic(
-            original,
-          ).copyWith(publishedAt: null).applyTo(repo, original);
+      final ComicMetadataApplyResult result = await ComicMetadataForm.fromComic(
+        original,
+      ).copyWith(publishedAt: null).applyTo(repo, original);
 
       expect(result, isA<ComicMetadataApplySucceeded>());
       expect(repo.callCount, 1);
@@ -201,12 +199,18 @@ void main() {
     test('only submits authors when ordered names change', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();
       final Comic original = _comic(
-        authors: <Author>[Author(name: 'A'), Author(name: 'B')],
+        authors: <Author>[
+          Author(name: 'A'),
+          Author(name: 'B'),
+        ],
       );
       final ComicMetadataApplyResult result =
           await ComicMetadataForm.fromComic(original)
               .copyWith(
-                authors: <Author>[Author(name: 'B'), Author(name: 'A')],
+                authors: <Author>[
+                  Author(name: 'B'),
+                  Author(name: 'A'),
+                ],
               )
               .applyTo(repo, original);
 

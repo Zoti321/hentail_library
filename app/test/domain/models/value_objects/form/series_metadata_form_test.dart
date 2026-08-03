@@ -155,15 +155,20 @@ void main() {
       expect(repo.clearTotalCount, isFalse);
     });
 
-    test('does not clear totalCount when already empty and unchanged', () async {
-      final _RecordingSeriesRepository repo = _RecordingSeriesRepository();
-      final Series original = _series(totalCount: null);
-      final SeriesMetadataApplyResult result =
-          await SeriesMetadataForm.fromSeries(original).applyTo(repo, original);
+    test(
+      'does not clear totalCount when already empty and unchanged',
+      () async {
+        final _RecordingSeriesRepository repo = _RecordingSeriesRepository();
+        final Series original = _series(totalCount: null);
+        final SeriesMetadataApplyResult result =
+            await SeriesMetadataForm.fromSeries(
+              original,
+            ).applyTo(repo, original);
 
-      expect(result, isA<SeriesMetadataApplySucceeded>());
-      expect(repo.callCount, 0);
-    });
+        expect(result, isA<SeriesMetadataApplySucceeded>());
+        expect(repo.callCount, 0);
+      },
+    );
 
     test('sets totalCount when text is a positive integer', () async {
       final _RecordingSeriesRepository repo = _RecordingSeriesRepository();

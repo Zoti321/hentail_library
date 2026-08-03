@@ -24,13 +24,13 @@ Future<void> _openDialog(
                   context: context,
                   builder: (BuildContext dialogContext) =>
                       EditSeriesItemSortOrderDialog(
-                    seriesId: 'series-1',
-                    comicId: 'comic-1',
-                    comicTitle: 'Test Comic',
-                    initialSortOrder: 1,
-                    initialSortOrderLocked: initialSortOrderLocked,
-                    onSubmit: onSubmit,
-                  ),
+                        seriesId: 'series-1',
+                        comicId: 'comic-1',
+                        comicTitle: 'Test Comic',
+                        initialSortOrder: 1,
+                        initialSortOrderLocked: initialSortOrderLocked,
+                        onSubmit: onSubmit,
+                      ),
                 );
               },
               child: const Text('open'),

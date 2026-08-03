@@ -43,11 +43,7 @@ Future<List<ReaderComicListItem>> _buildNavItemsFromContext(
       memberId,
     );
     items.add(
-      ReaderComicListItem(
-        comicId: memberId,
-        title: title,
-        order: index,
-      ),
+      ReaderComicListItem(comicId: memberId, title: title, order: index),
     );
   }
   return items;
@@ -65,8 +61,7 @@ Future<ReadSessionContextData> readSessionContextForReader(
       .read(seriesRepoProvider)
       .getReadingContextByComicId(normalizedComicId);
 
-  final int? preferredPageIndex =
-      (incognito || startFromFirstPage)
+  final int? preferredPageIndex = (incognito || startFromFirstPage)
       ? null
       : await ref.watch(
           comicReadingPageIndexForReaderProvider(normalizedComicId).future,

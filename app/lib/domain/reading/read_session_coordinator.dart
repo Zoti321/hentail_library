@@ -5,10 +5,7 @@ import 'package:hentai_library/domain/reading/reader_session_service.dart';
 import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
 
 class _ActiveReadingSession {
-  _ActiveReadingSession({
-    required this.comic,
-    required this.pageIndex,
-  });
+  _ActiveReadingSession({required this.comic, required this.pageIndex});
 
   final Comic comic;
   int pageIndex;

@@ -80,9 +80,7 @@ class MetadataRefreshProgressDialog extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(_kDialogRadius),
                   ),
                 ),
-                child: Text(
-                  showError ? l10n.commonClose : l10n.commonOk,
-                ),
+                child: Text(showError ? l10n.commonClose : l10n.commonOk),
               ),
             ]
           : const <Widget>[],

@@ -57,12 +57,14 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
     }
     setState(() => _lockBusy = true);
     try {
-      await ref.read(seriesRepoProvider).setMetaLocks(
-        seriesId: widget.series.id,
-        name: name,
-        serializationStatus: serializationStatus,
-        totalCount: totalCount,
-      );
+      await ref
+          .read(seriesRepoProvider)
+          .setMetaLocks(
+            seriesId: widget.series.id,
+            name: name,
+            serializationStatus: serializationStatus,
+            totalCount: totalCount,
+          );
       if (!mounted) {
         return;
       }
@@ -170,8 +172,7 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
             labelTrailing: MetadataLockButton(
               locked: _locks.serializationStatus,
               enabled: lockEnabled,
-              onChanged: (bool locked) =>
-                  _setLock(serializationStatus: locked),
+              onChanged: (bool locked) => _setLock(serializationStatus: locked),
             ),
             value: _form.serializationStatus,
             items: SerializationStatus.values,
