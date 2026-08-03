@@ -4,7 +4,6 @@ pub mod handle;
 pub mod library_lock;
 pub mod migrate;
 pub mod orchestrator;
-pub mod parser;
 pub mod plan;
 pub mod refresh;
 pub mod scanner;

@@ -5,7 +5,7 @@ use std::path::Path;
 use std::sync::Mutex;
 
 use hentai_core::comic::ComicDto;
-use hentai_core::sync::parser::{parse_epub, parsed_to_comic};
+use hentai_core::resource::{parse_epub, parsed_to_comic};
 use hentai_core::sync::plan::build_scan_replace_plan;
 use hentai_core::sync::scanner::ScanItem;
 use hentai_core::sync::writer::apply_scan_replace_plan;

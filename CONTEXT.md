@@ -19,7 +19,7 @@ Comic 与磁盘位置绑定，而非内容哈希。移动或重命名资源文�
 _Avoid_: 内容 ID、文件指纹
 
 **Resource**:
-磁盘上的原始文件或目录，扫描后若校验通过则入库为 Comic。
+磁盘上的原始文件或目录，扫描后若校验通过则入库为 Comic。解析得到的中间结果（路径、格式、页数、嵌入元数据等）在入库为 Comic 之前独立于 Comic 身份与用户元数据；Library sync / Metadata refresh / 阅读与缩略图共用同一套 Resource 解析规则。
 _Avoid_: 文件、素材
 
 **Saved path**:

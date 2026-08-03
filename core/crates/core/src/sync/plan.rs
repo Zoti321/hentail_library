@@ -11,7 +11,7 @@ use crate::metadata_lock::merge_kept_scan_with_existing;
 use super::migrate::{
     detect_path_migration_pairs, migrated_id_sets, ComicMigration, ComicMigrationPair,
 };
-use super::parser::can_generate_thumbnail;
+use crate::resource::can_generate_thumbnail;
 use super::scanner::ScanItem;
 
 pub struct ComicScanReplacePlan {

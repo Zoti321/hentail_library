@@ -8,12 +8,18 @@ use quick_xml::Reader;
 use zip::ZipArchive;
 
 use crate::comic::now_ms;
-use crate::formats::{count_pdf_pages, count_rar_images, count_sevenz_images, read_pdf_embedded_meta};
 use crate::comic_id::comic_id_from_path;
 use crate::error::HentaiError;
+use crate::formats::{
+    count_pdf_pages, count_rar_images, count_sevenz_images, read_pdf_embedded_meta,
+};
 
-const COMIC_IMAGE_EXTENSIONS: &[&str] = &[".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"];
+use super::media::{
+    basename, basename_without_extension, extension_lower, is_comic_image_extension,
+};
+use super::stat::read_resource_size;
 
+/// Disk Resource after parse — not a Comic; Library sync maps via [parsed_to_comic].
 #[derive(Debug, Clone)]
 pub struct ParsedResource {
     pub path: String,
@@ -28,90 +34,6 @@ pub struct ParsedResource {
 
 pub fn comic_id_for_path(path: &str) -> String {
     comic_id_from_path(path)
-}
-
-pub fn can_generate_thumbnail(resource_type: &str) -> bool {
-    matches!(
-        resource_type,
-        "dir" | "zip" | "cbz" | "epub" | "rar" | "cbr"
-    )
-}
-
-pub fn is_comic_image_extension(ext: &str) -> bool {
-    let lower = ext.to_lowercase();
-    COMIC_IMAGE_EXTENSIONS.contains(&lower.as_str())
-}
-
-pub fn extension_lower(path: &Path) -> String {
-    path.extension()
-        .and_then(|e| e.to_str())
-        .map(|e| format!(".{}", e.to_lowercase()))
-        .unwrap_or_default()
-}
-
-pub fn basename(path: &Path) -> String {
-    path.file_name()
-        .and_then(|n| n.to_str())
-        .unwrap_or("")
-        .to_string()
-}
-
-pub fn basename_without_extension(path: &Path) -> String {
-    path.file_stem()
-        .and_then(|n| n.to_str())
-        .unwrap_or("")
-        .to_string()
-}
-
-pub fn read_resource_size(path: &Path, resource_type: &str) -> Result<Option<i64>, HentaiError> {
-    if !path.exists() {
-        return Ok(None);
-    }
-    if resource_type == "dir" {
-        return compute_dir_image_files_size(path);
-    }
-    let meta = std::fs::metadata(path).map_err(|e| {
-        HentaiError::validation(format!("stat 失败: {} ({})", path.display(), e))
-    })?;
-    Ok(Some(meta.len() as i64))
-}
-
-fn compute_dir_image_files_size(dir: &Path) -> Result<Option<i64>, HentaiError> {
-    let mut total = 0i64;
-    for entry in std::fs::read_dir(dir).map_err(|e| {
-        HentaiError::validation(format!("读取目录失败: {} ({})", dir.display(), e))
-    })? {
-        let entry = entry.map_err(|e| HentaiError::validation(e.to_string()))?;
-        let path = entry.path();
-        if path.is_dir() {
-            return Ok(None);
-        }
-        if path.is_file() && is_comic_image_extension(&extension_lower(&path)) {
-            let meta = std::fs::metadata(&path).map_err(|e| HentaiError::validation(e.to_string()))?;
-            total += meta.len() as i64;
-        }
-    }
-    if total <= 0 {
-        return Ok(None);
-    }
-    Ok(Some(total))
-}
-
-pub fn read_source_stat(path: &Path, resource_type: &str) -> Result<Option<(i64, i64)>, HentaiError> {
-    if !path.exists() {
-        return Ok(None);
-    }
-    let meta = std::fs::metadata(path).map_err(|e| {
-        HentaiError::validation(format!("stat 失败: {} ({})", path.display(), e))
-    })?;
-    let modified_ms = meta
-        .modified()
-        .ok()
-        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-        .map(|d| d.as_millis() as i64)
-        .unwrap_or(0);
-    let size = read_resource_size(path, resource_type)?.unwrap_or(0);
-    Ok(Some((modified_ms, size)))
 }
 
 fn finalize_parsed(
@@ -601,6 +523,7 @@ pub fn normalize_roots(roots: &[String]) -> Vec<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::resource::media::can_generate_thumbnail;
     use std::io::Write;
     use tempfile::TempDir;
     use zip::write::SimpleFileOptions;

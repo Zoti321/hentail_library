@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
-use hentai_core::sync::parser::{parse_epub, parse_file, parse_zip_archive};
+use hentai_core::resource::{parse_epub, parse_file, parse_zip_archive};
 use tempfile::TempDir;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;

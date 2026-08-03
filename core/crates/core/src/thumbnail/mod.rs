@@ -93,7 +93,7 @@ pub async fn set_comic_thumbnail_from_page(
 ) -> Result<(), HentaiError> {
     use crate::db::{connection, map_db_err};
     use crate::entity::{comic_thumbnails, prelude::*};
-    use crate::sync::parser::read_source_stat;
+    use crate::resource::read_source_stat;
     use crate::thumbnail::generate::encode_thumbnail_jpeg;
     use sea_orm::{EntityTrait, Set};
     use std::path::Path;

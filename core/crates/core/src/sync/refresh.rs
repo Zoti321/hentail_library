@@ -11,9 +11,9 @@ use crate::series_id::series_name_from_folder_path;
 use crate::metadata_lock::{
     merge_kept_scan_with_existing, merge_series_name, series_name_needs_write,
 };
+use crate::resource::{parse_file, parsed_to_comic};
 
 use super::library_lock::try_acquire_library_write_lock;
-use super::parser::{parse_file, parsed_to_comic};
 use super::writer::upsert_comics;
 
 #[derive(Debug, Clone)]

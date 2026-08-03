@@ -11,7 +11,7 @@ use super::dto::{
 use super::format_group::FormatGroup;
 use super::handle::SyncHandle;
 use super::library_lock::try_acquire_library_write_lock;
-use super::parser::normalize_roots;
+use crate::resource::normalize_roots;
 use super::plan::{
     build_scan_replace_plan, count_all_comic_ids, load_existing_comics_map, load_saved_paths,
     load_thumbnail_stats,

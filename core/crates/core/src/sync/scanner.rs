@@ -8,7 +8,7 @@ use crate::error::HentaiError;
 
 use super::format_group::{FormatGroup, resource_type_enabled};
 use super::handle::SyncHandle;
-use super::parser::{
+use crate::resource::{
     comic_id_for_path, parse_directory, parse_file, parsed_to_comic, read_resource_size,
     read_source_stat,
 };

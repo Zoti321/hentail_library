@@ -11,6 +11,7 @@ pub mod metadata_lock;
 pub mod migration;
 pub mod path;
 pub mod reader;
+pub mod resource;
 pub mod runtime;
 pub mod series;
 pub mod series_id;

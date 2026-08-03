@@ -3,7 +3,7 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
-use hentai_core::sync::parser::{parse_file, parsed_to_comic};
+use hentai_core::resource::{parse_file, parsed_to_comic};
 use hentai_core::sync::plan::build_scan_replace_plan;
 use hentai_core::sync::scanner::ScanItem;
 use hentai_core::sync::writer::apply_scan_replace_plan;

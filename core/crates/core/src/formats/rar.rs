@@ -4,7 +4,7 @@ use unrar_ng::Archive;
 
 use crate::error::HentaiError;
 
-use crate::sync::parser::basename_without_extension;
+use crate::resource::basename_without_extension;
 
 use super::{is_comic_image_name, map_archive_err, map_reader_err, sort_archive_entry_names};
 
