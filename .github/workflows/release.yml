@@ -239,8 +239,8 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
           run-build-runner: "true"
-          # Cross-compile only needs android-* pdfium; skip flaky host (linux) download here.
-          fetch-native-deps: "false"
+          # FRB codegen cargo-expands hentai-core for the *host* (needs linux pdfium);
+          # Android ABIs are fetched in the next step for the APK link.
 
       - name: Fetch Android pdfium
         run: bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh" --android
