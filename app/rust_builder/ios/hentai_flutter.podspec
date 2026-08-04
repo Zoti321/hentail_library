@@ -34,10 +34,12 @@ A new Flutter FFI plugin project.
     :output_files => ["${BUILT_PRODUCTS_DIR}/libhentai_flutter.a"],
   }
 
-  # unrar-ng ships C++ objects inside the Rust staticlib. force_load must reach the
-  # Runner (user) target under CocoaPods static linkage; -lc++ resolves std:: symbols.
-  # See flutter_rust_bridge#1610 / #3173.
-  rust_lib_ldflags = '$(inherited) -force_load "${BUILT_PRODUCTS_DIR}/libhentai_flutter.a" -lc++ -lc++abi'
+  # cargokit writes to $PODS_CONFIGURATION_BUILD_DIR/$PRODUCT_NAME (see build_pod.sh).
+  # Do not use BUILT_PRODUCTS_DIR in user_target_xcconfig: on Runner it expands to
+  # Release-iphoneos/ and the .a is missing (Xcode: Build input file cannot be found).
+  # unrar-ng C++ objects need -lc++ on the final link (flutter_rust_bridge#1610).
+  rust_lib = '"${PODS_CONFIGURATION_BUILD_DIR}/hentai_flutter/libhentai_flutter.a"'
+  rust_lib_ldflags = "$(inherited) -force_load #{rust_lib} -lc++ -lc++abi"
 
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',

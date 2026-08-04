@@ -49,7 +49,7 @@ fetch_pdfium_for_platform() {
   trap cleanup RETURN
 
   echo "下载 $url ..."
-  curl -fsSL "$url" -o "$tmp_archive"
+  curl -fsSL --retry 5 --retry-all-errors --retry-delay 2 "$url" -o "$tmp_archive"
 
   if [[ "$artifact" == *.tgz ]]; then
     tar -xzf "$tmp_archive" -C "$tmp_extract"

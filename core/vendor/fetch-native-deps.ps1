@@ -34,7 +34,18 @@ function Fetch-PdfiumForPlatform {
     $TempArchive = Join-Path $env:TEMP "hentai-pdfium-$Artifact"
 
     Write-Host "下载 $Url ..."
-    Invoke-WebRequest -Uri $Url -OutFile $TempArchive -UseBasicParsing
+    $attempt = 0
+    while ($true) {
+        $attempt++
+        try {
+            Invoke-WebRequest -Uri $Url -OutFile $TempArchive -UseBasicParsing
+            break
+        } catch {
+            if ($attempt -ge 5) { throw }
+            Write-Host "下载失败 (尝试 $attempt/5): $_ ；2 秒后重试..."
+            Start-Sleep -Seconds 2
+        }
+    }
 
     $TempExtract = Join-Path $env:TEMP "hentai-pdfium-extract-$PlatformKey"
     if (Test-Path $TempExtract) { Remove-Item $TempExtract -Recurse -Force }
