@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS comics (
 CREATE TABLE IF NOT EXISTS comic_meta (
   comic_id TEXT NOT NULL PRIMARY KEY,
   title TEXT NOT NULL,
+  title_sort_key TEXT NOT NULL DEFAULT '',
   content_rating TEXT NOT NULL DEFAULT 'unknown',
   page_count INTEGER NOT NULL CHECK (page_count > 0),
   description TEXT,
@@ -55,6 +56,7 @@ CREATE TABLE IF NOT EXISTS series (
   series_id TEXT NOT NULL PRIMARY KEY,
   folder_path TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
+  name_sort_key TEXT NOT NULL DEFAULT '',
   serialization_status TEXT NOT NULL DEFAULT 'unknown'
     CHECK (serialization_status IN ('unknown', 'ongoing', 'ended', 'hiatus')),
   total_count INTEGER NULL CHECK (total_count IS NULL OR total_count > 0)

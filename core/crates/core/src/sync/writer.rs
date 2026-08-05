@@ -10,6 +10,7 @@ use crate::entity::{
 };
 use crate::error::HentaiError;
 use crate::history::normalize_reading_history_titles;
+use crate::util::compute_sort_key;
 
 use super::migrate::ComicMigration;
 use super::plan::ComicScanReplacePlan;
@@ -72,6 +73,7 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
     let meta_active = comic_meta::ActiveModel {
         comic_id: Set(to_id.clone()),
         title: Set(comic.title.clone()),
+        title_sort_key: Set(compute_sort_key(&comic.title)),
         content_rating: Set(comic.content_rating.clone()),
         page_count: Set(comic.page_count),
         description: Set(comic.description.clone()),
@@ -299,6 +301,7 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
         let meta_active = comic_meta::ActiveModel {
             comic_id: Set(comic.comic_id.clone()),
             title: Set(comic.title.clone()),
+            title_sort_key: Set(compute_sort_key(&comic.title)),
             content_rating: Set(comic.content_rating.clone()),
             page_count: Set(comic.page_count),
             description: Set(comic.description.clone()),
@@ -315,6 +318,7 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
                 sea_orm::sea_query::OnConflict::column(comic_meta::Column::ComicId)
                     .update_columns([
                         comic_meta::Column::Title,
+                        comic_meta::Column::TitleSortKey,
                         comic_meta::Column::ContentRating,
                         comic_meta::Column::PageCount,
                         comic_meta::Column::Description,

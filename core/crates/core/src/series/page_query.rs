@@ -42,13 +42,13 @@ fn build_order_by_clause(sort: &SeriesSortOptionDto, _values: &mut Vec<Value>) -
     match sort.field {
         SeriesSortFieldDto::Name => {
             let direction = if sort.descending { "DESC" } else { "ASC" };
-            format!("lower(s.name) {direction}, s.series_id ASC")
+            format!("s.name_sort_key {direction}, s.series_id ASC")
         }
         SeriesSortFieldDto::ComicCount => {
             let direction = if sort.descending { "DESC" } else { "ASC" };
             format!(
                 "(SELECT COUNT(*) FROM series_items si WHERE si.series_id = s.series_id) {direction}, \
-                 lower(s.name) ASC, s.series_id ASC"
+                 s.name_sort_key ASC, s.series_id ASC"
             )
         }
         SeriesSortFieldDto::Random => {

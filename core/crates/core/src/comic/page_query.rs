@@ -54,16 +54,27 @@ fn sort_join_clause(field: ComicSortFieldDto) -> &'static str {
 
 fn build_order_by_clause(sort: &ComicSortOptionDto) -> String {
     let direction = if sort.descending { "DESC" } else { "ASC" };
-    let primary = match sort.field {
-        ComicSortFieldDto::Title => format!("lower(m.title) {direction}"),
-        ComicSortFieldDto::CreatedAt => format!("c.created_at {direction}"),
-        ComicSortFieldDto::LastUpdatedAt => format!("c.last_updated_at {direction}"),
-        ComicSortFieldDto::PublishedAt => format!("m.published_at {direction} NULLS LAST"),
-        ComicSortFieldDto::ReadAt => format!("rh.last_read_time {direction} NULLS LAST"),
-        ComicSortFieldDto::FileSize => format!("c.resource_size {direction}"),
-        ComicSortFieldDto::PageCount => format!("m.page_count {direction}"),
-    };
-    format!("{primary}, lower(m.title) ASC")
+    match sort.field {
+        ComicSortFieldDto::Title => {
+            format!("m.title_sort_key {direction}, c.comic_id ASC")
+        }
+        other => {
+            let primary = match other {
+                ComicSortFieldDto::Title => unreachable!(),
+                ComicSortFieldDto::CreatedAt => format!("c.created_at {direction}"),
+                ComicSortFieldDto::LastUpdatedAt => format!("c.last_updated_at {direction}"),
+                ComicSortFieldDto::PublishedAt => {
+                    format!("m.published_at {direction} NULLS LAST")
+                }
+                ComicSortFieldDto::ReadAt => {
+                    format!("rh.last_read_time {direction} NULLS LAST")
+                }
+                ComicSortFieldDto::FileSize => format!("c.resource_size {direction}"),
+                ComicSortFieldDto::PageCount => format!("m.page_count {direction}"),
+            };
+            format!("{primary}, m.title_sort_key ASC, c.comic_id ASC")
+        }
+    }
 }
 
 fn build_where_clause(filter: &ComicFilterDto, values: &mut Vec<Value>) -> String {
@@ -182,7 +193,7 @@ mod tests {
         );
         assert!(sql.sql.contains("LEFT JOIN comic_reading_histories rh"));
         assert!(sql.sql.contains("ORDER BY rh.last_read_time DESC NULLS LAST"));
-        assert!(sql.sql.contains(", lower(m.title) ASC"));
+        assert!(sql.sql.contains(", m.title_sort_key ASC, c.comic_id ASC"));
     }
 
     #[test]
@@ -196,8 +207,26 @@ mod tests {
             10,
             5,
         );
-        assert!(sql.sql.contains("ORDER BY m.page_count ASC, lower(m.title) ASC"));
+        assert!(sql.sql.contains(
+            "ORDER BY m.page_count ASC, m.title_sort_key ASC, c.comic_id ASC"
+        ));
         assert!(!sql.sql.contains("comic_reading_histories"));
+    }
+
+    #[test]
+    fn order_by_title_uses_sort_key() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto::default(),
+            &ComicSortOptionDto {
+                field: ComicSortFieldDto::Title,
+                descending: false,
+            },
+            10,
+            0,
+        );
+        assert!(sql.sql.contains(
+            "ORDER BY m.title_sort_key ASC, c.comic_id ASC"
+        ));
     }
 
     #[test]

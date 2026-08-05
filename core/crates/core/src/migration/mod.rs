@@ -11,6 +11,7 @@ mod m20260718_000009_user_set_and_series_thumbnails;
 mod m20260801_000010_drop_series_reading_histories;
 mod m20260801_000011_series_item_sort_order_real;
 mod m20260801_000012_metadata_field_locks;
+mod m20260805_000013_title_name_sort_keys;
 
 pub struct Migrator;
 
@@ -29,6 +30,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260801_000010_drop_series_reading_histories::Migration),
             Box::new(m20260801_000011_series_item_sort_order_real::Migration),
             Box::new(m20260801_000012_metadata_field_locks::Migration),
+            Box::new(m20260805_000013_title_name_sort_keys::Migration),
         ]
     }
 }

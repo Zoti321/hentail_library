@@ -11,6 +11,7 @@ use crate::metadata_lock::{merge_series_name, resolve_member_sort_order};
 use crate::series_id::{
     folder_path_from_comic_path, series_id_from_folder_path, series_name_from_folder_path,
 };
+use crate::util::compute_sort_key;
 
 pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
     db: &C,
@@ -55,16 +56,19 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
             let mut active: series::ActiveModel = existing_row.clone().into();
             active.folder_path = Set(folder_path);
             // serialization_status / total_count have no scan source → never overwritten.
-            active.name = Set(merge_series_name(
+            let merged_name = merge_series_name(
                 existing_row.name_locked,
                 &existing_row.name,
                 &name,
-            ));
+            );
+            active.name_sort_key = Set(compute_sort_key(&merged_name));
+            active.name = Set(merged_name);
             active.update(db).await.map_err(crate::db::map_db_err)?;
         } else {
             Series::insert(series::ActiveModel {
                 series_id: Set(series_id.clone()),
                 folder_path: Set(folder_path),
+                name_sort_key: Set(compute_sort_key(&name)),
                 name: Set(name),
                 serialization_status: Set("unknown".to_string()),
                 total_count: Set(None),
