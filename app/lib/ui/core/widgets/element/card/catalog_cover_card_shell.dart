@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 
-/// Shared chrome + 2:3 edge-to-edge cover for catalog grid cards.
+/// Shared chrome + 2:3 cover slot for catalog grid cards.
 ///
 /// Used internally by [ComicCard] / [SeriesCard]; pages should keep using
 /// those domain cards rather than this shell directly.

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/image/image_decode_cache_size.dart';
 import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
 import 'package:hentai_library/ui/core/dto/comic_cover_state.dart';
-import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
+import 'package:hentai_library/ui/core/widgets/element/image/card_letterboxed_cover_image.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_placeholder.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_cover_viewport_notifier.dart';
 import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
@@ -33,18 +31,19 @@ class ComicCoverContent extends ConsumerWidget {
     final ComicCoverState state = ref.watch(comicCoverProvider(comicId));
 
     return switch (state) {
-      ComicCoverReady(:final data) => _buildImage(
-        ref,
-        context,
-        data,
-        ComicCoverPlaceholderKind.loading,
+      ComicCoverReady(:final data) => CardLetterboxedCoverImage(
+        cover: data,
+        onDecodeError: () {
+          ref.read(comicCoverProvider(comicId).notifier).markDecodeError();
+        },
       ),
-      ComicCoverLoading(:final previous) when previous != null => _buildImage(
-        ref,
-        context,
-        previous,
-        ComicCoverPlaceholderKind.loading,
-      ),
+      ComicCoverLoading(:final previous) when previous != null =>
+          CardLetterboxedCoverImage(
+            cover: previous,
+            onDecodeError: () {
+              ref.read(comicCoverProvider(comicId).notifier).markDecodeError();
+            },
+          ),
       ComicCoverLoading() => const ComicCoverPlaceholder(
         variant: ComicCoverPlaceholderVariant.card,
         kind: ComicCoverPlaceholderKind.loading,
@@ -74,40 +73,5 @@ class ComicCoverContent extends ConsumerWidget {
     return visibleIndices.contains(index)
         ? ThumbnailPriority.high
         : ThumbnailPriority.low;
-  }
-
-  Widget _buildImage(
-    WidgetRef ref,
-    BuildContext context,
-    ComicCoverImage data,
-    ComicCoverPlaceholderKind decodeFallbackKind,
-  ) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final ImageDecodeCacheSize cacheSize = decodeCacheSizeForContext(
-          context,
-          logicalWidth: constraints.maxWidth,
-          logicalHeight: constraints.maxHeight,
-        );
-        return AppComicImage(
-          filePath: data.filePath,
-          memoryBytes: data.memoryBytes,
-          fit: BoxFit.cover,
-          cacheWidth: cacheSize.cacheWidth,
-          cacheHeight: cacheSize.cacheHeight,
-          placeholder: ComicCoverPlaceholder(
-            variant: ComicCoverPlaceholderVariant.card,
-            kind: decodeFallbackKind,
-          ),
-          errorPlaceholder: ComicCoverPlaceholder(
-            variant: ComicCoverPlaceholderVariant.card,
-            kind: ComicCoverPlaceholderKind.error,
-          ),
-          onDecodeError: () {
-            ref.read(comicCoverProvider(comicId).notifier).markDecodeError();
-          },
-        );
-      },
-    );
   }
 }
