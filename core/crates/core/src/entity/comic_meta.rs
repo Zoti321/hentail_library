@@ -6,6 +6,7 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub comic_id: String,
     pub title: String,
+    pub title_sort_key: String,
     pub content_rating: String,
     pub page_count: i32,
     pub description: Option<String>,

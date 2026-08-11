@@ -8,7 +8,7 @@ use crate::error::HentaiError;
 use crate::metadata_lock::comic_auto_locks;
 use crate::sync::series_rebuild::rebuild_series_from_comics;
 use crate::sync::writer::{replace_comic_authors, replace_comic_tags};
-use crate::util::decode_basic_html_entities;
+use crate::util::{decode_basic_html_entities, compute_sort_key};
 
 #[derive(Debug, Clone, Default)]
 pub struct UpdateComicUserMetaDto {
@@ -94,7 +94,9 @@ pub async fn update_comic_user_meta(
             ..Default::default()
         };
         if let Some(title) = meta.title {
-            active.title = Set(decode_basic_html_entities(&title));
+            let decoded = decode_basic_html_entities(&title);
+            active.title_sort_key = Set(compute_sort_key(&decoded));
+            active.title = Set(decoded);
             meta_touched = true;
         }
         if let Some(content_rating) = meta.content_rating {

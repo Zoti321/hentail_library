@@ -4,6 +4,7 @@ use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
 use crate::metadata_lock::series_auto_locks;
+use crate::util::compute_sort_key;
 
 #[derive(Debug, Clone, Default)]
 pub struct UpdateSeriesUserMetaDto {
@@ -50,6 +51,7 @@ pub async fn update_series_user_meta(
         if trimmed.is_empty() {
             return Err(HentaiError::validation("系列名称不能为空".to_string()));
         }
+        active.name_sort_key = Set(compute_sort_key(trimmed));
         active.name = Set(trimmed.to_string());
     }
     if let Some(serialization_status) = meta.serialization_status {

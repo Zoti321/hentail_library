@@ -8,6 +8,7 @@ pub struct Model {
     #[sea_orm(unique)]
     pub folder_path: String,
     pub name: String,
+    pub name_sort_key: String,
     pub serialization_status: String,
     pub total_count: Option<i32>,
     pub name_locked: bool,

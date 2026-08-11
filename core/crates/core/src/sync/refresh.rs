@@ -7,6 +7,7 @@ use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
 use crate::series_id::series_name_from_folder_path;
+use crate::util::compute_sort_key;
 
 use crate::metadata_lock::{
     merge_kept_scan_with_existing, merge_series_name, series_name_needs_write,
@@ -117,11 +118,13 @@ pub async fn refresh_series_metadata(
     let folder_name = series_name_from_folder_path(&series_row.folder_path);
     if series_name_needs_write(series_row.name_locked, &series_row.name, &folder_name) {
         let mut active: series::ActiveModel = series_row.clone().into();
-        active.name = Set(merge_series_name(
+        let merged_name = merge_series_name(
             series_row.name_locked,
             &series_row.name,
             &folder_name,
-        ));
+        );
+        active.name_sort_key = Set(compute_sort_key(&merged_name));
+        active.name = Set(merged_name);
         active.update(&db).await.map_err(map_db_err)?;
     }
 
