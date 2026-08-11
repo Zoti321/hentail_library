@@ -38,12 +38,12 @@ class ComicCoverContent extends ConsumerWidget {
         },
       ),
       ComicCoverLoading(:final previous) when previous != null =>
-          CardLetterboxedCoverImage(
-            cover: previous,
-            onDecodeError: () {
-              ref.read(comicCoverProvider(comicId).notifier).markDecodeError();
-            },
-          ),
+        CardLetterboxedCoverImage(
+          cover: previous,
+          onDecodeError: () {
+            ref.read(comicCoverProvider(comicId).notifier).markDecodeError();
+          },
+        ),
       ComicCoverLoading() => const ComicCoverPlaceholder(
         variant: ComicCoverPlaceholderVariant.card,
         kind: ComicCoverPlaceholderKind.loading,

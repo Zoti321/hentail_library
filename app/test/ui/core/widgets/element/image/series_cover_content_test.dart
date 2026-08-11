@@ -20,9 +20,9 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: <Override>[
-          seriesCoverSourceProvider('series-1').overrideWith(
-            (Ref ref) async => SeriesCoverCustomThumbnail(bytes),
-          ),
+          seriesCoverSourceProvider(
+            'series-1',
+          ).overrideWith((Ref ref) async => SeriesCoverCustomThumbnail(bytes)),
         ],
         child: MaterialApp(
           theme: buildAppTheme(Brightness.light),
