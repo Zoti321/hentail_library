@@ -53,10 +53,11 @@ Accepted | Superseded by ADR-000N | Deprecated
 
 | ADR | 标题 | 状态 |
 | --- | ---- | ---- |
-| [0001](./0001-comic-identity-via-path.md) | Comic 身份锚定磁盘路径 | Accepted |
+| [0001](./0001-comic-identity-via-path.md) | Comic 身份锚定资源位置键 | Accepted（修订：含 WebDAV URL） |
 | [0002](./0002-rust-core-via-frb.md) | Rust 核心层经 FRB 接管数据与 I/O | Accepted |
 | [0003](./0003-unified-dev-logging.md) | 统一开发期日志（Dart `logging` + Rust `tracing`） | Accepted |
 | [0004](./0004-production-diagnostics.md) | 生产诊断与用户支持（日志导出） | Accepted |
 | [0005](./0005-unified-read-session.md) | 统一 Read session（仅 comicId；废弃系列阅读进度） | Accepted |
 | [0006](./0006-series-item-sort-order-lock.md) | Series item sort order lock（Komga 式手动排序） | Accepted |
 | [0007](./0007-metadata-field-locks.md) | Comic / Series metadata field locks（Komga 式） | Accepted |
+| [0008](./0008-multi-library-and-webdav.md) | 多 Library 与 WebDAV Remote library | Accepted |
