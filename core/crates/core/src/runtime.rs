@@ -10,5 +10,8 @@ pub fn runtime() -> &'static Runtime {
 }
 
 pub fn block_on<F: Future>(future: F) -> F::Output {
-    runtime().block_on(future)
+    match tokio::runtime::Handle::try_current() {
+        Ok(handle) => tokio::task::block_in_place(|| handle.block_on(future)),
+        Err(_) => runtime().block_on(future),
+    }
 }

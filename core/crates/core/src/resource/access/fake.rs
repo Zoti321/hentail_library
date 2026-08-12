@@ -18,11 +18,39 @@ enum FakeNode {
 #[derive(Debug, Default, Clone)]
 pub struct FakeResourceAccess {
     nodes: BTreeMap<String, FakeNode>,
+    unreachable_message: Option<String>,
 }
 
 impl FakeResourceAccess {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Mark all I/O as failing with a remote-access style error (auth / network).
+    pub fn set_unreachable(&mut self, message: impl Into<String>) {
+        self.unreachable_message = Some(message.into());
+    }
+
+    pub fn clear_unreachable(&mut self) {
+        self.unreachable_message = None;
+    }
+
+    fn ensure_reachable(&self) -> Result<(), HentaiError> {
+        if let Some(message) = &self.unreachable_message {
+            let lower = message.to_ascii_lowercase();
+            if lower.contains("401")
+                || lower.contains("403")
+                || lower.contains("auth")
+                || message.contains("认证")
+            {
+                return Err(HentaiError::remote_auth_failed(message.clone()));
+            }
+            if lower.contains("tls") || lower.contains("certificate") || message.contains("证书") {
+                return Err(HentaiError::remote_tls_failed(message.clone()));
+            }
+            return Err(HentaiError::remote_unreachable(message.clone()));
+        }
+        Ok(())
     }
 
     pub fn insert_dir(&mut self, location: impl Into<String>) {
@@ -76,6 +104,7 @@ impl FakeResourceAccess {
 
 impl ResourceAccess for FakeResourceAccess {
     fn list(&self, location: &str) -> Result<Vec<ResourceEntry>, HentaiError> {
+        self.ensure_reachable()?;
         let location = normalize_fake_location(location.to_string());
         match self.nodes.get(&location) {
             Some(FakeNode::Dir) => {}
@@ -119,6 +148,7 @@ impl ResourceAccess for FakeResourceAccess {
     }
 
     fn stat(&self, location: &str) -> Result<Option<ResourceStat>, HentaiError> {
+        self.ensure_reachable()?;
         let location = normalize_fake_location(location.to_string());
         Ok(match self.nodes.get(&location) {
             Some(FakeNode::Dir) => Some(ResourceStat {
@@ -139,6 +169,7 @@ impl ResourceAccess for FakeResourceAccess {
     }
 
     fn open_stream(&self, location: &str) -> Result<ResourceStream, HentaiError> {
+        self.ensure_reachable()?;
         let location = normalize_fake_location(location.to_string());
         match self.nodes.get(&location) {
             Some(FakeNode::File { bytes, .. }) => Ok(Box::new(Cursor::new(bytes.clone()))),

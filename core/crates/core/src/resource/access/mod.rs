@@ -1,13 +1,11 @@
 //! Resource access — list / stat / open-stream over Resources.
 //!
 //! Local uses the filesystem; tests inject [FakeResourceAccess]. Remote
-//! (WebDAV) will share this seam later — not implemented here.
-//!
-//! For Local, `location` is the same OS path string used for comicId
-//! (normalized path key semantics unchanged).
+//! uses [WebDavResourceAccess] (`reqwest_dav` + Basic).
 
 mod fake;
 mod local;
+mod webdav;
 
 use std::io::{Read, Seek};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -16,6 +14,7 @@ use crate::error::HentaiError;
 
 pub use fake::FakeResourceAccess;
 pub use local::LocalResourceAccess;
+pub use webdav::WebDavResourceAccess;
 
 /// File vs directory at a resource location.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -368,6 +368,7 @@ abstract class RustLibApi extends BaseApi {
     required SyncHandleDto handle,
     required SyncScanModeDto scanMode,
     required bool syncAll,
+    required List<RemoteLibraryCredentialDto> credentials,
   });
 
   void crateApiComicUpdateComicUserMetaFrb({
@@ -2682,6 +2683,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required SyncHandleDto handle,
     required SyncScanModeDto scanMode,
     required bool syncAll,
+    required List<RemoteLibraryCredentialDto> credentials,
   }) {
     final sink = RustStreamSink<SyncLibraryProgressDto>();
     unawaited(
@@ -2695,6 +2697,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             );
             sse_encode_sync_scan_mode_dto(scanMode, serializer);
             sse_encode_bool(syncAll, serializer);
+            sse_encode_list_remote_library_credential_dto(
+              credentials,
+              serializer,
+            );
             sse_encode_StreamSink_sync_library_progress_dto_Sse(
               sink,
               serializer,
@@ -2711,7 +2717,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             decodeErrorData: null,
           ),
           constMeta: kCrateApiSyncSyncLibraryFrbConstMeta,
-          argValues: [handle, scanMode, syncAll, sink],
+          argValues: [handle, scanMode, syncAll, credentials, sink],
           apiImpl: this,
         ),
       ),
@@ -2721,7 +2727,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   TaskConstMeta get kCrateApiSyncSyncLibraryFrbConstMeta => const TaskConstMeta(
     debugName: "sync_library_frb",
-    argNames: ["handle", "scanMode", "syncAll", "sink"],
+    argNames: ["handle", "scanMode", "syncAll", "credentials", "sink"],
   );
 
   @override
@@ -3812,6 +3818,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<RemoteLibraryCredentialDto>
+  dco_decode_list_remote_library_credential_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_remote_library_credential_dto)
+        .toList();
+  }
+
+  @protected
   List<SeriesComicOrderEntryDto> dco_decode_list_series_comic_order_entry_dto(
     dynamic raw,
   ) {
@@ -4058,6 +4073,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return RefreshSeriesResultFrbDto(
       succeeded: dco_decode_i_32(arr[0]),
       failed: dco_decode_i_32(arr[1]),
+    );
+  }
+
+  @protected
+  RemoteLibraryCredentialDto dco_decode_remote_library_credential_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return RemoteLibraryCredentialDto(
+      libraryId: dco_decode_String(arr[0]),
+      password: dco_decode_String(arr[1]),
     );
   }
 
@@ -5028,6 +5057,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<RemoteLibraryCredentialDto>
+  sse_decode_list_remote_library_credential_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <RemoteLibraryCredentialDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_remote_library_credential_dto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<SeriesComicOrderEntryDto> sse_decode_list_series_comic_order_entry_dto(
     SseDeserializer deserializer,
   ) {
@@ -5360,6 +5402,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return RefreshSeriesResultFrbDto(
       succeeded: var_succeeded,
       failed: var_failed,
+    );
+  }
+
+  @protected
+  RemoteLibraryCredentialDto sse_decode_remote_library_credential_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_libraryId = sse_decode_String(deserializer);
+    var var_password = sse_decode_String(deserializer);
+    return RemoteLibraryCredentialDto(
+      libraryId: var_libraryId,
+      password: var_password,
     );
   }
 
@@ -6432,6 +6487,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_remote_library_credential_dto(
+    List<RemoteLibraryCredentialDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_remote_library_credential_dto(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_series_comic_order_entry_dto(
     List<SeriesComicOrderEntryDto> self,
     SseSerializer serializer,
@@ -6729,6 +6796,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.succeeded, serializer);
     sse_encode_i_32(self.failed, serializer);
+  }
+
+  @protected
+  void sse_encode_remote_library_credential_dto(
+    RemoteLibraryCredentialDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.libraryId, serializer);
+    sse_encode_String(self.password, serializer);
   }
 
   @protected

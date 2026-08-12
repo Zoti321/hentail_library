@@ -1,10 +1,17 @@
 import 'package:hentai_library/data/adapters/sync_library_frb_adapter.dart';
 import 'package:hentai_library/domain/library/library_sync_coordinator.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
+import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:test/test.dart';
 
+class _FakeLibraryRepository implements LibraryRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 class _ScriptedSyncAdapter extends SyncLibraryFrbAdapter {
-  _ScriptedSyncAdapter(this._run);
+  _ScriptedSyncAdapter(this._run)
+    : super(libraryRepository: _FakeLibraryRepository());
 
   final Future<void> Function({
     ScanMode scanMode,

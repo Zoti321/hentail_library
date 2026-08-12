@@ -245,6 +245,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<ReadingHistoryDto> dco_decode_list_reading_history_dto(dynamic raw);
 
   @protected
+  List<RemoteLibraryCredentialDto>
+  dco_decode_list_remote_library_credential_dto(dynamic raw);
+
+  @protected
   List<SeriesComicOrderEntryDto> dco_decode_list_series_comic_order_entry_dto(
     dynamic raw,
   );
@@ -333,6 +337,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RefreshSeriesResultFrbDto dco_decode_refresh_series_result_frb_dto(
+    dynamic raw,
+  );
+
+  @protected
+  RemoteLibraryCredentialDto dco_decode_remote_library_credential_dto(
     dynamic raw,
   );
 
@@ -678,6 +687,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<RemoteLibraryCredentialDto>
+  sse_decode_list_remote_library_credential_dto(SseDeserializer deserializer);
+
+  @protected
   List<SeriesComicOrderEntryDto> sse_decode_list_series_comic_order_entry_dto(
     SseDeserializer deserializer,
   );
@@ -782,6 +795,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RefreshSeriesResultFrbDto sse_decode_refresh_series_result_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  RemoteLibraryCredentialDto sse_decode_remote_library_credential_dto(
     SseDeserializer deserializer,
   );
 
@@ -1227,6 +1245,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_remote_library_credential_dto(
+    List<RemoteLibraryCredentialDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_series_comic_order_entry_dto(
     List<SeriesComicOrderEntryDto> self,
     SseSerializer serializer,
@@ -1358,6 +1382,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_refresh_series_result_frb_dto(
     RefreshSeriesResultFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_remote_library_credential_dto(
+    RemoteLibraryCredentialDto self,
     SseSerializer serializer,
   );
 

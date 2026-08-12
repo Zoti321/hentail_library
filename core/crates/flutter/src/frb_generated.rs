@@ -2637,6 +2637,8 @@ fn wire__crate__api__sync__sync_library_frb_impl(
             let api_handle = <SyncHandleDto>::sse_decode(&mut deserializer);
             let api_scan_mode = <crate::api::sync::SyncScanModeDto>::sse_decode(&mut deserializer);
             let api_sync_all = <bool>::sse_decode(&mut deserializer);
+            let api_credentials =
+                <Vec<crate::api::sync::RemoteLibraryCredentialDto>>::sse_decode(&mut deserializer);
             let api_sink = <StreamSink<
                 crate::api::sync::SyncLibraryProgressDto,
                 flutter_rust_bridge::for_generated::SseCodec,
@@ -2650,6 +2652,7 @@ fn wire__crate__api__sync__sync_library_frb_impl(
                                 api_handle,
                                 api_scan_mode,
                                 api_sync_all,
+                                api_credentials,
                                 api_sink,
                             )
                             .await;
@@ -3858,6 +3861,20 @@ impl SseDecode for Vec<crate::api::history::ReadingHistoryDto> {
     }
 }
 
+impl SseDecode for Vec<crate::api::sync::RemoteLibraryCredentialDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::sync::RemoteLibraryCredentialDto>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::api::series::SeriesComicOrderEntryDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -4190,6 +4207,18 @@ impl SseDecode for crate::api::series::RefreshSeriesResultFrbDto {
         return crate::api::series::RefreshSeriesResultFrbDto {
             succeeded: var_succeeded,
             failed: var_failed,
+        };
+    }
+}
+
+impl SseDecode for crate::api::sync::RemoteLibraryCredentialDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_libraryId = <String>::sse_decode(deserializer);
+        let mut var_password = <String>::sse_decode(deserializer);
+        return crate::api::sync::RemoteLibraryCredentialDto {
+            library_id: var_libraryId,
+            password: var_password,
         };
     }
 }
@@ -5494,6 +5523,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::series::RefreshSeriesResultFr
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::sync::RemoteLibraryCredentialDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.library_id.into_into_dart().into_dart(),
+            self.password.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::sync::RemoteLibraryCredentialDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::RemoteLibraryCredentialDto>
+    for crate::api::sync::RemoteLibraryCredentialDto
+{
+    fn into_into_dart(self) -> crate::api::sync::RemoteLibraryCredentialDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::series::SeriesComicOrderEntryDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -6466,6 +6516,16 @@ impl SseEncode for Vec<crate::api::history::ReadingHistoryDto> {
     }
 }
 
+impl SseEncode for Vec<crate::api::sync::RemoteLibraryCredentialDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::sync::RemoteLibraryCredentialDto>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::api::series::SeriesComicOrderEntryDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -6716,6 +6776,14 @@ impl SseEncode for crate::api::series::RefreshSeriesResultFrbDto {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.succeeded, serializer);
         <i32>::sse_encode(self.failed, serializer);
+    }
+}
+
+impl SseEncode for crate::api::sync::RemoteLibraryCredentialDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.library_id, serializer);
+        <String>::sse_encode(self.password, serializer);
     }
 }
 

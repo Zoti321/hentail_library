@@ -11,7 +11,7 @@ mod stat;
 
 pub use access::{
     local_access, FakeResourceAccess, LocalResourceAccess, ResourceAccess, ResourceEntry,
-    ResourceKind, ResourceStat, ResourceStream,
+    ResourceKind, ResourceStat, ResourceStream, WebDavResourceAccess,
 };
 pub use media::{
     basename, basename_without_extension, can_generate_thumbnail, extension_lower,

@@ -199,7 +199,7 @@ fn sync_current_library_does_not_remove_other_library_comics() {
 
             let handle = create_sync_handle();
             // Sync all once to populate both.
-            sync_library(handle, SyncScanMode::Full, true, |_| {})
+            sync_library(handle, SyncScanMode::Full, true, vec![], |_| {})
                 .await
                 .expect("sync all");
 
@@ -214,7 +214,7 @@ fn sync_current_library_does_not_remove_other_library_comics() {
                 .await
                 .expect("current a");
             let handle = create_sync_handle();
-            sync_library(handle, SyncScanMode::Full, false, |_| {})
+            sync_library(handle, SyncScanMode::Full, false, vec![], |_| {})
                 .await
                 .expect("sync current");
 
@@ -252,7 +252,7 @@ fn per_library_format_groups_only_affect_that_library_on_sync() {
                 .expect("create b");
 
             let handle = create_sync_handle();
-            sync_library(handle, SyncScanMode::Full, true, |_| {})
+            sync_library(handle, SyncScanMode::Full, true, vec![], |_| {})
                 .await
                 .expect("sync all");
 
@@ -268,7 +268,7 @@ fn per_library_format_groups_only_affect_that_library_on_sync() {
                 .await
                 .expect("current");
             let handle = create_sync_handle();
-            sync_library(handle, SyncScanMode::Full, false, |_| {})
+            sync_library(handle, SyncScanMode::Full, false, vec![], |_| {})
                 .await
                 .expect("sync a");
 
@@ -304,7 +304,7 @@ fn delete_library_clears_only_that_library_comics_and_series() {
                 .expect("create b");
 
             let handle = create_sync_handle();
-            sync_library(handle, SyncScanMode::Full, true, |_| {})
+            sync_library(handle, SyncScanMode::Full, true, vec![], |_| {})
                 .await
                 .expect("sync all");
 
@@ -374,7 +374,7 @@ fn browse_defaults_to_current_library_scope() {
                 .await
                 .expect("b");
             let handle = create_sync_handle();
-            sync_library(handle, SyncScanMode::Full, true, |_| {})
+            sync_library(handle, SyncScanMode::Full, true, vec![], |_| {})
                 .await
                 .expect("sync");
 

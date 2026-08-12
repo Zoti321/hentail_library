@@ -10,6 +10,12 @@ pub enum HentaiErrorCode {
     ReaderUnsupportedType,
     ReaderInvalidContent,
     ReaderSessionNotOpen,
+    /// Remote library transport / DNS / timeout.
+    RemoteUnreachable,
+    /// WebDAV Basic auth rejected.
+    RemoteAuthFailed,
+    /// TLS / certificate problems talking to Remote library.
+    RemoteTlsFailed,
 }
 
 #[derive(Debug, Clone, Error)]
@@ -83,5 +89,38 @@ impl HentaiError {
             message: format!("阅读会话未打开: {}", comic_id.into()),
             context: None,
         }
+    }
+
+    pub fn remote_unreachable(message: impl Into<String>) -> Self {
+        Self {
+            code: HentaiErrorCode::RemoteUnreachable,
+            message: message.into(),
+            context: None,
+        }
+    }
+
+    pub fn remote_auth_failed(message: impl Into<String>) -> Self {
+        Self {
+            code: HentaiErrorCode::RemoteAuthFailed,
+            message: message.into(),
+            context: None,
+        }
+    }
+
+    pub fn remote_tls_failed(message: impl Into<String>) -> Self {
+        Self {
+            code: HentaiErrorCode::RemoteTlsFailed,
+            message: message.into(),
+            context: None,
+        }
+    }
+
+    pub fn is_remote_access_failure(&self) -> bool {
+        matches!(
+            self.code,
+            HentaiErrorCode::RemoteUnreachable
+                | HentaiErrorCode::RemoteAuthFailed
+                | HentaiErrorCode::RemoteTlsFailed
+        )
     }
 }

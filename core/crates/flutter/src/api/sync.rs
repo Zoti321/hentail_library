@@ -1,5 +1,5 @@
 use hentai_core::{
-    self, SyncHandle as CoreHandle,
+    self, RemoteLibraryCredential as CoreRemoteCredential, SyncHandle as CoreHandle,
     SyncLibraryPhaseDto as CorePhase, SyncLibraryProgressDto as CoreProgress,
     SyncLibraryRouteDto as CoreRoute, SyncScanMode as CoreScanMode,
     cancel_sync as core_cancel_sync, create_sync_handle as core_create_sync_handle,
@@ -69,6 +69,12 @@ pub struct SyncLibraryProgressDto {
     pub error_message: Option<String>,
 }
 
+#[derive(Debug, Clone)]
+pub struct RemoteLibraryCredentialDto {
+    pub library_id: String,
+    pub password: String,
+}
+
 pub struct SyncHandleDto {
     pub(crate) inner: CoreHandle,
 }
@@ -90,12 +96,21 @@ pub async fn sync_library_frb(
     handle: SyncHandleDto,
     scan_mode: SyncScanModeDto,
     sync_all: bool,
+    credentials: Vec<RemoteLibraryCredentialDto>,
     sink: crate::frb_generated::StreamSink<SyncLibraryProgressDto>,
 ) {
+    let core_credentials = credentials
+        .into_iter()
+        .map(|c| CoreRemoteCredential {
+            library_id: c.library_id,
+            password: c.password,
+        })
+        .collect();
     if let Err(error) = core_sync_library(
         handle.inner,
         map_scan_mode(scan_mode),
         sync_all,
+        core_credentials,
         |progress| {
             let _ = sink.add(map_progress(progress));
         },

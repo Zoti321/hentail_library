@@ -46,7 +46,7 @@ typedef SyncLibraryProgress = ({
   int? thumbnailDone,
   int? thumbnailFailedCount,
 
-  /// Rust 同步失败时的错误文案；仅 [SyncLibraryPhase.failed] 时有值。
+  /// 失败文案，或远程库跳过（不可达/缺凭证）时的可理解提示。
   String? errorMessage,
 });
 
