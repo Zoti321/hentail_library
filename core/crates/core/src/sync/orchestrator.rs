@@ -116,7 +116,7 @@ async fn sync_one_library(
     scan_mode: SyncScanMode,
     emit: &mut impl FnMut(SyncLibraryProgressDto),
 ) -> Result<Option<SyncLibraryProgressDto>, HentaiError> {
-    let roots = normalize_roots(&[library.root_path.clone()]);
+    let roots = normalize_roots(std::slice::from_ref(&library.root_path));
     if roots.is_empty() {
         return Ok(None);
     }
@@ -139,6 +139,7 @@ async fn sync_one_library(
     .await
 }
 
+#[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip(emit, roots, handle), err, fields(root_count = roots.len()))]
 async fn sync_with_roots(
     db: &sea_orm::DatabaseConnection,

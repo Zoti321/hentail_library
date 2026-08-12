@@ -36,6 +36,7 @@ pub fn comic_id_for_path(path: &str) -> String {
     comic_id_from_path(path)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn finalize_parsed_with(
     access: &dyn ResourceAccess,
     location: &str,

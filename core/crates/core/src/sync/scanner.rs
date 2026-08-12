@@ -120,7 +120,7 @@ fn is_excluded_root(location: &str, exclude_keys: &[String]) -> bool {
     if key.is_empty() {
         return false;
     }
-    exclude_keys.iter().any(|ex| key == *ex)
+    exclude_keys.contains(&key)
 }
 
 fn collect_from_directory(
