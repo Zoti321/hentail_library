@@ -107,5 +107,10 @@ pub fn merge_kept_scan_with_existing(scanned: &ComicDto, existing: &ComicDto) ->
             authors: locks.authors,
             tags: locks.tags,
         },
+        library_id: if scanned.library_id.is_empty() {
+            existing.library_id.clone()
+        } else {
+            scanned.library_id.clone()
+        },
     }
 }

@@ -25,9 +25,11 @@ class ComicCoverContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThumbnailPriority effectivePriority = _effectivePriority(ref);
+    // Provider build already schedules ensureLoaded via microtask; only bump
+    // priority here (no state writes during widget build).
     ref
         .read(comicCoverProvider(comicId).notifier)
-        .ensureLoaded(priority: effectivePriority);
+        .bumpPriority(effectivePriority);
     final ComicCoverState state = ref.watch(comicCoverProvider(comicId));
 
     return switch (state) {

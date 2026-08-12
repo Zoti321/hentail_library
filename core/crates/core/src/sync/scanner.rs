@@ -31,6 +31,17 @@ pub fn scan_roots(
     force_full_parse: bool,
     enabled_groups: &[FormatGroup],
 ) -> Result<Vec<ScanItem>, HentaiError> {
+    scan_roots_excluding(roots, &[], ctx, handle, force_full_parse, enabled_groups)
+}
+
+pub fn scan_roots_excluding(
+    roots: &[PathBuf],
+    exclude_roots: &[String],
+    ctx: &ScanContext,
+    handle: &SyncHandle,
+    force_full_parse: bool,
+    enabled_groups: &[FormatGroup],
+) -> Result<Vec<ScanItem>, HentaiError> {
     let root_locs: Vec<String> = roots
         .iter()
         .map(|r| r.to_string_lossy().into_owned())
@@ -38,6 +49,7 @@ pub fn scan_roots(
     scan_roots_with(
         local_access(),
         &root_locs,
+        exclude_roots,
         ctx,
         handle,
         force_full_parse,
@@ -48,11 +60,17 @@ pub fn scan_roots(
 pub fn scan_roots_with(
     access: &dyn ResourceAccess,
     roots: &[String],
+    exclude_roots: &[String],
     ctx: &ScanContext,
     handle: &SyncHandle,
     force_full_parse: bool,
     enabled_groups: &[FormatGroup],
 ) -> Result<Vec<ScanItem>, HentaiError> {
+    let exclude_keys: Vec<String> = exclude_roots
+        .iter()
+        .map(|r| crate::comic_id::normalize_path_for_key(r))
+        .filter(|k| !k.is_empty())
+        .collect();
     let mut candidates: Vec<String> = Vec::new();
     for root in roots {
         if handle.is_cancelled() {
@@ -63,7 +81,14 @@ pub fn scan_roots_with(
         };
         match stat.kind {
             ResourceKind::Dir => {
-                collect_from_directory(access, root, &mut candidates, handle, enabled_groups)?;
+                collect_from_directory(
+                    access,
+                    root,
+                    &exclude_keys,
+                    &mut candidates,
+                    handle,
+                    enabled_groups,
+                )?;
             }
             ResourceKind::File => candidates.push(root.clone()),
         }
@@ -90,9 +115,18 @@ pub fn scan_roots_with(
     Ok(items)
 }
 
+fn is_excluded_root(location: &str, exclude_keys: &[String]) -> bool {
+    let key = crate::comic_id::normalize_path_for_key(location);
+    if key.is_empty() {
+        return false;
+    }
+    exclude_keys.iter().any(|ex| key == *ex)
+}
+
 fn collect_from_directory(
     access: &dyn ResourceAccess,
     dir: &str,
+    exclude_keys: &[String],
     out: &mut Vec<String>,
     handle: &SyncHandle,
     enabled_groups: &[FormatGroup],
@@ -112,7 +146,17 @@ fn collect_from_directory(
         }
         match entry.kind {
             ResourceKind::Dir => {
-                collect_from_directory(access, &entry.location, out, handle, enabled_groups)?;
+                if is_excluded_root(&entry.location, exclude_keys) {
+                    continue;
+                }
+                collect_from_directory(
+                    access,
+                    &entry.location,
+                    exclude_keys,
+                    out,
+                    handle,
+                    enabled_groups,
+                )?;
             }
             ResourceKind::File => out.push(entry.location),
         }
@@ -251,6 +295,7 @@ mod tests {
             authors: vec![],
             tags: vec![],
             locks: crate::comic::ComicMetaLocks::default(),
+            library_id: String::new(),
         };
         let ctx = ScanContext {
             existing_by_id: HashMap::from([(comic_id.clone(), existing)]),
@@ -321,6 +366,7 @@ mod tests {
         let items = scan_roots_with(
             &fake,
             &["/lib".to_string()],
+            &[],
             &ctx,
             &handle,
             true,

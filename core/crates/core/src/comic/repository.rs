@@ -35,7 +35,16 @@ pub async fn fetch_comics_page(
     sort: ComicSortOptionDto,
 ) -> Result<PagedComicResultDto, HentaiError> {
     let db = connection()?;
-    let filter = filter.normalized();
+    let mut filter = filter.normalized();
+    filter.library_id = crate::library::resolve_browse_library_id(filter.library_id).await?;
+    if filter.library_id.is_none() {
+        return Ok(PagedComicResultDto {
+            items: vec![],
+            total_count: 0,
+            page: 1,
+            page_size: request.page_size.max(1),
+        });
+    }
     let page_size = request.page_size.max(1);
     let total_count = count_filtered(&db, &filter).await?;
     let total_pages = if total_count <= 0 {
@@ -78,13 +87,19 @@ pub async fn search_by_keyword(keyword: &str) -> Result<Vec<ComicDto>, HentaiErr
     if q.is_empty() {
         return Ok(vec![]);
     }
+    let Some(library_id) = crate::library::resolve_browse_library_id(None).await? else {
+        return Ok(vec![]);
+    };
     let db = connection()?;
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "SELECT c.comic_id FROM comics c \
          INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
-         WHERE lower(m.title) LIKE ?",
-        vec![Value::String(Some(Box::new(format!("%{q}%"))))],
+         WHERE c.library_id = ? AND lower(m.title) LIKE ?",
+        vec![
+            Value::String(Some(Box::new(library_id))),
+            Value::String(Some(Box::new(format!("%{q}%")))),
+        ],
     );
     let comic_ids = query_ids_from_stmt(&db, stmt).await?;
     load_comics_ordered(&db, comic_ids).await
@@ -202,6 +217,7 @@ pub async fn load_comics_ordered(
                 authors: meta.authors_locked,
                 tags: meta.tags_locked,
             },
+            library_id: model.library_id,
         });
     }
     Ok(result)

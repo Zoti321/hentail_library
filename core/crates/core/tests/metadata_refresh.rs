@@ -86,8 +86,8 @@ async fn upsert_paths(db: &DatabaseConnection, paths: &[&Path]) {
             comic,
         });
     }
-    let plan = build_scan_replace_plan(db, items).await.expect("plan");
-    apply_scan_replace_plan(db, &plan).await.expect("upsert");
+    let plan = build_scan_replace_plan(db, items, "").await.expect("plan");
+    apply_scan_replace_plan(db, &plan, "").await.expect("upsert");
 }
 
 async fn upsert_path(db: &DatabaseConnection, path: &Path) {

@@ -5,9 +5,10 @@ use std::sync::Mutex;
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::util::compute_sort_key;
 use hentai_core::{
-    connection, fetch_comics_page, fetch_series_page, init_db_at_path, update_comic_user_meta,
-    ComicFilterDto, ComicSortFieldDto, ComicSortOptionDto, PageRequestDto, SeriesFilterDto,
-    SeriesSortFieldDto, SeriesSortOptionDto, UpdateComicUserMetaDto,
+    connection, create_local_library, fetch_comics_page, fetch_series_page, init_db_at_path,
+    set_current_library_id, update_comic_user_meta, ComicFilterDto, ComicSortFieldDto,
+    ComicSortOptionDto, PageRequestDto, SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto,
+    UpdateComicUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, Database, DatabaseConnection, Statement};
 use tempfile::TempDir;
@@ -63,6 +64,27 @@ async fn clear_library(db: &DatabaseConnection) {
     .expect("clear");
 }
 
+async fn stamp_all_to_current_library(db: &DatabaseConnection, root: &str) {
+    let lib = create_local_library(root).await.expect("create library");
+    set_current_library_id(Some(&lib.library_id))
+        .await
+        .expect("set current");
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "UPDATE comics SET library_id = ?",
+        [sea_orm::Value::String(Some(Box::new(lib.library_id.clone())))],
+    ))
+    .await
+    .expect("stamp comics");
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "UPDATE series SET library_id = ?",
+        [sea_orm::Value::String(Some(Box::new(lib.library_id)))],
+    ))
+    .await
+    .expect("stamp series");
+}
+
 async fn insert_comic(db: &DatabaseConnection, comic_id: &str, path: &str, title: &str) {
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
@@ -103,6 +125,7 @@ fn fetch_comics_page_title_asc_uses_natural_order() {
             insert_comic(&db, "c10", "E:/lib/Vol 10.cbz", "Vol 10").await;
             insert_comic(&db, "c2", "E:/lib/Vol 2.cbz", "Vol 2").await;
             insert_comic(&db, "c1", "E:/lib/Vol 1.cbz", "vol 1").await;
+            stamp_all_to_current_library(&db, "E:/lib").await;
 
             let page = fetch_comics_page(
                 PageRequestDto {
@@ -140,7 +163,8 @@ fn fetch_series_page_name_asc_uses_natural_order() {
             insert_comic(&db, "c10", "E:/lib/Vol 10/a.cbz", "a").await;
             insert_comic(&db, "c2", "E:/lib/Vol 2/a.cbz", "a").await;
             insert_comic(&db, "c1", "E:/lib/Vol 1/a.cbz", "a").await;
-            rebuild_series_from_comics(&db).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None).await.expect("rebuild");
+            stamp_all_to_current_library(&db, "E:/lib").await;
 
             let page = fetch_series_page(
                 PageRequestDto {

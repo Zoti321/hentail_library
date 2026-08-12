@@ -1,16 +1,11 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
-#[sea_orm(table_name = "comics")]
+#[sea_orm(table_name = "app_prefs")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
-    pub comic_id: String,
-    pub path: String,
-    pub resource_type: String,
-    pub resource_size: i64,
-    pub created_at: i64,
-    pub last_updated_at: i64,
-    pub library_id: String,
+    pub key: String,
+    pub value: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

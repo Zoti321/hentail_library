@@ -2,22 +2,23 @@ use std::path::PathBuf;
 
 use crate::db::connection;
 use crate::error::HentaiError;
+use crate::library::{
+    find_library_by_id, get_current_library_id, list_libraries, LibraryDto,
+};
 use crate::reader::clear_reader_sessions;
+use crate::resource::normalize_roots;
 
 use super::dto::{
     LibrarySyncCountsDto, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto,
     SyncScanMode,
 };
-use super::format_group::FormatGroup;
 use super::handle::SyncHandle;
 use super::library_lock::try_acquire_library_write_lock;
-use crate::resource::normalize_roots;
 use super::plan::{
-    build_scan_replace_plan, count_all_comic_ids, load_existing_comics_map, load_saved_paths,
-    load_thumbnail_stats,
+    build_scan_replace_plan, load_existing_comics_map, load_thumbnail_stats,
 };
-use super::scanner::{ScanContext, scan_roots};
-use super::writer::{apply_scan_replace_plan, clear_all_comics};
+use super::scanner::{ScanContext, scan_roots_excluding};
+use super::writer::apply_scan_replace_plan;
 use crate::thumbnail::enqueue_thumbnails_low;
 
 fn return_if_cancelled(handle: &SyncHandle, phase: &str) -> bool {
@@ -37,105 +38,64 @@ fn log_sync_phase(phase: SyncLibraryPhaseDto, route: SyncLibraryRouteDto) {
 pub async fn sync_library(
     handle: SyncHandle,
     scan_mode: SyncScanMode,
-    enabled_format_groups: &[FormatGroup],
-    emit: impl FnMut(SyncLibraryProgressDto),
+    sync_all: bool,
+    mut emit: impl FnMut(SyncLibraryProgressDto),
 ) -> Result<(), HentaiError> {
     let _guard = try_acquire_library_write_lock()?;
     let db = connection()?;
-    let roots = load_saved_paths(&db).await?;
-    let effective = normalize_roots(&roots);
-    if effective.is_empty() {
-        return sync_no_roots(&db, &handle, emit).await;
+
+    let targets: Vec<LibraryDto> = if sync_all {
+        list_libraries().await?
+    } else {
+        match get_current_library_id().await? {
+            Some(id) => match find_library_by_id(&id).await? {
+                Some(lib) => vec![lib],
+                None => Vec::new(),
+            },
+            None => Vec::new(),
+        }
+    };
+
+    if targets.is_empty() {
+        return sync_noop(&mut emit).await;
     }
-    sync_with_roots(
-        &db,
-        &handle,
-        &effective,
-        scan_mode,
-        enabled_format_groups,
-        emit,
-    )
-    .await
+
+    let mut last_progress: Option<SyncLibraryProgressDto> = None;
+    for library in targets {
+        if return_if_cancelled(&handle, "library_loop") {
+            return Ok(());
+        }
+        if let Some(progress) =
+            sync_one_library(&db, &handle, &library, scan_mode, &mut emit).await?
+        {
+            last_progress = Some(progress);
+        }
+    }
+    // Emit a single Done for the whole run so Flutter stream consumers do not
+    // stop after the first library when sync_all is true.
+    if let Some(mut done) = last_progress {
+        done.phase = SyncLibraryPhaseDto::Done;
+        log_sync_phase(SyncLibraryPhaseDto::Done, done.route);
+        emit(done);
+    } else {
+        sync_noop(&mut emit).await?;
+    }
+    Ok(())
 }
 
-#[tracing::instrument(skip(emit, handle), err)]
-async fn sync_no_roots(
-    db: &sea_orm::DatabaseConnection,
-    handle: &SyncHandle,
-    mut emit: impl FnMut(SyncLibraryProgressDto),
+async fn sync_noop(
+    emit: &mut impl FnMut(SyncLibraryProgressDto),
 ) -> Result<(), HentaiError> {
-    if return_if_cancelled(handle, "no_roots_start") {
-        return Ok(());
-    }
-    let count = count_all_comic_ids(db).await?;
-    if count == 0 {
-        log_sync_phase(SyncLibraryPhaseDto::Done, SyncLibraryRouteDto::NoRootsNoop);
-        emit(progress(
-            SyncLibraryPhaseDto::Done,
-            SyncLibraryRouteDto::NoRootsNoop,
-            None,
-            0,
-            LibrarySyncCountsDto::default(),
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-        ));
-        return Ok(());
-    }
-    log_sync_phase(
-        SyncLibraryPhaseDto::ClearingLibrary,
-        SyncLibraryRouteDto::NoRootsCleared,
-    );
-    emit(progress(
-        SyncLibraryPhaseDto::ClearingLibrary,
-        SyncLibraryRouteDto::NoRootsCleared,
-        None,
-        0,
-        LibrarySyncCountsDto::default(),
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-    ));
-    if return_if_cancelled(handle, "clearing_library") {
-        return Ok(());
-    }
-    log_sync_phase(SyncLibraryPhaseDto::WritingDb, SyncLibraryRouteDto::NoRootsCleared);
-    emit(progress(
-        SyncLibraryPhaseDto::WritingDb,
-        SyncLibraryRouteDto::NoRootsCleared,
-        None,
-        0,
-        LibrarySyncCountsDto::default(),
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-        None,
-    ));
-    let removed = clear_all_comics(db).await?;
-    // Sole locality for sync-driven session invalidation (do not also clear from Flutter).
-    clear_reader_sessions();
-    log_sync_phase(SyncLibraryPhaseDto::Done, SyncLibraryRouteDto::NoRootsCleared);
-    tracing::info!(removed, "sync complete");
+    log_sync_phase(SyncLibraryPhaseDto::Done, SyncLibraryRouteDto::NoRootsNoop);
     emit(progress(
         SyncLibraryPhaseDto::Done,
-        SyncLibraryRouteDto::NoRootsCleared,
+        SyncLibraryRouteDto::NoRootsNoop,
         None,
         0,
         LibrarySyncCountsDto::default(),
-        Some(removed),
-        Some(0),
-        Some(0),
+        None,
+        None,
+        None,
         None,
         None,
         None,
@@ -144,15 +104,52 @@ async fn sync_no_roots(
     Ok(())
 }
 
+#[tracing::instrument(
+    skip(emit, handle, db, library),
+    err,
+    fields(library_id = %library.library_id, root = %library.root_path)
+)]
+async fn sync_one_library(
+    db: &sea_orm::DatabaseConnection,
+    handle: &SyncHandle,
+    library: &LibraryDto,
+    scan_mode: SyncScanMode,
+    emit: &mut impl FnMut(SyncLibraryProgressDto),
+) -> Result<Option<SyncLibraryProgressDto>, HentaiError> {
+    let roots = normalize_roots(&[library.root_path.clone()]);
+    if roots.is_empty() {
+        return Ok(None);
+    }
+    let exclude_roots: Vec<String> = list_libraries()
+        .await?
+        .into_iter()
+        .filter(|lib| lib.library_id != library.library_id)
+        .map(|lib| lib.root_path)
+        .collect();
+    sync_with_roots(
+        db,
+        handle,
+        &library.library_id,
+        &roots,
+        &exclude_roots,
+        scan_mode,
+        &library.enabled_format_groups,
+        emit,
+    )
+    .await
+}
+
 #[tracing::instrument(skip(emit, roots, handle), err, fields(root_count = roots.len()))]
 async fn sync_with_roots(
     db: &sea_orm::DatabaseConnection,
     handle: &SyncHandle,
+    library_id: &str,
     roots: &[PathBuf],
+    exclude_roots: &[String],
     scan_mode: SyncScanMode,
-    enabled_format_groups: &[FormatGroup],
-    mut emit: impl FnMut(SyncLibraryProgressDto),
-) -> Result<(), HentaiError> {
+    enabled_format_groups: &[crate::sync::format_group::FormatGroup],
+    emit: &mut impl FnMut(SyncLibraryProgressDto),
+) -> Result<Option<SyncLibraryProgressDto>, HentaiError> {
     let force_full_parse = scan_mode == SyncScanMode::Full;
     let existing_by_id = load_existing_comics_map(db).await?;
     let thumbnail_stats = load_thumbnail_stats(db).await?;
@@ -179,15 +176,19 @@ async fn sync_with_roots(
         None,
     ));
 
-    let scan_items = scan_roots(
+    let mut scan_items = scan_roots_excluding(
         roots,
+        exclude_roots,
         &ctx,
         handle,
         force_full_parse,
         enabled_format_groups,
     )?;
+    for item in &mut scan_items {
+        item.comic.library_id = library_id.to_string();
+    }
     if return_if_cancelled(handle, "scanning") {
-        return Ok(());
+        return Ok(None);
     }
     for item in &scan_items {
         counts.bump(&item.resource_type);
@@ -208,7 +209,7 @@ async fn sync_with_roots(
         ));
     }
     if return_if_cancelled(handle, "scanning_progress") {
-        return Ok(());
+        return Ok(None);
     }
 
     log_sync_phase(SyncLibraryPhaseDto::WritingDb, SyncLibraryRouteDto::WithRoots);
@@ -227,11 +228,11 @@ async fn sync_with_roots(
         None,
     ));
 
-    let plan = build_scan_replace_plan(db, scan_items).await?;
+    let plan = build_scan_replace_plan(db, scan_items, library_id).await?;
     if return_if_cancelled(handle, "writing_db") {
-        return Ok(());
+        return Ok(None);
     }
-    apply_scan_replace_plan(db, &plan).await?;
+    apply_scan_replace_plan(db, &plan, library_id).await?;
     // Sole locality for sync-driven session invalidation (do not also clear from Flutter).
     clear_reader_sessions();
 
@@ -245,7 +246,6 @@ async fn sync_with_roots(
         enqueue_thumbnails_low(comic_ids).await?;
     }
 
-    log_sync_phase(SyncLibraryPhaseDto::Done, SyncLibraryRouteDto::WithRoots);
     tracing::info!(
         accepted_total,
         removed = plan.removed_ids.len(),
@@ -253,10 +253,10 @@ async fn sync_with_roots(
         kept = plan.kept_count,
         migrated = plan.migrated_count,
         thumbnail_total = thumb_total,
-        "sync complete"
+        "library sync write complete"
     );
-    emit(progress(
-        SyncLibraryPhaseDto::Done,
+    Ok(Some(progress(
+        SyncLibraryPhaseDto::WritingDb,
         SyncLibraryRouteDto::WithRoots,
         None,
         accepted_total,
@@ -276,8 +276,7 @@ async fn sync_with_roots(
         },
         Some(0),
         Some(0),
-    ));
-    Ok(())
+    )))
 }
 
 #[allow(clippy::too_many_arguments)]

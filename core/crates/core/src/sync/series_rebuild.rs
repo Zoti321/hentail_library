@@ -13,15 +13,31 @@ use crate::series_id::{
 };
 use crate::util::compute_sort_key;
 
+/// Rebuild Folder series from comics.
+/// When `library_id` is `Some`, only that library's comics/series are considered.
 pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
     db: &C,
+    library_id: Option<&str>,
 ) -> Result<(), HentaiError> {
-    let comics = Comics::find().all(db).await.map_err(crate::db::map_db_err)?;
+    let comics = match library_id {
+        Some(id) => {
+            Comics::find()
+                .filter(crate::entity::comics::Column::LibraryId.eq(id))
+                .all(db)
+                .await
+                .map_err(crate::db::map_db_err)?
+        }
+        None => Comics::find().all(db).await.map_err(crate::db::map_db_err)?,
+    };
     let mut groups: HashMap<String, Vec<(String, String)>> = HashMap::new();
+    let mut group_library: HashMap<String, String> = HashMap::new();
     for comic in comics {
         let Some(folder_path) = folder_path_from_comic_path(&comic.path) else {
             continue;
         };
+        group_library
+            .entry(folder_path.clone())
+            .or_insert_with(|| comic.library_id.clone());
         groups
             .entry(folder_path)
             .or_default()
@@ -33,7 +49,16 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
         .map(|folder_path| series_id_from_folder_path(folder_path))
         .collect();
 
-    let existing_rows = Series::find().all(db).await.map_err(crate::db::map_db_err)?;
+    let existing_rows = match library_id {
+        Some(id) => {
+            Series::find()
+                .filter(crate::entity::series::Column::LibraryId.eq(id))
+                .all(db)
+                .await
+                .map_err(crate::db::map_db_err)?
+        }
+        None => Series::find().all(db).await.map_err(crate::db::map_db_err)?,
+    };
     for row in existing_rows {
         if !active_series_ids.contains(&row.series_id) {
             Series::delete_by_id(row.series_id)
@@ -47,6 +72,10 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
         entries.sort_by(|a, b| compare_paths_by_filename(&a.1, &b.1));
         let series_id = series_id_from_folder_path(&folder_path);
         let name = series_name_from_folder_path(&folder_path);
+        let series_library_id = group_library
+            .get(&folder_path)
+            .cloned()
+            .unwrap_or_default();
         let existing = Series::find_by_id(series_id.clone())
             .one(db)
             .await
@@ -55,6 +84,7 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
         if let Some(existing_row) = existing {
             let mut active: series::ActiveModel = existing_row.clone().into();
             active.folder_path = Set(folder_path);
+            active.library_id = Set(series_library_id);
             // serialization_status / total_count have no scan source → never overwritten.
             let merged_name = merge_series_name(
                 existing_row.name_locked,
@@ -75,6 +105,7 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
                 name_locked: Set(false),
                 serialization_status_locked: Set(false),
                 total_count_locked: Set(false),
+                library_id: Set(series_library_id),
             })
             .exec(db)
             .await

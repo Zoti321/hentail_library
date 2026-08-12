@@ -165,7 +165,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Add library folders in Settings and scan. If already configured, check Selected Paths or scan again.';
 
   @override
-  String get pathsTitle => 'Selected paths';
+  String get pathsTitle => 'Local libraries';
 
   @override
   String get homeStatSeries => 'Series';
@@ -343,7 +343,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Bundle app and core logs for troubleshooting';
 
   @override
-  String get settingsLibraryLocationLabel => 'Library paths';
+  String get settingsLibraryLocationLabel => 'Local libraries';
 
   @override
   String get settingsAutoScanLabel => 'Auto scan';
@@ -356,7 +356,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsSupportedFormatsDescription =>
-      'Unchecked formats are removed from the library on the next library sync. Comics already in the library remain readable until then.';
+      'Unchecked formats are removed from the current local library on the next library sync. Comics already in the library remain readable until then.';
 
   @override
   String get settingsSupportedFormatsGroupTitle => 'Format groups';
@@ -378,7 +378,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsDisableAllFormatsConfirmContent =>
-      'After saving, the next library sync will remove every Comic from the library. Continue?';
+      'After saving, the next library sync will remove every Comic from the current local library. Continue?';
+
+  @override
+  String get currentLibraryLabel => 'Current library';
+
+  @override
+  String get setCurrentLibrary => 'Set as current library';
+
+  @override
+  String get syncAllLibraries => 'Sync all libraries';
+
+  @override
+  String get noCurrentLibraryFormatsHint =>
+      'Add a local library and set it as current before configuring supported formats.';
 
   @override
   String get settingsAutoUpdateLabel => 'Automatic updates';
@@ -1328,7 +1341,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmRemovePathContent =>
-      'This path will be removed from the library. This cannot be undone.';
+      'This local library and its comics will be deleted immediately. This cannot be undone.';
 
   @override
   String get confirmClearHistoryTitle => 'Confirm clear';

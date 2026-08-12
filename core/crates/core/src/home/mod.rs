@@ -3,6 +3,7 @@ use sea_orm::{ConnectionTrait, DatabaseConnection, Statement, Value};
 use crate::comic::read_data_version;
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
+use crate::library::get_current_library_id;
 
 #[derive(Debug, Clone, Default)]
 pub struct HomePageCountsDto {
@@ -22,20 +23,22 @@ pub struct HomeContinueReadingDto {
 
 const SQL_COUNTS: &str = r#"
 SELECT
-  (SELECT COUNT(*) FROM comics) AS c_comic,
+  (SELECT COUNT(*) FROM comics WHERE library_id = ?) AS c_comic,
   (SELECT COUNT(*) FROM tags) AS c_tag,
-  (SELECT COUNT(*) FROM series) AS c_series,
+  (SELECT COUNT(*) FROM series WHERE library_id = ?) AS c_series,
   (SELECT COUNT(*) FROM authors) AS c_author
 "#;
 
 const SQL_COUNTS_HEALTHY: &str = r#"
 SELECT
-  (SELECT COUNT(*) FROM comics c INNER JOIN comic_meta cm ON cm.comic_id = c.comic_id WHERE cm.content_rating != ?) AS c_comic,
+  (SELECT COUNT(*) FROM comics c INNER JOIN comic_meta cm ON cm.comic_id = c.comic_id
+     WHERE c.library_id = ? AND cm.content_rating != ?) AS c_comic,
   (SELECT COUNT(*) FROM tags) AS c_tag,
   (
     SELECT COUNT(*)
     FROM series s
-    WHERE EXISTS (SELECT 1 FROM series_items si0 WHERE si0.series_id = s.series_id)
+    WHERE s.library_id = ?
+    AND EXISTS (SELECT 1 FROM series_items si0 WHERE si0.series_id = s.series_id)
     AND NOT EXISTS (
       SELECT 1
       FROM series_items si1
@@ -136,15 +139,32 @@ async fn load_continue_reading(
 }
 
 async fn load_counts(db: &DatabaseConnection, exclude_r18: bool) -> Result<HomePageCountsDto, HentaiError> {
+    let Some(library_id) = get_current_library_id().await? else {
+        return Ok(HomePageCountsDto {
+            comic_count: 0,
+            tag_count: count_tags(db).await?,
+            series_count: 0,
+            author_count: count_authors(db).await?,
+        });
+    };
     let row = if exclude_r18 {
         let stmt = Statement::from_sql_and_values(
             db.get_database_backend(),
             SQL_COUNTS_HEALTHY,
-            vec![Value::from("r18"); 2],
+            vec![
+                Value::from(library_id.clone()),
+                Value::from("r18"),
+                Value::from(library_id),
+                Value::from("r18"),
+            ],
         );
         db.query_one(stmt).await.map_err(map_db_err)?
     } else {
-        let stmt = Statement::from_sql_and_values(db.get_database_backend(), SQL_COUNTS, []);
+        let stmt = Statement::from_sql_and_values(
+            db.get_database_backend(),
+            SQL_COUNTS,
+            vec![Value::from(library_id.clone()), Value::from(library_id)],
+        );
         db.query_one(stmt).await.map_err(map_db_err)?
     };
     let Some(row) = row else {
@@ -156,4 +176,30 @@ async fn load_counts(db: &DatabaseConnection, exclude_r18: bool) -> Result<HomeP
         series_count: row.try_get::<i32>("", "c_series").unwrap_or(0),
         author_count: row.try_get::<i32>("", "c_author").unwrap_or(0),
     })
+}
+
+async fn count_tags(db: &DatabaseConnection) -> Result<i32, HentaiError> {
+    let row = db
+        .query_one(Statement::from_string(
+            db.get_database_backend(),
+            "SELECT COUNT(*) AS c FROM tags".to_string(),
+        ))
+        .await
+        .map_err(map_db_err)?;
+    Ok(row
+        .and_then(|r| r.try_get::<i32>("", "c").ok())
+        .unwrap_or(0))
+}
+
+async fn count_authors(db: &DatabaseConnection) -> Result<i32, HentaiError> {
+    let row = db
+        .query_one(Statement::from_string(
+            db.get_database_backend(),
+            "SELECT COUNT(*) AS c FROM authors".to_string(),
+        ))
+        .await
+        .map_err(map_db_err)?;
+    Ok(row
+        .and_then(|r| r.try_get::<i32>("", "c").ok())
+        .unwrap_or(0))
 }

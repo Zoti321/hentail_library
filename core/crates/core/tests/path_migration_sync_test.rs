@@ -100,10 +100,10 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
                 &FormatGroup::ALL,
             )
             .expect("first scan");
-            let plan = build_scan_replace_plan(&db, first_scan)
+            let plan = build_scan_replace_plan(&db, first_scan, "")
                 .await
                 .expect("first plan");
-            apply_scan_replace_plan(&db, &plan)
+            apply_scan_replace_plan(&db, &plan, "")
                 .await
                 .expect("first apply");
 
@@ -139,7 +139,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
                 &FormatGroup::ALL,
             )
             .expect("second scan");
-            let plan = build_scan_replace_plan(&db, second_scan)
+            let plan = build_scan_replace_plan(&db, second_scan, "")
                 .await
                 .expect("second plan");
 
@@ -150,7 +150,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
             assert_eq!(plan.migrations[0].from_comic_id, old_id);
             assert_eq!(plan.migrations[0].to_comic.comic_id, new_id);
 
-            apply_scan_replace_plan(&db, &plan)
+            apply_scan_replace_plan(&db, &plan, "")
                 .await
                 .expect("second apply");
 
@@ -213,9 +213,10 @@ fn ambiguous_same_fingerprint_moves_do_not_migrate() {
             .expect("first scan");
             apply_scan_replace_plan(
                 &db,
-                &build_scan_replace_plan(&db, first_scan)
+                &build_scan_replace_plan(&db, first_scan, "")
                     .await
                     .expect("first plan"),
+                "",
             )
             .await
             .expect("first apply");
@@ -250,14 +251,14 @@ fn ambiguous_same_fingerprint_moves_do_not_migrate() {
                 &FormatGroup::ALL,
             )
             .expect("second scan");
-            let plan = build_scan_replace_plan(&db, second_scan)
+            let plan = build_scan_replace_plan(&db, second_scan, "")
                 .await
                 .expect("second plan");
 
             assert_eq!(plan.migrated_count, 0);
             assert_eq!(plan.removed_ids.len(), 2);
             assert_eq!(plan.added_count, 2);
-            apply_scan_replace_plan(&db, &plan)
+            apply_scan_replace_plan(&db, &plan, "")
                 .await
                 .expect("second apply");
 

@@ -356,6 +356,7 @@ class SeriesFilterDto {
   final String? query;
   final bool requireItems;
   final String? serializationStatus;
+  final String? libraryId;
 
   const SeriesFilterDto({
     required this.showR18,
@@ -363,6 +364,7 @@ class SeriesFilterDto {
     this.query,
     required this.requireItems,
     this.serializationStatus,
+    this.libraryId,
   });
 
   @override
@@ -371,7 +373,8 @@ class SeriesFilterDto {
       r18Only.hashCode ^
       query.hashCode ^
       requireItems.hashCode ^
-      serializationStatus.hashCode;
+      serializationStatus.hashCode ^
+      libraryId.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -382,7 +385,8 @@ class SeriesFilterDto {
           r18Only == other.r18Only &&
           query == other.query &&
           requireItems == other.requireItems &&
-          serializationStatus == other.serializationStatus;
+          serializationStatus == other.serializationStatus &&
+          libraryId == other.libraryId;
 }
 
 /// FRB 层 DTO：字段与 `hentai_core::SeriesItemDto` 对齐，避免跨 crate opaque 绑定。

@@ -74,10 +74,14 @@ class ComicCover extends _$ComicCover {
     return const ComicCoverLoading();
   }
 
-  void ensureLoaded({ThumbnailPriority priority = ThumbnailPriority.high}) {
+  void bumpPriority(ThumbnailPriority priority) {
     if (priority.index < _priority.index) {
       _priority = priority;
     }
+  }
+
+  void ensureLoaded({ThumbnailPriority priority = ThumbnailPriority.high}) {
+    bumpPriority(priority);
     if (state is ComicCoverReady) {
       return;
     }

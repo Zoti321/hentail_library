@@ -1,5 +1,5 @@
 use hentai_core::{
-    self, FormatGroup as CoreFormatGroup, SyncHandle as CoreHandle,
+    self, SyncHandle as CoreHandle,
     SyncLibraryPhaseDto as CorePhase, SyncLibraryProgressDto as CoreProgress,
     SyncLibraryRouteDto as CoreRoute, SyncScanMode as CoreScanMode,
     cancel_sync as core_cancel_sync, create_sync_handle as core_create_sync_handle,
@@ -89,17 +89,13 @@ pub fn cancel_sync_frb(handle: &SyncHandleDto) {
 pub async fn sync_library_frb(
     handle: SyncHandleDto,
     scan_mode: SyncScanModeDto,
-    enabled_format_groups: Vec<FormatGroupDto>,
+    sync_all: bool,
     sink: crate::frb_generated::StreamSink<SyncLibraryProgressDto>,
 ) {
-    let groups: Vec<CoreFormatGroup> = enabled_format_groups
-        .into_iter()
-        .map(map_format_group)
-        .collect();
     if let Err(error) = core_sync_library(
         handle.inner,
         map_scan_mode(scan_mode),
-        &groups,
+        sync_all,
         |progress| {
             let _ = sink.add(map_progress(progress));
         },
@@ -115,15 +111,6 @@ fn map_scan_mode(mode: SyncScanModeDto) -> CoreScanMode {
     match mode {
         SyncScanModeDto::Incremental => CoreScanMode::Incremental,
         SyncScanModeDto::Full => CoreScanMode::Full,
-    }
-}
-
-fn map_format_group(group: FormatGroupDto) -> CoreFormatGroup {
-    match group {
-        FormatGroupDto::Folder => CoreFormatGroup::Folder,
-        FormatGroupDto::Pdf => CoreFormatGroup::Pdf,
-        FormatGroupDto::Epub => CoreFormatGroup::Epub,
-        FormatGroupDto::Archive => CoreFormatGroup::Archive,
     }
 }
 

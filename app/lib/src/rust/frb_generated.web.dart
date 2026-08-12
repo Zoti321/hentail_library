@@ -11,6 +11,7 @@ import 'api/comic.dart';
 import 'api/history.dart';
 import 'api/home.dart';
 import 'api/init.dart';
+import 'api/library.dart';
 import 'api/logging.dart';
 import 'api/path.dart';
 import 'api/reader.dart';
@@ -211,6 +212,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
+  LibraryDto dco_decode_library_dto(dynamic raw);
+
+  @protected
   LibrarySyncCountsDto dco_decode_library_sync_counts_dto(dynamic raw);
 
   @protected
@@ -226,6 +230,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<HomeContinueReadingDto> dco_decode_list_home_continue_reading_dto(
     dynamic raw,
   );
+
+  @protected
+  List<LibraryDto> dco_decode_list_library_dto(dynamic raw);
 
   @protected
   List<int> dco_decode_list_prim_i_32_loose(dynamic raw);
@@ -632,6 +639,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
   @protected
+  LibraryDto sse_decode_library_dto(SseDeserializer deserializer);
+
+  @protected
   LibrarySyncCountsDto sse_decode_library_sync_counts_dto(
     SseDeserializer deserializer,
   );
@@ -651,6 +661,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<HomeContinueReadingDto> sse_decode_list_home_continue_reading_dto(
     SseDeserializer deserializer,
   );
+
+  @protected
+  List<LibraryDto> sse_decode_list_library_dto(SseDeserializer deserializer);
 
   @protected
   List<int> sse_decode_list_prim_i_32_loose(SseDeserializer deserializer);
@@ -1159,6 +1172,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
+  void sse_encode_library_dto(LibraryDto self, SseSerializer serializer);
+
+  @protected
   void sse_encode_library_sync_counts_dto(
     LibrarySyncCountsDto self,
     SseSerializer serializer,
@@ -1179,6 +1195,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_home_continue_reading_dto(
     List<HomeContinueReadingDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_library_dto(
+    List<LibraryDto> self,
     SseSerializer serializer,
   );
 

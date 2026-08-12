@@ -160,7 +160,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeEmptyHint => '请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。';
 
   @override
-  String get pathsTitle => '选中路径';
+  String get pathsTitle => '本地库';
 
   @override
   String get homeStatSeries => '系列';
@@ -329,7 +329,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsExportLogsDescription => '打包应用与核心日志，便于问题反馈';
 
   @override
-  String get settingsLibraryLocationLabel => '库位置';
+  String get settingsLibraryLocationLabel => '本地库';
 
   @override
   String get settingsAutoScanLabel => '自动扫描';
@@ -342,7 +342,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsSupportedFormatsDescription =>
-      '取消勾选的格式会在下次库同步时从库中移除；未同步前已入库的漫画仍可阅读。';
+      '取消勾选的格式会在下次库同步时从当前本地库中移除；未同步前已入库的漫画仍可阅读。';
 
   @override
   String get settingsSupportedFormatsGroupTitle => '格式分组';
@@ -364,7 +364,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsDisableAllFormatsConfirmContent =>
-      '保存后，下次库同步将清空漫画库中的全部 Comic。确定继续？';
+      '保存后，下次库同步将清空当前本地库中的全部 Comic。确定继续？';
+
+  @override
+  String get currentLibraryLabel => '当前库';
+
+  @override
+  String get setCurrentLibrary => '设为当前库';
+
+  @override
+  String get syncAllLibraries => '同步全部库';
+
+  @override
+  String get noCurrentLibraryFormatsHint => '请先添加本地库并设为当前库，再配置支持的格式。';
 
   @override
   String get settingsAutoUpdateLabel => '自动更新';
@@ -1297,7 +1309,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmRemovePathTitle => '确认移除';
 
   @override
-  String get confirmRemovePathContent => '将从库中移除该路径。此操作不可撤销。';
+  String get confirmRemovePathContent => '将删除该本地库及其漫画记录。此操作立即生效且不可撤销。';
 
   @override
   String get confirmClearHistoryTitle => '确认清空';

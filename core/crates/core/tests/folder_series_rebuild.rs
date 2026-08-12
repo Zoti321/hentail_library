@@ -106,7 +106,7 @@ fn rebuild_series_groups_comics_by_parent_folder() {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_minimal_comics(&db).await;
-            rebuild_series_from_comics(&db).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None).await.expect("rebuild");
 
             let row = db
                 .query_one(Statement::from_string(
@@ -163,7 +163,7 @@ fn update_series_user_meta_preserves_fields_on_rebuild() {
             ))
             .await
             .expect("seed meta");
-            rebuild_series_from_comics(&db).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None).await.expect("rebuild");
 
             let series_id: String = db
                 .query_one(Statement::from_string(
@@ -188,7 +188,7 @@ fn update_series_user_meta_preserves_fields_on_rebuild() {
             .await
             .expect("update meta");
 
-            rebuild_series_from_comics(&connection().expect("connection"))
+            rebuild_series_from_comics(&connection().expect("connection"), None)
                 .await
                 .expect("rebuild again");
 
@@ -251,7 +251,7 @@ fn rebuild_overwrites_unlocked_series_name_from_folder() {
             ))
             .await
             .expect("seed meta");
-            rebuild_series_from_comics(&db).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None).await.expect("rebuild");
 
             let series_id: String = db
                 .query_one(Statement::from_string(
@@ -284,7 +284,7 @@ fn rebuild_overwrites_unlocked_series_name_from_folder() {
             .await
             .expect("unlock name");
 
-            rebuild_series_from_comics(&connection().expect("connection"))
+            rebuild_series_from_comics(&connection().expect("connection"), None)
                 .await
                 .expect("rebuild again");
 

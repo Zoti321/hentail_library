@@ -570,6 +570,7 @@ pub fn parsed_to_comic(parsed: &ParsedResource) -> crate::comic::ComicDto {
         authors: parsed.authors.clone(),
         tags: vec![],
         locks: crate::comic::ComicMetaLocks::default(),
+        library_id: String::new(),
     }
 }
 

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
@@ -21,6 +22,15 @@ class PathTile extends HookConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final l10n = context.l10n;
     final ValueNotifier<bool> isRemoving = useState<bool>(false);
+    final CurrentLibraryState? currentState = ref
+        .watch(currentLibraryProvider)
+        .asData
+        ?.value;
+    final LocalLibrary? matchedLibrary = currentState?.findByRootPath(path);
+    final bool isCurrent =
+        matchedLibrary != null &&
+        matchedLibrary.libraryId == currentState?.currentId;
+
     Future<void> handleRemovePath() async {
       final bool confirmed =
           await showDialog<bool>(
@@ -35,6 +45,8 @@ class PathTile extends HookConsumerWidget {
       isRemoving.value = true;
       try {
         await ref.read(pathRepoProvider).remove(path);
+        await ref.read(currentLibraryProvider.notifier).refresh();
+        ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
         if (!context.mounted) {
           return;
         }
@@ -48,6 +60,21 @@ class PathTile extends HookConsumerWidget {
         if (context.mounted) {
           isRemoving.value = false;
         }
+      }
+    }
+
+    Future<void> handleSetCurrent() async {
+      final LocalLibrary? library = matchedLibrary;
+      if (library == null || isCurrent) {
+        return;
+      }
+      try {
+        await ref.read(currentLibraryProvider.notifier).select(library.libraryId);
+      } catch (error) {
+        if (!context.mounted) {
+          return;
+        }
+        showErrorToast(context, error);
       }
     }
 
@@ -82,6 +109,29 @@ class PathTile extends HookConsumerWidget {
                   ),
                 ),
               ),
+              if (isCurrent)
+                Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Icon(
+                    LucideIcons.star,
+                    size: 16,
+                    color: theme.colorScheme.primary,
+                  ),
+                )
+              else if (matchedLibrary != null)
+                GhostButton.icon(
+                  icon: LucideIcons.star,
+                  tooltip: l10n.setCurrentLibrary,
+                  semanticLabel: l10n.setCurrentLibrary,
+                  iconSize: 16,
+                  size: 28,
+                  borderRadius: 8,
+                  foregroundColor: theme.colorScheme.hentai.iconDefault,
+                  hoverColor: theme.colorScheme.primary.withAlpha(10),
+                  overlayColor: theme.colorScheme.primary.withAlpha(14),
+                  delayTooltipThreeSeconds: true,
+                  onPressed: handleSetCurrent,
+                ),
               isRemoving.value
                   ? SizedBox(
                       width: 28,

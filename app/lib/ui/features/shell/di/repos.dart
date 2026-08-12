@@ -2,6 +2,7 @@ import 'package:hentai_library/data/repositories/app_setting_repository_impl.dar
 import 'package:hentai_library/data/repositories/author_repository_impl.dart';
 import 'package:hentai_library/data/repositories/comic_thumbnail_repository_impl.dart';
 import 'package:hentai_library/data/repositories/comic_repository_impl.dart';
+import 'package:hentai_library/data/repositories/library_repository_impl.dart';
 import 'package:hentai_library/data/repositories/path_repository_impl.dart';
 import 'package:hentai_library/data/repositories/reading_history_repository_impl.dart';
 import 'package:hentai_library/data/repositories/series_repository_impl.dart';
@@ -11,6 +12,7 @@ import 'package:hentai_library/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/domain/repositories/author_repository.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
+import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:hentai_library/domain/repositories/path_repository.dart';
 import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
@@ -38,6 +40,9 @@ AuthorRepository authorRepo(Ref ref) => const AuthorRepositoryImpl();
 
 @Riverpod(keepAlive: true)
 PathRepository pathRepo(Ref ref) => const PathRepositoryImpl();
+
+@Riverpod(keepAlive: true)
+LibraryRepository libraryRepo(Ref ref) => const LibraryRepositoryImpl();
 
 @Riverpod(keepAlive: true)
 ReadingHistoryRepository readingHistoryRepo(Ref ref) =>

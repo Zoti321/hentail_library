@@ -57,6 +57,8 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
                         showCountChips: showCountChips,
                         showActiveCountChipOnly: showActiveCountChipOnly,
                       ),
+                      const SizedBox(width: 8),
+                      const _CurrentLibrarySwitcherButton(),
                     ],
                   ),
                 ),
@@ -72,6 +74,183 @@ class LibraryPageHeaderToolbar extends ConsumerWidget {
           ),
           if (showDisplayTargetTabs) const LibraryDisplayTargetTabs(),
         ],
+      ),
+    );
+  }
+}
+
+class _CurrentLibrarySwitcherButton extends ConsumerStatefulWidget {
+  const _CurrentLibrarySwitcherButton();
+
+  @override
+  ConsumerState<_CurrentLibrarySwitcherButton> createState() =>
+      _CurrentLibrarySwitcherButtonState();
+}
+
+class _CurrentLibrarySwitcherButtonState
+    extends ConsumerState<_CurrentLibrarySwitcherButton> {
+  final CustomPopupMenuController _controller = CustomPopupMenuController();
+
+  @override
+  Widget build(BuildContext context) {
+    final AsyncValue<CurrentLibraryState> currentAsync = ref.watch(
+      currentLibraryProvider,
+    );
+    final CurrentLibraryState? state = currentAsync.asData?.value;
+    if (state == null || state.libraries.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final AppLocalizations l10n = context.l10n;
+    final LocalLibrary? current = state.current;
+    final String label = current == null
+        ? l10n.currentLibraryLabel
+        : localLibraryDisplayName(current);
+
+    return CustomPopupMenu(
+      controller: _controller,
+      barrierColor: Colors.transparent,
+      pressType: PressType.singleClick,
+      showArrow: false,
+      verticalMargin: -32,
+      menuBuilder: () => _CurrentLibrarySwitcherMenu(
+        libraries: state.libraries,
+        currentId: state.currentId,
+        onSelected: (String libraryId) {
+          _controller.hideMenu();
+          ref.read(currentLibraryProvider.notifier).select(libraryId);
+        },
+      ),
+      child: Tooltip(
+        message: l10n.currentLibraryLabel,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(8),
+            hoverColor: theme.hoverColor,
+            overlayColor: WidgetStateProperty.all(theme.hoverColor),
+            onTap: () => _controller.toggleMenu(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(
+                    LucideIcons.library,
+                    size: 14,
+                    color: cs.hentai.iconDefault,
+                  ),
+                  const SizedBox(width: 6),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 160),
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: cs.hentai.textSecondary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  Icon(
+                    LucideIcons.chevronDown,
+                    size: 14,
+                    color: cs.hentai.iconDefault,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CurrentLibrarySwitcherMenu extends StatelessWidget {
+  const _CurrentLibrarySwitcherMenu({
+    required this.libraries,
+    required this.currentId,
+    required this.onSelected,
+  });
+
+  final List<LocalLibrary> libraries;
+  final String? currentId;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    return PopupMenuPanelShell(
+      width: 260,
+      blurRadius: 6,
+      shadowOffset: const Offset(0, 4),
+      borderRadius: tokens.radius.xs,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: libraries
+              .map(
+                (LocalLibrary library) => _CurrentLibrarySwitcherMenuItem(
+                  label: localLibraryDisplayName(library),
+                  isSelected: library.libraryId == currentId,
+                  onTap: () => onSelected(library.libraryId),
+                ),
+              )
+              .toList(),
+        ),
+      ),
+    );
+  }
+}
+
+class _CurrentLibrarySwitcherMenuItem extends StatelessWidget {
+  const _CurrentLibrarySwitcherMenuItem({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return Material(
+      color: isSelected ? cs.primary.withAlpha(14) : Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        hoverColor: isSelected ? Colors.transparent : cs.primary.withAlpha(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected ? cs.primary : cs.hentai.textPrimary,
+                  ),
+                ),
+              ),
+              if (isSelected)
+                Icon(LucideIcons.check, size: 14, color: cs.primary),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -531,6 +710,12 @@ class _LibraryOverflowMenuButtonState
                 .read(scanLibraryControllerProvider.notifier)
                 .start(mode: ScanMode.full, silent: true);
           },
+          onSyncAll: () {
+            _controller.hideMenu();
+            ref
+                .read(scanLibraryControllerProvider.notifier)
+                .start(syncAll: true, silent: true);
+          },
         );
       },
       child: scanning
@@ -622,12 +807,14 @@ class _LibraryOverflowMenu extends StatelessWidget {
     required this.onRefresh,
     required this.onScan,
     required this.onDeepScan,
+    required this.onSyncAll,
   });
 
   final LibraryLayoutTier layoutTier;
   final VoidCallback onRefresh;
   final VoidCallback onScan;
   final VoidCallback onDeepScan;
+  final VoidCallback onSyncAll;
 
   @override
   Widget build(BuildContext context) {
@@ -659,6 +846,11 @@ class _LibraryOverflowMenu extends StatelessWidget {
               icon: LucideIcons.scanLine,
               label: l10n.libraryDeepScan,
               onTap: onDeepScan,
+            ),
+            _LibraryOverflowMenuItem(
+              icon: LucideIcons.folders,
+              label: l10n.syncAllLibraries,
+              onTap: onSyncAll,
             ),
           ],
         ),

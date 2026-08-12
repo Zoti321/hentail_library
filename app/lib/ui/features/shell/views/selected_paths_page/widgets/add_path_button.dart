@@ -34,6 +34,7 @@ class _AddPathButtonState extends ConsumerState<AddPathButton> {
       }
       final PathRepository pathRepository = ref.read(pathRepoProvider);
       await pathRepository.add(directoryPath);
+      await ref.read(currentLibraryProvider.notifier).refresh();
       if (!mounted) {
         return;
       }

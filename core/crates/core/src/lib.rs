@@ -7,6 +7,7 @@ pub mod db;
 pub mod entity;
 pub mod error;
 pub mod formats;
+pub mod library;
 pub mod metadata_lock;
 pub mod migration;
 pub mod path;
@@ -33,6 +34,11 @@ pub use comic::{
 pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_path_for_key};
 pub use db::{connection, db_config, init_db, init_db_at_path};
 pub use error::{HentaiError, HentaiErrorCode};
+pub use library::{
+    create_local_library, delete_library, get_current_library_id, library_id_from_root,
+    list_libraries, parse_format_groups_json, resolve_browse_library_id,
+    serialize_format_groups, set_current_library_id, update_library_format_groups, LibraryDto,
+};
 pub use path::{add_path, list_all_paths, remove_path, watch_paths};
 pub use sync::{
     FormatGroup, LibrarySyncCountsDto, RefreshSeriesProgressDto, RefreshSeriesResultDto,

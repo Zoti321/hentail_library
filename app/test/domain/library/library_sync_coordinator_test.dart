@@ -1,5 +1,4 @@
 import 'package:hentai_library/data/adapters/sync_library_frb_adapter.dart';
-import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/library/library_sync_coordinator.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:test/test.dart';
@@ -9,7 +8,7 @@ class _ScriptedSyncAdapter extends SyncLibraryFrbAdapter {
 
   final Future<void> Function({
     ScanMode scanMode,
-    List<FormatGroup> enabledFormatGroups,
+    bool syncAll,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   })
@@ -18,13 +17,13 @@ class _ScriptedSyncAdapter extends SyncLibraryFrbAdapter {
   @override
   Future<void> call({
     ScanMode scanMode = ScanMode.incremental,
-    List<FormatGroup> enabledFormatGroups = FormatGroup.all,
+    bool syncAll = false,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   }) {
     return _run(
       scanMode: scanMode,
-      enabledFormatGroups: enabledFormatGroups,
+      syncAll: syncAll,
       isCancelled: isCancelled,
       onProgress: onProgress,
     );
@@ -38,7 +37,7 @@ void main() {
       syncAdapter: _ScriptedSyncAdapter(
         ({
           ScanMode scanMode = ScanMode.incremental,
-          List<FormatGroup> enabledFormatGroups = FormatGroup.all,
+          bool syncAll = false,
           required isCancelled,
           onProgress,
         }) async {},
@@ -57,7 +56,7 @@ void main() {
       syncAdapter: _ScriptedSyncAdapter(
         ({
           ScanMode scanMode = ScanMode.incremental,
-          List<FormatGroup> enabledFormatGroups = FormatGroup.all,
+          bool syncAll = false,
           required isCancelled,
           onProgress,
         }) async {},
@@ -75,7 +74,7 @@ void main() {
     final LibrarySyncCoordinator coordinator = LibrarySyncCoordinator(
       syncAdapter: _ScriptedSyncAdapter(({
         ScanMode scanMode = ScanMode.incremental,
-        List<FormatGroup> enabledFormatGroups = FormatGroup.all,
+        bool syncAll = false,
         required isCancelled,
         onProgress,
       }) async {
@@ -105,5 +104,24 @@ void main() {
 
     expect(seen?.phase, SyncLibraryPhase.done);
     expect(seen?.acceptedTotal, 1);
+  });
+
+  test('runSync forwards syncAll to the adapter', () async {
+    bool? seenSyncAll;
+    final LibrarySyncCoordinator coordinator = LibrarySyncCoordinator(
+      syncAdapter: _ScriptedSyncAdapter(({
+        ScanMode scanMode = ScanMode.incremental,
+        bool syncAll = false,
+        required isCancelled,
+        onProgress,
+      }) async {
+        seenSyncAll = syncAll;
+      }),
+      onSyncSucceeded: () {},
+    );
+
+    await coordinator.runSync(syncAll: true, isCancelled: () => false);
+
+    expect(seenSyncAll, isTrue);
   });
 }

@@ -3,18 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/library/format_group.dart';
-import 'package:hentai_library/domain/models/app_setting.dart';
+import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/disable_all_format_groups_confirm_dialog.dart';
-import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
+import 'package:hentai_library/ui/features/shell/di/repos.dart';
+import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/widgets/selected_paths_header.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Supported resource formats 设置子页：草稿勾选 + 保存。
+/// Supported resource formats 设置子页：按当前本地库草稿勾选 + 保存。
 class SupportedFormatsSettingsPage extends ConsumerStatefulWidget {
   const SupportedFormatsSettingsPage({super.key});
 
@@ -28,11 +29,14 @@ class _SupportedFormatsSettingsPageState
   Set<FormatGroup>? _draft;
   bool _saving = false;
 
-  Set<FormatGroup> _draftOrLoaded(AppSetting setting) {
-    return _draft ?? setting.enabledFormatGroups.toSet();
+  Set<FormatGroup> _draftOrLoaded(LocalLibrary library) {
+    return _draft ?? library.enabledFormatGroups.toSet();
   }
 
-  Future<void> _save(Set<FormatGroup> draft) async {
+  Future<void> _save({
+    required LocalLibrary library,
+    required Set<FormatGroup> draft,
+  }) async {
     if (_saving) return;
     if (requiresDisableAllFormatGroupsConfirm(draft)) {
       final bool confirmed =
@@ -51,7 +55,10 @@ class _SupportedFormatsSettingsPageState
       final List<FormatGroup> ordered = FormatGroup.all
           .where(draft.contains)
           .toList(growable: false);
-      await ref.read(settingsProvider.notifier).setEnabledFormatGroups(ordered);
+      await ref
+          .read(libraryRepoProvider)
+          .updateFormatGroups(libraryId: library.libraryId, groups: ordered);
+      await ref.read(currentLibraryProvider.notifier).refresh();
       if (!mounted) return;
       setState(() {
         _draft = null;
@@ -68,7 +75,9 @@ class _SupportedFormatsSettingsPageState
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
-    final AsyncValue<AppSetting> settingsAsync = ref.watch(settingsProvider);
+    final AsyncValue<CurrentLibraryState> currentAsync = ref.watch(
+      currentLibraryProvider,
+    );
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -87,14 +96,86 @@ class _SupportedFormatsSettingsPageState
         final ThemeData theme = Theme.of(context);
         final ColorScheme cs = theme.colorScheme;
 
-        return settingsAsync.when(
+        return currentAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (Object error, StackTrace _) => Center(child: Text('$error')),
-          data: (AppSetting setting) {
-            final Set<FormatGroup> draft = _draftOrLoaded(setting);
+          data: (CurrentLibraryState state) {
+            final LocalLibrary? library = state.current;
+            if (library == null) {
+              return CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: <Widget>[
+                  SliverToBoxAdapter(
+                    child: PageContentWidthAlign(
+                      horizontalPadding: horizontalPadding,
+                      maxWidth: innerMaxWidth,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: SizedBox(
+                          height: 44,
+                          child: Row(
+                            children: <Widget>[
+                              GhostButton.icon(
+                                icon: LucideIcons.arrowLeft,
+                                tooltip: l10n.shellBack,
+                                semanticLabel: l10n.shellBackToSettings,
+                                iconSize: 16,
+                                size: 32,
+                                borderRadius: 8,
+                                foregroundColor: cs.hentai.iconDefault,
+                                hoverColor: theme.hoverColor,
+                                overlayColor: theme.hoverColor,
+                                onPressed: () =>
+                                    SelectedPathsPageHeaderToolbar.popOrGoSettings(
+                                      context,
+                                    ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  l10n.settingsSupportedFormatsTitle,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: cs.hentai.textPrimary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: PageContentWidthAlign(
+                      horizontalPadding: horizontalPadding,
+                      maxWidth: innerMaxWidth,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          top: tokens.layout.contentVerticalPadding,
+                          bottom: tokens.layout.contentAreaPadding.bottom,
+                        ),
+                        child: Text(
+                          l10n.noCurrentLibraryFormatsHint,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: cs.hentai.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            final Set<FormatGroup> draft = _draftOrLoaded(library);
             final bool dirty = !_setEquals(
               draft,
-              setting.enabledFormatGroups.toSet(),
+              library.enabledFormatGroups.toSet(),
             );
 
             return CustomScrollView(
@@ -140,7 +221,7 @@ class _SupportedFormatsSettingsPageState
                             ),
                             FilledButton(
                               onPressed: dirty && !_saving
-                                  ? () => _save(draft)
+                                  ? () => _save(library: library, draft: draft)
                                   : null,
                               child: Text(l10n.commonSave),
                             ),

@@ -383,7 +383,7 @@ abstract class AppLocalizations {
   /// No description provided for @pathsTitle.
   ///
   /// In zh, this message translates to:
-  /// **'选中路径'**
+  /// **'本地库'**
   String get pathsTitle;
 
   /// No description provided for @homeStatSeries.
@@ -635,7 +635,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsLibraryLocationLabel.
   ///
   /// In zh, this message translates to:
-  /// **'库位置'**
+  /// **'本地库'**
   String get settingsLibraryLocationLabel;
 
   /// No description provided for @settingsAutoScanLabel.
@@ -659,7 +659,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsSupportedFormatsDescription.
   ///
   /// In zh, this message translates to:
-  /// **'取消勾选的格式会在下次库同步时从库中移除；未同步前已入库的漫画仍可阅读。'**
+  /// **'取消勾选的格式会在下次库同步时从当前本地库中移除；未同步前已入库的漫画仍可阅读。'**
   String get settingsSupportedFormatsDescription;
 
   /// No description provided for @settingsSupportedFormatsGroupTitle.
@@ -701,8 +701,32 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDisableAllFormatsConfirmContent.
   ///
   /// In zh, this message translates to:
-  /// **'保存后，下次库同步将清空漫画库中的全部 Comic。确定继续？'**
+  /// **'保存后，下次库同步将清空当前本地库中的全部 Comic。确定继续？'**
   String get settingsDisableAllFormatsConfirmContent;
+
+  /// No description provided for @currentLibraryLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前库'**
+  String get currentLibraryLabel;
+
+  /// No description provided for @setCurrentLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'设为当前库'**
+  String get setCurrentLibrary;
+
+  /// No description provided for @syncAllLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'同步全部库'**
+  String get syncAllLibraries;
+
+  /// No description provided for @noCurrentLibraryFormatsHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'请先添加本地库并设为当前库，再配置支持的格式。'**
+  String get noCurrentLibraryFormatsHint;
 
   /// No description provided for @settingsAutoUpdateLabel.
   ///
@@ -2405,7 +2429,7 @@ abstract class AppLocalizations {
   /// No description provided for @confirmRemovePathContent.
   ///
   /// In zh, this message translates to:
-  /// **'将从库中移除该路径。此操作不可撤销。'**
+  /// **'将删除该本地库及其漫画记录。此操作立即生效且不可撤销。'**
   String get confirmRemovePathContent;
 
   /// No description provided for @confirmClearHistoryTitle.
