@@ -1,5 +1,10 @@
+mod remote_access;
 mod webdav_root;
 
+pub use remote_access::{
+    clear_remote_library_credentials, remote_password_for, resolve_access_for_comic,
+    set_remote_library_credentials, RemoteLibraryCredential, ResolvedAccess,
+};
 pub use webdav_root::{library_id_from_webdav_root, normalize_webdav_root};
 
 use std::path::Path;

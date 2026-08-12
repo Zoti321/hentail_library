@@ -2,7 +2,20 @@ use sha1::{Digest, Sha1};
 
 /// 与 Dart `PathNormalizer.normalizeForKey` 对齐的跨平台路径键。
 pub fn normalize_path_for_key(raw_path: &str) -> String {
-    let normalized_fs_path = normalize_for_file_system(raw_path);
+    let trimmed = raw_path.trim();
+    if trimmed.is_empty() {
+        return String::new();
+    }
+    let lower = trimmed.to_ascii_lowercase();
+    // Remote WebDAV URLs must not go through FS normalize (collapses `https://`).
+    if lower.starts_with("http://") || lower.starts_with("https://") {
+        let mut s = trimmed.replace('\\', "/");
+        while s.ends_with('/') && s.len() > 1 {
+            s.pop();
+        }
+        return s;
+    }
+    let normalized_fs_path = normalize_for_file_system(trimmed);
     if normalized_fs_path.is_empty() {
         return String::new();
     }

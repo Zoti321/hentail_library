@@ -302,15 +302,41 @@ pub fn parse_file_with(
         ".zip" => parse_zip_archive_with(access, location, "zip"),
         ".cbz" => parse_zip_archive_with(access, location, "cbz"),
         ".epub" => parse_epub_with(access, location),
-        // Path-bound format backends (rar / 7z / pdf) still require a local FS path.
-        ".cbr" => parse_rar_archive(path, "cbr"),
-        ".rar" => parse_rar_archive(path, "rar"),
-        ".cb7" => parse_sevenz_archive(path, "cb7"),
-        ".7z" => parse_sevenz_archive(path, "sevenz"),
-        ".pdf" => parse_pdf(path),
+        // Path-bound: Local uses path; Remote materializes via access then parses.
+        ".cbr" => parse_path_bound_with(access, location, |p| parse_rar_archive(p, "cbr")),
+        ".rar" => parse_path_bound_with(access, location, |p| parse_rar_archive(p, "rar")),
+        ".cb7" => parse_path_bound_with(access, location, |p| parse_sevenz_archive(p, "cb7")),
+        ".7z" => parse_path_bound_with(access, location, |p| parse_sevenz_archive(p, "sevenz")),
+        ".pdf" => parse_path_bound_with(access, location, parse_pdf),
         _ => Ok(None),
     }
 }
+
+fn is_remote_http_location(location: &str) -> bool {
+    let lower = location.to_ascii_lowercase();
+    lower.starts_with("http://") || lower.starts_with("https://")
+}
+
+fn parse_path_bound_with(
+    access: &dyn ResourceAccess,
+    location: &str,
+    parse: impl FnOnce(&Path) -> Result<Option<ParsedResource>, HentaiError>,
+) -> Result<Option<ParsedResource>, HentaiError> {
+    if !is_remote_http_location(location) {
+        return parse(Path::new(location));
+    }
+    let mut stream = access.open_stream(location)?;
+    let mut temp = tempfile::NamedTempFile::new()
+        .map_err(|e| HentaiError::validation(format!("创建临时文件失败: {e}")))?;
+    std::io::copy(&mut stream, &mut temp)
+        .map_err(|e| HentaiError::remote_unreachable(format!("下载远程资源失败: {e}")))?;
+            let mut parsed = parse(temp.path())?;
+            if let Some(ref mut p) = parsed {
+                // Keep identity keyed on the remote URL, not the temp path.
+                p.path = location.to_string();
+            }
+            Ok(parsed)
+        }
 
 pub fn parse_rar_archive(file: &Path, resource_type: &str) -> Result<Option<ParsedResource>, HentaiError> {
     let page_count = count_rar_images(file)?;

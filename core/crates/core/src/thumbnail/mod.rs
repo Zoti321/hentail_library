@@ -2,8 +2,8 @@ mod generate;
 mod queue;
 
 pub use generate::{
-    encode_thumbnail_jpeg, generate_thumbnail_jpeg, store_thumbnail_for_comic,
-    thumbnail_needs_generation,
+    encode_thumbnail_jpeg, generate_thumbnail_jpeg, generate_thumbnail_jpeg_with,
+    store_thumbnail_for_comic, store_thumbnail_for_comic_with, thumbnail_needs_generation,
 };
 pub use queue::{
     ensure_thumbnail, enqueue_thumbnails_low, watch_thumbnail_events, ThumbnailEvent,

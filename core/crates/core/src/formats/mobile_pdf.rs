@@ -6,6 +6,7 @@ use crate::error::HentaiError;
 pub struct PdfBackend {
     pub path: String,
     pub page_count: i32,
+    pub(crate) _remote_temp: Option<tempfile::NamedTempFile>,
 }
 
 fn unsupported() -> HentaiError {
@@ -23,6 +24,13 @@ pub fn read_pdf_embedded_meta(
 }
 
 pub fn open_pdf_backend(_file: &Path) -> Result<PdfBackend, HentaiError> {
+    Err(unsupported())
+}
+
+pub fn open_pdf_backend_kept(
+    _file: &Path,
+    _keep: tempfile::NamedTempFile,
+) -> Result<PdfBackend, HentaiError> {
     Err(unsupported())
 }
 

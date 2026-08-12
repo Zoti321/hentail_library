@@ -1,10 +1,12 @@
 use crate::error::HentaiError;
+use crate::runtime::block_on;
 
 use crate::formats::{read_pdf_page, read_rar_page, read_sevenz_page};
 
 use super::backend::{read_epub_page, read_zip_page, ReaderBackend};
 use super::dto::ReaderPageListDto;
 use super::manager::with_session;
+use super::writeback::writeback_after_open;
 
 #[tracing::instrument(err, fields(comic_id, resource_type, path))]
 pub fn load_page_list(
@@ -56,6 +58,10 @@ pub fn load_page_list(
         resource_type = %list.resource_type,
         "reader page list loaded"
     );
+    // First-open physical metadata writeback (ADR-0008 / #59). Best-effort.
+    if let Err(err) = block_on(writeback_after_open(comic_id, list.page_count)) {
+        tracing::warn!(comic_id, error = %err, "page_count writeback failed");
+    }
     Ok(list)
 }
 

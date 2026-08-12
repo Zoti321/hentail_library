@@ -1,15 +1,21 @@
 import 'dart:typed_data';
 
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/data/adapters/remote_credentials_frb.dart';
 import 'package:hentai_library/data/adapters/thumbnail_frb_mapper.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.dart';
+import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:hentai_library/domain/thumbnail/series_cover_source.dart';
 import 'package:hentai_library/domain/thumbnail/thumbnail_event.dart';
 import 'package:hentai_library/src/rust/api/thumbnail.dart' as rust;
 
 class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
-  const ComicThumbnailRepositoryImpl();
+  const ComicThumbnailRepositoryImpl({
+    required LibraryRepository libraryRepository,
+  }) : _libraryRepository = libraryRepository;
+
+  final LibraryRepository _libraryRepository;
 
   @override
   Future<ComicThumbnailRecord?> findByComicId(String comicId) async {
@@ -33,6 +39,7 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
     required String comicId,
     required ThumbnailPriority priority,
   }) async {
+    await pushRemoteLibraryCredentials(_libraryRepository);
     final rust.ComicThumbnailDto? row = guardFrbSync(
       () => rust.ensureThumbnailByComicIdFrb(
         comicId: comicId,
@@ -58,6 +65,7 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
     required String resourceType,
     required int pageIndex,
   }) async {
+    await pushRemoteLibraryCredentials(_libraryRepository);
     guardFrbSync(
       () => rust.setComicThumbnailFromPageFrb(
         comicId: comicId,
@@ -77,6 +85,7 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
     required String resourceType,
     required int pageIndex,
   }) async {
+    await pushRemoteLibraryCredentials(_libraryRepository);
     guardFrbSync(
       () => rust.setSeriesThumbnailFromPageFrb(
         seriesId: seriesId,

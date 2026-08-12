@@ -11,9 +11,10 @@ use crate::db::map_db_err;
 use crate::entity::{comic_thumbnails, prelude::*};
 use crate::error::HentaiError;
 use crate::formats::read_rar_cover_bytes;
+use crate::library::resolve_access_for_comic;
 use crate::resource::{
     basename, basename_without_extension, can_generate_thumbnail, extension_lower,
-    is_comic_image_extension, local_access, read_source_stat_with, ResourceAccess, ResourceKind,
+    is_comic_image_extension, read_source_stat_with, ResourceAccess, ResourceKind,
 };
 use crate::util::natural_sort::compare_filename_natural;
 
@@ -27,8 +28,9 @@ pub async fn thumbnail_needs_generation(
     if !can_generate_thumbnail(&comic.resource_type) {
         return Ok(false);
     }
+    let resolved = resolve_access_for_comic(comic)?;
     let Some((modified_ms, size)) =
-        read_source_stat_with(local_access(), &comic.path, &comic.resource_type)?
+        read_source_stat_with(resolved.as_dyn(), &comic.path, &comic.resource_type)?
     else {
         return Ok(false);
     };
@@ -50,18 +52,25 @@ pub async fn store_thumbnail_for_comic(
     db: &DatabaseConnection,
     comic: &ComicDto,
 ) -> Result<bool, HentaiError> {
+    let resolved = resolve_access_for_comic(comic)?;
+    store_thumbnail_for_comic_with(db, resolved.as_dyn(), comic).await
+}
+
+pub async fn store_thumbnail_for_comic_with(
+    db: &DatabaseConnection,
+    access: &dyn ResourceAccess,
+    comic: &ComicDto,
+) -> Result<bool, HentaiError> {
     let Some((modified_ms, size)) =
-        read_source_stat_with(local_access(), &comic.path, &comic.resource_type)?
+        read_source_stat_with(access, &comic.path, &comic.resource_type)?
     else {
         return Ok(false);
     };
-    let jpeg = tokio::task::spawn_blocking({
-        let path = comic.path.clone();
-        let resource_type = comic.resource_type.clone();
-        move || generate_thumbnail_jpeg(Path::new(&path), &resource_type)
-    })
-    .await
-    .map_err(|e| HentaiError::validation(e.to_string()))??;
+    let path = comic.path.clone();
+    let resource_type = comic.resource_type.clone();
+    // Remote access cannot cross await/spawn_blocking — generate on this thread when Remote,
+    // or use local path helper when Local (resolved already used above for stat).
+    let jpeg = generate_thumbnail_jpeg_with(access, &path, &resource_type)?;
     let Some(jpeg) = jpeg else {
         return Ok(false);
     };
@@ -85,8 +94,6 @@ pub async fn store_thumbnail_for_comic(
                     comic_thumbnails::Column::UpdatedAt,
                     comic_thumbnails::Column::SourceModifiedMs,
                     comic_thumbnails::Column::SourceSize,
-                    // Keep existing is_user_set; callers that skip user-set covers
-                    // must not regenerate, but never clear the flag here.
                 ])
                 .to_owned(),
         )
@@ -97,7 +104,11 @@ pub async fn store_thumbnail_for_comic(
 }
 
 pub fn generate_thumbnail_jpeg(path: &Path, resource_type: &str) -> Result<Option<Vec<u8>>, HentaiError> {
-    generate_thumbnail_jpeg_with(local_access(), &path.to_string_lossy(), resource_type)
+    generate_thumbnail_jpeg_with(
+        crate::resource::local_access(),
+        &path.to_string_lossy(),
+        resource_type,
+    )
 }
 
 pub fn generate_thumbnail_jpeg_with(
@@ -156,7 +167,19 @@ fn load_cover_bytes(
     match resource_type {
         "dir" => load_dir_cover(access, location),
         "zip" | "cbz" => load_zip_cover(access, location),
-        "rar" | "cbr" => read_rar_cover_bytes(Path::new(location)),
+        "rar" | "cbr" => {
+            if location.starts_with("http://") || location.starts_with("https://") {
+                // Materialize remotely for path-bound cover extract.
+                let mut stream = access.open_stream(location)?;
+                let mut temp = tempfile::NamedTempFile::new()
+                    .map_err(|e| HentaiError::validation(e.to_string()))?;
+                std::io::copy(&mut stream, &mut temp)
+                    .map_err(|e| HentaiError::remote_unreachable(e.to_string()))?;
+                read_rar_cover_bytes(temp.path())
+            } else {
+                read_rar_cover_bytes(Path::new(location))
+            }
+        }
         "epub" => load_epub_cover(access, location),
         _ => Ok(None),
     }

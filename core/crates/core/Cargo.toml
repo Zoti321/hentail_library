@@ -36,6 +36,7 @@ rayon = "1"
 regex = "1"
 sevenz-rust = "0.6"
 unrar-ng = "0.7"
+tempfile = "3"
 url = "2"
 reqwest_dav = { version = "0.3", default-features = false, features = ["rustls-tls"] }
 

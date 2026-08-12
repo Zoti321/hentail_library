@@ -1,10 +1,13 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 
-use crate::comic_id::normalize_path_for_key;
+use crate::comic::find_comic_by_id;
 use crate::error::HentaiError;
+use crate::library::{resolve_access_for_comic, ResolvedAccess};
+use crate::resource::{local_access, ResourceAccess};
+use crate::runtime::block_on;
 
-use super::backend::{open_backend, ReaderBackend};
+use super::backend::{open_backend_with, ReaderBackend};
 
 struct CachedSession {
     normalized_path: String,
@@ -77,7 +80,29 @@ fn store() -> &'static Mutex<SessionStore> {
 
 /// Ensure a session exists and increment its ref count.
 fn acquire_reader(comic_id: &str, path: &str, resource_type: &str) -> Result<(), HentaiError> {
-    let normalized_path = normalize_path_for_key(path);
+    let access = resolve_access_for_open(comic_id)?;
+    acquire_reader_with(access.as_dyn(), comic_id, path, resource_type)
+}
+
+fn resolve_access_for_open(comic_id: &str) -> Result<ResolvedAccess, HentaiError> {
+    match block_on(find_comic_by_id(comic_id)) {
+        Ok(Some(comic)) => resolve_access_for_comic(&comic),
+        Ok(None) => Ok(ResolvedAccess::Local(local_access())),
+        Err(err) if err.code == crate::error::HentaiErrorCode::DbInitFailed => {
+            // Unit tests / early boot: no DB yet → Local FS.
+            Ok(ResolvedAccess::Local(local_access()))
+        }
+        Err(err) => Err(err),
+    }
+}
+
+fn acquire_reader_with(
+    access: &dyn ResourceAccess,
+    comic_id: &str,
+    path: &str,
+    resource_type: &str,
+) -> Result<(), HentaiError> {
+    let normalized_path = super::backend::normalize_reader_location_for_session(path);
     let mut store = store()
         .lock()
         .map_err(|e| HentaiError::validation(e.to_string()))?;
@@ -103,7 +128,7 @@ fn acquire_reader(comic_id: &str, path: &str, resource_type: &str) -> Result<(),
 
     // Release the store lock while opening the backend (can be slow / I/O).
     drop(store);
-    let backend = open_backend(path, resource_type)?;
+    let backend = open_backend_with(access, path, resource_type)?;
     let mut store = self::store()
         .lock()
         .map_err(|e| HentaiError::validation(e.to_string()))?;
@@ -161,6 +186,16 @@ fn release_reader(comic_id: &str) {
 #[tracing::instrument(err, fields(comic_id, resource_type, path))]
 pub fn open_reader(comic_id: &str, path: &str, resource_type: &str) -> Result<(), HentaiError> {
     acquire_reader(comic_id, path, resource_type)
+}
+
+/// Test / injected-access open (FakeResourceAccess, etc.).
+pub fn open_reader_with(
+    access: &dyn ResourceAccess,
+    comic_id: &str,
+    path: &str,
+    resource_type: &str,
+) -> Result<(), HentaiError> {
+    acquire_reader_with(access, comic_id, path, resource_type)
 }
 
 /// Cold-path helper: acquire → run → release (drops session when ref hits 0).
@@ -240,9 +275,9 @@ mod tests {
     fn close_then_with_session_returns_session_not_open() {
         let temp = tempfile::tempdir().expect("tempdir");
         let path = write_tiny_cbz(temp.path(), "a.cbz");
-        open_reader("c1", &path, "cbz").expect("open");
-        close_reader("c1");
-        let err = with_session("c1", |_| Ok(())).expect_err("expected error");
+        open_reader("mgr-close-1", &path, "cbz").expect("open");
+        close_reader("mgr-close-1");
+        let err = with_session("mgr-close-1", |_| Ok(())).expect_err("expected error");
         assert_eq!(err.code, HentaiErrorCode::ReaderSessionNotOpen);
     }
 
@@ -250,12 +285,14 @@ mod tests {
     fn ephemeral_does_not_close_active_reader_session() {
         let temp = tempfile::tempdir().expect("tempdir");
         let path = write_tiny_cbz(temp.path(), "a.cbz");
-        open_reader("c1", &path, "cbz").expect("open");
-        with_ephemeral_reader("c1", &path, "cbz", || with_session("c1", |_| Ok(())))
-            .expect("ephemeral");
-        with_session("c1", |_| Ok(())).expect("reader session still open");
-        close_reader("c1");
-        let err = with_session("c1", |_| Ok(())).expect_err("closed");
+        open_reader("mgr-eph-active", &path, "cbz").expect("open");
+        with_ephemeral_reader("mgr-eph-active", &path, "cbz", || {
+            with_session("mgr-eph-active", |_| Ok(()))
+        })
+        .expect("ephemeral");
+        with_session("mgr-eph-active", |_| Ok(())).expect("reader session still open");
+        close_reader("mgr-eph-active");
+        let err = with_session("mgr-eph-active", |_| Ok(())).expect_err("closed");
         assert_eq!(err.code, HentaiErrorCode::ReaderSessionNotOpen);
     }
 
@@ -263,9 +300,11 @@ mod tests {
     fn ephemeral_alone_releases_session() {
         let temp = tempfile::tempdir().expect("tempdir");
         let path = write_tiny_cbz(temp.path(), "a.cbz");
-        with_ephemeral_reader("c1", &path, "cbz", || with_session("c1", |_| Ok(())))
-            .expect("ephemeral");
-        let err = with_session("c1", |_| Ok(())).expect_err("should be released");
+        with_ephemeral_reader("mgr-eph-alone", &path, "cbz", || {
+            with_session("mgr-eph-alone", |_| Ok(()))
+        })
+        .expect("ephemeral");
+        let err = with_session("mgr-eph-alone", |_| Ok(())).expect_err("should be released");
         assert_eq!(err.code, HentaiErrorCode::ReaderSessionNotOpen);
     }
 
@@ -274,9 +313,9 @@ mod tests {
         let temp = tempfile::tempdir().expect("tempdir");
         let path_a = write_tiny_cbz(temp.path(), "a.cbz");
         let path_b = write_tiny_cbz(temp.path(), "b.cbz");
-        open_reader("c1", &path_a, "cbz").expect("open a");
-        let err = open_reader("c1", &path_b, "cbz").expect_err("path change");
+        open_reader("mgr-path-change", &path_a, "cbz").expect("open a");
+        let err = open_reader("mgr-path-change", &path_b, "cbz").expect_err("path change");
         assert_eq!(err.code, HentaiErrorCode::ReaderKindMismatch);
-        close_reader("c1");
+        close_reader("mgr-path-change");
     }
 }

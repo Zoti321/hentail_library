@@ -8,9 +8,10 @@ use crate::series_id::series_name_from_folder_path;
 use crate::util::compute_sort_key;
 
 use crate::metadata_lock::{
-    merge_kept_scan_with_existing, merge_series_name, series_name_needs_write,
+    merge_refresh_scan_with_existing, merge_series_name, series_name_needs_write,
 };
-use crate::resource::{local_access, parse_file_with, parsed_to_comic, ResourceAccess};
+use crate::library::resolve_access_for_comic;
+use crate::resource::{parse_file_with, parsed_to_comic, ResourceAccess};
 
 use super::library_lock::try_acquire_library_write_lock;
 use super::writer::upsert_comics;
@@ -37,20 +38,33 @@ pub async fn refresh_comic_metadata(comic_id: &str) -> Result<(), HentaiError> {
 }
 
 pub(crate) async fn refresh_comic_metadata_locked(comic_id: &str) -> Result<(), HentaiError> {
+    let existing = find_comic_by_id(comic_id)
+        .await?
+        .ok_or_else(|| HentaiError::validation(format!("漫画不存在: {comic_id}")))?;
+
+    let resolved = resolve_access_for_comic(&existing)?;
+    refresh_comic_metadata_with(resolved.as_dyn(), &existing.comic_id).await
+}
+
+/// Injected-access refresh (FakeResourceAccess / tests).
+pub async fn refresh_comic_metadata_with(
+    access: &dyn ResourceAccess,
+    comic_id: &str,
+) -> Result<(), HentaiError> {
     let db = connection()?;
     let existing = find_comic_by_id(comic_id)
         .await?
         .ok_or_else(|| HentaiError::validation(format!("漫画不存在: {comic_id}")))?;
 
-    let Some(_) = local_access().stat(&existing.path)? else {
+    let Some(_) = access.stat(&existing.path)? else {
         return Err(HentaiError::reader_not_found(&existing.path));
     };
 
-    let parsed = parse_file_with(local_access(), &existing.path)?.ok_or_else(|| {
+    let parsed = parse_file_with(access, &existing.path)?.ok_or_else(|| {
         HentaiError::reader_invalid_content(format!("无法解析资源元数据: {}", existing.path))
     })?;
     let scanned = parsed_to_comic(&parsed);
-    let merged = merge_kept_scan_with_existing(&scanned, &existing);
+    let merged = merge_refresh_scan_with_existing(&scanned, &existing);
     upsert_comics(&db, &[merged]).await?;
     Ok(())
 }

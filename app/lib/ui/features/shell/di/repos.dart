@@ -24,7 +24,9 @@ part 'repos.g.dart';
 
 @Riverpod(keepAlive: true)
 ComicThumbnailRepository comicThumbnailRepo(Ref ref) =>
-    const ComicThumbnailRepositoryImpl();
+    ComicThumbnailRepositoryImpl(
+      libraryRepository: ref.read(libraryRepoProvider),
+    );
 
 @Riverpod(keepAlive: true)
 ComicRepository comicRepo(Ref ref) => const ComicRepositoryImpl();

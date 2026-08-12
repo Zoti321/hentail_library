@@ -7,12 +7,14 @@ use zip::ZipArchive;
 use crate::comic_id::normalize_path_for_key;
 use crate::error::HentaiError;
 use crate::formats::{
-    open_pdf_backend, open_rar_backend, open_sevenz_backend, PdfBackend, RarBackend, SevenZBackend,
+    open_pdf_backend, open_pdf_backend_kept, open_rar_backend, open_rar_backend_kept,
+    open_sevenz_backend, open_sevenz_backend_kept, PdfBackend, RarBackend, SevenZBackend,
 };
 use crate::resource::{
     basename, extension_lower, is_comic_image_extension, local_access, ResourceAccess, ResourceKind,
     ResourceStream,
 };
+use crate::sync::remote::normalize_remote_location_key;
 use crate::util::natural_sort::compare_filename_natural;
 
 type StreamArchive = ZipArchive<BufReader<ResourceStream>>;
@@ -51,7 +53,7 @@ pub fn open_backend_with(
     resource_type: &str,
 ) -> Result<ReaderBackend, HentaiError> {
     tracing::debug!(resource_type, "opening reader backend");
-    let normalized = normalize_path_for_key(path);
+    let normalized = normalize_reader_location(path);
     if normalized.is_empty() {
         return Err(HentaiError::reader_kind_mismatch("path 为空"));
     }
@@ -80,20 +82,17 @@ pub fn open_backend_with(
         "cbr" | "rar" => {
             ensure_file_kind(stat.kind, &normalized, resource_type)?;
             ensure_extension(Path::new(&normalized), resource_type)?;
-            // Path-bound format backend — Local location == FS path.
-            Ok(ReaderBackend::Rar(open_rar_backend(Path::new(&normalized))?))
+            open_path_bound_rar(access, &normalized)
         }
         "cb7" | "sevenz" => {
             ensure_file_kind(stat.kind, &normalized, resource_type)?;
             ensure_extension(Path::new(&normalized), resource_type)?;
-            Ok(ReaderBackend::SevenZ(open_sevenz_backend(Path::new(
-                &normalized,
-            ))?))
+            open_path_bound_sevenz(access, &normalized)
         }
         "pdf" => {
             ensure_file_kind(stat.kind, &normalized, "pdf")?;
             ensure_extension(Path::new(&normalized), "pdf")?;
-            Ok(ReaderBackend::Pdf(open_pdf_backend(Path::new(&normalized))?))
+            open_path_bound_pdf(access, &normalized)
         }
         other => Err(HentaiError::reader_unsupported_type(other)),
     }
@@ -207,6 +206,83 @@ fn open_epub(access: &dyn ResourceAccess, location: &str) -> Result<EpubBackend,
         archive: Mutex::new(archive),
         image_entries,
     })
+}
+
+pub(crate) fn normalize_reader_location_for_session(path: &str) -> String {
+    normalize_reader_location(path)
+}
+
+fn normalize_reader_location(path: &str) -> String {
+    let trimmed = path.trim();
+    let lower = trimmed.to_ascii_lowercase();
+    if lower.starts_with("http://") || lower.starts_with("https://") {
+        normalize_remote_location_key(trimmed)
+    } else {
+        normalize_path_for_key(trimmed)
+    }
+}
+
+fn is_remote_location(location: &str) -> bool {
+    let lower = location.to_ascii_lowercase();
+    lower.starts_with("http://") || lower.starts_with("https://")
+}
+
+fn materialize_remote_file(
+    access: &dyn ResourceAccess,
+    location: &str,
+) -> Result<tempfile::NamedTempFile, HentaiError> {
+    let mut stream = access
+        .open_stream(location)
+        .map_err(|e| HentaiError::reader_not_found(e.message))?;
+    let mut temp = tempfile::NamedTempFile::new()
+        .map_err(|e| HentaiError::validation(format!("创建临时文件失败: {e}")))?;
+    std::io::copy(&mut stream, &mut temp)
+        .map_err(|e| HentaiError::remote_unreachable(format!("下载远程资源失败: {e}")))?;
+    Ok(temp)
+}
+
+fn open_path_bound_pdf(
+    access: &dyn ResourceAccess,
+    location: &str,
+) -> Result<ReaderBackend, HentaiError> {
+    if is_remote_location(location) {
+        let temp = materialize_remote_file(access, location)?;
+        let path = temp.path().to_path_buf();
+        let backend = open_pdf_backend_kept(&path, temp)?;
+        Ok(ReaderBackend::Pdf(backend))
+    } else {
+        Ok(ReaderBackend::Pdf(open_pdf_backend(Path::new(location))?))
+    }
+}
+
+fn open_path_bound_rar(
+    access: &dyn ResourceAccess,
+    location: &str,
+) -> Result<ReaderBackend, HentaiError> {
+    if is_remote_location(location) {
+        let temp = materialize_remote_file(access, location)?;
+        let path = temp.path().to_path_buf();
+        let backend = open_rar_backend_kept(&path, temp)?;
+        Ok(ReaderBackend::Rar(backend))
+    } else {
+        Ok(ReaderBackend::Rar(open_rar_backend(Path::new(location))?))
+    }
+}
+
+fn open_path_bound_sevenz(
+    access: &dyn ResourceAccess,
+    location: &str,
+) -> Result<ReaderBackend, HentaiError> {
+    if is_remote_location(location) {
+        let temp = materialize_remote_file(access, location)?;
+        let path = temp.path().to_path_buf();
+        let backend = open_sevenz_backend_kept(&path, temp)?;
+        Ok(ReaderBackend::SevenZ(backend))
+    } else {
+        Ok(ReaderBackend::SevenZ(open_sevenz_backend(Path::new(
+            location,
+        ))?))
+    }
 }
 
 fn collect_epub_image_indices(archive: &mut StreamArchive) -> Result<Vec<usize>, HentaiError> {

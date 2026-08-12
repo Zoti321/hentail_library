@@ -12,6 +12,12 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 SyncHandleDto createSyncHandleFrb() =>
     RustLib.instance.api.crateApiSyncCreateSyncHandleFrb();
 
+void setRemoteLibraryCredentialsFrb({
+  required List<RemoteLibraryCredentialDto> credentials,
+}) => RustLib.instance.api.crateApiSyncSetRemoteLibraryCredentialsFrb(
+  credentials: credentials,
+);
+
 void cancelSyncFrb({required SyncHandleDto handle}) =>
     RustLib.instance.api.crateApiSyncCancelSyncFrb(handle: handle);
 

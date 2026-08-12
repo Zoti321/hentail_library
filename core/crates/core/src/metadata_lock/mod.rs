@@ -8,7 +8,7 @@ mod comic;
 mod series;
 
 pub use auto_lock::{comic_auto_locks, series_auto_locks, ComicAutoLocks, SeriesAutoLocks};
-pub use comic::merge_kept_scan_with_existing;
+pub use comic::{merge_kept_scan_with_existing, merge_refresh_scan_with_existing};
 pub use series::{
     merge_series_name, resolve_member_sort_order, series_name_needs_write,
 };

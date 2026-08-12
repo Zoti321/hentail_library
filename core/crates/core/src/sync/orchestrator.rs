@@ -21,12 +21,7 @@ use super::remote::{scan_remote_lightweight, RemoteScanOutcome};
 use super::scanner::{scan_roots_excluding, ScanContext, ScanItem};
 use super::writer::apply_scan_replace_plan;
 use crate::thumbnail::enqueue_thumbnails_low;
-
-#[derive(Debug, Clone)]
-pub struct RemoteLibraryCredential {
-    pub library_id: String,
-    pub password: String,
-}
+use crate::library::{set_remote_library_credentials, RemoteLibraryCredential};
 
 fn return_if_cancelled(handle: &SyncHandle, phase: &str) -> bool {
     if handle.is_cancelled() {
@@ -51,6 +46,7 @@ pub async fn sync_library(
 ) -> Result<(), HentaiError> {
     let _guard = try_acquire_library_write_lock()?;
     let db = connection()?;
+    set_remote_library_credentials(credentials.clone());
     let cred_map: HashMap<String, String> = credentials
         .into_iter()
         .map(|c| (c.library_id, c.password))

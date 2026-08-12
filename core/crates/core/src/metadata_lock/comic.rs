@@ -63,10 +63,28 @@ fn merge_list(locked: bool, existing: &[String], scanned: &[String]) -> Vec<Stri
 /// - Locked → keep library value
 /// - Unlocked + scanned present → take scan
 /// - Unlocked + scanned empty/missing → keep library value (do not clear)
+///
+/// `page_count`: when source path/type unchanged, keep existing (lightweight Remote
+/// sync registers placeholder `1` and must not clobber a real count filled on open).
 pub fn merge_kept_scan_with_existing(scanned: &ComicDto, existing: &ComicDto) -> ComicDto {
+    merge_scan_with_existing(scanned, existing, /*prefer_scanned_pages=*/ false)
+}
+
+/// Metadata refresh / first-open writeback: always take scanned `page_count` when > 0.
+pub fn merge_refresh_scan_with_existing(scanned: &ComicDto, existing: &ComicDto) -> ComicDto {
+    merge_scan_with_existing(scanned, existing, /*prefer_scanned_pages=*/ true)
+}
+
+fn merge_scan_with_existing(
+    scanned: &ComicDto,
+    existing: &ComicDto,
+    prefer_scanned_pages: bool,
+) -> ComicDto {
     let source_changed =
         existing.path != scanned.path || existing.resource_type != scanned.resource_type;
-    let page_count = if source_changed {
+    let page_count = if prefer_scanned_pages && scanned.page_count > 0 {
+        scanned.page_count
+    } else if source_changed {
         scanned.page_count
     } else {
         existing.page_count

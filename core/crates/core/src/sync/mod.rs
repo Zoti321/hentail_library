@@ -27,9 +27,9 @@ pub use dto::{
 pub use format_group::FormatGroup;
 pub use handle::{SyncHandle, cancel_sync, create_sync_handle};
 pub use library_lock::try_acquire_library_write_lock;
-pub use orchestrator::{sync_library, RemoteLibraryCredential};
+pub use orchestrator::sync_library;
 pub use refresh::{
-    refresh_comic_metadata, refresh_series_metadata, RefreshSeriesProgressDto,
-    RefreshSeriesResultDto,
+    refresh_comic_metadata, refresh_comic_metadata_with, refresh_series_metadata,
+    RefreshSeriesProgressDto, RefreshSeriesResultDto,
 };
 pub use remote::{comic_id_for_remote_location, scan_remote_lightweight, RemoteScanOutcome};

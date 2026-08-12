@@ -3,6 +3,7 @@ use hentai_core::{
     SyncLibraryPhaseDto as CorePhase, SyncLibraryProgressDto as CoreProgress,
     SyncLibraryRouteDto as CoreRoute, SyncScanMode as CoreScanMode,
     cancel_sync as core_cancel_sync, create_sync_handle as core_create_sync_handle,
+    set_remote_library_credentials as core_set_remote_credentials,
     sync_library as core_sync_library,
 };
 
@@ -84,6 +85,19 @@ pub fn create_sync_handle_frb() -> SyncHandleDto {
     SyncHandleDto {
         inner: core_create_sync_handle(),
     }
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn set_remote_library_credentials_frb(credentials: Vec<RemoteLibraryCredentialDto>) {
+    core_set_remote_credentials(
+        credentials
+            .into_iter()
+            .map(|c| CoreRemoteCredential {
+                library_id: c.library_id,
+                password: c.password,
+            })
+            .collect(),
+    );
 }
 
 #[flutter_rust_bridge::frb(sync)]

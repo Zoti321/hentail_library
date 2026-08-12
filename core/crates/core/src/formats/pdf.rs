@@ -10,6 +10,8 @@ use super::map_archive_err;
 pub struct PdfBackend {
     pub path: String,
     pub page_count: i32,
+    /// Keeps a temp file alive when the PDF was materialized from Remote access.
+    pub(crate) _remote_temp: Option<tempfile::NamedTempFile>,
 }
 
 fn bind_pdfium() -> Result<Pdfium, HentaiError> {
@@ -150,7 +152,17 @@ pub fn open_pdf_backend(file: &Path) -> Result<PdfBackend, HentaiError> {
     Ok(PdfBackend {
         path: file.to_string_lossy().to_string(),
         page_count,
+        _remote_temp: None,
     })
+}
+
+pub fn open_pdf_backend_kept(
+    file: &Path,
+    keep: tempfile::NamedTempFile,
+) -> Result<PdfBackend, HentaiError> {
+    let mut backend = open_pdf_backend(file)?;
+    backend._remote_temp = Some(keep);
+    Ok(backend)
 }
 
 pub fn read_pdf_page(backend: &PdfBackend, page_index: usize) -> Result<Vec<u8>, HentaiError> {
