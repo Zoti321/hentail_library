@@ -48,10 +48,17 @@ fn load_page_image_bytes(
 ) -> Result<Vec<u8>, HentaiError> {
     use crate::reader::manager::with_ephemeral_reader;
     use crate::reader::{load_reader_page, ReaderPageDto};
+    use crate::resource::{local_access, ResourceAccess};
+    use std::io::Read;
     with_ephemeral_reader(comic_id, path, resource_type, || {
         match load_reader_page(comic_id, path, resource_type, page_index)? {
             ReaderPageDto::FilePath { path: file_path } => {
-                std::fs::read(&file_path).map_err(|e| HentaiError::validation(e.to_string()))
+                let mut stream = local_access().open_stream(&file_path)?;
+                let mut buf = Vec::new();
+                stream
+                    .read_to_end(&mut buf)
+                    .map_err(|e| HentaiError::validation(e.to_string()))?;
+                Ok(buf)
             }
             ReaderPageDto::Bytes { data } => Ok(data),
         }

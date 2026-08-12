@@ -1,4 +1,3 @@
-use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::Path;
 
@@ -14,8 +13,9 @@ use crate::error::HentaiError;
 use crate::formats::read_rar_cover_bytes;
 use crate::resource::{
     basename, basename_without_extension, can_generate_thumbnail, extension_lower,
-    is_comic_image_extension, read_source_stat,
+    is_comic_image_extension, local_access, read_source_stat_with, ResourceAccess, ResourceKind,
 };
+use crate::util::natural_sort::compare_filename_natural;
 
 const MAX_LONG_EDGE: u32 = 512;
 const JPEG_QUALITY: u8 = 85;
@@ -27,8 +27,9 @@ pub async fn thumbnail_needs_generation(
     if !can_generate_thumbnail(&comic.resource_type) {
         return Ok(false);
     }
-    let path = Path::new(&comic.path);
-    let Some((modified_ms, size)) = read_source_stat(path, &comic.resource_type)? else {
+    let Some((modified_ms, size)) =
+        read_source_stat_with(local_access(), &comic.path, &comic.resource_type)?
+    else {
         return Ok(false);
     };
     let cached = ComicThumbnails::find_by_id(comic.comic_id.clone())
@@ -49,14 +50,15 @@ pub async fn store_thumbnail_for_comic(
     db: &DatabaseConnection,
     comic: &ComicDto,
 ) -> Result<bool, HentaiError> {
-    let path = Path::new(&comic.path);
-    let Some((modified_ms, size)) = read_source_stat(path, &comic.resource_type)? else {
+    let Some((modified_ms, size)) =
+        read_source_stat_with(local_access(), &comic.path, &comic.resource_type)?
+    else {
         return Ok(false);
     };
     let jpeg = tokio::task::spawn_blocking({
-        let path = path.to_path_buf();
+        let path = comic.path.clone();
         let resource_type = comic.resource_type.clone();
-        move || generate_thumbnail_jpeg(&path, &resource_type)
+        move || generate_thumbnail_jpeg(Path::new(&path), &resource_type)
     })
     .await
     .map_err(|e| HentaiError::validation(e.to_string()))??;
@@ -95,7 +97,15 @@ pub async fn store_thumbnail_for_comic(
 }
 
 pub fn generate_thumbnail_jpeg(path: &Path, resource_type: &str) -> Result<Option<Vec<u8>>, HentaiError> {
-    let source = load_cover_bytes(path, resource_type)?;
+    generate_thumbnail_jpeg_with(local_access(), &path.to_string_lossy(), resource_type)
+}
+
+pub fn generate_thumbnail_jpeg_with(
+    access: &dyn ResourceAccess,
+    location: &str,
+    resource_type: &str,
+) -> Result<Option<Vec<u8>>, HentaiError> {
+    let source = load_cover_bytes(access, location, resource_type)?;
     let Some(bytes) = source else {
         return Ok(None);
     };
@@ -138,44 +148,54 @@ fn resize_to_max_long_edge(img: &DynamicImage, max_long_edge: u32) -> DynamicIma
     }
 }
 
-fn load_cover_bytes(path: &Path, resource_type: &str) -> Result<Option<Vec<u8>>, HentaiError> {
+fn load_cover_bytes(
+    access: &dyn ResourceAccess,
+    location: &str,
+    resource_type: &str,
+) -> Result<Option<Vec<u8>>, HentaiError> {
     match resource_type {
-        "dir" => load_dir_cover(path),
-        "zip" | "cbz" => load_zip_cover(path),
-        "rar" | "cbr" => read_rar_cover_bytes(path),
-        "epub" => load_epub_cover(path),
+        "dir" => load_dir_cover(access, location),
+        "zip" | "cbz" => load_zip_cover(access, location),
+        "rar" | "cbr" => read_rar_cover_bytes(Path::new(location)),
+        "epub" => load_epub_cover(access, location),
         _ => Ok(None),
     }
 }
 
-fn load_dir_cover(dir: &Path) -> Result<Option<Vec<u8>>, HentaiError> {
+fn load_dir_cover(access: &dyn ResourceAccess, dir: &str) -> Result<Option<Vec<u8>>, HentaiError> {
     let mut image_files = Vec::new();
-    for entry in std::fs::read_dir(dir).map_err(|e| HentaiError::validation(e.to_string()))? {
-        let entry = entry.map_err(|e| HentaiError::validation(e.to_string()))?;
-        let p = entry.path();
-        if p.is_file() && is_comic_image_extension(&extension_lower(&p)) {
-            image_files.push(p);
+    for entry in access.list(dir)? {
+        if entry.kind == ResourceKind::File
+            && is_comic_image_extension(&extension_lower(Path::new(&entry.name)))
+        {
+            image_files.push(entry);
         }
     }
     if image_files.is_empty() {
         return Ok(None);
     }
-    image_files.sort_by(|a, b| compare_filename_natural(&basename(a), &basename(b)));
+    image_files.sort_by(|a, b| compare_filename_natural(&a.name, &b.name));
     let mut chosen = &image_files[0];
     for f in &image_files {
-        if basename_without_extension(f).eq_ignore_ascii_case("cover") {
+        if basename_without_extension(Path::new(&f.name)).eq_ignore_ascii_case("cover") {
             chosen = f;
             break;
         }
     }
-    std::fs::read(chosen)
-        .map(Some)
-        .map_err(|e| HentaiError::validation(e.to_string()))
+    let mut stream = access.open_stream(&chosen.location)?;
+    let mut buf = Vec::new();
+    stream
+        .read_to_end(&mut buf)
+        .map_err(|e| HentaiError::validation(e.to_string()))?;
+    Ok(Some(buf))
 }
 
-fn load_zip_cover(file: &Path) -> Result<Option<Vec<u8>>, HentaiError> {
-    let f = File::open(file).map_err(|e| HentaiError::validation(e.to_string()))?;
-    let mut archive = ZipArchive::new(BufReader::new(f))
+fn load_zip_cover(
+    access: &dyn ResourceAccess,
+    location: &str,
+) -> Result<Option<Vec<u8>>, HentaiError> {
+    let stream = access.open_stream(location)?;
+    let mut archive = ZipArchive::new(BufReader::new(stream))
         .map_err(|e| HentaiError::validation(e.to_string()))?;
     let mut entries: Vec<(String, usize)> = Vec::new();
     for i in 0..archive.len() {
@@ -198,7 +218,9 @@ fn load_zip_cover(file: &Path) -> Result<Option<Vec<u8>>, HentaiError> {
     if entries.is_empty() {
         return Ok(None);
     }
-    entries.sort_by(|a, b| compare_filename_natural(&basename(Path::new(&a.0)), &basename(Path::new(&b.0))));
+    entries.sort_by(|a, b| {
+        compare_filename_natural(&basename(Path::new(&a.0)), &basename(Path::new(&b.0)))
+    });
     let mut chosen_idx = entries[0].1;
     for (name, idx) in &entries {
         if basename_without_extension(Path::new(name)).eq_ignore_ascii_case("cover") {
@@ -215,9 +237,12 @@ fn load_zip_cover(file: &Path) -> Result<Option<Vec<u8>>, HentaiError> {
     Ok(Some(buf))
 }
 
-fn load_epub_cover(file: &Path) -> Result<Option<Vec<u8>>, HentaiError> {
-    let f = File::open(file).map_err(|e| HentaiError::validation(e.to_string()))?;
-    let mut archive = ZipArchive::new(BufReader::new(f))
+fn load_epub_cover(
+    access: &dyn ResourceAccess,
+    location: &str,
+) -> Result<Option<Vec<u8>>, HentaiError> {
+    let stream = access.open_stream(location)?;
+    let mut archive = ZipArchive::new(BufReader::new(stream))
         .map_err(|e| HentaiError::validation(e.to_string()))?;
     let mut images: Vec<(String, usize)> = Vec::new();
     for i in 0..archive.len() {
@@ -256,39 +281,30 @@ fn load_epub_cover(file: &Path) -> Result<Option<Vec<u8>>, HentaiError> {
     Ok(Some(buf))
 }
 
-fn compare_filename_natural(a: &str, b: &str) -> std::cmp::Ordering {
-    let a_parts = split_natural(a);
-    let b_parts = split_natural(b);
-    for (ap, bp) in a_parts.iter().zip(b_parts.iter()) {
-        match (ap.parse::<u64>(), bp.parse::<u64>()) {
-            (Ok(na), Ok(nb)) => match na.cmp(&nb) {
-                std::cmp::Ordering::Equal => continue,
-                other => return other,
-            },
-            _ => match ap.cmp(bp) {
-                std::cmp::Ordering::Equal => continue,
-                other => return other,
-            },
-        }
-    }
-    a_parts.len().cmp(&b_parts.len())
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::resource::FakeResourceAccess;
+    use std::io::{Cursor, Write};
+    use zip::write::SimpleFileOptions;
+    use zip::ZipWriter;
 
-fn split_natural(s: &str) -> Vec<String> {
-    let mut parts = Vec::new();
-    let mut current = String::new();
-    let mut was_digit = false;
-    for ch in s.chars() {
-        let is_digit = ch.is_ascii_digit();
-        if !current.is_empty() && is_digit != was_digit {
-            parts.push(current.clone());
-            current.clear();
+    #[test]
+    fn fake_access_loads_zip_cover_bytes_without_disk() {
+        let mut bytes = Vec::new();
+        {
+            let mut zip = ZipWriter::new(Cursor::new(&mut bytes));
+            zip.start_file("cover.jpg", SimpleFileOptions::default())
+                .expect("start");
+            zip.write_all(b"fake-cover-jpeg").expect("write");
+            zip.finish().expect("finish");
         }
-        current.push(ch);
-        was_digit = is_digit;
+        let mut fake = FakeResourceAccess::new();
+        fake.insert_file("/lib/comic.cbz", bytes);
+
+        let cover = load_cover_bytes(&fake, "/lib/comic.cbz", "cbz")
+            .expect("load")
+            .expect("cover bytes");
+        assert_eq!(cover, b"fake-cover-jpeg");
     }
-    if !current.is_empty() {
-        parts.push(current);
-    }
-    parts
 }

@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder, Set};
 
 use crate::comic::find_comic_by_id;
@@ -12,7 +10,7 @@ use crate::util::compute_sort_key;
 use crate::metadata_lock::{
     merge_kept_scan_with_existing, merge_series_name, series_name_needs_write,
 };
-use crate::resource::{parse_file, parsed_to_comic};
+use crate::resource::{local_access, parse_file_with, parsed_to_comic, ResourceAccess};
 
 use super::library_lock::try_acquire_library_write_lock;
 use super::writer::upsert_comics;
@@ -44,12 +42,11 @@ pub(crate) async fn refresh_comic_metadata_locked(comic_id: &str) -> Result<(), 
         .await?
         .ok_or_else(|| HentaiError::validation(format!("漫画不存在: {comic_id}")))?;
 
-    let path = PathBuf::from(&existing.path);
-    if !path.exists() {
+    let Some(_) = local_access().stat(&existing.path)? else {
         return Err(HentaiError::reader_not_found(&existing.path));
-    }
+    };
 
-    let parsed = parse_file(&path)?.ok_or_else(|| {
+    let parsed = parse_file_with(local_access(), &existing.path)?.ok_or_else(|| {
         HentaiError::reader_invalid_content(format!("无法解析资源元数据: {}", existing.path))
     })?;
     let scanned = parsed_to_comic(&parsed);

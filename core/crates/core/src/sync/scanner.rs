@@ -1,16 +1,16 @@
 use std::collections::HashMap;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use rayon::prelude::*;
 
 use crate::comic::ComicDto;
 use crate::error::HentaiError;
 
-use super::format_group::{FormatGroup, resource_type_enabled};
+use super::format_group::{resource_type_enabled, FormatGroup};
 use super::handle::SyncHandle;
 use crate::resource::{
-    comic_id_for_path, parse_directory, parse_file, parsed_to_comic, read_resource_size,
-    read_source_stat,
+    comic_id_for_path, local_access, parse_directory_with, parse_file_with, read_resource_size_with,
+    read_source_stat_with, ResourceAccess, ResourceKind,
 };
 
 pub struct ScanContext {
@@ -31,18 +31,41 @@ pub fn scan_roots(
     force_full_parse: bool,
     enabled_groups: &[FormatGroup],
 ) -> Result<Vec<ScanItem>, HentaiError> {
-    let mut candidates: Vec<PathBuf> = Vec::new();
+    let root_locs: Vec<String> = roots
+        .iter()
+        .map(|r| r.to_string_lossy().into_owned())
+        .collect();
+    scan_roots_with(
+        local_access(),
+        &root_locs,
+        ctx,
+        handle,
+        force_full_parse,
+        enabled_groups,
+    )
+}
+
+pub fn scan_roots_with(
+    access: &dyn ResourceAccess,
+    roots: &[String],
+    ctx: &ScanContext,
+    handle: &SyncHandle,
+    force_full_parse: bool,
+    enabled_groups: &[FormatGroup],
+) -> Result<Vec<ScanItem>, HentaiError> {
+    let mut candidates: Vec<String> = Vec::new();
     for root in roots {
         if handle.is_cancelled() {
             return Ok(vec![]);
         }
-        if !root.exists() {
+        let Some(stat) = access.stat(root)? else {
             continue;
-        }
-        if root.is_dir() {
-            collect_from_directory(root, &mut candidates, handle, enabled_groups)?;
-        } else if root.is_file() {
-            candidates.push(root.clone());
+        };
+        match stat.kind {
+            ResourceKind::Dir => {
+                collect_from_directory(access, root, &mut candidates, handle, enabled_groups)?;
+            }
+            ResourceKind::File => candidates.push(root.clone()),
         }
     }
     if handle.is_cancelled() {
@@ -54,7 +77,7 @@ pub fn scan_roots(
             if handle.is_cancelled() {
                 Ok(None)
             } else {
-                resolve_scan_item(path, ctx, force_full_parse, enabled_groups)
+                resolve_scan_item(access, path, ctx, force_full_parse, enabled_groups)
             }
         })
         .collect();
@@ -68,53 +91,51 @@ pub fn scan_roots(
 }
 
 fn collect_from_directory(
-    dir: &Path,
-    out: &mut Vec<PathBuf>,
+    access: &dyn ResourceAccess,
+    dir: &str,
+    out: &mut Vec<String>,
     handle: &SyncHandle,
     enabled_groups: &[FormatGroup],
 ) -> Result<(), HentaiError> {
     if handle.is_cancelled() {
         return Ok(());
     }
-    if let Some(parsed) = parse_directory(dir)? {
+    if let Some(parsed) = parse_directory_with(access, dir)? {
         if resource_type_enabled(&parsed.resource_type, enabled_groups) {
-            out.push(PathBuf::from(parsed.path));
+            out.push(parsed.path);
         }
         return Ok(());
     }
-    let entries = std::fs::read_dir(dir).map_err(|e| {
-        HentaiError::validation(format!("目录扫描失败: {} ({})", dir.display(), e))
-    })?;
-    for entry in entries {
+    for entry in access.list(dir)? {
         if handle.is_cancelled() {
             return Ok(());
         }
-        let entry = entry.map_err(|e| HentaiError::validation(e.to_string()))?;
-        let path = entry.path();
-        if path.is_dir() {
-            collect_from_directory(&path, out, handle, enabled_groups)?;
-        } else if path.is_file() {
-            out.push(path);
+        match entry.kind {
+            ResourceKind::Dir => {
+                collect_from_directory(access, &entry.location, out, handle, enabled_groups)?;
+            }
+            ResourceKind::File => out.push(entry.location),
         }
     }
     Ok(())
 }
 
 fn resolve_scan_item(
-    path: &Path,
+    access: &dyn ResourceAccess,
+    path: &str,
     ctx: &ScanContext,
     force_full_parse: bool,
     enabled_groups: &[FormatGroup],
 ) -> Result<Option<ScanItem>, HentaiError> {
-    let comic_id = comic_id_for_path(&path.to_string_lossy());
+    let comic_id = comic_id_for_path(path);
     if !force_full_parse {
         if let Some(existing) = ctx.existing_by_id.get(&comic_id) {
-            if try_reuse_existing(path, existing, ctx) {
+            if try_reuse_existing(access, path, existing, ctx) {
                 if !resource_type_enabled(&existing.resource_type, enabled_groups) {
                     return Ok(None);
                 }
                 let mut comic = existing.clone();
-                refresh_resource_size(path, &mut comic)?;
+                refresh_resource_size(access, path, &mut comic)?;
                 return Ok(Some(ScanItem {
                     path: existing.path.clone(),
                     resource_type: existing.resource_type.clone(),
@@ -123,10 +144,13 @@ fn resolve_scan_item(
             }
         }
     }
-    let parsed = if path.is_dir() {
-        parse_directory(path)?
-    } else {
-        parse_file(path)?
+    let kind = match access.stat(path)? {
+        Some(stat) => stat.kind,
+        None => return Ok(None),
+    };
+    let parsed = match kind {
+        ResourceKind::Dir => parse_directory_with(access, path)?,
+        ResourceKind::File => parse_file_with(access, path)?,
     };
     let Some(parsed) = parsed else {
         return Ok(None);
@@ -134,7 +158,7 @@ fn resolve_scan_item(
     if !resource_type_enabled(&parsed.resource_type, enabled_groups) {
         return Ok(None);
     }
-    let comic = parsed_to_comic(&parsed);
+    let comic = crate::resource::parsed_to_comic(&parsed);
     Ok(Some(ScanItem {
         path: parsed.path,
         resource_type: parsed.resource_type,
@@ -142,18 +166,28 @@ fn resolve_scan_item(
     }))
 }
 
-fn refresh_resource_size(path: &Path, comic: &mut ComicDto) -> Result<(), HentaiError> {
-    if let Some(size) = read_resource_size(path, &comic.resource_type)? {
+fn refresh_resource_size(
+    access: &dyn ResourceAccess,
+    path: &str,
+    comic: &mut ComicDto,
+) -> Result<(), HentaiError> {
+    if let Some(size) = read_resource_size_with(access, path, &comic.resource_type)? {
         comic.resource_size = size;
     }
     Ok(())
 }
 
-fn try_reuse_existing(path: &Path, existing: &ComicDto, ctx: &ScanContext) -> bool {
-    if existing.path != path.to_string_lossy() {
+fn try_reuse_existing(
+    access: &dyn ResourceAccess,
+    path: &str,
+    existing: &ComicDto,
+    ctx: &ScanContext,
+) -> bool {
+    if existing.path != path {
         return false;
     }
-    let Ok(Some((modified_ms, size))) = read_source_stat(path, &existing.resource_type) else {
+    let Ok(Some((modified_ms, size))) = read_source_stat_with(access, path, &existing.resource_type)
+    else {
         return false;
     };
     if let Some((cached_ms, cached_size)) = ctx.thumbnail_stats.get(&existing.comic_id) {
@@ -166,13 +200,22 @@ fn try_reuse_existing(path: &Path, existing: &ComicDto, ctx: &ScanContext) -> bo
 mod tests {
     use super::*;
     use crate::comic::ComicDto;
+    use crate::resource::FakeResourceAccess;
     use crate::sync::handle::create_sync_handle;
     use std::collections::HashMap;
     use std::fs::File;
-    use std::io::Write;
+    use std::io::{Cursor, Write};
     use tempfile::TempDir;
     use zip::write::SimpleFileOptions;
     use zip::ZipWriter;
+
+    fn write_minimal_cbz(bytes: &mut Vec<u8>) {
+        let mut zip = ZipWriter::new(Cursor::new(bytes));
+        zip.start_file("01.jpg", SimpleFileOptions::default())
+            .expect("start");
+        zip.write_all(b"fake-jpeg").expect("write");
+        zip.finish().expect("finish");
+    }
 
     #[test]
     fn reuse_existing_refreshes_stale_resource_size() {
@@ -187,7 +230,7 @@ mod tests {
 
         let path_str = path.to_string_lossy().to_string();
         let comic_id = comic_id_for_path(&path_str);
-        let (modified_ms, size) = read_source_stat(&path, "cbz")
+        let (modified_ms, size) = read_source_stat_with(local_access(), &path_str, "cbz")
             .expect("stat")
             .expect("source stat");
         assert!(size > 0);
@@ -258,4 +301,37 @@ mod tests {
         assert_eq!(items.len(), 1);
         assert_eq!(items[0].resource_type, "dir");
     }
+
+    #[test]
+    fn fake_access_discovers_dir_and_cbz_without_disk_walk() {
+        let mut cbz = Vec::new();
+        write_minimal_cbz(&mut cbz);
+
+        let mut fake = FakeResourceAccess::new();
+        fake.insert_dir("/lib");
+        fake.insert_dir("/lib/folder");
+        fake.insert_file("/lib/folder/01.jpg", b"fake-jpeg");
+        fake.insert_file("/lib/comic.cbz", cbz);
+
+        let handle = create_sync_handle();
+        let ctx = ScanContext {
+            existing_by_id: HashMap::new(),
+            thumbnail_stats: HashMap::new(),
+        };
+        let items = scan_roots_with(
+            &fake,
+            &["/lib".to_string()],
+            &ctx,
+            &handle,
+            true,
+            &[FormatGroup::Folder, FormatGroup::Archive],
+        )
+        .expect("scan");
+        let mut paths: Vec<_> = items.iter().map(|i| i.path.as_str()).collect();
+        paths.sort();
+        assert_eq!(paths, vec!["/lib/comic.cbz", "/lib/folder"]);
+        assert!(items.iter().any(|i| i.resource_type == "dir"));
+        assert!(items.iter().any(|i| i.resource_type == "cbz"));
+    }
 }
+
