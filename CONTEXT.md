@@ -1,57 +1,77 @@
 # Hentai Library
 
-本地漫画（本子）个人库：从指定文件夹扫描资源、管理元数据、按系列组织，并在桌面端离线阅读。
+个人漫画库：用户可维护一个或多个 Library（本地磁盘根或 WebDAV 远程根），扫描 Resource、管理元数据、按系列组织，并阅读（本地可离线；远程为在线流式）。
 
 ## Language
 
 ### Library & resources
 
 **Library**:
-用户在本机维护的全部漫画集合，由 Library sync 导入的 Comic 与按 Folder series 自动生成的 Series 组成。
-_Avoid_: 书架（UI 语境可用，领域模型中用 Library）
+用户的一份漫画集合（趋近 Komga：一个 Library root 对应一个 Library），由该根下 Library sync 导入的 Comic 与 Folder series 组成；可有独立配置（如 Supported resource formats）。应用内可同时存在多个 Library。
+_Avoid_: 书架（UI 可用）；把「全部库合并」称作一个 Library
+
+**Current library**:
+用户当前选中的 Library；浏览与搜索默认作用于此。Reading history 跨 Library 全局可见。
+_Avoid_: 活动库、选中书架
+
+**Local library**:
+Library root 为本机目录的 Library；Resource 来自本地文件系统；入库后可离线阅读。
+_Avoid_: 本地书架、磁盘库（口语可用，文档用 Local library）
+
+**Remote library**:
+Library root 为 WebDAV 根的 Library；Resource 经 WebDAV 发现与流式读取；不整本落盘。
+_Avoid_: 云库、网盘库、在线书架（无官方云账号语义）
+
+**Library root**:
+一个 Library 的唯一根位置：Local（本机目录）或 Remote（WebDAV 根 URL）。扫描与对齐均相对该根。
+_Avoid_: 扫描路径、挂载点；Saved path（旧称，仅指 Local 根）
+
+**Saved path**:
+Local library 的 Library root 之旧称；兼容文档与实现中仍可能出现，新表述优先用 Library root / Local library。
+_Avoid_: 在新设计中把 Saved path 扩成远程 URI
 
 **Comic**:
-库中一条可阅读的独立作品，对应磁盘上的一个资源文件或图片目录。身份由规范化后的磁盘路径派生（`comicId`）；同一路径始终是同一 Comic。
+某个 Library 中一条可阅读的独立作品，对应一个 Resource（本地文件/目录，或远程 WebDAV 上的文件）。身份由规范化后的资源位置键派生（`comicId`）；同一位置键始终是同一 Comic。
 _Avoid_: 本子、作品、条目（口语可用，文档与 issue 中用 Comic）
 
 **Comic identity**:
-Comic 与磁盘位置绑定，而非内容哈希。移动或重命名资源文件会改变路径，从而生成新的 `comicId`；下次 Scan 时旧 Comic 及其用户元数据、阅读历史、Series 归属会被清除，不会自动迁移到新路径。
+Comic 与资源位置键绑定，而非内容哈希。本地为规范化磁盘路径；远程为规范化 WebDAV 资源 URL。位置变化（移动/重命名/改 URL）生成新 `comicId`；Library sync 时旧记录及其用户元数据、阅读历史、Series 归属按该库对齐规则处理，不会仅凭内容自动迁移。详见 ADR-0001。
 _Avoid_: 内容 ID、文件指纹
 
 **Resource**:
-磁盘上的原始文件或目录，扫描后若校验通过则入库为 Comic。解析得到的中间结果（路径、格式、页数、嵌入元数据等）在入库为 Comic 之前独立于 Comic 身份与用户元数据；Library sync / Metadata refresh / 阅读与缩略图共用同一套 Resource 解析规则。
+可被发现并（校验后）入库为 Comic 的原始载体：本地文件/目录，或 WebDAV 上的文件。解析中间结果在入库前独立于 Comic 身份与用户元数据；Library sync / Metadata refresh / 阅读与缩略图共用同一套 Resource 访问与解析规则（经 Resource access）。
 _Avoid_: 文件、素材
 
-**Saved path**:
-用户登记在库中的根目录路径；扫描时从这些路径向下发现 Resource。
-_Avoid_: 扫描路径、文件夹、目录（UI 可用，领域术语用 Saved path）
+**Resource access**:
+对 Library root 下资源的统一访问能力（列举、属性、打开只读流）；Local 走文件系统，Remote 走 WebDAV。Scan、阅读与缩略图生成均经此端口，不在 UI 层分叉协议。
+_Avoid_: VFS、存储驱动、网盘 SDK
 
 **Scan**:
-遍历 Saved path、发现 Resource 并解析元数据的过程；用户与 UI 中常用的说法（如「扫描库」）。
-_Avoid_: 导入、索引（未体现与磁盘对齐的删除语义）
+遍历当前（或指定）Library 的 Library root、发现 Resource 并做轻量登记或解析的过程；用户与 UI 中常用的说法（如「扫描库」）。
+_Avoid_: 导入、索引（未体现与根对齐的删除语义）
 
 **Library sync**:
-让 Library 与当前 Saved path 下磁盘内容对齐的完整操作：包含 Scan，并将结果写入数据库——新增缺失 Comic、按字段锁合并元数据后更新仍存在的 Comic、删除磁盘上已消失的 Comic。若所有 Saved path 被移除，则清空整个 Library。元数据合并见 Metadata field lock。写库后由 core 使阅读会话失效；与 Metadata refresh 共用库级写锁（全局单飞）。
+让某个 Library 与其 Library root 下内容对齐的完整操作：包含 Scan，并写库——新增缺失 Comic、按字段锁合并后更新仍存在的 Comic、删除根上已消失的 Comic。默认只 sync Current library（可配置为全部 Library）。Remote library 在根不可达（网络/鉴权失败）时跳过该库且不删除其已有 Comic。若某 Library 被移除，则清除该库及其 Comic/Series。元数据合并见 Metadata field lock。写库后由 core 使相关阅读会话失效；与 Metadata refresh 共用库级写锁。
 _Avoid_: 同步、刷新（太泛，未体现镜像语义）
 
 _Scan_ 与 _Library sync_ 在用户触发的场景中指同一操作；领域文档与 issue 优先使用 Library sync。
 
 **Supported resource formats**:
-用户可配置的、Library sync 会收录的 Resource 格式范围；按 Format group 勾选（漫画文件夹 / PDF / EPUB / 漫画压缩包）。偏好存于应用设置，每次 Library sync 传入 core；未启用分组下的 Resource 不进入扫描结果，库中对应 Comic 在该次 sync 按 orphan 删除。默认四组全开；取消勾选仅在下次 sync 生效，此前已入库 Comic 仍可展示与阅读。
-_Avoid_: 媒体类型（库页浏览筛选用语）、导入格式
+按 Library 配置的、Library sync 会收录的 Resource 格式范围；按 Format group 勾选。未启用分组下的 Resource 不进入该次扫描结果，库中对应 Comic 按 orphan 删除。默认值与 Local / Remote 首版能力见产品定位；取消勾选仅在下次 sync 生效。
+_Avoid_: 媒体类型（库页浏览筛选用语）、导入格式、全局唯一一份格式设置（已改为每库）
 
 **Format group**:
-Supported resource formats 的勾选单位：`folder`（`dir`）、`pdf`、`epub`、`archive`（zip/cbz/rar/cbr/7z/cb7）。分组到 `resource_type` 的展开由 core 维护。
+Supported resource formats 的勾选单位：`folder`（`dir`）、`pdf`、`epub`、`archive`（zip/cbz/rar/cbr/7z/cb7）。分组到 `resource_type` 的展开由 core 维护。Remote library 首版不收录 `folder`。
 _Avoid_: 扩展名列表（用户设置层用分组）
 
 ### Organization & metadata
 
 **Series**:
-库中有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。用户可编辑连载状态与计划总卷数（各字段可有 Metadata field lock）；成员默认顺序由 sync 按文件名自然排序写入。用户可在系列详情手动编辑单本排序值（`SeriesItem.order`，浮点数）；手动保存后会锁定该成员（`sortOrderLocked`），后续 sync 保留锁定项的排序值，未锁定项仍按文件名自然排序更新；也可解锁排序以在下次 sync 恢复文件名序。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series；不在任何 Series 中的 Comic 仍作为独立条目存在于 Library 中。
+同一 Library 内有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。不跨 Library。用户可编辑连载状态与计划总卷数（各字段可有 Metadata field lock）；成员默认顺序由 sync 按文件名自然排序写入。用户可在系列详情手动编辑单本排序值（`SeriesItem.order`，浮点数）；手动保存后会锁定该成员（`sortOrderLocked`），后续 sync 保留锁定项的排序值，未锁定项仍按文件名自然排序更新；也可解锁排序以在下次 sync 恢复文件名序。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series；不在任何 Series 中的 Comic 仍作为独立条目存在于其 Library 中。
 _Avoid_: 合集、专辑、套系
 
 **Folder series**:
-Comic 的直接父目录对应一个 Series；Saved path 根目录下直接存放的 Comic 也会形成以根文件夹命名的 Series。Series 身份由规范化 `folder_path` 派生（`seriesId`）。
+Comic 的直接父目录对应一个 Series；Library root 下直接存放的 Comic 也会形成以根名命名的 Series。Series 身份由规范化 `folder_path`（含远程位置键时的父路径）派生（`seriesId`），且隶属于所属 Library。
 _Avoid_: 标题推断、自动分组
 
 **Tag**:
@@ -79,7 +99,7 @@ Comic / Series 元数据字段上的布尔锁（Komga 式）。未锁定且 Libr
 _Avoid_: 只读标记、冻结、保护位（口语可用，领域用 Metadata field lock）
 
 **Metadata refresh**:
-对单个 Comic 或 Series 从磁盘 Resource 重解析元数据并按 Metadata field lock 写回的操作（对齐 Komga「Refresh metadata」）。Comic：重解析该 Resource，更新物理字段，不动缩略图。Series：对每个成员执行 Comic 刷新，并在 `name` 未锁定时用文件夹名覆盖；不改连载状态、计划总卷数、成员排序与缩略图；部分成员失败则跳过并汇总。与 Library sync 共用 core 库级写锁（全局单飞）；互斥不在 Flutter 编排层重复实现。不是库页工具栏的「刷新」（后者仅重载 UI catalog），也不是全库 Library sync。
+对单个 Comic 或 Series 从 Resource 重解析元数据并按 Metadata field lock 写回的操作（对齐 Komga「Refresh metadata」）。Comic：经 Resource access 重解析，更新物理字段，不动缩略图。Series：对每个成员执行 Comic 刷新，并在 `name` 未锁定时用文件夹名覆盖；不改连载状态、计划总卷数、成员排序与缩略图；部分成员失败则跳过并汇总。与 Library sync 共用 core 库级写锁（全局单飞）；互斥不在 Flutter 编排层重复实现。不是库页工具栏的「刷新」（后者仅重载 UI catalog），也不是 Library sync。
 _Avoid_: 刷新、重新扫描、同步（易与 UI catalog refresh / Library sync 混淆）
 
 **Healthy mode**:
@@ -89,7 +109,7 @@ _Avoid_: 安全模式、青少年模式、R18 过滤
 ### Reading
 
 **Read session**:
-由 comicId 打开的阅读会话；不区分「单本 / 系列」两种模式。进度只写入 Reading history。入口参数仅为 comicId（及无痕等开关），不传 seriesId。退出阅读器一律回到该 Comic 的详情页。详见 ADR-0005。
+由 comicId 打开的阅读会话；不区分「单本 / 系列」两种模式。进度只写入 Reading history。入口参数仅为 comicId（及无痕等开关），不传 seriesId。退出阅读器一律回到该 Comic 的详情页。Local library 可读本地文件；Remote library 经 Resource access 流式读取，不整本缓存到磁盘。详见 ADR-0005。
 _Avoid_: Standalone read、Series read、单本模式、系列模式、Comic read（易与 Comic 实体混淆）
 
 **Series reading context**:
@@ -97,7 +117,7 @@ _Avoid_: Standalone read、Series read、单本模式、系列模式、Comic rea
 _Avoid_: 系列阅读模式、Series read、系列会话
 
 **Reading history**:
-用户对某 Comic 最近一次阅读的时间与页码记录。从库/详情/历史等重新打开该 Comic 时恢复页码；阅读器内切到同系列另一卷时，先落盘当前 Comic 进度（无痕除外），目标卷从第 1 页打开。无痕 Read session 不读写 Reading history。
+用户对某 Comic 最近一次阅读的时间与页码记录；跨 Library 全局保留与展示。从库/详情/历史等重新打开该 Comic 时恢复页码；阅读器内切到同系列另一卷时，先落盘当前 Comic 进度（无痕除外），目标卷从第 1 页打开。无痕 Read session 不读写 Reading history。
 _Avoid_: 阅读记录、系列进度、Series reading history
 
 **Scroll layout**:
