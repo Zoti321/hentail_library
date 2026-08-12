@@ -1,12 +1,22 @@
 import 'package:hentai_library/domain/library/format_group.dart';
 
-/// 本地库轻量快照（FRB LibraryDto → domain）。
+/// Library 轻量快照（FRB LibraryDto → domain）。含 Local 与 Remote。
 typedef LocalLibrary = ({
   String libraryId,
+  /// `local` | `remote`
+  String kind,
   String rootPath,
   String name,
   List<FormatGroup> enabledFormatGroups,
+  /// Remote Basic 用户名；Local 为空。
+  String username,
+  /// Remote 显式允许 HTTP；Local 恒为 false。
+  bool allowHttp,
 });
+
+bool isRemoteLibrary(LocalLibrary library) => library.kind == 'remote';
+
+bool isLocalLibrary(LocalLibrary library) => library.kind != 'remote';
 
 String localLibraryDisplayName(LocalLibrary library) {
   final String trimmed = library.name.trim();

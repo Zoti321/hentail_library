@@ -286,6 +286,73 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pathsLoadFailed => '路径加载失败';
 
   @override
+  String get pathsLibraryKindLocal => '本地';
+
+  @override
+  String get pathsLibraryKindRemote => '远程';
+
+  @override
+  String get remoteLibraryAddButton => '添加远程库';
+
+  @override
+  String get remoteLibraryAddedToast => '已添加远程库';
+
+  @override
+  String get remoteLibraryUpdatedToast => '已更新远程库';
+
+  @override
+  String get remoteLibraryAddTitle => '添加远程库';
+
+  @override
+  String get remoteLibraryEditTitle => '编辑远程库';
+
+  @override
+  String get remoteLibraryFormHint =>
+      '填写 WebDAV 根地址与 Basic 凭证。密码保存在系统安全存储，不会写入本地数据库。';
+
+  @override
+  String get remoteLibraryUrlLabel => 'WebDAV 根 URL';
+
+  @override
+  String get remoteLibraryUrlHint => '例如 nas.local/webdav 或 https://…';
+
+  @override
+  String get remoteLibraryUrlRequired => '请填写 WebDAV 根 URL';
+
+  @override
+  String get remoteLibraryHttpRequiresAllow => '使用 HTTP 时请先开启「允许 HTTP」';
+
+  @override
+  String get remoteLibraryUsernameLabel => '用户名';
+
+  @override
+  String get remoteLibraryPasswordLabel => '密码';
+
+  @override
+  String get remoteLibraryPasswordEditLabel => '密码（留空则不修改）';
+
+  @override
+  String get remoteLibraryPasswordKeepHint => '留空表示保持原密码';
+
+  @override
+  String get remoteLibraryPasswordRequired => '请填写密码';
+
+  @override
+  String get remoteLibraryAllowHttpLabel => '允许 HTTP';
+
+  @override
+  String get remoteLibraryAllowHttpOn => '已允许明文 HTTP（仅建议局域网）';
+
+  @override
+  String get remoteLibraryAllowHttpOff => '仅 HTTPS（默认）';
+
+  @override
+  String get remoteLibraryEditAction => '编辑远程库';
+
+  @override
+  String get commonAdd => '添加';
+
+  @override
   String get notFoundTitle => '页面不存在';
 
   @override

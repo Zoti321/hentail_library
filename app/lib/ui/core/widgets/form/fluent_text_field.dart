@@ -13,6 +13,7 @@ class FluentTextField extends StatefulWidget {
   final bool autofocus;
   final bool enabled;
   final TextInputType? keyboardType;
+  final bool obscureText;
 
   /// When true, reduces vertical padding for single-line fields (dialog forms).
   final bool isDense;
@@ -30,6 +31,7 @@ class FluentTextField extends StatefulWidget {
     this.autofocus = false,
     this.enabled = true,
     this.keyboardType,
+    this.obscureText = false,
     this.isDense = false,
   });
 
@@ -107,12 +109,13 @@ class FluentTextFieldState extends State<FluentTextField> {
               autofocus: widget.autofocus,
               enabled: widget.enabled,
               keyboardType: widget.keyboardType,
+              obscureText: widget.obscureText,
               onChanged: widget.onChanged,
               onSubmitted: widget.onSubmitted,
               textInputAction: widget.maxLines > 1
                   ? TextInputAction.newline
                   : TextInputAction.done,
-              maxLines: widget.maxLines,
+              maxLines: widget.obscureText ? 1 : widget.maxLines,
               style: TextStyle(
                 fontSize: tokens.text.bodyMd,
                 color: textColor,

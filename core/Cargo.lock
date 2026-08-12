@@ -1218,6 +1218,7 @@ dependencies = [
  "tokio",
  "tracing",
  "unrar-ng",
+ "url",
  "walkdir",
  "zip",
 ]

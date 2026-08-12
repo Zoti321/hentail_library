@@ -1,8 +1,9 @@
 use hentai_core::{
-    create_local_library as core_create, delete_library as core_delete,
-    get_current_library_id as core_get_current, list_libraries as core_list,
-    set_current_library_id as core_set_current,
-    update_library_format_groups as core_update_formats, FormatGroup as CoreFormatGroup,
+    create_local_library as core_create_local, create_remote_library as core_create_remote,
+    delete_library as core_delete, get_current_library_id as core_get_current,
+    list_libraries as core_list, set_current_library_id as core_set_current,
+    update_library_format_groups as core_update_formats,
+    update_remote_library as core_update_remote, FormatGroup as CoreFormatGroup,
     LibraryDto as CoreLibrary,
 };
 
@@ -17,6 +18,8 @@ pub struct LibraryDto {
     pub name: String,
     pub enabled_format_groups: Vec<FormatGroupDto>,
     pub created_at: i64,
+    pub username: String,
+    pub allow_http: bool,
 }
 
 impl From<CoreLibrary> for LibraryDto {
@@ -32,6 +35,8 @@ impl From<CoreLibrary> for LibraryDto {
                 .map(map_format_group)
                 .collect(),
             created_at: value.created_at,
+            username: value.username,
+            allow_http: value.allow_http,
         }
     }
 }
@@ -63,9 +68,37 @@ pub fn list_libraries_frb() -> Result<Vec<LibraryDto>, HentaiErrorDto> {
 
 #[flutter_rust_bridge::frb(sync)]
 pub fn create_local_library_frb(root_path: String) -> Result<LibraryDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_create(&root_path))
+    hentai_core::runtime::block_on(core_create_local(&root_path))
         .map(LibraryDto::from)
         .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn create_remote_library_frb(
+    root_url: String,
+    username: String,
+    allow_http: bool,
+) -> Result<LibraryDto, HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_create_remote(&root_url, &username, allow_http))
+        .map(LibraryDto::from)
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn update_remote_library_frb(
+    library_id: String,
+    root_url: String,
+    username: String,
+    allow_http: bool,
+) -> Result<LibraryDto, HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_update_remote(
+        &library_id,
+        &root_url,
+        &username,
+        allow_http,
+    ))
+    .map(LibraryDto::from)
+    .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]

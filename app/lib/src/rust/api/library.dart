@@ -19,6 +19,28 @@ LibraryDto createLocalLibraryFrb({required String rootPath}) => RustLib
     .api
     .crateApiLibraryCreateLocalLibraryFrb(rootPath: rootPath);
 
+LibraryDto createRemoteLibraryFrb({
+  required String rootUrl,
+  required String username,
+  required bool allowHttp,
+}) => RustLib.instance.api.crateApiLibraryCreateRemoteLibraryFrb(
+  rootUrl: rootUrl,
+  username: username,
+  allowHttp: allowHttp,
+);
+
+LibraryDto updateRemoteLibraryFrb({
+  required String libraryId,
+  required String rootUrl,
+  required String username,
+  required bool allowHttp,
+}) => RustLib.instance.api.crateApiLibraryUpdateRemoteLibraryFrb(
+  libraryId: libraryId,
+  rootUrl: rootUrl,
+  username: username,
+  allowHttp: allowHttp,
+);
+
 void deleteLibraryFrb({required String libraryId}) =>
     RustLib.instance.api.crateApiLibraryDeleteLibraryFrb(libraryId: libraryId);
 
@@ -43,6 +65,8 @@ class LibraryDto {
   final String name;
   final List<FormatGroupDto> enabledFormatGroups;
   final PlatformInt64 createdAt;
+  final String username;
+  final bool allowHttp;
 
   const LibraryDto({
     required this.libraryId,
@@ -51,6 +75,8 @@ class LibraryDto {
     required this.name,
     required this.enabledFormatGroups,
     required this.createdAt,
+    required this.username,
+    required this.allowHttp,
   });
 
   @override
@@ -60,7 +86,9 @@ class LibraryDto {
       rootPath.hashCode ^
       name.hashCode ^
       enabledFormatGroups.hashCode ^
-      createdAt.hashCode;
+      createdAt.hashCode ^
+      username.hashCode ^
+      allowHttp.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -72,5 +100,7 @@ class LibraryDto {
           rootPath == other.rootPath &&
           name == other.name &&
           enabledFormatGroups == other.enabledFormatGroups &&
-          createdAt == other.createdAt;
+          createdAt == other.createdAt &&
+          username == other.username &&
+          allowHttp == other.allowHttp;
 }

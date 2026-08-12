@@ -1,3 +1,7 @@
+mod webdav_root;
+
+pub use webdav_root::{library_id_from_webdav_root, normalize_webdav_root};
+
 use std::path::Path;
 
 use sea_orm::{
@@ -16,7 +20,13 @@ use crate::sync::writer::delete_comics_side_effects;
 
 const PREF_CURRENT_LIBRARY_ID: &str = "current_library_id";
 const KIND_LOCAL: &str = "local";
+const KIND_REMOTE: &str = "remote";
 const DEFAULT_FORMAT_GROUPS: [FormatGroup; 4] = FormatGroup::ALL;
+const REMOTE_DEFAULT_FORMAT_GROUPS: [FormatGroup; 3] = [
+    FormatGroup::Pdf,
+    FormatGroup::Epub,
+    FormatGroup::Archive,
+];
 
 #[derive(Debug, Clone)]
 pub struct LibraryDto {
@@ -26,6 +36,8 @@ pub struct LibraryDto {
     pub name: String,
     pub enabled_format_groups: Vec<FormatGroup>,
     pub created_at: i64,
+    pub username: String,
+    pub allow_http: bool,
 }
 
 /// SHA1 of `library:` + normalize_path_for_key(root) — distinct from comic_id.
@@ -95,6 +107,24 @@ fn library_name_from_root(root: &str) -> String {
         .to_string()
 }
 
+fn library_name_from_webdav_root(root: &str) -> String {
+    let trimmed = root.trim().trim_end_matches('/');
+    if let Ok(url) = url::Url::parse(trimmed) {
+        let path = url.path().trim_matches('/');
+        if !path.is_empty() {
+            if let Some(last) = path.rsplit('/').next() {
+                if !last.is_empty() {
+                    return last.to_string();
+                }
+            }
+        }
+        if let Some(host) = url.host_str() {
+            return host.to_string();
+        }
+    }
+    library_name_from_root(trimmed)
+}
+
 fn model_to_dto(model: libraries::Model) -> LibraryDto {
     LibraryDto {
         library_id: model.library_id,
@@ -103,6 +133,8 @@ fn model_to_dto(model: libraries::Model) -> LibraryDto {
         name: model.name,
         enabled_format_groups: parse_format_groups_json(&model.enabled_format_groups),
         created_at: model.created_at,
+        username: model.username,
+        allow_http: model.allow_http != 0,
     }
 }
 
@@ -143,6 +175,9 @@ pub async fn create_local_library(root_path: &str) -> Result<LibraryDto, HentaiE
     let existing_libs = list_libraries().await?;
     let new_key = normalize_path_for_key(root);
     for lib in &existing_libs {
+        if lib.kind != KIND_LOCAL {
+            continue;
+        }
         let other = normalize_path_for_key(&lib.root_path);
         if other.is_empty() || new_key.is_empty() {
             continue;
@@ -165,6 +200,8 @@ pub async fn create_local_library(root_path: &str) -> Result<LibraryDto, HentaiE
         name: library_name_from_root(root),
         enabled_format_groups: DEFAULT_FORMAT_GROUPS.to_vec(),
         created_at: now_ms(),
+        username: String::new(),
+        allow_http: false,
     };
     let active = libraries::ActiveModel {
         library_id: Set(dto.library_id.clone()),
@@ -173,6 +210,8 @@ pub async fn create_local_library(root_path: &str) -> Result<LibraryDto, HentaiE
         name: Set(dto.name.clone()),
         enabled_format_groups: Set(serialize_format_groups(&dto.enabled_format_groups)),
         created_at: Set(dto.created_at),
+        username: Set(String::new()),
+        allow_http: Set(0),
     };
     Libraries::insert(active)
         .exec(&db)
@@ -182,6 +221,121 @@ pub async fn create_local_library(root_path: &str) -> Result<LibraryDto, HentaiE
         set_current_library_id_inner(&db, Some(&dto.library_id)).await?;
     }
     Ok(dto)
+}
+
+pub async fn create_remote_library(
+    root_url: &str,
+    username: &str,
+    allow_http: bool,
+) -> Result<LibraryDto, HentaiError> {
+    let root = normalize_webdav_root(root_url, allow_http)?;
+    let user = username.trim().to_string();
+    let db = connection()?;
+    let library_id = library_id_from_webdav_root(&root);
+
+    if let Some(existing) = Libraries::find_by_id(library_id.clone())
+        .one(&db)
+        .await
+        .map_err(map_db_err)?
+    {
+        return update_existing_remote(existing, &root, &user, allow_http).await;
+    }
+    if let Some(existing) = Libraries::find()
+        .filter(libraries::Column::RootPath.eq(root.clone()))
+        .one(&db)
+        .await
+        .map_err(map_db_err)?
+    {
+        return update_existing_remote(existing, &root, &user, allow_http).await;
+    }
+
+    let count = list_libraries().await?.len();
+    let dto = LibraryDto {
+        library_id: library_id.clone(),
+        kind: KIND_REMOTE.to_string(),
+        root_path: root.clone(),
+        name: library_name_from_webdav_root(&root),
+        enabled_format_groups: REMOTE_DEFAULT_FORMAT_GROUPS.to_vec(),
+        created_at: now_ms(),
+        username: user.clone(),
+        allow_http,
+    };
+    let active = libraries::ActiveModel {
+        library_id: Set(dto.library_id.clone()),
+        kind: Set(dto.kind.clone()),
+        root_path: Set(dto.root_path.clone()),
+        name: Set(dto.name.clone()),
+        enabled_format_groups: Set(serialize_format_groups(&dto.enabled_format_groups)),
+        created_at: Set(dto.created_at),
+        username: Set(user),
+        allow_http: Set(if allow_http { 1 } else { 0 }),
+    };
+    Libraries::insert(active)
+        .exec(&db)
+        .await
+        .map_err(map_db_err)?;
+    if count == 0 {
+        set_current_library_id_inner(&db, Some(&dto.library_id)).await?;
+    }
+    Ok(dto)
+}
+
+pub async fn update_remote_library(
+    library_id: &str,
+    root_url: &str,
+    username: &str,
+    allow_http: bool,
+) -> Result<LibraryDto, HentaiError> {
+    let id = library_id.trim();
+    if id.is_empty() {
+        return Err(HentaiError::validation("library_id 不能为空"));
+    }
+    let root = normalize_webdav_root(root_url, allow_http)?;
+    let user = username.trim().to_string();
+    let db = connection()?;
+    let Some(model) = Libraries::find_by_id(id.to_string())
+        .one(&db)
+        .await
+        .map_err(map_db_err)?
+    else {
+        return Err(HentaiError::validation(format!("Library 不存在: {id}")));
+    };
+    if model.kind != KIND_REMOTE {
+        return Err(HentaiError::validation("仅 Remote library 可更新 WebDAV 根"));
+    }
+
+    // Prevent colliding with another library's root_path.
+    if let Some(other) = Libraries::find()
+        .filter(libraries::Column::RootPath.eq(root.clone()))
+        .one(&db)
+        .await
+        .map_err(map_db_err)?
+    {
+        if other.library_id != id {
+            return Err(HentaiError::validation("WebDAV 根已被其他 Library 使用"));
+        }
+    }
+
+    update_existing_remote(model, &root, &user, allow_http).await
+}
+
+async fn update_existing_remote(
+    model: libraries::Model,
+    root: &str,
+    username: &str,
+    allow_http: bool,
+) -> Result<LibraryDto, HentaiError> {
+    if model.kind != KIND_REMOTE {
+        return Err(HentaiError::validation("仅 Remote library 可更新 WebDAV 根"));
+    }
+    let db = connection()?;
+    let mut active: libraries::ActiveModel = model.into();
+    active.root_path = Set(root.to_string());
+    active.name = Set(library_name_from_webdav_root(root));
+    active.username = Set(username.to_string());
+    active.allow_http = Set(if allow_http { 1 } else { 0 });
+    let updated = active.update(&db).await.map_err(map_db_err)?;
+    Ok(model_to_dto(updated))
 }
 
 pub async fn delete_library(library_id: &str) -> Result<(), HentaiError> {

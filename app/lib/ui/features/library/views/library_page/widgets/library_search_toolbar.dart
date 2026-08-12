@@ -200,6 +200,9 @@ class _CurrentLibrarySwitcherMenu extends StatelessWidget {
               .map(
                 (LocalLibrary library) => _CurrentLibrarySwitcherMenuItem(
                   label: localLibraryDisplayName(library),
+                  kindLabel: isRemoteLibrary(library)
+                      ? context.l10n.pathsLibraryKindRemote
+                      : context.l10n.pathsLibraryKindLocal,
                   isSelected: library.libraryId == currentId,
                   onTap: () => onSelected(library.libraryId),
                 ),
@@ -214,11 +217,13 @@ class _CurrentLibrarySwitcherMenu extends StatelessWidget {
 class _CurrentLibrarySwitcherMenuItem extends StatelessWidget {
   const _CurrentLibrarySwitcherMenuItem({
     required this.label,
+    required this.kindLabel,
     required this.isSelected,
     required this.onTap,
   });
 
   final String label;
+  final String kindLabel;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -235,15 +240,29 @@ class _CurrentLibrarySwitcherMenuItem extends StatelessWidget {
           child: Row(
             children: <Widget>[
               Expanded(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    color: isSelected ? cs.primary : cs.hentai.textPrimary,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w500,
+                        color:
+                            isSelected ? cs.primary : cs.hentai.textPrimary,
+                      ),
+                    ),
+                    Text(
+                      kindLabel,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: cs.hentai.textTertiary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               if (isSelected)

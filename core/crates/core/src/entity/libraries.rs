@@ -11,6 +11,10 @@ pub struct Model {
     pub name: String,
     pub enabled_format_groups: String,
     pub created_at: i64,
+    /// Basic auth username for Remote library; empty for Local.
+    pub username: String,
+    /// Explicit HTTP opt-in for Remote library; always false for Local.
+    pub allow_http: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

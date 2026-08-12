@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/widgets/path_tile.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -15,12 +16,9 @@ class SelectedPathsListCard extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final l10n = context.l10n;
 
-    final List<String> paths = ref.watch(
-      selectedPathsPageProvider.select(
-        (AsyncValue<SelectedPathsPageState> async) =>
-            async.asData?.value.paths ?? const <String>[],
-      ),
-    );
+    final List<LocalLibrary> libraries =
+        ref.watch(currentLibraryProvider).asData?.value.libraries ??
+        const <LocalLibrary>[];
 
     return Container(
       decoration: BoxDecoration(
@@ -67,7 +65,7 @@ class SelectedPathsListCard extends ConsumerWidget {
                   ),
                   const Spacer(),
                   Text(
-                    l10n.pathsTotalCount(paths.length),
+                    l10n.pathsTotalCount(libraries.length),
                     style: TextStyle(
                       fontSize: 12,
                       color: theme.colorScheme.hentai.textTertiary,
@@ -76,20 +74,19 @@ class SelectedPathsListCard extends ConsumerWidget {
                 ],
               ),
             ),
-            if (paths.isEmpty)
+            if (libraries.isEmpty)
               _EmptyPaths(l10n: l10n)
             else
               ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: paths.length,
+                itemCount: libraries.length,
                 separatorBuilder: (_, int index) => Divider(
                   height: 1,
                   color: theme.colorScheme.hentai.borderSubtle,
                 ),
                 itemBuilder: (BuildContext context, int index) {
-                  final String path = paths[index];
-                  return PathTile(path: path);
+                  return PathTile(library: libraries[index]);
                 },
               ),
           ],

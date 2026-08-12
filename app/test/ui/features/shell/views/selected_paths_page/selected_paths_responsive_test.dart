@@ -100,9 +100,12 @@ class _FakeCurrentLibraryNotifier extends CurrentLibraryNotifier {
   Future<CurrentLibraryState> build() async {
     const LocalLibrary library = (
       libraryId: 'lib1',
+      kind: 'local',
       rootPath: 'C:\\comics',
       name: 'comics',
       enabledFormatGroups: FormatGroup.all,
+      username: '',
+      allowHttp: false,
     );
     return const CurrentLibraryState(
       libraries: <LocalLibrary>[library],

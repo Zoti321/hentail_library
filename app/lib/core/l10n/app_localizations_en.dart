@@ -297,6 +297,75 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pathsLoadFailed => 'Failed to load paths';
 
   @override
+  String get pathsLibraryKindLocal => 'Local';
+
+  @override
+  String get pathsLibraryKindRemote => 'Remote';
+
+  @override
+  String get remoteLibraryAddButton => 'Add remote library';
+
+  @override
+  String get remoteLibraryAddedToast => 'Remote library added';
+
+  @override
+  String get remoteLibraryUpdatedToast => 'Remote library updated';
+
+  @override
+  String get remoteLibraryAddTitle => 'Add Remote library';
+
+  @override
+  String get remoteLibraryEditTitle => 'Edit Remote library';
+
+  @override
+  String get remoteLibraryFormHint =>
+      'Enter the WebDAV root URL and Basic credentials. The password is stored in platform secure storage and never written to the local database.';
+
+  @override
+  String get remoteLibraryUrlLabel => 'WebDAV root URL';
+
+  @override
+  String get remoteLibraryUrlHint => 'e.g. nas.local/webdav or https://…';
+
+  @override
+  String get remoteLibraryUrlRequired => 'WebDAV root URL is required';
+
+  @override
+  String get remoteLibraryHttpRequiresAllow =>
+      'Turn on “Allow HTTP” before using an http:// URL';
+
+  @override
+  String get remoteLibraryUsernameLabel => 'Username';
+
+  @override
+  String get remoteLibraryPasswordLabel => 'Password';
+
+  @override
+  String get remoteLibraryPasswordEditLabel => 'Password (leave blank to keep)';
+
+  @override
+  String get remoteLibraryPasswordKeepHint =>
+      'Leave blank to keep the current password';
+
+  @override
+  String get remoteLibraryPasswordRequired => 'Password is required';
+
+  @override
+  String get remoteLibraryAllowHttpLabel => 'Allow HTTP';
+
+  @override
+  String get remoteLibraryAllowHttpOn => 'HTTP allowed (LAN only recommended)';
+
+  @override
+  String get remoteLibraryAllowHttpOff => 'HTTPS only (default)';
+
+  @override
+  String get remoteLibraryEditAction => 'Edit remote library';
+
+  @override
+  String get commonAdd => 'Add';
+
+  @override
   String get notFoundTitle => 'Page not found';
 
   @override

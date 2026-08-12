@@ -548,6 +548,138 @@ abstract class AppLocalizations {
   /// **'路径加载失败'**
   String get pathsLoadFailed;
 
+  /// No description provided for @pathsLibraryKindLocal.
+  ///
+  /// In zh, this message translates to:
+  /// **'本地'**
+  String get pathsLibraryKindLocal;
+
+  /// No description provided for @pathsLibraryKindRemote.
+  ///
+  /// In zh, this message translates to:
+  /// **'远程'**
+  String get pathsLibraryKindRemote;
+
+  /// No description provided for @remoteLibraryAddButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加远程库'**
+  String get remoteLibraryAddButton;
+
+  /// No description provided for @remoteLibraryAddedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已添加远程库'**
+  String get remoteLibraryAddedToast;
+
+  /// No description provided for @remoteLibraryUpdatedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已更新远程库'**
+  String get remoteLibraryUpdatedToast;
+
+  /// No description provided for @remoteLibraryAddTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加远程库'**
+  String get remoteLibraryAddTitle;
+
+  /// No description provided for @remoteLibraryEditTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑远程库'**
+  String get remoteLibraryEditTitle;
+
+  /// No description provided for @remoteLibraryFormHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'填写 WebDAV 根地址与 Basic 凭证。密码保存在系统安全存储，不会写入本地数据库。'**
+  String get remoteLibraryFormHint;
+
+  /// No description provided for @remoteLibraryUrlLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'WebDAV 根 URL'**
+  String get remoteLibraryUrlLabel;
+
+  /// No description provided for @remoteLibraryUrlHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'例如 nas.local/webdav 或 https://…'**
+  String get remoteLibraryUrlHint;
+
+  /// No description provided for @remoteLibraryUrlRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'请填写 WebDAV 根 URL'**
+  String get remoteLibraryUrlRequired;
+
+  /// No description provided for @remoteLibraryHttpRequiresAllow.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用 HTTP 时请先开启「允许 HTTP」'**
+  String get remoteLibraryHttpRequiresAllow;
+
+  /// No description provided for @remoteLibraryUsernameLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户名'**
+  String get remoteLibraryUsernameLabel;
+
+  /// No description provided for @remoteLibraryPasswordLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码'**
+  String get remoteLibraryPasswordLabel;
+
+  /// No description provided for @remoteLibraryPasswordEditLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码（留空则不修改）'**
+  String get remoteLibraryPasswordEditLabel;
+
+  /// No description provided for @remoteLibraryPasswordKeepHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'留空表示保持原密码'**
+  String get remoteLibraryPasswordKeepHint;
+
+  /// No description provided for @remoteLibraryPasswordRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'请填写密码'**
+  String get remoteLibraryPasswordRequired;
+
+  /// No description provided for @remoteLibraryAllowHttpLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许 HTTP'**
+  String get remoteLibraryAllowHttpLabel;
+
+  /// No description provided for @remoteLibraryAllowHttpOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'已允许明文 HTTP（仅建议局域网）'**
+  String get remoteLibraryAllowHttpOn;
+
+  /// No description provided for @remoteLibraryAllowHttpOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅 HTTPS（默认）'**
+  String get remoteLibraryAllowHttpOff;
+
+  /// No description provided for @remoteLibraryEditAction.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑远程库'**
+  String get remoteLibraryEditAction;
+
+  /// No description provided for @commonAdd.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加'**
+  String get commonAdd;
+
   /// No description provided for @notFoundTitle.
   ///
   /// In zh, this message translates to:

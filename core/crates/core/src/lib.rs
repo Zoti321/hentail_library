@@ -35,9 +35,10 @@ pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_
 pub use db::{connection, db_config, init_db, init_db_at_path};
 pub use error::{HentaiError, HentaiErrorCode};
 pub use library::{
-    create_local_library, delete_library, get_current_library_id, library_id_from_root,
-    list_libraries, parse_format_groups_json, resolve_browse_library_id,
-    serialize_format_groups, set_current_library_id, update_library_format_groups, LibraryDto,
+    create_local_library, create_remote_library, delete_library, get_current_library_id,
+    library_id_from_root, library_id_from_webdav_root, list_libraries, normalize_webdav_root,
+    parse_format_groups_json, resolve_browse_library_id, serialize_format_groups,
+    set_current_library_id, update_library_format_groups, update_remote_library, LibraryDto,
 };
 pub use path::{add_path, list_all_paths, remove_path, watch_paths};
 pub use sync::{
