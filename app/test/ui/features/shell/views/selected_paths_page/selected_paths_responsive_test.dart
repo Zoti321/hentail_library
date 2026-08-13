@@ -5,8 +5,6 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
-import 'package:hentai_library/ui/features/shell/view_models/selected_paths_page_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_page.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:riverpod/misc.dart' show Override;
