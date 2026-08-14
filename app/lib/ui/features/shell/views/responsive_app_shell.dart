@@ -59,6 +59,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
     required bool isExpanded,
     bool showCollapseToggle = true,
     bool applyDrawerTopInset = false,
+    VoidCallback? onLibrariesNavigate,
     required VoidCallback onToggleExpanded,
     required ValueChanged<String> onDestinationSelected,
   }) {
@@ -78,6 +79,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
             expandProgress: expandProgress,
             labelOpacity: labelOpacity,
             showCollapsedTooltip: showCollapsedTooltip,
+            onNavigate: onLibrariesNavigate,
           ),
     );
   }
@@ -120,6 +122,9 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
                     isExpanded: true,
                     showCollapseToggle: false,
                     applyDrawerTopInset: true,
+                    onLibrariesNavigate: () {
+                      appShellScaffoldKey.currentState?.closeDrawer();
+                    },
                     onToggleExpanded: () => Navigator.of(context).pop(),
                     onDestinationSelected: (String id) {
                       Navigator.of(context).pop();

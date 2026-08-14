@@ -21,11 +21,15 @@ class LibrariesSidebarSection extends ConsumerWidget {
     required this.expandProgress,
     required this.labelOpacity,
     required this.showCollapsedTooltip,
+    this.onNavigate,
   });
 
   final double expandProgress;
   final double labelOpacity;
   final bool showCollapsedTooltip;
+
+  /// Called before route changes (e.g. close the compact navigation drawer).
+  final VoidCallback? onNavigate;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -47,6 +51,7 @@ class LibrariesSidebarSection extends ConsumerWidget {
         isActive: librariesRailIconActive(selection),
         libraries: libraries,
         showCollapsedTooltip: showCollapsedTooltip,
+        onNavigate: onNavigate,
       );
     }
 
@@ -57,7 +62,10 @@ class LibrariesSidebarSection extends ConsumerWidget {
           isActive: selection.sectionActive,
           expandProgress: expandProgress,
           labelOpacity: labelOpacity,
-          onTap: () => LibraryManagementActions.goAllLibraries(context),
+          onTap: () {
+            LibraryManagementActions.goAllLibraries(context);
+            onNavigate?.call();
+          },
         ),
         ...libraries.map(
           (LocalLibrary library) => _LibrarySidebarRow(
@@ -65,6 +73,7 @@ class LibrariesSidebarSection extends ConsumerWidget {
             isActive: selection.activeLibraryId == library.libraryId,
             expandProgress: expandProgress,
             labelOpacity: labelOpacity,
+            onNavigate: onNavigate,
           ),
         ),
       ],
@@ -109,12 +118,14 @@ class _LibrarySidebarRow extends ConsumerWidget {
     required this.isActive,
     required this.expandProgress,
     required this.labelOpacity,
+    this.onNavigate,
   });
 
   final LocalLibrary library;
   final bool isActive;
   final double expandProgress;
   final double labelOpacity;
+  final VoidCallback? onNavigate;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -125,11 +136,14 @@ class _LibrarySidebarRow extends ConsumerWidget {
       leading: null,
       label: localLibraryDisplayName(library),
       indentWithoutIcon: true,
-      onTap: () => LibraryManagementActions.openLibrary(
-        ref,
-        context,
-        library.libraryId,
-      ),
+      onTap: () async {
+        await LibraryManagementActions.openLibrary(
+          ref,
+          context,
+          library.libraryId,
+        );
+        onNavigate?.call();
+      },
       trailing: _LibraryOverflowMenuButton(library: library),
     );
   }
@@ -140,11 +154,15 @@ class _CollapsedLibrariesButton extends HookConsumerWidget {
     required this.isActive,
     required this.libraries,
     required this.showCollapsedTooltip,
+    this.onNavigate,
   });
 
   final bool isActive;
   final List<LocalLibrary> libraries;
   final bool showCollapsedTooltip;
+  final VoidCallback? onNavigate;
+
+  static const double _kMenuMaxWidth = 240;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -170,7 +188,7 @@ class _CollapsedLibrariesButton extends HookConsumerWidget {
       verticalMargin: tokens.spacing.xs,
       horizontalMargin: tokens.spacing.sm,
       menuBuilder: () => PopupMenuPanelShell(
-        width: 220,
+        maxWidth: _kMenuMaxWidth,
         blurRadius: 6,
         shadowOffset: const Offset(4, 0),
         borderRadius: tokens.radius.xs,
@@ -199,13 +217,14 @@ class _CollapsedLibrariesButton extends HookConsumerWidget {
               ...libraries.map(
                 (LocalLibrary library) => _PopupMenuItem(
                   label: localLibraryDisplayName(library),
-                  onTap: () {
+                  onTap: () async {
                     controller.hideMenu();
-                    LibraryManagementActions.openLibrary(
+                    await LibraryManagementActions.openLibrary(
                       ref,
                       context,
                       library.libraryId,
                     );
+                    onNavigate?.call();
                   },
                 ),
               ),
@@ -227,6 +246,8 @@ class _CollapsedLibrariesButton extends HookConsumerWidget {
 class _SectionAddMenuButton extends HookConsumerWidget {
   const _SectionAddMenuButton();
 
+  static const double _kMenuMaxWidth = 240;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
@@ -243,7 +264,7 @@ class _SectionAddMenuButton extends HookConsumerWidget {
       showArrow: false,
       verticalMargin: -tokens.spacing.xs,
       menuBuilder: () => PopupMenuPanelShell(
-        width: 180,
+        maxWidth: _kMenuMaxWidth,
         blurRadius: 6,
         shadowOffset: const Offset(0, 4),
         borderRadius: tokens.radius.xs,
@@ -251,6 +272,7 @@ class _SectionAddMenuButton extends HookConsumerWidget {
           padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs + 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _PopupMenuItem(
                 label: l10n.sidebarAddLocalLibrary,
@@ -290,6 +312,8 @@ class _SectionAddMenuButton extends HookConsumerWidget {
 class _SectionOverflowMenuButton extends HookConsumerWidget {
   const _SectionOverflowMenuButton();
 
+  static const double _kMenuMaxWidth = 240;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
@@ -306,7 +330,7 @@ class _SectionOverflowMenuButton extends HookConsumerWidget {
       showArrow: false,
       verticalMargin: -tokens.spacing.xs,
       menuBuilder: () => PopupMenuPanelShell(
-        width: 200,
+        maxWidth: _kMenuMaxWidth,
         blurRadius: 6,
         shadowOffset: const Offset(0, 4),
         borderRadius: tokens.radius.xs,
@@ -314,6 +338,7 @@ class _SectionOverflowMenuButton extends HookConsumerWidget {
           padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs + 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _PopupMenuItem(
                 label: l10n.sidebarReorderLibrariesLater,
@@ -363,6 +388,8 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
 
   final LocalLibrary library;
 
+  static const double _kMenuMaxWidth = 240;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
@@ -380,7 +407,7 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
       showArrow: false,
       verticalMargin: -tokens.spacing.xs,
       menuBuilder: () => PopupMenuPanelShell(
-        width: 200,
+        maxWidth: _kMenuMaxWidth,
         blurRadius: 6,
         shadowOffset: const Offset(0, 4),
         borderRadius: tokens.radius.xs,
@@ -388,6 +415,7 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
           padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs + 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _PopupMenuItem(
                 label: l10n.sidebarScanLibrary,
@@ -482,6 +510,7 @@ class _PopupMenuItem extends StatelessWidget {
         ),
         child: Text(
           label,
+          textAlign: TextAlign.start,
           style: TextStyle(
             fontSize: tokens.text.bodySm,
             color: enabled ? cs.hentai.textPrimary : cs.hentai.textTertiary,
@@ -536,7 +565,7 @@ class _SidebarIconOnlyButton extends HookWidget {
                   color: background,
                   borderRadius: BorderRadius.circular(tokens.radius.md),
                   border: Border.all(
-                    width: isActive ? 1 : 0.8,
+                    width: 1,
                     color: isActive
                         ? cs.hentai.sidebarItemActiveBorder
                         : cs.hentai.sidebarBackground,
@@ -612,8 +641,9 @@ class _SidebarChromeRow extends HookWidget {
               decoration: BoxDecoration(
                 color: background,
                 borderRadius: BorderRadius.circular(tokens.radius.md),
+                // Constant border width avoids vertical jump on selection.
                 border: Border.all(
-                  width: isActive ? 1 : 0.8,
+                  width: 1,
                   color: isActive
                       ? cs.hentai.sidebarItemActiveBorder
                       : cs.hentai.sidebarBackground,
@@ -642,9 +672,16 @@ class _SidebarChromeRow extends HookWidget {
                         label,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        strutStyle: StrutStyle(
+                          fontSize: tokens.text.bodyMd,
+                          height: 1.2,
+                          fontWeight: FontWeight.w600,
+                          forceStrutHeight: true,
+                        ),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: textColor,
                           fontSize: tokens.text.bodyMd,
+                          height: 1.2,
                           fontWeight: isActive
                               ? FontWeight.w600
                               : FontWeight.w400,

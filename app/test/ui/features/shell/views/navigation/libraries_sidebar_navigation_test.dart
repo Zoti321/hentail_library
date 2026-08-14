@@ -127,6 +127,44 @@ void main() {
       expect(find.text('Alpha'), findsNothing);
     },
   );
+
+  testWidgets(
+    'compact drawer closes when tapping library section or library row',
+    (WidgetTester tester) async {
+      final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
+        libraries: <LocalLibrary>[_lib('a', 'Alpha'), _lib('b', 'Beta')],
+        currentId: 'a',
+      );
+      late GoRouter router;
+      await _pumpLibrariesShell(
+        tester,
+        fake,
+        (GoRouter r) => router = r,
+        viewportSize: const Size(400, 800),
+      );
+
+      openAppShellNavigationDrawer();
+      await tester.pumpAndSettle();
+      expect(appShellScaffoldKey.currentState?.isDrawerOpen, isTrue);
+      expect(find.text('Beta'), findsOneWidget);
+
+      await tester.tap(find.text('Beta'));
+      await tester.pumpAndSettle();
+
+      expect(router.state.uri.path, '/libraries/b');
+      expect(appShellScaffoldKey.currentState?.isDrawerOpen, isFalse);
+
+      openAppShellNavigationDrawer();
+      await tester.pumpAndSettle();
+      expect(appShellScaffoldKey.currentState?.isDrawerOpen, isTrue);
+
+      await tester.tap(find.text('漫画库').first);
+      await tester.pumpAndSettle();
+
+      expect(router.state.uri.path, LibrariesRoutes.all);
+      expect(appShellScaffoldKey.currentState?.isDrawerOpen, isFalse);
+    },
+  );
 }
 
 Finder _librariesRailIcon() {

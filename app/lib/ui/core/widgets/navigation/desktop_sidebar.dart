@@ -262,8 +262,10 @@ class _SidebarButtonState extends State<_SidebarButton> {
                   decoration: BoxDecoration(
                     color: backgroundColor,
                     borderRadius: BorderRadius.circular(8),
+                    // Keep border width constant so active chrome does not
+                    // shift neighboring nav rows vertically.
                     border: Border.all(
-                      width: widget.isActive ? 1 : 0.8,
+                      width: 1,
                       color: widget.isActive
                           ? cs.hentai.sidebarItemActiveBorder
                           : idleBackground,
@@ -315,6 +317,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
                                     style: theme.textTheme.bodyMedium!.copyWith(
                                       color: textColor,
                                       fontSize: 14,
+                                      height: 1.2,
                                       fontWeight: widget.isActive
                                           ? FontWeight.w600
                                           : FontWeight.w400,
@@ -324,6 +327,12 @@ class _SidebarButtonState extends State<_SidebarButton> {
                                       maxLines: 1,
                                       softWrap: false,
                                       overflow: TextOverflow.clip,
+                                      strutStyle: const StrutStyle(
+                                        fontSize: 14,
+                                        height: 1.2,
+                                        fontWeight: FontWeight.w600,
+                                        forceStrutHeight: true,
+                                      ),
                                     ),
                                   ),
                                 ),
