@@ -14,6 +14,21 @@ import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+/// Row hover: lighter than the shared sidebar token so action buttons can
+/// sit on a deeper chrome without blending in.
+Color _sidebarRowHoverBackground(HentaiColorScheme h) => Color.lerp(
+  h.sidebarBackground,
+  h.sidebarItemHoverBackground,
+  0.55,
+)!;
+
+/// Trailing +/-/⋯ button hover: darker than the row hover for contrast.
+Color _sidebarActionHoverBackground(HentaiColorScheme h) => Color.lerp(
+  h.sidebarItemHoverBackground,
+  h.borderStrong,
+  0.5,
+)!;
+
 /// Komga-style Libraries section for the desktop sidebar (injected by shell).
 class LibrariesSidebarSection extends ConsumerWidget {
   const LibrariesSidebarSection({
@@ -300,8 +315,8 @@ class _SectionAddMenuButton extends HookConsumerWidget {
         size: 28,
         borderRadius: tokens.radius.sm,
         foregroundColor: cs.hentai.textSecondary,
-        hoverColor: cs.hentai.sidebarItemHoverBackground,
-        overlayColor: cs.hentai.sidebarItemHoverBackground.withAlpha(110),
+        hoverColor: _sidebarActionHoverBackground(cs.hentai),
+        overlayColor: _sidebarActionHoverBackground(cs.hentai).withAlpha(110),
         delayTooltipThreeSeconds: true,
         onPressed: controller.toggleMenu,
       ),
@@ -374,8 +389,8 @@ class _SectionOverflowMenuButton extends HookConsumerWidget {
         size: 28,
         borderRadius: tokens.radius.sm,
         foregroundColor: cs.hentai.textSecondary,
-        hoverColor: cs.hentai.sidebarItemHoverBackground,
-        overlayColor: cs.hentai.sidebarItemHoverBackground.withAlpha(110),
+        hoverColor: _sidebarActionHoverBackground(cs.hentai),
+        overlayColor: _sidebarActionHoverBackground(cs.hentai).withAlpha(110),
         delayTooltipThreeSeconds: true,
         onPressed: controller.toggleMenu,
       ),
@@ -459,6 +474,7 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
                 ),
               _PopupMenuItem(
                 label: l10n.sidebarDeleteLibrary,
+                isDestructive: true,
                 onTap: () {
                   controller.hideMenu();
                   LibraryManagementActions.deleteLibrary(ref, context, library);
@@ -476,8 +492,8 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
         size: 28,
         borderRadius: tokens.radius.sm,
         foregroundColor: cs.hentai.textSecondary,
-        hoverColor: cs.hentai.sidebarItemHoverBackground,
-        overlayColor: cs.hentai.sidebarItemHoverBackground.withAlpha(110),
+        hoverColor: _sidebarActionHoverBackground(cs.hentai),
+        overlayColor: _sidebarActionHoverBackground(cs.hentai).withAlpha(110),
         delayTooltipThreeSeconds: true,
         onPressed: controller.toggleMenu,
       ),
@@ -485,35 +501,68 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
   }
 }
 
-class _PopupMenuItem extends StatelessWidget {
+class _PopupMenuItem extends HookWidget {
   const _PopupMenuItem({
     required this.label,
     required this.onTap,
     this.enabled = true,
+    this.isDestructive = false,
   });
 
   final String label;
   final VoidCallback onTap;
   final bool enabled;
+  final bool isDestructive;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
-    return InkWell(
-      onTap: enabled ? onTap : null,
-      splashFactory: NoSplash.splashFactory,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: tokens.spacing.md,
-          vertical: tokens.spacing.sm,
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.start,
-          style: TextStyle(
-            fontSize: tokens.text.bodySm,
-            color: enabled ? cs.hentai.textPrimary : cs.hentai.textTertiary,
+    final HentaiColorScheme h = cs.hentai;
+    final ValueNotifier<bool> hovered = useState(false);
+
+    final Color background;
+    final Color foreground;
+    if (!enabled) {
+      background = Colors.transparent;
+      foreground = h.textTertiary;
+    } else if (isDestructive) {
+      // Deep red fill for emphasis. Dark theme danger token is a light coral
+      // accent — darken it so white label stays readable.
+      final Color dangerFill = Theme.of(context).brightness == Brightness.dark
+          ? Color.lerp(h.contextMenuDanger, const Color(0xFF1A0505), 0.55)!
+          : h.contextMenuDanger;
+      background = hovered.value
+          ? Color.lerp(dangerFill, Colors.black, 0.14)!
+          : dangerFill;
+      foreground = Colors.white;
+    } else if (hovered.value) {
+      background = h.contextMenuHover;
+      foreground = h.textPrimary;
+    } else {
+      background = Colors.transparent;
+      foreground = h.textPrimary;
+    }
+
+    return MouseRegion(
+      onEnter: enabled ? (_) => hovered.value = true : null,
+      onExit: enabled ? (_) => hovered.value = false : null,
+      cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: GestureDetector(
+        onTap: enabled ? onTap : null,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOut,
+          color: background,
+          padding: EdgeInsets.symmetric(
+            horizontal: tokens.spacing.md,
+            vertical: tokens.spacing.sm,
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.start,
+            style: TextStyle(fontSize: tokens.text.bodySm, color: foreground),
           ),
         ),
       ),
@@ -612,17 +661,19 @@ class _SidebarChromeRow extends HookWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
+    final HentaiColorScheme h = cs.hentai;
     final AppThemeTokens tokens = context.tokens;
     final ValueNotifier<bool> hovered = useState(false);
     final double t = expandProgress.clamp(0.0, 1.0);
+    final Color rowHover = _sidebarRowHoverBackground(h);
     final Color background = isActive
-        ? cs.hentai.sidebarItemActiveBackground
-        : (hovered.value
-              ? cs.hentai.sidebarItemHoverBackground
-              : cs.hentai.sidebarBackground);
+        ? (hovered.value
+              ? Color.lerp(h.sidebarItemActiveBackground, rowHover, 0.4)!
+              : h.sidebarItemActiveBackground)
+        : (hovered.value ? rowHover : h.sidebarBackground);
     final Color textColor = isActive || hovered.value
-        ? cs.hentai.textPrimary
-        : cs.hentai.textSecondary;
+        ? h.textPrimary
+        : h.textSecondary;
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: tokens.spacing.xs / 2),
@@ -645,8 +696,8 @@ class _SidebarChromeRow extends HookWidget {
                 border: Border.all(
                   width: 1,
                   color: isActive
-                      ? cs.hentai.sidebarItemActiveBorder
-                      : cs.hentai.sidebarBackground,
+                      ? h.sidebarItemActiveBorder
+                      : h.sidebarBackground,
                 ),
               ),
               padding: EdgeInsets.only(
@@ -689,7 +740,13 @@ class _SidebarChromeRow extends HookWidget {
                       ),
                     ),
                   ),
-                  if (trailing != null) trailing!,
+                  if (trailing != null)
+                    // Keep the row in hover while the pointer is on actions;
+                    // action chrome uses a deeper fill so it stays distinct.
+                    MouseRegion(
+                      onEnter: (_) => hovered.value = true,
+                      child: trailing!,
+                    ),
                 ],
               ),
             ),
