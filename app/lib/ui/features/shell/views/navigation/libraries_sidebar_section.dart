@@ -516,7 +516,8 @@ class _PopupMenuItem extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final HentaiColorScheme h = cs.hentai;
     final ValueNotifier<bool> hovered = useState(false);
@@ -544,6 +545,14 @@ class _PopupMenuItem extends HookWidget {
       foreground = h.textPrimary;
     }
 
+    // copyWith keeps ThemeData.fontFamily (MI_Sans_Regular); a bare TextStyle
+    // under AnimatedDefaultTextStyle would fall back to the platform font.
+    final TextStyle labelStyle =
+        (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
+          fontSize: tokens.text.bodySm,
+          color: foreground,
+        );
+
     return MouseRegion(
       onEnter: enabled ? (_) => hovered.value = true : null,
       onExit: enabled ? (_) => hovered.value = false : null,
@@ -562,7 +571,7 @@ class _PopupMenuItem extends HookWidget {
           child: AnimatedDefaultTextStyle(
             duration: const Duration(milliseconds: 120),
             curve: Curves.easeOut,
-            style: TextStyle(fontSize: tokens.text.bodySm, color: foreground),
+            style: labelStyle,
             child: Text(label, textAlign: TextAlign.start),
           ),
         ),
