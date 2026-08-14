@@ -521,26 +521,23 @@ class _PopupMenuItem extends HookWidget {
     final HentaiColorScheme h = cs.hentai;
     final ValueNotifier<bool> hovered = useState(false);
 
+    // Idle must be opaque (panel surface). Lerping from Colors.transparent
+    // goes through muddy greys and looks like a broken color animation.
+    final Color idleBackground = cs.surface;
+    final Color dangerHover = Theme.of(context).brightness == Brightness.dark
+        ? Color.lerp(h.contextMenuDanger, const Color(0xFF1A0505), 0.55)!
+        : h.contextMenuDanger;
+
     final Color background;
     final Color foreground;
     if (!enabled) {
-      background = Colors.transparent;
+      background = idleBackground;
       foreground = h.textTertiary;
-    } else if (isDestructive) {
-      // Deep red fill for emphasis. Dark theme danger token is a light coral
-      // accent — darken it so white label stays readable.
-      final Color dangerFill = Theme.of(context).brightness == Brightness.dark
-          ? Color.lerp(h.contextMenuDanger, const Color(0xFF1A0505), 0.55)!
-          : h.contextMenuDanger;
-      background = hovered.value
-          ? Color.lerp(dangerFill, Colors.black, 0.14)!
-          : dangerFill;
-      foreground = Colors.white;
     } else if (hovered.value) {
-      background = h.contextMenuHover;
-      foreground = h.textPrimary;
+      background = isDestructive ? dangerHover : h.contextMenuHover;
+      foreground = isDestructive ? Colors.white : h.textPrimary;
     } else {
-      background = Colors.transparent;
+      background = idleBackground;
       foreground = h.textPrimary;
     }
 
@@ -559,10 +556,11 @@ class _PopupMenuItem extends HookWidget {
             horizontal: tokens.spacing.md,
             vertical: tokens.spacing.sm,
           ),
-          child: Text(
-            label,
-            textAlign: TextAlign.start,
+          child: AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 120),
+            curve: Curves.easeOut,
             style: TextStyle(fontSize: tokens.text.bodySm, color: foreground),
+            child: Text(label, textAlign: TextAlign.start),
           ),
         ),
       ),
