@@ -524,9 +524,12 @@ class _PopupMenuItem extends HookWidget {
     // Idle must be opaque (panel surface). Lerping from Colors.transparent
     // goes through muddy greys and looks like a broken color animation.
     final Color idleBackground = cs.surface;
-    final Color dangerHover = Theme.of(context).brightness == Brightness.dark
-        ? Color.lerp(h.contextMenuDanger, const Color(0xFF1A0505), 0.55)!
-        : h.contextMenuDanger;
+    // Light danger wash (not solid red) so hover stays readable.
+    final Color dangerHover = Color.lerp(
+      idleBackground,
+      h.contextMenuDanger,
+      0.2,
+    )!;
 
     final Color background;
     final Color foreground;
@@ -535,7 +538,7 @@ class _PopupMenuItem extends HookWidget {
       foreground = h.textTertiary;
     } else if (hovered.value) {
       background = isDestructive ? dangerHover : h.contextMenuHover;
-      foreground = isDestructive ? Colors.white : h.textPrimary;
+      foreground = isDestructive ? h.contextMenuDanger : h.textPrimary;
     } else {
       background = idleBackground;
       foreground = h.textPrimary;
@@ -721,16 +724,9 @@ class _SidebarChromeRow extends HookWidget {
                         label,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        strutStyle: StrutStyle(
-                          fontSize: tokens.text.bodyMd,
-                          height: 1.2,
-                          fontWeight: FontWeight.w600,
-                          forceStrutHeight: true,
-                        ),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: textColor,
                           fontSize: tokens.text.bodyMd,
-                          height: 1.2,
                           fontWeight: isActive
                               ? FontWeight.w600
                               : FontWeight.w400,
