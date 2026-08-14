@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -57,7 +58,7 @@ class ComicDetailNotFound extends StatelessWidget {
             ),
             label: l10n.comicDetailNotFound,
             action: TextButton.icon(
-              onPressed: () => context.go('/local'),
+              onPressed: () => LibraryManagementActions.goCurrentLibraryBrowseFromContext(context),
               icon: const Icon(LucideIcons.library, size: 16),
               label: Text(l10n.comicDetailGoToLibrary),
             ),

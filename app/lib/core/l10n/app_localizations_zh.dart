@@ -12,6 +12,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryTitle => '漫画库';
 
   @override
+  String get allLibrariesBrowsePlaceholderTitle => '全部库浏览';
+
+  @override
+  String get allLibrariesBrowsePlaceholderBody => '跨库聚合浏览后续实现。请从侧栏选择具体漫画库。';
+
+  @override
+  String get sidebarAddLibraryTooltip => '新建漫画库';
+
+  @override
+  String get sidebarAddLocalLibrary => '添加本地库';
+
+  @override
+  String get sidebarAddRemoteLibrary => '添加远程库';
+
+  @override
+  String get sidebarReorderLibrariesLater => '重新排序（后续）';
+
+  @override
+  String get sidebarScanAllLibraries => '扫描所有库';
+
+  @override
+  String get sidebarDeepScanAllLibraries => '深度扫描所有库';
+
+  @override
+  String get sidebarScanLibrary => '扫描库';
+
+  @override
+  String get sidebarDeepScanLibrary => '深度扫描库';
+
+  @override
+  String get sidebarRefreshMetadataLater => '刷新元数据（后续）';
+
+  @override
+  String get sidebarEditLibrary => '编辑';
+
+  @override
+  String get sidebarDeleteLibrary => '删除';
+
+  @override
   String get libraryEmptyTitle => '暂无漫画';
 
   @override

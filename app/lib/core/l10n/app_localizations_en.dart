@@ -12,6 +12,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryTitle => 'Library';
 
   @override
+  String get allLibrariesBrowsePlaceholderTitle => 'All libraries';
+
+  @override
+  String get allLibrariesBrowsePlaceholderBody =>
+      'Browsing all libraries together is coming later. Pick a library from the sidebar.';
+
+  @override
+  String get sidebarAddLibraryTooltip => 'Add library';
+
+  @override
+  String get sidebarAddLocalLibrary => 'Add local library';
+
+  @override
+  String get sidebarAddRemoteLibrary => 'Add remote library';
+
+  @override
+  String get sidebarReorderLibrariesLater => 'Reorder (later)';
+
+  @override
+  String get sidebarScanAllLibraries => 'Scan all libraries';
+
+  @override
+  String get sidebarDeepScanAllLibraries => 'Deep scan all libraries';
+
+  @override
+  String get sidebarScanLibrary => 'Scan library';
+
+  @override
+  String get sidebarDeepScanLibrary => 'Deep scan library';
+
+  @override
+  String get sidebarRefreshMetadataLater => 'Refresh metadata (later)';
+
+  @override
+  String get sidebarEditLibrary => 'Edit';
+
+  @override
+  String get sidebarDeleteLibrary => 'Delete';
+
+  @override
   String get libraryEmptyTitle => 'No comics yet';
 
   @override

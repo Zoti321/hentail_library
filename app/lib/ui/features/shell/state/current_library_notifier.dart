@@ -79,6 +79,16 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
     await refresh();
   }
 
+  Future<void> clear() async {
+    final CurrentLibraryState? previous = state.asData?.value;
+    await _repo.setCurrentId(null);
+    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
+    if (previous != null) {
+      state = AsyncData(previous.copyWith(clearCurrentId: true));
+    }
+    await refresh();
+  }
+
   Future<CurrentLibraryState> _load() async {
     await _migrateFormatGroupsFromAppSettingIfNeeded();
     final List<LocalLibrary> libraries = await _repo.list();

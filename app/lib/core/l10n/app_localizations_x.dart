@@ -88,6 +88,10 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       return pageTitleReader;
     }
 
+    if (path.startsWith('/libraries/')) {
+      return libraryTitle;
+    }
+
     if (path.startsWith('/comic/')) {
       return pageTitleComicDetail;
     }

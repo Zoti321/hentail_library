@@ -104,6 +104,84 @@ abstract class AppLocalizations {
   /// **'漫画库'**
   String get libraryTitle;
 
+  /// No description provided for @allLibrariesBrowsePlaceholderTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部库浏览'**
+  String get allLibrariesBrowsePlaceholderTitle;
+
+  /// No description provided for @allLibrariesBrowsePlaceholderBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'跨库聚合浏览后续实现。请从侧栏选择具体漫画库。'**
+  String get allLibrariesBrowsePlaceholderBody;
+
+  /// No description provided for @sidebarAddLibraryTooltip.
+  ///
+  /// In zh, this message translates to:
+  /// **'新建漫画库'**
+  String get sidebarAddLibraryTooltip;
+
+  /// No description provided for @sidebarAddLocalLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加本地库'**
+  String get sidebarAddLocalLibrary;
+
+  /// No description provided for @sidebarAddRemoteLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加远程库'**
+  String get sidebarAddRemoteLibrary;
+
+  /// No description provided for @sidebarReorderLibrariesLater.
+  ///
+  /// In zh, this message translates to:
+  /// **'重新排序（后续）'**
+  String get sidebarReorderLibrariesLater;
+
+  /// No description provided for @sidebarScanAllLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描所有库'**
+  String get sidebarScanAllLibraries;
+
+  /// No description provided for @sidebarDeepScanAllLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'深度扫描所有库'**
+  String get sidebarDeepScanAllLibraries;
+
+  /// No description provided for @sidebarScanLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描库'**
+  String get sidebarScanLibrary;
+
+  /// No description provided for @sidebarDeepScanLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'深度扫描库'**
+  String get sidebarDeepScanLibrary;
+
+  /// No description provided for @sidebarRefreshMetadataLater.
+  ///
+  /// In zh, this message translates to:
+  /// **'刷新元数据（后续）'**
+  String get sidebarRefreshMetadataLater;
+
+  /// No description provided for @sidebarEditLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑'**
+  String get sidebarEditLibrary;
+
+  /// No description provided for @sidebarDeleteLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除'**
+  String get sidebarDeleteLibrary;
+
   /// No description provided for @libraryEmptyTitle.
   ///
   /// In zh, this message translates to:

@@ -14,6 +14,10 @@ _Avoid_: 书架（UI 可用）；把「全部库合并」称作一个 Library
 用户当前选中的 Library；浏览与搜索默认作用于此。Reading history 跨 Library 全局可见。
 _Avoid_: 活动库、选中书架
 
+**All libraries browse**:
+跨多个 Library 的聚合浏览面（趋近 Komga「全部库」）；不是一个 Library。路由占位为 `/libraries/all`；本阶段仅占位提示，不实现聚合目录。
+_Avoid_: 全部库（若被理解成一个 Library）、合并库、全局书架
+
 **Local library**:
 Library root 为本机目录的 Library；Resource 来自本地文件系统；入库后可离线阅读。
 _Avoid_: 本地书架、磁盘库（口语可用，文档用 Local library）

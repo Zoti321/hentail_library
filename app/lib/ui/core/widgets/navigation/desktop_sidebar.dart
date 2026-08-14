@@ -5,9 +5,11 @@ import 'package:hentai_library/ui/core/dto/nav_item_data.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/app_navigation.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/libraries_sidebar_section.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class DesktopSidebar extends HookWidget {
+class DesktopSidebar extends HookConsumerWidget {
   static const double expandedWidth = 256;
   static const double collapsedWidth = 72;
   static const Duration _kAnimDuration = Duration(milliseconds: 220);
@@ -38,7 +40,7 @@ class DesktopSidebar extends HookWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
@@ -82,6 +84,29 @@ class DesktopSidebar extends HookWidget {
         final bool showCollapsedTooltip =
             expandController.status == AnimationStatus.dismissed;
 
+        final List<Widget> mainNav = <Widget>[];
+        for (final NavItemData item in menuItems) {
+          mainNav.add(
+            _SidebarButton(
+              item: item,
+              isActive: activeId == item.id,
+              expandProgress: curvedT,
+              labelOpacity: labelOpacity,
+              showCollapsedTooltip: showCollapsedTooltip,
+              onTap: () => onDestinationSelected(item.id),
+            ),
+          );
+          if (item.id == AppNavigation.navIdHome) {
+            mainNav.add(
+              LibrariesSidebarSection(
+                expandProgress: curvedT,
+                labelOpacity: labelOpacity,
+                showCollapsedTooltip: showCollapsedTooltip,
+              ),
+            );
+          }
+        }
+
         return Container(
           width: width,
           height: double.infinity,
@@ -119,17 +144,12 @@ class DesktopSidebar extends HookWidget {
                 ),
                 const SizedBox(height: 16),
               ],
-              ...menuItems.map(
-                (NavItemData item) => _SidebarButton(
-                  item: item,
-                  isActive: activeId == item.id,
-                  expandProgress: curvedT,
-                  labelOpacity: labelOpacity,
-                  showCollapsedTooltip: showCollapsedTooltip,
-                  onTap: () => onDestinationSelected(item.id),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: mainNav,
                 ),
               ),
-              const Spacer(),
               ...systemItems.map(
                 (NavItemData item) => _SidebarButton(
                   item: item,

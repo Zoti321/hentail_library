@@ -1,12 +1,13 @@
-ï»¿import 'dart:math' as math;
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// é¢åŒ…å±‘å¼è¿”å› [æ¼«ç”»åº“]ï¼ˆ`/local`ï¼‰ï¼Œå¯é€‰å±•ç¤ºå½“å‰é¡µå‰¯æ ‡é¢˜ã€‚
+/// Ãæ°üĞ¼Ê½·µ»ØÂş»­¿âä¯ÀÀÒ³£¬¿ÉÑ¡Õ¹Ê¾µ±Ç°Ò³¸±±êÌâ¡£
 final class LibraryReturnBreadcrumb extends StatelessWidget {
   const LibraryReturnBreadcrumb({
     super.key,
@@ -37,7 +38,7 @@ final class LibraryReturnBreadcrumb extends StatelessWidget {
     final Widget libraryLink = Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => context.go('/local'),
+        onTap: () => LibraryManagementActions.goCurrentLibraryBrowseFromContext(context),
         borderRadius: BorderRadius.circular(tokens.radius.md),
         hoverColor: cs.primary.withValues(alpha: 0.08),
         splashColor: cs.primary.withValues(alpha: 0.12),
@@ -97,7 +98,7 @@ final class LibraryReturnBreadcrumb extends StatelessWidget {
   }
 }
 
-/// å‰¯æ ‡é¢˜ä»…åœ¨æˆªæ–­æ—¶ç”¨çª„å‘½ä¸­åŒºï¼ˆä¿¡æ¯å›¾æ ‡ï¼‰å±•ç¤ºå®Œæ•´ Tooltipï¼Œé¿å… [Expanded] åŒ…ä¸€å±‚ [Tooltip] æ•´è¡Œå¯è§¦å‘ã€‚
+/// ¸±±êÌâ½öÔÚ½Ø¶ÏÊ±ÓÃÕ­ÃüÖĞÇø£¨ĞÅÏ¢Í¼±ê£©Õ¹Ê¾ÍêÕû Tooltip£¬±ÜÃâ [Expanded] °üÒ»²ã [Tooltip] ÕûĞĞ¿É´¥·¢¡£
 class _BreadcrumbTrailingTitle extends StatelessWidget {
   const _BreadcrumbTrailingTitle({
     required this.text,
