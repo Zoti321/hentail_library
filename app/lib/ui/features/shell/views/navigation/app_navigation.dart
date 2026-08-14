@@ -5,7 +5,6 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/ui/core/dto/nav_item_data.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
-import 'package:hentai_library/ui/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 abstract final class AppNavigation {

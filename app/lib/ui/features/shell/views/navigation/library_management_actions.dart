@@ -10,7 +10,6 @@ import 'package:hentai_library/domain/repositories/path_repository.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/remove_saved_path_confirm_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/remote_library_form_dialog.dart';
-import 'package:hentai_library/ui/features/shell/state/scan_library_controller.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/providers.dart';
 

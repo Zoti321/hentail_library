@@ -7,7 +7,7 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// 详情页异常态顶栏：仅返回�?
+/// ?????????????
 class ComicDetailBackHeader extends StatelessWidget {
   const ComicDetailBackHeader({super.key});
 
