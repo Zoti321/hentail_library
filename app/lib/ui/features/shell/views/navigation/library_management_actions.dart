@@ -129,21 +129,27 @@ abstract final class LibraryManagementActions {
         .read(currentLibraryProvider)
         .asData
         ?.value;
-    final List<LocalLibrary> remaining = state?.libraries ?? const <LocalLibrary>[];
-    if (remaining.isEmpty) {
+    final List<LocalLibrary> remaining =
+        state?.libraries ?? const <LocalLibrary>[];
+    final AfterLibraryDeleteNavigation nav = afterLibraryDeleteNavigation(
+      remainingLibraryIds: remaining
+          .map((LocalLibrary library) => library.libraryId)
+          .toList(),
+    );
+    final String? selectId = nav.selectLibraryId;
+    if (selectId == null) {
       await ref.read(currentLibraryProvider.notifier).clear();
       if (!context.mounted) {
         return;
       }
-      context.go(LibrariesRoutes.all);
+      context.go(nav.goPath);
       return;
     }
-    final String nextId = remaining.first.libraryId;
-    await ref.read(currentLibraryProvider.notifier).select(nextId);
+    await ref.read(currentLibraryProvider.notifier).select(selectId);
     if (!context.mounted) {
       return;
     }
-    context.go(LibrariesRoutes.library(nextId));
+    context.go(nav.goPath);
   }
 
   static Future<void> openLibrary(

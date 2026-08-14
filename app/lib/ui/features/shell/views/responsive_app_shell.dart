@@ -8,6 +8,7 @@ import 'package:hentai_library/ui/core/widgets/chrome/app_title_bar.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/diagnostic_mode_banner.dart';
 import 'package:hentai_library/ui/core/widgets/navigation/desktop_sidebar.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/app_navigation.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/libraries_sidebar_section.dart';
 import 'package:hentai_library/ui/providers.dart';
 
 enum _ShellLayoutMode { compact, medium, expanded }
@@ -68,6 +69,16 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
       applyDrawerTopInset: applyDrawerTopInset,
       onToggleExpanded: onToggleExpanded,
       onDestinationSelected: onDestinationSelected,
+      librariesSectionBuilder:
+          ({
+            required double expandProgress,
+            required double labelOpacity,
+            required bool showCollapsedTooltip,
+          }) => LibrariesSidebarSection(
+            expandProgress: expandProgress,
+            labelOpacity: labelOpacity,
+            showCollapsedTooltip: showCollapsedTooltip,
+          ),
     );
   }
 

@@ -14,6 +14,7 @@ import 'package:hentai_library/ui/features/shell/views/all_libraries_browse_page
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
@@ -72,6 +73,66 @@ void main() {
     await tester.pumpAndSettle();
     expect(router.state.uri.path, '/libraries/a');
   });
+
+  testWidgets(
+    'collapsed rail popup shows create actions then libraries and switches',
+    (WidgetTester tester) async {
+      final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
+        libraries: <LocalLibrary>[_lib('a', 'Alpha'), _lib('b', 'Beta')],
+        currentId: 'a',
+      );
+      late GoRouter router;
+      await _pumpLibrariesShell(
+        tester,
+        fake,
+        (GoRouter r) => router = r,
+        viewportSize: const Size(900, 900),
+      );
+
+      await tester.tap(_librariesRailIcon());
+      await tester.pumpAndSettle();
+
+      expect(find.text('添加本地库'), findsOneWidget);
+      expect(find.text('添加远程库'), findsOneWidget);
+      expect(find.text('Alpha'), findsWidgets);
+      expect(find.text('Beta'), findsWidgets);
+
+      await tester.tap(find.text('Beta').last);
+      await tester.pumpAndSettle();
+
+      expect(fake.selectedIds, <String>['b']);
+      expect(router.state.uri.path, '/libraries/b');
+    },
+  );
+
+  testWidgets(
+    'collapsed rail popup with no libraries shows only create actions',
+    (WidgetTester tester) async {
+      final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
+        libraries: const <LocalLibrary>[],
+        currentId: null,
+      );
+      await _pumpLibrariesShell(
+        tester,
+        fake,
+        (_) {},
+        viewportSize: const Size(900, 900),
+      );
+
+      await tester.tap(_librariesRailIcon());
+      await tester.pumpAndSettle();
+
+      expect(find.text('添加本地库'), findsOneWidget);
+      expect(find.text('添加远程库'), findsOneWidget);
+      expect(find.text('Alpha'), findsNothing);
+    },
+  );
+}
+
+Finder _librariesRailIcon() {
+  return find.byWidgetPredicate(
+    (Widget widget) => widget is Icon && widget.icon == LucideIcons.library,
+  );
 }
 
 LocalLibrary _lib(String id, String name) => (
@@ -89,8 +150,9 @@ Future<void> _pumpLibrariesShell(
   _FakeCurrentLibraryNotifier fake,
   void Function(GoRouter router) onRouter, {
   String initialLocation = '/home',
+  Size viewportSize = const Size(1280, 900),
 }) async {
-  tester.view.physicalSize = const Size(1280, 900);
+  tester.view.physicalSize = viewportSize;
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
 
@@ -179,7 +241,7 @@ class _FakeCurrentLibraryNotifier extends CurrentLibraryNotifier {
     required this.currentId,
   });
 
-  final List<LocalLibrary> libraries;
+  List<LocalLibrary> libraries;
   String? currentId;
   final List<String> selectedIds = <String>[];
 

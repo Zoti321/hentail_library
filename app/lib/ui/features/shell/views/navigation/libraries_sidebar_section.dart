@@ -1,5 +1,6 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
@@ -13,7 +14,7 @@ import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Komga-style Libraries section for [DesktopSidebar].
+/// Komga-style Libraries section for the desktop sidebar (injected by shell).
 class LibrariesSidebarSection extends ConsumerWidget {
   const LibrariesSidebarSection({
     super.key,
@@ -43,8 +44,7 @@ class LibrariesSidebarSection extends ConsumerWidget {
 
     if (collapsed) {
       return _CollapsedLibrariesButton(
-        sectionActive: selection.sectionActive,
-        libraryActive: selection.activeLibraryId != null,
+        isActive: librariesRailIconActive(selection),
         libraries: libraries,
         showCollapsedTooltip: showCollapsedTooltip,
       );
@@ -95,12 +95,9 @@ class _LibrariesSectionHeader extends StatelessWidget {
       leading: const Icon(LucideIcons.library, size: 18),
       label: l10n.libraryTitle,
       onTap: onTap,
-      trailing: Row(
+      trailing: const Row(
         mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          _SectionAddMenuButton(),
-          _SectionOverflowMenuButton(),
-        ],
+        children: <Widget>[_SectionAddMenuButton(), _SectionOverflowMenuButton()],
       ),
     );
   }
@@ -138,54 +135,47 @@ class _LibrarySidebarRow extends ConsumerWidget {
   }
 }
 
-class _CollapsedLibrariesButton extends ConsumerStatefulWidget {
+class _CollapsedLibrariesButton extends HookConsumerWidget {
   const _CollapsedLibrariesButton({
-    required this.sectionActive,
-    required this.libraryActive,
+    required this.isActive,
     required this.libraries,
     required this.showCollapsedTooltip,
   });
 
-  final bool sectionActive;
-  final bool libraryActive;
+  final bool isActive;
   final List<LocalLibrary> libraries;
   final bool showCollapsedTooltip;
 
   @override
-  ConsumerState<_CollapsedLibrariesButton> createState() =>
-      _CollapsedLibrariesButtonState();
-}
-
-class _CollapsedLibrariesButtonState
-    extends ConsumerState<_CollapsedLibrariesButton> {
-  final CustomPopupMenuController _controller = CustomPopupMenuController();
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme cs = theme.colorScheme;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
+    final CustomPopupMenuController controller = useMemoized(
+      CustomPopupMenuController.new,
+    );
+
     final Widget button = _SidebarIconOnlyButton(
-      isActive: widget.sectionActive || widget.libraryActive,
+      isActive: isActive,
       icon: LucideIcons.library,
       semanticLabel: l10n.libraryTitle,
-      onTap: () => _controller.toggleMenu(),
+      onTap: controller.toggleMenu,
     );
 
     return CustomPopupMenu(
-      controller: _controller,
+      controller: controller,
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,
       showArrow: false,
-      verticalMargin: 4,
-      horizontalMargin: 8,
+      verticalMargin: tokens.spacing.xs,
+      horizontalMargin: tokens.spacing.sm,
       menuBuilder: () => PopupMenuPanelShell(
         width: 220,
         blurRadius: 6,
         shadowOffset: const Offset(4, 0),
-        borderRadius: context.tokens.radius.xs,
+        borderRadius: tokens.radius.xs,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
+          padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs + 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -193,24 +183,24 @@ class _CollapsedLibrariesButtonState
               _PopupMenuItem(
                 label: l10n.sidebarAddLocalLibrary,
                 onTap: () {
-                  _controller.hideMenu();
+                  controller.hideMenu();
                   LibraryManagementActions.addLocalLibrary(ref, context);
                 },
               ),
               _PopupMenuItem(
                 label: l10n.sidebarAddRemoteLibrary,
                 onTap: () {
-                  _controller.hideMenu();
+                  controller.hideMenu();
                   LibraryManagementActions.addRemoteLibrary(ref, context);
                 },
               ),
-              if (widget.libraries.isNotEmpty)
-                Divider(height: 8, color: cs.hentai.borderSubtle),
-              ...widget.libraries.map(
+              if (libraries.isNotEmpty)
+                Divider(height: tokens.spacing.sm, color: cs.hentai.borderSubtle),
+              ...libraries.map(
                 (LocalLibrary library) => _PopupMenuItem(
                   label: localLibraryDisplayName(library),
                   onTap: () {
-                    _controller.hideMenu();
+                    controller.hideMenu();
                     LibraryManagementActions.openLibrary(
                       ref,
                       context,
@@ -223,7 +213,7 @@ class _CollapsedLibrariesButtonState
           ),
         ),
       ),
-      child: widget.showCollapsedTooltip
+      child: showCollapsedTooltip
           ? Tooltip(
               message: l10n.libraryTitle,
               waitDuration: const Duration(seconds: 1),
@@ -234,46 +224,45 @@ class _CollapsedLibrariesButtonState
   }
 }
 
-class _SectionAddMenuButton extends ConsumerStatefulWidget {
-  @override
-  ConsumerState<_SectionAddMenuButton> createState() =>
-      _SectionAddMenuButtonState();
-}
-
-class _SectionAddMenuButtonState extends ConsumerState<_SectionAddMenuButton> {
-  final CustomPopupMenuController _controller = CustomPopupMenuController();
+class _SectionAddMenuButton extends HookConsumerWidget {
+  const _SectionAddMenuButton();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final CustomPopupMenuController controller = useMemoized(
+      CustomPopupMenuController.new,
+    );
+
     return CustomPopupMenu(
-      controller: _controller,
+      controller: controller,
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,
       showArrow: false,
-      verticalMargin: -4,
+      verticalMargin: -tokens.spacing.xs,
       menuBuilder: () => PopupMenuPanelShell(
         width: 180,
         blurRadius: 6,
         shadowOffset: const Offset(0, 4),
-        borderRadius: context.tokens.radius.xs,
+        borderRadius: tokens.radius.xs,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
+          padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs + 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               _PopupMenuItem(
                 label: l10n.sidebarAddLocalLibrary,
                 onTap: () {
-                  _controller.hideMenu();
+                  controller.hideMenu();
                   LibraryManagementActions.addLocalLibrary(ref, context);
                 },
               ),
               _PopupMenuItem(
                 label: l10n.sidebarAddRemoteLibrary,
                 onTap: () {
-                  _controller.hideMenu();
+                  controller.hideMenu();
                   LibraryManagementActions.addRemoteLibrary(ref, context);
                 },
               ),
@@ -287,44 +276,42 @@ class _SectionAddMenuButtonState extends ConsumerState<_SectionAddMenuButton> {
         semanticLabel: l10n.sidebarAddLibraryTooltip,
         iconSize: 14,
         size: 28,
-        borderRadius: 6,
+        borderRadius: tokens.radius.sm,
         foregroundColor: cs.hentai.textSecondary,
         hoverColor: cs.hentai.sidebarItemHoverBackground,
         overlayColor: cs.hentai.sidebarItemHoverBackground.withAlpha(110),
         delayTooltipThreeSeconds: true,
-        onPressed: () => _controller.toggleMenu(),
+        onPressed: controller.toggleMenu,
       ),
     );
   }
 }
 
-class _SectionOverflowMenuButton extends ConsumerStatefulWidget {
-  @override
-  ConsumerState<_SectionOverflowMenuButton> createState() =>
-      _SectionOverflowMenuButtonState();
-}
-
-class _SectionOverflowMenuButtonState
-    extends ConsumerState<_SectionOverflowMenuButton> {
-  final CustomPopupMenuController _controller = CustomPopupMenuController();
+class _SectionOverflowMenuButton extends HookConsumerWidget {
+  const _SectionOverflowMenuButton();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final CustomPopupMenuController controller = useMemoized(
+      CustomPopupMenuController.new,
+    );
+
     return CustomPopupMenu(
-      controller: _controller,
+      controller: controller,
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,
       showArrow: false,
-      verticalMargin: -4,
+      verticalMargin: -tokens.spacing.xs,
       menuBuilder: () => PopupMenuPanelShell(
         width: 200,
         blurRadius: 6,
         shadowOffset: const Offset(0, 4),
-        borderRadius: context.tokens.radius.xs,
+        borderRadius: tokens.radius.xs,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
+          padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs + 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -336,14 +323,14 @@ class _SectionOverflowMenuButtonState
               _PopupMenuItem(
                 label: l10n.sidebarScanAllLibraries,
                 onTap: () {
-                  _controller.hideMenu();
+                  controller.hideMenu();
                   LibraryManagementActions.scanAllLibraries(ref);
                 },
               ),
               _PopupMenuItem(
                 label: l10n.sidebarDeepScanAllLibraries,
                 onTap: () {
-                  _controller.hideMenu();
+                  controller.hideMenu();
                   LibraryManagementActions.scanAllLibraries(
                     ref,
                     mode: ScanMode.full,
@@ -360,71 +347,67 @@ class _SectionOverflowMenuButtonState
         semanticLabel: l10n.libraryTitle,
         iconSize: 14,
         size: 28,
-        borderRadius: 6,
+        borderRadius: tokens.radius.sm,
         foregroundColor: cs.hentai.textSecondary,
         hoverColor: cs.hentai.sidebarItemHoverBackground,
         overlayColor: cs.hentai.sidebarItemHoverBackground.withAlpha(110),
         delayTooltipThreeSeconds: true,
-        onPressed: () => _controller.toggleMenu(),
+        onPressed: controller.toggleMenu,
       ),
     );
   }
 }
 
-class _LibraryOverflowMenuButton extends ConsumerStatefulWidget {
+class _LibraryOverflowMenuButton extends HookConsumerWidget {
   const _LibraryOverflowMenuButton({required this.library});
 
   final LocalLibrary library;
 
   @override
-  ConsumerState<_LibraryOverflowMenuButton> createState() =>
-      _LibraryOverflowMenuButtonState();
-}
-
-class _LibraryOverflowMenuButtonState
-    extends ConsumerState<_LibraryOverflowMenuButton> {
-  final CustomPopupMenuController _controller = CustomPopupMenuController();
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final bool remote = isRemoteLibrary(widget.library);
+    final AppThemeTokens tokens = context.tokens;
+    final bool remote = isRemoteLibrary(library);
+    final CustomPopupMenuController controller = useMemoized(
+      CustomPopupMenuController.new,
+    );
+
     return CustomPopupMenu(
-      controller: _controller,
+      controller: controller,
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,
       showArrow: false,
-      verticalMargin: -4,
+      verticalMargin: -tokens.spacing.xs,
       menuBuilder: () => PopupMenuPanelShell(
         width: 200,
         blurRadius: 6,
         shadowOffset: const Offset(0, 4),
-        borderRadius: context.tokens.radius.xs,
+        borderRadius: tokens.radius.xs,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
+          padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs + 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               _PopupMenuItem(
                 label: l10n.sidebarScanLibrary,
                 onTap: () {
-                  _controller.hideMenu();
+                  controller.hideMenu();
                   LibraryManagementActions.scanLibrary(
                     ref,
                     context,
-                    widget.library.libraryId,
+                    library.libraryId,
                   );
                 },
               ),
               _PopupMenuItem(
                 label: l10n.sidebarDeepScanLibrary,
                 onTap: () {
-                  _controller.hideMenu();
+                  controller.hideMenu();
                   LibraryManagementActions.scanLibrary(
                     ref,
                     context,
-                    widget.library.libraryId,
+                    library.libraryId,
                     mode: ScanMode.full,
                   );
                 },
@@ -438,23 +421,19 @@ class _LibraryOverflowMenuButtonState
                 _PopupMenuItem(
                   label: l10n.sidebarEditLibrary,
                   onTap: () {
-                    _controller.hideMenu();
+                    controller.hideMenu();
                     LibraryManagementActions.editRemoteLibrary(
                       ref,
                       context,
-                      widget.library,
+                      library,
                     );
                   },
                 ),
               _PopupMenuItem(
                 label: l10n.sidebarDeleteLibrary,
                 onTap: () {
-                  _controller.hideMenu();
-                  LibraryManagementActions.deleteLibrary(
-                    ref,
-                    context,
-                    widget.library,
-                  );
+                  controller.hideMenu();
+                  LibraryManagementActions.deleteLibrary(ref, context, library);
                 },
               ),
             ],
@@ -463,16 +442,16 @@ class _LibraryOverflowMenuButtonState
       ),
       child: GhostButton.icon(
         icon: LucideIcons.ellipsisVertical,
-        tooltip: localLibraryDisplayName(widget.library),
-        semanticLabel: localLibraryDisplayName(widget.library),
+        tooltip: localLibraryDisplayName(library),
+        semanticLabel: localLibraryDisplayName(library),
         iconSize: 14,
         size: 28,
-        borderRadius: 6,
+        borderRadius: tokens.radius.sm,
         foregroundColor: cs.hentai.textSecondary,
         hoverColor: cs.hentai.sidebarItemHoverBackground,
         overlayColor: cs.hentai.sidebarItemHoverBackground.withAlpha(110),
         delayTooltipThreeSeconds: true,
-        onPressed: () => _controller.toggleMenu(),
+        onPressed: controller.toggleMenu,
       ),
     );
   }
@@ -492,15 +471,19 @@ class _PopupMenuItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
     return InkWell(
       onTap: enabled ? onTap : null,
       splashFactory: NoSplash.splashFactory,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: tokens.spacing.md,
+          vertical: tokens.spacing.sm,
+        ),
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: tokens.text.bodySm,
             color: enabled ? cs.hentai.textPrimary : cs.hentai.textTertiary,
           ),
         ),
@@ -509,7 +492,7 @@ class _PopupMenuItem extends StatelessWidget {
   }
 }
 
-class _SidebarIconOnlyButton extends StatefulWidget {
+class _SidebarIconOnlyButton extends HookWidget {
   const _SidebarIconOnlyButton({
     required this.isActive,
     required this.icon,
@@ -523,29 +506,27 @@ class _SidebarIconOnlyButton extends StatefulWidget {
   final VoidCallback onTap;
 
   @override
-  State<_SidebarIconOnlyButton> createState() => _SidebarIconOnlyButtonState();
-}
-
-class _SidebarIconOnlyButtonState extends State<_SidebarIconOnlyButton> {
-  bool _hovered = false;
-
-  @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final Color background = widget.isActive
+    final AppThemeTokens tokens = context.tokens;
+    final ValueNotifier<bool> hovered = useState(false);
+    final Color background = isActive
         ? cs.hentai.sidebarItemActiveBackground
-        : (_hovered ? cs.hentai.sidebarItemHoverBackground : cs.hentai.sidebarBackground);
+        : (hovered.value
+              ? cs.hentai.sidebarItemHoverBackground
+              : cs.hentai.sidebarBackground);
+
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
+      margin: EdgeInsets.symmetric(vertical: tokens.spacing.xs),
       child: MouseRegion(
-        onEnter: (_) => setState(() => _hovered = true),
-        onExit: (_) => setState(() => _hovered = false),
+        onEnter: (_) => hovered.value = true,
+        onExit: (_) => hovered.value = false,
         cursor: SystemMouseCursors.click,
         child: Semantics(
           button: true,
-          label: widget.semanticLabel,
+          label: semanticLabel,
           child: GestureDetector(
-            onTap: widget.onTap,
+            onTap: onTap,
             child: Align(
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 220),
@@ -553,18 +534,18 @@ class _SidebarIconOnlyButtonState extends State<_SidebarIconOnlyButton> {
                 height: 36,
                 decoration: BoxDecoration(
                   color: background,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(tokens.radius.md),
                   border: Border.all(
-                    width: widget.isActive ? 1 : 0.8,
-                    color: widget.isActive
+                    width: isActive ? 1 : 0.8,
+                    color: isActive
                         ? cs.hentai.sidebarItemActiveBorder
                         : cs.hentai.sidebarBackground,
                   ),
                 ),
                 child: Icon(
-                  widget.icon,
+                  icon,
                   size: 18,
-                  color: widget.isActive || _hovered
+                  color: isActive || hovered.value
                       ? cs.hentai.textPrimary
                       : cs.hentai.textSecondary,
                 ),
@@ -577,7 +558,7 @@ class _SidebarIconOnlyButtonState extends State<_SidebarIconOnlyButton> {
   }
 }
 
-class _SidebarChromeRow extends StatefulWidget {
+class _SidebarChromeRow extends HookWidget {
   const _SidebarChromeRow({
     required this.isActive,
     required this.expandProgress,
@@ -599,80 +580,79 @@ class _SidebarChromeRow extends StatefulWidget {
   final bool indentWithoutIcon;
 
   @override
-  State<_SidebarChromeRow> createState() => _SidebarChromeRowState();
-}
-
-class _SidebarChromeRowState extends State<_SidebarChromeRow> {
-  bool _hovered = false;
-
-  @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
-    final double t = widget.expandProgress.clamp(0.0, 1.0);
-    final Color background = widget.isActive
+    final AppThemeTokens tokens = context.tokens;
+    final ValueNotifier<bool> hovered = useState(false);
+    final double t = expandProgress.clamp(0.0, 1.0);
+    final Color background = isActive
         ? cs.hentai.sidebarItemActiveBackground
-        : (_hovered ? cs.hentai.sidebarItemHoverBackground : cs.hentai.sidebarBackground);
-    final Color textColor = widget.isActive || _hovered
+        : (hovered.value
+              ? cs.hentai.sidebarItemHoverBackground
+              : cs.hentai.sidebarBackground);
+    final Color textColor = isActive || hovered.value
         ? cs.hentai.textPrimary
         : cs.hentai.textSecondary;
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 2),
+      margin: EdgeInsets.symmetric(vertical: tokens.spacing.xs / 2),
       child: MouseRegion(
-        onEnter: (_) => setState(() => _hovered = true),
-        onExit: (_) => setState(() => _hovered = false),
+        onEnter: (_) => hovered.value = true,
+        onExit: (_) => hovered.value = false,
         cursor: SystemMouseCursors.click,
         child: Semantics(
           button: true,
-          label: widget.label,
+          label: label,
           child: GestureDetector(
-            onTap: widget.onTap,
+            onTap: onTap,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 220),
               curve: Curves.easeOutCubic,
               decoration: BoxDecoration(
                 color: background,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(tokens.radius.md),
                 border: Border.all(
-                  width: widget.isActive ? 1 : 0.8,
-                  color: widget.isActive
+                  width: isActive ? 1 : 0.8,
+                  color: isActive
                       ? cs.hentai.sidebarItemActiveBorder
                       : cs.hentai.sidebarBackground,
                 ),
               ),
               padding: EdgeInsets.only(
-                left: widget.indentWithoutIcon ? 12 + 18 + 8 : 12 * t,
-                right: 4,
-                top: 6,
-                bottom: 6,
+                left: indentWithoutIcon
+                    ? tokens.spacing.md + 18 + tokens.spacing.sm
+                    : tokens.spacing.md * t,
+                right: tokens.spacing.xs,
+                top: tokens.spacing.xs + 2,
+                bottom: tokens.spacing.xs + 2,
               ),
               child: Row(
                 children: <Widget>[
-                  if (widget.leading != null)
+                  if (leading != null)
                     IconTheme(
                       data: IconThemeData(color: textColor, size: 18),
-                      child: widget.leading!,
+                      child: leading!,
                     ),
-                  if (widget.leading != null) const SizedBox(width: 8),
+                  if (leading != null) SizedBox(width: tokens.spacing.sm),
                   Expanded(
                     child: Opacity(
-                      opacity: widget.labelOpacity,
+                      opacity: labelOpacity,
                       child: Text(
-                        widget.label,
+                        label,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: textColor,
-                          fontSize: 14,
-                          fontWeight: widget.isActive
+                          fontSize: tokens.text.bodyMd,
+                          fontWeight: isActive
                               ? FontWeight.w600
                               : FontWeight.w400,
                         ),
                       ),
                     ),
                   ),
-                  if (widget.trailing != null) widget.trailing!,
+                  if (trailing != null) trailing!,
                 ],
               ),
             ),

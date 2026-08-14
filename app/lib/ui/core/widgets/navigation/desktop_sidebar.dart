@@ -5,9 +5,16 @@ import 'package:hentai_library/ui/core/dto/nav_item_data.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/app_navigation.dart';
-import 'package:hentai_library/ui/features/shell/views/navigation/libraries_sidebar_section.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+/// Builds the Libraries section inserted after Home in [DesktopSidebar].
+typedef DesktopSidebarLibrariesSectionBuilder =
+    Widget Function({
+      required double expandProgress,
+      required double labelOpacity,
+      required bool showCollapsedTooltip,
+    });
 
 class DesktopSidebar extends HookConsumerWidget {
   static const double expandedWidth = 256;
@@ -28,6 +35,7 @@ class DesktopSidebar extends HookConsumerWidget {
   final bool applyDrawerTopInset;
   final VoidCallback onToggleExpanded;
   final ValueChanged<String> onDestinationSelected;
+  final DesktopSidebarLibrariesSectionBuilder? librariesSectionBuilder;
 
   const DesktopSidebar({
     super.key,
@@ -37,6 +45,7 @@ class DesktopSidebar extends HookConsumerWidget {
     this.applyDrawerTopInset = false,
     required this.onToggleExpanded,
     required this.onDestinationSelected,
+    this.librariesSectionBuilder,
   });
 
   @override
@@ -97,13 +106,17 @@ class DesktopSidebar extends HookConsumerWidget {
             ),
           );
           if (item.id == AppNavigation.navIdHome) {
-            mainNav.add(
-              LibrariesSidebarSection(
-                expandProgress: curvedT,
-                labelOpacity: labelOpacity,
-                showCollapsedTooltip: showCollapsedTooltip,
-              ),
-            );
+            final DesktopSidebarLibrariesSectionBuilder? builder =
+                librariesSectionBuilder;
+            if (builder != null) {
+              mainNav.add(
+                builder(
+                  expandProgress: curvedT,
+                  labelOpacity: labelOpacity,
+                  showCollapsedTooltip: showCollapsedTooltip,
+                ),
+              );
+            }
           }
         }
 
@@ -115,7 +128,12 @@ class DesktopSidebar extends HookConsumerWidget {
             color: cs.hentai.sidebarBackground,
             border: Border(right: BorderSide(color: cs.hentai.borderSubtle)),
           ),
-          padding: EdgeInsets.fromLTRB(8, topPadding, 8, 16),
+          padding: EdgeInsets.fromLTRB(
+            tokens.spacing.sm,
+            topPadding,
+            tokens.spacing.sm,
+            tokens.spacing.lg,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -123,7 +141,7 @@ class DesktopSidebar extends HookConsumerWidget {
                 Align(
                   alignment: toggleAlignment,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs),
                     child: GhostButton.icon(
                       icon: LucideIcons.menu,
                       tooltip: '',
@@ -132,7 +150,7 @@ class DesktopSidebar extends HookConsumerWidget {
                           : l10n.sidebarExpand,
                       iconSize: 18,
                       size: 36,
-                      borderRadius: 8,
+                      borderRadius: tokens.radius.md,
                       foregroundColor: cs.hentai.textSecondary,
                       hoverColor: cs.hentai.sidebarItemHoverBackground,
                       overlayColor: cs.hentai.sidebarItemHoverBackground
@@ -142,7 +160,7 @@ class DesktopSidebar extends HookConsumerWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: tokens.spacing.lg),
               ],
               Expanded(
                 child: ListView(

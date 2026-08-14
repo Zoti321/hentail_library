@@ -81,5 +81,57 @@ void main() {
         (sectionActive: false, activeLibraryId: null),
       );
     });
+
+    test('series detail highlights current library child', () {
+      expect(
+        librariesSidebarSelection(
+          path: '/series/s1',
+          currentLibraryId: 'lib-a',
+        ),
+        (sectionActive: false, activeLibraryId: 'lib-a'),
+      );
+    });
+  });
+
+  group('librariesRailIconActive', () {
+    test('active for all-libraries section', () {
+      expect(
+        librariesRailIconActive((sectionActive: true, activeLibraryId: null)),
+        isTrue,
+      );
+    });
+
+    test('active when a library child context is selected', () {
+      expect(
+        librariesRailIconActive((
+          sectionActive: false,
+          activeLibraryId: 'lib-a',
+        )),
+        isTrue,
+      );
+    });
+
+    test('inactive on unrelated routes', () {
+      expect(
+        librariesRailIconActive((sectionActive: false, activeLibraryId: null)),
+        isFalse,
+      );
+    });
+  });
+
+  group('afterLibraryDeleteNavigation', () {
+    test('selects first remaining library browse path', () {
+      expect(
+        afterLibraryDeleteNavigation(remainingLibraryIds: <String>['b', 'c']),
+        (selectLibraryId: 'b', goPath: '/libraries/b'),
+      );
+    });
+
+    test('goes to all libraries when none remain', () {
+      expect(
+        afterLibraryDeleteNavigation(remainingLibraryIds: const <String>[]),
+        (selectLibraryId: null, goPath: '/libraries/all'),
+      );
+    });
   });
 }

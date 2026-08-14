@@ -52,6 +52,11 @@ typedef LibrariesSidebarSelection = ({
   String? activeLibraryId,
 });
 
+/// Collapsed rail icon is active for All libraries or a specific library context.
+bool librariesRailIconActive(LibrariesSidebarSelection selection) {
+  return selection.sectionActive || selection.activeLibraryId != null;
+}
+
 LibrariesSidebarSelection librariesSidebarSelection({
   required String path,
   required String? currentLibraryId,
@@ -67,4 +72,20 @@ LibrariesSidebarSelection librariesSidebarSelection({
     return (sectionActive: false, activeLibraryId: currentLibraryId);
   }
   return (sectionActive: false, activeLibraryId: null);
+}
+
+/// Where to go / what to select after deleting the viewed or Current library.
+typedef AfterLibraryDeleteNavigation = ({
+  String? selectLibraryId,
+  String goPath,
+});
+
+AfterLibraryDeleteNavigation afterLibraryDeleteNavigation({
+  required List<String> remainingLibraryIds,
+}) {
+  if (remainingLibraryIds.isEmpty) {
+    return (selectLibraryId: null, goPath: LibrariesRoutes.all);
+  }
+  final String nextId = remainingLibraryIds.first;
+  return (selectLibraryId: nextId, goPath: LibrariesRoutes.library(nextId));
 }
