@@ -77,11 +77,6 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
     }
   }
 
-  /// Call after library settings update so Scan interval timer resets.
-  void resetIntervalAnchor(String libraryId) {
-    _intervalAnchors[libraryId] = _now();
-  }
-
   void _ensureIntervalTicker() {
     _intervalTicker ??= Timer.periodic(const Duration(seconds: 30), (_) {
       unawaited(_tickIntervals());
@@ -103,10 +98,7 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
       now: now,
     );
     for (final String libraryId in due) {
-      final bool started = await _tryStartIncremental(libraryId);
-      if (!started) {
-        continue;
-      }
+      await _startIncrementalQueued(libraryId);
       LocalLibrary? matched;
       for (final LocalLibrary library in state.libraries) {
         if (library.libraryId == libraryId) {
@@ -158,23 +150,23 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
       if (!_isValidStartupToken(token)) {
         return;
       }
-      await _tryStartIncremental(libraryId);
+      await _startIncrementalQueued(libraryId);
     }
   }
 
-  Future<bool> _tryStartIncremental(String libraryId) async {
-    final ScanLibraryState scanState = ref.read(scanLibraryControllerProvider);
-    if (scanState.running) {
-      return false;
+  /// Waits out any in-flight Library sync, then starts incremental sync for [libraryId].
+  Future<void> _startIncrementalQueued(String libraryId) async {
+    final ScanLibraryController notifier = ref.read(
+      scanLibraryControllerProvider.notifier,
+    );
+    while (ref.read(scanLibraryControllerProvider).running) {
+      await notifier.start();
     }
-    await ref
-        .read(scanLibraryControllerProvider.notifier)
-        .start(
-          mode: ScanMode.incremental,
-          targetLibraryId: libraryId,
-          silent: true,
-        );
-    return true;
+    await notifier.start(
+      mode: ScanMode.incremental,
+      targetLibraryId: libraryId,
+      silent: true,
+    );
   }
 
   bool _isValidStartupToken(int token) {
