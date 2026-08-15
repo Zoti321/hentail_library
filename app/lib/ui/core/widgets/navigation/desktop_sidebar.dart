@@ -19,6 +19,15 @@ typedef DesktopSidebarLibrariesSectionBuilder =
 class DesktopSidebar extends HookConsumerWidget {
   static const double expandedWidth = 256;
   static const double collapsedWidth = 72;
+
+  /// Painted height of every sidebar nav chrome (main + libraries), border included.
+  /// Idle/hover/active/disabled must all keep this height to avoid layout shift.
+  static const double navItemHeight = 36;
+
+  /// Vertical gap outside each nav chrome (top and bottom).
+  static const double navItemVerticalMargin = 4;
+
+  static const double navItemIconSize = 18;
   static const Duration _kAnimDuration = Duration(milliseconds: 220);
   static const Curve _kAnimCurve = Curves.easeOutCubic;
 
@@ -256,6 +265,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
               alignment: align,
               child: SizedBox(
                 width: buttonWidth,
+                height: DesktopSidebar.navItemHeight,
                 child: AnimatedContainer(
                   duration: _kChromeAnimDuration,
                   curve: _kChromeAnimCurve,
@@ -283,7 +293,6 @@ class _SidebarButtonState extends State<_SidebarButton> {
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: horizontalPadding,
-                      vertical: 8,
                     ),
                     child: Align(
                       alignment: t < 0.001
@@ -298,7 +307,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
                             data: theme.copyWith(
                               iconTheme: IconThemeData(
                                 color: iconColor,
-                                size: 18,
+                                size: DesktopSidebar.navItemIconSize,
                               ),
                             ),
                             child: Icon(widget.item.icon),
@@ -352,7 +361,9 @@ class _SidebarButtonState extends State<_SidebarButton> {
     );
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
+      margin: const EdgeInsets.symmetric(
+        vertical: DesktopSidebar.navItemVerticalMargin,
+      ),
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),

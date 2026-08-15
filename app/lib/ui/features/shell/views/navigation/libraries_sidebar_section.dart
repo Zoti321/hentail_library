@@ -8,6 +8,7 @@ import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
+import 'package:hentai_library/ui/core/widgets/navigation/desktop_sidebar.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -605,7 +606,7 @@ class _SidebarIconOnlyButton extends HookWidget {
               : cs.hentai.sidebarBackground);
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: tokens.spacing.xs),
+      margin: EdgeInsets.symmetric(vertical: DesktopSidebar.navItemVerticalMargin),
       child: MouseRegion(
         onEnter: (_) => hovered.value = true,
         onExit: (_) => hovered.value = false,
@@ -618,8 +619,8 @@ class _SidebarIconOnlyButton extends HookWidget {
             child: Align(
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 220),
-                width: 36,
-                height: 36,
+                width: DesktopSidebar.navItemHeight,
+                height: DesktopSidebar.navItemHeight,
                 decoration: BoxDecoration(
                   color: background,
                   borderRadius: BorderRadius.circular(tokens.radius.md),
@@ -632,7 +633,7 @@ class _SidebarIconOnlyButton extends HookWidget {
                 ),
                 child: Icon(
                   icon,
-                  size: 18,
+                  size: DesktopSidebar.navItemIconSize,
                   color: isActive || hovered.value
                       ? cs.hentai.textPrimary
                       : cs.hentai.textSecondary,
@@ -686,7 +687,9 @@ class _SidebarChromeRow extends HookWidget {
         : h.textSecondary;
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: tokens.spacing.xs / 2),
+      margin: const EdgeInsets.symmetric(
+        vertical: DesktopSidebar.navItemVerticalMargin,
+      ),
       child: MouseRegion(
         onEnter: (_) => hovered.value = true,
         onExit: (_) => hovered.value = false,
@@ -699,6 +702,7 @@ class _SidebarChromeRow extends HookWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 220),
               curve: Curves.easeOutCubic,
+              height: DesktopSidebar.navItemHeight,
               decoration: BoxDecoration(
                 color: background,
                 borderRadius: BorderRadius.circular(tokens.radius.md),
@@ -712,17 +716,21 @@ class _SidebarChromeRow extends HookWidget {
               ),
               padding: EdgeInsets.only(
                 left: indentWithoutIcon
-                    ? tokens.spacing.md + 18 + tokens.spacing.sm
+                    ? tokens.spacing.md +
+                          DesktopSidebar.navItemIconSize +
+                          tokens.spacing.sm
                     : tokens.spacing.md * t,
                 right: tokens.spacing.xs,
-                top: tokens.spacing.xs + 2,
-                bottom: tokens.spacing.xs + 2,
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   if (leading != null)
                     IconTheme(
-                      data: IconThemeData(color: textColor, size: 18),
+                      data: IconThemeData(
+                        color: textColor,
+                        size: DesktopSidebar.navItemIconSize,
+                      ),
                       child: leading!,
                     ),
                   if (leading != null) SizedBox(width: tokens.spacing.sm),
@@ -733,9 +741,16 @@ class _SidebarChromeRow extends HookWidget {
                         label,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        strutStyle: const StrutStyle(
+                          fontSize: 14,
+                          height: 1.2,
+                          fontWeight: FontWeight.w600,
+                          forceStrutHeight: true,
+                        ),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: textColor,
                           fontSize: tokens.text.bodyMd,
+                          height: 1.2,
                           fontWeight: isActive
                               ? FontWeight.w600
                               : FontWeight.w400,
