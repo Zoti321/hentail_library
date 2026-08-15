@@ -234,24 +234,7 @@ pub async fn create_local_library(
     }
 
     let existing_libs = list_libraries().await?;
-    let new_key = normalize_path_for_key(root);
-    for lib in &existing_libs {
-        if lib.kind != KIND_LOCAL {
-            continue;
-        }
-        let other = normalize_path_for_key(&lib.root_path);
-        if other.is_empty() || new_key.is_empty() {
-            continue;
-        }
-        if new_key == other
-            || new_key.starts_with(&format!("{other}/"))
-            || other.starts_with(&format!("{new_key}/"))
-        {
-            return Err(HentaiError::validation(
-                "Local library 的 Library root 不能互相嵌套",
-            ));
-        }
-    }
+    ensure_local_root_not_nested(root, None, &existing_libs)?;
 
     let count = existing_libs.len();
     let dto = LibraryDto {
@@ -389,6 +372,73 @@ pub async fn update_remote_library(
     update_existing_remote(model, &root, &user, allow_http).await
 }
 
+/// Change a Local library's Library root while keeping `library_id` and name.
+/// Rejects empty roots and Local roots that equal or nest under another Local library.
+pub async fn update_local_library_root(
+    library_id: &str,
+    root_path: &str,
+) -> Result<LibraryDto, HentaiError> {
+    let id = library_id.trim();
+    if id.is_empty() {
+        return Err(HentaiError::validation("library_id 不能为空"));
+    }
+    let root = root_path.trim();
+    if root.is_empty() {
+        return Err(HentaiError::validation("Library root 不能为空"));
+    }
+    let db = connection()?;
+    let Some(model) = Libraries::find_by_id(id.to_string())
+        .one(&db)
+        .await
+        .map_err(map_db_err)?
+    else {
+        return Err(HentaiError::validation(format!("Library 不存在: {id}")));
+    };
+    if model.kind != KIND_LOCAL {
+        return Err(HentaiError::validation("仅 Local library 可更新本地 Library root"));
+    }
+
+    let existing_libs = list_libraries().await?;
+    ensure_local_root_not_nested(root, Some(id), &existing_libs)?;
+
+    let mut active: libraries::ActiveModel = model.into();
+    active.root_path = Set(root.to_string());
+    let updated = active.update(&db).await.map_err(map_db_err)?;
+    Ok(model_to_dto(updated))
+}
+
+fn ensure_local_root_not_nested(
+    root: &str,
+    exclude_library_id: Option<&str>,
+    existing_libs: &[LibraryDto],
+) -> Result<(), HentaiError> {
+    let new_key = normalize_path_for_key(root);
+    if new_key.is_empty() {
+        return Err(HentaiError::validation("Library root 不能为空"));
+    }
+    for lib in existing_libs {
+        if lib.kind != KIND_LOCAL {
+            continue;
+        }
+        if exclude_library_id.is_some_and(|id| lib.library_id == id) {
+            continue;
+        }
+        let other = normalize_path_for_key(&lib.root_path);
+        if other.is_empty() {
+            continue;
+        }
+        if new_key == other
+            || new_key.starts_with(&format!("{other}/"))
+            || other.starts_with(&format!("{new_key}/"))
+        {
+            return Err(HentaiError::validation(
+                "Local library 的 Library root 不能互相嵌套",
+            ));
+        }
+    }
+    Ok(())
+}
+
 async fn update_existing_remote(
     model: libraries::Model,
     root: &str,
@@ -401,7 +451,6 @@ async fn update_existing_remote(
     let db = connection()?;
     let mut active: libraries::ActiveModel = model.into();
     active.root_path = Set(root.to_string());
-    active.name = Set(library_name_from_webdav_root(root));
     active.username = Set(username.to_string());
     active.allow_http = Set(if allow_http { 1 } else { 0 });
     let updated = active.update(&db).await.map_err(map_db_err)?;

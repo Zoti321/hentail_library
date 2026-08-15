@@ -40,8 +40,8 @@ pub use library::{
     normalize_webdav_root, parse_format_groups_json, parse_scan_interval, resolve_access_for_comic,
     resolve_browse_library_id, serialize_format_groups, set_all_libraries_scan_on_startup,
     set_current_library_id, set_remote_library_credentials, update_library_format_groups,
-    update_library_settings, update_remote_library, LibraryDto, RemoteLibraryCredential,
-    ResolvedAccess, ScanInterval,
+    update_library_settings, update_local_library_root, update_remote_library, LibraryDto,
+    RemoteLibraryCredential, ResolvedAccess, ScanInterval,
 };
 pub use path::{add_path, list_all_paths, remove_path, watch_paths};
 pub use sync::{

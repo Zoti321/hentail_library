@@ -5,7 +5,6 @@ enum LibrarySidebarOverflowAction {
   scan,
   deepScan,
   refreshMetadataLater,
-  editConnection,
   edit,
   delete,
 }
@@ -13,15 +12,13 @@ enum LibrarySidebarOverflowAction {
 /// Builds overflow items for a Library sidebar child row.
 ///
 /// [edit] is always present and immediately above [delete].
-/// [editConnection] is Remote-only and sits above [edit].
 List<LibrarySidebarOverflowAction> librarySidebarOverflowActions(
   LocalLibrary library,
 ) {
-  return <LibrarySidebarOverflowAction>[
+  return const <LibrarySidebarOverflowAction>[
     LibrarySidebarOverflowAction.scan,
     LibrarySidebarOverflowAction.deepScan,
     LibrarySidebarOverflowAction.refreshMetadataLater,
-    if (isRemoteLibrary(library)) LibrarySidebarOverflowAction.editConnection,
     LibrarySidebarOverflowAction.edit,
     LibrarySidebarOverflowAction.delete,
   ];

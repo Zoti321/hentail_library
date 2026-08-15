@@ -44,6 +44,14 @@ LibraryDto updateRemoteLibraryFrb({
   allowHttp: allowHttp,
 );
 
+LibraryDto updateLocalLibraryRootFrb({
+  required String libraryId,
+  required String rootPath,
+}) => RustLib.instance.api.crateApiLibraryUpdateLocalLibraryRootFrb(
+  libraryId: libraryId,
+  rootPath: rootPath,
+);
+
 void deleteLibraryFrb({required String libraryId}) =>
     RustLib.instance.api.crateApiLibraryDeleteLibraryFrb(libraryId: libraryId);
 

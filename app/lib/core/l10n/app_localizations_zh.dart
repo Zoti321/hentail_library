@@ -54,10 +54,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sidebarDeleteLibrary => '删除';
 
   @override
+  String get dialogCreateLocalLibraryTitle => '添加本地库';
+
+  @override
+  String get dialogCreateRemoteLibraryTitle => '添加远程库';
+
+  @override
   String get dialogEditLibraryTitle => '编辑库';
 
   @override
   String get dialogEditLibraryTabGeneral => '常规';
+
+  @override
+  String get dialogEditLibraryTabWebDav => 'WebDAV';
 
   @override
   String get dialogEditLibraryTabScanner => '扫描';
@@ -67,6 +76,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get formLibraryRootLabel => '根位置';
+
+  @override
+  String get formLibraryRootBrowse => '浏览';
+
+  @override
+  String get formLibraryRootChangeConfirmTitle => '确认更改根位置？';
+
+  @override
+  String get formLibraryRootChangeConfirmBody =>
+      '更改库根后，下次同步将按新根对齐；旧路径下的漫画可能成为孤儿并被删除。此操作不会自动触发同步。';
 
   @override
   String get formLibraryScanOnStartupLabel => '启动时扫描';

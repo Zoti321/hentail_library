@@ -55,10 +55,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sidebarDeleteLibrary => 'Delete';
 
   @override
+  String get dialogCreateLocalLibraryTitle => 'Add local library';
+
+  @override
+  String get dialogCreateRemoteLibraryTitle => 'Add remote library';
+
+  @override
   String get dialogEditLibraryTitle => 'Edit library';
 
   @override
   String get dialogEditLibraryTabGeneral => 'General';
+
+  @override
+  String get dialogEditLibraryTabWebDav => 'WebDAV';
 
   @override
   String get dialogEditLibraryTabScanner => 'Scanner';
@@ -68,6 +77,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get formLibraryRootLabel => 'Root';
+
+  @override
+  String get formLibraryRootBrowse => 'Browse';
+
+  @override
+  String get formLibraryRootChangeConfirmTitle => 'Change library root?';
+
+  @override
+  String get formLibraryRootChangeConfirmBody =>
+      'After changing the library root, the next sync will align to the new root. Comics under the old path may become orphans and be removed. Sync is not started automatically.';
 
   @override
   String get formLibraryScanOnStartupLabel => 'Scan on startup';

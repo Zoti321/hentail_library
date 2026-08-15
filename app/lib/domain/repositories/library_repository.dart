@@ -25,6 +25,11 @@ abstract class LibraryRepository {
     String? password,
   });
 
+  Future<LocalLibrary> updateLocalRoot({
+    required String libraryId,
+    required String rootPath,
+  });
+
   Future<void> delete(String libraryId);
 
   Future<String?> getCurrentId();

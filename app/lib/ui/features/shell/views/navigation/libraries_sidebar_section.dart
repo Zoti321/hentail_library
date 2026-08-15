@@ -472,8 +472,6 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
       LibrarySidebarOverflowAction.deepScan => l10n.sidebarDeepScanLibrary,
       LibrarySidebarOverflowAction.refreshMetadataLater =>
         l10n.sidebarRefreshMetadataLater,
-      LibrarySidebarOverflowAction.editConnection =>
-        l10n.sidebarEditLibraryConnection,
       LibrarySidebarOverflowAction.edit => l10n.sidebarEditLibrary,
       LibrarySidebarOverflowAction.delete => l10n.sidebarDeleteLibrary,
     };
@@ -496,8 +494,6 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
         );
       case LibrarySidebarOverflowAction.refreshMetadataLater:
         break;
-      case LibrarySidebarOverflowAction.editConnection:
-        LibraryManagementActions.editRemoteLibrary(ref, context, library);
       case LibrarySidebarOverflowAction.edit:
         LibraryManagementActions.editLibrarySettings(ref, context, library);
       case LibrarySidebarOverflowAction.delete:

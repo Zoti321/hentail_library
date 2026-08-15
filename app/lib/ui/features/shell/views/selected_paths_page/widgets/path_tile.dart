@@ -5,12 +5,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/remove_saved_path_confirm_dialog.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/remote_library_form_dialog.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/library_form_dialog.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -93,35 +92,12 @@ class PathTile extends HookConsumerWidget {
       }
     }
 
-    Future<void> handleEditRemote() async {
-      final RemoteLibraryFormResult? result = await showRemoteLibraryFormDialog(
+    Future<void> handleEditRemote() {
+      return showLibraryFormDialog(
         context: context,
-        existing: library,
+        mode: LibraryFormMode.edit,
+        library: library,
       );
-      if (result == null || !context.mounted) {
-        return;
-      }
-      try {
-        final LibraryRepository repo = ref.read(libraryRepoProvider);
-        await repo.updateRemote(
-          libraryId: library.libraryId,
-          rootUrl: result.rootUrl,
-          username: result.username,
-          allowHttp: result.allowHttp,
-          password: result.passwordChanged ? result.password : null,
-        );
-        await ref.read(currentLibraryProvider.notifier).refresh();
-        ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
-        if (!context.mounted) {
-          return;
-        }
-        showSuccessToast(context, l10n.remoteLibraryUpdatedToast);
-      } catch (error) {
-        if (!context.mounted) {
-          return;
-        }
-        showErrorToast(context, error);
-      }
     }
 
     return Theme(

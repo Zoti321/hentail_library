@@ -32,14 +32,13 @@ void main() {
     );
   });
 
-  test('remote library: Edit connection then Edit then Delete', () {
+  test('remote library: same overflow as local (edit covers connection)', () {
     expect(
       librarySidebarOverflowActions(_lib(kind: 'remote')),
       <LibrarySidebarOverflowAction>[
         LibrarySidebarOverflowAction.scan,
         LibrarySidebarOverflowAction.deepScan,
         LibrarySidebarOverflowAction.refreshMetadataLater,
-        LibrarySidebarOverflowAction.editConnection,
         LibrarySidebarOverflowAction.edit,
         LibrarySidebarOverflowAction.delete,
       ],

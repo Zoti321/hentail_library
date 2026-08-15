@@ -101,6 +101,22 @@ class LibraryRepositoryImpl implements LibraryRepository {
   }
 
   @override
+  Future<LocalLibrary> updateLocalRoot({
+    required String libraryId,
+    required String rootPath,
+  }) async {
+    return guardFrbSync(
+      () => _mapLibrary(
+        rust.updateLocalLibraryRootFrb(
+          libraryId: libraryId,
+          rootPath: rootPath,
+        ),
+      ),
+      fallbackMessage: '更新本地库根路径失败',
+    );
+  }
+
+  @override
   Future<void> delete(String libraryId) async {
     try {
       guardFrbSync(

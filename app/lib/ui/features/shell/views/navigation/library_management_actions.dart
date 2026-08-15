@@ -1,88 +1,44 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/domain/repositories/library_repository.dart';
-import 'package:hentai_library/domain/repositories/path_repository.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/remove_saved_path_confirm_dialog.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_library_settings_dialog.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/remote_library_form_dialog.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/library_form_dialog.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/providers.dart';
 
 /// Shared Library create / edit / delete / scan actions for sidebar + paths page.
 abstract final class LibraryManagementActions {
-  static Future<void> addLocalLibrary(WidgetRef ref, BuildContext context) async {
-    final String? directoryPath = await FilePicker.platform.getDirectoryPath();
-    if (directoryPath == null || directoryPath.isEmpty) {
-      return;
-    }
-    final PathRepository pathRepository = ref.read(pathRepoProvider);
-    await pathRepository.add(directoryPath);
-    await ref.read(currentLibraryProvider.notifier).refresh();
-    if (!context.mounted) {
-      return;
-    }
-    showSuccessToast(context, context.l10n.pathsAddedOneToast);
+  static Future<void> addLocalLibrary(WidgetRef ref, BuildContext context) {
+    return showLibraryFormDialog(
+      context: context,
+      mode: LibraryFormMode.createLocal,
+    );
   }
 
-  static Future<void> addRemoteLibrary(
-    WidgetRef ref,
-    BuildContext context,
-  ) async {
-    final RemoteLibraryFormResult? result = await showRemoteLibraryFormDialog(
+  static Future<void> addRemoteLibrary(WidgetRef ref, BuildContext context) {
+    return showLibraryFormDialog(
       context: context,
+      mode: LibraryFormMode.createRemote,
     );
-    if (result == null || !context.mounted) {
-      return;
-    }
-    await ref.read(libraryRepoProvider).createRemote(
-      rootUrl: result.rootUrl,
-      username: result.username,
-      password: result.password,
-      allowHttp: result.allowHttp,
-    );
-    await ref.read(currentLibraryProvider.notifier).refresh();
-    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
-    if (!context.mounted) {
-      return;
-    }
-    showSuccessToast(context, context.l10n.remoteLibraryAddedToast);
   }
 
   static Future<void> editRemoteLibrary(
     WidgetRef ref,
     BuildContext context,
     LocalLibrary library,
-  ) async {
+  ) {
     if (!isRemoteLibrary(library)) {
-      return;
+      return Future<void>.value();
     }
-    final RemoteLibraryFormResult? result = await showRemoteLibraryFormDialog(
+    return showLibraryFormDialog(
       context: context,
-      existing: library,
+      mode: LibraryFormMode.edit,
+      library: library,
     );
-    if (result == null || !context.mounted) {
-      return;
-    }
-    final LibraryRepository repo = ref.read(libraryRepoProvider);
-    await repo.updateRemote(
-      libraryId: library.libraryId,
-      rootUrl: result.rootUrl,
-      username: result.username,
-      allowHttp: result.allowHttp,
-      password: result.passwordChanged ? result.password : null,
-    );
-    await ref.read(currentLibraryProvider.notifier).refresh();
-    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
-    if (!context.mounted) {
-      return;
-    }
-    showSuccessToast(context, context.l10n.remoteLibraryUpdatedToast);
   }
 
   static Future<void> editLibrarySettings(
@@ -90,7 +46,11 @@ abstract final class LibraryManagementActions {
     BuildContext context,
     LocalLibrary library,
   ) {
-    return showEditLibrarySettingsDialog(context: context, library: library);
+    return showLibraryFormDialog(
+      context: context,
+      mode: LibraryFormMode.edit,
+      library: library,
+    );
   }
 
   static Future<void> deleteLibrary(

@@ -188,6 +188,18 @@ abstract class AppLocalizations {
   /// **'删除'**
   String get sidebarDeleteLibrary;
 
+  /// No description provided for @dialogCreateLocalLibraryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加本地库'**
+  String get dialogCreateLocalLibraryTitle;
+
+  /// No description provided for @dialogCreateRemoteLibraryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加远程库'**
+  String get dialogCreateRemoteLibraryTitle;
+
   /// No description provided for @dialogEditLibraryTitle.
   ///
   /// In zh, this message translates to:
@@ -199,6 +211,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'常规'**
   String get dialogEditLibraryTabGeneral;
+
+  /// No description provided for @dialogEditLibraryTabWebDav.
+  ///
+  /// In zh, this message translates to:
+  /// **'WebDAV'**
+  String get dialogEditLibraryTabWebDav;
 
   /// No description provided for @dialogEditLibraryTabScanner.
   ///
@@ -217,6 +235,24 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'根位置'**
   String get formLibraryRootLabel;
+
+  /// No description provided for @formLibraryRootBrowse.
+  ///
+  /// In zh, this message translates to:
+  /// **'浏览'**
+  String get formLibraryRootBrowse;
+
+  /// No description provided for @formLibraryRootChangeConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认更改根位置？'**
+  String get formLibraryRootChangeConfirmTitle;
+
+  /// No description provided for @formLibraryRootChangeConfirmBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'更改库根后，下次同步将按新根对齐；旧路径下的漫画可能成为孤儿并被删除。此操作不会自动触发同步。'**
+  String get formLibraryRootChangeConfirmBody;
 
   /// No description provided for @formLibraryScanOnStartupLabel.
   ///

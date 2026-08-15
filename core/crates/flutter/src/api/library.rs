@@ -4,8 +4,10 @@ use hentai_core::{
     list_libraries as core_list, set_all_libraries_scan_on_startup as core_set_all_scan_on_startup,
     set_current_library_id as core_set_current,
     update_library_format_groups as core_update_formats,
-    update_library_settings as core_update_settings, update_remote_library as core_update_remote,
-    FormatGroup as CoreFormatGroup, LibraryDto as CoreLibrary, ScanInterval as CoreScanInterval,
+    update_library_settings as core_update_settings,
+    update_local_library_root as core_update_local_root,
+    update_remote_library as core_update_remote, FormatGroup as CoreFormatGroup,
+    LibraryDto as CoreLibrary, ScanInterval as CoreScanInterval,
 };
 
 use super::init::HentaiErrorDto;
@@ -145,6 +147,16 @@ pub fn update_remote_library_frb(
     ))
     .map(LibraryDto::from)
     .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn update_local_library_root_frb(
+    library_id: String,
+    root_path: String,
+) -> Result<LibraryDto, HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_update_local_root(&library_id, &root_path))
+        .map(LibraryDto::from)
+        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]
