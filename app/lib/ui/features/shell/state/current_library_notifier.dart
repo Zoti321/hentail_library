@@ -12,6 +12,7 @@ part 'current_library_notifier.g.dart';
 
 const String _kMigratedFormatGroupsPref =
     'migrated_enabled_format_groups_to_libraries_v1';
+const String _kMigratedAutoScanPref = 'migrated_auto_scan_to_libraries_v1';
 
 class CurrentLibraryState {
   const CurrentLibraryState({
@@ -91,6 +92,7 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
 
   Future<CurrentLibraryState> _load() async {
     await _migrateFormatGroupsFromAppSettingIfNeeded();
+    await _migrateAutoScanFromAppSettingIfNeeded();
     final List<LocalLibrary> libraries = await _repo.list();
     final String? currentId = await _repo.getCurrentId();
     return CurrentLibraryState(libraries: libraries, currentId: currentId);
@@ -119,6 +121,28 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
       await prefs.setBool(_kMigratedFormatGroupsPref, true);
     } catch (_) {
       // Best-effort upgrade path; browse still works with DB defaults.
+    }
+  }
+
+  /// One-shot: legacy app-level autoScan → all libraries Scan on startup.
+  Future<void> _migrateAutoScanFromAppSettingIfNeeded() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool(_kMigratedAutoScanPref) == true) {
+        return;
+      }
+      final bool? legacy = await ref
+          .read(appSettingRepoProvider)
+          .peekLegacyAutoScan();
+      if (legacy == true) {
+        await _repo.setAllScanOnStartup(true);
+      }
+      // Rewrite settings.json without autoScan when settings next load/save.
+      final AppSetting setting = await ref.read(settingsProvider.future);
+      await ref.read(appSettingRepoProvider).save(setting);
+      await prefs.setBool(_kMigratedAutoScanPref, true);
+    } catch (_) {
+      // Best-effort; libraries keep scan_on_startup defaults.
     }
   }
 }

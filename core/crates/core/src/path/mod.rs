@@ -9,7 +9,7 @@ pub async fn list_all_paths() -> Result<Vec<String>, HentaiError> {
 }
 
 pub async fn add_path(raw_path: &str) -> Result<(), HentaiError> {
-    let _ = create_local_library(raw_path).await?;
+    let _ = create_local_library(raw_path, None).await?;
     Ok(())
 }
 

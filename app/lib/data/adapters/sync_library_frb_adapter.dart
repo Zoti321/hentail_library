@@ -19,6 +19,7 @@ class SyncLibraryFrbAdapter {
   Future<void> call({
     ScanMode scanMode = ScanMode.incremental,
     bool syncAll = false,
+    String? targetLibraryId,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   }) async {
@@ -28,12 +29,14 @@ class SyncLibraryFrbAdapter {
       final credentials = await loadRemoteCredentialsForSync(
         libraryRepository: _libraryRepository,
         syncAll: syncAll,
+        targetLibraryId: targetLibraryId,
       );
       await for (final rust.SyncLibraryProgressDto event in guardFrbStream(
         () => rust.syncLibraryFrb(
           handle: handle,
           scanMode: _mapScanMode(scanMode),
           syncAll: syncAll,
+          targetLibraryId: targetLibraryId,
           credentials: credentials,
         ),
         fallbackMessage: '漫画库同步失败',
@@ -73,18 +76,18 @@ class SyncLibraryFrbAdapter {
 Future<List<rust.RemoteLibraryCredentialDto>> loadRemoteCredentialsForSync({
   required LibraryRepository libraryRepository,
   required bool syncAll,
+  String? targetLibraryId,
 }) async {
   final List<LocalLibrary> libraries = await libraryRepository.list();
-  final String? currentId = syncAll
-      ? null
-      : await libraryRepository.getCurrentId();
+  final String? scopedId = targetLibraryId ??
+      (syncAll ? null : await libraryRepository.getCurrentId());
   final List<rust.RemoteLibraryCredentialDto> out =
       <rust.RemoteLibraryCredentialDto>[];
   for (final LocalLibrary library in libraries) {
     if (!isRemoteLibrary(library)) {
       continue;
     }
-    if (!syncAll && library.libraryId != currentId) {
+    if (scopedId != null && library.libraryId != scopedId) {
       continue;
     }
     final String? password = await libraryRepository.readRemotePassword(

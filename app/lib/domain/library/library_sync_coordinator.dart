@@ -18,12 +18,14 @@ class LibrarySyncCoordinator {
   Future<void> runSync({
     ScanMode scanMode = ScanMode.incremental,
     bool syncAll = false,
+    String? targetLibraryId,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   }) async {
     await _syncAdapter.call(
       scanMode: scanMode,
       syncAll: syncAll,
+      targetLibraryId: targetLibraryId,
       isCancelled: isCancelled,
       onProgress: onProgress,
     );

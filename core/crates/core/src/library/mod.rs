@@ -33,6 +33,47 @@ const REMOTE_DEFAULT_FORMAT_GROUPS: [FormatGroup; 3] = [
     FormatGroup::Archive,
 ];
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ScanInterval {
+    Disabled,
+    Hourly,
+    Every6Hours,
+    Every12Hours,
+    Daily,
+    Weekly,
+}
+
+impl ScanInterval {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Disabled => "disabled",
+            Self::Hourly => "hourly",
+            Self::Every6Hours => "every_6_hours",
+            Self::Every12Hours => "every_12_hours",
+            Self::Daily => "daily",
+            Self::Weekly => "weekly",
+        }
+    }
+}
+
+pub fn parse_scan_interval(raw: &str) -> Result<ScanInterval, HentaiError> {
+    match raw.trim().to_ascii_lowercase().as_str() {
+        "disabled" => Ok(ScanInterval::Disabled),
+        "hourly" => Ok(ScanInterval::Hourly),
+        "every_6_hours" => Ok(ScanInterval::Every6Hours),
+        "every_12_hours" => Ok(ScanInterval::Every12Hours),
+        "daily" => Ok(ScanInterval::Daily),
+        "weekly" => Ok(ScanInterval::Weekly),
+        other => Err(HentaiError::validation(format!(
+            "无效的 Scan interval: {other}"
+        ))),
+    }
+}
+
+fn scan_interval_from_stored(raw: &str) -> ScanInterval {
+    parse_scan_interval(raw).unwrap_or(ScanInterval::Disabled)
+}
+
 #[derive(Debug, Clone)]
 pub struct LibraryDto {
     pub library_id: String,
@@ -43,6 +84,8 @@ pub struct LibraryDto {
     pub created_at: i64,
     pub username: String,
     pub allow_http: bool,
+    pub scan_on_startup: bool,
+    pub scan_interval: ScanInterval,
 }
 
 /// SHA1 of `library:` + normalize_path_for_key(root) — distinct from comic_id.
@@ -140,7 +183,17 @@ fn model_to_dto(model: libraries::Model) -> LibraryDto {
         created_at: model.created_at,
         username: model.username,
         allow_http: model.allow_http != 0,
+        scan_on_startup: model.scan_on_startup != 0,
+        scan_interval: scan_interval_from_stored(&model.scan_interval),
     }
+}
+
+fn resolve_library_name(explicit: Option<&str>, derived: String) -> String {
+    explicit
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+        .map(str::to_string)
+        .unwrap_or(derived)
 }
 
 pub async fn list_libraries() -> Result<Vec<LibraryDto>, HentaiError> {
@@ -153,7 +206,10 @@ pub async fn list_libraries() -> Result<Vec<LibraryDto>, HentaiError> {
     Ok(rows.into_iter().map(model_to_dto).collect())
 }
 
-pub async fn create_local_library(root_path: &str) -> Result<LibraryDto, HentaiError> {
+pub async fn create_local_library(
+    root_path: &str,
+    name: Option<&str>,
+) -> Result<LibraryDto, HentaiError> {
     let root = root_path.trim();
     if root.is_empty() {
         return Err(HentaiError::validation("Library root 不能为空"));
@@ -202,11 +258,13 @@ pub async fn create_local_library(root_path: &str) -> Result<LibraryDto, HentaiE
         library_id: library_id.clone(),
         kind: KIND_LOCAL.to_string(),
         root_path: root.to_string(),
-        name: library_name_from_root(root),
+        name: resolve_library_name(name, library_name_from_root(root)),
         enabled_format_groups: DEFAULT_FORMAT_GROUPS.to_vec(),
         created_at: now_ms(),
         username: String::new(),
         allow_http: false,
+        scan_on_startup: false,
+        scan_interval: ScanInterval::Disabled,
     };
     let active = libraries::ActiveModel {
         library_id: Set(dto.library_id.clone()),
@@ -217,6 +275,8 @@ pub async fn create_local_library(root_path: &str) -> Result<LibraryDto, HentaiE
         created_at: Set(dto.created_at),
         username: Set(String::new()),
         allow_http: Set(0),
+        scan_on_startup: Set(0),
+        scan_interval: Set(ScanInterval::Disabled.as_str().to_string()),
     };
     Libraries::insert(active)
         .exec(&db)
@@ -232,6 +292,7 @@ pub async fn create_remote_library(
     root_url: &str,
     username: &str,
     allow_http: bool,
+    name: Option<&str>,
 ) -> Result<LibraryDto, HentaiError> {
     let root = normalize_webdav_root(root_url, allow_http)?;
     let user = username.trim().to_string();
@@ -259,11 +320,13 @@ pub async fn create_remote_library(
         library_id: library_id.clone(),
         kind: KIND_REMOTE.to_string(),
         root_path: root.clone(),
-        name: library_name_from_webdav_root(&root),
+        name: resolve_library_name(name, library_name_from_webdav_root(&root)),
         enabled_format_groups: REMOTE_DEFAULT_FORMAT_GROUPS.to_vec(),
         created_at: now_ms(),
         username: user.clone(),
         allow_http,
+        scan_on_startup: false,
+        scan_interval: ScanInterval::Disabled,
     };
     let active = libraries::ActiveModel {
         library_id: Set(dto.library_id.clone()),
@@ -274,6 +337,8 @@ pub async fn create_remote_library(
         created_at: Set(dto.created_at),
         username: Set(user),
         allow_http: Set(if allow_http { 1 } else { 0 }),
+        scan_on_startup: Set(0),
+        scan_interval: Set(ScanInterval::Disabled.as_str().to_string()),
     };
     Libraries::insert(active)
         .exec(&db)
@@ -433,6 +498,52 @@ pub async fn update_library_format_groups(
     active.enabled_format_groups = Set(serialize_format_groups(&groups));
     let updated = active.update(&db).await.map_err(map_db_err)?;
     Ok(model_to_dto(updated))
+}
+
+pub async fn update_library_settings(
+    library_id: &str,
+    name: &str,
+    groups: Vec<FormatGroup>,
+    scan_on_startup: bool,
+    scan_interval: ScanInterval,
+) -> Result<LibraryDto, HentaiError> {
+    let id = library_id.trim();
+    if id.is_empty() {
+        return Err(HentaiError::validation("library_id 不能为空"));
+    }
+    let trimmed_name = name.trim();
+    if trimmed_name.is_empty() {
+        return Err(HentaiError::validation("Library name 不能为空"));
+    }
+    let db = connection()?;
+    let Some(model) = Libraries::find_by_id(id.to_string())
+        .one(&db)
+        .await
+        .map_err(map_db_err)?
+    else {
+        return Err(HentaiError::validation(format!("Library 不存在: {id}")));
+    };
+    let mut active: libraries::ActiveModel = model.into();
+    active.name = Set(trimmed_name.to_string());
+    active.enabled_format_groups = Set(serialize_format_groups(&groups));
+    active.scan_on_startup = Set(if scan_on_startup { 1 } else { 0 });
+    active.scan_interval = Set(scan_interval.as_str().to_string());
+    let updated = active.update(&db).await.map_err(map_db_err)?;
+    Ok(model_to_dto(updated))
+}
+
+/// Used when migrating legacy app-level `autoScan: true` onto every Library.
+pub async fn set_all_libraries_scan_on_startup(enabled: bool) -> Result<(), HentaiError> {
+    let db = connection()?;
+    let flag = if enabled { 1 } else { 0 };
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "UPDATE libraries SET scan_on_startup = ?",
+        [sea_orm::Value::Int(Some(flag))],
+    ))
+    .await
+    .map_err(map_db_err)?;
+    Ok(())
 }
 
 pub async fn find_library_by_id(library_id: &str) -> Result<Option<LibraryDto>, HentaiError> {

@@ -70,4 +70,7 @@ class _MemoryAppSettingRepository implements AppSettingRepository {
     // Simulate disk round-trip so missing codegen/json keys would drop fields.
     _setting = AppSetting.fromJson(setting.toJson());
   }
+
+  @override
+  Future<bool?> peekLegacyAutoScan() async => null;
 }

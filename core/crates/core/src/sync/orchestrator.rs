@@ -41,6 +41,7 @@ pub async fn sync_library(
     handle: SyncHandle,
     scan_mode: SyncScanMode,
     sync_all: bool,
+    target_library_id: Option<&str>,
     credentials: Vec<RemoteLibraryCredential>,
     mut emit: impl FnMut(SyncLibraryProgressDto),
 ) -> Result<(), HentaiError> {
@@ -52,7 +53,12 @@ pub async fn sync_library(
         .map(|c| (c.library_id, c.password))
         .collect();
 
-    let targets: Vec<LibraryDto> = if sync_all {
+    let targets: Vec<LibraryDto> = if let Some(id) = target_library_id.map(str::trim).filter(|s| !s.is_empty()) {
+        match find_library_by_id(id).await? {
+            Some(lib) => vec![lib],
+            None => Vec::new(),
+        }
+    } else if sync_all {
         list_libraries().await?
     } else {
         match get_current_library_id().await? {

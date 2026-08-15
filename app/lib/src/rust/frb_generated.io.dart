@@ -346,6 +346,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ScanIntervalDto dco_decode_scan_interval_dto(dynamic raw);
+
+  @protected
   SeriesComicOrderEntryDto dco_decode_series_comic_order_entry_dto(dynamic raw);
 
   @protected
@@ -802,6 +805,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RemoteLibraryCredentialDto sse_decode_remote_library_credential_dto(
     SseDeserializer deserializer,
   );
+
+  @protected
+  ScanIntervalDto sse_decode_scan_interval_dto(SseDeserializer deserializer);
 
   @protected
   SeriesComicOrderEntryDto sse_decode_series_comic_order_entry_dto(
@@ -1388,6 +1394,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_remote_library_credential_dto(
     RemoteLibraryCredentialDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_scan_interval_dto(
+    ScanIntervalDto self,
     SseSerializer serializer,
   );
 

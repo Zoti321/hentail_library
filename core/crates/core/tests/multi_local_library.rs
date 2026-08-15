@@ -187,10 +187,10 @@ fn sync_current_library_does_not_remove_other_library_comics() {
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
-            let lib_a = create_local_library(&root_a.to_string_lossy())
+            let lib_a = create_local_library(&root_a.to_string_lossy(), None)
                 .await
                 .expect("create a");
-            let lib_b = create_local_library(&root_b.to_string_lossy())
+            let lib_b = create_local_library(&root_b.to_string_lossy(), None)
                 .await
                 .expect("create b");
             set_current_library_id(Some(&lib_a.library_id))
@@ -199,7 +199,7 @@ fn sync_current_library_does_not_remove_other_library_comics() {
 
             let handle = create_sync_handle();
             // Sync all once to populate both.
-            sync_library(handle, SyncScanMode::Full, true, vec![], |_| {})
+            sync_library(handle, SyncScanMode::Full, true, None, vec![], |_| {})
                 .await
                 .expect("sync all");
 
@@ -214,7 +214,7 @@ fn sync_current_library_does_not_remove_other_library_comics() {
                 .await
                 .expect("current a");
             let handle = create_sync_handle();
-            sync_library(handle, SyncScanMode::Full, false, vec![], |_| {})
+            sync_library(handle, SyncScanMode::Full, false, None, vec![], |_| {})
                 .await
                 .expect("sync current");
 
@@ -244,15 +244,15 @@ fn per_library_format_groups_only_affect_that_library_on_sync() {
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
-            let lib_a = create_local_library(&root_a.to_string_lossy())
+            let lib_a = create_local_library(&root_a.to_string_lossy(), None)
                 .await
                 .expect("create a");
-            let _lib_b = create_local_library(&root_b.to_string_lossy())
+            let _lib_b = create_local_library(&root_b.to_string_lossy(), None)
                 .await
                 .expect("create b");
 
             let handle = create_sync_handle();
-            sync_library(handle, SyncScanMode::Full, true, vec![], |_| {})
+            sync_library(handle, SyncScanMode::Full, true, None, vec![], |_| {})
                 .await
                 .expect("sync all");
 
@@ -268,7 +268,7 @@ fn per_library_format_groups_only_affect_that_library_on_sync() {
                 .await
                 .expect("current");
             let handle = create_sync_handle();
-            sync_library(handle, SyncScanMode::Full, false, vec![], |_| {})
+            sync_library(handle, SyncScanMode::Full, false, None, vec![], |_| {})
                 .await
                 .expect("sync a");
 
@@ -296,15 +296,15 @@ fn delete_library_clears_only_that_library_comics_and_series() {
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
-            let lib_a = create_local_library(&root_a.to_string_lossy())
+            let lib_a = create_local_library(&root_a.to_string_lossy(), None)
                 .await
                 .expect("create a");
-            let lib_b = create_local_library(&root_b.to_string_lossy())
+            let lib_b = create_local_library(&root_b.to_string_lossy(), None)
                 .await
                 .expect("create b");
 
             let handle = create_sync_handle();
-            sync_library(handle, SyncScanMode::Full, true, vec![], |_| {})
+            sync_library(handle, SyncScanMode::Full, true, None, vec![], |_| {})
                 .await
                 .expect("sync all");
 
@@ -367,14 +367,14 @@ fn browse_defaults_to_current_library_scope() {
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
-            let lib_a = create_local_library(&root_a.to_string_lossy())
+            let lib_a = create_local_library(&root_a.to_string_lossy(), None)
                 .await
                 .expect("a");
-            let lib_b = create_local_library(&root_b.to_string_lossy())
+            let lib_b = create_local_library(&root_b.to_string_lossy(), None)
                 .await
                 .expect("b");
             let handle = create_sync_handle();
-            sync_library(handle, SyncScanMode::Full, true, vec![], |_| {})
+            sync_library(handle, SyncScanMode::Full, true, None, vec![], |_| {})
                 .await
                 .expect("sync");
 

@@ -22,7 +22,7 @@ fn with_global_db(test: impl FnOnce()) {
 }
 
 async fn stamp_fixture_to_current_library(db: &DatabaseConnection) {
-    let lib = create_local_library("C:/漫画").await.expect("library");
+    let lib = create_local_library("C:/漫画", None).await.expect("library");
     set_current_library_id(Some(&lib.library_id))
         .await
         .expect("current");

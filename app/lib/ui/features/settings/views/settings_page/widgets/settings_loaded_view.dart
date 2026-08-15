@@ -120,7 +120,6 @@ class _SettingsViewState extends State<SettingsView> {
                         children: <Widget>[
                           LibraryLocationRow(layoutTier: layoutTier),
                           SupportedFormatsRow(layoutTier: layoutTier),
-                          AutoScanRow(layoutTier: layoutTier),
                         ],
                       ),
                       SettingsGroup(

@@ -25,11 +25,13 @@ Stream<SyncLibraryProgressDto> syncLibraryFrb({
   required SyncHandleDto handle,
   required SyncScanModeDto scanMode,
   required bool syncAll,
+  String? targetLibraryId,
   required List<RemoteLibraryCredentialDto> credentials,
 }) => RustLib.instance.api.crateApiSyncSyncLibraryFrb(
   handle: handle,
   scanMode: scanMode,
   syncAll: syncAll,
+  targetLibraryId: targetLibraryId,
   credentials: credentials,
 );
 

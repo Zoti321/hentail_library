@@ -65,7 +65,7 @@ async fn clear_library(db: &DatabaseConnection) {
 }
 
 async fn stamp_all_to_current_library(db: &DatabaseConnection, root: &str) {
-    let lib = create_local_library(root).await.expect("create library");
+    let lib = create_local_library(root, None).await.expect("create library");
     set_current_library_id(Some(&lib.library_id))
         .await
         .expect("set current");

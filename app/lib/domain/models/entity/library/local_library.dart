@@ -1,4 +1,5 @@
 import 'package:hentai_library/domain/library/format_group.dart';
+import 'package:hentai_library/domain/library/scan_interval.dart';
 
 /// Library 轻量快照（FRB LibraryDto → domain）。含 Local 与 Remote。
 typedef LocalLibrary = ({
@@ -12,6 +13,8 @@ typedef LocalLibrary = ({
   String username,
   /// Remote 显式允许 HTTP；Local 恒为 false。
   bool allowHttp,
+  bool scanOnStartup,
+  ScanInterval scanInterval,
 });
 
 bool isRemoteLibrary(LocalLibrary library) => library.kind == 'remote';

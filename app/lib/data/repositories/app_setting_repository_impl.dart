@@ -42,6 +42,25 @@ class AppSettingRepositoryImpl implements AppSettingRepository {
     }
   }
 
+  @override
+  Future<bool?> peekLegacyAutoScan() async {
+    try {
+      final file = await _getSettingsFile();
+      if (!await file.exists()) {
+        return null;
+      }
+      final jsonStr = await file.readAsString();
+      final json = jsonDecode(jsonStr) as Map<String, dynamic>;
+      final Object? raw = json['autoScan'];
+      if (raw is bool) {
+        return raw;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<File> _getSettingsFile() async {
     final dir = await getApplicationSupportDirectory();
     return File(p.join(dir.path, _fileName));

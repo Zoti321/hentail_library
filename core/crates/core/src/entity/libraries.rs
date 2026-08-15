@@ -15,6 +15,10 @@ pub struct Model {
     pub username: String,
     /// Explicit HTTP opt-in for Remote library; always false for Local.
     pub allow_http: i32,
+    /// Scan on startup: 0/1.
+    pub scan_on_startup: i32,
+    /// Scan interval enum string (e.g. `disabled`, `hourly`, `daily`).
+    pub scan_interval: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

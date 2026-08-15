@@ -19,7 +19,7 @@
 - **无 Dart UseCase**：`sync_library`、`infer_series` 等为 Rust 原子 API。
 - **Repository**：`frb.*` + DTO → Entity 映射；无 Drift DAO。
 - **筛选**：`LibraryComicProjection` 留 Dart 构 `ComicFilterDto`；查询在 Rust（SeaORM）。
-- **设置**：`settings.json` 永久留 Dart（主题、Healthy mode、autoScan 等）。
+- **设置**：`settings.json` 永久留 Dart（主题、Healthy mode 等）。Library 的 Scan on startup / Scan interval 在 SQLite（每库属性），由 Flutter 编排触发。
 - **错误**：Rust `HentaiError { code, message, context }` → Dart `AppException` 子类。
 - **取消**：`create_sync_handle` / `sync_library` / `cancel_sync`；取消语义对齐原 Dart sync。
 

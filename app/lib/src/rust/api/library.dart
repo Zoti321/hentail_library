@@ -8,25 +8,28 @@ import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'sync.dart';
 
-// These functions are ignored because they are not marked as `pub`: `map_format_group_core`, `map_format_group`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `from`
+// These functions are ignored because they are not marked as `pub`: `map_format_group_core`, `map_format_group`, `map_scan_interval_core`, `map_scan_interval`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `from`
 
 List<LibraryDto> listLibrariesFrb() =>
     RustLib.instance.api.crateApiLibraryListLibrariesFrb();
 
-LibraryDto createLocalLibraryFrb({required String rootPath}) => RustLib
-    .instance
-    .api
-    .crateApiLibraryCreateLocalLibraryFrb(rootPath: rootPath);
+LibraryDto createLocalLibraryFrb({required String rootPath, String? name}) =>
+    RustLib.instance.api.crateApiLibraryCreateLocalLibraryFrb(
+      rootPath: rootPath,
+      name: name,
+    );
 
 LibraryDto createRemoteLibraryFrb({
   required String rootUrl,
   required String username,
   required bool allowHttp,
+  String? name,
 }) => RustLib.instance.api.crateApiLibraryCreateRemoteLibraryFrb(
   rootUrl: rootUrl,
   username: username,
   allowHttp: allowHttp,
+  name: name,
 );
 
 LibraryDto updateRemoteLibraryFrb({
@@ -58,6 +61,25 @@ LibraryDto updateLibraryFormatGroupsFrb({
   groups: groups,
 );
 
+LibraryDto updateLibrarySettingsFrb({
+  required String libraryId,
+  required String name,
+  required List<FormatGroupDto> groups,
+  required bool scanOnStartup,
+  required ScanIntervalDto scanInterval,
+}) => RustLib.instance.api.crateApiLibraryUpdateLibrarySettingsFrb(
+  libraryId: libraryId,
+  name: name,
+  groups: groups,
+  scanOnStartup: scanOnStartup,
+  scanInterval: scanInterval,
+);
+
+void setAllLibrariesScanOnStartupFrb({required bool enabled}) => RustLib
+    .instance
+    .api
+    .crateApiLibrarySetAllLibrariesScanOnStartupFrb(enabled: enabled);
+
 class LibraryDto {
   final String libraryId;
   final String kind;
@@ -67,6 +89,8 @@ class LibraryDto {
   final PlatformInt64 createdAt;
   final String username;
   final bool allowHttp;
+  final bool scanOnStartup;
+  final ScanIntervalDto scanInterval;
 
   const LibraryDto({
     required this.libraryId,
@@ -77,6 +101,8 @@ class LibraryDto {
     required this.createdAt,
     required this.username,
     required this.allowHttp,
+    required this.scanOnStartup,
+    required this.scanInterval,
   });
 
   @override
@@ -88,7 +114,9 @@ class LibraryDto {
       enabledFormatGroups.hashCode ^
       createdAt.hashCode ^
       username.hashCode ^
-      allowHttp.hashCode;
+      allowHttp.hashCode ^
+      scanOnStartup.hashCode ^
+      scanInterval.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -102,5 +130,16 @@ class LibraryDto {
           enabledFormatGroups == other.enabledFormatGroups &&
           createdAt == other.createdAt &&
           username == other.username &&
-          allowHttp == other.allowHttp;
+          allowHttp == other.allowHttp &&
+          scanOnStartup == other.scanOnStartup &&
+          scanInterval == other.scanInterval;
+}
+
+enum ScanIntervalDto {
+  disabled,
+  hourly,
+  every6Hours,
+  every12Hours,
+  daily,
+  weekly,
 }

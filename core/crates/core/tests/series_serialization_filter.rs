@@ -80,7 +80,7 @@ async fn seed_two_series(db: &DatabaseConnection) -> (String, String) {
     .expect("seed meta");
     rebuild_series_from_comics(db, None).await.expect("rebuild");
 
-    let lib = create_local_library("E:/lib").await.expect("library");
+    let lib = create_local_library("E:/lib", None).await.expect("library");
     set_current_library_id(Some(&lib.library_id))
         .await
         .expect("current");

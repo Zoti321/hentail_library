@@ -120,7 +120,7 @@ fn writeback_updates_page_count_and_keeps_locked_title() {
         let runtime = tokio::runtime::Runtime::new().expect("rt");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
-            let lib = create_remote_library("https://nas.example/dav", "u", false)
+            let lib = create_remote_library("https://nas.example/dav", "u", false, None)
                 .await
                 .expect("remote lib");
 
@@ -185,7 +185,7 @@ fn refresh_with_fake_updates_page_count() {
         let runtime = tokio::runtime::Runtime::new().expect("rt");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
-            let lib = create_remote_library("https://nas.example/dav", "u", false)
+            let lib = create_remote_library("https://nas.example/dav", "u", false, None)
                 .await
                 .expect("remote lib");
 

@@ -38,6 +38,7 @@ class ScanLibraryController extends _$ScanLibraryController {
   Future<void> start({
     ScanMode mode = ScanMode.incremental,
     bool syncAll = false,
+    String? targetLibraryId,
     bool silent = false,
   }) {
     if (state.running) return _future ?? Future<void>.value();
@@ -59,6 +60,7 @@ class ScanLibraryController extends _$ScanLibraryController {
         .runSync(
           scanMode: mode,
           syncAll: syncAll,
+          targetLibraryId: targetLibraryId,
           isCancelled: () => _cancelled,
           onProgress: (SyncLibraryProgress progress) {
             state = state.copyWith(progress: progress);

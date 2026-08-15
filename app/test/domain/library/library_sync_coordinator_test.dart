@@ -16,6 +16,7 @@ class _ScriptedSyncAdapter extends SyncLibraryFrbAdapter {
   final Future<void> Function({
     ScanMode scanMode,
     bool syncAll,
+    String? targetLibraryId,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   })
@@ -25,12 +26,14 @@ class _ScriptedSyncAdapter extends SyncLibraryFrbAdapter {
   Future<void> call({
     ScanMode scanMode = ScanMode.incremental,
     bool syncAll = false,
+    String? targetLibraryId,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   }) {
     return _run(
       scanMode: scanMode,
       syncAll: syncAll,
+      targetLibraryId: targetLibraryId,
       isCancelled: isCancelled,
       onProgress: onProgress,
     );
@@ -45,6 +48,7 @@ void main() {
         ({
           ScanMode scanMode = ScanMode.incremental,
           bool syncAll = false,
+          String? targetLibraryId,
           required isCancelled,
           onProgress,
         }) async {},
@@ -64,6 +68,7 @@ void main() {
         ({
           ScanMode scanMode = ScanMode.incremental,
           bool syncAll = false,
+          String? targetLibraryId,
           required isCancelled,
           onProgress,
         }) async {},
@@ -82,6 +87,7 @@ void main() {
       syncAdapter: _ScriptedSyncAdapter(({
         ScanMode scanMode = ScanMode.incremental,
         bool syncAll = false,
+        String? targetLibraryId,
         required isCancelled,
         onProgress,
       }) async {
@@ -119,6 +125,7 @@ void main() {
       syncAdapter: _ScriptedSyncAdapter(({
         ScanMode scanMode = ScanMode.incremental,
         bool syncAll = false,
+        String? targetLibraryId,
         required isCancelled,
         onProgress,
       }) async {

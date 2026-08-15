@@ -161,7 +161,7 @@ fn remote_reachable_plan_adds_and_orphans_without_deleting_on_unreachable() {
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
-            let lib = create_remote_library("https://nas.example/dav", "u", false)
+            let lib = create_remote_library("https://nas.example/dav", "u", false, None)
                 .await
                 .expect("create remote");
 

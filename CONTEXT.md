@@ -7,7 +7,7 @@
 ### Library & resources
 
 **Library**:
-用户的一份漫画集合（趋近 Komga：一个 Library root 对应一个 Library），由该根下 Library sync 导入的 Comic 与 Folder series 组成；可有独立配置（如 Supported resource formats）。应用内可同时存在多个 Library。
+用户的一份漫画集合（趋近 Komga：一个 Library root 对应一个 Library），由该根下 Library sync 导入的 Comic 与 Folder series 组成；可有独立配置（Supported resource formats、Scan on startup、Scan interval），以及可独立于 Library root 编辑的显示名。应用内可同时存在多个 Library。
 _Avoid_: 书架（UI 可用）；把「全部库合并」称作一个 Library
 
 **Current library**:
@@ -67,6 +67,14 @@ _Avoid_: 媒体类型（库页浏览筛选用语）、导入格式、全局唯�
 **Format group**:
 Supported resource formats 的勾选单位：`folder`（`dir`）、`pdf`、`epub`、`archive`（zip/cbz/rar/cbr/7z/cb7）。分组到 `resource_type` 的展开由 core 维护。Remote library 首版不收录 `folder`。
 _Avoid_: 扩展名列表（用户设置层用分组）
+
+**Scan on startup**:
+某 Library 的布尔配置：应用启动后是否对该库自动执行一次 incremental Library sync。按库独立；与 Scan interval 无关。
+_Avoid_: 自动扫描（易与全局旧设置或间隔扫混淆）、autoScan（已移除的应用级设置）
+
+**Scan interval**:
+某 Library 的周期自动 Library sync 档位：`disabled`、`hourly`、`every_6_hours`、`every_12_hours`、`daily`、`weekly`。按库独立计时；锚点为应用本次启动或该库本档被改为非 `disabled` 之时；到期对该库做 incremental Library sync。应用未运行时不调度。
+_Avoid_: 自动扫描间隔（口语可用）、cron、全局扫描周期
 
 ### Organization & metadata
 

@@ -1,6 +1,7 @@
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/repositories/flutter_secure_remote_library_credential_store.dart';
 import 'package:hentai_library/domain/library/format_group.dart';
+import 'package:hentai_library/domain/library/scan_interval.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:hentai_library/domain/repositories/remote_library_credential_store.dart';
@@ -24,9 +25,11 @@ class LibraryRepositoryImpl implements LibraryRepository {
   }
 
   @override
-  Future<LocalLibrary> createLocal(String rootPath) async {
+  Future<LocalLibrary> createLocal(String rootPath, {String? name}) async {
     return guardFrbSync(
-      () => _mapLibrary(rust.createLocalLibraryFrb(rootPath: rootPath)),
+      () => _mapLibrary(
+        rust.createLocalLibraryFrb(rootPath: rootPath, name: name),
+      ),
       fallbackMessage: '创建本地库失败',
     );
   }
@@ -37,6 +40,7 @@ class LibraryRepositoryImpl implements LibraryRepository {
     required String username,
     required String password,
     required bool allowHttp,
+    String? name,
   }) async {
     final LocalLibrary library = guardFrbSync(
       () => _mapLibrary(
@@ -44,6 +48,7 @@ class LibraryRepositoryImpl implements LibraryRepository {
           rootUrl: rootUrl,
           username: username,
           allowHttp: allowHttp,
+          name: name,
         ),
       ),
       fallbackMessage: '创建远程库失败',
@@ -140,6 +145,36 @@ class LibraryRepositoryImpl implements LibraryRepository {
   }
 
   @override
+  Future<LocalLibrary> updateSettings({
+    required String libraryId,
+    required String name,
+    required List<FormatGroup> groups,
+    required bool scanOnStartup,
+    required ScanInterval scanInterval,
+  }) async {
+    return guardFrbSync(
+      () => _mapLibrary(
+        rust.updateLibrarySettingsFrb(
+          libraryId: libraryId,
+          name: name,
+          groups: groups.map(_mapFormatGroup).toList(growable: false),
+          scanOnStartup: scanOnStartup,
+          scanInterval: _mapScanInterval(scanInterval),
+        ),
+      ),
+      fallbackMessage: '更新库设置失败',
+    );
+  }
+
+  @override
+  Future<void> setAllScanOnStartup(bool enabled) async {
+    guardFrbSync(
+      () => rust.setAllLibrariesScanOnStartupFrb(enabled: enabled),
+      fallbackMessage: '迁移启动扫描设置失败',
+    );
+  }
+
+  @override
   Future<String?> readRemotePassword(String libraryId) {
     return _credentials.readPassword(libraryId);
   }
@@ -156,6 +191,8 @@ LocalLibrary _mapLibrary(rust.LibraryDto dto) {
         .toList(growable: false),
     username: dto.username,
     allowHttp: dto.allowHttp,
+    scanOnStartup: dto.scanOnStartup,
+    scanInterval: _mapScanIntervalFromRust(dto.scanInterval),
   );
 }
 
@@ -174,5 +211,27 @@ FormatGroup _mapFormatGroupFromRust(rust_sync.FormatGroupDto group) {
     rust_sync.FormatGroupDto.pdf => FormatGroup.pdf,
     rust_sync.FormatGroupDto.epub => FormatGroup.epub,
     rust_sync.FormatGroupDto.archive => FormatGroup.archive,
+  };
+}
+
+rust.ScanIntervalDto _mapScanInterval(ScanInterval interval) {
+  return switch (interval) {
+    ScanInterval.disabled => rust.ScanIntervalDto.disabled,
+    ScanInterval.hourly => rust.ScanIntervalDto.hourly,
+    ScanInterval.every6Hours => rust.ScanIntervalDto.every6Hours,
+    ScanInterval.every12Hours => rust.ScanIntervalDto.every12Hours,
+    ScanInterval.daily => rust.ScanIntervalDto.daily,
+    ScanInterval.weekly => rust.ScanIntervalDto.weekly,
+  };
+}
+
+ScanInterval _mapScanIntervalFromRust(rust.ScanIntervalDto interval) {
+  return switch (interval) {
+    rust.ScanIntervalDto.disabled => ScanInterval.disabled,
+    rust.ScanIntervalDto.hourly => ScanInterval.hourly,
+    rust.ScanIntervalDto.every6Hours => ScanInterval.every6Hours,
+    rust.ScanIntervalDto.every12Hours => ScanInterval.every12Hours,
+    rust.ScanIntervalDto.daily => ScanInterval.daily,
+    rust.ScanIntervalDto.weekly => ScanInterval.weekly,
   };
 }

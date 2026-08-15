@@ -1,6 +1,7 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/data/adapters/sync_library_frb_adapter.dart';
 import 'package:hentai_library/domain/library/format_group.dart';
+import 'package:hentai_library/domain/library/scan_interval.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/domain/repositories/library_repository.dart';
@@ -43,6 +44,8 @@ LocalLibrary _lib({
   enabledFormatGroups: FormatGroup.all,
   username: kind == 'remote' ? 'u' : '',
   allowHttp: false,
+  scanOnStartup: false,
+  scanInterval: ScanInterval.disabled,
 );
 
 void main() {
@@ -132,23 +135,23 @@ void main() {
         sevenz: 0,
         pdf: 0,
       ),
-      errorMessage: '数据库操作失败',
+      errorMessage: 'db failed',
     );
 
     final SyncLibraryProgress mapped = mapRustSyncProgress(dto);
 
     expect(mapped.phase, SyncLibraryPhase.failed);
-    expect(mapped.errorMessage, '数据库操作失败');
+    expect(mapped.errorMessage, 'db failed');
   });
 
   test('failed progress throws SyncException in adapter flow', () {
     expect(
-      () => throw SyncException('数据库操作失败'),
+      () => throw SyncException('db failed'),
       throwsA(
         isA<SyncException>().having(
           (SyncException e) => e.message,
           'message',
-          '数据库操作失败',
+          'db failed',
         ),
       ),
     );

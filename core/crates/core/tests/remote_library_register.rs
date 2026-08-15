@@ -64,6 +64,7 @@ fn create_remote_library_defaults_https_and_remote_format_groups() {
                 "nas.local/webdav/comics",
                 "alice",
                 false,
+                None,
             )
             .await
             .expect("create remote");
@@ -118,10 +119,10 @@ fn http_remote_root_requires_explicit_allow() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
 
-            let denied = create_remote_library("http://nas.local/dav", "u", false).await;
+            let denied = create_remote_library("http://nas.local/dav", "u", false, None).await;
             assert!(denied.is_err(), "http without allow must fail");
 
-            let allowed = create_remote_library("http://nas.local/dav", "u", true)
+            let allowed = create_remote_library("http://nas.local/dav", "u", true, None)
                 .await
                 .expect("http with allow");
             assert_eq!(allowed.root_path, "http://nas.local/dav");
@@ -139,10 +140,10 @@ fn recreate_same_remote_root_updates_metadata() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
 
-            let first = create_remote_library("https://nas.local/dav", "old", false)
+            let first = create_remote_library("https://nas.local/dav", "old", false, None)
                 .await
                 .expect("create");
-            let second = create_remote_library("https://nas.local/dav", "new", true)
+            let second = create_remote_library("https://nas.local/dav", "new", true, None)
                 .await
                 .expect("recreate");
 
@@ -162,7 +163,7 @@ fn update_and_delete_remote_library_keeps_id_and_clears_row() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
 
-            let created = create_remote_library("https://a.example/dav", "old", false)
+            let created = create_remote_library("https://a.example/dav", "old", false, None)
                 .await
                 .expect("create");
             let updated = update_remote_library(

@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
-import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class LibraryLocationRow extends StatelessWidget {
@@ -59,37 +55,6 @@ class SupportedFormatsRow extends StatelessWidget {
         LucideIcons.chevronRight,
         size: 16,
         color: theme.colorScheme.hentai.iconSecondary,
-      ),
-    );
-  }
-}
-
-class AutoScanRow extends ConsumerWidget {
-  const AutoScanRow({required this.layoutTier, super.key});
-
-  final SettingsLayoutTier layoutTier;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final bool autoScan = ref.watch(
-      settingsProvider.select(
-        (AsyncValue<AppSetting> async) => async.asData?.value.autoScan ?? false,
-      ),
-    );
-    final ThemeData theme = Theme.of(context);
-    final l10n = context.l10n;
-    return SettingsRow(
-      layoutTier: layoutTier,
-      icon: Icon(
-        LucideIcons.refreshCw,
-        size: 20,
-        color: theme.colorScheme.hentai.iconDefault,
-      ),
-      label: l10n.settingsAutoScanLabel,
-      action: ToggleSwitch(
-        checked: autoScan,
-        onChange: () =>
-            ref.read(settingsProvider.notifier).setAutoScan(!autoScan),
       ),
     );
   }

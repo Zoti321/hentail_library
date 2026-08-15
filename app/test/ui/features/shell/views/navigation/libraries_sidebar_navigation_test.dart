@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/domain/library/format_group.dart';
+import 'package:hentai_library/domain/library/scan_interval.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -181,6 +182,8 @@ LocalLibrary _lib(String id, String name) => (
   enabledFormatGroups: const <FormatGroup>[],
   username: '',
   allowHttp: false,
+  scanOnStartup: false,
+  scanInterval: ScanInterval.disabled,
 );
 
 Future<void> _pumpLibrariesShell(

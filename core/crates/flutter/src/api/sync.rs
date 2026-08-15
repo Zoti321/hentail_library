@@ -110,6 +110,7 @@ pub async fn sync_library_frb(
     handle: SyncHandleDto,
     scan_mode: SyncScanModeDto,
     sync_all: bool,
+    target_library_id: Option<String>,
     credentials: Vec<RemoteLibraryCredentialDto>,
     sink: crate::frb_generated::StreamSink<SyncLibraryProgressDto>,
 ) {
@@ -124,6 +125,7 @@ pub async fn sync_library_frb(
         handle.inner,
         map_scan_mode(scan_mode),
         sync_all,
+        target_library_id.as_deref(),
         core_credentials,
         |progress| {
             let _ = sink.add(map_progress(progress));
