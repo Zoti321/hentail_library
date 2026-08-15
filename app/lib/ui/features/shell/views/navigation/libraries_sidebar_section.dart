@@ -2,6 +2,7 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
@@ -11,6 +12,7 @@ import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.da
 import 'package:hentai_library/ui/core/widgets/navigation/desktop_sidebar.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_sidebar_overflow_actions.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -411,10 +413,11 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
     final l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
-    final bool remote = isRemoteLibrary(library);
     final CustomPopupMenuController controller = useMemoized(
       CustomPopupMenuController.new,
     );
+    final List<LibrarySidebarOverflowAction> actions =
+        librarySidebarOverflowActions(library);
 
     return CustomPopupMenu(
       controller: controller,
@@ -433,54 +436,16 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              _PopupMenuItem(
-                label: l10n.sidebarScanLibrary,
-                onTap: () {
-                  controller.hideMenu();
-                  LibraryManagementActions.scanLibrary(
-                    ref,
-                    context,
-                    library.libraryId,
-                  );
-                },
-              ),
-              _PopupMenuItem(
-                label: l10n.sidebarDeepScanLibrary,
-                onTap: () {
-                  controller.hideMenu();
-                  LibraryManagementActions.scanLibrary(
-                    ref,
-                    context,
-                    library.libraryId,
-                    mode: ScanMode.full,
-                  );
-                },
-              ),
-              _PopupMenuItem(
-                label: l10n.sidebarRefreshMetadataLater,
-                enabled: false,
-                onTap: () {},
-              ),
-              if (remote)
+              for (final LibrarySidebarOverflowAction action in actions)
                 _PopupMenuItem(
-                  label: l10n.sidebarEditLibrary,
+                  label: _labelFor(l10n, action),
+                  enabled: action != LibrarySidebarOverflowAction.refreshMetadataLater,
+                  isDestructive: action == LibrarySidebarOverflowAction.delete,
                   onTap: () {
                     controller.hideMenu();
-                    LibraryManagementActions.editRemoteLibrary(
-                      ref,
-                      context,
-                      library,
-                    );
+                    _handleAction(ref, context, action);
                   },
                 ),
-              _PopupMenuItem(
-                label: l10n.sidebarDeleteLibrary,
-                isDestructive: true,
-                onTap: () {
-                  controller.hideMenu();
-                  LibraryManagementActions.deleteLibrary(ref, context, library);
-                },
-              ),
             ],
           ),
         ),
@@ -499,6 +464,45 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
         onPressed: controller.toggleMenu,
       ),
     );
+  }
+
+  String _labelFor(AppLocalizations l10n, LibrarySidebarOverflowAction action) {
+    return switch (action) {
+      LibrarySidebarOverflowAction.scan => l10n.sidebarScanLibrary,
+      LibrarySidebarOverflowAction.deepScan => l10n.sidebarDeepScanLibrary,
+      LibrarySidebarOverflowAction.refreshMetadataLater =>
+        l10n.sidebarRefreshMetadataLater,
+      LibrarySidebarOverflowAction.editConnection =>
+        l10n.sidebarEditLibraryConnection,
+      LibrarySidebarOverflowAction.edit => l10n.sidebarEditLibrary,
+      LibrarySidebarOverflowAction.delete => l10n.sidebarDeleteLibrary,
+    };
+  }
+
+  void _handleAction(
+    WidgetRef ref,
+    BuildContext context,
+    LibrarySidebarOverflowAction action,
+  ) {
+    switch (action) {
+      case LibrarySidebarOverflowAction.scan:
+        LibraryManagementActions.scanLibrary(ref, context, library.libraryId);
+      case LibrarySidebarOverflowAction.deepScan:
+        LibraryManagementActions.scanLibrary(
+          ref,
+          context,
+          library.libraryId,
+          mode: ScanMode.full,
+        );
+      case LibrarySidebarOverflowAction.refreshMetadataLater:
+        break;
+      case LibrarySidebarOverflowAction.editConnection:
+        LibraryManagementActions.editRemoteLibrary(ref, context, library);
+      case LibrarySidebarOverflowAction.edit:
+        LibraryManagementActions.editLibrarySettings(ref, context, library);
+      case LibrarySidebarOverflowAction.delete:
+        LibraryManagementActions.deleteLibrary(ref, context, library);
+    }
   }
 }
 

@@ -49,7 +49,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sidebarEditLibrary => 'Edit';
 
   @override
+  String get sidebarEditLibraryConnection => 'Edit connection';
+
+  @override
   String get sidebarDeleteLibrary => 'Delete';
+
+  @override
+  String get dialogEditLibraryTitle => 'Edit library';
+
+  @override
+  String get dialogEditLibraryTabGeneral => 'General';
+
+  @override
+  String get dialogEditLibraryTabScanner => 'Scanner';
+
+  @override
+  String get formLibraryNameLabel => 'Name';
+
+  @override
+  String get formLibraryRootLabel => 'Root';
+
+  @override
+  String get formLibraryScanOnStartupLabel => 'Scan on startup';
+
+  @override
+  String get formLibraryScanOnStartupOn => 'On';
+
+  @override
+  String get formLibraryScanOnStartupOff => 'Off';
+
+  @override
+  String get formLibraryScanIntervalLabel => 'Scan interval';
+
+  @override
+  String get scanIntervalDisabled => 'Disabled';
+
+  @override
+  String get scanIntervalHourly => 'Hourly';
+
+  @override
+  String get scanIntervalEvery6Hours => 'Every 6 hours';
+
+  @override
+  String get scanIntervalEvery12Hours => 'Every 12 hours';
+
+  @override
+  String get scanIntervalDaily => 'Daily';
+
+  @override
+  String get scanIntervalWeekly => 'Weekly';
 
   @override
   String get libraryEmptyTitle => 'No comics yet';

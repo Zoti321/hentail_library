@@ -48,7 +48,55 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sidebarEditLibrary => '编辑';
 
   @override
+  String get sidebarEditLibraryConnection => '编辑连接';
+
+  @override
   String get sidebarDeleteLibrary => '删除';
+
+  @override
+  String get dialogEditLibraryTitle => '编辑库';
+
+  @override
+  String get dialogEditLibraryTabGeneral => '常规';
+
+  @override
+  String get dialogEditLibraryTabScanner => '扫描';
+
+  @override
+  String get formLibraryNameLabel => '名称';
+
+  @override
+  String get formLibraryRootLabel => '根位置';
+
+  @override
+  String get formLibraryScanOnStartupLabel => '启动时扫描';
+
+  @override
+  String get formLibraryScanOnStartupOn => '开启';
+
+  @override
+  String get formLibraryScanOnStartupOff => '关闭';
+
+  @override
+  String get formLibraryScanIntervalLabel => '扫描间隔';
+
+  @override
+  String get scanIntervalDisabled => '关闭';
+
+  @override
+  String get scanIntervalHourly => '每小时';
+
+  @override
+  String get scanIntervalEvery6Hours => '每 6 小时';
+
+  @override
+  String get scanIntervalEvery12Hours => '每 12 小时';
+
+  @override
+  String get scanIntervalDaily => '每天';
+
+  @override
+  String get scanIntervalWeekly => '每周';
 
   @override
   String get libraryEmptyTitle => '暂无漫画';

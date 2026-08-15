@@ -176,11 +176,107 @@ abstract class AppLocalizations {
   /// **'编辑'**
   String get sidebarEditLibrary;
 
+  /// No description provided for @sidebarEditLibraryConnection.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑连接'**
+  String get sidebarEditLibraryConnection;
+
   /// No description provided for @sidebarDeleteLibrary.
   ///
   /// In zh, this message translates to:
   /// **'删除'**
   String get sidebarDeleteLibrary;
+
+  /// No description provided for @dialogEditLibraryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑库'**
+  String get dialogEditLibraryTitle;
+
+  /// No description provided for @dialogEditLibraryTabGeneral.
+  ///
+  /// In zh, this message translates to:
+  /// **'常规'**
+  String get dialogEditLibraryTabGeneral;
+
+  /// No description provided for @dialogEditLibraryTabScanner.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描'**
+  String get dialogEditLibraryTabScanner;
+
+  /// No description provided for @formLibraryNameLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'名称'**
+  String get formLibraryNameLabel;
+
+  /// No description provided for @formLibraryRootLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'根位置'**
+  String get formLibraryRootLabel;
+
+  /// No description provided for @formLibraryScanOnStartupLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'启动时扫描'**
+  String get formLibraryScanOnStartupLabel;
+
+  /// No description provided for @formLibraryScanOnStartupOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启'**
+  String get formLibraryScanOnStartupOn;
+
+  /// No description provided for @formLibraryScanOnStartupOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get formLibraryScanOnStartupOff;
+
+  /// No description provided for @formLibraryScanIntervalLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描间隔'**
+  String get formLibraryScanIntervalLabel;
+
+  /// No description provided for @scanIntervalDisabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get scanIntervalDisabled;
+
+  /// No description provided for @scanIntervalHourly.
+  ///
+  /// In zh, this message translates to:
+  /// **'每小时'**
+  String get scanIntervalHourly;
+
+  /// No description provided for @scanIntervalEvery6Hours.
+  ///
+  /// In zh, this message translates to:
+  /// **'每 6 小时'**
+  String get scanIntervalEvery6Hours;
+
+  /// No description provided for @scanIntervalEvery12Hours.
+  ///
+  /// In zh, this message translates to:
+  /// **'每 12 小时'**
+  String get scanIntervalEvery12Hours;
+
+  /// No description provided for @scanIntervalDaily.
+  ///
+  /// In zh, this message translates to:
+  /// **'每天'**
+  String get scanIntervalDaily;
+
+  /// No description provided for @scanIntervalWeekly.
+  ///
+  /// In zh, this message translates to:
+  /// **'每周'**
+  String get scanIntervalWeekly;
 
   /// No description provided for @libraryEmptyTitle.
   ///

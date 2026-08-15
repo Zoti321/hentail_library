@@ -9,6 +9,7 @@ import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:hentai_library/domain/repositories/path_repository.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/remove_saved_path_confirm_dialog.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_library_settings_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/remote_library_form_dialog.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -82,6 +83,14 @@ abstract final class LibraryManagementActions {
       return;
     }
     showSuccessToast(context, context.l10n.remoteLibraryUpdatedToast);
+  }
+
+  static Future<void> editLibrarySettings(
+    WidgetRef ref,
+    BuildContext context,
+    LocalLibrary library,
+  ) {
+    return showEditLibrarySettingsDialog(context: context, library: library);
   }
 
   static Future<void> deleteLibrary(

@@ -4,6 +4,8 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 
 import 'package:hentai_library/domain/library/format_group.dart';
 
+import 'package:hentai_library/domain/library/scan_interval.dart';
+
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
@@ -198,6 +200,17 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       FormatGroup.pdf => settingsFormatGroupPdf,
       FormatGroup.epub => settingsFormatGroupEpub,
       FormatGroup.archive => settingsFormatGroupArchive,
+    };
+  }
+
+  String scanIntervalLabel(ScanInterval interval) {
+    return switch (interval) {
+      ScanInterval.disabled => scanIntervalDisabled,
+      ScanInterval.hourly => scanIntervalHourly,
+      ScanInterval.every6Hours => scanIntervalEvery6Hours,
+      ScanInterval.every12Hours => scanIntervalEvery12Hours,
+      ScanInterval.daily => scanIntervalDaily,
+      ScanInterval.weekly => scanIntervalWeekly,
     };
   }
 

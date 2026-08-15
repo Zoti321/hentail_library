@@ -106,6 +106,10 @@ _Avoid_: 漫画表单、元数据 DTO
 编辑 Series 用户元数据（名称、连载状态、计划总卷数）时的可提交草稿；计划总卷数以原始文本持有，空串表示清除、正整数表示设置；校验失败以字段级结果返回，由 UI 在字段下方展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
 _Avoid_: 系列表单、SeriesForm、编辑系列 DTO
 
+**Library settings form**:
+编辑 Library 用户可配置项（显示名、Scan on startup、Scan interval、Supported resource formats）时的可提交草稿；校验与落库规则集中在此，非法结果以字段级返回由 UI 展示。不包含改 Library root 或 Remote 凭证。无变化则不写库。
+_Avoid_: 库表单、LibraryForm、编辑库 DTO、库元数据表单
+
 **Metadata field lock**:
 Comic / Series 元数据字段上的布尔锁（Komga 式）。未锁定且 Library sync 或 Metadata refresh 解析出有值时用扫描结果覆盖；已锁定则保留库内值；扫描空/缺不清除。编辑某字段并保存会自动锁定该字段（仅变更字段）；也可不改值单独上锁/解锁。解锁不自动触发 sync / refresh。Series 成员排序锁（`sortOrderLocked`）同属此策略（见 ADR-0006）。合并与自动上锁规则集中一处，供 Library sync、Metadata refresh 与用户元数据写入共用。详见 ADR-0007。
 _Avoid_: 只读标记、冻结、保护位（口语可用，领域用 Metadata field lock）
