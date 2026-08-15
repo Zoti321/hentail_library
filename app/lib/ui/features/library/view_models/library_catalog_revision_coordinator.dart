@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
+import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -32,6 +33,7 @@ class LibraryCatalogRevisionSnapshot {
 }
 
 /// Sync 后：活跃 Tab 立即刷新 catalog；非活跃 Tab debounce 后再刷新。
+/// 切库时两侧立即对齐，避免 header 漫画/系列计数短暂互串。
 @Riverpod(keepAlive: true)
 class LibraryCatalogRevisionCoordinator
     extends _$LibraryCatalogRevisionCoordinator {
@@ -60,7 +62,19 @@ class LibraryCatalogRevisionCoordinator
       if (previous == null || previous == next) {
         return;
       }
-      _flushInactiveRevisionOnTabSwitch();
+      _flushInactiveRevision();
+    });
+
+    ref.listen<AsyncValue<CurrentLibraryState>>(currentLibraryProvider, (
+      AsyncValue<CurrentLibraryState>? previous,
+      AsyncValue<CurrentLibraryState> next,
+    ) {
+      final String? previousId = previous?.asData?.value.currentId;
+      final String? nextId = next.asData?.value.currentId;
+      if (previousId == null || previousId == nextId) {
+        return;
+      }
+      _flushInactiveRevision();
     });
 
     return const LibraryCatalogRevisionSnapshot(
@@ -80,7 +94,7 @@ class LibraryCatalogRevisionCoordinator
     });
   }
 
-  void _flushInactiveRevisionOnTabSwitch() {
+  void _flushInactiveRevision() {
     _inactiveRefreshTimer?.cancel();
     _inactiveRefreshTimer = null;
     if (state.inactiveRevision == state.activeRevision) {
