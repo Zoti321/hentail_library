@@ -20,6 +20,12 @@ import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+/// Trailing action slot width — matches [GhostButton.icon] `size` on library rows.
+const double _kSidebarRowTrailingSlotSize = 28;
+
+/// Extra left inset for libraries nested under the 「更多」 expander.
+const double _kLibrariesMoreChildIndent = 8;
+
 /// Row hover: lighter than the shared sidebar token so action buttons can
 /// sit on a deeper chrome without blending in.
 Color _sidebarRowHoverBackground(HentaiColorScheme h) =>
@@ -128,6 +134,7 @@ class LibrariesSidebarSection extends HookConsumerWidget {
               isActive: selection.activeLibraryId == library.libraryId,
               expandProgress: expandProgress,
               labelOpacity: labelOpacity,
+              nestedUnderMore: true,
               onNavigate: onNavigate,
             ),
           ),
@@ -188,6 +195,7 @@ class _LibrariesMoreRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final ColorScheme cs = Theme.of(context).colorScheme;
     return _SidebarChromeRow(
       isActive: false,
       expandProgress: expandProgress,
@@ -196,9 +204,16 @@ class _LibrariesMoreRow extends StatelessWidget {
       label: l10n.sidebarMoreLibraries,
       indentWithoutIcon: true,
       onTap: onTap,
-      trailing: Icon(
-        expanded ? LucideIcons.chevronDown : LucideIcons.chevronRight,
-        size: 16,
+      trailing: SizedBox(
+        width: _kSidebarRowTrailingSlotSize,
+        height: _kSidebarRowTrailingSlotSize,
+        child: Center(
+          child: Icon(
+            expanded ? LucideIcons.chevronDown : LucideIcons.chevronRight,
+            size: 16,
+            color: cs.hentai.textSecondary,
+          ),
+        ),
       ),
     );
   }
@@ -210,6 +225,7 @@ class _LibrarySidebarRow extends ConsumerWidget {
     required this.isActive,
     required this.expandProgress,
     required this.labelOpacity,
+    this.nestedUnderMore = false,
     this.onNavigate,
   });
 
@@ -217,6 +233,7 @@ class _LibrarySidebarRow extends ConsumerWidget {
   final bool isActive;
   final double expandProgress;
   final double labelOpacity;
+  final bool nestedUnderMore;
   final VoidCallback? onNavigate;
 
   @override
@@ -228,6 +245,7 @@ class _LibrarySidebarRow extends ConsumerWidget {
       leading: null,
       label: localLibraryDisplayName(library),
       indentWithoutIcon: true,
+      extraLeftIndent: nestedUnderMore ? _kLibrariesMoreChildIndent : 0,
       onTap: () async {
         await LibraryManagementActions.openLibrary(
           ref,
@@ -789,6 +807,7 @@ class _SidebarChromeRow extends HookWidget {
     this.leading,
     this.trailing,
     this.indentWithoutIcon = false,
+    this.extraLeftIndent = 0,
   });
 
   final bool isActive;
@@ -799,6 +818,7 @@ class _SidebarChromeRow extends HookWidget {
   final Widget? leading;
   final Widget? trailing;
   final bool indentWithoutIcon;
+  final double extraLeftIndent;
 
   @override
   Widget build(BuildContext context) {
@@ -847,11 +867,13 @@ class _SidebarChromeRow extends HookWidget {
                 ),
               ),
               padding: EdgeInsets.only(
-                left: indentWithoutIcon
-                    ? tokens.spacing.md +
-                          DesktopSidebar.navItemIconSize +
-                          tokens.spacing.sm
-                    : tokens.spacing.md * t,
+                left:
+                    (indentWithoutIcon
+                        ? tokens.spacing.md +
+                              DesktopSidebar.navItemIconSize +
+                              tokens.spacing.sm
+                        : tokens.spacing.md * t) +
+                    extraLeftIndent,
                 right: tokens.spacing.xs,
               ),
               child: Row(

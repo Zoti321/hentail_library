@@ -202,6 +202,74 @@ void main() {
     expect(find.text('Alpha'), findsOneWidget);
     expect(find.text('Beta'), findsOneWidget);
   });
+
+  testWidgets('expanded unpinned libraries indent text under 更多', (
+    WidgetTester tester,
+  ) async {
+    final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
+      libraries: <LocalLibrary>[
+        _lib('a', 'Alpha'),
+        _lib('b', 'Beta', pinned: false),
+      ],
+      currentId: 'a',
+    );
+    await _pumpLibrariesShell(tester, fake, (_) {});
+
+    await tester.tap(find.text('更多'));
+    await tester.pump();
+
+    final double alphaLeft = tester.getTopLeft(find.text('Alpha')).dx;
+    final double betaLeft = tester.getTopLeft(find.text('Beta')).dx;
+    expect(betaLeft - alphaLeft, 8);
+  });
+
+  testWidgets('更多 chevron aligns with unpinned library overflow actions', (
+    WidgetTester tester,
+  ) async {
+    final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
+      libraries: <LocalLibrary>[
+        _lib('a', 'Alpha'),
+        _lib('b', 'Beta', pinned: false),
+      ],
+      currentId: 'a',
+    );
+    await _pumpLibrariesShell(tester, fake, (_) {});
+
+    await tester.tap(find.text('更多'));
+    await tester.pump();
+
+    final Finder moreRow = find.ancestor(
+      of: find.text('更多'),
+      matching: find.byType(GestureDetector),
+    ).first;
+    final Finder betaRow = find.ancestor(
+      of: find.text('Beta'),
+      matching: find.byType(GestureDetector),
+    ).first;
+
+    final RenderBox moreChevron = tester.renderObject<RenderBox>(
+      find.descendant(
+        of: moreRow,
+        matching: find.byIcon(LucideIcons.chevronDown),
+      ),
+    );
+    final RenderBox betaOverflow = tester.renderObject<RenderBox>(
+      find.descendant(
+        of: betaRow,
+        matching: find.byIcon(LucideIcons.ellipsisVertical),
+      ),
+    );
+
+    expect(
+      moreChevron.localToGlobal(Offset.zero).dx +
+          moreChevron.size.width / 2,
+      closeTo(
+        betaOverflow.localToGlobal(Offset.zero).dx +
+            betaOverflow.size.width / 2,
+        0.5,
+      ),
+    );
+  });
 }
 
 Finder _librariesRailIcon() {
