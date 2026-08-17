@@ -6,7 +6,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Ãæ°üĞ¼Ê½·µ»ØÂş»­¿âä¯ÀÀÒ³£¬¿ÉÑ¡Õ¹Ê¾µ±Ç°Ò³¸±±êÌâ¡£
+/// é¢åŒ…å±‘å¼è¿”å›æ¼«ç”»åº“æµè§ˆé¡µï¼Œå¯é€‰å±•ç¤ºå½“å‰é¡µå‰¯æ ‡é¢˜ã€‚
 final class LibraryReturnBreadcrumb extends StatelessWidget {
   const LibraryReturnBreadcrumb({
     super.key,
@@ -98,7 +98,7 @@ final class LibraryReturnBreadcrumb extends StatelessWidget {
   }
 }
 
-/// ¸±±êÌâ½öÔÚ½Ø¶ÏÊ±ÓÃÕ­ÃüÖĞÇø£¨ĞÅÏ¢Í¼±ê£©Õ¹Ê¾ÍêÕû Tooltip£¬±ÜÃâ [Expanded] °üÒ»²ã [Tooltip] ÕûĞĞ¿É´¥·¢¡£
+/// å‰¯æ ‡é¢˜ä»…åœ¨æˆªæ–­æ—¶ç”¨çª„å‘½ä¸­åŒºï¼ˆä¿¡æ¯å›¾æ ‡ï¼‰å±•ç¤ºå®Œæ•´ Tooltipï¼Œé¿å… [Expanded] åŒ…ä¸€å±‚ [Tooltip] æ•´è¡Œå¯è§¦å‘ã€‚
 class _BreadcrumbTrailingTitle extends StatelessWidget {
   const _BreadcrumbTrailingTitle({
     required this.text,
