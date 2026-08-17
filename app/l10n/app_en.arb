@@ -11,7 +11,21 @@
   "sidebarDeepScanAllLibraries": "Deep scan all libraries",
   "sidebarScanLibrary": "Scan library",
   "sidebarDeepScanLibrary": "Deep scan library",
-  "sidebarRefreshMetadataLater": "Refresh metadata (later)",
+  "cancelRefreshMetadata": "Cancel metadata refresh",
+  "refreshMetadataBatchDone": "Metadata refresh done: {succeeded} succeeded, {failed} failed",
+  "@refreshMetadataBatchDone": {
+    "placeholders": {
+      "succeeded": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
+  "refreshMetadataBatchCancelled": "Metadata refresh cancelled ({succeeded} refreshed, {failed} failed)",
+  "@refreshMetadataBatchCancelled": {
+    "placeholders": {
+      "succeeded": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "sidebarEditLibrary": "Edit",
   "sidebarEditLibraryConnection": "Edit connection",
   "sidebarDeleteLibrary": "Delete",
@@ -379,21 +393,6 @@
   "refreshMetadataComicSuccess": "Metadata refreshed",
   "refreshMetadataComicFailed": "Failed to refresh metadata",
   "refreshMetadataBusy": "Library sync or metadata refresh is in progress",
-  "refreshMetadataSeriesDialogTitle": "Refresh series metadata",
-  "refreshMetadataSeriesProgress": "Refreshing {current}/{total}",
-  "@refreshMetadataSeriesProgress": {
-    "placeholders": {
-      "current": { "type": "int" },
-      "total": { "type": "int" }
-    }
-  },
-  "refreshMetadataSeriesDone": "Done: {succeeded} succeeded, {failed} failed",
-  "@refreshMetadataSeriesDone": {
-    "placeholders": {
-      "succeeded": { "type": "int" },
-      "failed": { "type": "int" }
-    }
-  },
   "comicDetailShowInExplorer": "Show in file explorer",
   "comicDetailShowInExplorerFailed": "Could not show this item in File Explorer",
   "comicDetailDelete": "Delete",

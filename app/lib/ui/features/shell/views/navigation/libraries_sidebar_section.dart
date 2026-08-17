@@ -13,24 +13,20 @@ import 'package:hentai_library/ui/core/widgets/navigation/desktop_sidebar.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/library_sidebar_overflow_actions.dart';
+import 'package:hentai_library/ui/features/shell/state/metadata_refresh_toasts.dart';
+import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Row hover: lighter than the shared sidebar token so action buttons can
 /// sit on a deeper chrome without blending in.
-Color _sidebarRowHoverBackground(HentaiColorScheme h) => Color.lerp(
-  h.sidebarBackground,
-  h.sidebarItemHoverBackground,
-  0.55,
-)!;
+Color _sidebarRowHoverBackground(HentaiColorScheme h) =>
+    Color.lerp(h.sidebarBackground, h.sidebarItemHoverBackground, 0.55)!;
 
 /// Trailing +/-/⋯ button hover: darker than the row hover for contrast.
-Color _sidebarActionHoverBackground(HentaiColorScheme h) => Color.lerp(
-  h.sidebarItemHoverBackground,
-  h.borderStrong,
-  0.5,
-)!;
+Color _sidebarActionHoverBackground(HentaiColorScheme h) =>
+    Color.lerp(h.sidebarItemHoverBackground, h.borderStrong, 0.5)!;
 
 /// Komga-style Libraries section for the desktop sidebar (injected by shell).
 class LibrariesSidebarSection extends ConsumerWidget {
@@ -124,7 +120,10 @@ class _LibrariesSectionHeader extends StatelessWidget {
       onTap: onTap,
       trailing: const Row(
         mainAxisSize: MainAxisSize.min,
-        children: <Widget>[_SectionAddMenuButton(), _SectionOverflowMenuButton()],
+        children: <Widget>[
+          _SectionAddMenuButton(),
+          _SectionOverflowMenuButton(),
+        ],
       ),
     );
   }
@@ -231,7 +230,10 @@ class _CollapsedLibrariesButton extends HookConsumerWidget {
                 },
               ),
               if (libraries.isNotEmpty)
-                Divider(height: tokens.spacing.sm, color: cs.hentai.borderSubtle),
+                Divider(
+                  height: tokens.spacing.sm,
+                  color: cs.hentai.borderSubtle,
+                ),
               ...libraries.map(
                 (LocalLibrary library) => _PopupMenuItem(
                   label: localLibraryDisplayName(library),
@@ -418,6 +420,15 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
     );
     final List<LibrarySidebarOverflowAction> actions =
         librarySidebarOverflowActions(library);
+    final MetadataRefreshState refreshState = ref.watch(
+      metadataRefreshControllerProvider,
+    );
+    final bool scanning = ref.watch(scanLibraryControllerProvider).running;
+    final bool refreshingThis = ref
+        .read(metadataRefreshControllerProvider.notifier)
+        .isRefreshingLibrary(library.libraryId);
+    final bool otherWriteBusy =
+        scanning || (refreshState.running && !refreshingThis);
 
     return CustomPopupMenu(
       controller: controller,
@@ -438,12 +449,19 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
             children: <Widget>[
               for (final LibrarySidebarOverflowAction action in actions)
                 _PopupMenuItem(
-                  label: _labelFor(l10n, action),
-                  enabled: action != LibrarySidebarOverflowAction.refreshMetadataLater,
+                  label: _labelFor(
+                    l10n,
+                    action,
+                    refreshingThis: refreshingThis,
+                  ),
+                  enabled:
+                      action == LibrarySidebarOverflowAction.refreshMetadata
+                      ? !otherWriteBusy
+                      : true,
                   isDestructive: action == LibrarySidebarOverflowAction.delete,
                   onTap: () {
                     controller.hideMenu();
-                    _handleAction(ref, context, action);
+                    _handleAction(ref, context, action, refreshingThis);
                   },
                 ),
             ],
@@ -466,12 +484,16 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
     );
   }
 
-  String _labelFor(AppLocalizations l10n, LibrarySidebarOverflowAction action) {
+  String _labelFor(
+    AppLocalizations l10n,
+    LibrarySidebarOverflowAction action, {
+    required bool refreshingThis,
+  }) {
     return switch (action) {
       LibrarySidebarOverflowAction.scan => l10n.sidebarScanLibrary,
       LibrarySidebarOverflowAction.deepScan => l10n.sidebarDeepScanLibrary,
-      LibrarySidebarOverflowAction.refreshMetadataLater =>
-        l10n.sidebarRefreshMetadataLater,
+      LibrarySidebarOverflowAction.refreshMetadata =>
+        refreshingThis ? l10n.cancelRefreshMetadata : l10n.refreshMetadata,
       LibrarySidebarOverflowAction.edit => l10n.sidebarEditLibrary,
       LibrarySidebarOverflowAction.delete => l10n.sidebarDeleteLibrary,
     };
@@ -481,6 +503,7 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
     WidgetRef ref,
     BuildContext context,
     LibrarySidebarOverflowAction action,
+    bool refreshingThis,
   ) {
     switch (action) {
       case LibrarySidebarOverflowAction.scan:
@@ -492,12 +515,39 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
           library.libraryId,
           mode: ScanMode.full,
         );
-      case LibrarySidebarOverflowAction.refreshMetadataLater:
-        break;
+      case LibrarySidebarOverflowAction.refreshMetadata:
+        if (refreshingThis) {
+          ref.read(metadataRefreshControllerProvider.notifier).cancel();
+          return;
+        }
+        _refreshLibraryMetadata(ref, context);
       case LibrarySidebarOverflowAction.edit:
         LibraryManagementActions.editLibrarySettings(ref, context, library);
       case LibrarySidebarOverflowAction.delete:
         LibraryManagementActions.deleteLibrary(ref, context, library);
+    }
+  }
+
+  Future<void> _refreshLibraryMetadata(
+    WidgetRef ref,
+    BuildContext context,
+  ) async {
+    try {
+      final result = await ref
+          .read(metadataRefreshControllerProvider.notifier)
+          .refreshLibrary(
+            libraryId: library.libraryId,
+            name: localLibraryDisplayName(library),
+          );
+      if (!context.mounted) {
+        return;
+      }
+      showMetadataRefreshBatchToast(context, result);
+    } catch (err) {
+      if (!context.mounted) {
+        return;
+      }
+      showErrorToast(context, err);
     }
   }
 }
@@ -606,7 +656,9 @@ class _SidebarIconOnlyButton extends HookWidget {
               : cs.hentai.sidebarBackground);
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: DesktopSidebar.navItemVerticalMargin),
+      margin: EdgeInsets.symmetric(
+        vertical: DesktopSidebar.navItemVerticalMargin,
+      ),
       child: MouseRegion(
         onEnter: (_) => hovered.value = true,
         onExit: (_) => hovered.value = false,

@@ -85,10 +85,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  RustStreamSink<RefreshSeriesProgressFrbDto>
-  dco_decode_StreamSink_refresh_series_progress_frb_dto_Sse(dynamic raw);
-
-  @protected
   RustStreamSink<SyncLibraryProgressDto>
   dco_decode_StreamSink_sync_library_progress_dto_Sse(dynamic raw);
 
@@ -331,7 +327,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ReadingHistoryDto dco_decode_reading_history_dto(dynamic raw);
 
   @protected
-  RefreshSeriesProgressFrbDto dco_decode_refresh_series_progress_frb_dto(
+  RefreshLibraryResultFrbDto dco_decode_refresh_library_result_frb_dto(
     dynamic raw,
   );
 
@@ -486,12 +482,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RustStreamSink<List<SeriesDto>> sse_decode_StreamSink_list_series_dto_Sse(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  RustStreamSink<RefreshSeriesProgressFrbDto>
-  sse_decode_StreamSink_refresh_series_progress_frb_dto_Sse(
     SseDeserializer deserializer,
   );
 
@@ -792,7 +782,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  RefreshSeriesProgressFrbDto sse_decode_refresh_series_progress_frb_dto(
+  RefreshLibraryResultFrbDto sse_decode_refresh_library_result_frb_dto(
     SseDeserializer deserializer,
   );
 
@@ -992,12 +982,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_StreamSink_list_series_dto_Sse(
     RustStreamSink<List<SeriesDto>> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_refresh_series_progress_frb_dto_Sse(
-    RustStreamSink<RefreshSeriesProgressFrbDto> self,
     SseSerializer serializer,
   );
 
@@ -1380,8 +1364,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_refresh_series_progress_frb_dto(
-    RefreshSeriesProgressFrbDto self,
+  void sse_encode_refresh_library_result_frb_dto(
+    RefreshLibraryResultFrbDto self,
     SseSerializer serializer,
   );
 

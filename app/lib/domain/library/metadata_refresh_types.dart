@@ -1,9 +1,8 @@
-typedef RefreshSeriesProgress = ({
-  int current,
-  int total,
-  String? comicId,
+/// Batch Metadata refresh outcome (Series or Library).
+typedef MetadataRefreshBatchResult = ({
   int succeeded,
   int failed,
+  bool cancelled,
+  bool skipped,
+  String? skipMessage,
 });
-
-typedef RefreshSeriesResult = ({int succeeded, int failed});

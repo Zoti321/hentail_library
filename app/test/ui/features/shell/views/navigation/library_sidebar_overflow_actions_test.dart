@@ -19,18 +19,21 @@ LocalLibrary _lib({required String kind}) {
 }
 
 void main() {
-  test('local library: Edit immediately above Delete, no Edit connection', () {
-    expect(
-      librarySidebarOverflowActions(_lib(kind: 'local')),
-      <LibrarySidebarOverflowAction>[
-        LibrarySidebarOverflowAction.scan,
-        LibrarySidebarOverflowAction.deepScan,
-        LibrarySidebarOverflowAction.refreshMetadataLater,
-        LibrarySidebarOverflowAction.edit,
-        LibrarySidebarOverflowAction.delete,
-      ],
-    );
-  });
+  test(
+    'local library: Edit immediately above Delete, refresh metadata enabled',
+    () {
+      expect(
+        librarySidebarOverflowActions(_lib(kind: 'local')),
+        <LibrarySidebarOverflowAction>[
+          LibrarySidebarOverflowAction.scan,
+          LibrarySidebarOverflowAction.deepScan,
+          LibrarySidebarOverflowAction.refreshMetadata,
+          LibrarySidebarOverflowAction.edit,
+          LibrarySidebarOverflowAction.delete,
+        ],
+      );
+    },
+  );
 
   test('remote library: same overflow as local (edit covers connection)', () {
     expect(
@@ -38,7 +41,7 @@ void main() {
       <LibrarySidebarOverflowAction>[
         LibrarySidebarOverflowAction.scan,
         LibrarySidebarOverflowAction.deepScan,
-        LibrarySidebarOverflowAction.refreshMetadataLater,
+        LibrarySidebarOverflowAction.refreshMetadata,
         LibrarySidebarOverflowAction.edit,
         LibrarySidebarOverflowAction.delete,
       ],

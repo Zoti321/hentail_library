@@ -45,11 +45,11 @@ pub use library::{
 };
 pub use path::{add_path, list_all_paths, remove_path, watch_paths};
 pub use sync::{
-    FormatGroup, LibrarySyncCountsDto, RefreshSeriesProgressDto, RefreshSeriesResultDto,
-    SyncHandle, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto, SyncScanMode,
-    cancel_sync, comic_id_for_remote_location, create_sync_handle, refresh_comic_metadata,
-    refresh_series_metadata, scan_remote_lightweight, sync_library,
-    try_acquire_library_write_lock, RemoteScanOutcome,
+    FormatGroup, LibrarySyncCountsDto, RefreshLibraryResultDto, RefreshSeriesProgressDto,
+    RefreshSeriesResultDto, SyncHandle, SyncLibraryPhaseDto, SyncLibraryProgressDto,
+    SyncLibraryRouteDto, SyncScanMode, cancel_sync, comic_id_for_remote_location,
+    create_sync_handle, refresh_comic_metadata, refresh_library_metadata, refresh_series_metadata,
+    scan_remote_lightweight, sync_library, try_acquire_library_write_lock, RemoteScanOutcome,
 };
 pub use reader::{
     ReaderPageDto, ReaderPageListDto, clear_reader_page_cache, clear_reader_sessions,

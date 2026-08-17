@@ -43,7 +43,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sidebarDeepScanLibrary => 'Deep scan library';
 
   @override
-  String get sidebarRefreshMetadataLater => 'Refresh metadata (later)';
+  String get cancelRefreshMetadata => 'Cancel metadata refresh';
+
+  @override
+  String refreshMetadataBatchDone(int succeeded, int failed) {
+    return 'Metadata refresh done: $succeeded succeeded, $failed failed';
+  }
+
+  @override
+  String refreshMetadataBatchCancelled(int succeeded, int failed) {
+    return 'Metadata refresh cancelled ($succeeded refreshed, $failed failed)';
+  }
 
   @override
   String get sidebarEditLibrary => 'Edit';
@@ -860,19 +870,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get refreshMetadataBusy =>
       'Library sync or metadata refresh is in progress';
-
-  @override
-  String get refreshMetadataSeriesDialogTitle => 'Refresh series metadata';
-
-  @override
-  String refreshMetadataSeriesProgress(int current, int total) {
-    return 'Refreshing $current/$total';
-  }
-
-  @override
-  String refreshMetadataSeriesDone(int succeeded, int failed) {
-    return 'Done: $succeeded succeeded, $failed failed';
-  }
 
   @override
   String get comicDetailShowInExplorer => 'Show in file explorer';

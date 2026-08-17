@@ -11,7 +11,21 @@
   "sidebarDeepScanAllLibraries": "深度扫描所有库",
   "sidebarScanLibrary": "扫描库",
   "sidebarDeepScanLibrary": "深度扫描库",
-  "sidebarRefreshMetadataLater": "刷新元数据（后续）",
+  "cancelRefreshMetadata": "取消刷新元数据",
+  "refreshMetadataBatchDone": "元数据刷新完成：成功 {succeeded}，失败 {failed}",
+  "@refreshMetadataBatchDone": {
+    "placeholders": {
+      "succeeded": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
+  "refreshMetadataBatchCancelled": "已取消元数据刷新（已刷新 {succeeded}，失败 {failed}）",
+  "@refreshMetadataBatchCancelled": {
+    "placeholders": {
+      "succeeded": { "type": "int" },
+      "failed": { "type": "int" }
+    }
+  },
   "sidebarEditLibrary": "编辑",
   "sidebarEditLibraryConnection": "编辑连接",
   "sidebarDeleteLibrary": "删除",
@@ -379,21 +393,6 @@
   "refreshMetadataComicSuccess": "已刷新元数据",
   "refreshMetadataComicFailed": "刷新元数据失败",
   "refreshMetadataBusy": "库同步或元数据刷新进行中",
-  "refreshMetadataSeriesDialogTitle": "刷新系列元数据",
-  "refreshMetadataSeriesProgress": "正在刷新 {current}/{total}",
-  "@refreshMetadataSeriesProgress": {
-    "placeholders": {
-      "current": { "type": "int" },
-      "total": { "type": "int" }
-    }
-  },
-  "refreshMetadataSeriesDone": "完成：成功 {succeeded}，失败 {failed}",
-  "@refreshMetadataSeriesDone": {
-    "placeholders": {
-      "succeeded": { "type": "int" },
-      "failed": { "type": "int" }
-    }
-  },
   "comicDetailShowInExplorer": "在资源管理器中显示",
   "comicDetailShowInExplorerFailed": "无法在文件资源管理器中显示该项目",
   "comicDetailDelete": "删除",

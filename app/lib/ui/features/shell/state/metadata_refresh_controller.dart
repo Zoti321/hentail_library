@@ -9,13 +9,16 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'metadata_refresh_controller.freezed.dart';
 part 'metadata_refresh_controller.g.dart';
 
+enum MetadataRefreshTargetKind { comic, series, library }
+
 @freezed
 abstract class MetadataRefreshState with _$MetadataRefreshState {
   const factory MetadataRefreshState({
     @Default(false) bool running,
     String? targetLabel,
-    RefreshSeriesProgress? seriesProgress,
-    RefreshSeriesResult? seriesResult,
+    MetadataRefreshTargetKind? targetKind,
+    String? targetId,
+    MetadataRefreshBatchResult? batchResult,
     String? error,
   }) = _MetadataRefreshState;
 
@@ -36,7 +39,12 @@ class MetadataRefreshController extends _$MetadataRefreshController {
     }
     _ensureScanIdle();
 
-    state = MetadataRefreshState(running: true, targetLabel: title);
+    state = MetadataRefreshState(
+      running: true,
+      targetLabel: title,
+      targetKind: MetadataRefreshTargetKind.comic,
+      targetId: comicId,
+    );
     try {
       await ref.read(metadataRefreshCoordinatorProvider).refreshComic(comicId);
       state = const MetadataRefreshState();
@@ -49,7 +57,7 @@ class MetadataRefreshController extends _$MetadataRefreshController {
     }
   }
 
-  Future<RefreshSeriesResult> refreshSeries({
+  Future<MetadataRefreshBatchResult> refreshSeries({
     required String seriesId,
     required String name,
   }) async {
@@ -58,18 +66,18 @@ class MetadataRefreshController extends _$MetadataRefreshController {
     }
     _ensureScanIdle();
 
-    state = MetadataRefreshState(running: true, targetLabel: name);
+    state = MetadataRefreshState(
+      running: true,
+      targetLabel: name,
+      targetKind: MetadataRefreshTargetKind.series,
+      targetId: seriesId,
+    );
     try {
-      final RefreshSeriesResult result = await ref
+      final MetadataRefreshBatchResult batch = await ref
           .read(metadataRefreshCoordinatorProvider)
-          .refreshSeries(
-            seriesId,
-            onProgress: (RefreshSeriesProgress progress) {
-              state = state.copyWith(seriesProgress: progress);
-            },
-          );
-      state = MetadataRefreshState(seriesResult: result);
-      return result;
+          .refreshSeries(seriesId);
+      state = MetadataRefreshState(batchResult: batch);
+      return batch;
     } catch (e, st) {
       logError(AppLog.ui('metadataRefresh'), '刷新系列元数据失败', e, st);
       state = MetadataRefreshState(
@@ -77,6 +85,55 @@ class MetadataRefreshController extends _$MetadataRefreshController {
       );
       rethrow;
     }
+  }
+
+  Future<MetadataRefreshBatchResult> refreshLibrary({
+    required String libraryId,
+    required String name,
+  }) async {
+    if (state.running) {
+      throw AppException('元数据刷新进行中，请稍后再试');
+    }
+    _ensureScanIdle();
+
+    state = MetadataRefreshState(
+      running: true,
+      targetLabel: name,
+      targetKind: MetadataRefreshTargetKind.library,
+      targetId: libraryId,
+    );
+    try {
+      final MetadataRefreshBatchResult result = await ref
+          .read(metadataRefreshCoordinatorProvider)
+          .refreshLibrary(libraryId);
+      state = MetadataRefreshState(batchResult: result);
+      return result;
+    } catch (e, st) {
+      logError(AppLog.ui('metadataRefresh'), '刷新库元数据失败', e, st);
+      state = MetadataRefreshState(
+        error: e is AppException ? e.message : e.toString(),
+      );
+      rethrow;
+    }
+  }
+
+  void cancel() {
+    if (!state.running) {
+      return;
+    }
+    ref.read(metadataRefreshCoordinatorProvider).cancelActive();
+  }
+
+  bool isRefreshingLibrary(String libraryId) {
+    return state.running &&
+        state.targetKind == MetadataRefreshTargetKind.library &&
+        state.targetId == libraryId;
+  }
+
+  bool isRefreshingSeries(String seriesId) {
+    return state.running &&
+        state.targetKind == MetadataRefreshTargetKind.series &&
+        state.targetId == seriesId;
   }
 
   /// UI-friendly precheck only; authoritative mutual exclusion is Rust `library_lock`.

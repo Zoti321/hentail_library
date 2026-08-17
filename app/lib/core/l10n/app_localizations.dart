@@ -164,11 +164,23 @@ abstract class AppLocalizations {
   /// **'深度扫描库'**
   String get sidebarDeepScanLibrary;
 
-  /// No description provided for @sidebarRefreshMetadataLater.
+  /// No description provided for @cancelRefreshMetadata.
   ///
   /// In zh, this message translates to:
-  /// **'刷新元数据（后续）'**
-  String get sidebarRefreshMetadataLater;
+  /// **'取消刷新元数据'**
+  String get cancelRefreshMetadata;
+
+  /// No description provided for @refreshMetadataBatchDone.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据刷新完成：成功 {succeeded}，失败 {failed}'**
+  String refreshMetadataBatchDone(int succeeded, int failed);
+
+  /// No description provided for @refreshMetadataBatchCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已取消元数据刷新（已刷新 {succeeded}，失败 {failed}）'**
+  String refreshMetadataBatchCancelled(int succeeded, int failed);
 
   /// No description provided for @sidebarEditLibrary.
   ///
@@ -1585,24 +1597,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'库同步或元数据刷新进行中'**
   String get refreshMetadataBusy;
-
-  /// No description provided for @refreshMetadataSeriesDialogTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'刷新系列元数据'**
-  String get refreshMetadataSeriesDialogTitle;
-
-  /// No description provided for @refreshMetadataSeriesProgress.
-  ///
-  /// In zh, this message translates to:
-  /// **'正在刷新 {current}/{total}'**
-  String refreshMetadataSeriesProgress(int current, int total);
-
-  /// No description provided for @refreshMetadataSeriesDone.
-  ///
-  /// In zh, this message translates to:
-  /// **'完成：成功 {succeeded}，失败 {failed}'**
-  String refreshMetadataSeriesDone(int succeeded, int failed);
 
   /// No description provided for @comicDetailShowInExplorer.
   ///

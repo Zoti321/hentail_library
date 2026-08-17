@@ -10,15 +10,17 @@ class _FakeLibraryRepository implements LibraryRepository {
 }
 
 class _ScriptedRefreshAdapter extends MetadataRefreshFrbAdapter {
-  _ScriptedRefreshAdapter({this.onRefreshComic, this.onRefreshSeries})
-    : super(libraryRepository: _FakeLibraryRepository());
+  _ScriptedRefreshAdapter({
+    this.onRefreshComic,
+    this.onRefreshSeries,
+    this.onRefreshLibrary,
+  }) : super(libraryRepository: _FakeLibraryRepository());
 
   final Future<void> Function(String comicId)? onRefreshComic;
-  final Future<RefreshSeriesResult> Function(
-    String seriesId, {
-    void Function(RefreshSeriesProgress progress)? onProgress,
-  })?
+  final Future<MetadataRefreshBatchResult> Function(String seriesId)?
   onRefreshSeries;
+  final Future<MetadataRefreshBatchResult> Function(String libraryId)?
+  onRefreshLibrary;
 
   @override
   Future<void> refreshComic(String comicId) {
@@ -26,12 +28,27 @@ class _ScriptedRefreshAdapter extends MetadataRefreshFrbAdapter {
   }
 
   @override
-  Future<RefreshSeriesResult> refreshSeries(
-    String seriesId, {
-    void Function(RefreshSeriesProgress progress)? onProgress,
-  }) {
-    return onRefreshSeries?.call(seriesId, onProgress: onProgress) ??
-        Future<RefreshSeriesResult>.value((succeeded: 0, failed: 0));
+  Future<MetadataRefreshBatchResult> refreshSeries(String seriesId) {
+    return onRefreshSeries?.call(seriesId) ??
+        Future<MetadataRefreshBatchResult>.value((
+          succeeded: 0,
+          failed: 0,
+          cancelled: false,
+          skipped: false,
+          skipMessage: null,
+        ));
+  }
+
+  @override
+  Future<MetadataRefreshBatchResult> refreshLibrary(String libraryId) {
+    return onRefreshLibrary?.call(libraryId) ??
+        Future<MetadataRefreshBatchResult>.value((
+          succeeded: 0,
+          failed: 0,
+          cancelled: false,
+          skipped: false,
+          skipMessage: null,
+        ));
   }
 }
 
@@ -63,28 +80,83 @@ void main() {
       var notifyCount = 0;
       final MetadataRefreshCoordinator coordinator = MetadataRefreshCoordinator(
         adapter: _ScriptedRefreshAdapter(
-          onRefreshSeries:
-              (
-                String seriesId, {
-                void Function(RefreshSeriesProgress progress)? onProgress,
-              }) async {
-                onProgress?.call((
-                  current: 1,
-                  total: 1,
-                  comicId: 'c1',
-                  succeeded: 1,
-                  failed: 0,
-                ));
-                return (succeeded: 1, failed: 0);
-              },
+          onRefreshSeries: (String seriesId) async {
+            expect(seriesId, 's1');
+            return (
+              succeeded: 1,
+              failed: 0,
+              cancelled: false,
+              skipped: false,
+              skipMessage: null,
+            );
+          },
         ),
         onSucceeded: () => notifyCount++,
       );
 
-      final RefreshSeriesResult result = await coordinator.refreshSeries('s1');
+      final MetadataRefreshBatchResult result = await coordinator.refreshSeries(
+        's1',
+      );
 
       expect(result.succeeded, 1);
+      expect(result.cancelled, isFalse);
       expect(notifyCount, 1);
+    },
+  );
+
+  test(
+    'refreshLibrary notifies catalog revision after a non-skipped result',
+    () async {
+      var notifyCount = 0;
+      final MetadataRefreshCoordinator coordinator = MetadataRefreshCoordinator(
+        adapter: _ScriptedRefreshAdapter(
+          onRefreshLibrary: (String libraryId) async {
+            expect(libraryId, 'lib-1');
+            return (
+              succeeded: 2,
+              failed: 1,
+              cancelled: false,
+              skipped: false,
+              skipMessage: null,
+            );
+          },
+        ),
+        onSucceeded: () => notifyCount++,
+      );
+
+      final MetadataRefreshBatchResult result = await coordinator
+          .refreshLibrary('lib-1');
+
+      expect(result.succeeded, 2);
+      expect(result.failed, 1);
+      expect(notifyCount, 1);
+    },
+  );
+
+  test(
+    'refreshLibrary does not notify catalog revision when remote library is skipped',
+    () async {
+      var notifyCount = 0;
+      final MetadataRefreshCoordinator coordinator = MetadataRefreshCoordinator(
+        adapter: _ScriptedRefreshAdapter(
+          onRefreshLibrary: (String libraryId) async {
+            return (
+              succeeded: 0,
+              failed: 0,
+              cancelled: false,
+              skipped: true,
+              skipMessage: '已跳过远程库（缺少凭证）: https://nas.example/dav',
+            );
+          },
+        ),
+        onSucceeded: () => notifyCount++,
+      );
+
+      final MetadataRefreshBatchResult result = await coordinator
+          .refreshLibrary('lib-remote');
+
+      expect(result.skipped, isTrue);
+      expect(notifyCount, 0);
     },
   );
 }

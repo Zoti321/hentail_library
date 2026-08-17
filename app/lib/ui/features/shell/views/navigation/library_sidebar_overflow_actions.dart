@@ -4,7 +4,7 @@ import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 enum LibrarySidebarOverflowAction {
   scan,
   deepScan,
-  refreshMetadataLater,
+  refreshMetadata,
   edit,
   delete,
 }
@@ -18,7 +18,7 @@ List<LibrarySidebarOverflowAction> librarySidebarOverflowActions(
   return const <LibrarySidebarOverflowAction>[
     LibrarySidebarOverflowAction.scan,
     LibrarySidebarOverflowAction.deepScan,
-    LibrarySidebarOverflowAction.refreshMetadataLater,
+    LibrarySidebarOverflowAction.refreshMetadata,
     LibrarySidebarOverflowAction.edit,
     LibrarySidebarOverflowAction.delete,
   ];

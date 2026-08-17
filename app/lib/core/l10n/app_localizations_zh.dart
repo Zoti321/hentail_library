@@ -42,7 +42,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sidebarDeepScanLibrary => '深度扫描库';
 
   @override
-  String get sidebarRefreshMetadataLater => '刷新元数据（后续）';
+  String get cancelRefreshMetadata => '取消刷新元数据';
+
+  @override
+  String refreshMetadataBatchDone(int succeeded, int failed) {
+    return '元数据刷新完成：成功 $succeeded，失败 $failed';
+  }
+
+  @override
+  String refreshMetadataBatchCancelled(int succeeded, int failed) {
+    return '已取消元数据刷新（已刷新 $succeeded，失败 $failed）';
+  }
 
   @override
   String get sidebarEditLibrary => '编辑';
@@ -836,19 +846,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get refreshMetadataBusy => '库同步或元数据刷新进行中';
-
-  @override
-  String get refreshMetadataSeriesDialogTitle => '刷新系列元数据';
-
-  @override
-  String refreshMetadataSeriesProgress(int current, int total) {
-    return '正在刷新 $current/$total';
-  }
-
-  @override
-  String refreshMetadataSeriesDone(int succeeded, int failed) {
-    return '完成：成功 $succeeded，失败 $failed';
-  }
 
   @override
   String get comicDetailShowInExplorer => '在资源管理器中显示';
