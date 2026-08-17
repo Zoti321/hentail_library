@@ -8,9 +8,18 @@ mod rar;
 
 mod sevenz;
 
-pub use pdf::{count_pdf_pages, open_pdf_backend, read_pdf_embedded_meta, read_pdf_page, PdfBackend};
-pub use rar::{count_rar_images, open_rar_backend, read_rar_cover_bytes, read_rar_page, RarBackend};
-pub use sevenz::{count_sevenz_images, open_sevenz_backend, read_sevenz_page, SevenZBackend};
+pub use pdf::{
+    count_pdf_pages, open_pdf_backend, open_pdf_backend_kept, read_pdf_embedded_meta,
+    read_pdf_page, PdfBackend,
+};
+pub use rar::{
+    count_rar_images, open_rar_backend, open_rar_backend_kept, read_rar_cover_bytes, read_rar_page,
+    RarBackend,
+};
+pub use sevenz::{
+    count_sevenz_images, open_sevenz_backend, open_sevenz_backend_kept, read_sevenz_page,
+    SevenZBackend,
+};
 
 use std::path::Path;
 

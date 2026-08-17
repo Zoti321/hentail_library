@@ -14,6 +14,7 @@ pub struct Model {
     pub name_locked: bool,
     pub serialization_status_locked: bool,
     pub total_count_locked: bool,
+    pub library_id: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

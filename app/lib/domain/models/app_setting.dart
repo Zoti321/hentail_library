@@ -24,6 +24,7 @@ Map<String, dynamic> _migrateAppSettingJson(Map<String, dynamic> json) {
   migrated.remove('readerIsVertical');
   migrated.remove('readerDimLevel');
   migrated.remove('readerAutoPlayEnabled');
+  migrated.remove('autoScan');
   if (!migrated.containsKey('enabledFormatGroups')) {
     migrated['enabledFormatGroups'] = formatGroupsToStorage(FormatGroup.all);
   }
@@ -36,7 +37,6 @@ abstract class AppSetting with _$AppSetting {
     @Default(3) int version,
     @Default(AppThemePreference.system) AppThemePreference themePreference,
     @Default(AppLocalePreference.system) AppLocalePreference localePreference,
-    @Default(false) bool autoScan,
     @Default(kDefaultReadingMode) ReadingMode readingMode,
     @Default(kDefaultWebtoonMarginPercent) int webtoonMarginPercent,
     @Default(kDefaultWebtoonZoomMode) WebtoonZoomMode webtoonZoomMode,

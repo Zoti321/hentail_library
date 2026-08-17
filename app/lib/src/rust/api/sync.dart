@@ -6,11 +6,17 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `failed_progress`, `map_format_group`, `map_phase`, `map_progress`, `map_route`, `map_scan_mode`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
+// These functions are ignored because they are not marked as `pub`: `failed_progress`, `map_phase`, `map_progress`, `map_route`, `map_scan_mode`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
 
 SyncHandleDto createSyncHandleFrb() =>
     RustLib.instance.api.crateApiSyncCreateSyncHandleFrb();
+
+void setRemoteLibraryCredentialsFrb({
+  required List<RemoteLibraryCredentialDto> credentials,
+}) => RustLib.instance.api.crateApiSyncSetRemoteLibraryCredentialsFrb(
+  credentials: credentials,
+);
 
 void cancelSyncFrb({required SyncHandleDto handle}) =>
     RustLib.instance.api.crateApiSyncCancelSyncFrb(handle: handle);
@@ -18,11 +24,15 @@ void cancelSyncFrb({required SyncHandleDto handle}) =>
 Stream<SyncLibraryProgressDto> syncLibraryFrb({
   required SyncHandleDto handle,
   required SyncScanModeDto scanMode,
-  required List<FormatGroupDto> enabledFormatGroups,
+  required bool syncAll,
+  String? targetLibraryId,
+  required List<RemoteLibraryCredentialDto> credentials,
 }) => RustLib.instance.api.crateApiSyncSyncLibraryFrb(
   handle: handle,
   scanMode: scanMode,
-  enabledFormatGroups: enabledFormatGroups,
+  syncAll: syncAll,
+  targetLibraryId: targetLibraryId,
+  credentials: credentials,
 );
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncHandleDto>>
@@ -82,6 +92,27 @@ class LibrarySyncCountsDto {
           cb7 == other.cb7 &&
           sevenz == other.sevenz &&
           pdf == other.pdf;
+}
+
+class RemoteLibraryCredentialDto {
+  final String libraryId;
+  final String password;
+
+  const RemoteLibraryCredentialDto({
+    required this.libraryId,
+    required this.password,
+  });
+
+  @override
+  int get hashCode => libraryId.hashCode ^ password.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RemoteLibraryCredentialDto &&
+          runtimeType == other.runtimeType &&
+          libraryId == other.libraryId &&
+          password == other.password;
 }
 
 enum SyncLibraryPhaseDto {

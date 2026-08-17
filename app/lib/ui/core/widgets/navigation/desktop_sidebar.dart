@@ -5,11 +5,30 @@ import 'package:hentai_library/ui/core/dto/nav_item_data.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/app_navigation.dart';
+import 'package:hentai_library/ui/features/shell/state/library_reorder_mode.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class DesktopSidebar extends HookWidget {
+/// Builds the Libraries section inserted after Home in [DesktopSidebar].
+typedef DesktopSidebarLibrariesSectionBuilder =
+    Widget Function({
+      required double expandProgress,
+      required double labelOpacity,
+      required bool showCollapsedTooltip,
+    });
+
+class DesktopSidebar extends HookConsumerWidget {
   static const double expandedWidth = 256;
   static const double collapsedWidth = 72;
+
+  /// Painted height of every sidebar nav chrome (main + libraries), border included.
+  /// Idle/hover/active/disabled must all keep this height to avoid layout shift.
+  static const double navItemHeight = 36;
+
+  /// Vertical gap outside each nav chrome (top and bottom).
+  static const double navItemVerticalMargin = 4;
+
+  static const double navItemIconSize = 18;
   static const Duration _kAnimDuration = Duration(milliseconds: 220);
   static const Curve _kAnimCurve = Curves.easeOutCubic;
 
@@ -26,6 +45,13 @@ class DesktopSidebar extends HookWidget {
   final bool applyDrawerTopInset;
   final VoidCallback onToggleExpanded;
   final ValueChanged<String> onDestinationSelected;
+  final DesktopSidebarLibrariesSectionBuilder? librariesSectionBuilder;
+
+  /// When non-null and reorder mode is on, replaces main nav + system items.
+  final WidgetBuilder? librariesReorderPaneBuilder;
+
+  /// Compact / collapsed rail cannot enter Library reorder mode.
+  final bool allowLibraryReorder;
 
   const DesktopSidebar({
     super.key,
@@ -35,10 +61,13 @@ class DesktopSidebar extends HookWidget {
     this.applyDrawerTopInset = false,
     required this.onToggleExpanded,
     required this.onDestinationSelected,
+    this.librariesSectionBuilder,
+    this.librariesReorderPaneBuilder,
+    this.allowLibraryReorder = true,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
@@ -60,7 +89,17 @@ class DesktopSidebar extends HookWidget {
       return null;
     }, <Object?>[isExpanded]);
 
+    useEffect(() {
+      if (!isExpanded || !allowLibraryReorder) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ref.read(libraryReorderModeProvider.notifier).exit();
+        });
+      }
+      return null;
+    }, <Object?>[isExpanded, allowLibraryReorder]);
+
     final l10n = context.l10n;
+    final bool reorderMode = ref.watch(libraryReorderModeProvider);
     final List<NavItemData> menuItems = AppNavigation.desktopMainNavItems(l10n);
     final List<NavItemData> systemItems = AppNavigation.desktopSystemNavItems(
       l10n,
@@ -82,6 +121,33 @@ class DesktopSidebar extends HookWidget {
         final bool showCollapsedTooltip =
             expandController.status == AnimationStatus.dismissed;
 
+        final List<Widget> mainNav = <Widget>[];
+        for (final NavItemData item in menuItems) {
+          mainNav.add(
+            _SidebarButton(
+              item: item,
+              isActive: activeId == item.id,
+              expandProgress: curvedT,
+              labelOpacity: labelOpacity,
+              showCollapsedTooltip: showCollapsedTooltip,
+              onTap: () => onDestinationSelected(item.id),
+            ),
+          );
+          if (item.id == AppNavigation.navIdHome) {
+            final DesktopSidebarLibrariesSectionBuilder? builder =
+                librariesSectionBuilder;
+            if (builder != null) {
+              mainNav.add(
+                builder(
+                  expandProgress: curvedT,
+                  labelOpacity: labelOpacity,
+                  showCollapsedTooltip: showCollapsedTooltip,
+                ),
+              );
+            }
+          }
+        }
+
         return Container(
           width: width,
           height: double.infinity,
@@ -90,7 +156,12 @@ class DesktopSidebar extends HookWidget {
             color: cs.hentai.sidebarBackground,
             border: Border(right: BorderSide(color: cs.hentai.borderSubtle)),
           ),
-          padding: EdgeInsets.fromLTRB(8, topPadding, 8, 16),
+          padding: EdgeInsets.fromLTRB(
+            tokens.spacing.sm,
+            topPadding,
+            tokens.spacing.sm,
+            tokens.spacing.lg,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
@@ -98,7 +169,7 @@ class DesktopSidebar extends HookWidget {
                 Align(
                   alignment: toggleAlignment,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs),
                     child: GhostButton.icon(
                       icon: LucideIcons.menu,
                       tooltip: '',
@@ -107,7 +178,7 @@ class DesktopSidebar extends HookWidget {
                           : l10n.sidebarExpand,
                       iconSize: 18,
                       size: 36,
-                      borderRadius: 8,
+                      borderRadius: tokens.radius.md,
                       foregroundColor: cs.hentai.textSecondary,
                       hoverColor: cs.hentai.sidebarItemHoverBackground,
                       overlayColor: cs.hentai.sidebarItemHoverBackground
@@ -117,29 +188,25 @@ class DesktopSidebar extends HookWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: tokens.spacing.lg),
               ],
-              ...menuItems.map(
-                (NavItemData item) => _SidebarButton(
-                  item: item,
-                  isActive: activeId == item.id,
-                  expandProgress: curvedT,
-                  labelOpacity: labelOpacity,
-                  showCollapsedTooltip: showCollapsedTooltip,
-                  onTap: () => onDestinationSelected(item.id),
-                ),
+              Expanded(
+                child: reorderMode
+                    ? (librariesReorderPaneBuilder?.call(context) ??
+                          const SizedBox.shrink())
+                    : ListView(padding: EdgeInsets.zero, children: mainNav),
               ),
-              const Spacer(),
-              ...systemItems.map(
-                (NavItemData item) => _SidebarButton(
-                  item: item,
-                  isActive: activeId == item.id,
-                  expandProgress: curvedT,
-                  labelOpacity: labelOpacity,
-                  showCollapsedTooltip: showCollapsedTooltip,
-                  onTap: () => onDestinationSelected(item.id),
+              if (!reorderMode)
+                ...systemItems.map(
+                  (NavItemData item) => _SidebarButton(
+                    item: item,
+                    isActive: activeId == item.id,
+                    expandProgress: curvedT,
+                    labelOpacity: labelOpacity,
+                    showCollapsedTooltip: showCollapsedTooltip,
+                    onTap: () => onDestinationSelected(item.id),
+                  ),
                 ),
-              ),
             ],
           ),
         );
@@ -218,14 +285,17 @@ class _SidebarButtonState extends State<_SidebarButton> {
               alignment: align,
               child: SizedBox(
                 width: buttonWidth,
+                height: DesktopSidebar.navItemHeight,
                 child: AnimatedContainer(
                   duration: _kChromeAnimDuration,
                   curve: _kChromeAnimCurve,
                   decoration: BoxDecoration(
                     color: backgroundColor,
                     borderRadius: BorderRadius.circular(8),
+                    // Keep border width constant so active chrome does not
+                    // shift neighboring nav rows vertically.
                     border: Border.all(
-                      width: widget.isActive ? 1 : 0.8,
+                      width: 1,
                       color: widget.isActive
                           ? cs.hentai.sidebarItemActiveBorder
                           : idleBackground,
@@ -243,7 +313,6 @@ class _SidebarButtonState extends State<_SidebarButton> {
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: horizontalPadding,
-                      vertical: 8,
                     ),
                     child: Align(
                       alignment: t < 0.001
@@ -258,7 +327,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
                             data: theme.copyWith(
                               iconTheme: IconThemeData(
                                 color: iconColor,
-                                size: 18,
+                                size: DesktopSidebar.navItemIconSize,
                               ),
                             ),
                             child: Icon(widget.item.icon),
@@ -277,6 +346,7 @@ class _SidebarButtonState extends State<_SidebarButton> {
                                     style: theme.textTheme.bodyMedium!.copyWith(
                                       color: textColor,
                                       fontSize: 14,
+                                      height: 1.2,
                                       fontWeight: widget.isActive
                                           ? FontWeight.w600
                                           : FontWeight.w400,
@@ -286,6 +356,12 @@ class _SidebarButtonState extends State<_SidebarButton> {
                                       maxLines: 1,
                                       softWrap: false,
                                       overflow: TextOverflow.clip,
+                                      strutStyle: const StrutStyle(
+                                        fontSize: 14,
+                                        height: 1.2,
+                                        fontWeight: FontWeight.w600,
+                                        forceStrutHeight: true,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -305,7 +381,9 @@ class _SidebarButtonState extends State<_SidebarButton> {
     );
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
+      margin: const EdgeInsets.symmetric(
+        vertical: DesktopSidebar.navItemVerticalMargin,
+      ),
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),

@@ -88,6 +88,7 @@ class ComicDto {
   final List<String> authors;
   final List<String> tags;
   final ComicMetaLocksDto locks;
+  final String libraryId;
 
   const ComicDto({
     required this.comicId,
@@ -105,6 +106,7 @@ class ComicDto {
     required this.authors,
     required this.tags,
     required this.locks,
+    required this.libraryId,
   });
 
   @override
@@ -123,7 +125,8 @@ class ComicDto {
       lastReadTimeMs.hashCode ^
       authors.hashCode ^
       tags.hashCode ^
-      locks.hashCode;
+      locks.hashCode ^
+      libraryId.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -144,7 +147,8 @@ class ComicDto {
           lastReadTimeMs == other.lastReadTimeMs &&
           authors == other.authors &&
           tags == other.tags &&
-          locks == other.locks;
+          locks == other.locks &&
+          libraryId == other.libraryId;
 }
 
 class ComicFilterDto {
@@ -158,6 +162,7 @@ class ComicFilterDto {
   final List<String> authorsAll;
   final List<String> authorsAny;
   final List<String> authorsExclude;
+  final String? libraryId;
 
   const ComicFilterDto({
     required this.showR18,
@@ -170,6 +175,7 @@ class ComicFilterDto {
     required this.authorsAll,
     required this.authorsAny,
     required this.authorsExclude,
+    this.libraryId,
   });
 
   @override
@@ -183,7 +189,8 @@ class ComicFilterDto {
       tagsExclude.hashCode ^
       authorsAll.hashCode ^
       authorsAny.hashCode ^
-      authorsExclude.hashCode;
+      authorsExclude.hashCode ^
+      libraryId.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -199,7 +206,8 @@ class ComicFilterDto {
           tagsExclude == other.tagsExclude &&
           authorsAll == other.authorsAll &&
           authorsAny == other.authorsAny &&
-          authorsExclude == other.authorsExclude;
+          authorsExclude == other.authorsExclude &&
+          libraryId == other.libraryId;
 }
 
 class ComicMetaLocksDto {

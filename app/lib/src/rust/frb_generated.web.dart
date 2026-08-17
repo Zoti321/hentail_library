@@ -11,6 +11,7 @@ import 'api/comic.dart';
 import 'api/history.dart';
 import 'api/home.dart';
 import 'api/init.dart';
+import 'api/library.dart';
 import 'api/logging.dart';
 import 'api/path.dart';
 import 'api/reader.dart';
@@ -84,10 +85,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustStreamSink<List<SeriesDto>> dco_decode_StreamSink_list_series_dto_Sse(
     dynamic raw,
   );
-
-  @protected
-  RustStreamSink<RefreshSeriesProgressFrbDto>
-  dco_decode_StreamSink_refresh_series_progress_frb_dto_Sse(dynamic raw);
 
   @protected
   RustStreamSink<SyncLibraryProgressDto>
@@ -211,6 +208,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
+  LibraryDto dco_decode_library_dto(dynamic raw);
+
+  @protected
+  LibrarySidebarPlacementDto dco_decode_library_sidebar_placement_dto(
+    dynamic raw,
+  );
+
+  @protected
   LibrarySyncCountsDto dco_decode_library_sync_counts_dto(dynamic raw);
 
   @protected
@@ -228,6 +233,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<LibraryDto> dco_decode_list_library_dto(dynamic raw);
+
+  @protected
+  List<LibrarySidebarPlacementDto>
+  dco_decode_list_library_sidebar_placement_dto(dynamic raw);
+
+  @protected
   List<int> dco_decode_list_prim_i_32_loose(dynamic raw);
 
   @protected
@@ -238,6 +250,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<ReadingHistoryDto> dco_decode_list_reading_history_dto(dynamic raw);
+
+  @protected
+  List<RemoteLibraryCredentialDto>
+  dco_decode_list_remote_library_credential_dto(dynamic raw);
 
   @protected
   List<SeriesComicOrderEntryDto> dco_decode_list_series_comic_order_entry_dto(
@@ -322,7 +338,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ReadingHistoryDto dco_decode_reading_history_dto(dynamic raw);
 
   @protected
-  RefreshSeriesProgressFrbDto dco_decode_refresh_series_progress_frb_dto(
+  RefreshLibraryResultFrbDto dco_decode_refresh_library_result_frb_dto(
     dynamic raw,
   );
 
@@ -330,6 +346,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RefreshSeriesResultFrbDto dco_decode_refresh_series_result_frb_dto(
     dynamic raw,
   );
+
+  @protected
+  RemoteLibraryCredentialDto dco_decode_remote_library_credential_dto(
+    dynamic raw,
+  );
+
+  @protected
+  ScanIntervalDto dco_decode_scan_interval_dto(dynamic raw);
 
   @protected
   SeriesComicOrderEntryDto dco_decode_series_comic_order_entry_dto(dynamic raw);
@@ -469,12 +493,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RustStreamSink<List<SeriesDto>> sse_decode_StreamSink_list_series_dto_Sse(
-    SseDeserializer deserializer,
-  );
-
-  @protected
-  RustStreamSink<RefreshSeriesProgressFrbDto>
-  sse_decode_StreamSink_refresh_series_progress_frb_dto_Sse(
     SseDeserializer deserializer,
   );
 
@@ -632,6 +650,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
   @protected
+  LibraryDto sse_decode_library_dto(SseDeserializer deserializer);
+
+  @protected
+  LibrarySidebarPlacementDto sse_decode_library_sidebar_placement_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   LibrarySyncCountsDto sse_decode_library_sync_counts_dto(
     SseDeserializer deserializer,
   );
@@ -653,6 +679,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<LibraryDto> sse_decode_list_library_dto(SseDeserializer deserializer);
+
+  @protected
+  List<LibrarySidebarPlacementDto>
+  sse_decode_list_library_sidebar_placement_dto(SseDeserializer deserializer);
+
+  @protected
   List<int> sse_decode_list_prim_i_32_loose(SseDeserializer deserializer);
 
   @protected
@@ -665,6 +698,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<ReadingHistoryDto> sse_decode_list_reading_history_dto(
     SseDeserializer deserializer,
   );
+
+  @protected
+  List<RemoteLibraryCredentialDto>
+  sse_decode_list_remote_library_credential_dto(SseDeserializer deserializer);
 
   @protected
   List<SeriesComicOrderEntryDto> sse_decode_list_series_comic_order_entry_dto(
@@ -765,7 +802,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  RefreshSeriesProgressFrbDto sse_decode_refresh_series_progress_frb_dto(
+  RefreshLibraryResultFrbDto sse_decode_refresh_library_result_frb_dto(
     SseDeserializer deserializer,
   );
 
@@ -773,6 +810,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RefreshSeriesResultFrbDto sse_decode_refresh_series_result_frb_dto(
     SseDeserializer deserializer,
   );
+
+  @protected
+  RemoteLibraryCredentialDto sse_decode_remote_library_credential_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ScanIntervalDto sse_decode_scan_interval_dto(SseDeserializer deserializer);
 
   @protected
   SeriesComicOrderEntryDto sse_decode_series_comic_order_entry_dto(
@@ -957,12 +1002,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_StreamSink_list_series_dto_Sse(
     RustStreamSink<List<SeriesDto>> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_StreamSink_refresh_series_progress_frb_dto_Sse(
-    RustStreamSink<RefreshSeriesProgressFrbDto> self,
     SseSerializer serializer,
   );
 
@@ -1159,6 +1198,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
+  void sse_encode_library_dto(LibraryDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_library_sidebar_placement_dto(
+    LibrarySidebarPlacementDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_library_sync_counts_dto(
     LibrarySyncCountsDto self,
     SseSerializer serializer,
@@ -1183,6 +1231,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_library_dto(
+    List<LibraryDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_library_sidebar_placement_dto(
+    List<LibrarySidebarPlacementDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_prim_i_32_loose(
     List<int> self,
     SseSerializer serializer,
@@ -1203,6 +1263,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_reading_history_dto(
     List<ReadingHistoryDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_remote_library_credential_dto(
+    List<RemoteLibraryCredentialDto> self,
     SseSerializer serializer,
   );
 
@@ -1330,14 +1396,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_refresh_series_progress_frb_dto(
-    RefreshSeriesProgressFrbDto self,
+  void sse_encode_refresh_library_result_frb_dto(
+    RefreshLibraryResultFrbDto self,
     SseSerializer serializer,
   );
 
   @protected
   void sse_encode_refresh_series_result_frb_dto(
     RefreshSeriesResultFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_remote_library_credential_dto(
+    RemoteLibraryCredentialDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_scan_interval_dto(
+    ScanIntervalDto self,
     SseSerializer serializer,
   );
 

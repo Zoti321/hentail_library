@@ -63,7 +63,7 @@ pub async fn delete_comics_by_ids(comic_ids: Vec<String>) -> Result<(), HentaiEr
     ))
     .await
     .map_err(map_db_err)?;
-    rebuild_series_from_comics(&db).await?;
+    rebuild_series_from_comics(&db, None).await?;
     Ok(())
 }
 
@@ -213,10 +213,15 @@ pub async fn search_comic_ids_by_tag_expression(
     if includes.is_empty() && optional.is_empty() && excludes.is_empty() {
         return Ok(vec![]);
     }
+    let Some(library_id) = crate::library::resolve_browse_library_id(None).await? else {
+        return Ok(vec![]);
+    };
     let mut sql = String::from(
-        "SELECT c.comic_id FROM comics c INNER JOIN comic_meta m ON m.comic_id = c.comic_id WHERE 1=1",
+        "SELECT c.comic_id FROM comics c INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
+         WHERE c.library_id = ?",
     );
-    let mut values: Vec<sea_orm::Value> = Vec::new();
+    let mut values: Vec<sea_orm::Value> =
+        vec![sea_orm::Value::String(Some(Box::new(library_id)))];
     for name in &includes {
         sql.push_str(
             " AND (\

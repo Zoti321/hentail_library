@@ -12,6 +12,134 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryTitle => '漫画库';
 
   @override
+  String get allLibrariesBrowsePlaceholderTitle => '全部库浏览';
+
+  @override
+  String get allLibrariesBrowsePlaceholderBody => '跨库聚合浏览后续实现。请从侧栏选择具体漫画库。';
+
+  @override
+  String get sidebarAddLibraryTooltip => '新建漫画库';
+
+  @override
+  String get sidebarAddLocalLibrary => '添加本地库';
+
+  @override
+  String get sidebarAddRemoteLibrary => '添加远程库';
+
+  @override
+  String get sidebarReorderLibraries => '重新排序';
+
+  @override
+  String get sidebarExitReorder => '退出排序';
+
+  @override
+  String get sidebarPinnedSection => '已固定';
+
+  @override
+  String get sidebarUnpinnedSection => '未固定';
+
+  @override
+  String get sidebarMoreLibraries => '更多';
+
+  @override
+  String get sidebarScanAllLibraries => '扫描所有库';
+
+  @override
+  String get sidebarDeepScanAllLibraries => '深度扫描所有库';
+
+  @override
+  String get sidebarScanLibrary => '扫描库';
+
+  @override
+  String get sidebarDeepScanLibrary => '深度扫描库';
+
+  @override
+  String get cancelRefreshMetadata => '取消刷新元数据';
+
+  @override
+  String refreshMetadataBatchDone(int succeeded, int failed) {
+    return '元数据刷新完成：成功 $succeeded，失败 $failed';
+  }
+
+  @override
+  String refreshMetadataBatchCancelled(int succeeded, int failed) {
+    return '已取消元数据刷新（已刷新 $succeeded，失败 $failed）';
+  }
+
+  @override
+  String get sidebarEditLibrary => '编辑';
+
+  @override
+  String get sidebarEditLibraryConnection => '编辑连接';
+
+  @override
+  String get sidebarDeleteLibrary => '删除';
+
+  @override
+  String get dialogCreateLocalLibraryTitle => '添加本地库';
+
+  @override
+  String get dialogCreateRemoteLibraryTitle => '添加远程库';
+
+  @override
+  String get dialogEditLibraryTitle => '编辑库';
+
+  @override
+  String get dialogEditLibraryTabGeneral => '常规';
+
+  @override
+  String get dialogEditLibraryTabWebDav => 'WebDAV';
+
+  @override
+  String get dialogEditLibraryTabScanner => '扫描';
+
+  @override
+  String get formLibraryNameLabel => '名称';
+
+  @override
+  String get formLibraryRootLabel => '根位置';
+
+  @override
+  String get formLibraryRootBrowse => '浏览';
+
+  @override
+  String get formLibraryRootChangeConfirmTitle => '确认更改根位置？';
+
+  @override
+  String get formLibraryRootChangeConfirmBody =>
+      '更改库根后，下次同步将按新根对齐；旧路径下的漫画可能成为孤儿并被删除。此操作不会自动触发同步。';
+
+  @override
+  String get formLibraryScanOnStartupLabel => '启动时扫描';
+
+  @override
+  String get formLibraryScanOnStartupOn => '开启';
+
+  @override
+  String get formLibraryScanOnStartupOff => '关闭';
+
+  @override
+  String get formLibraryScanIntervalLabel => '扫描间隔';
+
+  @override
+  String get scanIntervalDisabled => '关闭';
+
+  @override
+  String get scanIntervalHourly => '每小时';
+
+  @override
+  String get scanIntervalEvery6Hours => '每 6 小时';
+
+  @override
+  String get scanIntervalEvery12Hours => '每 12 小时';
+
+  @override
+  String get scanIntervalDaily => '每天';
+
+  @override
+  String get scanIntervalWeekly => '每周';
+
+  @override
   String get libraryEmptyTitle => '暂无漫画';
 
   @override
@@ -160,7 +288,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeEmptyHint => '请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。';
 
   @override
-  String get pathsTitle => '选中路径';
+  String get pathsTitle => '本地库';
 
   @override
   String get homeStatSeries => '系列';
@@ -286,6 +414,73 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pathsLoadFailed => '路径加载失败';
 
   @override
+  String get pathsLibraryKindLocal => '本地';
+
+  @override
+  String get pathsLibraryKindRemote => '远程';
+
+  @override
+  String get remoteLibraryAddButton => '添加远程库';
+
+  @override
+  String get remoteLibraryAddedToast => '已添加远程库';
+
+  @override
+  String get remoteLibraryUpdatedToast => '已更新远程库';
+
+  @override
+  String get remoteLibraryAddTitle => '添加远程库';
+
+  @override
+  String get remoteLibraryEditTitle => '编辑远程库';
+
+  @override
+  String get remoteLibraryFormHint =>
+      '填写 WebDAV 根地址与 Basic 凭证。密码保存在系统安全存储，不会写入本地数据库。';
+
+  @override
+  String get remoteLibraryUrlLabel => 'WebDAV 根 URL';
+
+  @override
+  String get remoteLibraryUrlHint => '例如 nas.local/webdav 或 https://…';
+
+  @override
+  String get remoteLibraryUrlRequired => '请填写 WebDAV 根 URL';
+
+  @override
+  String get remoteLibraryHttpRequiresAllow => '使用 HTTP 时请先开启「允许 HTTP」';
+
+  @override
+  String get remoteLibraryUsernameLabel => '用户名';
+
+  @override
+  String get remoteLibraryPasswordLabel => '密码';
+
+  @override
+  String get remoteLibraryPasswordEditLabel => '密码（留空则不修改）';
+
+  @override
+  String get remoteLibraryPasswordKeepHint => '留空表示保持原密码';
+
+  @override
+  String get remoteLibraryPasswordRequired => '请填写密码';
+
+  @override
+  String get remoteLibraryAllowHttpLabel => '允许 HTTP';
+
+  @override
+  String get remoteLibraryAllowHttpOn => '已允许明文 HTTP（仅建议局域网）';
+
+  @override
+  String get remoteLibraryAllowHttpOff => '仅 HTTPS（默认）';
+
+  @override
+  String get remoteLibraryEditAction => '编辑远程库';
+
+  @override
+  String get commonAdd => '添加';
+
+  @override
   String get notFoundTitle => '页面不存在';
 
   @override
@@ -299,9 +494,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsGroupPersonalization => '个性化';
-
-  @override
-  String get settingsGroupLibrary => '漫画库';
 
   @override
   String get settingsGroupDiagnostics => '诊断与支持';
@@ -329,20 +521,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsExportLogsDescription => '打包应用与核心日志，便于问题反馈';
 
   @override
-  String get settingsLibraryLocationLabel => '库位置';
-
-  @override
   String get settingsAutoScanLabel => '自动扫描';
 
   @override
-  String get settingsSupportedFormatsLabel => '支持的格式';
-
-  @override
-  String get settingsSupportedFormatsTitle => '支持的格式';
-
-  @override
   String get settingsSupportedFormatsDescription =>
-      '取消勾选的格式会在下次库同步时从库中移除；未同步前已入库的漫画仍可阅读。';
+      '取消勾选的格式会在下次库同步时从当前本地库中移除；未同步前已入库的漫画仍可阅读。';
 
   @override
   String get settingsSupportedFormatsGroupTitle => '格式分组';
@@ -364,7 +547,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsDisableAllFormatsConfirmContent =>
-      '保存后，下次库同步将清空漫画库中的全部 Comic。确定继续？';
+      '保存后，下次库同步将清空当前本地库中的全部 Comic。确定继续？';
+
+  @override
+  String get currentLibraryLabel => '当前库';
+
+  @override
+  String get setCurrentLibrary => '设为当前库';
+
+  @override
+  String get syncAllLibraries => '同步全部库';
 
   @override
   String get settingsAutoUpdateLabel => '自动更新';
@@ -651,19 +843,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get refreshMetadataBusy => '库同步或元数据刷新进行中';
-
-  @override
-  String get refreshMetadataSeriesDialogTitle => '刷新系列元数据';
-
-  @override
-  String refreshMetadataSeriesProgress(int current, int total) {
-    return '正在刷新 $current/$total';
-  }
-
-  @override
-  String refreshMetadataSeriesDone(int succeeded, int failed) {
-    return '完成：成功 $succeeded，失败 $failed';
-  }
 
   @override
   String get comicDetailShowInExplorer => '在资源管理器中显示';
@@ -1297,7 +1476,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmRemovePathTitle => '确认移除';
 
   @override
-  String get confirmRemovePathContent => '将从库中移除该路径。此操作不可撤销。';
+  String get confirmRemovePathContent => '将删除该本地库及其漫画记录。此操作立即生效且不可撤销。';
 
   @override
   String get confirmClearHistoryTitle => '确认清空';

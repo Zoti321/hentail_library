@@ -58,6 +58,7 @@ pub struct SeriesFilterDto {
     pub query: Option<String>,
     pub require_items: bool,
     pub serialization_status: Option<String>,
+    pub library_id: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -228,6 +229,7 @@ impl From<SeriesFilterDto> for CoreSeriesFilter {
             query: value.query,
             require_items: value.require_items,
             serialization_status: value.serialization_status,
+            library_id: value.library_id,
         }
     }
 }
@@ -449,38 +451,49 @@ pub async fn watch_home_series_comic_order_map_frb(
 }
 
 #[derive(Debug, Clone)]
-pub struct RefreshSeriesProgressFrbDto {
-    pub current: i32,
-    pub total: i32,
-    pub comic_id: Option<String>,
-    pub succeeded: i32,
-    pub failed: i32,
-}
-
-#[derive(Debug, Clone)]
 pub struct RefreshSeriesResultFrbDto {
     pub succeeded: i32,
     pub failed: i32,
+    pub cancelled: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct RefreshLibraryResultFrbDto {
+    pub succeeded: i32,
+    pub failed: i32,
+    pub cancelled: bool,
+    pub skipped: bool,
+    pub skip_message: Option<String>,
 }
 
 #[flutter_rust_bridge::frb]
 pub async fn refresh_series_metadata_frb(
     series_id: String,
-    sink: crate::frb_generated::StreamSink<RefreshSeriesProgressFrbDto>,
+    handle: super::sync::SyncHandleDto,
 ) -> Result<RefreshSeriesResultFrbDto, HentaiErrorDto> {
-    let result = hentai_core::refresh_series_metadata(&series_id, |progress| {
-        let _ = sink.add(RefreshSeriesProgressFrbDto {
-            current: progress.current,
-            total: progress.total,
-            comic_id: progress.comic_id,
-            succeeded: progress.succeeded,
-            failed: progress.failed,
-        });
-    })
-    .await
-    .map_err(HentaiErrorDto::from)?;
+    let result = hentai_core::refresh_series_metadata(&series_id, &handle.inner, |_| {})
+        .await
+        .map_err(HentaiErrorDto::from)?;
     Ok(RefreshSeriesResultFrbDto {
         succeeded: result.succeeded,
         failed: result.failed,
+        cancelled: result.cancelled,
+    })
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn refresh_library_metadata_frb(
+    library_id: String,
+    handle: super::sync::SyncHandleDto,
+) -> Result<RefreshLibraryResultFrbDto, HentaiErrorDto> {
+    let result = hentai_core::refresh_library_metadata(&library_id, &handle.inner, |_| {})
+        .await
+        .map_err(HentaiErrorDto::from)?;
+    Ok(RefreshLibraryResultFrbDto {
+        succeeded: result.succeeded,
+        failed: result.failed,
+        cancelled: result.cancelled,
+        skipped: result.skipped,
+        skip_message: result.skip_message,
     })
 }

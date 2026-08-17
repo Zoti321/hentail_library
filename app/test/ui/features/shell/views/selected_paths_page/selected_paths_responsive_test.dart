@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/domain/library/format_group.dart';
+import 'package:hentai_library/domain/library/scan_interval.dart';
+import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/shell/view_models/selected_paths_page_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_page.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:riverpod/misc.dart' show Override;
@@ -16,7 +18,7 @@ void main() {
       await _pumpSelectedPathsPage(tester, viewportWidth: 360);
 
       expect(tester.takeException(), isNull);
-      final Text title = tester.widget<Text>(find.text('选中路径'));
+      final Text title = tester.widget<Text>(find.text('本地库'));
       expect(title.style?.fontSize, 18);
       expect(find.text('管理本地漫画根目录，支持批量选择'), findsNothing);
       expect(find.textContaining('路径 '), findsNothing);
@@ -31,7 +33,7 @@ void main() {
       await _pumpSelectedPathsPage(tester, viewportWidth: 700);
 
       expect(tester.takeException(), isNull);
-      final Text title = tester.widget<Text>(find.text('选中路径'));
+      final Text title = tester.widget<Text>(find.text('本地库'));
       expect(title.style?.fontSize, 22);
       expect(find.text('管理本地漫画根目录，支持批量选择'), findsNothing);
       expect(find.text('添加路径'), findsOneWidget);
@@ -43,7 +45,7 @@ void main() {
       await _pumpSelectedPathsPage(tester, viewportWidth: 1200);
 
       expect(tester.takeException(), isNull);
-      final Text title = tester.widget<Text>(find.text('选中路径'));
+      final Text title = tester.widget<Text>(find.text('本地库'));
       expect(title.style?.fontSize, 26);
     });
   });
@@ -81,6 +83,7 @@ Future<void> _pumpSelectedPathsPage(
 List<Override> _selectedPathsPageTestOverrides() {
   return <Override>[
     selectedPathsPageProvider.overrideWith(_FakeSelectedPathsPageNotifier.new),
+    currentLibraryProvider.overrideWith(_FakeCurrentLibraryNotifier.new),
   ];
 }
 
@@ -88,5 +91,28 @@ class _FakeSelectedPathsPageNotifier extends SelectedPathsPageNotifier {
   @override
   Future<SelectedPathsPageState> build() async {
     return const SelectedPathsPageState(paths: <String>['C:\\comics']);
+  }
+}
+
+class _FakeCurrentLibraryNotifier extends CurrentLibraryNotifier {
+  @override
+  Future<CurrentLibraryState> build() async {
+    const LocalLibrary library = (
+      libraryId: 'lib1',
+      kind: 'local',
+      rootPath: 'C:\\comics',
+      name: 'comics',
+      enabledFormatGroups: FormatGroup.all,
+      username: '',
+      allowHttp: false,
+      scanOnStartup: false,
+      scanInterval: ScanInterval.disabled,
+      pinned: true,
+      sidebarOrder: 0,
+    );
+    return const CurrentLibraryState(
+      libraries: <LocalLibrary>[library],
+      currentId: 'lib1',
+    );
   }
 }

@@ -4,6 +4,7 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/domain/library/metadata_refresh_types.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
@@ -11,10 +12,10 @@ import 'package:hentai_library/ui/core/widgets/actions/page_size_menu.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_series_dialog.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/metadata_refresh_progress_dialog.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_providers.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_back_header.dart';
+import 'package:hentai_library/ui/features/shell/state/metadata_refresh_toasts.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -117,9 +118,15 @@ class _SeriesDetailOverflowMenuButtonState
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
-    final bool writeBusy =
-        ref.watch(scanLibraryControllerProvider).running ||
-        ref.watch(metadataRefreshControllerProvider).running;
+    final MetadataRefreshState refreshState = ref.watch(
+      metadataRefreshControllerProvider,
+    );
+    final bool scanning = ref.watch(scanLibraryControllerProvider).running;
+    final bool refreshingThis = ref
+        .read(metadataRefreshControllerProvider.notifier)
+        .isRefreshingSeries(widget.series.id);
+    final bool otherWriteBusy =
+        scanning || (refreshState.running && !refreshingThis);
     return CustomPopupMenu(
       controller: _controller,
       barrierColor: Colors.transparent,
@@ -139,10 +146,18 @@ class _SeriesDetailOverflowMenuButtonState
             children: <Widget>[
               _SeriesDetailOverflowMenuItem(
                 icon: LucideIcons.refreshCw,
-                label: l10n.refreshMetadata,
-                enabled: !writeBusy,
+                label: refreshingThis
+                    ? l10n.cancelRefreshMetadata
+                    : l10n.refreshMetadata,
+                enabled: !otherWriteBusy,
                 onTap: () {
                   _controller.hideMenu();
+                  if (refreshingThis) {
+                    ref
+                        .read(metadataRefreshControllerProvider.notifier)
+                        .cancel();
+                    return;
+                  }
                   _refreshMetadata(context);
                 },
               ),
@@ -193,18 +208,18 @@ class _SeriesDetailOverflowMenuButtonState
   }
 
   Future<void> _refreshMetadata(BuildContext context) async {
-    final Future<void> future = ref
-        .read(metadataRefreshControllerProvider.notifier)
-        .refreshSeries(seriesId: widget.series.id, name: widget.series.name)
-        .then<void>((_) {});
-    if (!context.mounted) {
-      return;
-    }
-    await showMetadataRefreshProgressDialog(context);
     try {
-      await future;
-    } catch (_) {
-      // 错误已在进度对话框中展示。
+      final MetadataRefreshBatchResult result = await ref
+          .read(metadataRefreshControllerProvider.notifier)
+          .refreshSeries(seriesId: widget.series.id, name: widget.series.name);
+      if (!context.mounted) {
+        return;
+      }
+      showMetadataRefreshBatchToast(context, result);
+    } catch (err) {
+      if (context.mounted) {
+        showErrorToast(context, err);
+      }
     }
   }
 }

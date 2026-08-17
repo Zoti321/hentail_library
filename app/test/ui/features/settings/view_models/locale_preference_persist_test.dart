@@ -39,4 +39,7 @@ class _MemoryAppSettingRepository implements AppSettingRepository {
   Future<void> save(AppSetting setting) async {
     _setting = setting;
   }
+
+  @override
+  Future<bool?> peekLegacyAutoScan() async => null;
 }

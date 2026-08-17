@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -6,7 +7,7 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// 详情页异常态顶栏：仅返回。
+/// ?????????????
 class ComicDetailBackHeader extends StatelessWidget {
   const ComicDetailBackHeader({super.key});
 
@@ -58,6 +59,6 @@ class ComicDetailBackHeader extends StatelessWidget {
       context.pop();
       return;
     }
-    context.go('/local');
+    LibraryManagementActions.goCurrentLibraryBrowseFromContext(context);
   }
 }

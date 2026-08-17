@@ -1,32 +1,44 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/remove_saved_path_confirm_dialog.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/library_form_dialog.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class PathTile extends HookConsumerWidget {
-  const PathTile({super.key, required this.path});
+  const PathTile({super.key, required this.library});
 
-  final String path;
+  final LocalLibrary library;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final l10n = context.l10n;
     final ValueNotifier<bool> isRemoving = useState<bool>(false);
-    Future<void> handleRemovePath() async {
+    final CurrentLibraryState? currentState = ref
+        .watch(currentLibraryProvider)
+        .asData
+        ?.value;
+    final bool remote = isRemoteLibrary(library);
+    final bool isCurrent = library.libraryId == currentState?.currentId;
+
+    Future<void> handleRemove() async {
       final bool confirmed =
           await showDialog<bool>(
             context: context,
             builder: (BuildContext dialogContext) =>
-                RemoveSavedPathConfirmDialog(path: path),
+                RemoveSavedPathConfirmDialog(path: library.rootPath),
           ) ??
           false;
       if (!context.mounted || !confirmed) {
@@ -34,11 +46,24 @@ class PathTile extends HookConsumerWidget {
       }
       isRemoving.value = true;
       try {
-        await ref.read(pathRepoProvider).remove(path);
+        final String deletedId = library.libraryId;
+        final String routePath = GoRouterState.of(context).uri.path;
+        final bool wasViewing =
+            LibrariesRoutes.libraryIdFromPath(routePath) == deletedId ||
+            currentState?.currentId == deletedId;
+        await ref.read(libraryRepoProvider).delete(deletedId);
+        await ref.read(currentLibraryProvider.notifier).refresh();
+        ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
         if (!context.mounted) {
           return;
         }
         showSuccessToast(context, l10n.pathsRemovedToast);
+        if (wasViewing) {
+          await LibraryManagementActions.navigateAfterLibraryDeleted(
+            ref,
+            context,
+          );
+        }
       } catch (error) {
         if (!context.mounted) {
           return;
@@ -49,6 +74,30 @@ class PathTile extends HookConsumerWidget {
           isRemoving.value = false;
         }
       }
+    }
+
+    Future<void> handleSetCurrent() async {
+      if (isCurrent) {
+        return;
+      }
+      try {
+        await ref
+            .read(currentLibraryProvider.notifier)
+            .select(library.libraryId);
+      } catch (error) {
+        if (!context.mounted) {
+          return;
+        }
+        showErrorToast(context, error);
+      }
+    }
+
+    Future<void> handleEditRemote() {
+      return showLibraryFormDialog(
+        context: context,
+        mode: LibraryFormMode.edit,
+        library: library,
+      );
     }
 
     return Theme(
@@ -65,23 +114,77 @@ class PathTile extends HookConsumerWidget {
           child: Row(
             children: <Widget>[
               Icon(
-                _resolvePathTypeIcon(path),
+                remote
+                    ? LucideIcons.cloud
+                    : _resolveLocalIcon(library.rootPath),
                 size: 20,
                 color: theme.colorScheme.hentai.iconDefault,
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: Text(
-                  path,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: theme.colorScheme.onSurface,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      library.rootPath,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      remote
+                          ? l10n.pathsLibraryKindRemote
+                          : l10n.pathsLibraryKindLocal,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: theme.colorScheme.hentai.textTertiary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              if (isCurrent)
+                Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Icon(
+                    LucideIcons.star,
+                    size: 16,
+                    color: theme.colorScheme.primary,
+                  ),
+                )
+              else
+                GhostButton.icon(
+                  icon: LucideIcons.star,
+                  tooltip: l10n.setCurrentLibrary,
+                  semanticLabel: l10n.setCurrentLibrary,
+                  iconSize: 16,
+                  size: 28,
+                  borderRadius: 8,
+                  foregroundColor: theme.colorScheme.hentai.iconDefault,
+                  hoverColor: theme.colorScheme.primary.withAlpha(10),
+                  overlayColor: theme.colorScheme.primary.withAlpha(14),
+                  delayTooltipThreeSeconds: true,
+                  onPressed: handleSetCurrent,
+                ),
+              if (remote)
+                GhostButton.icon(
+                  icon: LucideIcons.pencil,
+                  tooltip: l10n.remoteLibraryEditAction,
+                  semanticLabel: l10n.remoteLibraryEditAction,
+                  iconSize: 16,
+                  size: 28,
+                  borderRadius: 8,
+                  foregroundColor: theme.colorScheme.hentai.iconDefault,
+                  hoverColor: theme.colorScheme.primary.withAlpha(10),
+                  overlayColor: theme.colorScheme.primary.withAlpha(14),
+                  delayTooltipThreeSeconds: true,
+                  onPressed: handleEditRemote,
+                ),
               isRemoving.value
                   ? SizedBox(
                       width: 28,
@@ -108,7 +211,7 @@ class PathTile extends HookConsumerWidget {
                       hoverColor: theme.colorScheme.primary.withAlpha(10),
                       overlayColor: theme.colorScheme.primary.withAlpha(14),
                       delayTooltipThreeSeconds: true,
-                      onPressed: handleRemovePath,
+                      onPressed: handleRemove,
                     ),
             ],
           ),
@@ -117,7 +220,7 @@ class PathTile extends HookConsumerWidget {
     );
   }
 
-  IconData _resolvePathTypeIcon(String path) {
+  IconData _resolveLocalIcon(String path) {
     final FileSystemEntityType pathType = FileSystemEntity.typeSync(path);
     if (pathType == FileSystemEntityType.file) {
       return LucideIcons.file;

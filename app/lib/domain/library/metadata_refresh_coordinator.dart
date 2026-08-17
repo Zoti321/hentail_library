@@ -20,15 +20,23 @@ class MetadataRefreshCoordinator {
     _onSucceeded();
   }
 
-  Future<RefreshSeriesResult> refreshSeries(
-    String seriesId, {
-    void Function(RefreshSeriesProgress progress)? onProgress,
-  }) async {
-    final RefreshSeriesResult result = await _adapter.refreshSeries(
+  Future<MetadataRefreshBatchResult> refreshSeries(String seriesId) async {
+    final MetadataRefreshBatchResult result = await _adapter.refreshSeries(
       seriesId,
-      onProgress: onProgress,
     );
     _onSucceeded();
     return result;
   }
+
+  Future<MetadataRefreshBatchResult> refreshLibrary(String libraryId) async {
+    final MetadataRefreshBatchResult result = await _adapter.refreshLibrary(
+      libraryId,
+    );
+    if (!result.skipped) {
+      _onSucceeded();
+    }
+    return result;
+  }
+
+  void cancelActive() => _adapter.cancelActive();
 }

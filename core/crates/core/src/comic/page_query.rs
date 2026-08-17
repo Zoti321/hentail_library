@@ -79,6 +79,10 @@ fn build_order_by_clause(sort: &ComicSortOptionDto) -> String {
 
 fn build_where_clause(filter: &ComicFilterDto, values: &mut Vec<Value>) -> String {
     let mut parts = vec!["1=1".to_string()];
+    if let Some(library_id) = &filter.library_id {
+        parts.push("c.library_id = ?".to_string());
+        push_sqlite_text(values, library_id.clone());
+    }
     if !filter.show_r18 {
         parts.push("m.content_rating != 'r18'".to_string());
     }
@@ -248,6 +252,7 @@ mod tests {
         let sql = build_ids_page_query(
             &ComicFilterDto {
                 authors_all: vec!["artist a".to_string()],
+                library_id: Some("lib1".to_string()),
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
@@ -256,5 +261,23 @@ mod tests {
         );
         assert!(sql.sql.contains("comic_authors ca"));
         assert!(sql.sql.contains("lower(ca.author_name) = ?"));
+    }
+
+    #[test]
+    fn library_id_filter_scopes_comics_where() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto {
+                library_id: Some("lib-abc".to_string()),
+                ..Default::default()
+            },
+            &ComicSortOptionDto::default(),
+            10,
+            0,
+        );
+        assert!(sql.sql.contains("c.library_id = ?"));
+        assert!(sql.values.iter().any(|v| matches!(
+            v,
+            Value::String(Some(s)) if s.as_str() == "lib-abc"
+        )));
     }
 }

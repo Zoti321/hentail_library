@@ -5,7 +5,6 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_about_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_diagnostics_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
-import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_library_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_header.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/locale_preference_row.dart';
@@ -113,14 +112,6 @@ class _SettingsViewState extends State<SettingsView> {
                             layoutTier: layoutTier,
                             viewportWidth: viewportWidth,
                           ),
-                        ],
-                      ),
-                      SettingsGroup(
-                        title: l10n.settingsGroupLibrary,
-                        children: <Widget>[
-                          LibraryLocationRow(layoutTier: layoutTier),
-                          SupportedFormatsRow(layoutTier: layoutTier),
-                          AutoScanRow(layoutTier: layoutTier),
                         ],
                       ),
                       SettingsGroup(

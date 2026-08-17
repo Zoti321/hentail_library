@@ -1,33 +1,43 @@
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/frb_error_mapper.dart';
-import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
+import 'package:hentai_library/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:hentai_library/src/rust/api/init.dart';
 import 'package:hentai_library/src/rust/api/sync.dart' as rust;
 
-/// Library sync 经 Rust FRB 执行；Dart 仅负责进度映射。
+/// Library sync 经 Rust FRB 执行；Dart 负责凭证注入与进度映射。
 class SyncLibraryFrbAdapter {
-  SyncLibraryFrbAdapter();
+  SyncLibraryFrbAdapter({required LibraryRepository libraryRepository})
+    : _libraryRepository = libraryRepository;
+
+  final LibraryRepository _libraryRepository;
 
   rust.SyncHandleDto? _activeHandle;
 
   Future<void> call({
     ScanMode scanMode = ScanMode.incremental,
-    List<FormatGroup> enabledFormatGroups = FormatGroup.all,
+    bool syncAll = false,
+    String? targetLibraryId,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   }) async {
     final handle = rust.createSyncHandleFrb();
     _activeHandle = handle;
     try {
+      final credentials = await loadRemoteCredentialsForSync(
+        libraryRepository: _libraryRepository,
+        syncAll: syncAll,
+        targetLibraryId: targetLibraryId,
+      );
       await for (final rust.SyncLibraryProgressDto event in guardFrbStream(
         () => rust.syncLibraryFrb(
           handle: handle,
           scanMode: _mapScanMode(scanMode),
-          enabledFormatGroups: enabledFormatGroups
-              .map(_mapFormatGroup)
-              .toList(growable: false),
+          syncAll: syncAll,
+          targetLibraryId: targetLibraryId,
+          credentials: credentials,
         ),
         fallbackMessage: '漫画库同步失败',
       )) {
@@ -62,19 +72,45 @@ class SyncLibraryFrbAdapter {
   }
 }
 
+/// 从安全存储读取 Remote 密码，供 core WebDAV Basic 鉴权。
+Future<List<rust.RemoteLibraryCredentialDto>> loadRemoteCredentialsForSync({
+  required LibraryRepository libraryRepository,
+  required bool syncAll,
+  String? targetLibraryId,
+}) async {
+  final List<LocalLibrary> libraries = await libraryRepository.list();
+  final String? scopedId =
+      targetLibraryId ??
+      (syncAll ? null : await libraryRepository.getCurrentId());
+  final List<rust.RemoteLibraryCredentialDto> out =
+      <rust.RemoteLibraryCredentialDto>[];
+  for (final LocalLibrary library in libraries) {
+    if (!isRemoteLibrary(library)) {
+      continue;
+    }
+    if (scopedId != null && library.libraryId != scopedId) {
+      continue;
+    }
+    final String? password = await libraryRepository.readRemotePassword(
+      library.libraryId,
+    );
+    if (password == null || password.isEmpty) {
+      continue;
+    }
+    out.add(
+      rust.RemoteLibraryCredentialDto(
+        libraryId: library.libraryId,
+        password: password,
+      ),
+    );
+  }
+  return out;
+}
+
 rust.SyncScanModeDto _mapScanMode(ScanMode mode) {
   return switch (mode) {
     ScanMode.incremental => rust.SyncScanModeDto.incremental,
     ScanMode.full => rust.SyncScanModeDto.full,
-  };
-}
-
-rust.FormatGroupDto _mapFormatGroup(FormatGroup group) {
-  return switch (group) {
-    FormatGroup.folder => rust.FormatGroupDto.folder,
-    FormatGroup.pdf => rust.FormatGroupDto.pdf,
-    FormatGroup.epub => rust.FormatGroupDto.epub,
-    FormatGroup.archive => rust.FormatGroupDto.archive,
   };
 }
 

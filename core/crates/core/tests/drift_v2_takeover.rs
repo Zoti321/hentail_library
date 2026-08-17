@@ -5,8 +5,8 @@ use std::sync::Mutex;
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::sync::writer::clear_all_comics;
 use hentai_core::{
-    connection, fetch_comics_page, find_comic_by_id, init_db_at_path, ComicFilterDto,
-    ComicSortOptionDto, PageRequestDto,
+    connection, create_local_library, fetch_comics_page, find_comic_by_id, init_db_at_path,
+    set_current_library_id, ComicFilterDto, ComicSortOptionDto, PageRequestDto,
 };
 use sea_orm::{ConnectionTrait, Database, DatabaseConnection, Statement};
 use tempfile::TempDir;
@@ -19,6 +19,27 @@ fn with_global_db(test: impl FnOnce()) {
         .lock()
         .expect("global db tests must run serially");
     test();
+}
+
+async fn stamp_fixture_to_current_library(db: &DatabaseConnection) {
+    let lib = create_local_library("C:/漫画", None).await.expect("library");
+    set_current_library_id(Some(&lib.library_id))
+        .await
+        .expect("current");
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "UPDATE comics SET library_id = ?",
+        [sea_orm::Value::String(Some(Box::new(lib.library_id.clone())))],
+    ))
+    .await
+    .expect("stamp comics");
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "UPDATE series SET library_id = ?",
+        [sea_orm::Value::String(Some(Box::new(lib.library_id)))],
+    ))
+    .await
+    .expect("stamp series");
 }
 
 fn fixture_sql() -> String {
@@ -93,6 +114,8 @@ fn fetch_comics_page_hides_r18_by_default() {
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
+            let db = connection().expect("connection");
+            stamp_fixture_to_current_library(&db).await;
             let page = fetch_comics_page(
                 PageRequestDto {
                     page: 1,
@@ -147,7 +170,8 @@ fn fetch_series_page_hides_r18_series_by_default() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
-            rebuild_series_from_comics(&db).await.expect("rebuild series");
+            rebuild_series_from_comics(&db, None).await.expect("rebuild series");
+            stamp_fixture_to_current_library(&db).await;
             use hentai_core::{fetch_series_page, SeriesFilterDto, SeriesSortOptionDto};
             let page = fetch_series_page(
                 PageRequestDto {
@@ -185,7 +209,8 @@ fn fetch_series_page_returns_series_with_items() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
-            rebuild_series_from_comics(&db).await.expect("rebuild series");
+            rebuild_series_from_comics(&db, None).await.expect("rebuild series");
+            stamp_fixture_to_current_library(&db).await;
             use hentai_core::{fetch_series_page, SeriesFilterDto, SeriesSortOptionDto};
             let page = fetch_series_page(
                 PageRequestDto {
@@ -221,7 +246,8 @@ fn fetch_series_comics_page_returns_ordered_comics() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
-            rebuild_series_from_comics(&db).await.expect("rebuild series");
+            rebuild_series_from_comics(&db, None).await.expect("rebuild series");
+            stamp_fixture_to_current_library(&db).await;
             use hentai_core::{
                 fetch_series_comics_metadata, fetch_series_comics_page, fetch_series_page,
                 PageRequestDto, SeriesFilterDto, SeriesSortOptionDto,
@@ -306,7 +332,8 @@ fn fetch_series_page_random_order_varies_between_queries() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
-            rebuild_series_from_comics(&db).await.expect("rebuild series");
+            rebuild_series_from_comics(&db, None).await.expect("rebuild series");
+            stamp_fixture_to_current_library(&db).await;
             use hentai_core::{
                 fetch_series_page, SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto,
             };

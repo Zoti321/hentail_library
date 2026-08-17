@@ -1,4 +1,3 @@
-use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::{Path, PathBuf};
 use std::time::{Duration, UNIX_EPOCH};
@@ -14,10 +13,11 @@ use crate::formats::{
     count_pdf_pages, count_rar_images, count_sevenz_images, read_pdf_embedded_meta,
 };
 
+use super::access::{local_access, ResourceAccess, ResourceKind};
 use super::media::{
     basename, basename_without_extension, extension_lower, is_comic_image_extension,
 };
-use super::stat::read_resource_size;
+use super::stat::read_resource_size_with;
 
 /// Disk Resource after parse — not a Comic; Library sync maps via [parsed_to_comic].
 #[derive(Debug, Clone)]
@@ -36,8 +36,10 @@ pub fn comic_id_for_path(path: &str) -> String {
     comic_id_from_path(path)
 }
 
-fn finalize_parsed(
-    path: &Path,
+#[allow(clippy::too_many_arguments)]
+fn finalize_parsed_with(
+    access: &dyn ResourceAccess,
+    location: &str,
     resource_type: &str,
     title: String,
     authors: Vec<String>,
@@ -48,11 +50,11 @@ fn finalize_parsed(
     if page_count <= 0 {
         return Ok(None);
     }
-    let Some(resource_size) = read_resource_size(path, resource_type)? else {
+    let Some(resource_size) = read_resource_size_with(access, location, resource_type)? else {
         return Ok(None);
     };
     Ok(Some(ParsedResource {
-        path: path.to_string_lossy().to_string(),
+        path: location.to_string(),
         resource_type: resource_type.to_string(),
         title,
         authors,
@@ -63,33 +65,64 @@ fn finalize_parsed(
     }))
 }
 
+fn finalize_parsed(
+    path: &Path,
+    resource_type: &str,
+    title: String,
+    authors: Vec<String>,
+    page_count: i32,
+    description: Option<String>,
+    published_at: Option<i64>,
+) -> Result<Option<ParsedResource>, HentaiError> {
+    finalize_parsed_with(
+        local_access(),
+        &path.to_string_lossy(),
+        resource_type,
+        title,
+        authors,
+        page_count,
+        description,
+        published_at,
+    )
+}
+
 pub fn parse_directory(dir: &Path) -> Result<Option<ParsedResource>, HentaiError> {
-    if !dir.is_dir() {
+    parse_directory_with(local_access(), &dir.to_string_lossy())
+}
+
+pub fn parse_directory_with(
+    access: &dyn ResourceAccess,
+    location: &str,
+) -> Result<Option<ParsedResource>, HentaiError> {
+    let Some(stat) = access.stat(location)? else {
+        return Ok(None);
+    };
+    if stat.kind != ResourceKind::Dir {
         return Ok(None);
     }
     let mut files = Vec::new();
-    for entry in std::fs::read_dir(dir).map_err(|e| {
-        HentaiError::validation(format!("读取目录失败: {} ({})", dir.display(), e))
-    })? {
-        let entry = entry.map_err(|e| HentaiError::validation(e.to_string()))?;
-        let path = entry.path();
-        if path.is_dir() {
+    for entry in access.list(location)? {
+        if entry.kind == ResourceKind::Dir {
             return Ok(None);
         }
-        if path.is_file() {
-            files.push(path);
+        if entry.kind == ResourceKind::File {
+            files.push(entry);
         }
     }
     if files.is_empty() {
         return Ok(None);
     }
-    if !files.iter().all(|f| is_comic_image_extension(&extension_lower(f))) {
+    if !files
+        .iter()
+        .all(|f| is_comic_image_extension(&extension_lower(Path::new(&f.name))))
+    {
         return Ok(None);
     }
-    finalize_parsed(
-        dir,
+    finalize_parsed_with(
+        access,
+        location,
         "dir",
-        basename(dir),
+        basename(Path::new(location)),
         vec![],
         files.len() as i32,
         None,
@@ -98,8 +131,16 @@ pub fn parse_directory(dir: &Path) -> Result<Option<ParsedResource>, HentaiError
 }
 
 pub fn parse_zip_archive(file: &Path, resource_type: &str) -> Result<Option<ParsedResource>, HentaiError> {
-    let f = File::open(file).map_err(|e| HentaiError::validation(e.to_string()))?;
-    let mut archive = match ZipArchive::new(BufReader::new(f)) {
+    parse_zip_archive_with(local_access(), &file.to_string_lossy(), resource_type)
+}
+
+pub fn parse_zip_archive_with(
+    access: &dyn ResourceAccess,
+    location: &str,
+    resource_type: &str,
+) -> Result<Option<ParsedResource>, HentaiError> {
+    let stream = access.open_stream(location)?;
+    let mut archive = match ZipArchive::new(BufReader::new(stream)) {
         Ok(archive) => archive,
         Err(_) => return Ok(None),
     };
@@ -135,12 +176,13 @@ pub fn parse_zip_archive(file: &Path, resource_type: &str) -> Result<Option<Pars
         .map(parse_comic_info_xml)
         .unwrap_or_default();
     let title = if meta.title.trim().is_empty() {
-        basename_without_extension(file)
+        basename_without_extension(Path::new(location))
     } else {
         meta.title
     };
-    finalize_parsed(
-        file,
+    finalize_parsed_with(
+        access,
+        location,
         resource_type,
         title,
         meta.authors,
@@ -243,23 +285,58 @@ fn comic_info_date_to_ms(year: Option<i32>, month: Option<u32>, day: Option<u32>
 }
 
 pub fn parse_file(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
-    let name = basename(file);
+    parse_file_with(local_access(), &file.to_string_lossy())
+}
+
+pub fn parse_file_with(
+    access: &dyn ResourceAccess,
+    location: &str,
+) -> Result<Option<ParsedResource>, HentaiError> {
+    let path = Path::new(location);
+    let name = basename(path);
     if name.starts_with('.') {
         return Ok(None);
     }
-    let ext = extension_lower(file);
+    let ext = extension_lower(path);
     match ext.as_str() {
-        ".zip" => parse_zip_archive(file, "zip"),
-        ".cbz" => parse_zip_archive(file, "cbz"),
-        ".epub" => parse_epub(file),
-        ".cbr" => parse_rar_archive(file, "cbr"),
-        ".rar" => parse_rar_archive(file, "rar"),
-        ".cb7" => parse_sevenz_archive(file, "cb7"),
-        ".7z" => parse_sevenz_archive(file, "sevenz"),
-        ".pdf" => parse_pdf(file),
+        ".zip" => parse_zip_archive_with(access, location, "zip"),
+        ".cbz" => parse_zip_archive_with(access, location, "cbz"),
+        ".epub" => parse_epub_with(access, location),
+        // Path-bound: Local uses path; Remote materializes via access then parses.
+        ".cbr" => parse_path_bound_with(access, location, |p| parse_rar_archive(p, "cbr")),
+        ".rar" => parse_path_bound_with(access, location, |p| parse_rar_archive(p, "rar")),
+        ".cb7" => parse_path_bound_with(access, location, |p| parse_sevenz_archive(p, "cb7")),
+        ".7z" => parse_path_bound_with(access, location, |p| parse_sevenz_archive(p, "sevenz")),
+        ".pdf" => parse_path_bound_with(access, location, parse_pdf),
         _ => Ok(None),
     }
 }
+
+fn is_remote_http_location(location: &str) -> bool {
+    let lower = location.to_ascii_lowercase();
+    lower.starts_with("http://") || lower.starts_with("https://")
+}
+
+fn parse_path_bound_with(
+    access: &dyn ResourceAccess,
+    location: &str,
+    parse: impl FnOnce(&Path) -> Result<Option<ParsedResource>, HentaiError>,
+) -> Result<Option<ParsedResource>, HentaiError> {
+    if !is_remote_http_location(location) {
+        return parse(Path::new(location));
+    }
+    let mut stream = access.open_stream(location)?;
+    let mut temp = tempfile::NamedTempFile::new()
+        .map_err(|e| HentaiError::validation(format!("创建临时文件失败: {e}")))?;
+    std::io::copy(&mut stream, &mut temp)
+        .map_err(|e| HentaiError::remote_unreachable(format!("下载远程资源失败: {e}")))?;
+            let mut parsed = parse(temp.path())?;
+            if let Some(ref mut p) = parsed {
+                // Keep identity keyed on the remote URL, not the temp path.
+                p.path = location.to_string();
+            }
+            Ok(parsed)
+        }
 
 pub fn parse_rar_archive(file: &Path, resource_type: &str) -> Result<Option<ParsedResource>, HentaiError> {
     let page_count = count_rar_images(file)?;
@@ -315,8 +392,15 @@ pub fn parse_pdf(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
 }
 
 pub fn parse_epub(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
-    let f = File::open(file).map_err(|e| HentaiError::validation(e.to_string()))?;
-    let mut archive = match ZipArchive::new(BufReader::new(f)) {
+    parse_epub_with(local_access(), &file.to_string_lossy())
+}
+
+pub fn parse_epub_with(
+    access: &dyn ResourceAccess,
+    location: &str,
+) -> Result<Option<ParsedResource>, HentaiError> {
+    let stream = access.open_stream(location)?;
+    let mut archive = match ZipArchive::new(BufReader::new(stream)) {
         Ok(a) => a,
         Err(_) => return Ok(None),
     };
@@ -331,12 +415,13 @@ pub fn parse_epub(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
     let meta = parse_opf_metadata(&opf_content);
     let page_count = count_epub_images(&mut archive)?;
     let title = if meta.title.trim().is_empty() {
-        basename_without_extension(file)
+        basename_without_extension(Path::new(location))
     } else {
         meta.title
     };
-    finalize_parsed(
-        file,
+    finalize_parsed_with(
+        access,
+        location,
         "epub",
         title,
         meta.authors,
@@ -346,7 +431,9 @@ pub fn parse_epub(file: &Path) -> Result<Option<ParsedResource>, HentaiError> {
     )
 }
 
-fn find_opf_path(archive: &mut ZipArchive<BufReader<File>>) -> Result<String, HentaiError> {
+fn find_opf_path<R: std::io::Read + std::io::Seek>(
+    archive: &mut ZipArchive<R>,
+) -> Result<String, HentaiError> {
     let container_xml = read_zip_entry_string(archive, "META-INF/container.xml")
         .map_err(|_| HentaiError::validation("epub container.xml 缺失".to_string()))?;
     extract_container_opf_path(&container_xml)
@@ -361,8 +448,8 @@ fn extract_container_opf_path(container_xml: &str) -> Option<String> {
     Some(rest[..end].replace('\\', "/"))
 }
 
-fn read_zip_entry_string(
-    archive: &mut ZipArchive<BufReader<File>>,
+fn read_zip_entry_string<R: std::io::Read + std::io::Seek>(
+    archive: &mut ZipArchive<R>,
     name: &str,
 ) -> Result<String, HentaiError> {
     let normalized = name.replace('\\', "/");
@@ -468,7 +555,9 @@ fn extract_xml_text(line: &str) -> Option<String> {
     Some(rest[..end].to_string())
 }
 
-fn count_epub_images(archive: &mut ZipArchive<BufReader<File>>) -> Result<i32, HentaiError> {
+fn count_epub_images<R: std::io::Read + std::io::Seek>(
+    archive: &mut ZipArchive<R>,
+) -> Result<i32, HentaiError> {
     let mut count = 0i32;
     for i in 0..archive.len() {
         let entry = archive
@@ -508,6 +597,7 @@ pub fn parsed_to_comic(parsed: &ParsedResource) -> crate::comic::ComicDto {
         authors: parsed.authors.clone(),
         tags: vec![],
         locks: crate::comic::ComicMetaLocks::default(),
+        library_id: String::new(),
     }
 }
 
@@ -524,6 +614,7 @@ pub fn normalize_roots(roots: &[String]) -> Vec<PathBuf> {
 mod tests {
     use super::*;
     use crate::resource::media::can_generate_thumbnail;
+    use std::fs::File;
     use std::io::Write;
     use tempfile::TempDir;
     use zip::write::SimpleFileOptions;

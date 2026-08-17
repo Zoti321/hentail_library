@@ -34,10 +34,11 @@ struct IdDiff {
 pub async fn build_scan_replace_plan(
     db: &DatabaseConnection,
     scanned: Vec<ScanItem>,
+    library_id: &str,
 ) -> Result<ComicScanReplacePlan, HentaiError> {
     let unique = dedupe_scanned(scanned);
     let scanned_ids: HashSet<String> = unique.keys().cloned().collect();
-    let existing = load_all_comics(db).await?;
+    let existing = load_comics_for_library(db, library_id).await?;
     let existing_by_id: HashMap<String, ComicDto> =
         existing.into_iter().map(|c| (c.comic_id.clone(), c)).collect();
     let existing_ids: HashSet<String> = existing_by_id.keys().cloned().collect();
@@ -144,6 +145,22 @@ async fn load_all_comics(db: &DatabaseConnection) -> Result<Vec<ComicDto>, Henta
   load_comics_ordered(db, ids).await
 }
 
+async fn load_comics_for_library(
+    db: &DatabaseConnection,
+    library_id: &str,
+) -> Result<Vec<ComicDto>, HentaiError> {
+    use crate::comic::repository::load_comics_ordered;
+    use sea_orm::ColumnTrait;
+    use sea_orm::QueryFilter;
+    let rows = Comics::find()
+        .filter(crate::entity::comics::Column::LibraryId.eq(library_id))
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let ids: Vec<String> = rows.into_iter().map(|r| r.comic_id).collect();
+    load_comics_ordered(db, ids).await
+}
+
 async fn build_thumbnail_targets(
     db: &DatabaseConnection,
     to_upsert: &[ComicDto],
@@ -196,15 +213,19 @@ pub async fn load_existing_comics_map(
 }
 
 pub async fn load_saved_paths(db: &DatabaseConnection) -> Result<Vec<String>, HentaiError> {
-    let rows = SavedPaths::find().all(db).await.map_err(map_db_err)?;
-    Ok(rows.into_iter().map(|r| r.raw_path).collect())
+    let rows = Libraries::find().all(db).await.map_err(map_db_err)?;
+    Ok(rows.into_iter().map(|r| r.root_path).collect())
 }
 
-pub async fn count_all_comic_ids(db: &DatabaseConnection) -> Result<i64, HentaiError> {
+pub async fn count_comic_ids_for_library(
+    db: &DatabaseConnection,
+    library_id: &str,
+) -> Result<i64, HentaiError> {
     let row = db
-        .query_one(Statement::from_string(
+        .query_one(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
-            "SELECT COUNT(*) FROM comics".to_string(),
+            "SELECT COUNT(*) FROM comics WHERE library_id = ?",
+            [sea_orm::Value::String(Some(Box::new(library_id.to_string())))],
         ))
         .await
         .map_err(map_db_err)?

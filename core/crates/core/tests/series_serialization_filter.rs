@@ -4,13 +4,14 @@ use std::sync::Mutex;
 
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::{
-    connection, fetch_series_page, init_db_at_path, update_series_user_meta, PageRequestDto,
-    SeriesFilterDto, SeriesSortOptionDto, UpdateSeriesUserMetaDto,
+    connection, create_local_library, fetch_series_page, init_db_at_path, set_current_library_id,
+    update_series_user_meta, PageRequestDto, SeriesFilterDto, SeriesSortOptionDto,
+    UpdateSeriesUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, Database, DatabaseConnection, Statement};
 use tempfile::TempDir;
 
-/// `init_db_at_path` 使用进程级全局连接，并行测试会互相覆盖。
+/// `init_db_at_path` ????????????????????
 static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
 
 fn with_global_db(test: impl FnOnce()) {
@@ -77,7 +78,26 @@ async fn seed_two_series(db: &DatabaseConnection) -> (String, String) {
     ))
     .await
     .expect("seed meta");
-    rebuild_series_from_comics(db).await.expect("rebuild");
+    rebuild_series_from_comics(db, None).await.expect("rebuild");
+
+    let lib = create_local_library("E:/lib", None).await.expect("library");
+    set_current_library_id(Some(&lib.library_id))
+        .await
+        .expect("current");
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "UPDATE comics SET library_id = ?",
+        [sea_orm::Value::String(Some(Box::new(lib.library_id.clone())))],
+    ))
+    .await
+    .expect("stamp comics");
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "UPDATE series SET library_id = ?",
+        [sea_orm::Value::String(Some(Box::new(lib.library_id)))],
+    ))
+    .await
+    .expect("stamp series");
 
     let rows = db
         .query_all(Statement::from_string(

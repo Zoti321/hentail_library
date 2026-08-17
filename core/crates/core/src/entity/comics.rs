@@ -10,6 +10,7 @@ pub struct Model {
     pub resource_size: i64,
     pub created_at: i64,
     pub last_updated_at: i64,
+    pub library_id: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

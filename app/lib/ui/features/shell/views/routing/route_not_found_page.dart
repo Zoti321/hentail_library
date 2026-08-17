@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// 通用路由 404 页，用于已移除或无效的路径。
+/// ???? 404 ??????????????
 class RouteNotFoundPage extends StatelessWidget {
   const RouteNotFoundPage({super.key});
 
@@ -55,7 +56,10 @@ class RouteNotFoundPage extends StatelessWidget {
                 GhostButton.iconText(
                   icon: LucideIcons.library,
                   text: l10n.notFoundGoLibrary,
-                  onPressed: () => context.go('/local'),
+                  onPressed: () =>
+                      LibraryManagementActions.goCurrentLibraryBrowseFromContext(
+                        context,
+                      ),
                 ),
               ],
             ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
@@ -168,7 +168,10 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
               ),
             ),
             TextButton(
-              onPressed: () => context.go('/local'),
+              onPressed: () =>
+                  LibraryManagementActions.goCurrentLibraryBrowseFromContext(
+                    context,
+                  ),
               style: TextButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),

@@ -116,7 +116,16 @@ pub async fn fetch_series_page(
     sort: SeriesSortOptionDto,
 ) -> Result<PagedSeriesResultDto, HentaiError> {
     let db = connection()?;
-    let filter = filter.normalized();
+    let mut filter = filter.normalized();
+    filter.library_id = crate::library::resolve_browse_library_id(filter.library_id).await?;
+    if filter.library_id.is_none() {
+        return Ok(PagedSeriesResultDto {
+            items: vec![],
+            total_count: 0,
+            page: 1,
+            page_size: request.page_size.max(1),
+        });
+    }
     let page_size = request.page_size.max(1);
     let total_count = count_filtered_series(&db, &filter).await?;
     let total_pages = if total_count <= 0 {
@@ -339,11 +348,16 @@ pub async fn search_series_by_keyword(keyword: &str) -> Result<Vec<SeriesDto>, H
     if q.is_empty() {
         return Ok(vec![]);
     }
+    let Some(library_id) = crate::library::resolve_browse_library_id(None).await? else {
+        return Ok(vec![]);
+    };
     let db = connection()?;
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT series_id FROM series WHERE lower(name) LIKE ? OR lower(folder_path) LIKE ?",
+        "SELECT series_id FROM series \
+         WHERE library_id = ? AND (lower(name) LIKE ? OR lower(folder_path) LIKE ?)",
         vec![
+            sea_orm::Value::String(Some(Box::new(library_id))),
             sea_orm::Value::String(Some(Box::new(format!("%{q}%")))),
             sea_orm::Value::String(Some(Box::new(format!("%{q}%")))),
         ],

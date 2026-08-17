@@ -12,6 +12,10 @@ mod m20260801_000010_drop_series_reading_histories;
 mod m20260801_000011_series_item_sort_order_real;
 mod m20260801_000012_metadata_field_locks;
 mod m20260805_000013_title_name_sort_keys;
+mod m20260812_000014_multi_local_libraries;
+mod m20260812_000015_remote_library_fields;
+mod m20260815_000016_library_scan_settings;
+mod m20260817_000017_library_sidebar_pin_order;
 
 pub struct Migrator;
 
@@ -31,6 +35,10 @@ impl MigratorTrait for Migrator {
             Box::new(m20260801_000011_series_item_sort_order_real::Migration),
             Box::new(m20260801_000012_metadata_field_locks::Migration),
             Box::new(m20260805_000013_title_name_sort_keys::Migration),
+            Box::new(m20260812_000014_multi_local_libraries::Migration),
+            Box::new(m20260812_000015_remote_library_fields::Migration),
+            Box::new(m20260815_000016_library_scan_settings::Migration),
+            Box::new(m20260817_000017_library_sidebar_pin_order::Migration),
         ]
     }
 }

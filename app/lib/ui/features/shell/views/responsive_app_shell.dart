@@ -8,6 +8,8 @@ import 'package:hentai_library/ui/core/widgets/chrome/app_title_bar.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/diagnostic_mode_banner.dart';
 import 'package:hentai_library/ui/core/widgets/navigation/desktop_sidebar.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/app_navigation.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/libraries_sidebar_section.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/libraries_sidebar_reorder_pane.dart';
 import 'package:hentai_library/ui/providers.dart';
 
 enum _ShellLayoutMode { compact, medium, expanded }
@@ -58,8 +60,10 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
     required bool isExpanded,
     bool showCollapseToggle = true,
     bool applyDrawerTopInset = false,
+    VoidCallback? onLibrariesNavigate,
     required VoidCallback onToggleExpanded,
     required ValueChanged<String> onDestinationSelected,
+    required bool allowLibraryReorder,
   }) {
     return DesktopSidebar(
       activeId: activeId,
@@ -68,6 +72,20 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
       applyDrawerTopInset: applyDrawerTopInset,
       onToggleExpanded: onToggleExpanded,
       onDestinationSelected: onDestinationSelected,
+      allowLibraryReorder: allowLibraryReorder,
+      librariesReorderPaneBuilder: (_) => const LibrariesSidebarReorderPane(),
+      librariesSectionBuilder:
+          ({
+            required double expandProgress,
+            required double labelOpacity,
+            required bool showCollapsedTooltip,
+          }) => LibrariesSidebarSection(
+            expandProgress: expandProgress,
+            labelOpacity: labelOpacity,
+            showCollapsedTooltip: showCollapsedTooltip,
+            allowLibraryReorder: allowLibraryReorder,
+            onNavigate: onLibrariesNavigate,
+          ),
     );
   }
 
@@ -109,6 +127,10 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
                     isExpanded: true,
                     showCollapseToggle: false,
                     applyDrawerTopInset: true,
+                    allowLibraryReorder: false,
+                    onLibrariesNavigate: () {
+                      appShellScaffoldKey.currentState?.closeDrawer();
+                    },
                     onToggleExpanded: () => Navigator.of(context).pop(),
                     onDestinationSelected: (String id) {
                       Navigator.of(context).pop();
@@ -132,6 +154,9 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
                               isExpanded: sidebarExpanded,
                               showCollapseToggle:
                                   layoutMode == _ShellLayoutMode.expanded,
+                              allowLibraryReorder:
+                                  layoutMode == _ShellLayoutMode.expanded &&
+                                  sidebarExpanded,
                               onToggleExpanded: () {
                                 if (layoutMode == _ShellLayoutMode.expanded) {
                                   ref

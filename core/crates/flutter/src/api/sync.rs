@@ -1,8 +1,9 @@
 use hentai_core::{
-    self, FormatGroup as CoreFormatGroup, SyncHandle as CoreHandle,
+    self, RemoteLibraryCredential as CoreRemoteCredential, SyncHandle as CoreHandle,
     SyncLibraryPhaseDto as CorePhase, SyncLibraryProgressDto as CoreProgress,
     SyncLibraryRouteDto as CoreRoute, SyncScanMode as CoreScanMode,
     cancel_sync as core_cancel_sync, create_sync_handle as core_create_sync_handle,
+    set_remote_library_credentials as core_set_remote_credentials,
     sync_library as core_sync_library,
 };
 
@@ -69,6 +70,12 @@ pub struct SyncLibraryProgressDto {
     pub error_message: Option<String>,
 }
 
+#[derive(Debug, Clone)]
+pub struct RemoteLibraryCredentialDto {
+    pub library_id: String,
+    pub password: String,
+}
+
 pub struct SyncHandleDto {
     pub(crate) inner: CoreHandle,
 }
@@ -81,6 +88,19 @@ pub fn create_sync_handle_frb() -> SyncHandleDto {
 }
 
 #[flutter_rust_bridge::frb(sync)]
+pub fn set_remote_library_credentials_frb(credentials: Vec<RemoteLibraryCredentialDto>) {
+    core_set_remote_credentials(
+        credentials
+            .into_iter()
+            .map(|c| CoreRemoteCredential {
+                library_id: c.library_id,
+                password: c.password,
+            })
+            .collect(),
+    );
+}
+
+#[flutter_rust_bridge::frb(sync)]
 pub fn cancel_sync_frb(handle: &SyncHandleDto) {
     core_cancel_sync(&handle.inner);
 }
@@ -89,17 +109,24 @@ pub fn cancel_sync_frb(handle: &SyncHandleDto) {
 pub async fn sync_library_frb(
     handle: SyncHandleDto,
     scan_mode: SyncScanModeDto,
-    enabled_format_groups: Vec<FormatGroupDto>,
+    sync_all: bool,
+    target_library_id: Option<String>,
+    credentials: Vec<RemoteLibraryCredentialDto>,
     sink: crate::frb_generated::StreamSink<SyncLibraryProgressDto>,
 ) {
-    let groups: Vec<CoreFormatGroup> = enabled_format_groups
+    let core_credentials = credentials
         .into_iter()
-        .map(map_format_group)
+        .map(|c| CoreRemoteCredential {
+            library_id: c.library_id,
+            password: c.password,
+        })
         .collect();
     if let Err(error) = core_sync_library(
         handle.inner,
         map_scan_mode(scan_mode),
-        &groups,
+        sync_all,
+        target_library_id.as_deref(),
+        core_credentials,
         |progress| {
             let _ = sink.add(map_progress(progress));
         },
@@ -115,15 +142,6 @@ fn map_scan_mode(mode: SyncScanModeDto) -> CoreScanMode {
     match mode {
         SyncScanModeDto::Incremental => CoreScanMode::Incremental,
         SyncScanModeDto::Full => CoreScanMode::Full,
-    }
-}
-
-fn map_format_group(group: FormatGroupDto) -> CoreFormatGroup {
-    match group {
-        FormatGroupDto::Folder => CoreFormatGroup::Folder,
-        FormatGroupDto::Pdf => CoreFormatGroup::Pdf,
-        FormatGroupDto::Epub => CoreFormatGroup::Epub,
-        FormatGroupDto::Archive => CoreFormatGroup::Archive,
     }
 }
 

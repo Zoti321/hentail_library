@@ -104,6 +104,252 @@ abstract class AppLocalizations {
   /// **'漫画库'**
   String get libraryTitle;
 
+  /// No description provided for @allLibrariesBrowsePlaceholderTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部库浏览'**
+  String get allLibrariesBrowsePlaceholderTitle;
+
+  /// No description provided for @allLibrariesBrowsePlaceholderBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'跨库聚合浏览后续实现。请从侧栏选择具体漫画库。'**
+  String get allLibrariesBrowsePlaceholderBody;
+
+  /// No description provided for @sidebarAddLibraryTooltip.
+  ///
+  /// In zh, this message translates to:
+  /// **'新建漫画库'**
+  String get sidebarAddLibraryTooltip;
+
+  /// No description provided for @sidebarAddLocalLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加本地库'**
+  String get sidebarAddLocalLibrary;
+
+  /// No description provided for @sidebarAddRemoteLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加远程库'**
+  String get sidebarAddRemoteLibrary;
+
+  /// No description provided for @sidebarReorderLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'重新排序'**
+  String get sidebarReorderLibraries;
+
+  /// No description provided for @sidebarExitReorder.
+  ///
+  /// In zh, this message translates to:
+  /// **'退出排序'**
+  String get sidebarExitReorder;
+
+  /// No description provided for @sidebarPinnedSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'已固定'**
+  String get sidebarPinnedSection;
+
+  /// No description provided for @sidebarUnpinnedSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'未固定'**
+  String get sidebarUnpinnedSection;
+
+  /// No description provided for @sidebarMoreLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'更多'**
+  String get sidebarMoreLibraries;
+
+  /// No description provided for @sidebarScanAllLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描所有库'**
+  String get sidebarScanAllLibraries;
+
+  /// No description provided for @sidebarDeepScanAllLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'深度扫描所有库'**
+  String get sidebarDeepScanAllLibraries;
+
+  /// No description provided for @sidebarScanLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描库'**
+  String get sidebarScanLibrary;
+
+  /// No description provided for @sidebarDeepScanLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'深度扫描库'**
+  String get sidebarDeepScanLibrary;
+
+  /// No description provided for @cancelRefreshMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消刷新元数据'**
+  String get cancelRefreshMetadata;
+
+  /// No description provided for @refreshMetadataBatchDone.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据刷新完成：成功 {succeeded}，失败 {failed}'**
+  String refreshMetadataBatchDone(int succeeded, int failed);
+
+  /// No description provided for @refreshMetadataBatchCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已取消元数据刷新（已刷新 {succeeded}，失败 {failed}）'**
+  String refreshMetadataBatchCancelled(int succeeded, int failed);
+
+  /// No description provided for @sidebarEditLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑'**
+  String get sidebarEditLibrary;
+
+  /// No description provided for @sidebarEditLibraryConnection.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑连接'**
+  String get sidebarEditLibraryConnection;
+
+  /// No description provided for @sidebarDeleteLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除'**
+  String get sidebarDeleteLibrary;
+
+  /// No description provided for @dialogCreateLocalLibraryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加本地库'**
+  String get dialogCreateLocalLibraryTitle;
+
+  /// No description provided for @dialogCreateRemoteLibraryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加远程库'**
+  String get dialogCreateRemoteLibraryTitle;
+
+  /// No description provided for @dialogEditLibraryTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑库'**
+  String get dialogEditLibraryTitle;
+
+  /// No description provided for @dialogEditLibraryTabGeneral.
+  ///
+  /// In zh, this message translates to:
+  /// **'常规'**
+  String get dialogEditLibraryTabGeneral;
+
+  /// No description provided for @dialogEditLibraryTabWebDav.
+  ///
+  /// In zh, this message translates to:
+  /// **'WebDAV'**
+  String get dialogEditLibraryTabWebDav;
+
+  /// No description provided for @dialogEditLibraryTabScanner.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描'**
+  String get dialogEditLibraryTabScanner;
+
+  /// No description provided for @formLibraryNameLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'名称'**
+  String get formLibraryNameLabel;
+
+  /// No description provided for @formLibraryRootLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'根位置'**
+  String get formLibraryRootLabel;
+
+  /// No description provided for @formLibraryRootBrowse.
+  ///
+  /// In zh, this message translates to:
+  /// **'浏览'**
+  String get formLibraryRootBrowse;
+
+  /// No description provided for @formLibraryRootChangeConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认更改根位置？'**
+  String get formLibraryRootChangeConfirmTitle;
+
+  /// No description provided for @formLibraryRootChangeConfirmBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'更改库根后，下次同步将按新根对齐；旧路径下的漫画可能成为孤儿并被删除。此操作不会自动触发同步。'**
+  String get formLibraryRootChangeConfirmBody;
+
+  /// No description provided for @formLibraryScanOnStartupLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'启动时扫描'**
+  String get formLibraryScanOnStartupLabel;
+
+  /// No description provided for @formLibraryScanOnStartupOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启'**
+  String get formLibraryScanOnStartupOn;
+
+  /// No description provided for @formLibraryScanOnStartupOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get formLibraryScanOnStartupOff;
+
+  /// No description provided for @formLibraryScanIntervalLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'扫描间隔'**
+  String get formLibraryScanIntervalLabel;
+
+  /// No description provided for @scanIntervalDisabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get scanIntervalDisabled;
+
+  /// No description provided for @scanIntervalHourly.
+  ///
+  /// In zh, this message translates to:
+  /// **'每小时'**
+  String get scanIntervalHourly;
+
+  /// No description provided for @scanIntervalEvery6Hours.
+  ///
+  /// In zh, this message translates to:
+  /// **'每 6 小时'**
+  String get scanIntervalEvery6Hours;
+
+  /// No description provided for @scanIntervalEvery12Hours.
+  ///
+  /// In zh, this message translates to:
+  /// **'每 12 小时'**
+  String get scanIntervalEvery12Hours;
+
+  /// No description provided for @scanIntervalDaily.
+  ///
+  /// In zh, this message translates to:
+  /// **'每天'**
+  String get scanIntervalDaily;
+
+  /// No description provided for @scanIntervalWeekly.
+  ///
+  /// In zh, this message translates to:
+  /// **'每周'**
+  String get scanIntervalWeekly;
+
   /// No description provided for @libraryEmptyTitle.
   ///
   /// In zh, this message translates to:
@@ -383,7 +629,7 @@ abstract class AppLocalizations {
   /// No description provided for @pathsTitle.
   ///
   /// In zh, this message translates to:
-  /// **'选中路径'**
+  /// **'本地库'**
   String get pathsTitle;
 
   /// No description provided for @homeStatSeries.
@@ -548,6 +794,138 @@ abstract class AppLocalizations {
   /// **'路径加载失败'**
   String get pathsLoadFailed;
 
+  /// No description provided for @pathsLibraryKindLocal.
+  ///
+  /// In zh, this message translates to:
+  /// **'本地'**
+  String get pathsLibraryKindLocal;
+
+  /// No description provided for @pathsLibraryKindRemote.
+  ///
+  /// In zh, this message translates to:
+  /// **'远程'**
+  String get pathsLibraryKindRemote;
+
+  /// No description provided for @remoteLibraryAddButton.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加远程库'**
+  String get remoteLibraryAddButton;
+
+  /// No description provided for @remoteLibraryAddedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已添加远程库'**
+  String get remoteLibraryAddedToast;
+
+  /// No description provided for @remoteLibraryUpdatedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已更新远程库'**
+  String get remoteLibraryUpdatedToast;
+
+  /// No description provided for @remoteLibraryAddTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加远程库'**
+  String get remoteLibraryAddTitle;
+
+  /// No description provided for @remoteLibraryEditTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑远程库'**
+  String get remoteLibraryEditTitle;
+
+  /// No description provided for @remoteLibraryFormHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'填写 WebDAV 根地址与 Basic 凭证。密码保存在系统安全存储，不会写入本地数据库。'**
+  String get remoteLibraryFormHint;
+
+  /// No description provided for @remoteLibraryUrlLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'WebDAV 根 URL'**
+  String get remoteLibraryUrlLabel;
+
+  /// No description provided for @remoteLibraryUrlHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'例如 nas.local/webdav 或 https://…'**
+  String get remoteLibraryUrlHint;
+
+  /// No description provided for @remoteLibraryUrlRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'请填写 WebDAV 根 URL'**
+  String get remoteLibraryUrlRequired;
+
+  /// No description provided for @remoteLibraryHttpRequiresAllow.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用 HTTP 时请先开启「允许 HTTP」'**
+  String get remoteLibraryHttpRequiresAllow;
+
+  /// No description provided for @remoteLibraryUsernameLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户名'**
+  String get remoteLibraryUsernameLabel;
+
+  /// No description provided for @remoteLibraryPasswordLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码'**
+  String get remoteLibraryPasswordLabel;
+
+  /// No description provided for @remoteLibraryPasswordEditLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'密码（留空则不修改）'**
+  String get remoteLibraryPasswordEditLabel;
+
+  /// No description provided for @remoteLibraryPasswordKeepHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'留空表示保持原密码'**
+  String get remoteLibraryPasswordKeepHint;
+
+  /// No description provided for @remoteLibraryPasswordRequired.
+  ///
+  /// In zh, this message translates to:
+  /// **'请填写密码'**
+  String get remoteLibraryPasswordRequired;
+
+  /// No description provided for @remoteLibraryAllowHttpLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许 HTTP'**
+  String get remoteLibraryAllowHttpLabel;
+
+  /// No description provided for @remoteLibraryAllowHttpOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'已允许明文 HTTP（仅建议局域网）'**
+  String get remoteLibraryAllowHttpOn;
+
+  /// No description provided for @remoteLibraryAllowHttpOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅 HTTPS（默认）'**
+  String get remoteLibraryAllowHttpOff;
+
+  /// No description provided for @remoteLibraryEditAction.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑远程库'**
+  String get remoteLibraryEditAction;
+
+  /// No description provided for @commonAdd.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加'**
+  String get commonAdd;
+
   /// No description provided for @notFoundTitle.
   ///
   /// In zh, this message translates to:
@@ -577,12 +955,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'个性化'**
   String get settingsGroupPersonalization;
-
-  /// No description provided for @settingsGroupLibrary.
-  ///
-  /// In zh, this message translates to:
-  /// **'漫画库'**
-  String get settingsGroupLibrary;
 
   /// No description provided for @settingsGroupDiagnostics.
   ///
@@ -632,34 +1004,16 @@ abstract class AppLocalizations {
   /// **'打包应用与核心日志，便于问题反馈'**
   String get settingsExportLogsDescription;
 
-  /// No description provided for @settingsLibraryLocationLabel.
-  ///
-  /// In zh, this message translates to:
-  /// **'库位置'**
-  String get settingsLibraryLocationLabel;
-
   /// No description provided for @settingsAutoScanLabel.
   ///
   /// In zh, this message translates to:
   /// **'自动扫描'**
   String get settingsAutoScanLabel;
 
-  /// No description provided for @settingsSupportedFormatsLabel.
-  ///
-  /// In zh, this message translates to:
-  /// **'支持的格式'**
-  String get settingsSupportedFormatsLabel;
-
-  /// No description provided for @settingsSupportedFormatsTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'支持的格式'**
-  String get settingsSupportedFormatsTitle;
-
   /// No description provided for @settingsSupportedFormatsDescription.
   ///
   /// In zh, this message translates to:
-  /// **'取消勾选的格式会在下次库同步时从库中移除；未同步前已入库的漫画仍可阅读。'**
+  /// **'取消勾选的格式会在下次库同步时从当前本地库中移除；未同步前已入库的漫画仍可阅读。'**
   String get settingsSupportedFormatsDescription;
 
   /// No description provided for @settingsSupportedFormatsGroupTitle.
@@ -701,8 +1055,26 @@ abstract class AppLocalizations {
   /// No description provided for @settingsDisableAllFormatsConfirmContent.
   ///
   /// In zh, this message translates to:
-  /// **'保存后，下次库同步将清空漫画库中的全部 Comic。确定继续？'**
+  /// **'保存后，下次库同步将清空当前本地库中的全部 Comic。确定继续？'**
   String get settingsDisableAllFormatsConfirmContent;
+
+  /// No description provided for @currentLibraryLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'当前库'**
+  String get currentLibraryLabel;
+
+  /// No description provided for @setCurrentLibrary.
+  ///
+  /// In zh, this message translates to:
+  /// **'设为当前库'**
+  String get setCurrentLibrary;
+
+  /// No description provided for @syncAllLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'同步全部库'**
+  String get syncAllLibraries;
 
   /// No description provided for @settingsAutoUpdateLabel.
   ///
@@ -1219,24 +1591,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'库同步或元数据刷新进行中'**
   String get refreshMetadataBusy;
-
-  /// No description provided for @refreshMetadataSeriesDialogTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'刷新系列元数据'**
-  String get refreshMetadataSeriesDialogTitle;
-
-  /// No description provided for @refreshMetadataSeriesProgress.
-  ///
-  /// In zh, this message translates to:
-  /// **'正在刷新 {current}/{total}'**
-  String refreshMetadataSeriesProgress(int current, int total);
-
-  /// No description provided for @refreshMetadataSeriesDone.
-  ///
-  /// In zh, this message translates to:
-  /// **'完成：成功 {succeeded}，失败 {failed}'**
-  String refreshMetadataSeriesDone(int succeeded, int failed);
 
   /// No description provided for @comicDetailShowInExplorer.
   ///
@@ -2405,7 +2759,7 @@ abstract class AppLocalizations {
   /// No description provided for @confirmRemovePathContent.
   ///
   /// In zh, this message translates to:
-  /// **'将从库中移除该路径。此操作不可撤销。'**
+  /// **'将删除该本地库及其漫画记录。此操作立即生效且不可撤销。'**
   String get confirmRemovePathContent;
 
   /// No description provided for @confirmClearHistoryTitle.

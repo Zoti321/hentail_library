@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
@@ -166,7 +166,10 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                     )
                   else if (searchedSeriesCount == 0 && searchedComicCount == 0)
                     _SearchResultsEmptyState(
-                      onGoToLibrary: () => context.go('/local'),
+                      onGoToLibrary: () =>
+                          LibraryManagementActions.goCurrentLibraryBrowseFromContext(
+                            context,
+                          ),
                     )
                   else ...<Widget>[
                     if (searchedSeriesCount > 0)

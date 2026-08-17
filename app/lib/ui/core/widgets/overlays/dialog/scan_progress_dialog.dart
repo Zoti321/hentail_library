@@ -196,6 +196,8 @@ class ScanProgressDialog extends ConsumerWidget {
 
     final String stageLabel = l10n.scanDialogRunningPhaseLabel(progress);
     final String? detail = _runningStageDetail(progress);
+    final String? warning = progress.errorMessage;
+    final double gap = context.tokens.spacing.sm;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,11 +205,20 @@ class ScanProgressDialog extends ConsumerWidget {
       children: <Widget>[
         Text(stageLabel, style: primaryStyle),
         if (detail != null && detail.isNotEmpty) ...<Widget>[
-          const SizedBox(height: 8),
+          SizedBox(height: gap),
           Text(
             detail,
             style: secondaryStyle,
             maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+        if (warning != null && warning.isNotEmpty) ...<Widget>[
+          SizedBox(height: gap),
+          Text(
+            warning,
+            style: tertiaryStyle,
+            maxLines: 4,
             overflow: TextOverflow.ellipsis,
           ),
         ],
@@ -251,14 +262,20 @@ class ScanProgressDialog extends ConsumerWidget {
     }
 
     final String label = l10n.scanDialogDoneSummaryLabel(progress);
+    final String? warning = progress?.errorMessage;
+    final double gap = context.tokens.spacing.sm;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Text(label, style: bodyStyle),
+        if (warning != null && warning.isNotEmpty) ...<Widget>[
+          SizedBox(height: gap),
+          Text(warning, style: tertiaryStyle),
+        ],
         if (thumbnailProgress.isActive) ...<Widget>[
-          const SizedBox(height: 8),
+          SizedBox(height: gap),
           Text(
             l10n.scanBackgroundThumbnails(
               thumbnailProgress.done,

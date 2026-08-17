@@ -123,16 +123,16 @@ fn upsert_epub_author_twice_does_not_fail_when_author_exists() {
                 comic: comic.clone(),
             };
 
-            let plan = build_scan_replace_plan(&db, vec![make_item()])
+            let plan = build_scan_replace_plan(&db, vec![make_item()], "")
                 .await
                 .expect("build plan");
-            apply_scan_replace_plan(&db, &plan)
+            apply_scan_replace_plan(&db, &plan, "")
                 .await
                 .expect("first sync");
-            let plan = build_scan_replace_plan(&db, vec![make_item()])
+            let plan = build_scan_replace_plan(&db, vec![make_item()], "")
                 .await
                 .expect("build plan again");
-            apply_scan_replace_plan(&db, &plan)
+            apply_scan_replace_plan(&db, &plan, "")
                 .await
                 .expect("rescan epub with existing author should not fail");
         });

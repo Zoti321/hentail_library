@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -78,6 +79,6 @@ class SearchedPageHeaderSection extends StatelessWidget {
       context.pop();
       return;
     }
-    context.go('/local');
+    LibraryManagementActions.goCurrentLibraryBrowseFromContext(context);
   }
 }

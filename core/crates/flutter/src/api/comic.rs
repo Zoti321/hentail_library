@@ -16,6 +16,7 @@ pub struct ComicFilterDto {
     pub authors_all: Vec<String>,
     pub authors_any: Vec<String>,
     pub authors_exclude: Vec<String>,
+    pub library_id: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -45,6 +46,7 @@ pub struct ComicDto {
     pub authors: Vec<String>,
     pub tags: Vec<String>,
     pub locks: ComicMetaLocksDto,
+    pub library_id: String,
 }
 
 #[derive(Debug, Clone)]
@@ -104,6 +106,7 @@ impl From<hentai_core::ComicDto> for ComicDto {
                 authors: value.locks.authors,
                 tags: value.locks.tags,
             },
+            library_id: value.library_id,
         }
     }
 }
@@ -121,6 +124,7 @@ impl From<ComicFilterDto> for hentai_core::ComicFilterDto {
             authors_all: value.authors_all,
             authors_any: value.authors_any,
             authors_exclude: value.authors_exclude,
+            library_id: value.library_id,
         }
     }
 }

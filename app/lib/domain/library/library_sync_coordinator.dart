@@ -1,5 +1,4 @@
 import 'package:hentai_library/data/adapters/sync_library_frb_adapter.dart';
-import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 
 /// UI-side helper: FRB Library sync + catalog revision bump.
@@ -18,13 +17,15 @@ class LibrarySyncCoordinator {
 
   Future<void> runSync({
     ScanMode scanMode = ScanMode.incremental,
-    List<FormatGroup> enabledFormatGroups = FormatGroup.all,
+    bool syncAll = false,
+    String? targetLibraryId,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   }) async {
     await _syncAdapter.call(
       scanMode: scanMode,
-      enabledFormatGroups: enabledFormatGroups,
+      syncAll: syncAll,
+      targetLibraryId: targetLibraryId,
       isCancelled: isCancelled,
       onProgress: onProgress,
     );

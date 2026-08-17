@@ -27,6 +27,7 @@ fn comic(
         authors: vec!["作者".to_string()],
         tags: vec!["标签".to_string()],
         locks: ComicMetaLocks::default(),
+        library_id: String::new(),
     }
 }
 

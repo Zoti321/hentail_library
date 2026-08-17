@@ -2,8 +2,8 @@ mod generate;
 mod queue;
 
 pub use generate::{
-    encode_thumbnail_jpeg, generate_thumbnail_jpeg, store_thumbnail_for_comic,
-    thumbnail_needs_generation,
+    encode_thumbnail_jpeg, generate_thumbnail_jpeg, generate_thumbnail_jpeg_with,
+    store_thumbnail_for_comic, store_thumbnail_for_comic_with, thumbnail_needs_generation,
 };
 pub use queue::{
     ensure_thumbnail, enqueue_thumbnails_low, watch_thumbnail_events, ThumbnailEvent,
@@ -48,10 +48,17 @@ fn load_page_image_bytes(
 ) -> Result<Vec<u8>, HentaiError> {
     use crate::reader::manager::with_ephemeral_reader;
     use crate::reader::{load_reader_page, ReaderPageDto};
+    use crate::resource::{local_access, ResourceAccess};
+    use std::io::Read;
     with_ephemeral_reader(comic_id, path, resource_type, || {
         match load_reader_page(comic_id, path, resource_type, page_index)? {
             ReaderPageDto::FilePath { path: file_path } => {
-                std::fs::read(&file_path).map_err(|e| HentaiError::validation(e.to_string()))
+                let mut stream = local_access().open_stream(&file_path)?;
+                let mut buf = Vec::new();
+                stream
+                    .read_to_end(&mut buf)
+                    .map_err(|e| HentaiError::validation(e.to_string()))?;
+                Ok(buf)
             }
             ReaderPageDto::Bytes { data } => Ok(data),
         }

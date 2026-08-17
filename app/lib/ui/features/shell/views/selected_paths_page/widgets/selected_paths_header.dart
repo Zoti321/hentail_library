@@ -6,6 +6,7 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_layout_constants.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/widgets/add_path_button.dart';
+import 'package:hentai_library/ui/features/shell/views/selected_paths_page/widgets/add_remote_library_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Sticky header: back + title on the left, add-path on the right.
@@ -84,6 +85,8 @@ class SelectedPathsPageHeaderToolbar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
+          const AddRemoteLibraryButton(),
+          const SizedBox(width: 8),
           const AddPathButton(),
         ],
       ),

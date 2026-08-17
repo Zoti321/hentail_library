@@ -12,6 +12,8 @@ pub struct ComicFilterDto {
     pub authors_all: Vec<String>,
     pub authors_any: Vec<String>,
     pub authors_exclude: Vec<String>,
+    /// When `None`, browse APIs resolve to Current library.
+    pub library_id: Option<String>,
 }
 
 impl Default for ComicFilterDto {
@@ -27,6 +29,7 @@ impl Default for ComicFilterDto {
             authors_all: vec![],
             authors_any: vec![],
             authors_exclude: vec![],
+            library_id: None,
         }
     }
 }
@@ -44,6 +47,10 @@ impl ComicFilterDto {
             authors_all: normalize_tags(self.authors_all),
             authors_any: normalize_tags(self.authors_any),
             authors_exclude: normalize_tags(self.authors_exclude),
+            library_id: self
+                .library_id
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty()),
         }
     }
 }
@@ -89,6 +96,8 @@ pub struct ComicDto {
     pub tags: Vec<String>,
     #[serde(default)]
     pub locks: ComicMetaLocks,
+    #[serde(default)]
+    pub library_id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -1,15 +1,22 @@
 import 'package:hentai_library/data/adapters/sync_library_frb_adapter.dart';
-import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/library/library_sync_coordinator.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
+import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:test/test.dart';
 
+class _FakeLibraryRepository implements LibraryRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 class _ScriptedSyncAdapter extends SyncLibraryFrbAdapter {
-  _ScriptedSyncAdapter(this._run);
+  _ScriptedSyncAdapter(this._run)
+    : super(libraryRepository: _FakeLibraryRepository());
 
   final Future<void> Function({
     ScanMode scanMode,
-    List<FormatGroup> enabledFormatGroups,
+    bool syncAll,
+    String? targetLibraryId,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   })
@@ -18,13 +25,15 @@ class _ScriptedSyncAdapter extends SyncLibraryFrbAdapter {
   @override
   Future<void> call({
     ScanMode scanMode = ScanMode.incremental,
-    List<FormatGroup> enabledFormatGroups = FormatGroup.all,
+    bool syncAll = false,
+    String? targetLibraryId,
     required bool Function() isCancelled,
     void Function(SyncLibraryProgress progress)? onProgress,
   }) {
     return _run(
       scanMode: scanMode,
-      enabledFormatGroups: enabledFormatGroups,
+      syncAll: syncAll,
+      targetLibraryId: targetLibraryId,
       isCancelled: isCancelled,
       onProgress: onProgress,
     );
@@ -38,7 +47,8 @@ void main() {
       syncAdapter: _ScriptedSyncAdapter(
         ({
           ScanMode scanMode = ScanMode.incremental,
-          List<FormatGroup> enabledFormatGroups = FormatGroup.all,
+          bool syncAll = false,
+          String? targetLibraryId,
           required isCancelled,
           onProgress,
         }) async {},
@@ -57,7 +67,8 @@ void main() {
       syncAdapter: _ScriptedSyncAdapter(
         ({
           ScanMode scanMode = ScanMode.incremental,
-          List<FormatGroup> enabledFormatGroups = FormatGroup.all,
+          bool syncAll = false,
+          String? targetLibraryId,
           required isCancelled,
           onProgress,
         }) async {},
@@ -75,7 +86,8 @@ void main() {
     final LibrarySyncCoordinator coordinator = LibrarySyncCoordinator(
       syncAdapter: _ScriptedSyncAdapter(({
         ScanMode scanMode = ScanMode.incremental,
-        List<FormatGroup> enabledFormatGroups = FormatGroup.all,
+        bool syncAll = false,
+        String? targetLibraryId,
         required isCancelled,
         onProgress,
       }) async {
@@ -105,5 +117,25 @@ void main() {
 
     expect(seen?.phase, SyncLibraryPhase.done);
     expect(seen?.acceptedTotal, 1);
+  });
+
+  test('runSync forwards syncAll to the adapter', () async {
+    bool? seenSyncAll;
+    final LibrarySyncCoordinator coordinator = LibrarySyncCoordinator(
+      syncAdapter: _ScriptedSyncAdapter(({
+        ScanMode scanMode = ScanMode.incremental,
+        bool syncAll = false,
+        String? targetLibraryId,
+        required isCancelled,
+        onProgress,
+      }) async {
+        seenSyncAll = syncAll;
+      }),
+      onSyncSucceeded: () {},
+    );
+
+    await coordinator.runSync(syncAll: true, isCancelled: () => false);
+
+    expect(seenSyncAll, isTrue);
   });
 }

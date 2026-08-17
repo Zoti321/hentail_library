@@ -100,10 +100,10 @@ fn disabling_archive_format_group_removes_existing_archive_comic_on_resync() {
             )
             .expect("first scan");
             assert_eq!(first_scan.len(), 2);
-            let plan = build_scan_replace_plan(&db, first_scan)
+            let plan = build_scan_replace_plan(&db, first_scan, "")
                 .await
                 .expect("first plan");
-            apply_scan_replace_plan(&db, &plan)
+            apply_scan_replace_plan(&db, &plan, "")
                 .await
                 .expect("first apply");
 
@@ -133,11 +133,11 @@ fn disabling_archive_format_group_removes_existing_archive_comic_on_resync() {
             assert_eq!(second_scan.len(), 1);
             assert_eq!(second_scan[0].resource_type, "dir");
 
-            let plan = build_scan_replace_plan(&db, second_scan)
+            let plan = build_scan_replace_plan(&db, second_scan, "")
                 .await
                 .expect("second plan");
             assert!(plan.removed_ids.contains(&archive_id));
-            apply_scan_replace_plan(&db, &plan)
+            apply_scan_replace_plan(&db, &plan, "")
                 .await
                 .expect("second apply");
 

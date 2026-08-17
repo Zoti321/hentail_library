@@ -60,6 +60,10 @@ fn build_order_by_clause(sort: &SeriesSortOptionDto, _values: &mut Vec<Value>) -
 
 fn build_where_clause(filter: &SeriesFilterDto, values: &mut Vec<Value>) -> String {
     let mut parts = vec!["1=1".to_string()];
+    if let Some(library_id) = &filter.library_id {
+        parts.push("s.library_id = ?".to_string());
+        push_sqlite_text(values, library_id.clone());
+    }
     if filter.require_items {
         parts.push(
             "EXISTS (SELECT 1 FROM series_items si WHERE si.series_id = s.series_id)".to_string(),

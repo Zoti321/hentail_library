@@ -45,12 +45,6 @@ class SettingsNotifier extends _$SettingsNotifier {
     await updateSettings(current.copyWith(localePreference: value));
   }
 
-  Future<void> setAutoScan(bool value) async {
-    final AppSetting? current = state.asData?.value;
-    if (current == null) return;
-    await updateSettings(current.copyWith(autoScan: value));
-  }
-
   Future<void> setEnabledFormatGroups(List<FormatGroup> value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;

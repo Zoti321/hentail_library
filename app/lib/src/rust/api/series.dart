@@ -7,6 +7,7 @@ import '../frb_generated.dart';
 import 'comic.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'sync.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_series_list`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
@@ -118,10 +119,20 @@ List<SeriesComicOrderEntryDto> loadHomeSeriesComicOrderMapFrb() =>
 Stream<List<SeriesComicOrderEntryDto>> watchHomeSeriesComicOrderMapFrb() =>
     RustLib.instance.api.crateApiSeriesWatchHomeSeriesComicOrderMapFrb();
 
-Stream<RefreshSeriesProgressFrbDto> refreshSeriesMetadataFrb({
+Future<RefreshSeriesResultFrbDto> refreshSeriesMetadataFrb({
   required String seriesId,
+  required SyncHandleDto handle,
 }) => RustLib.instance.api.crateApiSeriesRefreshSeriesMetadataFrb(
   seriesId: seriesId,
+  handle: handle,
+);
+
+Future<RefreshLibraryResultFrbDto> refreshLibraryMetadataFrb({
+  required String libraryId,
+  required SyncHandleDto handle,
+}) => RustLib.instance.api.crateApiSeriesRefreshLibraryMetadataFrb(
+  libraryId: libraryId,
+  handle: handle,
 );
 
 class PagedSeriesComicsResultDto {
@@ -180,52 +191,54 @@ class PagedSeriesResultDto {
           pageSize == other.pageSize;
 }
 
-class RefreshSeriesProgressFrbDto {
-  final int current;
-  final int total;
-  final String? comicId;
+class RefreshLibraryResultFrbDto {
   final int succeeded;
   final int failed;
+  final bool cancelled;
+  final bool skipped;
+  final String? skipMessage;
 
-  const RefreshSeriesProgressFrbDto({
-    required this.current,
-    required this.total,
-    this.comicId,
+  const RefreshLibraryResultFrbDto({
     required this.succeeded,
     required this.failed,
+    required this.cancelled,
+    required this.skipped,
+    this.skipMessage,
   });
 
   @override
   int get hashCode =>
-      current.hashCode ^
-      total.hashCode ^
-      comicId.hashCode ^
       succeeded.hashCode ^
-      failed.hashCode;
+      failed.hashCode ^
+      cancelled.hashCode ^
+      skipped.hashCode ^
+      skipMessage.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is RefreshSeriesProgressFrbDto &&
+      other is RefreshLibraryResultFrbDto &&
           runtimeType == other.runtimeType &&
-          current == other.current &&
-          total == other.total &&
-          comicId == other.comicId &&
           succeeded == other.succeeded &&
-          failed == other.failed;
+          failed == other.failed &&
+          cancelled == other.cancelled &&
+          skipped == other.skipped &&
+          skipMessage == other.skipMessage;
 }
 
 class RefreshSeriesResultFrbDto {
   final int succeeded;
   final int failed;
+  final bool cancelled;
 
   const RefreshSeriesResultFrbDto({
     required this.succeeded,
     required this.failed,
+    required this.cancelled,
   });
 
   @override
-  int get hashCode => succeeded.hashCode ^ failed.hashCode;
+  int get hashCode => succeeded.hashCode ^ failed.hashCode ^ cancelled.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -233,7 +246,8 @@ class RefreshSeriesResultFrbDto {
       other is RefreshSeriesResultFrbDto &&
           runtimeType == other.runtimeType &&
           succeeded == other.succeeded &&
-          failed == other.failed;
+          failed == other.failed &&
+          cancelled == other.cancelled;
 }
 
 class SeriesComicOrderEntryDto {
@@ -356,6 +370,7 @@ class SeriesFilterDto {
   final String? query;
   final bool requireItems;
   final String? serializationStatus;
+  final String? libraryId;
 
   const SeriesFilterDto({
     required this.showR18,
@@ -363,6 +378,7 @@ class SeriesFilterDto {
     this.query,
     required this.requireItems,
     this.serializationStatus,
+    this.libraryId,
   });
 
   @override
@@ -371,7 +387,8 @@ class SeriesFilterDto {
       r18Only.hashCode ^
       query.hashCode ^
       requireItems.hashCode ^
-      serializationStatus.hashCode;
+      serializationStatus.hashCode ^
+      libraryId.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -382,7 +399,8 @@ class SeriesFilterDto {
           r18Only == other.r18Only &&
           query == other.query &&
           requireItems == other.requireItems &&
-          serializationStatus == other.serializationStatus;
+          serializationStatus == other.serializationStatus &&
+          libraryId == other.libraryId;
 }
 
 /// FRB 层 DTO：字段与 `hentai_core::SeriesItemDto` 对齐，避免跨 crate opaque 绑定。

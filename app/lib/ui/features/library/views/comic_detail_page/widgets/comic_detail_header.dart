@@ -1,5 +1,6 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/util/utils.dart';
@@ -246,7 +247,7 @@ class _ComicDetailOverflowMenuButtonState
       if (context.canPop()) {
         context.pop();
       } else {
-        context.go('/local');
+        LibraryManagementActions.goCurrentLibraryBrowseFromContext(context);
       }
     } catch (err) {
       if (context.mounted) {

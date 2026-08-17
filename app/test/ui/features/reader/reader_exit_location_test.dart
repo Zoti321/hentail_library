@@ -18,7 +18,7 @@ void main() {
     });
 
     test('falls back to library when comicId is blank', () {
-      expect(resolveReaderExitLocation(comicId: ' '), '/local');
+      expect(resolveReaderExitLocation(comicId: ' '), '/libraries/all');
     });
   });
 }

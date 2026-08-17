@@ -11,6 +11,7 @@ use super::{is_comic_image_name, map_archive_err, map_reader_err, sort_archive_e
 pub struct RarBackend {
     pub path: PathBuf,
     pub entry_names: Vec<String>,
+    pub(crate) _remote_temp: Option<tempfile::NamedTempFile>,
 }
 
 pub fn count_rar_images(file: &Path) -> Result<Option<i32>, HentaiError> {
@@ -32,7 +33,17 @@ pub fn open_rar_backend(file: &Path) -> Result<RarBackend, HentaiError> {
     Ok(RarBackend {
         path: file.to_path_buf(),
         entry_names,
+        _remote_temp: None,
     })
+}
+
+pub fn open_rar_backend_kept(
+    file: &Path,
+    keep: tempfile::NamedTempFile,
+) -> Result<RarBackend, HentaiError> {
+    let mut backend = open_rar_backend(file)?;
+    backend._remote_temp = Some(keep);
+    Ok(backend)
 }
 
 pub fn read_rar_cover_bytes(file: &Path) -> Result<Option<Vec<u8>>, HentaiError> {

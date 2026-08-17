@@ -107,6 +107,7 @@ mod tests {
             authors: vec![],
             tags: vec![],
             locks: crate::comic::ComicMetaLocks::default(),
+            library_id: String::new(),
         }
     }
 

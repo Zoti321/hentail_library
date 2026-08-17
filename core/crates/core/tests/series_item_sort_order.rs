@@ -92,7 +92,7 @@ fn update_series_item_sort_order_sets_value_locks_and_reorders() {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_three_comics(&db).await;
-            rebuild_series_from_comics(&db).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None).await.expect("rebuild");
 
             let series = find_series_by_id(
                 &hentai_core::series_id_from_folder_path("E:/lib/Series"),
@@ -135,7 +135,7 @@ fn rebuild_preserves_locked_sort_order_and_renumbers_unlocked() {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_three_comics(&db).await;
-            rebuild_series_from_comics(&db).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None).await.expect("rebuild");
 
             let series_id = hentai_core::series_id_from_folder_path("E:/lib/Series");
             update_series_item_sort_order(&series_id, "c2", 2.5)
@@ -160,7 +160,7 @@ fn rebuild_preserves_locked_sort_order_and_renumbers_unlocked() {
             .await
             .expect("insert meta");
 
-            rebuild_series_from_comics(&db).await.expect("rebuild again");
+            rebuild_series_from_comics(&db, None).await.expect("rebuild again");
 
             let series = find_series_by_id(&series_id)
                 .await
@@ -197,7 +197,7 @@ fn unlock_sort_order_allows_rebuild_to_renumber() {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_three_comics(&db).await;
-            rebuild_series_from_comics(&db).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None).await.expect("rebuild");
 
             let series_id = hentai_core::series_id_from_folder_path("E:/lib/Series");
             update_series_item_sort_order(&series_id, "c3", 1.5)
@@ -208,7 +208,7 @@ fn unlock_sort_order_allows_rebuild_to_renumber() {
                 .await
                 .expect("unlock c3");
 
-            rebuild_series_from_comics(&db).await.expect("rebuild again");
+            rebuild_series_from_comics(&db, None).await.expect("rebuild again");
 
             let series = find_series_by_id(&series_id)
                 .await

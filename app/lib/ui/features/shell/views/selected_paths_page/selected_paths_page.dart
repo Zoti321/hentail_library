@@ -1,8 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/shell/view_models/selected_paths_page_notifier.dart';
+import 'package:hentai_library/ui/providers.dart';
 
 import 'widgets/widgets.dart';
 
@@ -94,7 +94,16 @@ class _SelectedPathsPageState extends ConsumerState<SelectedPathsPage> {
                     bottom: tokens.layout.contentAreaPadding.bottom,
                   ),
                   child: asyncState.when(
-                    data: (_) => const SelectedPathsListCard(),
+                    data: (_) {
+                      final AsyncValue<CurrentLibraryState> libraries = ref
+                          .watch(currentLibraryProvider);
+                      return libraries.when(
+                        data: (_) => const SelectedPathsListCard(),
+                        loading: () => const SelectedPathsLoadingCard(),
+                        error: (Object error, StackTrace _) =>
+                            SelectedPathsErrorCard(error: error),
+                      );
+                    },
                     loading: () => const SelectedPathsLoadingCard(),
                     error: (Object error, StackTrace _) =>
                         SelectedPathsErrorCard(error: error),

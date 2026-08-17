@@ -12,6 +12,135 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryTitle => 'Library';
 
   @override
+  String get allLibrariesBrowsePlaceholderTitle => 'All libraries';
+
+  @override
+  String get allLibrariesBrowsePlaceholderBody =>
+      'Browsing all libraries together is coming later. Pick a library from the sidebar.';
+
+  @override
+  String get sidebarAddLibraryTooltip => 'Add library';
+
+  @override
+  String get sidebarAddLocalLibrary => 'Add local library';
+
+  @override
+  String get sidebarAddRemoteLibrary => 'Add remote library';
+
+  @override
+  String get sidebarReorderLibraries => 'Reorder';
+
+  @override
+  String get sidebarExitReorder => 'Done reordering';
+
+  @override
+  String get sidebarPinnedSection => 'Pinned';
+
+  @override
+  String get sidebarUnpinnedSection => 'Unpinned';
+
+  @override
+  String get sidebarMoreLibraries => 'More';
+
+  @override
+  String get sidebarScanAllLibraries => 'Scan all libraries';
+
+  @override
+  String get sidebarDeepScanAllLibraries => 'Deep scan all libraries';
+
+  @override
+  String get sidebarScanLibrary => 'Scan library';
+
+  @override
+  String get sidebarDeepScanLibrary => 'Deep scan library';
+
+  @override
+  String get cancelRefreshMetadata => 'Cancel metadata refresh';
+
+  @override
+  String refreshMetadataBatchDone(int succeeded, int failed) {
+    return 'Metadata refresh done: $succeeded succeeded, $failed failed';
+  }
+
+  @override
+  String refreshMetadataBatchCancelled(int succeeded, int failed) {
+    return 'Metadata refresh cancelled ($succeeded refreshed, $failed failed)';
+  }
+
+  @override
+  String get sidebarEditLibrary => 'Edit';
+
+  @override
+  String get sidebarEditLibraryConnection => 'Edit connection';
+
+  @override
+  String get sidebarDeleteLibrary => 'Delete';
+
+  @override
+  String get dialogCreateLocalLibraryTitle => 'Add local library';
+
+  @override
+  String get dialogCreateRemoteLibraryTitle => 'Add remote library';
+
+  @override
+  String get dialogEditLibraryTitle => 'Edit library';
+
+  @override
+  String get dialogEditLibraryTabGeneral => 'General';
+
+  @override
+  String get dialogEditLibraryTabWebDav => 'WebDAV';
+
+  @override
+  String get dialogEditLibraryTabScanner => 'Scanner';
+
+  @override
+  String get formLibraryNameLabel => 'Name';
+
+  @override
+  String get formLibraryRootLabel => 'Root';
+
+  @override
+  String get formLibraryRootBrowse => 'Browse';
+
+  @override
+  String get formLibraryRootChangeConfirmTitle => 'Change library root?';
+
+  @override
+  String get formLibraryRootChangeConfirmBody =>
+      'After changing the library root, the next sync will align to the new root. Comics under the old path may become orphans and be removed. Sync is not started automatically.';
+
+  @override
+  String get formLibraryScanOnStartupLabel => 'Scan on startup';
+
+  @override
+  String get formLibraryScanOnStartupOn => 'On';
+
+  @override
+  String get formLibraryScanOnStartupOff => 'Off';
+
+  @override
+  String get formLibraryScanIntervalLabel => 'Scan interval';
+
+  @override
+  String get scanIntervalDisabled => 'Disabled';
+
+  @override
+  String get scanIntervalHourly => 'Hourly';
+
+  @override
+  String get scanIntervalEvery6Hours => 'Every 6 hours';
+
+  @override
+  String get scanIntervalEvery12Hours => 'Every 12 hours';
+
+  @override
+  String get scanIntervalDaily => 'Daily';
+
+  @override
+  String get scanIntervalWeekly => 'Weekly';
+
+  @override
   String get libraryEmptyTitle => 'No comics yet';
 
   @override
@@ -165,7 +294,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Add library folders in Settings and scan. If already configured, check Selected Paths or scan again.';
 
   @override
-  String get pathsTitle => 'Selected paths';
+  String get pathsTitle => 'Local libraries';
 
   @override
   String get homeStatSeries => 'Series';
@@ -297,6 +426,75 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pathsLoadFailed => 'Failed to load paths';
 
   @override
+  String get pathsLibraryKindLocal => 'Local';
+
+  @override
+  String get pathsLibraryKindRemote => 'Remote';
+
+  @override
+  String get remoteLibraryAddButton => 'Add remote library';
+
+  @override
+  String get remoteLibraryAddedToast => 'Remote library added';
+
+  @override
+  String get remoteLibraryUpdatedToast => 'Remote library updated';
+
+  @override
+  String get remoteLibraryAddTitle => 'Add Remote library';
+
+  @override
+  String get remoteLibraryEditTitle => 'Edit Remote library';
+
+  @override
+  String get remoteLibraryFormHint =>
+      'Enter the WebDAV root URL and Basic credentials. The password is stored in platform secure storage and never written to the local database.';
+
+  @override
+  String get remoteLibraryUrlLabel => 'WebDAV root URL';
+
+  @override
+  String get remoteLibraryUrlHint => 'e.g. nas.local/webdav or https://…';
+
+  @override
+  String get remoteLibraryUrlRequired => 'WebDAV root URL is required';
+
+  @override
+  String get remoteLibraryHttpRequiresAllow =>
+      'Turn on “Allow HTTP” before using an http:// URL';
+
+  @override
+  String get remoteLibraryUsernameLabel => 'Username';
+
+  @override
+  String get remoteLibraryPasswordLabel => 'Password';
+
+  @override
+  String get remoteLibraryPasswordEditLabel => 'Password (leave blank to keep)';
+
+  @override
+  String get remoteLibraryPasswordKeepHint =>
+      'Leave blank to keep the current password';
+
+  @override
+  String get remoteLibraryPasswordRequired => 'Password is required';
+
+  @override
+  String get remoteLibraryAllowHttpLabel => 'Allow HTTP';
+
+  @override
+  String get remoteLibraryAllowHttpOn => 'HTTP allowed (LAN only recommended)';
+
+  @override
+  String get remoteLibraryAllowHttpOff => 'HTTPS only (default)';
+
+  @override
+  String get remoteLibraryEditAction => 'Edit remote library';
+
+  @override
+  String get commonAdd => 'Add';
+
+  @override
   String get notFoundTitle => 'Page not found';
 
   @override
@@ -311,9 +509,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsGroupPersonalization => 'Personalization';
-
-  @override
-  String get settingsGroupLibrary => 'Library';
 
   @override
   String get settingsGroupDiagnostics => 'Diagnostics & support';
@@ -343,20 +538,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Bundle app and core logs for troubleshooting';
 
   @override
-  String get settingsLibraryLocationLabel => 'Library paths';
-
-  @override
   String get settingsAutoScanLabel => 'Auto scan';
 
   @override
-  String get settingsSupportedFormatsLabel => 'Supported formats';
-
-  @override
-  String get settingsSupportedFormatsTitle => 'Supported formats';
-
-  @override
   String get settingsSupportedFormatsDescription =>
-      'Unchecked formats are removed from the library on the next library sync. Comics already in the library remain readable until then.';
+      'Unchecked formats are removed from the current local library on the next library sync. Comics already in the library remain readable until then.';
 
   @override
   String get settingsSupportedFormatsGroupTitle => 'Format groups';
@@ -378,7 +564,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsDisableAllFormatsConfirmContent =>
-      'After saving, the next library sync will remove every Comic from the library. Continue?';
+      'After saving, the next library sync will remove every Comic from the current local library. Continue?';
+
+  @override
+  String get currentLibraryLabel => 'Current library';
+
+  @override
+  String get setCurrentLibrary => 'Set as current library';
+
+  @override
+  String get syncAllLibraries => 'Sync all libraries';
 
   @override
   String get settingsAutoUpdateLabel => 'Automatic updates';
@@ -671,19 +866,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get refreshMetadataBusy =>
       'Library sync or metadata refresh is in progress';
-
-  @override
-  String get refreshMetadataSeriesDialogTitle => 'Refresh series metadata';
-
-  @override
-  String refreshMetadataSeriesProgress(int current, int total) {
-    return 'Refreshing $current/$total';
-  }
-
-  @override
-  String refreshMetadataSeriesDone(int succeeded, int failed) {
-    return 'Done: $succeeded succeeded, $failed failed';
-  }
 
   @override
   String get comicDetailShowInExplorer => 'Show in file explorer';
@@ -1328,7 +1510,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmRemovePathContent =>
-      'This path will be removed from the library. This cannot be undone.';
+      'This local library and its comics will be deleted immediately. This cannot be undone.';
 
   @override
   String get confirmClearHistoryTitle => 'Confirm clear';

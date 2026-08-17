@@ -8,6 +8,8 @@ pub struct SeriesFilterDto {
     pub require_items: bool,
     /// `None` = 不限；`Some` = 精确匹配 `series.serialization_status`。
     pub serialization_status: Option<String>,
+    /// When `None`, browse APIs resolve to Current library.
+    pub library_id: Option<String>,
 }
 
 impl Default for SeriesFilterDto {
@@ -18,6 +20,7 @@ impl Default for SeriesFilterDto {
             query: None,
             require_items: true,
             serialization_status: None,
+            library_id: None,
         }
     }
 }
@@ -30,6 +33,10 @@ impl SeriesFilterDto {
             query: normalize_query(self.query),
             require_items: self.require_items,
             serialization_status: normalize_serialization_status(self.serialization_status),
+            library_id: self
+                .library_id
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty()),
         }
     }
 }
