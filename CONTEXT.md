@@ -4,6 +4,12 @@
 
 ## Language
 
+### Application data
+
+**App data profile**:
+与应用身份绑定的一整份本机应用数据树（含库文件、本地设置、日志与缓存等）。日常发布使用 `default`；非正式构建（Debug / Profile）使用独立的 `dev`，二者互不共享。与 Library（同一库文件内的多根集合）无关。详见 ADR-0010。
+_Avoid_: 开发库、发布库、数据库环境（易与 Library 混淆）
+
 ### Library & resources
 
 **Library**:

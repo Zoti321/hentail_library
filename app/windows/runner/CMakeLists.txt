@@ -30,6 +30,13 @@ target_compile_definitions(${BINARY_NAME} PRIVATE "FLUTTER_VERSION_BUILD=${FLUTT
 # Disable Windows macros that collide with C++ standard library functions.
 target_compile_definitions(${BINARY_NAME} PRIVATE "NOMINMAX")
 
+# Debug/Profile → App data profile `dev` (distinct ProductName / data dir). See ADR-0010.
+target_compile_definitions(${BINARY_NAME} PRIVATE
+  "$<$<OR:$<CONFIG:Debug>,$<CONFIG:Profile>>:APP_DATA_PROFILE_DEV>")
+# Ensure the resource compiler sees the same define (VERSIONINFO ProductName).
+set_property(SOURCE "Runner.rc" APPEND PROPERTY COMPILE_DEFINITIONS
+  "$<$<OR:$<CONFIG:Debug>,$<CONFIG:Profile>>:APP_DATA_PROFILE_DEV>")
+
 # Add dependency libraries and include directories. Add any application-specific
 # dependencies here.
 target_link_libraries(${BINARY_NAME} PRIVATE flutter flutter_wrapper_app)

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/util/app_locale.dart';
 import 'package:hentai_library/core/util/app_theme_mode.dart';
+import 'package:hentai_library/core/util/app_window_title.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/settings.dart';
@@ -58,7 +59,7 @@ class _AppRootState extends ConsumerState<_AppRoot> {
       // Prefer zh as first entry so unmatched device locales fall back to Chinese.
       supportedLocales: const <Locale>[Locale('zh'), Locale('en')],
       localizationsDelegates: AppLocalizations.localizationsDelegates,
-      title: 'hentai library',
+      title: appWindowTitle(),
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(Brightness.light),
       darkTheme: buildAppTheme(Brightness.dark),

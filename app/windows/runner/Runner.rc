@@ -95,7 +95,11 @@ BEGIN
             VALUE "InternalName", "hentai_library" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
             VALUE "OriginalFilename", "hentai_library.exe" "\0"
+#ifdef APP_DATA_PROFILE_DEV
+            VALUE "ProductName", "hentai_library_dev" "\0"
+#else
             VALUE "ProductName", "hentai_library" "\0"
+#endif
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
