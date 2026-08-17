@@ -511,9 +511,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsGroupPersonalization => 'Personalization';
 
   @override
-  String get settingsGroupLibrary => 'Library';
-
-  @override
   String get settingsGroupDiagnostics => 'Diagnostics & support';
 
   @override
@@ -541,16 +538,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Bundle app and core logs for troubleshooting';
 
   @override
-  String get settingsLibraryLocationLabel => 'Local libraries';
-
-  @override
   String get settingsAutoScanLabel => 'Auto scan';
-
-  @override
-  String get settingsSupportedFormatsLabel => 'Supported formats';
-
-  @override
-  String get settingsSupportedFormatsTitle => 'Supported formats';
 
   @override
   String get settingsSupportedFormatsDescription =>
@@ -586,10 +574,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get syncAllLibraries => 'Sync all libraries';
-
-  @override
-  String get noCurrentLibraryFormatsHint =>
-      'Add a local library and set it as current before configuring supported formats.';
 
   @override
   String get settingsAutoUpdateLabel => 'Automatic updates';

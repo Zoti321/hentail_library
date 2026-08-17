@@ -496,9 +496,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsGroupPersonalization => '个性化';
 
   @override
-  String get settingsGroupLibrary => '漫画库';
-
-  @override
   String get settingsGroupDiagnostics => '诊断与支持';
 
   @override
@@ -524,16 +521,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsExportLogsDescription => '打包应用与核心日志，便于问题反馈';
 
   @override
-  String get settingsLibraryLocationLabel => '本地库';
-
-  @override
   String get settingsAutoScanLabel => '自动扫描';
-
-  @override
-  String get settingsSupportedFormatsLabel => '支持的格式';
-
-  @override
-  String get settingsSupportedFormatsTitle => '支持的格式';
 
   @override
   String get settingsSupportedFormatsDescription =>
@@ -569,9 +557,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get syncAllLibraries => '同步全部库';
-
-  @override
-  String get noCurrentLibraryFormatsHint => '请先添加本地库并设为当前库，再配置支持的格式。';
 
   @override
   String get settingsAutoUpdateLabel => '自动更新';

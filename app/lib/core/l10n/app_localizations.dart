@@ -956,12 +956,6 @@ abstract class AppLocalizations {
   /// **'个性化'**
   String get settingsGroupPersonalization;
 
-  /// No description provided for @settingsGroupLibrary.
-  ///
-  /// In zh, this message translates to:
-  /// **'漫画库'**
-  String get settingsGroupLibrary;
-
   /// No description provided for @settingsGroupDiagnostics.
   ///
   /// In zh, this message translates to:
@@ -1010,29 +1004,11 @@ abstract class AppLocalizations {
   /// **'打包应用与核心日志，便于问题反馈'**
   String get settingsExportLogsDescription;
 
-  /// No description provided for @settingsLibraryLocationLabel.
-  ///
-  /// In zh, this message translates to:
-  /// **'本地库'**
-  String get settingsLibraryLocationLabel;
-
   /// No description provided for @settingsAutoScanLabel.
   ///
   /// In zh, this message translates to:
   /// **'自动扫描'**
   String get settingsAutoScanLabel;
-
-  /// No description provided for @settingsSupportedFormatsLabel.
-  ///
-  /// In zh, this message translates to:
-  /// **'支持的格式'**
-  String get settingsSupportedFormatsLabel;
-
-  /// No description provided for @settingsSupportedFormatsTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'支持的格式'**
-  String get settingsSupportedFormatsTitle;
 
   /// No description provided for @settingsSupportedFormatsDescription.
   ///
@@ -1099,12 +1075,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'同步全部库'**
   String get syncAllLibraries;
-
-  /// No description provided for @noCurrentLibraryFormatsHint.
-  ///
-  /// In zh, this message translates to:
-  /// **'请先添加本地库并设为当前库，再配置支持的格式。'**
-  String get noCurrentLibraryFormatsHint;
 
   /// No description provided for @settingsAutoUpdateLabel.
   ///
