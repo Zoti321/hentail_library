@@ -10,9 +10,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'ports.g.dart';
 
 @Riverpod(keepAlive: true)
-ReaderSessionPort readerSessionPort(Ref ref) => ReaderSessionFrbAdapter(
-  libraryRepository: ref.read(libraryRepoProvider),
-);
+ReaderSessionPort readerSessionPort(Ref ref) =>
+    ReaderSessionFrbAdapter(libraryRepository: ref.read(libraryRepoProvider));
 
 @Riverpod(keepAlive: true)
 ComicPageSourcePort comicPageSourcePort(Ref ref) =>

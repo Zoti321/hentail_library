@@ -9,8 +9,7 @@ class FlutterSecureRemoteLibraryCredentialStore
 
   final FlutterSecureStorage _storage;
 
-  static String _key(String libraryId) =>
-      'remote_library_password_$libraryId';
+  static String _key(String libraryId) => 'remote_library_password_$libraryId';
 
   @override
   Future<void> savePassword({

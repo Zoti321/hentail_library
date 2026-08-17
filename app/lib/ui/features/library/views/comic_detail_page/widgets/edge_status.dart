@@ -57,7 +57,10 @@ class ComicDetailNotFound extends StatelessWidget {
             ),
             label: l10n.comicDetailNotFound,
             action: TextButton.icon(
-              onPressed: () => LibraryManagementActions.goCurrentLibraryBrowseFromContext(context),
+              onPressed: () =>
+                  LibraryManagementActions.goCurrentLibraryBrowseFromContext(
+                    context,
+                  ),
               icon: const Icon(LucideIcons.library, size: 16),
               label: Text(l10n.comicDetailGoToLibrary),
             ),

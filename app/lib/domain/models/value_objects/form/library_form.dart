@@ -225,7 +225,10 @@ bool _settingsDiffer(LibraryForm ready, LocalLibrary original) {
   return ready.name != original.name.trim() ||
       ready.scanOnStartup != original.scanOnStartup ||
       ready.scanInterval != original.scanInterval ||
-      !_sameOrderedGroups(ready.enabledFormatGroups, original.enabledFormatGroups);
+      !_sameOrderedGroups(
+        ready.enabledFormatGroups,
+        original.enabledFormatGroups,
+      );
 }
 
 Future<void> _writeSettingsIfNeeded(

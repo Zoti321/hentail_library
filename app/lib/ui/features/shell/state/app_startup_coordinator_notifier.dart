@@ -64,14 +64,14 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
 
     for (final LocalLibrary library in libraries) {
       final String id = library.libraryId;
-      final ScanInterval previous =
-          _lastIntervals[id] ?? ScanInterval.disabled;
+      final ScanInterval previous = _lastIntervals[id] ?? ScanInterval.disabled;
       _lastIntervals[id] = library.scanInterval;
       if (library.scanInterval == ScanInterval.disabled) {
         _intervalAnchors.remove(id);
         continue;
       }
-      if (previous != library.scanInterval || !_intervalAnchors.containsKey(id)) {
+      if (previous != library.scanInterval ||
+          !_intervalAnchors.containsKey(id)) {
         _intervalAnchors[id] = now;
       }
     }

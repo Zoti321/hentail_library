@@ -11,60 +11,61 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
-  testWidgets('hover keeps border subtle and animates card shadow like catalog cards', (
-    WidgetTester tester,
-  ) async {
-    final ThemeData theme = buildAppTheme(Brightness.light);
-    final HentaiColorScheme h = theme.colorScheme.hentai;
+  testWidgets(
+    'hover keeps border subtle and animates card shadow like catalog cards',
+    (WidgetTester tester) async {
+      final ThemeData theme = buildAppTheme(Brightness.light);
+      final HentaiColorScheme h = theme.colorScheme.hentai;
 
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: <Override>[
-          comicCoverProvider('comic-1').overrideWith(_NoCoverComicCover.new),
-        ],
-        child: MaterialApp(
-          locale: const Locale('zh'),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          theme: theme,
-          home: Scaffold(
-            body: Center(
-              child: SizedBox(
-                width: 320,
-                height: 120,
-                child: ReadingHistoryCard(
-                  comicId: 'comic-1',
-                  title: 'Sample comic',
-                  lastReadTime: DateTime(2026, 1, 1),
-                  pageIndex: 12,
-                  onTap: () {},
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: <Override>[
+            comicCoverProvider('comic-1').overrideWith(_NoCoverComicCover.new),
+          ],
+          child: MaterialApp(
+            locale: const Locale('zh'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            theme: theme,
+            home: Scaffold(
+              body: Center(
+                child: SizedBox(
+                  width: 320,
+                  height: 120,
+                  child: ReadingHistoryCard(
+                    comicId: 'comic-1',
+                    title: 'Sample comic',
+                    lastReadTime: DateTime(2026, 1, 1),
+                    pageIndex: 12,
+                    onTap: () {},
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
 
-    BoxDecoration decoration = _cardDecoration(tester);
-    expect(_borderColor(decoration), h.borderSubtle);
-    expect(decoration.boxShadow!.single.color, h.cardShadow);
-    expect(decoration.boxShadow!.single.blurRadius, 2);
+      BoxDecoration decoration = _cardDecoration(tester);
+      expect(_borderColor(decoration), h.borderSubtle);
+      expect(decoration.boxShadow!.single.color, h.cardShadow);
+      expect(decoration.boxShadow!.single.blurRadius, 2);
 
-    final TestGesture mouse = await tester.createGesture(
-      kind: PointerDeviceKind.mouse,
-    );
-    addTearDown(mouse.removePointer);
-    await mouse.addPointer(location: Offset.zero);
-    await mouse.moveTo(tester.getCenter(find.byType(ReadingHistoryCard)));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 200));
+      final TestGesture mouse = await tester.createGesture(
+        kind: PointerDeviceKind.mouse,
+      );
+      addTearDown(mouse.removePointer);
+      await mouse.addPointer(location: Offset.zero);
+      await mouse.moveTo(tester.getCenter(find.byType(ReadingHistoryCard)));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
-    decoration = _cardDecoration(tester);
-    expect(_borderColor(decoration), h.borderSubtle);
-    expect(decoration.boxShadow!.single.color, h.cardShadowHover);
-    expect(decoration.boxShadow!.single.blurRadius, 4);
-  });
+      decoration = _cardDecoration(tester);
+      expect(_borderColor(decoration), h.borderSubtle);
+      expect(decoration.boxShadow!.single.color, h.cardShadowHover);
+      expect(decoration.boxShadow!.single.blurRadius, 4);
+    },
+  );
 }
 
 BoxDecoration _cardDecoration(WidgetTester tester) {

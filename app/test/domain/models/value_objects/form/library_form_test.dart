@@ -108,7 +108,8 @@ LocalLibrary _lib({
     kind: kind,
     rootPath: root,
     name: name,
-    enabledFormatGroups: groups ??
+    enabledFormatGroups:
+        groups ??
         (kind == 'remote'
             ? <FormatGroup>[
                 FormatGroup.pdf,
@@ -155,11 +156,7 @@ void main() {
     test('local create then settings when scan differs', () async {
       final _RecordingLibraryRepository repo = _RecordingLibraryRepository();
       final LibraryFormApplyResult result = await LibraryForm.createLocal()
-          .copyWith(
-            name: 'Alpha',
-            rootPath: r'D:\comics',
-            scanOnStartup: true,
-          )
+          .copyWith(name: 'Alpha', rootPath: r'D:\comics', scanOnStartup: true)
           .create(repo);
       expect(result, isA<LibraryFormApplySucceeded>());
       expect(repo.calls, <String>['createLocal', 'updateSettings']);
@@ -206,10 +203,7 @@ void main() {
         original,
       ).copyWith(rootPath: r'D:\comics2').applyTo(repo, original);
       expect(result, isA<LibraryFormApplySucceeded>());
-      expect(
-        (result as LibraryFormApplySucceeded).rootChanged,
-        isTrue,
-      );
+      expect((result as LibraryFormApplySucceeded).rootChanged, isTrue);
       expect(repo.calls, <String>['updateLocalRoot']);
       expect(repo.lastRoot, r'D:\comics2');
     });
@@ -222,9 +216,9 @@ void main() {
         username: 'u',
       );
       final _RecordingLibraryRepository repo = _RecordingLibraryRepository();
-      await LibraryForm.fromLibrary(original)
-          .copyWith(rootPath: 'https://b.example/dav')
-          .applyTo(repo, original);
+      await LibraryForm.fromLibrary(
+        original,
+      ).copyWith(rootPath: 'https://b.example/dav').applyTo(repo, original);
       expect(repo.calls, contains('updateRemote'));
       expect(repo.lastPassword, isNull);
     });

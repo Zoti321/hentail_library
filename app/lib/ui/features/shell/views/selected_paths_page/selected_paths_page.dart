@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -95,8 +95,8 @@ class _SelectedPathsPageState extends ConsumerState<SelectedPathsPage> {
                   ),
                   child: asyncState.when(
                     data: (_) {
-                      final AsyncValue<CurrentLibraryState> libraries =
-                          ref.watch(currentLibraryProvider);
+                      final AsyncValue<CurrentLibraryState> libraries = ref
+                          .watch(currentLibraryProvider);
                       return libraries.when(
                         data: (_) => const SelectedPathsListCard(),
                         loading: () => const SelectedPathsLoadingCard(),

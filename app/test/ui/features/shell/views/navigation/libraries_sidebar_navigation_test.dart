@@ -238,14 +238,12 @@ void main() {
     await tester.tap(find.text('更多'));
     await tester.pump();
 
-    final Finder moreRow = find.ancestor(
-      of: find.text('更多'),
-      matching: find.byType(GestureDetector),
-    ).first;
-    final Finder betaRow = find.ancestor(
-      of: find.text('Beta'),
-      matching: find.byType(GestureDetector),
-    ).first;
+    final Finder moreRow = find
+        .ancestor(of: find.text('更多'), matching: find.byType(GestureDetector))
+        .first;
+    final Finder betaRow = find
+        .ancestor(of: find.text('Beta'), matching: find.byType(GestureDetector))
+        .first;
 
     final RenderBox moreChevron = tester.renderObject<RenderBox>(
       find.descendant(
@@ -261,8 +259,7 @@ void main() {
     );
 
     expect(
-      moreChevron.localToGlobal(Offset.zero).dx +
-          moreChevron.size.width / 2,
+      moreChevron.localToGlobal(Offset.zero).dx + moreChevron.size.width / 2,
       closeTo(
         betaOverflow.localToGlobal(Offset.zero).dx +
             betaOverflow.size.width / 2,

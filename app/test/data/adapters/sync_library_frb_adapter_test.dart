@@ -33,10 +33,7 @@ class _CredRepo implements LibraryRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-LocalLibrary _lib({
-  required String id,
-  required String kind,
-}) => (
+LocalLibrary _lib({required String id, required String kind}) => (
   libraryId: id,
   kind: kind,
   rootPath: kind == 'remote' ? 'https://example/dav' : 'C:/lib',
@@ -51,47 +48,50 @@ LocalLibrary _lib({
 );
 
 void main() {
-  test('loadRemoteCredentialsForSync only includes current remote when not syncAll', () async {
-    final creds = await loadRemoteCredentialsForSync(
-      libraryRepository: _CredRepo(
-        libraries: <LocalLibrary>[
-          _lib(id: 'local1', kind: 'local'),
-          _lib(id: 'remote1', kind: 'remote'),
-          _lib(id: 'remote2', kind: 'remote'),
-        ],
-        currentId: 'remote1',
-        passwords: <String, String?>{
-          'remote1': 'secret1',
-          'remote2': 'secret2',
-        },
-      ),
-      syncAll: false,
-    );
+  test(
+    'loadRemoteCredentialsForSync only includes current remote when not syncAll',
+    () async {
+      final creds = await loadRemoteCredentialsForSync(
+        libraryRepository: _CredRepo(
+          libraries: <LocalLibrary>[
+            _lib(id: 'local1', kind: 'local'),
+            _lib(id: 'remote1', kind: 'remote'),
+            _lib(id: 'remote2', kind: 'remote'),
+          ],
+          currentId: 'remote1',
+          passwords: <String, String?>{
+            'remote1': 'secret1',
+            'remote2': 'secret2',
+          },
+        ),
+        syncAll: false,
+      );
 
-    expect(creds, hasLength(1));
-    expect(creds.single.libraryId, 'remote1');
-    expect(creds.single.password, 'secret1');
-  });
+      expect(creds, hasLength(1));
+      expect(creds.single.libraryId, 'remote1');
+      expect(creds.single.password, 'secret1');
+    },
+  );
 
-  test('loadRemoteCredentialsForSync includes all remotes with passwords when syncAll', () async {
-    final creds = await loadRemoteCredentialsForSync(
-      libraryRepository: _CredRepo(
-        libraries: <LocalLibrary>[
-          _lib(id: 'remote1', kind: 'remote'),
-          _lib(id: 'remote2', kind: 'remote'),
-        ],
-        currentId: 'remote1',
-        passwords: <String, String?>{
-          'remote1': 'secret1',
-          'remote2': null,
-        },
-      ),
-      syncAll: true,
-    );
+  test(
+    'loadRemoteCredentialsForSync includes all remotes with passwords when syncAll',
+    () async {
+      final creds = await loadRemoteCredentialsForSync(
+        libraryRepository: _CredRepo(
+          libraries: <LocalLibrary>[
+            _lib(id: 'remote1', kind: 'remote'),
+            _lib(id: 'remote2', kind: 'remote'),
+          ],
+          currentId: 'remote1',
+          passwords: <String, String?>{'remote1': 'secret1', 'remote2': null},
+        ),
+        syncAll: true,
+      );
 
-    expect(creds, hasLength(1));
-    expect(creds.single.libraryId, 'remote1');
-  });
+      expect(creds, hasLength(1));
+      expect(creds.single.libraryId, 'remote1');
+    },
+  );
 
   test('mapRustSyncProgress maps migrated count on done', () {
     const rust.SyncLibraryProgressDto dto = rust.SyncLibraryProgressDto(

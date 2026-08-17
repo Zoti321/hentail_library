@@ -96,7 +96,10 @@ class SeriesNotFound extends StatelessWidget {
             ),
             label: l10n.seriesDetailNotFound(_displayLabel(l10n)),
             action: TextButton.icon(
-              onPressed: () => LibraryManagementActions.goCurrentLibraryBrowseFromContext(context),
+              onPressed: () =>
+                  LibraryManagementActions.goCurrentLibraryBrowseFromContext(
+                    context,
+                  ),
               icon: const Icon(LucideIcons.library, size: 16),
               label: Text(l10n.comicDetailGoToLibrary),
             ),

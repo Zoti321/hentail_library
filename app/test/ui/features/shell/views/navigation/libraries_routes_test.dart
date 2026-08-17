@@ -67,10 +67,7 @@ void main() {
 
     test('comic detail highlights current library child', () {
       expect(
-        librariesSidebarSelection(
-          path: '/comic/c1',
-          currentLibraryId: 'lib-a',
-        ),
+        librariesSidebarSelection(path: '/comic/c1', currentLibraryId: 'lib-a'),
         (sectionActive: false, activeLibraryId: 'lib-a'),
       );
     });

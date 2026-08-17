@@ -166,7 +166,10 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                     )
                   else if (searchedSeriesCount == 0 && searchedComicCount == 0)
                     _SearchResultsEmptyState(
-                      onGoToLibrary: () => LibraryManagementActions.goCurrentLibraryBrowseFromContext(context),
+                      onGoToLibrary: () =>
+                          LibraryManagementActions.goCurrentLibraryBrowseFromContext(
+                            context,
+                          ),
                     )
                   else ...<Widget>[
                     if (searchedSeriesCount > 0)

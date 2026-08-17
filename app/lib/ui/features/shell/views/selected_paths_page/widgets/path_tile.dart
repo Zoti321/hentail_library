@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -114,7 +114,9 @@ class PathTile extends HookConsumerWidget {
           child: Row(
             children: <Widget>[
               Icon(
-                remote ? LucideIcons.cloud : _resolveLocalIcon(library.rootPath),
+                remote
+                    ? LucideIcons.cloud
+                    : _resolveLocalIcon(library.rootPath),
                 size: 20,
                 color: theme.colorScheme.hentai.iconDefault,
               ),

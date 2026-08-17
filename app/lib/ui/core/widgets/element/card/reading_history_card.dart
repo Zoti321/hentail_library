@@ -38,8 +38,9 @@ class ReadingHistoryCard extends HookConsumerWidget {
       bottomRight: Radius.circular(tokens.radius.md),
     );
 
-    final Color cardBackground =
-        isHovered.value ? cs.surfaceContainer : cs.surface;
+    final Color cardBackground = isHovered.value
+        ? cs.surfaceContainer
+        : cs.surface;
     final List<BoxShadow> cardShadows = isHovered.value
         ? <BoxShadow>[
             BoxShadow(

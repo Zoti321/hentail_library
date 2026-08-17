@@ -1,12 +1,5 @@
 /// Per-Library Scan interval (Komga-aligned presets).
-enum ScanInterval {
-  disabled,
-  hourly,
-  every6Hours,
-  every12Hours,
-  daily,
-  weekly,
-}
+enum ScanInterval { disabled, hourly, every6Hours, every12Hours, daily, weekly }
 
 extension ScanIntervalX on ScanInterval {
   Duration? get period {

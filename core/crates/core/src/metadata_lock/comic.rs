@@ -82,9 +82,7 @@ fn merge_scan_with_existing(
 ) -> ComicDto {
     let source_changed =
         existing.path != scanned.path || existing.resource_type != scanned.resource_type;
-    let page_count = if prefer_scanned_pages && scanned.page_count > 0 {
-        scanned.page_count
-    } else if source_changed {
+    let page_count = if (prefer_scanned_pages && scanned.page_count > 0) || source_changed {
         scanned.page_count
     } else {
         existing.page_count

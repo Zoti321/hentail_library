@@ -128,24 +128,22 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
 
   List<DialogSideTabItem> _sideTabs(AppLocalizations l10n) => _tabs
       .map(
-        (_LibraryFormTab tab) => DialogSideTabItem(
-          label: _tabLabel(l10n, tab),
-          icon: _tabIcon(tab),
-        ),
+        (_LibraryFormTab tab) =>
+            DialogSideTabItem(label: _tabLabel(l10n, tab), icon: _tabIcon(tab)),
       )
       .toList(growable: false);
 
   List<CapsuleTabItem> _capsuleTabs(AppLocalizations l10n) => _tabs
       .map(
-        (_LibraryFormTab tab) => CapsuleTabItem(
-          label: _tabLabel(l10n, tab),
-          icon: _tabIcon(tab),
-        ),
+        (_LibraryFormTab tab) =>
+            CapsuleTabItem(label: _tabLabel(l10n, tab), icon: _tabIcon(tab)),
       )
       .toList(growable: false);
 
   void _selectTab(int index) {
-    if (index < 0 || index >= _tabs.length || index == _tabs.indexOf(_selectedTab)) {
+    if (index < 0 ||
+        index >= _tabs.length ||
+        index == _tabs.indexOf(_selectedTab)) {
       return;
     }
     setState(() {
@@ -258,7 +256,9 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
     if (_saving) {
       return;
     }
-    final LibraryFormValidation validation = _form.validate(isCreate: _isCreate);
+    final LibraryFormValidation validation = _form.validate(
+      isCreate: _isCreate,
+    );
     if (!validation.isValid) {
       setState(() {
         _validation = validation;
@@ -303,9 +303,7 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
         return;
       }
       switch (result) {
-        case LibraryFormApplyInvalid(
-          :final LibraryFormValidation validation,
-        ):
+        case LibraryFormApplyInvalid(:final LibraryFormValidation validation):
           setState(() {
             _validation = validation;
             _previousTabIndex = _tabs.indexOf(_selectedTab);
@@ -319,7 +317,8 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
           }
           final String toast = switch (widget.mode) {
             LibraryFormMode.createLocal => context.l10n.pathsAddedOneToast,
-            LibraryFormMode.createRemote => context.l10n.remoteLibraryAddedToast,
+            LibraryFormMode.createRemote =>
+              context.l10n.remoteLibraryAddedToast,
             LibraryFormMode.edit => context.l10n.commonSavedToast,
           };
           showSuccessToast(context, toast);

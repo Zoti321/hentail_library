@@ -168,7 +168,10 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
               ),
             ),
             TextButton(
-              onPressed: () => LibraryManagementActions.goCurrentLibraryBrowseFromContext(context),
+              onPressed: () =>
+                  LibraryManagementActions.goCurrentLibraryBrowseFromContext(
+                    context,
+                  ),
               style: TextButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),

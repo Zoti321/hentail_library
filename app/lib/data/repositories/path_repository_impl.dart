@@ -8,10 +8,9 @@ import 'package:hentai_library/src/rust/api/library.dart' as rust_library;
 import 'package:hentai_library/src/rust/api/path.dart' as rust;
 
 class PathRepositoryImpl implements PathRepository {
-  const PathRepositoryImpl({
-    RemoteLibraryCredentialStore? credentials,
-  }) : _credentials =
-           credentials ?? const FlutterSecureRemoteLibraryCredentialStore();
+  const PathRepositoryImpl({RemoteLibraryCredentialStore? credentials})
+    : _credentials =
+          credentials ?? const FlutterSecureRemoteLibraryCredentialStore();
 
   final RemoteLibraryCredentialStore _credentials;
 

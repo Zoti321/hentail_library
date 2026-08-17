@@ -183,7 +183,7 @@ fn new_library_appends_to_pinned_end_when_unpinned_exist() {
                 listed.iter().map(|l| l.name.as_str()).collect::<Vec<_>>(),
                 vec!["A", "C", "B"]
             );
-            assert_eq!(lib_c.pinned, true);
+            assert!(lib_c.pinned);
             assert_eq!(lib_c.sidebar_order, 1);
             assert!(!listed[2].pinned);
         });

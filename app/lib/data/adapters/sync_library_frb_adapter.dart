@@ -79,7 +79,8 @@ Future<List<rust.RemoteLibraryCredentialDto>> loadRemoteCredentialsForSync({
   String? targetLibraryId,
 }) async {
   final List<LocalLibrary> libraries = await libraryRepository.list();
-  final String? scopedId = targetLibraryId ??
+  final String? scopedId =
+      targetLibraryId ??
       (syncAll ? null : await libraryRepository.getCurrentId());
   final List<rust.RemoteLibraryCredentialDto> out =
       <rust.RemoteLibraryCredentialDto>[];
