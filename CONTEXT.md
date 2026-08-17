@@ -109,8 +109,12 @@ Comic 的直接父目录对应一个 Series；Library root 下直接存放的 Co
 _Avoid_: 标题推断、自动分组
 
 **Tag**:
-用户为 Comic 附加的自由文本标签，用于筛选与归类。
-_Avoid_: 分类、关键词
+全局标签字典中的名称，用于筛选与归类；可来自用户创建或外部词库导入，再附着到 Comic。
+_Avoid_: 分类、关键词、Eh 标签（口语可用；领域与 issue 用 Tag）
+
+**Tag dictionary import**:
+从 EhTagTranslation Database（`db.text.json`）将约定命名空间下的中文译名幂等写入全局 Tag 字典的操作；不附着到 Comic，不删除本机已有 Tag。
+_Avoid_: ehentai 导入、标签同步、画廊导入（易被理解成给 Comic 打标或镜像删除）
 
 **Author**:
 Comic 的署名，用于展示与筛选；社团、画师、原作者等展示用名字均记为 Author，不区分类型。
