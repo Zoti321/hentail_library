@@ -78,7 +78,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -1476504335;
+  int get rustContentHash => -1276002174;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -407,6 +407,10 @@ abstract class RustLibApi extends BaseApi {
     required List<FormatGroupDto> groups,
     required bool scanOnStartup,
     required ScanIntervalDto scanInterval,
+  });
+
+  List<LibraryDto> crateApiLibraryUpdateLibrarySidebarLayoutFrb({
+    required List<LibrarySidebarPlacementDto> placements,
   });
 
   LibraryDto crateApiLibraryUpdateLocalLibraryRootFrb({
@@ -3011,6 +3015,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  List<LibraryDto> crateApiLibraryUpdateLibrarySidebarLayoutFrb({
+    required List<LibrarySidebarPlacementDto> placements,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_library_sidebar_placement_dto(placements, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 88)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_library_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiLibraryUpdateLibrarySidebarLayoutFrbConstMeta,
+        argValues: [placements],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiLibraryUpdateLibrarySidebarLayoutFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "update_library_sidebar_layout_frb",
+        argNames: ["placements"],
+      );
+
+  @override
   LibraryDto crateApiLibraryUpdateLocalLibraryRootFrb({
     required String libraryId,
     required String rootPath,
@@ -3021,7 +3053,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(libraryId, serializer);
           sse_encode_String(rootPath, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 88)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 89)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_library_dto,
@@ -3055,7 +3087,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(rootUrl, serializer);
           sse_encode_String(username, serializer);
           sse_encode_bool(allowHttp, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 89)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 90)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_library_dto,
@@ -3087,7 +3119,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(seriesId, serializer);
           sse_encode_String(comicId, serializer);
           sse_encode_f_64(sortOrder, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 90)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 91)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -3116,7 +3148,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 91,
+            funcId: 92,
             port: port_,
           );
         },
@@ -3148,7 +3180,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(seriesId, serializer);
           sse_encode_box_autoadd_update_series_user_meta_dto(meta, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 92)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 93)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -3179,7 +3211,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 93,
+              funcId: 94,
               port: port_,
             );
           },
@@ -3214,7 +3246,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 94,
+              funcId: 95,
               port: port_,
             );
           },
@@ -3246,7 +3278,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 95,
+              funcId: 96,
               port: port_,
             );
           },
@@ -3284,7 +3316,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 96,
+              funcId: 97,
               port: port_,
             );
           },
@@ -3322,7 +3354,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 97,
+              funcId: 98,
               port: port_,
             );
           },
@@ -3361,7 +3393,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 98,
+              funcId: 99,
               port: port_,
             );
           },
@@ -3396,7 +3428,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 99,
+              funcId: 100,
               port: port_,
             );
           },
@@ -3431,7 +3463,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 100,
+              funcId: 101,
               port: port_,
             );
           },
@@ -3466,7 +3498,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 101,
+              funcId: 102,
               port: port_,
             );
           },
@@ -3498,7 +3530,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 102,
+              funcId: 103,
               port: port_,
             );
           },
@@ -3935,8 +3967,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LibraryDto dco_decode_library_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 10)
-      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
+    if (arr.length != 12)
+      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
     return LibraryDto(
       libraryId: dco_decode_String(arr[0]),
       kind: dco_decode_String(arr[1]),
@@ -3948,6 +3980,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       allowHttp: dco_decode_bool(arr[7]),
       scanOnStartup: dco_decode_bool(arr[8]),
       scanInterval: dco_decode_scan_interval_dto(arr[9]),
+      pinned: dco_decode_bool(arr[10]),
+      sidebarOrder: dco_decode_i_32(arr[11]),
+    );
+  }
+
+  @protected
+  LibrarySidebarPlacementDto dco_decode_library_sidebar_placement_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return LibrarySidebarPlacementDto(
+      libraryId: dco_decode_String(arr[0]),
+      pinned: dco_decode_bool(arr[1]),
+      sidebarOrder: dco_decode_i_32(arr[2]),
     );
   }
 
@@ -4002,6 +4051,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<LibraryDto> dco_decode_list_library_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_library_dto).toList();
+  }
+
+  @protected
+  List<LibrarySidebarPlacementDto>
+  dco_decode_list_library_sidebar_placement_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_library_sidebar_placement_dto)
+        .toList();
   }
 
   @protected
@@ -5129,6 +5187,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_allowHttp = sse_decode_bool(deserializer);
     var var_scanOnStartup = sse_decode_bool(deserializer);
     var var_scanInterval = sse_decode_scan_interval_dto(deserializer);
+    var var_pinned = sse_decode_bool(deserializer);
+    var var_sidebarOrder = sse_decode_i_32(deserializer);
     return LibraryDto(
       libraryId: var_libraryId,
       kind: var_kind,
@@ -5140,6 +5200,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       allowHttp: var_allowHttp,
       scanOnStartup: var_scanOnStartup,
       scanInterval: var_scanInterval,
+      pinned: var_pinned,
+      sidebarOrder: var_sidebarOrder,
+    );
+  }
+
+  @protected
+  LibrarySidebarPlacementDto sse_decode_library_sidebar_placement_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_libraryId = sse_decode_String(deserializer);
+    var var_pinned = sse_decode_bool(deserializer);
+    var var_sidebarOrder = sse_decode_i_32(deserializer);
+    return LibrarySidebarPlacementDto(
+      libraryId: var_libraryId,
+      pinned: var_pinned,
+      sidebarOrder: var_sidebarOrder,
     );
   }
 
@@ -5230,6 +5307,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <LibraryDto>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_library_dto(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<LibrarySidebarPlacementDto>
+  sse_decode_list_library_sidebar_placement_dto(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <LibrarySidebarPlacementDto>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_library_sidebar_placement_dto(deserializer));
     }
     return ans_;
   }
@@ -6573,6 +6663,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.allowHttp, serializer);
     sse_encode_bool(self.scanOnStartup, serializer);
     sse_encode_scan_interval_dto(self.scanInterval, serializer);
+    sse_encode_bool(self.pinned, serializer);
+    sse_encode_i_32(self.sidebarOrder, serializer);
+  }
+
+  @protected
+  void sse_encode_library_sidebar_placement_dto(
+    LibrarySidebarPlacementDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.libraryId, serializer);
+    sse_encode_bool(self.pinned, serializer);
+    sse_encode_i_32(self.sidebarOrder, serializer);
   }
 
   @protected
@@ -6646,6 +6749,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_library_dto(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_library_sidebar_placement_dto(
+    List<LibrarySidebarPlacementDto> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_library_sidebar_placement_dto(item, serializer);
     }
   }
 

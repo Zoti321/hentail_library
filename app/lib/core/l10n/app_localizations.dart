@@ -134,11 +134,35 @@ abstract class AppLocalizations {
   /// **'添加远程库'**
   String get sidebarAddRemoteLibrary;
 
-  /// No description provided for @sidebarReorderLibrariesLater.
+  /// No description provided for @sidebarReorderLibraries.
   ///
   /// In zh, this message translates to:
-  /// **'重新排序（后续）'**
-  String get sidebarReorderLibrariesLater;
+  /// **'重新排序'**
+  String get sidebarReorderLibraries;
+
+  /// No description provided for @sidebarExitReorder.
+  ///
+  /// In zh, this message translates to:
+  /// **'退出排序'**
+  String get sidebarExitReorder;
+
+  /// No description provided for @sidebarPinnedSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'已固定'**
+  String get sidebarPinnedSection;
+
+  /// No description provided for @sidebarUnpinnedSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'未固定'**
+  String get sidebarUnpinnedSection;
+
+  /// No description provided for @sidebarMoreLibraries.
+  ///
+  /// In zh, this message translates to:
+  /// **'更多'**
+  String get sidebarMoreLibraries;
 
   /// No description provided for @sidebarScanAllLibraries.
   ///

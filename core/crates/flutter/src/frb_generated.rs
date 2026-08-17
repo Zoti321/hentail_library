@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1476504335;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1276002174;
 
 // Section: executor
 
@@ -2915,6 +2915,39 @@ fn wire__crate__api__library__update_library_settings_frb_impl(
         },
     )
 }
+fn wire__crate__api__library__update_library_sidebar_layout_frb_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "update_library_sidebar_layout_frb",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_placements = <Vec<crate::api::library::LibrarySidebarPlacementDto>>::sse_decode(
+                &mut deserializer,
+            );
+            deserializer.end();
+            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
+                let output_ok =
+                    crate::api::library::update_library_sidebar_layout_frb(api_placements)?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__crate__api__library__update_local_library_root_frb_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -3894,6 +3927,8 @@ impl SseDecode for crate::api::library::LibraryDto {
         let mut var_allowHttp = <bool>::sse_decode(deserializer);
         let mut var_scanOnStartup = <bool>::sse_decode(deserializer);
         let mut var_scanInterval = <crate::api::library::ScanIntervalDto>::sse_decode(deserializer);
+        let mut var_pinned = <bool>::sse_decode(deserializer);
+        let mut var_sidebarOrder = <i32>::sse_decode(deserializer);
         return crate::api::library::LibraryDto {
             library_id: var_libraryId,
             kind: var_kind,
@@ -3905,6 +3940,22 @@ impl SseDecode for crate::api::library::LibraryDto {
             allow_http: var_allowHttp,
             scan_on_startup: var_scanOnStartup,
             scan_interval: var_scanInterval,
+            pinned: var_pinned,
+            sidebar_order: var_sidebarOrder,
+        };
+    }
+}
+
+impl SseDecode for crate::api::library::LibrarySidebarPlacementDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_libraryId = <String>::sse_decode(deserializer);
+        let mut var_pinned = <bool>::sse_decode(deserializer);
+        let mut var_sidebarOrder = <i32>::sse_decode(deserializer);
+        return crate::api::library::LibrarySidebarPlacementDto {
+            library_id: var_libraryId,
+            pinned: var_pinned,
+            sidebar_order: var_sidebarOrder,
         };
     }
 }
@@ -3992,6 +4043,18 @@ impl SseDecode for Vec<crate::api::library::LibraryDto> {
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
             ans_.push(<crate::api::library::LibraryDto>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::library::LibrarySidebarPlacementDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::library::LibrarySidebarPlacementDto>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -4929,44 +4992,44 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        91 => wire__crate__api__series__update_series_user_meta_dto_default_impl(
+        92 => wire__crate__api__series__update_series_user_meta_dto_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        93 => {
+        94 => {
             wire__crate__api__series__watch_all_series_frb_impl(port, ptr, rust_vec_len, data_len)
         }
-        94 => wire__crate__api__author__watch_authors_frb_impl(port, ptr, rust_vec_len, data_len),
-        95 => wire__crate__api__comic__watch_comic_changes_impl(port, ptr, rust_vec_len, data_len),
-        96 => wire__crate__api__home__watch_continue_reading_top5_frb_impl(
+        95 => wire__crate__api__author__watch_authors_frb_impl(port, ptr, rust_vec_len, data_len),
+        96 => wire__crate__api__comic__watch_comic_changes_impl(port, ptr, rust_vec_len, data_len),
+        97 => wire__crate__api__home__watch_continue_reading_top5_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        97 => wire__crate__api__home__watch_home_page_counts_frb_impl(
+        98 => wire__crate__api__home__watch_home_page_counts_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        98 => wire__crate__api__series__watch_home_series_comic_order_map_frb_impl(
+        99 => wire__crate__api__series__watch_home_series_comic_order_map_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        99 => wire__crate__api__path__watch_paths_frb_impl(port, ptr, rust_vec_len, data_len),
-        100 => wire__crate__api__history__watch_reading_histories_frb_impl(
+        100 => wire__crate__api__path__watch_paths_frb_impl(port, ptr, rust_vec_len, data_len),
+        101 => wire__crate__api__history__watch_reading_histories_frb_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        101 => wire__crate__api__tag__watch_tags_frb_impl(port, ptr, rust_vec_len, data_len),
-        102 => wire__crate__api__thumbnail__watch_thumbnail_events_frb_impl(
+        102 => wire__crate__api__tag__watch_tags_frb_impl(port, ptr, rust_vec_len, data_len),
+        103 => wire__crate__api__thumbnail__watch_thumbnail_events_frb_impl(
             port,
             ptr,
             rust_vec_len,
@@ -5147,20 +5210,25 @@ fn pde_ffi_dispatcher_sync_impl(
         87 => {
             wire__crate__api__library__update_library_settings_frb_impl(ptr, rust_vec_len, data_len)
         }
-        88 => wire__crate__api__library__update_local_library_root_frb_impl(
+        88 => wire__crate__api__library__update_library_sidebar_layout_frb_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        89 => {
+        89 => wire__crate__api__library__update_local_library_root_frb_impl(
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        90 => {
             wire__crate__api__library__update_remote_library_frb_impl(ptr, rust_vec_len, data_len)
         }
-        90 => wire__crate__api__series__update_series_item_sort_order_frb_impl(
+        91 => wire__crate__api__series__update_series_item_sort_order_frb_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        92 => {
+        93 => {
             wire__crate__api__series__update_series_user_meta_frb_impl(ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -5469,6 +5537,8 @@ impl flutter_rust_bridge::IntoDart for crate::api::library::LibraryDto {
             self.allow_http.into_into_dart().into_dart(),
             self.scan_on_startup.into_into_dart().into_dart(),
             self.scan_interval.into_into_dart().into_dart(),
+            self.pinned.into_into_dart().into_dart(),
+            self.sidebar_order.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -5481,6 +5551,28 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::library::LibraryDto>
     for crate::api::library::LibraryDto
 {
     fn into_into_dart(self) -> crate::api::library::LibraryDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::library::LibrarySidebarPlacementDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.library_id.into_into_dart().into_dart(),
+            self.pinned.into_into_dart().into_dart(),
+            self.sidebar_order.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::library::LibrarySidebarPlacementDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::library::LibrarySidebarPlacementDto>
+    for crate::api::library::LibrarySidebarPlacementDto
+{
+    fn into_into_dart(self) -> crate::api::library::LibrarySidebarPlacementDto {
         self
     }
 }
@@ -6652,6 +6744,17 @@ impl SseEncode for crate::api::library::LibraryDto {
         <bool>::sse_encode(self.allow_http, serializer);
         <bool>::sse_encode(self.scan_on_startup, serializer);
         <crate::api::library::ScanIntervalDto>::sse_encode(self.scan_interval, serializer);
+        <bool>::sse_encode(self.pinned, serializer);
+        <i32>::sse_encode(self.sidebar_order, serializer);
+    }
+}
+
+impl SseEncode for crate::api::library::LibrarySidebarPlacementDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.library_id, serializer);
+        <bool>::sse_encode(self.pinned, serializer);
+        <i32>::sse_encode(self.sidebar_order, serializer);
     }
 }
 
@@ -6716,6 +6819,16 @@ impl SseEncode for Vec<crate::api::library::LibraryDto> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::api::library::LibraryDto>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::library::LibrarySidebarPlacementDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::library::LibrarySidebarPlacementDto>::sse_encode(item, serializer);
         }
     }
 }

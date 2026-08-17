@@ -107,6 +107,8 @@ class _FakeCurrentLibraryNotifier extends CurrentLibraryNotifier {
       allowHttp: false,
       scanOnStartup: false,
       scanInterval: ScanInterval.disabled,
+      pinned: true,
+      sidebarOrder: 0,
     );
     return const CurrentLibraryState(
       libraries: <LocalLibrary>[library],

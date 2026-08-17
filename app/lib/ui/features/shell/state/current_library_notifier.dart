@@ -1,4 +1,5 @@
 import 'package:hentai_library/domain/library/format_group.dart';
+import 'package:hentai_library/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/domain/repositories/library_repository.dart';
@@ -15,10 +16,7 @@ const String _kMigratedFormatGroupsPref =
 const String _kMigratedAutoScanPref = 'migrated_auto_scan_to_libraries_v1';
 
 class CurrentLibraryState {
-  const CurrentLibraryState({
-    required this.libraries,
-    required this.currentId,
-  });
+  const CurrentLibraryState({required this.libraries, required this.currentId});
 
   final List<LocalLibrary> libraries;
   final String? currentId;
@@ -78,6 +76,18 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
       state = AsyncData(previous.copyWith(currentId: libraryId));
     }
     await refresh();
+  }
+
+  Future<void> updateSidebarLayout(
+    List<LibrarySidebarPlacement> placements,
+  ) async {
+    final List<LocalLibrary> libraries = await _repo.updateSidebarLayout(
+      placements,
+    );
+    final CurrentLibraryState? previous = state.asData?.value;
+    state = AsyncData(
+      CurrentLibraryState(libraries: libraries, currentId: previous?.currentId),
+    );
   }
 
   Future<void> clear() async {

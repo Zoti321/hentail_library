@@ -209,6 +209,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LibraryDto dco_decode_library_dto(dynamic raw);
 
   @protected
+  LibrarySidebarPlacementDto dco_decode_library_sidebar_placement_dto(
+    dynamic raw,
+  );
+
+  @protected
   LibrarySyncCountsDto dco_decode_library_sync_counts_dto(dynamic raw);
 
   @protected
@@ -227,6 +232,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<LibraryDto> dco_decode_list_library_dto(dynamic raw);
+
+  @protected
+  List<LibrarySidebarPlacementDto>
+  dco_decode_list_library_sidebar_placement_dto(dynamic raw);
 
   @protected
   List<int> dco_decode_list_prim_i_32_loose(dynamic raw);
@@ -642,6 +651,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LibraryDto sse_decode_library_dto(SseDeserializer deserializer);
 
   @protected
+  LibrarySidebarPlacementDto sse_decode_library_sidebar_placement_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   LibrarySyncCountsDto sse_decode_library_sync_counts_dto(
     SseDeserializer deserializer,
   );
@@ -664,6 +678,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<LibraryDto> sse_decode_list_library_dto(SseDeserializer deserializer);
+
+  @protected
+  List<LibrarySidebarPlacementDto>
+  sse_decode_list_library_sidebar_placement_dto(SseDeserializer deserializer);
 
   @protected
   List<int> sse_decode_list_prim_i_32_loose(SseDeserializer deserializer);
@@ -1181,6 +1199,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_library_dto(LibraryDto self, SseSerializer serializer);
 
   @protected
+  void sse_encode_library_sidebar_placement_dto(
+    LibrarySidebarPlacementDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_library_sync_counts_dto(
     LibrarySyncCountsDto self,
     SseSerializer serializer,
@@ -1207,6 +1231,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_library_dto(
     List<LibraryDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_library_sidebar_placement_dto(
+    List<LibrarySidebarPlacementDto> self,
     SseSerializer serializer,
   );
 

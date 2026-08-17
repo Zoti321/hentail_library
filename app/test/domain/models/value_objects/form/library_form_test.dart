@@ -120,6 +120,8 @@ LocalLibrary _lib({
     allowHttp: allowHttp,
     scanOnStartup: scanOnStartup,
     scanInterval: scanInterval,
+    pinned: true,
+    sidebarOrder: 0,
   );
 }
 

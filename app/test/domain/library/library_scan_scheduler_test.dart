@@ -21,6 +21,8 @@ void main() {
       allowHttp: false,
       scanOnStartup: scanOnStartup,
       scanInterval: interval,
+      pinned: true,
+      sidebarOrder: 0,
     );
   }
 

@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -29,18 +30,20 @@ Color _sidebarActionHoverBackground(HentaiColorScheme h) =>
     Color.lerp(h.sidebarItemHoverBackground, h.borderStrong, 0.5)!;
 
 /// Komga-style Libraries section for the desktop sidebar (injected by shell).
-class LibrariesSidebarSection extends ConsumerWidget {
+class LibrariesSidebarSection extends HookConsumerWidget {
   const LibrariesSidebarSection({
     super.key,
     required this.expandProgress,
     required this.labelOpacity,
     required this.showCollapsedTooltip,
+    this.allowLibraryReorder = true,
     this.onNavigate,
   });
 
   final double expandProgress;
   final double labelOpacity;
   final bool showCollapsedTooltip;
+  final bool allowLibraryReorder;
 
   /// Called before route changes (e.g. close the compact navigation drawer).
   final VoidCallback? onNavigate;
@@ -59,6 +62,22 @@ class LibrariesSidebarSection extends ConsumerWidget {
       currentLibraryId: state?.currentId,
     );
     final bool collapsed = expandProgress < 0.05;
+    final LibrarySidebarSections sections = splitLibrarySidebar(libraries);
+    final String? currentId = state?.currentId;
+    final bool currentIsUnpinned =
+        currentId != null &&
+        sections.unpinned.any(
+          (LocalLibrary library) => library.libraryId == currentId,
+        );
+    final ValueNotifier<bool> moreExpanded = useState(false);
+    final ObjectRef<String?> autoOpenedFor = useRef<String?>(null);
+    useEffect(() {
+      if (currentIsUnpinned && autoOpenedFor.value != currentId) {
+        moreExpanded.value = true;
+        autoOpenedFor.value = currentId;
+      }
+      return null;
+    }, <Object?>[currentId, currentIsUnpinned]);
 
     if (collapsed) {
       return _CollapsedLibrariesButton(
@@ -69,6 +88,10 @@ class LibrariesSidebarSection extends ConsumerWidget {
       );
     }
 
+    final bool showMore = showLibrariesMore(sections.unpinned);
+    final bool reorderEnabled =
+        allowLibraryReorder && librariesReorderMenuEnabled(libraries.length);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -76,12 +99,13 @@ class LibrariesSidebarSection extends ConsumerWidget {
           isActive: selection.sectionActive,
           expandProgress: expandProgress,
           labelOpacity: labelOpacity,
+          reorderEnabled: reorderEnabled,
           onTap: () {
             LibraryManagementActions.goAllLibraries(context);
             onNavigate?.call();
           },
         ),
-        ...libraries.map(
+        ...sections.pinned.map(
           (LocalLibrary library) => _LibrarySidebarRow(
             library: library,
             isActive: selection.activeLibraryId == library.libraryId,
@@ -90,6 +114,23 @@ class LibrariesSidebarSection extends ConsumerWidget {
             onNavigate: onNavigate,
           ),
         ),
+        if (showMore)
+          _LibrariesMoreRow(
+            expanded: moreExpanded.value,
+            expandProgress: expandProgress,
+            labelOpacity: labelOpacity,
+            onTap: () => moreExpanded.value = !moreExpanded.value,
+          ),
+        if (showMore && moreExpanded.value)
+          ...sections.unpinned.map(
+            (LocalLibrary library) => _LibrarySidebarRow(
+              library: library,
+              isActive: selection.activeLibraryId == library.libraryId,
+              expandProgress: expandProgress,
+              labelOpacity: labelOpacity,
+              onNavigate: onNavigate,
+            ),
+          ),
       ],
     );
   }
@@ -100,12 +141,14 @@ class _LibrariesSectionHeader extends StatelessWidget {
     required this.isActive,
     required this.expandProgress,
     required this.labelOpacity,
+    required this.reorderEnabled,
     required this.onTap,
   });
 
   final bool isActive;
   final double expandProgress;
   final double labelOpacity;
+  final bool reorderEnabled;
   final VoidCallback onTap;
 
   @override
@@ -118,12 +161,44 @@ class _LibrariesSectionHeader extends StatelessWidget {
       leading: const Icon(LucideIcons.library, size: 18),
       label: l10n.libraryTitle,
       onTap: onTap,
-      trailing: const Row(
+      trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          _SectionAddMenuButton(),
-          _SectionOverflowMenuButton(),
+          const _SectionAddMenuButton(),
+          _SectionOverflowMenuButton(reorderEnabled: reorderEnabled),
         ],
+      ),
+    );
+  }
+}
+
+class _LibrariesMoreRow extends StatelessWidget {
+  const _LibrariesMoreRow({
+    required this.expanded,
+    required this.expandProgress,
+    required this.labelOpacity,
+    required this.onTap,
+  });
+
+  final bool expanded;
+  final double expandProgress;
+  final double labelOpacity;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return _SidebarChromeRow(
+      isActive: false,
+      expandProgress: expandProgress,
+      labelOpacity: labelOpacity,
+      leading: null,
+      label: l10n.sidebarMoreLibraries,
+      indentWithoutIcon: true,
+      onTap: onTap,
+      trailing: Icon(
+        expanded ? LucideIcons.chevronDown : LucideIcons.chevronRight,
+        size: 16,
       ),
     );
   }
@@ -330,7 +405,9 @@ class _SectionAddMenuButton extends HookConsumerWidget {
 }
 
 class _SectionOverflowMenuButton extends HookConsumerWidget {
-  const _SectionOverflowMenuButton();
+  const _SectionOverflowMenuButton({required this.reorderEnabled});
+
+  final bool reorderEnabled;
 
   static const double _kMenuMaxWidth = 240;
 
@@ -361,9 +438,12 @@ class _SectionOverflowMenuButton extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               _PopupMenuItem(
-                label: l10n.sidebarReorderLibrariesLater,
-                enabled: false,
-                onTap: () {},
+                label: l10n.sidebarReorderLibraries,
+                enabled: reorderEnabled,
+                onTap: () {
+                  controller.hideMenu();
+                  ref.read(libraryReorderModeProvider.notifier).enter();
+                },
               ),
               _PopupMenuItem(
                 label: l10n.sidebarScanAllLibraries,

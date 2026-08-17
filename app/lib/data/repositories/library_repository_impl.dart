@@ -1,6 +1,7 @@
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/repositories/flutter_secure_remote_library_credential_store.dart';
 import 'package:hentai_library/domain/library/format_group.dart';
+import 'package:hentai_library/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/domain/library/scan_interval.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/domain/repositories/library_repository.dart';
@@ -9,10 +10,9 @@ import 'package:hentai_library/src/rust/api/library.dart' as rust;
 import 'package:hentai_library/src/rust/api/sync.dart' as rust_sync;
 
 class LibraryRepositoryImpl implements LibraryRepository {
-  const LibraryRepositoryImpl({
-    RemoteLibraryCredentialStore? credentials,
-  }) : _credentials =
-           credentials ?? const FlutterSecureRemoteLibraryCredentialStore();
+  const LibraryRepositoryImpl({RemoteLibraryCredentialStore? credentials})
+    : _credentials =
+          credentials ?? const FlutterSecureRemoteLibraryCredentialStore();
 
   final RemoteLibraryCredentialStore _credentials;
 
@@ -191,6 +191,30 @@ class LibraryRepositoryImpl implements LibraryRepository {
   }
 
   @override
+  Future<List<LocalLibrary>> updateSidebarLayout(
+    List<LibrarySidebarPlacement> placements,
+  ) async {
+    return guardFrbSync(
+      () => rust
+          .updateLibrarySidebarLayoutFrb(
+            placements: placements
+                .map(
+                  (LibrarySidebarPlacement placement) =>
+                      rust.LibrarySidebarPlacementDto(
+                        libraryId: placement.libraryId,
+                        pinned: placement.pinned,
+                        sidebarOrder: placement.sidebarOrder,
+                      ),
+                )
+                .toList(growable: false),
+          )
+          .map(_mapLibrary)
+          .toList(growable: false),
+      fallbackMessage: '更新漫画库顺序失败',
+    );
+  }
+
+  @override
   Future<String?> readRemotePassword(String libraryId) {
     return _credentials.readPassword(libraryId);
   }
@@ -209,6 +233,8 @@ LocalLibrary _mapLibrary(rust.LibraryDto dto) {
     allowHttp: dto.allowHttp,
     scanOnStartup: dto.scanOnStartup,
     scanInterval: _mapScanIntervalFromRust(dto.scanInterval),
+    pinned: dto.pinned,
+    sidebarOrder: dto.sidebarOrder,
   );
 }
 

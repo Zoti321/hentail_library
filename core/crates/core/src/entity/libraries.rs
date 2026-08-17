@@ -19,6 +19,10 @@ pub struct Model {
     pub scan_on_startup: i32,
     /// Scan interval enum string (e.g. `disabled`, `hourly`, `daily`).
     pub scan_interval: String,
+    /// 1 = Pinned library, 0 = Unpinned library.
+    pub pinned: i32,
+    /// Order within the pin group (Library sidebar order).
+    pub sidebar_order: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

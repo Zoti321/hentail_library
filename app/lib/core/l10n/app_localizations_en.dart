@@ -28,7 +28,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sidebarAddRemoteLibrary => 'Add remote library';
 
   @override
-  String get sidebarReorderLibrariesLater => 'Reorder (later)';
+  String get sidebarReorderLibraries => 'Reorder';
+
+  @override
+  String get sidebarExitReorder => 'Done reordering';
+
+  @override
+  String get sidebarPinnedSection => 'Pinned';
+
+  @override
+  String get sidebarUnpinnedSection => 'Unpinned';
+
+  @override
+  String get sidebarMoreLibraries => 'More';
 
   @override
   String get sidebarScanAllLibraries => 'Scan all libraries';

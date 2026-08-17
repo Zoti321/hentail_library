@@ -37,6 +37,8 @@ class _FakeCurrentLibraryNotifier extends CurrentLibraryNotifier {
     allowHttp: false,
     scanOnStartup: false,
     scanInterval: ScanInterval.disabled,
+    pinned: true,
+    sidebarOrder: 0,
   );
 
   static const LocalLibrary _libraryB = (
@@ -49,6 +51,8 @@ class _FakeCurrentLibraryNotifier extends CurrentLibraryNotifier {
     allowHttp: false,
     scanOnStartup: false,
     scanInterval: ScanInterval.disabled,
+    pinned: true,
+    sidebarOrder: 0,
   );
 
   @override

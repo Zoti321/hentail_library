@@ -166,6 +166,42 @@ void main() {
       expect(appShellScaffoldKey.currentState?.isDrawerOpen, isFalse);
     },
   );
+
+  testWidgets('unpinned libraries stay behind 更多 until expanded', (
+    WidgetTester tester,
+  ) async {
+    final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
+      libraries: <LocalLibrary>[
+        _lib('a', 'Alpha'),
+        _lib('b', 'Beta', pinned: false),
+      ],
+      currentId: 'a',
+    );
+    await _pumpLibrariesShell(tester, fake, (_) {});
+
+    expect(find.text('Alpha'), findsOneWidget);
+    expect(find.text('Beta'), findsNothing);
+    expect(find.text('更多'), findsOneWidget);
+
+    await tester.tap(find.text('更多'));
+    await tester.pump();
+
+    expect(find.text('Beta'), findsOneWidget);
+  });
+
+  testWidgets('更多 is hidden when every library is pinned', (
+    WidgetTester tester,
+  ) async {
+    final _FakeCurrentLibraryNotifier fake = _FakeCurrentLibraryNotifier(
+      libraries: <LocalLibrary>[_lib('a', 'Alpha'), _lib('b', 'Beta')],
+      currentId: 'a',
+    );
+    await _pumpLibrariesShell(tester, fake, (_) {});
+
+    expect(find.text('更多'), findsNothing);
+    expect(find.text('Alpha'), findsOneWidget);
+    expect(find.text('Beta'), findsOneWidget);
+  });
 }
 
 Finder _librariesRailIcon() {
@@ -174,7 +210,12 @@ Finder _librariesRailIcon() {
   );
 }
 
-LocalLibrary _lib(String id, String name) => (
+LocalLibrary _lib(
+  String id,
+  String name, {
+  bool pinned = true,
+  int sidebarOrder = 0,
+}) => (
   libraryId: id,
   kind: 'local',
   rootPath: 'C:\\libs\\$name',
@@ -184,6 +225,8 @@ LocalLibrary _lib(String id, String name) => (
   allowHttp: false,
   scanOnStartup: false,
   scanInterval: ScanInterval.disabled,
+  pinned: pinned,
+  sidebarOrder: sidebarOrder,
 );
 
 Future<void> _pumpLibrariesShell(

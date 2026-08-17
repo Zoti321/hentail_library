@@ -7,6 +7,7 @@ pub use remote_access::{
 };
 pub use webdav_root::{library_id_from_webdav_root, normalize_webdav_root};
 
+use std::collections::HashSet;
 use std::path::Path;
 
 use sea_orm::{
@@ -27,11 +28,8 @@ const PREF_CURRENT_LIBRARY_ID: &str = "current_library_id";
 const KIND_LOCAL: &str = "local";
 const KIND_REMOTE: &str = "remote";
 const DEFAULT_FORMAT_GROUPS: [FormatGroup; 4] = FormatGroup::ALL;
-const REMOTE_DEFAULT_FORMAT_GROUPS: [FormatGroup; 3] = [
-    FormatGroup::Pdf,
-    FormatGroup::Epub,
-    FormatGroup::Archive,
-];
+const REMOTE_DEFAULT_FORMAT_GROUPS: [FormatGroup; 3] =
+    [FormatGroup::Pdf, FormatGroup::Epub, FormatGroup::Archive];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ScanInterval {
@@ -86,6 +84,16 @@ pub struct LibraryDto {
     pub allow_http: bool,
     pub scan_on_startup: bool,
     pub scan_interval: ScanInterval,
+    pub pinned: bool,
+    pub sidebar_order: i32,
+}
+
+/// One Library's pin group and Library sidebar order.
+#[derive(Debug, Clone)]
+pub struct LibrarySidebarPlacement {
+    pub library_id: String,
+    pub pinned: bool,
+    pub sidebar_order: i32,
 }
 
 /// SHA1 of `library:` + normalize_path_for_key(root) — distinct from comic_id.
@@ -185,6 +193,8 @@ fn model_to_dto(model: libraries::Model) -> LibraryDto {
         allow_http: model.allow_http != 0,
         scan_on_startup: model.scan_on_startup != 0,
         scan_interval: scan_interval_from_stored(&model.scan_interval),
+        pinned: model.pinned != 0,
+        sidebar_order: model.sidebar_order,
     }
 }
 
@@ -199,11 +209,68 @@ fn resolve_library_name(explicit: Option<&str>, derived: String) -> String {
 pub async fn list_libraries() -> Result<Vec<LibraryDto>, HentaiError> {
     let db = connection()?;
     let rows = Libraries::find()
+        .order_by_desc(libraries::Column::Pinned)
+        .order_by_asc(libraries::Column::SidebarOrder)
         .order_by_asc(libraries::Column::RootPath)
         .all(&db)
         .await
         .map_err(map_db_err)?;
     Ok(rows.into_iter().map(model_to_dto).collect())
+}
+
+fn next_pinned_sidebar_order(libs: &[LibraryDto]) -> i32 {
+    libs.iter()
+        .filter(|lib| lib.pinned)
+        .map(|lib| lib.sidebar_order)
+        .max()
+        .map(|max| max + 1)
+        .unwrap_or(0)
+}
+
+/// Replace every Library's pin group and Library sidebar order.
+///
+/// [placements] must contain each existing Library exactly once.
+pub async fn update_library_sidebar_layout(
+    placements: Vec<LibrarySidebarPlacement>,
+) -> Result<Vec<LibraryDto>, HentaiError> {
+    let existing = list_libraries().await?;
+    let existing_ids: HashSet<&str> = existing.iter().map(|l| l.library_id.as_str()).collect();
+    let mut seen = HashSet::<String>::new();
+    for placement in &placements {
+        let id = placement.library_id.trim();
+        if id.is_empty() {
+            return Err(HentaiError::validation("library_id 不能为空"));
+        }
+        if !existing_ids.contains(id) {
+            return Err(HentaiError::validation(format!("Library 不存在: {id}")));
+        }
+        if !seen.insert(id.to_string()) {
+            return Err(HentaiError::validation("Library sidebar 布局含重复库"));
+        }
+    }
+    if seen.len() != existing.len() {
+        return Err(HentaiError::validation(
+            "Library sidebar 布局必须包含全部 Library",
+        ));
+    }
+
+    let db = connection()?;
+    let txn = db.begin().await.map_err(map_db_err)?;
+    for placement in &placements {
+        txn.execute(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            "UPDATE libraries SET pinned = ?, sidebar_order = ? WHERE library_id = ?",
+            [
+                sea_orm::Value::Int(Some(if placement.pinned { 1 } else { 0 })),
+                sea_orm::Value::Int(Some(placement.sidebar_order)),
+                sea_orm::Value::String(Some(Box::new(placement.library_id.trim().to_string()))),
+            ],
+        ))
+        .await
+        .map_err(map_db_err)?;
+    }
+    txn.commit().await.map_err(map_db_err)?;
+    list_libraries().await
 }
 
 pub async fn create_local_library(
@@ -237,6 +304,7 @@ pub async fn create_local_library(
     ensure_local_root_not_nested(root, None, &existing_libs)?;
 
     let count = existing_libs.len();
+    let sidebar_order = next_pinned_sidebar_order(&existing_libs);
     let dto = LibraryDto {
         library_id: library_id.clone(),
         kind: KIND_LOCAL.to_string(),
@@ -248,6 +316,8 @@ pub async fn create_local_library(
         allow_http: false,
         scan_on_startup: false,
         scan_interval: ScanInterval::Disabled,
+        pinned: true,
+        sidebar_order,
     };
     let active = libraries::ActiveModel {
         library_id: Set(dto.library_id.clone()),
@@ -260,6 +330,8 @@ pub async fn create_local_library(
         allow_http: Set(0),
         scan_on_startup: Set(0),
         scan_interval: Set(ScanInterval::Disabled.as_str().to_string()),
+        pinned: Set(1),
+        sidebar_order: Set(sidebar_order),
     };
     Libraries::insert(active)
         .exec(&db)
@@ -298,7 +370,9 @@ pub async fn create_remote_library(
         return update_existing_remote(existing, &root, &user, allow_http).await;
     }
 
-    let count = list_libraries().await?.len();
+    let existing_libs = list_libraries().await?;
+    let count = existing_libs.len();
+    let sidebar_order = next_pinned_sidebar_order(&existing_libs);
     let dto = LibraryDto {
         library_id: library_id.clone(),
         kind: KIND_REMOTE.to_string(),
@@ -310,6 +384,8 @@ pub async fn create_remote_library(
         allow_http,
         scan_on_startup: false,
         scan_interval: ScanInterval::Disabled,
+        pinned: true,
+        sidebar_order,
     };
     let active = libraries::ActiveModel {
         library_id: Set(dto.library_id.clone()),
@@ -322,6 +398,8 @@ pub async fn create_remote_library(
         allow_http: Set(if allow_http { 1 } else { 0 }),
         scan_on_startup: Set(0),
         scan_interval: Set(ScanInterval::Disabled.as_str().to_string()),
+        pinned: Set(1),
+        sidebar_order: Set(sidebar_order),
     };
     Libraries::insert(active)
         .exec(&db)
@@ -354,7 +432,9 @@ pub async fn update_remote_library(
         return Err(HentaiError::validation(format!("Library 不存在: {id}")));
     };
     if model.kind != KIND_REMOTE {
-        return Err(HentaiError::validation("仅 Remote library 可更新 WebDAV 根"));
+        return Err(HentaiError::validation(
+            "仅 Remote library 可更新 WebDAV 根",
+        ));
     }
 
     // Prevent colliding with another library's root_path.
@@ -395,7 +475,9 @@ pub async fn update_local_library_root(
         return Err(HentaiError::validation(format!("Library 不存在: {id}")));
     };
     if model.kind != KIND_LOCAL {
-        return Err(HentaiError::validation("仅 Local library 可更新本地 Library root"));
+        return Err(HentaiError::validation(
+            "仅 Local library 可更新本地 Library root",
+        ));
     }
 
     let existing_libs = list_libraries().await?;
@@ -446,7 +528,9 @@ async fn update_existing_remote(
     allow_http: bool,
 ) -> Result<LibraryDto, HentaiError> {
     if model.kind != KIND_REMOTE {
-        return Err(HentaiError::validation("仅 Remote library 可更新 WebDAV 根"));
+        return Err(HentaiError::validation(
+            "仅 Remote library 可更新 WebDAV 根",
+        ));
     }
     let db = connection()?;
     let mut active: libraries::ActiveModel = model.into();
@@ -515,9 +599,7 @@ pub async fn set_current_library_id(library_id: Option<&str>) -> Result<(), Hent
             .map_err(map_db_err)?
             .is_some();
         if !exists {
-            return Err(HentaiError::validation(format!(
-                "Library 不存在: {id}"
-            )));
+            return Err(HentaiError::validation(format!("Library 不存在: {id}")));
         }
         set_current_library_id_inner(&db, Some(id)).await?;
     } else {
@@ -666,7 +748,9 @@ async fn load_comic_ids_for_library<C: ConnectionTrait>(
         .query_all(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
             "SELECT comic_id FROM comics WHERE library_id = ?",
-            [sea_orm::Value::String(Some(Box::new(library_id.to_string())))],
+            [sea_orm::Value::String(Some(Box::new(
+                library_id.to_string(),
+            )))],
         ))
         .await
         .map_err(map_db_err)?;

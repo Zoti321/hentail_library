@@ -15,6 +15,8 @@ LocalLibrary _lib({required String kind}) {
     allowHttp: false,
     scanOnStartup: false,
     scanInterval: ScanInterval.disabled,
+    pinned: true,
+    sidebarOrder: 0,
   );
 }
 

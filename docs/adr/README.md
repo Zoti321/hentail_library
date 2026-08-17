@@ -61,3 +61,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0006](./0006-series-item-sort-order-lock.md) | Series item sort order lock（Komga 式手动排序） | Accepted |
 | [0007](./0007-metadata-field-locks.md) | Comic / Series metadata field locks（Komga 式） | Accepted |
 | [0008](./0008-multi-library-and-webdav.md) | 多 Library 与 WebDAV Remote library | Accepted |
+| [0009](./0009-library-sidebar-pin-and-order.md) | Library pin 与 sidebar order 落在 libraries 表 | Accepted |

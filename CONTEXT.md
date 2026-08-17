@@ -76,6 +76,22 @@ _Avoid_: 自动扫描（易与全局旧设置或间隔扫混淆）、autoScan（
 某 Library 的周期自动 Library sync 档位：`disabled`、`hourly`、`every_6_hours`、`every_12_hours`、`daily`、`weekly`。按库独立计时；锚点为应用本次启动或该库本档被改为非 `disabled` 之时；到期对该库做 incremental Library sync。应用未运行时不调度。
 _Avoid_: 自动扫描间隔（口语可用）、cron、全局扫描周期
 
+**Pinned library**:
+用户选择在侧栏 Libraries 分区直接列出的 Library；Library 列表的全局顺序中 Pinned 一组排在 Unpinned 之前。新建 Library 默认为 Pinned，并排在已固定组末尾。详见 ADR-0009。
+_Avoid_: 置顶库、收藏库、固定库（易与 sticky header 的 pinned 混淆）；文档用 Pinned library，UI 文案可用「已固定」
+
+**Unpinned library**:
+用户选择不在侧栏直接列出的 Library；平时藏在「更多」展开后渲染，未固定组为空时不显示「更多」。排序模式里出现在「未固定」段。
+_Avoid_: 隐藏库、折叠库、次要库
+
+**Library sidebar order**:
+Pinned 组内与 Unpinned 组内各自的用户顺序；与 Series 成员的 `order` / `sortOrderLocked` 无关。`list_libraries` 按「Pinned 再 Unpinned、组内按该顺序」返回。
+_Avoid_: 库排序（太泛）、sortOrder（Series 用语）
+
+**Library reorder mode**:
+侧栏的短暂状态：整栏换成「重新排序」顶栏与已固定/未固定两段，靠跨段拖拽同时改 Pinned/Unpinned 与 Library sidebar order；退出后恢复普通侧栏。不是 Library 上的持久字段。
+_Avoid_: 编辑模式、排序页、固定开关（pin 只能在此模式用拖拽改，没有单独菜单项）
+
 ### Organization & metadata
 
 **Series**:

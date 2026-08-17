@@ -5,6 +5,7 @@ import 'package:hentai_library/ui/core/dto/nav_item_data.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/app_navigation.dart';
+import 'package:hentai_library/ui/features/shell/state/library_reorder_mode.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -46,6 +47,12 @@ class DesktopSidebar extends HookConsumerWidget {
   final ValueChanged<String> onDestinationSelected;
   final DesktopSidebarLibrariesSectionBuilder? librariesSectionBuilder;
 
+  /// When non-null and reorder mode is on, replaces main nav + system items.
+  final WidgetBuilder? librariesReorderPaneBuilder;
+
+  /// Compact / collapsed rail cannot enter Library reorder mode.
+  final bool allowLibraryReorder;
+
   const DesktopSidebar({
     super.key,
     required this.activeId,
@@ -55,6 +62,8 @@ class DesktopSidebar extends HookConsumerWidget {
     required this.onToggleExpanded,
     required this.onDestinationSelected,
     this.librariesSectionBuilder,
+    this.librariesReorderPaneBuilder,
+    this.allowLibraryReorder = true,
   });
 
   @override
@@ -80,7 +89,17 @@ class DesktopSidebar extends HookConsumerWidget {
       return null;
     }, <Object?>[isExpanded]);
 
+    useEffect(() {
+      if (!isExpanded || !allowLibraryReorder) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ref.read(libraryReorderModeProvider.notifier).exit();
+        });
+      }
+      return null;
+    }, <Object?>[isExpanded, allowLibraryReorder]);
+
     final l10n = context.l10n;
+    final bool reorderMode = ref.watch(libraryReorderModeProvider);
     final List<NavItemData> menuItems = AppNavigation.desktopMainNavItems(l10n);
     final List<NavItemData> systemItems = AppNavigation.desktopSystemNavItems(
       l10n,
@@ -172,21 +191,22 @@ class DesktopSidebar extends HookConsumerWidget {
                 SizedBox(height: tokens.spacing.lg),
               ],
               Expanded(
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: mainNav,
-                ),
+                child: reorderMode
+                    ? (librariesReorderPaneBuilder?.call(context) ??
+                          const SizedBox.shrink())
+                    : ListView(padding: EdgeInsets.zero, children: mainNav),
               ),
-              ...systemItems.map(
-                (NavItemData item) => _SidebarButton(
-                  item: item,
-                  isActive: activeId == item.id,
-                  expandProgress: curvedT,
-                  labelOpacity: labelOpacity,
-                  showCollapsedTooltip: showCollapsedTooltip,
-                  onTap: () => onDestinationSelected(item.id),
+              if (!reorderMode)
+                ...systemItems.map(
+                  (NavItemData item) => _SidebarButton(
+                    item: item,
+                    isActive: activeId == item.id,
+                    expandProgress: curvedT,
+                    labelOpacity: labelOpacity,
+                    showCollapsedTooltip: showCollapsedTooltip,
+                    onTap: () => onDestinationSelected(item.id),
+                  ),
                 ),
-              ),
             ],
           ),
         );

@@ -5,9 +5,11 @@ use hentai_core::{
     set_current_library_id as core_set_current,
     update_library_format_groups as core_update_formats,
     update_library_settings as core_update_settings,
+    update_library_sidebar_layout as core_update_sidebar,
     update_local_library_root as core_update_local_root,
     update_remote_library as core_update_remote, FormatGroup as CoreFormatGroup,
-    LibraryDto as CoreLibrary, ScanInterval as CoreScanInterval,
+    LibraryDto as CoreLibrary, LibrarySidebarPlacement as CoreSidebarPlacement,
+    ScanInterval as CoreScanInterval,
 };
 
 use super::init::HentaiErrorDto;
@@ -35,6 +37,8 @@ pub struct LibraryDto {
     pub allow_http: bool,
     pub scan_on_startup: bool,
     pub scan_interval: ScanIntervalDto,
+    pub pinned: bool,
+    pub sidebar_order: i32,
 }
 
 impl From<CoreLibrary> for LibraryDto {
@@ -54,8 +58,17 @@ impl From<CoreLibrary> for LibraryDto {
             allow_http: value.allow_http,
             scan_on_startup: value.scan_on_startup,
             scan_interval: map_scan_interval(value.scan_interval),
+            pinned: value.pinned,
+            sidebar_order: value.sidebar_order,
         }
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct LibrarySidebarPlacementDto {
+    pub library_id: String,
+    pub pinned: bool,
+    pub sidebar_order: i32,
 }
 
 fn map_format_group(group: CoreFormatGroup) -> FormatGroupDto {
@@ -209,5 +222,22 @@ pub fn update_library_settings_frb(
 #[flutter_rust_bridge::frb(sync)]
 pub fn set_all_libraries_scan_on_startup_frb(enabled: bool) -> Result<(), HentaiErrorDto> {
     hentai_core::runtime::block_on(core_set_all_scan_on_startup(enabled))
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn update_library_sidebar_layout_frb(
+    placements: Vec<LibrarySidebarPlacementDto>,
+) -> Result<Vec<LibraryDto>, HentaiErrorDto> {
+    let core_placements = placements
+        .into_iter()
+        .map(|p| CoreSidebarPlacement {
+            library_id: p.library_id,
+            pinned: p.pinned,
+            sidebar_order: p.sidebar_order,
+        })
+        .collect();
+    hentai_core::runtime::block_on(core_update_sidebar(core_placements))
+        .map(|rows| rows.into_iter().map(LibraryDto::from).collect())
         .map_err(HentaiErrorDto::from)
 }

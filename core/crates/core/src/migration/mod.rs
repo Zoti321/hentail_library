@@ -15,6 +15,7 @@ mod m20260805_000013_title_name_sort_keys;
 mod m20260812_000014_multi_local_libraries;
 mod m20260812_000015_remote_library_fields;
 mod m20260815_000016_library_scan_settings;
+mod m20260817_000017_library_sidebar_pin_order;
 
 pub struct Migrator;
 
@@ -37,6 +38,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260812_000014_multi_local_libraries::Migration),
             Box::new(m20260812_000015_remote_library_fields::Migration),
             Box::new(m20260815_000016_library_scan_settings::Migration),
+            Box::new(m20260817_000017_library_sidebar_pin_order::Migration),
         ]
     }
 }

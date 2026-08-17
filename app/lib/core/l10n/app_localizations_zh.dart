@@ -27,7 +27,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sidebarAddRemoteLibrary => '添加远程库';
 
   @override
-  String get sidebarReorderLibrariesLater => '重新排序（后续）';
+  String get sidebarReorderLibraries => '重新排序';
+
+  @override
+  String get sidebarExitReorder => '退出排序';
+
+  @override
+  String get sidebarPinnedSection => '已固定';
+
+  @override
+  String get sidebarUnpinnedSection => '未固定';
+
+  @override
+  String get sidebarMoreLibraries => '更多';
 
   @override
   String get sidebarScanAllLibraries => '扫描所有库';

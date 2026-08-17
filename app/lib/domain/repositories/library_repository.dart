@@ -1,4 +1,5 @@
 import 'package:hentai_library/domain/library/format_group.dart';
+import 'package:hentai_library/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/domain/library/scan_interval.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 
@@ -51,6 +52,11 @@ abstract class LibraryRepository {
 
   /// Legacy `autoScan: true` → all libraries Scan on startup.
   Future<void> setAllScanOnStartup(bool enabled);
+
+  /// Replace every Library's pin group and Library sidebar order.
+  Future<List<LocalLibrary>> updateSidebarLayout(
+    List<LibrarySidebarPlacement> placements,
+  );
 
   /// 供后续 Remote sync / read 注入 core；登记阶段仅保证可读写。
   Future<String?> readRemotePassword(String libraryId);

@@ -46,6 +46,8 @@ LocalLibrary _lib({
   allowHttp: false,
   scanOnStartup: false,
   scanInterval: ScanInterval.disabled,
+  pinned: true,
+  sidebarOrder: 0,
 );
 
 void main() {

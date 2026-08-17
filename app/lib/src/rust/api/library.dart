@@ -9,7 +9,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'sync.dart';
 
 // These functions are ignored because they are not marked as `pub`: `map_format_group_core`, `map_format_group`, `map_scan_interval_core`, `map_scan_interval`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `from`
 
 List<LibraryDto> listLibrariesFrb() =>
     RustLib.instance.api.crateApiLibraryListLibrariesFrb();
@@ -88,6 +88,12 @@ void setAllLibrariesScanOnStartupFrb({required bool enabled}) => RustLib
     .api
     .crateApiLibrarySetAllLibrariesScanOnStartupFrb(enabled: enabled);
 
+List<LibraryDto> updateLibrarySidebarLayoutFrb({
+  required List<LibrarySidebarPlacementDto> placements,
+}) => RustLib.instance.api.crateApiLibraryUpdateLibrarySidebarLayoutFrb(
+  placements: placements,
+);
+
 class LibraryDto {
   final String libraryId;
   final String kind;
@@ -99,6 +105,8 @@ class LibraryDto {
   final bool allowHttp;
   final bool scanOnStartup;
   final ScanIntervalDto scanInterval;
+  final bool pinned;
+  final int sidebarOrder;
 
   const LibraryDto({
     required this.libraryId,
@@ -111,6 +119,8 @@ class LibraryDto {
     required this.allowHttp,
     required this.scanOnStartup,
     required this.scanInterval,
+    required this.pinned,
+    required this.sidebarOrder,
   });
 
   @override
@@ -124,7 +134,9 @@ class LibraryDto {
       username.hashCode ^
       allowHttp.hashCode ^
       scanOnStartup.hashCode ^
-      scanInterval.hashCode;
+      scanInterval.hashCode ^
+      pinned.hashCode ^
+      sidebarOrder.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -140,7 +152,34 @@ class LibraryDto {
           username == other.username &&
           allowHttp == other.allowHttp &&
           scanOnStartup == other.scanOnStartup &&
-          scanInterval == other.scanInterval;
+          scanInterval == other.scanInterval &&
+          pinned == other.pinned &&
+          sidebarOrder == other.sidebarOrder;
+}
+
+class LibrarySidebarPlacementDto {
+  final String libraryId;
+  final bool pinned;
+  final int sidebarOrder;
+
+  const LibrarySidebarPlacementDto({
+    required this.libraryId,
+    required this.pinned,
+    required this.sidebarOrder,
+  });
+
+  @override
+  int get hashCode =>
+      libraryId.hashCode ^ pinned.hashCode ^ sidebarOrder.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LibrarySidebarPlacementDto &&
+          runtimeType == other.runtimeType &&
+          libraryId == other.libraryId &&
+          pinned == other.pinned &&
+          sidebarOrder == other.sidebarOrder;
 }
 
 enum ScanIntervalDto {
