@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/data/adapters/frb_error_mapper.dart';
@@ -70,40 +69,16 @@ class TagDictionaryImportController extends _$TagDictionaryImportController {
       return _fail(
         error,
         stackTrace,
-        fallback: '下载 EhTagTranslation 标签库失败，可尝试从本地文件导入',
+        fallback: '下载 EhTagTranslation 标签库失败',
       );
     } catch (error, stackTrace) {
       return _fail(
         error,
         stackTrace,
-        fallback: '下载 EhTagTranslation 标签库失败，可尝试从本地文件导入',
+        fallback: '下载 EhTagTranslation 标签库失败',
       );
     } finally {
       _cancelToken = null;
-    }
-  }
-
-  Future<TagDictionaryImportResult?> importFromLocalFile() async {
-    if (state.running) {
-      return null;
-    }
-    final FilePickerResult? picked = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: <String>['json'],
-    );
-    final String? path = picked?.files.single.path;
-    if (path == null || path.isEmpty) {
-      return null;
-    }
-
-    state = state.copyWith(running: true, clearError: true, clearResult: true);
-    try {
-      final Uint8List bytes = await ref
-          .read(ehTagDictionaryImportServiceProvider)
-          .readLocalFile(path);
-      return await _importBytes(bytes);
-    } catch (error, stackTrace) {
-      return _fail(error, stackTrace, fallback: '导入本地 db.text.json 失败');
     }
   }
 

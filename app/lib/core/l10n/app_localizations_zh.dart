@@ -1239,19 +1239,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataSearchNoMatchHint => '试试其他关键词，或清空搜索';
 
   @override
-  String get metadataImportEhTagFromNetwork => '从网络导入最新';
+  String get metadataImportEhTagFromEhentai => '从EHentai导入标签';
 
   @override
-  String get metadataImportEhTagFromLocalFile => '从本地文件导入';
+  String get metadataDeleteAllTags => '删除所有';
+
+  @override
+  String get metadataTagsDeletedAllToast => '已删除全部标签';
 
   @override
   String get metadataImportEhTagDialogTitle => '导入 EhTagTranslation 标签';
 
   @override
   String get metadataImportEhTagDialogBody => '正在下载 db.text.json 并写入标签字典…';
-
-  @override
-  String get metadataImportEhTagLocalBusyBody => '正在读取本地 db.text.json 并写入标签字典…';
 
   @override
   String metadataImportEhTagSummary(

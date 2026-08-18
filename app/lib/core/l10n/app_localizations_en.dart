@@ -1268,10 +1268,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Try another keyword, or clear the search';
 
   @override
-  String get metadataImportEhTagFromNetwork => 'Import latest from network';
+  String get metadataImportEhTagFromEhentai => 'Import tags from E-Hentai';
 
   @override
-  String get metadataImportEhTagFromLocalFile => 'Import from local file';
+  String get metadataDeleteAllTags => 'Delete all';
+
+  @override
+  String get metadataTagsDeletedAllToast => 'All tags deleted';
 
   @override
   String get metadataImportEhTagDialogTitle => 'Import EhTagTranslation tags';
@@ -1279,10 +1282,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get metadataImportEhTagDialogBody =>
       'Downloading db.text.json and updating the tag dictionary…';
-
-  @override
-  String get metadataImportEhTagLocalBusyBody =>
-      'Reading local db.text.json and updating the tag dictionary…';
 
   @override
   String metadataImportEhTagSummary(

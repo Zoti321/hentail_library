@@ -2324,17 +2324,23 @@ abstract class AppLocalizations {
   /// **'试试其他关键词，或清空搜索'**
   String get metadataSearchNoMatchHint;
 
-  /// No description provided for @metadataImportEhTagFromNetwork.
+  /// No description provided for @metadataImportEhTagFromEhentai.
   ///
   /// In zh, this message translates to:
-  /// **'从网络导入最新'**
-  String get metadataImportEhTagFromNetwork;
+  /// **'从EHentai导入标签'**
+  String get metadataImportEhTagFromEhentai;
 
-  /// No description provided for @metadataImportEhTagFromLocalFile.
+  /// No description provided for @metadataDeleteAllTags.
   ///
   /// In zh, this message translates to:
-  /// **'从本地文件导入'**
-  String get metadataImportEhTagFromLocalFile;
+  /// **'删除所有'**
+  String get metadataDeleteAllTags;
+
+  /// No description provided for @metadataTagsDeletedAllToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已删除全部标签'**
+  String get metadataTagsDeletedAllToast;
 
   /// No description provided for @metadataImportEhTagDialogTitle.
   ///
@@ -2347,12 +2353,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'正在下载 db.text.json 并写入标签字典…'**
   String get metadataImportEhTagDialogBody;
-
-  /// No description provided for @metadataImportEhTagLocalBusyBody.
-  ///
-  /// In zh, this message translates to:
-  /// **'正在读取本地 db.text.json 并写入标签字典…'**
-  String get metadataImportEhTagLocalBusyBody;
 
   /// No description provided for @metadataImportEhTagSummary.
   ///

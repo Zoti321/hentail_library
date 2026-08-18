@@ -1,22 +1,25 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/features/metadata/state/tag_dictionary_import_controller.dart';
+import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class MetadataTagsOverflowMenuButton extends ConsumerStatefulWidget {
   const MetadataTagsOverflowMenuButton({
-    required this.onImportFromNetwork,
-    required this.onImportFromLocalFile,
+    required this.onImportFromEhentai,
+    required this.onDeleteAllTags,
     super.key,
   });
 
-  final VoidCallback onImportFromNetwork;
-  final VoidCallback onImportFromLocalFile;
+  final VoidCallback onImportFromEhentai;
+  final VoidCallback onDeleteAllTags;
 
   @override
   ConsumerState<MetadataTagsOverflowMenuButton> createState() =>
@@ -32,6 +35,10 @@ class _MetadataTagsOverflowMenuButtonState
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
     final bool running = ref.watch(tagDictionaryImportControllerProvider).running;
+    final int tagCount = ref.watch(allTagsProvider).maybeWhen(
+      data: (List<Tag> tags) => tags.length,
+      orElse: () => 0,
+    );
     final l10n = context.l10n;
 
     return Padding(
@@ -43,18 +50,18 @@ class _MetadataTagsOverflowMenuButtonState
         showArrow: false,
         verticalMargin: -32,
         menuBuilder: () => _MetadataTagsOverflowMenu(
-          onImportFromNetwork: running
+          onImportFromEhentai: running
               ? null
               : () {
                   _controller.hideMenu();
-                  widget.onImportFromNetwork();
+                  widget.onImportFromEhentai();
                 },
-          onImportFromLocalFile: running
-              ? null
-              : () {
+          onDeleteAllTags: !running && tagCount > 0
+              ? () {
                   _controller.hideMenu();
-                  widget.onImportFromLocalFile();
-                },
+                  widget.onDeleteAllTags();
+                }
+              : null,
         ),
         child: GhostButton.icon(
           icon: LucideIcons.ellipsisVertical,
@@ -75,37 +82,38 @@ class _MetadataTagsOverflowMenuButtonState
 
 class _MetadataTagsOverflowMenu extends StatelessWidget {
   const _MetadataTagsOverflowMenu({
-    required this.onImportFromNetwork,
-    required this.onImportFromLocalFile,
+    required this.onImportFromEhentai,
+    required this.onDeleteAllTags,
   });
 
-  final VoidCallback? onImportFromNetwork;
-  final VoidCallback? onImportFromLocalFile;
+  final VoidCallback? onImportFromEhentai;
+  final VoidCallback? onDeleteAllTags;
 
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
     return PopupMenuPanelShell(
-      width: 240,
+      maxWidth: 240,
       blurRadius: 6,
       shadowOffset: const Offset(0, 4),
       borderRadius: tokens.radius.xs,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
+        padding: EdgeInsets.symmetric(vertical: tokens.spacing.xs + 2),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            _MetadataTagsOverflowMenuItem(
-              icon: LucideIcons.cloudDownload,
-              label: l10n.metadataImportEhTagFromNetwork,
-              onTap: onImportFromNetwork,
+            _MetadataTagsPopupMenuItem(
+              label: l10n.metadataImportEhTagFromEhentai,
+              enabled: onImportFromEhentai != null,
+              onTap: onImportFromEhentai,
             ),
-            _MetadataTagsOverflowMenuItem(
-              icon: LucideIcons.file,
-              label: l10n.metadataImportEhTagFromLocalFile,
-              onTap: onImportFromLocalFile,
+            _MetadataTagsPopupMenuItem(
+              label: l10n.metadataDeleteAllTags,
+              enabled: onDeleteAllTags != null,
+              isDestructive: true,
+              onTap: onDeleteAllTags,
             ),
           ],
         ),
@@ -114,45 +122,73 @@ class _MetadataTagsOverflowMenu extends StatelessWidget {
   }
 }
 
-class _MetadataTagsOverflowMenuItem extends StatelessWidget {
-  const _MetadataTagsOverflowMenuItem({
-    required this.icon,
+class _MetadataTagsPopupMenuItem extends HookWidget {
+  const _MetadataTagsPopupMenuItem({
     required this.label,
-    required this.onTap,
+    required this.enabled,
+    this.isDestructive = false,
+    this.onTap,
   });
 
-  final IconData icon;
   final String label;
+  final bool enabled;
+  final bool isDestructive;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final bool enabled = onTap != null;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          child: Row(
-            children: <Widget>[
-              Icon(
-                icon,
-                size: 16,
-                color: enabled ? cs.hentai.iconDefault : cs.outline,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: enabled ? cs.hentai.textPrimary : cs.outline,
-                  ),
-                ),
-              ),
-            ],
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final HentaiColorScheme h = cs.hentai;
+    final ValueNotifier<bool> hovered = useState(false);
+
+    final Color idleBackground = cs.surface;
+    final Color dangerHover = Color.lerp(
+      idleBackground,
+      h.contextMenuDanger,
+      0.2,
+    )!;
+
+    final Color background;
+    final Color foreground;
+    if (!enabled) {
+      background = idleBackground;
+      foreground = h.textTertiary;
+    } else if (hovered.value) {
+      background = isDestructive ? dangerHover : h.contextMenuHover;
+      foreground = isDestructive ? h.contextMenuDanger : h.textPrimary;
+    } else {
+      background = idleBackground;
+      foreground = h.textPrimary;
+    }
+
+    final TextStyle labelStyle =
+        (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
+          fontSize: tokens.text.bodySm,
+          color: foreground,
+        );
+
+    return MouseRegion(
+      onEnter: enabled ? (_) => hovered.value = true : null,
+      onExit: enabled ? (_) => hovered.value = false : null,
+      cursor: enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: GestureDetector(
+        onTap: enabled ? onTap : null,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOut,
+          color: background,
+          padding: EdgeInsets.symmetric(
+            horizontal: tokens.spacing.md,
+            vertical: tokens.spacing.sm,
+          ),
+          child: AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 120),
+            curve: Curves.easeOut,
+            style: labelStyle,
+            child: Text(label, textAlign: TextAlign.start),
           ),
         ),
       ),
