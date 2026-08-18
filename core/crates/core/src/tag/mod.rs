@@ -1,3 +1,5 @@
+mod ehtag_import;
+
 use sea_orm::{
     ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder, QuerySelect, Set,
     TransactionTrait,
@@ -109,3 +111,5 @@ pub async fn watch_tags(mut emit: impl FnMut(Vec<String>) -> Result<(), HentaiEr
         }
     }
 }
+
+pub use ehtag_import::{import_ehtag_dictionary, TagDictionaryImportResult};

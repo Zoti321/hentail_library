@@ -583,6 +583,19 @@
   "metadataAuthorsNoMatchTitle": "No matching authors",
   "metadataTagsNoMatchTitle": "No matching tags",
   "metadataSearchNoMatchHint": "Try another keyword, or clear the search",
+  "metadataImportEhTagFromNetwork": "Import latest from network",
+  "metadataImportEhTagFromLocalFile": "Import from local file",
+  "metadataImportEhTagDialogTitle": "Import EhTagTranslation tags",
+  "metadataImportEhTagDialogBody": "Downloading db.text.json and updating the tag dictionary…",
+  "metadataImportEhTagLocalBusyBody": "Reading local db.text.json and updating the tag dictionary…",
+  "metadataImportEhTagSummary": "Added {added}, skipped existing {skippedExisting}, skipped filtered/empty/deduped {skippedFiltered}",
+  "@metadataImportEhTagSummary": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "skippedExisting": {"type": "int"},
+      "skippedFiltered": {"type": "int"}
+    }
+  },
   "commonCancel": "Cancel",
   "commonSave": "Save",
   "commonSaveChanges": "Save changes",

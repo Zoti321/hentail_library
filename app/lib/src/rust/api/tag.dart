@@ -8,7 +8,13 @@ import 'comic.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`
+
+TagDictionaryImportResultDto importEhtagDictionaryFrb({
+  required List<int> jsonBytes,
+}) => RustLib.instance.api.crateApiTagImportEhtagDictionaryFrb(
+  jsonBytes: jsonBytes,
+);
 
 List<String> listAllTagsFrb() =>
     RustLib.instance.api.crateApiTagListAllTagsFrb();
@@ -29,6 +35,34 @@ void renameTagFrb({required String oldName, required String newName}) => RustLib
 
 Stream<List<String>> watchTagsFrb() =>
     RustLib.instance.api.crateApiTagWatchTagsFrb();
+
+class TagDictionaryImportResultDto {
+  final int added;
+  final int skippedExisting;
+  final int skippedFilteredOrEmptyOrDedupe;
+
+  const TagDictionaryImportResultDto({
+    required this.added,
+    required this.skippedExisting,
+    required this.skippedFilteredOrEmptyOrDedupe,
+  });
+
+  @override
+  int get hashCode =>
+      added.hashCode ^
+      skippedExisting.hashCode ^
+      skippedFilteredOrEmptyOrDedupe.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TagDictionaryImportResultDto &&
+          runtimeType == other.runtimeType &&
+          added == other.added &&
+          skippedExisting == other.skippedExisting &&
+          skippedFilteredOrEmptyOrDedupe ==
+              other.skippedFilteredOrEmptyOrDedupe;
+}
 
 class TagPagedNamesDto {
   final List<String> items;

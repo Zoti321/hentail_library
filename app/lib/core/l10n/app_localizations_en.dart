@@ -1268,6 +1268,32 @@ class AppLocalizationsEn extends AppLocalizations {
       'Try another keyword, or clear the search';
 
   @override
+  String get metadataImportEhTagFromNetwork => 'Import latest from network';
+
+  @override
+  String get metadataImportEhTagFromLocalFile => 'Import from local file';
+
+  @override
+  String get metadataImportEhTagDialogTitle => 'Import EhTagTranslation tags';
+
+  @override
+  String get metadataImportEhTagDialogBody =>
+      'Downloading db.text.json and updating the tag dictionary…';
+
+  @override
+  String get metadataImportEhTagLocalBusyBody =>
+      'Reading local db.text.json and updating the tag dictionary…';
+
+  @override
+  String metadataImportEhTagSummary(
+    int added,
+    int skippedExisting,
+    int skippedFiltered,
+  ) {
+    return 'Added $added, skipped existing $skippedExisting, skipped filtered/empty/deduped $skippedFiltered';
+  }
+
+  @override
   String get commonCancel => 'Cancel';
 
   @override

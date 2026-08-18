@@ -10,6 +10,7 @@ import 'package:hentai_library/ui/core/widgets/element/chip/count_digit_chip.dar
 import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_tags_overflow_menu.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 TextStyle metadataPageTitleStyle(
@@ -32,6 +33,8 @@ class MetadataPageHeaderSection extends StatelessWidget {
     required this.selectedTabIndex,
     required this.onTabSelected,
     required this.onAdd,
+    this.onImportTagsFromNetwork,
+    this.onImportTagsFromLocalFile,
     this.onOpenNavigation,
     super.key,
   });
@@ -42,6 +45,8 @@ class MetadataPageHeaderSection extends StatelessWidget {
   final int selectedTabIndex;
   final ValueChanged<int> onTabSelected;
   final VoidCallback onAdd;
+  final VoidCallback? onImportTagsFromNetwork;
+  final VoidCallback? onImportTagsFromLocalFile;
   final VoidCallback? onOpenNavigation;
 
   @override
@@ -58,6 +63,8 @@ class MetadataPageHeaderSection extends StatelessWidget {
           selectedTabIndex: selectedTabIndex,
           onTabSelected: onTabSelected,
           onAdd: onAdd,
+          onImportTagsFromNetwork: onImportTagsFromNetwork,
+          onImportTagsFromLocalFile: onImportTagsFromLocalFile,
           onOpenNavigation: onOpenNavigation,
         ),
       ),
@@ -71,6 +78,8 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
     required this.selectedTabIndex,
     required this.onTabSelected,
     required this.onAdd,
+    this.onImportTagsFromNetwork,
+    this.onImportTagsFromLocalFile,
     this.onOpenNavigation,
     super.key,
   });
@@ -79,6 +88,8 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
   final int selectedTabIndex;
   final ValueChanged<int> onTabSelected;
   final VoidCallback onAdd;
+  final VoidCallback? onImportTagsFromNetwork;
+  final VoidCallback? onImportTagsFromLocalFile;
   final VoidCallback? onOpenNavigation;
 
   @override
@@ -131,6 +142,13 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
                   ),
                 ),
               ),
+              if (selectedTabIndex == 1 &&
+                  onImportTagsFromNetwork != null &&
+                  onImportTagsFromLocalFile != null)
+                MetadataTagsOverflowMenuButton(
+                  onImportFromNetwork: onImportTagsFromNetwork!,
+                  onImportFromLocalFile: onImportTagsFromLocalFile!,
+                ),
               GhostButton.icon(
                 icon: LucideIcons.plus,
                 tooltip: addTooltip,

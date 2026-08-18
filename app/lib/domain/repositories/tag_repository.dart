@@ -1,4 +1,5 @@
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/domain/models/tag_dictionary_import_result.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 
@@ -13,4 +14,6 @@ abstract class TagRepository {
   Future<void> deleteByNames(List<String> names);
 
   Future<void> rename(String oldName, String newName);
+
+  Future<TagDictionaryImportResult> importEhTagDictionary(List<int> jsonBytes);
 }

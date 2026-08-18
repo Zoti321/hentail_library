@@ -2324,6 +2324,46 @@ abstract class AppLocalizations {
   /// **'试试其他关键词，或清空搜索'**
   String get metadataSearchNoMatchHint;
 
+  /// No description provided for @metadataImportEhTagFromNetwork.
+  ///
+  /// In zh, this message translates to:
+  /// **'从网络导入最新'**
+  String get metadataImportEhTagFromNetwork;
+
+  /// No description provided for @metadataImportEhTagFromLocalFile.
+  ///
+  /// In zh, this message translates to:
+  /// **'从本地文件导入'**
+  String get metadataImportEhTagFromLocalFile;
+
+  /// No description provided for @metadataImportEhTagDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入 EhTagTranslation 标签'**
+  String get metadataImportEhTagDialogTitle;
+
+  /// No description provided for @metadataImportEhTagDialogBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在下载 db.text.json 并写入标签字典…'**
+  String get metadataImportEhTagDialogBody;
+
+  /// No description provided for @metadataImportEhTagLocalBusyBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在读取本地 db.text.json 并写入标签字典…'**
+  String get metadataImportEhTagLocalBusyBody;
+
+  /// No description provided for @metadataImportEhTagSummary.
+  ///
+  /// In zh, this message translates to:
+  /// **'新增 {added} 条，已存在跳过 {skippedExisting} 条，过滤/空译/去重跳过 {skippedFiltered} 条'**
+  String metadataImportEhTagSummary(
+    int added,
+    int skippedExisting,
+    int skippedFiltered,
+  );
+
   /// No description provided for @commonCancel.
   ///
   /// In zh, this message translates to:

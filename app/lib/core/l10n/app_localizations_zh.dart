@@ -1239,6 +1239,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataSearchNoMatchHint => '试试其他关键词，或清空搜索';
 
   @override
+  String get metadataImportEhTagFromNetwork => '从网络导入最新';
+
+  @override
+  String get metadataImportEhTagFromLocalFile => '从本地文件导入';
+
+  @override
+  String get metadataImportEhTagDialogTitle => '导入 EhTagTranslation 标签';
+
+  @override
+  String get metadataImportEhTagDialogBody => '正在下载 db.text.json 并写入标签字典…';
+
+  @override
+  String get metadataImportEhTagLocalBusyBody => '正在读取本地 db.text.json 并写入标签字典…';
+
+  @override
+  String metadataImportEhTagSummary(
+    int added,
+    int skippedExisting,
+    int skippedFiltered,
+  ) {
+    return '新增 $added 条，已存在跳过 $skippedExisting 条，过滤/空译/去重跳过 $skippedFiltered 条';
+  }
+
+  @override
   String get commonCancel => '取消';
 
   @override

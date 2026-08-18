@@ -15,6 +15,11 @@ import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/tag_management_panel.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
+import 'package:hentai_library/ui/features/metadata/state/tag_dictionary_import_controller.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/tag_dictionary_import_busy_dialog.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/tag_dictionary_import_dialog.dart';
+import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/domain/models/tag_dictionary_import_result.dart';
 
 class MetadataManagementPage extends ConsumerStatefulWidget {
   const MetadataManagementPage({super.key});
@@ -145,6 +150,12 @@ class _MetadataManagementPageState
       selectedTabIndex: selectedIndex,
       onTabSelected: _handleTabSelected,
       onAdd: () => _invokeAddForTab(context, selectedIndex),
+      onImportTagsFromNetwork: selectedIndex == 1
+          ? () => _importTagsFromNetwork(context)
+          : null,
+      onImportTagsFromLocalFile: selectedIndex == 1
+          ? () => _importTagsFromLocalFile(context)
+          : null,
       onOpenNavigation: appShellPageNavigationOpener(context),
     );
     final Widget header = KeyedSubtree(
@@ -273,6 +284,71 @@ class _MetadataManagementPageState
         onSubmit: (String value) async {
           await ref.read(authorActionsProvider).addAuthor(Author(name: value));
         },
+      ),
+    );
+  }
+
+  Future<void> _importTagsFromNetwork(BuildContext context) async {
+    final TagDictionaryImportController controller = ref.read(
+      tagDictionaryImportControllerProvider.notifier,
+    );
+    final TagDictionaryImportResult? result =
+        await showTagDictionaryImportDialog(
+          context: context,
+          controller: controller,
+          importFromNetwork: ({onDownloadProgress}) =>
+              controller.importFromNetwork(
+                onDownloadProgress: onDownloadProgress,
+              ),
+        );
+    if (!context.mounted) {
+      return;
+    }
+    if (result != null) {
+      _showImportSummaryToast(context, result);
+    } else if (ref.read(tagDictionaryImportControllerProvider).error != null) {
+      showErrorToast(
+        context,
+        ref.read(tagDictionaryImportControllerProvider).error!,
+      );
+    }
+  }
+
+  Future<void> _importTagsFromLocalFile(BuildContext context) async {
+    final TagDictionaryImportController controller = ref.read(
+      tagDictionaryImportControllerProvider.notifier,
+    );
+    final l10n = context.l10n;
+    final TagDictionaryImportResult? result =
+        await showTagDictionaryImportBusyDialog<TagDictionaryImportResult>(
+          context: context,
+          title: l10n.metadataImportEhTagDialogTitle,
+          body: l10n.metadataImportEhTagLocalBusyBody,
+          task: controller.importFromLocalFile,
+        );
+    if (!context.mounted) {
+      return;
+    }
+    if (result != null) {
+      _showImportSummaryToast(context, result);
+    } else if (ref.read(tagDictionaryImportControllerProvider).error != null) {
+      showErrorToast(
+        context,
+        ref.read(tagDictionaryImportControllerProvider).error!,
+      );
+    }
+  }
+
+  void _showImportSummaryToast(
+    BuildContext context,
+    TagDictionaryImportResult result,
+  ) {
+    showSuccessToast(
+      context,
+      context.l10n.metadataImportEhTagSummary(
+        result.added,
+        result.skippedExisting,
+        result.skippedFilteredOrEmptyOrDedupe,
       ),
     );
   }
