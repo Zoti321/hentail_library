@@ -7,6 +7,8 @@ use crate::entity::{prelude::*, tags};
 use crate::error::HentaiError;
 
 const ALLOWED_NAMESPACES: &[&str] = &["female", "male", "mixed", "other"];
+/// SQLite 绑定变量上限约 999；单表仅 name 一列，留余量分批写入。
+const TAG_INSERT_BATCH_SIZE: usize = 500;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TagDictionaryImportResult {
@@ -67,21 +69,7 @@ pub async fn import_ehtag_dictionary(
     let added = to_insert.len() as u32;
     if !to_insert.is_empty() {
         let txn = db.begin().await.map_err(map_db_err)?;
-        for name in to_insert {
-            let active = tags::ActiveModel {
-                name: Set(name),
-            };
-            Tags::insert(active)
-                .on_conflict(
-                    sea_orm::sea_query::OnConflict::column(tags::Column::Name)
-                        .do_nothing()
-                        .to_owned(),
-                )
-                .do_nothing()
-                .exec(&txn)
-                .await
-                .map_err(map_db_err)?;
-        }
+        insert_tag_names_ignore_conflict(&txn, &to_insert).await?;
         txn.commit().await.map_err(map_db_err)?;
     }
 
@@ -90,6 +78,36 @@ pub async fn import_ehtag_dictionary(
         skipped_existing,
         skipped_filtered_or_empty_or_dedupe,
     })
+}
+
+async fn insert_tag_names_ignore_conflict(
+    conn: &impl sea_orm::ConnectionTrait,
+    names: &[String],
+) -> Result<(), HentaiError> {
+    if names.is_empty() {
+        return Ok(());
+    }
+
+    for chunk in names.chunks(TAG_INSERT_BATCH_SIZE) {
+        let models: Vec<tags::ActiveModel> = chunk
+            .iter()
+            .map(|name| tags::ActiveModel {
+                name: Set(name.clone()),
+            })
+            .collect();
+        Tags::insert_many(models)
+            .on_conflict(
+                sea_orm::sea_query::OnConflict::column(tags::Column::Name)
+                    .do_nothing()
+                    .to_owned(),
+            )
+            .do_nothing()
+            .exec(conn)
+            .await
+            .map_err(map_db_err)?;
+    }
+
+    Ok(())
 }
 
 fn collect_candidate_names(db: &EhTagDatabase) -> (Vec<String>, u32) {
