@@ -1,5 +1,5 @@
 import 'package:hentai_library/data/services/app_update/app_update_service.dart';
-import 'package:hentai_library/data/services/ehtag/ehtag_dictionary_import_service.dart';
+import 'package:hentai_library/data/services/tag_dictionary/tag_dictionary_download_service.dart';
 import 'package:hentai_library/domain/reading/read_session_coordinator.dart';
 import 'package:hentai_library/domain/reading/reader_session_service.dart';
 import 'package:hentai_library/ui/features/shell/di/ports.dart';
@@ -12,8 +12,8 @@ part 'services.g.dart';
 AppUpdateService appUpdateService(Ref ref) => AppUpdateService();
 
 @Riverpod(keepAlive: true)
-EhTagDictionaryImportService ehTagDictionaryImportService(Ref ref) =>
-    EhTagDictionaryImportService();
+TagDictionaryDownloadService tagDictionaryDownloadService(Ref ref) =>
+    TagDictionaryDownloadService();
 
 @Riverpod(keepAlive: true)
 ReaderSessionService readerSessionService(Ref ref) => ReaderSessionService(

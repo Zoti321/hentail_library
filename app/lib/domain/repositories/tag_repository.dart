@@ -15,5 +15,5 @@ abstract class TagRepository {
 
   Future<void> rename(String oldName, String newName);
 
-  Future<TagDictionaryImportResult> importEhTagDictionary(List<int> jsonBytes);
+  Future<TagDictionaryImportResult> importTagDictionary(List<int> jsonBytes);
 }

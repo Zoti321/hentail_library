@@ -1,6 +1,6 @@
 use hentai_core::{
     add_tag as core_add, count_all_tags as core_count, delete_tags_by_names, fetch_tags_page as core_fetch,
-    import_ehtag_dictionary as core_import_ehtag, list_all_tags, rename_tag as core_rename, watch_tags,
+    import_tag_dictionary as core_import_tag_dictionary, list_all_tags, rename_tag as core_rename, watch_tags,
     TagDictionaryImportResult,
 };
 
@@ -34,8 +34,8 @@ impl From<TagDictionaryImportResult> for TagDictionaryImportResultDto {
 }
 
 #[flutter_rust_bridge::frb(sync)]
-pub fn import_ehtag_dictionary_frb(json_bytes: Vec<u8>) -> Result<TagDictionaryImportResultDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_import_ehtag(&json_bytes))
+pub fn import_tag_dictionary_frb(json_bytes: Vec<u8>) -> Result<TagDictionaryImportResultDto, HentaiErrorDto> {
+    hentai_core::runtime::block_on(core_import_tag_dictionary(&json_bytes))
         .map(TagDictionaryImportResultDto::from)
         .map_err(HentaiErrorDto::from)
 }

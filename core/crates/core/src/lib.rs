@@ -81,7 +81,7 @@ pub use sync::{
     SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto, SyncScanMode,
 };
 pub use tag::{
-    add_tag, count_all_tags, delete_tags_by_names, fetch_tags_page, import_ehtag_dictionary,
+    add_tag, count_all_tags, delete_tags_by_names, fetch_tags_page, import_tag_dictionary,
     list_all_tags, rename_tag, watch_tags, TagDictionaryImportResult,
 };
 pub use thumbnail::{

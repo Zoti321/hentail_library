@@ -33,7 +33,6 @@ class MetadataPageHeaderSection extends StatelessWidget {
     required this.selectedTabIndex,
     required this.onTabSelected,
     required this.onAdd,
-    this.onImportTagsFromEhentai,
     this.onDeleteAllTags,
     this.onOpenNavigation,
     super.key,
@@ -45,7 +44,6 @@ class MetadataPageHeaderSection extends StatelessWidget {
   final int selectedTabIndex;
   final ValueChanged<int> onTabSelected;
   final VoidCallback onAdd;
-  final VoidCallback? onImportTagsFromEhentai;
   final VoidCallback? onDeleteAllTags;
   final VoidCallback? onOpenNavigation;
 
@@ -63,7 +61,6 @@ class MetadataPageHeaderSection extends StatelessWidget {
           selectedTabIndex: selectedTabIndex,
           onTabSelected: onTabSelected,
           onAdd: onAdd,
-          onImportTagsFromEhentai: onImportTagsFromEhentai,
           onDeleteAllTags: onDeleteAllTags,
           onOpenNavigation: onOpenNavigation,
         ),
@@ -78,7 +75,6 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
     required this.selectedTabIndex,
     required this.onTabSelected,
     required this.onAdd,
-    this.onImportTagsFromEhentai,
     this.onDeleteAllTags,
     this.onOpenNavigation,
     super.key,
@@ -88,7 +84,6 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
   final int selectedTabIndex;
   final ValueChanged<int> onTabSelected;
   final VoidCallback onAdd;
-  final VoidCallback? onImportTagsFromEhentai;
   final VoidCallback? onDeleteAllTags;
   final VoidCallback? onOpenNavigation;
 
@@ -142,11 +137,8 @@ class MetadataPageHeaderToolbar extends ConsumerWidget {
                   ),
                 ),
               ),
-              if (selectedTabIndex == 1 &&
-                  onImportTagsFromEhentai != null &&
-                  onDeleteAllTags != null)
+              if (selectedTabIndex == 1 && onDeleteAllTags != null)
                 MetadataTagsOverflowMenuButton(
-                  onImportFromEhentai: onImportTagsFromEhentai!,
                   onDeleteAllTags: onDeleteAllTags!,
                 ),
               GhostButton.icon(

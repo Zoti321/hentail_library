@@ -63,12 +63,12 @@ class TagRepositoryImpl implements TagRepository {
   }
 
   @override
-  Future<TagDictionaryImportResult> importEhTagDictionary(
+  Future<TagDictionaryImportResult> importTagDictionary(
     List<int> jsonBytes,
   ) async {
     final rust_tag.TagDictionaryImportResultDto result = guardFrbSync(
-      () => rust_tag.importEhtagDictionaryFrb(jsonBytes: jsonBytes),
-      fallbackMessage: '导入 EhTagTranslation 标签失败',
+      () => rust_tag.importTagDictionaryFrb(jsonBytes: jsonBytes),
+      fallbackMessage: '导入标签字典失败',
     );
     return TagDictionaryImportResult(
       added: result.added,

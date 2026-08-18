@@ -75,13 +75,13 @@ class TagDictionaryImportDialog extends HookConsumerWidget {
     }, <Object?>[started.value]);
 
     return HentaiDialog(
-      title: l10n.metadataImportEhTagDialogTitle,
+      title: l10n.metadataImportTagDictionaryDialogTitle,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Text(
-            l10n.metadataImportEhTagDialogBody,
+            l10n.metadataImportTagDictionaryDialogBody,
             style: TextStyle(color: colorScheme.hentai.textSecondary),
           ),
           const SizedBox(height: 16),

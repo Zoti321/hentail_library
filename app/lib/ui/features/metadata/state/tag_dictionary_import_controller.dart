@@ -46,6 +46,7 @@ class TagDictionaryImportController extends _$TagDictionaryImportController {
   TagDictionaryImportState build() => const TagDictionaryImportState();
 
   Future<TagDictionaryImportResult?> importFromNetwork({
+    required String url,
     void Function(int received, int total)? onDownloadProgress,
   }) async {
     if (state.running) {
@@ -55,8 +56,9 @@ class TagDictionaryImportController extends _$TagDictionaryImportController {
     _cancelToken = CancelToken();
     try {
       final Uint8List bytes = await ref
-          .read(ehTagDictionaryImportServiceProvider)
-          .downloadLatest(
+          .read(tagDictionaryDownloadServiceProvider)
+          .download(
+            url: url,
             cancelToken: _cancelToken,
             onProgress: onDownloadProgress,
           );
@@ -66,19 +68,23 @@ class TagDictionaryImportController extends _$TagDictionaryImportController {
         state = state.copyWith(running: false);
         return null;
       }
-      return _fail(
-        error,
-        stackTrace,
-        fallback: '下载 EhTagTranslation 标签库失败',
-      );
+      return _fail(error, stackTrace, fallback: '下载标签字典失败');
     } catch (error, stackTrace) {
-      return _fail(
-        error,
-        stackTrace,
-        fallback: '下载 EhTagTranslation 标签库失败',
-      );
+      return _fail(error, stackTrace, fallback: '下载标签字典失败');
     } finally {
       _cancelToken = null;
+    }
+  }
+
+  Future<TagDictionaryImportResult?> importFromBytes(Uint8List bytes) async {
+    if (state.running) {
+      return null;
+    }
+    state = state.copyWith(running: true, clearError: true, clearResult: true);
+    try {
+      return await _importBytes(bytes);
+    } catch (error, stackTrace) {
+      return _fail(error, stackTrace, fallback: '导入标签字典失败');
     }
   }
 
@@ -94,12 +100,12 @@ class TagDictionaryImportController extends _$TagDictionaryImportController {
     try {
       final TagDictionaryImportResult result = await ref
           .read(tagRepoProvider)
-          .importEhTagDictionary(bytes);
+          .importTagDictionary(bytes);
       ref.invalidate(allTagsProvider);
       state = state.copyWith(running: false, lastResult: result);
       return result;
     } catch (error, stackTrace) {
-      return _fail(error, stackTrace, fallback: '导入 EhTagTranslation 标签失败');
+      return _fail(error, stackTrace, fallback: '导入标签字典失败');
     }
   }
 

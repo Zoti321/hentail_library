@@ -63,3 +63,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0008](./0008-multi-library-and-webdav.md) | 多 Library 与 WebDAV Remote library | Accepted |
 | [0009](./0009-library-sidebar-pin-and-order.md) | Library pin 与 sidebar order 落在 libraries 表 | Accepted |
 | [0010](./0010-windows-app-data-profile-isolation.md) | Windows 上按构建变体隔离 App data profile | Accepted |
+| [0011](./0011-tag-dictionary-no-ehtag.md) | 移除 EhTagTranslation 接入，保留通用标签字典导入 | Accepted |

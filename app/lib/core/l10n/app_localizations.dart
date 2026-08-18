@@ -2324,12 +2324,6 @@ abstract class AppLocalizations {
   /// **'试试其他关键词，或清空搜索'**
   String get metadataSearchNoMatchHint;
 
-  /// No description provided for @metadataImportEhTagFromEhentai.
-  ///
-  /// In zh, this message translates to:
-  /// **'从EHentai导入标签'**
-  String get metadataImportEhTagFromEhentai;
-
   /// No description provided for @metadataDeleteAllTags.
   ///
   /// In zh, this message translates to:
@@ -2342,23 +2336,23 @@ abstract class AppLocalizations {
   /// **'已删除全部标签'**
   String get metadataTagsDeletedAllToast;
 
-  /// No description provided for @metadataImportEhTagDialogTitle.
+  /// No description provided for @metadataImportTagDictionaryDialogTitle.
   ///
   /// In zh, this message translates to:
-  /// **'导入 EhTagTranslation 标签'**
-  String get metadataImportEhTagDialogTitle;
+  /// **'导入标签字典'**
+  String get metadataImportTagDictionaryDialogTitle;
 
-  /// No description provided for @metadataImportEhTagDialogBody.
+  /// No description provided for @metadataImportTagDictionaryDialogBody.
   ///
   /// In zh, this message translates to:
-  /// **'正在下载 db.text.json 并写入标签字典…'**
-  String get metadataImportEhTagDialogBody;
+  /// **'正在下载标签字典并写入全局 Tag…'**
+  String get metadataImportTagDictionaryDialogBody;
 
-  /// No description provided for @metadataImportEhTagSummary.
+  /// No description provided for @metadataImportTagDictionarySummary.
   ///
   /// In zh, this message translates to:
-  /// **'新增 {added} 条，已存在跳过 {skippedExisting} 条，过滤/空译/去重跳过 {skippedFiltered} 条'**
-  String metadataImportEhTagSummary(
+  /// **'新增 {added} 条，已存在跳过 {skippedExisting} 条，过滤/空名/去重跳过 {skippedFiltered} 条'**
+  String metadataImportTagDictionarySummary(
     int added,
     int skippedExisting,
     int skippedFiltered,

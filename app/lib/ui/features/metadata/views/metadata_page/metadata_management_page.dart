@@ -17,9 +17,6 @@ import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
-import 'package:hentai_library/ui/features/metadata/state/tag_dictionary_import_controller.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/tag_dictionary_import_dialog.dart';
-import 'package:hentai_library/domain/models/tag_dictionary_import_result.dart';
 
 class MetadataManagementPage extends ConsumerStatefulWidget {
   const MetadataManagementPage({super.key});
@@ -150,9 +147,6 @@ class _MetadataManagementPageState
       selectedTabIndex: selectedIndex,
       onTabSelected: _handleTabSelected,
       onAdd: () => _invokeAddForTab(context, selectedIndex),
-      onImportTagsFromEhentai: selectedIndex == 1
-          ? () => _importTagsFromEhentai(context)
-          : null,
       onDeleteAllTags: selectedIndex == 1
           ? () => _deleteAllTags(context)
           : null,
@@ -288,32 +282,6 @@ class _MetadataManagementPageState
     );
   }
 
-  Future<void> _importTagsFromEhentai(BuildContext context) async {
-    final TagDictionaryImportController controller = ref.read(
-      tagDictionaryImportControllerProvider.notifier,
-    );
-    final TagDictionaryImportResult? result =
-        await showTagDictionaryImportDialog(
-          context: context,
-          controller: controller,
-          importFromNetwork: ({onDownloadProgress}) =>
-              controller.importFromNetwork(
-                onDownloadProgress: onDownloadProgress,
-              ),
-        );
-    if (!context.mounted) {
-      return;
-    }
-    if (result != null) {
-      _showImportSummaryToast(context, result);
-    } else if (ref.read(tagDictionaryImportControllerProvider).error != null) {
-      showErrorToast(
-        context,
-        ref.read(tagDictionaryImportControllerProvider).error!,
-      );
-    }
-  }
-
   Future<void> _deleteAllTags(BuildContext context) async {
     final List<Tag> tags = await ref.read(allTagsProvider.future);
     if (!context.mounted || tags.isEmpty) {
@@ -336,20 +304,6 @@ class _MetadataManagementPageState
       return;
     }
     showSuccessToast(context, context.l10n.metadataTagsDeletedAllToast);
-  }
-
-  void _showImportSummaryToast(
-    BuildContext context,
-    TagDictionaryImportResult result,
-  ) {
-    showSuccessToast(
-      context,
-      context.l10n.metadataImportEhTagSummary(
-        result.added,
-        result.skippedExisting,
-        result.skippedFilteredOrEmptyOrDedupe,
-      ),
-    );
   }
 }
 

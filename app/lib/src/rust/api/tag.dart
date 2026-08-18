@@ -10,9 +10,9 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`
 
-TagDictionaryImportResultDto importEhtagDictionaryFrb({
+TagDictionaryImportResultDto importTagDictionaryFrb({
   required List<int> jsonBytes,
-}) => RustLib.instance.api.crateApiTagImportEhtagDictionaryFrb(
+}) => RustLib.instance.api.crateApiTagImportTagDictionaryFrb(
   jsonBytes: jsonBytes,
 );
 

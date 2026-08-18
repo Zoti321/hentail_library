@@ -7,18 +7,15 @@ import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
-import 'package:hentai_library/ui/features/metadata/state/tag_dictionary_import_controller.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class MetadataTagsOverflowMenuButton extends ConsumerStatefulWidget {
   const MetadataTagsOverflowMenuButton({
-    required this.onImportFromEhentai,
     required this.onDeleteAllTags,
     super.key,
   });
 
-  final VoidCallback onImportFromEhentai;
   final VoidCallback onDeleteAllTags;
 
   @override
@@ -34,12 +31,12 @@ class _MetadataTagsOverflowMenuButtonState
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
-    final bool running = ref.watch(tagDictionaryImportControllerProvider).running;
     final int tagCount = ref.watch(allTagsProvider).maybeWhen(
       data: (List<Tag> tags) => tags.length,
       orElse: () => 0,
     );
     final l10n = context.l10n;
+    final bool enabled = tagCount > 0;
 
     return Padding(
       padding: const EdgeInsets.only(right: 8),
@@ -50,13 +47,7 @@ class _MetadataTagsOverflowMenuButtonState
         showArrow: false,
         verticalMargin: -32,
         menuBuilder: () => _MetadataTagsOverflowMenu(
-          onImportFromEhentai: running
-              ? null
-              : () {
-                  _controller.hideMenu();
-                  widget.onImportFromEhentai();
-                },
-          onDeleteAllTags: !running && tagCount > 0
+          onDeleteAllTags: enabled
               ? () {
                   _controller.hideMenu();
                   widget.onDeleteAllTags();
@@ -73,7 +64,7 @@ class _MetadataTagsOverflowMenuButtonState
           foregroundColor: cs.hentai.iconDefault,
           hoverColor: theme.hoverColor,
           overlayColor: theme.hoverColor,
-          onPressed: running ? null : _controller.showMenu,
+          onPressed: enabled ? _controller.showMenu : null,
         ),
       ),
     );
@@ -81,12 +72,8 @@ class _MetadataTagsOverflowMenuButtonState
 }
 
 class _MetadataTagsOverflowMenu extends StatelessWidget {
-  const _MetadataTagsOverflowMenu({
-    required this.onImportFromEhentai,
-    required this.onDeleteAllTags,
-  });
+  const _MetadataTagsOverflowMenu({required this.onDeleteAllTags});
 
-  final VoidCallback? onImportFromEhentai;
   final VoidCallback? onDeleteAllTags;
 
   @override
@@ -104,11 +91,6 @@ class _MetadataTagsOverflowMenu extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            _MetadataTagsPopupMenuItem(
-              label: l10n.metadataImportEhTagFromEhentai,
-              enabled: onImportFromEhentai != null,
-              onTap: onImportFromEhentai,
-            ),
             _MetadataTagsPopupMenuItem(
               label: l10n.metadataDeleteAllTags,
               enabled: onDeleteAllTags != null,

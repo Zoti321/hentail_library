@@ -1239,27 +1239,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataSearchNoMatchHint => '试试其他关键词，或清空搜索';
 
   @override
-  String get metadataImportEhTagFromEhentai => '从EHentai导入标签';
-
-  @override
   String get metadataDeleteAllTags => '删除所有';
 
   @override
   String get metadataTagsDeletedAllToast => '已删除全部标签';
 
   @override
-  String get metadataImportEhTagDialogTitle => '导入 EhTagTranslation 标签';
+  String get metadataImportTagDictionaryDialogTitle => '导入标签字典';
 
   @override
-  String get metadataImportEhTagDialogBody => '正在下载 db.text.json 并写入标签字典…';
+  String get metadataImportTagDictionaryDialogBody => '正在下载标签字典并写入全局 Tag…';
 
   @override
-  String metadataImportEhTagSummary(
+  String metadataImportTagDictionarySummary(
     int added,
     int skippedExisting,
     int skippedFiltered,
   ) {
-    return '新增 $added 条，已存在跳过 $skippedExisting 条，过滤/空译/去重跳过 $skippedFiltered 条';
+    return '新增 $added 条，已存在跳过 $skippedExisting 条，过滤/空名/去重跳过 $skippedFiltered 条';
   }
 
   @override

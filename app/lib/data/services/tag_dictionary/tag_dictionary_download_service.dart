@@ -1,16 +1,21 @@
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:hentai_library/core/constants/ehtag_dictionary_constants.dart';
 
-class EhTagDictionaryImportService {
-  EhTagDictionaryImportService({Dio? dio})
+/// 从网络 URL 下载标签字典 JSON 字节流。
+abstract final class TagDictionaryDownloadConstants {
+  static const Duration connectTimeout = Duration(seconds: 15);
+  static const Duration receiveTimeout = Duration(minutes: 2);
+}
+
+class TagDictionaryDownloadService {
+  TagDictionaryDownloadService({Dio? dio})
     : _dio =
           dio ??
           Dio(
             BaseOptions(
-              connectTimeout: EhTagDictionaryConstants.connectTimeout,
-              receiveTimeout: EhTagDictionaryConstants.receiveTimeout,
+              connectTimeout: TagDictionaryDownloadConstants.connectTimeout,
+              receiveTimeout: TagDictionaryDownloadConstants.receiveTimeout,
               followRedirects: true,
               validateStatus: (int? status) =>
                   status != null && status >= 200 && status < 400,
@@ -19,19 +24,20 @@ class EhTagDictionaryImportService {
 
   final Dio _dio;
 
-  Future<Uint8List> downloadLatest({
+  Future<Uint8List> download({
+    required String url,
     void Function(int received, int total)? onProgress,
     CancelToken? cancelToken,
   }) async {
     final Response<List<int>> response = await _dio.get<List<int>>(
-      EhTagDictionaryConstants.latestDbTextJsonUrl,
+      url,
       cancelToken: cancelToken,
       options: Options(responseType: ResponseType.bytes),
       onReceiveProgress: onProgress,
     );
     final List<int>? data = response.data;
     if (data == null || data.isEmpty) {
-      throw StateError('下载的 db.text.json 为空');
+      throw StateError('下载的标签字典为空');
     }
     return Uint8List.fromList(data);
   }

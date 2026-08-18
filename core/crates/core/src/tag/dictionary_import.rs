@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashSet};
 
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, Set, TransactionTrait};
 
@@ -6,8 +6,6 @@ use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, tags};
 use crate::error::HentaiError;
 
-const ALLOWED_NAMESPACES: &[&str] = &["female", "male", "mixed", "other"];
-/// SQLite 绑定变量上限约 999；单表仅 name 一列，留余量分批写入。
 const TAG_INSERT_BATCH_SIZE: usize = 500;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -18,28 +16,22 @@ pub struct TagDictionaryImportResult {
 }
 
 #[derive(Debug, serde::Deserialize)]
-struct EhTagDatabase {
-    data: Vec<EhTagNamespaceBlock>,
+#[serde(untagged)]
+enum TagDictionaryPayload {
+    Wrapped { tags: Vec<String> },
+    Flat(Vec<String>),
 }
 
-#[derive(Debug, serde::Deserialize)]
-struct EhTagNamespaceBlock {
-    namespace: String,
-    data: HashMap<String, EhTagEntry>,
-}
-
-#[derive(Debug, serde::Deserialize)]
-struct EhTagEntry {
-    name: Option<String>,
-}
-
-pub async fn import_ehtag_dictionary(
+pub async fn import_tag_dictionary(
     json_bytes: &[u8],
 ) -> Result<TagDictionaryImportResult, HentaiError> {
-    let parsed: EhTagDatabase = serde_json::from_slice(json_bytes)
-        .map_err(|err| HentaiError::validation(format!("无效的 db.text.json: {err}")))?;
+    let parsed: TagDictionaryPayload = serde_json::from_slice(json_bytes).map_err(|err| {
+        HentaiError::validation(format!(
+            "无效的标签字典 JSON（期望 {{\"tags\": [...]}} 或 [...]）: {err}"
+        ))
+    })?;
 
-    let (candidates, skipped_filtered_or_empty_or_dedupe) = collect_candidate_names(&parsed);
+    let (candidates, skipped_filtered_or_empty_or_dedupe) = collect_candidate_names(parsed);
     if candidates.is_empty() {
         return Ok(TagDictionaryImportResult {
             added: 0,
@@ -110,33 +102,28 @@ async fn insert_tag_names_ignore_conflict(
     Ok(())
 }
 
-fn collect_candidate_names(db: &EhTagDatabase) -> (Vec<String>, u32) {
+fn collect_candidate_names(payload: TagDictionaryPayload) -> (Vec<String>, u32) {
+    let raw_tags = match payload {
+        TagDictionaryPayload::Wrapped { tags } => tags,
+        TagDictionaryPayload::Flat(tags) => tags,
+    };
+
     let mut seen = HashSet::new();
     let mut candidates = Vec::new();
     let mut skipped = 0u32;
 
-    for block in &db.data {
-        if !ALLOWED_NAMESPACES.contains(&block.namespace.as_str()) {
-            skipped += block.data.len() as u32;
+    for raw in raw_tags {
+        let name = raw.trim();
+        if name.is_empty() {
+            skipped += 1;
             continue;
         }
-        for entry in block.data.values() {
-            let Some(raw) = entry.name.as_ref() else {
-                skipped += 1;
-                continue;
-            };
-            let name = raw.trim();
-            if name.is_empty() {
-                skipped += 1;
-                continue;
-            }
-            let owned = name.to_string();
-            if !seen.insert(owned.clone()) {
-                skipped += 1;
-                continue;
-            }
-            candidates.push(owned);
+        let owned = name.to_string();
+        if !seen.insert(owned.clone()) {
+            skipped += 1;
+            continue;
         }
+        candidates.push(owned);
     }
 
     (candidates, skipped)
@@ -147,43 +134,19 @@ mod tests {
     use super::*;
 
     #[test]
-    fn collect_candidate_names_filters_and_dedupes() {
-        let db: EhTagDatabase = serde_json::from_str(
-            r#"{
-              "data": [
-                {
-                  "namespace": "female",
-                  "data": {
-                    "big breasts": { "name": "巨乳" },
-                    "empty tag": { "name": "" },
-                    "no name": {}
-                  }
-                },
-                {
-                  "namespace": "male",
-                  "data": {
-                    "muscle": { "name": "肌肉" }
-                  }
-                },
-                {
-                  "namespace": "artist",
-                  "data": {
-                    "some artist": { "name": "某画师" }
-                  }
-                },
-                {
-                  "namespace": "female",
-                  "data": {
-                    "duplicate": { "name": "巨乳" }
-                  }
-                }
-              ]
-            }"#,
+    fn collect_candidate_names_accepts_wrapped_and_flat_payloads() {
+        let wrapped: TagDictionaryPayload = serde_json::from_str(
+            r#"{"tags": ["全彩", "  ", "NTR", "NTR"]}"#,
         )
-        .expect("fixture");
+        .expect("wrapped fixture");
+        let (wrapped_names, wrapped_skipped) = collect_candidate_names(wrapped);
+        assert_eq!(wrapped_names, vec!["全彩".to_string(), "NTR".to_string()]);
+        assert_eq!(wrapped_skipped, 2);
 
-        let (names, skipped) = collect_candidate_names(&db);
-        assert_eq!(names, vec!["巨乳".to_string(), "肌肉".to_string()]);
-        assert_eq!(skipped, 4);
+        let flat: TagDictionaryPayload =
+            serde_json::from_str(r#"["巨乳", "肌肉"]"#).expect("flat fixture");
+        let (flat_names, flat_skipped) = collect_candidate_names(flat);
+        assert_eq!(flat_names, vec!["巨乳".to_string(), "肌肉".to_string()]);
+        assert_eq!(flat_skipped, 0);
     }
 }

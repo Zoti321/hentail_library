@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -809559670;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1923191442;
 
 // Section: executor
 
@@ -1333,14 +1333,14 @@ fn wire__crate__api__series__get_series_reading_context_by_comic_id_frb_impl(
         },
     )
 }
-fn wire__crate__api__tag__import_ehtag_dictionary_frb_impl(
+fn wire__crate__api__tag__import_tag_dictionary_frb_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "import_ehtag_dictionary_frb",
+            debug_name: "import_tag_dictionary_frb",
             port: None,
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
         },
@@ -1357,7 +1357,7 @@ fn wire__crate__api__tag__import_ehtag_dictionary_frb_impl(
             let api_json_bytes = <Vec<u8>>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
-                let output_ok = crate::api::tag::import_ehtag_dictionary_frb(api_json_bytes)?;
+                let output_ok = crate::api::tag::import_tag_dictionary_frb(api_json_bytes)?;
                 Ok(output_ok)
             })())
         },
@@ -5177,7 +5177,7 @@ fn pde_ffi_dispatcher_sync_impl(
             rust_vec_len,
             data_len,
         ),
-        42 => wire__crate__api__tag__import_ehtag_dictionary_frb_impl(ptr, rust_vec_len, data_len),
+        42 => wire__crate__api__tag__import_tag_dictionary_frb_impl(ptr, rust_vec_len, data_len),
         44 => wire__crate__api__comic__init_db_frb_impl(ptr, rust_vec_len, data_len),
         46 => wire__crate__api__author__list_all_authors_frb_impl(ptr, rust_vec_len, data_len),
         47 => wire__crate__api__path__list_all_paths_frb_impl(ptr, rust_vec_len, data_len),

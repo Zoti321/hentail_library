@@ -1268,23 +1268,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Try another keyword, or clear the search';
 
   @override
-  String get metadataImportEhTagFromEhentai => 'Import tags from E-Hentai';
-
-  @override
   String get metadataDeleteAllTags => 'Delete all';
 
   @override
   String get metadataTagsDeletedAllToast => 'All tags deleted';
 
   @override
-  String get metadataImportEhTagDialogTitle => 'Import EhTagTranslation tags';
+  String get metadataImportTagDictionaryDialogTitle => 'Import tag dictionary';
 
   @override
-  String get metadataImportEhTagDialogBody =>
-      'Downloading db.text.json and updating the tag dictionary…';
+  String get metadataImportTagDictionaryDialogBody =>
+      'Downloading the tag dictionary and updating global tags…';
 
   @override
-  String metadataImportEhTagSummary(
+  String metadataImportTagDictionarySummary(
     int added,
     int skippedExisting,
     int skippedFiltered,

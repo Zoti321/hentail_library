@@ -113,8 +113,8 @@ _Avoid_: 标题推断、自动分组
 _Avoid_: 分类、关键词、Eh 标签（口语可用；领域与 issue 用 Tag）
 
 **Tag dictionary import**:
-从 EhTagTranslation Database（`db.text.json`）将约定命名空间下的中文译名幂等写入全局 Tag 字典的操作；不附着到 Comic，不删除本机已有 Tag。
-_Avoid_: ehentai 导入、标签同步、画廊导入（易被理解成给 Comic 打标或镜像删除）
+从外部 JSON 标签字典（经网络下载或本地字节）将标签名幂等写入全局 Tag 字典的操作；不附着到 Comic，不删除本机已有 Tag。JSON 格式见 `docs/agents/tag-dictionary-import.md`。UI 入口待接入自维护词库后启用。
+_Avoid_: ehentai 导入、EhTagTranslation、标签同步、画廊导入（易被理解成给 Comic 打标或镜像删除）
 
 **Author**:
 Comic 的署名，用于展示与筛选；社团、画师、原作者等展示用名字均记为 Author，不区分类型。

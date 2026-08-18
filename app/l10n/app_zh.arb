@@ -583,13 +583,12 @@
   "metadataAuthorsNoMatchTitle": "未找到匹配的作者",
   "metadataTagsNoMatchTitle": "未找到匹配的标签",
   "metadataSearchNoMatchHint": "试试其他关键词，或清空搜索",
-  "metadataImportEhTagFromEhentai": "从EHentai导入标签",
   "metadataDeleteAllTags": "删除所有",
   "metadataTagsDeletedAllToast": "已删除全部标签",
-  "metadataImportEhTagDialogTitle": "导入 EhTagTranslation 标签",
-  "metadataImportEhTagDialogBody": "正在下载 db.text.json 并写入标签字典…",
-  "metadataImportEhTagSummary": "新增 {added} 条，已存在跳过 {skippedExisting} 条，过滤/空译/去重跳过 {skippedFiltered} 条",
-  "@metadataImportEhTagSummary": {
+  "metadataImportTagDictionaryDialogTitle": "导入标签字典",
+  "metadataImportTagDictionaryDialogBody": "正在下载标签字典并写入全局 Tag…",
+  "metadataImportTagDictionarySummary": "新增 {added} 条，已存在跳过 {skippedExisting} 条，过滤/空名/去重跳过 {skippedFiltered} 条",
+  "@metadataImportTagDictionarySummary": {
     "placeholders": {
       "added": {"type": "int"},
       "skippedExisting": {"type": "int"},

@@ -78,7 +78,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -809559670;
+  int get rustContentHash => 1923191442;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -220,7 +220,7 @@ abstract class RustLibApi extends BaseApi {
     required String comicId,
   });
 
-  TagDictionaryImportResultDto crateApiTagImportEhtagDictionaryFrb({
+  TagDictionaryImportResultDto crateApiTagImportTagDictionaryFrb({
     required List<int> jsonBytes,
   });
 
@@ -1584,7 +1584,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  TagDictionaryImportResultDto crateApiTagImportEhtagDictionaryFrb({
+  TagDictionaryImportResultDto crateApiTagImportTagDictionaryFrb({
     required List<int> jsonBytes,
   }) {
     return handler.executeSync(
@@ -1598,16 +1598,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_tag_dictionary_import_result_dto,
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
-        constMeta: kCrateApiTagImportEhtagDictionaryFrbConstMeta,
+        constMeta: kCrateApiTagImportTagDictionaryFrbConstMeta,
         argValues: [jsonBytes],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiTagImportEhtagDictionaryFrbConstMeta =>
+  TaskConstMeta get kCrateApiTagImportTagDictionaryFrbConstMeta =>
       const TaskConstMeta(
-        debugName: "import_ehtag_dictionary_frb",
+        debugName: "import_tag_dictionary_frb",
         argNames: ["jsonBytes"],
       );
 
