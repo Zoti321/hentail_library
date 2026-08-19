@@ -28,39 +28,40 @@ void main() {
       expect(desktopFadeThroughUncoveredOpacity(1.0), 1.0);
     });
 
-    testWidgets('secondary animation uses covered vs uncovered based on pop flag', (
-      WidgetTester tester,
-    ) async {
-      final AnimationController primary = AnimationController(
-        vsync: tester,
-        value: 1,
-      );
-      final AnimationController secondary = AnimationController(
-        vsync: tester,
-        duration: kDesktopPageTransitionDuration,
-      );
-      addTearDown(primary.dispose);
-      addTearDown(secondary.dispose);
+    testWidgets(
+      'secondary animation uses covered vs uncovered based on pop flag',
+      (WidgetTester tester) async {
+        final AnimationController primary = AnimationController(
+          vsync: tester,
+          value: 1,
+        );
+        final AnimationController secondary = AnimationController(
+          vsync: tester,
+          duration: kDesktopPageTransitionDuration,
+        );
+        addTearDown(primary.dispose);
+        addTearDown(secondary.dispose);
 
-      secondary.value = 0.25;
-      expect(
-        resolveDesktopFadeThroughOpacity(
-          animation: primary,
-          secondaryAnimation: secondary,
-          revealingFromPop: false,
-        ),
-        desktopFadeThroughCoveredOpacity(0.25),
-      );
+        secondary.value = 0.25;
+        expect(
+          resolveDesktopFadeThroughOpacity(
+            animation: primary,
+            secondaryAnimation: secondary,
+            revealingFromPop: false,
+          ),
+          desktopFadeThroughCoveredOpacity(0.25),
+        );
 
-      secondary.value = 0.75;
-      expect(
-        resolveDesktopFadeThroughOpacity(
-          animation: primary,
-          secondaryAnimation: secondary,
-          revealingFromPop: true,
-        ),
-        desktopFadeThroughUncoveredOpacity(0.75),
-      );
-    });
+        secondary.value = 0.75;
+        expect(
+          resolveDesktopFadeThroughOpacity(
+            animation: primary,
+            secondaryAnimation: secondary,
+            revealingFromPop: true,
+          ),
+          desktopFadeThroughUncoveredOpacity(0.75),
+        );
+      },
+    );
   });
 }

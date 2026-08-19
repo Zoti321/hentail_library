@@ -91,7 +91,7 @@ void main() {
           matching: find.byType(DecoratedBox),
         ),
       );
-      final BoxDecoration decoration = box.decoration! as BoxDecoration;
+      final BoxDecoration decoration = box.decoration as BoxDecoration;
       expect(decoration.border, isNull);
       expect(decoration.color, isNotNull);
       expect(decoration.color!.a, 1.0);

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/ui/core/interaction/desktop_page_transition.dart';
@@ -39,10 +39,7 @@ final GoRouter appRouter = GoRouter(
           path: '/home',
           name: '主页',
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(
-                state: state,
-                child: const HomePage(),
-              ),
+              buildShellNavPage(state: state, child: const HomePage()),
         ),
         GoRoute(
           path: LibrariesRoutes.root,
@@ -84,10 +81,7 @@ final GoRouter appRouter = GoRouter(
           path: '/history',
           name: '历史记录',
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(
-                state: state,
-                child: const HistoryPage(),
-              ),
+              buildShellNavPage(state: state, child: const HistoryPage()),
         ),
         GoRoute(
           path: '/searched',
@@ -104,10 +98,7 @@ final GoRouter appRouter = GoRouter(
           path: '/settings',
           name: '设置',
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildShellNavPage(
-                state: state,
-                child: const SettingsPage(),
-              ),
+              buildShellNavPage(state: state, child: const SettingsPage()),
         ),
         ...buildSharedContentRoutes(),
       ],

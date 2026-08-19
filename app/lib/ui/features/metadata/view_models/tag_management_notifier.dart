@@ -63,9 +63,9 @@ class TagActions {
     if (tags.isEmpty) {
       return;
     }
-    await _ref.read(tagRepoProvider).deleteByNames(
-      tags.map((Tag tag) => tag.name).toList(),
-    );
+    await _ref
+        .read(tagRepoProvider)
+        .deleteByNames(tags.map((Tag tag) => tag.name).toList());
     _ref.invalidate(allTagsProvider);
   }
 

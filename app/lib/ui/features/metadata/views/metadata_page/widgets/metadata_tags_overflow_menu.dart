@@ -31,10 +31,9 @@ class _MetadataTagsOverflowMenuButtonState
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
-    final int tagCount = ref.watch(allTagsProvider).maybeWhen(
-      data: (List<Tag> tags) => tags.length,
-      orElse: () => 0,
-    );
+    final int tagCount = ref
+        .watch(allTagsProvider)
+        .maybeWhen(data: (List<Tag> tags) => tags.length, orElse: () => 0);
     final l10n = context.l10n;
     final bool enabled = tagCount > 0;
 
