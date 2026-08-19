@@ -184,8 +184,20 @@ jobs:
 
       - name: Install Linux build dependencies
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev libsecret-1-dev
+          export DEBIAN_FRONTEND=noninteractive
+          for attempt in 1 2 3; do
+            echo "apt attempt ${attempt}"
+            if timeout 10m sudo apt-get update -y -o Acquire::Retries=3 && \
+              timeout 15m sudo apt-get install -y --no-install-recommends \
+                clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev libsecret-1-dev; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              sleep 15
+            fi
+          done
+          echo "::error::Failed to install Linux build dependencies after retries."
+          exit 1
 
       - uses: ./.github/actions/flutter-frb-setup
         with:
