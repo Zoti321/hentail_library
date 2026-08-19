@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/util/utils.dart';
@@ -7,6 +8,7 @@ import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/app_title_bar.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/diagnostic_mode_banner.dart';
 import 'package:hentai_library/ui/core/widgets/navigation/desktop_sidebar.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/global_search_dialog.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/app_navigation.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_sidebar_section.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_sidebar_reorder_pane.dart';
@@ -61,6 +63,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
     bool showCollapseToggle = true,
     bool applyDrawerTopInset = false,
     VoidCallback? onLibrariesNavigate,
+    VoidCallback? onOpenSearch,
     required VoidCallback onToggleExpanded,
     required ValueChanged<String> onDestinationSelected,
     required bool allowLibraryReorder,
@@ -72,6 +75,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
       applyDrawerTopInset: applyDrawerTopInset,
       onToggleExpanded: onToggleExpanded,
       onDestinationSelected: onDestinationSelected,
+      onOpenSearch: onOpenSearch,
       allowLibraryReorder: allowLibraryReorder,
       librariesReorderPaneBuilder: (_) => const LibrariesSidebarReorderPane(),
       librariesSectionBuilder:
@@ -114,64 +118,86 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
         };
         final bool showSidebarRail = !isReaderRoute && !useDrawer;
 
-        return Scaffold(
-          key: appShellScaffoldKey,
-          drawer: useDrawer && !isReaderRoute
-              ? Drawer(
-                  width: DesktopSidebar.expandedWidth,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: _buildSidebar(
-                    activeId: sidebarActiveId,
-                    isExpanded: true,
-                    showCollapseToggle: false,
-                    applyDrawerTopInset: true,
-                    allowLibraryReorder: false,
-                    onLibrariesNavigate: () {
-                      appShellScaffoldKey.currentState?.closeDrawer();
-                    },
-                    onToggleExpanded: () => Navigator.of(context).pop(),
-                    onDestinationSelected: (String id) {
-                      Navigator.of(context).pop();
-                      _onSidebarDestinationSelected(id);
-                    },
-                  ),
-                )
-              : null,
-          body: Column(
-            children: <Widget>[
-              _ShellTitleBar(isReaderRoute: isReaderRoute),
-              const DiagnosticModeBanner(),
-              Expanded(
-                child: isReaderRoute
-                    ? widget.routeChild
-                    : Row(
-                        children: <Widget>[
-                          if (showSidebarRail)
-                            _buildSidebar(
-                              activeId: sidebarActiveId,
-                              isExpanded: sidebarExpanded,
-                              showCollapseToggle: !useDrawer,
-                              allowLibraryReorder:
-                                  !useDrawer && sidebarExpanded,
-                              onToggleExpanded: () {
-                                if (!useDrawer) {
-                                  ref
-                                      .read(settingsProvider.notifier)
-                                      .setDesktopSidebarExpanded(
-                                        !isSidebarExpandedPref,
-                                      );
-                                }
-                              },
-                              onDestinationSelected:
-                                  _onSidebarDestinationSelected,
-                            ),
-                          Expanded(child: widget.routeChild),
-                        ],
+        final VoidCallback? openSearch = isReaderRoute
+            ? null
+            : () => showGlobalSearchDialog(context);
+
+        return CallbackShortcuts(
+          bindings: <ShortcutActivator, VoidCallback>{
+            const SingleActivator(LogicalKeyboardKey.keyK, control: true): () {
+              openSearch?.call();
+            },
+            const SingleActivator(LogicalKeyboardKey.keyK, meta: true): () {
+              openSearch?.call();
+            },
+          },
+          child: Focus(
+            autofocus: true,
+            child: Scaffold(
+              key: appShellScaffoldKey,
+              drawer: useDrawer && !isReaderRoute
+                  ? Drawer(
+                      width: DesktopSidebar.expandedWidth,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
                       ),
+                      child: _buildSidebar(
+                        activeId: sidebarActiveId,
+                        isExpanded: true,
+                        showCollapseToggle: false,
+                        applyDrawerTopInset: true,
+                        allowLibraryReorder: false,
+                        onOpenSearch: openSearch,
+                        onLibrariesNavigate: () {
+                          appShellScaffoldKey.currentState?.closeDrawer();
+                        },
+                        onToggleExpanded: () => Navigator.of(context).pop(),
+                        onDestinationSelected: (String id) {
+                          Navigator.of(context).pop();
+                          _onSidebarDestinationSelected(id);
+                        },
+                      ),
+                    )
+                  : null,
+              body: Column(
+                children: <Widget>[
+                  _ShellTitleBar(
+                    isReaderRoute: isReaderRoute,
+                    onOpenSearch: openSearch,
+                  ),
+                  const DiagnosticModeBanner(),
+                  Expanded(
+                    child: isReaderRoute
+                        ? widget.routeChild
+                        : Row(
+                            children: <Widget>[
+                              if (showSidebarRail)
+                                _buildSidebar(
+                                  activeId: sidebarActiveId,
+                                  isExpanded: sidebarExpanded,
+                                  showCollapseToggle: !useDrawer,
+                                  allowLibraryReorder:
+                                      !useDrawer && sidebarExpanded,
+                                  onOpenSearch: openSearch,
+                                  onToggleExpanded: () {
+                                    if (!useDrawer) {
+                                      ref
+                                          .read(settingsProvider.notifier)
+                                          .setDesktopSidebarExpanded(
+                                            !isSidebarExpandedPref,
+                                          );
+                                    }
+                                  },
+                                  onDestinationSelected:
+                                      _onSidebarDestinationSelected,
+                                ),
+                              Expanded(child: widget.routeChild),
+                            ],
+                          ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },
@@ -180,9 +206,10 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
 }
 
 class _ShellTitleBar extends ConsumerWidget {
-  const _ShellTitleBar({required this.isReaderRoute});
+  const _ShellTitleBar({required this.isReaderRoute, this.onOpenSearch});
 
   final bool isReaderRoute;
+  final VoidCallback? onOpenSearch;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -193,14 +220,14 @@ class _ShellTitleBar extends ConsumerWidget {
       if (readerFullscreen) {
         return const SizedBox.shrink();
       }
-      if (isDesktop) {
-        return const AppTitleBar();
+      if (supportsDesktopWindowChrome) {
+        return AppTitleBar(onOpenSearch: onOpenSearch);
       }
       return const SizedBox.shrink();
     }
 
-    if (isDesktop) {
-      return const AppTitleBar();
+    if (supportsDesktopWindowChrome) {
+      return AppTitleBar(onOpenSearch: onOpenSearch);
     }
 
     // 移动端各页自带标题与汉堡菜单；此处只占位状态栏，避免双 header。

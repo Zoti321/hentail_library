@@ -192,6 +192,8 @@ class HentaiColorScheme {
     required this.imageFallback,
     required this.success,
     required this.warning,
+    required this.error,
+    required this.serializationHiatus,
     required this.winBackground,
     required this.winSurface,
     required this.sidebarBackground,
@@ -247,7 +249,9 @@ class HentaiColorScheme {
     imagePlaceholder: Color(0xFFECEEF1),
     imageFallback: Color(0xFFDDE1E6),
     success: Color(0xFF4CAF50),
-    warning: Color(0xFFEF4444),
+    warning: Color(0xFFF59E0B),
+    error: Color(0xFFEF4444),
+    serializationHiatus: Color(0xFFF59E0B),
     winBackground: Color(0xFFF5F5F6),
     winSurface: Color.fromRGBO(245, 245, 247, 1),
     sidebarBackground: Color(0xFFFAFAFA),
@@ -303,7 +307,9 @@ class HentaiColorScheme {
     imagePlaceholder: Color(0xFF3A3A3A),
     imageFallback: Color(0xFF4A4A4A),
     success: Color(0xFF4CAF50),
-    warning: Color(0xFFEF4444),
+    warning: Color(0xFFF59E0B),
+    error: Color(0xFFEF4444),
+    serializationHiatus: Color(0xFFF59E0B),
     winBackground: Color(0xFF1A1A1A),
     winSurface: Color.fromRGBO(45, 45, 47, 1),
     sidebarBackground: Color(0xFF202020),
@@ -359,6 +365,8 @@ class HentaiColorScheme {
   final Color imageFallback;
   final Color success;
   final Color warning;
+  final Color error;
+  final Color serializationHiatus;
   final Color winBackground;
   final Color winSurface;
   final Color sidebarBackground;

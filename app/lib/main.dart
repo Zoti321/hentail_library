@@ -53,7 +53,7 @@ Future<void> _prepareApp() async {
 
   configureGlobalImageCache();
 
-  if (isDesktop) {
+  if (supportsDesktopWindowChrome) {
     await _initWindow();
   }
 }

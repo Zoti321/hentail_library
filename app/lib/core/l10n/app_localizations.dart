@@ -695,7 +695,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeNoReadingHistory.
   ///
   /// In zh, this message translates to:
-  /// **'暂无阅读记录，'**
+  /// **'暂无阅读记录'**
   String get homeNoReadingHistory;
 
   /// No description provided for @homeGoToLibrary.
@@ -1153,6 +1153,24 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'关键词不能为空'**
   String get librarySearchKeywordEmpty;
+
+  /// No description provided for @globalSearchTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索'**
+  String get globalSearchTitle;
+
+  /// No description provided for @globalSearchSubmit.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索'**
+  String get globalSearchSubmit;
+
+  /// No description provided for @globalSearchSemantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索库内容'**
+  String get globalSearchSemantic;
 
   /// No description provided for @libraryFilterSortTooltip.
   ///

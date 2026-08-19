@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class FluentNumberStepperField extends HookWidget {
   const FluentNumberStepperField({
@@ -218,12 +219,12 @@ class FluentNumberStepperField extends HookWidget {
                           children: <Widget>[
                             _StepperButton(
                               key: incrementKey,
-                              icon: Icons.keyboard_arrow_up,
+                              icon: LucideIcons.chevronUp,
                               onPressed: () => stepBy(step),
                             ),
                             _StepperButton(
                               key: decrementKey,
-                              icon: Icons.keyboard_arrow_down,
+                              icon: LucideIcons.chevronDown,
                               onPressed: () => stepBy(-step),
                             ),
                           ],

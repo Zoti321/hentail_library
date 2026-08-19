@@ -45,6 +45,7 @@ class DesktopSidebar extends HookConsumerWidget {
   final bool applyDrawerTopInset;
   final VoidCallback onToggleExpanded;
   final ValueChanged<String> onDestinationSelected;
+  final VoidCallback? onOpenSearch;
   final DesktopSidebarLibrariesSectionBuilder? librariesSectionBuilder;
 
   /// When non-null and reorder mode is on, replaces main nav + system items.
@@ -61,6 +62,7 @@ class DesktopSidebar extends HookConsumerWidget {
     this.applyDrawerTopInset = false,
     required this.onToggleExpanded,
     required this.onDestinationSelected,
+    this.onOpenSearch,
     this.librariesSectionBuilder,
     this.librariesReorderPaneBuilder,
     this.allowLibraryReorder = true,
@@ -190,6 +192,15 @@ class DesktopSidebar extends HookConsumerWidget {
                 ),
                 SizedBox(height: tokens.spacing.lg),
               ],
+              if (onOpenSearch != null) ...<Widget>[
+                _SidebarSearchButton(
+                  expandProgress: curvedT,
+                  labelOpacity: labelOpacity,
+                  showCollapsedTooltip: showCollapsedTooltip,
+                  onTap: onOpenSearch!,
+                ),
+                SizedBox(height: tokens.spacing.sm),
+              ],
               Expanded(
                 child: reorderMode
                     ? (librariesReorderPaneBuilder?.call(context) ??
@@ -211,6 +222,141 @@ class DesktopSidebar extends HookConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _SidebarSearchButton extends StatefulWidget {
+  const _SidebarSearchButton({
+    required this.expandProgress,
+    required this.labelOpacity,
+    required this.showCollapsedTooltip,
+    required this.onTap,
+  });
+
+  final double expandProgress;
+  final double labelOpacity;
+  final bool showCollapsedTooltip;
+  final VoidCallback onTap;
+
+  @override
+  State<_SidebarSearchButton> createState() => _SidebarSearchButtonState();
+}
+
+class _SidebarSearchButtonState extends State<_SidebarSearchButton> {
+  static const Duration _kChromeAnimDuration = Duration(milliseconds: 220);
+  static const Curve _kChromeAnimCurve = Curves.easeOutCubic;
+  static const double _kCollapsedButtonSize = 36;
+
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final String label = context.l10n.globalSearchSemantic;
+    final double t = widget.expandProgress.clamp(0.0, 1.0);
+
+    final Color idleBackground = cs.hentai.sidebarBackground;
+    final Color backgroundColor = _isHovered
+        ? cs.hentai.sidebarItemHoverBackground
+        : idleBackground;
+    final Color foreground = _isHovered
+        ? cs.hentai.textPrimary
+        : cs.hentai.textSecondary;
+
+    final Widget actionable = Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double maxWidth = constraints.maxWidth;
+            final double buttonWidth =
+                _kCollapsedButtonSize + (maxWidth - _kCollapsedButtonSize) * t;
+            final double horizontalPadding = 12 * t;
+            final Alignment align = Alignment.lerp(
+              Alignment.center,
+              Alignment.centerLeft,
+              t,
+            )!;
+
+            return Align(
+              alignment: align,
+              child: SizedBox(
+                width: buttonWidth,
+                height: DesktopSidebar.navItemHeight,
+                child: AnimatedContainer(
+                  duration: _kChromeAnimDuration,
+                  curve: _kChromeAnimCurve,
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(width: 1, color: idleBackground),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                    child: Align(
+                      alignment: t < 0.001
+                          ? Alignment.center
+                          : Alignment.centerLeft,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Icon(
+                            LucideIcons.search,
+                            size: DesktopSidebar.navItemIconSize,
+                            color: foreground,
+                          ),
+                          Flexible(
+                            child: ClipRect(
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                widthFactor: t,
+                                child: Opacity(
+                                  opacity: widget.labelOpacity,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: Text(
+                                      label,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      softWrap: false,
+                                      style: theme.textTheme.bodyMedium!.copyWith(
+                                        color: foreground,
+                                        fontSize: 14,
+                                        height: 1.2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: widget.showCollapsedTooltip
+          ? Tooltip(
+              message: label,
+              waitDuration: const Duration(seconds: 1),
+              child: actionable,
+            )
+          : actionable,
     );
   }
 }

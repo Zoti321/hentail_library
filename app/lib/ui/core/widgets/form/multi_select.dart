@@ -328,7 +328,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                 Icon(
                   LucideIcons.circleAlert,
                   size: 14,
-                  color: cs.hentai.warning,
+                  color: cs.hentai.error,
                 ),
                 SizedBox(width: tokens.spacing.sm),
                 Text(

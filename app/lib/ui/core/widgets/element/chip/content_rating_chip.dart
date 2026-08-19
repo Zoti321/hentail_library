@@ -67,9 +67,9 @@ class ContentRatingChip extends StatelessWidget {
       case ContentRating.r18:
         return _ContentRatingVisual(
           label: label,
-          backgroundColor: colorScheme.hentai.warning.withAlpha(30),
-          borderColor: colorScheme.hentai.warning.withAlpha(90),
-          textColor: colorScheme.hentai.warning,
+          backgroundColor: colorScheme.hentai.error.withAlpha(30),
+          borderColor: colorScheme.hentai.error.withAlpha(90),
+          textColor: colorScheme.hentai.error,
         );
     }
   }

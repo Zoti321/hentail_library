@@ -65,7 +65,7 @@ class _SelectedPathsErrorCardState
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.hentai.warning,
+              color: theme.colorScheme.hentai.error,
             ),
           ),
           const SizedBox(height: 8),

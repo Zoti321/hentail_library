@@ -10,7 +10,7 @@ class ReaderFullscreenController extends _$ReaderFullscreenController {
   bool build() => false;
 
   Future<void> setFullscreen(bool value) async {
-    if (isDesktop) {
+    if (supportsDesktopWindowChrome) {
       await windowManager.setFullScreen(value);
     }
     state = value;
@@ -25,7 +25,7 @@ class ReaderFullscreenController extends _$ReaderFullscreenController {
       return;
     }
     state = false;
-    if (isDesktop) {
+    if (supportsDesktopWindowChrome) {
       await windowManager.setFullScreen(false);
     }
   }

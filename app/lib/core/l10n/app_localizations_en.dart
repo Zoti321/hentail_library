@@ -359,7 +359,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeContinueReading => 'Continue reading';
 
   @override
-  String get homeNoReadingHistory => 'No reading history yet, ';
+  String get homeNoReadingHistory => 'No reading history yet';
 
   @override
   String get homeGoToLibrary => 'Go to library';
@@ -624,6 +624,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get librarySearchKeywordEmpty => 'Keyword cannot be empty';
+
+  @override
+  String get globalSearchTitle => 'Search';
+
+  @override
+  String get globalSearchSubmit => 'Search';
+
+  @override
+  String get globalSearchSemantic => 'Search library';
 
   @override
   String get libraryFilterSortTooltip => 'Filter & sort';

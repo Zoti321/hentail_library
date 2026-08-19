@@ -29,11 +29,13 @@ class CustomTextField extends HookWidget {
     this.onSubmitted,
     this.hintText = '',
     this.controller,
+    this.autofocus = false,
   });
 
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final String hintText;
+  final bool autofocus;
 
   /// When set, this controller is used instead of an internal one (e.g. dialog reset).
   final TextEditingController? controller;
@@ -52,8 +54,13 @@ class CustomTextField extends HookWidget {
       void listener() => isFocused.value = focusNode.hasFocus;
 
       focusNode.addListener(listener);
+      if (autofocus) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          focusNode.requestFocus();
+        });
+      }
       return () => focusNode.removeListener(listener);
-    }, [focusNode]);
+    }, [focusNode, autofocus]);
 
     return Container(
       height: 40,

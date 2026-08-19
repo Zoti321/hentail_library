@@ -349,7 +349,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeContinueReading => '继续阅读';
 
   @override
-  String get homeNoReadingHistory => '暂无阅读记录，';
+  String get homeNoReadingHistory => '暂无阅读记录';
 
   @override
   String get homeGoToLibrary => '去漫画库';
@@ -605,6 +605,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get librarySearchKeywordEmpty => '关键词不能为空';
+
+  @override
+  String get globalSearchTitle => '搜索';
+
+  @override
+  String get globalSearchSubmit => '搜索';
+
+  @override
+  String get globalSearchSemantic => '搜索库内容';
 
   @override
   String get libraryFilterSortTooltip => '筛选与排序';
