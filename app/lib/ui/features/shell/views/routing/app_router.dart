@@ -39,7 +39,7 @@ final GoRouter appRouter = GoRouter(
           path: '/home',
           name: '主页',
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildDesktopFadeThroughPage(
+              buildShellNavPage(
                 state: state,
                 child: const HomePage(),
               ),
@@ -52,7 +52,7 @@ final GoRouter appRouter = GoRouter(
               path: LibrariesRoutes.allSegment,
               name: '全部库',
               pageBuilder: (BuildContext context, GoRouterState state) =>
-                  buildDesktopFadeThroughPage(
+                  buildShellNavPage(
                     state: state,
                     child: const AllLibrariesBrowsePage(),
                   ),
@@ -63,7 +63,7 @@ final GoRouter appRouter = GoRouter(
               pageBuilder: (BuildContext context, GoRouterState state) {
                 final String libraryId =
                     state.pathParameters['libraryId'] ?? '';
-                return buildDesktopFadeThroughPage(
+                return buildShellNavPage(
                   state: state,
                   child: LibraryBrowsePage(libraryId: libraryId),
                 );
@@ -75,7 +75,7 @@ final GoRouter appRouter = GoRouter(
           path: '/local',
           name: '本地漫画',
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildDesktopFadeThroughPage(
+              buildShellNavPage(
                 state: state,
                 child: const LegacyLocalLibraryRedirectPage(),
               ),
@@ -84,7 +84,7 @@ final GoRouter appRouter = GoRouter(
           path: '/history',
           name: '历史记录',
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildDesktopFadeThroughPage(
+              buildShellNavPage(
                 state: state,
                 child: const HistoryPage(),
               ),
@@ -94,7 +94,7 @@ final GoRouter appRouter = GoRouter(
           name: '搜索结果',
           pageBuilder: (BuildContext context, GoRouterState state) {
             final String query = state.uri.queryParameters['q'] ?? '';
-            return buildDesktopFadeThroughPage(
+            return buildShellNavPage(
               state: state,
               child: SearchedPage(query: query),
             );
@@ -104,7 +104,7 @@ final GoRouter appRouter = GoRouter(
           path: '/settings',
           name: '设置',
           pageBuilder: (BuildContext context, GoRouterState state) =>
-              buildDesktopFadeThroughPage(
+              buildShellNavPage(
                 state: state,
                 child: const SettingsPage(),
               ),

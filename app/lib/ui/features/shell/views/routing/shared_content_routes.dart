@@ -55,7 +55,7 @@ List<RouteBase> buildSharedContentRoutes({
       path: '/metadata',
       name: '管理',
       pageBuilder: (BuildContext context, GoRouterState state) =>
-          buildDesktopFadeThroughPage(
+          buildShellNavPage(
             state: state,
             child: const MetadataManagementPage(),
           ),

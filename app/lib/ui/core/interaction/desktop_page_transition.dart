@@ -172,3 +172,15 @@ CustomTransitionPage<void> buildDesktopFadeThroughPage({
     child: child,
   );
 }
+
+/// Shell top-level nav (sidebar / drawer): instant swap, no page transition.
+NoTransitionPage<void> buildShellNavPage({
+  required GoRouterState state,
+  required Widget child,
+}) {
+  return NoTransitionPage<void>(
+    key: state.pageKey,
+    name: state.name,
+    child: child,
+  );
+}
