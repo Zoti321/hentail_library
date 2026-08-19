@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/ui/core/interaction/desktop_page_transition.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/library_page.dart';
 import 'package:hentai_library/ui/features/library/views/searched_page.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/settings_page.dart';
@@ -26,6 +27,7 @@ String? _librariesRootRedirect(BuildContext context, GoRouterState state) {
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: appRootNavigatorKey,
+  observers: <NavigatorObserver>[desktopPageTransitionObserver],
   initialLocation: '/home',
   routes: <RouteBase>[
     ShellRoute(
@@ -36,8 +38,11 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/home',
           name: '主页',
-          builder: (BuildContext context, GoRouterState state) =>
-              const HomePage(),
+          pageBuilder: (BuildContext context, GoRouterState state) =>
+              buildDesktopFadeThroughPage(
+                state: state,
+                child: const HomePage(),
+              ),
         ),
         GoRoute(
           path: LibrariesRoutes.root,
@@ -46,16 +51,22 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: LibrariesRoutes.allSegment,
               name: '全部库',
-              builder: (BuildContext context, GoRouterState state) =>
-                  const AllLibrariesBrowsePage(),
+              pageBuilder: (BuildContext context, GoRouterState state) =>
+                  buildDesktopFadeThroughPage(
+                    state: state,
+                    child: const AllLibrariesBrowsePage(),
+                  ),
             ),
             GoRoute(
               path: ':libraryId',
               name: '漫画库',
-              builder: (BuildContext context, GoRouterState state) {
+              pageBuilder: (BuildContext context, GoRouterState state) {
                 final String libraryId =
                     state.pathParameters['libraryId'] ?? '';
-                return LibraryBrowsePage(libraryId: libraryId);
+                return buildDesktopFadeThroughPage(
+                  state: state,
+                  child: LibraryBrowsePage(libraryId: libraryId),
+                );
               },
             ),
           ],
@@ -63,28 +74,40 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/local',
           name: '本地漫画',
-          builder: (BuildContext context, GoRouterState state) =>
-              const LegacyLocalLibraryRedirectPage(),
+          pageBuilder: (BuildContext context, GoRouterState state) =>
+              buildDesktopFadeThroughPage(
+                state: state,
+                child: const LegacyLocalLibraryRedirectPage(),
+              ),
         ),
         GoRoute(
           path: '/history',
           name: '历史记录',
-          builder: (BuildContext context, GoRouterState state) =>
-              const HistoryPage(),
+          pageBuilder: (BuildContext context, GoRouterState state) =>
+              buildDesktopFadeThroughPage(
+                state: state,
+                child: const HistoryPage(),
+              ),
         ),
         GoRoute(
           path: '/searched',
           name: '搜索结果',
-          builder: (BuildContext context, GoRouterState state) {
+          pageBuilder: (BuildContext context, GoRouterState state) {
             final String query = state.uri.queryParameters['q'] ?? '';
-            return SearchedPage(query: query);
+            return buildDesktopFadeThroughPage(
+              state: state,
+              child: SearchedPage(query: query),
+            );
           },
         ),
         GoRoute(
           path: '/settings',
           name: '设置',
-          builder: (BuildContext context, GoRouterState state) =>
-              const SettingsPage(),
+          pageBuilder: (BuildContext context, GoRouterState state) =>
+              buildDesktopFadeThroughPage(
+                state: state,
+                child: const SettingsPage(),
+              ),
         ),
         ...buildSharedContentRoutes(),
       ],

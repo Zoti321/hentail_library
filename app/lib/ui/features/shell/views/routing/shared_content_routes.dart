@@ -1,12 +1,12 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/ui/core/interaction/desktop_page_transition.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/comic_detail_page.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/series_detail_page.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/metadata_management_page.dart';
 import 'package:hentai_library/ui/features/reader/reader.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/route_not_found_page.dart';
-import 'package:hentai_library/ui/features/shell/views/routing/series_detail_route_page.dart';
 import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_page.dart';
 
 typedef ComicDetailBuilder =
@@ -34,20 +34,31 @@ List<RouteBase> buildSharedContentRoutes({
     GoRoute(
       path: '/comic/:id',
       name: '漫画详情',
-      builder: (context, state) {
+      pageBuilder: (BuildContext context, GoRouterState state) {
         final String comicId = Uri.decodeComponent(state.pathParameters['id']!);
-        return resolvedComicDetailBuilder(context, comicId);
+        return buildDesktopFadeThroughPage(
+          state: state,
+          child: resolvedComicDetailBuilder(context, comicId),
+        );
       },
     ),
     GoRoute(
       path: '/paths',
       name: '选中路径',
-      builder: (context, state) => const SelectedPathsPage(),
+      pageBuilder: (BuildContext context, GoRouterState state) =>
+          buildDesktopFadeThroughPage(
+            state: state,
+            child: const SelectedPathsPage(),
+          ),
     ),
     GoRoute(
       path: '/metadata',
       name: '管理',
-      builder: (context, state) => const MetadataManagementPage(),
+      pageBuilder: (BuildContext context, GoRouterState state) =>
+          buildDesktopFadeThroughPage(
+            state: state,
+            child: const MetadataManagementPage(),
+          ),
     ),
     GoRoute(
       path: '/tags',
@@ -66,7 +77,7 @@ List<RouteBase> buildSharedContentRoutes({
         final String seriesId = Uri.decodeComponent(
           state.pathParameters['id']!,
         );
-        return buildSeriesDetailRoutePage(
+        return buildDesktopFadeThroughPage(
           state: state,
           child: resolvedSeriesDetailBuilder(context, seriesId),
         );
@@ -75,21 +86,27 @@ List<RouteBase> buildSharedContentRoutes({
     GoRoute(
       path: '/series',
       name: '页面不存在',
-      builder: (BuildContext context, GoRouterState state) =>
-          const RouteNotFoundPage(),
+      pageBuilder: (BuildContext context, GoRouterState state) =>
+          buildDesktopFadeThroughPage(
+            state: state,
+            child: const RouteNotFoundPage(),
+          ),
     ),
     GoRoute(
       path: '/reader',
       name: ReaderRouteArgs.readerRouteName,
-      builder: (context, state) {
+      pageBuilder: (BuildContext context, GoRouterState state) {
         final ReaderRouteArgs args = ReaderRouteArgs.fromQuery(
           state.uri.queryParameters,
         );
-        return ReaderPage(
-          comicId: args.comicId,
-          keepControlsOpen: args.keepControlsOpen,
-          incognito: args.incognito,
-          startFromFirstPage: args.startFromFirstPage,
+        return buildDesktopFadeThroughPage(
+          state: state,
+          child: ReaderPage(
+            comicId: args.comicId,
+            keepControlsOpen: args.keepControlsOpen,
+            incognito: args.incognito,
+            startFromFirstPage: args.startFromFirstPage,
+          ),
         );
       },
     ),

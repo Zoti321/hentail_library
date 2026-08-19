@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/core/interaction/desktop_page_transition.dart';
 
 part 'theme_layout_tokens.dart';
 part 'theme_typography_tokens.dart';
@@ -37,9 +38,9 @@ ThemeData buildAppTheme(Brightness brightness) {
       builders: {
         TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
         TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.linux: _DesktopFadePageTransitionsBuilder(),
-        TargetPlatform.macOS: _DesktopFadePageTransitionsBuilder(),
-        TargetPlatform.windows: _DesktopFadePageTransitionsBuilder(),
+        TargetPlatform.linux: DesktopFadeThroughPageTransitionsBuilder(),
+        TargetPlatform.macOS: DesktopFadeThroughPageTransitionsBuilder(),
+        TargetPlatform.windows: DesktopFadeThroughPageTransitionsBuilder(),
       },
     ),
     extensions: [tokens],
@@ -83,27 +84,4 @@ NavigationRailThemeData _buildNavRailThemeData(ColorScheme colorScheme) {
     backgroundColor: colorScheme.surface,
     useIndicator: true,
   );
-}
-
-/// Short fade for desktop route pushes; skips animation when reduced motion is on.
-class _DesktopFadePageTransitionsBuilder extends PageTransitionsBuilder {
-  const _DesktopFadePageTransitionsBuilder();
-
-  @override
-  Widget buildTransitions<T>(
-    PageRoute<T> route,
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
-    if (MediaQuery.disableAnimationsOf(context)) {
-      return child;
-    }
-    final Animation<double> fade = CurvedAnimation(
-      parent: animation,
-      curve: Curves.easeOutCubic,
-    );
-    return FadeTransition(opacity: fade, child: child);
-  }
 }
