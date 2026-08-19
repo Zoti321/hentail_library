@@ -109,7 +109,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
         final bool useDrawer = layoutMode == _ShellLayoutMode.compact;
         final bool sidebarExpanded = switch (layoutMode) {
           _ShellLayoutMode.compact => true,
-          _ShellLayoutMode.medium => false,
+          _ShellLayoutMode.medium ||
           _ShellLayoutMode.expanded => isSidebarExpandedPref,
         };
         final bool showSidebarRail = !isReaderRoute && !useDrawer;
@@ -152,13 +152,11 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
                             _buildSidebar(
                               activeId: sidebarActiveId,
                               isExpanded: sidebarExpanded,
-                              showCollapseToggle:
-                                  layoutMode == _ShellLayoutMode.expanded,
+                              showCollapseToggle: !useDrawer,
                               allowLibraryReorder:
-                                  layoutMode == _ShellLayoutMode.expanded &&
-                                  sidebarExpanded,
+                                  !useDrawer && sidebarExpanded,
                               onToggleExpanded: () {
-                                if (layoutMode == _ShellLayoutMode.expanded) {
+                                if (!useDrawer) {
                                   ref
                                       .read(settingsProvider.notifier)
                                       .setDesktopSidebarExpanded(

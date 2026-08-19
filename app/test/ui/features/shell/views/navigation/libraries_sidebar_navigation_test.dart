@@ -88,6 +88,7 @@ void main() {
         fake,
         (GoRouter r) => router = r,
         viewportSize: const Size(900, 900),
+        setting: AppSetting(desktopSidebarExpanded: false),
       );
 
       await tester.tap(_librariesRailIcon());
@@ -118,6 +119,7 @@ void main() {
         fake,
         (_) {},
         viewportSize: const Size(900, 900),
+        setting: AppSetting(desktopSidebarExpanded: false),
       );
 
       await tester.tap(_librariesRailIcon());
@@ -300,6 +302,7 @@ Future<void> _pumpLibrariesShell(
   void Function(GoRouter router) onRouter, {
   String initialLocation = '/home',
   Size viewportSize = const Size(1280, 900),
+  AppSetting? setting,
 }) async {
   tester.view.physicalSize = viewportSize;
   tester.view.devicePixelRatio = 1.0;
@@ -355,7 +358,9 @@ Future<void> _pumpLibrariesShell(
   await tester.pumpWidget(
     ProviderScope(
       overrides: <Override>[
-        settingsProvider.overrideWith(_FakeSettingsNotifier.new),
+        settingsProvider.overrideWith(
+          () => _FakeSettingsNotifier(setting ?? AppSetting()),
+        ),
         currentLibraryProvider.overrideWith(() => fake),
         scanLibraryControllerProvider.overrideWith(
           _IdleScanLibraryController.new,
@@ -375,8 +380,12 @@ Future<void> _pumpLibrariesShell(
 }
 
 class _FakeSettingsNotifier extends SettingsNotifier {
+  _FakeSettingsNotifier([this._setting]);
+
+  final AppSetting? _setting;
+
   @override
-  Future<AppSetting> build() async => AppSetting();
+  Future<AppSetting> build() async => _setting ?? AppSetting();
 }
 
 class _IdleScanLibraryController extends ScanLibraryController {

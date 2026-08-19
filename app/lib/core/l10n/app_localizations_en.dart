@@ -165,6 +165,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'No series match the current filters';
 
   @override
+  String get libraryClearFilters => 'Clear filters';
+
+  @override
   String comicCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

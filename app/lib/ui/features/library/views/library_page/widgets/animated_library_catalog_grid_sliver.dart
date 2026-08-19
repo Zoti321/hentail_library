@@ -71,7 +71,8 @@ class _AnimatedLibraryCatalogGridSliverState
         enableDraggable: false,
         itemCount: widget.itemCount,
         animationConfig: libraryCatalogSortFlipAnimationConfig(
-          enableAnimations: _enableSortFlipAnimation,
+          enableAnimations:
+              _enableSortFlipAnimation && !reduceMotionOf(context),
         ),
         childBuilder: (Widget Function(Widget child, int index) wrapGridChild) {
           return GridView.builder(

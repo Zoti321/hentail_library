@@ -8,6 +8,7 @@ typedef LibraryEmptyStateContent = ({
   String hint,
   LibraryEmptyStateIcon icon,
   bool showManagePathsEntry,
+  bool showClearFilters,
 });
 
 LibraryEmptyStateContent resolveLibraryEmptyStateContent({
@@ -22,12 +23,14 @@ LibraryEmptyStateContent resolveLibraryEmptyStateContent({
         hint: l10n.libraryEmptyHint,
         icon: LibraryEmptyStateIcon.library,
         showManagePathsEntry: true,
+        showClearFilters: false,
       ),
       LibraryDisplayTarget.series => (
         title: l10n.librarySeriesEmptyTitle,
         hint: l10n.librarySeriesEmptyHint,
         icon: LibraryEmptyStateIcon.library,
-        showManagePathsEntry: false,
+        showManagePathsEntry: true,
+        showClearFilters: false,
       ),
     };
   }
@@ -40,5 +43,6 @@ LibraryEmptyStateContent resolveLibraryEmptyStateContent({
     },
     icon: LibraryEmptyStateIcon.listFilter,
     showManagePathsEntry: false,
+    showClearFilters: true,
   );
 }

@@ -24,6 +24,7 @@ class SeriesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CatalogCoverCardShell(
+      semanticLabel: series.name,
       onTap: onTap,
       onSecondaryTapUp: onSecondaryTapUp,
       cover: SeriesCoverContent(

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/reading/read_session.dart';
+import 'package:hentai_library/ui/core/interaction/app_motion.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_series_navigation.dart';
@@ -45,7 +46,7 @@ class ReaderTopBar extends StatelessWidget {
     final double targetWidth = ReaderFloatingPanel.targetBarWidth(context);
 
     return AnimatedPositioned(
-      duration: const Duration(milliseconds: 300),
+      duration: motionDurationOf(context, const Duration(milliseconds: 300)),
       curve: Curves.easeOutCubic,
       top: showControls ? topPadding : topPadding - 20,
       left: 0,
@@ -53,7 +54,10 @@ class ReaderTopBar extends StatelessWidget {
       child: IgnorePointer(
         ignoring: !showControls,
         child: AnimatedOpacity(
-          duration: const Duration(milliseconds: 300),
+          duration: motionDurationOf(
+            context,
+            const Duration(milliseconds: 300),
+          ),
           opacity: showControls ? 1.0 : 0.0,
           child: Center(
             child: ReaderFloatingPanel(

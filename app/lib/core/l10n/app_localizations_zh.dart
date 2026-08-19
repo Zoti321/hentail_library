@@ -161,6 +161,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryNoMatchFilterHintSeries => '当前筛选条件下没有系列';
 
   @override
+  String get libraryClearFilters => '清除筛选';
+
+  @override
   String comicCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

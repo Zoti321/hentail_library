@@ -61,6 +61,7 @@
   "libraryNoMatchTitle": "没有匹配结果",
   "libraryNoMatchFilterHintComics": "当前筛选条件下没有漫画",
   "libraryNoMatchFilterHintSeries": "当前筛选条件下没有系列",
+  "libraryClearFilters": "清除筛选",
   "comicCount": "{count, plural, =0{0 本} other{{count} 本}}",
   "@comicCount": {
     "placeholders": {

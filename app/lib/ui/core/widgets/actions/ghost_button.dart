@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/core/interaction/interactive_target.dart';
 
 enum _GhostButtonVariant { icon, iconText, text }
 
@@ -73,13 +74,19 @@ class GhostButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final bool isEnabled = onPressed != null;
+    final bool compact = isCompactLayoutWidth(MediaQuery.sizeOf(context).width);
+    final double hitSize = minInteractiveSize(
+      visualSize: size,
+      compact: compact,
+    );
     final String effectiveTooltip = tooltip ?? text ?? '';
     final String semanticsText = semanticLabel ?? effectiveTooltip;
     final Color enabledForeground = foregroundColor ?? cs.onSurfaceVariant;
     final Color disabledForeground = enabledForeground.withAlpha(96);
     final Color effectiveHoverColor = hoverColor ?? cs.surfaceContainer;
     final Color effectiveOverlayColor =
-        overlayColor ?? effectiveHoverColor.withAlpha(110);
+        overlayColor ?? effectiveHoverColor.withAlpha(compact ? 160 : 110);
+    const InteractiveInkFeatureFactory splashFactory = NoSplash.splashFactory;
     final ButtonStyle ghostLabelStyle = ButtonStyle(
       foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
         if (states.contains(WidgetState.disabled)) {
@@ -88,12 +95,15 @@ class GhostButton extends StatelessWidget {
         return enabledForeground;
       }),
       backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-        if (states.contains(WidgetState.hovered)) {
+        if (states.contains(WidgetState.hovered) ||
+            (compact && states.contains(WidgetState.pressed))) {
           return effectiveHoverColor;
         }
         return Colors.transparent;
       }),
       overlayColor: WidgetStateProperty.all(effectiveOverlayColor),
+      splashFactory: splashFactory,
+      minimumSize: WidgetStateProperty.all(Size(0, hitSize)),
       shape: WidgetStateProperty.all(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
@@ -106,10 +116,12 @@ class GhostButton extends StatelessWidget {
             onPressed: onPressed,
             iconSize: iconSize,
             style: IconButton.styleFrom(
-              minimumSize: Size.square(size),
-              fixedSize: Size.square(size),
+              minimumSize: Size.square(hitSize),
+              fixedSize: compact ? null : Size.square(size),
               padding: EdgeInsets.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              tapTargetSize: compact
+                  ? MaterialTapTargetSize.padded
+                  : MaterialTapTargetSize.shrinkWrap,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(borderRadius),
               ),
@@ -147,9 +159,7 @@ class GhostButton extends StatelessWidget {
         ? button
         : Tooltip(
             message: effectiveTooltip,
-            waitDuration: delayTooltipThreeSeconds
-                ? const Duration(seconds: 3)
-                : null,
+            waitDuration: iconTooltipWait(delayed: delayTooltipThreeSeconds),
             showDuration: const Duration(seconds: 2),
             child: button,
           );

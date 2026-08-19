@@ -392,6 +392,12 @@ abstract class AppLocalizations {
   /// **'当前筛选条件下没有系列'**
   String get libraryNoMatchFilterHintSeries;
 
+  /// No description provided for @libraryClearFilters.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除筛选'**
+  String get libraryClearFilters;
+
   /// No description provided for @comicCount.
   ///
   /// In zh, this message translates to:

@@ -6,6 +6,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/navigation/desktop_sidebar.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/scan_library_controller.dart';
 import 'package:hentai_library/ui/features/shell/view_models/home_page_dashboard_notifier.dart';
@@ -34,6 +35,24 @@ void main() {
       find.descendant(
         of: find.byType(HomePageHeaderToolbar),
         matching: find.text('扫描漫画库'),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('medium shell shows a collapsible sidebar rail', (
+    WidgetTester tester,
+  ) async {
+    await _pumpShellHome(tester, const Size(800, 900));
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(DesktopSidebar), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(DesktopSidebar),
+        matching: find.byWidgetPredicate(
+          (Widget widget) => widget is Icon && widget.icon == LucideIcons.menu,
+        ),
       ),
       findsOneWidget,
     );

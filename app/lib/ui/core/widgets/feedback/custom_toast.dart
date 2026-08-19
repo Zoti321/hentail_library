@@ -1,23 +1,38 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double _kToastMaxWidth = 380;
 const double _kToastScreenInset = 24;
+const double _kCompactToastBottomBarGap = 56;
 
-/// 右下角与屏幕边缘的间距（与历史 SnackBar 定位一致）。
-EdgeInsets _desktopToastOuterMargin(BuildContext context) {
-  final double w = MediaQuery.sizeOf(context).width;
+/// Positions a toast: compact screens sit bottom-center above chrome;
+/// expanded screens keep the desktop bottom-right corner.
+EdgeInsets toastOuterMargin(Size size, {double bottomInset = 0}) {
+  const double inset = _kToastScreenInset;
+  if (AppLayoutBreakpoints.isCompact(size.width)) {
+    return EdgeInsets.fromLTRB(inset, 0, inset, inset + bottomInset);
+  }
   return EdgeInsets.only(
-    left: w > _kToastMaxWidth + _kToastScreenInset * 2
-        ? w - _kToastMaxWidth - _kToastScreenInset
-        : _kToastScreenInset,
-    bottom: _kToastScreenInset,
-    right: _kToastScreenInset,
+    left: size.width > _kToastMaxWidth + inset * 2
+        ? size.width - _kToastMaxWidth - inset
+        : inset,
+    bottom: inset + bottomInset,
+    right: inset,
   );
+}
+
+EdgeInsets _toastMarginForContext(BuildContext context) {
+  final Size size = MediaQuery.sizeOf(context);
+  final double safeBottom = MediaQuery.paddingOf(context).bottom;
+  final double bottomBar = AppLayoutBreakpoints.isCompact(size.width)
+      ? _kCompactToastBottomBarGap
+      : 0;
+  return toastOuterMargin(size, bottomInset: safeBottom + bottomBar);
 }
 
 enum AppToastType { success, error, info }
@@ -47,12 +62,15 @@ void showCustomToast(
   if (overlay == null) {
     return;
   }
-  final EdgeInsets margin = _desktopToastOuterMargin(context);
+  final EdgeInsets margin = _toastMarginForContext(context);
   late OverlayEntry entry;
   entry = OverlayEntry(
     builder: (BuildContext overlayContext) {
       return _ToastOverlayManager(
         margin: margin,
+        compact: AppLayoutBreakpoints.isCompact(
+          MediaQuery.sizeOf(context).width,
+        ),
         message: message,
         type: type,
         showIcon: showIcon,
@@ -193,6 +211,7 @@ class CustomToast extends StatelessWidget {
 class _ToastOverlayManager extends StatefulWidget {
   const _ToastOverlayManager({
     required this.margin,
+    required this.compact,
     required this.message,
     required this.type,
     required this.showIcon,
@@ -201,6 +220,7 @@ class _ToastOverlayManager extends StatefulWidget {
   });
 
   final EdgeInsets margin;
+  final bool compact;
   final String message;
   final AppToastType type;
   final bool showIcon;
@@ -257,7 +277,9 @@ class _ToastOverlayManagerState extends State<_ToastOverlayManager>
       children: <Widget>[
         const Positioned.fill(child: IgnorePointer(child: SizedBox.expand())),
         Align(
-          alignment: Alignment.bottomRight,
+          alignment: widget.compact
+              ? Alignment.bottomCenter
+              : Alignment.bottomRight,
           child: Padding(
             padding: widget.margin,
             child: ConstrainedBox(

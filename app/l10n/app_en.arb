@@ -61,6 +61,7 @@
   "libraryNoMatchTitle": "No matches",
   "libraryNoMatchFilterHintComics": "No comics match the current filters",
   "libraryNoMatchFilterHintSeries": "No series match the current filters",
+  "libraryClearFilters": "Clear filters",
   "comicCount": "{count, plural, =0{0 comics} one{1 comic} other{{count} comics}}",
   "@comicCount": {
     "placeholders": {

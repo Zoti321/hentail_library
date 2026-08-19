@@ -24,8 +24,9 @@ class LibraryComicsBlock extends ConsumerWidget {
     if (catalogAsync.hasError) {
       return catalogAsync.when(
         data: (_) => const SliverToBoxAdapter(child: SizedBox.shrink()),
-        loading: () => const SliverToBoxAdapter(
-          child: Center(child: CircularProgressIndicator()),
+        loading: () => _LibraryCatalogLoadingSliver(
+          layoutTier: layoutTier,
+          horizontalPadding: horizontalPadding,
         ),
         error: (Object err, StackTrace stack) => SliverToBoxAdapter(
           child: Padding(
@@ -37,8 +38,9 @@ class LibraryComicsBlock extends ConsumerWidget {
     }
     final LibraryComicsCatalogState? catalog = catalogAsync.value;
     if (catalog == null) {
-      return const SliverToBoxAdapter(
-        child: Center(child: CircularProgressIndicator()),
+      return _LibraryCatalogLoadingSliver(
+        layoutTier: layoutTier,
+        horizontalPadding: horizontalPadding,
       );
     }
     final List<Comic> comics = catalog.items;
