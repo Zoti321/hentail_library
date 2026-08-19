@@ -626,15 +626,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get librarySearchKeywordEmpty => 'Keyword cannot be empty';
 
   @override
-  String get globalSearchTitle => 'Search';
-
-  @override
-  String get globalSearchSubmit => 'Search';
-
-  @override
-  String get globalSearchSemantic => 'Search library';
-
-  @override
   String get libraryFilterSortTooltip => 'Filter & sort';
 
   @override
