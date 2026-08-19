@@ -14,6 +14,8 @@ import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_page_header.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/tag_management_panel.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
+import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 
 class MetadataManagementPage extends ConsumerStatefulWidget {
@@ -145,6 +147,9 @@ class _MetadataManagementPageState
       selectedTabIndex: selectedIndex,
       onTabSelected: _handleTabSelected,
       onAdd: () => _invokeAddForTab(context, selectedIndex),
+      onDeleteAllTags: selectedIndex == 1
+          ? () => _deleteAllTags(context)
+          : null,
       onOpenNavigation: appShellPageNavigationOpener(context),
     );
     final Widget header = KeyedSubtree(
@@ -275,6 +280,30 @@ class _MetadataManagementPageState
         },
       ),
     );
+  }
+
+  Future<void> _deleteAllTags(BuildContext context) async {
+    final List<Tag> tags = await ref.read(allTagsProvider.future);
+    if (!context.mounted || tags.isEmpty) {
+      return;
+    }
+
+    final bool confirmed =
+        await showDialog<bool>(
+          context: context,
+          builder: (BuildContext dialogContext) =>
+              TagConfirmDeleteDialog(count: tags.length),
+        ) ??
+        false;
+    if (!context.mounted || !confirmed) {
+      return;
+    }
+
+    await ref.read(tagActionsProvider).deleteAllTags();
+    if (!context.mounted) {
+      return;
+    }
+    showSuccessToast(context, context.l10n.metadataTagsDeletedAllToast);
   }
 }
 

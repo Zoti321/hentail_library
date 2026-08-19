@@ -100,7 +100,7 @@ Key semantic groups in `HentaiColorScheme`:
 - **Adaptive form surfaces** (`AdaptiveFormSurface` / `showAdaptiveFormSurface`): medium/expanded → centered dialog; compact (`< 600`) → full-page under `AppTitleBar`, with live morph (~200ms `easeOutCubic`) across the breakpoint. Use for multi-field editors; keep confirm/progress dialogs on `HentaiDialog`.
 - **Metadata edit** (`EditMetadataDialog`): 720px max dialog width, 4px radius; side tabs on medium/expanded, `CapsuleTabBar` on compact; presented via `AdaptiveFormSurface`
 - **Series edit** (`EditSeriesDialog`): same adaptive shell (480px max dialog width)
-- Toasts: `showCustomToast` / `showSuccessToast` / `showErrorToast` — bottom-right, max 380px — **not** `SnackBar` on desktop
+- Toasts: `showCustomToast` / `showSuccessToast` / `showErrorToast` — compact bottom-center; medium/expanded bottom-right (max 380 medium, 480 expanded); solid fill + layered shadow, no border — **not** `SnackBar` on desktop
 
 ### Interaction patterns
 

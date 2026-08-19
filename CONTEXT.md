@@ -4,6 +4,12 @@
 
 ## Language
 
+### Application data
+
+**App data profile**:
+与应用身份绑定的一整份本机应用数据树（含库文件、本地设置、日志与缓存等）。日常发布使用 `default`；非正式构建（Debug / Profile）使用独立的 `dev`，二者互不共享。与 Library（同一库文件内的多根集合）无关。详见 ADR-0010。
+_Avoid_: 开发库、发布库、数据库环境（易与 Library 混淆）
+
 ### Library & resources
 
 **Library**:
@@ -103,8 +109,12 @@ Comic 的直接父目录对应一个 Series；Library root 下直接存放的 Co
 _Avoid_: 标题推断、自动分组
 
 **Tag**:
-用户为 Comic 附加的自由文本标签，用于筛选与归类。
-_Avoid_: 分类、关键词
+全局标签字典中的名称，用于筛选与归类；可来自用户创建或外部词库导入，再附着到 Comic。
+_Avoid_: 分类、关键词、Eh 标签（口语可用；领域与 issue 用 Tag）
+
+**Tag dictionary import**:
+从外部 JSON 标签字典（经网络下载或本地字节）将标签名幂等写入全局 Tag 字典的操作；不附着到 Comic，不删除本机已有 Tag。JSON 格式见 `docs/agents/tag-dictionary-import.md`。UI 入口待接入自维护词库后启用。
+_Avoid_: ehentai 导入、EhTagTranslation、标签同步、画廊导入（易被理解成给 Comic 打标或镜像删除）
 
 **Author**:
 Comic 的署名，用于展示与筛选；社团、画师、原作者等展示用名字均记为 Author，不区分类型。

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/core/util/utils.dart';
+import 'package:hentai_library/ui/core/interaction/desktop_page_transition.dart';
 
 part 'theme_layout_tokens.dart';
 part 'theme_typography_tokens.dart';
@@ -38,8 +38,9 @@ ThemeData buildAppTheme(Brightness brightness) {
       builders: {
         TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
         TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-        TargetPlatform.windows: FadeForwardsPageTransitionsBuilder(),
-        TargetPlatform.macOS: ZoomPageTransitionsBuilder(),
+        TargetPlatform.linux: DesktopFadeThroughPageTransitionsBuilder(),
+        TargetPlatform.macOS: DesktopFadeThroughPageTransitionsBuilder(),
+        TargetPlatform.windows: DesktopFadeThroughPageTransitionsBuilder(),
       },
     ),
     extensions: [tokens],
@@ -70,13 +71,11 @@ ScrollbarThemeData _buildScrollbarTheme(ColorScheme colorScheme) {
 }
 
 AppBarTheme _buildAppBarThemeData(ColorScheme colorScheme) {
-  return isDesktop
-      ? AppBarTheme(
-          surfaceTintColor: Colors.transparent,
-          backgroundColor: colorScheme.surface,
-          scrolledUnderElevation: 0.0,
-        )
-      : const AppBarTheme();
+  return AppBarTheme(
+    surfaceTintColor: Colors.transparent,
+    backgroundColor: colorScheme.surface,
+    scrolledUnderElevation: 0.0,
+  );
 }
 
 NavigationRailThemeData _buildNavRailThemeData(ColorScheme colorScheme) {

@@ -392,6 +392,12 @@ abstract class AppLocalizations {
   /// **'当前筛选条件下没有系列'**
   String get libraryNoMatchFilterHintSeries;
 
+  /// No description provided for @libraryClearFilters.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除筛选'**
+  String get libraryClearFilters;
+
   /// No description provided for @comicCount.
   ///
   /// In zh, this message translates to:
@@ -689,7 +695,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeNoReadingHistory.
   ///
   /// In zh, this message translates to:
-  /// **'暂无阅读记录，'**
+  /// **'暂无阅读记录'**
   String get homeNoReadingHistory;
 
   /// No description provided for @homeGoToLibrary.
@@ -2323,6 +2329,40 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'试试其他关键词，或清空搜索'**
   String get metadataSearchNoMatchHint;
+
+  /// No description provided for @metadataDeleteAllTags.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除所有'**
+  String get metadataDeleteAllTags;
+
+  /// No description provided for @metadataTagsDeletedAllToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已删除全部标签'**
+  String get metadataTagsDeletedAllToast;
+
+  /// No description provided for @metadataImportTagDictionaryDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入标签字典'**
+  String get metadataImportTagDictionaryDialogTitle;
+
+  /// No description provided for @metadataImportTagDictionaryDialogBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在下载标签字典并写入全局 Tag…'**
+  String get metadataImportTagDictionaryDialogBody;
+
+  /// No description provided for @metadataImportTagDictionarySummary.
+  ///
+  /// In zh, this message translates to:
+  /// **'新增 {added} 条，已存在跳过 {skippedExisting} 条，过滤/空名/去重跳过 {skippedFiltered} 条'**
+  String metadataImportTagDictionarySummary(
+    int added,
+    int skippedExisting,
+    int skippedFiltered,
+  );
 
   /// No description provided for @commonCancel.
   ///

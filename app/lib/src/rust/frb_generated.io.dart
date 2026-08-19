@@ -244,6 +244,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Int32List dco_decode_list_prim_i_32_strict(dynamic raw);
 
   @protected
+  List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
@@ -406,6 +409,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SyncScanModeDto dco_decode_sync_scan_mode_dto(dynamic raw);
+
+  @protected
+  TagDictionaryImportResultDto dco_decode_tag_dictionary_import_result_dto(
+    dynamic raw,
+  );
 
   @protected
   TagPagedNamesDto dco_decode_tag_paged_names_dto(dynamic raw);
@@ -690,6 +698,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Int32List sse_decode_list_prim_i_32_strict(SseDeserializer deserializer);
 
   @protected
+  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
@@ -898,6 +909,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SyncScanModeDto sse_decode_sync_scan_mode_dto(SseDeserializer deserializer);
+
+  @protected
+  TagDictionaryImportResultDto sse_decode_tag_dictionary_import_result_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   TagPagedNamesDto sse_decode_tag_paged_names_dto(SseDeserializer deserializer);
@@ -1253,6 +1269,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
     SseSerializer serializer,
@@ -1516,6 +1535,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_sync_scan_mode_dto(
     SyncScanModeDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_tag_dictionary_import_result_dto(
+    TagDictionaryImportResultDto self,
     SseSerializer serializer,
   );
 

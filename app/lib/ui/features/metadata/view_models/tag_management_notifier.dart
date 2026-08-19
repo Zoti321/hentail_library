@@ -58,6 +58,17 @@ class TagActions {
     _ref.invalidate(allTagsProvider);
   }
 
+  Future<void> deleteAllTags() async {
+    final List<Tag> tags = await _ref.read(tagRepoProvider).listAll();
+    if (tags.isEmpty) {
+      return;
+    }
+    await _ref
+        .read(tagRepoProvider)
+        .deleteByNames(tags.map((Tag tag) => tag.name).toList());
+    _ref.invalidate(allTagsProvider);
+  }
+
   Future<void> renameTag(Tag oldTag, String newName) async {
     final trimmed = newName.trim();
     if (trimmed.isEmpty || trimmed == oldTag.name) return;

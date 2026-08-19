@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/core/interaction/interactive_target.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 
 typedef ContentSwitcherBottomBarItem = ({IconData icon, String label});
@@ -18,11 +19,13 @@ class ContentSwitcherBottomBar extends StatelessWidget {
 
   static const double _barHeight = 56;
   static const double _iconSize = 20;
-  static const double _labelFontSize = 11;
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final double labelFontSize = tokens.text.labelXs;
+
     return Material(
       color: cs.surface,
       elevation: 0,
@@ -41,27 +44,44 @@ class ContentSwitcherBottomBar extends StatelessWidget {
                 final Color foreground = selected
                     ? cs.primary
                     : cs.onSurfaceVariant;
+                final Color background = selected
+                    ? cs.primary.withAlpha(28)
+                    : Colors.transparent;
                 return Expanded(
-                  child: InkWell(
-                    onTap: () => onSelected(index),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Icon(item.icon, size: _iconSize, color: foreground),
-                        const SizedBox(height: 4),
-                        Text(
-                          item.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: _labelFontSize,
-                            fontWeight: selected
-                                ? FontWeight.w600
-                                : FontWeight.w500,
-                            color: foreground,
-                          ),
+                  child: Semantics(
+                    button: true,
+                    selected: selected,
+                    label: item.label,
+                    child: Material(
+                      color: background,
+                      child: InkWell(
+                        splashFactory: NoSplash.splashFactory,
+                        highlightColor: Colors.transparent,
+                        hoverColor: cs.surfaceContainer,
+                        onTap: () {
+                          onSelected(index);
+                          unfocusAfterPointerActivation();
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(item.icon, size: _iconSize, color: foreground),
+                            SizedBox(height: tokens.spacing.xs),
+                            Text(
+                              item.label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: labelFontSize,
+                                fontWeight: selected
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                                color: foreground,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 );

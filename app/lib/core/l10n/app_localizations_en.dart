@@ -165,6 +165,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'No series match the current filters';
 
   @override
+  String get libraryClearFilters => 'Clear filters';
+
+  @override
   String comicCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -356,7 +359,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeContinueReading => 'Continue reading';
 
   @override
-  String get homeNoReadingHistory => 'No reading history yet, ';
+  String get homeNoReadingHistory => 'No reading history yet';
 
   @override
   String get homeGoToLibrary => 'Go to library';
@@ -1266,6 +1269,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get metadataSearchNoMatchHint =>
       'Try another keyword, or clear the search';
+
+  @override
+  String get metadataDeleteAllTags => 'Delete all';
+
+  @override
+  String get metadataTagsDeletedAllToast => 'All tags deleted';
+
+  @override
+  String get metadataImportTagDictionaryDialogTitle => 'Import tag dictionary';
+
+  @override
+  String get metadataImportTagDictionaryDialogBody =>
+      'Downloading the tag dictionary and updating global tags…';
+
+  @override
+  String metadataImportTagDictionarySummary(
+    int added,
+    int skippedExisting,
+    int skippedFiltered,
+  ) {
+    return 'Added $added, skipped existing $skippedExisting, skipped filtered/empty/deduped $skippedFiltered';
+  }
 
   @override
   String get commonCancel => 'Cancel';

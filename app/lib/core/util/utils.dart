@@ -14,6 +14,9 @@ bool get isDesktop {
   ].contains(defaultTargetPlatform);
 }
 
+/// OS window chrome (caption, fullscreen). Layout breakpoints stay separate.
+bool get supportsDesktopWindowChrome => isDesktop;
+
 /// Whether a `explorer.exe /select` [ProcessResult] should be treated as failure.
 ///
 /// On Windows, `explorer.exe` returns exit code 1 even when the folder opens

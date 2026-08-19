@@ -10,8 +10,6 @@ import 'package:hentai_library/ui/core/widgets/element/chip/r18_rating_chip.dart
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_info_sections.dart';
 
 /// 休刊状态 chip 描边/文字色（仅系列详情页使用）。
-const Color _kSeriesHiatusChipColor = Color(0xFFF59E0B);
-
 Color _serializationChipAccentColor(
   ColorScheme cs,
   SerializationStatus status,
@@ -19,7 +17,7 @@ Color _serializationChipAccentColor(
   return switch (status) {
     SerializationStatus.ongoing => cs.hentai.success,
     SerializationStatus.ended => cs.hentai.textTertiary,
-    SerializationStatus.hiatus => _kSeriesHiatusChipColor,
+    SerializationStatus.hiatus => cs.hentai.serializationHiatus,
     SerializationStatus.unknown => cs.hentai.textSecondary,
   };
 }

@@ -44,9 +44,7 @@ class HomePageContinueReadingSection extends ConsumerWidget {
           SizedBox(height: tokens.spacing.sm),
           SizedBox(
             height: continueReadingStripHeight + 8,
-            child: const Center(
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
+            child: const _ContinueReadingSkeleton(),
           ),
         ],
       );
@@ -136,7 +134,7 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     if (widget.loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const _ContinueReadingSkeleton();
     }
     if (widget.hasError) {
       return Center(
@@ -206,6 +204,75 @@ class _ContinueReadingBodyState extends State<_ContinueReadingBody> {
                 queryParameters: ReaderRouteArgs(
                   comicId: item.comicId,
                 ).toQueryParameters(),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ContinueReadingSkeleton extends StatelessWidget {
+  const _ContinueReadingSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final Color bar = cs.hentai.imagePlaceholder;
+    return ExcludeSemantics(
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 3,
+        separatorBuilder: (BuildContext context, int index) =>
+            SizedBox(width: tokens.spacing.md),
+        itemBuilder: (BuildContext context, int index) {
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              color: cs.surface,
+              borderRadius: BorderRadius.circular(tokens.radius.xs),
+              border: Border.all(color: cs.hentai.borderSubtle),
+            ),
+            child: SizedBox(
+              width: continueReadingItemWidthCompact,
+              height: continueReadingStripHeight,
+              child: Row(
+                children: <Widget>[
+                  ColoredBox(
+                    color: bar,
+                    child: SizedBox(
+                      width: continueReadingStripHeight * 2 / 3,
+                      height: double.infinity,
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(tokens.spacing.lg),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ColoredBox(
+                            color: bar,
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: tokens.text.bodyMd,
+                            ),
+                          ),
+                          SizedBox(height: tokens.spacing.md),
+                          ColoredBox(
+                            color: bar,
+                            child: SizedBox(
+                              width: 96,
+                              height: tokens.text.labelXs,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           );

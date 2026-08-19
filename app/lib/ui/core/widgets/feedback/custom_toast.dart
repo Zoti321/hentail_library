@@ -1,22 +1,62 @@
-﻿import 'dart:async';
+import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-const double _kToastMaxWidth = 380;
+const double _kToastStandardMaxWidth = 380;
+const double _kToastExpandedMaxWidth = 480;
 const double _kToastScreenInset = 24;
+const double _kCompactToastBottomBarGap = 56;
 
-/// 右下角与屏幕边缘的间距（与历史 SnackBar 定位一致）。
-EdgeInsets _desktopToastOuterMargin(BuildContext context) {
-  final double w = MediaQuery.sizeOf(context).width;
+/// Max toast width for [viewportWidth], following [AppLayoutBreakpoints].
+double toastMaxWidth(double viewportWidth) {
+  if (AppLayoutBreakpoints.isExpanded(viewportWidth)) {
+    return _kToastExpandedMaxWidth;
+  }
+  if (AppLayoutBreakpoints.isCompact(viewportWidth)) {
+    return math.min(
+      viewportWidth - _kToastScreenInset * 2,
+      _kToastStandardMaxWidth,
+    );
+  }
+  return _kToastStandardMaxWidth;
+}
+
+/// Inner padding: expanded gets a taller bar; compact/medium stay denser.
+EdgeInsets toastContentPadding(
+  double viewportWidth, {
+  AppThemeTokens tokens = AppThemeTokens.shared,
+}) {
+  if (AppLayoutBreakpoints.isExpanded(viewportWidth)) {
+    return EdgeInsets.symmetric(
+      horizontal: tokens.spacing.xl,
+      vertical: tokens.spacing.lg,
+    );
+  }
+  return EdgeInsets.symmetric(
+    horizontal: tokens.spacing.lg,
+    vertical: tokens.spacing.md,
+  );
+}
+
+/// Positions a toast: compact screens sit bottom-center above chrome;
+/// medium/expanded screens keep the desktop bottom-right corner.
+EdgeInsets toastOuterMargin(Size size, {double bottomInset = 0}) {
+  const double inset = _kToastScreenInset;
+  if (AppLayoutBreakpoints.isCompact(size.width)) {
+    return EdgeInsets.fromLTRB(inset, 0, inset, inset + bottomInset);
+  }
+  final double maxWidth = toastMaxWidth(size.width);
   return EdgeInsets.only(
-    left: w > _kToastMaxWidth + _kToastScreenInset * 2
-        ? w - _kToastMaxWidth - _kToastScreenInset
-        : _kToastScreenInset,
-    bottom: _kToastScreenInset,
-    right: _kToastScreenInset,
+    left: size.width > maxWidth + inset * 2
+        ? size.width - maxWidth - inset
+        : inset,
+    bottom: inset + bottomInset,
+    right: inset,
   );
 }
 
@@ -30,7 +70,7 @@ void _removeActiveToastImmediately() {
   entry?.remove();
 }
 
-/// 桌面端自定义 Toast：右下角、限宽；同时只显示一条。
+/// 自定义 Toast：按断点限宽；同时只显示一条。
 void showCustomToast(
   BuildContext context, {
   required String message,
@@ -47,12 +87,10 @@ void showCustomToast(
   if (overlay == null) {
     return;
   }
-  final EdgeInsets margin = _desktopToastOuterMargin(context);
   late OverlayEntry entry;
   entry = OverlayEntry(
     builder: (BuildContext overlayContext) {
       return _ToastOverlayManager(
-        margin: margin,
         message: message,
         type: type,
         showIcon: showIcon,
@@ -102,68 +140,65 @@ class CustomToast extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
+    final AppThemeTokens tokens =
+        Theme.of(context).extension<AppThemeTokens>() ?? AppThemeTokens.shared;
+    final double viewportWidth = MediaQuery.sizeOf(context).width;
     final IconData iconData = switch (type) {
       AppToastType.success => LucideIcons.circleCheckBig,
       AppToastType.error => LucideIcons.circleAlert,
       AppToastType.info => LucideIcons.info,
     };
-    final bool isLight = theme.brightness == Brightness.light;
-    final Color toastBackground = isLight
-        ? const Color(0xFFFFFFFF)
-        : cs.surfaceContainerHigh;
+    final bool isDark = theme.brightness == Brightness.dark;
+    final Color toastBackground = isDark ? cs.surfaceContainerHigh : cs.surface;
     final Color accentColor = switch (type) {
       AppToastType.success => cs.primary,
       AppToastType.error => cs.error,
       AppToastType.info => cs.primary,
     };
     final Color foregroundColor = cs.hentai.textPrimary;
-    final Color iconColor = accentColor;
-    final List<BoxShadow> elevationShadows = isLight
-        ? <BoxShadow>[
-            BoxShadow(
-              color: Colors.black.withAlpha(28),
-              blurRadius: 28,
-              spreadRadius: 0,
-              offset: const Offset(0, 10),
-            ),
-            BoxShadow(
-              color: Colors.black.withAlpha(12),
-              blurRadius: 8,
-              spreadRadius: 0,
-              offset: const Offset(0, 2),
-            ),
-          ]
-        : <BoxShadow>[
-            BoxShadow(
-              color: cs.shadow.withAlpha(140),
-              blurRadius: 28,
-              spreadRadius: 0,
-              offset: const Offset(0, 10),
-            ),
-            BoxShadow(
-              color: Colors.black.withAlpha(72),
-              blurRadius: 10,
-              spreadRadius: 0,
-              offset: const Offset(0, 3),
-            ),
-          ];
+    final Color ambient = isDark
+        ? Colors.black.withAlpha(52)
+        : Colors.black.withAlpha(14);
+    final Color contact = isDark
+        ? Colors.black.withAlpha(72)
+        : Colors.black.withAlpha(22);
+    final List<BoxShadow> elevationShadows = <BoxShadow>[
+      BoxShadow(color: ambient, blurRadius: 32, offset: const Offset(0, 14)),
+      BoxShadow(
+        color: cs.hentai.cardShadowHover,
+        blurRadius: 24,
+        spreadRadius: 0,
+        offset: const Offset(0, 8),
+      ),
+      BoxShadow(
+        color: cs.hentai.cardShadow,
+        blurRadius: 8,
+        spreadRadius: 0,
+        offset: const Offset(0, 2),
+      ),
+      BoxShadow(
+        color: contact,
+        blurRadius: 4,
+        spreadRadius: 0,
+        offset: const Offset(0, 1),
+      ),
+    ];
     return Material(
       color: Colors.transparent,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: toastBackground,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: accentColor, width: 0.5),
+          borderRadius: BorderRadius.circular(tokens.radius.md),
           boxShadow: elevationShadows,
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: toastContentPadding(viewportWidth, tokens: tokens),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               if (showIcon) ...<Widget>[
-                Icon(iconData, size: 20, color: iconColor),
-                const SizedBox(width: 10),
+                Icon(iconData, size: 20, color: accentColor),
+                SizedBox(width: tokens.spacing.sm),
               ],
               Expanded(
                 child: Text(
@@ -176,7 +211,7 @@ class CustomToast extends StatelessWidget {
                       ) ??
                       TextStyle(
                         color: foregroundColor,
-                        fontSize: 14,
+                        fontSize: tokens.text.bodyMd,
                         fontWeight: FontWeight.w500,
                         height: 1.35,
                       ),
@@ -192,7 +227,6 @@ class CustomToast extends StatelessWidget {
 
 class _ToastOverlayManager extends StatefulWidget {
   const _ToastOverlayManager({
-    required this.margin,
     required this.message,
     required this.type,
     required this.showIcon,
@@ -200,7 +234,6 @@ class _ToastOverlayManager extends StatefulWidget {
     required this.onDismissed,
   });
 
-  final EdgeInsets margin;
   final String message;
   final AppToastType type;
   final bool showIcon;
@@ -253,15 +286,23 @@ class _ToastOverlayManagerState extends State<_ToastOverlayManager>
       curve: Curves.easeOutCubic,
       reverseCurve: Curves.easeInCubic,
     );
+    final Size size = MediaQuery.sizeOf(context);
+    final double safeBottom = MediaQuery.paddingOf(context).bottom;
+    final bool compact = AppLayoutBreakpoints.isCompact(size.width);
+    final double bottomBar = compact ? _kCompactToastBottomBarGap : 0;
+    final EdgeInsets margin = toastOuterMargin(
+      size,
+      bottomInset: safeBottom + bottomBar,
+    );
     return Stack(
       children: <Widget>[
         const Positioned.fill(child: IgnorePointer(child: SizedBox.expand())),
         Align(
-          alignment: Alignment.bottomRight,
+          alignment: compact ? Alignment.bottomCenter : Alignment.bottomRight,
           child: Padding(
-            padding: widget.margin,
+            padding: margin,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _kToastMaxWidth),
+              constraints: BoxConstraints(maxWidth: toastMaxWidth(size.width)),
               child: SlideTransition(
                 position: Tween<Offset>(
                   begin: const Offset(0, 0.12),

@@ -32,6 +32,10 @@ class LibraryQueryIntentNotifier extends _$LibraryQueryIntentNotifier {
     state = state.copyWith(displayTarget: target);
   }
 
+  void clearKeyword() {
+    state = state.copyWith(keyword: '');
+  }
+
   void resetFilter() {
     state = state.copyWith(
       keyword: '',

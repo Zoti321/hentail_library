@@ -78,21 +78,11 @@ class _TagNameEditorDialogState extends ConsumerState<TagNameEditorDialog> {
       actions: [
         TextButton(
           onPressed: _saving ? null : () => Navigator.of(context).pop(),
-          style: TextButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
           child: Text(l10n.commonCancel),
         ),
         const SizedBox(width: 8),
         FilledButton(
           onPressed: _saving ? null : _handleSave,
-          style: FilledButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
           child: _saving
               ? const SizedBox(
                   width: 16,

@@ -1,9 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/ui/core/interaction/app_motion.dart';
+import 'package:hentai_library/ui/core/interaction/reader_input.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
@@ -126,6 +129,8 @@ class ReaderPage extends HookConsumerWidget {
       GlobalKey<ScaffoldState>.new,
       <Object?>[],
     );
+    final FocusNode readerFocusNode = useFocusNode();
+    final bool reduceMotion = reduceMotionOf(context);
     useEffect(() {
       if (!keepControlsOpen || hasAppliedKeepControls.value) {
         return null;
@@ -146,7 +151,10 @@ class ReaderPage extends HookConsumerWidget {
     useEffect(
       () {
         final bool canStartAutoPlay =
-            readerAutoPlayEnabled &&
+            readerAutoPlayAllowed(
+              userEnabled: readerAutoPlayEnabled,
+              reduceMotion: reduceMotion,
+            ) &&
             autoPlayState != null &&
             autoPlayState.readingMode.supportsAutoPlay &&
             autoPlayState.totalPages > 0 &&
@@ -197,6 +205,7 @@ class ReaderPage extends HookConsumerWidget {
         routeContext.comicId,
         controller,
         ref,
+        reduceMotion,
       ],
     );
     useEffect(() {
@@ -212,142 +221,190 @@ class ReaderPage extends HookConsumerWidget {
       return null;
     }, <Object?>[seriesAdvancePromptPending, context]);
 
-    return Theme(
-      data: theme,
-      child: PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (bool didPop, dynamic result) async {
-          if (didPop) {
-            return;
-          }
-          await controller.executeExitReader(
-            context: context,
-            routeContext: routeContext,
+    void dispatchReaderKeyboard(LogicalKeyboardKey key) {
+      final bool showControls =
+          viewAsync.asData?.value.viewState.showControls ?? false;
+      final ReaderKeyboardCommand? command = readerKeyboardCommandFor(
+        key,
+        showControls: showControls,
+      );
+      if (command == null) {
+        return;
+      }
+      switch (command) {
+        case ReaderKeyboardCommand.prevPage:
+          controller.prevPage();
+        case ReaderKeyboardCommand.nextPage:
+          final ReaderPageViewModel? viewModel = viewAsync.asData?.value;
+          unawaited(
+            controller.requestNextPage(
+              navContext: viewModel != null && viewModel.hasSeriesContext
+                  ? viewModel.navContext
+                  : null,
+              session: routeContext.session,
+              router: GoRouter.of(context),
+            ),
           );
-        },
-        child: Scaffold(
-          key: scaffoldKey,
-          backgroundColor: theme.colorScheme.hentai.readerBackground,
-          body: viewAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (Object e, StackTrace st) => Center(child: Text('$e')),
-            data: (ReaderPageViewModel viewModel) {
-              final ReaderState state = viewModel.viewState;
-              final int? preferredPageIndex = viewModel.preferredPageIndex;
-              if (state.totalPages == 0) {
-                return Center(child: Text(context.l10n.readerNoImages));
+        case ReaderKeyboardCommand.hideControls:
+          controller.setShowControls(false);
+        case ReaderKeyboardCommand.exit:
+          unawaited(
+            controller.executeExitReader(
+              context: context,
+              routeContext: routeContext,
+            ),
+          );
+      }
+    }
+
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.arrowLeft): () =>
+            dispatchReaderKeyboard(LogicalKeyboardKey.arrowLeft),
+        const SingleActivator(LogicalKeyboardKey.arrowRight): () =>
+            dispatchReaderKeyboard(LogicalKeyboardKey.arrowRight),
+        const SingleActivator(LogicalKeyboardKey.space): () =>
+            dispatchReaderKeyboard(LogicalKeyboardKey.space),
+        const SingleActivator(LogicalKeyboardKey.escape): () =>
+            dispatchReaderKeyboard(LogicalKeyboardKey.escape),
+      },
+      child: Focus(
+        focusNode: readerFocusNode,
+        autofocus: true,
+        child: Theme(
+          data: theme,
+          child: PopScope(
+            canPop: false,
+            onPopInvokedWithResult: (bool didPop, dynamic result) async {
+              if (didPop) {
+                return;
               }
-              final int initialPage = state.currentIndex - 1;
-              final ReadingMode activeReadingMode = state.readingMode;
-              final ReaderNavContextData? seriesNavContext =
-                  viewModel.hasSeriesContext ? viewModel.navContext : null;
-              Future<void> requestNextPage() => controller.requestNextPage(
-                navContext: seriesNavContext,
-                session: routeContext.session,
-                router: GoRouter.of(context),
-              );
-              return Stack(
-                children: [
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTapUp: (TapUpDetails details) {
-                      if (activeReadingMode.isWebtoon) {
-                        controller.toggleShowControls();
-                        return;
-                      }
-                      final ReaderTapZone zone = _resolveTapZone(
-                        context,
-                        details.globalPosition.dx,
-                      );
-                      controller.handleTapZone(
-                        zone,
-                        navContext: seriesNavContext,
-                        session: routeContext.session,
-                        router: GoRouter.of(context),
-                      );
-                    },
-                    child: ReaderContent(
-                      key: ValueKey<String>(routeContext.comicId),
-                      comicId: routeContext.comicId,
-                      incognito: routeContext.incognito,
-                      initialPage: initialPage,
-                      preferredPageIndex: preferredPageIndex,
-                      readingMode: activeReadingMode,
-                      onRequestNextPage: requestNextPage,
-                    ),
-                  ),
-                  ReaderTopBar(
-                    showControls: state.showControls,
-                    title: state.comic.title,
-                    readerFullscreen: readerFullscreen,
-                    navContext: seriesNavContext,
-                    session: routeContext.session,
-                    seriesId: viewModel.seriesId,
-                    onExit: () async {
-                      await controller.executeExitReader(
-                        context: context,
-                        routeContext: routeContext,
-                      );
-                    },
-                    onToggleFullscreen: controller.toggleFullscreen,
-                  ),
-                  ReaderBottomBar(
-                    showControls: state.showControls,
-                    currentIndex: state.currentIndex,
-                    totalPages: state.totalPages,
-                    readerAutoPlayEnabled: readerAutoPlayEnabled,
-                    showAutoPlayControls: activeReadingMode.supportsAutoPlay,
-                    onPrevPage: controller.prevPage,
-                    onNextPage: requestNextPage,
-                    onSetIndex: controller.setIndex,
-                    onReaderAutoPlayEnabledChanged: (bool value) {
-                      controller.setAutoPlayEnabled(value);
-                    },
-                    showSeriesComicNav: seriesNavContext != null,
-                    onPrevSeriesComic: seriesNavContext?.previousItem != null
-                        ? () async {
-                            final String targetComicId =
-                                seriesNavContext!.previousItem!.comicId;
-                            await ref
-                                .read(readerSeriesNavigationProvider.notifier)
-                                .switchComic(
-                                  router: GoRouter.of(context),
-                                  currentSession: routeContext.session,
-                                  targetComicId: targetComicId,
-                                );
-                          }
-                        : null,
-                    onNextSeriesComic: seriesNavContext?.nextItem != null
-                        ? () async {
-                            final String targetComicId =
-                                seriesNavContext!.nextItem!.comicId;
-                            await ref
-                                .read(readerSeriesNavigationProvider.notifier)
-                                .switchComic(
-                                  router: GoRouter.of(context),
-                                  currentSession: routeContext.session,
-                                  targetComicId: targetComicId,
-                                );
-                          }
-                        : null,
-                  ),
-                ],
+              await controller.executeExitReader(
+                context: context,
+                routeContext: routeContext,
               );
             },
+            child: Scaffold(
+              key: scaffoldKey,
+              backgroundColor: theme.colorScheme.hentai.readerBackground,
+              body: viewAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (Object e, StackTrace st) => Center(child: Text('$e')),
+                data: (ReaderPageViewModel viewModel) {
+                  final ReaderState state = viewModel.viewState;
+                  final int? preferredPageIndex = viewModel.preferredPageIndex;
+                  if (state.totalPages == 0) {
+                    return Center(child: Text(context.l10n.readerNoImages));
+                  }
+                  final int initialPage = state.currentIndex - 1;
+                  final ReadingMode activeReadingMode = state.readingMode;
+                  final ReaderNavContextData? seriesNavContext =
+                      viewModel.hasSeriesContext ? viewModel.navContext : null;
+                  Future<void> requestNextPage() => controller.requestNextPage(
+                    navContext: seriesNavContext,
+                    session: routeContext.session,
+                    router: GoRouter.of(context),
+                  );
+                  return Stack(
+                    children: [
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTapUp: (TapUpDetails details) {
+                          readerFocusNode.requestFocus();
+                          if (activeReadingMode.isWebtoon) {
+                            controller.toggleShowControls();
+                            return;
+                          }
+                          final ReaderTapZone zone = resolveReaderTapZone(
+                            globalX: details.globalPosition.dx,
+                            width: MediaQuery.sizeOf(context).width,
+                          );
+                          controller.handleTapZone(
+                            zone,
+                            navContext: seriesNavContext,
+                            session: routeContext.session,
+                            router: GoRouter.of(context),
+                          );
+                        },
+                        child: ReaderContent(
+                          key: ValueKey<String>(routeContext.comicId),
+                          comicId: routeContext.comicId,
+                          incognito: routeContext.incognito,
+                          initialPage: initialPage,
+                          preferredPageIndex: preferredPageIndex,
+                          readingMode: activeReadingMode,
+                          onRequestNextPage: requestNextPage,
+                        ),
+                      ),
+                      ReaderTopBar(
+                        showControls: state.showControls,
+                        title: state.comic.title,
+                        readerFullscreen: readerFullscreen,
+                        navContext: seriesNavContext,
+                        session: routeContext.session,
+                        seriesId: viewModel.seriesId,
+                        onExit: () async {
+                          await controller.executeExitReader(
+                            context: context,
+                            routeContext: routeContext,
+                          );
+                        },
+                        onToggleFullscreen: controller.toggleFullscreen,
+                      ),
+                      ReaderBottomBar(
+                        showControls: state.showControls,
+                        currentIndex: state.currentIndex,
+                        totalPages: state.totalPages,
+                        readerAutoPlayEnabled: readerAutoPlayEnabled,
+                        showAutoPlayControls:
+                            activeReadingMode.supportsAutoPlay,
+                        onPrevPage: controller.prevPage,
+                        onNextPage: requestNextPage,
+                        onSetIndex: controller.setIndex,
+                        onReaderAutoPlayEnabledChanged: (bool value) {
+                          controller.setAutoPlayEnabled(value);
+                        },
+                        showSeriesComicNav: seriesNavContext != null,
+                        onPrevSeriesComic:
+                            seriesNavContext?.previousItem != null
+                            ? () async {
+                                final String targetComicId =
+                                    seriesNavContext!.previousItem!.comicId;
+                                await ref
+                                    .read(
+                                      readerSeriesNavigationProvider.notifier,
+                                    )
+                                    .switchComic(
+                                      router: GoRouter.of(context),
+                                      currentSession: routeContext.session,
+                                      targetComicId: targetComicId,
+                                    );
+                              }
+                            : null,
+                        onNextSeriesComic: seriesNavContext?.nextItem != null
+                            ? () async {
+                                final String targetComicId =
+                                    seriesNavContext!.nextItem!.comicId;
+                                await ref
+                                    .read(
+                                      readerSeriesNavigationProvider.notifier,
+                                    )
+                                    .switchComic(
+                                      router: GoRouter.of(context),
+                                      currentSession: routeContext.session,
+                                      targetComicId: targetComicId,
+                                    );
+                              }
+                            : null,
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
           ),
         ),
       ),
     );
-  }
-
-  ReaderTapZone _resolveTapZone(BuildContext context, double globalX) {
-    final double width = MediaQuery.sizeOf(context).width;
-    if (globalX < width * 0.3) {
-      return ReaderTapZone.left;
-    }
-    if (globalX > width * 0.7) {
-      return ReaderTapZone.right;
-    }
-    return ReaderTapZone.center;
   }
 }

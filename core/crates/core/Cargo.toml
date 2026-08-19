@@ -18,6 +18,10 @@ path = "tests/epub_sync_test.rs"
 name = "metadata_read"
 path = "tests/metadata_read_test.rs"
 
+[[test]]
+name = "tag_import"
+path = "tests/tag_import_test.rs"
+
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

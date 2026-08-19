@@ -31,6 +31,7 @@ class ComicCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return CatalogCoverCardShell(
+      semanticLabel: comic.title,
       onTap: onTap,
       onSecondaryTapUp: (TapUpDetails details) {
         _showContextMenu(context, ref, details.globalPosition);

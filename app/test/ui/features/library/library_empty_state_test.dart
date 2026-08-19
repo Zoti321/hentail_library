@@ -18,6 +18,7 @@ void main() {
       expect(content.hint, l10n.libraryEmptyHint);
       expect(content.icon, LibraryEmptyStateIcon.library);
       expect(content.showManagePathsEntry, isTrue);
+      expect(content.showClearFilters, isFalse);
     });
 
     test('comics filtered empty shows no-match copy', () {
@@ -31,6 +32,7 @@ void main() {
       expect(content.hint, l10n.libraryNoMatchFilterHintComics);
       expect(content.icon, LibraryEmptyStateIcon.listFilter);
       expect(content.showManagePathsEntry, isFalse);
+      expect(content.showClearFilters, isTrue);
     });
 
     test('series table empty shows series empty copy', () {
@@ -43,7 +45,8 @@ void main() {
       expect(content.title, l10n.librarySeriesEmptyTitle);
       expect(content.hint, l10n.librarySeriesEmptyHint);
       expect(content.icon, LibraryEmptyStateIcon.library);
-      expect(content.showManagePathsEntry, isFalse);
+      expect(content.showManagePathsEntry, isTrue);
+      expect(content.showClearFilters, isFalse);
     });
 
     test('series filtered empty shows no-match copy', () {
@@ -57,6 +60,7 @@ void main() {
       expect(content.hint, l10n.libraryNoMatchFilterHintSeries);
       expect(content.icon, LibraryEmptyStateIcon.listFilter);
       expect(content.showManagePathsEntry, isFalse);
+      expect(content.showClearFilters, isTrue);
     });
   });
 }

@@ -161,6 +161,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryNoMatchFilterHintSeries => '当前筛选条件下没有系列';
 
   @override
+  String get libraryClearFilters => '清除筛选';
+
+  @override
   String comicCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -346,7 +349,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homeContinueReading => '继续阅读';
 
   @override
-  String get homeNoReadingHistory => '暂无阅读记录，';
+  String get homeNoReadingHistory => '暂无阅读记录';
 
   @override
   String get homeGoToLibrary => '去漫画库';
@@ -1237,6 +1240,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get metadataSearchNoMatchHint => '试试其他关键词，或清空搜索';
+
+  @override
+  String get metadataDeleteAllTags => '删除所有';
+
+  @override
+  String get metadataTagsDeletedAllToast => '已删除全部标签';
+
+  @override
+  String get metadataImportTagDictionaryDialogTitle => '导入标签字典';
+
+  @override
+  String get metadataImportTagDictionaryDialogBody => '正在下载标签字典并写入全局 Tag…';
+
+  @override
+  String metadataImportTagDictionarySummary(
+    int added,
+    int skippedExisting,
+    int skippedFiltered,
+  ) {
+    return '新增 $added 条，已存在跳过 $skippedExisting 条，过滤/空名/去重跳过 $skippedFiltered 条';
+  }
 
   @override
   String get commonCancel => '取消';

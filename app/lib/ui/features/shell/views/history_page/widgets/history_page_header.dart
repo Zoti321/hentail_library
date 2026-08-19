@@ -125,7 +125,7 @@ class HistoryPageHeaderToolbar extends ConsumerWidget {
             iconSize: 16,
             size: 32,
             borderRadius: 8,
-            foregroundColor: cs.hentai.warning,
+            foregroundColor: cs.hentai.error,
             hoverColor: cs.error.withAlpha(24),
             overlayColor: cs.error.withAlpha(20),
             delayTooltipThreeSeconds: true,

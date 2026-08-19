@@ -61,6 +61,7 @@
   "libraryNoMatchTitle": "No matches",
   "libraryNoMatchFilterHintComics": "No comics match the current filters",
   "libraryNoMatchFilterHintSeries": "No series match the current filters",
+  "libraryClearFilters": "Clear filters",
   "comicCount": "{count, plural, =0{0 comics} one{1 comic} other{{count} comics}}",
   "@comicCount": {
     "placeholders": {
@@ -152,7 +153,7 @@
   },
   "homeNoAuthors": "No authors yet",
   "homeContinueReading": "Continue reading",
-  "homeNoReadingHistory": "No reading history yet, ",
+  "homeNoReadingHistory": "No reading history yet",
   "homeGoToLibrary": "Go to library",
   "historyTitle": "Reading history",
   "historyClearAction": "Clear reading history",
@@ -583,6 +584,18 @@
   "metadataAuthorsNoMatchTitle": "No matching authors",
   "metadataTagsNoMatchTitle": "No matching tags",
   "metadataSearchNoMatchHint": "Try another keyword, or clear the search",
+  "metadataDeleteAllTags": "Delete all",
+  "metadataTagsDeletedAllToast": "All tags deleted",
+  "metadataImportTagDictionaryDialogTitle": "Import tag dictionary",
+  "metadataImportTagDictionaryDialogBody": "Downloading the tag dictionary and updating global tags…",
+  "metadataImportTagDictionarySummary": "Added {added}, skipped existing {skippedExisting}, skipped filtered/empty/deduped {skippedFiltered}",
+  "@metadataImportTagDictionarySummary": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "skippedExisting": {"type": "int"},
+      "skippedFiltered": {"type": "int"}
+    }
+  },
   "commonCancel": "Cancel",
   "commonSave": "Save",
   "commonSaveChanges": "Save changes",

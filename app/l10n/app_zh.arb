@@ -61,6 +61,7 @@
   "libraryNoMatchTitle": "没有匹配结果",
   "libraryNoMatchFilterHintComics": "当前筛选条件下没有漫画",
   "libraryNoMatchFilterHintSeries": "当前筛选条件下没有系列",
+  "libraryClearFilters": "清除筛选",
   "comicCount": "{count, plural, =0{0 本} other{{count} 本}}",
   "@comicCount": {
     "placeholders": {
@@ -152,7 +153,7 @@
   },
   "homeNoAuthors": "暂无作者",
   "homeContinueReading": "继续阅读",
-  "homeNoReadingHistory": "暂无阅读记录，",
+  "homeNoReadingHistory": "暂无阅读记录",
   "homeGoToLibrary": "去漫画库",
   "historyTitle": "阅读历史",
   "historyClearAction": "清空阅读历史",
@@ -583,6 +584,18 @@
   "metadataAuthorsNoMatchTitle": "未找到匹配的作者",
   "metadataTagsNoMatchTitle": "未找到匹配的标签",
   "metadataSearchNoMatchHint": "试试其他关键词，或清空搜索",
+  "metadataDeleteAllTags": "删除所有",
+  "metadataTagsDeletedAllToast": "已删除全部标签",
+  "metadataImportTagDictionaryDialogTitle": "导入标签字典",
+  "metadataImportTagDictionaryDialogBody": "正在下载标签字典并写入全局 Tag…",
+  "metadataImportTagDictionarySummary": "新增 {added} 条，已存在跳过 {skippedExisting} 条，过滤/空名/去重跳过 {skippedFiltered} 条",
+  "@metadataImportTagDictionarySummary": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "skippedExisting": {"type": "int"},
+      "skippedFiltered": {"type": "int"}
+    }
+  },
   "commonCancel": "取消",
   "commonSave": "保存",
   "commonSaveChanges": "保存更改",

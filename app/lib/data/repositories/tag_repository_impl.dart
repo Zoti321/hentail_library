@@ -1,5 +1,6 @@
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/domain/models/tag_dictionary_import_result.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/tag_repository.dart';
@@ -58,6 +59,21 @@ class TagRepositoryImpl implements TagRepository {
     guardFrbSync(
       () => rust_tag.renameTagFrb(oldName: oldName, newName: newName),
       fallbackMessage: '重命名标签失败',
+    );
+  }
+
+  @override
+  Future<TagDictionaryImportResult> importTagDictionary(
+    List<int> jsonBytes,
+  ) async {
+    final rust_tag.TagDictionaryImportResultDto result = guardFrbSync(
+      () => rust_tag.importTagDictionaryFrb(jsonBytes: jsonBytes),
+      fallbackMessage: '导入标签字典失败',
+    );
+    return TagDictionaryImportResult(
+      added: result.added,
+      skippedExisting: result.skippedExisting,
+      skippedFilteredOrEmptyOrDedupe: result.skippedFilteredOrEmptyOrDedupe,
     );
   }
 }

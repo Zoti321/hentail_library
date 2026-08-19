@@ -6,6 +6,7 @@ import 'package:hentai_library/core/image/image_cache_config.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/core/logging/app_logging.dart';
+import 'package:hentai_library/core/util/app_window_title.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 import 'package:hentai_library/data/adapters/frb_zone_guard.dart';
@@ -52,7 +53,7 @@ Future<void> _prepareApp() async {
 
   configureGlobalImageCache();
 
-  if (isDesktop) {
+  if (supportsDesktopWindowChrome) {
     await _initWindow();
   }
 }
@@ -111,6 +112,7 @@ Future<void> _initWindow() async {
   await WindowManager.instance.ensureInitialized();
 
   windowManager.waitUntilReadyToShow().then((_) async {
+    await windowManager.setTitle(appWindowTitle());
     await windowManager.setTitleBarStyle(
       TitleBarStyle.hidden,
       windowButtonVisibility: true,
