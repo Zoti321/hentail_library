@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/ui/core/interaction/app_motion.dart';
+import 'package:hentai_library/ui/core/interaction/interactive_target.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 
 /// Shared chrome + 2:3 cover slot for catalog grid cards.
@@ -38,8 +39,15 @@ class CatalogCoverCardShell extends HookWidget {
       const Duration(milliseconds: 200),
     );
 
+    void invokeTap({required bool fromPointer}) {
+      onTap?.call();
+      if (fromPointer) {
+        unfocusAfterPointerActivation();
+      }
+    }
+
     Widget card = GestureDetector(
-      onTap: onTap,
+      onTap: onTap == null ? null : () => invokeTap(fromPointer: true),
       onSecondaryTapUp: onSecondaryTapUp,
       onLongPressStart: onLongPressStart,
       child: AnimatedContainer(
@@ -98,7 +106,7 @@ class CatalogCoverCardShell extends HookWidget {
       actions: <Type, Action<Intent>>{
         ActivateIntent: CallbackAction<ActivateIntent>(
           onInvoke: (ActivateIntent intent) {
-            onTap?.call();
+            invokeTap(fromPointer: false);
             return null;
           },
         ),

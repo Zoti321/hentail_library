@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/interaction/app_motion.dart';
+import 'package:hentai_library/ui/core/interaction/interactive_target.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
@@ -80,7 +81,10 @@ class ReadingHistoryCard extends HookConsumerWidget {
             ),
           },
           child: GestureDetector(
-            onTap: onTap,
+            onTap: () {
+              onTap();
+              unfocusAfterPointerActivation();
+            },
             child: AnimatedContainer(
               duration: motionDurationOf(
                 context,

@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 
 /// iOS HIG minimum; used on compact (phone-width) layouts.
@@ -21,4 +23,22 @@ double minInteractiveSize({required double visualSize, required bool compact}) {
 
 Duration iconTooltipWait({required bool delayed}) {
   return delayed ? kIconTooltipWait : Duration.zero;
+}
+
+/// Drop keyboard focus after a pointer activation so click chrome does not stick.
+///
+/// Keyboard Enter/Space should keep focus for sequential activation.
+void unfocusAfterPointerActivation() {
+  if (_activationFromKeyboard()) {
+    return;
+  }
+  FocusManager.instance.primaryFocus?.unfocus();
+}
+
+bool _activationFromKeyboard() {
+  final Set<LogicalKeyboardKey> keys =
+      HardwareKeyboard.instance.logicalKeysPressed;
+  return keys.contains(LogicalKeyboardKey.enter) ||
+      keys.contains(LogicalKeyboardKey.numpadEnter) ||
+      keys.contains(LogicalKeyboardKey.space);
 }

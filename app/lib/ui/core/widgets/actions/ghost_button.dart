@@ -87,6 +87,12 @@ class GhostButton extends StatelessWidget {
     final Color effectiveOverlayColor =
         overlayColor ?? effectiveHoverColor.withAlpha(compact ? 160 : 110);
     const InteractiveInkFeatureFactory splashFactory = NoSplash.splashFactory;
+    final VoidCallback? handlePressed = onPressed == null
+        ? null
+        : () {
+            onPressed!();
+            unfocusAfterPointerActivation();
+          };
     final ButtonStyle ghostLabelStyle = ButtonStyle(
       foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
         if (states.contains(WidgetState.disabled)) {
@@ -113,7 +119,7 @@ class GhostButton extends StatelessWidget {
     );
     final Widget button = _variant == _GhostButtonVariant.icon
         ? IconButton(
-            onPressed: onPressed,
+            onPressed: handlePressed,
             iconSize: iconSize,
             style: IconButton.styleFrom(
               minimumSize: Size.square(hitSize),
@@ -139,7 +145,7 @@ class GhostButton extends StatelessWidget {
           )
         : _variant == _GhostButtonVariant.text
         ? TextButton(
-            onPressed: onPressed,
+            onPressed: handlePressed,
             style: ghostLabelStyle,
             child: Text(
               text!,
@@ -147,7 +153,7 @@ class GhostButton extends StatelessWidget {
             ),
           )
         : TextButton.icon(
-            onPressed: onPressed,
+            onPressed: handlePressed,
             icon: Icon(icon!, size: iconSize),
             label: Text(
               text!,
