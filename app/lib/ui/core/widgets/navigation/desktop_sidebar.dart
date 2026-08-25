@@ -74,6 +74,8 @@ class DesktopSidebar extends HookConsumerWidget {
     final double topPadding = applyDrawerTopInset
         ? MediaQuery.viewPaddingOf(context).top + tokens.spacing.lg
         : 0;
+    final double bottomPadding =
+        MediaQuery.viewPaddingOf(context).bottom + tokens.spacing.lg;
 
     final AnimationController expandController = useAnimationController(
       duration: _kAnimDuration,
@@ -160,7 +162,7 @@ class DesktopSidebar extends HookConsumerWidget {
             tokens.spacing.sm,
             topPadding,
             tokens.spacing.sm,
-            tokens.spacing.lg,
+            bottomPadding,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

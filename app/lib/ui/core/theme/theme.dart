@@ -1,9 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hentai_library/ui/core/interaction/desktop_page_transition.dart';
 
 part 'theme_layout_tokens.dart';
 part 'theme_typography_tokens.dart';
 part 'theme_visual_tokens.dart';
+
+/// Shell / theme-boundary system bar style for everyday browsing chrome.
+///
+/// Keeps edge-to-edge (transparent system bars). Icon contrast follows
+/// [ColorScheme.brightness]; navigation bar color uses [ColorScheme.surface]
+/// on platforms that still honor it (ignored under forced edge-to-edge where
+/// the app paints behind the bars instead).
+SystemUiOverlayStyle appSystemUiOverlayStyle(ColorScheme colorScheme) {
+  final bool isDark = colorScheme.brightness == Brightness.dark;
+  final Brightness iconBrightness = isDark ? Brightness.light : Brightness.dark;
+  return SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: iconBrightness,
+    statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+    systemNavigationBarColor: colorScheme.surface,
+    systemNavigationBarIconBrightness: iconBrightness,
+    systemNavigationBarContrastEnforced: false,
+  );
+}
 
 ThemeData buildAppTheme(Brightness brightness) {
   final colorScheme = HentaiColorScheme.buildBaseColorScheme(brightness);
@@ -75,6 +95,7 @@ AppBarTheme _buildAppBarThemeData(ColorScheme colorScheme) {
     surfaceTintColor: Colors.transparent,
     backgroundColor: colorScheme.surface,
     scrolledUnderElevation: 0.0,
+    systemOverlayStyle: appSystemUiOverlayStyle(colorScheme),
   );
 }
 
