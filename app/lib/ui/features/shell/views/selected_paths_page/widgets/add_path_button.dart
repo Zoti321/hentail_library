@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/io/local_library_root_access.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/repositories/path_repository.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
@@ -27,9 +28,17 @@ class _AddPathButtonState extends ConsumerState<AddPathButton> {
     }
     setState(() => isPicking = true);
     try {
+      await ensureLocalFilesystemAccess();
       final String? directoryPath = await FilePicker.platform
           .getDirectoryPath();
       if (directoryPath == null || directoryPath.isEmpty) {
+        return;
+      }
+      if (!await isLocalLibraryRootReadable(directoryPath)) {
+        if (!mounted) {
+          return;
+        }
+        showErrorToast(context, context.l10n.formLibraryRootUnreadable);
         return;
       }
       final PathRepository pathRepository = ref.read(pathRepoProvider);

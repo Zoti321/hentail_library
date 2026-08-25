@@ -101,6 +101,16 @@ mod tests {
     }
 
     #[test]
+    fn local_stat_missing_is_none_and_probe_root_errors() {
+        let temp = tempfile::TempDir::new().expect("temp");
+        let missing = temp.path().join("missing-root");
+        let loc = missing.to_string_lossy().to_string();
+        let access = LocalResourceAccess;
+        assert!(access.stat(&loc).expect("stat").is_none());
+        assert!(access.probe_root(&loc).is_err());
+    }
+
+    #[test]
     fn local_list_stat_open_stream_matches_disk() {
         let temp = tempfile::TempDir::new().expect("temp");
         let root = temp.path().join("root");

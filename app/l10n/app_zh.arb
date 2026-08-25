@@ -42,6 +42,7 @@
   "formLibraryNameLabel": "名称",
   "formLibraryRootLabel": "根位置",
   "formLibraryRootBrowse": "浏览",
+  "formLibraryRootUnreadable": "无法读取该目录。请授予存储权限后重试，或选择应用可读的路径。",
   "formLibraryRootChangeConfirmTitle": "确认更改根位置？",
   "formLibraryRootChangeConfirmBody": "更改库根后，下次同步将按新根对齐；旧路径下的漫画可能成为孤儿并被删除。此操作不会自动触发同步。",
   "formLibraryScanOnStartupLabel": "启动时扫描",

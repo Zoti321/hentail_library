@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
+import 'package:hentai_library/core/io/local_library_root_access.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/data/adapters/frb_error_mapper.dart';
 import 'package:hentai_library/domain/library/library_sync_coordinator.dart';
@@ -40,6 +41,7 @@ class ScanLibraryController extends _$ScanLibraryController {
     bool syncAll = false,
     String? targetLibraryId,
     bool silent = false,
+    bool promptStorageAccess = true,
   }) {
     if (state.running) return _future ?? Future<void>.value();
 
@@ -56,20 +58,26 @@ class ScanLibraryController extends _$ScanLibraryController {
     final LibrarySyncCoordinator coordinator = ref.read(
       librarySyncCoordinatorProvider,
     );
-    _future = coordinator
-        .runSync(
-          scanMode: mode,
-          syncAll: syncAll,
-          targetLibraryId: targetLibraryId,
-          isCancelled: () => _cancelled,
-          onProgress: (SyncLibraryProgress progress) {
-            state = state.copyWith(progress: progress);
-          },
-        )
-        .then((_) {
+    _future =
+        () async {
+          if (promptStorageAccess) {
+            await ensureLocalFilesystemAccess();
+          }
+          if (_cancelled) {
+            return;
+          }
+          await coordinator.runSync(
+            scanMode: mode,
+            syncAll: syncAll,
+            targetLibraryId: targetLibraryId,
+            isCancelled: () => _cancelled,
+            onProgress: (SyncLibraryProgress progress) {
+              state = state.copyWith(progress: progress);
+            },
+          );
+        }().then((_) {
           state = state.copyWith(running: false);
-        })
-        .catchError((Object e, StackTrace st) {
+        }).catchError((Object e, StackTrace st) {
           logError(AppLog.ui('scan'), '漫画库同步失败', e, st);
           final String message = switch (e) {
             AppException(:final message) => message,

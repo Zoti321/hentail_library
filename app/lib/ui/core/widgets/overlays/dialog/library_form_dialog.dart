@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:hentai_library/core/io/local_library_root_access.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/library/format_group.dart';
@@ -285,6 +286,32 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
       return;
     }
 
+    if (!_isRemote) {
+      final LocalLibrary? original = widget.library;
+      final bool rootChanged =
+          original == null ||
+          _form.rootPath.trim() != original.rootPath.trim();
+      if (_isCreate || rootChanged) {
+        await ensureLocalFilesystemAccess();
+        if (!mounted) {
+          return;
+        }
+        if (!await isLocalLibraryRootReadable(_form.rootPath)) {
+          if (!mounted) {
+            return;
+          }
+          setState(() {
+            _validation = LibraryFormValidation(
+              rootError: context.l10n.formLibraryRootUnreadable,
+            );
+            _previousTabIndex = _tabs.indexOf(_selectedTab);
+            _selectedTab = _LibraryFormTab.general;
+          });
+          return;
+        }
+      }
+    }
+
     setState(() {
       _validation = null;
       _saving = true;
@@ -356,8 +383,25 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
   }
 
   Future<void> _browseLocalRoot() async {
+    await ensureLocalFilesystemAccess();
+    if (!mounted) {
+      return;
+    }
     final String? directoryPath = await FilePicker.platform.getDirectoryPath();
     if (directoryPath == null || directoryPath.isEmpty || !mounted) {
+      return;
+    }
+    if (!await isLocalLibraryRootReadable(directoryPath)) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _validation = LibraryFormValidation(
+          rootError: context.l10n.formLibraryRootUnreadable,
+        );
+        _previousTabIndex = _tabs.indexOf(_selectedTab);
+        _selectedTab = _LibraryFormTab.general;
+      });
       return;
     }
     setState(() {

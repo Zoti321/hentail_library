@@ -95,7 +95,9 @@ class _SettingsViewState extends State<SettingsView> {
                 child: Padding(
                   padding: EdgeInsets.only(
                     top: tokens.layout.contentVerticalPadding,
-                    bottom: tokens.layout.contentAreaPadding.bottom,
+                    bottom:
+                        tokens.layout.contentAreaPadding.bottom +
+                        MediaQuery.viewPaddingOf(context).bottom,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
