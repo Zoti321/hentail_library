@@ -1,0 +1,108 @@
+name: Build Android
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semantic version without v prefix (default: pubspec version)"
+        required: false
+        type: string
+        default: ""
+      target_platform:
+        description: "Flutter Android target platform"
+        required: false
+        type: choice
+        options:
+          - android-arm64
+          - android-arm
+          - android-x64
+        default: android-arm64
+
+concurrency:
+  group: build-android-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: false
+
+env:
+  FLUTTER_VERSION: "3.38.5"
+  FRB_CODEGEN_VERSION: "2.12.0"
+
+jobs:
+  build-android:
+    name: build-android
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "name=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            # pubspec: version: 0.0.1+1 → take 0.0.1
+            name="$(sed -n 's/^version:[[:space:]]*\([^+[:space:]]*\).*/\1/p' app/pubspec.yaml | head -n1)"
+            if [ -z "$name" ]; then
+              echo "Failed to parse version from app/pubspec.yaml" >&2
+              exit 1
+            fi
+            echo "name=${name}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: ./.github/actions/flutter-frb-setup
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
+          # FRB codegen cargo-expands hentai-core for the *host* (needs linux pdfium);
+          # Android ABIs are fetched in the next step for the APK link.
+
+      - name: Fetch Android pdfium
+        run: bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh" --android
+
+      - name: Configure Android release signing
+        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > app/android/upload-keystore.jks
+          printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=upload-keystore.jks\n' \
+            "$ANDROID_KEYSTORE_PASSWORD" "$ANDROID_KEY_PASSWORD" "$ANDROID_KEY_ALIAS" \
+            > app/android/key.properties
+
+      - name: Accept Android SDK licenses
+        run: yes | flutter doctor --android-licenses
+
+      - name: flutter build apk
+        working-directory: app
+        run: >
+          flutter build apk --release
+          --target-platform ${{ github.event.inputs.target_platform }}
+          --build-name=${{ steps.version.outputs.name }}
+          --build-number=${{ github.run_number }}
+
+      - name: Package Android APK
+        id: package
+        run: |
+          VERSION="${{ steps.version.outputs.name }}"
+          PLATFORM="${{ github.event.inputs.target_platform }}"
+          mkdir -p dist
+          OUT="dist/hentai_library_${VERSION}_${PLATFORM}.apk"
+          cp app/build/app/outputs/flutter-apk/app-release.apk "$OUT"
+          echo "path=${OUT}" >> "$GITHUB_OUTPUT"
+          ls -lh "$OUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-${{ github.event.inputs.target_platform }}
+          path: ${{ steps.package.outputs.path }}
+          if-no-files-found: error
+          retention-days: 14
