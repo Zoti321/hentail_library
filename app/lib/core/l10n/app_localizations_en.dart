@@ -104,6 +104,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get formLibraryRootBrowse => 'Browse';
 
   @override
+  String get formLibraryRootUnreadable =>
+      'Cannot read this folder. Grant storage access and try again, or pick a folder the app can read.';
+
+  @override
   String get formLibraryRootChangeConfirmTitle => 'Change library root?';
 
   @override

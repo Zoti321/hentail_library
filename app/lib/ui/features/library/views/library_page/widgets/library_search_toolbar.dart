@@ -480,13 +480,22 @@ class _LibraryOverflowMenuButtonState
         } else if (next.error != null) {
           showErrorToast(context, next.error!);
         } else {
-          showSuccessToast(
-            context,
-            context.l10n.libraryScanSuccessToast(
-              mode: next.scanMode,
-              progress: next.progress,
-            ),
-          );
+          final String? warning = next.progress?.errorMessage;
+          if (warning != null && warning.isNotEmpty) {
+            showCustomToast(
+              context,
+              message: warning,
+              type: AppToastType.info,
+            );
+          } else {
+            showSuccessToast(
+              context,
+              context.l10n.libraryScanSuccessToast(
+                mode: next.scanMode,
+                progress: next.progress,
+              ),
+            );
+          }
         }
       }
     });

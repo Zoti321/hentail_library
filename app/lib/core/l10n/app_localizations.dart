@@ -278,6 +278,12 @@ abstract class AppLocalizations {
   /// **'浏览'**
   String get formLibraryRootBrowse;
 
+  /// No description provided for @formLibraryRootUnreadable.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法读取该目录。请授予存储权限后重试，或选择应用可读的路径。'**
+  String get formLibraryRootUnreadable;
+
   /// No description provided for @formLibraryRootChangeConfirmTitle.
   ///
   /// In zh, this message translates to:

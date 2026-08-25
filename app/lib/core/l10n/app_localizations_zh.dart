@@ -103,6 +103,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get formLibraryRootBrowse => '浏览';
 
   @override
+  String get formLibraryRootUnreadable => '无法读取该目录。请授予存储权限后重试，或选择应用可读的路径。';
+
+  @override
   String get formLibraryRootChangeConfirmTitle => '确认更改根位置？';
 
   @override

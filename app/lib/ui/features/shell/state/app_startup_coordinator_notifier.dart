@@ -160,12 +160,13 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
       scanLibraryControllerProvider.notifier,
     );
     while (ref.read(scanLibraryControllerProvider).running) {
-      await notifier.start();
+      await notifier.start(promptStorageAccess: false);
     }
     await notifier.start(
       mode: ScanMode.incremental,
       targetLibraryId: libraryId,
       silent: true,
+      promptStorageAccess: false,
     );
   }
 

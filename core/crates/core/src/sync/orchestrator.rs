@@ -6,7 +6,7 @@ use crate::library::{
     find_library_by_id, get_current_library_id, list_libraries, LibraryDto,
 };
 use crate::reader::clear_reader_sessions;
-use crate::resource::{normalize_roots, WebDavResourceAccess};
+use crate::resource::{local_access, normalize_roots, WebDavResourceAccess};
 
 use super::dto::{
     LibrarySyncCountsDto, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncLibraryRouteDto,
@@ -75,7 +75,7 @@ pub async fn sync_library(
     }
 
     let mut last_progress: Option<SyncLibraryProgressDto> = None;
-    let mut remote_warnings: Vec<String> = Vec::new();
+    let mut skip_warnings: Vec<String> = Vec::new();
     for library in targets {
         if return_if_cancelled(&handle, "library_loop") {
             return Ok(());
@@ -94,17 +94,17 @@ pub async fn sync_library(
                 last_progress = Some(progress);
             }
             SyncOneOutcome::Skipped { warning } => {
-                remote_warnings.push(warning);
+                skip_warnings.push(warning);
             }
             SyncOneOutcome::None => {}
         }
     }
     // Emit a single Done for the whole run so Flutter stream consumers do not
     // stop after the first library when sync_all is true.
-    let warning = if remote_warnings.is_empty() {
+    let warning = if skip_warnings.is_empty() {
         None
     } else {
-        Some(remote_warnings.join("\n"))
+        Some(skip_warnings.join("\n"))
     };
     if let Some(mut done) = last_progress {
         done.phase = SyncLibraryPhaseDto::Done;
@@ -122,9 +122,9 @@ pub async fn sync_library(
             None,
             0,
             LibrarySyncCountsDto::default(),
-            Some(0),
-            Some(0),
-            Some(0),
+            None,
+            None,
+            None,
             None,
             None,
             None,
@@ -185,6 +185,10 @@ async fn sync_one_library(
     let roots = normalize_roots(std::slice::from_ref(&library.root_path));
     if roots.is_empty() {
         return Ok(SyncOneOutcome::None);
+    }
+    if let Err(err) = local_access().probe_root(&library.root_path) {
+        let warning = emit_local_skip(emit, &library.root_path, &err.message);
+        return Ok(SyncOneOutcome::Skipped { warning });
     }
     let exclude_roots: Vec<String> = list_libraries()
         .await?
@@ -331,6 +335,31 @@ fn emit_scanning(emit: &mut impl FnMut(SyncLibraryProgressDto)) {
         None,
         None,
     ));
+}
+
+fn emit_local_skip(
+    emit: &mut impl FnMut(SyncLibraryProgressDto),
+    root: &str,
+    detail: &str,
+) -> String {
+    let message = format!("已跳过不可读的本地库 {root}: {detail}");
+    tracing::warn!("{message}");
+    emit(progress(
+        SyncLibraryPhaseDto::Scanning,
+        SyncLibraryRouteDto::WithRoots,
+        None,
+        0,
+        LibrarySyncCountsDto::default(),
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        None,
+        Some(message.clone()),
+    ));
+    message
 }
 
 fn emit_remote_skip(
