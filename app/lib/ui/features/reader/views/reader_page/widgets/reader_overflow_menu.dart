@@ -22,11 +22,13 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
     required this.comicId,
     this.seriesId,
     this.incognito = false,
+    this.startFromFirstPage = false,
   });
 
   final String comicId;
   final String? seriesId;
   final bool incognito;
+  final bool startFromFirstPage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -174,7 +176,11 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
     return ref
         .read(
           readerControllerProvider(
-            readerControllerKey(comicId, incognito: incognito),
+            readerControllerKey(
+              comicId,
+              incognito: incognito,
+              startFromFirstPage: startFromFirstPage,
+            ),
           ),
         )
         .asData

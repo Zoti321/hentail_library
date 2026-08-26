@@ -330,6 +330,7 @@ class ReaderPage extends HookConsumerWidget {
                           key: ValueKey<String>(routeContext.comicId),
                           comicId: routeContext.comicId,
                           incognito: routeContext.incognito,
+                          startFromFirstPage: routeContext.startFromFirstPage,
                           initialPage: initialPage,
                           preferredPageIndex: preferredPageIndex,
                           readingMode: activeReadingMode,

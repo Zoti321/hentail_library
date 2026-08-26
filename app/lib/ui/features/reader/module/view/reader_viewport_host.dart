@@ -9,6 +9,7 @@ class ReaderViewportHost extends StatelessWidget {
     super.key,
     required this.comicId,
     required this.incognito,
+    this.startFromFirstPage = false,
     required this.initialPage,
     required this.preferredPageIndex,
     required this.readingMode,
@@ -17,6 +18,7 @@ class ReaderViewportHost extends StatelessWidget {
 
   final String comicId;
   final bool incognito;
+  final bool startFromFirstPage;
   final int initialPage;
   final int? preferredPageIndex;
   final ReadingMode readingMode;
@@ -28,6 +30,7 @@ class ReaderViewportHost extends StatelessWidget {
       return ContinuousVerticalViewport(
         comicId: comicId,
         incognito: incognito,
+        startFromFirstPage: startFromFirstPage,
         preferredPageIndex: preferredPageIndex,
       );
     }
@@ -35,6 +38,7 @@ class ReaderViewportHost extends StatelessWidget {
       return DualPageViewport(
         comicId: comicId,
         incognito: incognito,
+        startFromFirstPage: startFromFirstPage,
         readingMode: readingMode,
         initialPage: initialPage,
         preferredPageIndex: preferredPageIndex,
@@ -44,6 +48,7 @@ class ReaderViewportHost extends StatelessWidget {
     return PagedViewport(
       comicId: comicId,
       incognito: incognito,
+      startFromFirstPage: startFromFirstPage,
       initialPage: initialPage,
       preferredPageIndex: preferredPageIndex,
       onRequestNextPage: onRequestNextPage,
