@@ -134,6 +134,7 @@ class ReaderTopBar extends StatelessWidget {
                     comicId: session?.comicId ?? '',
                     seriesId: seriesId,
                     incognito: session?.incognito ?? false,
+                    startFromFirstPage: session?.startFromFirstPage ?? false,
                   ),
                 ],
               ),

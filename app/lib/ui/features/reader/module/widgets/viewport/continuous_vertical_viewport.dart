@@ -20,11 +20,13 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     super.key,
     required this.comicId,
     required this.incognito,
+    this.startFromFirstPage = false,
     required this.preferredPageIndex,
   });
 
   final String comicId;
   final bool incognito;
+  final bool startFromFirstPage;
   final int? preferredPageIndex;
 
   @override
@@ -32,6 +34,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     final ReaderControllerKey viewKey = readerControllerKey(
       comicId,
       incognito: incognito,
+      startFromFirstPage: startFromFirstPage,
     );
     final int currentIndex = ref.watch(
       readerControllerProvider(viewKey).select(

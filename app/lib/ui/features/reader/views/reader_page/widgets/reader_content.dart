@@ -9,6 +9,7 @@ class ReaderContent extends ConsumerWidget {
     super.key,
     required this.comicId,
     required this.incognito,
+    this.startFromFirstPage = false,
     required this.initialPage,
     required this.preferredPageIndex,
     required this.readingMode,
@@ -17,6 +18,7 @@ class ReaderContent extends ConsumerWidget {
 
   final String comicId;
   final bool incognito;
+  final bool startFromFirstPage;
   final int initialPage;
   final int? preferredPageIndex;
   final ReadingMode readingMode;
@@ -45,6 +47,7 @@ class ReaderContent extends ConsumerWidget {
         key: ValueKey<ReadingMode>(readingMode),
         comicId: comicId,
         incognito: incognito,
+        startFromFirstPage: startFromFirstPage,
         initialPage: initialPage,
         preferredPageIndex: preferredPageIndex,
         readingMode: readingMode,

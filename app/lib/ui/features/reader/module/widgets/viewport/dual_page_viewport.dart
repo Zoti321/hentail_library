@@ -19,6 +19,7 @@ class DualPageViewport extends HookConsumerWidget {
     super.key,
     required this.comicId,
     required this.incognito,
+    this.startFromFirstPage = false,
     required this.readingMode,
     required this.initialPage,
     required this.preferredPageIndex,
@@ -27,6 +28,7 @@ class DualPageViewport extends HookConsumerWidget {
 
   final String comicId;
   final bool incognito;
+  final bool startFromFirstPage;
   final ReadingMode readingMode;
   final int initialPage;
   final int? preferredPageIndex;
@@ -37,6 +39,7 @@ class DualPageViewport extends HookConsumerWidget {
     final ReaderControllerKey viewKey = readerControllerKey(
       comicId,
       incognito: incognito,
+      startFromFirstPage: startFromFirstPage,
     );
     final ReaderState? readerState = ref
         .watch(readerControllerProvider(viewKey))

@@ -17,6 +17,7 @@ class PagedViewport extends HookConsumerWidget {
     super.key,
     required this.comicId,
     required this.incognito,
+    this.startFromFirstPage = false,
     required this.initialPage,
     required this.preferredPageIndex,
     this.onRequestNextPage,
@@ -24,6 +25,7 @@ class PagedViewport extends HookConsumerWidget {
 
   final String comicId;
   final bool incognito;
+  final bool startFromFirstPage;
   final int initialPage;
   final int? preferredPageIndex;
   final Future<void> Function()? onRequestNextPage;
@@ -33,6 +35,7 @@ class PagedViewport extends HookConsumerWidget {
     final ReaderControllerKey viewKey = readerControllerKey(
       comicId,
       incognito: incognito,
+      startFromFirstPage: startFromFirstPage,
     );
     final int currentIndex = ref.watch(
       readerControllerProvider(viewKey).select(
