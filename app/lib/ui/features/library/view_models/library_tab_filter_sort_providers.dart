@@ -153,34 +153,22 @@ LibraryMetadataFilterSelection libraryComicsTabAuthorFilter(Ref ref) {
 
 @Riverpod(keepAlive: true)
 Set<String> libraryComicsTabLanguageFilter(Ref ref) {
-  final AsyncValue<Set<String>> selectionAsync = ref.watch(
-    libraryLanguageFilterProvider,
-  );
-  return selectionAsync.maybeWhen(
-    data: (Set<String> selection) => selection,
-    orElse: () => const <String>{},
+  return ref.watch(
+    libraryIncludeSetFilterProvider(LibraryIncludeSetKind.language),
   );
 }
 
 @Riverpod(keepAlive: true)
 Set<String> libraryComicsTabParodyFilter(Ref ref) {
-  final AsyncValue<Set<String>> selectionAsync = ref.watch(
-    libraryParodyFilterProvider,
-  );
-  return selectionAsync.maybeWhen(
-    data: (Set<String> selection) => selection,
-    orElse: () => const <String>{},
+  return ref.watch(
+    libraryIncludeSetFilterProvider(LibraryIncludeSetKind.parody),
   );
 }
 
 @Riverpod(keepAlive: true)
 Set<String> libraryComicsTabCharacterFilter(Ref ref) {
-  final AsyncValue<Set<String>> selectionAsync = ref.watch(
-    libraryCharacterFilterProvider,
-  );
-  return selectionAsync.maybeWhen(
-    data: (Set<String> selection) => selection,
-    orElse: () => const <String>{},
+  return ref.watch(
+    libraryIncludeSetFilterProvider(LibraryIncludeSetKind.character),
   );
 }
 

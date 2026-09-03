@@ -27,9 +27,27 @@ class LibraryComicsFilterResetNotifier
     await ref.read(libraryMediaTypeFilterProvider.notifier).clearAll();
     await ref.read(libraryTagFilterProvider.notifier).clear();
     await ref.read(libraryAuthorFilterProvider.notifier).clear();
-    await ref.read(libraryLanguageFilterProvider.notifier).clear();
-    await ref.read(libraryParodyFilterProvider.notifier).clear();
-    await ref.read(libraryCharacterFilterProvider.notifier).clear();
+    await ref
+        .read(
+          libraryIncludeSetFilterProvider(
+            LibraryIncludeSetKind.language,
+          ).notifier,
+        )
+        .clear();
+    await ref
+        .read(
+          libraryIncludeSetFilterProvider(
+            LibraryIncludeSetKind.parody,
+          ).notifier,
+        )
+        .clear();
+    await ref
+        .read(
+          libraryIncludeSetFilterProvider(
+            LibraryIncludeSetKind.character,
+          ).notifier,
+        )
+        .clear();
     await ref.read(libraryTabSortProvider.notifier).resetComicsSortToDefault();
     ref.invalidate(libraryComicsCatalogControllerProvider);
   }

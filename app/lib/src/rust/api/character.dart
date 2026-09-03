@@ -9,3 +9,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 List<String> listAllCharactersFrb() =>
     RustLib.instance.api.crateApiCharacterListAllCharactersFrb();
+
+List<String> listDistinctCharactersFrb({String? libraryId}) => RustLib
+    .instance
+    .api
+    .crateApiCharacterListDistinctCharactersFrb(libraryId: libraryId);

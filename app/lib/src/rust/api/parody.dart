@@ -9,3 +9,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 List<String> listAllParodiesFrb() =>
     RustLib.instance.api.crateApiParodyListAllParodiesFrb();
+
+List<String> listDistinctParodiesFrb({String? libraryId}) => RustLib
+    .instance
+    .api
+    .crateApiParodyListDistinctParodiesFrb(libraryId: libraryId);

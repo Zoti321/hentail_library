@@ -70,26 +70,21 @@ abstract class LibraryComicFilter with _$LibraryComicFilter {
       if (authorsExclude!.any((p) => p.matchesComic(comic))) return false;
     }
     if (languages != null && languages!.isNotEmpty) {
-      if (!comic.languages.any(
-        (l) => languages!.contains(l.toLowerCase()),
-      )) {
-        return false;
-      }
+      if (!_anyIgnoreCase(comic.languages, languages!)) return false;
     }
     if (parodies != null && parodies!.isNotEmpty) {
-      if (!comic.parodies.any(
-        (p) => parodies!.contains(p.toLowerCase()),
-      )) {
-        return false;
-      }
+      if (!_anyIgnoreCase(comic.parodies, parodies!)) return false;
     }
     if (characters != null && characters!.isNotEmpty) {
-      if (!comic.characters.any(
-        (c) => characters!.contains(c.toLowerCase()),
-      )) {
-        return false;
-      }
+      if (!_anyIgnoreCase(comic.characters, characters!)) return false;
     }
     return true;
   }
+}
+
+bool _anyIgnoreCase(Iterable<String> values, Set<String> selected) {
+  final Set<String> wanted = selected
+      .map((String s) => s.toLowerCase())
+      .toSet();
+  return values.any((String value) => wanted.contains(value.toLowerCase()));
 }

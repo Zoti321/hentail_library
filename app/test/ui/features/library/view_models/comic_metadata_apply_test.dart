@@ -6,6 +6,7 @@ import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/ui/core/widgets/form/character_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/parody_library_multi_select_field.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
 import 'package:riverpod/misc.dart' show ProviderOrFamily;
 import 'package:test/test.dart';
@@ -70,6 +71,7 @@ void main() {
       expect(invalidated, <ProviderOrFamily>[
         allTagsProvider,
         allCharactersProvider,
+        libraryDistinctCharactersProvider,
       ]);
       expect(invalidated.contains(allParodiesProvider), isFalse);
     });
@@ -123,7 +125,9 @@ void main() {
       expect(repo.callCount, 1);
       expect(invalidated, <ProviderOrFamily>[
         allParodiesProvider,
+        libraryDistinctParodiesProvider,
         allCharactersProvider,
+        libraryDistinctCharactersProvider,
       ]);
     });
 

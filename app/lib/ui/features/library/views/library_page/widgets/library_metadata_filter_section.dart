@@ -2,20 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
+import 'package:hentai_library/domain/library/library_tri_state_pick.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_author_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tag_filter_notifier.dart';
-import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_include_set_filter_controls.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_metadata_filter_controls.dart';
-import 'package:hentai_library/ui/core/widgets/form/character_library_multi_select_field.dart';
-import 'package:hentai_library/ui/core/widgets/form/parody_library_multi_select_field.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
+
+LibraryMetadataFilterSelection includeOnlyFilterSelection(Set<String> names) {
+  return LibraryMetadataFilterSelection(
+    picks: <String, LibraryTriStatePick>{
+      for (final String name in names) name: LibraryTriStatePick.include,
+    },
+  );
+}
 
 class LibraryTagFilterControls extends ConsumerWidget {
   const LibraryTagFilterControls({super.key});
@@ -98,15 +105,6 @@ class LibraryAuthorFilterControls extends ConsumerWidget {
 class LibraryLanguageFilterControls extends ConsumerWidget {
   const LibraryLanguageFilterControls({super.key});
 
-  static const List<String> _languageNames = <String>[
-    'Chinese',
-    'Japanese',
-    'English',
-    'Korean',
-    'Spanish',
-    'Other',
-  ];
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
@@ -120,12 +118,26 @@ class LibraryLanguageFilterControls extends ConsumerWidget {
       libraryComicsTabLanguageFilterProvider,
     );
 
-    return LibraryIncludeSetFilterControls(
+    return LibraryMetadataFilterControls(
       title: context.l10n.libraryLanguageFilter,
-      names: _languageNames,
-      selected: selected,
-      onToggle: ref.read(libraryLanguageFilterProvider.notifier).toggle,
-      onClear: ref.read(libraryLanguageFilterProvider.notifier).clear,
+      names: ComicLanguageNames.closedSet,
+      selection: includeOnlyFilterSelection(selected),
+      includeOnly: true,
+      labelFor: context.l10n.comicLanguageLabel,
+      onToggle: ref
+          .read(
+            libraryIncludeSetFilterProvider(
+              LibraryIncludeSetKind.language,
+            ).notifier,
+          )
+          .toggle,
+      onClear: ref
+          .read(
+            libraryIncludeSetFilterProvider(
+              LibraryIncludeSetKind.language,
+            ).notifier,
+          )
+          .clear,
     );
   }
 }
@@ -143,7 +155,7 @@ class LibraryParodyFilterControls extends ConsumerWidget {
     }
 
     final AsyncValue<List<String>> parodiesAsync = ref.watch(
-      allParodiesProvider,
+      libraryDistinctParodiesProvider,
     );
     final Set<String> selected = ref.watch(
       libraryComicsTabParodyFilterProvider,
@@ -153,13 +165,26 @@ class LibraryParodyFilterControls extends ConsumerWidget {
       orElse: () => const <String>[],
     );
 
-    return LibraryIncludeSetFilterControls(
+    return LibraryMetadataFilterControls(
       title: context.l10n.libraryParodyFilter,
       names: names,
-      selected: selected,
+      selection: includeOnlyFilterSelection(selected),
+      includeOnly: true,
       isLoading: parodiesAsync.isLoading,
-      onToggle: ref.read(libraryParodyFilterProvider.notifier).toggle,
-      onClear: ref.read(libraryParodyFilterProvider.notifier).clear,
+      onToggle: ref
+          .read(
+            libraryIncludeSetFilterProvider(
+              LibraryIncludeSetKind.parody,
+            ).notifier,
+          )
+          .toggle,
+      onClear: ref
+          .read(
+            libraryIncludeSetFilterProvider(
+              LibraryIncludeSetKind.parody,
+            ).notifier,
+          )
+          .clear,
     );
   }
 }
@@ -177,7 +202,7 @@ class LibraryCharacterFilterControls extends ConsumerWidget {
     }
 
     final AsyncValue<List<String>> charactersAsync = ref.watch(
-      allCharactersProvider,
+      libraryDistinctCharactersProvider,
     );
     final Set<String> selected = ref.watch(
       libraryComicsTabCharacterFilterProvider,
@@ -187,13 +212,26 @@ class LibraryCharacterFilterControls extends ConsumerWidget {
       orElse: () => const <String>[],
     );
 
-    return LibraryIncludeSetFilterControls(
+    return LibraryMetadataFilterControls(
       title: context.l10n.libraryCharacterFilter,
       names: names,
-      selected: selected,
+      selection: includeOnlyFilterSelection(selected),
+      includeOnly: true,
       isLoading: charactersAsync.isLoading,
-      onToggle: ref.read(libraryCharacterFilterProvider.notifier).toggle,
-      onClear: ref.read(libraryCharacterFilterProvider.notifier).clear,
+      onToggle: ref
+          .read(
+            libraryIncludeSetFilterProvider(
+              LibraryIncludeSetKind.character,
+            ).notifier,
+          )
+          .toggle,
+      onClear: ref
+          .read(
+            libraryIncludeSetFilterProvider(
+              LibraryIncludeSetKind.character,
+            ).notifier,
+          )
+          .clear,
     );
   }
 }

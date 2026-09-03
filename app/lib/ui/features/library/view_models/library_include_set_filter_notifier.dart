@@ -1,97 +1,46 @@
+import 'package:hentai_library/data/adapters/frb_call_guard.dart';
+import 'package:hentai_library/src/rust/api/character.dart' as rust_character;
+import 'package:hentai_library/src/rust/api/parody.dart' as rust_parody;
+import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 part 'library_include_set_filter_notifier.g.dart';
 
-@Riverpod(keepAlive: true)
-class LibraryLanguageFilter extends _$LibraryLanguageFilter {
-  static const String _storageKey = 'library_language_filter';
+enum LibraryIncludeSetKind { language, parody, character }
 
+/// Session-scoped include-only filter (OR). keepAlive retains picks while browsing.
+@Riverpod(keepAlive: true)
+class LibraryIncludeSetFilter extends _$LibraryIncludeSetFilter {
   @override
-  Future<Set<String>> build() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final List<String>? stored = prefs.getStringList(_storageKey);
-    return stored?.toSet() ?? const <String>{};
-  }
+  Set<String> build(LibraryIncludeSetKind kind) => <String>{};
 
   Future<void> toggle(String name) async {
-    final Set<String> current = await future;
-    final Set<String> updated = Set<String>.of(current);
-    if (updated.contains(name)) {
+    final Set<String> updated = Set<String>.of(state);
+    if (!updated.add(name)) {
       updated.remove(name);
-    } else {
-      updated.add(name);
     }
-    state = AsyncValue<Set<String>>.data(updated);
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_storageKey, updated.toList());
+    state = updated;
   }
 
   Future<void> clear() async {
-    state = const AsyncValue<Set<String>>.data(<String>{});
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_storageKey);
+    state = <String>{};
   }
 }
 
 @Riverpod(keepAlive: true)
-class LibraryParodyFilter extends _$LibraryParodyFilter {
-  static const String _storageKey = 'library_parody_filter';
-
-  @override
-  Future<Set<String>> build() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final List<String>? stored = prefs.getStringList(_storageKey);
-    return stored?.toSet() ?? const <String>{};
-  }
-
-  Future<void> toggle(String name) async {
-    final Set<String> current = await future;
-    final Set<String> updated = Set<String>.of(current);
-    if (updated.contains(name)) {
-      updated.remove(name);
-    } else {
-      updated.add(name);
-    }
-    state = AsyncValue<Set<String>>.data(updated);
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_storageKey, updated.toList());
-  }
-
-  Future<void> clear() async {
-    state = const AsyncValue<Set<String>>.data(<String>{});
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_storageKey);
-  }
+Future<List<String>> libraryDistinctParodies(Ref ref) async {
+  final String? libraryId = ref.watch(currentLibraryProvider).asData?.value.currentId;
+  return guardFrbSync(
+    () => rust_parody.listDistinctParodiesFrb(libraryId: libraryId),
+    fallbackMessage: '读取原作列表失败',
+  );
 }
 
 @Riverpod(keepAlive: true)
-class LibraryCharacterFilter extends _$LibraryCharacterFilter {
-  static const String _storageKey = 'library_character_filter';
-
-  @override
-  Future<Set<String>> build() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final List<String>? stored = prefs.getStringList(_storageKey);
-    return stored?.toSet() ?? const <String>{};
-  }
-
-  Future<void> toggle(String name) async {
-    final Set<String> current = await future;
-    final Set<String> updated = Set<String>.of(current);
-    if (updated.contains(name)) {
-      updated.remove(name);
-    } else {
-      updated.add(name);
-    }
-    state = AsyncValue<Set<String>>.data(updated);
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_storageKey, updated.toList());
-  }
-
-  Future<void> clear() async {
-    state = const AsyncValue<Set<String>>.data(<String>{});
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_storageKey);
-  }
+Future<List<String>> libraryDistinctCharacters(Ref ref) async {
+  final String? libraryId = ref.watch(currentLibraryProvider).asData?.value.currentId;
+  return guardFrbSync(
+    () => rust_character.listDistinctCharactersFrb(libraryId: libraryId),
+    fallbackMessage: '读取角色列表失败',
+  );
 }

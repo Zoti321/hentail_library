@@ -100,11 +100,11 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
               const LibraryFilterControls(),
               const LibraryMediaTypeFilterControls(),
               const LibrarySerializationStatusFilterControls(),
+              const LibraryTagFilterControls(),
+              const LibraryAuthorFilterControls(),
               const LibraryLanguageFilterControls(),
               const LibraryParodyFilterControls(),
               const LibraryCharacterFilterControls(),
-              const LibraryTagFilterControls(),
-              const LibraryAuthorFilterControls(),
               SizedBox(height: tokens.spacing.lg),
               Padding(
                 padding: const EdgeInsets.only(

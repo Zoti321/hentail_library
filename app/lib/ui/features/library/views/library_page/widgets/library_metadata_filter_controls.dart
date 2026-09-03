@@ -24,18 +24,22 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
     required this.names,
     required this.selection,
     required this.onToggle,
-    required this.onIncludeModeChanged,
+    this.onIncludeModeChanged,
     required this.onClear,
     this.isLoading = false,
+    this.includeOnly = false,
+    this.labelFor,
   });
 
   final String title;
   final List<String> names;
   final LibraryMetadataFilterSelection selection;
   final LibraryMetadataFilterToggle onToggle;
-  final LibraryMetadataIncludeModeChanged onIncludeModeChanged;
+  final LibraryMetadataIncludeModeChanged? onIncludeModeChanged;
   final LibraryMetadataFilterClear onClear;
   final bool isLoading;
+  final bool includeOnly;
+  final String Function(String name)? labelFor;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -104,6 +108,7 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
+              if (!includeOnly || names.length > 6)
               Padding(
                 padding: EdgeInsets.fromLTRB(
                   kLibraryFilterSortDrawerContentInset,
@@ -149,10 +154,11 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    _IncludeModeIconButton(
-                      mode: selection.includeMode,
-                      onChanged: onIncludeModeChanged,
-                    ),
+                    if (!includeOnly && onIncludeModeChanged != null)
+                      _IncludeModeIconButton(
+                        mode: selection.includeMode,
+                        onChanged: onIncludeModeChanged!,
+                      ),
                   ],
                 ),
               ),
@@ -197,6 +203,8 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
                       final LibraryTriStatePick state = selection.pickStateFor(
                         name,
                       );
+                      final bool isIncluded =
+                          state == LibraryTriStatePick.include;
                       return Material(
                         color: Colors.transparent,
                         child: InkWell(
@@ -212,14 +220,27 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
                             ),
                             child: Row(
                               children: <Widget>[
-                                LibraryTriStateFilterCheckbox(
-                                  state: state,
-                                  onPressed: () => onToggle(name),
-                                ),
+                                if (includeOnly)
+                                  SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: Checkbox(
+                                      value: isIncluded,
+                                      onChanged: (_) => onToggle(name),
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      visualDensity: VisualDensity.compact,
+                                    ),
+                                  )
+                                else
+                                  LibraryTriStateFilterCheckbox(
+                                    state: state,
+                                    onPressed: () => onToggle(name),
+                                  ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    name,
+                                    labelFor?.call(name) ?? name,
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: cs.hentai.textPrimary,
