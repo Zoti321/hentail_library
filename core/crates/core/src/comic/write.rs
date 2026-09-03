@@ -275,9 +275,15 @@ pub async fn search_comic_ids_by_tag_expression(
         sql.push_str(
             " AND (\
                EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) = ?) \
-               OR EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) = ?)\
+               OR EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) = ?) \
+               OR EXISTS (SELECT 1 FROM comic_parodies cp WHERE cp.comic_id = c.comic_id AND lower(cp.parody_name) = ?) \
+               OR EXISTS (SELECT 1 FROM comic_characters cc WHERE cc.comic_id = c.comic_id AND lower(cc.character_name) = ?) \
+               OR EXISTS (SELECT 1 FROM json_each(m.languages) je WHERE lower(je.value) = ?)\
              )",
         );
+        values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
+        values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
+        values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
         values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
         values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
     }
@@ -286,9 +292,21 @@ pub async fn search_comic_ids_by_tag_expression(
         sql.push_str(&format!(
             " AND (\
                EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) IN ({placeholders})) \
-               OR EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) IN ({placeholders}))\
+               OR EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) IN ({placeholders})) \
+               OR EXISTS (SELECT 1 FROM comic_parodies cp WHERE cp.comic_id = c.comic_id AND lower(cp.parody_name) IN ({placeholders})) \
+               OR EXISTS (SELECT 1 FROM comic_characters cc WHERE cc.comic_id = c.comic_id AND lower(cc.character_name) IN ({placeholders})) \
+               OR EXISTS (SELECT 1 FROM json_each(m.languages) je WHERE lower(je.value) IN ({placeholders}))\
              )"
         ));
+        for name in &optional {
+            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
+        }
+        for name in &optional {
+            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
+        }
+        for name in &optional {
+            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
+        }
         for name in &optional {
             values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
         }
@@ -300,8 +318,20 @@ pub async fn search_comic_ids_by_tag_expression(
         let placeholders = excludes.iter().map(|_| "?").collect::<Vec<_>>().join(",");
         sql.push_str(&format!(
             " AND NOT EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) IN ({placeholders})) \
-              AND NOT EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) IN ({placeholders}))"
+              AND NOT EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) IN ({placeholders})) \
+              AND NOT EXISTS (SELECT 1 FROM comic_parodies cp WHERE cp.comic_id = c.comic_id AND lower(cp.parody_name) IN ({placeholders})) \
+              AND NOT EXISTS (SELECT 1 FROM comic_characters cc WHERE cc.comic_id = c.comic_id AND lower(cc.character_name) IN ({placeholders})) \
+              AND NOT EXISTS (SELECT 1 FROM json_each(m.languages) je WHERE lower(je.value) IN ({placeholders}))"
         ));
+        for name in &excludes {
+            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
+        }
+        for name in &excludes {
+            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
+        }
+        for name in &excludes {
+            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
+        }
         for name in &excludes {
             values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
         }

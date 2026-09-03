@@ -177,6 +177,60 @@ void main() {
         ),
       );
     });
+
+    test('known parody name routes to metadata', () {
+      final LibrarySearchQuery query = parseLibrarySearchQuery(
+        '"Naruto"',
+        knownTagNames: tags,
+        knownAuthorNames: authors,
+        knownParodyNames: <String>{'Naruto'},
+      );
+
+      expect(
+        query,
+        isA<LibrarySearchMetadataQuery>().having(
+          (LibrarySearchMetadataQuery q) => q.mustInclude,
+          'mustInclude',
+          <String>{'naruto'},
+        ),
+      );
+    });
+
+    test('known language name routes to metadata', () {
+      final LibrarySearchQuery query = parseLibrarySearchQuery(
+        '"Chinese"',
+        knownTagNames: tags,
+        knownAuthorNames: authors,
+        knownLanguageNames: <String>{'Chinese'},
+      );
+
+      expect(
+        query,
+        isA<LibrarySearchMetadataQuery>().having(
+          (LibrarySearchMetadataQuery q) => q.mustInclude,
+          'mustInclude',
+          <String>{'chinese'},
+        ),
+      );
+    });
+
+    test('known character name routes to metadata', () {
+      final LibrarySearchQuery query = parseLibrarySearchQuery(
+        'Sakura',
+        knownTagNames: tags,
+        knownAuthorNames: authors,
+        knownCharacterNames: <String>{'Sakura'},
+      );
+
+      expect(
+        query,
+        isA<LibrarySearchMetadataQuery>().having(
+          (LibrarySearchMetadataQuery q) => q.mustInclude,
+          'mustInclude',
+          <String>{'sakura'},
+        ),
+      );
+    });
   });
 
   group('parseLibrarySearchQuery quotes', () {

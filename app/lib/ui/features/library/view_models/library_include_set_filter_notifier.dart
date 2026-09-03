@@ -25,11 +25,6 @@ class LibraryIncludeSetFilter extends _$LibraryIncludeSetFilter {
   Future<void> clear() async {
     state = <String>{};
   }
-
-  Future<void> selectOnly(String name) async {
-    final String trimmed = name.trim();
-    state = trimmed.isEmpty ? <String>{} : <String>{trimmed};
-  }
 }
 
 @Riverpod(keepAlive: true)

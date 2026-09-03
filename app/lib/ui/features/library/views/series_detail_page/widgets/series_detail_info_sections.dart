@@ -7,10 +7,7 @@ import 'package:hentai_library/ui/core/layout/detail_meta_chip_row_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/r18_rating_chip.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_include_filter_navigation.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_info_sections.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 休刊状态 chip 描边/文字色（仅系列详情页使用）。
 Color _serializationChipAccentColor(
@@ -107,7 +104,7 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
   }
 }
 
-class SeriesDetailMetadataBlock extends ConsumerWidget {
+class SeriesDetailMetadataBlock extends StatelessWidget {
   const SeriesDetailMetadataBlock({
     super.key,
     required this.authors,
@@ -122,7 +119,7 @@ class SeriesDetailMetadataBlock extends ConsumerWidget {
   final List<String> characters;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
     final List<Widget> rows = <Widget>[];
@@ -132,12 +129,6 @@ class SeriesDetailMetadataBlock extends ConsumerWidget {
         LabeledMetaChipRow(
           label: l10n.comicDetailParodies,
           items: parodies,
-          onItemTap: (String parody) => browseLibraryWithIncludeFilter(
-            ref,
-            context,
-            kind: LibraryIncludeSetKind.parody,
-            value: parody,
-          ),
         ),
       );
     }
@@ -151,12 +142,6 @@ class SeriesDetailMetadataBlock extends ConsumerWidget {
         LabeledMetaChipRow(
           label: l10n.comicDetailCharacters,
           items: characters,
-          onItemTap: (String character) => browseLibraryWithIncludeFilter(
-            ref,
-            context,
-            kind: LibraryIncludeSetKind.character,
-            value: character,
-          ),
         ),
       );
     }
