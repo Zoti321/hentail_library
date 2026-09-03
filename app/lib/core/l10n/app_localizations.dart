@@ -1275,15 +1275,21 @@ abstract class AppLocalizations {
   String get librarySerializationStatusFilter;
 
   /// No description provided for @libraryLanguageFilter.
-
+  ///
+  /// In zh, this message translates to:
+  /// **'语言'**
   String get libraryLanguageFilter;
 
   /// No description provided for @libraryParodyFilter.
-
+  ///
+  /// In zh, this message translates to:
+  /// **'原作'**
   String get libraryParodyFilter;
 
   /// No description provided for @libraryCharacterFilter.
-
+  ///
+  /// In zh, this message translates to:
+  /// **'角色'**
   String get libraryCharacterFilter;
 
   /// No description provided for @libraryTagFilter.
