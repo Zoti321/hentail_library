@@ -9,6 +9,8 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/foundation/horizontal_wheel_scroll_listener.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/r18_rating_chip.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_include_filter_navigation.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/ui/features/reader/reader.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
@@ -101,16 +103,14 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
   }
 }
 
-/// Cover-right Language 分段文案；idle/hover 可点。
-///
-/// 字段作用域搜索尚未实现：点击为占位 no-op（#72），勿假装已按 Language 过滤。
-class ComicLanguageSegments extends StatelessWidget {
+/// Cover-right Language 分段文案；点击跳转当前库并按 Language 筛选。
+class ComicLanguageSegments extends ConsumerWidget {
   const ComicLanguageSegments({super.key, required this.languages});
 
   final List<String> languages;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppLocalizations l10n = context.l10n;
@@ -131,8 +131,12 @@ class ComicLanguageSegments extends StatelessWidget {
       children.add(
         _ComicLanguageSegmentLink(
           label: l10n.comicLanguageLabel(canonical),
-          // TODO(#72): field-scoped search for Language — placeholder no-op.
-          onTap: () {},
+          onTap: () => browseLibraryWithIncludeFilter(
+            ref,
+            context,
+            kind: LibraryIncludeSetKind.language,
+            value: canonical,
+          ),
         ),
       );
     }
@@ -209,13 +213,13 @@ class ComicDetailDescription extends StatelessWidget {
 }
 
 /// 作者、标签与资源信息统一信息区。
-class ComicDetailMetadataBlock extends StatelessWidget {
+class ComicDetailMetadataBlock extends ConsumerWidget {
   const ComicDetailMetadataBlock({super.key, required this.comic});
 
   final Comic comic;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
     final List<String> authors = comic.authors.map((a) => a.name).toList();
@@ -223,13 +227,16 @@ class ComicDetailMetadataBlock extends StatelessWidget {
     final List<Widget> rows = <Widget>[];
     // Order: Parody → Author → Character → Tag.
     if (comic.parodies.isNotEmpty) {
-      // 字段作用域搜索尚未实现：点击为占位 no-op（#73），勿假装已按 Parody 过滤。
       rows.add(
         LabeledMetaChipRow(
           label: l10n.comicDetailParodies,
           items: comic.parodies,
-          // TODO(#73): field-scoped search for Parody — placeholder no-op.
-          onItemTap: (_) {},
+          onItemTap: (String parody) => browseLibraryWithIncludeFilter(
+            ref,
+            context,
+            kind: LibraryIncludeSetKind.parody,
+            value: parody,
+          ),
         ),
       );
     }
@@ -239,13 +246,16 @@ class ComicDetailMetadataBlock extends StatelessWidget {
       );
     }
     if (comic.characters.isNotEmpty) {
-      // 字段作用域搜索尚未实现：点击为占位 no-op（#74），勿假装已按 Character 过滤。
       rows.add(
         LabeledMetaChipRow(
           label: l10n.comicDetailCharacters,
           items: comic.characters,
-          // TODO(#74): field-scoped search for Character — placeholder no-op.
-          onItemTap: (_) {},
+          onItemTap: (String character) => browseLibraryWithIncludeFilter(
+            ref,
+            context,
+            kind: LibraryIncludeSetKind.character,
+            value: character,
+          ),
         ),
       );
     }

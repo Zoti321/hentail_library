@@ -7,7 +7,10 @@ import 'package:hentai_library/ui/core/layout/detail_meta_chip_row_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/r18_rating_chip.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_include_filter_navigation.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_info_sections.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 休刊状态 chip 描边/文字色（仅系列详情页使用）。
 Color _serializationChipAccentColor(
@@ -104,7 +107,7 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
   }
 }
 
-class SeriesDetailMetadataBlock extends StatelessWidget {
+class SeriesDetailMetadataBlock extends ConsumerWidget {
   const SeriesDetailMetadataBlock({
     super.key,
     required this.authors,
@@ -119,19 +122,22 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
   final List<String> characters;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
     final List<Widget> rows = <Widget>[];
     // Order: Parody → Author → Character → Tag（与 Comic 一致）。
     if (parodies.isNotEmpty) {
-      // 字段作用域搜索尚未实现：点击为占位 no-op（#73），勿假装已按 Parody 过滤。
       rows.add(
         LabeledMetaChipRow(
           label: l10n.comicDetailParodies,
           items: parodies,
-          // TODO(#73): field-scoped search for Parody — placeholder no-op.
-          onItemTap: (_) {},
+          onItemTap: (String parody) => browseLibraryWithIncludeFilter(
+            ref,
+            context,
+            kind: LibraryIncludeSetKind.parody,
+            value: parody,
+          ),
         ),
       );
     }
@@ -141,13 +147,16 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
       );
     }
     if (characters.isNotEmpty) {
-      // 与 Comic 一致占位 no-op（#75 / #74）。
       rows.add(
         LabeledMetaChipRow(
           label: l10n.comicDetailCharacters,
           items: characters,
-          // TODO(#75/#74): field-scoped search for Character — placeholder no-op.
-          onItemTap: (_) {},
+          onItemTap: (String character) => browseLibraryWithIncludeFilter(
+            ref,
+            context,
+            kind: LibraryIncludeSetKind.character,
+            value: character,
+          ),
         ),
       );
     }
