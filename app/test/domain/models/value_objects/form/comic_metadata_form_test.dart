@@ -332,5 +332,111 @@ void main() {
       ).copyWith(isR18: false).applyTo(repo, original);
       expect(repo.contentRating, ContentRating.safe);
     });
+
+    test('marks dictionary fields written only when submitted', () async {
+      final _RecordingComicRepository repo = _RecordingComicRepository();
+      final Comic original = _comic();
+      final ComicMetadataApplyResult tagsOnly =
+          await ComicMetadataForm.fromComic(original)
+              .addTag('new-tag')
+              .applyTo(repo, original);
+      expect(
+        tagsOnly,
+        isA<ComicMetadataApplySucceeded>()
+            .having(
+              (ComicMetadataApplySucceeded r) => r.tagsWritten,
+              'tagsWritten',
+              isTrue,
+            )
+            .having(
+              (ComicMetadataApplySucceeded r) => r.parodiesWritten,
+              'parodiesWritten',
+              isFalse,
+            )
+            .having(
+              (ComicMetadataApplySucceeded r) => r.charactersWritten,
+              'charactersWritten',
+              isFalse,
+            ),
+      );
+
+      final ComicMetadataApplyResult titleOnly =
+          await ComicMetadataForm.fromComic(
+            original,
+          ).copyWith(title: '仅改标题').applyTo(repo, original);
+      expect(
+        titleOnly,
+        isA<ComicMetadataApplySucceeded>()
+            .having(
+              (ComicMetadataApplySucceeded r) => r.tagsWritten,
+              'tagsWritten',
+              isFalse,
+            )
+            .having(
+              (ComicMetadataApplySucceeded r) => r.parodiesWritten,
+              'parodiesWritten',
+              isFalse,
+            )
+            .having(
+              (ComicMetadataApplySucceeded r) => r.charactersWritten,
+              'charactersWritten',
+              isFalse,
+            ),
+      );
+
+      final ComicMetadataApplyResult parodyAndCharacter =
+          await ComicMetadataForm.fromComic(original)
+              .addParody('Fate')
+              .addCharacter('Saber')
+              .applyTo(repo, original);
+      expect(
+        parodyAndCharacter,
+        isA<ComicMetadataApplySucceeded>()
+            .having(
+              (ComicMetadataApplySucceeded r) => r.tagsWritten,
+              'tagsWritten',
+              isFalse,
+            )
+            .having(
+              (ComicMetadataApplySucceeded r) => r.parodiesWritten,
+              'parodiesWritten',
+              isTrue,
+            )
+            .having(
+              (ComicMetadataApplySucceeded r) => r.charactersWritten,
+              'charactersWritten',
+              isTrue,
+            ),
+      );
+    });
+
+    test('no repository call leaves dictionary flags false', () async {
+      final _RecordingComicRepository repo = _RecordingComicRepository();
+      final Comic original = _comic(tags: <Tag>[Tag(name: 'T')]);
+      final ComicMetadataApplyResult result = await ComicMetadataForm.fromComic(
+        original,
+      ).applyTo(repo, original);
+
+      expect(repo.callCount, 0);
+      expect(
+        result,
+        isA<ComicMetadataApplySucceeded>()
+            .having(
+              (ComicMetadataApplySucceeded r) => r.tagsWritten,
+              'tagsWritten',
+              isFalse,
+            )
+            .having(
+              (ComicMetadataApplySucceeded r) => r.parodiesWritten,
+              'parodiesWritten',
+              isFalse,
+            )
+            .having(
+              (ComicMetadataApplySucceeded r) => r.charactersWritten,
+              'charactersWritten',
+              isFalse,
+            ),
+      );
+    });
   });
 }

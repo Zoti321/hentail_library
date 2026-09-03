@@ -14,6 +14,7 @@ import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.da
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/comic_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_back_header.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_series_nav.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -92,7 +93,12 @@ class ComicDetailHeader extends ConsumerWidget {
       context: context,
       comic: comic,
       onSave: (ComicMetadataForm data) async {
-        await data.applyTo(ref.read(comicRepoProvider), comic);
+        await applyComicMetadataForm(
+          ref.read(comicRepoProvider),
+          data,
+          comic,
+          invalidate: ref.invalidate,
+        );
       },
     );
   }

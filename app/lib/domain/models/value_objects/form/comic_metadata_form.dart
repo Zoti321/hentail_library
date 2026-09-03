@@ -61,7 +61,20 @@ final class ComicMetadataApplyInvalid extends ComicMetadataApplyResult {
 }
 
 final class ComicMetadataApplySucceeded extends ComicMetadataApplyResult {
-  const ComicMetadataApplySucceeded();
+  const ComicMetadataApplySucceeded({
+    this.tagsWritten = false,
+    this.parodiesWritten = false,
+    this.charactersWritten = false,
+  });
+
+  /// 本次是否向仓储提交了 Tag 列表（可能写入全局 Tag 字典）。
+  final bool tagsWritten;
+
+  /// 本次是否向仓储提交了 Parody 列表（可能写入全局 Parody 字典）。
+  final bool parodiesWritten;
+
+  /// 本次是否向仓储提交了 Character 列表（可能写入全局 Character 字典）。
+  final bool charactersWritten;
 }
 
 extension ComicMetadataFormOps on ComicMetadataForm {
@@ -266,7 +279,11 @@ extension ComicMetadataFormOps on ComicMetadataForm {
       parodies: parodies,
       characters: characters,
     );
-    return const ComicMetadataApplySucceeded();
+    return ComicMetadataApplySucceeded(
+      tagsWritten: tags != null,
+      parodiesWritten: parodies != null,
+      charactersWritten: characters != null,
+    );
   }
 }
 

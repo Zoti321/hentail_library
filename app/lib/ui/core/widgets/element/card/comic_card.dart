@@ -11,6 +11,7 @@ import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/comic_context_menu.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/comic_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -76,7 +77,12 @@ class ComicCard extends ConsumerWidget {
               context: context,
               comic: comic,
               onSave: (ComicMetadataForm data) async {
-                await data.applyTo(ref.read(comicRepoProvider), comic);
+                await applyComicMetadataForm(
+                  ref.read(comicRepoProvider),
+                  data,
+                  comic,
+                  invalidate: ref.invalidate,
+                );
               },
             );
           case ComicContextAction.showInExplorer:
