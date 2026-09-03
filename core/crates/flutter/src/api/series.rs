@@ -109,6 +109,9 @@ pub struct SeriesComicsMetadataDto {
     pub authors: Vec<String>,
     pub tags: Vec<String>,
     pub has_r18: bool,
+    pub languages: Vec<String>,
+    pub parodies: Vec<String>,
+    pub characters: Vec<String>,
 }
 
 /// ADR-0005：由 comicId 派生的阅读器用系列上下文。
@@ -217,6 +220,9 @@ impl From<CoreSeriesComicsMetadata> for SeriesComicsMetadataDto {
             authors: value.authors,
             tags: value.tags,
             has_r18: value.has_r18,
+            languages: value.languages,
+            parodies: value.parodies,
+            characters: value.characters,
         }
     }
 }

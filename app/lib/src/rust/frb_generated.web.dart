@@ -7,12 +7,14 @@
 // ignore_for_file: argument_type_not_assignable
 
 import 'api/author.dart';
+import 'api/character.dart';
 import 'api/comic.dart';
 import 'api/history.dart';
 import 'api/home.dart';
 import 'api/init.dart';
 import 'api/library.dart';
 import 'api/logging.dart';
+import 'api/parody.dart';
 import 'api/path.dart';
 import 'api/reader.dart';
 import 'api/series.dart';

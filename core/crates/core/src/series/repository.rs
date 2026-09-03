@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use sea_orm::{
     ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, PaginatorTrait, QueryFilter,
@@ -55,6 +55,12 @@ pub struct SeriesComicsMetadataDto {
     pub authors: Vec<String>,
     pub tags: Vec<String>,
     pub has_r18: bool,
+    /// Member order + first-seen dedupe (flattened across member Language lists).
+    pub languages: Vec<String>,
+    /// Member order + first-seen dedupe (within each member: alphabetical like Comic DTO).
+    pub parodies: Vec<String>,
+    /// Member order + first-seen dedupe (within each member: alphabetical like Comic DTO).
+    pub characters: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -264,10 +270,15 @@ pub async fn fetch_series_comics_metadata(
     if !series_exists(&db, series_id).await? {
         return Ok(SeriesComicsMetadataDto::default());
     }
+    let (languages, parodies, characters) =
+        query_series_language_parody_character(&db, series_id).await?;
     Ok(SeriesComicsMetadataDto {
         authors: query_series_author_names(&db, series_id).await?,
         tags: query_series_tag_names(&db, series_id).await?,
         has_r18: query_series_has_r18(&db, series_id).await?,
+        languages,
+        parodies,
+        characters,
     })
 }
 
@@ -472,6 +483,39 @@ async fn query_series_comic_id_orders_page(
             Ok((comic_id, sort_order, locked_i64 != 0))
         })
         .collect()
+}
+
+/// Walk Series members in `sort_order` / `comic_id` order; flatten Language / Parody /
+/// Character lists with first-seen dedupe (US-21 / #75).
+async fn query_series_language_parody_character(
+    db: &DatabaseConnection,
+    series_id: &str,
+) -> Result<(Vec<String>, Vec<String>, Vec<String>), HentaiError> {
+    let comic_ids = query_all_series_comic_ids(db, series_id).await?;
+    if comic_ids.is_empty() {
+        return Ok((vec![], vec![], vec![]));
+    }
+    let comics = load_comics_ordered(db, comic_ids).await?;
+    let mut languages = Vec::new();
+    let mut parodies = Vec::new();
+    let mut characters = Vec::new();
+    let mut seen_languages = HashSet::new();
+    let mut seen_parodies = HashSet::new();
+    let mut seen_characters = HashSet::new();
+    for comic in comics {
+        append_first_seen(&mut languages, &mut seen_languages, &comic.languages);
+        append_first_seen(&mut parodies, &mut seen_parodies, &comic.parodies);
+        append_first_seen(&mut characters, &mut seen_characters, &comic.characters);
+    }
+    Ok((languages, parodies, characters))
+}
+
+fn append_first_seen(out: &mut Vec<String>, seen: &mut HashSet<String>, values: &[String]) {
+    for value in values {
+        if seen.insert(value.clone()) {
+            out.push(value.clone());
+        }
+    }
 }
 
 async fn query_series_author_names(

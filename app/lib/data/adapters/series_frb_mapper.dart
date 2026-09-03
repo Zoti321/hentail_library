@@ -56,6 +56,9 @@ SeriesComicsMetadata mapRustSeriesComicsMetadata(
     authors: dto.authors,
     tags: dto.tags,
     hasR18: dto.hasR18,
+    languages: dto.languages,
+    parodies: dto.parodies,
+    characters: dto.characters,
   );
 }
 

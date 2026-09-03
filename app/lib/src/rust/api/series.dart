@@ -297,18 +297,30 @@ class SeriesComicsMetadataDto {
   final List<String> authors;
   final List<String> tags;
   final bool hasR18;
+  final List<String> languages;
+  final List<String> parodies;
+  final List<String> characters;
 
   const SeriesComicsMetadataDto({
     required this.authors,
     required this.tags,
     required this.hasR18,
+    required this.languages,
+    required this.parodies,
+    required this.characters,
   });
 
   static Future<SeriesComicsMetadataDto> default_() =>
       RustLib.instance.api.crateApiSeriesSeriesComicsMetadataDtoDefault();
 
   @override
-  int get hashCode => authors.hashCode ^ tags.hashCode ^ hasR18.hashCode;
+  int get hashCode =>
+      authors.hashCode ^
+      tags.hashCode ^
+      hasR18.hashCode ^
+      languages.hashCode ^
+      parodies.hashCode ^
+      characters.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -317,7 +329,10 @@ class SeriesComicsMetadataDto {
           runtimeType == other.runtimeType &&
           authors == other.authors &&
           tags == other.tags &&
-          hasR18 == other.hasR18;
+          hasR18 == other.hasR18 &&
+          languages == other.languages &&
+          parodies == other.parodies &&
+          characters == other.characters;
 }
 
 /// FRB 层 DTO：字段与 `hentai_core::SeriesDto` 对齐。

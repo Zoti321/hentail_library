@@ -112,12 +112,17 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
                                 tokens,
                                 cs,
                                 hasR18: metadata?.hasR18 ?? false,
+                                languages:
+                                    metadata?.languages ?? const <String>[],
+                                parodies:
+                                    metadata?.parodies ?? const <String>[],
                               ),
                               SizedBox(height: sectionGap),
                               if (hasMetadata) ...<Widget>[
                                 SeriesDetailMetadataBlock(
                                   authors: metadata!.authors,
                                   tags: metadata.tags,
+                                  characters: metadata.characters,
                                 ),
                                 SizedBox(height: sectionGap),
                               ],
@@ -160,6 +165,8 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
     AppThemeTokens tokens,
     ColorScheme cs, {
     required bool hasR18,
+    required List<String> languages,
+    required List<String> parodies,
   }) {
     return DetailPrimaryRowLayout(
       cover: SeriesDetailCover(series: widget.series),
@@ -182,7 +189,12 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
               ),
             ),
           ),
-          SeriesDetailSummaryMetaRow(series: widget.series, hasR18: hasR18),
+          SeriesDetailSummaryMetaRow(
+            series: widget.series,
+            hasR18: hasR18,
+            languages: languages,
+            parodies: parodies,
+          ),
         ],
       ),
     );

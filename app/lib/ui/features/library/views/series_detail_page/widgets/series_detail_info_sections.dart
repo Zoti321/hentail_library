@@ -49,10 +49,14 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
     super.key,
     required this.series,
     this.hasR18 = false,
+    this.languages = const <String>[],
+    this.parodies = const <String>[],
   });
 
   final Series series;
   final bool hasR18;
+  final List<String> languages;
+  final List<String> parodies;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +65,8 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final bool showSerialization =
         series.serializationStatus != SerializationStatus.unknown;
+    final bool hasLanguages = languages.isNotEmpty;
+    final bool hasParodies = parodies.isNotEmpty;
     final List<Widget> chipRowChildren = <Widget>[
       if (showSerialization)
         SeriesSerializationChip(status: series.serializationStatus),
@@ -71,6 +77,9 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: tokens.spacing.xs,
       children: <Widget>[
+        // Align with Comic cover-right: Language → Parody → status chips → volume.
+        if (hasLanguages) ComicLanguageSegments(languages: languages),
+        if (hasParodies) ComicParodyChipRow(parodies: parodies),
         SizedBox(
           height: kSeriesDetailMetaChipRowHeight,
           child: Align(
@@ -104,10 +113,12 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
     super.key,
     required this.authors,
     required this.tags,
+    this.characters = const <String>[],
   });
 
   final List<String> authors;
   final List<String> tags;
+  final List<String> characters;
 
   @override
   Widget build(BuildContext context) {
@@ -121,6 +132,17 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
     }
     if (tags.isNotEmpty) {
       rows.add(LabeledMetaChipRow(label: l10n.comicDetailTags, items: tags));
+    }
+    if (characters.isNotEmpty) {
+      // Character labeled chip 行（Tags 下方）；与 Comic 一致占位 no-op（#75 / #74）。
+      rows.add(
+        LabeledMetaChipRow(
+          label: l10n.comicDetailCharacters,
+          items: characters,
+          // TODO(#75/#74): field-scoped search for Character — placeholder no-op.
+          onItemTap: (_) {},
+        ),
+      );
     }
     if (rows.isEmpty) {
       return const SizedBox.shrink();
