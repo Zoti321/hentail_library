@@ -120,12 +120,24 @@ _Avoid_: ehentai 导入、EhTagTranslation、标签同步、画廊导入（易�
 Comic 的署名，用于展示与筛选；社团、画师、原作者等展示用名字均记为 Author，不区分类型。
 _Avoid_: 画师、创作者、社团、Circle（领域模型中统一用 Author）
 
+**Parody**:
+Comic 所同人化的原作 / IP 名（可多值）；无所属 IP 时可用字面值如「原创」。与 Folder series（本库 Series）无关。
+_Avoid_: Series、IP 系列、原作系列（易与 Folder series 混淆）；work（`djm` 旧 Kind 名）
+
+**Character**:
+Comic 中出场人物名（可多值）；用于展示与筛选，与 Tag / Author 分列。
+_Avoid_: 角色标签（并入 Tag）、actor（`djm` 旧 Kind 名）
+
+**Language**（Comic language）:
+Comic 文本所用语言的规范英文名有序列表（闭集首批：`Chinese`、`Japanese`、`English`、`Korean`、`Spanish`、`Other`）；空列表表示未知/未设。展示时按**界面语言**译为本地文案（如中文界面下 `Chinese`→「中文」、`Japanese`→「日语」），多项以 `|` 拼接；未在展示表中的值原样显示。与应用「界面语言」设置不是同一概念。
+_Avoid_: 界面语言、locale、译文语言；把 Language 做成自由 Tag
+
 **Content rating**:
 Comic 的内容分级：`unknown`、`safe`、`r18`；主要由用户设定，也可通过路径关键词自动检测为 `r18`。
 _Avoid_: 分级、年龄限制
 
 **Comic metadata form**:
-编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag）时的可提交草稿；校验与 normalize、Author/Tag 增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
+编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag、Parody、Character、Language）时的可提交草稿；校验与 normalize、多值名增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
 _Avoid_: 漫画表单、元数据 DTO
 
 **Series metadata form**:
