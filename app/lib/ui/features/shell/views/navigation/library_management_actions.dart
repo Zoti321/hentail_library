@@ -165,12 +165,15 @@ abstract final class LibraryManagementActions {
     BuildContext context,
     String libraryId, {
     ScanMode mode = ScanMode.incremental,
+    bool navigate = false,
   }) async {
     await ref.read(currentLibraryProvider.notifier).select(libraryId);
     if (!context.mounted) {
       return;
     }
-    context.go(LibrariesRoutes.library(libraryId));
+    if (navigate) {
+      context.go(LibrariesRoutes.library(libraryId));
+    }
     await ref
         .read(scanLibraryControllerProvider.notifier)
         .start(mode: mode, silent: true);
