@@ -116,6 +116,7 @@ fn merge_scan_with_existing(
         authors: merge_list(locks.authors, &existing.authors, &scanned.authors),
         tags: merge_list(locks.tags, &existing.tags, &scanned.tags),
         languages: merge_list(locks.languages, &existing.languages, &scanned.languages),
+        parodies: merge_list(locks.parodies, &existing.parodies, &scanned.parodies),
         locks: ComicMetaLocks {
             title: locks.title,
             description: locks.description,
@@ -124,6 +125,7 @@ fn merge_scan_with_existing(
             authors: locks.authors,
             tags: locks.tags,
             languages: locks.languages,
+            parodies: locks.parodies,
         },
         library_id: if scanned.library_id.is_empty() {
             existing.library_id.clone()

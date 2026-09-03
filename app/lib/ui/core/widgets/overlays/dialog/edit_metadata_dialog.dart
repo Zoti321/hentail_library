@@ -17,6 +17,7 @@ import 'package:hentai_library/ui/core/widgets/form/fluent_date_picker_field.dar
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_toggle_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/metadata_lock_button.dart';
+import 'package:hentai_library/ui/core/widgets/form/parody_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
@@ -115,6 +116,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     bool? authors,
     bool? tags,
     bool? languages,
+    bool? parodies,
   }) async {
     if (_lockBusy) {
       return;
@@ -132,6 +134,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
             authors: authors,
             tags: tags,
             languages: languages,
+            parodies: parodies,
           );
       if (!mounted) {
         return;
@@ -145,6 +148,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           authors: authors,
           tags: tags,
           languages: languages,
+          parodies: parodies,
         );
       });
     } catch (_) {
@@ -311,6 +315,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           key: const ValueKey<String>('authors-tags'),
           authors: _form.authors,
           tags: _form.tags,
+          parodies: _form.parodies,
           locks: _locks,
           lockBusy: _lockBusy || _saving,
           onAddAuthor: (String name) {
@@ -324,6 +329,12 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           },
           onRemoveTag: (String name) {
             _updateForm((ComicMetadataForm f) => f.removeTag(name));
+          },
+          onAddParody: (String name) {
+            _updateForm((ComicMetadataForm f) => f.addParody(name));
+          },
+          onRemoveParody: (String name) {
+            _updateForm((ComicMetadataForm f) => f.removeParody(name));
           },
           onLockChanged: _setLock,
         ),
@@ -454,6 +465,7 @@ typedef _MetaLockChanged =
       bool? authors,
       bool? tags,
       bool? languages,
+      bool? parodies,
     });
 
 class _EditMetadataGeneralTab extends StatelessWidget {
@@ -629,23 +641,29 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
     super.key,
     required this.authors,
     required this.tags,
+    required this.parodies,
     required this.locks,
     required this.lockBusy,
     required this.onAddAuthor,
     required this.onRemoveAuthor,
     required this.onAddTag,
     required this.onRemoveTag,
+    required this.onAddParody,
+    required this.onRemoveParody,
     required this.onLockChanged,
   });
 
   final List<Author> authors;
   final List<Tag> tags;
+  final List<String> parodies;
   final ComicMetaLocks locks;
   final bool lockBusy;
   final ValueChanged<String> onAddAuthor;
   final ValueChanged<String> onRemoveAuthor;
   final ValueChanged<String> onAddTag;
   final ValueChanged<String> onRemoveTag;
+  final ValueChanged<String> onAddParody;
+  final ValueChanged<String> onRemoveParody;
   final _MetaLockChanged onLockChanged;
 
   @override
@@ -680,6 +698,18 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
           selectedNames: tags.map((Tag t) => t.name).toList(),
           onAdd: onAddTag,
           onRemove: onRemoveTag,
+        ),
+        ParodyLibraryMultiSelectField(
+          label: l10n.comicDetailParodies,
+          labelTrailing: MetadataLockButton(
+            locked: locks.parodies,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(parodies: locked),
+          ),
+          icon: LucideIcons.bookMarked,
+          selectedNames: parodies,
+          onAdd: onAddParody,
+          onRemove: onRemoveParody,
         ),
       ],
     );

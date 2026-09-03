@@ -175,6 +175,7 @@ fn register_remote_file(
         authors: vec![],
         tags: vec![],
         languages: vec![],
+        parodies: vec![],
         locks: Default::default(),
         library_id: String::new(),
     };

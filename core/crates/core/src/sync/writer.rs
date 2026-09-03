@@ -6,7 +6,8 @@ use sea_orm::{
 use crate::comic::{now_ms, ComicDto};
 use crate::db::map_db_err;
 use crate::entity::{
-    authors, comic_authors, comic_meta, comic_tags, comic_thumbnails, comics, prelude::*, tags,
+    authors, comic_authors, comic_meta, comic_parodies, comic_tags, comic_thumbnails, comics,
+    parodies, prelude::*, tags,
 };
 use crate::error::HentaiError;
 use crate::history::normalize_reading_history_titles;
@@ -88,6 +89,7 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
         tags_locked: Set(comic.locks.tags),
         languages: Set(crate::comic::serialize_languages(&comic.languages)),
         languages_locked: Set(comic.locks.languages),
+        parodies_locked: Set(comic.locks.parodies),
     };
     ComicMeta::insert(meta_active)
         .exec(db)
@@ -96,6 +98,7 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
 
     rekey_comic_child_table(db, "comic_tags", from_id, to_id).await?;
     rekey_comic_child_table(db, "comic_authors", from_id, to_id).await?;
+    rekey_comic_child_table(db, "comic_parodies", from_id, to_id).await?;
     rekey_comic_child_table(db, "comic_reading_histories", from_id, to_id).await?;
     rekey_comic_child_table(db, "comic_thumbnails", from_id, to_id).await?;
     rekey_comic_child_table(db, "series_items", from_id, to_id).await?;
@@ -368,6 +371,7 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
             tags_locked: Set(comic.locks.tags),
             languages: Set(crate::comic::serialize_languages(&comic.languages)),
             languages_locked: Set(comic.locks.languages),
+            parodies_locked: Set(comic.locks.parodies),
         };
         ComicMeta::insert(meta_active)
             .on_conflict(
@@ -387,6 +391,7 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
                         comic_meta::Column::TagsLocked,
                         comic_meta::Column::Languages,
                         comic_meta::Column::LanguagesLocked,
+                        comic_meta::Column::ParodiesLocked,
                     ])
                     .to_owned(),
             )
@@ -396,6 +401,7 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
 
         replace_comic_authors(db, &comic.comic_id, &comic.authors).await?;
         replace_comic_tags(db, &comic.comic_id, &comic.tags).await?;
+        replace_comic_parodies(db, &comic.comic_id, &comic.parodies).await?;
     }
     Ok(())
 }
@@ -492,6 +498,40 @@ pub async fn replace_comic_tags<C: ConnectionTrait>(
             tag_name: Set(name.clone()),
         };
         ComicTags::insert(row).exec(db).await.map_err(map_db_err)?;
+    }
+    Ok(())
+}
+
+pub async fn replace_comic_parodies<C: ConnectionTrait>(
+    db: &C,
+    comic_id: &str,
+    parody_names: &[String],
+) -> Result<(), HentaiError> {
+    ComicParodies::delete_many()
+        .filter(comic_parodies::Column::ComicId.eq(comic_id))
+        .exec(db)
+        .await
+        .map_err(map_db_err)?;
+    let unique: std::collections::HashSet<&String> = parody_names.iter().collect();
+    for name in unique {
+        let parody = parodies::ActiveModel {
+            name: Set(name.clone()),
+        };
+        Parodies::insert(parody)
+            .on_conflict(
+                sea_orm::sea_query::OnConflict::column(parodies::Column::Name)
+                    .do_nothing()
+                    .to_owned(),
+            )
+            .do_nothing()
+            .exec(db)
+            .await
+            .map_err(map_db_err)?;
+        let row = comic_parodies::ActiveModel {
+            comic_id: Set(comic_id.to_string()),
+            parody_name: Set(name.clone()),
+        };
+        ComicParodies::insert(row).exec(db).await.map_err(map_db_err)?;
     }
     Ok(())
 }

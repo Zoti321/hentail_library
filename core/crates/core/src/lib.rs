@@ -11,6 +11,7 @@ pub mod library;
 pub mod metadata_lock;
 pub mod migration;
 pub mod path;
+pub mod parody;
 pub mod reader;
 pub mod resource;
 pub mod runtime;
@@ -54,6 +55,7 @@ pub use library::{
     ResolvedAccess, ScanInterval,
 };
 pub use path::{add_path, list_all_paths, remove_path, watch_paths};
+pub use parody::list_all_parodies;
 pub use reader::{
     clear_reader_page_cache, clear_reader_sessions, close_reader, load_page_bytes, load_page_list,
     load_reader_page, open_reader, open_reader_with, prefetch_reader_pages, writeback_after_open,

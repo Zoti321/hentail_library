@@ -27,6 +27,7 @@ fn comic(
         authors: vec!["作者".to_string()],
         tags: vec!["标签".to_string()],
         languages: vec![],
+        parodies: vec![],
         locks: ComicMetaLocks::default(),
         library_id: String::new(),
     }
@@ -214,11 +215,14 @@ fn member_sort_order_unlocked_uses_natural_index() {
 
 #[test]
 fn comic_auto_locks_only_written_fields() {
-    let locks = comic_auto_locks(true, false, false, true, false, false, false);
+    let locks = comic_auto_locks(
+        true, false, false, true, false, false, false, false,
+    );
     assert!(locks.title);
     assert!(!locks.description);
     assert!(locks.content_rating);
     assert!(!locks.languages);
+    assert!(!locks.parodies);
     assert!(locks.any());
 }
 
@@ -251,6 +255,37 @@ fn merge_locked_languages_preserves_existing() {
     existing.locks.languages = true;
     let merged = merge_kept_scan_with_existing(&scanned, &existing);
     assert_eq!(merged.languages, vec!["Chinese".to_string()]);
+}
+
+#[test]
+fn merge_unlocked_parodies_keep_existing_when_scan_empty() {
+    let mut scanned = comic("id1", "/a/b", "zip", "扫描标题", 5);
+    scanned.parodies = vec![];
+    let mut existing = comic("id1", "/a/b", "zip", "用户标题", 5);
+    existing.parodies = vec!["Fate".to_string()];
+    let merged = merge_kept_scan_with_existing(&scanned, &existing);
+    assert_eq!(merged.parodies, vec!["Fate".to_string()]);
+}
+
+#[test]
+fn merge_unlocked_parodies_replace_when_scan_non_empty() {
+    let mut scanned = comic("id1", "/a/b", "zip", "扫描标题", 5);
+    scanned.parodies = vec!["原创".to_string()];
+    let mut existing = comic("id1", "/a/b", "zip", "用户标题", 5);
+    existing.parodies = vec!["Fate".to_string()];
+    let merged = merge_kept_scan_with_existing(&scanned, &existing);
+    assert_eq!(merged.parodies, vec!["原创".to_string()]);
+}
+
+#[test]
+fn merge_locked_parodies_preserves_existing() {
+    let mut scanned = comic("id1", "/a/b", "zip", "扫描标题", 5);
+    scanned.parodies = vec!["原创".to_string()];
+    let mut existing = comic("id1", "/a/b", "zip", "用户标题", 5);
+    existing.parodies = vec!["Fate".to_string()];
+    existing.locks.parodies = true;
+    let merged = merge_kept_scan_with_existing(&scanned, &existing);
+    assert_eq!(merged.parodies, vec!["Fate".to_string()]);
 }
 
 #[test]

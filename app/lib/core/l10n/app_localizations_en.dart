@@ -838,6 +838,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comicDetailTags => 'Tags';
 
   @override
+  String get comicDetailParodies => 'Parody';
+
+  @override
   String get comicDetailResourceFormat => 'Format';
 
   @override
@@ -1433,6 +1436,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get formAuthorEmptyRemaining => 'No more options';
+
+  @override
+  String get formParodySelectPlaceholder => 'Select or enter parody…';
+
+  @override
+  String get formParodyListLoadFailed => 'Failed to load parodies';
+
+  @override
+  String get formParodyEmptyCatalog => 'No parodies yet';
+
+  @override
+  String get formParodyEmptyRemaining => 'No more options';
 
   @override
   String get formTagSelectPlaceholder => 'Select or enter tag…';

@@ -22,6 +22,8 @@ abstract class Comic with _$Comic {
     @Default(<Tag>[]) List<Tag> tags,
     /// Ordered canonical English Language names; empty = unset.
     @Default(<String>[]) List<String> languages,
+    /// Parody (IP / franchise) names; empty = none.
+    @Default(<String>[]) List<String> parodies,
     required int pageCount,
     String? description,
     DateTime? publishedAt,

@@ -20,6 +20,7 @@ pub struct Model {
     /// JSON array of canonical English language names (ordered).
     pub languages: String,
     pub languages_locked: bool,
+    pub parodies_locked: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

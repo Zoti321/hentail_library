@@ -44,11 +44,13 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
       comic.publishedAt,
     );
     final bool hasLanguages = comic.languages.isNotEmpty;
+    final bool hasParodies = comic.parodies.isNotEmpty;
 
     if (pageLabel == null &&
         !showR18 &&
         publishedLabel == null &&
-        !hasLanguages) {
+        !hasLanguages &&
+        !hasParodies) {
       return const SizedBox.shrink();
     }
 
@@ -80,8 +82,9 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: tokens.spacing.xs,
       children: <Widget>[
-        // Stack: Language → age-restriction → page count (published date nearby).
+        // Stack: Language → Parody → age-restriction → page count (published date nearby).
         if (hasLanguages) ComicLanguageSegments(languages: comic.languages),
+        if (hasParodies) ComicParodyChipRow(parodies: comic.parodies),
         SizedBox(
           height: kDetailMetaChipRowHeight,
           child: Align(
@@ -141,6 +144,42 @@ class ComicLanguageSegments extends StatelessWidget {
       runSpacing: tokens.spacing.xs,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: children,
+    );
+  }
+}
+
+/// Cover-right Parody chip 行；idle/hover 对齐 Author/Tag chip。
+///
+/// 字段作用域搜索尚未实现：点击为占位 no-op（#73），勿假装已按 Parody 过滤。
+class ComicParodyChipRow extends StatelessWidget {
+  const ComicParodyChipRow({super.key, required this.parodies});
+
+  final List<String> parodies;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    return SizedBox(
+      height: kDetailMetaChipRowHeight,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            spacing: tokens.spacing.sm,
+            children: parodies
+                .map(
+                  (String name) => OutlinedMetaChip(
+                    text: name,
+                    compact: true,
+                    // TODO(#73): field-scoped search for Parody — placeholder no-op.
+                    onTap: () {},
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -17,6 +17,7 @@ mod m20260812_000015_remote_library_fields;
 mod m20260815_000016_library_scan_settings;
 mod m20260817_000017_library_sidebar_pin_order;
 mod m20260903_000018_comic_languages;
+mod m20260903_000019_comic_parodies;
 
 pub struct Migrator;
 
@@ -41,6 +42,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260815_000016_library_scan_settings::Migration),
             Box::new(m20260817_000017_library_sidebar_pin_order::Migration),
             Box::new(m20260903_000018_comic_languages::Migration),
+            Box::new(m20260903_000019_comic_parodies::Migration),
         ]
     }
 }

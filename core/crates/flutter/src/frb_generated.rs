@@ -1490,6 +1490,35 @@ fn wire__crate__api__author__list_all_authors_frb_impl(
         },
     )
 }
+fn wire__crate__api__parody__list_all_parodies_frb_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "list_all_parodies_frb",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
+                let output_ok = crate::api::parody::list_all_parodies_frb()?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__crate__api__path__list_all_paths_frb_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -3745,6 +3774,7 @@ impl SseDecode for crate::api::comic::ComicDto {
         let mut var_authors = <Vec<String>>::sse_decode(deserializer);
         let mut var_tags = <Vec<String>>::sse_decode(deserializer);
         let mut var_languages = <Vec<String>>::sse_decode(deserializer);
+        let mut var_parodies = <Vec<String>>::sse_decode(deserializer);
         let mut var_locks = <crate::api::comic::ComicMetaLocksDto>::sse_decode(deserializer);
         let mut var_libraryId = <String>::sse_decode(deserializer);
         return crate::api::comic::ComicDto {
@@ -3763,6 +3793,7 @@ impl SseDecode for crate::api::comic::ComicDto {
             authors: var_authors,
             tags: var_tags,
             languages: var_languages,
+            parodies: var_parodies,
             locks: var_locks,
             library_id: var_libraryId,
         };
@@ -3809,6 +3840,7 @@ impl SseDecode for crate::api::comic::ComicMetaLocksDto {
         let mut var_authors = <bool>::sse_decode(deserializer);
         let mut var_tags = <bool>::sse_decode(deserializer);
         let mut var_languages = <bool>::sse_decode(deserializer);
+        let mut var_parodies = <bool>::sse_decode(deserializer);
         return crate::api::comic::ComicMetaLocksDto {
             title: var_title,
             description: var_description,
@@ -3817,6 +3849,7 @@ impl SseDecode for crate::api::comic::ComicMetaLocksDto {
             authors: var_authors,
             tags: var_tags,
             languages: var_languages,
+            parodies: var_parodies,
         };
     }
 }
@@ -4716,6 +4749,7 @@ impl SseDecode for crate::api::comic::SetComicMetaLocksFrbDto {
         let mut var_authors = <Option<bool>>::sse_decode(deserializer);
         let mut var_tags = <Option<bool>>::sse_decode(deserializer);
         let mut var_languages = <Option<bool>>::sse_decode(deserializer);
+        let mut var_parodies = <Option<bool>>::sse_decode(deserializer);
         return crate::api::comic::SetComicMetaLocksFrbDto {
             title: var_title,
             description: var_description,
@@ -4724,6 +4758,7 @@ impl SseDecode for crate::api::comic::SetComicMetaLocksFrbDto {
             authors: var_authors,
             tags: var_tags,
             languages: var_languages,
+            parodies: var_parodies,
         };
     }
 }
@@ -4917,6 +4952,7 @@ impl SseDecode for crate::api::comic::UpdateComicUserMetaFrbDto {
         let mut var_authors = <Option<Vec<String>>>::sse_decode(deserializer);
         let mut var_tags = <Option<Vec<String>>>::sse_decode(deserializer);
         let mut var_languages = <Option<Vec<String>>>::sse_decode(deserializer);
+        let mut var_parodies = <Option<Vec<String>>>::sse_decode(deserializer);
         return crate::api::comic::UpdateComicUserMetaFrbDto {
             title: var_title,
             content_rating: var_contentRating,
@@ -4925,6 +4961,7 @@ impl SseDecode for crate::api::comic::UpdateComicUserMetaFrbDto {
             authors: var_authors,
             tags: var_tags,
             languages: var_languages,
+            parodies: var_parodies,
         };
     }
 }
@@ -5284,6 +5321,7 @@ fn pde_ffi_dispatcher_sync_impl(
         94 => {
             wire__crate__api__series__update_series_user_meta_frb_impl(ptr, rust_vec_len, data_len)
         }
+        105 => wire__crate__api__parody__list_all_parodies_frb_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -5347,6 +5385,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicDto {
             self.authors.into_into_dart().into_dart(),
             self.tags.into_into_dart().into_dart(),
             self.languages.into_into_dart().into_dart(),
+            self.parodies.into_into_dart().into_dart(),
             self.locks.into_into_dart().into_dart(),
             self.library_id.into_into_dart().into_dart(),
         ]
@@ -5402,6 +5441,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicMetaLocksDto {
             self.authors.into_into_dart().into_dart(),
             self.tags.into_into_dart().into_dart(),
             self.languages.into_into_dart().into_dart(),
+            self.parodies.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -6219,6 +6259,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::SetComicMetaLocksFrbDt
             self.authors.into_into_dart().into_dart(),
             self.tags.into_into_dart().into_dart(),
             self.languages.into_into_dart().into_dart(),
+            self.parodies.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -6471,6 +6512,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::UpdateComicUserMetaFrb
             self.authors.into_into_dart().into_dart(),
             self.tags.into_into_dart().into_dart(),
             self.languages.into_into_dart().into_dart(),
+            self.parodies.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -6672,6 +6714,7 @@ impl SseEncode for crate::api::comic::ComicDto {
         <Vec<String>>::sse_encode(self.authors, serializer);
         <Vec<String>>::sse_encode(self.tags, serializer);
         <Vec<String>>::sse_encode(self.languages, serializer);
+        <Vec<String>>::sse_encode(self.parodies, serializer);
         <crate::api::comic::ComicMetaLocksDto>::sse_encode(self.locks, serializer);
         <String>::sse_encode(self.library_id, serializer);
     }
@@ -6704,6 +6747,7 @@ impl SseEncode for crate::api::comic::ComicMetaLocksDto {
         <bool>::sse_encode(self.authors, serializer);
         <bool>::sse_encode(self.tags, serializer);
         <bool>::sse_encode(self.languages, serializer);
+        <bool>::sse_encode(self.parodies, serializer);
     }
 }
 
@@ -7384,6 +7428,7 @@ impl SseEncode for crate::api::comic::SetComicMetaLocksFrbDto {
         <Option<bool>>::sse_encode(self.authors, serializer);
         <Option<bool>>::sse_encode(self.tags, serializer);
         <Option<bool>>::sse_encode(self.languages, serializer);
+        <Option<bool>>::sse_encode(self.parodies, serializer);
     }
 }
 
@@ -7558,6 +7603,7 @@ impl SseEncode for crate::api::comic::UpdateComicUserMetaFrbDto {
         <Option<Vec<String>>>::sse_encode(self.authors, serializer);
         <Option<Vec<String>>>::sse_encode(self.tags, serializer);
         <Option<Vec<String>>>::sse_encode(self.languages, serializer);
+        <Option<Vec<String>>>::sse_encode(self.parodies, serializer);
     }
 }
 

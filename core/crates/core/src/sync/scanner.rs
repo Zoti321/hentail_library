@@ -295,6 +295,7 @@ mod tests {
             authors: vec![],
             tags: vec![],
             languages: vec![],
+            parodies: vec![],
             locks: crate::comic::ComicMetaLocks::default(),
             library_id: String::new(),
         };
