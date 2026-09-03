@@ -17,6 +17,7 @@ import 'package:hentai_library/ui/core/widgets/form/fluent_date_picker_field.dar
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_toggle_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/metadata_lock_button.dart';
+import 'package:hentai_library/ui/core/widgets/form/character_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/parody_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
@@ -117,6 +118,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     bool? tags,
     bool? languages,
     bool? parodies,
+    bool? characters,
   }) async {
     if (_lockBusy) {
       return;
@@ -135,6 +137,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
             tags: tags,
             languages: languages,
             parodies: parodies,
+            characters: characters,
           );
       if (!mounted) {
         return;
@@ -149,6 +152,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           tags: tags,
           languages: languages,
           parodies: parodies,
+          characters: characters,
         );
       });
     } catch (_) {
@@ -316,6 +320,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           authors: _form.authors,
           tags: _form.tags,
           parodies: _form.parodies,
+          characters: _form.characters,
           locks: _locks,
           lockBusy: _lockBusy || _saving,
           onAddAuthor: (String name) {
@@ -335,6 +340,12 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           },
           onRemoveParody: (String name) {
             _updateForm((ComicMetadataForm f) => f.removeParody(name));
+          },
+          onAddCharacter: (String name) {
+            _updateForm((ComicMetadataForm f) => f.addCharacter(name));
+          },
+          onRemoveCharacter: (String name) {
+            _updateForm((ComicMetadataForm f) => f.removeCharacter(name));
           },
           onLockChanged: _setLock,
         ),
@@ -466,6 +477,7 @@ typedef _MetaLockChanged =
       bool? tags,
       bool? languages,
       bool? parodies,
+      bool? characters,
     });
 
 class _EditMetadataGeneralTab extends StatelessWidget {
@@ -642,6 +654,7 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
     required this.authors,
     required this.tags,
     required this.parodies,
+    required this.characters,
     required this.locks,
     required this.lockBusy,
     required this.onAddAuthor,
@@ -650,12 +663,15 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
     required this.onRemoveTag,
     required this.onAddParody,
     required this.onRemoveParody,
+    required this.onAddCharacter,
+    required this.onRemoveCharacter,
     required this.onLockChanged,
   });
 
   final List<Author> authors;
   final List<Tag> tags;
   final List<String> parodies;
+  final List<String> characters;
   final ComicMetaLocks locks;
   final bool lockBusy;
   final ValueChanged<String> onAddAuthor;
@@ -664,6 +680,8 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
   final ValueChanged<String> onRemoveTag;
   final ValueChanged<String> onAddParody;
   final ValueChanged<String> onRemoveParody;
+  final ValueChanged<String> onAddCharacter;
+  final ValueChanged<String> onRemoveCharacter;
   final _MetaLockChanged onLockChanged;
 
   @override
@@ -710,6 +728,18 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
           selectedNames: parodies,
           onAdd: onAddParody,
           onRemove: onRemoveParody,
+        ),
+        CharacterLibraryMultiSelectField(
+          label: l10n.comicDetailCharacters,
+          labelTrailing: MetadataLockButton(
+            locked: locks.characters,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(characters: locked),
+          ),
+          icon: LucideIcons.userRound,
+          selectedNames: characters,
+          onAdd: onAddCharacter,
+          onRemove: onRemoveCharacter,
         ),
       ],
     );

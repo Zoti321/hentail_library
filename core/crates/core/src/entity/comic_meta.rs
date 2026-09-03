@@ -21,6 +21,7 @@ pub struct Model {
     pub languages: String,
     pub languages_locked: bool,
     pub parodies_locked: bool,
+    pub characters_locked: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

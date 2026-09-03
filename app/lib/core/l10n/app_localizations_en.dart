@@ -841,6 +841,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comicDetailParodies => 'Parody';
 
   @override
+  String get comicDetailCharacters => 'Characters';
+
+  @override
   String get comicDetailResourceFormat => 'Format';
 
   @override
@@ -1448,6 +1451,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get formParodyEmptyRemaining => 'No more options';
+
+  @override
+  String get formCharacterSelectPlaceholder => 'Select or enter character…';
+
+  @override
+  String get formCharacterListLoadFailed => 'Failed to load characters';
+
+  @override
+  String get formCharacterEmptyCatalog => 'No characters yet';
+
+  @override
+  String get formCharacterEmptyRemaining => 'No more options';
 
   @override
   String get formTagSelectPlaceholder => 'Select or enter tag…';

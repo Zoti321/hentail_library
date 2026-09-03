@@ -1538,6 +1538,12 @@ abstract class AppLocalizations {
   /// **'原作'**
   String get comicDetailParodies;
 
+  /// No description provided for @comicDetailCharacters.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色'**
+  String get comicDetailCharacters;
+
   /// No description provided for @comicDetailResourceFormat.
   ///
   /// In zh, this message translates to:
@@ -2675,6 +2681,30 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'没有更多可选'**
   String get formParodyEmptyRemaining;
+
+  /// No description provided for @formCharacterSelectPlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择或输入角色…'**
+  String get formCharacterSelectPlaceholder;
+
+  /// No description provided for @formCharacterListLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色列表加载失败'**
+  String get formCharacterListLoadFailed;
+
+  /// No description provided for @formCharacterEmptyCatalog.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无角色'**
+  String get formCharacterEmptyCatalog;
+
+  /// No description provided for @formCharacterEmptyRemaining.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有更多可选'**
+  String get formCharacterEmptyRemaining;
 
   /// No description provided for @formTagSelectPlaceholder.
   ///

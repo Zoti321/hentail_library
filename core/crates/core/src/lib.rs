@@ -1,4 +1,5 @@
 pub mod author;
+pub mod character;
 pub mod comic;
 pub mod comic_id;
 pub mod db;
@@ -26,6 +27,7 @@ pub use author::{
     add_author, count_all_authors, delete_authors_by_names, fetch_authors_page, list_all_authors,
     rename_author, watch_authors,
 };
+pub use character::list_all_characters;
 pub use comic::{
     count_all, delete_comics_by_ids, fetch_comics_page, find_comic_by_id, read_data_version,
     search_by_keyword, search_by_tag_expression, set_comic_meta_locks, update_comic_user_meta,

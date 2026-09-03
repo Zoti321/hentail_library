@@ -54,7 +54,7 @@ async fn seed_comic(db: &impl ConnectionTrait) {
     db.execute(Statement::from_string(
         sea_orm::DatabaseBackend::Sqlite,
         "DELETE FROM comic_tags; DELETE FROM comic_authors; DELETE FROM comic_parodies; \
-         DELETE FROM comic_meta; DELETE FROM comics"
+         DELETE FROM comic_characters; DELETE FROM comic_meta; DELETE FROM comics"
             .to_string(),
     ))
     .await
@@ -217,6 +217,101 @@ fn update_comic_user_meta_persists_parodies_and_auto_locks() {
                 .expect("exists");
             assert!(cleared.parodies.is_empty());
             assert!(cleared.locks.parodies);
+        });
+    });
+}
+
+#[test]
+fn update_comic_user_meta_persists_characters_and_auto_locks() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let db = connection().expect("connection");
+            seed_comic(&db).await;
+
+            update_comic_user_meta(
+                "c1",
+                UpdateComicUserMetaDto {
+                    characters: Some(vec!["Saber".to_string(), "Rin".to_string()]),
+                    ..Default::default()
+                },
+            )
+            .await
+            .expect("update");
+
+            let comic = find_comic_by_id("c1")
+                .await
+                .expect("find")
+                .expect("exists");
+            let mut names = comic.characters.clone();
+            names.sort();
+            assert_eq!(
+                names,
+                vec!["Rin".to_string(), "Saber".to_string()]
+            );
+            assert!(comic.locks.characters);
+            assert!(!comic.locks.title);
+
+            update_comic_user_meta(
+                "c1",
+                UpdateComicUserMetaDto {
+                    characters: Some(vec![]),
+                    ..Default::default()
+                },
+            )
+            .await
+            .expect("clear characters");
+
+            let cleared = find_comic_by_id("c1")
+                .await
+                .expect("find")
+                .expect("exists");
+            assert!(cleared.characters.is_empty());
+            assert!(cleared.locks.characters);
+        });
+    });
+}
+
+#[test]
+fn set_comic_meta_locks_characters_without_changing_values() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let db = connection().expect("connection");
+            seed_comic(&db).await;
+
+            update_comic_user_meta(
+                "c1",
+                UpdateComicUserMetaDto {
+                    characters: Some(vec!["Saber".to_string()]),
+                    ..Default::default()
+                },
+            )
+            .await
+            .expect("update");
+
+            set_comic_meta_locks(
+                "c1",
+                SetComicMetaLocksDto {
+                    characters: Some(false),
+                    ..Default::default()
+                },
+            )
+            .await
+            .expect("set locks");
+
+            let comic = find_comic_by_id("c1")
+                .await
+                .expect("find")
+                .expect("exists");
+            assert_eq!(comic.characters, vec!["Saber".to_string()]);
+            assert!(!comic.locks.characters);
         });
     });
 }

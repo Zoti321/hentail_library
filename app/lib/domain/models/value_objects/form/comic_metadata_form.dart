@@ -19,6 +19,7 @@ abstract class ComicMetadataForm with _$ComicMetadataForm {
     @Default([]) List<Author> authors,
     @Default([]) List<String> languages,
     @Default([]) List<String> parodies,
+    @Default([]) List<String> characters,
   }) = _ComicMetadataForm;
 
   factory ComicMetadataForm.fromComic(Comic comic) {
@@ -31,6 +32,7 @@ abstract class ComicMetadataForm with _$ComicMetadataForm {
       authors: List<Author>.from(comic.authors),
       languages: List<String>.from(comic.languages),
       parodies: List<String>.from(comic.parodies),
+      characters: List<String>.from(comic.characters),
     );
   }
 }
@@ -70,13 +72,14 @@ extension ComicMetadataFormOps on ComicMetadataForm {
     );
   }
 
-  /// trim 标题；概要空白 → `null`；Language / Parody trim + 保序去重。
+  /// trim 标题；概要空白 → `null`；Language / Parody / Character trim + 保序去重。
   ComicMetadataForm get normalized {
     return copyWith(
       title: title.trim(),
       description: _normalizeOptionalText(description),
       languages: _normalizeOrderedNames(languages),
       parodies: _normalizeOrderedNames(parodies),
+      characters: _normalizeOrderedNames(characters),
     );
   }
 
@@ -156,6 +159,23 @@ extension ComicMetadataFormOps on ComicMetadataForm {
     );
   }
 
+  ComicMetadataForm addCharacter(String name) {
+    final String trimmed = name.trim();
+    if (trimmed.isEmpty) {
+      return this;
+    }
+    if (characters.contains(trimmed)) {
+      return this;
+    }
+    return copyWith(characters: <String>[...characters, trimmed]);
+  }
+
+  ComicMetadataForm removeCharacter(String name) {
+    return copyWith(
+      characters: characters.where((String n) => n != name).toList(),
+    );
+  }
+
   /// 非法 → [ComicMetadataApplyInvalid]；相对 [original] 仅提交值变化字段 →
   /// [ComicMetadataApplySucceeded]。无变化时不调仓储。`isR18` → Content rating。
   Future<ComicMetadataApplyResult> applyTo(
@@ -213,6 +233,10 @@ extension ComicMetadataFormOps on ComicMetadataForm {
         !_sameOrderedNames(ready.parodies, original.parodies)
         ? ready.parodies
         : null;
+    final List<String>? characters =
+        !_sameOrderedNames(ready.characters, original.characters)
+        ? ready.characters
+        : null;
 
     final bool hasChanges =
         title != null ||
@@ -223,7 +247,8 @@ extension ComicMetadataFormOps on ComicMetadataForm {
         authors != null ||
         tags != null ||
         languages != null ||
-        parodies != null;
+        parodies != null ||
+        characters != null;
     if (!hasChanges) {
       return const ComicMetadataApplySucceeded();
     }
@@ -239,6 +264,7 @@ extension ComicMetadataFormOps on ComicMetadataForm {
       tags: tags,
       languages: languages,
       parodies: parodies,
+      characters: characters,
     );
     return const ComicMetadataApplySucceeded();
   }

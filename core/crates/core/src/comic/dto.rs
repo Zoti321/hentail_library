@@ -78,6 +78,7 @@ pub struct ComicMetaLocks {
     pub tags: bool,
     pub languages: bool,
     pub parodies: bool,
+    pub characters: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -102,6 +103,9 @@ pub struct ComicDto {
     /// Parody (IP / franchise) names attached to this Comic; empty = none.
     #[serde(default)]
     pub parodies: Vec<String>,
+    /// Character names attached to this Comic; empty = none.
+    #[serde(default)]
+    pub characters: Vec<String>,
     #[serde(default)]
     pub locks: ComicMetaLocks,
     #[serde(default)]

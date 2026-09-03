@@ -90,6 +90,7 @@ class ComicRepositoryImpl implements ComicRepository {
     List<Tag>? tags,
     List<String>? languages,
     List<String>? parodies,
+    List<String>? characters,
   }) async {
     guardFrbSync(
       () => rust.updateComicUserMetaFrb(
@@ -107,6 +108,7 @@ class ComicRepositoryImpl implements ComicRepository {
           tags: tags?.map((Tag t) => t.name).toList(),
           languages: languages,
           parodies: parodies,
+          characters: characters,
         ),
       ),
       fallbackMessage: '更新漫画元数据失败',
@@ -124,6 +126,7 @@ class ComicRepositoryImpl implements ComicRepository {
     bool? tags,
     bool? languages,
     bool? parodies,
+    bool? characters,
   }) async {
     guardFrbSync(
       () => rust.setComicMetaLocksFrb(
@@ -137,6 +140,7 @@ class ComicRepositoryImpl implements ComicRepository {
           tags: tags,
           languages: languages,
           parodies: parodies,
+          characters: characters,
         ),
       ),
       fallbackMessage: '更新漫画元数据锁失败',

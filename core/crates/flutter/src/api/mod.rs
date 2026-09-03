@@ -1,4 +1,5 @@
 pub mod author;
+pub mod character;
 pub mod comic;
 pub mod history;
 pub mod home;
@@ -15,6 +16,7 @@ pub mod tag;
 pub mod thumbnail;
 
 pub use author::*;
+pub use character::*;
 pub use comic::*;
 pub use history::*;
 pub use home::*;

@@ -8,8 +8,8 @@ use sea_orm::sea_query::Expr;
 
 use crate::db::{connection, map_db_err};
 use crate::entity::{
-    comic_authors, comic_meta, comic_parodies, comic_reading_histories, comic_tags, comics,
-    prelude::*,
+    comic_authors, comic_characters, comic_meta, comic_parodies, comic_reading_histories,
+    comic_tags, comics, prelude::*,
 };
 use crate::error::HentaiError;
 
@@ -189,6 +189,7 @@ pub async fn load_comics_ordered(
     let tag_map = load_tag_names(db, &comic_ids).await?;
     let author_map = load_author_names(db, &comic_ids).await?;
     let parody_map = load_parody_names(db, &comic_ids).await?;
+    let character_map = load_character_names(db, &comic_ids).await?;
     let last_read_map = load_last_read_times(db, &comic_ids).await?;
     let mut result = Vec::with_capacity(comic_ids.len());
     for id in comic_ids {
@@ -218,6 +219,10 @@ pub async fn load_comics_ordered(
                 .get(&model.comic_id)
                 .cloned()
                 .unwrap_or_default(),
+            characters: character_map
+                .get(&model.comic_id)
+                .cloned()
+                .unwrap_or_default(),
             locks: crate::comic::ComicMetaLocks {
                 title: meta.title_locked,
                 description: meta.description_locked,
@@ -227,6 +232,7 @@ pub async fn load_comics_ordered(
                 tags: meta.tags_locked,
                 languages: meta.languages_locked,
                 parodies: meta.parodies_locked,
+                characters: meta.characters_locked,
             },
             library_id: model.library_id,
         });
@@ -299,6 +305,23 @@ async fn load_parody_names(
     let mut map: HashMap<String, Vec<String>> = HashMap::new();
     for row in rows {
         map.entry(row.comic_id).or_default().push(row.parody_name);
+    }
+    Ok(map)
+}
+
+async fn load_character_names(
+    db: &DatabaseConnection,
+    comic_ids: &[String],
+) -> Result<HashMap<String, Vec<String>>, HentaiError> {
+    let rows = ComicCharacters::find()
+        .filter(Expr::col(comic_characters::Column::ComicId).is_in(comic_ids.to_vec()))
+        .order_by_asc(comic_characters::Column::CharacterName)
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let mut map: HashMap<String, Vec<String>> = HashMap::new();
+    for row in rows {
+        map.entry(row.comic_id).or_default().push(row.character_name);
     }
     Ok(map)
 }

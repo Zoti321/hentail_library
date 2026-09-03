@@ -7,7 +7,9 @@ use crate::entity::{comic_meta, comics};
 use crate::error::HentaiError;
 use crate::metadata_lock::comic_auto_locks;
 use crate::sync::series_rebuild::rebuild_series_from_comics;
-use crate::sync::writer::{replace_comic_authors, replace_comic_parodies, replace_comic_tags};
+use crate::sync::writer::{
+    replace_comic_authors, replace_comic_characters, replace_comic_parodies, replace_comic_tags,
+};
 use crate::util::{compute_sort_key, decode_basic_html_entities};
 
 #[derive(Debug, Clone, Default)]
@@ -21,6 +23,7 @@ pub struct UpdateComicUserMetaDto {
     pub tags: Option<Vec<String>>,
     pub languages: Option<Vec<String>>,
     pub parodies: Option<Vec<String>>,
+    pub characters: Option<Vec<String>>,
 }
 
 /// Partial patch for Comic metadata field locks (`None` = leave unchanged).
@@ -34,6 +37,7 @@ pub struct SetComicMetaLocksDto {
     pub tags: Option<bool>,
     pub languages: Option<bool>,
     pub parodies: Option<bool>,
+    pub characters: Option<bool>,
 }
 
 pub async fn touch_comic<C: ConnectionTrait>(db: &C, comic_id: &str) -> Result<(), HentaiError> {
@@ -85,7 +89,8 @@ pub async fn update_comic_user_meta(
         || meta.authors.is_some()
         || meta.tags.is_some()
         || meta.languages.is_some()
-        || meta.parodies.is_some();
+        || meta.parodies.is_some()
+        || meta.characters.is_some();
     let auto_locks = comic_auto_locks(
         meta.title.is_some(),
         meta.description.is_some(),
@@ -95,6 +100,7 @@ pub async fn update_comic_user_meta(
         meta.tags.is_some(),
         meta.languages.is_some(),
         meta.parodies.is_some(),
+        meta.characters.is_some(),
     );
     if touch_meta_row {
         let mut active = comic_meta::ActiveModel {
@@ -158,6 +164,10 @@ pub async fn update_comic_user_meta(
             active.parodies_locked = Set(true);
             meta_touched = true;
         }
+        if auto_locks.characters {
+            active.characters_locked = Set(true);
+            meta_touched = true;
+        }
         if meta_touched || auto_locks.any() {
             active.update(&txn).await.map_err(map_db_err)?;
             meta_touched = true;
@@ -173,6 +183,10 @@ pub async fn update_comic_user_meta(
     }
     if let Some(parodies) = meta.parodies {
         replace_comic_parodies(&txn, comic_id, &parodies).await?;
+        meta_touched = true;
+    }
+    if let Some(characters) = meta.characters {
+        replace_comic_characters(&txn, comic_id, &characters).await?;
         meta_touched = true;
     }
     if meta_touched {
@@ -194,6 +208,7 @@ pub async fn set_comic_meta_locks(
         && locks.tags.is_none()
         && locks.languages.is_none()
         && locks.parodies.is_none()
+        && locks.characters.is_none()
     {
         return Ok(());
     }
@@ -226,6 +241,9 @@ pub async fn set_comic_meta_locks(
     }
     if let Some(v) = locks.parodies {
         active.parodies_locked = Set(v);
+    }
+    if let Some(v) = locks.characters {
+        active.characters_locked = Set(v);
     }
     active.update(&txn).await.map_err(map_db_err)?;
     touch_comic(&txn, comic_id).await?;

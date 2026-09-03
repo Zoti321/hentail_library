@@ -29,6 +29,7 @@ pub struct ComicMetaLocksDto {
     pub tags: bool,
     pub languages: bool,
     pub parodies: bool,
+    pub characters: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -49,6 +50,7 @@ pub struct ComicDto {
     pub tags: Vec<String>,
     pub languages: Vec<String>,
     pub parodies: Vec<String>,
+    pub characters: Vec<String>,
     pub locks: ComicMetaLocksDto,
     pub library_id: String,
 }
@@ -104,6 +106,7 @@ impl From<hentai_core::ComicDto> for ComicDto {
             tags: value.tags,
             languages: value.languages,
             parodies: value.parodies,
+            characters: value.characters,
             locks: ComicMetaLocksDto {
                 title: value.locks.title,
                 description: value.locks.description,
@@ -113,6 +116,7 @@ impl From<hentai_core::ComicDto> for ComicDto {
                 tags: value.locks.tags,
                 languages: value.locks.languages,
                 parodies: value.locks.parodies,
+                characters: value.locks.characters,
             },
             library_id: value.library_id,
         }
@@ -221,6 +225,7 @@ pub struct UpdateComicUserMetaFrbDto {
     pub tags: Option<Vec<String>>,
     pub languages: Option<Vec<String>>,
     pub parodies: Option<Vec<String>>,
+    pub characters: Option<Vec<String>>,
 }
 
 #[flutter_rust_bridge::frb(sync)]
@@ -245,6 +250,7 @@ pub fn update_comic_user_meta_frb(
             tags: meta.tags,
             languages: meta.languages,
             parodies: meta.parodies,
+            characters: meta.characters,
         },
     ))
     .map_err(HentaiErrorDto::from)
@@ -260,6 +266,7 @@ pub struct SetComicMetaLocksFrbDto {
     pub tags: Option<bool>,
     pub languages: Option<bool>,
     pub parodies: Option<bool>,
+    pub characters: Option<bool>,
 }
 
 #[flutter_rust_bridge::frb(sync)]
@@ -278,6 +285,7 @@ pub fn set_comic_meta_locks_frb(
             tags: locks.tags,
             languages: locks.languages,
             parodies: locks.parodies,
+            characters: locks.characters,
         },
     ))
     .map_err(HentaiErrorDto::from)

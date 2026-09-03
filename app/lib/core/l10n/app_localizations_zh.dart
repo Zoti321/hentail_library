@@ -818,6 +818,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get comicDetailParodies => '原作';
 
   @override
+  String get comicDetailCharacters => '角色';
+
+  @override
   String get comicDetailResourceFormat => '资源格式';
 
   @override
@@ -1417,6 +1420,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get formParodyEmptyRemaining => '没有更多可选';
+
+  @override
+  String get formCharacterSelectPlaceholder => '选择或输入角色…';
+
+  @override
+  String get formCharacterListLoadFailed => '角色列表加载失败';
+
+  @override
+  String get formCharacterEmptyCatalog => '暂无角色';
+
+  @override
+  String get formCharacterEmptyRemaining => '没有更多可选';
 
   @override
   String get formTagSelectPlaceholder => '选择或输入标签…';

@@ -268,6 +268,19 @@ class ComicDetailMetadataBlock extends StatelessWidget {
     if (tags.isNotEmpty) {
       rows.add(LabeledMetaChipRow(label: l10n.comicDetailTags, items: tags));
     }
+    final List<String> characters = comic.characters;
+    if (characters.isNotEmpty) {
+      // Character labeled chip 行（Tags 下方）；idle/hover 对齐 Author/Tag。
+      // 字段作用域搜索尚未实现：点击为占位 no-op（#74），勿假装已按 Character 过滤。
+      rows.add(
+        LabeledMetaChipRow(
+          label: l10n.comicDetailCharacters,
+          items: characters,
+          // TODO(#74): field-scoped search for Character — placeholder no-op.
+          onItemTap: (_) {},
+        ),
+      );
+    }
     rows.add(
       ComicDetailInfoRow(
         label: l10n.comicDetailResourceFormat,
@@ -335,10 +348,14 @@ class LabeledMetaChipRow extends HookWidget {
     super.key,
     required this.label,
     required this.items,
+    this.onItemTap,
   });
 
   final String label;
   final List<String> items;
+
+  /// 为 null 时走库页精确元数据搜索（Author/Tag）；非 null 时由调用方处理（可作占位）。
+  final ValueChanged<String>? onItemTap;
 
   @override
   Widget build(BuildContext context) {
@@ -373,6 +390,11 @@ class LabeledMetaChipRow extends HookWidget {
                       (String item) => OutlinedMetaChip(
                         text: item,
                         onTap: () {
+                          final ValueChanged<String>? custom = onItemTap;
+                          if (custom != null) {
+                            custom(item);
+                            return;
+                          }
                           final String query =
                               formatLibrarySearchExactMetaQuery(item);
                           final String encoded = Uri.encodeQueryComponent(

@@ -17,6 +17,7 @@ class _RecordingComicRepository implements ComicRepository {
   List<Tag>? tags;
   List<String>? languages;
   List<String>? parodies;
+  List<String>? characters;
   int callCount = 0;
 
   @override
@@ -31,6 +32,7 @@ class _RecordingComicRepository implements ComicRepository {
     List<Tag>? tags,
     List<String>? languages,
     List<String>? parodies,
+    List<String>? characters,
   }) async {
     callCount += 1;
     this.comicId = comicId;
@@ -43,6 +45,7 @@ class _RecordingComicRepository implements ComicRepository {
     this.tags = tags;
     this.languages = languages;
     this.parodies = parodies;
+    this.characters = characters;
   }
 
   @override
@@ -58,6 +61,7 @@ Comic _comic({
   List<Tag> tags = const <Tag>[],
   List<String> languages = const <String>[],
   List<String> parodies = const <String>[],
+  List<String> characters = const <String>[],
 }) {
   final DateTime now = DateTime.utc(2024, 1, 1);
   return Comic(
@@ -75,6 +79,7 @@ Comic _comic({
     tags: tags,
     languages: languages,
     parodies: parodies,
+    characters: characters,
     pageCount: 1,
   );
 }
@@ -273,6 +278,21 @@ void main() {
       expect(repo.languages, isNull);
     });
 
+    test('only submits characters when ordered names change', () async {
+      final _RecordingComicRepository repo = _RecordingComicRepository();
+      final Comic original = _comic(characters: <String>['Saber', 'Rider']);
+      final ComicMetadataApplyResult result =
+          await ComicMetadataForm.fromComic(original)
+              .copyWith(characters: <String>['Rider', 'Saber'])
+              .applyTo(repo, original);
+
+      expect(result, isA<ComicMetadataApplySucceeded>());
+      expect(repo.callCount, 1);
+      expect(repo.characters, <String>['Rider', 'Saber']);
+      expect(repo.title, isNull);
+      expect(repo.parodies, isNull);
+    });
+
     test('persists all fields that differ from original', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();
       final DateTime published = DateTime.utc(2020, 5, 1);
@@ -286,6 +306,7 @@ void main() {
         tags: <Tag>[Tag(name: 'T')],
         languages: <String>['Chinese'],
         parodies: <String>['Fate'],
+        characters: <String>['Saber'],
       ).applyTo(repo, original);
 
       expect(result, isA<ComicMetadataApplySucceeded>());
@@ -300,6 +321,7 @@ void main() {
       expect(repo.tags, <Tag>[Tag(name: 'T')]);
       expect(repo.languages, <String>['Chinese']);
       expect(repo.parodies, <String>['Fate']);
+      expect(repo.characters, <String>['Saber']);
     });
 
     test('isR18 false maps to safe when original was r18', () async {

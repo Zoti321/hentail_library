@@ -24,6 +24,8 @@ abstract class Comic with _$Comic {
     @Default(<String>[]) List<String> languages,
     /// Parody (IP / franchise) names; empty = none.
     @Default(<String>[]) List<String> parodies,
+    /// Character names; empty = none.
+    @Default(<String>[]) List<String> characters,
     required int pageCount,
     String? description,
     DateTime? publishedAt,

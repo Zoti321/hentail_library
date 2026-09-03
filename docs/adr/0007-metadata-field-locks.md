@@ -16,7 +16,7 @@ Komga 的模型是：字段级锁；编辑自动上锁；未锁定且刷新源�
 
 ### 范围
 
-- **Comic**：`title`、`description`、`published_at`、`content_rating`、`authors`、`tags`、`languages`、`parodies`（整字段一把锁）。
+- **Comic**：`title`、`description`、`published_at`、`content_rating`、`authors`、`tags`、`languages`、`parodies`、`characters`（整字段一把锁）。
 - **Series**：`name`、`serialization_status`、`total_count`。
 - **SeriesItem**：补齐 `sort_order_locked` 的解锁 API（与 ADR-0006 配套）。
 
@@ -27,7 +27,7 @@ Komga 的模型是：字段级锁；编辑自动上锁；未锁定且刷新源�
 - **未锁定 + 扫描有值** → 用扫描结果覆盖。
 - **已锁定** → 保留库内值。
 - **未锁定 + 扫描空/缺** → 不清除（对齐 Komga 对「源侧缺失」的保守处理）。
-- `content_rating`：扫描侧当前固定为 `unknown` 时**不覆盖**；`authors` / `tags` / `languages` / `parodies` 仅在扫描列表非空时替换。
+- `content_rating`：扫描侧当前固定为 `unknown` 时**不覆盖**；`authors` / `tags` / `languages` / `parodies` / `characters` 仅在扫描列表非空时替换。
 - Series：仅 `name` 在未锁时由文件夹名覆盖；`serialization_status` / `total_count` 无扫描源，sync 永不改写。
 - 解锁只改标志，不自动触发 Library sync 或 Metadata refresh；下次用户发起的 sync / rebuild / Metadata refresh 再生效。
 - 用户主动的 Metadata refresh（单本 Comic 或 Series 成员批量）与 Library sync 使用同一套 merge / 字段锁规则；refresh 不删除 orphan、不重建成员排序、不重生成缩略图。

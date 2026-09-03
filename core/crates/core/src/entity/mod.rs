@@ -1,6 +1,8 @@
 pub mod app_prefs;
 pub mod authors;
+pub mod characters;
 pub mod comic_authors;
+pub mod comic_characters;
 pub mod comic_meta;
 pub mod comic_parodies;
 pub mod comic_reading_histories;
@@ -18,7 +20,9 @@ pub mod tags;
 pub mod prelude {
     pub use super::app_prefs::Entity as AppPrefs;
     pub use super::authors::Entity as Authors;
+    pub use super::characters::Entity as Characters;
     pub use super::comic_authors::Entity as ComicAuthors;
+    pub use super::comic_characters::Entity as ComicCharacters;
     pub use super::comic_meta::Entity as ComicMeta;
     pub use super::comic_parodies::Entity as ComicParodies;
     pub use super::comic_reading_histories::Entity as ComicReadingHistories;

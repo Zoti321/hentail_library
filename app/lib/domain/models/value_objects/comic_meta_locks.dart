@@ -12,6 +12,7 @@ class ComicMetaLocks {
     this.tags = false,
     this.languages = false,
     this.parodies = false,
+    this.characters = false,
   });
 
   static const ComicMetaLocks unlocked = ComicMetaLocks();
@@ -24,6 +25,7 @@ class ComicMetaLocks {
   final bool tags;
   final bool languages;
   final bool parodies;
+  final bool characters;
 
   ComicMetaLocks copyWith({
     bool? title,
@@ -34,6 +36,7 @@ class ComicMetaLocks {
     bool? tags,
     bool? languages,
     bool? parodies,
+    bool? characters,
   }) {
     return ComicMetaLocks(
       title: title ?? this.title,
@@ -44,6 +47,7 @@ class ComicMetaLocks {
       tags: tags ?? this.tags,
       languages: languages ?? this.languages,
       parodies: parodies ?? this.parodies,
+      characters: characters ?? this.characters,
     );
   }
 
@@ -58,7 +62,8 @@ class ComicMetaLocks {
           authors == other.authors &&
           tags == other.tags &&
           languages == other.languages &&
-          parodies == other.parodies;
+          parodies == other.parodies &&
+          characters == other.characters;
 
   @override
   int get hashCode => Object.hash(
@@ -70,5 +75,6 @@ class ComicMetaLocks {
     tags,
     languages,
     parodies,
+    characters,
   );
 }

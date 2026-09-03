@@ -26,6 +26,7 @@ Comic mapRustComic(rust.ComicDto dto) {
     tags: dto.tags.map((String n) => Tag(name: n)).toList(),
     languages: List<String>.from(dto.languages),
     parodies: List<String>.from(dto.parodies),
+    characters: List<String>.from(dto.characters),
     pageCount: dto.pageCount,
     description: dto.description,
     publishedAt: dto.publishedAt == null
@@ -43,6 +44,7 @@ Comic mapRustComic(rust.ComicDto dto) {
       tags: dto.locks.tags,
       languages: dto.locks.languages,
       parodies: dto.locks.parodies,
+      characters: dto.locks.characters,
     ),
   );
 }
