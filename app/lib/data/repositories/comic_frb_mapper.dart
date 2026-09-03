@@ -24,6 +24,7 @@ Comic mapRustComic(rust.ComicDto dto) {
     authors: dto.authors.map((String n) => Author(name: n)).toList(),
     contentRating: ContentRating.values.byName(dto.contentRating),
     tags: dto.tags.map((String n) => Tag(name: n)).toList(),
+    languages: List<String>.from(dto.languages),
     pageCount: dto.pageCount,
     description: dto.description,
     publishedAt: dto.publishedAt == null
@@ -39,6 +40,7 @@ Comic mapRustComic(rust.ComicDto dto) {
       contentRating: dto.locks.contentRating,
       authors: dto.locks.authors,
       tags: dto.locks.tags,
+      languages: dto.locks.languages,
     ),
   );
 }

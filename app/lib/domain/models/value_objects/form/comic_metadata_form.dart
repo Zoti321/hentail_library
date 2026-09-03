@@ -17,6 +17,7 @@ abstract class ComicMetadataForm with _$ComicMetadataForm {
     @Default(false) bool isR18,
     @Default([]) List<Tag> tags,
     @Default([]) List<Author> authors,
+    @Default([]) List<String> languages,
   }) = _ComicMetadataForm;
 
   factory ComicMetadataForm.fromComic(Comic comic) {
@@ -27,6 +28,7 @@ abstract class ComicMetadataForm with _$ComicMetadataForm {
       isR18: comic.contentRating == ContentRating.r18,
       tags: List<Tag>.from(comic.tags),
       authors: List<Author>.from(comic.authors),
+      languages: List<String>.from(comic.languages),
     );
   }
 }
@@ -66,11 +68,12 @@ extension ComicMetadataFormOps on ComicMetadataForm {
     );
   }
 
-  /// trim 标题；概要空白 → `null`。
+  /// trim 标题；概要空白 → `null`；Language trim + 保序去重。
   ComicMetadataForm get normalized {
     return copyWith(
       title: title.trim(),
       description: _normalizeOptionalText(description),
+      languages: _normalizeOrderedNames(languages),
     );
   }
 
@@ -114,6 +117,23 @@ extension ComicMetadataFormOps on ComicMetadataForm {
 
   ComicMetadataForm removeTag(String name) {
     return copyWith(tags: tags.where((Tag t) => t.name != name).toList());
+  }
+
+  ComicMetadataForm addLanguage(String canonical) {
+    final String trimmed = canonical.trim();
+    if (trimmed.isEmpty) {
+      return this;
+    }
+    if (languages.contains(trimmed)) {
+      return this;
+    }
+    return copyWith(languages: <String>[...languages, trimmed]);
+  }
+
+  ComicMetadataForm removeLanguage(String canonical) {
+    return copyWith(
+      languages: languages.where((String name) => name != canonical).toList(),
+    );
   }
 
   /// 非法 → [ComicMetadataApplyInvalid]；相对 [original] 仅提交值变化字段 →
@@ -165,6 +185,10 @@ extension ComicMetadataFormOps on ComicMetadataForm {
         )
         ? ready.tags
         : null;
+    final List<String>? languages =
+        !_sameOrderedNames(ready.languages, original.languages)
+        ? ready.languages
+        : null;
 
     final bool hasChanges =
         title != null ||
@@ -173,7 +197,8 @@ extension ComicMetadataFormOps on ComicMetadataForm {
         clearPublishedAt ||
         contentRating != null ||
         authors != null ||
-        tags != null;
+        tags != null ||
+        languages != null;
     if (!hasChanges) {
       return const ComicMetadataApplySucceeded();
     }
@@ -187,6 +212,7 @@ extension ComicMetadataFormOps on ComicMetadataForm {
       authors: authors,
       contentRating: contentRating,
       tags: tags,
+      languages: languages,
     );
     return const ComicMetadataApplySucceeded();
   }
@@ -198,6 +224,18 @@ String? _normalizeOptionalText(String? value) {
   }
   final String trimmed = value.trim();
   return trimmed.isEmpty ? null : trimmed;
+}
+
+List<String> _normalizeOrderedNames(Iterable<String> source) {
+  final List<String> out = <String>[];
+  for (final String raw in source) {
+    final String trimmed = raw.trim();
+    if (trimmed.isEmpty || out.contains(trimmed)) {
+      continue;
+    }
+    out.add(trimmed);
+  }
+  return out;
 }
 
 bool _sameOrderedNames(Iterable<String> a, Iterable<String> b) {

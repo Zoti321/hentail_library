@@ -6,9 +6,11 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/form/author_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_date_picker_field.dart';
@@ -112,6 +114,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     bool? contentRating,
     bool? authors,
     bool? tags,
+    bool? languages,
   }) async {
     if (_lockBusy) {
       return;
@@ -128,6 +131,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
             contentRating: contentRating,
             authors: authors,
             tags: tags,
+            languages: languages,
           );
       if (!mounted) {
         return;
@@ -140,6 +144,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           contentRating: contentRating,
           authors: authors,
           tags: tags,
+          languages: languages,
         );
       });
     } catch (_) {
@@ -270,6 +275,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           description: _form.description ?? '',
           publishedAt: _form.publishedAt,
           isR18: _form.isR18,
+          languages: _form.languages,
           locks: _locks,
           lockBusy: _lockBusy || _saving,
           onTitleChanged: (String value) {
@@ -292,6 +298,12 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           },
           onIsR18Changed: (bool value) {
             _updateForm((ComicMetadataForm f) => f.copyWith(isR18: value));
+          },
+          onAddLanguage: (String name) {
+            _updateForm((ComicMetadataForm f) => f.addLanguage(name));
+          },
+          onRemoveLanguage: (String name) {
+            _updateForm((ComicMetadataForm f) => f.removeLanguage(name));
           },
           onLockChanged: _setLock,
         ),
@@ -441,6 +453,7 @@ typedef _MetaLockChanged =
       bool? contentRating,
       bool? authors,
       bool? tags,
+      bool? languages,
     });
 
 class _EditMetadataGeneralTab extends StatelessWidget {
@@ -451,12 +464,15 @@ class _EditMetadataGeneralTab extends StatelessWidget {
     required this.description,
     required this.publishedAt,
     required this.isR18,
+    required this.languages,
     required this.locks,
     required this.lockBusy,
     required this.onTitleChanged,
     required this.onDescriptionChanged,
     required this.onPublishedAtChanged,
     required this.onIsR18Changed,
+    required this.onAddLanguage,
+    required this.onRemoveLanguage,
     required this.onLockChanged,
   });
 
@@ -465,18 +481,22 @@ class _EditMetadataGeneralTab extends StatelessWidget {
   final String description;
   final DateTime? publishedAt;
   final bool isR18;
+  final List<String> languages;
   final ComicMetaLocks locks;
   final bool lockBusy;
   final ValueChanged<String> onTitleChanged;
   final ValueChanged<String> onDescriptionChanged;
   final ValueChanged<DateTime?> onPublishedAtChanged;
   final ValueChanged<bool> onIsR18Changed;
+  final ValueChanged<String> onAddLanguage;
+  final ValueChanged<String> onRemoveLanguage;
   final _MetaLockChanged onLockChanged;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
     final bool compact = AppLayoutBreakpoints.isCompact(
       MediaQuery.sizeOf(context).width,
     );
@@ -503,6 +523,13 @@ class _EditMetadataGeneralTab extends StatelessWidget {
       checkedLabel: 'R18',
       uncheckedLabel: l10n.filterAgeAllAges,
     );
+
+    final List<String> languageChoices = <String>[
+      ...ComicLanguageNames.closedSet,
+      ...languages.where(
+        (String name) => !ComicLanguageNames.closedSet.contains(name),
+      ),
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -547,6 +574,51 @@ class _EditMetadataGeneralTab extends StatelessWidget {
               Expanded(flex: 2, child: contentRatingField),
             ],
           ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: tokens.spacing.sm,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    l10n.formLanguagesLabel,
+                    style: TextStyle(
+                      fontSize: tokens.text.bodySm,
+                      color: cs.hentai.textPrimary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                MetadataLockButton(
+                  locked: locks.languages,
+                  enabled: !lockBusy,
+                  onChanged: (bool locked) => onLockChanged(languages: locked),
+                ),
+              ],
+            ),
+            Wrap(
+              spacing: tokens.spacing.sm,
+              runSpacing: tokens.spacing.sm,
+              children: languageChoices.map((String canonical) {
+                final bool selected = languages.contains(canonical);
+                return OutlinedMetaChip(
+                  text: l10n.comicLanguageLabel(canonical),
+                  compact: true,
+                  borderColor: selected ? cs.primary : null,
+                  textColor: selected ? cs.primary : null,
+                  onTap: () {
+                    if (selected) {
+                      onRemoveLanguage(canonical);
+                    } else {
+                      onAddLanguage(canonical);
+                    }
+                  },
+                );
+              }).toList(),
+            ),
+          ],
+        ),
       ],
     );
   }

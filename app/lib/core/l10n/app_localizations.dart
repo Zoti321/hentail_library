@@ -2532,6 +2532,48 @@ abstract class AppLocalizations {
   /// **'发布日期'**
   String get formPublishedDateLabel;
 
+  /// No description provided for @formLanguagesLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'语言'**
+  String get formLanguagesLabel;
+
+  /// No description provided for @comicLanguageChinese.
+  ///
+  /// In zh, this message translates to:
+  /// **'中文'**
+  String get comicLanguageChinese;
+
+  /// No description provided for @comicLanguageJapanese.
+  ///
+  /// In zh, this message translates to:
+  /// **'日语'**
+  String get comicLanguageJapanese;
+
+  /// No description provided for @comicLanguageEnglish.
+  ///
+  /// In zh, this message translates to:
+  /// **'英语'**
+  String get comicLanguageEnglish;
+
+  /// No description provided for @comicLanguageKorean.
+  ///
+  /// In zh, this message translates to:
+  /// **'韩语'**
+  String get comicLanguageKorean;
+
+  /// No description provided for @comicLanguageSpanish.
+  ///
+  /// In zh, this message translates to:
+  /// **'西班牙语'**
+  String get comicLanguageSpanish;
+
+  /// No description provided for @comicLanguageOther.
+  ///
+  /// In zh, this message translates to:
+  /// **'其他'**
+  String get comicLanguageOther;
+
   /// No description provided for @formAgeRestrictionLabel.
   ///
   /// In zh, this message translates to:

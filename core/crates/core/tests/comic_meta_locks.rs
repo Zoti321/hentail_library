@@ -112,6 +112,102 @@ fn update_comic_user_meta_locks_only_written_fields() {
 }
 
 #[test]
+fn update_comic_user_meta_persists_languages_and_auto_locks() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let db = connection().expect("connection");
+            seed_comic(&db).await;
+
+            update_comic_user_meta(
+                "c1",
+                UpdateComicUserMetaDto {
+                    languages: Some(vec![
+                        "Chinese".to_string(),
+                        "Japanese".to_string(),
+                    ]),
+                    ..Default::default()
+                },
+            )
+            .await
+            .expect("update");
+
+            let comic = find_comic_by_id("c1")
+                .await
+                .expect("find")
+                .expect("exists");
+            assert_eq!(
+                comic.languages,
+                vec!["Chinese".to_string(), "Japanese".to_string()]
+            );
+            assert!(comic.locks.languages);
+            assert!(!comic.locks.title);
+
+            update_comic_user_meta(
+                "c1",
+                UpdateComicUserMetaDto {
+                    languages: Some(vec![]),
+                    ..Default::default()
+                },
+            )
+            .await
+            .expect("clear languages");
+
+            let cleared = find_comic_by_id("c1")
+                .await
+                .expect("find")
+                .expect("exists");
+            assert!(cleared.languages.is_empty());
+            assert!(cleared.locks.languages);
+        });
+    });
+}
+
+#[test]
+fn set_comic_meta_locks_languages_without_changing_values() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let db = connection().expect("connection");
+            seed_comic(&db).await;
+
+            update_comic_user_meta(
+                "c1",
+                UpdateComicUserMetaDto {
+                    languages: Some(vec!["English".to_string()]),
+                    ..Default::default()
+                },
+            )
+            .await
+            .expect("update");
+
+            set_comic_meta_locks(
+                "c1",
+                SetComicMetaLocksDto {
+                    languages: Some(false),
+                    ..Default::default()
+                },
+            )
+            .await
+            .expect("set locks");
+
+            let comic = find_comic_by_id("c1")
+                .await
+                .expect("find")
+                .expect("exists");
+            assert_eq!(comic.languages, vec!["English".to_string()]);
+            assert!(!comic.locks.languages);
+        });
+    });
+}
+
+#[test]
 fn set_comic_meta_locks_changes_flags_without_changing_values() {
     with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");

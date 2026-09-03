@@ -9,6 +9,7 @@ pub struct ComicAutoLocks {
     pub content_rating: bool,
     pub authors: bool,
     pub tags: bool,
+    pub languages: bool,
 }
 
 impl ComicAutoLocks {
@@ -19,6 +20,7 @@ impl ComicAutoLocks {
             || self.content_rating
             || self.authors
             || self.tags
+            || self.languages
     }
 
     /// Fields present in the patch auto-lock; absent fields leave locks unchanged.
@@ -29,6 +31,7 @@ impl ComicAutoLocks {
         content_rating: bool,
         authors: bool,
         tags: bool,
+        languages: bool,
     ) -> Self {
         Self {
             title,
@@ -37,6 +40,7 @@ impl ComicAutoLocks {
             content_rating,
             authors,
             tags,
+            languages,
         }
     }
 }
@@ -75,6 +79,7 @@ pub fn comic_auto_locks(
     content_rating: bool,
     authors: bool,
     tags: bool,
+    languages: bool,
 ) -> ComicAutoLocks {
     ComicAutoLocks::from_written_fields(
         title,
@@ -83,6 +88,7 @@ pub fn comic_auto_locks(
         content_rating,
         authors,
         tags,
+        languages,
     )
 }
 

@@ -86,6 +86,8 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
         content_rating_locked: Set(comic.locks.content_rating),
         authors_locked: Set(comic.locks.authors),
         tags_locked: Set(comic.locks.tags),
+        languages: Set(crate::comic::serialize_languages(&comic.languages)),
+        languages_locked: Set(comic.locks.languages),
     };
     ComicMeta::insert(meta_active)
         .exec(db)
@@ -364,6 +366,8 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
             content_rating_locked: Set(comic.locks.content_rating),
             authors_locked: Set(comic.locks.authors),
             tags_locked: Set(comic.locks.tags),
+            languages: Set(crate::comic::serialize_languages(&comic.languages)),
+            languages_locked: Set(comic.locks.languages),
         };
         ComicMeta::insert(meta_active)
             .on_conflict(
@@ -381,6 +385,8 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
                         comic_meta::Column::ContentRatingLocked,
                         comic_meta::Column::AuthorsLocked,
                         comic_meta::Column::TagsLocked,
+                        comic_meta::Column::Languages,
+                        comic_meta::Column::LanguagesLocked,
                     ])
                     .to_owned(),
             )

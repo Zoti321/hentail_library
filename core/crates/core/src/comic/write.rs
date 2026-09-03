@@ -1,6 +1,6 @@
 use sea_orm::{ActiveModelTrait, ConnectionTrait, Set, Statement, TransactionTrait};
 
-use crate::comic::dto::{now_ms, ComicDto};
+use crate::comic::dto::{now_ms, serialize_languages, ComicDto};
 use crate::comic::repository::load_comics_ordered;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comics};
@@ -8,7 +8,7 @@ use crate::error::HentaiError;
 use crate::metadata_lock::comic_auto_locks;
 use crate::sync::series_rebuild::rebuild_series_from_comics;
 use crate::sync::writer::{replace_comic_authors, replace_comic_tags};
-use crate::util::{decode_basic_html_entities, compute_sort_key};
+use crate::util::{compute_sort_key, decode_basic_html_entities};
 
 #[derive(Debug, Clone, Default)]
 pub struct UpdateComicUserMetaDto {
@@ -19,6 +19,7 @@ pub struct UpdateComicUserMetaDto {
     pub published_at: Option<i64>,
     pub authors: Option<Vec<String>>,
     pub tags: Option<Vec<String>>,
+    pub languages: Option<Vec<String>>,
 }
 
 /// Partial patch for Comic metadata field locks (`None` = leave unchanged).
@@ -30,6 +31,7 @@ pub struct SetComicMetaLocksDto {
     pub content_rating: Option<bool>,
     pub authors: Option<bool>,
     pub tags: Option<bool>,
+    pub languages: Option<bool>,
 }
 
 pub async fn touch_comic<C: ConnectionTrait>(db: &C, comic_id: &str) -> Result<(), HentaiError> {
@@ -79,7 +81,8 @@ pub async fn update_comic_user_meta(
         || meta.description.is_some()
         || meta.published_at.is_some()
         || meta.authors.is_some()
-        || meta.tags.is_some();
+        || meta.tags.is_some()
+        || meta.languages.is_some();
     let auto_locks = comic_auto_locks(
         meta.title.is_some(),
         meta.description.is_some(),
@@ -87,6 +90,7 @@ pub async fn update_comic_user_meta(
         meta.content_rating.is_some(),
         meta.authors.is_some(),
         meta.tags.is_some(),
+        meta.languages.is_some(),
     );
     if touch_meta_row {
         let mut active = comic_meta::ActiveModel {
@@ -119,6 +123,10 @@ pub async fn update_comic_user_meta(
             });
             meta_touched = true;
         }
+        if let Some(languages) = meta.languages {
+            active.languages = Set(serialize_languages(&normalize_languages(languages)));
+            meta_touched = true;
+        }
         if auto_locks.title {
             active.title_locked = Set(true);
         }
@@ -138,6 +146,9 @@ pub async fn update_comic_user_meta(
         if auto_locks.tags {
             active.tags_locked = Set(true);
             meta_touched = true;
+        }
+        if auto_locks.languages {
+            active.languages_locked = Set(true);
         }
         if meta_touched || auto_locks.any() {
             active.update(&txn).await.map_err(map_db_err)?;
@@ -169,6 +180,7 @@ pub async fn set_comic_meta_locks(
         && locks.content_rating.is_none()
         && locks.authors.is_none()
         && locks.tags.is_none()
+        && locks.languages.is_none()
     {
         return Ok(());
     }
@@ -195,6 +207,9 @@ pub async fn set_comic_meta_locks(
     }
     if let Some(v) = locks.tags {
         active.tags_locked = Set(v);
+    }
+    if let Some(v) = locks.languages {
+        active.languages_locked = Set(v);
     }
     active.update(&txn).await.map_err(map_db_err)?;
     touch_comic(&txn, comic_id).await?;
@@ -296,4 +311,19 @@ fn normalize_tag_set(source: Vec<String>) -> Vec<String> {
         }
     }
     set.into_iter().collect()
+}
+
+/// Trim empties; preserve order and first-seen duplicates removed.
+fn normalize_languages(source: Vec<String>) -> Vec<String> {
+    let mut out = Vec::new();
+    for value in source {
+        let trimmed = value.trim().to_string();
+        if trimmed.is_empty() {
+            continue;
+        }
+        if !out.iter().any(|existing: &String| existing == &trimmed) {
+            out.push(trimmed);
+        }
+    }
+    out
 }

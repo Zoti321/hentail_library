@@ -87,6 +87,7 @@ class ComicDto {
   final PlatformInt64? lastReadTimeMs;
   final List<String> authors;
   final List<String> tags;
+  final List<String> languages;
   final ComicMetaLocksDto locks;
   final String libraryId;
 
@@ -105,6 +106,7 @@ class ComicDto {
     this.lastReadTimeMs,
     required this.authors,
     required this.tags,
+    required this.languages,
     required this.locks,
     required this.libraryId,
   });
@@ -125,6 +127,7 @@ class ComicDto {
       lastReadTimeMs.hashCode ^
       authors.hashCode ^
       tags.hashCode ^
+      languages.hashCode ^
       locks.hashCode ^
       libraryId.hashCode;
 
@@ -147,6 +150,7 @@ class ComicDto {
           lastReadTimeMs == other.lastReadTimeMs &&
           authors == other.authors &&
           tags == other.tags &&
+          languages == other.languages &&
           locks == other.locks &&
           libraryId == other.libraryId;
 }
@@ -217,6 +221,7 @@ class ComicMetaLocksDto {
   final bool contentRating;
   final bool authors;
   final bool tags;
+  final bool languages;
 
   const ComicMetaLocksDto({
     required this.title,
@@ -225,6 +230,7 @@ class ComicMetaLocksDto {
     required this.contentRating,
     required this.authors,
     required this.tags,
+    required this.languages,
   });
 
   @override
@@ -234,7 +240,8 @@ class ComicMetaLocksDto {
       publishedAt.hashCode ^
       contentRating.hashCode ^
       authors.hashCode ^
-      tags.hashCode;
+      tags.hashCode ^
+      languages.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -246,7 +253,8 @@ class ComicMetaLocksDto {
           publishedAt == other.publishedAt &&
           contentRating == other.contentRating &&
           authors == other.authors &&
-          tags == other.tags;
+          tags == other.tags &&
+          languages == other.languages;
 }
 
 enum ComicSortFieldDto {
@@ -333,6 +341,7 @@ class SetComicMetaLocksFrbDto {
   final bool? contentRating;
   final bool? authors;
   final bool? tags;
+  final bool? languages;
 
   const SetComicMetaLocksFrbDto({
     this.title,
@@ -341,6 +350,7 @@ class SetComicMetaLocksFrbDto {
     this.contentRating,
     this.authors,
     this.tags,
+    this.languages,
   });
 
   static Future<SetComicMetaLocksFrbDto> default_() =>
@@ -353,7 +363,8 @@ class SetComicMetaLocksFrbDto {
       publishedAt.hashCode ^
       contentRating.hashCode ^
       authors.hashCode ^
-      tags.hashCode;
+      tags.hashCode ^
+      languages.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -365,7 +376,8 @@ class SetComicMetaLocksFrbDto {
           publishedAt == other.publishedAt &&
           contentRating == other.contentRating &&
           authors == other.authors &&
-          tags == other.tags;
+          tags == other.tags &&
+          languages == other.languages;
 }
 
 class UpdateComicUserMetaFrbDto {
@@ -375,6 +387,7 @@ class UpdateComicUserMetaFrbDto {
   final PlatformInt64? publishedAt;
   final List<String>? authors;
   final List<String>? tags;
+  final List<String>? languages;
 
   const UpdateComicUserMetaFrbDto({
     this.title,
@@ -383,6 +396,7 @@ class UpdateComicUserMetaFrbDto {
     this.publishedAt,
     this.authors,
     this.tags,
+    this.languages,
   });
 
   static Future<UpdateComicUserMetaFrbDto> default_() =>
@@ -395,7 +409,8 @@ class UpdateComicUserMetaFrbDto {
       description.hashCode ^
       publishedAt.hashCode ^
       authors.hashCode ^
-      tags.hashCode;
+      tags.hashCode ^
+      languages.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -407,5 +422,6 @@ class UpdateComicUserMetaFrbDto {
           description == other.description &&
           publishedAt == other.publishedAt &&
           authors == other.authors &&
-          tags == other.tags;
+          tags == other.tags &&
+          languages == other.languages;
 }

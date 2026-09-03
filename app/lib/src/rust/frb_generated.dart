@@ -3839,8 +3839,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ComicDto dco_decode_comic_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 16)
-      throw Exception('unexpected arr length: expect 16 but see ${arr.length}');
+    if (arr.length != 17)
+      throw Exception('unexpected arr length: expect 17 but see ${arr.length}');
     return ComicDto(
       comicId: dco_decode_String(arr[0]),
       path: dco_decode_String(arr[1]),
@@ -3856,8 +3856,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       lastReadTimeMs: dco_decode_opt_box_autoadd_i_64(arr[11]),
       authors: dco_decode_list_String(arr[12]),
       tags: dco_decode_list_String(arr[13]),
-      locks: dco_decode_comic_meta_locks_dto(arr[14]),
-      libraryId: dco_decode_String(arr[15]),
+      languages: dco_decode_list_String(arr[14]),
+      locks: dco_decode_comic_meta_locks_dto(arr[15]),
+      libraryId: dco_decode_String(arr[16]),
     );
   }
 
@@ -3886,8 +3887,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ComicMetaLocksDto dco_decode_comic_meta_locks_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return ComicMetaLocksDto(
       title: dco_decode_bool(arr[0]),
       description: dco_decode_bool(arr[1]),
@@ -3895,6 +3896,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       contentRating: dco_decode_bool(arr[3]),
       authors: dco_decode_bool(arr[4]),
       tags: dco_decode_bool(arr[5]),
+      languages: dco_decode_bool(arr[6]),
     );
   }
 
@@ -4572,8 +4574,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SetComicMetaLocksFrbDto dco_decode_set_comic_meta_locks_frb_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return SetComicMetaLocksFrbDto(
       title: dco_decode_opt_box_autoadd_bool(arr[0]),
       description: dco_decode_opt_box_autoadd_bool(arr[1]),
@@ -4581,6 +4583,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       contentRating: dco_decode_opt_box_autoadd_bool(arr[3]),
       authors: dco_decode_opt_box_autoadd_bool(arr[4]),
       tags: dco_decode_opt_box_autoadd_bool(arr[5]),
+      languages: dco_decode_opt_box_autoadd_bool(arr[6]),
     );
   }
 
@@ -4714,8 +4717,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return UpdateComicUserMetaFrbDto(
       title: dco_decode_opt_String(arr[0]),
       contentRating: dco_decode_opt_String(arr[1]),
@@ -4723,6 +4726,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       publishedAt: dco_decode_opt_box_autoadd_i_64(arr[3]),
       authors: dco_decode_opt_list_String(arr[4]),
       tags: dco_decode_opt_list_String(arr[5]),
+      languages: dco_decode_opt_list_String(arr[6]),
     );
   }
 
@@ -5045,6 +5049,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_lastReadTimeMs = sse_decode_opt_box_autoadd_i_64(deserializer);
     var var_authors = sse_decode_list_String(deserializer);
     var var_tags = sse_decode_list_String(deserializer);
+    var var_languages = sse_decode_list_String(deserializer);
     var var_locks = sse_decode_comic_meta_locks_dto(deserializer);
     var var_libraryId = sse_decode_String(deserializer);
     return ComicDto(
@@ -5062,6 +5067,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       lastReadTimeMs: var_lastReadTimeMs,
       authors: var_authors,
       tags: var_tags,
+      languages: var_languages,
       locks: var_locks,
       libraryId: var_libraryId,
     );
@@ -5107,6 +5113,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_contentRating = sse_decode_bool(deserializer);
     var var_authors = sse_decode_bool(deserializer);
     var var_tags = sse_decode_bool(deserializer);
+    var var_languages = sse_decode_bool(deserializer);
     return ComicMetaLocksDto(
       title: var_title,
       description: var_description,
@@ -5114,6 +5121,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       contentRating: var_contentRating,
       authors: var_authors,
       tags: var_tags,
+      languages: var_languages,
     );
   }
 
@@ -5983,6 +5991,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_contentRating = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_authors = sse_decode_opt_box_autoadd_bool(deserializer);
     var var_tags = sse_decode_opt_box_autoadd_bool(deserializer);
+    var var_languages = sse_decode_opt_box_autoadd_bool(deserializer);
     return SetComicMetaLocksFrbDto(
       title: var_title,
       description: var_description,
@@ -5990,6 +5999,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       contentRating: var_contentRating,
       authors: var_authors,
       tags: var_tags,
+      languages: var_languages,
     );
   }
 
@@ -6164,6 +6174,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_publishedAt = sse_decode_opt_box_autoadd_i_64(deserializer);
     var var_authors = sse_decode_opt_list_String(deserializer);
     var var_tags = sse_decode_opt_list_String(deserializer);
+    var var_languages = sse_decode_opt_list_String(deserializer);
     return UpdateComicUserMetaFrbDto(
       title: var_title,
       contentRating: var_contentRating,
@@ -6171,6 +6182,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       publishedAt: var_publishedAt,
       authors: var_authors,
       tags: var_tags,
+      languages: var_languages,
     );
   }
 
@@ -6595,6 +6607,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_i_64(self.lastReadTimeMs, serializer);
     sse_encode_list_String(self.authors, serializer);
     sse_encode_list_String(self.tags, serializer);
+    sse_encode_list_String(self.languages, serializer);
     sse_encode_comic_meta_locks_dto(self.locks, serializer);
     sse_encode_String(self.libraryId, serializer);
   }
@@ -6630,6 +6643,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.contentRating, serializer);
     sse_encode_bool(self.authors, serializer);
     sse_encode_bool(self.tags, serializer);
+    sse_encode_bool(self.languages, serializer);
   }
 
   @protected
@@ -7380,6 +7394,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_bool(self.contentRating, serializer);
     sse_encode_opt_box_autoadd_bool(self.authors, serializer);
     sse_encode_opt_box_autoadd_bool(self.tags, serializer);
+    sse_encode_opt_box_autoadd_bool(self.languages, serializer);
   }
 
   @protected
@@ -7524,6 +7539,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_i_64(self.publishedAt, serializer);
     sse_encode_opt_list_String(self.authors, serializer);
     sse_encode_opt_list_String(self.tags, serializer);
+    sse_encode_opt_list_String(self.languages, serializer);
   }
 
   @protected

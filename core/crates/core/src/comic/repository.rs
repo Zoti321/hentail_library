@@ -209,6 +209,7 @@ pub async fn load_comics_ordered(
             last_read_time_ms: last_read_map.get(&model.comic_id).copied(),
             authors: author_map.get(&model.comic_id).cloned().unwrap_or_default(),
             tags: tag_map.get(&model.comic_id).cloned().unwrap_or_default(),
+            languages: crate::comic::parse_languages_json(&meta.languages),
             locks: crate::comic::ComicMetaLocks {
                 title: meta.title_locked,
                 description: meta.description_locked,
@@ -216,6 +217,7 @@ pub async fn load_comics_ordered(
                 content_rating: meta.content_rating_locked,
                 authors: meta.authors_locked,
                 tags: meta.tags_locked,
+                languages: meta.languages_locked,
             },
             library_id: model.library_id,
         });

@@ -34,6 +34,7 @@ abstract class ComicRepository {
     List<Author>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
+    List<String>? languages,
   });
 
   /// 按字段设置元数据锁（不改值）；`null` 表示该字段不变。
@@ -45,6 +46,7 @@ abstract class ComicRepository {
     bool? contentRating,
     bool? authors,
     bool? tags,
+    bool? languages,
   });
 
   /// 关键词搜索（数据库命中），由上层决定是否再应用额外业务过滤。

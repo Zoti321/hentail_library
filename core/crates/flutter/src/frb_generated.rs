@@ -3744,6 +3744,7 @@ impl SseDecode for crate::api::comic::ComicDto {
         let mut var_lastReadTimeMs = <Option<i64>>::sse_decode(deserializer);
         let mut var_authors = <Vec<String>>::sse_decode(deserializer);
         let mut var_tags = <Vec<String>>::sse_decode(deserializer);
+        let mut var_languages = <Vec<String>>::sse_decode(deserializer);
         let mut var_locks = <crate::api::comic::ComicMetaLocksDto>::sse_decode(deserializer);
         let mut var_libraryId = <String>::sse_decode(deserializer);
         return crate::api::comic::ComicDto {
@@ -3761,6 +3762,7 @@ impl SseDecode for crate::api::comic::ComicDto {
             last_read_time_ms: var_lastReadTimeMs,
             authors: var_authors,
             tags: var_tags,
+            languages: var_languages,
             locks: var_locks,
             library_id: var_libraryId,
         };
@@ -3806,6 +3808,7 @@ impl SseDecode for crate::api::comic::ComicMetaLocksDto {
         let mut var_contentRating = <bool>::sse_decode(deserializer);
         let mut var_authors = <bool>::sse_decode(deserializer);
         let mut var_tags = <bool>::sse_decode(deserializer);
+        let mut var_languages = <bool>::sse_decode(deserializer);
         return crate::api::comic::ComicMetaLocksDto {
             title: var_title,
             description: var_description,
@@ -3813,6 +3816,7 @@ impl SseDecode for crate::api::comic::ComicMetaLocksDto {
             content_rating: var_contentRating,
             authors: var_authors,
             tags: var_tags,
+            languages: var_languages,
         };
     }
 }
@@ -4711,6 +4715,7 @@ impl SseDecode for crate::api::comic::SetComicMetaLocksFrbDto {
         let mut var_contentRating = <Option<bool>>::sse_decode(deserializer);
         let mut var_authors = <Option<bool>>::sse_decode(deserializer);
         let mut var_tags = <Option<bool>>::sse_decode(deserializer);
+        let mut var_languages = <Option<bool>>::sse_decode(deserializer);
         return crate::api::comic::SetComicMetaLocksFrbDto {
             title: var_title,
             description: var_description,
@@ -4718,6 +4723,7 @@ impl SseDecode for crate::api::comic::SetComicMetaLocksFrbDto {
             content_rating: var_contentRating,
             authors: var_authors,
             tags: var_tags,
+            languages: var_languages,
         };
     }
 }
@@ -4910,6 +4916,7 @@ impl SseDecode for crate::api::comic::UpdateComicUserMetaFrbDto {
         let mut var_publishedAt = <Option<i64>>::sse_decode(deserializer);
         let mut var_authors = <Option<Vec<String>>>::sse_decode(deserializer);
         let mut var_tags = <Option<Vec<String>>>::sse_decode(deserializer);
+        let mut var_languages = <Option<Vec<String>>>::sse_decode(deserializer);
         return crate::api::comic::UpdateComicUserMetaFrbDto {
             title: var_title,
             content_rating: var_contentRating,
@@ -4917,6 +4924,7 @@ impl SseDecode for crate::api::comic::UpdateComicUserMetaFrbDto {
             published_at: var_publishedAt,
             authors: var_authors,
             tags: var_tags,
+            languages: var_languages,
         };
     }
 }
@@ -5338,6 +5346,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicDto {
             self.last_read_time_ms.into_into_dart().into_dart(),
             self.authors.into_into_dart().into_dart(),
             self.tags.into_into_dart().into_dart(),
+            self.languages.into_into_dart().into_dart(),
             self.locks.into_into_dart().into_dart(),
             self.library_id.into_into_dart().into_dart(),
         ]
@@ -5392,6 +5401,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicMetaLocksDto {
             self.content_rating.into_into_dart().into_dart(),
             self.authors.into_into_dart().into_dart(),
             self.tags.into_into_dart().into_dart(),
+            self.languages.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -6208,6 +6218,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::SetComicMetaLocksFrbDt
             self.content_rating.into_into_dart().into_dart(),
             self.authors.into_into_dart().into_dart(),
             self.tags.into_into_dart().into_dart(),
+            self.languages.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -6459,6 +6470,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::UpdateComicUserMetaFrb
             self.published_at.into_into_dart().into_dart(),
             self.authors.into_into_dart().into_dart(),
             self.tags.into_into_dart().into_dart(),
+            self.languages.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -6659,6 +6671,7 @@ impl SseEncode for crate::api::comic::ComicDto {
         <Option<i64>>::sse_encode(self.last_read_time_ms, serializer);
         <Vec<String>>::sse_encode(self.authors, serializer);
         <Vec<String>>::sse_encode(self.tags, serializer);
+        <Vec<String>>::sse_encode(self.languages, serializer);
         <crate::api::comic::ComicMetaLocksDto>::sse_encode(self.locks, serializer);
         <String>::sse_encode(self.library_id, serializer);
     }
@@ -6690,6 +6703,7 @@ impl SseEncode for crate::api::comic::ComicMetaLocksDto {
         <bool>::sse_encode(self.content_rating, serializer);
         <bool>::sse_encode(self.authors, serializer);
         <bool>::sse_encode(self.tags, serializer);
+        <bool>::sse_encode(self.languages, serializer);
     }
 }
 
@@ -7369,6 +7383,7 @@ impl SseEncode for crate::api::comic::SetComicMetaLocksFrbDto {
         <Option<bool>>::sse_encode(self.content_rating, serializer);
         <Option<bool>>::sse_encode(self.authors, serializer);
         <Option<bool>>::sse_encode(self.tags, serializer);
+        <Option<bool>>::sse_encode(self.languages, serializer);
     }
 }
 
@@ -7542,6 +7557,7 @@ impl SseEncode for crate::api::comic::UpdateComicUserMetaFrbDto {
         <Option<i64>>::sse_encode(self.published_at, serializer);
         <Option<Vec<String>>>::sse_encode(self.authors, serializer);
         <Option<Vec<String>>>::sse_encode(self.tags, serializer);
+        <Option<Vec<String>>>::sse_encode(self.languages, serializer);
     }
 }
 

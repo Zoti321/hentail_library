@@ -1378,6 +1378,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get formPublishedDateLabel => 'Published date';
 
   @override
+  String get formLanguagesLabel => 'Language';
+
+  @override
+  String get comicLanguageChinese => 'Chinese';
+
+  @override
+  String get comicLanguageJapanese => 'Japanese';
+
+  @override
+  String get comicLanguageEnglish => 'English';
+
+  @override
+  String get comicLanguageKorean => 'Korean';
+
+  @override
+  String get comicLanguageSpanish => 'Spanish';
+
+  @override
+  String get comicLanguageOther => 'Other';
+
+  @override
   String get formAgeRestrictionLabel => 'Age restriction';
 
   @override

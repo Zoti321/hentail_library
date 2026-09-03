@@ -88,6 +88,7 @@ class ComicRepositoryImpl implements ComicRepository {
     List<Author>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
+    List<String>? languages,
   }) async {
     guardFrbSync(
       () => rust.updateComicUserMetaFrb(
@@ -103,6 +104,7 @@ class ComicRepositoryImpl implements ComicRepository {
               : comicTimestampToMs(publishedAt),
           authors: authors?.map((Author a) => a.name).toList(),
           tags: tags?.map((Tag t) => t.name).toList(),
+          languages: languages,
         ),
       ),
       fallbackMessage: '更新漫画元数据失败',
@@ -118,6 +120,7 @@ class ComicRepositoryImpl implements ComicRepository {
     bool? contentRating,
     bool? authors,
     bool? tags,
+    bool? languages,
   }) async {
     guardFrbSync(
       () => rust.setComicMetaLocksFrb(
@@ -129,6 +132,7 @@ class ComicRepositoryImpl implements ComicRepository {
           contentRating: contentRating,
           authors: authors,
           tags: tags,
+          languages: languages,
         ),
       ),
       fallbackMessage: '更新漫画元数据锁失败',

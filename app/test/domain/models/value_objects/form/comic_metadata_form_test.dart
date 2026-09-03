@@ -15,6 +15,7 @@ class _RecordingComicRepository implements ComicRepository {
   List<Author>? authors;
   ContentRating? contentRating;
   List<Tag>? tags;
+  List<String>? languages;
   int callCount = 0;
 
   @override
@@ -27,6 +28,7 @@ class _RecordingComicRepository implements ComicRepository {
     List<Author>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
+    List<String>? languages,
   }) async {
     callCount += 1;
     this.comicId = comicId;
@@ -37,6 +39,7 @@ class _RecordingComicRepository implements ComicRepository {
     this.authors = authors;
     this.contentRating = contentRating;
     this.tags = tags;
+    this.languages = languages;
   }
 
   @override
@@ -50,6 +53,7 @@ Comic _comic({
   ContentRating contentRating = ContentRating.safe,
   List<Author> authors = const <Author>[],
   List<Tag> tags = const <Tag>[],
+  List<String> languages = const <String>[],
 }) {
   final DateTime now = DateTime.utc(2024, 1, 1);
   return Comic(
@@ -65,6 +69,7 @@ Comic _comic({
     contentRating: contentRating,
     authors: authors,
     tags: tags,
+    languages: languages,
     pageCount: 1,
   );
 }
@@ -113,6 +118,14 @@ void main() {
       ).normalized;
       expect(ready.title, '标题');
       expect(ready.description, isNull);
+    });
+
+    test('normalized trims and dedupes languages in order', () {
+      final ComicMetadataForm ready = ComicMetadataForm(
+        title: '标题',
+        languages: <String>[' Chinese ', 'Japanese', 'Chinese', ''],
+      ).normalized;
+      expect(ready.languages, <String>['Chinese', 'Japanese']);
     });
   });
 
@@ -224,6 +237,22 @@ void main() {
       expect(repo.tags, isNull);
     });
 
+    test('only submits languages when ordered names change', () async {
+      final _RecordingComicRepository repo = _RecordingComicRepository();
+      final Comic original = _comic(
+        languages: <String>['Chinese', 'Japanese'],
+      );
+      final ComicMetadataApplyResult result =
+          await ComicMetadataForm.fromComic(original)
+              .copyWith(languages: <String>['Japanese', 'Chinese'])
+              .applyTo(repo, original);
+
+      expect(result, isA<ComicMetadataApplySucceeded>());
+      expect(repo.callCount, 1);
+      expect(repo.languages, <String>['Japanese', 'Chinese']);
+      expect(repo.title, isNull);
+    });
+
     test('persists all fields that differ from original', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();
       final DateTime published = DateTime.utc(2020, 5, 1);
@@ -235,6 +264,7 @@ void main() {
         isR18: true,
         authors: <Author>[Author(name: 'A')],
         tags: <Tag>[Tag(name: 'T')],
+        languages: <String>['Chinese'],
       ).applyTo(repo, original);
 
       expect(result, isA<ComicMetadataApplySucceeded>());
@@ -247,6 +277,7 @@ void main() {
       expect(repo.contentRating, ContentRating.r18);
       expect(repo.authors, <Author>[Author(name: 'A')]);
       expect(repo.tags, <Tag>[Tag(name: 'T')]);
+      expect(repo.languages, <String>['Chinese']);
     });
 
     test('isR18 false maps to safe when original was r18', () async {

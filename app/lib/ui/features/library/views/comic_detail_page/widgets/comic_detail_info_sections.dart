@@ -43,8 +43,12 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
       context,
       comic.publishedAt,
     );
+    final bool hasLanguages = comic.languages.isNotEmpty;
 
-    if (pageLabel == null && !showR18 && publishedLabel == null) {
+    if (pageLabel == null &&
+        !showR18 &&
+        publishedLabel == null &&
+        !hasLanguages) {
       return const SizedBox.shrink();
     }
 
@@ -76,6 +80,8 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: tokens.spacing.xs,
       children: <Widget>[
+        // Stack: Language → age-restriction → page count (published date nearby).
+        if (hasLanguages) ComicLanguageSegments(languages: comic.languages),
         SizedBox(
           height: kDetailMetaChipRowHeight,
           child: Align(
@@ -91,6 +97,86 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
             children: statSegments,
           ),
       ],
+    );
+  }
+}
+
+/// Cover-right Language 分段文案；idle/hover 可点。
+///
+/// 字段作用域搜索尚未实现：点击为占位 no-op（#72），勿假装已按 Language 过滤。
+class ComicLanguageSegments extends StatelessWidget {
+  const ComicLanguageSegments({super.key, required this.languages});
+
+  final List<String> languages;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppLocalizations l10n = context.l10n;
+    final List<Widget> children = <Widget>[];
+    for (int i = 0; i < languages.length; i++) {
+      if (i > 0) {
+        children.add(
+          Text(
+            '|',
+            style: TextStyle(
+              fontSize: tokens.text.bodySm,
+              color: cs.hentai.textSecondary,
+            ),
+          ),
+        );
+      }
+      final String canonical = languages[i];
+      children.add(
+        _ComicLanguageSegmentLink(
+          label: l10n.comicLanguageLabel(canonical),
+          // TODO(#72): field-scoped search for Language — placeholder no-op.
+          onTap: () {},
+        ),
+      );
+    }
+    return Wrap(
+      spacing: 0,
+      runSpacing: tokens.spacing.xs,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: children,
+    );
+  }
+}
+
+class _ComicLanguageSegmentLink extends HookWidget {
+  const _ComicLanguageSegmentLink({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final ValueNotifier<bool> hovered = useState(false);
+    final Color color = hovered.value
+        ? cs.primary
+        : cs.hentai.textSecondary;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => hovered.value = true,
+      onExit: (_) => hovered.value = false,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: tokens.text.bodySm,
+            color: color,
+            decoration: hovered.value
+                ? TextDecoration.underline
+                : TextDecoration.none,
+            decorationColor: color,
+          ),
+        ),
+      ),
     );
   }
 }

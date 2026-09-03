@@ -17,6 +17,9 @@ pub struct Model {
     pub content_rating_locked: bool,
     pub authors_locked: bool,
     pub tags_locked: bool,
+    /// JSON array of canonical English language names (ordered).
+    pub languages: String,
+    pub languages_locked: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

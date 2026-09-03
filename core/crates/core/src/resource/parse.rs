@@ -596,6 +596,7 @@ pub fn parsed_to_comic(parsed: &ParsedResource) -> crate::comic::ComicDto {
         last_read_time_ms: None,
         authors: parsed.authors.clone(),
         tags: vec![],
+        languages: vec![],
         locks: crate::comic::ComicMetaLocks::default(),
         library_id: String::new(),
     }

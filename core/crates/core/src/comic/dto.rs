@@ -76,6 +76,7 @@ pub struct ComicMetaLocks {
     pub content_rating: bool,
     pub authors: bool,
     pub tags: bool,
+    pub languages: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -94,10 +95,30 @@ pub struct ComicDto {
     pub last_read_time_ms: Option<i64>,
     pub authors: Vec<String>,
     pub tags: Vec<String>,
+    /// Ordered canonical English language names; empty = unset.
+    #[serde(default)]
+    pub languages: Vec<String>,
     #[serde(default)]
     pub locks: ComicMetaLocks,
     #[serde(default)]
     pub library_id: String,
+}
+
+/// Serialize Language list for `comic_meta.languages` JSON column.
+pub fn serialize_languages(languages: &[String]) -> String {
+    serde_json::to_string(languages).unwrap_or_else(|_| "[]".to_string())
+}
+
+/// Parse Language list; invalid JSON → empty (unset).
+pub fn parse_languages_json(raw: &str) -> Vec<String> {
+    let Ok(values) = serde_json::from_str::<Vec<String>>(raw) else {
+        return Vec::new();
+    };
+    values
+        .into_iter()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect()
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

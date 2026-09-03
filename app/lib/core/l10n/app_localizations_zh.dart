@@ -1347,6 +1347,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get formPublishedDateLabel => '发布日期';
 
   @override
+  String get formLanguagesLabel => '语言';
+
+  @override
+  String get comicLanguageChinese => '中文';
+
+  @override
+  String get comicLanguageJapanese => '日语';
+
+  @override
+  String get comicLanguageEnglish => '英语';
+
+  @override
+  String get comicLanguageKorean => '韩语';
+
+  @override
+  String get comicLanguageSpanish => '西班牙语';
+
+  @override
+  String get comicLanguageOther => '其他';
+
+  @override
   String get formAgeRestrictionLabel => '年龄限制';
 
   @override
