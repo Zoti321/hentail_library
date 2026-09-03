@@ -79,12 +79,18 @@ bool isLibraryComicFilterSortCustomized({
   required LibraryMediaTypeFilterSelection mediaTypeFilter,
   required LibraryMetadataFilterSelection tagFilter,
   required LibraryMetadataFilterSelection authorFilter,
+  required Set<String> languageFilter,
+  required Set<String> parodyFilter,
+  required Set<String> characterFilter,
   required LibraryComicSortOption sortOption,
 }) {
   return ageRestriction != LibraryAgeRestrictionFilter.unrestricted ||
       mediaTypeFilter.isActive ||
       tagFilter.isActive ||
       authorFilter.isActive ||
+      languageFilter.isNotEmpty ||
+      parodyFilter.isNotEmpty ||
+      characterFilter.isNotEmpty ||
       sortOption.field != kLibraryDefaultSortOption.field ||
       sortOption.descending != kLibraryDefaultSortOption.descending;
 }
@@ -107,6 +113,9 @@ bool isLibraryFilterSortCustomizedForTarget({
   required LibraryMediaTypeFilterSelection mediaTypeFilter,
   required LibraryMetadataFilterSelection tagFilter,
   required LibraryMetadataFilterSelection authorFilter,
+  required Set<String> languageFilter,
+  required Set<String> parodyFilter,
+  required Set<String> characterFilter,
   required LibrarySerializationStatusFilter serializationStatusFilter,
   required LibraryTabSortSettings sortSettings,
 }) {
@@ -116,6 +125,9 @@ bool isLibraryFilterSortCustomizedForTarget({
       mediaTypeFilter: mediaTypeFilter,
       tagFilter: tagFilter,
       authorFilter: authorFilter,
+      languageFilter: languageFilter,
+      parodyFilter: parodyFilter,
+      characterFilter: characterFilter,
       sortOption: sortSettings.comics,
     ),
     LibraryDisplayTarget.series => isLibrarySeriesFilterSortCustomized(

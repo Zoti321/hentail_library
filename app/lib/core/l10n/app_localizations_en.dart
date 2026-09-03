@@ -687,6 +687,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get librarySerializationStatusFilter => 'Serialization status';
 
   @override
+  String get libraryLanguageFilter => 'Language';
+
+  @override
+  String get libraryParodyFilter => 'Parody';
+
+  @override
+  String get libraryCharacterFilter => 'Characters';
+
+  @override
   String get libraryTagFilter => 'Tags';
 
   @override

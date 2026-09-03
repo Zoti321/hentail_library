@@ -8,6 +8,7 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_author_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_media_type_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_serialization_status_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tag_filter_notifier.dart';
@@ -151,6 +152,39 @@ LibraryMetadataFilterSelection libraryComicsTabAuthorFilter(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
+Set<String> libraryComicsTabLanguageFilter(Ref ref) {
+  final AsyncValue<Set<String>> selectionAsync = ref.watch(
+    libraryLanguageFilterProvider,
+  );
+  return selectionAsync.maybeWhen(
+    data: (Set<String> selection) => selection,
+    orElse: () => const <String>{},
+  );
+}
+
+@Riverpod(keepAlive: true)
+Set<String> libraryComicsTabParodyFilter(Ref ref) {
+  final AsyncValue<Set<String>> selectionAsync = ref.watch(
+    libraryParodyFilterProvider,
+  );
+  return selectionAsync.maybeWhen(
+    data: (Set<String> selection) => selection,
+    orElse: () => const <String>{},
+  );
+}
+
+@Riverpod(keepAlive: true)
+Set<String> libraryComicsTabCharacterFilter(Ref ref) {
+  final AsyncValue<Set<String>> selectionAsync = ref.watch(
+    libraryCharacterFilterProvider,
+  );
+  return selectionAsync.maybeWhen(
+    data: (Set<String> selection) => selection,
+    orElse: () => const <String>{},
+  );
+}
+
+@Riverpod(keepAlive: true)
 bool libraryActiveFilterSortIsCustomized(Ref ref) {
   final LibraryDisplayTarget target = ref.watch(libraryDisplayTargetProvider);
   final AsyncValue<LibraryTabAgeRestrictionSettings> ageAsync = ref.watch(
@@ -167,6 +201,15 @@ bool libraryActiveFilterSortIsCustomized(Ref ref) {
   );
   final LibraryMetadataFilterSelection authorFilter = ref.watch(
     libraryComicsTabAuthorFilterProvider,
+  );
+  final Set<String> languageFilter = ref.watch(
+    libraryComicsTabLanguageFilterProvider,
+  );
+  final Set<String> parodyFilter = ref.watch(
+    libraryComicsTabParodyFilterProvider,
+  );
+  final Set<String> characterFilter = ref.watch(
+    libraryComicsTabCharacterFilterProvider,
   );
   final LibrarySerializationStatusFilter serializationStatusFilter = ref.watch(
     librarySeriesTabSerializationStatusFilterProvider,
@@ -185,6 +228,9 @@ bool libraryActiveFilterSortIsCustomized(Ref ref) {
     mediaTypeFilter: mediaTypeFilter,
     tagFilter: tagFilter,
     authorFilter: authorFilter,
+    languageFilter: languageFilter,
+    parodyFilter: parodyFilter,
+    characterFilter: characterFilter,
     serializationStatusFilter: serializationStatusFilter,
     sortSettings: sortSettings,
   );

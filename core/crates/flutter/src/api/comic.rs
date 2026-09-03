@@ -16,6 +16,9 @@ pub struct ComicFilterDto {
     pub authors_all: Vec<String>,
     pub authors_any: Vec<String>,
     pub authors_exclude: Vec<String>,
+    pub languages: Vec<String>,
+    pub parodies: Vec<String>,
+    pub characters: Vec<String>,
     pub library_id: Option<String>,
 }
 
@@ -136,6 +139,9 @@ impl From<ComicFilterDto> for hentai_core::ComicFilterDto {
             authors_all: value.authors_all,
             authors_any: value.authors_any,
             authors_exclude: value.authors_exclude,
+            languages: value.languages,
+            parodies: value.parodies,
+            characters: value.characters,
             library_id: value.library_id,
         }
     }

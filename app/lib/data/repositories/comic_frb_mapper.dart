@@ -64,6 +64,9 @@ rust.ComicFilterDto mapLibraryFilter(LibraryComicFilter filter) {
     authorsAll: _mapAuthorPicks(filter.authorsAll),
     authorsAny: _mapAuthorPicks(filter.authorsAny),
     authorsExclude: _mapAuthorPicks(filter.authorsExclude),
+    languages: _mapStringSet(filter.languages),
+    parodies: _mapStringSet(filter.parodies),
+    characters: _mapStringSet(filter.characters),
   );
 }
 
@@ -74,6 +77,16 @@ List<String> _mapTagPicks(Set<LibraryTagPick>? picks) {
   return picks
       .map((LibraryTagPick pick) => pick.name.trim().toLowerCase())
       .where((String name) => name.isNotEmpty)
+      .toList();
+}
+
+List<String> _mapStringSet(Set<String>? items) {
+  if (items == null || items.isEmpty) {
+    return const <String>[];
+  }
+  return items
+      .map((String s) => s.trim().toLowerCase())
+      .where((String s) => s.isNotEmpty)
       .toList();
 }
 
@@ -130,5 +143,8 @@ rust.ComicFilterDto unrestrictedListFilter() {
     authorsAll: <String>[],
     authorsAny: <String>[],
     authorsExclude: <String>[],
+    languages: <String>[],
+    parodies: <String>[],
+    characters: <String>[],
   );
 }

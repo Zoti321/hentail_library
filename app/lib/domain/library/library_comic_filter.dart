@@ -20,6 +20,9 @@ abstract class LibraryComicFilter with _$LibraryComicFilter {
     Set<LibraryAuthorPick>? authorsAll,
     Set<LibraryAuthorPick>? authorsAny,
     Set<LibraryAuthorPick>? authorsExclude,
+    Set<String>? languages,
+    Set<String>? parodies,
+    Set<String>? characters,
   }) = _LibraryComicFilter;
 
   LibraryComicFilter._();
@@ -31,7 +34,13 @@ abstract class LibraryComicFilter with _$LibraryComicFilter {
       final inAuthors = comic.authors.any(
         (a) => a.name.toLowerCase().contains(q),
       );
-      if (!inTitle && !inAuthors) return false;
+      final inParodies = comic.parodies.any(
+        (p) => p.toLowerCase().contains(q),
+      );
+      final inCharacters = comic.characters.any(
+        (c) => c.toLowerCase().contains(q),
+      );
+      if (!inTitle && !inAuthors && !inParodies && !inCharacters) return false;
     }
     if (!showR18 && comic.contentRating == ContentRating.r18) {
       return false;
@@ -59,6 +68,27 @@ abstract class LibraryComicFilter with _$LibraryComicFilter {
     }
     if (authorsExclude != null && authorsExclude!.isNotEmpty) {
       if (authorsExclude!.any((p) => p.matchesComic(comic))) return false;
+    }
+    if (languages != null && languages!.isNotEmpty) {
+      if (!comic.languages.any(
+        (l) => languages!.contains(l.toLowerCase()),
+      )) {
+        return false;
+      }
+    }
+    if (parodies != null && parodies!.isNotEmpty) {
+      if (!comic.parodies.any(
+        (p) => parodies!.contains(p.toLowerCase()),
+      )) {
+        return false;
+      }
+    }
+    if (characters != null && characters!.isNotEmpty) {
+      if (!comic.characters.any(
+        (c) => characters!.contains(c.toLowerCase()),
+      )) {
+        return false;
+      }
     }
     return true;
   }

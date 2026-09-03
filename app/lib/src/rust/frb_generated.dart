@@ -3918,8 +3918,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ComicFilterDto dco_decode_comic_filter_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 11)
-      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    if (arr.length != 14)
+      throw Exception('unexpected arr length: expect 14 but see ${arr.length}');
     return ComicFilterDto(
       showR18: dco_decode_bool(arr[0]),
       query: dco_decode_opt_String(arr[1]),
@@ -3931,7 +3931,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       authorsAll: dco_decode_list_String(arr[7]),
       authorsAny: dco_decode_list_String(arr[8]),
       authorsExclude: dco_decode_list_String(arr[9]),
-      libraryId: dco_decode_opt_String(arr[10]),
+      languages: dco_decode_list_String(arr[10]),
+      parodies: dco_decode_list_String(arr[11]),
+      characters: dco_decode_list_String(arr[12]),
+      libraryId: dco_decode_opt_String(arr[13]),
     );
   }
 
@@ -5151,6 +5154,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_authorsAll = sse_decode_list_String(deserializer);
     var var_authorsAny = sse_decode_list_String(deserializer);
     var var_authorsExclude = sse_decode_list_String(deserializer);
+    var var_languages = sse_decode_list_String(deserializer);
+    var var_parodies = sse_decode_list_String(deserializer);
+    var var_characters = sse_decode_list_String(deserializer);
     var var_libraryId = sse_decode_opt_String(deserializer);
     return ComicFilterDto(
       showR18: var_showR18,
@@ -5163,6 +5169,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       authorsAll: var_authorsAll,
       authorsAny: var_authorsAny,
       authorsExclude: var_authorsExclude,
+      languages: var_languages,
+      parodies: var_parodies,
+      characters: var_characters,
       libraryId: var_libraryId,
     );
   }
@@ -6713,6 +6722,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_String(self.authorsAll, serializer);
     sse_encode_list_String(self.authorsAny, serializer);
     sse_encode_list_String(self.authorsExclude, serializer);
+    sse_encode_list_String(self.languages, serializer);
+    sse_encode_list_String(self.parodies, serializer);
+    sse_encode_list_String(self.characters, serializer);
     sse_encode_opt_String(self.libraryId, serializer);
   }
 

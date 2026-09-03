@@ -3844,6 +3844,9 @@ impl SseDecode for crate::api::comic::ComicFilterDto {
         let mut var_authorsAll = <Vec<String>>::sse_decode(deserializer);
         let mut var_authorsAny = <Vec<String>>::sse_decode(deserializer);
         let mut var_authorsExclude = <Vec<String>>::sse_decode(deserializer);
+        let mut var_languages = <Vec<String>>::sse_decode(deserializer);
+        let mut var_parodies = <Vec<String>>::sse_decode(deserializer);
+        let mut var_characters = <Vec<String>>::sse_decode(deserializer);
         let mut var_libraryId = <Option<String>>::sse_decode(deserializer);
         return crate::api::comic::ComicFilterDto {
             show_r18: var_showR18,
@@ -3856,6 +3859,9 @@ impl SseDecode for crate::api::comic::ComicFilterDto {
             authors_all: var_authorsAll,
             authors_any: var_authorsAny,
             authors_exclude: var_authorsExclude,
+            languages: var_languages,
+            parodies: var_parodies,
+            characters: var_characters,
             library_id: var_libraryId,
         };
     }
@@ -5461,6 +5467,9 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicFilterDto {
             self.authors_all.into_into_dart().into_dart(),
             self.authors_any.into_into_dart().into_dart(),
             self.authors_exclude.into_into_dart().into_dart(),
+            self.languages.into_into_dart().into_dart(),
+            self.parodies.into_into_dart().into_dart(),
+            self.characters.into_into_dart().into_dart(),
             self.library_id.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -6787,6 +6796,9 @@ impl SseEncode for crate::api::comic::ComicFilterDto {
         <Vec<String>>::sse_encode(self.authors_all, serializer);
         <Vec<String>>::sse_encode(self.authors_any, serializer);
         <Vec<String>>::sse_encode(self.authors_exclude, serializer);
+        <Vec<String>>::sse_encode(self.languages, serializer);
+        <Vec<String>>::sse_encode(self.parodies, serializer);
+        <Vec<String>>::sse_encode(self.characters, serializer);
         <Option<String>>::sse_encode(self.library_id, serializer);
     }
 }

@@ -15,6 +15,9 @@ class LibraryComicProjection {
     required LibraryMediaTypeFilterSelection mediaTypeFilter,
     required LibraryMetadataFilterSelection tagFilter,
     required LibraryMetadataFilterSelection authorFilter,
+    Set<String> languages = const <String>{},
+    Set<String> parodies = const <String>{},
+    Set<String> characters = const <String>{},
     String? keyword,
   }) {
     final String? query = keyword?.trim().isEmpty ?? true
@@ -34,6 +37,9 @@ class LibraryComicProjection {
       authorsAll: _mapAuthorNames(authorSets.all),
       authorsAny: _mapAuthorNames(authorSets.any),
       authorsExclude: _mapAuthorNames(authorSets.exclude),
+      languages: languages.isEmpty ? null : languages,
+      parodies: parodies.isEmpty ? null : parodies,
+      characters: characters.isEmpty ? null : characters,
     );
   }
 

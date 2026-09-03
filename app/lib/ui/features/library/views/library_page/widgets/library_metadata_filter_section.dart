@@ -7,8 +7,13 @@ import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_author_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tag_filter_notifier.dart';
+import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_include_set_filter_controls.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_metadata_filter_controls.dart';
+import 'package:hentai_library/ui/core/widgets/form/character_library_multi_select_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/parody_library_multi_select_field.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
 
@@ -86,6 +91,109 @@ class LibraryAuthorFilterControls extends ConsumerWidget {
           .read(libraryAuthorFilterProvider.notifier)
           .setIncludeMode,
       onClear: ref.read(libraryAuthorFilterProvider.notifier).clear,
+    );
+  }
+}
+
+class LibraryLanguageFilterControls extends ConsumerWidget {
+  const LibraryLanguageFilterControls({super.key});
+
+  static const List<String> _languageNames = <String>[
+    'Chinese',
+    'Japanese',
+    'English',
+    'Korean',
+    'Spanish',
+    'Other',
+  ];
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
+    );
+    if (displayTarget != LibraryDisplayTarget.comics) {
+      return const SizedBox.shrink();
+    }
+
+    final Set<String> selected = ref.watch(
+      libraryComicsTabLanguageFilterProvider,
+    );
+
+    return LibraryIncludeSetFilterControls(
+      title: context.l10n.libraryLanguageFilter,
+      names: _languageNames,
+      selected: selected,
+      onToggle: ref.read(libraryLanguageFilterProvider.notifier).toggle,
+      onClear: ref.read(libraryLanguageFilterProvider.notifier).clear,
+    );
+  }
+}
+
+class LibraryParodyFilterControls extends ConsumerWidget {
+  const LibraryParodyFilterControls({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
+    );
+    if (displayTarget != LibraryDisplayTarget.comics) {
+      return const SizedBox.shrink();
+    }
+
+    final AsyncValue<List<String>> parodiesAsync = ref.watch(
+      allParodiesProvider,
+    );
+    final Set<String> selected = ref.watch(
+      libraryComicsTabParodyFilterProvider,
+    );
+    final List<String> names = parodiesAsync.maybeWhen(
+      data: (List<String> parodies) => parodies.toList()..sort(),
+      orElse: () => const <String>[],
+    );
+
+    return LibraryIncludeSetFilterControls(
+      title: context.l10n.libraryParodyFilter,
+      names: names,
+      selected: selected,
+      isLoading: parodiesAsync.isLoading,
+      onToggle: ref.read(libraryParodyFilterProvider.notifier).toggle,
+      onClear: ref.read(libraryParodyFilterProvider.notifier).clear,
+    );
+  }
+}
+
+class LibraryCharacterFilterControls extends ConsumerWidget {
+  const LibraryCharacterFilterControls({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryDisplayTarget displayTarget = ref.watch(
+      libraryDisplayTargetProvider,
+    );
+    if (displayTarget != LibraryDisplayTarget.comics) {
+      return const SizedBox.shrink();
+    }
+
+    final AsyncValue<List<String>> charactersAsync = ref.watch(
+      allCharactersProvider,
+    );
+    final Set<String> selected = ref.watch(
+      libraryComicsTabCharacterFilterProvider,
+    );
+    final List<String> names = charactersAsync.maybeWhen(
+      data: (List<String> characters) => characters.toList()..sort(),
+      orElse: () => const <String>[],
+    );
+
+    return LibraryIncludeSetFilterControls(
+      title: context.l10n.libraryCharacterFilter,
+      names: names,
+      selected: selected,
+      isLoading: charactersAsync.isLoading,
+      onToggle: ref.read(libraryCharacterFilterProvider.notifier).toggle,
+      onClear: ref.read(libraryCharacterFilterProvider.notifier).clear,
     );
   }
 }

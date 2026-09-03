@@ -1274,6 +1274,18 @@ abstract class AppLocalizations {
   /// **'连载状态'**
   String get librarySerializationStatusFilter;
 
+  /// No description provided for @libraryLanguageFilter.
+
+  String get libraryLanguageFilter;
+
+  /// No description provided for @libraryParodyFilter.
+
+  String get libraryParodyFilter;
+
+  /// No description provided for @libraryCharacterFilter.
+
+  String get libraryCharacterFilter;
+
   /// No description provided for @libraryTagFilter.
   ///
   /// In zh, this message translates to:

@@ -174,6 +174,9 @@ class ComicFilterDto {
   final List<String> authorsAll;
   final List<String> authorsAny;
   final List<String> authorsExclude;
+  final List<String> languages;
+  final List<String> parodies;
+  final List<String> characters;
   final String? libraryId;
 
   const ComicFilterDto({
@@ -187,6 +190,9 @@ class ComicFilterDto {
     required this.authorsAll,
     required this.authorsAny,
     required this.authorsExclude,
+    required this.languages,
+    required this.parodies,
+    required this.characters,
     this.libraryId,
   });
 
@@ -202,6 +208,9 @@ class ComicFilterDto {
       authorsAll.hashCode ^
       authorsAny.hashCode ^
       authorsExclude.hashCode ^
+      languages.hashCode ^
+      parodies.hashCode ^
+      characters.hashCode ^
       libraryId.hashCode;
 
   @override
@@ -219,6 +228,9 @@ class ComicFilterDto {
           authorsAll == other.authorsAll &&
           authorsAny == other.authorsAny &&
           authorsExclude == other.authorsExclude &&
+          languages == other.languages &&
+          parodies == other.parodies &&
+          characters == other.characters &&
           libraryId == other.libraryId;
 }
 

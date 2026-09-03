@@ -91,9 +91,15 @@ fn build_where_clause(filter: &ComicFilterDto, values: &mut Vec<Value>) -> Strin
         parts.push(
             "(lower(m.title) LIKE ? OR EXISTS (\
              SELECT 1 FROM comic_authors ca \
-             WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) LIKE ?))"
+             WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) LIKE ?) OR EXISTS (\
+             SELECT 1 FROM comic_parodies cp \
+             WHERE cp.comic_id = c.comic_id AND lower(cp.parody_name) LIKE ?) OR EXISTS (\
+             SELECT 1 FROM comic_characters cc \
+             WHERE cc.comic_id = c.comic_id AND lower(cc.character_name) LIKE ?))"
                 .to_string(),
         );
+        push_sqlite_text(values, pattern.clone());
+        push_sqlite_text(values, pattern.clone());
         push_sqlite_text(values, pattern.clone());
         push_sqlite_text(values, pattern);
     }
@@ -165,6 +171,36 @@ fn build_where_clause(filter: &ComicFilterDto, values: &mut Vec<Value>) -> Strin
         ));
         for author in &filter.authors_exclude {
             push_sqlite_text(values, author.clone());
+        }
+    }
+    if !filter.languages.is_empty() {
+        let placeholders = placeholders(filter.languages.len());
+        parts.push(format!(
+            "EXISTS (SELECT 1 FROM json_each(m.languages) je \
+             WHERE lower(je.value) IN ({placeholders}))"
+        ));
+        for lang in &filter.languages {
+            push_sqlite_text(values, lang.clone());
+        }
+    }
+    if !filter.parodies.is_empty() {
+        let placeholders = placeholders(filter.parodies.len());
+        parts.push(format!(
+            "EXISTS (SELECT 1 FROM comic_parodies cp \
+             WHERE cp.comic_id = c.comic_id AND lower(cp.parody_name) IN ({placeholders}))"
+        ));
+        for parody in &filter.parodies {
+            push_sqlite_text(values, parody.clone());
+        }
+    }
+    if !filter.characters.is_empty() {
+        let placeholders = placeholders(filter.characters.len());
+        parts.push(format!(
+            "EXISTS (SELECT 1 FROM comic_characters cc \
+             WHERE cc.comic_id = c.comic_id AND lower(cc.character_name) IN ({placeholders}))"
+        ));
+        for character in &filter.characters {
+            push_sqlite_text(values, character.clone());
         }
     }
     parts.join(" AND ")
@@ -261,6 +297,66 @@ mod tests {
         );
         assert!(sql.sql.contains("comic_authors ca"));
         assert!(sql.sql.contains("lower(ca.author_name) = ?"));
+    }
+
+    #[test]
+    fn languages_filter_uses_json_each() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto {
+                languages: vec!["chinese".to_string(), "japanese".to_string()],
+                ..Default::default()
+            },
+            &ComicSortOptionDto::default(),
+            10,
+            0,
+        );
+        assert!(sql.sql.contains("json_each(m.languages)"));
+        assert!(sql.sql.contains("lower(je.value) IN"));
+    }
+
+    #[test]
+    fn parodies_filter_joins_comic_parodies() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto {
+                parodies: vec!["naruto".to_string()],
+                ..Default::default()
+            },
+            &ComicSortOptionDto::default(),
+            10,
+            0,
+        );
+        assert!(sql.sql.contains("comic_parodies cp"));
+        assert!(sql.sql.contains("lower(cp.parody_name) IN"));
+    }
+
+    #[test]
+    fn characters_filter_joins_comic_characters() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto {
+                characters: vec!["sakura".to_string()],
+                ..Default::default()
+            },
+            &ComicSortOptionDto::default(),
+            10,
+            0,
+        );
+        assert!(sql.sql.contains("comic_characters cc"));
+        assert!(sql.sql.contains("lower(cc.character_name) IN"));
+    }
+
+    #[test]
+    fn query_searches_parody_and_character() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto {
+                query: Some("naruto".to_string()),
+                ..Default::default()
+            },
+            &ComicSortOptionDto::default(),
+            10,
+            0,
+        );
+        assert!(sql.sql.contains("comic_parodies"));
+        assert!(sql.sql.contains("comic_characters"));
     }
 
     #[test]

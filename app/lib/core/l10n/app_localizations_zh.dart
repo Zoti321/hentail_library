@@ -667,6 +667,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get librarySerializationStatusFilter => '连载状态';
 
   @override
+  String get libraryLanguageFilter => '语言';
+
+  @override
+  String get libraryParodyFilter => '原作';
+
+  @override
+  String get libraryCharacterFilter => '角色';
+
+  @override
   String get libraryTagFilter => '标签';
 
   @override
