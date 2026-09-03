@@ -3,16 +3,28 @@ import 'package:test/test.dart';
 
 void main() {
   group('SeriesComicsMetadata.hasMetadataBlock', () {
-    test('false when authors/tags/characters all empty', () {
+    test('false when authors/tags/characters/parodies all empty', () {
       expect(
         const SeriesComicsMetadata(
           authors: <String>[],
           tags: <String>[],
           hasR18: false,
           languages: <String>['Japanese'],
-          parodies: <String>['Fate'],
         ).hasMetadataBlock,
         isFalse,
+      );
+    });
+
+    test('true when parodies non-empty even if authors/tags/characters empty',
+        () {
+      expect(
+        const SeriesComicsMetadata(
+          authors: <String>[],
+          tags: <String>[],
+          hasR18: false,
+          parodies: <String>['Fate'],
+        ).hasMetadataBlock,
+        isTrue,
       );
     });
 

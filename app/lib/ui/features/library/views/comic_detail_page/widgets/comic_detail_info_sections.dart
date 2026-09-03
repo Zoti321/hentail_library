@@ -44,13 +44,11 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
       comic.publishedAt,
     );
     final bool hasLanguages = comic.languages.isNotEmpty;
-    final bool hasParodies = comic.parodies.isNotEmpty;
 
     if (pageLabel == null &&
         !showR18 &&
         publishedLabel == null &&
-        !hasLanguages &&
-        !hasParodies) {
+        !hasLanguages) {
       return const SizedBox.shrink();
     }
 
@@ -82,9 +80,8 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: tokens.spacing.xs,
       children: <Widget>[
-        // Stack: Language → Parody → age-restriction → page count (published date nearby).
+        // Stack: Language → age-restriction → page count (published date nearby).
         if (hasLanguages) ComicLanguageSegments(languages: comic.languages),
-        if (hasParodies) ComicParodyChipRow(parodies: comic.parodies),
         SizedBox(
           height: kDetailMetaChipRowHeight,
           child: Align(
@@ -144,42 +141,6 @@ class ComicLanguageSegments extends StatelessWidget {
       runSpacing: tokens.spacing.xs,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: children,
-    );
-  }
-}
-
-/// Cover-right Parody chip 行；idle/hover 对齐 Author/Tag chip。
-///
-/// 字段作用域搜索尚未实现：点击为占位 no-op（#73），勿假装已按 Parody 过滤。
-class ComicParodyChipRow extends StatelessWidget {
-  const ComicParodyChipRow({super.key, required this.parodies});
-
-  final List<String> parodies;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppThemeTokens tokens = context.tokens;
-    return SizedBox(
-      height: kDetailMetaChipRowHeight,
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            spacing: tokens.spacing.sm,
-            children: parodies
-                .map(
-                  (String name) => OutlinedMetaChip(
-                    text: name,
-                    compact: true,
-                    // TODO(#73): field-scoped search for Parody — placeholder no-op.
-                    onTap: () {},
-                  ),
-                )
-                .toList(),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -260,26 +221,36 @@ class ComicDetailMetadataBlock extends StatelessWidget {
     final List<String> authors = comic.authors.map((a) => a.name).toList();
     final List<String> tags = comic.tags.map((t) => t.name).toList();
     final List<Widget> rows = <Widget>[];
+    // Order: Parody → Author → Character → Tag.
+    if (comic.parodies.isNotEmpty) {
+      // 字段作用域搜索尚未实现：点击为占位 no-op（#73），勿假装已按 Parody 过滤。
+      rows.add(
+        LabeledMetaChipRow(
+          label: l10n.comicDetailParodies,
+          items: comic.parodies,
+          // TODO(#73): field-scoped search for Parody — placeholder no-op.
+          onItemTap: (_) {},
+        ),
+      );
+    }
     if (authors.isNotEmpty) {
       rows.add(
         LabeledMetaChipRow(label: l10n.comicDetailAuthors, items: authors),
       );
     }
-    if (tags.isNotEmpty) {
-      rows.add(LabeledMetaChipRow(label: l10n.comicDetailTags, items: tags));
-    }
-    final List<String> characters = comic.characters;
-    if (characters.isNotEmpty) {
-      // Character labeled chip 行（Tags 下方）；idle/hover 对齐 Author/Tag。
+    if (comic.characters.isNotEmpty) {
       // 字段作用域搜索尚未实现：点击为占位 no-op（#74），勿假装已按 Character 过滤。
       rows.add(
         LabeledMetaChipRow(
           label: l10n.comicDetailCharacters,
-          items: characters,
+          items: comic.characters,
           // TODO(#74): field-scoped search for Character — placeholder no-op.
           onItemTap: (_) {},
         ),
       );
+    }
+    if (tags.isNotEmpty) {
+      rows.add(LabeledMetaChipRow(label: l10n.comicDetailTags, items: tags));
     }
     rows.add(
       ComicDetailInfoRow(

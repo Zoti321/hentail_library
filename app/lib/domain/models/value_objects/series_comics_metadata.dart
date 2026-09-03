@@ -23,7 +23,8 @@ class SeriesComicsMetadata {
   final List<String> characters;
 
   bool get hasMetadataBlock =>
+      parodies.isNotEmpty ||
       authors.isNotEmpty ||
-      tags.isNotEmpty ||
-      characters.isNotEmpty;
+      characters.isNotEmpty ||
+      tags.isNotEmpty;
 }
