@@ -11,6 +11,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_tab_filte
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_controls.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_metadata_filter_section.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
+import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_prefer_library_root_series_controls.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_sort_controls.dart';
 
 /// 抽屉分区标题等内容相对左缘的内边距。
@@ -120,6 +121,7 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: tokens.spacing.sm),
+              const LibraryPreferLibraryRootSeriesControls(),
               const LibrarySortControls(),
             ],
           ),

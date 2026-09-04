@@ -88,9 +88,23 @@ void main() {
           ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
           serializationStatusFilter:
               LibrarySerializationStatusFilter.unrestricted,
+          preferLibraryRootSeries: true,
           sortOption: kLibraryDefaultSeriesSortOption,
         ),
         isFalse,
+      );
+    });
+
+    test('prefer library root series off counts as customized', () {
+      expect(
+        isLibrarySeriesFilterSortCustomized(
+          ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
+          serializationStatusFilter:
+              LibrarySerializationStatusFilter.unrestricted,
+          preferLibraryRootSeries: false,
+          sortOption: kLibraryDefaultSeriesSortOption,
+        ),
+        isTrue,
       );
     });
 
@@ -99,6 +113,7 @@ void main() {
         isLibrarySeriesFilterSortCustomized(
           ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
           serializationStatusFilter: LibrarySerializationStatusFilter.ongoing,
+          preferLibraryRootSeries: true,
           sortOption: kLibraryDefaultSeriesSortOption,
         ),
         isTrue,
@@ -122,6 +137,7 @@ void main() {
           characterFilter: const <String>{},
           serializationStatusFilter:
               LibrarySerializationStatusFilter.unrestricted,
+          preferLibraryRootSeries: true,
           sortSettings: _defaultSortSettings,
         ),
         isFalse,
@@ -140,6 +156,27 @@ void main() {
           parodyFilter: const <String>{},
           characterFilter: const <String>{},
           serializationStatusFilter: LibrarySerializationStatusFilter.ended,
+          preferLibraryRootSeries: true,
+          sortSettings: _defaultSortSettings,
+        ),
+        isTrue,
+      );
+    });
+
+    test('series target counts prefer library root series off', () {
+      expect(
+        isLibraryFilterSortCustomizedForTarget(
+          target: LibraryDisplayTarget.series,
+          ageSettings: _defaultAgeSettings,
+          mediaTypeFilter: const LibraryMediaTypeFilterSelection(),
+          tagFilter: _emptyTagFilter,
+          authorFilter: _emptyAuthorFilter,
+          languageFilter: const <String>{},
+          parodyFilter: const <String>{},
+          characterFilter: const <String>{},
+          serializationStatusFilter:
+              LibrarySerializationStatusFilter.unrestricted,
+          preferLibraryRootSeries: false,
           sortSettings: _defaultSortSettings,
         ),
         isTrue,

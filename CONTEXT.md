@@ -108,6 +108,14 @@ _Avoid_: 合集、专辑、套系
 Comic 的直接父目录对应一个 Series；Library root 下直接存放的 Comic 也会形成以根名命名的 Series。Series 身份由规范化 `folder_path`（含远程位置键时的父路径）派生（`seriesId`），且隶属于所属 Library。
 _Avoid_: 标题推断、自动分组
 
+**Library root series**:
+某 Library 中 `folder_path` 等于该库 Library root 的 Folder series（根下散落 Comic 所归属的那一条）。
+_Avoid_: 根系列置顶实体、isRoot 标志、Pinned series
+
+**Prefer library root series**:
+Series 浏览列表的应用级偏好：开启时，若 Library root series 仍落在当前筛选结果中，则固定排在列表最前；其余条目仍按当前排序字段排列。默认开启；非 Series 身份或 pin。
+_Avoid_: 置顶系列、pin series（易与 Pinned library 混淆）
+
 **Tag**:
 全局标签字典中的名称，用于筛选与归类；可来自用户创建或外部词库导入，再附着到 Comic。
 _Avoid_: 分类、关键词、Eh 标签（口语可用；领域与 issue 用 Tag）

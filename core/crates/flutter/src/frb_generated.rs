@@ -4820,6 +4820,7 @@ impl SseDecode for crate::api::series::SeriesFilterDto {
         let mut var_requireItems = <bool>::sse_decode(deserializer);
         let mut var_serializationStatus = <Option<String>>::sse_decode(deserializer);
         let mut var_libraryId = <Option<String>>::sse_decode(deserializer);
+        let mut var_preferLibraryRootSeries = <bool>::sse_decode(deserializer);
         return crate::api::series::SeriesFilterDto {
             show_r18: var_showR18,
             r18_only: var_r18Only,
@@ -4827,6 +4828,7 @@ impl SseDecode for crate::api::series::SeriesFilterDto {
             require_items: var_requireItems,
             serialization_status: var_serializationStatus,
             library_id: var_libraryId,
+            prefer_library_root_series: var_preferLibraryRootSeries,
         };
     }
 }
@@ -6349,6 +6351,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::series::SeriesFilterDto {
             self.require_items.into_into_dart().into_dart(),
             self.serialization_status.into_into_dart().into_dart(),
             self.library_id.into_into_dart().into_dart(),
+            self.prefer_library_root_series.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -7647,6 +7650,7 @@ impl SseEncode for crate::api::series::SeriesFilterDto {
         <bool>::sse_encode(self.require_items, serializer);
         <Option<String>>::sse_encode(self.serialization_status, serializer);
         <Option<String>>::sse_encode(self.library_id, serializer);
+        <bool>::sse_encode(self.prefer_library_root_series, serializer);
     }
 }
 

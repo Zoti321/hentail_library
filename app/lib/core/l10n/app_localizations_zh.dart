@@ -730,6 +730,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get librarySeriesSortRandom => '随机';
 
   @override
+  String get libraryPreferLibraryRootSeries => '优先显示库根系列';
+
+  @override
   String get filterAgeUnrestricted => '不限';
 
   @override

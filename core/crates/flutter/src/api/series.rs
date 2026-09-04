@@ -59,6 +59,7 @@ pub struct SeriesFilterDto {
     pub require_items: bool,
     pub serialization_status: Option<String>,
     pub library_id: Option<String>,
+    pub prefer_library_root_series: bool,
 }
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -236,6 +237,7 @@ impl From<SeriesFilterDto> for CoreSeriesFilter {
             require_items: value.require_items,
             serialization_status: value.serialization_status,
             library_id: value.library_id,
+            prefer_library_root_series: value.prefer_library_root_series,
         }
     }
 }

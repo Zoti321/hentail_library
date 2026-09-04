@@ -45,6 +45,7 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
       keyword,
       ref.watch(librarySeriesTabAgeRestrictionFilterProvider),
       ref.watch(librarySeriesTabSerializationStatusFilterProvider),
+      ref.watch(librarySeriesTabPreferLibraryRootSeriesProvider),
       ref.watch(librarySeriesTabSortOptionProvider),
       ref.watch(librarySeriesTabPageSizeProvider),
     ));
@@ -89,12 +90,16 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     final LibrarySerializationStatusFilter serializationStatusFilter = ref.read(
       librarySeriesTabSerializationStatusFilterProvider,
     );
+    final bool preferLibraryRootSeries = ref.read(
+      librarySeriesTabPreferLibraryRootSeriesProvider,
+    );
     final LibrarySeriesSortOption sortOption = ref.read(
       librarySeriesTabSortOptionProvider,
     );
     final LibrarySeriesFilter filter = _librarySeriesProjection.buildListFilter(
       ageRestriction: ageRestriction,
       serializationStatusFilter: serializationStatusFilter,
+      preferLibraryRootSeries: preferLibraryRootSeries,
       keyword: keyword,
     );
     final int pageSize = ref.read(librarySeriesTabPageSizeProvider);

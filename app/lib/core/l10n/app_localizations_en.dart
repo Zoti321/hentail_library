@@ -750,6 +750,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get librarySeriesSortRandom => 'Random';
 
   @override
+  String get libraryPreferLibraryRootSeries => 'Prefer library root series';
+
+  @override
   String get filterAgeUnrestricted => 'All';
 
   @override

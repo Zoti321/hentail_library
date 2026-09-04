@@ -1400,6 +1400,12 @@ abstract class AppLocalizations {
   /// **'随机'**
   String get librarySeriesSortRandom;
 
+  /// No description provided for @libraryPreferLibraryRootSeries.
+  ///
+  /// In zh, this message translates to:
+  /// **'优先显示库根系列'**
+  String get libraryPreferLibraryRootSeries;
+
   /// No description provided for @filterAgeUnrestricted.
   ///
   /// In zh, this message translates to:

@@ -299,6 +299,7 @@
   "librarySeriesSortName": "名称",
   "librarySeriesSortComicCount": "漫画数量",
   "librarySeriesSortRandom": "随机",
+  "libraryPreferLibraryRootSeries": "优先显示库根系列",
   "filterAgeUnrestricted": "不限",
   "filterAgeAllAges": "全年龄",
   "filterAgeR18Only": "R18",

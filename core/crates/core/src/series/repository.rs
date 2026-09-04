@@ -15,6 +15,7 @@ use crate::error::HentaiError;
 
 use super::dto::{SeriesFilterDto, SeriesSortOptionDto};
 use super::page_query::{build_count_query, build_ids_page_query};
+use crate::comic_id::normalize_path_for_key;
 
 #[derive(Debug, Clone)]
 pub struct SeriesItemDto {
@@ -152,7 +153,14 @@ pub async fn fetch_series_page(
         });
     }
     let offset = (effective_page - 1) * page_size;
-    let ids_query = build_ids_page_query(&filter, &sort, page_size, offset);
+    let prefer_root_folder_path = resolve_prefer_root_folder_path(&filter).await?;
+    let ids_query = build_ids_page_query(
+        &filter,
+        &sort,
+        prefer_root_folder_path.as_deref(),
+        page_size,
+        offset,
+    );
     let series_ids = query_series_ids(&db, &ids_query).await?;
     let items = load_series_by_ids(&db, series_ids).await?;
     Ok(PagedSeriesResultDto {
@@ -161,6 +169,21 @@ pub async fn fetch_series_page(
         page: effective_page,
         page_size,
     })
+}
+
+async fn resolve_prefer_root_folder_path(
+    filter: &SeriesFilterDto,
+) -> Result<Option<String>, HentaiError> {
+    if !filter.prefer_library_root_series {
+        return Ok(None);
+    }
+    let Some(library_id) = filter.library_id.as_deref() else {
+        return Ok(None);
+    };
+    let Some(library) = crate::library::find_library_by_id(library_id).await? else {
+        return Ok(None);
+    };
+    Ok(Some(normalize_path_for_key(&library.root_path)))
 }
 
 async fn count_filtered_series(

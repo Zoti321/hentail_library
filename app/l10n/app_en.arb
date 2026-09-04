@@ -299,6 +299,7 @@
   "librarySeriesSortName": "Name",
   "librarySeriesSortComicCount": "Comic count",
   "librarySeriesSortRandom": "Random",
+  "libraryPreferLibraryRootSeries": "Prefer library root series",
   "filterAgeUnrestricted": "All",
   "filterAgeAllAges": "All ages",
   "filterAgeR18Only": "R18 only",

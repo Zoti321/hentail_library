@@ -2,6 +2,7 @@ import 'package:hentai_library/domain/library/library_age_restriction_filter.dar
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
+import 'package:hentai_library/domain/library/library_prefer_library_root_series.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
 import 'package:hentai_library/domain/models/enums.dart';
@@ -99,10 +100,14 @@ bool isLibrarySeriesFilterSortCustomized({
   required LibraryAgeRestrictionFilter ageRestriction,
   required LibrarySerializationStatusFilter serializationStatusFilter,
   required LibrarySeriesSortOption sortOption,
+  bool preferLibraryRootSeries =
+      LibraryPreferLibraryRootSeries.defaultValue,
 }) {
   return ageRestriction != LibraryAgeRestrictionFilter.unrestricted ||
       serializationStatusFilter !=
           LibrarySerializationStatusFilter.unrestricted ||
+      preferLibraryRootSeries !=
+          LibraryPreferLibraryRootSeries.defaultValue ||
       sortOption.field != kLibraryDefaultSeriesSortOption.field ||
       sortOption.descending != kLibraryDefaultSeriesSortOption.descending;
 }
@@ -118,6 +123,8 @@ bool isLibraryFilterSortCustomizedForTarget({
   required Set<String> characterFilter,
   required LibrarySerializationStatusFilter serializationStatusFilter,
   required LibraryTabSortSettings sortSettings,
+  bool preferLibraryRootSeries =
+      LibraryPreferLibraryRootSeries.defaultValue,
 }) {
   return switch (target) {
     LibraryDisplayTarget.comics => isLibraryComicFilterSortCustomized(
@@ -133,6 +140,7 @@ bool isLibraryFilterSortCustomizedForTarget({
     LibraryDisplayTarget.series => isLibrarySeriesFilterSortCustomized(
       ageRestriction: ageSettings.series,
       serializationStatusFilter: serializationStatusFilter,
+      preferLibraryRootSeries: preferLibraryRootSeries,
       sortOption: sortSettings.series,
     ),
   };
