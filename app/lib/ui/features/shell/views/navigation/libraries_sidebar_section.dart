@@ -837,6 +837,10 @@ class _SidebarChromeRow extends HookWidget {
     final Color textColor = isActive || hovered.value
         ? h.textPrimary
         : h.textSecondary;
+    // Trailing actions are fixed-width (28+). Showing them while the rail is
+    // still near collapsedWidth overflows the Row; gate on the same fade window
+    // as labels (labelOpacity > 0 ⇒ expandProgress past the mid Interval).
+    final bool showTrailing = trailing != null && labelOpacity > 0;
 
     return Container(
       margin: const EdgeInsets.symmetric(
@@ -876,50 +880,56 @@ class _SidebarChromeRow extends HookWidget {
                     extraLeftIndent,
                 right: tokens.spacing.xs,
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  if (leading != null)
-                    IconTheme(
-                      data: IconThemeData(
-                        color: textColor,
-                        size: DesktopSidebar.navItemIconSize,
-                      ),
-                      child: leading!,
-                    ),
-                  if (leading != null) SizedBox(width: tokens.spacing.sm),
-                  Expanded(
-                    child: Opacity(
-                      opacity: labelOpacity,
-                      child: Text(
-                        label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        strutStyle: const StrutStyle(
-                          fontSize: 14,
-                          height: 1.2,
-                          fontWeight: FontWeight.w600,
-                          forceStrutHeight: true,
-                        ),
-                        style: theme.textTheme.bodyMedium?.copyWith(
+              child: ClipRect(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    if (leading != null)
+                      IconTheme(
+                        data: IconThemeData(
                           color: textColor,
-                          fontSize: tokens.text.bodyMd,
-                          height: 1.2,
-                          fontWeight: isActive
-                              ? FontWeight.w600
-                              : FontWeight.w400,
+                          size: DesktopSidebar.navItemIconSize,
+                        ),
+                        child: leading!,
+                      ),
+                    if (leading != null) SizedBox(width: tokens.spacing.sm),
+                    Expanded(
+                      child: Opacity(
+                        opacity: labelOpacity,
+                        child: Text(
+                          label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                          strutStyle: const StrutStyle(
+                            fontSize: 14,
+                            height: 1.2,
+                            fontWeight: FontWeight.w600,
+                            forceStrutHeight: true,
+                          ),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: textColor,
+                            fontSize: tokens.text.bodyMd,
+                            height: 1.2,
+                            fontWeight: isActive
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  if (trailing != null)
-                    // Keep the row in hover while the pointer is on actions;
-                    // action chrome uses a deeper fill so it stays distinct.
-                    MouseRegion(
-                      onEnter: (_) => hovered.value = true,
-                      child: trailing!,
-                    ),
-                ],
+                    if (showTrailing)
+                      // Keep the row in hover while the pointer is on actions;
+                      // action chrome uses a deeper fill so it stays distinct.
+                      MouseRegion(
+                        onEnter: (_) => hovered.value = true,
+                        child: Opacity(
+                          opacity: labelOpacity,
+                          child: trailing!,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
