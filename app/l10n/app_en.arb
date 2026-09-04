@@ -232,7 +232,6 @@
   "settingsDisableAllFormatsConfirmContent": "After saving, the next library sync will remove every Comic from the current local library. Continue?",
   "currentLibraryLabel": "Current library",
   "setCurrentLibrary": "Set as current library",
-  "syncAllLibraries": "Sync all libraries",
   "settingsAutoUpdateLabel": "Automatic updates",
   "settingsCurrentVersion": "Current version v{version}",
   "@settingsCurrentVersion": {

@@ -580,9 +580,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setCurrentLibrary => 'Set as current library';
 
   @override
-  String get syncAllLibraries => 'Sync all libraries';
-
-  @override
   String get settingsAutoUpdateLabel => 'Automatic updates';
 
   @override

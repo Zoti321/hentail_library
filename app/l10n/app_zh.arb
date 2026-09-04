@@ -232,7 +232,6 @@
   "settingsDisableAllFormatsConfirmContent": "保存后，下次库同步将清空当前本地库中的全部 Comic。确定继续？",
   "currentLibraryLabel": "当前库",
   "setCurrentLibrary": "设为当前库",
-  "syncAllLibraries": "同步全部库",
   "settingsAutoUpdateLabel": "自动更新",
   "settingsCurrentVersion": "当前版本 v{version}",
   "@settingsCurrentVersion": {

@@ -1082,12 +1082,6 @@ abstract class AppLocalizations {
   /// **'设为当前库'**
   String get setCurrentLibrary;
 
-  /// No description provided for @syncAllLibraries.
-  ///
-  /// In zh, this message translates to:
-  /// **'同步全部库'**
-  String get syncAllLibraries;
-
   /// No description provided for @settingsAutoUpdateLabel.
   ///
   /// In zh, this message translates to:

@@ -540,12 +540,6 @@ class _LibraryOverflowMenuButtonState
                 .read(scanLibraryControllerProvider.notifier)
                 .start(mode: ScanMode.full, silent: true);
           },
-          onSyncAll: () {
-            _controller.hideMenu();
-            ref
-                .read(scanLibraryControllerProvider.notifier)
-                .start(syncAll: true, silent: true);
-          },
         );
       },
       child: scanning
@@ -637,14 +631,12 @@ class _LibraryOverflowMenu extends StatelessWidget {
     required this.onRefresh,
     required this.onScan,
     required this.onDeepScan,
-    required this.onSyncAll,
   });
 
   final LibraryLayoutTier layoutTier;
   final VoidCallback onRefresh;
   final VoidCallback onScan;
   final VoidCallback onDeepScan;
-  final VoidCallback onSyncAll;
 
   @override
   Widget build(BuildContext context) {
@@ -676,11 +668,6 @@ class _LibraryOverflowMenu extends StatelessWidget {
               icon: LucideIcons.scanLine,
               label: l10n.libraryDeepScan,
               onTap: onDeepScan,
-            ),
-            _LibraryOverflowMenuItem(
-              icon: LucideIcons.folders,
-              label: l10n.syncAllLibraries,
-              onTap: onSyncAll,
             ),
           ],
         ),

@@ -562,9 +562,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get setCurrentLibrary => '设为当前库';
 
   @override
-  String get syncAllLibraries => '同步全部库';
-
-  @override
   String get settingsAutoUpdateLabel => '自动更新';
 
   @override
