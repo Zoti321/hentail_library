@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/core/utils/name_contains_filter.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
@@ -79,6 +80,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
   final TextEditingController _inputController = TextEditingController();
   final FocusNode _inputFocusNode = FocusNode();
   late final ValueNotifier<List<String>> _selectedNamesNotifier;
+  late final ValueNotifier<String> _filterQueryNotifier;
   double _fieldWidth = 0;
 
   @override
@@ -87,6 +89,8 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
     _selectedNamesNotifier = ValueNotifier<List<String>>(
       List<String>.of(widget.selectedNames),
     );
+    _filterQueryNotifier = ValueNotifier<String>(_inputController.text);
+    _inputController.addListener(_syncFilterQuery);
     _inputFocusNode.addListener(_handleInputFocusChange);
   }
 
@@ -98,11 +102,20 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
 
   @override
   void dispose() {
+    _inputController.removeListener(_syncFilterQuery);
     _inputFocusNode.removeListener(_handleInputFocusChange);
     _inputFocusNode.dispose();
     _inputController.dispose();
     _selectedNamesNotifier.dispose();
+    _filterQueryNotifier.dispose();
     super.dispose();
+  }
+
+  void _syncFilterQuery() {
+    final String next = _inputController.text;
+    if (_filterQueryNotifier.value != next) {
+      _filterQueryNotifier.value = next;
+    }
   }
 
   void _syncSelectedNamesNotifier() {
@@ -194,15 +207,28 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                       List<String> selectedNames,
                       Widget? _,
                     ) {
-                      return _MultiSelectMenuPanel<T>(
-                        key: ValueKey<String>(selectedNames.join('|')),
-                        width: _fieldWidth,
-                        itemsProvider: widget.itemsProvider,
-                        selectedNames: selectedNames,
-                        onAdd: widget.onAdd,
-                        onRetry: widget.onRetry,
-                        resolveName: widget.resolveName,
-                        copy: widget.copy,
+                      return ValueListenableBuilder<String>(
+                        valueListenable: _filterQueryNotifier,
+                        builder:
+                            (
+                              BuildContext context,
+                              String filterQuery,
+                              Widget? __,
+                            ) {
+                              return _MultiSelectMenuPanel<T>(
+                                key: ValueKey<String>(
+                                  '${selectedNames.join('|')}|$filterQuery',
+                                ),
+                                width: _fieldWidth,
+                                itemsProvider: widget.itemsProvider,
+                                selectedNames: selectedNames,
+                                filterQuery: filterQuery,
+                                onAdd: widget.onAdd,
+                                onRetry: widget.onRetry,
+                                resolveName: widget.resolveName,
+                                copy: widget.copy,
+                              );
+                            },
                       );
                     },
               ),
@@ -359,6 +385,7 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
     required this.width,
     required this.itemsProvider,
     required this.selectedNames,
+    required this.filterQuery,
     required this.onAdd,
     required this.onRetry,
     required this.resolveName,
@@ -368,6 +395,7 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
   final double width;
   final ProviderListenable<AsyncValue<List<T>>> itemsProvider;
   final List<String> selectedNames;
+  final String filterQuery;
   final ValueChanged<String> onAdd;
   final VoidCallback onRetry;
   final String Function(T item) resolveName;
@@ -418,6 +446,10 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
         final Set<String> selected = selectedNames.toSet();
         final List<T> remaining = items
             .where((T item) => !selected.contains(resolveName(item)))
+            .where(
+              (T item) =>
+                  nameMatchesContainsFilter(resolveName(item), filterQuery),
+            )
             .toList();
         return _MultiSelectMenuList<T>(
           width: width,

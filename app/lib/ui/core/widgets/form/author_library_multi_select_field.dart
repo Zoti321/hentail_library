@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/data/repositories/named_facet_form_listing.dart';
+import 'package:hentai_library/domain/models/named_facet_form_candidate.dart';
+import 'package:hentai_library/src/rust/api/named_facet.dart';
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/core/widgets/form/named_facet_multi_select_field.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+/// Snapshot of Author candidates for Comic metadata form (attachment count order).
+final authorsForComicMetadataFormProvider =
+    FutureProvider.autoDispose<List<NamedFacetFormCandidate>>((Ref ref) {
+  return listNamedFacetForMetadataForm(JunctionNamedFacetFrb.author);
+});
 
 /// 全库作者多选：字段内 chip + 内联输入；浮层列出未选字典项。
 class AuthorLibraryMultiSelectField extends ConsumerWidget {
@@ -31,7 +39,7 @@ class AuthorLibraryMultiSelectField extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    return MultiSelect<Author>(
+    return NamedFacetMultiSelectField(
       label: label,
       labelTrailing: labelTrailing,
       icon: icon,
@@ -39,9 +47,8 @@ class AuthorLibraryMultiSelectField extends ConsumerWidget {
       onAdd: onAdd,
       onRemove: onRemove,
       compactTrigger: compactTrigger,
-      itemsProvider: allAuthorsProvider,
-      onRetry: () => ref.invalidate(allAuthorsProvider),
-      resolveName: (Author author) => author.name,
+      itemsProvider: authorsForComicMetadataFormProvider,
+      onRetry: () => ref.invalidate(authorsForComicMetadataFormProvider),
       copy: MultiSelectCopy(
         inputPlaceholder: l10n.formAuthorSelectPlaceholder,
         listLoadFailed: l10n.formAuthorListLoadFailed,

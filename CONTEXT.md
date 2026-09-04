@@ -132,6 +132,10 @@ _Avoid_: 角色标签（并入 Tag）、actor（`djm` 旧 Kind 名）
 Comic 上以「名称字符串」附着的元数据面：Tag、Author、Parody、Character 为字典表 + junction 全量 replace（core `named_facet`）；Language 为 `comic_meta.languages` JSON 闭集特例，不走 junction。新增同类 junction facet 应扩展 `JunctionNamedFacet`，而非再复制一套 replace/list/list_distinct 管道。
 _Avoid_: 元数据字段（太泛）、标签族（易漏 Author / Language）
 
+**Named facet attachment count**:
+某个 Named metadata facet 名字当前附着到多少 Comic（跨全部 Library 的 junction 行数）；未附着的字典项为 0。用于 Comic metadata form 候选排序等，不是阅读器 session 引用计数。
+_Avoid_: 引用次数、usage count、ref_count、热度
+
 **Comic catalog query**:
 库页 / 搜索共用的 Comic 目录查询：Dart 只组装筛选 intent（`LibraryComicFilter` / metadata expression）；谓词 SQL 集中在 core `comic/filter_predicate`（catalog 分桶与跨 facet 表达式共用 typed facet helpers）。
 _Avoid_: 内存 matches、在 Flutter 再写一份 WHERE

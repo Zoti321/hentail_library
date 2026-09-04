@@ -14,6 +14,7 @@ import 'api/home.dart';
 import 'api/init.dart';
 import 'api/library.dart';
 import 'api/logging.dart';
+import 'api/named_facet.dart';
 import 'api/parody.dart';
 import 'api/path.dart';
 import 'api/reader.dart';
@@ -210,6 +211,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
+  JunctionNamedFacetFrb dco_decode_junction_named_facet_frb(dynamic raw);
+
+  @protected
   LibraryDto dco_decode_library_dto(dynamic raw);
 
   @protected
@@ -240,6 +244,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<LibrarySidebarPlacementDto>
   dco_decode_list_library_sidebar_placement_dto(dynamic raw);
+
+  @protected
+  List<NamedFacetFormEntryFrbDto>
+  dco_decode_list_named_facet_form_entry_frb_dto(dynamic raw);
 
   @protected
   List<int> dco_decode_list_prim_i_32_loose(dynamic raw);
@@ -275,6 +283,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<SeriesItemDto> dco_decode_list_series_item_dto(dynamic raw);
+
+  @protected
+  NamedFacetFormEntryFrbDto dco_decode_named_facet_form_entry_frb_dto(
+    dynamic raw,
+  );
 
   @protected
   String? dco_decode_opt_String(dynamic raw);
@@ -660,6 +673,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
   @protected
+  JunctionNamedFacetFrb sse_decode_junction_named_facet_frb(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   LibraryDto sse_decode_library_dto(SseDeserializer deserializer);
 
   @protected
@@ -694,6 +712,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<LibrarySidebarPlacementDto>
   sse_decode_list_library_sidebar_placement_dto(SseDeserializer deserializer);
+
+  @protected
+  List<NamedFacetFormEntryFrbDto>
+  sse_decode_list_named_facet_form_entry_frb_dto(SseDeserializer deserializer);
 
   @protected
   List<int> sse_decode_list_prim_i_32_loose(SseDeserializer deserializer);
@@ -731,6 +753,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<SeriesItemDto> sse_decode_list_series_item_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  NamedFacetFormEntryFrbDto sse_decode_named_facet_form_entry_frb_dto(
     SseDeserializer deserializer,
   );
 
@@ -1216,6 +1243,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
+  void sse_encode_junction_named_facet_frb(
+    JunctionNamedFacetFrb self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_library_dto(LibraryDto self, SseSerializer serializer);
 
   @protected
@@ -1257,6 +1290,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_library_sidebar_placement_dto(
     List<LibrarySidebarPlacementDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_named_facet_form_entry_frb_dto(
+    List<NamedFacetFormEntryFrbDto> self,
     SseSerializer serializer,
   );
 
@@ -1314,6 +1353,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_series_item_dto(
     List<SeriesItemDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_named_facet_form_entry_frb_dto(
+    NamedFacetFormEntryFrbDto self,
     SseSerializer serializer,
   );
 

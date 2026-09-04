@@ -6,7 +6,8 @@ use std::sync::Mutex;
 
 use hentai_core::{
     connection, create_local_library, init_db_at_path, list_all_named_facet_names,
-    list_distinct_named_facet_names, replace_comic_named_facet, JunctionNamedFacet,
+    list_distinct_named_facet_names, list_named_facet_for_form, replace_comic_named_facet,
+    JunctionNamedFacet,
 };
 use sea_orm::{ConnectionTrait, Database, Statement};
 use tempfile::TempDir;
@@ -237,6 +238,98 @@ fn list_distinct_named_facet_names_scopes_to_library() {
             .await
             .expect("distinct b");
             assert_eq!(in_b, vec!["Marisa".to_string()]);
+        });
+    });
+}
+
+#[test]
+fn list_named_facet_for_form_returns_attachment_counts_sorted_desc_then_name() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let root = temp.path().join("lib");
+        std::fs::create_dir_all(&root).expect("mkdir");
+        let db_path = create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let lib = create_local_library(&root.to_string_lossy(), None)
+                .await
+                .expect("create library");
+            let db = connection().expect("connection");
+            clear_facet_tables(&db).await;
+            seed_comic(&db, "c1", &lib.library_id, "E:/lib/a.cbz").await;
+            seed_comic(&db, "c2", &lib.library_id, "E:/lib/b.cbz").await;
+            seed_comic(&db, "c3", &lib.library_id, "E:/lib/c.cbz").await;
+
+            // Seed unused dictionary name (count 0) via replace then clear attachments.
+            replace_comic_named_facet(
+                &db,
+                JunctionNamedFacet::Tag,
+                "c1",
+                &["Unused".to_string(), "Beta".to_string()],
+            )
+            .await
+            .expect("seed unused");
+            replace_comic_named_facet(&db, JunctionNamedFacet::Tag, "c1", &["Beta".to_string()])
+                .await
+                .expect("detach Unused");
+
+            replace_comic_named_facet(
+                &db,
+                JunctionNamedFacet::Tag,
+                "c1",
+                &["Alpha".to_string(), "Beta".to_string()],
+            )
+            .await
+            .expect("c1");
+            replace_comic_named_facet(
+                &db,
+                JunctionNamedFacet::Tag,
+                "c2",
+                &["Alpha".to_string()],
+            )
+            .await
+            .expect("c2");
+            replace_comic_named_facet(
+                &db,
+                JunctionNamedFacet::Tag,
+                "c3",
+                &["Alpha".to_string(), "Gamma".to_string()],
+            )
+            .await
+            .expect("c3");
+
+            let form = list_named_facet_for_form(JunctionNamedFacet::Tag)
+                .await
+                .expect("form list");
+            let pairs: Vec<(&str, i64)> = form
+                .iter()
+                .map(|e| (e.name.as_str(), e.attachment_count))
+                .collect();
+            // Alpha:3, Beta:1, Gamma:1 (name ASC tie), Unused:0
+            assert_eq!(
+                pairs,
+                vec![
+                    ("Alpha", 3),
+                    ("Beta", 1),
+                    ("Gamma", 1),
+                    ("Unused", 0),
+                ]
+            );
+
+            // Management list_all remains name ASC only.
+            let all = list_all_named_facet_names(JunctionNamedFacet::Tag)
+                .await
+                .expect("list all");
+            assert_eq!(
+                all,
+                vec![
+                    "Alpha".to_string(),
+                    "Beta".to_string(),
+                    "Gamma".to_string(),
+                    "Unused".to_string(),
+                ]
+            );
         });
     });
 }

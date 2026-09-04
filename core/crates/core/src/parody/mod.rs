@@ -1,5 +1,6 @@
 use crate::named_facet::{
-    list_all_named_facet_names, list_distinct_named_facet_names, JunctionNamedFacet,
+    list_all_named_facet_names, list_distinct_named_facet_names, list_named_facet_for_form,
+    JunctionNamedFacet, NamedFacetFormEntry,
 };
 use crate::error::HentaiError;
 
@@ -9,6 +10,10 @@ pub fn distinct_parodies_sql() -> String {
 
 pub async fn list_all_parodies() -> Result<Vec<String>, HentaiError> {
     list_all_named_facet_names(JunctionNamedFacet::Parody).await
+}
+
+pub async fn list_parodies_for_metadata_form() -> Result<Vec<NamedFacetFormEntry>, HentaiError> {
+    list_named_facet_for_form(JunctionNamedFacet::Parody).await
 }
 
 pub async fn list_distinct_parodies(

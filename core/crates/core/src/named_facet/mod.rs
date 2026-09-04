@@ -56,6 +56,29 @@ impl JunctionNamedFacet {
              ORDER BY j.{name_col} COLLATE NOCASE"
         )
     }
+
+    /// Form picker candidates: name + global attachment count.
+    ///
+    /// Order: `attachment_count` DESC, then `name` ASC. Unused dictionary rows are 0.
+    pub fn form_listing_sql(self) -> String {
+        let dict = self.dict_table();
+        let junction = self.junction_table();
+        let name_col = self.junction_name_column();
+        format!(
+            "SELECT d.name AS name, COUNT(j.{name_col}) AS attachment_count \
+             FROM {dict} d \
+             LEFT JOIN {junction} j ON j.{name_col} = d.name \
+             GROUP BY d.name \
+             ORDER BY attachment_count DESC, d.name ASC"
+        )
+    }
+}
+
+/// Named metadata facet row for Comic metadata form MultiSelect candidates.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NamedFacetFormEntry {
+    pub name: String,
+    pub attachment_count: i64,
 }
 
 /// Delete all junction rows for `comic_id`, upsert names into the dictionary, then re-attach.
@@ -145,6 +168,37 @@ pub async fn list_distinct_named_facet_names(
         .collect()
 }
 
+/// Dictionary names with Named facet attachment count for Comic metadata form pickers.
+///
+/// Sorted by attachment count descending, then name ascending. Does not mutate
+/// existing `list_all_named_facet_names` (name ASC) used by management UIs.
+pub async fn list_named_facet_for_form(
+    facet: JunctionNamedFacet,
+) -> Result<Vec<NamedFacetFormEntry>, HentaiError> {
+    let db = connection()?;
+    let rows = db
+        .query_all(Statement::from_string(
+            sea_orm::DatabaseBackend::Sqlite,
+            facet.form_listing_sql(),
+        ))
+        .await
+        .map_err(map_db_err)?;
+    rows.into_iter()
+        .map(|row| {
+            let name = row
+                .try_get_by_index::<String>(0)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+            let attachment_count = row
+                .try_get_by_index::<i64>(1)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+            Ok(NamedFacetFormEntry {
+                name,
+                attachment_count,
+            })
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -161,6 +215,22 @@ mod tests {
             assert!(sql.contains(facet.junction_table()), "{facet:?}");
             assert!(sql.contains("c.library_id = ?"), "{facet:?}");
             assert!(sql.contains(facet.junction_name_column()), "{facet:?}");
+        }
+    }
+
+    #[test]
+    fn form_listing_sql_counts_and_orders_for_each_facet() {
+        for facet in [
+            JunctionNamedFacet::Tag,
+            JunctionNamedFacet::Author,
+            JunctionNamedFacet::Parody,
+            JunctionNamedFacet::Character,
+        ] {
+            let sql = facet.form_listing_sql();
+            assert!(sql.contains(facet.dict_table()), "{facet:?}");
+            assert!(sql.contains(facet.junction_table()), "{facet:?}");
+            assert!(sql.contains("attachment_count DESC"), "{facet:?}");
+            assert!(sql.contains("d.name ASC"), "{facet:?}");
         }
     }
 }

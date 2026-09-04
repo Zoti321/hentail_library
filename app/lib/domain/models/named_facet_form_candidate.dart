@@ -1,0 +1,7 @@
+/// Comic metadata form Named facet picker row (core owns sort).
+typedef NamedFacetFormCandidate = ({String name, int attachmentCount});
+
+NamedFacetFormCandidate namedFacetFormCandidate({
+  required String name,
+  required int attachmentCount,
+}) => (name: name, attachmentCount: attachmentCount);

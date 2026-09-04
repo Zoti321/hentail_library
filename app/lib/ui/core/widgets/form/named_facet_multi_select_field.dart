@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hentai_library/domain/models/named_facet_form_candidate.dart';
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show ProviderListenable;
 
-/// Shared multi-select chrome for string-named junction facets (Parody / Character).
+/// Shared multi-select chrome for Named metadata facets in Comic metadata form.
 class NamedFacetMultiSelectField extends ConsumerWidget {
   const NamedFacetMultiSelectField({
     super.key,
@@ -25,14 +26,15 @@ class NamedFacetMultiSelectField extends ConsumerWidget {
   final List<String> selectedNames;
   final ValueChanged<String> onAdd;
   final ValueChanged<String> onRemove;
-  final ProviderListenable<AsyncValue<List<String>>> itemsProvider;
+  final ProviderListenable<AsyncValue<List<NamedFacetFormCandidate>>>
+  itemsProvider;
   final VoidCallback onRetry;
   final MultiSelectCopy copy;
   final bool compactTrigger;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return MultiSelect<String>(
+    return MultiSelect<NamedFacetFormCandidate>(
       label: label,
       labelTrailing: labelTrailing,
       icon: icon,
@@ -42,7 +44,7 @@ class NamedFacetMultiSelectField extends ConsumerWidget {
       compactTrigger: compactTrigger,
       itemsProvider: itemsProvider,
       onRetry: onRetry,
-      resolveName: (String name) => name,
+      resolveName: (NamedFacetFormCandidate item) => item.name,
       copy: copy,
     );
   }
