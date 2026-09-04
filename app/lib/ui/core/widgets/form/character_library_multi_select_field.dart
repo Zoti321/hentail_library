@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/data/adapters/frb_call_guard.dart';
-import 'package:hentai_library/src/rust/api/character.dart' as rust_character;
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
+import 'package:hentai_library/ui/core/widgets/form/named_facet_multi_select_field.dart';
+import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 全局 Character 名字典（无独立管理页；由 Comic 附着写入填充）。
 final allCharactersProvider =
-    FutureProvider.autoDispose<List<String>>((Ref ref) async {
-  return guardFrbSync(
-    rust_character.listAllCharactersFrb,
-    fallbackMessage: '读取角色列表失败',
-  );
+    FutureProvider.autoDispose<List<String>>((Ref ref) {
+  return ref.watch(characterRepoProvider).listAll();
 });
 
 /// Character 多选：字段内 chip + 内联输入；浮层列出未选字典项（对齐 Author/Tag/Parody）。
@@ -38,7 +35,7 @@ class CharacterLibraryMultiSelectField extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    return MultiSelect<String>(
+    return NamedFacetMultiSelectField(
       label: label,
       labelTrailing: labelTrailing,
       icon: icon,
@@ -48,7 +45,6 @@ class CharacterLibraryMultiSelectField extends ConsumerWidget {
       compactTrigger: compactTrigger,
       itemsProvider: allCharactersProvider,
       onRetry: () => ref.invalidate(allCharactersProvider),
-      resolveName: (String name) => name,
       copy: MultiSelectCopy(
         inputPlaceholder: l10n.formCharacterSelectPlaceholder,
         listLoadFailed: l10n.formCharacterListLoadFailed,

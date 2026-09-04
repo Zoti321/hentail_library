@@ -128,6 +128,10 @@ _Avoid_: Series、IP 系列、原作系列（易与 Folder series 混淆）；wo
 Comic 中出场人物名（可多值）；用于展示与筛选，与 Tag / Author 分列。
 _Avoid_: 角色标签（并入 Tag）、actor（`djm` 旧 Kind 名）
 
+**Named metadata facet**:
+Comic 上以「名称字符串」附着的元数据面：Tag、Author、Parody、Character 为字典表 + junction 全量 replace（core `named_facet`）；Language 为 `comic_meta.languages` JSON 闭集特例，不走 junction。新增同类 junction facet 应扩展 `JunctionNamedFacet`，而非再复制一套 replace/list/list_distinct 管道。
+_Avoid_: 元数据字段（太泛）、标签族（易漏 Author / Language）
+
 **Language**（Comic language）:
 Comic 文本所用语言的规范英文名有序列表（闭集首批：`Chinese`、`Japanese`、`English`、`Korean`、`Spanish`、`Other`）；空列表表示未知/未设。展示时按**界面语言**译为本地文案（如中文界面下 `Chinese`→「中文」、`Japanese`→「日语」），多项以 `|` 拼接；未在展示表中的值原样显示。与应用「界面语言」设置不是同一概念。
 _Avoid_: 界面语言、locale、译文语言；把 Language 做成自由 Tag

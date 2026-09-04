@@ -4,13 +4,10 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
-import 'package:hentai_library/src/rust/api/character.dart' as rust_character;
-import 'package:hentai_library/src/rust/api/parody.dart' as rust_parody;
 import 'package:hentai_library/ui/features/library/view_models/library_page_series_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
-import 'package:hentai_library/data/adapters/frb_call_guard.dart';
 
 typedef _SearchVocabulary = ({
   Set<String> tags,
@@ -28,14 +25,10 @@ Future<_SearchVocabulary> _loadSearchVocabulary(Ref ref) async {
       .currentId;
   final List<Tag> tags = await ref.read(tagRepoProvider).listAll();
   final List<Author> authors = await ref.read(authorRepoProvider).listAll();
-  final List<String> parodies = guardFrbSync(
-    () => rust_parody.listDistinctParodiesFrb(libraryId: libraryId),
-    fallbackMessage: '读取原作列表失败',
-  );
-  final List<String> characters = guardFrbSync(
-    () => rust_character.listDistinctCharactersFrb(libraryId: libraryId),
-    fallbackMessage: '读取角色列表失败',
-  );
+  final List<String> parodies =
+      await ref.read(parodyRepoProvider).listDistinct(libraryId: libraryId);
+  final List<String> characters =
+      await ref.read(characterRepoProvider).listDistinct(libraryId: libraryId);
   return (
     tags: tags.map((Tag t) => t.name).toSet(),
     authors: authors.map((Author a) => a.name).toSet(),

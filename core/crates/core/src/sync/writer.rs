@@ -6,11 +6,11 @@ use sea_orm::{
 use crate::comic::{now_ms, ComicDto};
 use crate::db::map_db_err;
 use crate::entity::{
-    authors, characters, comic_authors, comic_characters, comic_meta, comic_parodies, comic_tags,
-    comic_thumbnails, comics, parodies, prelude::*, tags,
+    comic_authors, comic_meta, comic_tags, comic_thumbnails, comics, prelude::*,
 };
 use crate::error::HentaiError;
 use crate::history::normalize_reading_history_titles;
+use crate::named_facet::{replace_comic_named_facet, JunctionNamedFacet};
 use crate::util::compute_sort_key;
 
 use super::migrate::ComicMigration;
@@ -444,33 +444,7 @@ pub async fn replace_comic_authors<C: ConnectionTrait>(
     comic_id: &str,
     author_names: &[String],
 ) -> Result<(), HentaiError> {
-    ComicAuthors::delete_many()
-        .filter(comic_authors::Column::ComicId.eq(comic_id))
-        .exec(db)
-        .await
-        .map_err(map_db_err)?;
-    let unique: std::collections::HashSet<&String> = author_names.iter().collect();
-    for name in unique {
-        let author = authors::ActiveModel {
-            name: Set(name.clone()),
-        };
-        Authors::insert(author)
-            .on_conflict(
-                sea_orm::sea_query::OnConflict::column(authors::Column::Name)
-                    .do_nothing()
-                    .to_owned(),
-            )
-            .do_nothing()
-            .exec(db)
-            .await
-            .map_err(map_db_err)?;
-        let row = comic_authors::ActiveModel {
-            comic_id: Set(comic_id.to_string()),
-            author_name: Set(name.clone()),
-        };
-        ComicAuthors::insert(row).exec(db).await.map_err(map_db_err)?;
-    }
-    Ok(())
+    replace_comic_named_facet(db, JunctionNamedFacet::Author, comic_id, author_names).await
 }
 
 pub async fn replace_comic_tags<C: ConnectionTrait>(
@@ -478,33 +452,7 @@ pub async fn replace_comic_tags<C: ConnectionTrait>(
     comic_id: &str,
     tag_names: &[String],
 ) -> Result<(), HentaiError> {
-    ComicTags::delete_many()
-        .filter(comic_tags::Column::ComicId.eq(comic_id))
-        .exec(db)
-        .await
-        .map_err(map_db_err)?;
-    let unique: std::collections::HashSet<&String> = tag_names.iter().collect();
-    for name in unique {
-        let tag = tags::ActiveModel {
-            name: Set(name.clone()),
-        };
-        Tags::insert(tag)
-            .on_conflict(
-                sea_orm::sea_query::OnConflict::column(tags::Column::Name)
-                    .do_nothing()
-                    .to_owned(),
-            )
-            .do_nothing()
-            .exec(db)
-            .await
-            .map_err(map_db_err)?;
-        let row = comic_tags::ActiveModel {
-            comic_id: Set(comic_id.to_string()),
-            tag_name: Set(name.clone()),
-        };
-        ComicTags::insert(row).exec(db).await.map_err(map_db_err)?;
-    }
-    Ok(())
+    replace_comic_named_facet(db, JunctionNamedFacet::Tag, comic_id, tag_names).await
 }
 
 pub async fn replace_comic_parodies<C: ConnectionTrait>(
@@ -512,33 +460,7 @@ pub async fn replace_comic_parodies<C: ConnectionTrait>(
     comic_id: &str,
     parody_names: &[String],
 ) -> Result<(), HentaiError> {
-    ComicParodies::delete_many()
-        .filter(comic_parodies::Column::ComicId.eq(comic_id))
-        .exec(db)
-        .await
-        .map_err(map_db_err)?;
-    let unique: std::collections::HashSet<&String> = parody_names.iter().collect();
-    for name in unique {
-        let parody = parodies::ActiveModel {
-            name: Set(name.clone()),
-        };
-        Parodies::insert(parody)
-            .on_conflict(
-                sea_orm::sea_query::OnConflict::column(parodies::Column::Name)
-                    .do_nothing()
-                    .to_owned(),
-            )
-            .do_nothing()
-            .exec(db)
-            .await
-            .map_err(map_db_err)?;
-        let row = comic_parodies::ActiveModel {
-            comic_id: Set(comic_id.to_string()),
-            parody_name: Set(name.clone()),
-        };
-        ComicParodies::insert(row).exec(db).await.map_err(map_db_err)?;
-    }
-    Ok(())
+    replace_comic_named_facet(db, JunctionNamedFacet::Parody, comic_id, parody_names).await
 }
 
 pub async fn replace_comic_characters<C: ConnectionTrait>(
@@ -546,31 +468,5 @@ pub async fn replace_comic_characters<C: ConnectionTrait>(
     comic_id: &str,
     character_names: &[String],
 ) -> Result<(), HentaiError> {
-    ComicCharacters::delete_many()
-        .filter(comic_characters::Column::ComicId.eq(comic_id))
-        .exec(db)
-        .await
-        .map_err(map_db_err)?;
-    let unique: std::collections::HashSet<&String> = character_names.iter().collect();
-    for name in unique {
-        let character = characters::ActiveModel {
-            name: Set(name.clone()),
-        };
-        Characters::insert(character)
-            .on_conflict(
-                sea_orm::sea_query::OnConflict::column(characters::Column::Name)
-                    .do_nothing()
-                    .to_owned(),
-            )
-            .do_nothing()
-            .exec(db)
-            .await
-            .map_err(map_db_err)?;
-        let row = comic_characters::ActiveModel {
-            comic_id: Set(comic_id.to_string()),
-            character_name: Set(name.clone()),
-        };
-        ComicCharacters::insert(row).exec(db).await.map_err(map_db_err)?;
-    }
-    Ok(())
+    replace_comic_named_facet(db, JunctionNamedFacet::Character, comic_id, character_names).await
 }

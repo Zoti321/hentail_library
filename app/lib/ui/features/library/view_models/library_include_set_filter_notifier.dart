@@ -1,6 +1,4 @@
-import 'package:hentai_library/data/adapters/frb_call_guard.dart';
-import 'package:hentai_library/src/rust/api/character.dart' as rust_character;
-import 'package:hentai_library/src/rust/api/parody.dart' as rust_parody;
+import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -30,17 +28,11 @@ class LibraryIncludeSetFilter extends _$LibraryIncludeSetFilter {
 @Riverpod(keepAlive: true)
 Future<List<String>> libraryDistinctParodies(Ref ref) async {
   final String? libraryId = ref.watch(currentLibraryProvider).asData?.value.currentId;
-  return guardFrbSync(
-    () => rust_parody.listDistinctParodiesFrb(libraryId: libraryId),
-    fallbackMessage: '读取原作列表失败',
-  );
+  return ref.watch(parodyRepoProvider).listDistinct(libraryId: libraryId);
 }
 
 @Riverpod(keepAlive: true)
 Future<List<String>> libraryDistinctCharacters(Ref ref) async {
   final String? libraryId = ref.watch(currentLibraryProvider).asData?.value.currentId;
-  return guardFrbSync(
-    () => rust_character.listDistinctCharactersFrb(libraryId: libraryId),
-    fallbackMessage: '读取角色列表失败',
-  );
+  return ref.watch(characterRepoProvider).listDistinct(libraryId: libraryId);
 }

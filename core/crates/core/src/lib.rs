@@ -11,6 +11,7 @@ pub mod home;
 pub mod library;
 pub mod metadata_lock;
 pub mod migration;
+pub mod named_facet;
 pub mod path;
 pub mod parody;
 pub mod reader;
@@ -55,6 +56,10 @@ pub use library::{
     update_library_settings, update_library_sidebar_layout, update_local_library_root,
     update_remote_library, LibraryDto, LibrarySidebarPlacement, RemoteLibraryCredential,
     ResolvedAccess, ScanInterval,
+};
+pub use named_facet::{
+    list_all_named_facet_names, list_distinct_named_facet_names, replace_comic_named_facet,
+    JunctionNamedFacet,
 };
 pub use path::{add_path, list_all_paths, remove_path, watch_paths};
 pub use parody::{list_all_parodies, list_distinct_parodies};
