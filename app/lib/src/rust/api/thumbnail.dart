@@ -12,12 +12,13 @@ part 'thumbnail.freezed.dart';
 // These functions are ignored because they are not marked as `pub`: `map_event`, `map_priority`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`
 
-ComicThumbnailDto? findThumbnailByComicIdFrb({required String comicId}) =>
-    RustLib.instance.api.crateApiThumbnailFindThumbnailByComicIdFrb(
-      comicId: comicId,
-    );
+Future<ComicThumbnailDto?> findThumbnailByComicIdFrb({
+  required String comicId,
+}) => RustLib.instance.api.crateApiThumbnailFindThumbnailByComicIdFrb(
+  comicId: comicId,
+);
 
-ComicThumbnailDto? ensureThumbnailByComicIdFrb({
+Future<ComicThumbnailDto?> ensureThumbnailByComicIdFrb({
   required String comicId,
   required ThumbnailPriorityDto priority,
 }) => RustLib.instance.api.crateApiThumbnailEnsureThumbnailByComicIdFrb(
@@ -56,16 +57,17 @@ void setSeriesThumbnailFromPageFrb({
   pageIndex: pageIndex,
 );
 
-SeriesThumbnailDto? findSeriesThumbnailBySeriesIdFrb({
+Future<SeriesThumbnailDto?> findSeriesThumbnailBySeriesIdFrb({
   required String seriesId,
 }) => RustLib.instance.api.crateApiThumbnailFindSeriesThumbnailBySeriesIdFrb(
   seriesId: seriesId,
 );
 
-SeriesCoverSourceDto resolveSeriesCoverFrb({required String seriesId}) =>
-    RustLib.instance.api.crateApiThumbnailResolveSeriesCoverFrb(
-      seriesId: seriesId,
-    );
+Future<SeriesCoverSourceDto> resolveSeriesCoverFrb({
+  required String seriesId,
+}) => RustLib.instance.api.crateApiThumbnailResolveSeriesCoverFrb(
+  seriesId: seriesId,
+);
 
 Stream<ThumbnailEventDto> watchThumbnailEventsFrb() =>
     RustLib.instance.api.crateApiThumbnailWatchThumbnailEventsFrb();

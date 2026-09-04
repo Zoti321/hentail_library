@@ -102,26 +102,25 @@ fn map_event(event: CoreEvent) -> ThumbnailEventDto {
     }
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn find_thumbnail_by_comic_id_frb(
+#[flutter_rust_bridge::frb]
+pub async fn find_thumbnail_by_comic_id_frb(
     comic_id: String,
 ) -> Result<Option<ComicThumbnailDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(find_thumbnail_by_comic_id(&comic_id))
+    find_thumbnail_by_comic_id(&comic_id)
+        .await
         .map(|opt| opt.map(ComicThumbnailDto::from))
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn ensure_thumbnail_by_comic_id_frb(
+#[flutter_rust_bridge::frb]
+pub async fn ensure_thumbnail_by_comic_id_frb(
     comic_id: String,
     priority: ThumbnailPriorityDto,
 ) -> Result<Option<ComicThumbnailDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(ensure_thumbnail(
-        &comic_id,
-        map_priority(priority),
-    ))
-    .map(|opt| opt.map(ComicThumbnailDto::from))
-    .map_err(HentaiErrorDto::from)
+    ensure_thumbnail(&comic_id, map_priority(priority))
+        .await
+        .map(|opt| opt.map(ComicThumbnailDto::from))
+        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]
@@ -164,20 +163,22 @@ pub fn set_series_thumbnail_from_page_frb(
     .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn find_series_thumbnail_by_series_id_frb(
+#[flutter_rust_bridge::frb]
+pub async fn find_series_thumbnail_by_series_id_frb(
     series_id: String,
 ) -> Result<Option<SeriesThumbnailDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(find_series_thumbnail_by_series_id(&series_id))
+    find_series_thumbnail_by_series_id(&series_id)
+        .await
         .map(|opt| opt.map(SeriesThumbnailDto::from))
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn resolve_series_cover_frb(
+#[flutter_rust_bridge::frb]
+pub async fn resolve_series_cover_frb(
     series_id: String,
 ) -> Result<SeriesCoverSourceDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(resolve_series_cover(&series_id))
+    resolve_series_cover(&series_id)
+        .await
         .map(SeriesCoverSourceDto::from)
         .map_err(HentaiErrorDto::from)
 }

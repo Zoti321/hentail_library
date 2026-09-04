@@ -18,7 +18,7 @@ void initDbFrb({required String appDataDir, required String dbFileName}) =>
 String comicIdFromPathFrb({required String rawPath}) =>
     RustLib.instance.api.crateApiComicComicIdFromPathFrb(rawPath: rawPath);
 
-PagedComicResultDto fetchComicsPageFrb({
+Future<PagedComicResultDto> fetchComicsPageFrb({
   required PageRequestDto request,
   required ComicFilterDto filter,
   required ComicSortOptionDto sort,
@@ -28,10 +28,10 @@ PagedComicResultDto fetchComicsPageFrb({
   sort: sort,
 );
 
-ComicDto? findComicByIdFrb({required String comicId}) =>
+Future<ComicDto?> findComicByIdFrb({required String comicId}) =>
     RustLib.instance.api.crateApiComicFindComicByIdFrb(comicId: comicId);
 
-List<ComicDto> searchByKeywordFrb({required String keyword}) =>
+Future<List<ComicDto>> searchByKeywordFrb({required String keyword}) =>
     RustLib.instance.api.crateApiComicSearchByKeywordFrb(keyword: keyword);
 
 void deleteComicsByIdsFrb({required List<String> comicIds}) =>
@@ -56,7 +56,7 @@ void setComicMetaLocksFrb({
 Future<void> refreshComicMetadataFrb({required String comicId}) =>
     RustLib.instance.api.crateApiComicRefreshComicMetadataFrb(comicId: comicId);
 
-List<ComicDto> searchByTagExpressionFrb({
+Future<List<ComicDto>> searchByTagExpressionFrb({
   required List<String> mustInclude,
   required List<String> optionalOr,
   required List<String> mustExclude,
@@ -66,7 +66,7 @@ List<ComicDto> searchByTagExpressionFrb({
   mustExclude: mustExclude,
 );
 
-PlatformInt64 countAllComicsFrb() =>
+Future<PlatformInt64> countAllComicsFrb() =>
     RustLib.instance.api.crateApiComicCountAllComicsFrb();
 
 Stream<int> watchComicChanges() =>

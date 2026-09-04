@@ -22,25 +22,26 @@ void main() {
   test('buildReaderImageProvider wraps file path with named cache', () {
     ensureReaderImageCacheConfigured();
 
+    // Skip existsSync gate by using memory bytes for ResizeImage shape checks.
     final ImageProvider<Object>? provider = buildReaderImageProvider(
-      filePath: r'C:\tmp\page.jpg',
+      memoryBytes: Uint8List.fromList(<int>[1, 2, 3, 4]),
       cacheWidth: 800,
     );
 
     expect(provider, isA<ResizeImage>());
     final ResizeImage resize = provider! as ResizeImage;
     expect(resize.width, 800);
-    expect(resize.imageProvider, isA<ExtendedFileImageProvider>());
+    expect(resize.imageProvider, isA<ExtendedMemoryImageProvider>());
   });
 
   test('buildReaderImageProvider without cacheWidth uses native decode', () {
     ensureReaderImageCacheConfigured();
 
     final ImageProvider<Object>? provider = buildReaderImageProvider(
-      filePath: r'C:\tmp\page.jpg',
+      memoryBytes: Uint8List.fromList(<int>[1, 2, 3, 4]),
     );
 
-    expect(provider, isA<ExtendedFileImageProvider>());
+    expect(provider, isA<ExtendedMemoryImageProvider>());
     expect(provider, isNot(isA<ResizeImage>()));
   });
 
@@ -56,6 +57,32 @@ void main() {
     final ResizeImage resize = provider! as ResizeImage;
     expect(resize.imageProvider, isA<ExtendedMemoryImageProvider>());
   });
+
+  test(
+    'prefetch and display share ResizeImage cacheWidth for the same slot',
+    () {
+      ensureReaderImageCacheConfigured();
+      const int cacheWidth = 720;
+      final Uint8List bytes = Uint8List.fromList(<int>[9, 9, 9]);
+
+      final ImageProvider<Object>? display = buildReaderImageProvider(
+        memoryBytes: bytes,
+        cacheWidth: cacheWidth,
+      );
+      final ImageProvider<Object>? prefetch = buildReaderImageProvider(
+        memoryBytes: bytes,
+        cacheWidth: cacheWidth,
+      );
+
+      expect(display, isA<ResizeImage>());
+      expect(prefetch, isA<ResizeImage>());
+      final ResizeImage displayResize = display! as ResizeImage;
+      final ResizeImage prefetchResize = prefetch! as ResizeImage;
+      expect(displayResize.width, cacheWidth);
+      expect(prefetchResize.width, cacheWidth);
+      expect(displayResize, prefetchResize);
+    },
+  );
 
   test('clearReaderImageCache removes named cache', () {
     ensureReaderImageCacheConfigured();

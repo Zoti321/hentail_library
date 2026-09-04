@@ -18,10 +18,10 @@ Stream<List<SeriesDto>> watchAllSeriesFrb() =>
 List<SeriesDto> getAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesGetAllSeriesFrb();
 
-PlatformInt64 countAllSeriesFrb() =>
+Future<PlatformInt64> countAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesCountAllSeriesFrb();
 
-PagedSeriesResultDto fetchSeriesPageFrb({
+Future<PagedSeriesResultDto> fetchSeriesPageFrb({
   required PageRequestDto request,
   required SeriesFilterDto filter,
   required SeriesSortOptionDto sort,
@@ -31,7 +31,7 @@ PagedSeriesResultDto fetchSeriesPageFrb({
   sort: sort,
 );
 
-SeriesDto? findSeriesByIdFrb({required String seriesId}) =>
+Future<SeriesDto?> findSeriesByIdFrb({required String seriesId}) =>
     RustLib.instance.api.crateApiSeriesFindSeriesByIdFrb(seriesId: seriesId);
 
 SeriesReadingContextDto? getSeriesReadingContextByComicIdFrb({
@@ -40,7 +40,7 @@ SeriesReadingContextDto? getSeriesReadingContextByComicIdFrb({
   comicId: comicId,
 );
 
-PagedSeriesComicsResultDto fetchSeriesComicsPageFrb({
+Future<PagedSeriesComicsResultDto> fetchSeriesComicsPageFrb({
   required String seriesId,
   required PageRequestDto request,
 }) => RustLib.instance.api.crateApiSeriesFetchSeriesComicsPageFrb(
@@ -98,12 +98,12 @@ void setSeriesItemSortOrderLockedFrb({
   locked: locked,
 );
 
-List<SeriesDto> searchSeriesByKeywordFrb({required String keyword}) => RustLib
-    .instance
-    .api
-    .crateApiSeriesSearchSeriesByKeywordFrb(keyword: keyword);
+Future<List<SeriesDto>> searchSeriesByKeywordFrb({required String keyword}) =>
+    RustLib.instance.api.crateApiSeriesSearchSeriesByKeywordFrb(
+      keyword: keyword,
+    );
 
-List<SeriesDto> searchSeriesByTagExpressionFrb({
+Future<List<SeriesDto>> searchSeriesByTagExpressionFrb({
   required List<String> mustInclude,
   required List<String> optionalOr,
   required List<String> mustExclude,

@@ -19,8 +19,8 @@ class ComicRepositoryImpl implements ComicRepository {
   const ComicRepositoryImpl();
 
   @override
-  Future<int> countAll() async => guardFrbSync(
-    () => rust.countAllComicsFrb().toInt(),
+  Future<int> countAll() async => guardFrb(
+    () async => (await rust.countAllComicsFrb()).toInt(),
     fallbackMessage: '统计漫画数量失败',
   );
 
@@ -30,7 +30,7 @@ class ComicRepositoryImpl implements ComicRepository {
     if (total <= 0) {
       return <Comic>[];
     }
-    final rust.PagedComicResultDto page = guardFrbSync(
+    final rust.PagedComicResultDto page = await guardFrb(
       () => rust.fetchComicsPageFrb(
         request: rust.PageRequestDto(page: 1, pageSize: total),
         filter: unrestrictedListFilter(),
@@ -50,7 +50,7 @@ class ComicRepositoryImpl implements ComicRepository {
     required LibraryComicFilter filter,
     required LibraryComicSortOption sortOption,
   }) async {
-    final rust.PagedComicResultDto page = guardFrbSync(
+    final rust.PagedComicResultDto page = await guardFrb(
       () => rust.fetchComicsPageFrb(
         request: mapPageRequest(request),
         filter: mapLibraryFilter(filter),
@@ -63,7 +63,7 @@ class ComicRepositoryImpl implements ComicRepository {
 
   @override
   Future<Comic?> findById(String comicId) async {
-    final rust.ComicDto? dto = guardFrbSync(
+    final rust.ComicDto? dto = await guardFrb(
       () => rust.findComicByIdFrb(comicId: comicId),
       fallbackMessage: '读取漫画失败',
     );
@@ -149,11 +149,11 @@ class ComicRepositoryImpl implements ComicRepository {
 
   @override
   Future<List<Comic>> searchByKeyword(String keyword) async {
-    return guardFrbSync(
-      () =>
-          rust.searchByKeywordFrb(keyword: keyword).map(mapRustComic).toList(),
+    final List<rust.ComicDto> rows = await guardFrb(
+      () => rust.searchByKeywordFrb(keyword: keyword),
       fallbackMessage: '搜索漫画失败',
     );
+    return rows.map(mapRustComic).toList();
   }
 
   @override
@@ -162,16 +162,14 @@ class ComicRepositoryImpl implements ComicRepository {
     required Set<String> optionalOr,
     required Set<String> mustExclude,
   }) async {
-    return guardFrbSync(
-      () => rust
-          .searchByTagExpressionFrb(
-            mustInclude: mustInclude.toList(),
-            optionalOr: optionalOr.toList(),
-            mustExclude: mustExclude.toList(),
-          )
-          .map(mapRustComic)
-          .toList(),
+    final List<rust.ComicDto> rows = await guardFrb(
+      () => rust.searchByTagExpressionFrb(
+        mustInclude: mustInclude.toList(),
+        optionalOr: optionalOr.toList(),
+        mustExclude: mustExclude.toList(),
+      ),
       fallbackMessage: '按元数据搜索漫画失败',
     );
+    return rows.map(mapRustComic).toList();
   }
 }

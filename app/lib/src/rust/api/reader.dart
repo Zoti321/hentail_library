@@ -11,7 +11,7 @@ part 'reader.freezed.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`, `from`
 
-void openReaderFrb({
+Future<void> openReaderFrb({
   required String comicId,
   required String path,
   required String resourceType,
@@ -21,7 +21,7 @@ void openReaderFrb({
   resourceType: resourceType,
 );
 
-ReaderPageListDto loadPageListFrb({
+Future<ReaderPageListDto> loadPageListFrb({
   required String comicId,
   required String path,
   required String resourceType,

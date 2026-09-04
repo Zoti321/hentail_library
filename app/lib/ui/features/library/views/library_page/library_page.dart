@@ -4,7 +4,6 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_cover_viewport_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_inactive_subscription.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_revision_coordinator.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
@@ -148,7 +147,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(libraryCatalogRevisionCoordinatorProvider);
+    // Keep inactive-tab catalog warm; do not watch revision coordinator here —
+    // catalog controllers already select watchRevision leaves.
     ref.watch(libraryCatalogInactiveSubscriptionProvider);
     ref.listen<LibraryDisplayTarget>(libraryDisplayTargetProvider, (
       LibraryDisplayTarget? previous,

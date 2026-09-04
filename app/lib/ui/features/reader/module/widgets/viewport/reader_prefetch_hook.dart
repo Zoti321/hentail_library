@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/core/image/image_decode_cache_size.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_logic.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
@@ -28,6 +29,11 @@ void useReaderPrefetchWindow({
         neighborCount: kReaderPrefetchNeighborCount,
         extraPageIndexesOneBased: extraPageIndexesOneBased,
       );
+      final int? cacheWidth = decodeCacheSizeForContext(
+        context,
+        logicalWidth: slotLogicalWidth,
+        logicalHeight: slotLogicalWidth,
+      ).cacheWidth;
       final ReaderPrefetchController controller = ref.read(
         readerPrefetchControllerProvider.notifier,
       );
@@ -49,6 +55,7 @@ void useReaderPrefetchWindow({
             comicId: comicId,
             pageIndexesOneBased: targets,
             imageList: imageList,
+            cacheWidth: cacheWidth,
           ),
         );
       });

@@ -196,27 +196,30 @@ pub fn comic_id_from_path_frb(raw_path: String) -> String {
     hentai_core::comic_id_from_path(&raw_path)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn fetch_comics_page_frb(
+#[flutter_rust_bridge::frb]
+pub async fn fetch_comics_page_frb(
     request: PageRequestDto,
     filter: ComicFilterDto,
     sort: ComicSortOptionDto,
 ) -> Result<PagedComicResultDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(fetch_comics_page(request.into(), filter.into(), sort.into()))
+    fetch_comics_page(request.into(), filter.into(), sort.into())
+        .await
         .map(PagedComicResultDto::from)
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn find_comic_by_id_frb(comic_id: String) -> Result<Option<ComicDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(find_comic_by_id(&comic_id))
+#[flutter_rust_bridge::frb]
+pub async fn find_comic_by_id_frb(comic_id: String) -> Result<Option<ComicDto>, HentaiErrorDto> {
+    find_comic_by_id(&comic_id)
+        .await
         .map(|opt| opt.map(ComicDto::from))
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn search_by_keyword_frb(keyword: String) -> Result<Vec<ComicDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(search_by_keyword(&keyword))
+#[flutter_rust_bridge::frb]
+pub async fn search_by_keyword_frb(keyword: String) -> Result<Vec<ComicDto>, HentaiErrorDto> {
+    search_by_keyword(&keyword)
+        .await
         .map(|rows| rows.into_iter().map(ComicDto::from).collect())
         .map_err(HentaiErrorDto::from)
 }
@@ -304,24 +307,21 @@ pub async fn refresh_comic_metadata_frb(comic_id: String) -> Result<(), HentaiEr
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn search_by_tag_expression_frb(
+#[flutter_rust_bridge::frb]
+pub async fn search_by_tag_expression_frb(
     must_include: Vec<String>,
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
 ) -> Result<Vec<ComicDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(hentai_core::search_by_tag_expression(
-        must_include,
-        optional_or,
-        must_exclude,
-    ))
-    .map(|rows| rows.into_iter().map(ComicDto::from).collect())
-    .map_err(HentaiErrorDto::from)
+    hentai_core::search_by_tag_expression(must_include, optional_or, must_exclude)
+        .await
+        .map(|rows| rows.into_iter().map(ComicDto::from).collect())
+        .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn count_all_comics_frb() -> Result<i64, HentaiErrorDto> {
-    hentai_core::runtime::block_on(count_all()).map_err(HentaiErrorDto::from)
+#[flutter_rust_bridge::frb]
+pub async fn count_all_comics_frb() -> Result<i64, HentaiErrorDto> {
+    count_all().await.map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb]

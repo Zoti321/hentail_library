@@ -69,11 +69,12 @@ class ComicCoverContent extends ConsumerWidget {
     if (index == null) {
       return priority;
     }
-    final Set<int> visibleIndices = ref.watch(
-      libraryCatalogCoverViewportProvider,
+    // Per-index select: only rebuild when this cell enters/leaves the viewport.
+    final bool inViewport = ref.watch(
+      libraryCatalogCoverViewportProvider.select(
+        (Set<int> indices) => indices.contains(index),
+      ),
     );
-    return visibleIndices.contains(index)
-        ? ThumbnailPriority.high
-        : ThumbnailPriority.low;
+    return inViewport ? ThumbnailPriority.high : ThumbnailPriority.low;
   }
 }

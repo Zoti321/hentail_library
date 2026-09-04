@@ -222,5 +222,6 @@ class _FakePrefetch extends ReaderPrefetchController {
     required String comicId,
     required Set<int> pageIndexesOneBased,
     required List<ReaderPageImageData> imageList,
+    int? cacheWidth,
   }) async {}
 }

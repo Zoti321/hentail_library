@@ -289,25 +289,27 @@ pub fn get_all_series_frb() -> Result<Vec<SeriesDto>, HentaiErrorDto> {
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn count_all_series_frb() -> Result<i64, HentaiErrorDto> {
-    hentai_core::runtime::block_on(count_all_series()).map_err(HentaiErrorDto::from)
+#[flutter_rust_bridge::frb]
+pub async fn count_all_series_frb() -> Result<i64, HentaiErrorDto> {
+    count_all_series().await.map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn fetch_series_page_frb(
+#[flutter_rust_bridge::frb]
+pub async fn fetch_series_page_frb(
     request: PageRequestDto,
     filter: SeriesFilterDto,
     sort: SeriesSortOptionDto,
 ) -> Result<PagedSeriesResultDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_fetch_page(request.into(), filter.into(), sort.into()))
+    core_fetch_page(request.into(), filter.into(), sort.into())
+        .await
         .map(PagedSeriesResultDto::from)
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn find_series_by_id_frb(series_id: String) -> Result<Option<SeriesDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_find(&series_id))
+#[flutter_rust_bridge::frb]
+pub async fn find_series_by_id_frb(series_id: String) -> Result<Option<SeriesDto>, HentaiErrorDto> {
+    core_find(&series_id)
+        .await
         .map(|opt| opt.map(SeriesDto::from))
         .map_err(HentaiErrorDto::from)
 }
@@ -328,12 +330,13 @@ pub fn get_series_reading_context_by_comic_id_frb(
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn fetch_series_comics_page_frb(
+#[flutter_rust_bridge::frb]
+pub async fn fetch_series_comics_page_frb(
     series_id: String,
     request: PageRequestDto,
 ) -> Result<PagedSeriesComicsResultDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_fetch_series_comics_page(&series_id, request.into()))
+    core_fetch_series_comics_page(&series_id, request.into())
+        .await
         .map(PagedSeriesComicsResultDto::from)
         .map_err(HentaiErrorDto::from)
 }
@@ -409,26 +412,24 @@ pub fn set_series_item_sort_order_locked_frb(
     .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn search_series_by_keyword_frb(keyword: String) -> Result<Vec<SeriesDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(search_series_by_keyword(&keyword))
+#[flutter_rust_bridge::frb]
+pub async fn search_series_by_keyword_frb(keyword: String) -> Result<Vec<SeriesDto>, HentaiErrorDto> {
+    search_series_by_keyword(&keyword)
+        .await
         .map(map_series_list)
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn search_series_by_tag_expression_frb(
+#[flutter_rust_bridge::frb]
+pub async fn search_series_by_tag_expression_frb(
     must_include: Vec<String>,
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
 ) -> Result<Vec<SeriesDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(search_series_by_tag_expression(
-        must_include,
-        optional_or,
-        must_exclude,
-    ))
-    .map(map_series_list)
-    .map_err(HentaiErrorDto::from)
+    search_series_by_tag_expression(must_include, optional_or, must_exclude)
+        .await
+        .map(map_series_list)
+        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]

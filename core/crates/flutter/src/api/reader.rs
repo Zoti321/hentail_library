@@ -37,24 +37,36 @@ impl From<CoreDto> for ReaderPageDto {
     }
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn open_reader_frb(
+#[flutter_rust_bridge::frb]
+pub async fn open_reader_frb(
     comic_id: String,
     path: String,
     resource_type: String,
 ) -> Result<(), HentaiErrorDto> {
-    open_reader(&comic_id, &path, &resource_type).map_err(HentaiErrorDto::from)
+    tokio::task::spawn_blocking(move || {
+        open_reader(&comic_id, &path, &resource_type)
+    })
+    .await
+    .map_err(|error| {
+        HentaiErrorDto::from(hentai_core::HentaiError::reader_invalid_content(error.to_string()))
+    })?
+    .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn load_page_list_frb(
+#[flutter_rust_bridge::frb]
+pub async fn load_page_list_frb(
     comic_id: String,
     path: String,
     resource_type: String,
 ) -> Result<ReaderPageListDto, HentaiErrorDto> {
-    load_page_list(&comic_id, &path, &resource_type)
-        .map(ReaderPageListDto::from)
-        .map_err(HentaiErrorDto::from)
+    tokio::task::spawn_blocking(move || {
+        load_page_list(&comic_id, &path, &resource_type).map(ReaderPageListDto::from)
+    })
+    .await
+    .map_err(|error| {
+        HentaiErrorDto::from(hentai_core::HentaiError::reader_invalid_content(error.to_string()))
+    })?
+    .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]

@@ -67,6 +67,7 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
     required String comicId,
     required Set<int> pageIndexesOneBased,
     required List<ReaderPageImageData> imageList,
+    int? cacheWidth,
   }) async {
     if (pageIndexesOneBased.isEmpty || imageList.isEmpty) {
       return;
@@ -83,6 +84,7 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
       final ReaderPageImageData imageData = imageList[pageOneBased - 1];
       final ImageProvider<Object>? provider = await _resolveReaderImageProvider(
         imageData: imageData,
+        cacheWidth: cacheWidth,
       );
       if (provider == null) {
         continue;
@@ -100,9 +102,13 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
 
   Future<ImageProvider<Object>?> _resolveReaderImageProvider({
     required ReaderPageImageData imageData,
+    int? cacheWidth,
   }) async {
     if (imageData is ReaderDirPageImageData) {
-      return buildReaderImageProvider(filePath: imageData.file.path);
+      return buildReaderImageProvider(
+        filePath: imageData.file.path,
+        cacheWidth: cacheWidth,
+      );
     }
     if (imageData is! ReaderArchivePageImageData) {
       return null;
@@ -116,9 +122,11 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
     return switch (page) {
       ReaderPageFilePath(:final String path) => buildReaderImageProvider(
         filePath: path,
+        cacheWidth: cacheWidth,
       ),
       ReaderPageBytes(:final Uint8List data) => buildReaderImageProvider(
         memoryBytes: data,
+        cacheWidth: cacheWidth,
       ),
     };
   }
