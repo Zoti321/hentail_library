@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/data/repositories/named_facet_form_listing.dart';
 import 'package:hentai_library/domain/models/named_facet_form_candidate.dart';
-import 'package:hentai_library/src/rust/api/named_facet.dart';
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
 import 'package:hentai_library/ui/core/widgets/form/named_facet_multi_select_field.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
@@ -17,7 +16,7 @@ final allCharactersProvider =
 /// Snapshot of Character candidates for Comic metadata form (attachment count order).
 final charactersForComicMetadataFormProvider =
     FutureProvider.autoDispose<List<NamedFacetFormCandidate>>((Ref ref) {
-  return listNamedFacetForMetadataForm(JunctionNamedFacetFrb.character);
+  return listNamedFacetForMetadataForm(NamedFacetFormKind.character);
 });
 
 /// Character 多选：字段内 chip + 内联输入；浮层列出未选字典项（对齐 Author/Tag）。

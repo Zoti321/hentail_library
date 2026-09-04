@@ -20,10 +20,6 @@ pub async fn list_all_tags() -> Result<Vec<String>, HentaiError> {
     Ok(rows.into_iter().map(|r| r.name).collect())
 }
 
-pub async fn list_tags_for_metadata_form() -> Result<Vec<crate::NamedFacetFormEntry>, HentaiError> {
-    crate::list_named_facet_for_form(crate::JunctionNamedFacet::Tag).await
-}
-
 pub async fn count_all_tags() -> Result<i64, HentaiError> {
     let db = connection()?;
     Tags::find().count(&db).await.map_err(map_db_err).map(|c| c as i64)

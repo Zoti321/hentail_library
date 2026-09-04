@@ -40,6 +40,9 @@ class _MultiSelectDropdownListStyles {
 }
 
 /// 图书馆实体多选：字段内 chip + 内联输入；浮层列出未选字典项。
+///
+/// Uses [ConsumerStatefulWidget] for [CustomPopupMenuController] + input/filter
+/// notifiers that must outlive overlay rebuilds (hooks impractical here).
 class MultiSelect<T> extends ConsumerStatefulWidget {
   const MultiSelect({
     super.key,

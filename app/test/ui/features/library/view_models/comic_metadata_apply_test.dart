@@ -5,7 +5,6 @@ import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_f
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/ui/core/widgets/form/character_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/parody_library_multi_select_field.dart';
-import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
@@ -71,9 +70,7 @@ void main() {
 
       expect(invalidated, <ProviderOrFamily>[
         allTagsProvider,
-        tagsForComicMetadataFormProvider,
         allCharactersProvider,
-        charactersForComicMetadataFormProvider,
         libraryDistinctCharactersProvider,
       ]);
       expect(invalidated.contains(allParodiesProvider), isFalse);
@@ -106,10 +103,7 @@ void main() {
 
       expect(result, isA<ComicMetadataApplySucceeded>());
       expect(repo.callCount, 1);
-      expect(invalidated, <ProviderOrFamily>[
-        allTagsProvider,
-        tagsForComicMetadataFormProvider,
-      ]);
+      expect(invalidated, <ProviderOrFamily>[allTagsProvider]);
     });
 
     test('invalidates parody and character lists when those fields change',
@@ -131,10 +125,8 @@ void main() {
       expect(repo.callCount, 1);
       expect(invalidated, <ProviderOrFamily>[
         allParodiesProvider,
-        parodiesForComicMetadataFormProvider,
         libraryDistinctParodiesProvider,
         allCharactersProvider,
-        charactersForComicMetadataFormProvider,
         libraryDistinctCharactersProvider,
       ]);
     });

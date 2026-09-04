@@ -1,10 +1,8 @@
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
-import 'package:hentai_library/ui/core/widgets/form/author_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/character_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/parody_library_multi_select_field.dart';
-import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
 import 'package:riverpod/misc.dart' show ProviderOrFamily;
@@ -16,16 +14,13 @@ void refreshComicMetadataDictionaries(
 ) {
   if (result.tagsWritten) {
     invalidate(allTagsProvider);
-    invalidate(tagsForComicMetadataFormProvider);
   }
   if (result.parodiesWritten) {
     invalidate(allParodiesProvider);
-    invalidate(parodiesForComicMetadataFormProvider);
     invalidate(libraryDistinctParodiesProvider);
   }
   if (result.charactersWritten) {
     invalidate(allCharactersProvider);
-    invalidate(charactersForComicMetadataFormProvider);
     invalidate(libraryDistinctCharactersProvider);
   }
 }

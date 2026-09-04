@@ -1,6 +1,5 @@
 use crate::named_facet::{
-    list_all_named_facet_names, list_distinct_named_facet_names, list_named_facet_for_form,
-    JunctionNamedFacet, NamedFacetFormEntry,
+    list_all_named_facet_names, list_distinct_named_facet_names, JunctionNamedFacet,
 };
 use crate::error::HentaiError;
 
@@ -10,10 +9,6 @@ pub fn distinct_characters_sql() -> String {
 
 pub async fn list_all_characters() -> Result<Vec<String>, HentaiError> {
     list_all_named_facet_names(JunctionNamedFacet::Character).await
-}
-
-pub async fn list_characters_for_metadata_form() -> Result<Vec<NamedFacetFormEntry>, HentaiError> {
-    list_named_facet_for_form(JunctionNamedFacet::Character).await
 }
 
 pub async fn list_distinct_characters(

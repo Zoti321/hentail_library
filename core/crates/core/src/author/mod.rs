@@ -18,11 +18,6 @@ pub async fn list_all_authors() -> Result<Vec<String>, HentaiError> {
     Ok(rows.into_iter().map(|r| r.name).collect())
 }
 
-pub async fn list_authors_for_metadata_form(
-) -> Result<Vec<crate::NamedFacetFormEntry>, HentaiError> {
-    crate::list_named_facet_for_form(crate::JunctionNamedFacet::Author).await
-}
-
 pub async fn count_all_authors() -> Result<i64, HentaiError> {
     let db = connection()?;
     Authors::find().count(&db).await.map_err(map_db_err).map(|c| c as i64)
