@@ -1,4 +1,5 @@
 mod dto;
+mod filter_predicate;
 mod page_query;
 pub mod repository;
 pub mod write;
