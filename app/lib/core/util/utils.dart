@@ -32,13 +32,24 @@ bool shouldTreatExplorerSelectAsFailure({
   return exitCode != 0;
 }
 
+/// Convert app-stored POSIX paths to native Windows separators for `explorer.exe`.
+///
+/// `explorer.exe` treats each `/segment` in an argument as a command-line switch.
+/// Paths stored with forward slashes therefore lose every path token and fall
+/// back to the user's Documents folder.
+@visibleForTesting
+String toWindowsExplorerPath(String path) => path.replaceAll('/', r'\');
+
 Future<void> showInFileExplorer(String path) async {
   final String normalizedPath = path.trim();
   if (normalizedPath.isEmpty) {
     throw ValidationException('无法在文件资源管理器中显示该项目：路径为空');
   }
   if (Platform.isWindows) {
-    await Process.run('explorer.exe', <String>['/select,', normalizedPath]);
+    await Process.run('explorer.exe', <String>[
+      '/select,',
+      toWindowsExplorerPath(normalizedPath),
+    ]);
     return;
   }
   if (Platform.isMacOS) {
