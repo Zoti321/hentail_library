@@ -919,12 +919,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get seriesDetailEdit => '编辑系列';
 
   @override
-  String get seriesItemEditSortOrder => '编辑排序';
-
-  @override
-  String get dialogEditSeriesItemSortOrderTitle => '编辑排序';
-
-  @override
   String get formSeriesItemSortOrderLabel => '排序序号';
 
   @override

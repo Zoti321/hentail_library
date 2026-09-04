@@ -1736,18 +1736,6 @@ abstract class AppLocalizations {
   /// **'编辑系列'**
   String get seriesDetailEdit;
 
-  /// No description provided for @seriesItemEditSortOrder.
-  ///
-  /// In zh, this message translates to:
-  /// **'编辑排序'**
-  String get seriesItemEditSortOrder;
-
-  /// No description provided for @dialogEditSeriesItemSortOrderTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'编辑排序'**
-  String get dialogEditSeriesItemSortOrderTitle;
-
   /// No description provided for @formSeriesItemSortOrderLabel.
   ///
   /// In zh, this message translates to:

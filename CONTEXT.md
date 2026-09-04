@@ -101,7 +101,7 @@ _Avoid_: 编辑模式、排序页、固定开关（pin 只能在此模式用拖�
 ### Organization & metadata
 
 **Series**:
-同一 Library 内有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。不跨 Library。用户可编辑连载状态与计划总卷数（各字段可有 Metadata field lock）；成员默认顺序由 sync 按文件名自然排序写入。用户可在系列详情手动编辑单本排序值（`SeriesItem.order`，浮点数）；手动保存后会锁定该成员（`sortOrderLocked`），后续 sync 保留锁定项的排序值，未锁定项仍按文件名自然排序更新；也可解锁排序以在下次 sync 恢复文件名序。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series；不在任何 Series 中的 Comic 仍作为独立条目存在于其 Library 中。
+同一 Library 内有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。不跨 Library。用户可编辑连载状态与计划总卷数（各字段可有 Metadata field lock）；成员默认顺序由 sync 按文件名自然排序写入。用户可手动编辑单本排序值（`SeriesItem.order`，浮点数）；手动保存后会锁定该成员（`sortOrderLocked`），后续 sync 保留锁定项的排序值，未锁定项仍按文件名自然排序更新；也可解锁排序以在下次 sync 恢复文件名序。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series。Library sync 成功重建后，凡能解析出父路径的 Comic 恰好属于一个 Folder series（含 Library root series）；无父路径以致无归属视为异常/非常态，仍可容忍。
 _Avoid_: 合集、专辑、套系
 
 **Folder series**:

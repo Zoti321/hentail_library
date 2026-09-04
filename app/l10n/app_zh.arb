@@ -423,8 +423,6 @@
   "comicDetailSeriesNext": "下一本",
   "comicDetailSeriesNextSemantic": "系列下一本",
   "seriesDetailEdit": "编辑系列",
-  "seriesItemEditSortOrder": "编辑排序",
-  "dialogEditSeriesItemSortOrderTitle": "编辑排序",
   "formSeriesItemSortOrderLabel": "排序序号",
   "formSeriesItemSortOrderHint": "例如 1 或 1.5",
   "formSeriesItemSortOrderInvalid": "请输入有效数字",

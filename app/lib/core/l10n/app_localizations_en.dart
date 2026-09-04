@@ -945,12 +945,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get seriesDetailEdit => 'Edit series';
 
   @override
-  String get seriesItemEditSortOrder => 'Edit sort order';
-
-  @override
-  String get dialogEditSeriesItemSortOrderTitle => 'Edit sort order';
-
-  @override
   String get formSeriesItemSortOrderLabel => 'Sort number';
 
   @override
