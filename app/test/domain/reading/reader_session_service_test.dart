@@ -104,7 +104,7 @@ class _FakeComicPageSourcePort implements ComicPageSourcePort {
   }
 
   @override
-  void clearPageCache({required String comicId}) {
+  Future<void> clearPageCache({required String comicId}) async {
     clearedComicIds.add(comicId);
   }
 }
@@ -371,13 +371,13 @@ void main() {
       ]);
     });
 
-    test('clearPageCache delegates to page source', () {
+    test('clearPageCache delegates to page source', () async {
       final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
         pages: <ReadSessionPage>[],
       );
       final ReaderSessionService service = _service(pageSource: pageSource);
 
-      service.clearPageCache(comicId: 'c1');
+      await service.clearPageCache(comicId: 'c1');
 
       expect(pageSource.clearedComicIds, <String>['c1']);
     });

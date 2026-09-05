@@ -55,6 +55,8 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
   }
 
   Future<LibraryComicsCatalogState> _load() async {
+    // Comics sort has no `random` field (unlike Series); always watch revision.
+    // If random comics sort is added later, exempt revision like Series (P2-8).
     ref.watch(libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics));
 
     final LibraryRevisionState revisionState = ref.read(

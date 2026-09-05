@@ -119,9 +119,14 @@ pub async fn prefetch_reader_pages_frb(
     Ok(())
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn clear_reader_page_cache_frb(comic_id: String) -> Result<(), HentaiErrorDto> {
-    clear_reader_page_cache(&comic_id).map_err(HentaiErrorDto::from)
+#[flutter_rust_bridge::frb]
+pub async fn clear_reader_page_cache_frb(comic_id: String) -> Result<(), HentaiErrorDto> {
+    tokio::task::spawn_blocking(move || clear_reader_page_cache(&comic_id))
+        .await
+        .map_err(|error| {
+            HentaiErrorDto::from(hentai_core::HentaiError::reader_invalid_content(error.to_string()))
+        })?
+        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]

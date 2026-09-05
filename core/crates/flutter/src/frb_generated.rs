@@ -217,15 +217,16 @@ fn wire__crate__api__history__clear_all_reading_frb_impl(
     )
 }
 fn wire__crate__api__reader__clear_reader_page_cache_frb_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
             debug_name: "clear_reader_page_cache_frb",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
         move || {
             let message = unsafe {
@@ -239,10 +240,16 @@ fn wire__crate__api__reader__clear_reader_page_cache_frb_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_comic_id = <String>::sse_decode(&mut deserializer);
             deserializer.end();
-            transform_result_sse::<_, crate::api::init::HentaiErrorDto>((move || {
-                let output_ok = crate::api::reader::clear_reader_page_cache_frb(api_comic_id)?;
-                Ok(output_ok)
-            })())
+            move |context| async move {
+                transform_result_sse::<_, crate::api::init::HentaiErrorDto>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::reader::clear_reader_page_cache_frb(api_comic_id).await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
         },
     )
 }
@@ -5401,6 +5408,12 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
+        6 => wire__crate__api__reader__clear_reader_page_cache_frb_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
         10 => wire__crate__api__comic__comic_sort_field_dto_default_impl(
             port,
             ptr,
@@ -5623,9 +5636,6 @@ fn pde_ffi_dispatcher_sync_impl(
         3 => wire__crate__api__tag__add_tag_frb_impl(ptr, rust_vec_len, data_len),
         4 => wire__crate__api__sync__cancel_sync_frb_impl(ptr, rust_vec_len, data_len),
         5 => wire__crate__api__history__clear_all_reading_frb_impl(ptr, rust_vec_len, data_len),
-        6 => {
-            wire__crate__api__reader__clear_reader_page_cache_frb_impl(ptr, rust_vec_len, data_len)
-        }
         7 => wire__crate__api__reader__clear_reader_sessions_frb_impl(ptr, rust_vec_len, data_len),
         8 => wire__crate__api__reader__close_reader_frb_impl(ptr, rust_vec_len, data_len),
         9 => wire__crate__api__comic__comic_id_from_path_frb_impl(ptr, rust_vec_len, data_len),

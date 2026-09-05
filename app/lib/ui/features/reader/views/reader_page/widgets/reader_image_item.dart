@@ -46,6 +46,9 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     final Widget errorPlaceholder = _buildReaderImageErrorPlaceholder(context);
     final ReaderPageImageData imageData = widget.imageData;
     final int? cacheWidth = _readerDecodeCacheWidth(context);
+    final FilterQuality filterQuality = readerImageFilterQuality(
+      isScrolling: ReaderScrollActivity.isScrollingOf(context),
+    );
 
     if (imageData is ReaderDirPageImageData) {
       final String dirPath = imageData.file.path.trim();
@@ -59,7 +62,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
           child: AppComicImage(
             filePath: imageData.file.path,
             fit: widget.fit,
-            filterQuality: FilterQuality.high,
+            filterQuality: filterQuality,
             useReaderImageCache: true,
             cacheWidth: cacheWidth,
             loadingPlaceholder: loadingSurface,
@@ -90,7 +93,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
               ReaderPageFilePath(:final String path) => AppComicImage(
                 filePath: path,
                 fit: widget.fit,
-                filterQuality: FilterQuality.high,
+                filterQuality: filterQuality,
                 useReaderImageCache: true,
                 cacheWidth: cacheWidth,
                 loadingPlaceholder: loadingSurface,
@@ -100,7 +103,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
               ReaderPageBytes(:final Uint8List data) => AppComicImage(
                 memoryBytes: data,
                 fit: widget.fit,
-                filterQuality: FilterQuality.high,
+                filterQuality: filterQuality,
                 useReaderImageCache: true,
                 cacheWidth: cacheWidth,
                 loadingPlaceholder: loadingSurface,

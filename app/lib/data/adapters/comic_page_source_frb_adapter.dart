@@ -128,7 +128,7 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
   }
 
   @override
-  void clearPageCache({required String comicId}) {
-    rust.clearReaderPageCacheFrb(comicId: comicId);
+  Future<void> clearPageCache({required String comicId}) {
+    return rust.clearReaderPageCacheFrb(comicId: comicId);
   }
 }

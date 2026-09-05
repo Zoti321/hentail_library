@@ -133,8 +133,8 @@ class ReaderSessionService {
     );
   }
 
-  void clearPageCache({required String comicId}) {
-    _pageSource.clearPageCache(comicId: comicId);
+  Future<void> clearPageCache({required String comicId}) {
+    return _pageSource.clearPageCache(comicId: comicId);
   }
 
   Future<({Comic comic, List<ReadSessionPage> pages})> _openPages(

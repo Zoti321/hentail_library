@@ -69,7 +69,9 @@ Future<void> prefetchReaderPagesFrb({
   generation: generation,
 );
 
-void clearReaderPageCacheFrb({required String comicId}) => RustLib.instance.api
+Future<void> clearReaderPageCacheFrb({required String comicId}) => RustLib
+    .instance
+    .api
     .crateApiReaderClearReaderPageCacheFrb(comicId: comicId);
 
 void closeReaderFrb({required String comicId}) =>

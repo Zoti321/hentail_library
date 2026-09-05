@@ -135,6 +135,49 @@ void main() {
     expect(decoration.color, theme.colorScheme.surface);
     expect(decoration.boxShadow!.single.color, h.cardShadow);
   });
+
+  testWidgets('wraps card chrome in a RepaintBoundary', (
+    WidgetTester tester,
+  ) async {
+    final ThemeData theme = buildAppTheme(Brightness.light);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: <Override>[
+          comicCoverProvider('comic-1').overrideWith(_NoCoverComicCover.new),
+        ],
+        child: MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: theme,
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 320,
+                height: 120,
+                child: ReadingHistoryCard(
+                  comicId: 'comic-1',
+                  title: 'Sample comic',
+                  lastReadTime: DateTime(2026, 1, 1),
+                  pageIndex: 12,
+                  onTap: () {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      find.descendant(
+        of: find.byType(ReadingHistoryCard),
+        matching: find.byType(RepaintBoundary),
+      ),
+      findsWidgets,
+    );
+  });
 }
 
 BoxDecoration _cardDecoration(WidgetTester tester) {

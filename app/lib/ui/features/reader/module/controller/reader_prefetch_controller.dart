@@ -34,7 +34,10 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
       state = Map<String, int>.from(state)..remove(comicId);
     }
     clearReaderImageCache();
-    ref.read(readerSessionServiceProvider).clearPageCache(comicId: comicId);
+    // Fire-and-forget: async FRB must not block exit navigation (P2-4).
+    unawaited(
+      ref.read(readerSessionServiceProvider).clearPageCache(comicId: comicId),
+    );
     ref.invalidate(comicReaderPageProvider);
   }
 

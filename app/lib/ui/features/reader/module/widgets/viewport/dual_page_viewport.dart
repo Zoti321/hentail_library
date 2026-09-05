@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_page_crossfade_policy.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/resume_visible_sync_gate.dart';
@@ -278,6 +279,9 @@ class _DualSpreadPage extends StatelessWidget {
     final double slotLogicalWidth = readerDualPageSlotLogicalWidth(
       MediaQuery.sizeOf(context).width,
     );
+    final bool enableCrossfade = readerPageCrossfadeEnabled(
+      reduceMotion: MediaQuery.disableAnimationsOf(context),
+    );
     if (pages.isEmpty) {
       return const SizedBox.expand();
     }
@@ -300,7 +304,7 @@ class _DualSpreadPage extends StatelessWidget {
               imageData: imageData,
               slotLogicalWidth: slotLogicalWidth,
               alignment: alignment,
-              enableCrossfade: true,
+              enableCrossfade: enableCrossfade,
             ),
           ),
           if (!coverOnRight) const Expanded(child: SizedBox.shrink()),
@@ -318,7 +322,7 @@ class _DualSpreadPage extends StatelessWidget {
                   imageData: leftImage,
                   slotLogicalWidth: slotLogicalWidth,
                   alignment: Alignment.centerRight,
-                  enableCrossfade: true,
+                  enableCrossfade: enableCrossfade,
                 ),
         ),
         Expanded(
@@ -328,7 +332,7 @@ class _DualSpreadPage extends StatelessWidget {
                   imageData: rightImage,
                   slotLogicalWidth: slotLogicalWidth,
                   alignment: Alignment.centerLeft,
-                  enableCrossfade: true,
+                  enableCrossfade: enableCrossfade,
                 ),
         ),
       ],

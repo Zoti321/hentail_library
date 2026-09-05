@@ -6,11 +6,14 @@ import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_cover_viewport_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/core/dto/history_grid_item.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/reading_history_card.dart';
 import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
+import 'package:hentai_library/ui/features/shell/view_models/history_cover_viewport_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/history_load_more_throttle.dart';
 import 'package:hentai_library/ui/features/shell/view_models/history_paged_feed_state.dart';
 import 'package:hentai_library/ui/features/shell/views/history_page/history_layout_constants.dart';
 import 'package:hentai_library/ui/features/shell/views/history_page/widgets/history_page_header.dart';
@@ -18,6 +21,7 @@ import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double _kHistoryLoadMoreThreshold = 400;
+const double _kHistoryGridMainAxisSpacing = 12;
 
 class HistoryPage extends ConsumerStatefulWidget {
   const HistoryPage({super.key});
@@ -29,6 +33,7 @@ class HistoryPage extends ConsumerStatefulWidget {
 class _HistoryPageState extends ConsumerState<HistoryPage> {
   final GlobalKey _headerMeasureKey = GlobalKey();
   double? _headerExtent;
+  DateTime? _lastLoadMoreAttemptAt;
 
   @override
   void initState() {
@@ -84,10 +89,42 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
 
         return NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification notification) {
-            if (notification is! ScrollUpdateNotification) {
+            if (notification is! ScrollUpdateNotification &&
+                notification is! ScrollEndNotification) {
               return false;
             }
             final ScrollMetrics metrics = notification.metrics;
+            final HistoryPagedFeedState? feed = ref
+                .read(historyPagedFeedControllerProvider)
+                .asData
+                ?.value;
+            final int itemCount = feed?.items.length ?? 0;
+            if (itemCount > 0) {
+              final HistoryGridMetrics gridMetrics = historyGridMetrics(
+                layoutTier,
+                viewportWidth,
+              );
+              final ({int startIndex, int endIndex}) range =
+                  visibleCatalogGridIndexRange(
+                    scrollPixels: metrics.pixels,
+                    viewportHeight: metrics.viewportDimension,
+                    gridStartScrollOffset: 0,
+                    itemCount: itemCount,
+                    rowExtent: gridMetrics.mainAxisExtent,
+                    rowSpacing: _kHistoryGridMainAxisSpacing,
+                    crossAxisCount: gridMetrics.crossAxisCount,
+                    rowBuffer: 2,
+                  );
+              ref
+                  .read(historyCoverViewportProvider.notifier)
+                  .updateRange(
+                    startIndex: range.startIndex,
+                    endIndex: range.endIndex,
+                  );
+            }
+            if (notification is! ScrollUpdateNotification) {
+              return false;
+            }
             if (metrics.maxScrollExtent <= 0) {
               return false;
             }
@@ -97,6 +134,14 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
             if (!nearBottom) {
               return false;
             }
+            final DateTime now = DateTime.now();
+            if (!shouldAttemptHistoryLoadMore(
+              lastAttemptAt: _lastLoadMoreAttemptAt,
+              now: now,
+            )) {
+              return false;
+            }
+            _lastLoadMoreAttemptAt = now;
             ref.read(historyPagedFeedControllerProvider.notifier).loadMore();
             return false;
           },
@@ -304,7 +349,7 @@ class _HistoryListSliver extends ConsumerWidget {
               sliver: SliverGrid.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: gridMetrics.crossAxisCount,
-                  mainAxisSpacing: 12,
+                  mainAxisSpacing: _kHistoryGridMainAxisSpacing,
                   crossAxisSpacing: 12,
                   mainAxisExtent: gridMetrics.mainAxisExtent,
                 ),
@@ -316,6 +361,8 @@ class _HistoryListSliver extends ConsumerWidget {
                     title: item.title,
                     lastReadTime: item.lastReadTime,
                     pageIndex: item.pageIndex,
+                    gridIndex: index,
+                    coverViewport: historyCoverViewportProvider,
                     onTap: () => appRouter.pushNamed(
                       ReaderRouteArgs.readerRouteName,
                       queryParameters: ReaderRouteArgs(

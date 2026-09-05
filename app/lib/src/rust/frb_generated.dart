@@ -103,7 +103,7 @@ abstract class RustLibApi extends BaseApi {
 
   int crateApiHistoryClearAllReadingFrb();
 
-  void crateApiReaderClearReaderPageCacheFrb({required String comicId});
+  Future<void> crateApiReaderClearReaderPageCacheFrb({required String comicId});
 
   void crateApiReaderClearReaderSessionsFrb();
 
@@ -636,13 +636,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "clear_all_reading_frb", argNames: []);
 
   @override
-  void crateApiReaderClearReaderPageCacheFrb({required String comicId}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<void> crateApiReaderClearReaderPageCacheFrb({
+    required String comicId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(comicId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
