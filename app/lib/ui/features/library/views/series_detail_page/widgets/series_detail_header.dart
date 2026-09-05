@@ -1,4 +1,3 @@
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
@@ -11,6 +10,7 @@ import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/page_size_menu.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/anchored_overlay_menu.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_series_dialog.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_providers.dart';
@@ -110,7 +110,14 @@ class _SeriesDetailOverflowMenuButton extends ConsumerStatefulWidget {
 
 class _SeriesDetailOverflowMenuButtonState
     extends ConsumerState<_SeriesDetailOverflowMenuButton> {
-  final CustomPopupMenuController _controller = CustomPopupMenuController();
+  final AnchoredOverlayMenuController _controller =
+      AnchoredOverlayMenuController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,13 +134,11 @@ class _SeriesDetailOverflowMenuButtonState
         .isRefreshingSeries(widget.series.id);
     final bool otherWriteBusy =
         scanning || (refreshState.running && !refreshingThis);
-    return CustomPopupMenu(
+    return AnchoredOverlayMenu(
       controller: _controller,
       barrierColor: Colors.transparent,
-      pressType: PressType.singleClick,
-      showArrow: false,
-      verticalMargin: -32,
-      menuBuilder: () => PopupMenuPanelShell(
+      position: AnchoredOverlayMenuPosition.under,
+      menuBuilder: (VoidCallback hideMenu) => PopupMenuPanelShell(
         width: 200,
         blurRadius: 6,
         shadowOffset: const Offset(0, 4),
@@ -151,7 +156,7 @@ class _SeriesDetailOverflowMenuButtonState
                     : l10n.refreshMetadata,
                 enabled: !otherWriteBusy,
                 onTap: () {
-                  _controller.hideMenu();
+                  hideMenu();
                   if (refreshingThis) {
                     ref
                         .read(metadataRefreshControllerProvider.notifier)
@@ -165,7 +170,7 @@ class _SeriesDetailOverflowMenuButtonState
                 icon: LucideIcons.folderOpen,
                 label: l10n.comicDetailShowInExplorer,
                 onTap: () {
-                  _controller.hideMenu();
+                  hideMenu();
                   showInFileExplorer(widget.series.folderPath).catchError((
                     Object error,
                     StackTrace stackTrace,

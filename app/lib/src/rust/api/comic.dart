@@ -18,7 +18,7 @@ void initDbFrb({required String appDataDir, required String dbFileName}) =>
 String comicIdFromPathFrb({required String rawPath}) =>
     RustLib.instance.api.crateApiComicComicIdFromPathFrb(rawPath: rawPath);
 
-PagedComicResultDto fetchComicsPageFrb({
+Future<PagedComicResultDto> fetchComicsPageFrb({
   required PageRequestDto request,
   required ComicFilterDto filter,
   required ComicSortOptionDto sort,
@@ -28,11 +28,21 @@ PagedComicResultDto fetchComicsPageFrb({
   sort: sort,
 );
 
-ComicDto? findComicByIdFrb({required String comicId}) =>
+Future<ComicDto?> findComicByIdFrb({required String comicId}) =>
     RustLib.instance.api.crateApiComicFindComicByIdFrb(comicId: comicId);
 
-List<ComicDto> searchByKeywordFrb({required String keyword}) =>
+Future<List<ComicDto>> searchByKeywordFrb({required String keyword}) =>
     RustLib.instance.api.crateApiComicSearchByKeywordFrb(keyword: keyword);
+
+Future<PagedComicResultDto> searchByKeywordPageFrb({
+  required String keyword,
+  required int page,
+  required int pageSize,
+}) => RustLib.instance.api.crateApiComicSearchByKeywordPageFrb(
+  keyword: keyword,
+  page: page,
+  pageSize: pageSize,
+);
 
 void deleteComicsByIdsFrb({required List<String> comicIds}) =>
     RustLib.instance.api.crateApiComicDeleteComicsByIdsFrb(comicIds: comicIds);
@@ -56,7 +66,7 @@ void setComicMetaLocksFrb({
 Future<void> refreshComicMetadataFrb({required String comicId}) =>
     RustLib.instance.api.crateApiComicRefreshComicMetadataFrb(comicId: comicId);
 
-List<ComicDto> searchByTagExpressionFrb({
+Future<List<ComicDto>> searchByTagExpressionFrb({
   required List<String> mustInclude,
   required List<String> optionalOr,
   required List<String> mustExclude,
@@ -66,7 +76,21 @@ List<ComicDto> searchByTagExpressionFrb({
   mustExclude: mustExclude,
 );
 
-PlatformInt64 countAllComicsFrb() =>
+Future<PagedComicResultDto> searchByTagExpressionPageFrb({
+  required List<String> mustInclude,
+  required List<String> optionalOr,
+  required List<String> mustExclude,
+  required int page,
+  required int pageSize,
+}) => RustLib.instance.api.crateApiComicSearchByTagExpressionPageFrb(
+  mustInclude: mustInclude,
+  optionalOr: optionalOr,
+  mustExclude: mustExclude,
+  page: page,
+  pageSize: pageSize,
+);
+
+Future<PlatformInt64> countAllComicsFrb() =>
     RustLib.instance.api.crateApiComicCountAllComicsFrb();
 
 Stream<int> watchComicChanges() =>
@@ -87,6 +111,9 @@ class ComicDto {
   final PlatformInt64? lastReadTimeMs;
   final List<String> authors;
   final List<String> tags;
+  final List<String> languages;
+  final List<String> parodies;
+  final List<String> characters;
   final ComicMetaLocksDto locks;
   final String libraryId;
 
@@ -105,6 +132,9 @@ class ComicDto {
     this.lastReadTimeMs,
     required this.authors,
     required this.tags,
+    required this.languages,
+    required this.parodies,
+    required this.characters,
     required this.locks,
     required this.libraryId,
   });
@@ -125,6 +155,9 @@ class ComicDto {
       lastReadTimeMs.hashCode ^
       authors.hashCode ^
       tags.hashCode ^
+      languages.hashCode ^
+      parodies.hashCode ^
+      characters.hashCode ^
       locks.hashCode ^
       libraryId.hashCode;
 
@@ -147,6 +180,9 @@ class ComicDto {
           lastReadTimeMs == other.lastReadTimeMs &&
           authors == other.authors &&
           tags == other.tags &&
+          languages == other.languages &&
+          parodies == other.parodies &&
+          characters == other.characters &&
           locks == other.locks &&
           libraryId == other.libraryId;
 }
@@ -162,6 +198,9 @@ class ComicFilterDto {
   final List<String> authorsAll;
   final List<String> authorsAny;
   final List<String> authorsExclude;
+  final List<String> languages;
+  final List<String> parodies;
+  final List<String> characters;
   final String? libraryId;
 
   const ComicFilterDto({
@@ -175,6 +214,9 @@ class ComicFilterDto {
     required this.authorsAll,
     required this.authorsAny,
     required this.authorsExclude,
+    required this.languages,
+    required this.parodies,
+    required this.characters,
     this.libraryId,
   });
 
@@ -190,6 +232,9 @@ class ComicFilterDto {
       authorsAll.hashCode ^
       authorsAny.hashCode ^
       authorsExclude.hashCode ^
+      languages.hashCode ^
+      parodies.hashCode ^
+      characters.hashCode ^
       libraryId.hashCode;
 
   @override
@@ -207,6 +252,9 @@ class ComicFilterDto {
           authorsAll == other.authorsAll &&
           authorsAny == other.authorsAny &&
           authorsExclude == other.authorsExclude &&
+          languages == other.languages &&
+          parodies == other.parodies &&
+          characters == other.characters &&
           libraryId == other.libraryId;
 }
 
@@ -217,6 +265,9 @@ class ComicMetaLocksDto {
   final bool contentRating;
   final bool authors;
   final bool tags;
+  final bool languages;
+  final bool parodies;
+  final bool characters;
 
   const ComicMetaLocksDto({
     required this.title,
@@ -225,6 +276,9 @@ class ComicMetaLocksDto {
     required this.contentRating,
     required this.authors,
     required this.tags,
+    required this.languages,
+    required this.parodies,
+    required this.characters,
   });
 
   @override
@@ -234,7 +288,10 @@ class ComicMetaLocksDto {
       publishedAt.hashCode ^
       contentRating.hashCode ^
       authors.hashCode ^
-      tags.hashCode;
+      tags.hashCode ^
+      languages.hashCode ^
+      parodies.hashCode ^
+      characters.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -246,7 +303,10 @@ class ComicMetaLocksDto {
           publishedAt == other.publishedAt &&
           contentRating == other.contentRating &&
           authors == other.authors &&
-          tags == other.tags;
+          tags == other.tags &&
+          languages == other.languages &&
+          parodies == other.parodies &&
+          characters == other.characters;
 }
 
 enum ComicSortFieldDto {
@@ -333,6 +393,9 @@ class SetComicMetaLocksFrbDto {
   final bool? contentRating;
   final bool? authors;
   final bool? tags;
+  final bool? languages;
+  final bool? parodies;
+  final bool? characters;
 
   const SetComicMetaLocksFrbDto({
     this.title,
@@ -341,6 +404,9 @@ class SetComicMetaLocksFrbDto {
     this.contentRating,
     this.authors,
     this.tags,
+    this.languages,
+    this.parodies,
+    this.characters,
   });
 
   static Future<SetComicMetaLocksFrbDto> default_() =>
@@ -353,7 +419,10 @@ class SetComicMetaLocksFrbDto {
       publishedAt.hashCode ^
       contentRating.hashCode ^
       authors.hashCode ^
-      tags.hashCode;
+      tags.hashCode ^
+      languages.hashCode ^
+      parodies.hashCode ^
+      characters.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -365,7 +434,10 @@ class SetComicMetaLocksFrbDto {
           publishedAt == other.publishedAt &&
           contentRating == other.contentRating &&
           authors == other.authors &&
-          tags == other.tags;
+          tags == other.tags &&
+          languages == other.languages &&
+          parodies == other.parodies &&
+          characters == other.characters;
 }
 
 class UpdateComicUserMetaFrbDto {
@@ -375,6 +447,9 @@ class UpdateComicUserMetaFrbDto {
   final PlatformInt64? publishedAt;
   final List<String>? authors;
   final List<String>? tags;
+  final List<String>? languages;
+  final List<String>? parodies;
+  final List<String>? characters;
 
   const UpdateComicUserMetaFrbDto({
     this.title,
@@ -383,6 +458,9 @@ class UpdateComicUserMetaFrbDto {
     this.publishedAt,
     this.authors,
     this.tags,
+    this.languages,
+    this.parodies,
+    this.characters,
   });
 
   static Future<UpdateComicUserMetaFrbDto> default_() =>
@@ -395,7 +473,10 @@ class UpdateComicUserMetaFrbDto {
       description.hashCode ^
       publishedAt.hashCode ^
       authors.hashCode ^
-      tags.hashCode;
+      tags.hashCode ^
+      languages.hashCode ^
+      parodies.hashCode ^
+      characters.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -407,5 +488,8 @@ class UpdateComicUserMetaFrbDto {
           description == other.description &&
           publishedAt == other.publishedAt &&
           authors == other.authors &&
-          tags == other.tags;
+          tags == other.tags &&
+          languages == other.languages &&
+          parodies == other.parodies &&
+          characters == other.characters;
 }

@@ -1,4 +1,5 @@
 pub mod author;
+pub mod character;
 pub mod comic;
 pub mod comic_id;
 pub mod db;
@@ -10,7 +11,9 @@ pub mod home;
 pub mod library;
 pub mod metadata_lock;
 pub mod migration;
+pub mod named_facet;
 pub mod path;
+pub mod parody;
 pub mod reader;
 pub mod resource;
 pub mod runtime;
@@ -25,9 +28,11 @@ pub use author::{
     add_author, count_all_authors, delete_authors_by_names, fetch_authors_page, list_all_authors,
     rename_author, watch_authors,
 };
+pub use character::{list_all_characters, list_distinct_characters};
 pub use comic::{
     count_all, delete_comics_by_ids, fetch_comics_page, find_comic_by_id, read_data_version,
-    search_by_keyword, search_by_tag_expression, set_comic_meta_locks, update_comic_user_meta,
+    search_by_keyword, search_by_keyword_page, search_by_tag_expression,
+    search_by_tag_expression_page, set_comic_meta_locks, update_comic_user_meta,
     ComicDto, ComicFilterDto, ComicMetaLocks, ComicSortFieldDto, ComicSortOptionDto,
     PageRequestDto, PagedComicResultDto, SetComicMetaLocksDto, UpdateComicUserMetaDto,
 };
@@ -53,7 +58,12 @@ pub use library::{
     update_remote_library, LibraryDto, LibrarySidebarPlacement, RemoteLibraryCredential,
     ResolvedAccess, ScanInterval,
 };
+pub use named_facet::{
+    list_all_named_facet_names, list_distinct_named_facet_names, list_named_facet_for_form,
+    replace_comic_named_facet, JunctionNamedFacet, NamedFacetFormEntry,
+};
 pub use path::{add_path, list_all_paths, remove_path, watch_paths};
+pub use parody::{list_all_parodies, list_distinct_parodies};
 pub use reader::{
     clear_reader_page_cache, clear_reader_sessions, close_reader, load_page_bytes, load_page_list,
     load_reader_page, open_reader, open_reader_with, prefetch_reader_pages, writeback_after_open,

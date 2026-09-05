@@ -8,6 +8,7 @@ import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:riverpod/misc.dart' show ProviderListenable;
 
 class ReadingHistoryCard extends HookConsumerWidget {
   const ReadingHistoryCard({
@@ -18,6 +19,8 @@ class ReadingHistoryCard extends HookConsumerWidget {
     required this.pageIndex,
     required this.onTap,
     this.onDelete,
+    this.gridIndex,
+    this.coverViewport,
   });
 
   final String comicId;
@@ -26,6 +29,12 @@ class ReadingHistoryCard extends HookConsumerWidget {
   final int? pageIndex;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
+
+  /// History grid index for cover viewport prioritization; leave null off-grid.
+  final int? gridIndex;
+
+  /// Optional cover viewport set (e.g. History page notifier).
+  final ProviderListenable<Set<int>>? coverViewport;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -62,124 +71,130 @@ class ReadingHistoryCard extends HookConsumerWidget {
 
     final String progressLabel = _progressLabel(context, pageIndex);
 
-    return Semantics(
-      button: true,
-      label: title,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) => isHovered.value = true,
-        onExit: (_) => isHovered.value = false,
-        child: FocusableActionDetector(
-          mouseCursor: SystemMouseCursors.click,
-          onShowFocusHighlight: (bool value) => isFocused.value = value,
-          actions: <Type, Action<Intent>>{
-            ActivateIntent: CallbackAction<ActivateIntent>(
-              onInvoke: (ActivateIntent intent) {
-                onTap();
-                return null;
-              },
-            ),
-          },
-          child: GestureDetector(
-            onTap: () {
-              onTap();
-              unfocusAfterPointerActivation();
+    return RepaintBoundary(
+      child: Semantics(
+        button: true,
+        label: title,
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          onEnter: (_) => isHovered.value = true,
+          onExit: (_) => isHovered.value = false,
+          child: FocusableActionDetector(
+            mouseCursor: SystemMouseCursors.click,
+            onShowFocusHighlight: (bool value) => isFocused.value = value,
+            actions: <Type, Action<Intent>>{
+              ActivateIntent: CallbackAction<ActivateIntent>(
+                onInvoke: (ActivateIntent intent) {
+                  onTap();
+                  return null;
+                },
+              ),
             },
-            child: AnimatedContainer(
-              duration: motionDurationOf(
-                context,
-                const Duration(milliseconds: 200),
-              ),
-              curve: Curves.easeOutCubic,
-              decoration: BoxDecoration(
-                color: cardBackground,
-                borderRadius: cardRadius,
-                border: Border.all(color: cs.hentai.borderSubtle, width: 1),
-                boxShadow: cardShadows,
-              ),
-              child: ClipRRect(
-                borderRadius: cardRadius,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    AspectRatio(
-                      aspectRatio: 2 / 3,
-                      child: ClipRRect(
-                        borderRadius: coverInnerRadius,
-                        child: ComicCoverContent(comicId: comicId),
-                      ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                color: cs.hentai.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Icon(
-                                  LucideIcons.clock,
-                                  size: 12,
-                                  color: cs.hentai.textTertiary,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  context.l10n.relativeTimeAgo(lastReadTime),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: cs.hentai.textTertiary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            if (progressLabel.isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                progressLabel,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: cs.hentai.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                    if (onDelete != null) ...[
-                      Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: Center(
-                          child: GhostButton.icon(
-                            icon: LucideIcons.trash2,
-                            tooltip: context.l10n.historyDeleteRecord,
-                            semanticLabel: context.l10n.historyDeleteRecord,
-                            onPressed: onDelete,
-                            iconSize: 18,
-                            size: 32,
-                            borderRadius: tokens.radius.md,
-                            foregroundColor: cs.hentai.textTertiary,
-                            hoverColor: theme.hoverColor,
-                            overlayColor: theme.hoverColor.withAlpha(110),
-                            delayTooltipThreeSeconds: true,
+            child: GestureDetector(
+              onTap: () {
+                onTap();
+                unfocusAfterPointerActivation();
+              },
+              child: AnimatedContainer(
+                duration: motionDurationOf(
+                  context,
+                  const Duration(milliseconds: 200),
+                ),
+                curve: Curves.easeOutCubic,
+                decoration: BoxDecoration(
+                  color: cardBackground,
+                  borderRadius: cardRadius,
+                  border: Border.all(color: cs.hentai.borderSubtle, width: 1),
+                  boxShadow: cardShadows,
+                ),
+                child: ClipRRect(
+                  borderRadius: cardRadius,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AspectRatio(
+                        aspectRatio: 2 / 3,
+                        child: ClipRRect(
+                          borderRadius: coverInnerRadius,
+                          child: ComicCoverContent(
+                            comicId: comicId,
+                            gridIndex: gridIndex,
+                            coverViewport: coverViewport,
                           ),
                         ),
                       ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: cs.hentai.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Icon(
+                                    LucideIcons.clock,
+                                    size: 12,
+                                    color: cs.hentai.textTertiary,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    context.l10n.relativeTimeAgo(lastReadTime),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: cs.hentai.textTertiary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (progressLabel.isNotEmpty) ...[
+                                const SizedBox(height: 8),
+                                Text(
+                                  progressLabel,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: cs.hentai.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (onDelete != null) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: Center(
+                            child: GhostButton.icon(
+                              icon: LucideIcons.trash2,
+                              tooltip: context.l10n.historyDeleteRecord,
+                              semanticLabel: context.l10n.historyDeleteRecord,
+                              onPressed: onDelete,
+                              iconSize: 18,
+                              size: 32,
+                              borderRadius: tokens.radius.md,
+                              foregroundColor: cs.hentai.textTertiary,
+                              hoverColor: theme.hoverColor,
+                              overlayColor: theme.hoverColor.withAlpha(110),
+                              delayTooltipThreeSeconds: true,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),

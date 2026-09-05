@@ -3,15 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/errors/app_exception.dart';
-import 'package:hentai_library/core/logging/app_log.dart';
-import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
-import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_detail_series_nav_provider.dart';
-import 'package:hentai_library/ui/features/shell/state/library_series_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -40,87 +35,20 @@ class _ComicDetailSeriesNavState extends ConsumerState<ComicDetailSeriesNav> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<AsyncValue<List<Series>>>(allSeriesProvider, (
-      AsyncValue<List<Series>>? previous,
-      AsyncValue<List<Series>> next,
-    ) {
-      final List<Series>? allSeries = next.asData?.value;
-      if (allSeries == null) {
-        return;
-      }
-      final List<Series> matches = findSeriesListContainingComic(
-        allSeries,
-        widget.comicId,
-      );
-      if (matches.length <= 1) {
-        return;
-      }
-      final List<Series>? previousSeries = previous?.asData?.value;
-      if (previousSeries != null) {
-        final List<Series> previousMatches = findSeriesListContainingComic(
-          previousSeries,
-          widget.comicId,
-        );
-        if (previousMatches.length > 1) {
-          return;
-        }
-      }
-      final String seriesList = matches.map((Series s) => s.name).join('、');
-      AppLog.ui(
-        'comic_detail',
-      ).warning('漫画详情系列导航冲突：comicId=${widget.comicId}，系列=[$seriesList]');
-      if (!context.mounted) {
-        return;
-      }
-      showErrorToast(
-        context,
-        AppException(context.l10n.comicDetailSeriesNavConflict),
-      );
-    });
-
-    final AsyncValue<List<Series>> allSeriesAsync = ref.watch(
-      allSeriesProvider,
+    final AsyncValue<ComicDetailSeriesNavResult> navAsync = ref.watch(
+      comicDetailSeriesNavProvider(widget.comicId),
     );
-    return allSeriesAsync.when(
-      data: (List<Series> allSeries) => _buildForSeriesList(allSeries),
-      loading: () => const _ComicDetailSeriesNavPlaceholder(),
-      error: (Object _, StackTrace _) => const SizedBox.shrink(),
-      skipLoadingOnReload: true,
-      skipLoadingOnRefresh: true,
-    );
-  }
-
-  Widget _buildForSeriesList(List<Series> allSeries) {
-    final List<Series> matches = findSeriesListContainingComic(
-      allSeries,
-      widget.comicId,
-    );
-    if (matches.isEmpty || matches.length > 1) {
-      return const SizedBox.shrink();
-    }
-
-    final AsyncValue<ComicDetailSeriesNavSeriesData?> seriesNavAsync = ref
-        .watch(comicDetailSeriesNavForSeriesProvider(matches.single.id));
-    return seriesNavAsync.when(
-      data: (ComicDetailSeriesNavSeriesData? seriesData) {
-        if (seriesData == null) {
-          return const SizedBox.shrink();
-        }
-        final int currentIndex = seriesData.items.indexWhere(
-          (ComicDetailSeriesNavItem item) => item.comicId == widget.comicId,
-        );
-        if (currentIndex < 0) {
-          return const SizedBox.shrink();
-        }
-        return _ComicDetailSeriesNavControls(
-          data: ComicDetailSeriesNavData(
-            seriesId: seriesData.seriesId,
-            seriesName: seriesData.seriesName,
-            items: seriesData.items,
-            currentIndex: currentIndex,
-          ),
-          menuController: _menuController,
-        );
+    return navAsync.when(
+      data: (ComicDetailSeriesNavResult result) {
+        return switch (result) {
+          ComicDetailSeriesNavReady(:final data) =>
+            _ComicDetailSeriesNavControls(
+              data: data,
+              menuController: _menuController,
+            ),
+          ComicDetailSeriesNavNone() ||
+          ComicDetailSeriesNavConflict() => const SizedBox.shrink(),
+        };
       },
       loading: () => const _ComicDetailSeriesNavPlaceholder(),
       error: (Object _, StackTrace _) => const SizedBox.shrink(),

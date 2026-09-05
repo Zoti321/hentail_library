@@ -20,7 +20,7 @@ void main() {
     await File(pdfPath).writeAsString(_minimalOnePagePdf, flush: true);
 
     try {
-      openReaderFrb(
+      await openReaderFrb(
         comicId: 'pdf-android-smoke',
         path: pdfPath,
         resourceType: 'pdf',
@@ -28,7 +28,7 @@ void main() {
     } on HentaiErrorDto catch (e) {
       fail('openReaderFrb failed: ${e.code} | ${e.message} | ${e.context}');
     }
-    final list = loadPageListFrb(
+    final list = await loadPageListFrb(
       comicId: 'pdf-android-smoke',
       path: pdfPath,
       resourceType: 'pdf',

@@ -19,12 +19,13 @@ pub fn build_count_query(filter: &SeriesFilterDto) -> PageSqlQuery {
 pub fn build_ids_page_query(
     filter: &SeriesFilterDto,
     sort: &SeriesSortOptionDto,
+    prefer_root_folder_path: Option<&str>,
     limit: i32,
     offset: i32,
 ) -> PageSqlQuery {
     let mut values = Vec::new();
     let where_clause = build_where_clause(filter, &mut values);
-    let order_by = build_order_by_clause(sort, &mut values);
+    let order_by = build_order_by_clause(sort, prefer_root_folder_path, &mut values);
     values.push(Value::Int(Some(limit)));
     values.push(Value::Int(Some(offset)));
     PageSqlQuery {
@@ -38,8 +39,12 @@ pub fn build_ids_page_query(
     }
 }
 
-fn build_order_by_clause(sort: &SeriesSortOptionDto, _values: &mut Vec<Value>) -> String {
-    match sort.field {
+fn build_order_by_clause(
+    sort: &SeriesSortOptionDto,
+    prefer_root_folder_path: Option<&str>,
+    values: &mut Vec<Value>,
+) -> String {
+    let secondary = match sort.field {
         SeriesSortFieldDto::Name => {
             let direction = if sort.descending { "DESC" } else { "ASC" };
             format!("s.name_sort_key {direction}, s.series_id ASC")
@@ -55,6 +60,15 @@ fn build_order_by_clause(sort: &SeriesSortOptionDto, _values: &mut Vec<Value>) -
             let direction = if sort.descending { "DESC" } else { "ASC" };
             format!("RANDOM() {direction}, s.series_id ASC")
         }
+    };
+    match prefer_root_folder_path {
+        Some(root) => {
+            push_sqlite_text(values, root.to_string());
+            format!(
+                "CASE WHEN s.folder_path = ? THEN 0 ELSE 1 END ASC, {secondary}"
+            )
+        }
+        None => secondary,
     }
 }
 
@@ -114,6 +128,7 @@ mod tests {
                 field: SeriesSortFieldDto::Random,
                 descending: true,
             },
+            None,
             20,
             0,
         );
@@ -129,10 +144,53 @@ mod tests {
                 field: SeriesSortFieldDto::ComicCount,
                 descending: true,
             },
+            None,
             10,
             0,
         );
         assert!(query.sql.contains("COUNT(*)"));
         assert!(query.sql.contains("DESC"));
+    }
+
+    #[test]
+    fn prefer_root_folder_path_prefixes_order_by_case() {
+        let query = build_ids_page_query(
+            &SeriesFilterDto::default(),
+            &SeriesSortOptionDto {
+                field: SeriesSortFieldDto::Name,
+                descending: false,
+            },
+            Some("E:/lib"),
+            20,
+            0,
+        );
+        assert!(
+            query
+                .sql
+                .contains("CASE WHEN s.folder_path = ? THEN 0 ELSE 1 END ASC")
+        );
+        assert!(query.sql.contains("s.name_sort_key ASC"));
+        // prefer root path is bound before LIMIT/OFFSET
+        assert_eq!(query.values.len(), 3);
+        match &query.values[0] {
+            Value::String(Some(s)) => assert_eq!(s.as_str(), "E:/lib"),
+            other => panic!("expected root path binding, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn without_prefer_root_folder_path_keeps_plain_order() {
+        let query = build_ids_page_query(
+            &SeriesFilterDto::default(),
+            &SeriesSortOptionDto {
+                field: SeriesSortFieldDto::Name,
+                descending: false,
+            },
+            None,
+            20,
+            0,
+        );
+        assert!(!query.sql.contains("CASE WHEN s.folder_path"));
+        assert_eq!(query.values.len(), 2);
     }
 }

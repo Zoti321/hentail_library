@@ -18,10 +18,10 @@ Stream<List<SeriesDto>> watchAllSeriesFrb() =>
 List<SeriesDto> getAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesGetAllSeriesFrb();
 
-PlatformInt64 countAllSeriesFrb() =>
+Future<PlatformInt64> countAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesCountAllSeriesFrb();
 
-PagedSeriesResultDto fetchSeriesPageFrb({
+Future<PagedSeriesResultDto> fetchSeriesPageFrb({
   required PageRequestDto request,
   required SeriesFilterDto filter,
   required SeriesSortOptionDto sort,
@@ -31,7 +31,7 @@ PagedSeriesResultDto fetchSeriesPageFrb({
   sort: sort,
 );
 
-SeriesDto? findSeriesByIdFrb({required String seriesId}) =>
+Future<SeriesDto?> findSeriesByIdFrb({required String seriesId}) =>
     RustLib.instance.api.crateApiSeriesFindSeriesByIdFrb(seriesId: seriesId);
 
 SeriesReadingContextDto? getSeriesReadingContextByComicIdFrb({
@@ -40,7 +40,7 @@ SeriesReadingContextDto? getSeriesReadingContextByComicIdFrb({
   comicId: comicId,
 );
 
-PagedSeriesComicsResultDto fetchSeriesComicsPageFrb({
+Future<PagedSeriesComicsResultDto> fetchSeriesComicsPageFrb({
   required String seriesId,
   required PageRequestDto request,
 }) => RustLib.instance.api.crateApiSeriesFetchSeriesComicsPageFrb(
@@ -98,12 +98,12 @@ void setSeriesItemSortOrderLockedFrb({
   locked: locked,
 );
 
-List<SeriesDto> searchSeriesByKeywordFrb({required String keyword}) => RustLib
-    .instance
-    .api
-    .crateApiSeriesSearchSeriesByKeywordFrb(keyword: keyword);
+Future<List<SeriesDto>> searchSeriesByKeywordFrb({required String keyword}) =>
+    RustLib.instance.api.crateApiSeriesSearchSeriesByKeywordFrb(
+      keyword: keyword,
+    );
 
-List<SeriesDto> searchSeriesByTagExpressionFrb({
+Future<List<SeriesDto>> searchSeriesByTagExpressionFrb({
   required List<String> mustInclude,
   required List<String> optionalOr,
   required List<String> mustExclude,
@@ -297,18 +297,30 @@ class SeriesComicsMetadataDto {
   final List<String> authors;
   final List<String> tags;
   final bool hasR18;
+  final List<String> languages;
+  final List<String> parodies;
+  final List<String> characters;
 
   const SeriesComicsMetadataDto({
     required this.authors,
     required this.tags,
     required this.hasR18,
+    required this.languages,
+    required this.parodies,
+    required this.characters,
   });
 
   static Future<SeriesComicsMetadataDto> default_() =>
       RustLib.instance.api.crateApiSeriesSeriesComicsMetadataDtoDefault();
 
   @override
-  int get hashCode => authors.hashCode ^ tags.hashCode ^ hasR18.hashCode;
+  int get hashCode =>
+      authors.hashCode ^
+      tags.hashCode ^
+      hasR18.hashCode ^
+      languages.hashCode ^
+      parodies.hashCode ^
+      characters.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -317,7 +329,10 @@ class SeriesComicsMetadataDto {
           runtimeType == other.runtimeType &&
           authors == other.authors &&
           tags == other.tags &&
-          hasR18 == other.hasR18;
+          hasR18 == other.hasR18 &&
+          languages == other.languages &&
+          parodies == other.parodies &&
+          characters == other.characters;
 }
 
 /// FRB 层 DTO：字段与 `hentai_core::SeriesDto` 对齐。
@@ -371,6 +386,7 @@ class SeriesFilterDto {
   final bool requireItems;
   final String? serializationStatus;
   final String? libraryId;
+  final bool preferLibraryRootSeries;
 
   const SeriesFilterDto({
     required this.showR18,
@@ -379,6 +395,7 @@ class SeriesFilterDto {
     required this.requireItems,
     this.serializationStatus,
     this.libraryId,
+    required this.preferLibraryRootSeries,
   });
 
   @override
@@ -388,7 +405,8 @@ class SeriesFilterDto {
       query.hashCode ^
       requireItems.hashCode ^
       serializationStatus.hashCode ^
-      libraryId.hashCode;
+      libraryId.hashCode ^
+      preferLibraryRootSeries.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -400,7 +418,8 @@ class SeriesFilterDto {
           query == other.query &&
           requireItems == other.requireItems &&
           serializationStatus == other.serializationStatus &&
-          libraryId == other.libraryId;
+          libraryId == other.libraryId &&
+          preferLibraryRootSeries == other.preferLibraryRootSeries;
 }
 
 /// FRB 层 DTO：字段与 `hentai_core::SeriesItemDto` 对齐，避免跨 crate opaque 绑定。

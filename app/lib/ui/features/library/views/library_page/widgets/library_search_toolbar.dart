@@ -482,11 +482,7 @@ class _LibraryOverflowMenuButtonState
         } else {
           final String? warning = next.progress?.errorMessage;
           if (warning != null && warning.isNotEmpty) {
-            showCustomToast(
-              context,
-              message: warning,
-              type: AppToastType.info,
-            );
+            showCustomToast(context, message: warning, type: AppToastType.info);
           } else {
             showSuccessToast(
               context,
@@ -502,8 +498,12 @@ class _LibraryOverflowMenuButtonState
 
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
-    final ScanLibraryState scanState = ref.watch(scanLibraryControllerProvider);
-    final bool scanning = scanState.running;
+    final ({bool running, ScanMode scanMode}) scanLeaf = ref.watch(
+      scanLibraryControllerProvider.select(
+        (ScanLibraryState s) => (running: s.running, scanMode: s.scanMode),
+      ),
+    );
+    final bool scanning = scanLeaf.running;
     final AppLocalizations l10n = context.l10n;
 
     return CustomPopupMenu(
@@ -540,17 +540,11 @@ class _LibraryOverflowMenuButtonState
                 .read(scanLibraryControllerProvider.notifier)
                 .start(mode: ScanMode.full, silent: true);
           },
-          onSyncAll: () {
-            _controller.hideMenu();
-            ref
-                .read(scanLibraryControllerProvider.notifier)
-                .start(syncAll: true, silent: true);
-          },
         );
       },
       child: scanning
           ? Tooltip(
-              message: scanState.scanMode == ScanMode.full
+              message: scanLeaf.scanMode == ScanMode.full
                   ? l10n.libraryScanningDeep
                   : l10n.libraryScanning,
               child: Semantics(
@@ -637,14 +631,12 @@ class _LibraryOverflowMenu extends StatelessWidget {
     required this.onRefresh,
     required this.onScan,
     required this.onDeepScan,
-    required this.onSyncAll,
   });
 
   final LibraryLayoutTier layoutTier;
   final VoidCallback onRefresh;
   final VoidCallback onScan;
   final VoidCallback onDeepScan;
-  final VoidCallback onSyncAll;
 
   @override
   Widget build(BuildContext context) {
@@ -676,11 +668,6 @@ class _LibraryOverflowMenu extends StatelessWidget {
               icon: LucideIcons.scanLine,
               label: l10n.libraryDeepScan,
               onTap: onDeepScan,
-            ),
-            _LibraryOverflowMenuItem(
-              icon: LucideIcons.folders,
-              label: l10n.syncAllLibraries,
-              onTap: onSyncAll,
             ),
           ],
         ),

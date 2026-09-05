@@ -1,14 +1,16 @@
 use sea_orm::{ActiveModelTrait, ConnectionTrait, Set, Statement, TransactionTrait};
 
-use crate::comic::dto::{now_ms, ComicDto};
+use crate::comic::dto::{now_ms, serialize_languages, ComicDto, PagedComicResultDto};
 use crate::comic::repository::load_comics_ordered;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comics};
 use crate::error::HentaiError;
 use crate::metadata_lock::comic_auto_locks;
 use crate::sync::series_rebuild::rebuild_series_from_comics;
-use crate::sync::writer::{replace_comic_authors, replace_comic_tags};
-use crate::util::{decode_basic_html_entities, compute_sort_key};
+use crate::sync::writer::{
+    replace_comic_authors, replace_comic_characters, replace_comic_parodies, replace_comic_tags,
+};
+use crate::util::{compute_sort_key, decode_basic_html_entities};
 
 #[derive(Debug, Clone, Default)]
 pub struct UpdateComicUserMetaDto {
@@ -19,6 +21,9 @@ pub struct UpdateComicUserMetaDto {
     pub published_at: Option<i64>,
     pub authors: Option<Vec<String>>,
     pub tags: Option<Vec<String>>,
+    pub languages: Option<Vec<String>>,
+    pub parodies: Option<Vec<String>>,
+    pub characters: Option<Vec<String>>,
 }
 
 /// Partial patch for Comic metadata field locks (`None` = leave unchanged).
@@ -30,6 +35,9 @@ pub struct SetComicMetaLocksDto {
     pub content_rating: Option<bool>,
     pub authors: Option<bool>,
     pub tags: Option<bool>,
+    pub languages: Option<bool>,
+    pub parodies: Option<bool>,
+    pub characters: Option<bool>,
 }
 
 pub async fn touch_comic<C: ConnectionTrait>(db: &C, comic_id: &str) -> Result<(), HentaiError> {
@@ -79,7 +87,10 @@ pub async fn update_comic_user_meta(
         || meta.description.is_some()
         || meta.published_at.is_some()
         || meta.authors.is_some()
-        || meta.tags.is_some();
+        || meta.tags.is_some()
+        || meta.languages.is_some()
+        || meta.parodies.is_some()
+        || meta.characters.is_some();
     let auto_locks = comic_auto_locks(
         meta.title.is_some(),
         meta.description.is_some(),
@@ -87,6 +98,9 @@ pub async fn update_comic_user_meta(
         meta.content_rating.is_some(),
         meta.authors.is_some(),
         meta.tags.is_some(),
+        meta.languages.is_some(),
+        meta.parodies.is_some(),
+        meta.characters.is_some(),
     );
     if touch_meta_row {
         let mut active = comic_meta::ActiveModel {
@@ -119,6 +133,10 @@ pub async fn update_comic_user_meta(
             });
             meta_touched = true;
         }
+        if let Some(languages) = meta.languages {
+            active.languages = Set(serialize_languages(&normalize_languages(languages)));
+            meta_touched = true;
+        }
         if auto_locks.title {
             active.title_locked = Set(true);
         }
@@ -139,6 +157,17 @@ pub async fn update_comic_user_meta(
             active.tags_locked = Set(true);
             meta_touched = true;
         }
+        if auto_locks.languages {
+            active.languages_locked = Set(true);
+        }
+        if auto_locks.parodies {
+            active.parodies_locked = Set(true);
+            meta_touched = true;
+        }
+        if auto_locks.characters {
+            active.characters_locked = Set(true);
+            meta_touched = true;
+        }
         if meta_touched || auto_locks.any() {
             active.update(&txn).await.map_err(map_db_err)?;
             meta_touched = true;
@@ -150,6 +179,14 @@ pub async fn update_comic_user_meta(
     }
     if let Some(tags) = meta.tags {
         replace_comic_tags(&txn, comic_id, &tags).await?;
+        meta_touched = true;
+    }
+    if let Some(parodies) = meta.parodies {
+        replace_comic_parodies(&txn, comic_id, &parodies).await?;
+        meta_touched = true;
+    }
+    if let Some(characters) = meta.characters {
+        replace_comic_characters(&txn, comic_id, &characters).await?;
         meta_touched = true;
     }
     if meta_touched {
@@ -169,6 +206,9 @@ pub async fn set_comic_meta_locks(
         && locks.content_rating.is_none()
         && locks.authors.is_none()
         && locks.tags.is_none()
+        && locks.languages.is_none()
+        && locks.parodies.is_none()
+        && locks.characters.is_none()
     {
         return Ok(());
     }
@@ -196,6 +236,15 @@ pub async fn set_comic_meta_locks(
     if let Some(v) = locks.tags {
         active.tags_locked = Set(v);
     }
+    if let Some(v) = locks.languages {
+        active.languages_locked = Set(v);
+    }
+    if let Some(v) = locks.parodies {
+        active.parodies_locked = Set(v);
+    }
+    if let Some(v) = locks.characters {
+        active.characters_locked = Set(v);
+    }
     active.update(&txn).await.map_err(map_db_err)?;
     touch_comic(&txn, comic_id).await?;
     txn.commit().await.map_err(map_db_err)?;
@@ -222,44 +271,13 @@ pub async fn search_comic_ids_by_tag_expression(
     );
     let mut values: Vec<sea_orm::Value> =
         vec![sea_orm::Value::String(Some(Box::new(library_id)))];
-    for name in &includes {
-        sql.push_str(
-            " AND (\
-               EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) = ?) \
-               OR EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) = ?)\
-             )",
-        );
-        values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
-        values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
-    }
-    if !optional.is_empty() {
-        let placeholders = optional.iter().map(|_| "?").collect::<Vec<_>>().join(",");
-        sql.push_str(&format!(
-            " AND (\
-               EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) IN ({placeholders})) \
-               OR EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) IN ({placeholders}))\
-             )"
-        ));
-        for name in &optional {
-            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
-        }
-        for name in &optional {
-            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
-        }
-    }
-    if !excludes.is_empty() {
-        let placeholders = excludes.iter().map(|_| "?").collect::<Vec<_>>().join(",");
-        sql.push_str(&format!(
-            " AND NOT EXISTS (SELECT 1 FROM comic_tags ct WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) IN ({placeholders})) \
-              AND NOT EXISTS (SELECT 1 FROM comic_authors ca WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) IN ({placeholders}))"
-        ));
-        for name in &excludes {
-            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
-        }
-        for name in &excludes {
-            values.push(sea_orm::Value::String(Some(Box::new(name.clone()))));
-        }
-    }
+    super::filter_predicate::append_metadata_expression_predicates(
+        &mut sql,
+        &mut values,
+        &includes,
+        &optional,
+        &excludes,
+    );
     let db = connection()?;
     let rows = db
         .query_all(Statement::from_sql_and_values(
@@ -282,9 +300,41 @@ pub async fn search_by_tag_expression(
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
 ) -> Result<Vec<ComicDto>, HentaiError> {
+    let page = search_by_tag_expression_page(must_include, optional_or, must_exclude, 1, i32::MAX)
+        .await?;
+    Ok(page.items)
+}
+
+pub async fn search_by_tag_expression_page(
+    must_include: Vec<String>,
+    optional_or: Vec<String>,
+    must_exclude: Vec<String>,
+    page: i32,
+    page_size: i32,
+) -> Result<PagedComicResultDto, HentaiError> {
+    let page = page.max(1);
+    let page_size = page_size.max(1);
     let ids = search_comic_ids_by_tag_expression(must_include, optional_or, must_exclude).await?;
+    let total_count = ids.len() as i64;
+    if total_count == 0 {
+        return Ok(PagedComicResultDto {
+            items: vec![],
+            total_count: 0,
+            page,
+            page_size,
+        });
+    }
+    let start = ((page - 1) as i64 * page_size as i64).min(total_count) as usize;
+    let end = (start as i64 + page_size as i64).min(total_count) as usize;
+    let page_ids = ids[start..end].to_vec();
     let db = connection()?;
-    load_comics_ordered(&db, ids).await
+    let items = load_comics_ordered(&db, page_ids).await?;
+    Ok(PagedComicResultDto {
+        items,
+        total_count,
+        page,
+        page_size,
+    })
 }
 
 fn normalize_tag_set(source: Vec<String>) -> Vec<String> {
@@ -296,4 +346,19 @@ fn normalize_tag_set(source: Vec<String>) -> Vec<String> {
         }
     }
     set.into_iter().collect()
+}
+
+/// Trim empties; preserve order and first-seen duplicates removed.
+fn normalize_languages(source: Vec<String>) -> Vec<String> {
+    let mut out = Vec::new();
+    for value in source {
+        let trimmed = value.trim().to_string();
+        if trimmed.is_empty() {
+            continue;
+        }
+        if !out.iter().any(|existing: &String| existing == &trimmed) {
+            out.push(trimmed);
+        }
+    }
+    out
 }

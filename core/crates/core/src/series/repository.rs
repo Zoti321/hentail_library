@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use sea_orm::{
     ColumnTrait, ConnectionTrait, DatabaseConnection, EntityTrait, PaginatorTrait, QueryFilter,
@@ -15,6 +15,7 @@ use crate::error::HentaiError;
 
 use super::dto::{SeriesFilterDto, SeriesSortOptionDto};
 use super::page_query::{build_count_query, build_ids_page_query};
+use crate::comic_id::normalize_path_for_key;
 
 #[derive(Debug, Clone)]
 pub struct SeriesItemDto {
@@ -55,6 +56,12 @@ pub struct SeriesComicsMetadataDto {
     pub authors: Vec<String>,
     pub tags: Vec<String>,
     pub has_r18: bool,
+    /// Member order + first-seen dedupe (flattened across member Language lists).
+    pub languages: Vec<String>,
+    /// Member order + first-seen dedupe (within each member: alphabetical like Comic DTO).
+    pub parodies: Vec<String>,
+    /// Member order + first-seen dedupe (within each member: alphabetical like Comic DTO).
+    pub characters: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -146,7 +153,14 @@ pub async fn fetch_series_page(
         });
     }
     let offset = (effective_page - 1) * page_size;
-    let ids_query = build_ids_page_query(&filter, &sort, page_size, offset);
+    let prefer_root_folder_path = resolve_prefer_root_folder_path(&filter).await?;
+    let ids_query = build_ids_page_query(
+        &filter,
+        &sort,
+        prefer_root_folder_path.as_deref(),
+        page_size,
+        offset,
+    );
     let series_ids = query_series_ids(&db, &ids_query).await?;
     let items = load_series_by_ids(&db, series_ids).await?;
     Ok(PagedSeriesResultDto {
@@ -155,6 +169,21 @@ pub async fn fetch_series_page(
         page: effective_page,
         page_size,
     })
+}
+
+async fn resolve_prefer_root_folder_path(
+    filter: &SeriesFilterDto,
+) -> Result<Option<String>, HentaiError> {
+    if !filter.prefer_library_root_series {
+        return Ok(None);
+    }
+    let Some(library_id) = filter.library_id.as_deref() else {
+        return Ok(None);
+    };
+    let Some(library) = crate::library::find_library_by_id(library_id).await? else {
+        return Ok(None);
+    };
+    Ok(Some(normalize_path_for_key(&library.root_path)))
 }
 
 async fn count_filtered_series(
@@ -264,10 +293,15 @@ pub async fn fetch_series_comics_metadata(
     if !series_exists(&db, series_id).await? {
         return Ok(SeriesComicsMetadataDto::default());
     }
+    let (languages, parodies, characters) =
+        query_series_language_parody_character(&db, series_id).await?;
     Ok(SeriesComicsMetadataDto {
         authors: query_series_author_names(&db, series_id).await?,
         tags: query_series_tag_names(&db, series_id).await?,
         has_r18: query_series_has_r18(&db, series_id).await?,
+        languages,
+        parodies,
+        characters,
     })
 }
 
@@ -472,6 +506,39 @@ async fn query_series_comic_id_orders_page(
             Ok((comic_id, sort_order, locked_i64 != 0))
         })
         .collect()
+}
+
+/// Walk Series members in `sort_order` / `comic_id` order; flatten Language / Parody /
+/// Character lists with first-seen dedupe (US-21 / #75).
+async fn query_series_language_parody_character(
+    db: &DatabaseConnection,
+    series_id: &str,
+) -> Result<(Vec<String>, Vec<String>, Vec<String>), HentaiError> {
+    let comic_ids = query_all_series_comic_ids(db, series_id).await?;
+    if comic_ids.is_empty() {
+        return Ok((vec![], vec![], vec![]));
+    }
+    let comics = load_comics_ordered(db, comic_ids).await?;
+    let mut languages = Vec::new();
+    let mut parodies = Vec::new();
+    let mut characters = Vec::new();
+    let mut seen_languages = HashSet::new();
+    let mut seen_parodies = HashSet::new();
+    let mut seen_characters = HashSet::new();
+    for comic in comics {
+        append_first_seen(&mut languages, &mut seen_languages, &comic.languages);
+        append_first_seen(&mut parodies, &mut seen_parodies, &comic.parodies);
+        append_first_seen(&mut characters, &mut seen_characters, &comic.characters);
+    }
+    Ok((languages, parodies, characters))
+}
+
+fn append_first_seen(out: &mut Vec<String>, seen: &mut HashSet<String>, values: &[String]) {
+    for value in values {
+        if seen.insert(value.clone()) {
+            out.push(value.clone());
+        }
+    }
 }
 
 async fn query_series_author_names(

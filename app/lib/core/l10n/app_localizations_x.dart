@@ -22,6 +22,8 @@ import 'package:hentai_library/domain/models/app_setting.dart';
 
 import 'package:hentai_library/domain/models/enums.dart';
 
+import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
+
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 
 import 'package:intl/intl.dart';
@@ -346,6 +348,27 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       ContentRating.r18 => contentRatingR18,
     };
   }
+
+  /// Comic Language 闭集规范名 → 本地展示文案。
+  Map<String, String> get comicLanguageClosedLabels => <String, String>{
+    ComicLanguageNames.chinese: comicLanguageChinese,
+    ComicLanguageNames.japanese: comicLanguageJapanese,
+    ComicLanguageNames.english: comicLanguageEnglish,
+    ComicLanguageNames.korean: comicLanguageKorean,
+    ComicLanguageNames.spanish: comicLanguageSpanish,
+    ComicLanguageNames.other: comicLanguageOther,
+  };
+
+  String comicLanguageLabel(String canonical) => comicLanguageDisplayLabel(
+    canonical,
+    closedLabels: comicLanguageClosedLabels,
+  );
+
+  String formatComicLanguages(Iterable<String> canonical) =>
+      formatComicLanguagesDisplay(
+        canonical,
+        closedLabels: comicLanguageClosedLabels,
+      );
 
   String formatFluentDatePickerLabel(DateTime date, Locale locale) {
     if (locale.languageCode == 'zh') {

@@ -1,4 +1,3 @@
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:go_router/go_router.dart';
@@ -12,8 +11,10 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/anchored_overlay_menu.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/comic_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_back_header.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_series_nav.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -92,7 +93,12 @@ class ComicDetailHeader extends ConsumerWidget {
       context: context,
       comic: comic,
       onSave: (ComicMetadataForm data) async {
-        await data.applyTo(ref.read(comicRepoProvider), comic);
+        await applyComicMetadataForm(
+          ref.read(comicRepoProvider),
+          data,
+          comic,
+          invalidate: ref.invalidate,
+        );
       },
     );
   }
@@ -110,7 +116,14 @@ class _ComicDetailOverflowMenuButton extends ConsumerStatefulWidget {
 
 class _ComicDetailOverflowMenuButtonState
     extends ConsumerState<_ComicDetailOverflowMenuButton> {
-  final CustomPopupMenuController _controller = CustomPopupMenuController();
+  final AnchoredOverlayMenuController _controller =
+      AnchoredOverlayMenuController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,13 +131,14 @@ class _ComicDetailOverflowMenuButtonState
     final ThemeData theme = Theme.of(context);
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
-    return CustomPopupMenu(
+    // Material-aligned overlay coords (ancestor: overlay) — avoids
+    // custom_pop_up_menu misplacement when the desktop sidebar is expanded.
+    // `under` keeps the panel below the trigger like other header menus.
+    return AnchoredOverlayMenu(
       controller: _controller,
       barrierColor: Colors.transparent,
-      pressType: PressType.singleClick,
-      showArrow: false,
-      verticalMargin: -32,
-      menuBuilder: () => PopupMenuPanelShell(
+      position: AnchoredOverlayMenuPosition.under,
+      menuBuilder: (VoidCallback hideMenu) => PopupMenuPanelShell(
         width: 200,
         blurRadius: 6,
         shadowOffset: const Offset(0, 4),
@@ -140,7 +154,7 @@ class _ComicDetailOverflowMenuButtonState
                 label: l10n.refreshMetadata,
                 enabled: !_isLibraryWriteBusy(ref),
                 onTap: () {
-                  _controller.hideMenu();
+                  hideMenu();
                   _refreshMetadata(context);
                 },
               ),
@@ -148,7 +162,7 @@ class _ComicDetailOverflowMenuButtonState
                 icon: LucideIcons.folderOpen,
                 label: l10n.comicDetailShowInExplorer,
                 onTap: () {
-                  _controller.hideMenu();
+                  hideMenu();
                   showInFileExplorer(widget.comic.path).catchError((
                     Object error,
                     StackTrace stackTrace,
@@ -175,7 +189,7 @@ class _ComicDetailOverflowMenuButtonState
                 icon: LucideIcons.trash2,
                 label: l10n.comicDetailDelete,
                 onTap: () {
-                  _controller.hideMenu();
+                  hideMenu();
                   _confirmDelete(context);
                 },
               ),

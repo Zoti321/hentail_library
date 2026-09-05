@@ -34,10 +34,10 @@ Komga 等同类产品的常见做法是：用户编辑排序值后，将该条�
 ### 读取与 UI
 
 - **`fetchSeriesComicsPage`** 返回 **`PagedSeriesComicsResult`**，每项含 `(comic, sortOrder)`，供系列详情分页网格使用。
-- 系列详情（desktop / 非 compact）：封面 hover 显示铅笔，打开排序对话框。
-- 右键 / 长按：`SeriesItemContextMenu` 提供「编辑排序」；卡片 **不展示** 排序数字。
+- 成员排序编辑并入 **Comic 元数据对话框**（常规页分区；无 Series 归属时隐藏）；一次保存编排元数据写入与 `updateSeriesItemSortOrder` / 锁。
+- 系列详情（desktop / 非 compact）：封面 hover 铅笔与右键 / 长按菜单打开同一元数据对话框（带排序种子）；卡片 **不展示** 排序数字。
 - 校验：必填、有限数字；允许负数与重复值（由用户自行承担语义）。
-- 保存后刷新系列漫画 catalog（并 bump library revision）。
+- 排序有变更时保存后 bump library revision（系列漫画 catalog 随之刷新）。
 
 ## Consequences
 

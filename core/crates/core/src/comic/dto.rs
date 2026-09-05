@@ -12,6 +12,12 @@ pub struct ComicFilterDto {
     pub authors_all: Vec<String>,
     pub authors_any: Vec<String>,
     pub authors_exclude: Vec<String>,
+    /// Language names to include (OR semantics); empty = no filter.
+    pub languages: Vec<String>,
+    /// Parody names to include (OR semantics); empty = no filter.
+    pub parodies: Vec<String>,
+    /// Character names to include (OR semantics); empty = no filter.
+    pub characters: Vec<String>,
     /// When `None`, browse APIs resolve to Current library.
     pub library_id: Option<String>,
 }
@@ -29,6 +35,9 @@ impl Default for ComicFilterDto {
             authors_all: vec![],
             authors_any: vec![],
             authors_exclude: vec![],
+            languages: vec![],
+            parodies: vec![],
+            characters: vec![],
             library_id: None,
         }
     }
@@ -47,6 +56,9 @@ impl ComicFilterDto {
             authors_all: normalize_tags(self.authors_all),
             authors_any: normalize_tags(self.authors_any),
             authors_exclude: normalize_tags(self.authors_exclude),
+            languages: normalize_tags(self.languages),
+            parodies: normalize_tags(self.parodies),
+            characters: normalize_tags(self.characters),
             library_id: self
                 .library_id
                 .map(|s| s.trim().to_string())
@@ -76,6 +88,9 @@ pub struct ComicMetaLocks {
     pub content_rating: bool,
     pub authors: bool,
     pub tags: bool,
+    pub languages: bool,
+    pub parodies: bool,
+    pub characters: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -94,10 +109,36 @@ pub struct ComicDto {
     pub last_read_time_ms: Option<i64>,
     pub authors: Vec<String>,
     pub tags: Vec<String>,
+    /// Ordered canonical English language names; empty = unset.
+    #[serde(default)]
+    pub languages: Vec<String>,
+    /// Parody (IP / franchise) names attached to this Comic; empty = none.
+    #[serde(default)]
+    pub parodies: Vec<String>,
+    /// Character names attached to this Comic; empty = none.
+    #[serde(default)]
+    pub characters: Vec<String>,
     #[serde(default)]
     pub locks: ComicMetaLocks,
     #[serde(default)]
     pub library_id: String,
+}
+
+/// Serialize Language list for `comic_meta.languages` JSON column.
+pub fn serialize_languages(languages: &[String]) -> String {
+    serde_json::to_string(languages).unwrap_or_else(|_| "[]".to_string())
+}
+
+/// Parse Language list; invalid JSON → empty (unset).
+pub fn parse_languages_json(raw: &str) -> Vec<String> {
+    let Ok(values) = serde_json::from_str::<Vec<String>>(raw) else {
+        return Vec::new();
+    };
+    values
+        .into_iter()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect()
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

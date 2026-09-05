@@ -5,22 +5,30 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/entity/comic/series.dart';
+import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/form/author_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_date_picker_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/fluent_number_stepper_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_toggle_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/metadata_lock_button.dart';
+import 'package:hentai_library/ui/core/widgets/form/character_library_multi_select_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/parody_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_side_tab_bar.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -39,15 +47,27 @@ const Duration _kEditMetadataTabTransitionDuration = Duration(
 
 enum _EditMetadataTab { general, authorsAndTags }
 
-/// 打开漫画元数据编辑表面。
+/// 打开对话框时已知的 Series 成员排序种子（领域上仍属 SeriesItem，非 Comic 元数据）。
+typedef SeriesItemSortEditSeed = ({
+  String seriesId,
+  double sortOrder,
+  bool sortOrderLocked,
+});
+
+/// 打开漫画元数据编辑表面。有 Series 归属时在常规页展示成员排序区。
 Future<void> showEditMetadataDialog({
   required BuildContext context,
   required Comic comic,
   required Future<void> Function(ComicMetadataForm) onSave,
+  SeriesItemSortEditSeed? seriesItemSort,
 }) {
   return showAdaptiveFormSurfaceWidget<void>(
     context: context,
-    surface: EditMetadataDialog(comic: comic, onSave: onSave),
+    surface: EditMetadataDialog(
+      comic: comic,
+      onSave: onSave,
+      seriesItemSort: seriesItemSort,
+    ),
   );
 }
 
@@ -56,10 +76,12 @@ class EditMetadataDialog extends StatefulHookConsumerWidget {
     super.key,
     required this.comic,
     required this.onSave,
+    this.seriesItemSort,
   });
 
   final Comic comic;
   final Future<void> Function(ComicMetadataForm) onSave;
+  final SeriesItemSortEditSeed? seriesItemSort;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -74,6 +96,12 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   int _previousTabIndex = 0;
   bool _saving = false;
   bool _lockBusy = false;
+
+  /// null = 无归属或尚未加载到归属。
+  SeriesItemSortEditSeed? _seriesSortSeed;
+  late String _sortOrderText;
+  late bool _sortOrderLocked;
+  String? _sortOrderError;
 
   List<DialogSideTabItem> _sideTabs(AppLocalizations l10n) =>
       <DialogSideTabItem>[
@@ -103,6 +131,61 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     super.initState();
     _form = ComicMetadataForm.fromComic(widget.comic);
     _locks = widget.comic.locks;
+    final SeriesItemSortEditSeed? seed = widget.seriesItemSort;
+    if (seed != null) {
+      _applySeriesSortSeed(seed);
+    } else {
+      _sortOrderText = '';
+      _sortOrderLocked = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadSeriesSortMembership();
+      });
+    }
+  }
+
+  void _applySeriesSortSeed(SeriesItemSortEditSeed seed) {
+    _seriesSortSeed = seed;
+    _sortOrderText = _formatSortOrder(seed.sortOrder);
+    _sortOrderLocked = seed.sortOrderLocked;
+  }
+
+  Future<void> _loadSeriesSortMembership() async {
+    try {
+      final List<Series> all = await ref.read(seriesRepoProvider).getAll();
+      SeriesItemSortEditSeed? found;
+      for (final Series series in all) {
+        for (final SeriesItem item in series.items) {
+          if (item.comicId == widget.comic.comicId) {
+            found = (
+              seriesId: series.id,
+              sortOrder: item.order,
+              sortOrderLocked: item.sortOrderLocked,
+            );
+            break;
+          }
+        }
+        if (found != null) {
+          break;
+        }
+      }
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        if (found != null) {
+          _applySeriesSortSeed(found);
+        } else {
+          _seriesSortSeed = null;
+        }
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _seriesSortSeed = null;
+      });
+    }
   }
 
   Future<void> _setLock({
@@ -112,6 +195,9 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     bool? contentRating,
     bool? authors,
     bool? tags,
+    bool? languages,
+    bool? parodies,
+    bool? characters,
   }) async {
     if (_lockBusy) {
       return;
@@ -128,6 +214,9 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
             contentRating: contentRating,
             authors: authors,
             tags: tags,
+            languages: languages,
+            parodies: parodies,
+            characters: characters,
           );
       if (!mounted) {
         return;
@@ -140,6 +229,9 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           contentRating: contentRating,
           authors: authors,
           tags: tags,
+          languages: languages,
+          parodies: parodies,
+          characters: characters,
         );
       });
     } catch (_) {
@@ -221,12 +313,33 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       });
       return;
     }
+
+    final SeriesItemSortEditSeed? seed = _seriesSortSeed;
+    double? parsedSortOrder;
+    if (seed != null) {
+      final String trimmed = _sortOrderText.trim();
+      final double? parsed = double.tryParse(trimmed);
+      if (trimmed.isEmpty || parsed == null || !parsed.isFinite) {
+        setState(() {
+          _sortOrderError = context.l10n.formSeriesItemSortOrderInvalid;
+          _previousTabIndex = _selectedTab.index;
+          _selectedTab = _EditMetadataTab.general;
+        });
+        return;
+      }
+      parsedSortOrder = parsed;
+    }
+
     setState(() {
       _validation = null;
+      _sortOrderError = null;
       _saving = true;
     });
     try {
       await widget.onSave(_form.normalized);
+      if (seed != null && parsedSortOrder != null) {
+        await _persistSeriesSortIfChanged(seed, parsedSortOrder);
+      }
       if (mounted) {
         showSuccessToast(context, context.l10n.commonSavedToast);
         Navigator.of(context).pop();
@@ -244,6 +357,41 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
         setState(() => _saving = false);
       }
     }
+  }
+
+  Future<void> _persistSeriesSortIfChanged(
+    SeriesItemSortEditSeed seed,
+    double sortOrder,
+  ) async {
+    final bool orderChanged = sortOrder != seed.sortOrder;
+    final bool lockChanged = _sortOrderLocked != seed.sortOrderLocked;
+    if (!orderChanged && !lockChanged) {
+      return;
+    }
+
+    final repo = ref.read(seriesRepoProvider);
+    if (orderChanged) {
+      await repo.updateSeriesItemSortOrder(
+        seriesId: seed.seriesId,
+        comicId: widget.comic.comicId,
+        sortOrder: sortOrder,
+      );
+      // Saving sort order always locks; clear if draft wants unlocked.
+      if (!_sortOrderLocked) {
+        await repo.setSeriesItemSortOrderLocked(
+          seriesId: seed.seriesId,
+          comicId: widget.comic.comicId,
+          locked: false,
+        );
+      }
+    } else if (lockChanged) {
+      await repo.setSeriesItemSortOrderLocked(
+        seriesId: seed.seriesId,
+        comicId: widget.comic.comicId,
+        locked: _sortOrderLocked,
+      );
+    }
+    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
   }
 
   Widget _buildTabPane(AppThemeTokens tokens) {
@@ -270,8 +418,13 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           description: _form.description ?? '',
           publishedAt: _form.publishedAt,
           isR18: _form.isR18,
+          languages: _form.languages,
           locks: _locks,
           lockBusy: _lockBusy || _saving,
+          showSeriesSort: _seriesSortSeed != null,
+          sortOrderText: _sortOrderText,
+          sortOrderLocked: _sortOrderLocked,
+          sortOrderError: _sortOrderError,
           onTitleChanged: (String value) {
             setState(() {
               _form = _form.copyWith(title: value);
@@ -293,12 +446,31 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           onIsR18Changed: (bool value) {
             _updateForm((ComicMetadataForm f) => f.copyWith(isR18: value));
           },
+          onAddLanguage: (String name) {
+            _updateForm((ComicMetadataForm f) => f.addLanguage(name));
+          },
+          onRemoveLanguage: (String name) {
+            _updateForm((ComicMetadataForm f) => f.removeLanguage(name));
+          },
+          onSortOrderChanged: (String value) {
+            setState(() {
+              _sortOrderText = value;
+              if (_sortOrderError != null) {
+                _sortOrderError = null;
+              }
+            });
+          },
+          onSortOrderLockedChanged: (bool locked) {
+            setState(() => _sortOrderLocked = locked);
+          },
           onLockChanged: _setLock,
         ),
         _EditMetadataTab.authorsAndTags => _EditMetadataAuthorsTagsTab(
           key: const ValueKey<String>('authors-tags'),
           authors: _form.authors,
           tags: _form.tags,
+          parodies: _form.parodies,
+          characters: _form.characters,
           locks: _locks,
           lockBusy: _lockBusy || _saving,
           onAddAuthor: (String name) {
@@ -312,6 +484,18 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           },
           onRemoveTag: (String name) {
             _updateForm((ComicMetadataForm f) => f.removeTag(name));
+          },
+          onAddParody: (String name) {
+            _updateForm((ComicMetadataForm f) => f.addParody(name));
+          },
+          onRemoveParody: (String name) {
+            _updateForm((ComicMetadataForm f) => f.removeParody(name));
+          },
+          onAddCharacter: (String name) {
+            _updateForm((ComicMetadataForm f) => f.addCharacter(name));
+          },
+          onRemoveCharacter: (String name) {
+            _updateForm((ComicMetadataForm f) => f.removeCharacter(name));
           },
           onLockChanged: _setLock,
         ),
@@ -441,6 +625,9 @@ typedef _MetaLockChanged =
       bool? contentRating,
       bool? authors,
       bool? tags,
+      bool? languages,
+      bool? parodies,
+      bool? characters,
     });
 
 class _EditMetadataGeneralTab extends StatelessWidget {
@@ -451,12 +638,21 @@ class _EditMetadataGeneralTab extends StatelessWidget {
     required this.description,
     required this.publishedAt,
     required this.isR18,
+    required this.languages,
     required this.locks,
     required this.lockBusy,
+    required this.showSeriesSort,
+    required this.sortOrderText,
+    required this.sortOrderLocked,
+    required this.sortOrderError,
     required this.onTitleChanged,
     required this.onDescriptionChanged,
     required this.onPublishedAtChanged,
     required this.onIsR18Changed,
+    required this.onAddLanguage,
+    required this.onRemoveLanguage,
+    required this.onSortOrderChanged,
+    required this.onSortOrderLockedChanged,
     required this.onLockChanged,
   });
 
@@ -465,18 +661,28 @@ class _EditMetadataGeneralTab extends StatelessWidget {
   final String description;
   final DateTime? publishedAt;
   final bool isR18;
+  final List<String> languages;
   final ComicMetaLocks locks;
   final bool lockBusy;
+  final bool showSeriesSort;
+  final String sortOrderText;
+  final bool sortOrderLocked;
+  final String? sortOrderError;
   final ValueChanged<String> onTitleChanged;
   final ValueChanged<String> onDescriptionChanged;
   final ValueChanged<DateTime?> onPublishedAtChanged;
   final ValueChanged<bool> onIsR18Changed;
+  final ValueChanged<String> onAddLanguage;
+  final ValueChanged<String> onRemoveLanguage;
+  final ValueChanged<String> onSortOrderChanged;
+  final ValueChanged<bool> onSortOrderLockedChanged;
   final _MetaLockChanged onLockChanged;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
     final bool compact = AppLayoutBreakpoints.isCompact(
       MediaQuery.sizeOf(context).width,
     );
@@ -503,6 +709,13 @@ class _EditMetadataGeneralTab extends StatelessWidget {
       checkedLabel: 'R18',
       uncheckedLabel: l10n.filterAgeAllAges,
     );
+
+    final List<String> languageChoices = <String>[
+      ...ComicLanguageNames.closedSet,
+      ...languages.where(
+        (String name) => !ComicLanguageNames.closedSet.contains(name),
+      ),
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -547,9 +760,75 @@ class _EditMetadataGeneralTab extends StatelessWidget {
               Expanded(flex: 2, child: contentRatingField),
             ],
           ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: tokens.spacing.sm,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    l10n.formLanguagesLabel,
+                    style: TextStyle(
+                      fontSize: tokens.text.bodySm,
+                      color: cs.hentai.textPrimary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                MetadataLockButton(
+                  locked: locks.languages,
+                  enabled: !lockBusy,
+                  onChanged: (bool locked) => onLockChanged(languages: locked),
+                ),
+              ],
+            ),
+            Wrap(
+              spacing: tokens.spacing.sm,
+              runSpacing: tokens.spacing.sm,
+              children: languageChoices.map((String canonical) {
+                final bool selected = languages.contains(canonical);
+                return OutlinedMetaChip(
+                  text: l10n.comicLanguageLabel(canonical),
+                  compact: true,
+                  borderColor: selected ? cs.primary : null,
+                  textColor: selected ? cs.primary : null,
+                  onTap: () {
+                    if (selected) {
+                      onRemoveLanguage(canonical);
+                    } else {
+                      onAddLanguage(canonical);
+                    }
+                  },
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+        if (showSeriesSort)
+          FluentNumberStepperField(
+            initialValue: sortOrderText,
+            labelText: l10n.formSeriesItemSortOrderLabel,
+            labelTrailing: MetadataLockButton(
+              locked: sortOrderLocked,
+              enabled: !lockBusy,
+              onChanged: onSortOrderLockedChanged,
+            ),
+            errorText: sortOrderError,
+            hintText: l10n.formSeriesItemSortOrderHint,
+            isDense: true,
+            onChanged: onSortOrderChanged,
+          ),
       ],
     );
   }
+}
+
+String _formatSortOrder(double value) {
+  if (value == value.roundToDouble()) {
+    return value.round().toString();
+  }
+  return value.toString();
 }
 
 class _EditMetadataAuthorsTagsTab extends StatelessWidget {
@@ -557,23 +836,35 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
     super.key,
     required this.authors,
     required this.tags,
+    required this.parodies,
+    required this.characters,
     required this.locks,
     required this.lockBusy,
     required this.onAddAuthor,
     required this.onRemoveAuthor,
     required this.onAddTag,
     required this.onRemoveTag,
+    required this.onAddParody,
+    required this.onRemoveParody,
+    required this.onAddCharacter,
+    required this.onRemoveCharacter,
     required this.onLockChanged,
   });
 
   final List<Author> authors;
   final List<Tag> tags;
+  final List<String> parodies;
+  final List<String> characters;
   final ComicMetaLocks locks;
   final bool lockBusy;
   final ValueChanged<String> onAddAuthor;
   final ValueChanged<String> onRemoveAuthor;
   final ValueChanged<String> onAddTag;
   final ValueChanged<String> onRemoveTag;
+  final ValueChanged<String> onAddParody;
+  final ValueChanged<String> onRemoveParody;
+  final ValueChanged<String> onAddCharacter;
+  final ValueChanged<String> onRemoveCharacter;
   final _MetaLockChanged onLockChanged;
 
   @override
@@ -608,6 +899,30 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
           selectedNames: tags.map((Tag t) => t.name).toList(),
           onAdd: onAddTag,
           onRemove: onRemoveTag,
+        ),
+        ParodyLibraryMultiSelectField(
+          label: l10n.comicDetailParodies,
+          labelTrailing: MetadataLockButton(
+            locked: locks.parodies,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(parodies: locked),
+          ),
+          icon: LucideIcons.bookMarked,
+          selectedNames: parodies,
+          onAdd: onAddParody,
+          onRemove: onRemoveParody,
+        ),
+        CharacterLibraryMultiSelectField(
+          label: l10n.comicDetailCharacters,
+          labelTrailing: MetadataLockButton(
+            locked: locks.characters,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(characters: locked),
+          ),
+          icon: LucideIcons.userRound,
+          selectedNames: characters,
+          onAdd: onAddCharacter,
+          onRemove: onRemoveCharacter,
         ),
       ],
     );

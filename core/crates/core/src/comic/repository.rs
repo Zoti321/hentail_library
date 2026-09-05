@@ -7,7 +7,10 @@ use sea_orm::{
 use sea_orm::sea_query::Expr;
 
 use crate::db::{connection, map_db_err};
-use crate::entity::{comic_authors, comic_meta, comic_reading_histories, comic_tags, comics, prelude::*};
+use crate::entity::{
+    comic_authors, comic_characters, comic_meta, comic_parodies, comic_reading_histories,
+    comic_tags, comics, prelude::*,
+};
 use crate::error::HentaiError;
 
 use super::dto::{
@@ -83,26 +86,75 @@ pub async fn find_comic_by_id(comic_id: &str) -> Result<Option<ComicDto>, Hentai
 }
 
 pub async fn search_by_keyword(keyword: &str) -> Result<Vec<ComicDto>, HentaiError> {
+    let page = search_by_keyword_page(keyword, 1, i32::MAX).await?;
+    Ok(page.items)
+}
+
+pub async fn search_by_keyword_page(
+    keyword: &str,
+    page: i32,
+    page_size: i32,
+) -> Result<PagedComicResultDto, HentaiError> {
     let q = keyword.trim().to_lowercase();
+    let page = page.max(1);
+    let page_size = page_size.max(1);
     if q.is_empty() {
-        return Ok(vec![]);
+        return Ok(PagedComicResultDto {
+            items: vec![],
+            total_count: 0,
+            page,
+            page_size,
+        });
     }
     let Some(library_id) = crate::library::resolve_browse_library_id(None).await? else {
-        return Ok(vec![]);
+        return Ok(PagedComicResultDto {
+            items: vec![],
+            total_count: 0,
+            page,
+            page_size,
+        });
     };
     let db = connection()?;
-    let stmt = Statement::from_sql_and_values(
+    let count_stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT c.comic_id FROM comics c \
+        "SELECT COUNT(*) FROM comics c \
          INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
          WHERE c.library_id = ? AND lower(m.title) LIKE ?",
         vec![
-            Value::String(Some(Box::new(library_id))),
+            Value::String(Some(Box::new(library_id.clone()))),
             Value::String(Some(Box::new(format!("%{q}%")))),
         ],
     );
-    let comic_ids = query_ids_from_stmt(&db, stmt).await?;
-    load_comics_ordered(&db, comic_ids).await
+    let total_count = db
+        .query_one(count_stmt)
+        .await
+        .map_err(map_db_err)?
+        .ok_or_else(|| HentaiError::db_query_failed("search count 无结果", None))?
+        .try_get_by_index::<i64>(0)
+        .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+    let offset = (page - 1) as i64 * page_size as i64;
+    let ids_stmt = Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "SELECT c.comic_id FROM comics c \
+         INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
+         WHERE c.library_id = ? AND lower(m.title) LIKE ? \
+         ORDER BY lower(m.title) ASC \
+         LIMIT ? OFFSET ?",
+        vec![
+            Value::String(Some(Box::new(library_id))),
+            Value::String(Some(Box::new(format!("%{q}%")))),
+            Value::BigInt(Some(page_size as i64)),
+            Value::BigInt(Some(offset)),
+        ],
+    );
+    let comic_ids = query_ids_from_stmt(&db, ids_stmt).await?;
+    let items = load_comics_ordered(&db, comic_ids).await?;
+    Ok(PagedComicResultDto {
+        items,
+        total_count,
+        page,
+        page_size,
+    })
 }
 
 pub async fn read_data_version() -> Result<i32, HentaiError> {
@@ -185,6 +237,8 @@ pub async fn load_comics_ordered(
         .collect();
     let tag_map = load_tag_names(db, &comic_ids).await?;
     let author_map = load_author_names(db, &comic_ids).await?;
+    let parody_map = load_parody_names(db, &comic_ids).await?;
+    let character_map = load_character_names(db, &comic_ids).await?;
     let last_read_map = load_last_read_times(db, &comic_ids).await?;
     let mut result = Vec::with_capacity(comic_ids.len());
     for id in comic_ids {
@@ -209,6 +263,15 @@ pub async fn load_comics_ordered(
             last_read_time_ms: last_read_map.get(&model.comic_id).copied(),
             authors: author_map.get(&model.comic_id).cloned().unwrap_or_default(),
             tags: tag_map.get(&model.comic_id).cloned().unwrap_or_default(),
+            languages: crate::comic::parse_languages_json(&meta.languages),
+            parodies: parody_map
+                .get(&model.comic_id)
+                .cloned()
+                .unwrap_or_default(),
+            characters: character_map
+                .get(&model.comic_id)
+                .cloned()
+                .unwrap_or_default(),
             locks: crate::comic::ComicMetaLocks {
                 title: meta.title_locked,
                 description: meta.description_locked,
@@ -216,6 +279,9 @@ pub async fn load_comics_ordered(
                 content_rating: meta.content_rating_locked,
                 authors: meta.authors_locked,
                 tags: meta.tags_locked,
+                languages: meta.languages_locked,
+                parodies: meta.parodies_locked,
+                characters: meta.characters_locked,
             },
             library_id: model.library_id,
         });
@@ -271,6 +337,40 @@ async fn load_author_names(
     let mut map: HashMap<String, Vec<String>> = HashMap::new();
     for row in rows {
         map.entry(row.comic_id).or_default().push(row.author_name);
+    }
+    Ok(map)
+}
+
+async fn load_parody_names(
+    db: &DatabaseConnection,
+    comic_ids: &[String],
+) -> Result<HashMap<String, Vec<String>>, HentaiError> {
+    let rows = ComicParodies::find()
+        .filter(Expr::col(comic_parodies::Column::ComicId).is_in(comic_ids.to_vec()))
+        .order_by_asc(comic_parodies::Column::ParodyName)
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let mut map: HashMap<String, Vec<String>> = HashMap::new();
+    for row in rows {
+        map.entry(row.comic_id).or_default().push(row.parody_name);
+    }
+    Ok(map)
+}
+
+async fn load_character_names(
+    db: &DatabaseConnection,
+    comic_ids: &[String],
+) -> Result<HashMap<String, Vec<String>>, HentaiError> {
+    let rows = ComicCharacters::find()
+        .filter(Expr::col(comic_characters::Column::ComicId).is_in(comic_ids.to_vec()))
+        .order_by_asc(comic_characters::Column::CharacterName)
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let mut map: HashMap<String, Vec<String>> = HashMap::new();
+    for row in rows {
+        map.entry(row.comic_id).or_default().push(row.character_name);
     }
     Ok(map)
 }

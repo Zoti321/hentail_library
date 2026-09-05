@@ -580,9 +580,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setCurrentLibrary => 'Set as current library';
 
   @override
-  String get syncAllLibraries => 'Sync all libraries';
-
-  @override
   String get settingsAutoUpdateLabel => 'Automatic updates';
 
   @override
@@ -687,6 +684,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get librarySerializationStatusFilter => 'Serialization status';
 
   @override
+  String get libraryLanguageFilter => 'Language';
+
+  @override
+  String get libraryParodyFilter => 'Parody';
+
+  @override
+  String get libraryCharacterFilter => 'Characters';
+
+  @override
   String get libraryTagFilter => 'Tags';
 
   @override
@@ -742,6 +748,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get librarySeriesSortRandom => 'Random';
+
+  @override
+  String get libraryPreferLibraryRootSeries => 'Prefer library root series';
 
   @override
   String get filterAgeUnrestricted => 'All';
@@ -838,6 +847,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comicDetailTags => 'Tags';
 
   @override
+  String get comicDetailParodies => 'Parody';
+
+  @override
+  String get comicDetailCharacters => 'Characters';
+
+  @override
   String get comicDetailResourceFormat => 'Format';
 
   @override
@@ -928,12 +943,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get seriesDetailEdit => 'Edit series';
-
-  @override
-  String get seriesItemEditSortOrder => 'Edit sort order';
-
-  @override
-  String get dialogEditSeriesItemSortOrderTitle => 'Edit sort order';
 
   @override
   String get formSeriesItemSortOrderLabel => 'Sort number';
@@ -1378,6 +1387,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get formPublishedDateLabel => 'Published date';
 
   @override
+  String get formLanguagesLabel => 'Language';
+
+  @override
+  String get comicLanguageChinese => 'Chinese';
+
+  @override
+  String get comicLanguageJapanese => 'Japanese';
+
+  @override
+  String get comicLanguageEnglish => 'English';
+
+  @override
+  String get comicLanguageKorean => 'Korean';
+
+  @override
+  String get comicLanguageSpanish => 'Spanish';
+
+  @override
+  String get comicLanguageOther => 'Other';
+
+  @override
   String get formAgeRestrictionLabel => 'Age restriction';
 
   @override
@@ -1412,6 +1442,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get formAuthorEmptyRemaining => 'No more options';
+
+  @override
+  String get formParodySelectPlaceholder => 'Select or enter parody…';
+
+  @override
+  String get formParodyListLoadFailed => 'Failed to load parodies';
+
+  @override
+  String get formParodyEmptyCatalog => 'No parodies yet';
+
+  @override
+  String get formParodyEmptyRemaining => 'No more options';
+
+  @override
+  String get formCharacterSelectPlaceholder => 'Select or enter character…';
+
+  @override
+  String get formCharacterListLoadFailed => 'Failed to load characters';
+
+  @override
+  String get formCharacterEmptyCatalog => 'No characters yet';
+
+  @override
+  String get formCharacterEmptyRemaining => 'No more options';
 
   @override
   String get formTagSelectPlaceholder => 'Select or enter tag…';

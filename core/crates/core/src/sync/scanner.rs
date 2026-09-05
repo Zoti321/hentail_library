@@ -294,6 +294,9 @@ mod tests {
             last_read_time_ms: None,
             authors: vec![],
             tags: vec![],
+            languages: vec![],
+            parodies: vec![],
+            characters: vec![],
             locks: crate::comic::ComicMetaLocks::default(),
             library_id: String::new(),
         };

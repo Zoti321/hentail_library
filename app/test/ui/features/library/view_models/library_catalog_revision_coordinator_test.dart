@@ -9,6 +9,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_catalog_r
 import 'package:hentai_library/ui/features/shell/di/ports.dart';
 import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/scan_library_controller.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
@@ -74,26 +75,45 @@ class _FakeCurrentLibraryNotifier extends CurrentLibraryNotifier {
   }
 }
 
+class _ControllableScanLibraryController extends ScanLibraryController {
+  _ControllableScanLibraryController({required bool running})
+    : _running = running;
+
+  bool _running;
+
+  @override
+  ScanLibraryState build() => ScanLibraryState(running: _running);
+
+  void setRunning(bool running) {
+    _running = running;
+    state = state.copyWith(running: running);
+  }
+}
+
 void main() {
   group('LibraryCatalogRevisionCoordinator', () {
     late StreamController<void> events;
     late _FakeCurrentLibraryNotifier currentLibrary;
+    late _ControllableScanLibraryController scanLibrary;
     late ProviderContainer container;
 
     setUp(() {
       events = StreamController<void>.broadcast();
       currentLibrary = _FakeCurrentLibraryNotifier(currentId: 'lib-a');
+      scanLibrary = _ControllableScanLibraryController(running: false);
       container = ProviderContainer(
         overrides: <Override>[
           libraryRevisionPortProvider.overrideWithValue(
             _FakeLibraryRevisionPort(events),
           ),
           currentLibraryProvider.overrideWith(() => currentLibrary),
+          scanLibraryControllerProvider.overrideWith(() => scanLibrary),
         ],
       );
       // Warm keepAlive providers so listens are attached and notifiers init.
       container.read(currentLibraryProvider);
       container.read(libraryRevisionProvider);
+      container.read(scanLibraryControllerProvider);
       container.read(libraryCatalogRevisionCoordinatorProvider);
     });
 
@@ -147,6 +167,72 @@ void main() {
             libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.series),
           ),
           1,
+        );
+      },
+    );
+
+    test(
+      'library sync running throttles active catalog revision bumps',
+      () async {
+        scanLibrary.setRunning(true);
+        // Allow listen to observe running=true before bumps.
+        await Future<void>.delayed(Duration.zero);
+
+        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        expect(
+          container.read(
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+          ),
+          1,
+        );
+
+        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        expect(
+          container.read(
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+          ),
+          1,
+          reason: 'subsequent bumps during sync stay merged until throttle',
+        );
+
+        await Future<void>.delayed(
+          kLibrarySyncCatalogRevisionThrottle +
+              const Duration(milliseconds: 50),
+        );
+
+        expect(
+          container.read(
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+          ),
+          3,
+        );
+      },
+    );
+
+    test(
+      'library sync settle flushes pending active catalog revision',
+      () async {
+        scanLibrary.setRunning(true);
+        await Future<void>.delayed(Duration.zero);
+
+        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        expect(
+          container.read(
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+          ),
+          1,
+        );
+
+        scanLibrary.setRunning(false);
+        await Future<void>.delayed(Duration.zero);
+
+        expect(
+          container.read(
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+          ),
+          2,
         );
       },
     );

@@ -26,5 +26,5 @@ abstract class ComicPageSourcePort {
     required int generation,
   });
 
-  void clearPageCache({required String comicId});
+  Future<void> clearPageCache({required String comicId});
 }

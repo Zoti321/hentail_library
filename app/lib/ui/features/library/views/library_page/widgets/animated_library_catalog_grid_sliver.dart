@@ -30,6 +30,14 @@ class _AnimatedLibraryCatalogGridSliverState
   AppThemeTokens? _lastTokens;
   LibraryLayoutTier? _lastLayoutTier;
   SliverGridDelegate? _cachedDelegate;
+  Timer? _returnToVirtualizedTimer;
+  int _flipEpoch = 0;
+
+  @override
+  void dispose() {
+    _returnToVirtualizedTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   void didUpdateWidget(AnimatedLibraryCatalogGridSliver oldWidget) {
@@ -47,6 +55,23 @@ class _AnimatedLibraryCatalogGridSliverState
       sortChanged: sortChanged,
       suppressChanged: suppressChanged,
     );
+
+    if (sortChanged && _enableSortFlipAnimation) {
+      _scheduleReturnToVirtualizedGrid();
+    }
+  }
+
+  void _scheduleReturnToVirtualizedGrid() {
+    _returnToVirtualizedTimer?.cancel();
+    final int epoch = ++_flipEpoch;
+    _returnToVirtualizedTimer = Timer(kLibraryCatalogSortFlipDuration, () {
+      if (!mounted || epoch != _flipEpoch || !_enableSortFlipAnimation) {
+        return;
+      }
+      setState(() {
+        _enableSortFlipAnimation = false;
+      });
+    });
   }
 
   SliverGridDelegate _delegateFor(BuildContext context) {
@@ -66,20 +91,36 @@ class _AnimatedLibraryCatalogGridSliverState
 
   @override
   Widget build(BuildContext context) {
+    final SliverGridDelegate gridDelegate = _delegateFor(context);
+
+    // Steady-state path: true SliverGrid so CustomScrollView virtualizes.
+    // Sort FLIP briefly uses shrinkWrap ReorderableBuilder, then returns.
+    if (!_enableSortFlipAnimation) {
+      return SliverGrid(
+        gridDelegate: gridDelegate,
+        delegate: SliverChildBuilderDelegate(
+          (BuildContext context, int index) {
+            return widget.itemBuilder(context, index);
+          },
+          childCount: widget.itemCount,
+          addAutomaticKeepAlives: false,
+        ),
+      );
+    }
+
     return SliverToBoxAdapter(
       child: ReorderableBuilder<void>.builder(
         enableDraggable: false,
         itemCount: widget.itemCount,
         animationConfig: libraryCatalogSortFlipAnimationConfig(
-          enableAnimations:
-              _enableSortFlipAnimation && !reduceMotionOf(context),
+          enableAnimations: !reduceMotionOf(context),
         ),
         childBuilder: (Widget Function(Widget child, int index) wrapGridChild) {
           return GridView.builder(
             key: _gridViewKey,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: _delegateFor(context),
+            gridDelegate: gridDelegate,
             itemCount: widget.itemCount,
             itemBuilder: (BuildContext context, int index) {
               return wrapGridChild(widget.itemBuilder(context, index), index);

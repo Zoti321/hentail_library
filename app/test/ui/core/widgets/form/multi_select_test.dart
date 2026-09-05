@@ -368,6 +368,152 @@ void main() {
     );
   });
 
+  testWidgets(
+    'input filters unselected candidates with case-insensitive contains',
+    (WidgetTester tester) async {
+      await pumpMultiSelect(tester, selectedNames: const <String>['gamma']);
+
+      await tester.tap(find.byType(TextField));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), '  AlP  ');
+      await tester.pumpAndSettle();
+
+      final Finder menu = find.byKey(MultiSelect.menuPanelKey);
+      expect(
+        find.descendant(of: menu, matching: find.text('alpha')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: menu, matching: find.text('beta')),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: menu, matching: find.text('gamma')),
+        findsNothing,
+      );
+      // Selected chip stays visible while filtering.
+      expect(find.widgetWithText(OutlinedMetaChip, 'gamma'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'whitespace-only input shows all remaining unselected candidates',
+    (WidgetTester tester) async {
+      await pumpMultiSelect(tester, selectedNames: const <String>['alpha']);
+
+      await tester.tap(find.byType(TextField));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), '   ');
+      await tester.pumpAndSettle();
+
+      final Finder menu = find.byKey(MultiSelect.menuPanelKey);
+      expect(
+        find.descendant(of: menu, matching: find.text('beta')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: menu, matching: find.text('gamma')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: menu, matching: find.text('alpha')),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets('no-match filter shows emptyRemaining and Enter still adds', (
+    WidgetTester tester,
+  ) async {
+    final List<String> added = <String>[];
+    await pumpMultiSelect(tester, onAdd: added.add);
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'zzz');
+    await tester.pumpAndSettle();
+
+    expect(
+      find.descendant(
+        of: find.byKey(MultiSelect.menuPanelKey),
+        matching: find.text('没有更多可选'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('alpha'), findsNothing);
+
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(added, <String>['zzz']);
+  });
+
+  testWidgets('dropdown rows do not display attachment count digits', (
+    WidgetTester tester,
+  ) async {
+    final Provider<AsyncValue<List<({String name, int attachmentCount})>>>
+    countedProvider =
+        Provider<AsyncValue<List<({String name, int attachmentCount})>>>(
+          (Ref ref) =>
+              const AsyncData<List<({String name, int attachmentCount})>>(
+                <({String name, int attachmentCount})>[
+                  (name: 'popular', attachmentCount: 42),
+                  (name: 'rare', attachmentCount: 1),
+                ],
+              ),
+        );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: buildAppTheme(Brightness.light),
+          home: Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.all(24),
+              child: MultiSelect<({String name, int attachmentCount})>(
+                label: '标签',
+                icon: LucideIcons.tag,
+                selectedNames: const <String>[],
+                onAdd: (_) {},
+                onRemove: (_) {},
+                itemsProvider: countedProvider,
+                onRetry: () {},
+                resolveName: (({String name, int attachmentCount}) item) =>
+                    item.name,
+                copy: const MultiSelectCopy(
+                  inputPlaceholder: '选择或输入标签…',
+                  listLoadFailed: '标签列表加载失败',
+                  emptyCatalog: '暂无标签',
+                  emptyRemaining: '没有更多可选',
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+
+    final Finder menu = find.byKey(MultiSelect.menuPanelKey);
+    expect(
+      find.descendant(of: menu, matching: find.text('popular')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: menu, matching: find.textContaining('42')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: menu, matching: find.textContaining('1')),
+      findsNothing,
+    );
+  });
+
   testWidgets('shows loading and error UI for catalog AsyncValue', (
     WidgetTester tester,
   ) async {

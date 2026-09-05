@@ -1,17 +1,19 @@
 mod dto;
+mod filter_predicate;
 mod page_query;
 pub mod repository;
 pub mod write;
 
 pub use dto::{
-    now_ms, ComicDto, ComicFilterDto, ComicMetaLocks, ComicSortFieldDto, ComicSortOptionDto,
-    PageRequestDto, PagedComicResultDto,
+    now_ms, parse_languages_json, serialize_languages, ComicDto, ComicFilterDto, ComicMetaLocks,
+    ComicSortFieldDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
 };
 pub use repository::{
     count_all, fetch_comics_page, find_comic_by_id, load_comics_ordered, read_data_version,
-    search_by_keyword,
+    search_by_keyword, search_by_keyword_page,
 };
 pub use write::{
-    delete_comics_by_ids, search_by_tag_expression, search_comic_ids_by_tag_expression,
-    set_comic_meta_locks, update_comic_user_meta, SetComicMetaLocksDto, UpdateComicUserMetaDto,
+    delete_comics_by_ids, search_by_tag_expression, search_by_tag_expression_page,
+    search_comic_ids_by_tag_expression, set_comic_meta_locks, update_comic_user_meta,
+    SetComicMetaLocksDto, UpdateComicUserMetaDto,
 };

@@ -1082,12 +1082,6 @@ abstract class AppLocalizations {
   /// **'设为当前库'**
   String get setCurrentLibrary;
 
-  /// No description provided for @syncAllLibraries.
-  ///
-  /// In zh, this message translates to:
-  /// **'同步全部库'**
-  String get syncAllLibraries;
-
   /// No description provided for @settingsAutoUpdateLabel.
   ///
   /// In zh, this message translates to:
@@ -1274,6 +1268,24 @@ abstract class AppLocalizations {
   /// **'连载状态'**
   String get librarySerializationStatusFilter;
 
+  /// No description provided for @libraryLanguageFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'语言'**
+  String get libraryLanguageFilter;
+
+  /// No description provided for @libraryParodyFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'原作'**
+  String get libraryParodyFilter;
+
+  /// No description provided for @libraryCharacterFilter.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色'**
+  String get libraryCharacterFilter;
+
   /// No description provided for @libraryTagFilter.
   ///
   /// In zh, this message translates to:
@@ -1387,6 +1399,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'随机'**
   String get librarySeriesSortRandom;
+
+  /// No description provided for @libraryPreferLibraryRootSeries.
+  ///
+  /// In zh, this message translates to:
+  /// **'优先显示库根系列'**
+  String get libraryPreferLibraryRootSeries;
 
   /// No description provided for @filterAgeUnrestricted.
   ///
@@ -1531,6 +1549,18 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'标签'**
   String get comicDetailTags;
+
+  /// No description provided for @comicDetailParodies.
+  ///
+  /// In zh, this message translates to:
+  /// **'原作'**
+  String get comicDetailParodies;
+
+  /// No description provided for @comicDetailCharacters.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色'**
+  String get comicDetailCharacters;
 
   /// No description provided for @comicDetailResourceFormat.
   ///
@@ -1705,18 +1735,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'编辑系列'**
   String get seriesDetailEdit;
-
-  /// No description provided for @seriesItemEditSortOrder.
-  ///
-  /// In zh, this message translates to:
-  /// **'编辑排序'**
-  String get seriesItemEditSortOrder;
-
-  /// No description provided for @dialogEditSeriesItemSortOrderTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'编辑排序'**
-  String get dialogEditSeriesItemSortOrderTitle;
 
   /// No description provided for @formSeriesItemSortOrderLabel.
   ///
@@ -2532,6 +2550,48 @@ abstract class AppLocalizations {
   /// **'发布日期'**
   String get formPublishedDateLabel;
 
+  /// No description provided for @formLanguagesLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'语言'**
+  String get formLanguagesLabel;
+
+  /// No description provided for @comicLanguageChinese.
+  ///
+  /// In zh, this message translates to:
+  /// **'中文'**
+  String get comicLanguageChinese;
+
+  /// No description provided for @comicLanguageJapanese.
+  ///
+  /// In zh, this message translates to:
+  /// **'日语'**
+  String get comicLanguageJapanese;
+
+  /// No description provided for @comicLanguageEnglish.
+  ///
+  /// In zh, this message translates to:
+  /// **'英语'**
+  String get comicLanguageEnglish;
+
+  /// No description provided for @comicLanguageKorean.
+  ///
+  /// In zh, this message translates to:
+  /// **'韩语'**
+  String get comicLanguageKorean;
+
+  /// No description provided for @comicLanguageSpanish.
+  ///
+  /// In zh, this message translates to:
+  /// **'西班牙语'**
+  String get comicLanguageSpanish;
+
+  /// No description provided for @comicLanguageOther.
+  ///
+  /// In zh, this message translates to:
+  /// **'其他'**
+  String get comicLanguageOther;
+
   /// No description provided for @formAgeRestrictionLabel.
   ///
   /// In zh, this message translates to:
@@ -2603,6 +2663,54 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'没有更多可选'**
   String get formAuthorEmptyRemaining;
+
+  /// No description provided for @formParodySelectPlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择或输入原作…'**
+  String get formParodySelectPlaceholder;
+
+  /// No description provided for @formParodyListLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'原作列表加载失败'**
+  String get formParodyListLoadFailed;
+
+  /// No description provided for @formParodyEmptyCatalog.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无原作'**
+  String get formParodyEmptyCatalog;
+
+  /// No description provided for @formParodyEmptyRemaining.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有更多可选'**
+  String get formParodyEmptyRemaining;
+
+  /// No description provided for @formCharacterSelectPlaceholder.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择或输入角色…'**
+  String get formCharacterSelectPlaceholder;
+
+  /// No description provided for @formCharacterListLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色列表加载失败'**
+  String get formCharacterListLoadFailed;
+
+  /// No description provided for @formCharacterEmptyCatalog.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无角色'**
+  String get formCharacterEmptyCatalog;
+
+  /// No description provided for @formCharacterEmptyRemaining.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有更多可选'**
+  String get formCharacterEmptyRemaining;
 
   /// No description provided for @formTagSelectPlaceholder.
   ///

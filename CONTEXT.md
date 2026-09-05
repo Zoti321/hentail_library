@@ -101,12 +101,20 @@ _Avoid_: 编辑模式、排序页、固定开关（pin 只能在此模式用拖�
 ### Organization & metadata
 
 **Series**:
-同一 Library 内有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。不跨 Library。用户可编辑连载状态与计划总卷数（各字段可有 Metadata field lock）；成员默认顺序由 sync 按文件名自然排序写入。用户可在系列详情手动编辑单本排序值（`SeriesItem.order`，浮点数）；手动保存后会锁定该成员（`sortOrderLocked`），后续 sync 保留锁定项的排序值，未锁定项仍按文件名自然排序更新；也可解锁排序以在下次 sync 恢复文件名序。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series；不在任何 Series 中的 Comic 仍作为独立条目存在于其 Library 中。
+同一 Library 内有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。不跨 Library。用户可编辑连载状态与计划总卷数（各字段可有 Metadata field lock）；成员默认顺序由 sync 按文件名自然排序写入。用户可手动编辑单本排序值（`SeriesItem.order`，浮点数）；手动保存后会锁定该成员（`sortOrderLocked`），后续 sync 保留锁定项的排序值，未锁定项仍按文件名自然排序更新；也可解锁排序以在下次 sync 恢复文件名序。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series。Library sync 成功重建后，凡能解析出父路径的 Comic 恰好属于一个 Folder series（含 Library root series）；无父路径以致无归属视为异常/非常态，仍可容忍。
 _Avoid_: 合集、专辑、套系
 
 **Folder series**:
 Comic 的直接父目录对应一个 Series；Library root 下直接存放的 Comic 也会形成以根名命名的 Series。Series 身份由规范化 `folder_path`（含远程位置键时的父路径）派生（`seriesId`），且隶属于所属 Library。
 _Avoid_: 标题推断、自动分组
+
+**Library root series**:
+某 Library 中 `folder_path` 等于该库 Library root 的 Folder series（根下散落 Comic 所归属的那一条）。
+_Avoid_: 根系列置顶实体、isRoot 标志、Pinned series
+
+**Prefer library root series**:
+Series 浏览列表的应用级偏好：开启时，若 Library root series 仍落在当前筛选结果中，则固定排在列表最前；其余条目仍按当前排序字段排列。默认开启；非 Series 身份或 pin。
+_Avoid_: 置顶系列、pin series（易与 Pinned library 混淆）
 
 **Tag**:
 全局标签字典中的名称，用于筛选与归类；可来自用户创建或外部词库导入，再附着到 Comic。
@@ -120,12 +128,36 @@ _Avoid_: ehentai 导入、EhTagTranslation、标签同步、画廊导入（易�
 Comic 的署名，用于展示与筛选；社团、画师、原作者等展示用名字均记为 Author，不区分类型。
 _Avoid_: 画师、创作者、社团、Circle（领域模型中统一用 Author）
 
+**Parody**:
+Comic 所同人化的原作 / IP 名（可多值）；无所属 IP 时可用字面值如「原创」。与 Folder series（本库 Series）无关。
+_Avoid_: Series、IP 系列、原作系列（易与 Folder series 混淆）；work（`djm` 旧 Kind 名）
+
+**Character**:
+Comic 中出场人物名（可多值）；用于展示与筛选，与 Tag / Author 分列。
+_Avoid_: 角色标签（并入 Tag）、actor（`djm` 旧 Kind 名）
+
+**Named metadata facet**:
+Comic 上以「名称字符串」附着的元数据面：Tag、Author、Parody、Character 为字典表 + junction 全量 replace（core `named_facet`）；Language 为 `comic_meta.languages` JSON 闭集特例，不走 junction。新增同类 junction facet 应扩展 `JunctionNamedFacet`，而非再复制一套 replace/list/list_distinct 管道。
+_Avoid_: 元数据字段（太泛）、标签族（易漏 Author / Language）
+
+**Named facet attachment count**:
+某个 Named metadata facet 名字当前附着到多少 Comic（跨全部 Library 的 junction 行数）；未附着的字典项为 0。用于 Comic metadata form 候选排序等，不是阅读器 session 引用计数。
+_Avoid_: 引用次数、usage count、ref_count、热度
+
+**Comic catalog query**:
+库页 / 搜索共用的 Comic 目录查询：Dart 只组装筛选 intent（`LibraryComicFilter` / metadata expression）；谓词 SQL 集中在 core `comic/filter_predicate`（catalog 分桶与跨 facet 表达式共用 typed facet helpers）。
+_Avoid_: 内存 matches、在 Flutter 再写一份 WHERE
+
+**Language**（Comic language）:
+Comic 文本所用语言的规范英文名有序列表（闭集首批：`Chinese`、`Japanese`、`English`、`Korean`、`Spanish`、`Other`）；空列表表示未知/未设。展示时按**界面语言**译为本地文案（如中文界面下 `Chinese`→「中文」、`Japanese`→「日语」），多项以 `|` 拼接；未在展示表中的值原样显示。与应用「界面语言」设置不是同一概念。
+_Avoid_: 界面语言、locale、译文语言；把 Language 做成自由 Tag
+
 **Content rating**:
 Comic 的内容分级：`unknown`、`safe`、`r18`；主要由用户设定，也可通过路径关键词自动检测为 `r18`。
 _Avoid_: 分级、年龄限制
 
 **Comic metadata form**:
-编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag）时的可提交草稿；校验与 normalize、Author/Tag 增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
+编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag、Parody、Character、Language）时的可提交草稿；校验与 normalize、多值名增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
 _Avoid_: 漫画表单、元数据 DTO
 
 **Series metadata form**:

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_page_crossfade_policy.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/resume_visible_sync_gate.dart';
@@ -217,7 +218,9 @@ class PagedViewport extends HookConsumerWidget {
               return ReaderImageItem(
                 imageData: imageData,
                 slotLogicalWidth: slotLogicalWidth,
-                enableCrossfade: true,
+                enableCrossfade: readerPageCrossfadeEnabled(
+                  reduceMotion: MediaQuery.disableAnimationsOf(context),
+                ),
               );
             },
           ),

@@ -19,7 +19,7 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
 
   @override
   Future<ComicThumbnailRecord?> findByComicId(String comicId) async {
-    final rust.ComicThumbnailDto? row = guardFrbSync(
+    final rust.ComicThumbnailDto? row = await guardFrb(
       () => rust.findThumbnailByComicIdFrb(comicId: comicId),
       fallbackMessage: '读取缩略图失败',
     );
@@ -40,7 +40,7 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
     required ThumbnailPriority priority,
   }) async {
     await pushRemoteLibraryCredentials(_libraryRepository);
-    final rust.ComicThumbnailDto? row = guardFrbSync(
+    final rust.ComicThumbnailDto? row = await guardFrb(
       () => rust.ensureThumbnailByComicIdFrb(
         comicId: comicId,
         priority: mapThumbnailPriority(priority),
@@ -100,7 +100,7 @@ class ComicThumbnailRepositoryImpl implements ComicThumbnailRepository {
 
   @override
   Future<SeriesCoverSource> resolveSeriesCover(String seriesId) async {
-    final rust.SeriesCoverSourceDto dto = guardFrbSync(
+    final rust.SeriesCoverSourceDto dto = await guardFrb(
       () => rust.resolveSeriesCoverFrb(seriesId: seriesId),
       fallbackMessage: '解析系列封面失败',
     );

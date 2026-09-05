@@ -1,6 +1,7 @@
 use sea_orm::Value;
 
 use super::dto::{ComicFilterDto, ComicSortFieldDto, ComicSortOptionDto};
+use super::filter_predicate::build_catalog_where_clause;
 
 pub struct PageSqlQuery {
     pub sql: String,
@@ -11,7 +12,7 @@ const COMIC_META_JOIN: &str = "INNER JOIN comic_meta m ON m.comic_id = c.comic_i
 
 pub fn build_count_query(filter: &ComicFilterDto) -> PageSqlQuery {
     let mut values = Vec::new();
-    let where_clause = build_where_clause(filter, &mut values);
+    let where_clause = build_catalog_where_clause(filter, &mut values);
     PageSqlQuery {
         sql: format!(
             "SELECT COUNT(*) AS c FROM comics c {COMIC_META_JOIN} WHERE {where_clause}"
@@ -27,7 +28,7 @@ pub fn build_ids_page_query(
     offset: i32,
 ) -> PageSqlQuery {
     let mut values = Vec::new();
-    let where_clause = build_where_clause(filter, &mut values);
+    let where_clause = build_catalog_where_clause(filter, &mut values);
     let sort_join = sort_join_clause(sort.field);
     let order_by = build_order_by_clause(sort);
     values.push(Value::Int(Some(limit)));
@@ -75,109 +76,6 @@ fn build_order_by_clause(sort: &ComicSortOptionDto) -> String {
             format!("{primary}, m.title_sort_key ASC, c.comic_id ASC")
         }
     }
-}
-
-fn build_where_clause(filter: &ComicFilterDto, values: &mut Vec<Value>) -> String {
-    let mut parts = vec!["1=1".to_string()];
-    if let Some(library_id) = &filter.library_id {
-        parts.push("c.library_id = ?".to_string());
-        push_sqlite_text(values, library_id.clone());
-    }
-    if !filter.show_r18 {
-        parts.push("m.content_rating != 'r18'".to_string());
-    }
-    if let Some(query) = &filter.query {
-        let pattern = format!("%{query}%");
-        parts.push(
-            "(lower(m.title) LIKE ? OR EXISTS (\
-             SELECT 1 FROM comic_authors ca \
-             WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) LIKE ?))"
-                .to_string(),
-        );
-        push_sqlite_text(values, pattern.clone());
-        push_sqlite_text(values, pattern);
-    }
-    if !filter.resource_types.is_empty() {
-        let placeholders = placeholders(filter.resource_types.len());
-        parts.push(format!("c.resource_type IN ({placeholders})"));
-        for rt in &filter.resource_types {
-            push_sqlite_text(values, rt.clone());
-        }
-    }
-    if !filter.content_ratings.is_empty() {
-        let placeholders = placeholders(filter.content_ratings.len());
-        parts.push(format!("m.content_rating IN ({placeholders})"));
-        for rating in &filter.content_ratings {
-            push_sqlite_text(values, rating.clone());
-        }
-    }
-    for tag in &filter.tags_all {
-        parts.push(
-            "EXISTS (SELECT 1 FROM comic_tags ct \
-             WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) = ?)"
-                .to_string(),
-        );
-        push_sqlite_text(values, tag.clone());
-    }
-    if !filter.tags_any.is_empty() {
-        let placeholders = placeholders(filter.tags_any.len());
-        parts.push(format!(
-            "EXISTS (SELECT 1 FROM comic_tags ct \
-             WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) IN ({placeholders}))"
-        ));
-        for tag in &filter.tags_any {
-            push_sqlite_text(values, tag.clone());
-        }
-    }
-    if !filter.tags_exclude.is_empty() {
-        let placeholders = placeholders(filter.tags_exclude.len());
-        parts.push(format!(
-            "NOT EXISTS (SELECT 1 FROM comic_tags ct \
-             WHERE ct.comic_id = c.comic_id AND lower(ct.tag_name) IN ({placeholders}))"
-        ));
-        for tag in &filter.tags_exclude {
-            push_sqlite_text(values, tag.clone());
-        }
-    }
-    for author in &filter.authors_all {
-        parts.push(
-            "EXISTS (SELECT 1 FROM comic_authors ca \
-             WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) = ?)"
-                .to_string(),
-        );
-        push_sqlite_text(values, author.clone());
-    }
-    if !filter.authors_any.is_empty() {
-        let placeholders = placeholders(filter.authors_any.len());
-        parts.push(format!(
-            "EXISTS (SELECT 1 FROM comic_authors ca \
-             WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) IN ({placeholders}))"
-        ));
-        for author in &filter.authors_any {
-            push_sqlite_text(values, author.clone());
-        }
-    }
-    if !filter.authors_exclude.is_empty() {
-        let placeholders = placeholders(filter.authors_exclude.len());
-        parts.push(format!(
-            "NOT EXISTS (SELECT 1 FROM comic_authors ca \
-             WHERE ca.comic_id = c.comic_id AND lower(ca.author_name) IN ({placeholders}))"
-        ));
-        for author in &filter.authors_exclude {
-            push_sqlite_text(values, author.clone());
-        }
-    }
-    parts.join(" AND ")
-}
-
-fn placeholders(count: usize) -> String {
-    std::iter::repeat_n("?", count)
-        .collect::<Vec<_>>()
-        .join(",")
-}
-
-fn push_sqlite_text(values: &mut Vec<Value>, text: String) {
-    values.push(Value::String(Some(Box::new(text))));
 }
 
 #[cfg(test)]
@@ -261,6 +159,66 @@ mod tests {
         );
         assert!(sql.sql.contains("comic_authors ca"));
         assert!(sql.sql.contains("lower(ca.author_name) = ?"));
+    }
+
+    #[test]
+    fn languages_filter_uses_json_each() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto {
+                languages: vec!["chinese".to_string(), "japanese".to_string()],
+                ..Default::default()
+            },
+            &ComicSortOptionDto::default(),
+            10,
+            0,
+        );
+        assert!(sql.sql.contains("json_each(m.languages)"));
+        assert!(sql.sql.contains("lower(je.value) IN"));
+    }
+
+    #[test]
+    fn parodies_filter_joins_comic_parodies() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto {
+                parodies: vec!["naruto".to_string()],
+                ..Default::default()
+            },
+            &ComicSortOptionDto::default(),
+            10,
+            0,
+        );
+        assert!(sql.sql.contains("comic_parodies cp"));
+        assert!(sql.sql.contains("lower(cp.parody_name) IN"));
+    }
+
+    #[test]
+    fn characters_filter_joins_comic_characters() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto {
+                characters: vec!["sakura".to_string()],
+                ..Default::default()
+            },
+            &ComicSortOptionDto::default(),
+            10,
+            0,
+        );
+        assert!(sql.sql.contains("comic_characters cc"));
+        assert!(sql.sql.contains("lower(cc.character_name) IN"));
+    }
+
+    #[test]
+    fn query_searches_parody_and_character() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto {
+                query: Some("naruto".to_string()),
+                ..Default::default()
+            },
+            &ComicSortOptionDto::default(),
+            10,
+            0,
+        );
+        assert!(sql.sql.contains("comic_parodies"));
+        assert!(sql.sql.contains("comic_characters"));
     }
 
     #[test]

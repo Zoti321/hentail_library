@@ -43,14 +43,17 @@ String? unwrapFullyQuotedLibrarySearchQuery(String input) {
 /// Parses search-box text with `+` (AND), space (OR), `-` (exclude), and
 /// `"..."` quoted exact tokens (`\"` / `\\` escapes).
 ///
-/// Tokens that exactly match a known tag or author name (case-insensitive)
-/// participate in a metadata expression. If there is no positive known token,
-/// falls back to a whole-string title keyword query. Unmatched quotes also
-/// fall back to a whole-string keyword query.
+/// Tokens that exactly match a known tag, author, parody, character, or
+/// language name (case-insensitive) participate in a metadata expression. If
+/// there is no positive known token, falls back to a whole-string title keyword
+/// query. Unmatched quotes also fall back to a whole-string keyword query.
 LibrarySearchQuery parseLibrarySearchQuery(
   String input, {
   required Set<String> knownTagNames,
   required Set<String> knownAuthorNames,
+  Set<String> knownParodyNames = const <String>{},
+  Set<String> knownCharacterNames = const <String>{},
+  Set<String> knownLanguageNames = const <String>{},
 }) {
   final String trimmed = input.trim();
   if (trimmed.isEmpty) {
@@ -60,6 +63,9 @@ LibrarySearchQuery parseLibrarySearchQuery(
   final Set<String> known = <String>{
     ...knownTagNames.map((String n) => n.trim().toLowerCase()),
     ...knownAuthorNames.map((String n) => n.trim().toLowerCase()),
+    ...knownParodyNames.map((String n) => n.trim().toLowerCase()),
+    ...knownCharacterNames.map((String n) => n.trim().toLowerCase()),
+    ...knownLanguageNames.map((String n) => n.trim().toLowerCase()),
   }..removeWhere((String n) => n.isEmpty);
 
   final _LexResult? lexed = _lexSearchExpression(trimmed);

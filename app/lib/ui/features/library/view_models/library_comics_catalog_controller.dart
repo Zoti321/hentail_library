@@ -46,12 +46,17 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
       ref.watch(libraryComicsTabMediaTypeFilterProvider),
       ref.watch(libraryComicsTabTagFilterProvider),
       ref.watch(libraryComicsTabAuthorFilterProvider),
+      ref.watch(libraryComicsTabLanguageFilterProvider),
+      ref.watch(libraryComicsTabParodyFilterProvider),
+      ref.watch(libraryComicsTabCharacterFilterProvider),
       ref.watch(libraryComicsTabSortOptionProvider),
       ref.watch(libraryComicsTabPageSizeProvider),
     ));
   }
 
   Future<LibraryComicsCatalogState> _load() async {
+    // Comics sort has no `random` field (unlike Series); always watch revision.
+    // If random comics sort is added later, exempt revision like Series (P2-8).
     ref.watch(libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics));
 
     final LibraryRevisionState revisionState = ref.read(
@@ -96,11 +101,23 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     final LibraryComicSortOption sortOption = ref.read(
       libraryComicsTabSortOptionProvider,
     );
+    final Set<String> languageFilter = ref.read(
+      libraryComicsTabLanguageFilterProvider,
+    );
+    final Set<String> parodyFilter = ref.read(
+      libraryComicsTabParodyFilterProvider,
+    );
+    final Set<String> characterFilter = ref.read(
+      libraryComicsTabCharacterFilterProvider,
+    );
     final LibraryComicFilter filter = _libraryComicProjection.buildListFilter(
       ageRestriction: ageRestriction,
       mediaTypeFilter: mediaTypeFilter,
       tagFilter: tagFilter,
       authorFilter: authorFilter,
+      languages: languageFilter,
+      parodies: parodyFilter,
+      characters: characterFilter,
       keyword: keyword,
     );
     final int pageSize = ref.read(libraryComicsTabPageSizeProvider);

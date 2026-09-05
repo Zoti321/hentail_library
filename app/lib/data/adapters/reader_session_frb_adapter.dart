@@ -17,7 +17,7 @@ class ReaderSessionFrbAdapter implements ReaderSessionPort {
   Future<void> openComic(Comic comic) async {
     await pushRemoteLibraryCredentials(_libraryRepository);
     try {
-      rust.openReaderFrb(
+      await rust.openReaderFrb(
         comicId: comic.comicId,
         path: comic.path,
         resourceType: mapResourceType(comic.resourceType),

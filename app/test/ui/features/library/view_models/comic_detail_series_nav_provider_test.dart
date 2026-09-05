@@ -5,10 +5,10 @@ import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
+import 'package:hentai_library/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_detail_series_nav_provider.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
-import 'package:hentai_library/ui/features/shell/state/library_series_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
 
@@ -65,6 +65,29 @@ class _FakeSeriesRepo implements SeriesRepository {
   }
 
   @override
+  Future<SeriesReadingContext?> getReadingContextByComicId(
+    String comicId,
+  ) async {
+    for (final Series series in _series) {
+      if (!series.containsComic(comicId)) {
+        continue;
+      }
+      final List<SeriesItem> sorted = List<SeriesItem>.from(series.items)
+        ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
+      final List<String> orderedComicIds = sorted
+          .map((SeriesItem item) => item.comicId)
+          .toList(growable: false);
+      return (
+        seriesId: series.id,
+        seriesName: series.name,
+        orderedComicIds: orderedComicIds,
+        currentIndex: orderedComicIds.indexOf(comicId),
+      );
+    }
+    return null;
+  }
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
@@ -90,7 +113,6 @@ void main() {
     container = ProviderContainer(
       overrides: <Override>[
         libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
-        allSeriesProvider.overrideWith((Ref ref) async => <Series>[series]),
         comicRepoProvider.overrideWith(
           (Ref ref) => _FakeComicRepo(<String, String>{
             'comic-a': 'Alpha',
@@ -181,5 +203,12 @@ void main() {
         expect(identical(ready.data.items, cachedSeriesData?.items), isTrue);
       },
     );
+
+    test('returns none when reading context has no membership', () async {
+      final ComicDetailSeriesNavResult result = await container.read(
+        comicDetailSeriesNavProvider('comic-missing').future,
+      );
+      expect(result, isA<ComicDetailSeriesNavNone>());
+    });
   });
 }

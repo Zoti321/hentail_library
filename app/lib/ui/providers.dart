@@ -10,5 +10,6 @@ export 'features/shell/view_models/debouncer.dart';
 export 'features/shell/view_models/history_paged_feed_controller.dart';
 export 'features/shell/view_models/home_page_dashboard_notifier.dart';
 export 'features/shell/view_models/selected_paths_page_notifier.dart';
+export 'features/shell/view_models/stream_throttle.dart';
 export 'providers/comic_cover_providers.dart';
 export 'providers/series_cover_providers.dart';

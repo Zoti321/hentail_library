@@ -17,6 +17,9 @@ abstract class ComicMetadataForm with _$ComicMetadataForm {
     @Default(false) bool isR18,
     @Default([]) List<Tag> tags,
     @Default([]) List<Author> authors,
+    @Default([]) List<String> languages,
+    @Default([]) List<String> parodies,
+    @Default([]) List<String> characters,
   }) = _ComicMetadataForm;
 
   factory ComicMetadataForm.fromComic(Comic comic) {
@@ -27,6 +30,9 @@ abstract class ComicMetadataForm with _$ComicMetadataForm {
       isR18: comic.contentRating == ContentRating.r18,
       tags: List<Tag>.from(comic.tags),
       authors: List<Author>.from(comic.authors),
+      languages: List<String>.from(comic.languages),
+      parodies: List<String>.from(comic.parodies),
+      characters: List<String>.from(comic.characters),
     );
   }
 }
@@ -55,7 +61,20 @@ final class ComicMetadataApplyInvalid extends ComicMetadataApplyResult {
 }
 
 final class ComicMetadataApplySucceeded extends ComicMetadataApplyResult {
-  const ComicMetadataApplySucceeded();
+  const ComicMetadataApplySucceeded({
+    this.tagsWritten = false,
+    this.parodiesWritten = false,
+    this.charactersWritten = false,
+  });
+
+  /// 本次是否向仓储提交了 Tag 列表（可能写入全局 Tag 字典）。
+  final bool tagsWritten;
+
+  /// 本次是否向仓储提交了 Parody 列表（可能写入全局 Parody 字典）。
+  final bool parodiesWritten;
+
+  /// 本次是否向仓储提交了 Character 列表（可能写入全局 Character 字典）。
+  final bool charactersWritten;
 }
 
 extension ComicMetadataFormOps on ComicMetadataForm {
@@ -66,11 +85,14 @@ extension ComicMetadataFormOps on ComicMetadataForm {
     );
   }
 
-  /// trim 标题；概要空白 → `null`。
+  /// trim 标题；概要空白 → `null`；Language / Parody / Character trim + 保序去重。
   ComicMetadataForm get normalized {
     return copyWith(
       title: title.trim(),
       description: _normalizeOptionalText(description),
+      languages: _normalizeOrderedNames(languages),
+      parodies: _normalizeOrderedNames(parodies),
+      characters: _normalizeOrderedNames(characters),
     );
   }
 
@@ -114,6 +136,55 @@ extension ComicMetadataFormOps on ComicMetadataForm {
 
   ComicMetadataForm removeTag(String name) {
     return copyWith(tags: tags.where((Tag t) => t.name != name).toList());
+  }
+
+  ComicMetadataForm addLanguage(String canonical) {
+    final String trimmed = canonical.trim();
+    if (trimmed.isEmpty) {
+      return this;
+    }
+    if (languages.contains(trimmed)) {
+      return this;
+    }
+    return copyWith(languages: <String>[...languages, trimmed]);
+  }
+
+  ComicMetadataForm removeLanguage(String canonical) {
+    return copyWith(
+      languages: languages.where((String name) => name != canonical).toList(),
+    );
+  }
+
+  ComicMetadataForm addParody(String name) {
+    final String trimmed = name.trim();
+    if (trimmed.isEmpty) {
+      return this;
+    }
+    if (parodies.contains(trimmed)) {
+      return this;
+    }
+    return copyWith(parodies: <String>[...parodies, trimmed]);
+  }
+
+  ComicMetadataForm removeParody(String name) {
+    return copyWith(parodies: parodies.where((String n) => n != name).toList());
+  }
+
+  ComicMetadataForm addCharacter(String name) {
+    final String trimmed = name.trim();
+    if (trimmed.isEmpty) {
+      return this;
+    }
+    if (characters.contains(trimmed)) {
+      return this;
+    }
+    return copyWith(characters: <String>[...characters, trimmed]);
+  }
+
+  ComicMetadataForm removeCharacter(String name) {
+    return copyWith(
+      characters: characters.where((String n) => n != name).toList(),
+    );
   }
 
   /// 非法 → [ComicMetadataApplyInvalid]；相对 [original] 仅提交值变化字段 →
@@ -165,6 +236,18 @@ extension ComicMetadataFormOps on ComicMetadataForm {
         )
         ? ready.tags
         : null;
+    final List<String>? languages =
+        !_sameOrderedNames(ready.languages, original.languages)
+        ? ready.languages
+        : null;
+    final List<String>? parodies =
+        !_sameOrderedNames(ready.parodies, original.parodies)
+        ? ready.parodies
+        : null;
+    final List<String>? characters =
+        !_sameOrderedNames(ready.characters, original.characters)
+        ? ready.characters
+        : null;
 
     final bool hasChanges =
         title != null ||
@@ -173,7 +256,10 @@ extension ComicMetadataFormOps on ComicMetadataForm {
         clearPublishedAt ||
         contentRating != null ||
         authors != null ||
-        tags != null;
+        tags != null ||
+        languages != null ||
+        parodies != null ||
+        characters != null;
     if (!hasChanges) {
       return const ComicMetadataApplySucceeded();
     }
@@ -187,8 +273,15 @@ extension ComicMetadataFormOps on ComicMetadataForm {
       authors: authors,
       contentRating: contentRating,
       tags: tags,
+      languages: languages,
+      parodies: parodies,
+      characters: characters,
     );
-    return const ComicMetadataApplySucceeded();
+    return ComicMetadataApplySucceeded(
+      tagsWritten: tags != null,
+      parodiesWritten: parodies != null,
+      charactersWritten: characters != null,
+    );
   }
 }
 
@@ -198,6 +291,18 @@ String? _normalizeOptionalText(String? value) {
   }
   final String trimmed = value.trim();
   return trimmed.isEmpty ? null : trimmed;
+}
+
+List<String> _normalizeOrderedNames(Iterable<String> source) {
+  final List<String> out = <String>[];
+  for (final String raw in source) {
+    final String trimmed = raw.trim();
+    if (trimmed.isEmpty || out.contains(trimmed)) {
+      continue;
+    }
+    out.add(trimmed);
+  }
+  return out;
 }
 
 bool _sameOrderedNames(Iterable<String> a, Iterable<String> b) {

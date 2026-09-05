@@ -289,8 +289,7 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
     if (!_isRemote) {
       final LocalLibrary? original = widget.library;
       final bool rootChanged =
-          original == null ||
-          _form.rootPath.trim() != original.rootPath.trim();
+          original == null || _form.rootPath.trim() != original.rootPath.trim();
       if (_isCreate || rootChanged) {
         await ensureLocalFilesystemAccess();
         if (!mounted) {

@@ -9,6 +9,7 @@ class LibrarySeriesFilter {
     this.query,
     this.requireItems = true,
     this.serializationStatus,
+    this.preferLibraryRootSeries = true,
   });
 
   final bool showR18;
@@ -16,6 +17,7 @@ class LibrarySeriesFilter {
   final String? query;
   final bool requireItems;
   final String? serializationStatus;
+  final bool preferLibraryRootSeries;
 }
 
 class LibrarySeriesProjection {
@@ -25,6 +27,7 @@ class LibrarySeriesProjection {
     required LibraryAgeRestrictionFilter ageRestriction,
     LibrarySerializationStatusFilter serializationStatusFilter =
         LibrarySerializationStatusFilter.unrestricted,
+    bool preferLibraryRootSeries = true,
     String? keyword,
   }) {
     final String? query = keyword?.trim().isEmpty ?? true
@@ -39,6 +42,7 @@ class LibrarySeriesProjection {
       requireItems: true,
       serializationStatus: serializationStatusFilter
           .seriesSerializationStatus(),
+      preferLibraryRootSeries: preferLibraryRootSeries,
     );
   }
 }

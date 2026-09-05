@@ -4,6 +4,7 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -11,7 +12,9 @@ import 'package:hentai_library/ui/core/widgets/element/card/catalog_cover_card_s
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/series_item_context_menu.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_series_item_sort_order_dialog.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -48,7 +51,7 @@ class SeriesDetailComicCard extends HookConsumerWidget {
         comicId: comic.comicId,
         gridIndex: gridIndex,
         showEditOnHover: !compact,
-        onEdit: () => _openSortOrderDialog(context, ref),
+        onEdit: () => _openEditMetadata(context, ref),
       ),
       info: (bool isHover) => _SeriesDetailComicCardInfo(
         title: comic.title,
@@ -58,15 +61,24 @@ class SeriesDetailComicCard extends HookConsumerWidget {
     );
   }
 
-  void _openSortOrderDialog(BuildContext context, WidgetRef ref) {
-    showEditSeriesItemSortOrderDialog(
+  void _openEditMetadata(BuildContext context, WidgetRef ref) {
+    final Comic comic = item.comic;
+    showEditMetadataDialog(
       context: context,
-      ref: ref,
-      seriesId: seriesId,
-      comicId: item.comic.comicId,
-      comicTitle: item.comic.title,
-      initialSortOrder: item.sortOrder,
-      initialSortOrderLocked: item.sortOrderLocked,
+      comic: comic,
+      seriesItemSort: (
+        seriesId: seriesId,
+        sortOrder: item.sortOrder,
+        sortOrderLocked: item.sortOrderLocked,
+      ),
+      onSave: (ComicMetadataForm data) async {
+        await applyComicMetadataForm(
+          ref.read(comicRepoProvider),
+          data,
+          comic,
+          invalidate: ref.invalidate,
+        );
+      },
     );
   }
 
@@ -96,8 +108,8 @@ class SeriesDetailComicCard extends HookConsumerWidget {
   ) {
     final l10n = context.l10n;
     switch (action) {
-      case SeriesItemContextAction.editSortOrder:
-        _openSortOrderDialog(context, ref);
+      case SeriesItemContextAction.editMetadata:
+        _openEditMetadata(context, ref);
       case SeriesItemContextAction.showInExplorer:
         showInFileExplorer(item.comic.path).catchError((
           Object error,

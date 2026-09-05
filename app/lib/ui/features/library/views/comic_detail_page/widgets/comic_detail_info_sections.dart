@@ -43,8 +43,12 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
       context,
       comic.publishedAt,
     );
+    final bool hasLanguages = comic.languages.isNotEmpty;
 
-    if (pageLabel == null && !showR18 && publishedLabel == null) {
+    if (pageLabel == null &&
+        !showR18 &&
+        publishedLabel == null &&
+        !hasLanguages) {
       return const SizedBox.shrink();
     }
 
@@ -76,6 +80,8 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: tokens.spacing.xs,
       children: <Widget>[
+        // Stack: Language → age-restriction → page count (published date nearby).
+        if (hasLanguages) ComicLanguageSegments(languages: comic.languages),
         SizedBox(
           height: kDetailMetaChipRowHeight,
           child: Align(
@@ -91,6 +97,85 @@ class ComicDetailSummaryMetaRow extends ConsumerWidget {
             children: statSegments,
           ),
       ],
+    );
+  }
+}
+
+/// Cover-right Language 分段文案；点击跳转搜索结果（与 Tag/Author 相同的精确元数据查询）。
+class ComicLanguageSegments extends StatelessWidget {
+  const ComicLanguageSegments({super.key, required this.languages});
+
+  final List<String> languages;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppLocalizations l10n = context.l10n;
+    final List<Widget> children = <Widget>[];
+    for (int i = 0; i < languages.length; i++) {
+      if (i > 0) {
+        children.add(
+          Text(
+            '|',
+            style: TextStyle(
+              fontSize: tokens.text.bodySm,
+              color: cs.hentai.textSecondary,
+            ),
+          ),
+        );
+      }
+      final String canonical = languages[i];
+      children.add(
+        _ComicLanguageSegmentLink(
+          label: l10n.comicLanguageLabel(canonical),
+          onTap: () {
+            final String query = formatLibrarySearchExactMetaQuery(canonical);
+            final String encoded = Uri.encodeQueryComponent(query);
+            appRouter.push('/searched?q=$encoded');
+          },
+        ),
+      );
+    }
+    return Wrap(
+      spacing: 0,
+      runSpacing: tokens.spacing.xs,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: children,
+    );
+  }
+}
+
+class _ComicLanguageSegmentLink extends HookWidget {
+  const _ComicLanguageSegmentLink({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final ValueNotifier<bool> hovered = useState(false);
+    final Color color = hovered.value ? cs.primary : cs.hentai.textSecondary;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => hovered.value = true,
+      onExit: (_) => hovered.value = false,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: tokens.text.bodySm,
+            color: color,
+            decoration: hovered.value
+                ? TextDecoration.underline
+                : TextDecoration.none,
+            decorationColor: color,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -135,9 +220,26 @@ class ComicDetailMetadataBlock extends StatelessWidget {
     final List<String> authors = comic.authors.map((a) => a.name).toList();
     final List<String> tags = comic.tags.map((t) => t.name).toList();
     final List<Widget> rows = <Widget>[];
+    // Order: Parody → Author → Character → Tag.
+    if (comic.parodies.isNotEmpty) {
+      rows.add(
+        LabeledMetaChipRow(
+          label: l10n.comicDetailParodies,
+          items: comic.parodies,
+        ),
+      );
+    }
     if (authors.isNotEmpty) {
       rows.add(
         LabeledMetaChipRow(label: l10n.comicDetailAuthors, items: authors),
+      );
+    }
+    if (comic.characters.isNotEmpty) {
+      rows.add(
+        LabeledMetaChipRow(
+          label: l10n.comicDetailCharacters,
+          items: comic.characters,
+        ),
       );
     }
     if (tags.isNotEmpty) {
@@ -210,10 +312,14 @@ class LabeledMetaChipRow extends HookWidget {
     super.key,
     required this.label,
     required this.items,
+    this.onItemTap,
   });
 
   final String label;
   final List<String> items;
+
+  /// 为 null 时走库页精确元数据搜索（Author/Tag/Parody/Character）；非 null 时由调用方处理。
+  final ValueChanged<String>? onItemTap;
 
   @override
   Widget build(BuildContext context) {
@@ -248,6 +354,11 @@ class LabeledMetaChipRow extends HookWidget {
                       (String item) => OutlinedMetaChip(
                         text: item,
                         onTap: () {
+                          final ValueChanged<String>? custom = onItemTap;
+                          if (custom != null) {
+                            custom(item);
+                            return;
+                          }
                           final String query =
                               formatLibrarySearchExactMetaQuery(item);
                           final String encoded = Uri.encodeQueryComponent(

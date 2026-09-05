@@ -35,8 +35,8 @@ class SeriesRepositoryImpl implements SeriesRepository {
   }
 
   @override
-  Future<int> countAll() async => guardFrbSync(
-    () => rust_series.countAllSeriesFrb().toInt(),
+  Future<int> countAll() async => guardFrb(
+    () async => (await rust_series.countAllSeriesFrb()).toInt(),
     fallbackMessage: '统计系列数量失败',
   );
 
@@ -46,7 +46,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
     required LibrarySeriesFilter filter,
     required LibrarySeriesSortOption sortOption,
   }) async {
-    final rust_series.PagedSeriesResultDto page = guardFrbSync(
+    final rust_series.PagedSeriesResultDto page = await guardFrb(
       () => rust_series.fetchSeriesPageFrb(
         request: mapSeriesPageRequest(request),
         filter: mapLibrarySeriesFilter(filter),
@@ -59,7 +59,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
 
   @override
   Future<Series?> findById(String seriesId) async {
-    final rust_series.SeriesDto? dto = guardFrbSync(
+    final rust_series.SeriesDto? dto = await guardFrb(
       () => rust_series.findSeriesByIdFrb(seriesId: seriesId),
       fallbackMessage: '读取系列失败',
     );
@@ -82,7 +82,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
     required String seriesId,
     required PageRequest request,
   }) async {
-    final rust_series.PagedSeriesComicsResultDto page = guardFrbSync(
+    final rust_series.PagedSeriesComicsResultDto page = await guardFrb(
       () => rust_series.fetchSeriesComicsPageFrb(
         seriesId: seriesId,
         request: mapSeriesPageRequest(request),
@@ -191,13 +191,11 @@ class SeriesRepositoryImpl implements SeriesRepository {
 
   @override
   Future<List<Series>> searchByKeyword(String keyword) async {
-    return guardFrbSync(
-      () => rust_series
-          .searchSeriesByKeywordFrb(keyword: keyword)
-          .map(mapRustSeries)
-          .toList(),
+    final List<rust_series.SeriesDto> rows = await guardFrb(
+      () => rust_series.searchSeriesByKeywordFrb(keyword: keyword),
       fallbackMessage: '搜索系列失败',
     );
+    return rows.map(mapRustSeries).toList();
   }
 
   @override
@@ -206,16 +204,14 @@ class SeriesRepositoryImpl implements SeriesRepository {
     required Set<String> optionalOr,
     required Set<String> mustExclude,
   }) async {
-    return guardFrbSync(
-      () => rust_series
-          .searchSeriesByTagExpressionFrb(
-            mustInclude: mustInclude.toList(),
-            optionalOr: optionalOr.toList(),
-            mustExclude: mustExclude.toList(),
-          )
-          .map(mapRustSeries)
-          .toList(),
+    final List<rust_series.SeriesDto> rows = await guardFrb(
+      () => rust_series.searchSeriesByTagExpressionFrb(
+        mustInclude: mustInclude.toList(),
+        optionalOr: optionalOr.toList(),
+        mustExclude: mustExclude.toList(),
+      ),
       fallbackMessage: '按元数据搜索系列失败',
     );
+    return rows.map(mapRustSeries).toList();
   }
 }

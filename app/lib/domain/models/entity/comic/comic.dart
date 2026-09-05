@@ -20,6 +20,15 @@ abstract class Comic with _$Comic {
     @Default(<Author>[]) List<Author> authors,
     @Default(ContentRating.unknown) ContentRating contentRating,
     @Default(<Tag>[]) List<Tag> tags,
+
+    /// Ordered canonical English Language names; empty = unset.
+    @Default(<String>[]) List<String> languages,
+
+    /// Parody (IP / franchise) names; empty = none.
+    @Default(<String>[]) List<String> parodies,
+
+    /// Character names; empty = none.
+    @Default(<String>[]) List<String> characters,
     required int pageCount,
     String? description,
     DateTime? publishedAt,

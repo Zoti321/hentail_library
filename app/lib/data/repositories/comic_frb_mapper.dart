@@ -24,6 +24,9 @@ Comic mapRustComic(rust.ComicDto dto) {
     authors: dto.authors.map((String n) => Author(name: n)).toList(),
     contentRating: ContentRating.values.byName(dto.contentRating),
     tags: dto.tags.map((String n) => Tag(name: n)).toList(),
+    languages: List<String>.from(dto.languages),
+    parodies: List<String>.from(dto.parodies),
+    characters: List<String>.from(dto.characters),
     pageCount: dto.pageCount,
     description: dto.description,
     publishedAt: dto.publishedAt == null
@@ -39,6 +42,9 @@ Comic mapRustComic(rust.ComicDto dto) {
       contentRating: dto.locks.contentRating,
       authors: dto.locks.authors,
       tags: dto.locks.tags,
+      languages: dto.locks.languages,
+      parodies: dto.locks.parodies,
+      characters: dto.locks.characters,
     ),
   );
 }
@@ -58,6 +64,9 @@ rust.ComicFilterDto mapLibraryFilter(LibraryComicFilter filter) {
     authorsAll: _mapAuthorPicks(filter.authorsAll),
     authorsAny: _mapAuthorPicks(filter.authorsAny),
     authorsExclude: _mapAuthorPicks(filter.authorsExclude),
+    languages: _mapStringSet(filter.languages),
+    parodies: _mapStringSet(filter.parodies),
+    characters: _mapStringSet(filter.characters),
   );
 }
 
@@ -68,6 +77,16 @@ List<String> _mapTagPicks(Set<LibraryTagPick>? picks) {
   return picks
       .map((LibraryTagPick pick) => pick.name.trim().toLowerCase())
       .where((String name) => name.isNotEmpty)
+      .toList();
+}
+
+List<String> _mapStringSet(Set<String>? items) {
+  if (items == null || items.isEmpty) {
+    return const <String>[];
+  }
+  return items
+      .map((String s) => s.trim().toLowerCase())
+      .where((String s) => s.isNotEmpty)
       .toList();
 }
 
@@ -124,5 +143,8 @@ rust.ComicFilterDto unrestrictedListFilter() {
     authorsAll: <String>[],
     authorsAny: <String>[],
     authorsExclude: <String>[],
+    languages: <String>[],
+    parodies: <String>[],
+    characters: <String>[],
   );
 }

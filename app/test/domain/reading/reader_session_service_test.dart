@@ -56,16 +56,19 @@ class _FakeComicPageSourcePort implements ComicPageSourcePort {
     List<List<int>>? prefetchedPageIndexes,
     List<String>? clearedComicIds,
   }) : prefetchedPageIndexes = prefetchedPageIndexes ?? <List<int>>[],
-       clearedComicIds = clearedComicIds ?? <String>[];
+       clearedComicIds = clearedComicIds ?? <String>[],
+       loadPagesCallCount = 0;
 
   final List<ReadSessionPage> pages;
   final Object? error;
   final ReaderPagePayload? readerPagePayload;
   final List<List<int>> prefetchedPageIndexes;
   final List<String> clearedComicIds;
+  int loadPagesCallCount;
 
   @override
   Future<List<ReadSessionPage>> loadPages(Comic comic) async {
+    loadPagesCallCount += 1;
     if (error != null) {
       throw error!;
     }
@@ -101,7 +104,7 @@ class _FakeComicPageSourcePort implements ComicPageSourcePort {
   }
 
   @override
-  void clearPageCache({required String comicId}) {
+  Future<void> clearPageCache({required String comicId}) async {
     clearedComicIds.add(comicId);
   }
 }
@@ -257,6 +260,44 @@ void main() {
       expect(sessionPort.closedComicIds, <String>['c1']);
     });
 
+    test('open then loadPages lists pages only once', () async {
+      final _FakeReaderSessionPort sessionPort = _FakeReaderSessionPort();
+      final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
+        pages: <ReadSessionPage>[
+          ReadSessionArchivePage(comicId: 'c1', pageIndex: 0),
+          ReadSessionArchivePage(comicId: 'c1', pageIndex: 1),
+        ],
+      );
+      final ReaderSessionService service = ReaderSessionService(
+        comicRepo: _FakeComicRepository(comic: _inputComic()),
+        pageSource: pageSource,
+        readingHistoryRepo: _FakeReadingHistoryRepository(),
+        sessionPort: sessionPort,
+      );
+
+      final ReaderSessionSnapshot snapshot = await service.open(comicId: 'c1');
+      final List<ReadSessionPage> pages = await service.loadPages('c1');
+
+      expect(snapshot.pages, pages);
+      expect(pageSource.loadPagesCallCount, 1);
+      expect(sessionPort.openedComicIds, <String>['c1']);
+    });
+
+    test('close clears page-list cache so next open lists again', () async {
+      final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
+        pages: <ReadSessionPage>[
+          ReadSessionArchivePage(comicId: 'c1', pageIndex: 0),
+        ],
+      );
+      final ReaderSessionService service = _service(pageSource: pageSource);
+
+      await service.open(comicId: 'c1');
+      await service.close('c1');
+      await service.open(comicId: 'c1');
+
+      expect(pageSource.loadPagesCallCount, 2);
+    });
+
     test(
       'loadReaderPage delegates to page source with archive index',
       () async {
@@ -330,13 +371,13 @@ void main() {
       ]);
     });
 
-    test('clearPageCache delegates to page source', () {
+    test('clearPageCache delegates to page source', () async {
       final _FakeComicPageSourcePort pageSource = _FakeComicPageSourcePort(
         pages: <ReadSessionPage>[],
       );
       final ReaderSessionService service = _service(pageSource: pageSource);
 
-      service.clearPageCache(comicId: 'c1');
+      await service.clearPageCache(comicId: 'c1');
 
       expect(pageSource.clearedComicIds, <String>['c1']);
     });

@@ -562,9 +562,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get setCurrentLibrary => '设为当前库';
 
   @override
-  String get syncAllLibraries => '同步全部库';
-
-  @override
   String get settingsAutoUpdateLabel => '自动更新';
 
   @override
@@ -667,6 +664,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get librarySerializationStatusFilter => '连载状态';
 
   @override
+  String get libraryLanguageFilter => '语言';
+
+  @override
+  String get libraryParodyFilter => '原作';
+
+  @override
+  String get libraryCharacterFilter => '角色';
+
+  @override
   String get libraryTagFilter => '标签';
 
   @override
@@ -722,6 +728,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get librarySeriesSortRandom => '随机';
+
+  @override
+  String get libraryPreferLibraryRootSeries => '优先显示库根系列';
 
   @override
   String get filterAgeUnrestricted => '不限';
@@ -815,6 +824,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get comicDetailTags => '标签';
 
   @override
+  String get comicDetailParodies => '原作';
+
+  @override
+  String get comicDetailCharacters => '角色';
+
+  @override
   String get comicDetailResourceFormat => '资源格式';
 
   @override
@@ -902,12 +917,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get seriesDetailEdit => '编辑系列';
-
-  @override
-  String get seriesItemEditSortOrder => '编辑排序';
-
-  @override
-  String get dialogEditSeriesItemSortOrderTitle => '编辑排序';
 
   @override
   String get formSeriesItemSortOrderLabel => '排序序号';
@@ -1347,6 +1356,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get formPublishedDateLabel => '发布日期';
 
   @override
+  String get formLanguagesLabel => '语言';
+
+  @override
+  String get comicLanguageChinese => '中文';
+
+  @override
+  String get comicLanguageJapanese => '日语';
+
+  @override
+  String get comicLanguageEnglish => '英语';
+
+  @override
+  String get comicLanguageKorean => '韩语';
+
+  @override
+  String get comicLanguageSpanish => '西班牙语';
+
+  @override
+  String get comicLanguageOther => '其他';
+
+  @override
   String get formAgeRestrictionLabel => '年龄限制';
 
   @override
@@ -1381,6 +1411,30 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get formAuthorEmptyRemaining => '没有更多可选';
+
+  @override
+  String get formParodySelectPlaceholder => '选择或输入原作…';
+
+  @override
+  String get formParodyListLoadFailed => '原作列表加载失败';
+
+  @override
+  String get formParodyEmptyCatalog => '暂无原作';
+
+  @override
+  String get formParodyEmptyRemaining => '没有更多可选';
+
+  @override
+  String get formCharacterSelectPlaceholder => '选择或输入角色…';
+
+  @override
+  String get formCharacterListLoadFailed => '角色列表加载失败';
+
+  @override
+  String get formCharacterEmptyCatalog => '暂无角色';
+
+  @override
+  String get formCharacterEmptyRemaining => '没有更多可选';
 
   @override
   String get formTagSelectPlaceholder => '选择或输入标签…';

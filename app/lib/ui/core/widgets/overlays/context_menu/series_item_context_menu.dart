@@ -3,7 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/common.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-enum SeriesItemContextAction { editSortOrder, showInExplorer }
+enum SeriesItemContextAction { editMetadata, showInExplorer }
 
 class SeriesItemContextMenu {
   static void show(
@@ -52,8 +52,8 @@ class _MenuContent extends StatelessWidget {
           children: <Widget>[
             ContextMenuActionItem(
               icon: LucideIcons.pencil,
-              label: l10n.seriesItemEditSortOrder,
-              onTap: () => handleAction(SeriesItemContextAction.editSortOrder),
+              label: l10n.comicDetailEditMetadata,
+              onTap: () => handleAction(SeriesItemContextAction.editMetadata),
             ),
             ContextMenuActionItem(
               icon: LucideIcons.externalLink,

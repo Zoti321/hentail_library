@@ -18,6 +18,14 @@
 | `*.bak` | 轮转备份（若有） |
 | `diagnostics.json` | 版本、平台、导出时间、日志级别 |
 
+## 性能复现（流畅度排查）
+
+复现 UI 卡顿时请**关闭详细诊断**（Verbose / Dart `FINE` + Rust `debug`）。热路径日志本身会污染 Timeline（见 ADR-0004、issue #80 P2-7）。
+
+1. 确认设置里 **详细诊断** 为关（冷启动默认关）。
+2. 使用 **Profile** 模式：`flutter run --profile`。
+3. 再用 DevTools Performance 抓滚动 / 翻页帧。
+
 ## 本地查看 Rust 日志（开发）
 
 ```bash

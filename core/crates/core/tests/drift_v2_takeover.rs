@@ -338,9 +338,12 @@ fn fetch_series_page_random_order_varies_between_queries() {
                 fetch_series_page, SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto,
             };
             use std::collections::HashSet;
+            // 关闭「优先库根」：否则 CASE 分区会把根系列钉死在最前，
+            // fixture 里若根/非根各仅少数条，RANDOM() 无法体现整体顺序变化。
             let filter = SeriesFilterDto {
                 show_r18: true,
                 require_items: true,
+                prefer_library_root_series: false,
                 ..Default::default()
             };
             let mut orders = HashSet::new();

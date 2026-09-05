@@ -16,7 +16,7 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
   @override
   Future<List<ReadSessionPage>> loadPages(Comic comic) async {
     try {
-      final rust.ReaderPageListDto pageList = rust.loadPageListFrb(
+      final rust.ReaderPageListDto pageList = await rust.loadPageListFrb(
         comicId: comic.comicId,
         path: comic.path,
         resourceType: mapResourceType(comic.resourceType),
@@ -128,7 +128,7 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
   }
 
   @override
-  void clearPageCache({required String comicId}) {
-    rust.clearReaderPageCacheFrb(comicId: comicId);
+  Future<void> clearPageCache({required String comicId}) {
+    return rust.clearReaderPageCacheFrb(comicId: comicId);
   }
 }

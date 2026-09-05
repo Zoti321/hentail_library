@@ -30,4 +30,21 @@ void main() {
       greaterThanOrEqualTo(1),
     );
   });
+
+  test(
+    'cover viewport membership select only flips for enter/leave indices',
+    () {
+      const Set<int> previous = <int>{0, 1, 2, 3};
+      const Set<int> next = <int>{2, 3, 4, 5};
+
+      bool membership(Set<int> indices, int index) => indices.contains(index);
+
+      expect(membership(previous, 0), isTrue);
+      expect(membership(next, 0), isFalse);
+      expect(membership(previous, 2), isTrue);
+      expect(membership(next, 2), isTrue);
+      expect(membership(previous, 5), isFalse);
+      expect(membership(next, 5), isTrue);
+    },
+  );
 }

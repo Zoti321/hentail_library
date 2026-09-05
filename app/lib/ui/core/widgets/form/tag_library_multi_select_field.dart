@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/data/repositories/named_facet_form_listing.dart';
+import 'package:hentai_library/domain/models/named_facet_form_candidate.dart';
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
-import 'package:hentai_library/ui/providers.dart';
+import 'package:hentai_library/ui/core/widgets/form/named_facet_multi_select_field.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+/// Snapshot of Tag candidates for Comic metadata form (attachment count order).
+final tagsForComicMetadataFormProvider =
+    FutureProvider.autoDispose<List<NamedFacetFormCandidate>>((Ref ref) {
+      return listNamedFacetForMetadataForm(NamedFacetFormKind.tag);
+    });
 
 /// 全库标签多选：字段内 chip + 内联输入；浮层列出未选字典项。
 class TagLibraryMultiSelectField extends ConsumerWidget {
@@ -31,7 +38,7 @@ class TagLibraryMultiSelectField extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    return MultiSelect<Tag>(
+    return NamedFacetMultiSelectField(
       label: label,
       labelTrailing: labelTrailing,
       icon: icon,
@@ -39,9 +46,8 @@ class TagLibraryMultiSelectField extends ConsumerWidget {
       onAdd: onAdd,
       onRemove: onRemove,
       compactTrigger: compactTrigger,
-      itemsProvider: allTagsProvider,
-      onRetry: () => ref.invalidate(allTagsProvider),
-      resolveName: (Tag tag) => tag.name,
+      itemsProvider: tagsForComicMetadataFormProvider,
+      onRetry: () => ref.invalidate(tagsForComicMetadataFormProvider),
       copy: MultiSelectCopy(
         inputPlaceholder: l10n.formTagSelectPlaceholder,
         listLoadFailed: l10n.formTagListLoadFailed,

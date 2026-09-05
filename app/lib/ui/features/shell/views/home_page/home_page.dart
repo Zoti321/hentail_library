@@ -71,17 +71,17 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final AsyncValue<HomePageCounts> homePageCounts = ref.watch(
-      homePageCountsStreamProvider,
+    final ({int comicCount, bool isLibraryEmpty}) homeCountsLeaf = ref.watch(
+      homePageCountsStreamProvider.select((AsyncValue<HomePageCounts> async) {
+        return async.maybeWhen(
+          data: (HomePageCounts c) =>
+              (comicCount: c.comicCount, isLibraryEmpty: c.comicCount == 0),
+          orElse: () => (comicCount: 0, isLibraryEmpty: false),
+        );
+      }),
     );
-    final int comicCount = homePageCounts.maybeWhen(
-      data: (HomePageCounts c) => c.comicCount,
-      orElse: () => 0,
-    );
-    final bool isLibraryEmpty = homePageCounts.maybeWhen(
-      data: (HomePageCounts c) => c.comicCount == 0,
-      orElse: () => false,
-    );
+    final int comicCount = homeCountsLeaf.comicCount;
+    final bool isLibraryEmpty = homeCountsLeaf.isLibraryEmpty;
     final l10n = context.l10n;
     final String greetingText = l10n.homeGreetingReader(
       l10n.homeGreetingPhraseForHour(DateTime.now().hour),

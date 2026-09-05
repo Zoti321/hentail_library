@@ -34,6 +34,9 @@ abstract class ComicRepository {
     List<Author>? authors,
     ContentRating? contentRating,
     List<Tag>? tags,
+    List<String>? languages,
+    List<String>? parodies,
+    List<String>? characters,
   });
 
   /// 按字段设置元数据锁（不改值）；`null` 表示该字段不变。
@@ -45,15 +48,32 @@ abstract class ComicRepository {
     bool? contentRating,
     bool? authors,
     bool? tags,
+    bool? languages,
+    bool? parodies,
+    bool? characters,
   });
 
   /// 关键词搜索（数据库命中），由上层决定是否再应用额外业务过滤。
   Future<List<Comic>> searchByKeyword(String keyword);
+
+  /// 关键词分页搜索。
+  Future<PagedResult<Comic>> searchByKeywordPage({
+    required String keyword,
+    required PageRequest request,
+  });
 
   /// 元数据表达式搜索（每 token 匹配标签名或作者名），由上层决定是否再应用额外业务过滤。
   Future<List<Comic>> searchByMetadataExpression({
     required Set<String> mustInclude,
     required Set<String> optionalOr,
     required Set<String> mustExclude,
+  });
+
+  /// 元数据表达式分页搜索。
+  Future<PagedResult<Comic>> searchByMetadataExpressionPage({
+    required Set<String> mustInclude,
+    required Set<String> optionalOr,
+    required Set<String> mustExclude,
+    required PageRequest request,
   });
 }

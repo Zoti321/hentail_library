@@ -24,18 +24,22 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
     required this.names,
     required this.selection,
     required this.onToggle,
-    required this.onIncludeModeChanged,
+    this.onIncludeModeChanged,
     required this.onClear,
     this.isLoading = false,
+    this.includeOnly = false,
+    this.labelFor,
   });
 
   final String title;
   final List<String> names;
   final LibraryMetadataFilterSelection selection;
   final LibraryMetadataFilterToggle onToggle;
-  final LibraryMetadataIncludeModeChanged onIncludeModeChanged;
+  final LibraryMetadataIncludeModeChanged? onIncludeModeChanged;
   final LibraryMetadataFilterClear onClear;
   final bool isLoading;
+  final bool includeOnly;
+  final String Function(String name)? labelFor;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -104,58 +108,61 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  kLibraryFilterSortDrawerContentInset,
-                  tokens.spacing.sm,
-                  kLibraryFilterSortDrawerContentInset,
-                  8,
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: TextField(
-                        onChanged: (String value) => searchQuery.value = value,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: cs.hentai.textPrimary,
-                        ),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          hintText: l10n.libraryMetadataFilterSearchHint,
-                          hintStyle: TextStyle(color: cs.hentai.textTertiary),
-                          prefixIcon: Icon(
-                            LucideIcons.search,
-                            size: 16,
-                            color: cs.hentai.iconSecondary,
+              if (!includeOnly || names.length > 6)
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    kLibraryFilterSortDrawerContentInset,
+                    tokens.spacing.sm,
+                    kLibraryFilterSortDrawerContentInset,
+                    8,
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TextField(
+                          onChanged: (String value) =>
+                              searchQuery.value = value,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: cs.hentai.textPrimary,
                           ),
-                          prefixIconConstraints: const BoxConstraints(
-                            minWidth: 36,
-                            minHeight: 32,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 8,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: cs.outlineVariant),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: cs.outlineVariant),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            hintText: l10n.libraryMetadataFilterSearchHint,
+                            hintStyle: TextStyle(color: cs.hentai.textTertiary),
+                            prefixIcon: Icon(
+                              LucideIcons.search,
+                              size: 16,
+                              color: cs.hentai.iconSecondary,
+                            ),
+                            prefixIconConstraints: const BoxConstraints(
+                              minWidth: 36,
+                              minHeight: 32,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 8,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(color: cs.outlineVariant),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(color: cs.outlineVariant),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    _IncludeModeIconButton(
-                      mode: selection.includeMode,
-                      onChanged: onIncludeModeChanged,
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      if (!includeOnly && onIncludeModeChanged != null)
+                        _IncludeModeIconButton(
+                          mode: selection.includeMode,
+                          onChanged: onIncludeModeChanged!,
+                        ),
+                    ],
+                  ),
                 ),
-              ),
               if (isLoading)
                 Padding(
                   padding: const EdgeInsets.all(16),
@@ -187,16 +194,18 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
                   ),
                 )
               else
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 240),
+                SizedBox(
+                  height: 240,
                   child: ListView.builder(
-                    shrinkWrap: true,
+                    itemExtent: 40,
                     itemCount: filteredNames.length,
                     itemBuilder: (BuildContext context, int index) {
                       final String name = filteredNames[index];
                       final LibraryTriStatePick state = selection.pickStateFor(
                         name,
                       );
+                      final bool isIncluded =
+                          state == LibraryTriStatePick.include;
                       return Material(
                         color: Colors.transparent,
                         child: InkWell(
@@ -212,14 +221,27 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
                             ),
                             child: Row(
                               children: <Widget>[
-                                LibraryTriStateFilterCheckbox(
-                                  state: state,
-                                  onPressed: () => onToggle(name),
-                                ),
+                                if (includeOnly)
+                                  SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: Checkbox(
+                                      value: isIncluded,
+                                      onChanged: (_) => onToggle(name),
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      visualDensity: VisualDensity.compact,
+                                    ),
+                                  )
+                                else
+                                  LibraryTriStateFilterCheckbox(
+                                    state: state,
+                                    onPressed: () => onToggle(name),
+                                  ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    name,
+                                    labelFor?.call(name) ?? name,
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: cs.hentai.textPrimary,

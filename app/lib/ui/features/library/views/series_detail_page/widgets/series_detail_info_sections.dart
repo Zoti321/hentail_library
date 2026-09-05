@@ -49,10 +49,12 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
     super.key,
     required this.series,
     this.hasR18 = false,
+    this.languages = const <String>[],
   });
 
   final Series series;
   final bool hasR18;
+  final List<String> languages;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +63,7 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final bool showSerialization =
         series.serializationStatus != SerializationStatus.unknown;
+    final bool hasLanguages = languages.isNotEmpty;
     final List<Widget> chipRowChildren = <Widget>[
       if (showSerialization)
         SeriesSerializationChip(status: series.serializationStatus),
@@ -71,6 +74,8 @@ class SeriesDetailSummaryMetaRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: tokens.spacing.xs,
       children: <Widget>[
+        // Align with Comic cover-right: Language → status chips → volume.
+        if (hasLanguages) ComicLanguageSegments(languages: languages),
         SizedBox(
           height: kSeriesDetailMetaChipRowHeight,
           child: Align(
@@ -104,19 +109,37 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
     super.key,
     required this.authors,
     required this.tags,
+    this.parodies = const <String>[],
+    this.characters = const <String>[],
   });
 
   final List<String> authors;
   final List<String> tags;
+  final List<String> parodies;
+  final List<String> characters;
 
   @override
   Widget build(BuildContext context) {
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
     final List<Widget> rows = <Widget>[];
+    // Order: Parody → Author → Character → Tag（与 Comic 一致）。
+    if (parodies.isNotEmpty) {
+      rows.add(
+        LabeledMetaChipRow(label: l10n.comicDetailParodies, items: parodies),
+      );
+    }
     if (authors.isNotEmpty) {
       rows.add(
         LabeledMetaChipRow(label: l10n.comicDetailAuthors, items: authors),
+      );
+    }
+    if (characters.isNotEmpty) {
+      rows.add(
+        LabeledMetaChipRow(
+          label: l10n.comicDetailCharacters,
+          items: characters,
+        ),
       );
     }
     if (tags.isNotEmpty) {

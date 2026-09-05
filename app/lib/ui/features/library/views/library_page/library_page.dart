@@ -1,10 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_cover_viewport_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_inactive_subscription.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_revision_coordinator.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
@@ -22,6 +23,8 @@ class LibraryPage extends ConsumerStatefulWidget {
 }
 
 class _LibraryPageState extends ConsumerState<LibraryPage> {
+  static const Duration _coverViewportMinInterval = Duration(milliseconds: 75);
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey _headerMeasureKey = GlobalKey();
   final GlobalKey _catalogBlocksKey = GlobalKey();
@@ -29,6 +32,10 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   double? _headerExtent;
   double? _catalogGridContentStartOffset;
   bool _isEndDrawerOpen = false;
+  bool _coverViewportUpdateScheduled = false;
+  DateTime? _lastCoverViewportUpdateAt;
+  Timer? _coverViewportThrottleTimer;
+
   @override
   void initState() {
     super.initState();
@@ -38,16 +45,44 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   void dispose() {
+    _coverViewportThrottleTimer?.cancel();
     _scrollController.removeListener(_scheduleCoverViewportUpdate);
     _scrollController.dispose();
     super.dispose();
   }
 
   void _scheduleCoverViewportUpdate() {
+    if (_coverViewportUpdateScheduled) {
+      return;
+    }
+    final DateTime now = DateTime.now();
+    final DateTime? last = _lastCoverViewportUpdateAt;
+    if (last != null) {
+      final Duration elapsed = now.difference(last);
+      if (elapsed < _coverViewportMinInterval) {
+        _coverViewportUpdateScheduled = true;
+        _coverViewportThrottleTimer?.cancel();
+        _coverViewportThrottleTimer = Timer(
+          _coverViewportMinInterval - elapsed,
+          () {
+            _coverViewportUpdateScheduled = false;
+            if (!mounted) {
+              return;
+            }
+            _scheduleCoverViewportUpdate();
+          },
+        );
+        return;
+      }
+    }
+
+    _coverViewportUpdateScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _coverViewportUpdateScheduled = false;
       if (!mounted) {
         return;
       }
+      _lastCoverViewportUpdateAt = DateTime.now();
       _updateCoverViewport();
     });
   }
@@ -148,7 +183,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(libraryCatalogRevisionCoordinatorProvider);
+    // Keep inactive-tab catalog warm; do not watch revision coordinator here —
+    // catalog controllers already select watchRevision leaves.
     ref.watch(libraryCatalogInactiveSubscriptionProvider);
     ref.listen<LibraryDisplayTarget>(libraryDisplayTargetProvider, (
       LibraryDisplayTarget? previous,
@@ -247,45 +283,36 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               : null,
           body: Stack(
             children: <Widget>[
-              NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification notification) {
-                  if (notification is ScrollUpdateNotification ||
-                      notification is ScrollMetricsNotification) {
-                    _scheduleCoverViewportUpdate();
-                  }
-                  return false;
-                },
-                child: CustomScrollView(
-                  controller: _scrollController,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  slivers: <Widget>[
-                    if (_headerExtent == null)
-                      SliverToBoxAdapter(child: header)
-                    else
-                      SliverPersistentHeader(
-                        pinned: true,
-                        delegate: LibraryPinnedHeaderDelegate(
-                          extent: _headerExtent!,
-                          child: header,
-                        ),
+              CustomScrollView(
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: <Widget>[
+                  if (_headerExtent == null)
+                    SliverToBoxAdapter(child: header)
+                  else
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: LibraryPinnedHeaderDelegate(
+                        extent: _headerExtent!,
+                        child: header,
                       ),
-                    LibraryContentSearchSliver(
+                    ),
+                  LibraryContentSearchSliver(
+                    layoutTier: layoutTier,
+                    horizontalPadding: horizontalPadding,
+                  ),
+                  LibraryBlocksSliverGroup(
+                    key: _catalogBlocksKey,
+                    seriesBlock: LibrarySeriesBlock(
                       layoutTier: layoutTier,
                       horizontalPadding: horizontalPadding,
                     ),
-                    LibraryBlocksSliverGroup(
-                      key: _catalogBlocksKey,
-                      seriesBlock: LibrarySeriesBlock(
-                        layoutTier: layoutTier,
-                        horizontalPadding: horizontalPadding,
-                      ),
-                      comicsBlock: LibraryComicsBlock(
-                        layoutTier: layoutTier,
-                        horizontalPadding: horizontalPadding,
-                      ),
+                    comicsBlock: LibraryComicsBlock(
+                      layoutTier: layoutTier,
+                      horizontalPadding: horizontalPadding,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               LibraryScrollToTopButton(
                 scrollController: _scrollController,

@@ -12,8 +12,10 @@ import 'package:hentai_library/domain/reading/reader_page_payload.dart';
 import 'package:hentai_library/domain/reading/reader_session_snapshot.dart';
 
 /// 阅读 I/O 编排：显式 open/close、页码约定与 session snapshot。
+///
+/// 同一 comicId 在 close 前复用页列表，避免 open 与 loadPages 双次列页。
 class ReaderSessionService {
-  const ReaderSessionService({
+  ReaderSessionService({
     required ComicRepository comicRepo,
     required ComicPageSourcePort pageSource,
     required ReadingHistoryRepository readingHistoryRepo,
@@ -27,6 +29,8 @@ class ReaderSessionService {
   final ComicPageSourcePort _pageSource;
   final ReadingHistoryRepository _readingHistoryRepo;
   final ReaderSessionPort _sessionPort;
+  final Map<String, ({Comic comic, List<ReadSessionPage> pages})> _openedPages =
+      <String, ({Comic comic, List<ReadSessionPage> pages})>{};
 
   /// UI 页码为 1-based；归档页字节 API 为 0-based。
   static int uiToArchivePageIndex(int oneBasedPageIndex) =>
@@ -71,7 +75,10 @@ class ReaderSessionService {
     return opened.pages;
   }
 
-  Future<void> close(String comicId) => _sessionPort.closeComic(comicId);
+  Future<void> close(String comicId) async {
+    _openedPages.remove(comicId);
+    await _sessionPort.closeComic(comicId);
+  }
 
   Future<Uint8List?> loadPageBytes({
     required Comic comic,
@@ -126,13 +133,18 @@ class ReaderSessionService {
     );
   }
 
-  void clearPageCache({required String comicId}) {
-    _pageSource.clearPageCache(comicId: comicId);
+  Future<void> clearPageCache({required String comicId}) {
+    return _pageSource.clearPageCache(comicId: comicId);
   }
 
   Future<({Comic comic, List<ReadSessionPage> pages})> _openPages(
     String comicId,
   ) async {
+    final ({Comic comic, List<ReadSessionPage> pages})? cached =
+        _openedPages[comicId];
+    if (cached != null) {
+      return cached;
+    }
     final Comic? comic = await _comicRepo.findById(comicId);
     if (comic == null) {
       throw ReadSessionPageLoadException.comicNotFound(comicId);
@@ -146,7 +158,12 @@ class ReaderSessionService {
           path: comic.path,
         );
       }
-      return (comic: comic, pages: List<ReadSessionPage>.unmodifiable(pages));
+      final ({Comic comic, List<ReadSessionPage> pages}) opened = (
+        comic: comic,
+        pages: List<ReadSessionPage>.unmodifiable(pages),
+      );
+      _openedPages[comicId] = opened;
+      return opened;
     } on ReadSessionPageLoadException {
       rethrow;
     } on Object catch (error, stackTrace) {

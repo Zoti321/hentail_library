@@ -6,10 +6,11 @@ use sea_orm::{
 use crate::comic::{now_ms, ComicDto};
 use crate::db::map_db_err;
 use crate::entity::{
-    authors, comic_authors, comic_meta, comic_tags, comic_thumbnails, comics, prelude::*, tags,
+    comic_authors, comic_meta, comic_tags, comic_thumbnails, comics, prelude::*,
 };
 use crate::error::HentaiError;
 use crate::history::normalize_reading_history_titles;
+use crate::named_facet::{replace_comic_named_facet, JunctionNamedFacet};
 use crate::util::compute_sort_key;
 
 use super::migrate::ComicMigration;
@@ -86,6 +87,10 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
         content_rating_locked: Set(comic.locks.content_rating),
         authors_locked: Set(comic.locks.authors),
         tags_locked: Set(comic.locks.tags),
+        languages: Set(crate::comic::serialize_languages(&comic.languages)),
+        languages_locked: Set(comic.locks.languages),
+        parodies_locked: Set(comic.locks.parodies),
+        characters_locked: Set(comic.locks.characters),
     };
     ComicMeta::insert(meta_active)
         .exec(db)
@@ -94,6 +99,8 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
 
     rekey_comic_child_table(db, "comic_tags", from_id, to_id).await?;
     rekey_comic_child_table(db, "comic_authors", from_id, to_id).await?;
+    rekey_comic_child_table(db, "comic_parodies", from_id, to_id).await?;
+    rekey_comic_child_table(db, "comic_characters", from_id, to_id).await?;
     rekey_comic_child_table(db, "comic_reading_histories", from_id, to_id).await?;
     rekey_comic_child_table(db, "comic_thumbnails", from_id, to_id).await?;
     rekey_comic_child_table(db, "series_items", from_id, to_id).await?;
@@ -364,6 +371,10 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
             content_rating_locked: Set(comic.locks.content_rating),
             authors_locked: Set(comic.locks.authors),
             tags_locked: Set(comic.locks.tags),
+            languages: Set(crate::comic::serialize_languages(&comic.languages)),
+            languages_locked: Set(comic.locks.languages),
+            parodies_locked: Set(comic.locks.parodies),
+            characters_locked: Set(comic.locks.characters),
         };
         ComicMeta::insert(meta_active)
             .on_conflict(
@@ -381,6 +392,10 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
                         comic_meta::Column::ContentRatingLocked,
                         comic_meta::Column::AuthorsLocked,
                         comic_meta::Column::TagsLocked,
+                        comic_meta::Column::Languages,
+                        comic_meta::Column::LanguagesLocked,
+                        comic_meta::Column::ParodiesLocked,
+                        comic_meta::Column::CharactersLocked,
                     ])
                     .to_owned(),
             )
@@ -390,6 +405,8 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
 
         replace_comic_authors(db, &comic.comic_id, &comic.authors).await?;
         replace_comic_tags(db, &comic.comic_id, &comic.tags).await?;
+        replace_comic_parodies(db, &comic.comic_id, &comic.parodies).await?;
+        replace_comic_characters(db, &comic.comic_id, &comic.characters).await?;
     }
     Ok(())
 }
@@ -427,33 +444,7 @@ pub async fn replace_comic_authors<C: ConnectionTrait>(
     comic_id: &str,
     author_names: &[String],
 ) -> Result<(), HentaiError> {
-    ComicAuthors::delete_many()
-        .filter(comic_authors::Column::ComicId.eq(comic_id))
-        .exec(db)
-        .await
-        .map_err(map_db_err)?;
-    let unique: std::collections::HashSet<&String> = author_names.iter().collect();
-    for name in unique {
-        let author = authors::ActiveModel {
-            name: Set(name.clone()),
-        };
-        Authors::insert(author)
-            .on_conflict(
-                sea_orm::sea_query::OnConflict::column(authors::Column::Name)
-                    .do_nothing()
-                    .to_owned(),
-            )
-            .do_nothing()
-            .exec(db)
-            .await
-            .map_err(map_db_err)?;
-        let row = comic_authors::ActiveModel {
-            comic_id: Set(comic_id.to_string()),
-            author_name: Set(name.clone()),
-        };
-        ComicAuthors::insert(row).exec(db).await.map_err(map_db_err)?;
-    }
-    Ok(())
+    replace_comic_named_facet(db, JunctionNamedFacet::Author, comic_id, author_names).await
 }
 
 pub async fn replace_comic_tags<C: ConnectionTrait>(
@@ -461,31 +452,21 @@ pub async fn replace_comic_tags<C: ConnectionTrait>(
     comic_id: &str,
     tag_names: &[String],
 ) -> Result<(), HentaiError> {
-    ComicTags::delete_many()
-        .filter(comic_tags::Column::ComicId.eq(comic_id))
-        .exec(db)
-        .await
-        .map_err(map_db_err)?;
-    let unique: std::collections::HashSet<&String> = tag_names.iter().collect();
-    for name in unique {
-        let tag = tags::ActiveModel {
-            name: Set(name.clone()),
-        };
-        Tags::insert(tag)
-            .on_conflict(
-                sea_orm::sea_query::OnConflict::column(tags::Column::Name)
-                    .do_nothing()
-                    .to_owned(),
-            )
-            .do_nothing()
-            .exec(db)
-            .await
-            .map_err(map_db_err)?;
-        let row = comic_tags::ActiveModel {
-            comic_id: Set(comic_id.to_string()),
-            tag_name: Set(name.clone()),
-        };
-        ComicTags::insert(row).exec(db).await.map_err(map_db_err)?;
-    }
-    Ok(())
+    replace_comic_named_facet(db, JunctionNamedFacet::Tag, comic_id, tag_names).await
+}
+
+pub async fn replace_comic_parodies<C: ConnectionTrait>(
+    db: &C,
+    comic_id: &str,
+    parody_names: &[String],
+) -> Result<(), HentaiError> {
+    replace_comic_named_facet(db, JunctionNamedFacet::Parody, comic_id, parody_names).await
+}
+
+pub async fn replace_comic_characters<C: ConnectionTrait>(
+    db: &C,
+    comic_id: &str,
+    character_names: &[String],
+) -> Result<(), HentaiError> {
+    replace_comic_named_facet(db, JunctionNamedFacet::Character, comic_id, character_names).await
 }
