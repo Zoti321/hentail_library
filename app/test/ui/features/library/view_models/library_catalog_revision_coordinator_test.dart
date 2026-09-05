@@ -197,7 +197,8 @@ void main() {
         );
 
         await Future<void>.delayed(
-          kLibrarySyncCatalogRevisionThrottle + const Duration(milliseconds: 50),
+          kLibrarySyncCatalogRevisionThrottle +
+              const Duration(milliseconds: 50),
         );
 
         expect(

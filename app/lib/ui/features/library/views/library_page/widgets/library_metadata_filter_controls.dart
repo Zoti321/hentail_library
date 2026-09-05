@@ -109,59 +109,60 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               if (!includeOnly || names.length > 6)
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  kLibraryFilterSortDrawerContentInset,
-                  tokens.spacing.sm,
-                  kLibraryFilterSortDrawerContentInset,
-                  8,
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: TextField(
-                        onChanged: (String value) => searchQuery.value = value,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: cs.hentai.textPrimary,
-                        ),
-                        decoration: InputDecoration(
-                          isDense: true,
-                          hintText: l10n.libraryMetadataFilterSearchHint,
-                          hintStyle: TextStyle(color: cs.hentai.textTertiary),
-                          prefixIcon: Icon(
-                            LucideIcons.search,
-                            size: 16,
-                            color: cs.hentai.iconSecondary,
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    kLibraryFilterSortDrawerContentInset,
+                    tokens.spacing.sm,
+                    kLibraryFilterSortDrawerContentInset,
+                    8,
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TextField(
+                          onChanged: (String value) =>
+                              searchQuery.value = value,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: cs.hentai.textPrimary,
                           ),
-                          prefixIconConstraints: const BoxConstraints(
-                            minWidth: 36,
-                            minHeight: 32,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 8,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: cs.outlineVariant),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: cs.outlineVariant),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            hintText: l10n.libraryMetadataFilterSearchHint,
+                            hintStyle: TextStyle(color: cs.hentai.textTertiary),
+                            prefixIcon: Icon(
+                              LucideIcons.search,
+                              size: 16,
+                              color: cs.hentai.iconSecondary,
+                            ),
+                            prefixIconConstraints: const BoxConstraints(
+                              minWidth: 36,
+                              minHeight: 32,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 8,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(color: cs.outlineVariant),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(color: cs.outlineVariant),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    if (!includeOnly && onIncludeModeChanged != null)
-                      _IncludeModeIconButton(
-                        mode: selection.includeMode,
-                        onChanged: onIncludeModeChanged!,
-                      ),
-                  ],
+                      const SizedBox(width: 4),
+                      if (!includeOnly && onIncludeModeChanged != null)
+                        _IncludeModeIconButton(
+                          mode: selection.includeMode,
+                          onChanged: onIncludeModeChanged!,
+                        ),
+                    ],
+                  ),
                 ),
-              ),
               if (isLoading)
                 Padding(
                   padding: const EdgeInsets.all(16),

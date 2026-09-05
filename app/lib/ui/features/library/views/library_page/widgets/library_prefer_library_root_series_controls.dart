@@ -60,9 +60,7 @@ class LibraryPreferLibraryRootSeriesControls extends ConsumerWidget {
                   ),
                 ),
               ),
-              IgnorePointer(
-                child: ToggleSwitch(checked: enabled),
-              ),
+              IgnorePointer(child: ToggleSwitch(checked: enabled)),
             ],
           ),
         ),

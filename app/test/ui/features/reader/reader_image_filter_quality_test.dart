@@ -5,17 +5,11 @@ import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader
 void main() {
   group('readerImageFilterQuality', () {
     test('uses medium while scrolling', () {
-      expect(
-        readerImageFilterQuality(isScrolling: true),
-        FilterQuality.medium,
-      );
+      expect(readerImageFilterQuality(isScrolling: true), FilterQuality.medium);
     });
 
     test('uses high when idle', () {
-      expect(
-        readerImageFilterQuality(isScrolling: false),
-        FilterQuality.high,
-      );
+      expect(readerImageFilterQuality(isScrolling: false), FilterQuality.high);
     });
   });
 }

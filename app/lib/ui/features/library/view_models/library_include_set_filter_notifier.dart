@@ -27,12 +27,20 @@ class LibraryIncludeSetFilter extends _$LibraryIncludeSetFilter {
 
 @Riverpod(keepAlive: true)
 Future<List<String>> libraryDistinctParodies(Ref ref) async {
-  final String? libraryId = ref.watch(currentLibraryProvider).asData?.value.currentId;
+  final String? libraryId = ref
+      .watch(currentLibraryProvider)
+      .asData
+      ?.value
+      .currentId;
   return ref.watch(parodyRepoProvider).listDistinct(libraryId: libraryId);
 }
 
 @Riverpod(keepAlive: true)
 Future<List<String>> libraryDistinctCharacters(Ref ref) async {
-  final String? libraryId = ref.watch(currentLibraryProvider).asData?.value.currentId;
+  final String? libraryId = ref
+      .watch(currentLibraryProvider)
+      .asData
+      ?.value
+      .currentId;
   return ref.watch(characterRepoProvider).listDistinct(libraryId: libraryId);
 }

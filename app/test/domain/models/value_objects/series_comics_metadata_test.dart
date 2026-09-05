@@ -15,18 +15,20 @@ void main() {
       );
     });
 
-    test('true when parodies non-empty even if authors/tags/characters empty',
-        () {
-      expect(
-        const SeriesComicsMetadata(
-          authors: <String>[],
-          tags: <String>[],
-          hasR18: false,
-          parodies: <String>['Fate'],
-        ).hasMetadataBlock,
-        isTrue,
-      );
-    });
+    test(
+      'true when parodies non-empty even if authors/tags/characters empty',
+      () {
+        expect(
+          const SeriesComicsMetadata(
+            authors: <String>[],
+            tags: <String>[],
+            hasR18: false,
+            parodies: <String>['Fate'],
+          ).hasMetadataBlock,
+          isTrue,
+        );
+      },
+    );
 
     test('true when characters non-empty even if authors/tags empty', () {
       expect(

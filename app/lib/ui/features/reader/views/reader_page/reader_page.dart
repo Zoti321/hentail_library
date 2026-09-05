@@ -65,26 +65,27 @@ class ReaderPage extends HookConsumerWidget {
     final ThemeData theme = buildAppTheme(Brightness.dark);
 
     // Shell watch: comic + totalPages only — page turns must not rebuild chrome tree.
-    final AsyncValue<({Comic comic, int totalPages})> viewShellAsync = ref.watch(
-      readerControllerProvider(viewKey).select((
-        AsyncValue<ReaderState> asyncState,
-      ) {
-        if (asyncState.hasError) {
-          return AsyncError<({Comic comic, int totalPages})>(
-            asyncState.error!,
-            asyncState.stackTrace!,
-          );
-        }
-        final ReaderState? state = asyncState.asData?.value;
-        if (state == null) {
-          return const AsyncLoading<({Comic comic, int totalPages})>();
-        }
-        return AsyncData<({Comic comic, int totalPages})>((
-          comic: state.comic,
-          totalPages: state.totalPages,
-        ));
-      }),
-    );
+    final AsyncValue<({Comic comic, int totalPages})> viewShellAsync = ref
+        .watch(
+          readerControllerProvider(viewKey).select((
+            AsyncValue<ReaderState> asyncState,
+          ) {
+            if (asyncState.hasError) {
+              return AsyncError<({Comic comic, int totalPages})>(
+                asyncState.error!,
+                asyncState.stackTrace!,
+              );
+            }
+            final ReaderState? state = asyncState.asData?.value;
+            if (state == null) {
+              return const AsyncLoading<({Comic comic, int totalPages})>();
+            }
+            return AsyncData<({Comic comic, int totalPages})>((
+              comic: state.comic,
+              totalPages: state.totalPages,
+            ));
+          }),
+        );
     final AsyncValue<ReadSessionContextData> sessionAsync = ref.watch(
       readSessionContextForReaderProvider(
         comicId: routeContext.comicId,
@@ -113,7 +114,11 @@ class ReaderPage extends HookConsumerWidget {
     // Freeze resume index synchronously on first ready frame (before content builds).
     if (loadedShell != null && frozenInitialPage.value == null) {
       final int openIndex =
-          ref.read(readerControllerProvider(viewKey)).asData?.value.currentIndex ??
+          ref
+              .read(readerControllerProvider(viewKey))
+              .asData
+              ?.value
+              .currentIndex ??
           1;
       frozenOpenIndex.value = openIndex;
       frozenInitialPage.value = openIndex - 1;
@@ -121,7 +126,9 @@ class ReaderPage extends HookConsumerWidget {
 
     useEffect(
       () {
-        if (!readerReady || loadedShell == null || frozenOpenIndex.value == null) {
+        if (!readerReady ||
+            loadedShell == null ||
+            frozenOpenIndex.value == null) {
           return null;
         }
         unawaited(
@@ -169,7 +176,11 @@ class ReaderPage extends HookConsumerWidget {
       }
       hasAppliedKeepControls.value = true;
       final bool showControls =
-          ref.read(readerControllerProvider(viewKey)).asData?.value.showControls ??
+          ref
+              .read(readerControllerProvider(viewKey))
+              .asData
+              ?.value
+              .showControls ??
           false;
       if (showControls) {
         return null;
@@ -195,7 +206,11 @@ class ReaderPage extends HookConsumerWidget {
 
     void dispatchReaderKeyboard(LogicalKeyboardKey key) {
       final bool showControls =
-          ref.read(readerControllerProvider(viewKey)).asData?.value.showControls ??
+          ref
+              .read(readerControllerProvider(viewKey))
+              .asData
+              ?.value
+              .showControls ??
           false;
       final ReaderKeyboardCommand? command = readerKeyboardCommandFor(
         key,
@@ -279,7 +294,8 @@ class ReaderPage extends HookConsumerWidget {
                         routeContext: routeContext,
                         readerFocusNode: readerFocusNode,
                         initialPage: initialPage,
-                        preferredPageIndex: shell.sessionContext.preferredPageIndex,
+                        preferredPageIndex:
+                            shell.sessionContext.preferredPageIndex,
                         seriesNavContext: seriesNavContext,
                       ),
                       _ReaderTopBarSlot(

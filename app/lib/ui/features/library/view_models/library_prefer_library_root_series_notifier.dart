@@ -12,7 +12,9 @@ class LibraryPreferLibraryRootSeriesNotifier
   @override
   Future<bool> build() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return LibraryPreferLibraryRootSeries.fromStorage(prefs.getBool(_storageKey));
+    return LibraryPreferLibraryRootSeries.fromStorage(
+      prefs.getBool(_storageKey),
+    );
   }
 
   Future<void> setEnabled(bool enabled) async {

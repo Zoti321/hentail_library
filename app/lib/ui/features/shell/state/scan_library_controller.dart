@@ -60,35 +60,37 @@ class ScanLibraryController extends _$ScanLibraryController {
     );
     _future =
         () async {
-          if (promptStorageAccess) {
-            await ensureLocalFilesystemAccess();
-          }
-          if (_cancelled) {
-            return;
-          }
-          await coordinator.runSync(
-            scanMode: mode,
-            syncAll: syncAll,
-            targetLibraryId: targetLibraryId,
-            isCancelled: () => _cancelled,
-            onProgress: (SyncLibraryProgress progress) {
-              state = state.copyWith(progress: progress);
-            },
-          );
-        }().then((_) {
-          state = state.copyWith(running: false);
-        }).catchError((Object e, StackTrace st) {
-          logError(AppLog.ui('scan'), '漫画库同步失败', e, st);
-          final String message = switch (e) {
-            AppException(:final message) => message,
-            HentaiErrorDto error => frbErrorMessage(
-              error,
-              fallbackMessage: '漫画库同步失败',
-            ),
-            _ => e.toString(),
-          };
-          state = state.copyWith(running: false, error: message);
-        });
+              if (promptStorageAccess) {
+                await ensureLocalFilesystemAccess();
+              }
+              if (_cancelled) {
+                return;
+              }
+              await coordinator.runSync(
+                scanMode: mode,
+                syncAll: syncAll,
+                targetLibraryId: targetLibraryId,
+                isCancelled: () => _cancelled,
+                onProgress: (SyncLibraryProgress progress) {
+                  state = state.copyWith(progress: progress);
+                },
+              );
+            }()
+            .then((_) {
+              state = state.copyWith(running: false);
+            })
+            .catchError((Object e, StackTrace st) {
+              logError(AppLog.ui('scan'), '漫画库同步失败', e, st);
+              final String message = switch (e) {
+                AppException(:final message) => message,
+                HentaiErrorDto error => frbErrorMessage(
+                  error,
+                  fallbackMessage: '漫画库同步失败',
+                ),
+                _ => e.toString(),
+              };
+              state = state.copyWith(running: false, error: message);
+            });
 
     return _future!;
   }

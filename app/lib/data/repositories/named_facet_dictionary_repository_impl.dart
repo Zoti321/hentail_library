@@ -11,10 +11,7 @@ class NamedFacetDictionaryRepositoryImpl
 
   @override
   Future<List<String>> listAll() async {
-    return guardFrbSync(
-      _listAllFrb,
-      fallbackMessage: _listFallbackMessage,
-    );
+    return guardFrbSync(_listAllFrb, fallbackMessage: _listFallbackMessage);
   }
 
   @override
@@ -26,19 +23,21 @@ class NamedFacetDictionaryRepositoryImpl
   }
 
   String get _listFallbackMessage => switch (kind) {
-        NamedFacetKind.parody => '读取原作列表失败',
-        NamedFacetKind.character => '读取角色列表失败',
-      };
+    NamedFacetKind.parody => '读取原作列表失败',
+    NamedFacetKind.character => '读取角色列表失败',
+  };
 
   List<String> _listAllFrb() => switch (kind) {
-        NamedFacetKind.parody => rust_parody.listAllParodiesFrb(),
-        NamedFacetKind.character => rust_character.listAllCharactersFrb(),
-      };
+    NamedFacetKind.parody => rust_parody.listAllParodiesFrb(),
+    NamedFacetKind.character => rust_character.listAllCharactersFrb(),
+  };
 
   List<String> _listDistinctFrb(String? libraryId) => switch (kind) {
-        NamedFacetKind.parody =>
-          rust_parody.listDistinctParodiesFrb(libraryId: libraryId),
-        NamedFacetKind.character =>
-          rust_character.listDistinctCharactersFrb(libraryId: libraryId),
-      };
+    NamedFacetKind.parody => rust_parody.listDistinctParodiesFrb(
+      libraryId: libraryId,
+    ),
+    NamedFacetKind.character => rust_character.listDistinctCharactersFrb(
+      libraryId: libraryId,
+    ),
+  };
 }

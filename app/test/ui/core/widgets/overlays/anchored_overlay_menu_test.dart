@@ -73,63 +73,71 @@ void main() {
   });
 
   group('anchoredOverlayMenuRect', () {
-    testWidgets('uses overlay-local coords so sidebar inset is not double-counted', (
-      WidgetTester tester,
-    ) async {
-      late RelativeRect rect;
-      await tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: Overlay(
-            initialEntries: <OverlayEntry>[
-              OverlayEntry(
-                builder: (BuildContext context) {
-                  return Row(
-                    children: <Widget>[
-                      const SizedBox(width: 256, child: ColoredBox(color: Colors.grey)),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.topLeft,
-                          child: Builder(
-                            builder: (BuildContext buttonContext) {
-                              return GestureDetector(
-                                onTap: () {
-                                  final RenderBox button =
-                                      buttonContext.findRenderObject()! as RenderBox;
-                                  final RenderBox overlay =
-                                      Overlay.of(buttonContext).context.findRenderObject()!
-                                          as RenderBox;
-                                  rect = anchoredOverlayMenuRect(
-                                    button: button,
-                                    overlay: overlay,
-                                    position: AnchoredOverlayMenuPosition.over,
-                                  );
-                                },
-                                child: const SizedBox(
-                                  width: 32,
-                                  height: 32,
-                                  child: ColoredBox(color: Colors.blue),
-                                ),
-                              );
-                            },
+    testWidgets(
+      'uses overlay-local coords so sidebar inset is not double-counted',
+      (WidgetTester tester) async {
+        late RelativeRect rect;
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Overlay(
+              initialEntries: <OverlayEntry>[
+                OverlayEntry(
+                  builder: (BuildContext context) {
+                    return Row(
+                      children: <Widget>[
+                        const SizedBox(
+                          width: 256,
+                          child: ColoredBox(color: Colors.grey),
+                        ),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Builder(
+                              builder: (BuildContext buttonContext) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    final RenderBox button =
+                                        buttonContext.findRenderObject()!
+                                            as RenderBox;
+                                    final RenderBox overlay =
+                                        Overlay.of(
+                                              buttonContext,
+                                            ).context.findRenderObject()!
+                                            as RenderBox;
+                                    rect = anchoredOverlayMenuRect(
+                                      button: button,
+                                      overlay: overlay,
+                                      position:
+                                          AnchoredOverlayMenuPosition.over,
+                                    );
+                                  },
+                                  child: const SizedBox(
+                                    width: 32,
+                                    height: 32,
+                                    child: ColoredBox(color: Colors.blue),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ],
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.tap(find.byType(GestureDetector));
-      await tester.pump();
+        await tester.tap(find.byType(GestureDetector));
+        await tester.pump();
 
-      // Button is immediately after 256px sidebar, top-left of content.
-      expect(rect.left, 256);
-      expect(rect.top, 0);
-    });
+        // Button is immediately after 256px sidebar, top-left of content.
+        expect(rect.left, 256);
+        expect(rect.top, 0);
+      },
+    );
   });
 }

@@ -8,16 +8,17 @@ import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Name-ASC dictionary for management / non-form callers.
-final allCharactersProvider =
-    FutureProvider.autoDispose<List<String>>((Ref ref) {
+final allCharactersProvider = FutureProvider.autoDispose<List<String>>((
+  Ref ref,
+) {
   return ref.watch(characterRepoProvider).listAll();
 });
 
 /// Snapshot of Character candidates for Comic metadata form (attachment count order).
 final charactersForComicMetadataFormProvider =
     FutureProvider.autoDispose<List<NamedFacetFormCandidate>>((Ref ref) {
-  return listNamedFacetForMetadataForm(NamedFacetFormKind.character);
-});
+      return listNamedFacetForMetadataForm(NamedFacetFormKind.character);
+    });
 
 /// Character 多选：字段内 chip + 内联输入；浮层列出未选字典项（对齐 Author/Tag）。
 class CharacterLibraryMultiSelectField extends ConsumerWidget {

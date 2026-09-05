@@ -106,30 +106,32 @@ void main() {
       expect(invalidated, <ProviderOrFamily>[allTagsProvider]);
     });
 
-    test('invalidates parody and character lists when those fields change',
-        () async {
-      final _RecordingComicRepository repo = _RecordingComicRepository();
-      final Comic original = _comic();
-      final List<ProviderOrFamily> invalidated = <ProviderOrFamily>[];
+    test(
+      'invalidates parody and character lists when those fields change',
+      () async {
+        final _RecordingComicRepository repo = _RecordingComicRepository();
+        final Comic original = _comic();
+        final List<ProviderOrFamily> invalidated = <ProviderOrFamily>[];
 
-      final ComicMetadataApplyResult result = await applyComicMetadataForm(
-        repo,
-        ComicMetadataForm.fromComic(original)
-            .addParody('Fate')
-            .addCharacter('Saber'),
-        original,
-        invalidate: invalidated.add,
-      );
+        final ComicMetadataApplyResult result = await applyComicMetadataForm(
+          repo,
+          ComicMetadataForm.fromComic(
+            original,
+          ).addParody('Fate').addCharacter('Saber'),
+          original,
+          invalidate: invalidated.add,
+        );
 
-      expect(result, isA<ComicMetadataApplySucceeded>());
-      expect(repo.callCount, 1);
-      expect(invalidated, <ProviderOrFamily>[
-        allParodiesProvider,
-        libraryDistinctParodiesProvider,
-        allCharactersProvider,
-        libraryDistinctCharactersProvider,
-      ]);
-    });
+        expect(result, isA<ComicMetadataApplySucceeded>());
+        expect(repo.callCount, 1);
+        expect(invalidated, <ProviderOrFamily>[
+          allParodiesProvider,
+          libraryDistinctParodiesProvider,
+          allCharactersProvider,
+          libraryDistinctCharactersProvider,
+        ]);
+      },
+    );
 
     test('does not invalidate when only title changes', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();

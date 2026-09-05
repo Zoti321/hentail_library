@@ -482,11 +482,7 @@ class _LibraryOverflowMenuButtonState
         } else {
           final String? warning = next.progress?.errorMessage;
           if (warning != null && warning.isNotEmpty) {
-            showCustomToast(
-              context,
-              message: warning,
-              type: AppToastType.info,
-            );
+            showCustomToast(context, message: warning, type: AppToastType.info);
           } else {
             showSuccessToast(
               context,

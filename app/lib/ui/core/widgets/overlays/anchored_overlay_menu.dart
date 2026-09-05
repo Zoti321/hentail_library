@@ -49,8 +49,7 @@ RelativeRect anchoredOverlayMenuRect({
 }) {
   final Offset effectiveOffset = switch (position) {
     AnchoredOverlayMenuPosition.over => offset,
-    AnchoredOverlayMenuPosition.under =>
-      Offset(0, button.size.height) + offset,
+    AnchoredOverlayMenuPosition.under => Offset(0, button.size.height) + offset,
   };
   return RelativeRect.fromRect(
     Rect.fromPoints(
@@ -93,15 +92,13 @@ Offset resolveAnchoredOverlayMenuOffset({
     fittedX = screen.left + screenPadding + padding.left;
   } else if (fittedX + menuSize.width >
       screen.right - screenPadding - padding.right) {
-    fittedX =
-        screen.right - menuSize.width - screenPadding - padding.right;
+    fittedX = screen.right - menuSize.width - screenPadding - padding.right;
   }
   if (fittedY < screen.top + screenPadding + padding.top) {
     fittedY = screenPadding + padding.top;
   } else if (fittedY + menuSize.height >
       screen.bottom - screenPadding - padding.bottom) {
-    fittedY =
-        screen.bottom - menuSize.height - screenPadding - padding.bottom;
+    fittedY = screen.bottom - menuSize.height - screenPadding - padding.bottom;
   }
   return Offset(fittedX, fittedY);
 }

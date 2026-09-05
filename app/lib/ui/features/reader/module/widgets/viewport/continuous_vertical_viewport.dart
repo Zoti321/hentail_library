@@ -170,56 +170,49 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
     final ObjectRef<int> currentIndexRef = useRef<int>(currentIndex);
     currentIndexRef.value = currentIndex;
 
-    useEffect(
-      () {
-        void handleVisiblePositionChange() {
-          if (isProgrammaticScroll.value || imageList.isEmpty) {
-            return;
-          }
-          final int? visibleIndex = _resolvePrimaryVisibleIndex(
-            itemPositionsListener.itemPositions.value,
-          );
-          if (visibleIndex == null) {
-            return;
-          }
-          final int visibleIndexOneBased = visibleIndex + 1;
-          final int? applyIndex = resumeSyncGate.value.onVisibleIndex(
-            visibleIndexOneBased,
-          );
-          if (applyIndex == null) {
-            return;
-          }
-          if (lastVisibleMainIndex.value == applyIndex) {
-            return;
-          }
-          lastVisibleMainIndex.value = applyIndex;
-          if (currentIndexRef.value == applyIndex) {
-            return;
-          }
-          controller.setIndex(applyIndex);
+    useEffect(() {
+      void handleVisiblePositionChange() {
+        if (isProgrammaticScroll.value || imageList.isEmpty) {
+          return;
         }
+        final int? visibleIndex = _resolvePrimaryVisibleIndex(
+          itemPositionsListener.itemPositions.value,
+        );
+        if (visibleIndex == null) {
+          return;
+        }
+        final int visibleIndexOneBased = visibleIndex + 1;
+        final int? applyIndex = resumeSyncGate.value.onVisibleIndex(
+          visibleIndexOneBased,
+        );
+        if (applyIndex == null) {
+          return;
+        }
+        if (lastVisibleMainIndex.value == applyIndex) {
+          return;
+        }
+        lastVisibleMainIndex.value = applyIndex;
+        if (currentIndexRef.value == applyIndex) {
+          return;
+        }
+        controller.setIndex(applyIndex);
+      }
 
-        itemPositionsListener.itemPositions.addListener(
+      itemPositionsListener.itemPositions.addListener(
+        handleVisiblePositionChange,
+      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) {
+          return;
+        }
+        handleVisiblePositionChange();
+      });
+      return () {
+        itemPositionsListener.itemPositions.removeListener(
           handleVisiblePositionChange,
         );
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!context.mounted) {
-            return;
-          }
-          handleVisiblePositionChange();
-        });
-        return () {
-          itemPositionsListener.itemPositions.removeListener(
-            handleVisiblePositionChange,
-          );
-        };
-      },
-      <Object?>[
-        itemPositionsListener,
-        imageList.length,
-        controller,
-      ],
-    );
+      };
+    }, <Object?>[itemPositionsListener, imageList.length, controller]);
     useEffect(() {
       if (imageList.isEmpty) {
         lastVisibleMainIndex.value = null;

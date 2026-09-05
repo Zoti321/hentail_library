@@ -68,7 +68,8 @@ LibrarySearchQuery _parse(String trimmed, LibrarySearchVocabulary vocabulary) {
 }
 
 @Riverpod()
-class LibrarySearchPageComicsController extends _$LibrarySearchPageComicsController {
+class LibrarySearchPageComicsController
+    extends _$LibrarySearchPageComicsController {
   int _loadedPage = 0;
   LibrarySearchQuery? _query;
 

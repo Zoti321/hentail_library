@@ -380,9 +380,18 @@ void main() {
       await tester.pumpAndSettle();
 
       final Finder menu = find.byKey(MultiSelect.menuPanelKey);
-      expect(find.descendant(of: menu, matching: find.text('alpha')), findsOneWidget);
-      expect(find.descendant(of: menu, matching: find.text('beta')), findsNothing);
-      expect(find.descendant(of: menu, matching: find.text('gamma')), findsNothing);
+      expect(
+        find.descendant(of: menu, matching: find.text('alpha')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: menu, matching: find.text('beta')),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: menu, matching: find.text('gamma')),
+        findsNothing,
+      );
       // Selected chip stays visible while filtering.
       expect(find.widgetWithText(OutlinedMetaChip, 'gamma'), findsOneWidget);
     },
@@ -399,9 +408,18 @@ void main() {
       await tester.pumpAndSettle();
 
       final Finder menu = find.byKey(MultiSelect.menuPanelKey);
-      expect(find.descendant(of: menu, matching: find.text('beta')), findsOneWidget);
-      expect(find.descendant(of: menu, matching: find.text('gamma')), findsOneWidget);
-      expect(find.descendant(of: menu, matching: find.text('alpha')), findsNothing);
+      expect(
+        find.descendant(of: menu, matching: find.text('beta')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: menu, matching: find.text('gamma')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: menu, matching: find.text('alpha')),
+        findsNothing,
+      );
     },
   );
 
@@ -436,12 +454,13 @@ void main() {
     final Provider<AsyncValue<List<({String name, int attachmentCount})>>>
     countedProvider =
         Provider<AsyncValue<List<({String name, int attachmentCount})>>>(
-          (Ref ref) => const AsyncData<List<({String name, int attachmentCount})>>(
-            <({String name, int attachmentCount})>[
-              (name: 'popular', attachmentCount: 42),
-              (name: 'rare', attachmentCount: 1),
-            ],
-          ),
+          (Ref ref) =>
+              const AsyncData<List<({String name, int attachmentCount})>>(
+                <({String name, int attachmentCount})>[
+                  (name: 'popular', attachmentCount: 42),
+                  (name: 'rare', attachmentCount: 1),
+                ],
+              ),
         );
 
     await tester.pumpWidget(
@@ -481,9 +500,18 @@ void main() {
     await tester.pumpAndSettle();
 
     final Finder menu = find.byKey(MultiSelect.menuPanelKey);
-    expect(find.descendant(of: menu, matching: find.text('popular')), findsOneWidget);
-    expect(find.descendant(of: menu, matching: find.textContaining('42')), findsNothing);
-    expect(find.descendant(of: menu, matching: find.textContaining('1')), findsNothing);
+    expect(
+      find.descendant(of: menu, matching: find.text('popular')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: menu, matching: find.textContaining('42')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: menu, matching: find.textContaining('1')),
+      findsNothing,
+    );
   });
 
   testWidgets('shows loading and error UI for catalog AsyncValue', (

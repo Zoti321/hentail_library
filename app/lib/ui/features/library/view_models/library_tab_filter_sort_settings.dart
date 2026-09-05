@@ -100,14 +100,12 @@ bool isLibrarySeriesFilterSortCustomized({
   required LibraryAgeRestrictionFilter ageRestriction,
   required LibrarySerializationStatusFilter serializationStatusFilter,
   required LibrarySeriesSortOption sortOption,
-  bool preferLibraryRootSeries =
-      LibraryPreferLibraryRootSeries.defaultValue,
+  bool preferLibraryRootSeries = LibraryPreferLibraryRootSeries.defaultValue,
 }) {
   return ageRestriction != LibraryAgeRestrictionFilter.unrestricted ||
       serializationStatusFilter !=
           LibrarySerializationStatusFilter.unrestricted ||
-      preferLibraryRootSeries !=
-          LibraryPreferLibraryRootSeries.defaultValue ||
+      preferLibraryRootSeries != LibraryPreferLibraryRootSeries.defaultValue ||
       sortOption.field != kLibraryDefaultSeriesSortOption.field ||
       sortOption.descending != kLibraryDefaultSeriesSortOption.descending;
 }
@@ -123,8 +121,7 @@ bool isLibraryFilterSortCustomizedForTarget({
   required Set<String> characterFilter,
   required LibrarySerializationStatusFilter serializationStatusFilter,
   required LibraryTabSortSettings sortSettings,
-  bool preferLibraryRootSeries =
-      LibraryPreferLibraryRootSeries.defaultValue,
+  bool preferLibraryRootSeries = LibraryPreferLibraryRootSeries.defaultValue,
 }) {
   return switch (target) {
     LibraryDisplayTarget.comics => isLibraryComicFilterSortCustomized(

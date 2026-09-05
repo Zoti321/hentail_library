@@ -34,10 +34,10 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      expect(
-        await container.read(allParodiesProvider.future),
-        <String>['Fate', 'Touhou'],
-      );
+      expect(await container.read(allParodiesProvider.future), <String>[
+        'Fate',
+        'Touhou',
+      ]);
     },
   );
 
@@ -53,10 +53,9 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      expect(
-        await container.read(allCharactersProvider.future),
-        <String>['Reimu'],
-      );
+      expect(await container.read(allCharactersProvider.future), <String>[
+        'Reimu',
+      ]);
     },
   );
 }

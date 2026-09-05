@@ -48,9 +48,7 @@ void main() {
             comicReaderPageProvider(
               comicId: _comicId,
               pageIndex: 0,
-            ).overrideWith(
-              (Ref ref) async => ReaderPageBytes(Uint8List(0)),
-            ),
+            ).overrideWith((Ref ref) async => ReaderPageBytes(Uint8List(0))),
           ],
           child: const MaterialApp(
             home: Scaffold(

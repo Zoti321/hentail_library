@@ -14,20 +14,20 @@ void main() {
   group('formatComicLanguagesDisplay', () {
     test('joins localized closed-set names with pipe', () {
       expect(
-        formatComicLanguagesDisplay(
-          <String>['Chinese', 'Japanese'],
-          closedLabels: zhLabels,
-        ),
+        formatComicLanguagesDisplay(<String>[
+          'Chinese',
+          'Japanese',
+        ], closedLabels: zhLabels),
         '中文|日语',
       );
     });
 
     test('passes unknown tokens through verbatim', () {
       expect(
-        formatComicLanguagesDisplay(
-          <String>['Chinese', 'Esperanto'],
-          closedLabels: zhLabels,
-        ),
+        formatComicLanguagesDisplay(<String>[
+          'Chinese',
+          'Esperanto',
+        ], closedLabels: zhLabels),
         '中文|Esperanto',
       );
     });

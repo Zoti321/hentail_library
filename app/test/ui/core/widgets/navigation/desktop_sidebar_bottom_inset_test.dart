@@ -48,7 +48,8 @@ void main() {
       expect(settings, findsOneWidget);
 
       final Rect settingsRect = tester.getRect(settings);
-      final double gapAboveViewportBottom = viewport.height - settingsRect.bottom;
+      final double gapAboveViewportBottom =
+          viewport.height - settingsRect.bottom;
       expect(gapAboveViewportBottom, greaterThanOrEqualTo(bottomInset));
     },
   );

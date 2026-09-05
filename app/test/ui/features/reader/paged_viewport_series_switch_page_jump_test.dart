@@ -44,9 +44,9 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: <Override>[
-            readerControllerProvider(_uiKeyAfterVolumeSwitch).overrideWith(
-              () => _PagedReaderController(1, pageCount),
-            ),
+            readerControllerProvider(
+              _uiKeyAfterVolumeSwitch,
+            ).overrideWith(() => _PagedReaderController(1, pageCount)),
             readerPrefetchControllerProvider.overrideWith(_FakePrefetch.new),
             comicImagesProvider(
               comicId: _comicId,

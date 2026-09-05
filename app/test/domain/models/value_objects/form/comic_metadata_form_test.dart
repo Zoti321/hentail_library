@@ -249,9 +249,7 @@ void main() {
 
     test('only submits languages when ordered names change', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();
-      final Comic original = _comic(
-        languages: <String>['Chinese', 'Japanese'],
-      );
+      final Comic original = _comic(languages: <String>['Chinese', 'Japanese']);
       final ComicMetadataApplyResult result =
           await ComicMetadataForm.fromComic(original)
               .copyWith(languages: <String>['Japanese', 'Chinese'])
@@ -266,10 +264,9 @@ void main() {
     test('only submits parodies when ordered names change', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();
       final Comic original = _comic(parodies: <String>['Fate', '原创']);
-      final ComicMetadataApplyResult result =
-          await ComicMetadataForm.fromComic(original)
-              .copyWith(parodies: <String>['原创', 'Fate'])
-              .applyTo(repo, original);
+      final ComicMetadataApplyResult result = await ComicMetadataForm.fromComic(
+        original,
+      ).copyWith(parodies: <String>['原创', 'Fate']).applyTo(repo, original);
 
       expect(result, isA<ComicMetadataApplySucceeded>());
       expect(repo.callCount, 1);
@@ -337,9 +334,9 @@ void main() {
       final _RecordingComicRepository repo = _RecordingComicRepository();
       final Comic original = _comic();
       final ComicMetadataApplyResult tagsOnly =
-          await ComicMetadataForm.fromComic(original)
-              .addTag('new-tag')
-              .applyTo(repo, original);
+          await ComicMetadataForm.fromComic(
+            original,
+          ).addTag('new-tag').applyTo(repo, original);
       expect(
         tagsOnly,
         isA<ComicMetadataApplySucceeded>()
@@ -385,10 +382,9 @@ void main() {
       );
 
       final ComicMetadataApplyResult parodyAndCharacter =
-          await ComicMetadataForm.fromComic(original)
-              .addParody('Fate')
-              .addCharacter('Saber')
-              .applyTo(repo, original);
+          await ComicMetadataForm.fromComic(
+            original,
+          ).addParody('Fate').addCharacter('Saber').applyTo(repo, original);
       expect(
         parodyAndCharacter,
         isA<ComicMetadataApplySucceeded>()

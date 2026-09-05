@@ -8,16 +8,15 @@ import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Name-ASC dictionary for management / non-form callers.
-final allParodiesProvider =
-    FutureProvider.autoDispose<List<String>>((Ref ref) {
+final allParodiesProvider = FutureProvider.autoDispose<List<String>>((Ref ref) {
   return ref.watch(parodyRepoProvider).listAll();
 });
 
 /// Snapshot of Parody candidates for Comic metadata form (attachment count order).
 final parodiesForComicMetadataFormProvider =
     FutureProvider.autoDispose<List<NamedFacetFormCandidate>>((Ref ref) {
-  return listNamedFacetForMetadataForm(NamedFacetFormKind.parody);
-});
+      return listNamedFacetForMetadataForm(NamedFacetFormKind.parody);
+    });
 
 /// Parody 多选：字段内 chip + 内联输入；浮层列出未选字典项（对齐 Author/Tag）。
 class ParodyLibraryMultiSelectField extends ConsumerWidget {

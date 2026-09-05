@@ -9,8 +9,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 /// Snapshot of Author candidates for Comic metadata form (attachment count order).
 final authorsForComicMetadataFormProvider =
     FutureProvider.autoDispose<List<NamedFacetFormCandidate>>((Ref ref) {
-  return listNamedFacetForMetadataForm(NamedFacetFormKind.author);
-});
+      return listNamedFacetForMetadataForm(NamedFacetFormKind.author);
+    });
 
 /// 全库作者多选：字段内 chip + 内联输入；浮层列出未选字典项。
 class AuthorLibraryMultiSelectField extends ConsumerWidget {

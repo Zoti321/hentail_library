@@ -33,12 +33,15 @@ void main() {
   });
 
   group('toWindowsExplorerPath', () {
-    test('converts posix separators so explorer does not treat them as switches', () {
-      expect(
-        toWindowsExplorerPath(r'D:/library/Series A'),
-        r'D:\library\Series A',
-      );
-    });
+    test(
+      'converts posix separators so explorer does not treat them as switches',
+      () {
+        expect(
+          toWindowsExplorerPath(r'D:/library/Series A'),
+          r'D:\library\Series A',
+        );
+      },
+    );
 
     test('leaves native windows separators unchanged', () {
       expect(

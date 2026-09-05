@@ -41,12 +41,13 @@ class _ComicDetailSeriesNavState extends ConsumerState<ComicDetailSeriesNav> {
     return navAsync.when(
       data: (ComicDetailSeriesNavResult result) {
         return switch (result) {
-          ComicDetailSeriesNavReady(:final data) => _ComicDetailSeriesNavControls(
-            data: data,
-            menuController: _menuController,
-          ),
-          ComicDetailSeriesNavNone() || ComicDetailSeriesNavConflict() =>
-            const SizedBox.shrink(),
+          ComicDetailSeriesNavReady(:final data) =>
+            _ComicDetailSeriesNavControls(
+              data: data,
+              menuController: _menuController,
+            ),
+          ComicDetailSeriesNavNone() ||
+          ComicDetailSeriesNavConflict() => const SizedBox.shrink(),
         };
       },
       loading: () => const _ComicDetailSeriesNavPlaceholder(),

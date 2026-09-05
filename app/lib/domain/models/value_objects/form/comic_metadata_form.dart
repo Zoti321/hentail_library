@@ -167,9 +167,7 @@ extension ComicMetadataFormOps on ComicMetadataForm {
   }
 
   ComicMetadataForm removeParody(String name) {
-    return copyWith(
-      parodies: parodies.where((String n) => n != name).toList(),
-    );
+    return copyWith(parodies: parodies.where((String n) => n != name).toList());
   }
 
   ComicMetadataForm addCharacter(String name) {

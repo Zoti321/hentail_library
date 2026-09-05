@@ -126,10 +126,7 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
     // Order: Parody → Author → Character → Tag（与 Comic 一致）。
     if (parodies.isNotEmpty) {
       rows.add(
-        LabeledMetaChipRow(
-          label: l10n.comicDetailParodies,
-          items: parodies,
-        ),
+        LabeledMetaChipRow(label: l10n.comicDetailParodies, items: parodies),
       );
     }
     if (authors.isNotEmpty) {

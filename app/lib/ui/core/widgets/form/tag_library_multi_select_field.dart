@@ -9,8 +9,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 /// Snapshot of Tag candidates for Comic metadata form (attachment count order).
 final tagsForComicMetadataFormProvider =
     FutureProvider.autoDispose<List<NamedFacetFormCandidate>>((Ref ref) {
-  return listNamedFacetForMetadataForm(NamedFacetFormKind.tag);
-});
+      return listNamedFacetForMetadataForm(NamedFacetFormKind.tag);
+    });
 
 /// 全库标签多选：字段内 chip + 内联输入；浮层列出未选字典项。
 class TagLibraryMultiSelectField extends ConsumerWidget {

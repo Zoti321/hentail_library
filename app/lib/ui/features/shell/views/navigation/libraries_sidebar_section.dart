@@ -925,10 +925,7 @@ class _SidebarChromeRow extends HookWidget {
                       // action chrome uses a deeper fill so it stays distinct.
                       MouseRegion(
                         onEnter: (_) => hovered.value = true,
-                        child: Opacity(
-                          opacity: labelOpacity,
-                          child: trailing!,
-                        ),
+                        child: Opacity(opacity: labelOpacity, child: trailing!),
                       ),
                   ],
                 ),

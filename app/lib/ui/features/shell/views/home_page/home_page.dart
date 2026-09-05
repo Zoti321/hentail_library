@@ -74,10 +74,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     final ({int comicCount, bool isLibraryEmpty}) homeCountsLeaf = ref.watch(
       homePageCountsStreamProvider.select((AsyncValue<HomePageCounts> async) {
         return async.maybeWhen(
-          data: (HomePageCounts c) => (
-            comicCount: c.comicCount,
-            isLibraryEmpty: c.comicCount == 0,
-          ),
+          data: (HomePageCounts c) =>
+              (comicCount: c.comicCount, isLibraryEmpty: c.comicCount == 0),
           orElse: () => (comicCount: 0, isLibraryEmpty: false),
         );
       }),
