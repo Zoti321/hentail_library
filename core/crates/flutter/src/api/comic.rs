@@ -1,5 +1,6 @@
 use hentai_core::{
-    self, count_all, fetch_comics_page, find_comic_by_id, init_db, read_data_version, search_by_keyword,
+    self, count_all, fetch_comics_page, find_comic_by_id, init_db, read_data_version,
+    search_by_keyword, search_by_keyword_page, search_by_tag_expression_page,
 };
 
 use super::init::HentaiErrorDto;
@@ -224,6 +225,18 @@ pub async fn search_by_keyword_frb(keyword: String) -> Result<Vec<ComicDto>, Hen
         .map_err(HentaiErrorDto::from)
 }
 
+#[flutter_rust_bridge::frb]
+pub async fn search_by_keyword_page_frb(
+    keyword: String,
+    page: i32,
+    page_size: i32,
+) -> Result<PagedComicResultDto, HentaiErrorDto> {
+    search_by_keyword_page(&keyword, page, page_size)
+        .await
+        .map(PagedComicResultDto::from)
+        .map_err(HentaiErrorDto::from)
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct UpdateComicUserMetaFrbDto {
     pub title: Option<String>,
@@ -316,6 +329,20 @@ pub async fn search_by_tag_expression_frb(
     hentai_core::search_by_tag_expression(must_include, optional_or, must_exclude)
         .await
         .map(|rows| rows.into_iter().map(ComicDto::from).collect())
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn search_by_tag_expression_page_frb(
+    must_include: Vec<String>,
+    optional_or: Vec<String>,
+    must_exclude: Vec<String>,
+    page: i32,
+    page_size: i32,
+) -> Result<PagedComicResultDto, HentaiErrorDto> {
+    search_by_tag_expression_page(must_include, optional_or, must_exclude, page, page_size)
+        .await
+        .map(PagedComicResultDto::from)
         .map_err(HentaiErrorDto::from)
 }
 

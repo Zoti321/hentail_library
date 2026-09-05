@@ -1,6 +1,7 @@
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
+import 'package:hentai_library/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/library_series_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -180,22 +181,33 @@ Future<ComicDetailSeriesNavResult> comicDetailSeriesNav(
   Ref ref,
   String comicId,
 ) async {
-  final List<Series> allSeries = await ref.watch(allSeriesProvider.future);
-  final List<Series> matches = findSeriesListContainingComic(
-    allSeries,
-    comicId,
-  );
-  if (matches.isEmpty) {
+  // Interim: reading context SQL uses `.one()`, so multi-series membership
+  // degrades to the first series only (no Conflict).
+  final SeriesReadingContext? ctx = await ref
+      .read(seriesRepoProvider)
+      .getReadingContextByComicId(comicId);
+  if (ctx == null) {
     return const ComicDetailSeriesNavNone();
-  }
-  if (matches.length > 1) {
-    return ComicDetailSeriesNavConflict(
-      matches.map((Series series) => series.name).toList(),
-    );
   }
 
   final ComicDetailSeriesNavSeriesData? seriesData = await ref.watch(
-    comicDetailSeriesNavForSeriesProvider(matches.single.id).future,
+    comicDetailSeriesNavForSeriesProvider(ctx.seriesId).future,
   );
-  return resolveComicDetailSeriesNavResult(allSeries, comicId, seriesData);
+  if (seriesData == null) {
+    return const ComicDetailSeriesNavNone();
+  }
+  final int currentIndex = seriesData.items.indexWhere(
+    (ComicDetailSeriesNavItem item) => item.comicId == comicId,
+  );
+  if (currentIndex < 0) {
+    return const ComicDetailSeriesNavNone();
+  }
+  return ComicDetailSeriesNavReady(
+    ComicDetailSeriesNavData(
+      seriesId: seriesData.seriesId,
+      seriesName: seriesData.seriesName,
+      items: seriesData.items,
+      currentIndex: currentIndex,
+    ),
+  );
 }

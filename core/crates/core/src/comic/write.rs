@@ -1,6 +1,6 @@
 use sea_orm::{ActiveModelTrait, ConnectionTrait, Set, Statement, TransactionTrait};
 
-use crate::comic::dto::{now_ms, serialize_languages, ComicDto};
+use crate::comic::dto::{now_ms, serialize_languages, ComicDto, PagedComicResultDto};
 use crate::comic::repository::load_comics_ordered;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comics};
@@ -300,9 +300,41 @@ pub async fn search_by_tag_expression(
     optional_or: Vec<String>,
     must_exclude: Vec<String>,
 ) -> Result<Vec<ComicDto>, HentaiError> {
+    let page = search_by_tag_expression_page(must_include, optional_or, must_exclude, 1, i32::MAX)
+        .await?;
+    Ok(page.items)
+}
+
+pub async fn search_by_tag_expression_page(
+    must_include: Vec<String>,
+    optional_or: Vec<String>,
+    must_exclude: Vec<String>,
+    page: i32,
+    page_size: i32,
+) -> Result<PagedComicResultDto, HentaiError> {
+    let page = page.max(1);
+    let page_size = page_size.max(1);
     let ids = search_comic_ids_by_tag_expression(must_include, optional_or, must_exclude).await?;
+    let total_count = ids.len() as i64;
+    if total_count == 0 {
+        return Ok(PagedComicResultDto {
+            items: vec![],
+            total_count: 0,
+            page,
+            page_size,
+        });
+    }
+    let start = ((page - 1) as i64 * page_size as i64).min(total_count) as usize;
+    let end = (start as i64 + page_size as i64).min(total_count) as usize;
+    let page_ids = ids[start..end].to_vec();
     let db = connection()?;
-    load_comics_ordered(&db, ids).await
+    let items = load_comics_ordered(&db, page_ids).await?;
+    Ok(PagedComicResultDto {
+        items,
+        total_count,
+        page,
+        page_size,
+    })
 }
 
 fn normalize_tag_set(source: Vec<String>) -> Vec<String> {

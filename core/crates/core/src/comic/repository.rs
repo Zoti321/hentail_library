@@ -86,26 +86,75 @@ pub async fn find_comic_by_id(comic_id: &str) -> Result<Option<ComicDto>, Hentai
 }
 
 pub async fn search_by_keyword(keyword: &str) -> Result<Vec<ComicDto>, HentaiError> {
+    let page = search_by_keyword_page(keyword, 1, i32::MAX).await?;
+    Ok(page.items)
+}
+
+pub async fn search_by_keyword_page(
+    keyword: &str,
+    page: i32,
+    page_size: i32,
+) -> Result<PagedComicResultDto, HentaiError> {
     let q = keyword.trim().to_lowercase();
+    let page = page.max(1);
+    let page_size = page_size.max(1);
     if q.is_empty() {
-        return Ok(vec![]);
+        return Ok(PagedComicResultDto {
+            items: vec![],
+            total_count: 0,
+            page,
+            page_size,
+        });
     }
     let Some(library_id) = crate::library::resolve_browse_library_id(None).await? else {
-        return Ok(vec![]);
+        return Ok(PagedComicResultDto {
+            items: vec![],
+            total_count: 0,
+            page,
+            page_size,
+        });
     };
     let db = connection()?;
-    let stmt = Statement::from_sql_and_values(
+    let count_stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
-        "SELECT c.comic_id FROM comics c \
+        "SELECT COUNT(*) FROM comics c \
          INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
          WHERE c.library_id = ? AND lower(m.title) LIKE ?",
         vec![
-            Value::String(Some(Box::new(library_id))),
+            Value::String(Some(Box::new(library_id.clone()))),
             Value::String(Some(Box::new(format!("%{q}%")))),
         ],
     );
-    let comic_ids = query_ids_from_stmt(&db, stmt).await?;
-    load_comics_ordered(&db, comic_ids).await
+    let total_count = db
+        .query_one(count_stmt)
+        .await
+        .map_err(map_db_err)?
+        .ok_or_else(|| HentaiError::db_query_failed("search count 无结果", None))?
+        .try_get_by_index::<i64>(0)
+        .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))?;
+    let offset = (page - 1) as i64 * page_size as i64;
+    let ids_stmt = Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "SELECT c.comic_id FROM comics c \
+         INNER JOIN comic_meta m ON m.comic_id = c.comic_id \
+         WHERE c.library_id = ? AND lower(m.title) LIKE ? \
+         ORDER BY lower(m.title) ASC \
+         LIMIT ? OFFSET ?",
+        vec![
+            Value::String(Some(Box::new(library_id))),
+            Value::String(Some(Box::new(format!("%{q}%")))),
+            Value::BigInt(Some(page_size as i64)),
+            Value::BigInt(Some(offset)),
+        ],
+    );
+    let comic_ids = query_ids_from_stmt(&db, ids_stmt).await?;
+    let items = load_comics_ordered(&db, comic_ids).await?;
+    Ok(PagedComicResultDto {
+        items,
+        total_count,
+        page,
+        page_size,
+    })
 }
 
 pub async fn read_data_version() -> Result<i32, HentaiError> {

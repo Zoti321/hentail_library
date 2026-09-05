@@ -3,7 +3,7 @@ import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 
 typedef LibraryTabPageSizeSettings = ({int comics, int series});
 
-const List<int> kLibraryPageSizeOptions = <int>[20, 50, 100, 200, 500];
+const List<int> kLibraryPageSizeOptions = <int>[20, 50, 100, 200];
 
 const LibraryTabPageSizeSettings kDefaultLibraryTabPageSizeSettings = (
   comics: kDefaultPageSize,
@@ -11,6 +11,10 @@ const LibraryTabPageSizeSettings kDefaultLibraryTabPageSizeSettings = (
 );
 
 int normalizeLibraryPageSize(int? raw) {
+  // Legacy stored value; 500 was removed from the options list.
+  if (raw == 500) {
+    return 200;
+  }
   if (raw == null || !kLibraryPageSizeOptions.contains(raw)) {
     return kDefaultPageSize;
   }

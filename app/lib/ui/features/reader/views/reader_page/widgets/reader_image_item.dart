@@ -1,5 +1,4 @@
-﻿import 'dart:io';
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/image/image_decode_cache_size.dart';
@@ -49,8 +48,8 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     final int? cacheWidth = _readerDecodeCacheWidth(context);
 
     if (imageData is ReaderDirPageImageData) {
-      final String dirPath = imageData.file.path;
-      if (!_readerImageFileExists(dirPath)) {
+      final String dirPath = imageData.file.path.trim();
+      if (dirPath.isEmpty) {
         return errorPlaceholder;
       }
       return ReaderPageFadeIn(
@@ -83,10 +82,6 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
       loading: () => loadingSurface,
       error: (_, StackTrace _) => errorPlaceholder,
       data: (ReaderPagePayload page) {
-        if (page is ReaderPageFilePath && !_readerImageFileExists(page.path)) {
-          _scheduleReaderPageReload(archiveData);
-          return loadingSurface;
-        }
         return ReaderPageFadeIn(
           enabled: widget.enableCrossfade,
           child: Align(
@@ -100,6 +95,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
                 cacheWidth: cacheWidth,
                 loadingPlaceholder: loadingSurface,
                 errorPlaceholder: errorPlaceholder,
+                onDecodeError: () => _scheduleReaderPageReload(archiveData),
               ),
               ReaderPageBytes(:final Uint8List data) => AppComicImage(
                 memoryBytes: data,
@@ -159,17 +155,5 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
         color: Theme.of(context).colorScheme.hentai.readerTextMuted,
       ),
     );
-  }
-}
-
-bool _readerImageFileExists(String path) {
-  final String trimmed = path.trim();
-  if (trimmed.isEmpty) {
-    return false;
-  }
-  try {
-    return File(trimmed).existsSync();
-  } on Object {
-    return false;
   }
 }

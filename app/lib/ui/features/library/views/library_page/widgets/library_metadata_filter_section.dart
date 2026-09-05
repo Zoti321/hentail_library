@@ -24,6 +24,31 @@ LibraryMetadataFilterSelection includeOnlyFilterSelection(Set<String> names) {
   );
 }
 
+/// Sorted tag names for the library filter drawer ([allTagsProvider] already sorts).
+final libraryFilterTagNamesProvider = Provider<AsyncValue<List<String>>>((
+  Ref ref,
+) {
+  return ref
+      .watch(allTagsProvider)
+      .whenData(
+        (List<Tag> tags) =>
+            tags.map((Tag tag) => tag.name).toList(growable: false),
+      );
+});
+
+/// Sorted author names for the library filter drawer.
+final libraryFilterAuthorNamesProvider = Provider<AsyncValue<List<String>>>((
+  Ref ref,
+) {
+  return ref.watch(allAuthorsProvider).whenData((List<Author> authors) {
+    final List<String> names = authors
+        .map((Author author) => author.name)
+        .toList();
+    names.sort();
+    return names;
+  });
+});
+
 class LibraryTagFilterControls extends ConsumerWidget {
   const LibraryTagFilterControls({super.key});
 
@@ -36,16 +61,17 @@ class LibraryTagFilterControls extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    final AsyncValue<List<Tag>> tagsAsync = ref.watch(allTagsProvider);
+    final AsyncValue<List<String>> namesAsync = ref.watch(
+      libraryFilterTagNamesProvider,
+    );
     final LibraryMetadataFilterSelection selection = ref
         .watch(libraryTagFilterProvider)
         .maybeWhen(
           data: (LibraryMetadataFilterSelection value) => value,
           orElse: () => const LibraryMetadataFilterSelection(),
         );
-    final List<String> names = tagsAsync.maybeWhen(
-      data: (List<Tag> tags) =>
-          tags.map((Tag tag) => tag.name).toList()..sort(),
+    final List<String> names = namesAsync.maybeWhen(
+      data: (List<String> value) => value,
       orElse: () => const <String>[],
     );
 
@@ -53,7 +79,7 @@ class LibraryTagFilterControls extends ConsumerWidget {
       title: context.l10n.libraryTagFilter,
       names: names,
       selection: selection,
-      isLoading: tagsAsync.isLoading,
+      isLoading: namesAsync.isLoading,
       onToggle: ref.read(libraryTagFilterProvider.notifier).toggle,
       onIncludeModeChanged: ref
           .read(libraryTagFilterProvider.notifier)
@@ -75,16 +101,17 @@ class LibraryAuthorFilterControls extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    final AsyncValue<List<Author>> authorsAsync = ref.watch(allAuthorsProvider);
+    final AsyncValue<List<String>> namesAsync = ref.watch(
+      libraryFilterAuthorNamesProvider,
+    );
     final LibraryMetadataFilterSelection selection = ref
         .watch(libraryAuthorFilterProvider)
         .maybeWhen(
           data: (LibraryMetadataFilterSelection value) => value,
           orElse: () => const LibraryMetadataFilterSelection(),
         );
-    final List<String> names = authorsAsync.maybeWhen(
-      data: (List<Author> authors) =>
-          authors.map((Author author) => author.name).toList()..sort(),
+    final List<String> names = namesAsync.maybeWhen(
+      data: (List<String> value) => value,
       orElse: () => const <String>[],
     );
 
@@ -92,7 +119,7 @@ class LibraryAuthorFilterControls extends ConsumerWidget {
       title: context.l10n.libraryAuthorFilter,
       names: names,
       selection: selection,
-      isLoading: authorsAsync.isLoading,
+      isLoading: namesAsync.isLoading,
       onToggle: ref.read(libraryAuthorFilterProvider.notifier).toggle,
       onIncludeModeChanged: ref
           .read(libraryAuthorFilterProvider.notifier)

@@ -3,6 +3,23 @@ import 'dart:typed_data';
 /// 对齐 Komga：稳态预加载邻居页数（单侧）。
 const int kReaderPrefetchNeighborCount = 2;
 
+/// 阅读器命名 ImageCache 条目上限（连续/分页共用；高于邻居窗口以保持已读页热）。
+const int kReaderImageCacheMaxEntries = 24;
+
+/// 窗口集合未变时不 bump prefetch generation，避免快滑取消在途预取。
+bool shouldBumpPrefetchGeneration({
+  required Set<int>? previousWindow,
+  required Set<int> nextWindow,
+}) {
+  if (previousWindow == null) {
+    return true;
+  }
+  if (previousWindow.length != nextWindow.length) {
+    return true;
+  }
+  return !previousWindow.containsAll(nextWindow);
+}
+
 /// 计算以 [centerPageOneBased] 为中心的预加载页码集合（1-based）。
 Set<int> computePrefetchWindow({
   required int centerPageOneBased,

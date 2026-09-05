@@ -7,6 +7,7 @@ import 'package:hentai_library/ui/features/reader/module/controller/reader_image
 import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_logic.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
+import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -14,6 +15,8 @@ part 'reader_prefetch_controller.g.dart';
 
 @Riverpod(keepAlive: true)
 class ReaderPrefetchController extends _$ReaderPrefetchController {
+  final Map<String, Set<int>> _lastWarmWindows = <String, Set<int>>{};
+
   @override
   Map<String, int> build() => <String, int>{};
 
@@ -26,11 +29,13 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
   void clearComic(String comicId) {
     // Invalidate Flutter-side prefetch generation before disk clear.
     bumpGeneration(comicId);
+    _lastWarmWindows.remove(comicId);
     if (state.containsKey(comicId)) {
       state = Map<String, int>.from(state)..remove(comicId);
     }
     clearReaderImageCache();
     ref.read(readerSessionServiceProvider).clearPageCache(comicId: comicId);
+    ref.invalidate(comicReaderPageProvider);
   }
 
   Future<void> warmWindow({
@@ -48,6 +53,14 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
       neighborCount: kReaderPrefetchNeighborCount,
       extraPageIndexesOneBased: extraPageIndexesOneBased,
     );
+    final Set<int>? previous = _lastWarmWindows[comicId];
+    if (!shouldBumpPrefetchGeneration(
+      previousWindow: previous,
+      nextWindow: targets,
+    )) {
+      return;
+    }
+    _lastWarmWindows[comicId] = Set<int>.from(targets);
     final int generation = bumpGeneration(comicId);
     unawaited(
       ref

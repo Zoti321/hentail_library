@@ -14,7 +14,7 @@ void ensureReaderImageCacheConfigured() {
     kReaderImageCacheName,
     ImageCache.new,
   );
-  cache.maximumSize = kReaderPrefetchNeighborCount * 2 + 3;
+  cache.maximumSize = kReaderImageCacheMaxEntries;
   cache.maximumSizeBytes = kReaderImageCacheMaxBytes;
 }
 
@@ -41,10 +41,7 @@ ImageProvider<Object>? buildReaderImageProvider({
   if (resolvedPath == null || resolvedPath.isEmpty) {
     return null;
   }
-  final File file = File(resolvedPath);
-  if (!file.existsSync()) {
-    return null;
-  }
+  // 不在此处 existsSync：缺失文件由 ImageProvider 加载失败路径处理，避免 build 同步 IO。
   return ResizeImage.resizeIfNeeded(
     cacheWidth,
     cacheHeight,

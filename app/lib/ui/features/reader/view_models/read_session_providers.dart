@@ -48,7 +48,8 @@ Future<List<ReaderPageImageData>> comicImages(
   return pages.map(_mapReadSessionPageToUi).toList(growable: false);
 }
 
-@Riverpod()
+/// 会话内 keepAlive：翻页回看不因 autoDispose 重载；退出阅读器时由 prefetch clearComic invalidate。
+@Riverpod(keepAlive: true)
 Future<ReaderPagePayload> comicReaderPage(
   Ref ref, {
   required String comicId,

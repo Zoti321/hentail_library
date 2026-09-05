@@ -157,6 +157,22 @@ class ComicRepositoryImpl implements ComicRepository {
   }
 
   @override
+  Future<PagedResult<Comic>> searchByKeywordPage({
+    required String keyword,
+    required PageRequest request,
+  }) async {
+    final rust.PagedComicResultDto page = await guardFrb(
+      () => rust.searchByKeywordPageFrb(
+        keyword: keyword,
+        page: request.page,
+        pageSize: request.pageSize,
+      ),
+      fallbackMessage: '搜索漫画失败',
+    );
+    return mapPagedResult(page);
+  }
+
+  @override
   Future<List<Comic>> searchByMetadataExpression({
     required Set<String> mustInclude,
     required Set<String> optionalOr,
@@ -171,5 +187,25 @@ class ComicRepositoryImpl implements ComicRepository {
       fallbackMessage: '按元数据搜索漫画失败',
     );
     return rows.map(mapRustComic).toList();
+  }
+
+  @override
+  Future<PagedResult<Comic>> searchByMetadataExpressionPage({
+    required Set<String> mustInclude,
+    required Set<String> optionalOr,
+    required Set<String> mustExclude,
+    required PageRequest request,
+  }) async {
+    final rust.PagedComicResultDto page = await guardFrb(
+      () => rust.searchByTagExpressionPageFrb(
+        mustInclude: mustInclude.toList(),
+        optionalOr: optionalOr.toList(),
+        mustExclude: mustExclude.toList(),
+        page: request.page,
+        pageSize: request.pageSize,
+      ),
+      fallbackMessage: '按元数据搜索漫画失败',
+    );
+    return mapPagedResult(page);
   }
 }

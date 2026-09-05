@@ -13,6 +13,7 @@ class SearchResultHorizontalSection extends StatefulWidget {
     required this.itemHeight,
     required this.itemBuilder,
     this.itemSpacing,
+    this.onNearEnd,
   });
 
   final String title;
@@ -20,6 +21,9 @@ class SearchResultHorizontalSection extends StatefulWidget {
   final double itemHeight;
   final IndexedWidgetBuilder itemBuilder;
   final double? itemSpacing;
+
+  /// 水平滚到接近末尾时回调（用于分页 loadMore）。
+  final VoidCallback? onNearEnd;
 
   @override
   State<SearchResultHorizontalSection> createState() =>
@@ -69,6 +73,10 @@ class _SearchResultHorizontalSectionState
         _canScrollBack = canBack;
         _canScrollForward = canForward;
       });
+    }
+    final VoidCallback? onNearEnd = widget.onNearEnd;
+    if (onNearEnd != null && maxExtent > 0 && offset >= maxExtent - 240) {
+      onNearEnd();
     }
   }
 

@@ -21,14 +21,25 @@ void main() {
     });
   });
 
-  test('buildReaderImageProvider returns null for missing file path', () {
+  test(
+    'buildReaderImageProvider does not sync-check missing files on the hot path',
+    () {
+      ensureReaderImageCacheConfigured();
+
+      final ImageProvider<Object>? provider = buildReaderImageProvider(
+        filePath: r'C:\hentai_library_tests\missing_reader_page.jpg',
+      );
+
+      // Missing files are deferred to ImageProvider load failure (no existsSync).
+      expect(provider, isA<ExtendedFileImageProvider>());
+    },
+  );
+
+  test('buildReaderImageProvider returns null for empty file path', () {
     ensureReaderImageCacheConfigured();
 
-    final ImageProvider<Object>? provider = buildReaderImageProvider(
-      filePath: r'C:\hentai_library_tests\missing_reader_page.jpg',
-    );
-
-    expect(provider, isNull);
+    expect(buildReaderImageProvider(filePath: '   '), isNull);
+    expect(buildReaderImageProvider(), isNull);
   });
 
   test(

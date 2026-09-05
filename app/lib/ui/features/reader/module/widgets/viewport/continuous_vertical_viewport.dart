@@ -167,6 +167,9 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       ],
     );
 
+    final ObjectRef<int> currentIndexRef = useRef<int>(currentIndex);
+    currentIndexRef.value = currentIndex;
+
     useEffect(
       () {
         void handleVisiblePositionChange() {
@@ -190,7 +193,7 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
             return;
           }
           lastVisibleMainIndex.value = applyIndex;
-          if (currentIndex == applyIndex) {
+          if (currentIndexRef.value == applyIndex) {
             return;
           }
           controller.setIndex(applyIndex);
@@ -214,7 +217,6 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       <Object?>[
         itemPositionsListener,
         imageList.length,
-        currentIndex,
         controller,
       ],
     );

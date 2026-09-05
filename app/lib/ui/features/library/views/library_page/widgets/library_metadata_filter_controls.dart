@@ -193,10 +193,10 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
                   ),
                 )
               else
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 240),
+                SizedBox(
+                  height: 240,
                   child: ListView.builder(
-                    shrinkWrap: true,
+                    itemExtent: 40,
                     itemCount: filteredNames.length,
                     itemBuilder: (BuildContext context, int index) {
                       final String name = filteredNames[index];

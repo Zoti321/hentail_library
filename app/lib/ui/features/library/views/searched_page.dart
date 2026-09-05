@@ -74,23 +74,27 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final String trimmedQuery = widget.query.trim();
 
-    final AsyncValue<List<Comic>> searchedComics = ref.watch(
-      librarySearchPageComicsProvider(trimmedQuery),
+    final AsyncValue<LibrarySearchComicsPage> searchedComics = ref.watch(
+      librarySearchPageComicsControllerProvider(trimmedQuery),
     );
     final AsyncValue<LibrarySeriesViewData> searchedSeriesDataAsync = ref.watch(
       librarySearchPageSeriesViewDataProvider(trimmedQuery),
     );
 
     final List<Comic> comics = searchedComics.maybeWhen(
-      data: (List<Comic> value) => value,
+      data: (LibrarySearchComicsPage page) => page.items,
       orElse: () => const <Comic>[],
+    );
+    final int searchedComicTotal = searchedComics.maybeWhen(
+      data: (LibrarySearchComicsPage page) => page.totalCount,
+      orElse: () => comics.length,
     );
     final List<Series> series = searchedSeriesDataAsync.maybeWhen(
       data: (LibrarySeriesViewData value) => value.filteredSeries,
       orElse: () => const <Series>[],
     );
 
-    final int searchedComicCount = comics.length;
+    final int searchedComicCount = searchedComicTotal;
     final int searchedSeriesCount = series.length;
     final int totalResultCount = searchedComicCount + searchedSeriesCount;
 
@@ -164,7 +168,7 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                         style: TextStyle(fontSize: 13, color: cs.error),
                       ),
                     )
-                  else if (searchedSeriesCount == 0 && searchedComicCount == 0)
+                  else if (searchedSeriesCount == 0 && comics.isEmpty)
                     _SearchResultsEmptyState(
                       onGoToLibrary: () =>
                           LibraryManagementActions.goCurrentLibraryBrowseFromContext(
@@ -194,11 +198,20 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                           );
                         },
                       ),
-                    if (searchedComicCount > 0)
+                    if (comics.isNotEmpty)
                       SearchResultHorizontalSection(
                         title: l10n.libraryTabComics,
                         itemCount: comics.length,
                         itemHeight: cardHeight,
+                        onNearEnd: () {
+                          ref
+                              .read(
+                                librarySearchPageComicsControllerProvider(
+                                  trimmedQuery,
+                                ).notifier,
+                              )
+                              .loadMore();
+                        },
                         itemBuilder: (BuildContext context, int index) {
                           final Comic comic = comics[index];
                           return SizedBox(

@@ -41,13 +41,23 @@ class DualPageViewport extends HookConsumerWidget {
       incognito: incognito,
       startFromFirstPage: startFromFirstPage,
     );
-    final ReaderState? readerState = ref
-        .watch(readerControllerProvider(viewKey))
-        .asData
-        ?.value;
-    final int currentIndex = readerState?.currentIndex ?? 1;
-    final int totalPages = readerState?.totalPages ?? 1;
-    final ReadingMode activeMode = readerState?.readingMode ?? readingMode;
+    final int currentIndex = ref.watch(
+      readerControllerProvider(viewKey).select(
+        (AsyncValue<ReaderState> value) =>
+            value.asData?.value.currentIndex ?? 1,
+      ),
+    );
+    final int totalPages = ref.watch(
+      readerControllerProvider(viewKey).select(
+        (AsyncValue<ReaderState> value) => value.asData?.value.totalPages ?? 1,
+      ),
+    );
+    final ReadingMode activeMode = ref.watch(
+      readerControllerProvider(viewKey).select(
+        (AsyncValue<ReaderState> value) =>
+            value.asData?.value.readingMode ?? readingMode,
+      ),
+    );
     final images = ref
         .watch(comicImagesProvider(comicId: comicId))
         .asData

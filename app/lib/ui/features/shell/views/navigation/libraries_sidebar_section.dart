@@ -521,7 +521,9 @@ class _LibraryOverflowMenuButton extends HookConsumerWidget {
     final MetadataRefreshState refreshState = ref.watch(
       metadataRefreshControllerProvider,
     );
-    final bool scanning = ref.watch(scanLibraryControllerProvider).running;
+    final bool scanning = ref.watch(
+      scanLibraryControllerProvider.select((s) => s.running),
+    );
     final bool refreshingThis = ref
         .read(metadataRefreshControllerProvider.notifier)
         .isRefreshingLibrary(library.libraryId);

@@ -15,7 +15,7 @@ void main() {
 
     final ImageCache? cache = getMemoryImageCache(kReaderImageCacheName);
     expect(cache, isNotNull);
-    expect(cache!.maximumSize, kReaderPrefetchNeighborCount * 2 + 3);
+    expect(cache!.maximumSize, kReaderImageCacheMaxEntries);
     expect(cache.maximumSizeBytes, kReaderImageCacheMaxBytes);
   });
 

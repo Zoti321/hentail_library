@@ -502,8 +502,12 @@ class _LibraryOverflowMenuButtonState
 
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
-    final ScanLibraryState scanState = ref.watch(scanLibraryControllerProvider);
-    final bool scanning = scanState.running;
+    final ({bool running, ScanMode scanMode}) scanLeaf = ref.watch(
+      scanLibraryControllerProvider.select(
+        (ScanLibraryState s) => (running: s.running, scanMode: s.scanMode),
+      ),
+    );
+    final bool scanning = scanLeaf.running;
     final AppLocalizations l10n = context.l10n;
 
     return CustomPopupMenu(
@@ -544,7 +548,7 @@ class _LibraryOverflowMenuButtonState
       },
       child: scanning
           ? Tooltip(
-              message: scanState.scanMode == ScanMode.full
+              message: scanLeaf.scanMode == ScanMode.full
                   ? l10n.libraryScanningDeep
                   : l10n.libraryScanning,
               child: Semantics(
