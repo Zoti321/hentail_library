@@ -216,7 +216,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                             (
                               BuildContext context,
                               String filterQuery,
-                              Widget? __,
+                              Widget? _,
                             ) {
                               return _MultiSelectMenuPanel<T>(
                                 key: ValueKey<String>(
