@@ -27,6 +27,7 @@ import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_side_tab_bar.dart';
+import 'package:hentai_library/ui/features/library/view_models/series_item_sort_persist.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -46,13 +47,6 @@ const Duration _kEditMetadataTabTransitionDuration = Duration(
 );
 
 enum _EditMetadataTab { general, authorsAndTags }
-
-/// 打开对话框时已知的 Series 成员排序种子（领域上仍属 SeriesItem，非 Comic 元数据）。
-typedef SeriesItemSortEditSeed = ({
-  String seriesId,
-  double sortOrder,
-  bool sortOrderLocked,
-});
 
 /// 打开漫画元数据编辑表面。有 Series 归属时在常规页展示成员排序区。
 Future<void> showEditMetadataDialog({
@@ -363,35 +357,16 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     SeriesItemSortEditSeed seed,
     double sortOrder,
   ) async {
-    final bool orderChanged = sortOrder != seed.sortOrder;
-    final bool lockChanged = _sortOrderLocked != seed.sortOrderLocked;
-    if (!orderChanged && !lockChanged) {
-      return;
+    final bool wrote = await persistSeriesItemSortIfChanged(
+      repo: ref.read(seriesRepoProvider),
+      comicId: widget.comic.comicId,
+      seed: seed,
+      sortOrder: sortOrder,
+      draftLocked: _sortOrderLocked,
+    );
+    if (wrote) {
+      ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
     }
-
-    final repo = ref.read(seriesRepoProvider);
-    if (orderChanged) {
-      await repo.updateSeriesItemSortOrder(
-        seriesId: seed.seriesId,
-        comicId: widget.comic.comicId,
-        sortOrder: sortOrder,
-      );
-      // Saving sort order always locks; clear if draft wants unlocked.
-      if (!_sortOrderLocked) {
-        await repo.setSeriesItemSortOrderLocked(
-          seriesId: seed.seriesId,
-          comicId: widget.comic.comicId,
-          locked: false,
-        );
-      }
-    } else if (lockChanged) {
-      await repo.setSeriesItemSortOrderLocked(
-        seriesId: seed.seriesId,
-        comicId: widget.comic.comicId,
-        locked: _sortOrderLocked,
-      );
-    }
-    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
   }
 
   Widget _buildTabPane(AppThemeTokens tokens) {
