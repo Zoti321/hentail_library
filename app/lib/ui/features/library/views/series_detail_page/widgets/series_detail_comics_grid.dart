@@ -3,12 +3,14 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/library/view_models/comic_detail_return_series_notifier.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_page_widgets.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_comic_card.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class SeriesDetailComicsGridSliver extends StatelessWidget {
+class SeriesDetailComicsGridSliver extends ConsumerWidget {
   const SeriesDetailComicsGridSliver({
     super.key,
     required this.seriesId,
@@ -21,7 +23,7 @@ class SeriesDetailComicsGridSliver extends StatelessWidget {
   final bool isLoading;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final LibraryLayoutTier layoutTier = libraryLayoutTierForWidth(
       MediaQuery.sizeOf(context).width,
     );
@@ -70,6 +72,9 @@ class SeriesDetailComicsGridSliver extends StatelessWidget {
             item: item,
             gridIndex: index,
             onTap: () {
+              ref
+                  .read(comicDetailReturnSeriesProvider.notifier)
+                  .remember(seriesId);
               appRouter.pushNamed(
                 '漫画详情',
                 pathParameters: <String, String>{'id': item.comic.comicId},

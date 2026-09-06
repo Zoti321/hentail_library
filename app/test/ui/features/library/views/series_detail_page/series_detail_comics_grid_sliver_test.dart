@@ -4,6 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_comics_grid.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Future<void> _pumpGridSliver(
   WidgetTester tester, {
@@ -11,22 +12,24 @@ Future<void> _pumpGridSliver(
   bool isLoading = false,
 }) async {
   await tester.pumpWidget(
-    MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      theme: buildAppTheme(Brightness.light),
-      home: Scaffold(
-        body: CustomScrollView(
-          slivers: <Widget>[
-            SliverPadding(
-              padding: const EdgeInsets.all(16),
-              sliver: SeriesDetailComicsGridSliver(
-                seriesId: 'series-1',
-                items: items,
-                isLoading: isLoading,
+    ProviderScope(
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        theme: buildAppTheme(Brightness.light),
+        home: Scaffold(
+          body: CustomScrollView(
+            slivers: <Widget>[
+              SliverPadding(
+                padding: const EdgeInsets.all(16),
+                sliver: SeriesDetailComicsGridSliver(
+                  seriesId: 'series-1',
+                  items: items,
+                  isLoading: isLoading,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     ),

@@ -220,6 +220,11 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                               key: Key('search-comic-${comic.comicId}'),
                               comic: comic,
                               onTap: () {
+                                ref
+                                    .read(
+                                      comicDetailReturnSeriesProvider.notifier,
+                                    )
+                                    .clear();
                                 appRouter.pushNamed(
                                   '漫画详情',
                                   pathParameters: <String, String>{
