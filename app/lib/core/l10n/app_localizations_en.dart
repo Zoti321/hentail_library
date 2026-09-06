@@ -1360,6 +1360,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dialogEditMetadataTabAuthorsTags => 'Authors & tags';
 
   @override
+  String get smartFacetMatchToggleLabel => 'Smart match';
+
+  @override
+  String get smartFacetMatchHintTooltip => 'Suggested by smart match';
+
+  @override
   String get formSeriesNameLabel => 'Series name';
 
   @override

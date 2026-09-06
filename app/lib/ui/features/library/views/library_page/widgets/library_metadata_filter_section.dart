@@ -150,6 +150,7 @@ class LibraryLanguageFilterControls extends ConsumerWidget {
       names: ComicLanguageNames.closedSet,
       selection: includeOnlyFilterSelection(selected),
       includeOnly: true,
+      enablePinyinAssistedNameMatch: false,
       labelFor: context.l10n.comicLanguageLabel,
       onToggle: ref
           .read(

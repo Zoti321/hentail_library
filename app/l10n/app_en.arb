@@ -618,6 +618,8 @@
   "dialogEditMetadataTitle": "Edit metadata",
   "dialogEditMetadataTabGeneral": "General",
   "dialogEditMetadataTabAuthorsTags": "Authors & tags",
+  "smartFacetMatchToggleLabel": "Smart match",
+  "smartFacetMatchHintTooltip": "Suggested by smart match",
   "formSeriesNameLabel": "Series name",
   "formSeriesSerializationStatusLabel": "Serialization status",
   "formSeriesTotalCountLabel": "Total volumes",

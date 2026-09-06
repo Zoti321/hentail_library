@@ -125,6 +125,7 @@ abstract final class LibraryManagementActions {
     BuildContext context,
     String libraryId,
   ) async {
+    ref.read(comicDetailReturnSeriesProvider.notifier).clear();
     await ref.read(currentLibraryProvider.notifier).select(libraryId);
     if (!context.mounted) {
       return;
@@ -133,10 +134,12 @@ abstract final class LibraryManagementActions {
   }
 
   static void goAllLibraries(BuildContext context) {
+    clearComicDetailReturnSeriesFromContext(context);
     context.go(LibrariesRoutes.all);
   }
 
   static void goCurrentLibraryBrowse(WidgetRef ref, BuildContext context) {
+    ref.read(comicDetailReturnSeriesProvider.notifier).clear();
     final String? currentId = ref
         .read(currentLibraryProvider)
         .asData
@@ -149,6 +152,7 @@ abstract final class LibraryManagementActions {
   static void goCurrentLibraryBrowseFromContext(BuildContext context) {
     try {
       final ProviderContainer container = ProviderScope.containerOf(context);
+      container.read(comicDetailReturnSeriesProvider.notifier).clear();
       final String? currentId = container
           .read(currentLibraryProvider)
           .asData

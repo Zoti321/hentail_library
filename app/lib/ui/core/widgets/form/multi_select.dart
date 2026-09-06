@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/utils/name_contains_filter.dart';
+import 'package:hentai_library/core/utils/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
@@ -57,10 +57,13 @@ class MultiSelect<T> extends ConsumerStatefulWidget {
     required this.copy,
     this.labelTrailing,
     this.compactTrigger = false,
+    this.resolveSmartMatched,
+    this.smartMatchedTooltip,
   });
 
   static const Key fieldSurfaceKey = Key('multi_select_field_surface');
   static const Key menuPanelKey = Key('multi_select_menu_panel');
+  static const Key smartMatchedHintKey = Key('multi_select_smart_matched_hint');
 
   final String label;
   final Widget? labelTrailing;
@@ -74,6 +77,10 @@ class MultiSelect<T> extends ConsumerStatefulWidget {
   final MultiSelectCopy copy;
   final bool compactTrigger;
 
+  /// When true for a dropdown row, show Smart facet match hint icon.
+  final bool Function(T item)? resolveSmartMatched;
+  final String? smartMatchedTooltip;
+
   @override
   ConsumerState<MultiSelect<T>> createState() => _MultiSelectState<T>();
 }
@@ -82,9 +89,12 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
   final CustomPopupMenuController _menuController = CustomPopupMenuController();
   final TextEditingController _inputController = TextEditingController();
   final FocusNode _inputFocusNode = FocusNode();
+  final ScrollController _menuScrollController = ScrollController();
   late final ValueNotifier<List<String>> _selectedNamesNotifier;
   late final ValueNotifier<String> _filterQueryNotifier;
   double _fieldWidth = 0;
+  double _menuScrollOffset = 0;
+  bool _menuSessionActive = false;
 
   @override
   void initState() {
@@ -95,6 +105,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
     _filterQueryNotifier = ValueNotifier<String>(_inputController.text);
     _inputController.addListener(_syncFilterQuery);
     _inputFocusNode.addListener(_handleInputFocusChange);
+    _menuScrollController.addListener(_storeMenuScrollOffset);
   }
 
   @override
@@ -107,17 +118,31 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
   void dispose() {
     _inputController.removeListener(_syncFilterQuery);
     _inputFocusNode.removeListener(_handleInputFocusChange);
+    _menuScrollController.removeListener(_storeMenuScrollOffset);
     _inputFocusNode.dispose();
     _inputController.dispose();
+    _menuScrollController.dispose();
     _selectedNamesNotifier.dispose();
     _filterQueryNotifier.dispose();
     super.dispose();
   }
 
+  void _storeMenuScrollOffset() {
+    if (_menuScrollController.hasClients) {
+      _menuScrollOffset = _menuScrollController.offset;
+    }
+  }
+
   void _syncFilterQuery() {
     final String next = _inputController.text;
-    if (_filterQueryNotifier.value != next) {
-      _filterQueryNotifier.value = next;
+    if (_filterQueryNotifier.value == next) {
+      return;
+    }
+    _filterQueryNotifier.value = next;
+    // Filter membership changes a lot; reset to a predictable start.
+    _menuScrollOffset = 0;
+    if (_menuScrollController.hasClients) {
+      _menuScrollController.jumpTo(0);
     }
   }
 
@@ -143,15 +168,31 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
   }
 
   void _openMenu() {
+    _menuSessionActive = true;
     if (!_menuController.menuIsShowing) {
       _menuController.showMenu();
     }
   }
 
   void _closeMenu() {
+    _menuSessionActive = false;
     if (_menuController.menuIsShowing) {
       _menuController.hideMenu();
     }
+  }
+
+  void _handleMenuVisibility(bool showing) {
+    if (showing) {
+      _menuSessionActive = true;
+      return;
+    }
+    // Barrier hides before chip onPressed; defer clearing so remove can reopen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _menuController.menuIsShowing) {
+        return;
+      }
+      _menuSessionActive = false;
+    });
   }
 
   void _submitInput() {
@@ -162,6 +203,38 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
     widget.onAdd(trimmed);
     _inputController.clear();
     _inputFocusNode.requestFocus();
+  }
+
+  void _addFromMenu(String name) {
+    widget.onAdd(name);
+    // Align with keyboard submit: clear inline filter so the open menu shows
+    // all remaining unselected candidates.
+    _inputController.clear();
+    _inputFocusNode.requestFocus();
+  }
+
+  void _removeSelected(String name) {
+    final bool restoreMenu = _menuSessionActive;
+    widget.onRemove(name);
+    if (!restoreMenu) {
+      return;
+    }
+    // Transparent CustomPopupMenu barrier hides on chip taps; reopen and
+    // restore scroll so remove matches the "selection-only" retention rule.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _openMenu();
+      _inputFocusNode.requestFocus();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_menuScrollController.hasClients) {
+          return;
+        }
+        final double max = _menuScrollController.position.maxScrollExtent;
+        _menuScrollController.jumpTo(_menuScrollOffset.clamp(0.0, max));
+      });
+    });
   }
 
   @override
@@ -202,6 +275,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
               pressType: PressType.singleClick,
               showArrow: false,
               verticalMargin: 4,
+              menuOnChange: _handleMenuVisibility,
               menuBuilder: () => ValueListenableBuilder<List<String>>(
                 valueListenable: _selectedNamesNotifier,
                 builder:
@@ -219,16 +293,20 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                               Widget? _,
                             ) {
                               return _MultiSelectMenuPanel<T>(
-                                key: ValueKey<String>(
-                                  '${selectedNames.join('|')}|$filterQuery',
-                                ),
+                                // Key only on filter so selection changes do not
+                                // force-rebuild the panel (which jumps scroll).
+                                // Filter changes intentionally reset scroll.
+                                key: ValueKey<String>(filterQuery),
                                 width: _fieldWidth,
                                 itemsProvider: widget.itemsProvider,
                                 selectedNames: selectedNames,
                                 filterQuery: filterQuery,
-                                onAdd: widget.onAdd,
+                                scrollController: _menuScrollController,
+                                onAdd: _addFromMenu,
                                 onRetry: widget.onRetry,
                                 resolveName: widget.resolveName,
+                                resolveSmartMatched: widget.resolveSmartMatched,
+                                smartMatchedTooltip: widget.smartMatchedTooltip,
                                 copy: widget.copy,
                               );
                             },
@@ -283,7 +361,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                                 for (final String name in widget.selectedNames)
                                   OutlinedMetaChip(
                                     text: name,
-                                    onRemove: () => widget.onRemove(name),
+                                    onRemove: () => _removeSelected(name),
                                   ),
                                 ConstrainedBox(
                                   constraints: const BoxConstraints(
@@ -389,20 +467,26 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
     required this.itemsProvider,
     required this.selectedNames,
     required this.filterQuery,
+    required this.scrollController,
     required this.onAdd,
     required this.onRetry,
     required this.resolveName,
     required this.copy,
+    this.resolveSmartMatched,
+    this.smartMatchedTooltip,
   });
 
   final double width;
   final ProviderListenable<AsyncValue<List<T>>> itemsProvider;
   final List<String> selectedNames;
   final String filterQuery;
+  final ScrollController scrollController;
   final ValueChanged<String> onAdd;
   final VoidCallback onRetry;
   final String Function(T item) resolveName;
   final MultiSelectCopy copy;
+  final bool Function(T item)? resolveSmartMatched;
+  final String? smartMatchedTooltip;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -451,15 +535,21 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
             .where((T item) => !selected.contains(resolveName(item)))
             .where(
               (T item) =>
-                  nameMatchesContainsFilter(resolveName(item), filterQuery),
+                  nameMatchesPinyinAssistedFilter(
+                    resolveName(item),
+                    filterQuery,
+                  ),
             )
             .toList();
         return _MultiSelectMenuList<T>(
           width: width,
           items: remaining,
           allCatalogEmpty: items.isEmpty,
+          scrollController: scrollController,
           onAdd: onAdd,
           resolveName: resolveName,
+          resolveSmartMatched: resolveSmartMatched,
+          smartMatchedTooltip: smartMatchedTooltip,
           copy: copy,
         );
       },
@@ -511,17 +601,23 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
     required this.width,
     required this.items,
     required this.allCatalogEmpty,
+    required this.scrollController,
     required this.onAdd,
     required this.resolveName,
     required this.copy,
+    this.resolveSmartMatched,
+    this.smartMatchedTooltip,
   });
 
   final double width;
   final List<T> items;
   final bool allCatalogEmpty;
+  final ScrollController scrollController;
   final ValueChanged<String> onAdd;
   final String Function(T item) resolveName;
   final MultiSelectCopy copy;
+  final bool Function(T item)? resolveSmartMatched;
+  final String? smartMatchedTooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -553,6 +649,7 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
               ),
             )
           : ListView.builder(
+              controller: scrollController,
               shrinkWrap: true,
               physics: const ClampingScrollPhysics(),
               padding: EdgeInsets.only(
@@ -563,8 +660,12 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
               itemBuilder: (BuildContext context, int index) {
                 final T item = items[index];
                 final String name = resolveName(item);
+                final bool smartMatched =
+                    resolveSmartMatched?.call(item) ?? false;
                 return _MultiSelectDropdownRow(
                   displayName: name,
+                  smartMatched: smartMatched,
+                  smartMatchedTooltip: smartMatchedTooltip,
                   onSelect: () => onAdd(name),
                 );
               },
@@ -577,15 +678,54 @@ class _MultiSelectDropdownRow extends StatelessWidget {
   const _MultiSelectDropdownRow({
     required this.displayName,
     required this.onSelect,
+    this.smartMatched = false,
+    this.smartMatchedTooltip,
   });
 
   final String displayName;
   final VoidCallback onSelect;
+  final bool smartMatched;
+  final String? smartMatchedTooltip;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+
+    final Widget nameText = Text(
+      displayName,
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: cs.hentai.textPrimary,
+      ),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    );
+
+    final Widget rowChild;
+    if (smartMatched) {
+      final Widget hint = Icon(
+        LucideIcons.sparkles,
+        key: MultiSelect.smartMatchedHintKey,
+        size: 14,
+        color: cs.hentai.textTertiary,
+      );
+      final String? tip = smartMatchedTooltip;
+      rowChild = Row(
+        children: <Widget>[
+          Expanded(child: nameText),
+          SizedBox(width: tokens.spacing.sm),
+          if (tip == null || tip.isEmpty)
+            hint
+          else
+            Tooltip(message: tip, child: hint),
+        ],
+      );
+    } else {
+      rowChild = nameText;
+    }
 
     return Theme(
       data: theme.copyWith(
@@ -600,16 +740,7 @@ class _MultiSelectDropdownRow extends StatelessWidget {
           onTap: onSelect,
           child: Padding(
             padding: _MultiSelectDropdownListStyles.rowPadding,
-            child: Text(
-              displayName,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: cs.hentai.textPrimary,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+            child: rowChild,
           ),
         ),
       ),

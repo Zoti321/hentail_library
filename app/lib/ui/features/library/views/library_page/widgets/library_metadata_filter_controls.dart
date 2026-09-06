@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/core/utils/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/domain/library/library_tri_state_pick.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -28,6 +29,7 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
     required this.onClear,
     this.isLoading = false,
     this.includeOnly = false,
+    this.enablePinyinAssistedNameMatch = true,
     this.labelFor,
   });
 
@@ -39,6 +41,8 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
   final LibraryMetadataFilterClear onClear;
   final bool isLoading;
   final bool includeOnly;
+  /// Language closed-set filters keep plain contains (see issue #87).
+  final bool enablePinyinAssistedNameMatch;
   final String Function(String name)? labelFor;
 
   @override
@@ -49,12 +53,16 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
     final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
-    final String query = searchQuery.value.trim().toLowerCase();
-    final List<String> filteredNames = query.isEmpty
-        ? names
-        : names
-              .where((String name) => name.toLowerCase().contains(query))
-              .toList();
+    final String query = searchQuery.value;
+    final List<String> filteredNames = names
+        .where((String name) {
+          if (!enablePinyinAssistedNameMatch) {
+            final String normalized = query.trim().toLowerCase();
+            return normalized.isEmpty || name.toLowerCase().contains(normalized);
+          }
+          return nameMatchesPinyinAssistedFilter(name, query);
+        })
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

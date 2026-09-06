@@ -131,6 +131,9 @@ class _LibraryComicsGridSliver extends StatelessWidget {
             comic: manga,
             gridIndex: index,
             onTap: () {
+              ProviderScope.containerOf(context)
+                  .read(comicDetailReturnSeriesProvider.notifier)
+                  .clear();
               appRouter.pushNamed(
                 '漫画详情',
                 pathParameters: <String, String>{'id': manga.comicId},

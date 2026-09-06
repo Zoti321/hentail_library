@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/data/repositories/named_facet_form_listing.dart';
-import 'package:hentai_library/domain/models/named_facet_form_candidate.dart';
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
 import 'package:hentai_library/ui/core/widgets/form/named_facet_multi_select_field.dart';
+import 'package:hentai_library/ui/features/library/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-/// Snapshot of Tag candidates for Comic metadata form (attachment count order).
-final tagsForComicMetadataFormProvider =
-    FutureProvider.autoDispose<List<NamedFacetFormCandidate>>((Ref ref) {
-      return listNamedFacetForMetadataForm(NamedFacetFormKind.tag);
-    });
 
 /// 全库标签多选：字段内 chip + 内联输入；浮层列出未选字典项。
 class TagLibraryMultiSelectField extends ConsumerWidget {
@@ -21,6 +14,7 @@ class TagLibraryMultiSelectField extends ConsumerWidget {
     required this.selectedNames,
     required this.onAdd,
     required this.onRemove,
+    required this.scope,
     this.labelTrailing,
     this.compactTrigger = false,
   });
@@ -31,8 +25,7 @@ class TagLibraryMultiSelectField extends ConsumerWidget {
   final List<String> selectedNames;
   final ValueChanged<String> onAdd;
   final ValueChanged<String> onRemove;
-
-  /// When true, shortens the field chrome (e.g. metadata dialog).
+  final ComicMetadataSmartFacetScope scope;
   final bool compactTrigger;
 
   @override
@@ -46,8 +39,9 @@ class TagLibraryMultiSelectField extends ConsumerWidget {
       onAdd: onAdd,
       onRemove: onRemove,
       compactTrigger: compactTrigger,
-      itemsProvider: tagsForComicMetadataFormProvider,
-      onRetry: () => ref.invalidate(tagsForComicMetadataFormProvider),
+      itemsProvider: tagsSmartForComicMetadataFormProvider(scope),
+      onRetry: () =>
+          ref.invalidate(tagsSmartForComicMetadataFormProvider(scope)),
       copy: MultiSelectCopy(
         inputPlaceholder: l10n.formTagSelectPlaceholder,
         listLoadFailed: l10n.formTagListLoadFailed,

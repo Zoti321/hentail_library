@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/ui/core/dto/nav_item_data.dart';
+import 'package:hentai_library/ui/features/library/view_models/comic_detail_return_series_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -63,6 +64,7 @@ abstract final class AppNavigation {
   }
 
   static void goToNavId(BuildContext context, String id, {WidgetRef? ref}) {
+    clearComicDetailReturnSeriesFromContext(context);
     switch (id) {
       case navIdHome:
         context.go('/home');
