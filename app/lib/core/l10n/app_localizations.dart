@@ -2496,6 +2496,18 @@ abstract class AppLocalizations {
   /// **'作者&标签'**
   String get dialogEditMetadataTabAuthorsTags;
 
+  /// No description provided for @smartFacetMatchToggleLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'智能匹配'**
+  String get smartFacetMatchToggleLabel;
+
+  /// No description provided for @smartFacetMatchHintTooltip.
+  ///
+  /// In zh, this message translates to:
+  /// **'由智能匹配推荐'**
+  String get smartFacetMatchHintTooltip;
+
   /// No description provided for @formSeriesNameLabel.
   ///
   /// In zh, this message translates to:

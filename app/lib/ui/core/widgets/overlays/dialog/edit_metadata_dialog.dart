@@ -23,11 +23,15 @@ import 'package:hentai_library/ui/core/widgets/form/metadata_lock_button.dart';
 import 'package:hentai_library/ui/core/widgets/form/character_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/parody_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
+import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_side_tab_bar.dart';
+import 'package:hentai_library/domain/library/smart_facet_match_preference.dart';
+import 'package:hentai_library/ui/features/library/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_item_sort_persist.dart';
+import 'package:hentai_library/ui/features/library/view_models/smart_facet_match_preference_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -442,6 +446,12 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
         ),
         _EditMetadataTab.authorsAndTags => _EditMetadataAuthorsTagsTab(
           key: const ValueKey<String>('authors-tags'),
+          scope: (
+            comicId: widget.comic.comicId,
+            title: _form.title,
+            resourcePath: widget.comic.path,
+            seriesId: _seriesSortSeed?.seriesId,
+          ),
           authors: _form.authors,
           tags: _form.tags,
           parodies: _form.parodies,
@@ -806,9 +816,10 @@ String _formatSortOrder(double value) {
   return value.toString();
 }
 
-class _EditMetadataAuthorsTagsTab extends StatelessWidget {
+class _EditMetadataAuthorsTagsTab extends ConsumerWidget {
   const _EditMetadataAuthorsTagsTab({
     super.key,
+    required this.scope,
     required this.authors,
     required this.tags,
     required this.parodies,
@@ -826,6 +837,7 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
     required this.onLockChanged,
   });
 
+  final ComicMetadataSmartFacetScope scope;
   final List<Author> authors;
   final List<Tag> tags;
   final List<String> parodies;
@@ -843,14 +855,55 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
   final _MetaLockChanged onLockChanged;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final bool smartMatchEnabled =
+        ref.watch(smartFacetMatchPreferenceProvider).asData?.value ??
+        SmartFacetMatchPreference.defaultValue;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: tokens.spacing.lg,
       children: <Widget>[
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                ref
+                    .read(smartFacetMatchPreferenceProvider.notifier)
+                    .setEnabled(!smartMatchEnabled);
+              },
+              borderRadius: BorderRadius.circular(tokens.radius.sm),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: tokens.spacing.sm,
+                  vertical: tokens.spacing.xs,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      l10n.smartFacetMatchToggleLabel,
+                      style: TextStyle(
+                        fontSize: tokens.text.bodySm,
+                        fontWeight: FontWeight.w500,
+                        color: cs.hentai.textPrimary,
+                      ),
+                    ),
+                    SizedBox(width: tokens.spacing.sm),
+                    IgnorePointer(
+                      child: ToggleSwitch(checked: smartMatchEnabled),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
         AuthorLibraryMultiSelectField(
           label: l10n.comicDetailAuthors,
           labelTrailing: MetadataLockButton(
@@ -862,6 +915,7 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
           selectedNames: authors.map((Author a) => a.name).toList(),
           onAdd: onAddAuthor,
           onRemove: onRemoveAuthor,
+          scope: scope,
         ),
         TagLibraryMultiSelectField(
           label: l10n.comicDetailTags,
@@ -874,6 +928,7 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
           selectedNames: tags.map((Tag t) => t.name).toList(),
           onAdd: onAddTag,
           onRemove: onRemoveTag,
+          scope: scope,
         ),
         ParodyLibraryMultiSelectField(
           label: l10n.comicDetailParodies,
@@ -886,6 +941,7 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
           selectedNames: parodies,
           onAdd: onAddParody,
           onRemove: onRemoveParody,
+          scope: scope,
         ),
         CharacterLibraryMultiSelectField(
           label: l10n.comicDetailCharacters,
@@ -898,6 +954,7 @@ class _EditMetadataAuthorsTagsTab extends StatelessWidget {
           selectedNames: characters,
           onAdd: onAddCharacter,
           onRemove: onRemoveCharacter,
+          scope: scope,
         ),
       ],
     );
