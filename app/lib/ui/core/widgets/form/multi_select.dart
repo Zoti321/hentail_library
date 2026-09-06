@@ -82,9 +82,12 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
   final CustomPopupMenuController _menuController = CustomPopupMenuController();
   final TextEditingController _inputController = TextEditingController();
   final FocusNode _inputFocusNode = FocusNode();
+  final ScrollController _menuScrollController = ScrollController();
   late final ValueNotifier<List<String>> _selectedNamesNotifier;
   late final ValueNotifier<String> _filterQueryNotifier;
   double _fieldWidth = 0;
+  double _menuScrollOffset = 0;
+  bool _menuSessionActive = false;
 
   @override
   void initState() {
@@ -95,6 +98,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
     _filterQueryNotifier = ValueNotifier<String>(_inputController.text);
     _inputController.addListener(_syncFilterQuery);
     _inputFocusNode.addListener(_handleInputFocusChange);
+    _menuScrollController.addListener(_storeMenuScrollOffset);
   }
 
   @override
@@ -107,17 +111,31 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
   void dispose() {
     _inputController.removeListener(_syncFilterQuery);
     _inputFocusNode.removeListener(_handleInputFocusChange);
+    _menuScrollController.removeListener(_storeMenuScrollOffset);
     _inputFocusNode.dispose();
     _inputController.dispose();
+    _menuScrollController.dispose();
     _selectedNamesNotifier.dispose();
     _filterQueryNotifier.dispose();
     super.dispose();
   }
 
+  void _storeMenuScrollOffset() {
+    if (_menuScrollController.hasClients) {
+      _menuScrollOffset = _menuScrollController.offset;
+    }
+  }
+
   void _syncFilterQuery() {
     final String next = _inputController.text;
-    if (_filterQueryNotifier.value != next) {
-      _filterQueryNotifier.value = next;
+    if (_filterQueryNotifier.value == next) {
+      return;
+    }
+    _filterQueryNotifier.value = next;
+    // Filter membership changes a lot; reset to a predictable start.
+    _menuScrollOffset = 0;
+    if (_menuScrollController.hasClients) {
+      _menuScrollController.jumpTo(0);
     }
   }
 
@@ -143,15 +161,31 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
   }
 
   void _openMenu() {
+    _menuSessionActive = true;
     if (!_menuController.menuIsShowing) {
       _menuController.showMenu();
     }
   }
 
   void _closeMenu() {
+    _menuSessionActive = false;
     if (_menuController.menuIsShowing) {
       _menuController.hideMenu();
     }
+  }
+
+  void _handleMenuVisibility(bool showing) {
+    if (showing) {
+      _menuSessionActive = true;
+      return;
+    }
+    // Barrier hides before chip onPressed; defer clearing so remove can reopen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _menuController.menuIsShowing) {
+        return;
+      }
+      _menuSessionActive = false;
+    });
   }
 
   void _submitInput() {
@@ -162,6 +196,38 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
     widget.onAdd(trimmed);
     _inputController.clear();
     _inputFocusNode.requestFocus();
+  }
+
+  void _addFromMenu(String name) {
+    widget.onAdd(name);
+    // Align with keyboard submit: clear inline filter so the open menu shows
+    // all remaining unselected candidates.
+    _inputController.clear();
+    _inputFocusNode.requestFocus();
+  }
+
+  void _removeSelected(String name) {
+    final bool restoreMenu = _menuSessionActive;
+    widget.onRemove(name);
+    if (!restoreMenu) {
+      return;
+    }
+    // Transparent CustomPopupMenu barrier hides on chip taps; reopen and
+    // restore scroll so remove matches the "selection-only" retention rule.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _openMenu();
+      _inputFocusNode.requestFocus();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_menuScrollController.hasClients) {
+          return;
+        }
+        final double max = _menuScrollController.position.maxScrollExtent;
+        _menuScrollController.jumpTo(_menuScrollOffset.clamp(0.0, max));
+      });
+    });
   }
 
   @override
@@ -202,6 +268,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
               pressType: PressType.singleClick,
               showArrow: false,
               verticalMargin: 4,
+              menuOnChange: _handleMenuVisibility,
               menuBuilder: () => ValueListenableBuilder<List<String>>(
                 valueListenable: _selectedNamesNotifier,
                 builder:
@@ -219,14 +286,16 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                               Widget? _,
                             ) {
                               return _MultiSelectMenuPanel<T>(
-                                key: ValueKey<String>(
-                                  '${selectedNames.join('|')}|$filterQuery',
-                                ),
+                                // Key only on filter so selection changes do not
+                                // force-rebuild the panel (which jumps scroll).
+                                // Filter changes intentionally reset scroll.
+                                key: ValueKey<String>(filterQuery),
                                 width: _fieldWidth,
                                 itemsProvider: widget.itemsProvider,
                                 selectedNames: selectedNames,
                                 filterQuery: filterQuery,
-                                onAdd: widget.onAdd,
+                                scrollController: _menuScrollController,
+                                onAdd: _addFromMenu,
                                 onRetry: widget.onRetry,
                                 resolveName: widget.resolveName,
                                 copy: widget.copy,
@@ -283,7 +352,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                                 for (final String name in widget.selectedNames)
                                   OutlinedMetaChip(
                                     text: name,
-                                    onRemove: () => widget.onRemove(name),
+                                    onRemove: () => _removeSelected(name),
                                   ),
                                 ConstrainedBox(
                                   constraints: const BoxConstraints(
@@ -389,6 +458,7 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
     required this.itemsProvider,
     required this.selectedNames,
     required this.filterQuery,
+    required this.scrollController,
     required this.onAdd,
     required this.onRetry,
     required this.resolveName,
@@ -399,6 +469,7 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
   final ProviderListenable<AsyncValue<List<T>>> itemsProvider;
   final List<String> selectedNames;
   final String filterQuery;
+  final ScrollController scrollController;
   final ValueChanged<String> onAdd;
   final VoidCallback onRetry;
   final String Function(T item) resolveName;
@@ -458,6 +529,7 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
           width: width,
           items: remaining,
           allCatalogEmpty: items.isEmpty,
+          scrollController: scrollController,
           onAdd: onAdd,
           resolveName: resolveName,
           copy: copy,
@@ -511,6 +583,7 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
     required this.width,
     required this.items,
     required this.allCatalogEmpty,
+    required this.scrollController,
     required this.onAdd,
     required this.resolveName,
     required this.copy,
@@ -519,6 +592,7 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
   final double width;
   final List<T> items;
   final bool allCatalogEmpty;
+  final ScrollController scrollController;
   final ValueChanged<String> onAdd;
   final String Function(T item) resolveName;
   final MultiSelectCopy copy;
@@ -553,6 +627,7 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
               ),
             )
           : ListView.builder(
+              controller: scrollController,
               shrinkWrap: true,
               physics: const ClampingScrollPhysics(),
               padding: EdgeInsets.only(

@@ -13,6 +13,15 @@ final _catalogProvider = Provider<AsyncValue<List<String>>>(
       const AsyncData<List<String>>(<String>['alpha', 'beta', 'gamma']),
 );
 
+final _longCatalogProvider = Provider<AsyncValue<List<String>>>(
+  (Ref ref) => AsyncData<List<String>>(
+    List<String>.generate(
+      40,
+      (int i) => 'item-${i.toString().padLeft(2, '0')}',
+    ),
+  ),
+);
+
 void main() {
   Future<void> pumpMultiSelect(
     WidgetTester tester, {
@@ -190,6 +199,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+
     await tester.tap(find.byIcon(Icons.close).first);
     await tester.pumpAndSettle();
 
@@ -197,10 +209,14 @@ void main() {
     expect(find.widgetWithText(OutlinedMetaChip, 'alpha'), findsNothing);
     expect(find.widgetWithText(OutlinedMetaChip, 'beta'), findsOneWidget);
 
-    await tester.tap(find.byType(TextField));
-    await tester.pumpAndSettle();
-
-    expect(find.text('alpha'), findsOneWidget);
+    // Menu stays open after chip remove so the name returns to candidates.
+    expect(
+      find.descendant(
+        of: find.byKey(MultiSelect.menuPanelKey),
+        matching: find.text('alpha'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('dropdown matches field width and excludes selected names', (
@@ -263,6 +279,256 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(added, <String>['beta']);
+  });
+
+  testWidgets(
+    'selecting filtered candidate clears input and shows all remaining',
+    (WidgetTester tester) async {
+      final List<String> selected = <String>['gamma'];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            locale: const Locale('zh'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            theme: buildAppTheme(Brightness.light),
+            home: Scaffold(
+              body: Padding(
+                padding: const EdgeInsets.all(24),
+                child: StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return MultiSelect<String>(
+                      label: '标签',
+                      icon: LucideIcons.tag,
+                      selectedNames: selected,
+                      onAdd: (String name) {
+                        setState(() => selected.add(name));
+                      },
+                      onRemove: (String name) {
+                        setState(() => selected.remove(name));
+                      },
+                      itemsProvider: _catalogProvider,
+                      onRetry: () {},
+                      resolveName: (String name) => name,
+                      copy: const MultiSelectCopy(
+                        inputPlaceholder: '选择或输入标签…',
+                        listLoadFailed: '标签列表加载失败',
+                        emptyCatalog: '暂无标签',
+                        emptyRemaining: '没有更多可选',
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(TextField));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'alp');
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.descendant(
+          of: find.byKey(MultiSelect.menuPanelKey),
+          matching: find.text('alpha'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller?.text,
+        isEmpty,
+      );
+
+      final Finder menu = find.byKey(MultiSelect.menuPanelKey);
+      expect(
+        find.descendant(of: menu, matching: find.text('alpha')),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: menu, matching: find.text('beta')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: menu, matching: find.text('gamma')),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets('selecting without filter preserves open menu scroll offset', (
+    WidgetTester tester,
+  ) async {
+    final List<String> selected = <String>[];
+
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: buildAppTheme(Brightness.light),
+          home: Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.all(24),
+              child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return MultiSelect<String>(
+                    label: '标签',
+                    icon: LucideIcons.tag,
+                    selectedNames: selected,
+                    onAdd: (String name) {
+                      setState(() => selected.add(name));
+                    },
+                    onRemove: (String name) {
+                      setState(() => selected.remove(name));
+                    },
+                    itemsProvider: _longCatalogProvider,
+                    onRetry: () {},
+                    resolveName: (String name) => name,
+                    copy: const MultiSelectCopy(
+                      inputPlaceholder: '选择或输入标签…',
+                      listLoadFailed: '标签列表加载失败',
+                      emptyCatalog: '暂无标签',
+                      emptyRemaining: '没有更多可选',
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+
+    final Finder menu = find.byKey(MultiSelect.menuPanelKey);
+    final Finder menuScrollable = find.descendant(
+      of: menu,
+      matching: find.byType(Scrollable),
+    );
+    final Finder pickTarget = find.descendant(
+      of: menu,
+      matching: find.text('item-18'),
+    );
+    await tester.scrollUntilVisible(pickTarget, 40, scrollable: menuScrollable);
+    await tester.pumpAndSettle();
+
+    final double offsetBefore = tester
+        .state<ScrollableState>(menuScrollable)
+        .position
+        .pixels;
+    expect(offsetBefore, greaterThan(0));
+
+    await tester.tap(pickTarget);
+    await tester.pumpAndSettle();
+
+    final double offsetAfter = tester
+        .state<ScrollableState>(menuScrollable)
+        .position
+        .pixels;
+    expect(offsetAfter, closeTo(offsetBefore, 1.0));
+    expect(find.byKey(MultiSelect.menuPanelKey), findsOneWidget);
+    expect(find.widgetWithText(OutlinedMetaChip, 'item-18'), findsOneWidget);
+  });
+
+  testWidgets('removing chip while menu open preserves scroll offset', (
+    WidgetTester tester,
+  ) async {
+    final List<String> selected = <String>['item-00'];
+
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: buildAppTheme(Brightness.light),
+          home: Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.all(24),
+              child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return MultiSelect<String>(
+                    label: '标签',
+                    icon: LucideIcons.tag,
+                    selectedNames: selected,
+                    onAdd: (String name) {
+                      setState(() => selected.add(name));
+                    },
+                    onRemove: (String name) {
+                      setState(() => selected.remove(name));
+                    },
+                    itemsProvider: _longCatalogProvider,
+                    onRetry: () {},
+                    resolveName: (String name) => name,
+                    copy: const MultiSelectCopy(
+                      inputPlaceholder: '选择或输入标签…',
+                      listLoadFailed: '标签列表加载失败',
+                      emptyCatalog: '暂无标签',
+                      emptyRemaining: '没有更多可选',
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+
+    final Finder menu = find.byKey(MultiSelect.menuPanelKey);
+    final Finder menuScrollable = find.descendant(
+      of: menu,
+      matching: find.byType(Scrollable),
+    );
+    final Finder deepItem = find.descendant(
+      of: menu,
+      matching: find.text('item-18'),
+    );
+    await tester.scrollUntilVisible(deepItem, 40, scrollable: menuScrollable);
+    await tester.pumpAndSettle();
+
+    final double offsetBefore = tester
+        .state<ScrollableState>(menuScrollable)
+        .position
+        .pixels;
+    expect(offsetBefore, greaterThan(0));
+
+    await tester.tap(find.byIcon(Icons.close).first);
+    await tester.pumpAndSettle();
+
+    final double offsetAfter = tester
+        .state<ScrollableState>(menuScrollable)
+        .position
+        .pixels;
+    expect(offsetAfter, closeTo(offsetBefore, 1.0));
+    expect(find.widgetWithText(OutlinedMetaChip, 'item-00'), findsNothing);
+
+    // Returned candidate may sit above the preserved viewport; scroll up to it.
+    final Finder returnedItem = find.descendant(
+      of: find.byKey(MultiSelect.menuPanelKey),
+      matching: find.text('item-00'),
+    );
+    await tester.scrollUntilVisible(
+      returnedItem,
+      -40,
+      scrollable: menuScrollable,
+    );
+    await tester.pumpAndSettle();
+    expect(returnedItem, findsOneWidget);
   });
 
   testWidgets(
