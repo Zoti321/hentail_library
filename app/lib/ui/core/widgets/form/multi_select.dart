@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/core/utils/name_contains_filter.dart';
+import 'package:hentai_library/core/utils/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
@@ -451,7 +451,10 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
             .where((T item) => !selected.contains(resolveName(item)))
             .where(
               (T item) =>
-                  nameMatchesContainsFilter(resolveName(item), filterQuery),
+                  nameMatchesPinyinAssistedFilter(
+                    resolveName(item),
+                    filterQuery,
+                  ),
             )
             .toList();
         return _MultiSelectMenuList<T>(

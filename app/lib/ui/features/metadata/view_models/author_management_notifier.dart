@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/utils/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 
@@ -27,16 +28,15 @@ final authorFilterProvider = NotifierProvider<AuthorFilterNotifier, String>(
 
 final filteredAuthorsProvider = Provider<List<Author>>((ref) {
   final AsyncValue<List<Author>> asyncAuthors = ref.watch(allAuthorsProvider);
-  final String query = ref.watch(authorFilterProvider).trim().toLowerCase();
+  final String query = ref.watch(authorFilterProvider);
   final List<Author> authors = asyncAuthors.maybeWhen(
     data: (List<Author> value) => value,
     orElse: () => const <Author>[],
   );
-  if (query.isEmpty) {
-    return authors;
-  }
   return authors
-      .where((Author item) => item.name.toLowerCase().contains(query))
+      .where(
+        (Author item) => nameMatchesPinyinAssistedFilter(item.name, query),
+      )
       .toList();
 });
 
