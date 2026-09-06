@@ -88,11 +88,23 @@ fn resolve_access_for_open(comic_id: &str) -> Result<ResolvedAccess, HentaiError
     match block_on(find_comic_by_id(comic_id)) {
         Ok(Some(comic)) => resolve_access_for_comic(&comic),
         Ok(None) => Ok(ResolvedAccess::Local(local_access())),
-        Err(err) if err.code == crate::error::HentaiErrorCode::DbInitFailed => {
-            // Unit tests / early boot: no DB yet → Local FS.
+        Err(err) if is_db_unavailable_for_open(&err) => {
+            // No usable DB yet, or connection became invalid (e.g. temp DB
+            // deleted by parallel tests) → Local FS path open.
             Ok(ResolvedAccess::Local(local_access()))
         }
         Err(err) => Err(err),
+    }
+}
+
+fn is_db_unavailable_for_open(err: &HentaiError) -> bool {
+    match err.code {
+        crate::error::HentaiErrorCode::DbInitFailed => true,
+        crate::error::HentaiErrorCode::DbQueryFailed => {
+            let lower = err.message.to_ascii_lowercase();
+            lower.contains("unable to open database file") || lower.contains("(code: 14)")
+        }
+        _ => false,
     }
 }
 
