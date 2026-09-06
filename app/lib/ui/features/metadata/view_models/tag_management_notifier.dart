@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/utils/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 
@@ -29,16 +30,13 @@ final tagFilterProvider = NotifierProvider<TagFilterNotifier, String>(
 
 final filteredTagsProvider = Provider<List<Tag>>((ref) {
   final AsyncValue<List<Tag>> asyncTags = ref.watch(allTagsProvider);
-  final String query = ref.watch(tagFilterProvider).trim().toLowerCase();
+  final String query = ref.watch(tagFilterProvider);
   final List<Tag> tags = asyncTags.maybeWhen(
     data: (List<Tag> value) => value,
     orElse: () => const <Tag>[],
   );
-  if (query.isEmpty) {
-    return tags;
-  }
   return tags
-      .where((Tag item) => item.name.toLowerCase().contains(query))
+      .where((Tag item) => nameMatchesPinyinAssistedFilter(item.name, query))
       .toList();
 });
 
