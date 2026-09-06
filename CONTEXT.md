@@ -144,6 +144,10 @@ _Avoid_: 元数据字段（太泛）、标签族（易漏 Author / Language）
 某个 Named metadata facet 名字当前附着到多少 Comic（跨全部 Library 的 junction 行数）；未附着的字典项为 0。用于 Comic metadata form 候选排序等，不是阅读器 session 引用计数。
 _Avoid_: 引用次数、usage count、ref_count、热度
 
+**Pinyin-assisted name match**:
+对 Named metadata facet 显示名的客户端名称过滤增强：拉丁查询除大小写不敏感 substring 外，还可按无调全拼或拼音首字母命中中文名；含汉字的查询仍只做显示名 substring。适用于元数据 MultiSelect、库页 metadata 筛选抽屉、元数据管理 Author/Tag 列表搜索；不适用于图书馆搜索栏的 facet token 精确匹配。
+_Avoid_: 拼音搜索引擎、fuzzy search、拼音索引、全文检索
+
 **Comic catalog query**:
 库页 / 搜索共用的 Comic 目录查询：Dart 只组装筛选 intent（`LibraryComicFilter` / metadata expression）；谓词 SQL 集中在 core `comic/filter_predicate`（catalog 分桶与跨 facet 表达式共用 typed facet helpers）。
 _Avoid_: 内存 matches、在 Flutter 再写一份 WHERE
