@@ -68,7 +68,43 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
         }
     }
 
-    for (folder_path, mut entries) in groups {
+    let rewrite_comic_ids: Vec<String> = groups
+        .values()
+        .flat_map(|entries| entries.iter().map(|(comic_id, _)| comic_id.clone()))
+        .collect();
+
+    // Capture locks before clearing memberships so migrate-across-series keeps ADR-0006.
+    let locked_orders: HashMap<String, f64> = if rewrite_comic_ids.is_empty() {
+        HashMap::new()
+    } else {
+        SeriesItems::find()
+            .filter(series_items::Column::ComicId.is_in(rewrite_comic_ids.clone()))
+            .all(db)
+            .await
+            .map_err(crate::db::map_db_err)?
+            .into_iter()
+            .filter(|item| item.sort_order_locked)
+            .map(|item| (item.comic_id, item.sort_order))
+            .collect()
+    };
+
+    // Clear old memberships for comics we are about to rewrite so insert order
+    // across Folder series cannot hit series_items.comic_id UNIQUE (#84).
+    if !rewrite_comic_ids.is_empty() {
+        SeriesItems::delete_many()
+            .filter(series_items::Column::ComicId.is_in(rewrite_comic_ids))
+            .exec(db)
+            .await
+            .map_err(crate::db::map_db_err)?;
+    }
+
+    let mut folder_paths: Vec<String> = groups.keys().cloned().collect();
+    folder_paths.sort();
+
+    for folder_path in folder_paths {
+        let mut entries = groups
+            .remove(&folder_path)
+            .expect("folder path comes from groups keys");
         entries.sort_by(|a, b| compare_paths_by_filename(&a.1, &b.1));
         let series_id = series_id_from_folder_path(&folder_path);
         let name = series_name_from_folder_path(&folder_path);
@@ -83,7 +119,7 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
 
         if let Some(existing_row) = existing {
             let mut active: series::ActiveModel = existing_row.clone().into();
-            active.folder_path = Set(folder_path);
+            active.folder_path = Set(folder_path.clone());
             active.library_id = Set(series_library_id);
             // serialization_status / total_count have no scan source → never overwritten.
             let merged_name = merge_series_name(
@@ -97,7 +133,7 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
         } else {
             Series::insert(series::ActiveModel {
                 series_id: Set(series_id.clone()),
-                folder_path: Set(folder_path),
+                folder_path: Set(folder_path.clone()),
                 name_sort_key: Set(compute_sort_key(&name)),
                 name: Set(name),
                 serialization_status: Set("unknown".to_string()),
@@ -111,23 +147,6 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
             .await
             .map_err(crate::db::map_db_err)?;
         }
-
-        let previous_items = SeriesItems::find()
-            .filter(series_items::Column::SeriesId.eq(series_id.clone()))
-            .all(db)
-            .await
-            .map_err(crate::db::map_db_err)?;
-        let locked_orders: HashMap<String, f64> = previous_items
-            .into_iter()
-            .filter(|item| item.sort_order_locked)
-            .map(|item| (item.comic_id, item.sort_order))
-            .collect();
-
-        SeriesItems::delete_many()
-            .filter(series_items::Column::SeriesId.eq(series_id.clone()))
-            .exec(db)
-            .await
-            .map_err(crate::db::map_db_err)?;
 
         for (index, (comic_id, _)) in entries.iter().enumerate() {
             let (sort_order, sort_order_locked) = resolve_member_sort_order(
