@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/domain/library/smart_facet_match.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
@@ -611,6 +612,76 @@ void main() {
       find.descendant(
         of: find.byKey(MultiSelect.menuPanelKey),
         matching: find.text('重试'),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('shows smart match hint icon only on matched dropdown rows', (
+    WidgetTester tester,
+  ) async {
+    final Provider<AsyncValue<List<SmartFacetMatchCandidate>>> smartProvider =
+        Provider<AsyncValue<List<SmartFacetMatchCandidate>>>(
+          (Ref ref) => const AsyncData<List<SmartFacetMatchCandidate>>(
+            <SmartFacetMatchCandidate>[
+              (name: 'matched', attachmentCount: 1, smartMatched: true),
+              (name: 'plain', attachmentCount: 2, smartMatched: false),
+            ],
+          ),
+        );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: buildAppTheme(Brightness.light),
+          home: Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.all(24),
+              child: MultiSelect<SmartFacetMatchCandidate>(
+                label: '标签',
+                icon: LucideIcons.tag,
+                selectedNames: const <String>[],
+                onAdd: (_) {},
+                onRemove: (_) {},
+                itemsProvider: smartProvider,
+                onRetry: () {},
+                resolveName: (SmartFacetMatchCandidate item) => item.name,
+                resolveSmartMatched: (SmartFacetMatchCandidate item) =>
+                    item.smartMatched,
+                smartMatchedTooltip: '由智能匹配推荐',
+                copy: const MultiSelectCopy(
+                  inputPlaceholder: '选择或输入标签…',
+                  listLoadFailed: '标签列表加载失败',
+                  emptyCatalog: '暂无标签',
+                  emptyRemaining: '没有更多可选',
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+
+    final Finder menu = find.byKey(MultiSelect.menuPanelKey);
+    expect(
+      find.descendant(of: menu, matching: find.text('matched')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: menu, matching: find.text('plain')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: menu,
+        matching: find.byKey(MultiSelect.smartMatchedHintKey),
       ),
       findsOneWidget,
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/domain/models/named_facet_form_candidate.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/domain/library/smart_facet_match.dart';
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod/misc.dart' show ProviderListenable;
@@ -26,7 +27,7 @@ class NamedFacetMultiSelectField extends ConsumerWidget {
   final List<String> selectedNames;
   final ValueChanged<String> onAdd;
   final ValueChanged<String> onRemove;
-  final ProviderListenable<AsyncValue<List<NamedFacetFormCandidate>>>
+  final ProviderListenable<AsyncValue<List<SmartFacetMatchCandidate>>>
   itemsProvider;
   final VoidCallback onRetry;
   final MultiSelectCopy copy;
@@ -34,7 +35,8 @@ class NamedFacetMultiSelectField extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return MultiSelect<NamedFacetFormCandidate>(
+    final String tooltip = context.l10n.smartFacetMatchHintTooltip;
+    return MultiSelect<SmartFacetMatchCandidate>(
       label: label,
       labelTrailing: labelTrailing,
       icon: icon,
@@ -44,7 +46,9 @@ class NamedFacetMultiSelectField extends ConsumerWidget {
       compactTrigger: compactTrigger,
       itemsProvider: itemsProvider,
       onRetry: onRetry,
-      resolveName: (NamedFacetFormCandidate item) => item.name,
+      resolveName: (SmartFacetMatchCandidate item) => item.name,
+      resolveSmartMatched: (SmartFacetMatchCandidate item) => item.smartMatched,
+      smartMatchedTooltip: tooltip,
       copy: copy,
     );
   }

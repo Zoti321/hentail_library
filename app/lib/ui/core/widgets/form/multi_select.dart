@@ -57,10 +57,13 @@ class MultiSelect<T> extends ConsumerStatefulWidget {
     required this.copy,
     this.labelTrailing,
     this.compactTrigger = false,
+    this.resolveSmartMatched,
+    this.smartMatchedTooltip,
   });
 
   static const Key fieldSurfaceKey = Key('multi_select_field_surface');
   static const Key menuPanelKey = Key('multi_select_menu_panel');
+  static const Key smartMatchedHintKey = Key('multi_select_smart_matched_hint');
 
   final String label;
   final Widget? labelTrailing;
@@ -73,6 +76,10 @@ class MultiSelect<T> extends ConsumerStatefulWidget {
   final String Function(T item) resolveName;
   final MultiSelectCopy copy;
   final bool compactTrigger;
+
+  /// When true for a dropdown row, show Smart facet match hint icon.
+  final bool Function(T item)? resolveSmartMatched;
+  final String? smartMatchedTooltip;
 
   @override
   ConsumerState<MultiSelect<T>> createState() => _MultiSelectState<T>();
@@ -229,6 +236,8 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                                 onAdd: widget.onAdd,
                                 onRetry: widget.onRetry,
                                 resolveName: widget.resolveName,
+                                resolveSmartMatched: widget.resolveSmartMatched,
+                                smartMatchedTooltip: widget.smartMatchedTooltip,
                                 copy: widget.copy,
                               );
                             },
@@ -393,6 +402,8 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
     required this.onRetry,
     required this.resolveName,
     required this.copy,
+    this.resolveSmartMatched,
+    this.smartMatchedTooltip,
   });
 
   final double width;
@@ -403,6 +414,8 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
   final VoidCallback onRetry;
   final String Function(T item) resolveName;
   final MultiSelectCopy copy;
+  final bool Function(T item)? resolveSmartMatched;
+  final String? smartMatchedTooltip;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -460,6 +473,8 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
           allCatalogEmpty: items.isEmpty,
           onAdd: onAdd,
           resolveName: resolveName,
+          resolveSmartMatched: resolveSmartMatched,
+          smartMatchedTooltip: smartMatchedTooltip,
           copy: copy,
         );
       },
@@ -514,6 +529,8 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
     required this.onAdd,
     required this.resolveName,
     required this.copy,
+    this.resolveSmartMatched,
+    this.smartMatchedTooltip,
   });
 
   final double width;
@@ -522,6 +539,8 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
   final ValueChanged<String> onAdd;
   final String Function(T item) resolveName;
   final MultiSelectCopy copy;
+  final bool Function(T item)? resolveSmartMatched;
+  final String? smartMatchedTooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -563,8 +582,12 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
               itemBuilder: (BuildContext context, int index) {
                 final T item = items[index];
                 final String name = resolveName(item);
+                final bool smartMatched =
+                    resolveSmartMatched?.call(item) ?? false;
                 return _MultiSelectDropdownRow(
                   displayName: name,
+                  smartMatched: smartMatched,
+                  smartMatchedTooltip: smartMatchedTooltip,
                   onSelect: () => onAdd(name),
                 );
               },
@@ -577,15 +600,54 @@ class _MultiSelectDropdownRow extends StatelessWidget {
   const _MultiSelectDropdownRow({
     required this.displayName,
     required this.onSelect,
+    this.smartMatched = false,
+    this.smartMatchedTooltip,
   });
 
   final String displayName;
   final VoidCallback onSelect;
+  final bool smartMatched;
+  final String? smartMatchedTooltip;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+
+    final Widget nameText = Text(
+      displayName,
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: cs.hentai.textPrimary,
+      ),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    );
+
+    final Widget rowChild;
+    if (smartMatched) {
+      final Widget hint = Icon(
+        LucideIcons.sparkles,
+        key: MultiSelect.smartMatchedHintKey,
+        size: 14,
+        color: cs.hentai.textTertiary,
+      );
+      final String? tip = smartMatchedTooltip;
+      rowChild = Row(
+        children: <Widget>[
+          Expanded(child: nameText),
+          SizedBox(width: tokens.spacing.sm),
+          if (tip == null || tip.isEmpty)
+            hint
+          else
+            Tooltip(message: tip, child: hint),
+        ],
+      );
+    } else {
+      rowChild = nameText;
+    }
 
     return Theme(
       data: theme.copyWith(
@@ -600,16 +662,7 @@ class _MultiSelectDropdownRow extends StatelessWidget {
           onTap: onSelect,
           child: Padding(
             padding: _MultiSelectDropdownListStyles.rowPadding,
-            child: Text(
-              displayName,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: cs.hentai.textPrimary,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+            child: rowChild,
           ),
         ),
       ),

@@ -618,6 +618,8 @@
   "dialogEditMetadataTitle": "编辑元数据",
   "dialogEditMetadataTabGeneral": "常规",
   "dialogEditMetadataTabAuthorsTags": "作者&标签",
+  "smartFacetMatchToggleLabel": "智能匹配",
+  "smartFacetMatchHintTooltip": "由智能匹配推荐",
   "formSeriesNameLabel": "系列名称",
   "formSeriesSerializationStatusLabel": "连载状态",
   "formSeriesTotalCountLabel": "漫画总数",
