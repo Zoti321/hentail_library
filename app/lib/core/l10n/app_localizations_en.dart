@@ -795,13 +795,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String libraryScanCompleteStats(int added, int removed, int kept) {
-    return 'Scan complete: added $added, removed $removed, kept $kept';
+  String libraryScanCompleteStats(int added, int removed, int migrated) {
+    return 'Scan complete: added $added, removed $removed, migrated $migrated';
   }
 
   @override
-  String libraryDeepScanCompleteStats(int added, int removed, int kept) {
-    return 'Deep scan complete: added $added, removed $removed, kept $kept';
+  String libraryDeepScanCompleteStats(int added, int removed, int migrated) {
+    return 'Deep scan complete: added $added, removed $removed, migrated $migrated';
+  }
+
+  @override
+  String libraryStartupScanCompleteStats(int added, int removed, int migrated) {
+    return 'Startup scan complete: added $added, removed $removed, migrated $migrated';
   }
 
   @override

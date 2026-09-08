@@ -326,7 +326,7 @@
       }
     }
   },
-  "libraryScanCompleteStats": "扫描完成：新增 {added}，移除 {removed}，保留 {kept}",
+  "libraryScanCompleteStats": "扫描完成：新增 {added}，移除 {removed}，迁移 {migrated}",
   "@libraryScanCompleteStats": {
     "placeholders": {
       "added": {
@@ -335,12 +335,12 @@
       "removed": {
         "type": "int"
       },
-      "kept": {
+      "migrated": {
         "type": "int"
       }
     }
   },
-  "libraryDeepScanCompleteStats": "深度扫描完成：新增 {added}，移除 {removed}，保留 {kept}",
+  "libraryDeepScanCompleteStats": "深度扫描完成：新增 {added}，移除 {removed}，迁移 {migrated}",
   "@libraryDeepScanCompleteStats": {
     "placeholders": {
       "added": {
@@ -349,7 +349,21 @@
       "removed": {
         "type": "int"
       },
-      "kept": {
+      "migrated": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryStartupScanCompleteStats": "应用启动时扫描完成：新增 {added}，移除 {removed}，迁移 {migrated}",
+  "@libraryStartupScanCompleteStats": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "removed": {
+        "type": "int"
+      },
+      "migrated": {
         "type": "int"
       }
     }
