@@ -19,6 +19,7 @@ abstract class ScanLibraryState with _$ScanLibraryState {
     @Default(false) bool cancelled,
     @Default(false) bool runInBackground,
     @Default(false) bool silent,
+    @Default(false) bool fromStartup,
     @Default(ScanMode.incremental) ScanMode scanMode,
     String? error,
     SyncLibraryProgress? progress,
@@ -35,12 +36,24 @@ class ScanLibraryController extends _$ScanLibraryController {
   @override
   ScanLibraryState build() => const ScanLibraryState();
 
+  /// Waits until any in-flight Library sync finishes (or was never running).
+  Future<void> waitUntilIdle() async {
+    while (state.running) {
+      final Future<void>? inFlight = _future;
+      if (inFlight == null) {
+        return;
+      }
+      await inFlight;
+    }
+  }
+
   /// 幂等启动：若已在运行则直接返回同一个 Future。
   Future<void> start({
     ScanMode mode = ScanMode.incremental,
     bool syncAll = false,
     String? targetLibraryId,
     bool silent = false,
+    bool fromStartup = false,
     bool promptStorageAccess = true,
   }) {
     if (state.running) return _future ?? Future<void>.value();
@@ -50,6 +63,7 @@ class ScanLibraryController extends _$ScanLibraryController {
       running: true,
       cancelled: false,
       silent: silent,
+      fromStartup: fromStartup,
       scanMode: mode,
       error: null,
       progress: null,

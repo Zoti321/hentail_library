@@ -463,39 +463,6 @@ class _LibraryOverflowMenuButtonState
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(scanLibraryControllerProvider, (
-      ScanLibraryState? previous,
-      ScanLibraryState next,
-    ) {
-      if (previous == null || !previous.silent) {
-        return;
-      }
-      if (previous.running && !next.running) {
-        if (next.cancelled) {
-          showCustomToast(
-            context,
-            message: context.l10n.libraryScanCancelledToast,
-            type: AppToastType.info,
-          );
-        } else if (next.error != null) {
-          showErrorToast(context, next.error!);
-        } else {
-          final String? warning = next.progress?.errorMessage;
-          if (warning != null && warning.isNotEmpty) {
-            showCustomToast(context, message: warning, type: AppToastType.info);
-          } else {
-            showSuccessToast(
-              context,
-              context.l10n.libraryScanSuccessToast(
-                mode: next.scanMode,
-                progress: next.progress,
-              ),
-            );
-          }
-        }
-      }
-    });
-
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
     final ({bool running, ScanMode scanMode}) scanLeaf = ref.watch(
