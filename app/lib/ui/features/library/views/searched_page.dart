@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/card/comic_card.dart';
-import 'package:hentai_library/ui/core/widgets/element/card/series_card.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/widgets.dart';
-import 'package:hentai_library/ui/features/library/views/searched_page/widgets/search_result_horizontal_section.dart';
 import 'package:hentai_library/ui/features/library/views/searched_page/widgets/searched_page_header.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+const double _kSearchLoadMoreThreshold = 400;
+
+/// Kept as [ConsumerStatefulWidget] for pinned-header measure + load-more
+/// throttle, matching library/history page shells.
 class SearchedPage extends ConsumerStatefulWidget {
   const SearchedPage({super.key, required this.query});
 
@@ -27,6 +28,7 @@ class SearchedPage extends ConsumerStatefulWidget {
 class _SearchedPageState extends ConsumerState<SearchedPage> {
   final GlobalKey _headerMeasureKey = GlobalKey();
   double? _headerExtent;
+  DateTime? _lastLoadMoreAttemptAt;
 
   @override
   void didChangeDependencies() {
@@ -65,6 +67,32 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
     );
   }
 
+  bool _onScrollNotification(ScrollNotification notification, String query) {
+    if (notification is! ScrollUpdateNotification) {
+      return false;
+    }
+    final ScrollMetrics metrics = notification.metrics;
+    if (metrics.maxScrollExtent <= 0) {
+      return false;
+    }
+    final bool nearBottom =
+        metrics.pixels >= metrics.maxScrollExtent - _kSearchLoadMoreThreshold;
+    if (!nearBottom) {
+      return false;
+    }
+    final DateTime now = DateTime.now();
+    final DateTime? last = _lastLoadMoreAttemptAt;
+    if (last != null &&
+        now.difference(last) < const Duration(milliseconds: 400)) {
+      return false;
+    }
+    _lastLoadMoreAttemptAt = now;
+    ref
+        .read(librarySearchPageComicsControllerProvider(query).notifier)
+        .loadMore();
+    return false;
+  }
+
   Widget _buildScrollView(
     BuildContext context, {
     required LibraryLayoutTier layoutTier,
@@ -77,9 +105,6 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
     final AsyncValue<LibrarySearchComicsPage> searchedComics = ref.watch(
       librarySearchPageComicsControllerProvider(trimmedQuery),
     );
-    final AsyncValue<LibrarySeriesViewData> searchedSeriesDataAsync = ref.watch(
-      librarySearchPageSeriesViewDataProvider(trimmedQuery),
-    );
 
     final List<Comic> comics = searchedComics.maybeWhen(
       data: (LibrarySearchComicsPage page) => page.items,
@@ -89,25 +114,11 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
       data: (LibrarySearchComicsPage page) => page.totalCount,
       orElse: () => comics.length,
     );
-    final List<Series> series = searchedSeriesDataAsync.maybeWhen(
-      data: (LibrarySeriesViewData value) => value.filteredSeries,
-      orElse: () => const <Series>[],
-    );
+    final bool isLoading = searchedComics.isLoading;
+    final bool hasResolvedData = searchedComics.hasValue;
+    final bool hasError = searchedComics.hasError;
+    final Object? error = searchedComics.error;
 
-    final int searchedComicCount = searchedComicTotal;
-    final int searchedSeriesCount = series.length;
-    final int totalResultCount = searchedComicCount + searchedSeriesCount;
-
-    final bool isLoading =
-        searchedComics.isLoading || searchedSeriesDataAsync.isLoading;
-    final bool hasResolvedData =
-        searchedComics.hasValue && searchedSeriesDataAsync.hasValue;
-    final bool hasError =
-        searchedComics.hasError || searchedSeriesDataAsync.hasError;
-    final Object? error = searchedComics.error ?? searchedSeriesDataAsync.error;
-
-    final double cardWidth = libraryGridMaxCrossAxisExtent(layoutTier);
-    final double cardHeight = catalogCoverCardMainAxisExtent(tokens, cardWidth);
     final AppLocalizations l10n = context.l10n;
     final Widget headerSection = trimmedQuery.isEmpty
         ? SearchedPageHeaderSection(
@@ -121,133 +132,128 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
             layoutTier: layoutTier,
             horizontalPadding: horizontalPadding,
             query: trimmedQuery,
-            resultCount: totalResultCount,
+            resultCount: searchedComicTotal,
           );
     final Widget header = KeyedSubtree(
       key: _headerMeasureKey,
       child: headerSection,
     );
 
-    return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      slivers: <Widget>[
-        if (_headerExtent == null)
-          SliverToBoxAdapter(child: header)
-        else
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: LibraryPinnedHeaderDelegate(
-              extent: _headerExtent!,
-              child: header,
+    return NotificationListener<ScrollNotification>(
+      onNotification: (ScrollNotification notification) =>
+          _onScrollNotification(notification, trimmedQuery),
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: <Widget>[
+          if (_headerExtent == null)
+            SliverToBoxAdapter(child: header)
+          else
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: LibraryPinnedHeaderDelegate(
+                extent: _headerExtent!,
+                child: header,
+              ),
             ),
-          ),
-        SliverPadding(
-          padding: EdgeInsets.fromLTRB(
-            horizontalPadding,
-            tokens.layout.contentVerticalPadding + kLibrarySearchToGridSpacing,
-            horizontalPadding,
-            tokens.layout.contentVerticalPadding,
-          ),
-          sliver: SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: tokens.spacing.lg,
-              children: <Widget>[
-                if (trimmedQuery.isNotEmpty) ...<Widget>[
-                  LibrarySearchField(initialQuery: trimmedQuery),
-                  if (isLoading && !hasResolvedData)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 48),
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  else if (hasError && !hasResolvedData)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 24),
-                      child: Text(
-                        l10n.searchLoadFailed(error.toString()),
-                        style: TextStyle(fontSize: 13, color: cs.error),
-                      ),
-                    )
-                  else if (searchedSeriesCount == 0 && comics.isEmpty)
-                    _SearchResultsEmptyState(
-                      onGoToLibrary: () =>
-                          LibraryManagementActions.goCurrentLibraryBrowseFromContext(
-                            context,
-                          ),
-                    )
-                  else ...<Widget>[
-                    if (searchedSeriesCount > 0)
-                      SearchResultHorizontalSection(
-                        title: l10n.libraryTabSeries,
-                        itemCount: series.length,
-                        itemHeight: cardHeight,
-                        itemBuilder: (BuildContext context, int index) {
-                          final Series item = series[index];
-                          return SizedBox(
-                            width: cardWidth,
-                            child: SeriesCard(
-                              key: Key('search-series-${item.id}'),
-                              series: item,
-                              onTap: () {
-                                final String encoded = Uri.encodeComponent(
-                                  item.id,
-                                );
-                                appRouter.push('/series/$encoded');
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    if (comics.isNotEmpty)
-                      SearchResultHorizontalSection(
-                        title: l10n.libraryTabComics,
-                        itemCount: comics.length,
-                        itemHeight: cardHeight,
-                        onNearEnd: () {
+          if (trimmedQuery.isEmpty)
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(child: Text(l10n.searchEnterKeyword)),
+            )
+          else ...<Widget>[
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                tokens.layout.contentVerticalPadding +
+                    kLibrarySearchToGridSpacing,
+                horizontalPadding,
+                tokens.spacing.lg,
+              ),
+              sliver: SliverToBoxAdapter(
+                child: LibrarySearchField(initialQuery: trimmedQuery),
+              ),
+            ),
+            if (isLoading && !hasResolvedData)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: tokens.spacing.xl * 2,
+                  ),
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+              )
+            else if (hasError && !hasResolvedData)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    horizontalPadding,
+                    0,
+                    horizontalPadding,
+                    tokens.layout.contentVerticalPadding,
+                  ),
+                  child: Text(
+                    l10n.searchLoadFailed(error.toString()),
+                    style: TextStyle(
+                      fontSize: tokens.text.bodySm,
+                      color: cs.error,
+                    ),
+                  ),
+                ),
+              )
+            else if (comics.isEmpty)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: _SearchResultsEmptyState(
+                    onGoToLibrary: () =>
+                        LibraryManagementActions.goCurrentLibraryBrowseFromContext(
+                          context,
+                        ),
+                  ),
+                ),
+              )
+            else
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(
+                  horizontalPadding,
+                  0,
+                  horizontalPadding,
+                  tokens.layout.contentVerticalPadding,
+                ),
+                sliver: SliverGrid(
+                  gridDelegate: libraryGridDelegateForTokens(
+                    tokens,
+                    layoutTier,
+                  ),
+                  delegate: SliverChildBuilderDelegate((
+                    BuildContext context,
+                    int index,
+                  ) {
+                    final Comic comic = comics[index];
+                    return Center(
+                      child: ComicCard(
+                        key: Key('search-comic-${comic.comicId}'),
+                        comic: comic,
+                        gridIndex: index,
+                        onTap: () {
                           ref
-                              .read(
-                                librarySearchPageComicsControllerProvider(
-                                  trimmedQuery,
-                                ).notifier,
-                              )
-                              .loadMore();
-                        },
-                        itemBuilder: (BuildContext context, int index) {
-                          final Comic comic = comics[index];
-                          return SizedBox(
-                            width: cardWidth,
-                            child: ComicCard(
-                              key: Key('search-comic-${comic.comicId}'),
-                              comic: comic,
-                              onTap: () {
-                                ref
-                                    .read(
-                                      comicDetailReturnSeriesProvider.notifier,
-                                    )
-                                    .clear();
-                                appRouter.pushNamed(
-                                  '漫画详情',
-                                  pathParameters: <String, String>{
-                                    'id': comic.comicId,
-                                  },
-                                );
-                              },
-                            ),
+                              .read(comicDetailReturnSeriesProvider.notifier)
+                              .clear();
+                          appRouter.pushNamed(
+                            '漫画详情',
+                            pathParameters: <String, String>{
+                              'id': comic.comicId,
+                            },
                           );
                         },
                       ),
-                  ],
-                ],
-              ],
-            ),
-          ),
-        ),
-        if (trimmedQuery.isEmpty)
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Center(child: Text(l10n.searchEnterKeyword)),
-          ),
-      ],
+                    );
+                  }, childCount: comics.length),
+                ),
+              ),
+          ],
+        ],
+      ),
     );
   }
 }

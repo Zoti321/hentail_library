@@ -1,11 +1,9 @@
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_page_series_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
@@ -14,7 +12,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_search_page_providers.g.dart';
 
-/// 搜索结果区默认每页条数（水平虚拟列表按页追加）。
+/// 搜索结果区默认每页条数（垂直网格触底按页追加）。
 const int kLibrarySearchPageSize = 40;
 
 typedef LibrarySearchVocabulary = ({
@@ -156,44 +154,4 @@ class LibrarySearchPageComicsController
             ),
     };
   }
-}
-
-@Riverpod()
-Future<LibrarySeriesViewData> librarySearchPageSeriesViewData(
-  Ref ref,
-  String keyword,
-) async {
-  final String trimmed = keyword.trim();
-  if (trimmed.isEmpty) {
-    return const LibrarySeriesViewData(
-      headerTotalSeriesWithItemsCount: 0,
-      seriesWithItemsCount: 0,
-      filteredSeries: <Series>[],
-    );
-  }
-  final LibrarySearchVocabulary vocabulary = await ref.watch(
-    librarySearchVocabularyProvider.future,
-  );
-  final LibrarySearchQuery query = _parse(trimmed, vocabulary);
-  final List<Series> matched = switch (query) {
-    LibrarySearchKeywordQuery(:final keyword) =>
-      await ref.read(seriesRepoProvider).searchByKeyword(keyword),
-    LibrarySearchMetadataQuery(
-      :final mustInclude,
-      :final optionalOr,
-      :final mustExclude,
-    ) =>
-      await ref
-          .read(seriesRepoProvider)
-          .searchByMetadataExpression(
-            mustInclude: mustInclude,
-            optionalOr: optionalOr,
-            mustExclude: mustExclude,
-          ),
-  };
-  return LibrarySeriesViewData(
-    headerTotalSeriesWithItemsCount: matched.length,
-    seriesWithItemsCount: matched.length,
-    filteredSeries: matched,
-  );
 }
