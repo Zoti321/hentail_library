@@ -15,6 +15,7 @@ import 'package:hentai_library/ui/core/widgets/overlays/context_menu/series_item
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -77,6 +78,8 @@ class SeriesDetailComicCard extends HookConsumerWidget {
           data,
           comic,
           invalidate: ref.invalidate,
+          notifyExternalChange: () =>
+              ref.read(libraryRevisionProvider.notifier).notifyExternalChange(),
         );
       },
     );

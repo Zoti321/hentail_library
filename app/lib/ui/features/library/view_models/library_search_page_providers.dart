@@ -9,6 +9,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_page_seri
 import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_search_page_providers.g.dart';
@@ -32,8 +33,10 @@ typedef LibrarySearchComicsPage = ({
 });
 
 /// Vocabulary keepAlive：避免每次改 query 全表 listAll。
+/// 监听 [libraryRevisionProvider]，元数据写库 bump 后重取，新建 facet 可精确解析。
 @Riverpod(keepAlive: true)
 Future<LibrarySearchVocabulary> librarySearchVocabulary(Ref ref) async {
+  ref.watch(libraryRevisionProvider);
   final String? libraryId = ref
       .watch(currentLibraryProvider)
       .asData
