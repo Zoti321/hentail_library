@@ -3,7 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/common.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-enum SeriesItemContextAction { editMetadata, showInExplorer }
+enum SeriesItemContextAction { editMetadata, showInExplorer, delete }
 
 class SeriesItemContextMenu {
   static void show(
@@ -16,7 +16,7 @@ class SeriesItemContextMenu {
       context,
       position: position,
       width: 236,
-      height: 152,
+      height: 196,
       builder: (VoidCallback onClose) =>
           _MenuContent(title: comicTitle, onClose: onClose, onAction: onAction),
     );
@@ -59,6 +59,12 @@ class _MenuContent extends StatelessWidget {
               icon: LucideIcons.externalLink,
               label: l10n.comicDetailShowInExplorer,
               onTap: () => handleAction(SeriesItemContextAction.showInExplorer),
+            ),
+            ContextMenuActionItem(
+              icon: LucideIcons.trash2,
+              label: l10n.comicDetailDelete,
+              isDestructive: true,
+              onTap: () => handleAction(SeriesItemContextAction.delete),
             ),
           ],
         ),

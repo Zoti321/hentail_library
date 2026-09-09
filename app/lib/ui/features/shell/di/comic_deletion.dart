@@ -8,6 +8,5 @@ part 'comic_deletion.g.dart';
 @Riverpod(keepAlive: true)
 ComicDeletionService comicDeletionService(Ref ref) => ComicDeletionService(
   comicRepository: ref.read(comicRepoProvider),
-  readingHistoryRepository: ref.read(readingHistoryRepoProvider),
   readerSessionPort: ref.read(readerSessionPortProvider),
 );
