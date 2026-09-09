@@ -110,7 +110,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get formLibraryRootChangeConfirmBody =>
-      '更改库根后，下次同步将按新根对齐；旧路径下的漫画可能成为孤儿并被删除。此操作不会自动触发同步。';
+      '保存后，若新根当前可读，将按相对路径立即执行 Path migration，尽量保留漫画与系列的用户元数据、字段锁和阅读进度；若新根当前不可读，则仅保存新根。未在新根下匹配到相对路径的条目会保留旧身份，等待下次库同步处理。此操作不会自动触发同步。';
 
   @override
   String get formLibraryScanOnStartupLabel => '启动时扫描';

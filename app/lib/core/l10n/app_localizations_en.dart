@@ -112,7 +112,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get formLibraryRootChangeConfirmBody =>
-      'After changing the library root, the next sync will align to the new root. Comics under the old path may become orphans and be removed. Sync is not started automatically.';
+      'After saving, if the new root is readable now, Path migration runs immediately by relative path so comic and series user metadata, locks, and reading progress can be kept. If the new root is not readable now, only the new root is saved. Items whose relative paths do not exist under the new root keep their old identity until the next library sync. Sync is not started automatically.';
 
   @override
   String get formLibraryScanOnStartupLabel => 'Scan on startup';
