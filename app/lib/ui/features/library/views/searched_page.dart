@@ -106,14 +106,10 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
       librarySearchPageComicsControllerProvider(trimmedQuery),
     );
 
-    final List<Comic> comics = searchedComics.maybeWhen(
-      data: (LibrarySearchComicsPage page) => page.items,
-      orElse: () => const <Comic>[],
-    );
-    final int searchedComicTotal = searchedComics.maybeWhen(
-      data: (LibrarySearchComicsPage page) => page.totalCount,
-      orElse: () => comics.length,
-    );
+    // Prefer asData so reload/loading frames keep prior items (avoid empty flash).
+    final LibrarySearchComicsPage? resolvedPage = searchedComics.asData?.value;
+    final List<Comic> comics = resolvedPage?.items ?? const <Comic>[];
+    final int searchedComicTotal = resolvedPage?.totalCount ?? comics.length;
     final bool isLoading = searchedComics.isLoading;
     final bool hasResolvedData = searchedComics.hasValue;
     final bool hasError = searchedComics.hasError;

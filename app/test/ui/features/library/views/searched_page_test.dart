@@ -12,6 +12,7 @@ import 'package:hentai_library/ui/core/widgets/element/card/series_card.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/meta_chip.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_search_page_providers.dart';
 import 'package:hentai_library/ui/features/library/views/searched_page.dart';
+import 'package:hentai_library/ui/features/library/views/searched_page/widgets/searched_page_header.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -248,4 +249,64 @@ void main() {
 
     expect(controller.loadMoreCalls, greaterThan(0));
   });
+
+  testWidgets(
+    'search results settle without continuous frame scheduling or header churn',
+    (WidgetTester tester) async {
+      const String query = 'stable';
+      final LibrarySearchComicsPage page = (
+        items: <Comic>[_comic('c1', 'Comic One'), _comic('c2', 'Comic Two')],
+        totalCount: 2,
+        hasMore: false,
+        loadingMore: false,
+      );
+      final _FixedComicsController controller = _FixedComicsController(page);
+
+      await _pumpSearchedPage(
+        tester,
+        query: query,
+        comicsPage: page,
+        controller: controller,
+      );
+
+      // Infinite setState / measure loops fail here instead of hanging forever.
+      await tester.pumpAndSettle(const Duration(milliseconds: 16));
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.byType(ComicCard), findsNWidgets(2));
+
+      final MetaChip chip = tester.widget(find.byType(MetaChip));
+      expect(chip.label, '2');
+
+      final List<double> headerHeights = <double>[];
+      for (int i = 0; i < 45; i++) {
+        await tester.pump(const Duration(milliseconds: 16));
+        expect(
+          find.byType(CircularProgressIndicator),
+          findsNothing,
+          reason: 'loading indicator reappeared on idle frame $i',
+        );
+        expect(
+          tester.widget<MetaChip>(find.byType(MetaChip)).label,
+          '2',
+          reason: 'result count chip churned on idle frame $i',
+        );
+        final RenderBox headerBox =
+            tester.renderObject(find.byType(SearchedPageHeaderSection))
+                as RenderBox;
+        headerHeights.add(headerBox.size.height);
+      }
+
+      expect(
+        headerHeights.toSet().length,
+        1,
+        reason: 'pinned header height oscillated: $headerHeights',
+      );
+      expect(
+        tester.binding.hasScheduledFrame,
+        isFalse,
+        reason: 'frames keep being scheduled after idle (rebuild/animation loop)',
+      );
+    },
+  );
 }

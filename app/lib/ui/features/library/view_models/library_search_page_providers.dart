@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
@@ -31,10 +32,16 @@ typedef LibrarySearchComicsPage = ({
 });
 
 /// Vocabulary keepAlive：避免每次改 query 全表 listAll。
-/// 监听 [libraryRevisionProvider]，元数据写库 bump 后重取，新建 facet 可精确解析。
+/// 监听 revision 叶子，元数据写库 bump 后重取，新建 facet 可精确解析。
+///
+/// 注意：搜索结果列表（[LibrarySearchPageComicsController]）不得
+/// `watch` 本 provider——缩略图等写库也会 bump revision，否则结果区会反复
+/// 重抓并闪烁。Vocabulary 供新一次解析/搜索读取即可。
 @Riverpod(keepAlive: true)
 Future<LibrarySearchVocabulary> librarySearchVocabulary(Ref ref) async {
-  ref.watch(libraryRevisionProvider);
+  ref.watch(
+    libraryRevisionProvider.select((LibraryRevisionState s) => s.revision),
+  );
   final String? libraryId = ref
       .watch(currentLibraryProvider)
       .asData
@@ -87,7 +94,14 @@ class LibrarySearchPageComicsController
         loadingMore: false,
       );
     }
-    final LibrarySearchVocabulary vocabulary = await ref.watch(
+    // 切库时重搜；不要 watch vocabulary/raw revision（缩略图写库会持续 bump）。
+    ref.watch(
+      currentLibraryProvider.select(
+        (AsyncValue<CurrentLibraryState> asyncValue) =>
+            asyncValue.asData?.value.currentId,
+      ),
+    );
+    final LibrarySearchVocabulary vocabulary = await ref.read(
       librarySearchVocabularyProvider.future,
     );
     _query = _parse(trimmed, vocabulary);
