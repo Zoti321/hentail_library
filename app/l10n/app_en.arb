@@ -296,6 +296,7 @@
   "libraryComicSortReadAt": "Read time",
   "libraryComicSortFileSize": "File size",
   "libraryComicSortPageCount": "Page count",
+  "libraryExpandBySeries": "Expand by series",
   "librarySeriesSortName": "Name",
   "librarySeriesSortComicCount": "Comic count",
   "librarySeriesSortRandom": "Random",

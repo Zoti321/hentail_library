@@ -1,4 +1,5 @@
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/domain/library/library_expand_by_series.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
@@ -74,9 +75,27 @@ void main() {
           languageFilter: const <String>{},
           parodyFilter: const <String>{},
           characterFilter: const <String>{},
+          expandBySeries: LibraryExpandBySeries.defaultValue,
           sortOption: kLibraryDefaultSortOption,
         ),
         isFalse,
+      );
+    });
+
+    test('expand by series off counts as customized', () {
+      expect(
+        isLibraryComicFilterSortCustomized(
+          ageRestriction: LibraryAgeRestrictionFilter.unrestricted,
+          mediaTypeFilter: const LibraryMediaTypeFilterSelection(),
+          tagFilter: _emptyTagFilter,
+          authorFilter: _emptyAuthorFilter,
+          languageFilter: const <String>{},
+          parodyFilter: const <String>{},
+          characterFilter: const <String>{},
+          expandBySeries: false,
+          sortOption: kLibraryDefaultSortOption,
+        ),
+        isTrue,
       );
     });
   });
@@ -137,6 +156,7 @@ void main() {
           characterFilter: const <String>{},
           serializationStatusFilter:
               LibrarySerializationStatusFilter.unrestricted,
+          expandBySeries: false,
           preferLibraryRootSeries: true,
           sortSettings: _defaultSortSettings,
         ),

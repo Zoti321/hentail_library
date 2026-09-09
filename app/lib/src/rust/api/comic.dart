@@ -21,10 +21,12 @@ String comicIdFromPathFrb({required String rawPath}) =>
 Future<PagedComicResultDto> fetchComicsPageFrb({
   required PageRequestDto request,
   required ComicFilterDto filter,
+  required bool expandBySeries,
   required ComicSortOptionDto sort,
 }) => RustLib.instance.api.crateApiComicFetchComicsPageFrb(
   request: request,
   filter: filter,
+  expandBySeries: expandBySeries,
   sort: sort,
 );
 

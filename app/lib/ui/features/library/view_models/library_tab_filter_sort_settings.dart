@@ -1,5 +1,6 @@
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/library/library_expand_by_series.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/domain/library/library_prefer_library_root_series.dart';
@@ -84,6 +85,7 @@ bool isLibraryComicFilterSortCustomized({
   required Set<String> parodyFilter,
   required Set<String> characterFilter,
   required LibraryComicSortOption sortOption,
+  bool expandBySeries = LibraryExpandBySeries.defaultValue,
 }) {
   return ageRestriction != LibraryAgeRestrictionFilter.unrestricted ||
       mediaTypeFilter.isActive ||
@@ -92,6 +94,7 @@ bool isLibraryComicFilterSortCustomized({
       languageFilter.isNotEmpty ||
       parodyFilter.isNotEmpty ||
       characterFilter.isNotEmpty ||
+      expandBySeries != LibraryExpandBySeries.defaultValue ||
       sortOption.field != kLibraryDefaultSortOption.field ||
       sortOption.descending != kLibraryDefaultSortOption.descending;
 }
@@ -121,6 +124,7 @@ bool isLibraryFilterSortCustomizedForTarget({
   required Set<String> characterFilter,
   required LibrarySerializationStatusFilter serializationStatusFilter,
   required LibraryTabSortSettings sortSettings,
+  bool expandBySeries = LibraryExpandBySeries.defaultValue,
   bool preferLibraryRootSeries = LibraryPreferLibraryRootSeries.defaultValue,
 }) {
   return switch (target) {
@@ -132,6 +136,7 @@ bool isLibraryFilterSortCustomizedForTarget({
       languageFilter: languageFilter,
       parodyFilter: parodyFilter,
       characterFilter: characterFilter,
+      expandBySeries: expandBySeries,
       sortOption: sortSettings.comics,
     ),
     LibraryDisplayTarget.series => isLibrarySeriesFilterSortCustomized(

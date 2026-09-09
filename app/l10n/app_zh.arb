@@ -296,6 +296,7 @@
   "libraryComicSortReadAt": "阅读时间",
   "libraryComicSortFileSize": "文件大小",
   "libraryComicSortPageCount": "页数",
+  "libraryExpandBySeries": "按系列展开",
   "librarySeriesSortName": "名称",
   "librarySeriesSortComicCount": "漫画数量",
   "librarySeriesSortRandom": "随机",

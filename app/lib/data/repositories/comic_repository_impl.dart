@@ -34,6 +34,7 @@ class ComicRepositoryImpl implements ComicRepository {
       () => rust.fetchComicsPageFrb(
         request: rust.PageRequestDto(page: 1, pageSize: total),
         filter: unrestrictedListFilter(),
+        expandBySeries: false,
         sort: const rust.ComicSortOptionDto(
           field: rust.ComicSortFieldDto.title,
           descending: false,
@@ -48,12 +49,14 @@ class ComicRepositoryImpl implements ComicRepository {
   Future<PagedResult<Comic>> fetchComicsPage({
     required PageRequest request,
     required LibraryComicFilter filter,
+    required bool expandBySeries,
     required LibraryComicSortOption sortOption,
   }) async {
     final rust.PagedComicResultDto page = await guardFrb(
       () => rust.fetchComicsPageFrb(
         request: mapPageRequest(request),
         filter: mapLibraryFilter(filter),
+        expandBySeries: expandBySeries,
         sort: mapSortOption(sortOption),
       ),
       fallbackMessage: '读取漫画分页失败',
