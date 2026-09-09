@@ -45,8 +45,12 @@ _Avoid_: 在新设计中把 Saved path 扩成远程 URI
 _Avoid_: 本子、作品、条目（口语可用，文档与 issue 中用 Comic）
 
 **Comic identity**:
-Comic 与资源位置键绑定，而非内容哈希。本地为规范化磁盘路径；远程为规范化 WebDAV 资源 URL。位置变化（移动/重命名/改 URL）生成新 `comicId`；Library sync 时旧记录及其用户元数据、阅读历史、Series 归属按该库对齐规则处理，不会仅凭内容自动迁移。详见 ADR-0001。
+Comic 与资源位置键绑定，而非内容哈希。本地为规范化磁盘路径；远程为规范化 WebDAV 资源 URL。位置变化（移动/重命名/改 URL）生成新 `comicId`；连续性靠 Path migration，而非内容哈希身份。详见 ADR-0001、ADR-0013。
 _Avoid_: 内容 ID、文件指纹
+
+**Path migration**:
+位置键变化后仍判定为同一 Comic（或同一 Series）时，将库记录 rekey 到新身份并保留用户元数据、Metadata field lock、阅读历史等，而不是 orphan 删除后再当新条目导入。Library sync 内对 Comic 用资源弱指纹（类型 + 大小 + 页数）在 removed/added 间做 1:1 唯一配对；Local 改 Library root 且新根可读时，按相对旧根的路径前缀 remapping（含 Series 的 `folder_path` / `seriesId`）。指纹歧义、相对路径对不上、或新根不可读则不迁，交由后续 Library sync 对齐。不是 Metadata refresh，也不改变 Comic identity 的位置锚定。详见 ADR-0013。
+_Avoid_: 自动迁移身份、内容指纹身份、搬家、重命名保留、rekey（实现用语）
 
 **Resource**:
 可被发现并（校验后）入库为 Comic 的原始载体：本地文件/目录，或 WebDAV 上的文件。解析中间结果在入库前独立于 Comic 身份与用户元数据；Library sync / Metadata refresh / 阅读与缩略图共用同一套 Resource 访问与解析规则（经 Resource access）。
@@ -61,7 +65,7 @@ _Avoid_: VFS、存储驱动、网盘 SDK
 _Avoid_: 导入、索引（未体现与根对齐的删除语义）
 
 **Library sync**:
-让某个 Library 与其 Library root 下内容对齐的完整操作：包含 Scan，并写库——新增缺失 Comic、按字段锁合并后更新仍存在的 Comic、删除根上已消失的 Comic。默认只 sync Current library（可配置为全部 Library）。Remote library 在根不可达（网络/鉴权失败）时跳过该库且不删除其已有 Comic。若某 Library 被移除，则清除该库及其 Comic/Series。元数据合并见 Metadata field lock。写库后由 core 使相关阅读会话失效；与 Metadata refresh 共用库级写锁。
+让某个 Library 与其 Library root 下内容对齐的完整操作：包含 Scan，并写库——新增缺失 Comic、按字段锁合并后更新仍存在的 Comic、对可配对的位置变化执行 Path migration、删除根上已消失且未迁走的 Comic。默认只 sync Current library（可配置为全部 Library）。Remote library 在根不可达（网络/鉴权失败）时跳过该库且不删除其已有 Comic。若某 Library 被移除，则清除该库及其 Comic/Series。元数据合并见 Metadata field lock。写库后由 core 使相关阅读会话失效；与 Metadata refresh、Local 改根（含 Path migration）共用库级写锁。
 _Avoid_: 同步、刷新（太泛，未体现镜像语义）
 
 _Scan_ 与 _Library sync_ 在用户触发的场景中指同一操作；领域文档与 issue 优先使用 Library sync。
@@ -173,7 +177,7 @@ _Avoid_: 漫画表单、元数据 DTO
 _Avoid_: 系列表单、SeriesForm、编辑系列 DTO
 
 **Library form**:
-创建或编辑 Library 时的可提交草稿：显示名（必填）、Library root（Local 目录或 Remote WebDAV URL）、Remote 凭证（用户名/密码/allow HTTP；编辑时密码空表示保留）、Scan on startup、Scan interval、Supported resource formats。校验与落库规则集中在此；非法结果以字段级返回由 UI 展示。Local root 之间禁止相等或互相嵌套（对齐 Komga）。改 root 时保留 `libraryId`，下次 Library sync 按新根对齐（旧路径 Comic 可能 orphan 删除）。无变化则不写库。
+创建或编辑 Library 时的可提交草稿：显示名（必填）、Library root（Local 目录或 Remote WebDAV URL）、Remote 凭证（用户名/密码/allow HTTP；编辑时密码空表示保留）、Scan on startup、Scan interval、Supported resource formats。校验与落库规则集中在此；非法结果以字段级返回由 UI 展示。Local root 之间禁止相等或互相嵌套（对齐 Komga）。改 Local root 时保留 `libraryId`；若新根可读则按相对路径做 Path migration（含 Series），否则只写新根、不立刻迁移。不自动触发 Library sync。无变化则不写库。
 _Avoid_: 库表单、LibraryForm DTO、Library settings form（旧称）、编辑库元数据
 
 **Metadata field lock**:
