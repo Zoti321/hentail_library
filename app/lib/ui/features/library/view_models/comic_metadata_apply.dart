@@ -26,11 +26,15 @@ void refreshComicMetadataDictionaries(
 }
 
 /// 落库 Comic 用户元数据，并在字典字段有写入时刷新相关列表缓存。
+///
+/// 实际落库成功后调用 [notifyExternalChange]，使库页 catalog 与搜索
+/// vocabulary 等依赖 [libraryRevision] 的监听方立即重取。
 Future<ComicMetadataApplyResult> applyComicMetadataForm(
   ComicRepository repository,
   ComicMetadataForm form,
   Comic original, {
   required void Function(ProviderOrFamily provider) invalidate,
+  required void Function() notifyExternalChange,
 }) async {
   final ComicMetadataApplyResult result = await form.applyTo(
     repository,
@@ -38,6 +42,9 @@ Future<ComicMetadataApplyResult> applyComicMetadataForm(
   );
   if (result is ComicMetadataApplySucceeded) {
     refreshComicMetadataDictionaries(invalidate, result);
+    if (result.persisted) {
+      notifyExternalChange();
+    }
   }
   return result;
 }

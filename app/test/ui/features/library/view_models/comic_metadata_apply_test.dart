@@ -93,17 +93,20 @@ void main() {
       final _RecordingComicRepository repo = _RecordingComicRepository();
       final Comic original = _comic();
       final List<ProviderOrFamily> invalidated = <ProviderOrFamily>[];
+      var notifyCount = 0;
 
       final ComicMetadataApplyResult result = await applyComicMetadataForm(
         repo,
         ComicMetadataForm.fromComic(original).addTag('new-tag'),
         original,
         invalidate: invalidated.add,
+        notifyExternalChange: () => notifyCount += 1,
       );
 
       expect(result, isA<ComicMetadataApplySucceeded>());
       expect(repo.callCount, 1);
       expect(invalidated, <ProviderOrFamily>[allTagsProvider]);
+      expect(notifyCount, 1);
     });
 
     test(
@@ -112,6 +115,7 @@ void main() {
         final _RecordingComicRepository repo = _RecordingComicRepository();
         final Comic original = _comic();
         final List<ProviderOrFamily> invalidated = <ProviderOrFamily>[];
+        var notifyCount = 0;
 
         final ComicMetadataApplyResult result = await applyComicMetadataForm(
           repo,
@@ -120,6 +124,7 @@ void main() {
           ).addParody('Fate').addCharacter('Saber'),
           original,
           invalidate: invalidated.add,
+          notifyExternalChange: () => notifyCount += 1,
         );
 
         expect(result, isA<ComicMetadataApplySucceeded>());
@@ -130,23 +135,63 @@ void main() {
           allCharactersProvider,
           libraryDistinctCharactersProvider,
         ]);
+        expect(notifyCount, 1);
       },
     );
 
-    test('does not invalidate when only title changes', () async {
+    test('notifies external change when only title changes', () async {
       final _RecordingComicRepository repo = _RecordingComicRepository();
       final Comic original = _comic();
       final List<ProviderOrFamily> invalidated = <ProviderOrFamily>[];
+      var notifyCount = 0;
 
       await applyComicMetadataForm(
         repo,
         ComicMetadataForm.fromComic(original).copyWith(title: '新标题'),
         original,
         invalidate: invalidated.add,
+        notifyExternalChange: () => notifyCount += 1,
       );
 
       expect(repo.callCount, 1);
       expect(invalidated, isEmpty);
+      expect(notifyCount, 1);
+    });
+
+    test('does not notify when form is invalid', () async {
+      final _RecordingComicRepository repo = _RecordingComicRepository();
+      final Comic original = _comic();
+      var notifyCount = 0;
+
+      final ComicMetadataApplyResult result = await applyComicMetadataForm(
+        repo,
+        ComicMetadataForm.fromComic(original).copyWith(title: '   '),
+        original,
+        invalidate: (_) {},
+        notifyExternalChange: () => notifyCount += 1,
+      );
+
+      expect(result, isA<ComicMetadataApplyInvalid>());
+      expect(repo.callCount, 0);
+      expect(notifyCount, 0);
+    });
+
+    test('does not notify when nothing persisted', () async {
+      final _RecordingComicRepository repo = _RecordingComicRepository();
+      final Comic original = _comic();
+      var notifyCount = 0;
+
+      final ComicMetadataApplyResult result = await applyComicMetadataForm(
+        repo,
+        ComicMetadataForm.fromComic(original),
+        original,
+        invalidate: (_) {},
+        notifyExternalChange: () => notifyCount += 1,
+      );
+
+      expect(result, isA<ComicMetadataApplySucceeded>());
+      expect(repo.callCount, 0);
+      expect(notifyCount, 0);
     });
   });
 }

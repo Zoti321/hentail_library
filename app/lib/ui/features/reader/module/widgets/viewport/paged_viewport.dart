@@ -67,16 +67,6 @@ class PagedViewport extends HookConsumerWidget {
     final ObjectRef<DateTime?> lastWheelAt = useRef<DateTime?>(null);
     const int wheelThrottleMs = 200;
 
-    useReaderPrefetchWindow(
-      ref: ref,
-      context: context,
-      comicId: comicId,
-      centerPageOneBased: currentIndex,
-      totalPages: totalPages,
-      slotLogicalWidth: readerPagedSlotLogicalWidth(viewportSize.width),
-      imageList: imageList,
-    );
-
     useEffect(() {
       hasAppliedPreferredPage.value = false;
       resumeSyncGate.value = ResumeVisibleSyncGate();
@@ -113,6 +103,8 @@ class PagedViewport extends HookConsumerWidget {
       }
       return null;
     }, <Object?>[comicId, preferredPageIndex, totalPages, currentIndex]);
+    // Jump/animate before prefetch so the landing page mounts and starts loading
+    // ahead of neighbor warmWindow contention (large slider jumps).
     useEffect(() {
       if (!pageController.hasClients || imageList.isEmpty) {
         return null;
@@ -159,6 +151,16 @@ class PagedViewport extends HookConsumerWidget {
         alignGeneration.value++;
       };
     }, <Object?>[currentIndex, pageController, imageList.length]);
+
+    useReaderPrefetchWindow(
+      ref: ref,
+      context: context,
+      comicId: comicId,
+      centerPageOneBased: currentIndex,
+      totalPages: totalPages,
+      slotLogicalWidth: readerPagedSlotLogicalWidth(viewportSize.width),
+      imageList: imageList,
+    );
 
     return Center(
       child: ConstrainedBox(

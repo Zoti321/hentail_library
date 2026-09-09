@@ -773,13 +773,18 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String libraryScanCompleteStats(int added, int removed, int kept) {
-    return '扫描完成：新增 $added，移除 $removed，保留 $kept';
+  String libraryScanCompleteStats(int added, int removed, int migrated) {
+    return '扫描完成：新增 $added，移除 $removed，迁移 $migrated';
   }
 
   @override
-  String libraryDeepScanCompleteStats(int added, int removed, int kept) {
-    return '深度扫描完成：新增 $added，移除 $removed，保留 $kept';
+  String libraryDeepScanCompleteStats(int added, int removed, int migrated) {
+    return '深度扫描完成：新增 $added，移除 $removed，迁移 $migrated';
+  }
+
+  @override
+  String libraryStartupScanCompleteStats(int added, int removed, int migrated) {
+    return '应用启动时扫描完成：新增 $added，移除 $removed，迁移 $migrated';
   }
 
   @override

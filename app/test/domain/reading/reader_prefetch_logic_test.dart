@@ -26,4 +26,37 @@ void main() {
       );
     });
   });
+
+  group('pagesLeavingPrefetchWindow', () {
+    test('empty when no previous window', () {
+      expect(
+        pagesLeavingPrefetchWindow(
+          previousWindow: null,
+          nextWindow: <int>{1, 2, 3},
+        ),
+        isEmpty,
+      );
+    });
+
+    test('returns pages dropped by a large center jump', () {
+      final Set<int> previous = computePrefetchWindow(
+        centerPageOneBased: 1,
+        totalPages: 40,
+        neighborCount: kReaderPrefetchNeighborCount,
+      );
+      final Set<int> next = computePrefetchWindow(
+        centerPageOneBased: 28,
+        totalPages: 40,
+        neighborCount: kReaderPrefetchNeighborCount,
+      );
+      expect(
+        pagesLeavingPrefetchWindow(
+          previousWindow: previous,
+          nextWindow: next,
+        ),
+        previous.difference(next),
+      );
+      expect(previous.difference(next), isNotEmpty);
+    });
+  });
 }

@@ -72,6 +72,54 @@ void main() {
     });
   });
 
+  group('AnchoredOverlayMenu', () {
+    testWidgets(
+      'parent rebuild while menu open does not call markNeedsBuild during build',
+      (WidgetTester tester) async {
+        final AnchoredOverlayMenuController controller =
+            AnchoredOverlayMenuController();
+        addTearDown(controller.dispose);
+
+        var menuLabel = 'v1';
+        late StateSetter setParentState;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  setParentState = setState;
+                  return AnchoredOverlayMenu(
+                    controller: controller,
+                    menuBuilder: (VoidCallback hideMenu) => Text(menuLabel),
+                    child: TextButton(
+                      onPressed: controller.toggleMenu,
+                      child: const Text('open'),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('open'));
+        await tester.pump();
+        expect(find.text('v1'), findsOneWidget);
+
+        // Comic detail header rebuilds while overlay is open (e.g. scan busy
+        // flag). didUpdateWidget must not mark OverlayEntry dirty mid-build.
+        setParentState(() => menuLabel = 'v2');
+        await tester.pump();
+        expect(tester.takeException(), isNull);
+
+        // Content refresh is deferred to the next frame.
+        await tester.pump();
+        expect(find.text('v2'), findsOneWidget);
+      },
+    );
+  });
+
   group('anchoredOverlayMenuRect', () {
     testWidgets(
       'uses overlay-local coords so sidebar inset is not double-counted',

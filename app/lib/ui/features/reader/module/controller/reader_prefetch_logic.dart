@@ -20,6 +20,18 @@ bool shouldBumpPrefetchGeneration({
   return !previousWindow.containsAll(nextWindow);
 }
 
+/// 离开预取窗口的页（1-based）。Rust `evict_outside_pages` 会删其磁盘缓存，
+/// 对应 keepAlive [comicReaderPage] FilePath 必须一并失效，否则大跳回落点会卡在丢文件。
+Set<int> pagesLeavingPrefetchWindow({
+  required Set<int>? previousWindow,
+  required Set<int> nextWindow,
+}) {
+  if (previousWindow == null || previousWindow.isEmpty) {
+    return const <int>{};
+  }
+  return previousWindow.difference(nextWindow);
+}
+
 /// 计算以 [centerPageOneBased] 为中心的预加载页码集合（1-based）。
 Set<int> computePrefetchWindow({
   required int centerPageOneBased,

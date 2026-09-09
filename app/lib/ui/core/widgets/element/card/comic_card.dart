@@ -82,6 +82,9 @@ class ComicCard extends ConsumerWidget {
                   data,
                   comic,
                   invalidate: ref.invalidate,
+                  notifyExternalChange: () => ref
+                      .read(libraryRevisionProvider.notifier)
+                      .notifyExternalChange(),
                 );
               },
             );

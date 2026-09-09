@@ -98,17 +98,6 @@ class DualPageViewport extends HookConsumerWidget {
       spreadIndex: currentSpread,
     );
 
-    useReaderPrefetchWindow(
-      ref: ref,
-      context: context,
-      comicId: comicId,
-      centerPageOneBased: currentIndex,
-      totalPages: safeTotalPages,
-      slotLogicalWidth: readerDualPageSlotLogicalWidth(viewportSize.width),
-      imageList: imageList,
-      extraPageIndexesOneBased: spreadPages,
-    );
-
     useEffect(() {
       hasAppliedPreferredPage.value = false;
       resumeSyncGate.value = ResumeVisibleSyncGate();
@@ -144,6 +133,7 @@ class DualPageViewport extends HookConsumerWidget {
       }
       return null;
     }, <Object?>[comicId, preferredPageIndex, totalPages, currentIndex]);
+    // Align PageView before prefetch so large jumps mount the landing spread first.
     useEffect(() {
       if (!pageController.hasClients || imageList.isEmpty) {
         return null;
@@ -186,6 +176,17 @@ class DualPageViewport extends HookConsumerWidget {
         alignGeneration.value++;
       };
     }, <Object?>[currentSpread, pageController, imageList.length]);
+
+    useReaderPrefetchWindow(
+      ref: ref,
+      context: context,
+      comicId: comicId,
+      centerPageOneBased: currentIndex,
+      totalPages: safeTotalPages,
+      slotLogicalWidth: readerDualPageSlotLogicalWidth(viewportSize.width),
+      imageList: imageList,
+      extraPageIndexesOneBased: spreadPages,
+    );
 
     return Center(
       child: ConstrainedBox(

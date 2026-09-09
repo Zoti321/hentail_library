@@ -37,18 +37,21 @@ void useReaderPrefetchWindow({
       final ReaderPrefetchController controller = ref.read(
         readerPrefetchControllerProvider.notifier,
       );
-      unawaited(
-        controller.warmWindow(
-          comicId: comicId,
-          centerPageOneBased: centerPageOneBased,
-          totalPages: totalPages,
-          extraPageIndexesOneBased: extraPageIndexesOneBased,
-        ),
-      );
+      // Defer warmWindow: useEffect can run during hook init/build, and
+      // bumpGeneration must not modify providers mid-build (Riverpod assert).
+      // Also lets viewport jumpToPage mount the landing page first.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) {
           return;
         }
+        unawaited(
+          controller.warmWindow(
+            comicId: comicId,
+            centerPageOneBased: centerPageOneBased,
+            totalPages: totalPages,
+            extraPageIndexesOneBased: extraPageIndexesOneBased,
+          ),
+        );
         unawaited(
           controller.precacheWindow(
             context: context,

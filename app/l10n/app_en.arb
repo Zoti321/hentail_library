@@ -326,7 +326,7 @@
       }
     }
   },
-  "libraryScanCompleteStats": "Scan complete: added {added}, removed {removed}, kept {kept}",
+  "libraryScanCompleteStats": "Scan complete: added {added}, removed {removed}, migrated {migrated}",
   "@libraryScanCompleteStats": {
     "placeholders": {
       "added": {
@@ -335,12 +335,12 @@
       "removed": {
         "type": "int"
       },
-      "kept": {
+      "migrated": {
         "type": "int"
       }
     }
   },
-  "libraryDeepScanCompleteStats": "Deep scan complete: added {added}, removed {removed}, kept {kept}",
+  "libraryDeepScanCompleteStats": "Deep scan complete: added {added}, removed {removed}, migrated {migrated}",
   "@libraryDeepScanCompleteStats": {
     "placeholders": {
       "added": {
@@ -349,7 +349,21 @@
       "removed": {
         "type": "int"
       },
-      "kept": {
+      "migrated": {
+        "type": "int"
+      }
+    }
+  },
+  "libraryStartupScanCompleteStats": "Startup scan complete: added {added}, removed {removed}, migrated {migrated}",
+  "@libraryStartupScanCompleteStats": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "removed": {
+        "type": "int"
+      },
+      "migrated": {
         "type": "int"
       }
     }

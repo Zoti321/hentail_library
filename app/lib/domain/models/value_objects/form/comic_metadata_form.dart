@@ -62,10 +62,14 @@ final class ComicMetadataApplyInvalid extends ComicMetadataApplyResult {
 
 final class ComicMetadataApplySucceeded extends ComicMetadataApplyResult {
   const ComicMetadataApplySucceeded({
+    this.persisted = false,
     this.tagsWritten = false,
     this.parodiesWritten = false,
     this.charactersWritten = false,
   });
+
+  /// 本次是否实际调用了仓储写入（无字段变化时为 false）。
+  final bool persisted;
 
   /// 本次是否向仓储提交了 Tag 列表（可能写入全局 Tag 字典）。
   final bool tagsWritten;
@@ -278,6 +282,7 @@ extension ComicMetadataFormOps on ComicMetadataForm {
       characters: characters,
     );
     return ComicMetadataApplySucceeded(
+      persisted: true,
       tagsWritten: tags != null,
       parodiesWritten: parodies != null,
       charactersWritten: characters != null,

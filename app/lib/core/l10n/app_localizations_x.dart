@@ -244,8 +244,8 @@ extension AppLocalizationsLabelsX on AppLocalizations {
 
   String libraryScanSuccessToast({
     required ScanMode mode,
-
     required SyncLibraryProgress? progress,
+    bool fromStartup = false,
   }) {
     final bool isDeepScan = mode == ScanMode.full;
 
@@ -265,20 +265,22 @@ extension AppLocalizationsLabelsX on AppLocalizations {
             : libraryScanCompleteCleared(progress.removedCount ?? 0),
 
       SyncLibraryRoute.withRoots =>
-        isDeepScan
+        fromStartup
+            ? libraryStartupScanCompleteStats(
+                progress.addedCount ?? 0,
+                progress.removedCount ?? 0,
+                progress.migratedCount ?? 0,
+              )
+            : isDeepScan
             ? libraryDeepScanCompleteStats(
                 progress.addedCount ?? 0,
-
                 progress.removedCount ?? 0,
-
-                progress.keptCount ?? 0,
+                progress.migratedCount ?? 0,
               )
             : libraryScanCompleteStats(
                 progress.addedCount ?? 0,
-
                 progress.removedCount ?? 0,
-
-                progress.keptCount ?? 0,
+                progress.migratedCount ?? 0,
               ),
     };
   }
