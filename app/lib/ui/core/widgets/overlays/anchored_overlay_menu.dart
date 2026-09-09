@@ -168,7 +168,18 @@ class _AnchoredOverlayMenuState extends State<AnchoredOverlayMenu> {
       return;
     }
     // Refresh open menu content (e.g. enabled flags) without remeasuring.
-    _entry?.markNeedsBuild();
+    // Defer: OverlayEntry is not under this element, so markNeedsBuild during
+    // the parent's build (didUpdateWidget) throws.
+    final OverlayEntry? entry = _entry;
+    if (entry == null) {
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !identical(_entry, entry)) {
+        return;
+      }
+      entry.markNeedsBuild();
+    });
   }
 
   @override
