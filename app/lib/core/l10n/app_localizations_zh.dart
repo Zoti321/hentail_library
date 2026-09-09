@@ -1171,10 +1171,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataTabTags => '标签';
 
   @override
+  String get metadataTabParodies => '原作';
+
+  @override
+  String get metadataTabCharacters => '角色';
+
+  @override
   String get metadataAddAuthor => '添加作者';
 
   @override
   String get metadataAddTag => '添加标签';
+
+  @override
+  String get metadataAddParody => '添加原作';
+
+  @override
+  String get metadataAddCharacter => '添加角色';
 
   @override
   String get metadataAdd => '添加';
@@ -1198,6 +1210,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataAllTags => '全部标签';
 
   @override
+  String get metadataAllParodies => '全部原作';
+
+  @override
+  String get metadataAllCharacters => '全部角色';
+
+  @override
   String metadataTotalCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -1214,6 +1232,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataRenameTag => '重命名标签';
 
   @override
+  String get metadataRenameParody => '重命名原作';
+
+  @override
+  String get metadataRenameCharacter => '重命名角色';
+
+  @override
   String get metadataNewName => '新名称';
 
   @override
@@ -1221,6 +1245,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get metadataRenameTagHint => '输入新的标签名称…';
+
+  @override
+  String get metadataRenameParodyHint => '输入新的原作名称…';
+
+  @override
+  String get metadataRenameCharacterHint => '输入新的角色名称…';
 
   @override
   String get metadataNameLabel => '名称';
@@ -1232,10 +1262,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataAddTagHint => '输入标签名称…';
 
   @override
+  String get metadataAddParodyHint => '输入原作名称…';
+
+  @override
+  String get metadataAddCharacterHint => '输入角色名称…';
+
+  @override
   String get metadataAuthorDeletedToast => '已删除作者';
 
   @override
   String get metadataTagDeletedToast => '已删除标签';
+
+  @override
+  String get metadataParodyDeletedToast => '已删除原作';
+
+  @override
+  String get metadataCharacterDeletedToast => '已删除角色';
 
   @override
   String get metadataAuthorsEmptyTitle => '暂无作者';
@@ -1250,13 +1292,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataTagsEmptyHint => '你可以从这里添加、重命名或删除标签。';
 
   @override
+  String get metadataParodiesEmptyTitle => '暂无原作';
+
+  @override
+  String get metadataParodiesEmptyHint => '你可以从这里添加、重命名或删除原作。';
+
+  @override
+  String get metadataCharactersEmptyTitle => '暂无角色';
+
+  @override
+  String get metadataCharactersEmptyHint => '你可以从这里添加、重命名或删除角色。';
+
+  @override
   String get metadataAuthorsNoMatchTitle => '未找到匹配的作者';
 
   @override
   String get metadataTagsNoMatchTitle => '未找到匹配的标签';
 
   @override
+  String get metadataParodiesNoMatchTitle => '未找到匹配的原作';
+
+  @override
+  String get metadataCharactersNoMatchTitle => '未找到匹配的角色';
+
+  @override
   String get metadataSearchNoMatchHint => '试试其他关键词，或清空搜索';
+
+  @override
+  String metadataAttachmentCountLabel(String count) {
+    return 'Named facet attachment count：$count';
+  }
+
+  @override
+  String get metadataLoadingMore => '正在加载更多…';
+
+  @override
+  String get metadataScrollToLoadMore => '滚动到底部以加载更多';
+
+  @override
+  String get metadataListEnd => '已显示全部';
 
   @override
   String get metadataDeleteAllTags => '删除所有';
@@ -1562,6 +1636,14 @@ class AppLocalizationsZh extends AppLocalizations {
       other: '将删除 $count 个标签，并同时从所有漫画中移除这些标签。此操作不可撤销。',
     );
     return '$_temp0';
+  }
+
+  @override
+  String get confirmDeleteNamedFacetTitle => '确认删除';
+
+  @override
+  String confirmDeleteNamedFacetContent(String name, int count) {
+    return '将删除「$name」，并影响 $count 个 Named facet attachment。此操作不可撤销。';
   }
 
   @override

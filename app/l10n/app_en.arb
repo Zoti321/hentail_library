@@ -568,8 +568,12 @@
   "readerNoImages": "No images",
   "metadataTabAuthors": "Authors",
   "metadataTabTags": "Tags",
+  "metadataTabParodies": "Parodies",
+  "metadataTabCharacters": "Characters",
   "metadataAddAuthor": "Add author",
   "metadataAddTag": "Add tag",
+  "metadataAddParody": "Add parody",
+  "metadataAddCharacter": "Add character",
   "metadataAdd": "Add",
   "metadataSearchNameHint": "Search by name…",
   "metadataRename": "Rename",
@@ -577,6 +581,8 @@
   "metadataMoreActions": "More actions",
   "metadataAllAuthors": "All authors",
   "metadataAllTags": "All tags",
+  "metadataAllParodies": "All parodies",
+  "metadataAllCharacters": "All characters",
   "metadataTotalCount": "{count, plural, one{1 item} other{{count} items}}",
   "@metadataTotalCount": {
     "placeholders": {
@@ -587,21 +593,44 @@
   },
   "metadataRenameAuthor": "Rename author",
   "metadataRenameTag": "Rename tag",
+  "metadataRenameParody": "Rename parody",
+  "metadataRenameCharacter": "Rename character",
   "metadataNewName": "New name",
   "metadataRenameAuthorHint": "Enter a new author name…",
   "metadataRenameTagHint": "Enter a new tag name…",
+  "metadataRenameParodyHint": "Enter a new parody name…",
+  "metadataRenameCharacterHint": "Enter a new character name…",
   "metadataNameLabel": "Name",
   "metadataAddAuthorHint": "Enter author name…",
   "metadataAddTagHint": "Enter tag name…",
+  "metadataAddParodyHint": "Enter parody name…",
+  "metadataAddCharacterHint": "Enter character name…",
   "metadataAuthorDeletedToast": "Author deleted",
   "metadataTagDeletedToast": "Tag deleted",
+  "metadataParodyDeletedToast": "Parody deleted",
+  "metadataCharacterDeletedToast": "Character deleted",
   "metadataAuthorsEmptyTitle": "No authors yet",
   "metadataAuthorsEmptyHint": "Add, rename, or delete authors here.",
   "metadataTagsEmptyTitle": "No tags yet",
   "metadataTagsEmptyHint": "Add, rename, or delete tags here.",
+  "metadataParodiesEmptyTitle": "No parodies yet",
+  "metadataParodiesEmptyHint": "Add, rename, or delete parodies here.",
+  "metadataCharactersEmptyTitle": "No characters yet",
+  "metadataCharactersEmptyHint": "Add, rename, or delete characters here.",
   "metadataAuthorsNoMatchTitle": "No matching authors",
   "metadataTagsNoMatchTitle": "No matching tags",
+  "metadataParodiesNoMatchTitle": "No matching parodies",
+  "metadataCharactersNoMatchTitle": "No matching characters",
   "metadataSearchNoMatchHint": "Try another keyword, or clear the search",
+  "metadataAttachmentCountLabel": "Named facet attachment count: {count}",
+  "@metadataAttachmentCountLabel": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "metadataLoadingMore": "Loading more…",
+  "metadataScrollToLoadMore": "Scroll to load more",
+  "metadataListEnd": "All items loaded",
   "metadataDeleteAllTags": "Delete all",
   "metadataTagsDeletedAllToast": "All tags deleted",
   "metadataImportTagDictionaryDialogTitle": "Import tag dictionary",
@@ -747,6 +776,14 @@
   "confirmDeleteTagsContent": "{count, plural, one{Delete 1 tag and remove it from all comics. This cannot be undone.} other{Delete {count} tags and remove them from all comics. This cannot be undone.}}",
   "@confirmDeleteTagsContent": {
     "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "confirmDeleteNamedFacetTitle": "Confirm deletion",
+  "confirmDeleteNamedFacetContent": "Delete \"{name}\" and affect {count} named facet attachments. This cannot be undone.",
+  "@confirmDeleteNamedFacetContent": {
+    "placeholders": {
+      "name": {"type": "String"},
       "count": {"type": "int"}
     }
   },

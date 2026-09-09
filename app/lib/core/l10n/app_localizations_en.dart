@@ -1199,10 +1199,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataTabTags => 'Tags';
 
   @override
+  String get metadataTabParodies => 'Parodies';
+
+  @override
+  String get metadataTabCharacters => 'Characters';
+
+  @override
   String get metadataAddAuthor => 'Add author';
 
   @override
   String get metadataAddTag => 'Add tag';
+
+  @override
+  String get metadataAddParody => 'Add parody';
+
+  @override
+  String get metadataAddCharacter => 'Add character';
 
   @override
   String get metadataAdd => 'Add';
@@ -1226,6 +1238,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataAllTags => 'All tags';
 
   @override
+  String get metadataAllParodies => 'All parodies';
+
+  @override
+  String get metadataAllCharacters => 'All characters';
+
+  @override
   String metadataTotalCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -1243,6 +1261,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataRenameTag => 'Rename tag';
 
   @override
+  String get metadataRenameParody => 'Rename parody';
+
+  @override
+  String get metadataRenameCharacter => 'Rename character';
+
+  @override
   String get metadataNewName => 'New name';
 
   @override
@@ -1250,6 +1274,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get metadataRenameTagHint => 'Enter a new tag name…';
+
+  @override
+  String get metadataRenameParodyHint => 'Enter a new parody name…';
+
+  @override
+  String get metadataRenameCharacterHint => 'Enter a new character name…';
 
   @override
   String get metadataNameLabel => 'Name';
@@ -1261,10 +1291,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataAddTagHint => 'Enter tag name…';
 
   @override
+  String get metadataAddParodyHint => 'Enter parody name…';
+
+  @override
+  String get metadataAddCharacterHint => 'Enter character name…';
+
+  @override
   String get metadataAuthorDeletedToast => 'Author deleted';
 
   @override
   String get metadataTagDeletedToast => 'Tag deleted';
+
+  @override
+  String get metadataParodyDeletedToast => 'Parody deleted';
+
+  @override
+  String get metadataCharacterDeletedToast => 'Character deleted';
 
   @override
   String get metadataAuthorsEmptyTitle => 'No authors yet';
@@ -1279,14 +1321,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataTagsEmptyHint => 'Add, rename, or delete tags here.';
 
   @override
+  String get metadataParodiesEmptyTitle => 'No parodies yet';
+
+  @override
+  String get metadataParodiesEmptyHint =>
+      'Add, rename, or delete parodies here.';
+
+  @override
+  String get metadataCharactersEmptyTitle => 'No characters yet';
+
+  @override
+  String get metadataCharactersEmptyHint =>
+      'Add, rename, or delete characters here.';
+
+  @override
   String get metadataAuthorsNoMatchTitle => 'No matching authors';
 
   @override
   String get metadataTagsNoMatchTitle => 'No matching tags';
 
   @override
+  String get metadataParodiesNoMatchTitle => 'No matching parodies';
+
+  @override
+  String get metadataCharactersNoMatchTitle => 'No matching characters';
+
+  @override
   String get metadataSearchNoMatchHint =>
       'Try another keyword, or clear the search';
+
+  @override
+  String metadataAttachmentCountLabel(String count) {
+    return 'Named facet attachment count: $count';
+  }
+
+  @override
+  String get metadataLoadingMore => 'Loading more…';
+
+  @override
+  String get metadataScrollToLoadMore => 'Scroll to load more';
+
+  @override
+  String get metadataListEnd => 'All items loaded';
 
   @override
   String get metadataDeleteAllTags => 'Delete all';
@@ -1597,6 +1673,14 @@ class AppLocalizationsEn extends AppLocalizations {
       one: 'Delete 1 tag and remove it from all comics. This cannot be undone.',
     );
     return '$_temp0';
+  }
+
+  @override
+  String get confirmDeleteNamedFacetTitle => 'Confirm deletion';
+
+  @override
+  String confirmDeleteNamedFacetContent(String name, int count) {
+    return 'Delete \"$name\" and affect $count named facet attachments. This cannot be undone.';
   }
 
   @override

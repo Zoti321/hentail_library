@@ -1,20 +1,20 @@
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/domain/models/entity/comic/author.dart';
-import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/domain/models/value_objects/page_request.dart';
+import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/content_switcher_bottom_bar.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/count_digit_chip.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
+import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/metadata_management_page.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/author_management_panel.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/named_facet_management_panel.dart';
+import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 void main() {
@@ -33,6 +33,8 @@ void main() {
         expect(find.text('共 2 条'), findsNothing);
         expect(find.text('作者'), findsOneWidget);
         expect(find.text('标签'), findsOneWidget);
+        expect(find.text('原作'), findsOneWidget);
+        expect(find.text('角色'), findsOneWidget);
       },
     );
 
@@ -49,27 +51,29 @@ void main() {
       expect(find.text('管理作者与标签'), findsNothing);
       expect(find.byTooltip('添加作者'), findsOneWidget);
       expect(find.textContaining('Ctrl+N'), findsNothing);
+      expect(find.text('原作'), findsWidgets);
+      expect(find.text('角色'), findsWidgets);
     });
 
-    testWidgets(
-      'compact author panel uses overflow actions without bulk delete',
-      (WidgetTester tester) async {
-        await _pumpAuthorPanel(
-          tester,
-          viewportWidth: 360,
-          layoutTier: MetadataLayoutTier.compact,
-        );
+    testWidgets('author panel renders name chips without inline rename', (
+      WidgetTester tester,
+    ) async {
+      await _pumpAuthorPanel(
+        tester,
+        viewportWidth: 360,
+        layoutTier: MetadataLayoutTier.compact,
+      );
 
-        expect(tester.takeException(), isNull);
-        expect(find.text('作者管理'), findsNothing);
-        expect(find.byTooltip('删除已选'), findsNothing);
-        expect(find.byTooltip('更多操作'), findsNWidgets(2));
-        expect(find.byType(CustomPopupMenu), findsNWidgets(2));
-        expect(find.byType(PopupMenuButton), findsNothing);
-      },
-    );
+      expect(tester.takeException(), isNull);
+      expect(find.text('作者管理'), findsNothing);
+      expect(find.byTooltip('重命名'), findsNothing);
+      expect(find.byTooltip('删除已选'), findsNothing);
+      expect(find.byType(OutlinedMetaChip), findsNWidgets(2));
+      expect(find.text('作者 A'), findsOneWidget);
+      expect(find.text('作者 B'), findsOneWidget);
+    });
 
-    testWidgets('expanded author panel keeps row actions in card layout', (
+    testWidgets('expanded author panel keeps chip flow without row actions', (
       WidgetTester tester,
     ) async {
       await _pumpAuthorPanel(
@@ -79,14 +83,9 @@ void main() {
       );
 
       expect(tester.takeException(), isNull);
-      expect(find.text('作者管理'), findsNothing);
-      expect(find.byTooltip('删除已选'), findsNothing);
-      expect(
-        find.byWidgetPredicate((Widget widget) => widget is PopupMenuButton),
-        findsNothing,
-      );
-      expect(find.byType(CustomPopupMenu), findsNothing);
-      expect(find.byTooltip('重命名'), findsNWidgets(2));
+      expect(find.byTooltip('重命名'), findsNothing);
+      expect(find.byType(OutlinedMetaChip), findsNWidgets(2));
+      expect(find.text('共 2 条'), findsOneWidget);
     });
   });
 }
@@ -121,6 +120,7 @@ Future<void> _pumpMetadataPage(
       ),
     ),
   );
+  await tester.pump();
   await tester.pumpAndSettle();
 }
 
@@ -144,7 +144,8 @@ Future<void> _pumpAuthorPanel(
         home: Scaffold(
           body: CustomScrollView(
             slivers: <Widget>[
-              AuthorManagementSliverGroup(
+              NamedFacetManagementSliverGroup(
+                kind: ManagedNamedFacetKind.author,
                 layoutTier: layoutTier,
                 viewportWidth: viewportWidth,
                 horizontalPadding: metadataContentHorizontalPadding(layoutTier),
@@ -159,19 +160,84 @@ Future<void> _pumpAuthorPanel(
       ),
     ),
   );
+  await tester.pump();
   await tester.pumpAndSettle();
 }
 
 List<Override> _metadataTestOverrides() {
   return <Override>[
-    allAuthorsProvider.overrideWith(
-      (Ref ref) => Stream<List<Author>>.value(<Author>[
-        Author(name: '作者 A'),
-        Author(name: '作者 B'),
-      ]),
-    ),
-    allTagsProvider.overrideWith(
-      (Ref ref) => Future<List<Tag>>.value(<Tag>[Tag(name: '标签 A')]),
+    namedFacetManagementRepoProvider.overrideWithValue(
+      _FakeNamedFacetManagementRepository(
+        itemsByKind: <ManagedNamedFacetKind, List<String>>{
+          ManagedNamedFacetKind.author: <String>['作者 A', '作者 B'],
+          ManagedNamedFacetKind.tag: <String>['标签 A'],
+          ManagedNamedFacetKind.parody: <String>['原作 A'],
+          ManagedNamedFacetKind.character: <String>['角色 A'],
+        },
+      ),
     ),
   ];
+}
+
+class _FakeNamedFacetManagementRepository
+    implements NamedFacetManagementRepository {
+  _FakeNamedFacetManagementRepository({required this.itemsByKind});
+
+  final Map<ManagedNamedFacetKind, List<String>> itemsByKind;
+
+  List<String> _items(ManagedNamedFacetKind kind) =>
+      List<String>.of(itemsByKind[kind] ?? const <String>[]);
+
+  @override
+  Future<List<String>> listAll(ManagedNamedFacetKind kind) async =>
+      _items(kind);
+
+  @override
+  Future<PagedResult<String>> fetchPage(
+    ManagedNamedFacetKind kind,
+    PageRequest request,
+  ) async {
+    final List<String> all = _items(kind);
+    final int start = request.offset;
+    final int end = (start + request.pageSize).clamp(0, all.length);
+    return PagedResult<String>(
+      items: start >= all.length ? const <String>[] : all.sublist(start, end),
+      totalCount: all.length,
+      page: request.page,
+      pageSize: request.pageSize,
+    );
+  }
+
+  @override
+  Future<void> add(ManagedNamedFacetKind kind, String name) async {
+    itemsByKind.putIfAbsent(kind, () => <String>[]).add(name);
+  }
+
+  @override
+  Future<void> deleteByNames(
+    ManagedNamedFacetKind kind,
+    List<String> names,
+  ) async {
+    itemsByKind[kind]?.removeWhere(names.contains);
+  }
+
+  @override
+  Future<void> rename(
+    ManagedNamedFacetKind kind,
+    String oldName,
+    String newName,
+  ) async {
+    final List<String>? items = itemsByKind[kind];
+    if (items == null) {
+      return;
+    }
+    final int index = items.indexOf(oldName);
+    if (index >= 0) {
+      items[index] = newName;
+    }
+  }
+
+  @override
+  Future<int> countAttachments(ManagedNamedFacetKind kind, String name) async =>
+      name == '作者 A' ? 3 : 0;
 }

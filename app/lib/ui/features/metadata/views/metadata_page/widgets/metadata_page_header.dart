@@ -7,8 +7,8 @@ import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/content_switcher_bottom_bar.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/count_digit_chip.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
+import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
+import 'package:hentai_library/ui/features/metadata/view_models/named_facet_management_controller.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_tags_overflow_menu.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -175,9 +175,11 @@ class _MetadataActiveCountChip extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final int count = selectedTabIndex == 0
-        ? ref.watch(filteredAuthorsProvider).length
-        : ref.watch(filteredTagsProvider).length;
+    final ManagedNamedFacetKind kind = metadataTabKind(selectedTabIndex);
+    final state = ref.watch(namedFacetManagementControllerProvider(kind));
+    final int count = state.hasSearchQuery
+        ? state.items.length
+        : state.totalCount;
     return CountDigitChip(
       count: count,
       semanticLabel: l10n.metadataTotalCount(count),
@@ -205,6 +207,14 @@ class MetadataEntityTabs extends StatelessWidget {
           icon: LucideIcons.penLine,
         ),
         CapsuleTabItem(label: l10n.metadataTabTags, icon: LucideIcons.tags),
+        CapsuleTabItem(
+          label: l10n.metadataTabParodies,
+          icon: LucideIcons.clapperboard,
+        ),
+        CapsuleTabItem(
+          label: l10n.metadataTabCharacters,
+          icon: LucideIcons.userRound,
+        ),
       ],
       selectedIndex: selectedTabIndex,
       onSelected: onTabSelected,
@@ -229,6 +239,8 @@ class MetadataEntityBottomBar extends StatelessWidget {
       items: <ContentSwitcherBottomBarItem>[
         (icon: LucideIcons.penLine, label: l10n.metadataTabAuthors),
         (icon: LucideIcons.tags, label: l10n.metadataTabTags),
+        (icon: LucideIcons.clapperboard, label: l10n.metadataTabParodies),
+        (icon: LucideIcons.userRound, label: l10n.metadataTabCharacters),
       ],
       selectedIndex: selectedTabIndex,
       onSelected: onTabSelected,
@@ -294,4 +306,14 @@ class MetadataPinnedHeaderDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(covariant MetadataPinnedHeaderDelegate oldDelegate) {
     return oldDelegate.extent != extent || oldDelegate.child != child;
   }
+}
+
+ManagedNamedFacetKind metadataTabKind(int index) {
+  return switch (index) {
+    0 => ManagedNamedFacetKind.author,
+    1 => ManagedNamedFacetKind.tag,
+    2 => ManagedNamedFacetKind.parody,
+    3 => ManagedNamedFacetKind.character,
+    _ => ManagedNamedFacetKind.tag,
+  };
 }

@@ -71,6 +71,16 @@ List<RouteBase> buildSharedContentRoutes({
           '/metadata?tab=authors',
     ),
     GoRoute(
+      path: '/parodies',
+      redirect: (BuildContext context, GoRouterState state) =>
+          '/metadata?tab=parodies',
+    ),
+    GoRoute(
+      path: '/characters',
+      redirect: (BuildContext context, GoRouterState state) =>
+          '/metadata?tab=characters',
+    ),
+    GoRoute(
       path: '/series/:id',
       name: '系列详情',
       pageBuilder: (BuildContext context, GoRouterState state) {

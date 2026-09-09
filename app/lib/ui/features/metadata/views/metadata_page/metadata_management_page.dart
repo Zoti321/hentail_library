@@ -3,20 +3,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_scroll_to_top_button.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/author_management_panel.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_content_search.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_page_header.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/tag_management_panel.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/named_facet_management_panel.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 
 class MetadataManagementPage extends ConsumerStatefulWidget {
   const MetadataManagementPage({super.key});
@@ -41,11 +38,13 @@ class _MetadataManagementPageState
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_handleScrollLoadMore);
     WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_handleScrollLoadMore);
     _scrollController.dispose();
     super.dispose();
   }
@@ -185,26 +184,13 @@ class _MetadataManagementPageState
               ),
             ),
             if (_visitedTabIndexes.contains(selectedIndex))
-              switch (selectedIndex) {
-                0 => AuthorManagementSliverGroup(
-                  layoutTier: layoutTier,
-                  viewportWidth: viewportWidth,
-                  horizontalPadding: horizontalPadding,
-                  contentMaxWidth: innerMaxWidth,
-                ),
-                1 => TagManagementSliverGroup(
-                  layoutTier: layoutTier,
-                  viewportWidth: viewportWidth,
-                  horizontalPadding: horizontalPadding,
-                  contentMaxWidth: innerMaxWidth,
-                ),
-                _ => TagManagementSliverGroup(
-                  layoutTier: layoutTier,
-                  viewportWidth: viewportWidth,
-                  horizontalPadding: horizontalPadding,
-                  contentMaxWidth: innerMaxWidth,
-                ),
-              },
+              NamedFacetManagementSliverGroup(
+                kind: metadataTabKind(selectedIndex),
+                layoutTier: layoutTier,
+                viewportWidth: viewportWidth,
+                horizontalPadding: horizontalPadding,
+                contentMaxWidth: innerMaxWidth,
+              ),
           ],
         ),
         LibraryScrollToTopButton(
@@ -234,52 +220,12 @@ class _MetadataManagementPageState
     setState(() {
       _selectedTabIndex = index;
     });
+    context.go('/metadata?tab=${_tabQueryForIndex(index)}');
     _scrollToContentTop();
   }
 
   Future<void> _invokeAddForTab(BuildContext context, int tabIndex) async {
-    switch (tabIndex) {
-      case 0:
-        await _openAddAuthorDialog(context);
-        break;
-      case 1:
-        await _openAddTagDialog(context);
-        break;
-      default:
-        break;
-    }
-  }
-
-  Future<void> _openAddTagDialog(BuildContext context) async {
-    final l10n = context.l10n;
-    await showDialog<void>(
-      context: context,
-      builder: (BuildContext dialogContext) => TagNameEditorDialog(
-        title: l10n.metadataAddTag,
-        labelText: l10n.metadataNameLabel,
-        hintText: l10n.metadataAddTagHint,
-        initialValue: '',
-        onSubmit: (String value) async {
-          await ref.read(tagActionsProvider).addTag(Tag(name: value));
-        },
-      ),
-    );
-  }
-
-  Future<void> _openAddAuthorDialog(BuildContext context) async {
-    final l10n = context.l10n;
-    await showDialog<void>(
-      context: context,
-      builder: (BuildContext dialogContext) => TagNameEditorDialog(
-        title: l10n.metadataAddAuthor,
-        labelText: l10n.metadataNameLabel,
-        hintText: l10n.metadataAddAuthorHint,
-        initialValue: '',
-        onSubmit: (String value) async {
-          await ref.read(authorActionsProvider).addAuthor(Author(name: value));
-        },
-      ),
-    );
+    await openNamedFacetCreateDialog(context, ref, metadataTabKind(tabIndex));
   }
 
   Future<void> _deleteAllTags(BuildContext context) async {
@@ -300,10 +246,33 @@ class _MetadataManagementPageState
     }
 
     await ref.read(tagActionsProvider).deleteAllTags();
+    await ref
+        .read(
+          namedFacetManagementControllerProvider(metadataTabKind(1)).notifier,
+        )
+        .refresh();
     if (!context.mounted) {
       return;
     }
     showSuccessToast(context, context.l10n.metadataTagsDeletedAllToast);
+  }
+
+  void _handleScrollLoadMore() {
+    if (!_scrollController.hasClients) {
+      return;
+    }
+    final ScrollPosition position = _scrollController.position;
+    if (position.maxScrollExtent - position.pixels > 240) {
+      return;
+    }
+    final int selectedIndex = _selectedTabIndex ?? 1;
+    ref
+        .read(
+          namedFacetManagementControllerProvider(
+            metadataTabKind(selectedIndex),
+          ).notifier,
+        )
+        .loadMore();
   }
 }
 
@@ -322,7 +291,21 @@ int _tabIndexFromQuery(String? tab) {
       return 0;
     case 'tags':
       return 1;
+    case 'parodies':
+      return 2;
+    case 'characters':
+      return 3;
     default:
       return 1;
   }
+}
+
+String _tabQueryForIndex(int index) {
+  return switch (index) {
+    0 => 'authors',
+    1 => 'tags',
+    2 => 'parodies',
+    3 => 'characters',
+    _ => 'tags',
+  };
 }

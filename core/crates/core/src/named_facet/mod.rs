@@ -2,7 +2,7 @@
 //!
 //! Language is a closed-set JSON column on `comic_meta` and is not handled here.
 
-use sea_orm::{ConnectionTrait, Statement, Value};
+use sea_orm::{ConnectionTrait, Statement, TransactionTrait, Value};
 
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
@@ -144,6 +144,48 @@ pub async fn list_all_named_facet_names(
         .collect()
 }
 
+pub async fn count_all_named_facet_names(facet: JunctionNamedFacet) -> Result<i64, HentaiError> {
+    let db = connection()?;
+    let dict = facet.dict_table();
+    let rows = db
+        .query_all(Statement::from_string(
+            sea_orm::DatabaseBackend::Sqlite,
+            format!("SELECT COUNT(*) FROM {dict}"),
+        ))
+        .await
+        .map_err(map_db_err)?;
+    rows.into_iter()
+        .next()
+        .ok_or_else(|| HentaiError::db_query_failed("count row missing".to_string(), None))
+        .and_then(|row| {
+            row.try_get_by_index::<i64>(0)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+        })
+}
+
+pub async fn fetch_named_facet_page(
+    facet: JunctionNamedFacet,
+    limit: i32,
+    offset: i32,
+) -> Result<Vec<String>, HentaiError> {
+    let db = connection()?;
+    let dict = facet.dict_table();
+    let rows = db
+        .query_all(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            format!("SELECT name FROM {dict} ORDER BY name ASC LIMIT ? OFFSET ?"),
+            [Value::Int(Some(limit)), Value::Int(Some(offset))],
+        ))
+        .await
+        .map_err(map_db_err)?;
+    rows.into_iter()
+        .map(|row| {
+            row.try_get_by_index::<String>(0)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+        })
+        .collect()
+}
+
 pub async fn list_distinct_named_facet_names(
     facet: JunctionNamedFacet,
     library_id: Option<String>,
@@ -166,6 +208,91 @@ pub async fn list_distinct_named_facet_names(
                 .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
         })
         .collect()
+}
+
+pub async fn add_named_facet_name(
+    facet: JunctionNamedFacet,
+    name: &str,
+) -> Result<(), HentaiError> {
+    let db = connection()?;
+    let dict = facet.dict_table();
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        format!("INSERT OR IGNORE INTO {dict} (name) VALUES (?)"),
+        [Value::String(Some(Box::new(name.to_string())))],
+    ))
+    .await
+    .map_err(map_db_err)?;
+    Ok(())
+}
+
+pub async fn delete_named_facet_by_names(
+    facet: JunctionNamedFacet,
+    names: Vec<String>,
+) -> Result<(), HentaiError> {
+    if names.is_empty() {
+        return Ok(());
+    }
+    let db = connection()?;
+    let dict = facet.dict_table();
+    let placeholders = std::iter::repeat("?")
+        .take(names.len())
+        .collect::<Vec<_>>()
+        .join(", ");
+    let values = names
+        .into_iter()
+        .map(|name| Value::String(Some(Box::new(name))))
+        .collect::<Vec<_>>();
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        format!("DELETE FROM {dict} WHERE name IN ({placeholders})"),
+        values,
+    ))
+    .await
+    .map_err(map_db_err)?;
+    Ok(())
+}
+
+pub async fn rename_named_facet_name(
+    facet: JunctionNamedFacet,
+    old_name: &str,
+    new_name: &str,
+) -> Result<(), HentaiError> {
+    let db = connection()?;
+    let txn = db.begin().await.map_err(map_db_err)?;
+    let dict = facet.dict_table();
+    let junction = facet.junction_table();
+    let name_col = facet.junction_name_column();
+
+    txn.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        format!("INSERT OR IGNORE INTO {dict} (name) VALUES (?)"),
+        [Value::String(Some(Box::new(new_name.to_string())))],
+    ))
+    .await
+    .map_err(map_db_err)?;
+
+    txn.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        format!("UPDATE {junction} SET {name_col} = ? WHERE {name_col} = ?"),
+        [
+            Value::String(Some(Box::new(new_name.to_string()))),
+            Value::String(Some(Box::new(old_name.to_string()))),
+        ],
+    ))
+    .await
+    .map_err(map_db_err)?;
+
+    txn.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        format!("DELETE FROM {dict} WHERE name = ?"),
+        [Value::String(Some(Box::new(old_name.to_string())))],
+    ))
+    .await
+    .map_err(map_db_err)?;
+
+    txn.commit().await.map_err(map_db_err)?;
+    Ok(())
 }
 
 /// Dictionary names with Named facet attachment count for Comic metadata form pickers.
@@ -197,6 +324,30 @@ pub async fn list_named_facet_for_form(
             })
         })
         .collect()
+}
+
+pub async fn count_named_facet_attachments(
+    facet: JunctionNamedFacet,
+    name: &str,
+) -> Result<i64, HentaiError> {
+    let db = connection()?;
+    let junction = facet.junction_table();
+    let name_col = facet.junction_name_column();
+    let rows = db
+        .query_all(Statement::from_sql_and_values(
+            sea_orm::DatabaseBackend::Sqlite,
+            format!("SELECT COUNT(*) FROM {junction} WHERE {name_col} = ?"),
+            [Value::String(Some(Box::new(name.to_string())))],
+        ))
+        .await
+        .map_err(map_db_err)?;
+    rows.into_iter()
+        .next()
+        .ok_or_else(|| HentaiError::db_query_failed("count row missing".to_string(), None))
+        .and_then(|row| {
+            row.try_get_by_index::<i64>(0)
+                .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
+        })
 }
 
 #[cfg(test)]
