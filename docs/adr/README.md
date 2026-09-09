@@ -64,4 +64,5 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0009](./0009-library-sidebar-pin-and-order.md) | Library pin 与 sidebar order 落在 libraries 表 | Accepted |
 | [0010](./0010-windows-app-data-profile-isolation.md) | Windows 上按构建变体隔离 App data profile | Accepted |
 | [0011](./0011-tag-dictionary-no-ehtag.md) | 移除 EhTagTranslation 接入，保留通用标签字典导入 | Accepted |
+| [0012](./0012-comic-deletion-deletes-local-resource.md) | 用户 Comic deletion 删除 Local Resource；sync / 删库不删盘 | Accepted |
 | [0013](./0013-path-migration.md) | Path migration：弱指纹 + Local 库根相对路径 remapping | Accepted |

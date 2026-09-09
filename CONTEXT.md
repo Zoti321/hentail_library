@@ -52,6 +52,10 @@ _Avoid_: 内容 ID、文件指纹
 位置键变化后仍判定为同一 Comic（或同一 Series）时，将库记录 rekey 到新身份并保留用户元数据、Metadata field lock、阅读历史等，而不是 orphan 删除后再当新条目导入。Library sync 内对 Comic 用资源弱指纹（类型 + 大小 + 页数）在 removed/added 间做 1:1 唯一配对；Local 改 Library root 且新根可读时，按相对旧根的路径前缀 remapping（含 Series 的 `folder_path` / `seriesId`）。指纹歧义、相对路径对不上、或新根不可读则不迁，交由后续 Library sync 对齐。不是 Metadata refresh，也不改变 Comic identity 的位置锚定。详见 ADR-0013。
 _Avoid_: 自动迁移身份、内容指纹身份、搬家、重命名保留、rekey（实现用语）
 
+**Comic deletion**:
+用户主动删除 Comic：从 Library 移除该 Comic 及其库内关联数据；对 Local library 在路径安全校验后永久删除其 Resource（成功或路径已不存在后再清库；删盘失败则不改库）；对 Remote library 仅清库、不删远程 Resource。不是 Library sync 的 orphan 清理，也不是删除整个 Library（后两者仍只动库记录）。详见 ADR-0012。
+_Avoid_: 删文件、从库移除（若暗示不删 Local Resource）、回收站删除、自动 orphan 删盘
+
 **Resource**:
 可被发现并（校验后）入库为 Comic 的原始载体：本地文件/目录，或 WebDAV 上的文件。解析中间结果在入库前独立于 Comic 身份与用户元数据；Library sync / Metadata refresh / 阅读与缩略图共用同一套 Resource 访问与解析规则（经 Resource access）。
 _Avoid_: 文件、素材
@@ -119,6 +123,10 @@ _Avoid_: 根系列置顶实体、isRoot 标志、Pinned series
 **Prefer library root series**:
 Series 浏览列表的应用级偏好：开启时，若 Library root series 仍落在当前筛选结果中，则固定排在列表最前；其余条目仍按当前排序字段排列。默认开启；非 Series 身份或 pin。
 _Avoid_: 置顶系列、pin series（易与 Pinned library 混淆）
+
+**Expand by series**:
+Comics 浏览列表的应用级偏好：开启时仍为扁平 Comic 列表，但按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 块内按 SeriesItem.order；无 Series 归属的 Comic 整块垫底、块内标题升序」展开；开启时忽略 Comics 排序字段。默认开启；非视觉分组/折叠，也不共用 Prefer library root series 开关。
+_Avoid_: 分组浏览、按系列折叠、group by series、系列模式列表
 
 **Tag**:
 全局标签字典中的名称，用于筛选与归类；可来自用户创建或外部词库导入，再附着到 Comic。
@@ -213,3 +221,7 @@ _Avoid_: Webtoon 模式（易与作品类型混淆）、卷轴模式
 **Paged layout**:
 阅读器分页翻页的版式；逐页切换而非连续滚动。
 _Avoid_: 翻页模式、单页模式
+
+**Page image copy**:
+用户在 Read session 中，将某一页的位图写入系统剪贴板的动作（便于粘贴分享）；对象是页的位图，不是 Comic 封面或库缩略图。
+_Avoid_: 复制图片、分享图片、导出页面、保存图片（口语可用；领域与 issue 用 Page image copy）
