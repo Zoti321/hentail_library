@@ -91,15 +91,6 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
           )
         : viewportSize.width;
 
-    useReaderPrefetchWindow(
-      ref: ref,
-      context: context,
-      comicId: comicId,
-      centerPageOneBased: currentIndex,
-      totalPages: totalPages,
-      slotLogicalWidth: slotLogicalWidth,
-      imageList: imageList,
-    );
     void executeScrollToIndex(int targetIndexOneBased) {
       if (!context.mounted || !itemScrollController.isAttached) {
         return;
@@ -240,6 +231,19 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
         isProgrammaticScroll.value = false;
       };
     }, <Object?>[currentIndex, imageList.length]);
+
+    // Prefetch after programmatic jump scheduling so large slider seeks hit the
+    // landing page load path before neighbor warmWindow work.
+    useReaderPrefetchWindow(
+      ref: ref,
+      context: context,
+      comicId: comicId,
+      centerPageOneBased: currentIndex,
+      totalPages: totalPages,
+      slotLogicalWidth: slotLogicalWidth,
+      imageList: imageList,
+    );
+
     final bool useOriginalSize = zoomMode == WebtoonZoomMode.originalSize;
     final Widget pageList = ScrollablePositionedList.builder(
       itemScrollController: itemScrollController,

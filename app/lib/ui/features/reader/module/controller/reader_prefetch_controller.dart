@@ -63,8 +63,32 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
     )) {
       return;
     }
+    // Drop keepAlive FilePaths for pages Rust is about to evict from disk cache.
+    for (final int pageOneBased in pagesLeavingPrefetchWindow(
+      previousWindow: previous,
+      nextWindow: targets,
+    )) {
+      ref.invalidate(
+        comicReaderPageProvider(
+          comicId: comicId,
+          pageIndex: pageOneBased - 1,
+        ),
+      );
+    }
     _lastWarmWindows[comicId] = Set<int>.from(targets);
     final int generation = bumpGeneration(comicId);
+    // Kick the landing/center page before neighbor prefetch contends on the archive.
+    final int centerZeroBased = centerPageOneBased.clamp(1, totalPages) - 1;
+    unawaited(
+      ref
+          .read(
+            comicReaderPageProvider(
+              comicId: comicId,
+              pageIndex: centerZeroBased,
+            ).future,
+          )
+          .then<void>((_) {}, onError: (_, StackTrace _) {}),
+    );
     unawaited(
       ref
           .read(readerSessionServiceProvider)
