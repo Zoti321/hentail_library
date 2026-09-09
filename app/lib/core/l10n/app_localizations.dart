@@ -2012,6 +2012,18 @@ abstract class AppLocalizations {
   /// **'将当前页设为系列封面'**
   String get readerSetSeriesCover;
 
+  /// No description provided for @readerPageImageMenuTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'页图'**
+  String get readerPageImageMenuTitle;
+
+  /// No description provided for @readerCopyPageImage.
+  ///
+  /// In zh, this message translates to:
+  /// **'复制页图'**
+  String get readerCopyPageImage;
+
   /// No description provided for @readerMore.
   ///
   /// In zh, this message translates to:
@@ -2029,6 +2041,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'阅读状态未就绪'**
   String get readerStateNotReady;
+
+  /// No description provided for @readerCopyPageImageSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'已复制页图'**
+  String get readerCopyPageImageSuccess;
 
   /// No description provided for @readerComicCoverSet.
   ///

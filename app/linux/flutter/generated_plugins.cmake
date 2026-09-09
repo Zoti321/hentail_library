@@ -5,7 +5,9 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   flutter_acrylic
   flutter_secure_storage_linux
+  irondash_engine_context
   screen_retriever_linux
+  super_native_extensions
   system_theme
   url_launcher_linux
   window_manager

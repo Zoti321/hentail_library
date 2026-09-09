@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_page_crossfade_policy.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
@@ -59,6 +60,14 @@ class DualPageViewport extends HookConsumerWidget {
             value.asData?.value.readingMode ?? readingMode,
       ),
     );
+    final Comic? comic = ref.watch(
+      readerControllerProvider(
+        viewKey,
+      ).select((AsyncValue<ReaderState> value) => value.asData?.value.comic),
+    );
+    if (comic == null) {
+      return const SizedBox.expand();
+    }
     final images = ref
         .watch(comicImagesProvider(comicId: comicId))
         .asData
@@ -252,6 +261,7 @@ class DualPageViewport extends HookConsumerWidget {
                 spreadIndex: spreadIndex,
               );
               return _DualSpreadPage(
+                comic: comic,
                 pages: pages,
                 imageList: imageList,
                 readingMode: activeMode,
@@ -266,11 +276,13 @@ class DualPageViewport extends HookConsumerWidget {
 
 class _DualSpreadPage extends StatelessWidget {
   const _DualSpreadPage({
+    required this.comic,
     required this.pages,
     required this.imageList,
     required this.readingMode,
   });
 
+  final Comic comic;
   final List<int> pages;
   final List<ReaderPageImageData> imageList;
   final ReadingMode readingMode;
@@ -302,6 +314,7 @@ class _DualSpreadPage extends StatelessWidget {
           if (coverOnRight) const Expanded(child: SizedBox.shrink()),
           Expanded(
             child: ReaderImageItem(
+              comic: comic,
               imageData: imageData,
               slotLogicalWidth: slotLogicalWidth,
               alignment: alignment,
@@ -320,6 +333,7 @@ class _DualSpreadPage extends StatelessWidget {
           child: leftImage == null
               ? const SizedBox.shrink()
               : ReaderImageItem(
+                  comic: comic,
                   imageData: leftImage,
                   slotLogicalWidth: slotLogicalWidth,
                   alignment: Alignment.centerRight,
@@ -330,6 +344,7 @@ class _DualSpreadPage extends StatelessWidget {
           child: rightImage == null
               ? const SizedBox.shrink()
               : ReaderImageItem(
+                  comic: comic,
                   imageData: rightImage,
                   slotLogicalWidth: slotLogicalWidth,
                   alignment: Alignment.centerLeft,

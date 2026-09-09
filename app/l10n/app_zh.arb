@@ -523,9 +523,12 @@
   "readingModeWebtoonOriginalSize": "原始尺寸",
   "readerSetComicCover": "将当前页设为漫画封面",
   "readerSetSeriesCover": "将当前页设为系列封面",
+  "readerPageImageMenuTitle": "页图",
+  "readerCopyPageImage": "复制页图",
   "readerMore": "更多",
   "readerMoreSemantic": "更多阅读选项",
   "readerStateNotReady": "阅读状态未就绪",
+  "readerCopyPageImageSuccess": "已复制页图",
   "readerComicCoverSet": "已设为漫画封面",
   "readerComicCoverSetFailed": "设置漫画封面失败：{error}",
   "@readerComicCoverSetFailed": {
