@@ -1664,11 +1664,23 @@ abstract class AppLocalizations {
   /// **'删除漫画？'**
   String get comicDetailDeleteTitle;
 
-  /// No description provided for @comicDetailDeleteConfirm.
+  /// No description provided for @comicDetailDeleteLocalConfirm.
   ///
   /// In zh, this message translates to:
-  /// **'将删除「{title}」。此操作不可撤销。'**
-  String comicDetailDeleteConfirm(String title);
+  /// **'将从库中移除「{title}」，并永久删除其在磁盘上的资源（文件或图片文件夹）。此操作不可撤销。'**
+  String comicDetailDeleteLocalConfirm(String title);
+
+  /// No description provided for @comicDetailDeleteRemoteConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'将从库中移除「{title}」。不会删除远程资源。'**
+  String comicDetailDeleteRemoteConfirm(String title);
+
+  /// No description provided for @comicDetailDeleteLocalAcknowledge.
+  ///
+  /// In zh, this message translates to:
+  /// **'我了解磁盘上的资源将被永久删除'**
+  String get comicDetailDeleteLocalAcknowledge;
 
   /// No description provided for @comicDetailCancel.
   ///
@@ -1676,11 +1688,17 @@ abstract class AppLocalizations {
   /// **'取消'**
   String get comicDetailCancel;
 
-  /// No description provided for @comicDetailDeletedToast.
+  /// No description provided for @comicDetailDeletedWithResourceToast.
   ///
   /// In zh, this message translates to:
-  /// **'已删除漫画'**
-  String get comicDetailDeletedToast;
+  /// **'已删除漫画及磁盘资源'**
+  String get comicDetailDeletedWithResourceToast;
+
+  /// No description provided for @comicDetailRemovedFromLibraryToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已从库中移除漫画'**
+  String get comicDetailRemovedFromLibraryToast;
 
   /// No description provided for @comicDetailNotFound.
   ///

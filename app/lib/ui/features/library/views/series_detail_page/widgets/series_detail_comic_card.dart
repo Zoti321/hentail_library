@@ -13,6 +13,7 @@ import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/series_item_context_menu.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/ui/features/library/comic_delete_flow.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
@@ -137,6 +138,8 @@ class SeriesDetailComicCard extends HookConsumerWidget {
             ),
           );
         });
+      case SeriesItemContextAction.delete:
+        confirmAndDeleteComic(context, ref, item.comic);
     }
   }
 }

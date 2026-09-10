@@ -908,15 +908,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comicDetailDeleteTitle => 'Delete comic?';
 
   @override
-  String comicDetailDeleteConfirm(String title) {
-    return '\"$title\" will be deleted. This cannot be undone.';
+  String comicDetailDeleteLocalConfirm(String title) {
+    return '\"$title\" will be removed from the library and its disk resource (file or image folder) will be permanently deleted. This cannot be undone.';
   }
+
+  @override
+  String comicDetailDeleteRemoteConfirm(String title) {
+    return '\"$title\" will be removed from the library only. Remote resources will not be deleted.';
+  }
+
+  @override
+  String get comicDetailDeleteLocalAcknowledge =>
+      'I understand the disk resource will be permanently deleted';
 
   @override
   String get comicDetailCancel => 'Cancel';
 
   @override
-  String get comicDetailDeletedToast => 'Comic deleted';
+  String get comicDetailDeletedWithResourceToast =>
+      'Comic and disk resource deleted';
+
+  @override
+  String get comicDetailRemovedFromLibraryToast => 'Comic removed from library';
 
   @override
   String get comicDetailNotFound => 'Comic not found or removed';

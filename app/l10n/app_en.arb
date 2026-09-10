@@ -417,16 +417,26 @@
   "comicDetailShowInExplorerFailed": "Could not show this item in File Explorer",
   "comicDetailDelete": "Delete",
   "comicDetailDeleteTitle": "Delete comic?",
-  "comicDetailDeleteConfirm": "\"{title}\" will be deleted. This cannot be undone.",
-  "@comicDetailDeleteConfirm": {
+  "comicDetailDeleteLocalConfirm": "\"{title}\" will be removed from the library and its disk resource (file or image folder) will be permanently deleted. This cannot be undone.",
+  "@comicDetailDeleteLocalConfirm": {
     "placeholders": {
       "title": {
         "type": "String"
       }
     }
   },
+  "comicDetailDeleteRemoteConfirm": "\"{title}\" will be removed from the library only. Remote resources will not be deleted.",
+  "@comicDetailDeleteRemoteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "comicDetailDeleteLocalAcknowledge": "I understand the disk resource will be permanently deleted",
   "comicDetailCancel": "Cancel",
-  "comicDetailDeletedToast": "Comic deleted",
+  "comicDetailDeletedWithResourceToast": "Comic and disk resource deleted",
+  "comicDetailRemovedFromLibraryToast": "Comic removed from library",
   "comicDetailNotFound": "Comic not found or removed",
   "comicDetailLoadFailedRetry": "Failed to load. Please retry.",
   "comicDetailGoToLibrary": "Go to library",

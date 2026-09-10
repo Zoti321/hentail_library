@@ -9,8 +9,8 @@ import 'package:hentai_library/ui/core/widgets/element/card/catalog_cover_card_s
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/comic_context_menu.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/comic_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/ui/features/library/comic_delete_flow.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/app_router.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
@@ -113,30 +113,7 @@ class ComicCard extends ConsumerWidget {
               );
             });
           case ComicContextAction.delete:
-            showDialog<bool>(
-              context: context,
-              builder: (BuildContext dialogContext) =>
-                  ComicConfirmDeleteDialog(title: comic.title),
-            ).then((bool? confirmed) async {
-              if (confirmed != true || !context.mounted) {
-                return;
-              }
-              try {
-                await ref.read(comicDeletionServiceProvider).deleteComics(
-                  <String>[comic.comicId],
-                );
-                ref
-                    .read(comicCoverCacheManagerProvider.notifier)
-                    .clearForComics(<String>[comic.comicId]);
-                if (context.mounted) {
-                  showSuccessToast(context, l10n.comicDetailDeletedToast);
-                }
-              } catch (err) {
-                if (context.mounted) {
-                  showErrorToast(context, err);
-                }
-              }
-            });
+            confirmAndDeleteComic(context, ref, comic);
         }
       },
     );

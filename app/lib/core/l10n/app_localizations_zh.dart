@@ -883,15 +883,26 @@ class AppLocalizationsZh extends AppLocalizations {
   String get comicDetailDeleteTitle => '删除漫画？';
 
   @override
-  String comicDetailDeleteConfirm(String title) {
-    return '将删除「$title」。此操作不可撤销。';
+  String comicDetailDeleteLocalConfirm(String title) {
+    return '将从库中移除「$title」，并永久删除其在磁盘上的资源（文件或图片文件夹）。此操作不可撤销。';
   }
+
+  @override
+  String comicDetailDeleteRemoteConfirm(String title) {
+    return '将从库中移除「$title」。不会删除远程资源。';
+  }
+
+  @override
+  String get comicDetailDeleteLocalAcknowledge => '我了解磁盘上的资源将被永久删除';
 
   @override
   String get comicDetailCancel => '取消';
 
   @override
-  String get comicDetailDeletedToast => '已删除漫画';
+  String get comicDetailDeletedWithResourceToast => '已删除漫画及磁盘资源';
+
+  @override
+  String get comicDetailRemovedFromLibraryToast => '已从库中移除漫画';
 
   @override
   String get comicDetailNotFound => '漫画不存在或已移除';
