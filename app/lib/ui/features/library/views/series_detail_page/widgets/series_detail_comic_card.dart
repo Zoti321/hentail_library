@@ -91,13 +91,9 @@ class SeriesDetailComicCard extends HookConsumerWidget {
     WidgetRef ref,
     Offset globalPosition,
   ) {
-    final RenderBox overlay =
-        Overlay.of(context).context.findRenderObject() as RenderBox;
-    final Offset relativePosition = overlay.globalToLocal(globalPosition);
-
     SeriesItemContextMenu.show(
       context,
-      position: relativePosition,
+      position: globalPosition,
       comicTitle: item.comic.title,
       onAction: (SeriesItemContextAction action) {
         _handleContextAction(context, ref, action);

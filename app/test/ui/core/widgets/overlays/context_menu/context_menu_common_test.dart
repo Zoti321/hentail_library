@@ -10,7 +10,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(800, 600));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
-    const Offset anchor = Offset(120, 80);
+    const Offset anchor = Offset(120, 80); // global; root overlay origin is (0,0)
     const Key menuKey = Key('context-menu-panel');
 
     await tester.pumpWidget(

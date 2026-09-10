@@ -5,6 +5,11 @@ import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.da
 typedef ContextMenuBuilder = Widget Function(VoidCallback onClose);
 
 class ContextMenuCommon {
+  /// Shows a context menu with its top-left at [position].
+  ///
+  /// [position] must be in **global** coordinates (e.g. [TapUpDetails.globalPosition]).
+  /// It is converted into the [Overlay]'s local space so ShellRoute + in-app
+  /// title bar insets do not shift the menu (reader non-fullscreen case).
   static void show(
     BuildContext context, {
     required Offset position,
@@ -13,15 +18,24 @@ class ContextMenuCommon {
     required ContextMenuBuilder builder,
   }) {
     final OverlayState overlay = Overlay.of(context);
+    final RenderBox overlayBox =
+        overlay.context.findRenderObject()! as RenderBox;
+    final Offset local = overlayBox.globalToLocal(position);
+    final Size overlaySize = overlayBox.size;
     late OverlayEntry entry;
-    final Size screenSize = MediaQuery.of(context).size;
-    double left = position.dx;
-    double top = position.dy;
-    if (left + width > screenSize.width) {
-      left = screenSize.width - width - 10;
+    double left = local.dx;
+    double top = local.dy;
+    if (left + width > overlaySize.width) {
+      left = overlaySize.width - width - 10;
     }
-    if (top + height > screenSize.height) {
-      top = screenSize.height - height - 10;
+    if (top + height > overlaySize.height) {
+      top = overlaySize.height - height - 10;
+    }
+    if (left < 0) {
+      left = 0;
+    }
+    if (top < 0) {
+      top = 0;
     }
     entry = OverlayEntry(
       builder: (BuildContext context) => Stack(
