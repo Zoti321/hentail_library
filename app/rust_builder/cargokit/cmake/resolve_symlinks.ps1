@@ -22,7 +22,9 @@ function Resolve-Symlinks {
             $realPath += '/'
         }
 
-        $item = Get-Item $realPath
+        # -Force: AppData and other Hidden/System path segments are invisible to Get-Item otherwise
+        # (see https://github.com/irondash/cargokit/pull/119).
+        $item = Get-Item -Force $realPath
         if ($item.LinkTarget) {
             $realPath = $item.LinkTarget.Replace('\', '/')
         }
