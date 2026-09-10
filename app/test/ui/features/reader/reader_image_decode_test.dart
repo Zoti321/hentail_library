@@ -42,6 +42,28 @@ void main() {
     expect(buildReaderImageProvider(), isNull);
   });
 
+  test('isUsableReaderCacheFile rejects missing and empty files', () async {
+    final File missing = File(
+      '${Directory.systemTemp.path}/reader_cache_missing_${DateTime.now().microsecondsSinceEpoch}.webp',
+    );
+    expect(isUsableReaderCacheFile(missing.path), isFalse);
+
+    final File empty = File(
+      '${Directory.systemTemp.path}/reader_cache_empty_${DateTime.now().microsecondsSinceEpoch}.webp',
+    );
+    await empty.create();
+    addTearDown(() {
+      if (empty.existsSync()) {
+        empty.deleteSync();
+      }
+    });
+    expect(empty.lengthSync(), 0);
+    expect(isUsableReaderCacheFile(empty.path), isFalse);
+
+    await empty.writeAsBytes(const <int>[0x52, 0x49, 0x46, 0x46]);
+    expect(isUsableReaderCacheFile(empty.path), isTrue);
+  });
+
   test(
     'buildReaderImageProvider skips decode resize for existing reader pages',
     () async {

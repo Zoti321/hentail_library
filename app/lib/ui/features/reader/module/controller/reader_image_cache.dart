@@ -42,6 +42,7 @@ ImageProvider<Object>? buildReaderImageProvider({
     return null;
   }
   // 不在此处 existsSync：缺失文件由 ImageProvider 加载失败路径处理，避免 build 同步 IO。
+  // 预取 / 展示侧在调用前用 [isUsableReaderCacheFile] 过滤空文件与已驱逐路径。
   return ResizeImage.resizeIfNeeded(
     cacheWidth,
     cacheHeight,
@@ -50,6 +51,20 @@ ImageProvider<Object>? buildReaderImageProvider({
       imageCacheName: kReaderImageCacheName,
     ),
   );
+}
+
+/// 磁盘页缓存是否可交给 [ExtendedFileImageProvider]（存在且非空）。
+bool isUsableReaderCacheFile(String path) {
+  final String trimmed = path.trim();
+  if (trimmed.isEmpty) {
+    return false;
+  }
+  final File file = File(trimmed);
+  try {
+    return file.existsSync() && file.lengthSync() > 0;
+  } on FileSystemException {
+    return false;
+  }
 }
 
 Future<void> precacheReaderImage({

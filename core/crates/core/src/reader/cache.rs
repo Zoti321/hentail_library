@@ -54,13 +54,31 @@ impl ReaderCache {
         bytes: &[u8],
     ) -> Result<PathBuf, HentaiError> {
         let page_index = normalize_page_index(page_index)?;
+        if bytes.is_empty() {
+            return Err(HentaiError::reader_invalid_content("页面数据为空"));
+        }
         let dir = self.comic_cache_dir(comic_id, source_path)?;
         fs::create_dir_all(&dir).map_err(map_io_err)?;
-        remove_existing_page_files(&dir, page_index)?;
         let extension = image_extension(bytes);
         let file_path = dir.join(format!("{page_index:0PAGE_FILE_WIDTH$}.{extension}"));
-        let mut file = fs::File::create(&file_path).map_err(map_io_err)?;
-        file.write_all(bytes).map_err(map_io_err)?;
+        // Temp name must not match `{index}.` prefix so concurrent lookups never see a
+        // zero-byte final path from File::create before write_all completes.
+        let tmp_path = dir.join(format!(
+            ".partial_{page_index:0PAGE_FILE_WIDTH$}_{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        if let Err(err) = write_bytes_atomic(&tmp_path, bytes) {
+            let _ = fs::remove_file(&tmp_path);
+            return Err(err);
+        }
+        remove_existing_page_files(&dir, page_index)?;
+        if let Err(err) = fs::rename(&tmp_path, &file_path) {
+            let _ = fs::remove_file(&tmp_path);
+            return Err(map_io_err(err));
+        }
         Ok(file_path)
     }
 
@@ -178,11 +196,37 @@ fn normalize_page_index(page_index: i32) -> Result<i32, HentaiError> {
 
 fn find_cached_page_file(dir: &Path, page_index: i32) -> Option<PathBuf> {
     let prefix = format!("{page_index:0PAGE_FILE_WIDTH$}.");
-    fs::read_dir(dir)
-        .ok()?
-        .filter_map(|entry| entry.ok())
-        .find(|entry| entry.file_name().to_string_lossy().starts_with(&prefix))
-        .map(|entry| entry.path())
+    let Ok(entries) = fs::read_dir(dir) else {
+        return None;
+    };
+    let mut hit = None;
+    for entry in entries.flatten() {
+        let name = entry.file_name();
+        if !name.to_string_lossy().starts_with(&prefix) {
+            continue;
+        }
+        let path = entry.path();
+        match fs::metadata(&path) {
+            Ok(meta) if meta.is_file() && meta.len() > 0 => {
+                if hit.is_none() {
+                    hit = Some(path);
+                }
+            }
+            Ok(meta) if meta.is_file() && meta.len() == 0 => {
+                // Heal poisoned empty finals left by interrupted / non-atomic writes.
+                let _ = fs::remove_file(&path);
+            }
+            _ => {}
+        }
+    }
+    hit
+}
+
+fn write_bytes_atomic(path: &Path, bytes: &[u8]) -> Result<(), HentaiError> {
+    let mut file = fs::File::create(path).map_err(map_io_err)?;
+    file.write_all(bytes).map_err(map_io_err)?;
+    file.sync_all().map_err(map_io_err)?;
+    Ok(())
 }
 
 fn remove_existing_page_files(dir: &Path, page_index: i32) -> Result<(), HentaiError> {
@@ -259,12 +303,45 @@ mod tests {
             .write_page("comic-1", &source.to_string_lossy(), 3, b"\xFF\xD8\xFFpage")
             .expect("write");
         assert!(written.exists());
+        assert!(fs::metadata(&written).expect("meta").len() > 0);
 
         let hit = cache
             .cached_page_path("comic-1", &source.to_string_lossy(), 3)
             .expect("lookup")
             .expect("cached");
         assert_eq!(hit, written);
+    }
+
+    #[test]
+    fn cached_page_path_ignores_and_removes_empty_files() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let source = temp.path().join("comic.cbz");
+        fs::write(&source, b"archive-bytes").expect("write source");
+        let cache = ReaderCache::with_root(temp.path().join("reader_cache"));
+        let dir = cache
+            .comic_cache_dir("comic-1", &source.to_string_lossy())
+            .expect("dir");
+        fs::create_dir_all(&dir).expect("mkdir");
+        let empty = dir.join("00000.webp");
+        fs::File::create(&empty).expect("create empty");
+        assert_eq!(fs::metadata(&empty).expect("meta").len(), 0);
+
+        assert!(cache
+            .cached_page_path("comic-1", &source.to_string_lossy(), 0)
+            .expect("lookup")
+            .is_none());
+        assert!(!empty.exists(), "poison empty cache file must be removed");
+    }
+
+    #[test]
+    fn write_page_rejects_empty_bytes() {
+        let temp = tempfile::tempdir().expect("tempdir");
+        let source = temp.path().join("comic.cbz");
+        fs::write(&source, b"archive-bytes").expect("write source");
+        let cache = ReaderCache::with_root(temp.path().join("reader_cache"));
+        assert!(cache
+            .write_page("comic-1", &source.to_string_lossy(), 0, &[])
+            .is_err());
     }
 
     #[test]

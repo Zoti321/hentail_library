@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -10,6 +9,7 @@ import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/common.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_image_cache.dart';
 import 'package:hentai_library/ui/features/reader/view_models/page_image_copy_provider.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -159,7 +159,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     }
     if (_checkedCachePath != path) {
       _checkedCachePath = path;
-      if (!File(path).existsSync()) {
+      if (!isUsableReaderCacheFile(path)) {
         if (_reloadedMissingCachePath == path) {
           // Already invalidated once for this path; don't loop forever.
           return errorPlaceholder;
