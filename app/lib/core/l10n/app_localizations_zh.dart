@@ -721,6 +721,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get libraryComicSortPageCount => '页数';
 
   @override
+  String get libraryExpandBySeries => '按系列展开';
+
+  @override
   String get librarySeriesSortName => '名称';
 
   @override

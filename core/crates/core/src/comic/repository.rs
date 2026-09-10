@@ -35,6 +35,7 @@ pub async fn count_all() -> Result<i64, HentaiError> {
 pub async fn fetch_comics_page(
     request: PageRequestDto,
     filter: ComicFilterDto,
+    expand_by_series: bool,
     sort: ComicSortOptionDto,
 ) -> Result<PagedComicResultDto, HentaiError> {
     let db = connection()?;
@@ -68,7 +69,15 @@ pub async fn fetch_comics_page(
         });
     }
     let offset = (effective_page - 1) * page_size;
-    let ids_query = build_ids_page_query(&filter, &sort, page_size, offset);
+    let library_root_path = resolve_library_root_path(&filter, expand_by_series).await?;
+    let ids_query = build_ids_page_query(
+        &filter,
+        &sort,
+        expand_by_series,
+        library_root_path.as_deref(),
+        page_size,
+        offset,
+    );
     let comic_ids = query_string_ids(&db, &ids_query).await?;
     let items = load_comics_ordered(&db, comic_ids).await?;
     Ok(PagedComicResultDto {
@@ -77,6 +86,22 @@ pub async fn fetch_comics_page(
         page: effective_page,
         page_size,
     })
+}
+
+async fn resolve_library_root_path(
+    filter: &ComicFilterDto,
+    expand_by_series: bool,
+) -> Result<Option<String>, HentaiError> {
+    if !expand_by_series {
+        return Ok(None);
+    }
+    let Some(library_id) = filter.library_id.as_deref() else {
+        return Ok(None);
+    };
+    let Some(library) = crate::library::find_library_by_id(library_id).await? else {
+        return Ok(None);
+    };
+    Ok(Some(crate::comic_id::normalize_path_for_key(&library.root_path)))
 }
 
 pub async fn find_comic_by_id(comic_id: &str) -> Result<Option<ComicDto>, HentaiError> {

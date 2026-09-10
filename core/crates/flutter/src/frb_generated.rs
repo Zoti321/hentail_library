@@ -887,6 +887,7 @@ fn wire__crate__api__comic__fetch_comics_page_frb_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_request = <crate::api::comic::PageRequestDto>::sse_decode(&mut deserializer);
             let api_filter = <crate::api::comic::ComicFilterDto>::sse_decode(&mut deserializer);
+            let api_expand_by_series = <bool>::sse_decode(&mut deserializer);
             let api_sort = <crate::api::comic::ComicSortOptionDto>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
@@ -895,6 +896,7 @@ fn wire__crate__api__comic__fetch_comics_page_frb_impl(
                         let output_ok = crate::api::comic::fetch_comics_page_frb(
                             api_request,
                             api_filter,
+                            api_expand_by_series,
                             api_sort,
                         )
                         .await?;

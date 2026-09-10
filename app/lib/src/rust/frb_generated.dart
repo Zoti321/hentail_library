@@ -163,6 +163,7 @@ abstract class RustLibApi extends BaseApi {
   Future<PagedComicResultDto> crateApiComicFetchComicsPageFrb({
     required PageRequestDto request,
     required ComicFilterDto filter,
+    required bool expandBySeries,
     required ComicSortOptionDto sort,
   });
 
@@ -1189,6 +1190,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<PagedComicResultDto> crateApiComicFetchComicsPageFrb({
     required PageRequestDto request,
     required ComicFilterDto filter,
+    required bool expandBySeries,
     required ComicSortOptionDto sort,
   }) {
     return handler.executeNormal(
@@ -1197,6 +1199,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_page_request_dto(request, serializer);
           sse_encode_box_autoadd_comic_filter_dto(filter, serializer);
+          sse_encode_bool(expandBySeries, serializer);
           sse_encode_box_autoadd_comic_sort_option_dto(sort, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
@@ -1210,7 +1213,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_hentai_error_dto,
         ),
         constMeta: kCrateApiComicFetchComicsPageFrbConstMeta,
-        argValues: [request, filter, sort],
+        argValues: [request, filter, expandBySeries, sort],
         apiImpl: this,
       ),
     );
@@ -1219,7 +1222,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiComicFetchComicsPageFrbConstMeta =>
       const TaskConstMeta(
         debugName: "fetch_comics_page_frb",
-        argNames: ["request", "filter", "sort"],
+        argNames: ["request", "filter", "expandBySeries", "sort"],
       );
 
   @override

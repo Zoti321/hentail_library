@@ -7,6 +7,7 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_filter_reset_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_filter_reset_notifier.dart';
+import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_expand_by_series_controls.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_controls.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_metadata_filter_section.dart';
@@ -121,6 +122,7 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: tokens.spacing.sm),
+              const LibraryExpandBySeriesControls(),
               const LibraryPreferLibraryRootSeriesControls(),
               const LibrarySortControls(),
             ],

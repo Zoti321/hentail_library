@@ -1382,6 +1382,12 @@ abstract class AppLocalizations {
   /// **'页数'**
   String get libraryComicSortPageCount;
 
+  /// No description provided for @libraryExpandBySeries.
+  ///
+  /// In zh, this message translates to:
+  /// **'按系列展开'**
+  String get libraryExpandBySeries;
+
   /// No description provided for @librarySeriesSortName.
   ///
   /// In zh, this message translates to:

@@ -24,13 +24,15 @@ pub fn build_count_query(filter: &ComicFilterDto) -> PageSqlQuery {
 pub fn build_ids_page_query(
     filter: &ComicFilterDto,
     sort: &ComicSortOptionDto,
+    expand_by_series: bool,
+    library_root_path: Option<&str>,
     limit: i32,
     offset: i32,
 ) -> PageSqlQuery {
     let mut values = Vec::new();
     let where_clause = build_catalog_where_clause(filter, &mut values);
-    let sort_join = sort_join_clause(sort.field);
-    let order_by = build_order_by_clause(sort);
+    let sort_join = sort_join_clause(sort.field, expand_by_series);
+    let order_by = build_order_by_clause(sort, expand_by_series, library_root_path, &mut values);
     values.push(Value::Int(Some(limit)));
     values.push(Value::Int(Some(offset)));
     PageSqlQuery {
@@ -44,7 +46,11 @@ pub fn build_ids_page_query(
     }
 }
 
-fn sort_join_clause(field: ComicSortFieldDto) -> &'static str {
+fn sort_join_clause(field: ComicSortFieldDto, expand_by_series: bool) -> &'static str {
+    if expand_by_series {
+        return " LEFT JOIN series_items si ON si.comic_id = c.comic_id \
+                LEFT JOIN series s ON s.series_id = si.series_id";
+    }
     match field {
         ComicSortFieldDto::ReadAt => {
             " LEFT JOIN comic_reading_histories rh ON rh.comic_id = c.comic_id"
@@ -53,7 +59,32 @@ fn sort_join_clause(field: ComicSortFieldDto) -> &'static str {
     }
 }
 
-fn build_order_by_clause(sort: &ComicSortOptionDto) -> String {
+fn build_order_by_clause(
+    sort: &ComicSortOptionDto,
+    expand_by_series: bool,
+    library_root_path: Option<&str>,
+    values: &mut Vec<Value>,
+) -> String {
+    if expand_by_series {
+        if let Some(root) = library_root_path {
+            values.push(Value::String(Some(Box::new(root.to_string()))));
+        }
+        let root_priority = if library_root_path.is_some() {
+            "CASE \
+                 WHEN s.series_id IS NULL THEN 2 \
+                 WHEN s.folder_path = ? THEN 0 \
+                 ELSE 1 \
+             END"
+        } else {
+            "CASE WHEN s.series_id IS NULL THEN 1 ELSE 0 END"
+        };
+        return format!(
+            "{root_priority} ASC, \
+             CASE WHEN s.series_id IS NULL THEN NULL ELSE s.name_sort_key END ASC NULLS LAST, \
+             CASE WHEN s.series_id IS NULL THEN NULL ELSE si.sort_order END ASC NULLS LAST, \
+             m.title_sort_key ASC, c.comic_id ASC"
+        );
+    }
     let direction = if sort.descending { "DESC" } else { "ASC" };
     match sort.field {
         ComicSortFieldDto::Title => {
@@ -90,6 +121,8 @@ mod tests {
                 field: ComicSortFieldDto::ReadAt,
                 descending: true,
             },
+            false,
+            None,
             20,
             0,
         );
@@ -106,6 +139,8 @@ mod tests {
                 field: ComicSortFieldDto::PageCount,
                 descending: false,
             },
+            false,
+            None,
             10,
             5,
         );
@@ -123,6 +158,8 @@ mod tests {
                 field: ComicSortFieldDto::Title,
                 descending: false,
             },
+            false,
+            None,
             10,
             0,
         );
@@ -139,6 +176,8 @@ mod tests {
                 field: ComicSortFieldDto::PublishedAt,
                 descending: false,
             },
+            false,
+            None,
             10,
             0,
         );
@@ -154,6 +193,8 @@ mod tests {
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
+            false,
+            None,
             10,
             0,
         );
@@ -169,6 +210,8 @@ mod tests {
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
+            false,
+            None,
             10,
             0,
         );
@@ -184,6 +227,8 @@ mod tests {
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
+            false,
+            None,
             10,
             0,
         );
@@ -199,6 +244,8 @@ mod tests {
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
+            false,
+            None,
             10,
             0,
         );
@@ -214,6 +261,8 @@ mod tests {
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
+            false,
+            None,
             10,
             0,
         );
@@ -229,6 +278,8 @@ mod tests {
                 ..Default::default()
             },
             &ComicSortOptionDto::default(),
+            false,
+            None,
             10,
             0,
         );
@@ -237,5 +288,27 @@ mod tests {
             v,
             Value::String(Some(s)) if s.as_str() == "lib-abc"
         )));
+    }
+
+    #[test]
+    fn expand_by_series_orders_root_then_series_then_unassigned() {
+        let sql = build_ids_page_query(
+            &ComicFilterDto::default(),
+            &ComicSortOptionDto::default(),
+            true,
+            Some("E:/lib"),
+            10,
+            0,
+        );
+        assert!(sql.sql.contains("LEFT JOIN series_items si ON si.comic_id = c.comic_id"));
+        assert!(sql.sql.contains("LEFT JOIN series s ON s.series_id = si.series_id"));
+        assert!(sql.sql.contains("WHEN s.folder_path = ? THEN 0"));
+        assert!(sql.sql.contains("s.name_sort_key END ASC NULLS LAST"));
+        assert!(sql.sql.contains("si.sort_order END ASC NULLS LAST"));
+        assert!(sql.sql.contains("m.title_sort_key ASC, c.comic_id ASC"));
+        assert!(matches!(
+            sql.values[0],
+            Value::String(Some(ref s)) if s.as_str() == "E:/lib"
+        ));
     }
 }

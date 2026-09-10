@@ -741,6 +741,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryComicSortPageCount => 'Page count';
 
   @override
+  String get libraryExpandBySeries => 'Expand by series';
+
+  @override
   String get librarySeriesSortName => 'Name';
 
   @override

@@ -1,5 +1,6 @@
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
+import 'package:hentai_library/domain/library/library_expand_by_series.dart';
 import 'package:hentai_library/domain/library/library_media_type_filter.dart';
 import 'package:hentai_library/domain/library/library_metadata_filter_selection.dart';
 import 'package:hentai_library/domain/library/library_prefer_library_root_series.dart';
@@ -9,6 +10,7 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_author_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_expand_by_series_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_media_type_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_prefer_library_root_series_notifier.dart';
@@ -132,6 +134,17 @@ bool librarySeriesTabPreferLibraryRootSeries(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
+bool libraryComicsTabExpandBySeries(Ref ref) {
+  final AsyncValue<bool> settingsAsync = ref.watch(
+    libraryExpandBySeriesProvider,
+  );
+  return settingsAsync.maybeWhen(
+    data: (bool enabled) => enabled,
+    orElse: () => LibraryExpandBySeries.defaultValue,
+  );
+}
+
+@Riverpod(keepAlive: true)
 LibraryMediaTypeFilterSelection libraryComicsTabMediaTypeFilter(Ref ref) {
   final AsyncValue<LibraryMediaTypeFilterSelection> selectionAsync = ref.watch(
     libraryMediaTypeFilterProvider,
@@ -212,6 +225,7 @@ bool libraryActiveFilterSortIsCustomized(Ref ref) {
   final Set<String> characterFilter = ref.watch(
     libraryComicsTabCharacterFilterProvider,
   );
+  final bool expandBySeries = ref.watch(libraryComicsTabExpandBySeriesProvider);
   final LibrarySerializationStatusFilter serializationStatusFilter = ref.watch(
     librarySeriesTabSerializationStatusFilterProvider,
   );
@@ -236,6 +250,7 @@ bool libraryActiveFilterSortIsCustomized(Ref ref) {
     parodyFilter: parodyFilter,
     characterFilter: characterFilter,
     serializationStatusFilter: serializationStatusFilter,
+    expandBySeries: expandBySeries,
     preferLibraryRootSeries: preferLibraryRootSeries,
     sortSettings: sortSettings,
   );

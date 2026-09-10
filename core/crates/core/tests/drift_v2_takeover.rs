@@ -125,6 +125,7 @@ fn fetch_comics_page_hides_r18_by_default() {
                     show_r18: false,
                     ..Default::default()
                 },
+                false,
                 ComicSortOptionDto::default(),
             )
             .await

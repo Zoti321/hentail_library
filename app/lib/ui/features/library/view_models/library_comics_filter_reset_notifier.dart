@@ -1,9 +1,11 @@
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
+import 'package:hentai_library/domain/library/library_expand_by_series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_author_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_media_type_filter_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_expand_by_series_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tag_filter_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_sort_notifier.dart';
@@ -48,6 +50,9 @@ class LibraryComicsFilterResetNotifier
           ).notifier,
         )
         .clear();
+    await ref
+        .read(libraryExpandBySeriesProvider.notifier)
+        .setEnabled(LibraryExpandBySeries.defaultValue);
     await ref.read(libraryTabSortProvider.notifier).resetComicsSortToDefault();
     ref.invalidate(libraryComicsCatalogControllerProvider);
   }
