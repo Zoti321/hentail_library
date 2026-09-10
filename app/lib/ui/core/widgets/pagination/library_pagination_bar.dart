@@ -19,14 +19,12 @@ class LibraryPaginationBar extends ConsumerWidget {
     required this.target,
     required this.page,
     required this.totalPages,
-    required this.isLoading,
     this.placement = LibraryPaginationPlacement.bottom,
   });
 
   final LibraryPaginationTarget target;
   final int page;
   final int totalPages;
-  final bool isLoading;
   final LibraryPaginationPlacement placement;
 
   @override
@@ -37,8 +35,10 @@ class LibraryPaginationBar extends ConsumerWidget {
     final l10n = context.l10n;
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final bool canGoPrevious = !isLoading && page > 1;
-    final bool canGoNext = !isLoading && page < totalPages;
+    // Do not gate on catalog reload: disabling flips cursor/hover and drops
+    // clicks while sync FRB fetch is in flight (felt as "偶发无反应").
+    final bool canGoPrevious = page > 1;
+    final bool canGoNext = page < totalPages;
     return Padding(
       padding: _paddingForPlacement(tokens),
       child: Row(
@@ -161,7 +161,6 @@ class LibraryPaginationBarSliver extends ConsumerWidget {
             target: target,
             page: catalog.pagination.page,
             totalPages: catalog.pagination.totalPages,
-            isLoading: catalogAsync.isLoading,
             placement: placement,
           ),
         );
@@ -178,7 +177,6 @@ class LibraryPaginationBarSliver extends ConsumerWidget {
             target: target,
             page: catalog.pagination.page,
             totalPages: catalog.pagination.totalPages,
-            isLoading: catalogAsync.isLoading,
             placement: placement,
           ),
         );
