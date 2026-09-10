@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_page_crossfade_policy.dart';
@@ -49,6 +50,14 @@ class PagedViewport extends HookConsumerWidget {
         (AsyncValue<ReaderState> value) => value.asData?.value.totalPages ?? 1,
       ),
     );
+    final Comic? comic = ref.watch(
+      readerControllerProvider(
+        viewKey,
+      ).select((AsyncValue<ReaderState> value) => value.asData?.value.comic),
+    );
+    if (comic == null) {
+      return const SizedBox.expand();
+    }
     final images = ref
         .watch(comicImagesProvider(comicId: comicId))
         .asData
@@ -218,6 +227,7 @@ class PagedViewport extends HookConsumerWidget {
                 MediaQuery.sizeOf(context).width,
               );
               return ReaderImageItem(
+                comic: comic,
                 imageData: imageData,
                 slotLogicalWidth: slotLogicalWidth,
                 enableCrossfade: readerPageCrossfadeEnabled(

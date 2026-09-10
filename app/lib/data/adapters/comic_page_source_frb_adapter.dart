@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:hentai_library/data/adapters/reader_frb_mapper.dart';
@@ -25,9 +26,14 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
         return const <ReadSessionPage>[];
       }
       if (comic.resourceType == ResourceType.dir) {
-        return pageList.dirPagePaths
-            .map(ReadSessionDirPage.new)
-            .toList(growable: false);
+        return List<ReadSessionPage>.generate(
+          pageList.dirPagePaths.length,
+          (int index) => ReadSessionDirPage(
+            filePath: pageList.dirPagePaths[index],
+            pageIndex: index,
+          ),
+          growable: false,
+        );
       }
       return List<ReadSessionPage>.generate(
         pageList.pageCount,
@@ -50,10 +56,19 @@ class ComicPageSourceFrbAdapter implements ComicPageSourcePort {
     required Comic comic,
     required int pageIndex,
   }) async {
-    if (comic.resourceType == ResourceType.dir) {
-      return null;
-    }
     try {
+      // Dir pages are file paths from the reader session; Rust load_page_bytes
+      // rejects dir. Reuse loadReaderPage then read full-resolution file bytes.
+      if (comic.resourceType == ResourceType.dir) {
+        final ReaderPagePayload page = await loadReaderPage(
+          comic: comic,
+          pageIndex: pageIndex,
+        );
+        return switch (page) {
+          ReaderPageFilePath(:final String path) => File(path).readAsBytes(),
+          ReaderPageBytes(:final Uint8List data) => data,
+        };
+      }
       return rust.loadPageBytesFrb(
         comicId: comic.comicId,
         path: comic.path,

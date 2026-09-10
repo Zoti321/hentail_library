@@ -1,11 +1,16 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/image/image_decode_cache_size.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/reading/reader_page_payload.dart';
+import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/element/image/app_comic_image.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/context_menu/common.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/reader/view_models/page_image_copy_provider.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -13,6 +18,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 class ReaderImageItem extends ConsumerStatefulWidget {
   const ReaderImageItem({
     super.key,
+    required this.comic,
     required this.imageData,
     required this.slotLogicalWidth,
     this.enableCrossfade = false,
@@ -20,6 +26,7 @@ class ReaderImageItem extends ConsumerStatefulWidget {
     this.fit = BoxFit.contain,
   });
 
+  final Comic comic;
   final ReaderPageImageData imageData;
   final double slotLogicalWidth;
   final bool enableCrossfade;
@@ -58,26 +65,29 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     if (imageData is ReaderDirPageImageData) {
       final String dirPath = imageData.file.path.trim();
       if (dirPath.isEmpty) {
-        return errorPlaceholder;
+        return _wrapWithContextMenu(context, errorPlaceholder);
       }
-      return ReaderPageFadeIn(
-        enabled: widget.enableCrossfade,
-        child: Align(
-          alignment: widget.alignment,
-          child: AppComicImage(
-            filePath: imageData.file.path,
-            fit: widget.fit,
-            filterQuality: filterQuality,
-            useReaderImageCache: true,
-            cacheWidth: cacheWidth,
-            loadingPlaceholder: loadingSurface,
-            errorPlaceholder: errorPlaceholder,
+      return _wrapWithContextMenu(
+        context,
+        ReaderPageFadeIn(
+          enabled: widget.enableCrossfade,
+          child: Align(
+            alignment: widget.alignment,
+            child: AppComicImage(
+              filePath: imageData.file.path,
+              fit: widget.fit,
+              filterQuality: filterQuality,
+              useReaderImageCache: true,
+              cacheWidth: cacheWidth,
+              loadingPlaceholder: loadingSurface,
+              errorPlaceholder: errorPlaceholder,
+            ),
           ),
         ),
       );
     }
     if (imageData is! ReaderArchivePageImageData) {
-      return errorPlaceholder;
+      return _wrapWithContextMenu(context, errorPlaceholder);
     }
     final ReaderArchivePageImageData archiveData = imageData;
     final AsyncValue<ReaderPagePayload> pageAsync = ref.watch(
@@ -87,19 +97,19 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
       ),
     );
     return pageAsync.when(
-      loading: () => loadingSurface,
-      error: (_, StackTrace _) => errorPlaceholder,
+      loading: () => _wrapWithContextMenu(context, loadingSurface),
+      error: (_, StackTrace _) =>
+          _wrapWithContextMenu(context, errorPlaceholder),
       data: (ReaderPagePayload page) {
-        return switch (page) {
-          ReaderPageFilePath(:final String path) =>
-            _buildArchiveFilePathPage(
-              archiveData: archiveData,
-              path: path,
-              loadingSurface: loadingSurface,
-              errorPlaceholder: errorPlaceholder,
-              filterQuality: filterQuality,
-              cacheWidth: cacheWidth,
-            ),
+        final Widget content = switch (page) {
+          ReaderPageFilePath(:final String path) => _buildArchiveFilePathPage(
+            archiveData: archiveData,
+            path: path,
+            loadingSurface: loadingSurface,
+            errorPlaceholder: errorPlaceholder,
+            filterQuality: filterQuality,
+            cacheWidth: cacheWidth,
+          ),
           ReaderPageBytes(:final Uint8List data) => ReaderPageFadeIn(
             enabled: widget.enableCrossfade,
             child: Align(
@@ -116,7 +126,21 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
             ),
           ),
         };
+        return _wrapWithContextMenu(context, content);
       },
+    );
+  }
+
+  Widget _wrapWithContextMenu(BuildContext context, Widget child) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onSecondaryTapUp: (TapUpDetails details) {
+        _showContextMenu(context, details.globalPosition);
+      },
+      onLongPressStart: (LongPressStartDetails details) {
+        _showContextMenu(context, details.globalPosition);
+      },
+      child: child,
     );
   }
 
@@ -206,5 +230,44 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
         color: Theme.of(context).colorScheme.hentai.readerTextMuted,
       ),
     );
+  }
+
+  void _showContextMenu(BuildContext context, Offset position) {
+    final String title = context.l10n.readerPageImageMenuTitle;
+    ContextMenuCommon.show(
+      context,
+      position: position,
+      width: 236,
+      height: 92,
+      builder: (VoidCallback onClose) => ContextMenuContainer(
+        title: title,
+        child: ContextMenuActionItem(
+          icon: LucideIcons.copy,
+          label: context.l10n.readerCopyPageImage,
+          onTap: () {
+            onClose();
+            _copyPageImage(context);
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _copyPageImage(BuildContext context) async {
+    try {
+      await ref
+          .read(pageImageCopyProvider)
+          .execute(
+            comic: widget.comic,
+            archivePageIndex: widget.imageData.archivePageIndex,
+          );
+      if (context.mounted) {
+        showSuccessToast(context, context.l10n.readerCopyPageImageSuccess);
+      }
+    } on Object catch (error) {
+      if (context.mounted) {
+        showErrorToast(context, error);
+      }
+    }
   }
 }

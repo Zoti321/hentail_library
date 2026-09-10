@@ -533,9 +533,12 @@
   "readingModeWebtoonOriginalSize": "Original size",
   "readerSetComicCover": "Set current page as comic cover",
   "readerSetSeriesCover": "Set current page as series cover",
+  "readerPageImageMenuTitle": "Page image",
+  "readerCopyPageImage": "Page image copy",
   "readerMore": "More",
   "readerMoreSemantic": "More reading options",
   "readerStateNotReady": "Reader not ready",
+  "readerCopyPageImageSuccess": "Page image copied",
   "readerComicCoverSet": "Set as comic cover",
   "readerComicCoverSetFailed": "Failed to set comic cover: {error}",
   "@readerComicCoverSetFailed": {
