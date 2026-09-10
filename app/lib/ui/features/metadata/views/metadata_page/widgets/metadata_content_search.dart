@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/form/custom_text_field.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/author_management_notifier.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
+import 'package:hentai_library/ui/features/metadata/view_models/named_facet_management_controller.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_page_header.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
 
 class MetadataContentSearch extends ConsumerWidget {
@@ -23,11 +24,10 @@ class MetadataContentSearch extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppThemeTokens tokens = context.tokens;
     final String hintText = context.l10n.metadataSearchNameHint;
-    final String query = switch (selectedTabIndex) {
-      0 => ref.watch(authorFilterProvider),
-      1 => ref.watch(tagFilterProvider),
-      _ => '',
-    };
+    final ManagedNamedFacetKind kind = metadataTabKind(selectedTabIndex);
+    final String query = ref
+        .watch(namedFacetManagementControllerProvider(kind))
+        .query;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -45,14 +45,9 @@ class MetadataContentSearch extends ConsumerWidget {
             hintText: hintText,
             initialQuery: query,
             onChanged: (String value) {
-              switch (selectedTabIndex) {
-                case 0:
-                  ref.read(authorFilterProvider.notifier).setQuery(value);
-                  break;
-                case 1:
-                  ref.read(tagFilterProvider.notifier).setQuery(value);
-                  break;
-              }
+              ref
+                  .read(namedFacetManagementControllerProvider(kind).notifier)
+                  .setQuery(value);
             },
           ),
         ),

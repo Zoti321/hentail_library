@@ -4,10 +4,59 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import 'comic.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `from`, `from`
+
+List<String> listAllNamedFacetNamesFrb({
+  required JunctionNamedFacetFrb facet,
+}) => RustLib.instance.api.crateApiNamedFacetListAllNamedFacetNamesFrb(
+  facet: facet,
+);
+
+NamedFacetPagedNamesDto fetchNamedFacetPageFrb({
+  required JunctionNamedFacetFrb facet,
+  required PageRequestDto request,
+}) => RustLib.instance.api.crateApiNamedFacetFetchNamedFacetPageFrb(
+  facet: facet,
+  request: request,
+);
+
+void addNamedFacetNameFrb({
+  required JunctionNamedFacetFrb facet,
+  required String name,
+}) => RustLib.instance.api.crateApiNamedFacetAddNamedFacetNameFrb(
+  facet: facet,
+  name: name,
+);
+
+void deleteNamedFacetByNamesFrb({
+  required JunctionNamedFacetFrb facet,
+  required List<String> names,
+}) => RustLib.instance.api.crateApiNamedFacetDeleteNamedFacetByNamesFrb(
+  facet: facet,
+  names: names,
+);
+
+void renameNamedFacetNameFrb({
+  required JunctionNamedFacetFrb facet,
+  required String oldName,
+  required String newName,
+}) => RustLib.instance.api.crateApiNamedFacetRenameNamedFacetNameFrb(
+  facet: facet,
+  oldName: oldName,
+  newName: newName,
+);
+
+PlatformInt64 countNamedFacetAttachmentsFrb({
+  required JunctionNamedFacetFrb facet,
+  required String name,
+}) => RustLib.instance.api.crateApiNamedFacetCountNamedFacetAttachmentsFrb(
+  facet: facet,
+  name: name,
+);
 
 /// Comic metadata form candidates sorted by attachment count DESC, name ASC.
 List<NamedFacetFormEntryFrbDto> listNamedFacetForFormFrb({
@@ -39,4 +88,32 @@ class NamedFacetFormEntryFrbDto {
           runtimeType == other.runtimeType &&
           name == other.name &&
           attachmentCount == other.attachmentCount;
+}
+
+class NamedFacetPagedNamesDto {
+  final List<String> items;
+  final PlatformInt64 totalCount;
+  final int page;
+  final int pageSize;
+
+  const NamedFacetPagedNamesDto({
+    required this.items,
+    required this.totalCount,
+    required this.page,
+    required this.pageSize,
+  });
+
+  @override
+  int get hashCode =>
+      items.hashCode ^ totalCount.hashCode ^ page.hashCode ^ pageSize.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NamedFacetPagedNamesDto &&
+          runtimeType == other.runtimeType &&
+          items == other.items &&
+          totalCount == other.totalCount &&
+          page == other.page &&
+          pageSize == other.pageSize;
 }

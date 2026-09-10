@@ -288,6 +288,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  NamedFacetPagedNamesDto dco_decode_named_facet_paged_names_dto(dynamic raw);
+
+  @protected
   String? dco_decode_opt_String(dynamic raw);
 
   @protected
@@ -756,6 +759,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   NamedFacetFormEntryFrbDto sse_decode_named_facet_form_entry_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  NamedFacetPagedNamesDto sse_decode_named_facet_paged_names_dto(
     SseDeserializer deserializer,
   );
 
@@ -1357,6 +1365,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_named_facet_form_entry_frb_dto(
     NamedFacetFormEntryFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_named_facet_paged_names_dto(
+    NamedFacetPagedNamesDto self,
     SseSerializer serializer,
   );
 

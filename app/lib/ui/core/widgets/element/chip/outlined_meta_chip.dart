@@ -136,37 +136,62 @@ class _InteractiveOutlinedMetaChip extends HookWidget {
       hoverFill.withAlpha(110),
       hoverFill,
     );
-    final Color backgroundColor = isPressed.value
-        ? pressFill
-        : isHovered.value
-        ? hoverFill
-        : cs.surface;
 
-    return Semantics(
-      button: true,
-      label: text,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) => isHovered.value = true,
-        onExit: (_) {
-          isHovered.value = false;
-          isPressed.value = false;
-        },
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTapDown: (_) => isPressed.value = true,
-          onTapUp: (_) => isPressed.value = false,
-          onTapCancel: () => isPressed.value = false,
-          onTap: onTap,
-          child: _OutlinedMetaChipChrome(
-            backgroundColor: backgroundColor,
-            borderColor: borderColor,
-            borderRadius: borderRadius,
-            padding: padding,
-            animate: true,
-            child: child,
-          ),
+    return FocusableActionDetector(
+      actions: <Type, Action<Intent>>{
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (ActivateIntent intent) {
+            onTap();
+            return null;
+          },
         ),
+      },
+      onShowFocusHighlight: (bool focused) {
+        if (!focused && !isHovered.value) {
+          isPressed.value = false;
+        }
+      },
+      onShowHoverHighlight: (bool hovered) {
+        isHovered.value = hovered;
+        if (!hovered) {
+          isPressed.value = false;
+        }
+      },
+      child: Builder(
+        builder: (BuildContext context) {
+          final bool focused = Focus.of(context).hasFocus;
+          final Color focusedFill = Color.alphaBlend(
+            hoverFill.withAlpha(80),
+            cs.surface,
+          );
+          final Color resolvedBackground = isPressed.value
+              ? pressFill
+              : isHovered.value || focused
+              ? (isHovered.value ? hoverFill : focusedFill)
+              : cs.surface;
+          return Semantics(
+            button: true,
+            label: text,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapDown: (_) => isPressed.value = true,
+                onTapUp: (_) => isPressed.value = false,
+                onTapCancel: () => isPressed.value = false,
+                onTap: onTap,
+                child: _OutlinedMetaChipChrome(
+                  backgroundColor: resolvedBackground,
+                  borderColor: borderColor,
+                  borderRadius: borderRadius,
+                  padding: padding,
+                  animate: true,
+                  child: child,
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
