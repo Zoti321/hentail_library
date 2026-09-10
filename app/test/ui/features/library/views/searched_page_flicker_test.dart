@@ -208,8 +208,10 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      final bool flashedLoading =
-          find.byType(CircularProgressIndicator).evaluate().isNotEmpty;
+      final bool flashedLoading = find
+          .byType(CircularProgressIndicator)
+          .evaluate()
+          .isNotEmpty;
       final bool lostCards = find.byType(ComicCard).evaluate().length < 2;
       final bool countChurned =
           tester.widget<MetaChip>(find.byType(MetaChip)).label != '2';

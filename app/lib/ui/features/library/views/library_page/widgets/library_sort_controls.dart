@@ -70,7 +70,9 @@ class _ComicSortListRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
-    final bool expandBySeries = ref.watch(libraryComicsTabExpandBySeriesProvider);
+    final bool expandBySeries = ref.watch(
+      libraryComicsTabExpandBySeriesProvider,
+    );
     final LibraryComicSortOption sortOption = ref.watch(
       libraryActiveComicSortOptionProvider,
     );

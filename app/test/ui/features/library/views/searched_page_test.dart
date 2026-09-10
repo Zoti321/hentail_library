@@ -305,7 +305,8 @@ void main() {
       expect(
         tester.binding.hasScheduledFrame,
         isFalse,
-        reason: 'frames keep being scheduled after idle (rebuild/animation loop)',
+        reason:
+            'frames keep being scheduled after idle (rebuild/animation loop)',
       );
     },
   );

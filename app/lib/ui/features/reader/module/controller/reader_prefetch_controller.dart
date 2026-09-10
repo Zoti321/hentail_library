@@ -69,10 +69,7 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
       nextWindow: targets,
     )) {
       ref.invalidate(
-        comicReaderPageProvider(
-          comicId: comicId,
-          pageIndex: pageOneBased - 1,
-        ),
+        comicReaderPageProvider(comicId: comicId, pageIndex: pageOneBased - 1),
       );
     }
     _lastWarmWindows[comicId] = Set<int>.from(targets);

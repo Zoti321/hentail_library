@@ -66,8 +66,7 @@ class NamedFacetManagementState {
 const Object _sentinel = Object();
 
 @Riverpod(keepAlive: true)
-class NamedFacetManagementController
-    extends _$NamedFacetManagementController {
+class NamedFacetManagementController extends _$NamedFacetManagementController {
   int _page = 1;
 
   @override
@@ -184,9 +183,10 @@ class NamedFacetManagementController
   }
 
   Future<void> delete(String name) async {
-    await ref
-        .read(namedFacetManagementRepoProvider)
-        .deleteByNames(kind, <String>[name]);
+    await ref.read(namedFacetManagementRepoProvider).deleteByNames(
+      kind,
+      <String>[name],
+    );
     await refresh();
   }
 

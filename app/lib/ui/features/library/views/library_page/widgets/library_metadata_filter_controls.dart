@@ -41,6 +41,7 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
   final LibraryMetadataFilterClear onClear;
   final bool isLoading;
   final bool includeOnly;
+
   /// Language closed-set filters keep plain contains (see issue #87).
   final bool enablePinyinAssistedNameMatch;
   final String Function(String name)? labelFor;
@@ -54,15 +55,13 @@ class LibraryMetadataFilterControls extends HookConsumerWidget {
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
     final String query = searchQuery.value;
-    final List<String> filteredNames = names
-        .where((String name) {
-          if (!enablePinyinAssistedNameMatch) {
-            final String normalized = query.trim().toLowerCase();
-            return normalized.isEmpty || name.toLowerCase().contains(normalized);
-          }
-          return nameMatchesPinyinAssistedFilter(name, query);
-        })
-        .toList();
+    final List<String> filteredNames = names.where((String name) {
+      if (!enablePinyinAssistedNameMatch) {
+        final String normalized = query.trim().toLowerCase();
+        return normalized.isEmpty || name.toLowerCase().contains(normalized);
+      }
+      return nameMatchesPinyinAssistedFilter(name, query);
+    }).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

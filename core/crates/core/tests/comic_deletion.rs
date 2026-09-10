@@ -114,7 +114,7 @@ fn local_file_deletion_removes_disk_resource_and_db_row() {
                 handle,
                 SyncScanMode::Full,
                 false,
-                Some(library.library_id),
+                Some(library.library_id.as_str()),
                 vec![],
                 |_| {},
             )
@@ -156,7 +156,7 @@ fn local_dir_deletion_removes_directory_resource() {
                 handle,
                 SyncScanMode::Full,
                 false,
-                Some(library.library_id),
+                Some(library.library_id.as_str()),
                 vec![],
                 |_| {},
             )
@@ -198,7 +198,7 @@ fn missing_local_resource_still_allows_library_removal() {
                 handle,
                 SyncScanMode::Full,
                 false,
-                Some(library.library_id),
+                Some(library.library_id.as_str()),
                 vec![],
                 |_| {},
             )

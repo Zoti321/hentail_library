@@ -111,7 +111,9 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     final Set<String> characterFilter = ref.read(
       libraryComicsTabCharacterFilterProvider,
     );
-    final bool expandBySeries = ref.read(libraryComicsTabExpandBySeriesProvider);
+    final bool expandBySeries = ref.read(
+      libraryComicsTabExpandBySeriesProvider,
+    );
     final LibraryComicFilter filter = _libraryComicProjection.buildListFilter(
       ageRestriction: ageRestriction,
       mediaTypeFilter: mediaTypeFilter,

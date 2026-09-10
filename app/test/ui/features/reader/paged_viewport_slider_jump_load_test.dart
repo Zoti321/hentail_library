@@ -25,12 +25,73 @@ import 'package:riverpod/misc.dart' show Override;
 
 /// 1x1 PNG — non-empty payload for archive page providers.
 final Uint8List _kTinyPng = Uint8List.fromList(<int>[
-  0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
-  0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-  0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00,
-  0x0A, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-  0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49,
-  0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
+  0x89,
+  0x50,
+  0x4E,
+  0x47,
+  0x0D,
+  0x0A,
+  0x1A,
+  0x0A,
+  0x00,
+  0x00,
+  0x00,
+  0x0D,
+  0x49,
+  0x48,
+  0x44,
+  0x52,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x08,
+  0x06,
+  0x00,
+  0x00,
+  0x00,
+  0x1F,
+  0x15,
+  0xC4,
+  0x89,
+  0x00,
+  0x00,
+  0x00,
+  0x0A,
+  0x49,
+  0x44,
+  0x41,
+  0x54,
+  0x78,
+  0x9C,
+  0x63,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x05,
+  0x00,
+  0x01,
+  0x0D,
+  0x0A,
+  0x2D,
+  0xB4,
+  0x00,
+  0x00,
+  0x00,
+  0x00,
+  0x49,
+  0x45,
+  0x4E,
+  0x44,
+  0xAE,
+  0x42,
+  0x60,
+  0x82,
 ]);
 
 const String _comicId = 'paged-slider-jump-load-comic';
@@ -99,11 +160,8 @@ void main() {
                 pageIndex: index,
               ).overrideWith((Ref ref) async {
                 requestedZeroBased.add(index);
-                final Completer<ReaderPagePayload> completer =
-                    pending.putIfAbsent(
-                      index,
-                      Completer<ReaderPagePayload>.new,
-                    );
+                final Completer<ReaderPagePayload> completer = pending
+                    .putIfAbsent(index, Completer<ReaderPagePayload>.new);
                 return completer.future;
               });
             }),
@@ -143,9 +201,9 @@ void main() {
         tester.element(find.byType(PagedViewport)),
       );
 
-      container.read(readerControllerProvider(_viewKey).notifier).setIndex(
-        jumpToPage,
-      );
+      container
+          .read(readerControllerProvider(_viewKey).notifier)
+          .setIndex(jumpToPage);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 16));
       await tester.pump(const Duration(milliseconds: 200));
@@ -188,10 +246,7 @@ void main() {
       );
 
       final AsyncValue<ReaderPagePayload> landing = container.read(
-        comicReaderPageProvider(
-          comicId: _comicId,
-          pageIndex: landingZeroBased,
-        ),
+        comicReaderPageProvider(comicId: _comicId, pageIndex: landingZeroBased),
       );
       expect(
         landing.hasValue,

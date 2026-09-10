@@ -26,16 +26,17 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AdaptiveFormSurface), findsOneWidget);
-      expect(find.textContaining('Named facet attachment count'), findsOneWidget);
+      expect(
+        find.textContaining('Named facet attachment count'),
+        findsOneWidget,
+      );
       expect(find.textContaining('3'), findsWidgets);
     });
 
     testWidgets('search filters with pinyin-assisted match via listAll', (
       WidgetTester tester,
     ) async {
-      final _FakeRepo repo = _FakeRepo(
-        authors: <String>['张三', '李四', 'Alpha'],
-      );
+      final _FakeRepo repo = _FakeRepo(authors: <String>['张三', '李四', 'Alpha']);
       late WidgetRef widgetRef;
       await _pumpPanel(
         tester,

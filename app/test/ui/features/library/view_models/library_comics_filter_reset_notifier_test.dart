@@ -32,7 +32,9 @@ void main() {
           LibraryDisplayTarget.comics,
           LibraryAgeRestrictionFilter.r18Only,
         );
-    await container.read(libraryExpandBySeriesProvider.notifier).setEnabled(false);
+    await container
+        .read(libraryExpandBySeriesProvider.notifier)
+        .setEnabled(false);
     await container
         .read(libraryTabSortProvider.notifier)
         .setComicSortField(LibraryComicSortField.createdAt);
