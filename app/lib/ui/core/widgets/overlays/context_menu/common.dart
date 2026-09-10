@@ -51,12 +51,13 @@ class ContextMenuCommon {
 class ContextMenuContainer extends StatelessWidget {
   const ContextMenuContainer({
     super.key,
-    required this.title,
+    this.title,
     required this.child,
     this.width = 236,
   });
 
-  final String title;
+  /// When null, the title header row is omitted.
+  final String? title;
   final Widget child;
   final double width;
 
@@ -64,6 +65,7 @@ class ContextMenuContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final String? title = this.title;
     return PopupMenuPanelShell(
       width: width,
       blurRadius: 6,
@@ -73,19 +75,20 @@ class ContextMenuContainer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: cs.hentai.textPrimary,
+          if (title != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: cs.hentai.textPrimary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
           child,
         ],
       ),

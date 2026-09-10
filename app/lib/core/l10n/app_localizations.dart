@@ -2036,16 +2036,10 @@ abstract class AppLocalizations {
   /// **'将当前页设为系列封面'**
   String get readerSetSeriesCover;
 
-  /// No description provided for @readerPageImageMenuTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'页图'**
-  String get readerPageImageMenuTitle;
-
   /// No description provided for @readerCopyPageImage.
   ///
   /// In zh, this message translates to:
-  /// **'复制页图'**
+  /// **'复制图片'**
   String get readerCopyPageImage;
 
   /// No description provided for @readerMore.
@@ -2069,7 +2063,7 @@ abstract class AppLocalizations {
   /// No description provided for @readerCopyPageImageSuccess.
   ///
   /// In zh, this message translates to:
-  /// **'已复制页图'**
+  /// **'已复制图片'**
   String get readerCopyPageImageSuccess;
 
   /// No description provided for @readerComicCoverSet.

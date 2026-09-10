@@ -233,14 +233,14 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
   }
 
   void _showContextMenu(BuildContext context, Offset position) {
-    final String title = context.l10n.readerPageImageMenuTitle;
     ContextMenuCommon.show(
       context,
       position: position,
       width: 236,
-      height: 92,
+      // Single action row (~36) + panel border; keep close to cursor when
+      // clamped near the bottom edge.
+      height: 48,
       builder: (VoidCallback onClose) => ContextMenuContainer(
-        title: title,
         child: ContextMenuActionItem(
           icon: LucideIcons.copy,
           label: context.l10n.readerCopyPageImage,

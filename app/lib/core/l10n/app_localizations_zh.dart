@@ -1088,10 +1088,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readerSetSeriesCover => '将当前页设为系列封面';
 
   @override
-  String get readerPageImageMenuTitle => '页图';
-
-  @override
-  String get readerCopyPageImage => '复制页图';
+  String get readerCopyPageImage => '复制图片';
 
   @override
   String get readerMore => '更多';
@@ -1103,7 +1100,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readerStateNotReady => '阅读状态未就绪';
 
   @override
-  String get readerCopyPageImageSuccess => '已复制页图';
+  String get readerCopyPageImageSuccess => '已复制图片';
 
   @override
   String get readerComicCoverSet => '已设为漫画封面';

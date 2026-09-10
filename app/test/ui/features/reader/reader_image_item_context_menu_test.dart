@@ -10,6 +10,7 @@ import 'package:hentai_library/domain/ports/clipboard_image_port.dart';
 import 'package:hentai_library/domain/ports/comic_page_source_port.dart';
 import 'package:hentai_library/domain/reading/page_image_copy.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/features/reader/view_models/page_image_copy_provider.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_image_item.dart';
@@ -95,12 +96,20 @@ void main() {
       ),
     );
 
+    final Offset pressAt = tester.getCenter(find.byType(ReaderImageItem));
     await tester.longPress(find.byType(ReaderImageItem));
     await tester.pump();
 
-    expect(find.text('复制页图'), findsOneWidget);
+    expect(find.text('复制图片'), findsOneWidget);
+    expect(find.text('页图'), findsNothing);
 
-    await tester.tap(find.text('复制页图'));
+    final Offset menuTopLeft = tester.getTopLeft(
+      find.byType(PopupMenuPanelShell),
+    );
+    expect(menuTopLeft.dx, closeTo(pressAt.dx, 1));
+    expect(menuTopLeft.dy, closeTo(pressAt.dy, 1));
+
+    await tester.tap(find.text('复制图片'));
     await tester.pump();
 
     expect(calls, <({String comicId, int pageIndex})>[

@@ -1117,10 +1117,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerSetSeriesCover => 'Set current page as series cover';
 
   @override
-  String get readerPageImageMenuTitle => 'Page image';
-
-  @override
-  String get readerCopyPageImage => 'Page image copy';
+  String get readerCopyPageImage => 'Copy image';
 
   @override
   String get readerMore => 'More';
@@ -1132,7 +1129,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerStateNotReady => 'Reader not ready';
 
   @override
-  String get readerCopyPageImageSuccess => 'Page image copied';
+  String get readerCopyPageImageSuccess => 'Image copied';
 
   @override
   String get readerComicCoverSet => 'Set as comic cover';
