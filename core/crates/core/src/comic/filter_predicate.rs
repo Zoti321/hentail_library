@@ -254,6 +254,7 @@ pub(super) fn append_metadata_expression_predicates(
 }
 
 /// Build only the predicate suffix for unit tests (starts with empty base).
+#[cfg(test)]
 fn build_metadata_expression_predicate_sql(
     must_include: &[String],
     optional_or: &[String],

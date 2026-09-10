@@ -235,8 +235,7 @@ pub async fn delete_named_facet_by_names(
     }
     let db = connection()?;
     let dict = facet.dict_table();
-    let placeholders = std::iter::repeat("?")
-        .take(names.len())
+    let placeholders = std::iter::repeat_n("?", names.len())
         .collect::<Vec<_>>()
         .join(", ");
     let values = names

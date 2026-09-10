@@ -1,7 +1,7 @@
 use hentai_core::comic::{ComicDto, ComicMetaLocks};
 use hentai_core::metadata_lock::{
-    comic_auto_locks, merge_kept_scan_with_existing, merge_series_name,
-    resolve_member_sort_order, series_auto_locks, series_name_needs_write,
+    merge_kept_scan_with_existing, merge_series_name, resolve_member_sort_order, series_auto_locks,
+    series_name_needs_write, ComicAutoLocks,
 };
 
 fn comic(
@@ -216,9 +216,11 @@ fn member_sort_order_unlocked_uses_natural_index() {
 
 #[test]
 fn comic_auto_locks_only_written_fields() {
-    let locks = comic_auto_locks(
-        true, false, false, true, false, false, false, false, false,
-    );
+    let locks = ComicAutoLocks {
+        title: true,
+        content_rating: true,
+        ..Default::default()
+    };
     assert!(locks.title);
     assert!(!locks.description);
     assert!(locks.content_rating);

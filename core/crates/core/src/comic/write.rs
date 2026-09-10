@@ -8,7 +8,7 @@ use crate::comic_id::normalize_path_for_key;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_meta, comics};
 use crate::error::HentaiError;
-use crate::metadata_lock::comic_auto_locks;
+use crate::metadata_lock::ComicAutoLocks;
 use crate::sync::series_rebuild::rebuild_series_from_comics;
 use crate::sync::writer::delete_comics_side_effects;
 use crate::sync::writer::{
@@ -183,17 +183,17 @@ pub async fn update_comic_user_meta(
         || meta.languages.is_some()
         || meta.parodies.is_some()
         || meta.characters.is_some();
-    let auto_locks = comic_auto_locks(
-        meta.title.is_some(),
-        meta.description.is_some(),
-        meta.published_at.is_some(),
-        meta.content_rating.is_some(),
-        meta.authors.is_some(),
-        meta.tags.is_some(),
-        meta.languages.is_some(),
-        meta.parodies.is_some(),
-        meta.characters.is_some(),
-    );
+    let auto_locks = ComicAutoLocks {
+        title: meta.title.is_some(),
+        description: meta.description.is_some(),
+        published_at: meta.published_at.is_some(),
+        content_rating: meta.content_rating.is_some(),
+        authors: meta.authors.is_some(),
+        tags: meta.tags.is_some(),
+        languages: meta.languages.is_some(),
+        parodies: meta.parodies.is_some(),
+        characters: meta.characters.is_some(),
+    };
     if touch_meta_row {
         let mut active = comic_meta::ActiveModel {
             comic_id: Set(comic_id.to_string()),
