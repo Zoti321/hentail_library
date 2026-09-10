@@ -49,6 +49,7 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
       ref.watch(libraryComicsTabLanguageFilterProvider),
       ref.watch(libraryComicsTabParodyFilterProvider),
       ref.watch(libraryComicsTabCharacterFilterProvider),
+      ref.watch(libraryComicsTabExpandBySeriesProvider),
       ref.watch(libraryComicsTabSortOptionProvider),
       ref.watch(libraryComicsTabPageSizeProvider),
     ));
@@ -110,6 +111,9 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
     final Set<String> characterFilter = ref.read(
       libraryComicsTabCharacterFilterProvider,
     );
+    final bool expandBySeries = ref.read(
+      libraryComicsTabExpandBySeriesProvider,
+    );
     final LibraryComicFilter filter = _libraryComicProjection.buildListFilter(
       ageRestriction: ageRestriction,
       mediaTypeFilter: mediaTypeFilter,
@@ -128,6 +132,7 @@ class LibraryComicsCatalogController extends _$LibraryComicsCatalogController {
           .fetchComicsPage(
             request: request,
             filter: filter,
+            expandBySeries: expandBySeries,
             sortOption: sortOption,
           ),
     );

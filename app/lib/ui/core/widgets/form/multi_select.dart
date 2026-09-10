@@ -534,11 +534,10 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
         final List<T> remaining = items
             .where((T item) => !selected.contains(resolveName(item)))
             .where(
-              (T item) =>
-                  nameMatchesPinyinAssistedFilter(
-                    resolveName(item),
-                    filterQuery,
-                  ),
+              (T item) => nameMatchesPinyinAssistedFilter(
+                resolveName(item),
+                filterQuery,
+              ),
             )
             .toList();
         return _MultiSelectMenuList<T>(

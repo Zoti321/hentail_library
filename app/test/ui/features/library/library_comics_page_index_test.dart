@@ -41,6 +41,7 @@ class _FakeComicRepo implements ComicRepository {
   Future<PagedResult<Comic>> fetchComicsPage({
     required PageRequest request,
     required LibraryComicFilter filter,
+    required bool expandBySeries,
     required LibraryComicSortOption sortOption,
   }) async {
     return PagedResult<Comic>(

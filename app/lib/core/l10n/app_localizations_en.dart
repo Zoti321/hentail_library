@@ -112,7 +112,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get formLibraryRootChangeConfirmBody =>
-      'After changing the library root, the next sync will align to the new root. Comics under the old path may become orphans and be removed. Sync is not started automatically.';
+      'After saving, if the new root is readable now, Path migration runs immediately by relative path so comic and series user metadata, locks, and reading progress can be kept. If the new root is not readable now, only the new root is saved. Items whose relative paths do not exist under the new root keep their old identity until the next library sync. Sync is not started automatically.';
 
   @override
   String get formLibraryScanOnStartupLabel => 'Scan on startup';
@@ -741,6 +741,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryComicSortPageCount => 'Page count';
 
   @override
+  String get libraryExpandBySeries => 'Expand by series';
+
+  @override
   String get librarySeriesSortName => 'Name';
 
   @override
@@ -908,15 +911,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comicDetailDeleteTitle => 'Delete comic?';
 
   @override
-  String comicDetailDeleteConfirm(String title) {
-    return '\"$title\" will be deleted. This cannot be undone.';
+  String comicDetailDeleteLocalConfirm(String title) {
+    return '\"$title\" will be removed from the library and its disk resource (file or image folder) will be permanently deleted. This cannot be undone.';
   }
+
+  @override
+  String comicDetailDeleteRemoteConfirm(String title) {
+    return '\"$title\" will be removed from the library only. Remote resources will not be deleted.';
+  }
+
+  @override
+  String get comicDetailDeleteLocalAcknowledge =>
+      'I understand the disk resource will be permanently deleted';
 
   @override
   String get comicDetailCancel => 'Cancel';
 
   @override
-  String get comicDetailDeletedToast => 'Comic deleted';
+  String get comicDetailDeletedWithResourceToast =>
+      'Comic and disk resource deleted';
+
+  @override
+  String get comicDetailRemovedFromLibraryToast => 'Comic removed from library';
 
   @override
   String get comicDetailNotFound => 'Comic not found or removed';
@@ -1101,6 +1117,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerSetSeriesCover => 'Set current page as series cover';
 
   @override
+  String get readerPageImageMenuTitle => 'Page image';
+
+  @override
+  String get readerCopyPageImage => 'Page image copy';
+
+  @override
   String get readerMore => 'More';
 
   @override
@@ -1108,6 +1130,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get readerStateNotReady => 'Reader not ready';
+
+  @override
+  String get readerCopyPageImageSuccess => 'Page image copied';
 
   @override
   String get readerComicCoverSet => 'Set as comic cover';
@@ -1199,10 +1224,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataTabTags => 'Tags';
 
   @override
+  String get metadataTabParodies => 'Parodies';
+
+  @override
+  String get metadataTabCharacters => 'Characters';
+
+  @override
   String get metadataAddAuthor => 'Add author';
 
   @override
   String get metadataAddTag => 'Add tag';
+
+  @override
+  String get metadataAddParody => 'Add parody';
+
+  @override
+  String get metadataAddCharacter => 'Add character';
 
   @override
   String get metadataAdd => 'Add';
@@ -1226,6 +1263,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataAllTags => 'All tags';
 
   @override
+  String get metadataAllParodies => 'All parodies';
+
+  @override
+  String get metadataAllCharacters => 'All characters';
+
+  @override
   String metadataTotalCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -1243,6 +1286,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataRenameTag => 'Rename tag';
 
   @override
+  String get metadataRenameParody => 'Rename parody';
+
+  @override
+  String get metadataRenameCharacter => 'Rename character';
+
+  @override
   String get metadataNewName => 'New name';
 
   @override
@@ -1250,6 +1299,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get metadataRenameTagHint => 'Enter a new tag name…';
+
+  @override
+  String get metadataRenameParodyHint => 'Enter a new parody name…';
+
+  @override
+  String get metadataRenameCharacterHint => 'Enter a new character name…';
 
   @override
   String get metadataNameLabel => 'Name';
@@ -1261,10 +1316,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataAddTagHint => 'Enter tag name…';
 
   @override
+  String get metadataAddParodyHint => 'Enter parody name…';
+
+  @override
+  String get metadataAddCharacterHint => 'Enter character name…';
+
+  @override
   String get metadataAuthorDeletedToast => 'Author deleted';
 
   @override
   String get metadataTagDeletedToast => 'Tag deleted';
+
+  @override
+  String get metadataParodyDeletedToast => 'Parody deleted';
+
+  @override
+  String get metadataCharacterDeletedToast => 'Character deleted';
 
   @override
   String get metadataAuthorsEmptyTitle => 'No authors yet';
@@ -1279,14 +1346,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataTagsEmptyHint => 'Add, rename, or delete tags here.';
 
   @override
+  String get metadataParodiesEmptyTitle => 'No parodies yet';
+
+  @override
+  String get metadataParodiesEmptyHint =>
+      'Add, rename, or delete parodies here.';
+
+  @override
+  String get metadataCharactersEmptyTitle => 'No characters yet';
+
+  @override
+  String get metadataCharactersEmptyHint =>
+      'Add, rename, or delete characters here.';
+
+  @override
   String get metadataAuthorsNoMatchTitle => 'No matching authors';
 
   @override
   String get metadataTagsNoMatchTitle => 'No matching tags';
 
   @override
+  String get metadataParodiesNoMatchTitle => 'No matching parodies';
+
+  @override
+  String get metadataCharactersNoMatchTitle => 'No matching characters';
+
+  @override
   String get metadataSearchNoMatchHint =>
       'Try another keyword, or clear the search';
+
+  @override
+  String metadataAttachmentCountLabel(String count) {
+    return 'Named facet attachment count: $count';
+  }
+
+  @override
+  String get metadataLoadingMore => 'Loading more…';
+
+  @override
+  String get metadataScrollToLoadMore => 'Scroll to load more';
+
+  @override
+  String get metadataListEnd => 'All items loaded';
 
   @override
   String get metadataDeleteAllTags => 'Delete all';
@@ -1597,6 +1698,14 @@ class AppLocalizationsEn extends AppLocalizations {
       one: 'Delete 1 tag and remove it from all comics. This cannot be undone.',
     );
     return '$_temp0';
+  }
+
+  @override
+  String get confirmDeleteNamedFacetTitle => 'Confirm deletion';
+
+  @override
+  String confirmDeleteNamedFacetContent(String name, int count) {
+    return 'Delete \"$name\" and affect $count named facet attachments. This cannot be undone.';
   }
 
   @override

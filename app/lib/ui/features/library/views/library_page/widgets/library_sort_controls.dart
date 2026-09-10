@@ -70,31 +70,35 @@ class _ComicSortListRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
+    final bool expandBySeries = ref.watch(
+      libraryComicsTabExpandBySeriesProvider,
+    );
     final LibraryComicSortOption sortOption = ref.watch(
       libraryActiveComicSortOptionProvider,
     );
     final bool isSelected = sortOption.field == field;
     final bool isImplemented = field.isImplemented;
+    final bool isEnabled = isImplemented && !expandBySeries;
     final bool isAscending = !sortOption.descending;
     final AppLocalizations l10n = context.l10n;
     final TextStyle labelStyle = TextStyle(
       fontSize: 13,
       fontWeight: FontWeight.w400,
-      color: isImplemented ? cs.hentai.textSecondary : cs.hentai.textTertiary,
+      color: isEnabled ? cs.hentai.textSecondary : cs.hentai.textTertiary,
     );
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: isImplemented
+        onTap: isEnabled
             ? () {
                 ref
                     .read(libraryTabSortProvider.notifier)
                     .setComicSortField(field);
               }
             : null,
-        hoverColor: isImplemented ? theme.hoverColor : null,
-        splashColor: isImplemented ? theme.splashColor : null,
+        hoverColor: isEnabled ? theme.hoverColor : null,
+        splashColor: isEnabled ? theme.splashColor : null,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
             kLibraryFilterSortDrawerContentInset,
@@ -112,7 +116,7 @@ class _ComicSortListRow extends ConsumerWidget {
                             ? LucideIcons.chevronUp
                             : LucideIcons.chevronDown,
                         size: 14,
-                        color: cs.primary,
+                        color: isEnabled ? cs.primary : cs.hentai.textTertiary,
                       )
                     : null,
               ),

@@ -14,14 +14,12 @@ class SeriesDetailPaginationBar extends ConsumerWidget {
     required this.seriesId,
     required this.page,
     required this.totalPages,
-    required this.isLoading,
     this.placement = LibraryPaginationPlacement.bottom,
   });
 
   final String seriesId;
   final int page;
   final int totalPages;
-  final bool isLoading;
   final LibraryPaginationPlacement placement;
 
   @override
@@ -31,8 +29,9 @@ class SeriesDetailPaginationBar extends ConsumerWidget {
     }
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final bool canGoPrevious = !isLoading && page > 1;
-    final bool canGoNext = !isLoading && page < totalPages;
+    // Keep enabled during catalog reload so hover/cursor/clicks stay stable.
+    final bool canGoPrevious = page > 1;
+    final bool canGoNext = page < totalPages;
     final SeriesDetailComicsCatalogController notifier = ref.read(
       seriesDetailComicsCatalogControllerProvider(seriesId).notifier,
     );

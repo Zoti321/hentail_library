@@ -44,7 +44,7 @@
   "formLibraryRootBrowse": "Browse",
   "formLibraryRootUnreadable": "Cannot read this folder. Grant storage access and try again, or pick a folder the app can read.",
   "formLibraryRootChangeConfirmTitle": "Change library root?",
-  "formLibraryRootChangeConfirmBody": "After changing the library root, the next sync will align to the new root. Comics under the old path may become orphans and be removed. Sync is not started automatically.",
+  "formLibraryRootChangeConfirmBody": "After saving, if the new root is readable now, Path migration runs immediately by relative path so comic and series user metadata, locks, and reading progress can be kept. If the new root is not readable now, only the new root is saved. Items whose relative paths do not exist under the new root keep their old identity until the next library sync. Sync is not started automatically.",
   "formLibraryScanOnStartupLabel": "Scan on startup",
   "formLibraryScanOnStartupOn": "On",
   "formLibraryScanOnStartupOff": "Off",
@@ -296,6 +296,7 @@
   "libraryComicSortReadAt": "Read time",
   "libraryComicSortFileSize": "File size",
   "libraryComicSortPageCount": "Page count",
+  "libraryExpandBySeries": "Expand by series",
   "librarySeriesSortName": "Name",
   "librarySeriesSortComicCount": "Comic count",
   "librarySeriesSortRandom": "Random",
@@ -417,16 +418,26 @@
   "comicDetailShowInExplorerFailed": "Could not show this item in File Explorer",
   "comicDetailDelete": "Delete",
   "comicDetailDeleteTitle": "Delete comic?",
-  "comicDetailDeleteConfirm": "\"{title}\" will be deleted. This cannot be undone.",
-  "@comicDetailDeleteConfirm": {
+  "comicDetailDeleteLocalConfirm": "\"{title}\" will be removed from the library and its disk resource (file or image folder) will be permanently deleted. This cannot be undone.",
+  "@comicDetailDeleteLocalConfirm": {
     "placeholders": {
       "title": {
         "type": "String"
       }
     }
   },
+  "comicDetailDeleteRemoteConfirm": "\"{title}\" will be removed from the library only. Remote resources will not be deleted.",
+  "@comicDetailDeleteRemoteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "comicDetailDeleteLocalAcknowledge": "I understand the disk resource will be permanently deleted",
   "comicDetailCancel": "Cancel",
-  "comicDetailDeletedToast": "Comic deleted",
+  "comicDetailDeletedWithResourceToast": "Comic and disk resource deleted",
+  "comicDetailRemovedFromLibraryToast": "Comic removed from library",
   "comicDetailNotFound": "Comic not found or removed",
   "comicDetailLoadFailedRetry": "Failed to load. Please retry.",
   "comicDetailGoToLibrary": "Go to library",
@@ -523,9 +534,12 @@
   "readingModeWebtoonOriginalSize": "Original size",
   "readerSetComicCover": "Set current page as comic cover",
   "readerSetSeriesCover": "Set current page as series cover",
+  "readerPageImageMenuTitle": "Page image",
+  "readerCopyPageImage": "Page image copy",
   "readerMore": "More",
   "readerMoreSemantic": "More reading options",
   "readerStateNotReady": "Reader not ready",
+  "readerCopyPageImageSuccess": "Page image copied",
   "readerComicCoverSet": "Set as comic cover",
   "readerComicCoverSetFailed": "Failed to set comic cover: {error}",
   "@readerComicCoverSetFailed": {
@@ -568,8 +582,12 @@
   "readerNoImages": "No images",
   "metadataTabAuthors": "Authors",
   "metadataTabTags": "Tags",
+  "metadataTabParodies": "Parodies",
+  "metadataTabCharacters": "Characters",
   "metadataAddAuthor": "Add author",
   "metadataAddTag": "Add tag",
+  "metadataAddParody": "Add parody",
+  "metadataAddCharacter": "Add character",
   "metadataAdd": "Add",
   "metadataSearchNameHint": "Search by name…",
   "metadataRename": "Rename",
@@ -577,6 +595,8 @@
   "metadataMoreActions": "More actions",
   "metadataAllAuthors": "All authors",
   "metadataAllTags": "All tags",
+  "metadataAllParodies": "All parodies",
+  "metadataAllCharacters": "All characters",
   "metadataTotalCount": "{count, plural, one{1 item} other{{count} items}}",
   "@metadataTotalCount": {
     "placeholders": {
@@ -587,21 +607,44 @@
   },
   "metadataRenameAuthor": "Rename author",
   "metadataRenameTag": "Rename tag",
+  "metadataRenameParody": "Rename parody",
+  "metadataRenameCharacter": "Rename character",
   "metadataNewName": "New name",
   "metadataRenameAuthorHint": "Enter a new author name…",
   "metadataRenameTagHint": "Enter a new tag name…",
+  "metadataRenameParodyHint": "Enter a new parody name…",
+  "metadataRenameCharacterHint": "Enter a new character name…",
   "metadataNameLabel": "Name",
   "metadataAddAuthorHint": "Enter author name…",
   "metadataAddTagHint": "Enter tag name…",
+  "metadataAddParodyHint": "Enter parody name…",
+  "metadataAddCharacterHint": "Enter character name…",
   "metadataAuthorDeletedToast": "Author deleted",
   "metadataTagDeletedToast": "Tag deleted",
+  "metadataParodyDeletedToast": "Parody deleted",
+  "metadataCharacterDeletedToast": "Character deleted",
   "metadataAuthorsEmptyTitle": "No authors yet",
   "metadataAuthorsEmptyHint": "Add, rename, or delete authors here.",
   "metadataTagsEmptyTitle": "No tags yet",
   "metadataTagsEmptyHint": "Add, rename, or delete tags here.",
+  "metadataParodiesEmptyTitle": "No parodies yet",
+  "metadataParodiesEmptyHint": "Add, rename, or delete parodies here.",
+  "metadataCharactersEmptyTitle": "No characters yet",
+  "metadataCharactersEmptyHint": "Add, rename, or delete characters here.",
   "metadataAuthorsNoMatchTitle": "No matching authors",
   "metadataTagsNoMatchTitle": "No matching tags",
+  "metadataParodiesNoMatchTitle": "No matching parodies",
+  "metadataCharactersNoMatchTitle": "No matching characters",
   "metadataSearchNoMatchHint": "Try another keyword, or clear the search",
+  "metadataAttachmentCountLabel": "Named facet attachment count: {count}",
+  "@metadataAttachmentCountLabel": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "metadataLoadingMore": "Loading more…",
+  "metadataScrollToLoadMore": "Scroll to load more",
+  "metadataListEnd": "All items loaded",
   "metadataDeleteAllTags": "Delete all",
   "metadataTagsDeletedAllToast": "All tags deleted",
   "metadataImportTagDictionaryDialogTitle": "Import tag dictionary",
@@ -747,6 +790,14 @@
   "confirmDeleteTagsContent": "{count, plural, one{Delete 1 tag and remove it from all comics. This cannot be undone.} other{Delete {count} tags and remove them from all comics. This cannot be undone.}}",
   "@confirmDeleteTagsContent": {
     "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "confirmDeleteNamedFacetTitle": "Confirm deletion",
+  "confirmDeleteNamedFacetContent": "Delete \"{name}\" and affect {count} named facet attachments. This cannot be undone.",
+  "@confirmDeleteNamedFacetContent": {
+    "placeholders": {
+      "name": {"type": "String"},
       "count": {"type": "int"}
     }
   },

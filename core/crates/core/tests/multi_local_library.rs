@@ -342,6 +342,7 @@ fn delete_library_clears_only_that_library_comics_and_series() {
                     page_size: 50,
                 },
                 ComicFilterDto::default(),
+                false,
                 Default::default(),
             )
             .await
@@ -387,6 +388,7 @@ fn browse_defaults_to_current_library_scope() {
                     page_size: 50,
                 },
                 ComicFilterDto::default(),
+                false,
                 Default::default(),
             )
             .await
@@ -403,6 +405,7 @@ fn browse_defaults_to_current_library_scope() {
                     page_size: 50,
                 },
                 ComicFilterDto::default(),
+                false,
                 Default::default(),
             )
             .await

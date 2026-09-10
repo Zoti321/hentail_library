@@ -5,9 +5,10 @@ use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
 use hentai_core::{
-    connection, create_local_library, init_db_at_path, list_all_named_facet_names,
-    list_distinct_named_facet_names, list_named_facet_for_form, replace_comic_named_facet,
-    JunctionNamedFacet,
+    add_named_facet_name, connection, count_all_named_facet_names, count_named_facet_attachments,
+    create_local_library, delete_named_facet_by_names, fetch_named_facet_page, init_db_at_path,
+    list_all_named_facet_names, list_distinct_named_facet_names, list_named_facet_for_form,
+    rename_named_facet_name, replace_comic_named_facet, JunctionNamedFacet,
 };
 use sea_orm::{ConnectionTrait, Database, Statement};
 use tempfile::TempDir;
@@ -137,11 +138,7 @@ fn replace_comic_named_facet_upserts_dict_and_replaces_junction() {
                 &db,
                 JunctionNamedFacet::Parody,
                 "c-a",
-                &[
-                    "Fate".to_string(),
-                    "Fate".to_string(),
-                    "Touhou".to_string(),
-                ],
+                &["Fate".to_string(), "Fate".to_string(), "Touhou".to_string()],
             )
             .await
             .expect("replace");
@@ -282,14 +279,9 @@ fn list_named_facet_for_form_returns_attachment_counts_sorted_desc_then_name() {
             )
             .await
             .expect("c1");
-            replace_comic_named_facet(
-                &db,
-                JunctionNamedFacet::Tag,
-                "c2",
-                &["Alpha".to_string()],
-            )
-            .await
-            .expect("c2");
+            replace_comic_named_facet(&db, JunctionNamedFacet::Tag, "c2", &["Alpha".to_string()])
+                .await
+                .expect("c2");
             replace_comic_named_facet(
                 &db,
                 JunctionNamedFacet::Tag,
@@ -309,12 +301,7 @@ fn list_named_facet_for_form_returns_attachment_counts_sorted_desc_then_name() {
             // Alpha:3, Beta:1, Gamma:1 (name ASC tie), Unused:0
             assert_eq!(
                 pairs,
-                vec![
-                    ("Alpha", 3),
-                    ("Beta", 1),
-                    ("Gamma", 1),
-                    ("Unused", 0),
-                ]
+                vec![("Alpha", 3), ("Beta", 1), ("Gamma", 1), ("Unused", 0),]
             );
 
             // Management list_all remains name ASC only.
@@ -369,6 +356,101 @@ fn replace_comic_named_facet_works_for_all_junction_facets() {
                     vec!["Alpha".to_string()],
                     "{facet:?}"
                 );
+            }
+        });
+    });
+}
+
+#[test]
+fn generic_named_facet_dictionary_crud_and_paging_work_for_all_facets() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let root = temp.path().join("lib");
+        std::fs::create_dir_all(&root).expect("mkdir");
+        let db_path = create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let lib = create_local_library(&root.to_string_lossy(), None)
+                .await
+                .expect("create library");
+            let db = connection().expect("connection");
+            clear_facet_tables(&db).await;
+            seed_comic(&db, "c-a", &lib.library_id, "E:/lib-a/a.cbz").await;
+            seed_comic(&db, "c-b", &lib.library_id, "E:/lib-a/b.cbz").await;
+
+            for facet in [
+                JunctionNamedFacet::Tag,
+                JunctionNamedFacet::Author,
+                JunctionNamedFacet::Parody,
+                JunctionNamedFacet::Character,
+            ] {
+                add_named_facet_name(facet, "Beta")
+                    .await
+                    .unwrap_or_else(|_| panic!("add Beta {facet:?}"));
+                add_named_facet_name(facet, "Alpha")
+                    .await
+                    .unwrap_or_else(|_| panic!("add Alpha {facet:?}"));
+                assert_eq!(
+                    count_all_named_facet_names(facet)
+                        .await
+                        .unwrap_or_else(|_| panic!("count {facet:?}")),
+                    2,
+                    "{facet:?}"
+                );
+                assert_eq!(
+                    fetch_named_facet_page(facet, 1, 0)
+                        .await
+                        .unwrap_or_else(|_| panic!("page {facet:?}")),
+                    vec!["Alpha".to_string()],
+                    "{facet:?}"
+                );
+
+                replace_comic_named_facet(&db, facet, "c-a", &["Alpha".to_string()])
+                    .await
+                    .unwrap_or_else(|_| panic!("attach c-a {facet:?}"));
+                replace_comic_named_facet(
+                    &db,
+                    facet,
+                    "c-b",
+                    &["Alpha".to_string(), "Beta".to_string()],
+                )
+                .await
+                .unwrap_or_else(|_| panic!("attach c-b {facet:?}"));
+                assert_eq!(
+                    count_named_facet_attachments(facet, "Alpha")
+                        .await
+                        .unwrap_or_else(|_| panic!("attachments alpha {facet:?}")),
+                    2,
+                    "{facet:?}"
+                );
+
+                rename_named_facet_name(facet, "Alpha", "Gamma")
+                    .await
+                    .unwrap_or_else(|_| panic!("rename {facet:?}"));
+                assert_eq!(
+                    count_named_facet_attachments(facet, "Gamma")
+                        .await
+                        .unwrap_or_else(|_| panic!("attachments gamma {facet:?}")),
+                    2,
+                    "{facet:?}"
+                );
+                let all = list_all_named_facet_names(facet)
+                    .await
+                    .unwrap_or_else(|_| panic!("list all {facet:?}"));
+                assert_eq!(
+                    all,
+                    vec!["Beta".to_string(), "Gamma".to_string()],
+                    "{facet:?}"
+                );
+
+                delete_named_facet_by_names(facet, vec!["Beta".to_string()])
+                    .await
+                    .unwrap_or_else(|_| panic!("delete {facet:?}"));
+                let after_delete = list_all_named_facet_names(facet)
+                    .await
+                    .unwrap_or_else(|_| panic!("list after delete {facet:?}"));
+                assert_eq!(after_delete, vec!["Gamma".to_string()], "{facet:?}");
             }
         });
     });

@@ -201,9 +201,10 @@ pub fn comic_id_from_path_frb(raw_path: String) -> String {
 pub async fn fetch_comics_page_frb(
     request: PageRequestDto,
     filter: ComicFilterDto,
+    expand_by_series: bool,
     sort: ComicSortOptionDto,
 ) -> Result<PagedComicResultDto, HentaiErrorDto> {
-    fetch_comics_page(request.into(), filter.into(), sort.into())
+    fetch_comics_page(request.into(), filter.into(), expand_by_series, sort.into())
         .await
         .map(PagedComicResultDto::from)
         .map_err(HentaiErrorDto::from)

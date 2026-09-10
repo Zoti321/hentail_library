@@ -26,31 +26,6 @@ impl ComicAutoLocks {
             || self.parodies
             || self.characters
     }
-
-    /// Fields present in the patch auto-lock; absent fields leave locks unchanged.
-    pub fn from_written_fields(
-        title: bool,
-        description: bool,
-        published_at: bool,
-        content_rating: bool,
-        authors: bool,
-        tags: bool,
-        languages: bool,
-        parodies: bool,
-        characters: bool,
-    ) -> Self {
-        Self {
-            title,
-            description,
-            published_at,
-            content_rating,
-            authors,
-            tags,
-            languages,
-            parodies,
-            characters,
-        }
-    }
 }
 
 /// Which Series Metadata field locks become `true` for a user-meta write (ADR-0007).
@@ -77,31 +52,6 @@ impl SeriesAutoLocks {
             total_count,
         }
     }
-}
-
-/// Convenience: build Comic auto-locks from patch presence flags.
-pub fn comic_auto_locks(
-    title: bool,
-    description: bool,
-    published_at: bool,
-    content_rating: bool,
-    authors: bool,
-    tags: bool,
-    languages: bool,
-    parodies: bool,
-    characters: bool,
-) -> ComicAutoLocks {
-    ComicAutoLocks::from_written_fields(
-        title,
-        description,
-        published_at,
-        content_rating,
-        authors,
-        tags,
-        languages,
-        parodies,
-        characters,
-    )
 }
 
 pub fn series_auto_locks(

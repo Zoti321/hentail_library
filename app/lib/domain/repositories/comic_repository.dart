@@ -18,6 +18,7 @@ abstract class ComicRepository {
   Future<PagedResult<Comic>> fetchComicsPage({
     required PageRequest request,
     required LibraryComicFilter filter,
+    required bool expandBySeries,
     required LibraryComicSortOption sortOption,
   });
 

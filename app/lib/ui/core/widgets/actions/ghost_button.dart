@@ -117,30 +117,50 @@ class GhostButton extends StatelessWidget {
       ),
       padding: WidgetStateProperty.all(padding),
     );
+    // IconButton.styleFrom maps [hoverColor] into overlay (painted *over* the
+    // icon). Use background fill + translucent overlay, same as iconText/text.
+    final ButtonStyle ghostIconStyle =
+        IconButton.styleFrom(
+          minimumSize: Size.square(hitSize),
+          fixedSize: compact ? null : Size.square(size),
+          padding: EdgeInsets.zero,
+          tapTargetSize: compact
+              ? MaterialTapTargetSize.padded
+              : MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.standard,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
+          foregroundColor: isEnabled
+              ? enabledForeground
+              : disabledForeground,
+          disabledBackgroundColor: Colors.transparent,
+          splashFactory: splashFactory,
+        ).copyWith(
+          backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+            if (states.contains(WidgetState.hovered) ||
+                (compact && states.contains(WidgetState.pressed))) {
+              return effectiveHoverColor;
+            }
+            return Colors.transparent;
+          }),
+          overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+            if (states.contains(WidgetState.disabled)) {
+              return null;
+            }
+            if (states.contains(WidgetState.hovered) ||
+                states.contains(WidgetState.pressed) ||
+                states.contains(WidgetState.focused)) {
+              return effectiveOverlayColor;
+            }
+            return null;
+          }),
+        );
     final Widget button = _variant == _GhostButtonVariant.icon
         ? IconButton(
             onPressed: handlePressed,
             iconSize: iconSize,
-            style: IconButton.styleFrom(
-              minimumSize: Size.square(hitSize),
-              fixedSize: compact ? null : Size.square(size),
-              padding: EdgeInsets.zero,
-              tapTargetSize: compact
-                  ? MaterialTapTargetSize.padded
-                  : MaterialTapTargetSize.shrinkWrap,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(borderRadius),
-              ),
-              foregroundColor: isEnabled
-                  ? enabledForeground
-                  : disabledForeground,
-              backgroundColor: Colors.transparent,
-              disabledBackgroundColor: Colors.transparent,
-              hoverColor: effectiveHoverColor,
-              highlightColor: effectiveHoverColor,
-              overlayColor: effectiveOverlayColor,
-              splashFactory: NoSplash.splashFactory,
-            ),
+            style: ghostIconStyle,
             icon: Icon(icon!),
           )
         : _variant == _GhostButtonVariant.text

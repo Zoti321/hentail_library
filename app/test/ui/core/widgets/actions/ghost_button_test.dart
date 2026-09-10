@@ -62,6 +62,40 @@ void main() {
     );
   });
 
+  testWidgets('icon hover fills background; overlay stays translucent', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: buildAppTheme(Brightness.light),
+        home: const Scaffold(
+          body: GhostButton.icon(
+            icon: LucideIcons.chevronRight,
+            tooltip: 'Next',
+            onPressed: _noop,
+          ),
+        ),
+      ),
+    );
+
+    final IconButton button = tester.widget(find.byType(IconButton));
+    final ColorScheme cs = buildAppTheme(Brightness.light).colorScheme;
+    const Set<WidgetState> hovered = <WidgetState>{WidgetState.hovered};
+
+    final Color? hoveredBackground = button.style!.backgroundColor?.resolve(
+      hovered,
+    );
+    final Color? hoveredOverlay = button.style!.overlayColor?.resolve(hovered);
+
+    expect(hoveredBackground, cs.surfaceContainer);
+    expect(hoveredOverlay, isNotNull);
+    expect(hoveredOverlay!.a, lessThan(1.0));
+    expect(
+      button.style!.backgroundColor?.resolve(const <WidgetState>{}),
+      Colors.transparent,
+    );
+  });
+
   testWidgets('pointer press unfocuses the icon button', (
     WidgetTester tester,
   ) async {

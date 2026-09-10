@@ -112,6 +112,50 @@ async fn insert_comic(db: &DatabaseConnection, comic_id: &str, path: &str, title
     .expect("insert meta");
 }
 
+async fn insert_series(
+    db: &DatabaseConnection,
+    series_id: &str,
+    folder_path: &str,
+    name: &str,
+    library_id: &str,
+) {
+    let key = compute_sort_key(name);
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "INSERT INTO series (series_id, folder_path, name, name_sort_key, serialization_status, library_id) \
+         VALUES (?, ?, ?, ?, 'unknown', ?)",
+        [
+            sea_orm::Value::String(Some(Box::new(series_id.to_string()))),
+            sea_orm::Value::String(Some(Box::new(folder_path.to_string()))),
+            sea_orm::Value::String(Some(Box::new(name.to_string()))),
+            sea_orm::Value::String(Some(Box::new(key))),
+            sea_orm::Value::String(Some(Box::new(library_id.to_string()))),
+        ],
+    ))
+    .await
+    .expect("insert series");
+}
+
+async fn insert_series_item(
+    db: &DatabaseConnection,
+    series_id: &str,
+    comic_id: &str,
+    sort_order: f64,
+) {
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "INSERT INTO series_items (series_id, comic_id, sort_order, sort_order_locked) \
+         VALUES (?, ?, ?, 0)",
+        [
+            sea_orm::Value::String(Some(Box::new(series_id.to_string()))),
+            sea_orm::Value::String(Some(Box::new(comic_id.to_string()))),
+            sea_orm::Value::Double(Some(sort_order)),
+        ],
+    ))
+    .await
+    .expect("insert series item");
+}
+
 #[test]
 fn fetch_comics_page_title_asc_uses_natural_order() {
     with_global_db(|| {
@@ -136,6 +180,7 @@ fn fetch_comics_page_title_asc_uses_natural_order() {
                     show_r18: true,
                     ..Default::default()
                 },
+                false,
                 ComicSortOptionDto {
                     field: ComicSortFieldDto::Title,
                     descending: false,
@@ -146,6 +191,82 @@ fn fetch_comics_page_title_asc_uses_natural_order() {
 
             let titles: Vec<&str> = page.items.iter().map(|c| c.title.as_str()).collect();
             assert_eq!(titles, vec!["vol 1", "Vol 2", "Vol 10"]);
+        });
+    });
+}
+
+#[test]
+fn fetch_comics_page_expand_by_series_flattens_series_blocks() {
+    with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            let db = connection().expect("connection");
+            clear_library(&db).await;
+
+            insert_comic(&db, "root-2", "E:/lib/root/vol2.cbz", "Root Vol 2").await;
+            insert_comic(&db, "root-1", "E:/lib/root/vol1.cbz", "Root Vol 1").await;
+            insert_comic(&db, "beta-2", "E:/lib/beta/vol2.cbz", "Beta Vol 2").await;
+            insert_comic(&db, "beta-1", "E:/lib/beta/vol1.cbz", "Beta Vol 1").await;
+            insert_comic(&db, "alpha-1", "E:/lib/alpha/vol1.cbz", "Alpha Vol 1").await;
+            insert_comic(&db, "loose-b", "E:/lib/loose-b.cbz", "Loose B").await;
+            insert_comic(&db, "loose-a", "E:/lib/loose-a.cbz", "Loose A").await;
+
+            let lib = create_local_library("E:/lib", None).await.expect("create library");
+            set_current_library_id(Some(&lib.library_id))
+                .await
+                .expect("set current");
+            db.execute(Statement::from_sql_and_values(
+                sea_orm::DatabaseBackend::Sqlite,
+                "UPDATE comics SET library_id = ?",
+                [sea_orm::Value::String(Some(Box::new(lib.library_id.clone())))],
+            ))
+            .await
+            .expect("stamp comics");
+
+            insert_series(&db, "series-root", "E:/lib", "Root Series", &lib.library_id).await;
+            insert_series(&db, "series-beta", "E:/lib/beta", "Beta Series", &lib.library_id).await;
+            insert_series(&db, "series-alpha", "E:/lib/alpha", "Alpha Series", &lib.library_id)
+                .await;
+            insert_series_item(&db, "series-root", "root-1", 1.0).await;
+            insert_series_item(&db, "series-root", "root-2", 2.0).await;
+            insert_series_item(&db, "series-beta", "beta-1", 10.0).await;
+            insert_series_item(&db, "series-beta", "beta-2", 20.0).await;
+            insert_series_item(&db, "series-alpha", "alpha-1", 5.0).await;
+
+            let page = fetch_comics_page(
+                PageRequestDto {
+                    page: 1,
+                    page_size: 50,
+                },
+                ComicFilterDto {
+                    show_r18: true,
+                    ..Default::default()
+                },
+                true,
+                ComicSortOptionDto {
+                    field: ComicSortFieldDto::CreatedAt,
+                    descending: true,
+                },
+            )
+            .await
+            .expect("page");
+
+            let ids: Vec<&str> = page.items.iter().map(|c| c.comic_id.as_str()).collect();
+            assert_eq!(
+                ids,
+                vec![
+                    "root-1",
+                    "root-2",
+                    "alpha-1",
+                    "beta-1",
+                    "beta-2",
+                    "loose-a",
+                    "loose-b",
+                ]
+            );
         });
     });
 }

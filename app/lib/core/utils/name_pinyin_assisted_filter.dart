@@ -1,14 +1,10 @@
 import 'package:pinyin_pro_flutter/pinyin_pro_flutter.dart';
 
-final RegExp _cjkInQuery = RegExp(
-  r'[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]',
-);
+final RegExp _cjkInQuery = RegExp(r'[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]');
 
 final RegExp _toneDigitsOrSpace = RegExp(r'[\s1-5]');
 
-final RegExp _toneMarkVowels = RegExp(
-  r'[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]',
-);
+final RegExp _toneMarkVowels = RegExp(r'[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]');
 
 const Map<String, String> _toneMarkToAscii = <String, String>{
   'ā': 'a',

@@ -12,9 +12,8 @@ part 'read_session_providers.g.dart';
 
 ReaderPageImageData _mapReadSessionPageToUi(ReadSessionPage page) {
   return switch (page) {
-    ReadSessionDirPage(:final String filePath) => ReaderDirPageImageData(
-      File(filePath),
-    ),
+    ReadSessionDirPage(:final String filePath, :final int pageIndex) =>
+      ReaderDirPageImageData(File(filePath), pageIndex: pageIndex),
     ReadSessionArchivePage(:final String comicId, :final int pageIndex) =>
       ReaderArchivePageImageData(comicId: comicId, pageIndex: pageIndex),
   };

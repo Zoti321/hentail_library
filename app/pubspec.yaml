@@ -61,6 +61,7 @@ dependencies:
   archive: ^4.0.9
   flutter_secure_storage: ^10.3.1
   pinyin_pro_flutter: ^1.0.3
+  super_clipboard: 0.9.1
 
 dev_dependencies:
   flutter_test:

@@ -21,7 +21,6 @@ void main() {
               target: LibraryPaginationTarget.series,
               page: 2,
               totalPages: 5,
-              isLoading: true,
             ),
           ),
         ),
@@ -29,5 +28,35 @@ void main() {
     );
 
     expect(find.text('第 2 / 5 页'), findsOneWidget);
+  });
+
+  testWidgets('mid-range page keeps all page buttons enabled', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: buildAppTheme(Brightness.light),
+          home: const Scaffold(
+            body: LibraryPaginationBar(
+              target: LibraryPaginationTarget.series,
+              page: 2,
+              totalPages: 5,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final Iterable<IconButton> buttons = tester.widgetList<IconButton>(
+      find.byType(IconButton),
+    );
+    expect(buttons.length, 4);
+    for (final IconButton button in buttons) {
+      expect(button.onPressed, isNotNull);
+    }
   });
 }

@@ -12,8 +12,8 @@ import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/anchored_overlay_menu.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/comic_confirm_delete_dialog.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/ui/features/library/comic_delete_flow.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_back_header.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_series_nav.dart';
@@ -240,36 +240,21 @@ class _ComicDetailOverflowMenuButtonState
   }
 
   Future<void> _confirmDelete(BuildContext context) async {
-    final AppLocalizations l10n = context.l10n;
-    final bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) =>
-          ComicConfirmDeleteDialog(title: widget.comic.title),
+    await confirmAndDeleteComic(
+      context,
+      ref,
+      widget.comic,
+      onDeleted: () {
+        if (!context.mounted) {
+          return;
+        }
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          LibraryManagementActions.goCurrentLibraryBrowseFromContext(context);
+        }
+      },
     );
-    if (confirmed != true || !context.mounted) {
-      return;
-    }
-    try {
-      await ref.read(comicDeletionServiceProvider).deleteComics(<String>[
-        widget.comic.comicId,
-      ]);
-      ref.read(comicCoverCacheManagerProvider.notifier).clearForComics(<String>[
-        widget.comic.comicId,
-      ]);
-      if (!context.mounted) {
-        return;
-      }
-      showSuccessToast(context, l10n.comicDetailDeletedToast);
-      if (context.canPop()) {
-        context.pop();
-      } else {
-        LibraryManagementActions.goCurrentLibraryBrowseFromContext(context);
-      }
-    } catch (err) {
-      if (context.mounted) {
-        showErrorToast(context, err);
-      }
-    }
   }
 }
 

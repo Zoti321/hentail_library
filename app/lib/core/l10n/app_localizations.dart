@@ -293,7 +293,7 @@ abstract class AppLocalizations {
   /// No description provided for @formLibraryRootChangeConfirmBody.
   ///
   /// In zh, this message translates to:
-  /// **'更改库根后，下次同步将按新根对齐；旧路径下的漫画可能成为孤儿并被删除。此操作不会自动触发同步。'**
+  /// **'保存后，若新根当前可读，将按相对路径立即执行 Path migration，尽量保留漫画与系列的用户元数据、字段锁和阅读进度；若新根当前不可读，则仅保存新根。未在新根下匹配到相对路径的条目会保留旧身份，等待下次库同步处理。此操作不会自动触发同步。'**
   String get formLibraryRootChangeConfirmBody;
 
   /// No description provided for @formLibraryScanOnStartupLabel.
@@ -1382,6 +1382,12 @@ abstract class AppLocalizations {
   /// **'页数'**
   String get libraryComicSortPageCount;
 
+  /// No description provided for @libraryExpandBySeries.
+  ///
+  /// In zh, this message translates to:
+  /// **'按系列展开'**
+  String get libraryExpandBySeries;
+
   /// No description provided for @librarySeriesSortName.
   ///
   /// In zh, this message translates to:
@@ -1664,11 +1670,23 @@ abstract class AppLocalizations {
   /// **'删除漫画？'**
   String get comicDetailDeleteTitle;
 
-  /// No description provided for @comicDetailDeleteConfirm.
+  /// No description provided for @comicDetailDeleteLocalConfirm.
   ///
   /// In zh, this message translates to:
-  /// **'将删除「{title}」。此操作不可撤销。'**
-  String comicDetailDeleteConfirm(String title);
+  /// **'将从库中移除「{title}」，并永久删除其在磁盘上的资源（文件或图片文件夹）。此操作不可撤销。'**
+  String comicDetailDeleteLocalConfirm(String title);
+
+  /// No description provided for @comicDetailDeleteRemoteConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'将从库中移除「{title}」。不会删除远程资源。'**
+  String comicDetailDeleteRemoteConfirm(String title);
+
+  /// No description provided for @comicDetailDeleteLocalAcknowledge.
+  ///
+  /// In zh, this message translates to:
+  /// **'我了解磁盘上的资源将被永久删除'**
+  String get comicDetailDeleteLocalAcknowledge;
 
   /// No description provided for @comicDetailCancel.
   ///
@@ -1676,11 +1694,17 @@ abstract class AppLocalizations {
   /// **'取消'**
   String get comicDetailCancel;
 
-  /// No description provided for @comicDetailDeletedToast.
+  /// No description provided for @comicDetailDeletedWithResourceToast.
   ///
   /// In zh, this message translates to:
-  /// **'已删除漫画'**
-  String get comicDetailDeletedToast;
+  /// **'已删除漫画及磁盘资源'**
+  String get comicDetailDeletedWithResourceToast;
+
+  /// No description provided for @comicDetailRemovedFromLibraryToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已从库中移除漫画'**
+  String get comicDetailRemovedFromLibraryToast;
 
   /// No description provided for @comicDetailNotFound.
   ///
@@ -2012,6 +2036,18 @@ abstract class AppLocalizations {
   /// **'将当前页设为系列封面'**
   String get readerSetSeriesCover;
 
+  /// No description provided for @readerPageImageMenuTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'页图'**
+  String get readerPageImageMenuTitle;
+
+  /// No description provided for @readerCopyPageImage.
+  ///
+  /// In zh, this message translates to:
+  /// **'复制页图'**
+  String get readerCopyPageImage;
+
   /// No description provided for @readerMore.
   ///
   /// In zh, this message translates to:
@@ -2029,6 +2065,12 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'阅读状态未就绪'**
   String get readerStateNotReady;
+
+  /// No description provided for @readerCopyPageImageSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'已复制页图'**
+  String get readerCopyPageImageSuccess;
 
   /// No description provided for @readerComicCoverSet.
   ///
@@ -2198,6 +2240,18 @@ abstract class AppLocalizations {
   /// **'标签'**
   String get metadataTabTags;
 
+  /// No description provided for @metadataTabParodies.
+  ///
+  /// In zh, this message translates to:
+  /// **'原作'**
+  String get metadataTabParodies;
+
+  /// No description provided for @metadataTabCharacters.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色'**
+  String get metadataTabCharacters;
+
   /// No description provided for @metadataAddAuthor.
   ///
   /// In zh, this message translates to:
@@ -2209,6 +2263,18 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'添加标签'**
   String get metadataAddTag;
+
+  /// No description provided for @metadataAddParody.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加原作'**
+  String get metadataAddParody;
+
+  /// No description provided for @metadataAddCharacter.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加角色'**
+  String get metadataAddCharacter;
 
   /// No description provided for @metadataAdd.
   ///
@@ -2252,6 +2318,18 @@ abstract class AppLocalizations {
   /// **'全部标签'**
   String get metadataAllTags;
 
+  /// No description provided for @metadataAllParodies.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部原作'**
+  String get metadataAllParodies;
+
+  /// No description provided for @metadataAllCharacters.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部角色'**
+  String get metadataAllCharacters;
+
   /// No description provided for @metadataTotalCount.
   ///
   /// In zh, this message translates to:
@@ -2269,6 +2347,18 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'重命名标签'**
   String get metadataRenameTag;
+
+  /// No description provided for @metadataRenameParody.
+  ///
+  /// In zh, this message translates to:
+  /// **'重命名原作'**
+  String get metadataRenameParody;
+
+  /// No description provided for @metadataRenameCharacter.
+  ///
+  /// In zh, this message translates to:
+  /// **'重命名角色'**
+  String get metadataRenameCharacter;
 
   /// No description provided for @metadataNewName.
   ///
@@ -2288,6 +2378,18 @@ abstract class AppLocalizations {
   /// **'输入新的标签名称…'**
   String get metadataRenameTagHint;
 
+  /// No description provided for @metadataRenameParodyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入新的原作名称…'**
+  String get metadataRenameParodyHint;
+
+  /// No description provided for @metadataRenameCharacterHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入新的角色名称…'**
+  String get metadataRenameCharacterHint;
+
   /// No description provided for @metadataNameLabel.
   ///
   /// In zh, this message translates to:
@@ -2306,6 +2408,18 @@ abstract class AppLocalizations {
   /// **'输入标签名称…'**
   String get metadataAddTagHint;
 
+  /// No description provided for @metadataAddParodyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入原作名称…'**
+  String get metadataAddParodyHint;
+
+  /// No description provided for @metadataAddCharacterHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入角色名称…'**
+  String get metadataAddCharacterHint;
+
   /// No description provided for @metadataAuthorDeletedToast.
   ///
   /// In zh, this message translates to:
@@ -2317,6 +2431,18 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'已删除标签'**
   String get metadataTagDeletedToast;
+
+  /// No description provided for @metadataParodyDeletedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已删除原作'**
+  String get metadataParodyDeletedToast;
+
+  /// No description provided for @metadataCharacterDeletedToast.
+  ///
+  /// In zh, this message translates to:
+  /// **'已删除角色'**
+  String get metadataCharacterDeletedToast;
 
   /// No description provided for @metadataAuthorsEmptyTitle.
   ///
@@ -2342,6 +2468,30 @@ abstract class AppLocalizations {
   /// **'你可以从这里添加、重命名或删除标签。'**
   String get metadataTagsEmptyHint;
 
+  /// No description provided for @metadataParodiesEmptyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无原作'**
+  String get metadataParodiesEmptyTitle;
+
+  /// No description provided for @metadataParodiesEmptyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'你可以从这里添加、重命名或删除原作。'**
+  String get metadataParodiesEmptyHint;
+
+  /// No description provided for @metadataCharactersEmptyTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无角色'**
+  String get metadataCharactersEmptyTitle;
+
+  /// No description provided for @metadataCharactersEmptyHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'你可以从这里添加、重命名或删除角色。'**
+  String get metadataCharactersEmptyHint;
+
   /// No description provided for @metadataAuthorsNoMatchTitle.
   ///
   /// In zh, this message translates to:
@@ -2354,11 +2504,47 @@ abstract class AppLocalizations {
   /// **'未找到匹配的标签'**
   String get metadataTagsNoMatchTitle;
 
+  /// No description provided for @metadataParodiesNoMatchTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到匹配的原作'**
+  String get metadataParodiesNoMatchTitle;
+
+  /// No description provided for @metadataCharactersNoMatchTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到匹配的角色'**
+  String get metadataCharactersNoMatchTitle;
+
   /// No description provided for @metadataSearchNoMatchHint.
   ///
   /// In zh, this message translates to:
   /// **'试试其他关键词，或清空搜索'**
   String get metadataSearchNoMatchHint;
+
+  /// No description provided for @metadataAttachmentCountLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'Named facet attachment count：{count}'**
+  String metadataAttachmentCountLabel(String count);
+
+  /// No description provided for @metadataLoadingMore.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在加载更多…'**
+  String get metadataLoadingMore;
+
+  /// No description provided for @metadataScrollToLoadMore.
+  ///
+  /// In zh, this message translates to:
+  /// **'滚动到底部以加载更多'**
+  String get metadataScrollToLoadMore;
+
+  /// No description provided for @metadataListEnd.
+  ///
+  /// In zh, this message translates to:
+  /// **'已显示全部'**
+  String get metadataListEnd;
 
   /// No description provided for @metadataDeleteAllTags.
   ///
@@ -2921,6 +3107,18 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'{count, plural, other{将删除 {count} 个标签，并同时从所有漫画中移除这些标签。此操作不可撤销。}}'**
   String confirmDeleteTagsContent(int count);
+
+  /// No description provided for @confirmDeleteNamedFacetTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认删除'**
+  String get confirmDeleteNamedFacetTitle;
+
+  /// No description provided for @confirmDeleteNamedFacetContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'将删除「{name}」，并影响 {count} 个 Named facet attachment。此操作不可撤销。'**
+  String confirmDeleteNamedFacetContent(String name, int count);
 
   /// No description provided for @confirmRemovePathTitle.
   ///

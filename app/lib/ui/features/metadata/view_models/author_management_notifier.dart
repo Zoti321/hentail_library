@@ -34,9 +34,7 @@ final filteredAuthorsProvider = Provider<List<Author>>((ref) {
     orElse: () => const <Author>[],
   );
   return authors
-      .where(
-        (Author item) => nameMatchesPinyinAssistedFilter(item.name, query),
-      )
+      .where((Author item) => nameMatchesPinyinAssistedFilter(item.name, query))
       .toList();
 });
 

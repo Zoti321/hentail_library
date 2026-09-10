@@ -44,7 +44,7 @@ pub async fn apply_scan_replace_plan(
     Ok(())
 }
 
-async fn apply_comic_rekeys<C: ConnectionTrait>(
+pub(crate) async fn apply_comic_rekeys<C: ConnectionTrait>(
     db: &C,
     migrations: &[ComicMigration],
 ) -> Result<(), HentaiError> {
@@ -54,7 +54,7 @@ async fn apply_comic_rekeys<C: ConnectionTrait>(
     Ok(())
 }
 
-async fn apply_comic_rekey<C: ConnectionTrait>(
+pub(crate) async fn apply_comic_rekey<C: ConnectionTrait>(
     db: &C,
     migration: &ComicMigration,
 ) -> Result<(), HentaiError> {
@@ -113,7 +113,7 @@ async fn apply_comic_rekey<C: ConnectionTrait>(
     Ok(())
 }
 
-async fn rekey_comic_child_table<C: ConnectionTrait>(
+pub(crate) async fn rekey_comic_child_table<C: ConnectionTrait>(
     db: &C,
     table: &str,
     from_id: &str,
@@ -132,7 +132,7 @@ async fn rekey_comic_child_table<C: ConnectionTrait>(
     Ok(())
 }
 
-async fn rekey_reference_column<C: ConnectionTrait>(
+pub(crate) async fn rekey_reference_column<C: ConnectionTrait>(
     db: &C,
     table: &str,
     column: &str,

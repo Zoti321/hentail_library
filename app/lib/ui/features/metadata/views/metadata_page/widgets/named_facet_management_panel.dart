@@ -1,0 +1,609 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
+import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/chrome/status_card_shell.dart';
+import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
+import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
+import 'package:hentai_library/ui/features/metadata/view_models/named_facet_management_controller.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_shell.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+class NamedFacetManagementSliverGroup extends ConsumerWidget {
+  const NamedFacetManagementSliverGroup({
+    required this.kind,
+    required this.layoutTier,
+    required this.viewportWidth,
+    required this.horizontalPadding,
+    required this.contentMaxWidth,
+    super.key,
+  });
+
+  final ManagedNamedFacetKind kind;
+  final MetadataLayoutTier layoutTier;
+  final double viewportWidth;
+  final double horizontalPadding;
+  final double contentMaxWidth;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(namedFacetManagementControllerProvider(kind));
+    final AppThemeTokens tokens = context.tokens;
+
+    if (state.isLoading && state.items.isEmpty) {
+      return _padListSliver(
+        tokens,
+        SliverToBoxAdapter(
+          child: _alignedListChild(
+            context,
+            const _NamedFacetManagementLoadingState(),
+          ),
+        ),
+      );
+    }
+
+    if (state.error != null && state.items.isEmpty) {
+      return _padListSliver(
+        tokens,
+        SliverToBoxAdapter(
+          child: _alignedListChild(
+            context,
+            _NamedFacetManagementErrorState(
+              error: state.error!,
+              onRetry: () => ref
+                  .read(namedFacetManagementControllerProvider(kind).notifier)
+                  .refresh(),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (state.items.isEmpty) {
+      return _padListSliver(
+        tokens,
+        SliverToBoxAdapter(
+          child: _alignedListChild(
+            context,
+            _NamedFacetManagementEmptyState(
+              kind: kind,
+              hasSearchQuery: state.hasSearchQuery,
+              onCreate: () => openNamedFacetCreateDialog(context, ref, kind),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return _padListSliver(
+      tokens,
+      SliverToBoxAdapter(
+        child: _alignedListChild(
+          context,
+          _NamedFacetListCardContent(
+            kind: kind,
+            layoutTier: layoutTier,
+            state: state,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _alignedListChild(BuildContext context, Widget child) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: pageContentAlignedHorizontalInset(
+          viewportWidth: viewportWidth,
+          horizontalPadding: horizontalPadding,
+          maxWidth: contentMaxWidth,
+        ),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _padListSliver(AppThemeTokens tokens, Widget sliver) {
+    return SliverPadding(
+      padding: EdgeInsets.only(
+        bottom: tokens.layout.contentVerticalPadding + 24,
+      ),
+      sliver: sliver,
+    );
+  }
+}
+
+class _NamedFacetListCardContent extends ConsumerWidget {
+  const _NamedFacetListCardContent({
+    required this.kind,
+    required this.layoutTier,
+    required this.state,
+  });
+
+  final ManagedNamedFacetKind kind;
+  final MetadataLayoutTier layoutTier;
+  final NamedFacetManagementState state;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return MetadataPanelListCard(
+      radius: 12,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          _NamedFacetListHeader(
+            kind: kind,
+            layoutTier: layoutTier,
+            totalCount: state.totalCount,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: state.items
+                  .map(
+                    (String item) => OutlinedMetaChip(
+                      text: item,
+                      compact: true,
+                      onTap: () => showAdaptiveFormSurfaceWidget<void>(
+                        context: context,
+                        surface: _NamedFacetDetailSurface(
+                          kind: kind,
+                          initialName: item,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+          if (state.error != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Text(
+                '${state.error}',
+                style: TextStyle(fontSize: 12, color: cs.error),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            child: _NamedFacetListFooter(state: state),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NamedFacetListHeader extends StatelessWidget {
+  const _NamedFacetListHeader({
+    required this.kind,
+    required this.layoutTier,
+    required this.totalCount,
+  });
+
+  final ManagedNamedFacetKind kind;
+  final MetadataLayoutTier layoutTier;
+  final int totalCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+    final bool showTotalCount = metadataListHeaderShowsTotalCount(layoutTier);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerHighest,
+        border: Border(bottom: BorderSide(color: cs.hentai.borderSubtle)),
+      ),
+      child: Row(
+        children: <Widget>[
+          Icon(_iconForKind(kind), size: 16, color: cs.onSurfaceVariant),
+          const SizedBox(width: 8),
+          Text(
+            l10n.metadataListTitle(kind),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: cs.hentai.textSecondary,
+            ),
+          ),
+          if (showTotalCount) ...<Widget>[
+            const SizedBox(width: 12),
+            Text(
+              l10n.metadataTotalCount(totalCount),
+              style: TextStyle(fontSize: 13, color: cs.hentai.textTertiary),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _NamedFacetListFooter extends StatelessWidget {
+  const _NamedFacetListFooter({required this.state});
+
+  final NamedFacetManagementState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
+    final String message = state.hasSearchQuery
+        ? l10n.metadataTotalCount(state.items.length)
+        : state.isLoadingMore
+        ? l10n.metadataLoadingMore
+        : state.hasMore
+        ? l10n.metadataScrollToLoadMore
+        : l10n.metadataListEnd;
+    return Text(
+      message,
+      textAlign: TextAlign.center,
+      style: TextStyle(fontSize: 12, color: cs.hentai.textTertiary),
+    );
+  }
+}
+
+class _NamedFacetManagementLoadingState extends StatelessWidget {
+  const _NamedFacetManagementLoadingState();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return StatusCardShell(
+      padding: const EdgeInsets.symmetric(vertical: 42),
+      borderRadius: 14,
+      child: Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2.2,
+          color: theme.colorScheme.primary,
+        ),
+      ),
+    );
+  }
+}
+
+class _NamedFacetManagementErrorState extends StatelessWidget {
+  const _NamedFacetManagementErrorState({
+    required this.error,
+    required this.onRetry,
+  });
+
+  final Object error;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return StatusCardShell(
+      padding: const EdgeInsets.all(20),
+      borderRadius: 14,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            '$error',
+            style: TextStyle(
+              fontSize: kMetadataPanelSubtitleFontSize,
+              color: theme.colorScheme.hentai.textTertiary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          FilledButton(
+            onPressed: onRetry,
+            child: Text(context.l10n.commonRetry),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NamedFacetManagementEmptyState extends StatelessWidget {
+  const _NamedFacetManagementEmptyState({
+    required this.kind,
+    required this.hasSearchQuery,
+    required this.onCreate,
+  });
+
+  final ManagedNamedFacetKind kind;
+  final bool hasSearchQuery;
+  final VoidCallback onCreate;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final l10n = context.l10n;
+    return StatusCardShell(
+      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 20),
+      borderRadius: 14,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(_iconForKind(kind), size: 32, color: cs.onSurfaceVariant),
+          const SizedBox(height: 12),
+          Text(
+            hasSearchQuery
+                ? l10n.metadataNoMatchTitle(kind)
+                : l10n.metadataEmptyTitle(kind),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: cs.hentai.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            hasSearchQuery
+                ? l10n.metadataSearchNoMatchHint
+                : l10n.metadataEmptyHint(kind),
+            style: TextStyle(
+              fontSize: kMetadataPanelSubtitleFontSize,
+              color: cs.hentai.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          if (!hasSearchQuery) ...<Widget>[
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: onCreate,
+              child: Text(l10n.metadataAddLabel(kind)),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _NamedFacetDetailSurface extends ConsumerStatefulWidget {
+  const _NamedFacetDetailSurface({
+    required this.kind,
+    required this.initialName,
+  });
+
+  final ManagedNamedFacetKind kind;
+  final String initialName;
+
+  @override
+  ConsumerState<_NamedFacetDetailSurface> createState() =>
+      _NamedFacetDetailSurfaceState();
+}
+
+class _NamedFacetDetailSurfaceState
+    extends ConsumerState<_NamedFacetDetailSurface> {
+  late String _name = widget.initialName;
+  int? _attachmentCount;
+  Object? _countError;
+  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCount();
+  }
+
+  Future<void> _loadCount() async {
+    setState(() {
+      _countError = null;
+    });
+    try {
+      final count = await ref
+          .read(namedFacetManagementControllerProvider(widget.kind).notifier)
+          .countAttachments(_name);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _attachmentCount = count;
+      });
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _countError = error;
+      });
+    }
+  }
+
+  Future<void> _rename() async {
+    final l10n = context.l10n;
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) => TagNameEditorDialog(
+        title: l10n.metadataRenameTitle(widget.kind),
+        labelText: l10n.metadataNewName,
+        hintText: l10n.metadataRenameHint(widget.kind),
+        initialValue: _name,
+        shouldCloseOnUnchanged: true,
+        onSubmit: (String value) async {
+          await ref
+              .read(
+                namedFacetManagementControllerProvider(widget.kind).notifier,
+              )
+              .rename(_name, value);
+          if (!mounted) {
+            return;
+          }
+          setState(() {
+            _name = value.trim();
+            _attachmentCount = null;
+          });
+          await _loadCount();
+        },
+      ),
+    );
+  }
+
+  Future<void> _delete() async {
+    final int? count = _attachmentCount;
+    if (count == null) {
+      return;
+    }
+    final bool confirmed =
+        await showDialog<bool>(
+          context: context,
+          builder: (BuildContext dialogContext) =>
+              _NamedFacetConfirmDeleteDialog(
+                name: _name,
+                attachmentCount: count,
+              ),
+        ) ??
+        false;
+    if (!confirmed || !mounted) {
+      return;
+    }
+
+    setState(() => _busy = true);
+    try {
+      await ref
+          .read(namedFacetManagementControllerProvider(widget.kind).notifier)
+          .delete(_name);
+      if (!mounted) {
+        return;
+      }
+      showSuccessToast(context, context.l10n.metadataDeletedToast(widget.kind));
+      Navigator.of(context).pop();
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      showErrorToast(context, error);
+    } finally {
+      if (mounted) {
+        setState(() => _busy = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return AdaptiveFormSurface(
+      title: _name,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            l10n.metadataNameLabel,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.hentai.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(_name, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 18),
+          Text(
+            l10n.metadataAttachmentCountLabel(
+              _attachmentCount?.toString() ?? l10n.shellLoading,
+            ),
+            style: TextStyle(
+              fontSize: 13,
+              color: Theme.of(context).colorScheme.hentai.textSecondary,
+            ),
+          ),
+          if (_countError != null) ...<Widget>[
+            const SizedBox(height: 8),
+            Text(
+              '$_countError',
+              style: TextStyle(
+                fontSize: 12,
+                color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+          ],
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: _busy ? null : () => Navigator.of(context).maybePop(),
+          child: Text(l10n.commonClose),
+        ),
+        OutlinedButton(
+          onPressed: _busy ? null : _rename,
+          child: Text(l10n.metadataRename),
+        ),
+        FilledButton(
+          onPressed: _busy || _attachmentCount == null ? null : _delete,
+          child: Text(l10n.metadataDelete),
+        ),
+      ],
+      fitContentHeight: true,
+    );
+  }
+}
+
+class _NamedFacetConfirmDeleteDialog extends StatelessWidget {
+  const _NamedFacetConfirmDeleteDialog({
+    required this.name,
+    required this.attachmentCount,
+  });
+
+  final String name;
+  final int attachmentCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return HentaiDialog(
+      title: l10n.confirmDeleteNamedFacetTitle,
+      content: Text(l10n.confirmDeleteNamedFacetContent(name, attachmentCount)),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(l10n.commonCancel),
+        ),
+        const SizedBox(width: 8),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text(l10n.commonDelete),
+        ),
+      ],
+    );
+  }
+}
+
+Future<void> openNamedFacetCreateDialog(
+  BuildContext context,
+  WidgetRef ref,
+  ManagedNamedFacetKind kind,
+) async {
+  final l10n = context.l10n;
+  await showDialog<void>(
+    context: context,
+    builder: (BuildContext dialogContext) => TagNameEditorDialog(
+      title: l10n.metadataAddLabel(kind),
+      labelText: l10n.metadataNameLabel,
+      hintText: l10n.metadataAddHint(kind),
+      initialValue: '',
+      onSubmit: (String value) async {
+        await ref
+            .read(namedFacetManagementControllerProvider(kind).notifier)
+            .add(value);
+      },
+    ),
+  );
+}
+
+IconData _iconForKind(ManagedNamedFacetKind kind) => switch (kind) {
+  ManagedNamedFacetKind.author => LucideIcons.penLine,
+  ManagedNamedFacetKind.tag => LucideIcons.tags,
+  ManagedNamedFacetKind.parody => LucideIcons.clapperboard,
+  ManagedNamedFacetKind.character => LucideIcons.userRound,
+};

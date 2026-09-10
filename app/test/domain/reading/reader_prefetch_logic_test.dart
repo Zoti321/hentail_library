@@ -50,10 +50,7 @@ void main() {
         neighborCount: kReaderPrefetchNeighborCount,
       );
       expect(
-        pagesLeavingPrefetchWindow(
-          previousWindow: previous,
-          nextWindow: next,
-        ),
+        pagesLeavingPrefetchWindow(previousWindow: previous, nextWindow: next),
         previous.difference(next),
       );
       expect(previous.difference(next), isNotEmpty);

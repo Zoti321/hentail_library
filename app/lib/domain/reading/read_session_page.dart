@@ -4,9 +4,10 @@ sealed class ReadSessionPage {
 }
 
 final class ReadSessionDirPage extends ReadSessionPage {
-  const ReadSessionDirPage(this.filePath);
+  const ReadSessionDirPage({required this.filePath, required this.pageIndex});
 
   final String filePath;
+  final int pageIndex;
 }
 
 final class ReadSessionArchivePage extends ReadSessionPage {

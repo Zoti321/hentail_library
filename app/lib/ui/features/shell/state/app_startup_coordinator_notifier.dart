@@ -22,8 +22,9 @@ class AppStartupCoordinatorNotifier extends _$AppStartupCoordinatorNotifier {
   final Map<String, DateTime> _intervalAnchors = <String, DateTime>{};
   final Map<String, ScanInterval> _lastIntervals = <String, ScanInterval>{};
   DateTime Function() _now = DateTime.now;
-  Duration _startupDelay = startupDelayForTests ?? const Duration(seconds: 3);
-  bool _scheduleStartupAtIdle = scheduleStartupAtIdleForTests ?? true;
+  final Duration _startupDelay =
+      startupDelayForTests ?? const Duration(seconds: 3);
+  final bool _scheduleStartupAtIdle = scheduleStartupAtIdleForTests ?? true;
 
   @visibleForTesting
   static Duration? startupDelayForTests;

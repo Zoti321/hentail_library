@@ -69,10 +69,7 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
       nextWindow: targets,
     )) {
       ref.invalidate(
-        comicReaderPageProvider(
-          comicId: comicId,
-          pageIndex: pageOneBased - 1,
-        ),
+        comicReaderPageProvider(comicId: comicId, pageIndex: pageOneBased - 1),
       );
     }
     _lastWarmWindows[comicId] = Set<int>.from(targets);
@@ -145,8 +142,12 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
     int? cacheWidth,
   }) async {
     if (imageData is ReaderDirPageImageData) {
+      final String path = imageData.file.path;
+      if (!isUsableReaderCacheFile(path)) {
+        return null;
+      }
       return buildReaderImageProvider(
-        filePath: imageData.file.path,
+        filePath: path,
         cacheWidth: cacheWidth,
       );
     }
@@ -160,10 +161,12 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
       ).future,
     );
     return switch (page) {
-      ReaderPageFilePath(:final String path) => buildReaderImageProvider(
-        filePath: path,
-        cacheWidth: cacheWidth,
-      ),
+      ReaderPageFilePath(:final String path) => isUsableReaderCacheFile(path)
+          ? buildReaderImageProvider(
+              filePath: path,
+              cacheWidth: cacheWidth,
+            )
+          : null,
       ReaderPageBytes(:final Uint8List data) => buildReaderImageProvider(
         memoryBytes: data,
         cacheWidth: cacheWidth,

@@ -44,7 +44,7 @@
   "formLibraryRootBrowse": "浏览",
   "formLibraryRootUnreadable": "无法读取该目录。请授予存储权限后重试，或选择应用可读的路径。",
   "formLibraryRootChangeConfirmTitle": "确认更改根位置？",
-  "formLibraryRootChangeConfirmBody": "更改库根后，下次同步将按新根对齐；旧路径下的漫画可能成为孤儿并被删除。此操作不会自动触发同步。",
+  "formLibraryRootChangeConfirmBody": "保存后，若新根当前可读，将按相对路径立即执行 Path migration，尽量保留漫画与系列的用户元数据、字段锁和阅读进度；若新根当前不可读，则仅保存新根。未在新根下匹配到相对路径的条目会保留旧身份，等待下次库同步处理。此操作不会自动触发同步。",
   "formLibraryScanOnStartupLabel": "启动时扫描",
   "formLibraryScanOnStartupOn": "开启",
   "formLibraryScanOnStartupOff": "关闭",
@@ -296,6 +296,7 @@
   "libraryComicSortReadAt": "阅读时间",
   "libraryComicSortFileSize": "文件大小",
   "libraryComicSortPageCount": "页数",
+  "libraryExpandBySeries": "按系列展开",
   "librarySeriesSortName": "名称",
   "librarySeriesSortComicCount": "漫画数量",
   "librarySeriesSortRandom": "随机",
@@ -417,16 +418,26 @@
   "comicDetailShowInExplorerFailed": "无法在文件资源管理器中显示该项目",
   "comicDetailDelete": "删除",
   "comicDetailDeleteTitle": "删除漫画？",
-  "comicDetailDeleteConfirm": "将删除「{title}」。此操作不可撤销。",
-  "@comicDetailDeleteConfirm": {
+  "comicDetailDeleteLocalConfirm": "将从库中移除「{title}」，并永久删除其在磁盘上的资源（文件或图片文件夹）。此操作不可撤销。",
+  "@comicDetailDeleteLocalConfirm": {
     "placeholders": {
       "title": {
         "type": "String"
       }
     }
   },
+  "comicDetailDeleteRemoteConfirm": "将从库中移除「{title}」。不会删除远程资源。",
+  "@comicDetailDeleteRemoteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "comicDetailDeleteLocalAcknowledge": "我了解磁盘上的资源将被永久删除",
   "comicDetailCancel": "取消",
-  "comicDetailDeletedToast": "已删除漫画",
+  "comicDetailDeletedWithResourceToast": "已删除漫画及磁盘资源",
+  "comicDetailRemovedFromLibraryToast": "已从库中移除漫画",
   "comicDetailNotFound": "漫画不存在或已移除",
   "comicDetailLoadFailedRetry": "加载失败，请重试",
   "comicDetailGoToLibrary": "前往漫画库",
@@ -523,9 +534,12 @@
   "readingModeWebtoonOriginalSize": "原始尺寸",
   "readerSetComicCover": "将当前页设为漫画封面",
   "readerSetSeriesCover": "将当前页设为系列封面",
+  "readerPageImageMenuTitle": "页图",
+  "readerCopyPageImage": "复制页图",
   "readerMore": "更多",
   "readerMoreSemantic": "更多阅读选项",
   "readerStateNotReady": "阅读状态未就绪",
+  "readerCopyPageImageSuccess": "已复制页图",
   "readerComicCoverSet": "已设为漫画封面",
   "readerComicCoverSetFailed": "设置漫画封面失败：{error}",
   "@readerComicCoverSetFailed": {
@@ -568,8 +582,12 @@
   "readerNoImages": "暂无图片",
   "metadataTabAuthors": "作者",
   "metadataTabTags": "标签",
+  "metadataTabParodies": "原作",
+  "metadataTabCharacters": "角色",
   "metadataAddAuthor": "添加作者",
   "metadataAddTag": "添加标签",
+  "metadataAddParody": "添加原作",
+  "metadataAddCharacter": "添加角色",
   "metadataAdd": "添加",
   "metadataSearchNameHint": "搜索名称…",
   "metadataRename": "重命名",
@@ -577,6 +595,8 @@
   "metadataMoreActions": "更多操作",
   "metadataAllAuthors": "全部作者",
   "metadataAllTags": "全部标签",
+  "metadataAllParodies": "全部原作",
+  "metadataAllCharacters": "全部角色",
   "metadataTotalCount": "{count, plural, other{共 {count} 条}}",
   "@metadataTotalCount": {
     "placeholders": {
@@ -587,21 +607,46 @@
   },
   "metadataRenameAuthor": "重命名作者",
   "metadataRenameTag": "重命名标签",
+  "metadataRenameParody": "重命名原作",
+  "metadataRenameCharacter": "重命名角色",
   "metadataNewName": "新名称",
   "metadataRenameAuthorHint": "输入新的作者名称…",
   "metadataRenameTagHint": "输入新的标签名称…",
+  "metadataRenameParodyHint": "输入新的原作名称…",
+  "metadataRenameCharacterHint": "输入新的角色名称…",
   "metadataNameLabel": "名称",
   "metadataAddAuthorHint": "输入作者名称…",
   "metadataAddTagHint": "输入标签名称…",
+  "metadataAddParodyHint": "输入原作名称…",
+  "metadataAddCharacterHint": "输入角色名称…",
   "metadataAuthorDeletedToast": "已删除作者",
   "metadataTagDeletedToast": "已删除标签",
+  "metadataParodyDeletedToast": "已删除原作",
+  "metadataCharacterDeletedToast": "已删除角色",
   "metadataAuthorsEmptyTitle": "暂无作者",
   "metadataAuthorsEmptyHint": "你可以从这里添加、重命名或删除作者。",
   "metadataTagsEmptyTitle": "暂无标签",
   "metadataTagsEmptyHint": "你可以从这里添加、重命名或删除标签。",
+  "metadataParodiesEmptyTitle": "暂无原作",
+  "metadataParodiesEmptyHint": "你可以从这里添加、重命名或删除原作。",
+  "metadataCharactersEmptyTitle": "暂无角色",
+  "metadataCharactersEmptyHint": "你可以从这里添加、重命名或删除角色。",
   "metadataAuthorsNoMatchTitle": "未找到匹配的作者",
   "metadataTagsNoMatchTitle": "未找到匹配的标签",
+  "metadataParodiesNoMatchTitle": "未找到匹配的原作",
+  "metadataCharactersNoMatchTitle": "未找到匹配的角色",
   "metadataSearchNoMatchHint": "试试其他关键词，或清空搜索",
+  "metadataAttachmentCountLabel": "Named facet attachment count：{count}",
+  "@metadataAttachmentCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "metadataLoadingMore": "正在加载更多…",
+  "metadataScrollToLoadMore": "滚动到底部以加载更多",
+  "metadataListEnd": "已显示全部",
   "metadataDeleteAllTags": "删除所有",
   "metadataTagsDeletedAllToast": "已删除全部标签",
   "metadataImportTagDictionaryDialogTitle": "导入标签字典",
@@ -747,6 +792,14 @@
   "confirmDeleteTagsContent": "{count, plural, other{将删除 {count} 个标签，并同时从所有漫画中移除这些标签。此操作不可撤销。}}",
   "@confirmDeleteTagsContent": {
     "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "confirmDeleteNamedFacetTitle": "确认删除",
+  "confirmDeleteNamedFacetContent": "将删除「{name}」，并影响 {count} 个 Named facet attachment。此操作不可撤销。",
+  "@confirmDeleteNamedFacetContent": {
+    "placeholders": {
+      "name": {"type": "String"},
       "count": {"type": "int"}
     }
   },
