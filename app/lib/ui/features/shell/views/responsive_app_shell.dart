@@ -114,6 +114,10 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
           _ShellLayoutMode.expanded => isSidebarExpandedPref,
         };
         final bool showSidebarRail = !isReaderRoute && !useDrawer;
+        // Fullscreen transitions can briefly report a tiny content height while
+        // fixed chrome (title bar 36) is still in the tree.
+        final bool showShellChrome =
+            constraints.maxHeight >= AppTitleBar.height;
 
         return Scaffold(
           key: appShellScaffoldKey,
@@ -142,9 +146,9 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
               : null,
           body: Column(
             children: <Widget>[
-              _ShellTitleBar(isReaderRoute: isReaderRoute),
-              const DiagnosticModeBanner(),
-              const LibraryScanShellFeedback(),
+              if (showShellChrome) _ShellTitleBar(isReaderRoute: isReaderRoute),
+              if (showShellChrome) const DiagnosticModeBanner(),
+              if (showShellChrome) const LibraryScanShellFeedback(),
               Expanded(
                 child: isReaderRoute
                     ? widget.routeChild

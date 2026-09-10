@@ -5,6 +5,8 @@ import 'package:window_manager/window_manager.dart';
 class AppTitleBar extends StatefulWidget {
   const AppTitleBar({super.key});
 
+  static const double height = 36;
+
   @override
   State<AppTitleBar> createState() => _AppTitleBarState();
 }
@@ -37,7 +39,7 @@ class _AppTitleBarState extends State<AppTitleBar> with WindowListener {
     final cs = Theme.of(context).colorScheme;
 
     return Container(
-      height: 36,
+      height: AppTitleBar.height,
       decoration: BoxDecoration(
         color: cs.surface,
         border: Border(
@@ -47,7 +49,11 @@ class _AppTitleBarState extends State<AppTitleBar> with WindowListener {
       child: Row(
         children: [
           const Expanded(child: DragToMoveArea(child: SizedBox.expand())),
-          SizedBox(width: 138, height: 36, child: WindowCaption()),
+          SizedBox(
+            width: 138,
+            height: AppTitleBar.height,
+            child: WindowCaption(),
+          ),
         ],
       ),
     );

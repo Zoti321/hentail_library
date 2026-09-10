@@ -10,10 +10,20 @@ class ReaderFullscreenController extends _$ReaderFullscreenController {
   bool build() => false;
 
   Future<void> setFullscreen(bool value) async {
-    if (supportsDesktopWindowChrome) {
-      await windowManager.setFullScreen(value);
+    if (value) {
+      // Hide in-app chrome before the OS resize. Otherwise the title bar can
+      // remain visible through intermediate window sizes and overflow the shell.
+      state = true;
+      if (supportsDesktopWindowChrome) {
+        await windowManager.setFullScreen(true);
+      }
+      return;
     }
-    state = value;
+
+    if (supportsDesktopWindowChrome) {
+      await windowManager.setFullScreen(false);
+    }
+    state = false;
   }
 
   Future<void> toggleFullscreen() async {
@@ -24,9 +34,6 @@ class ReaderFullscreenController extends _$ReaderFullscreenController {
     if (!state) {
       return;
     }
-    state = false;
-    if (supportsDesktopWindowChrome) {
-      await windowManager.setFullScreen(false);
-    }
+    await setFullscreen(false);
   }
 }
