@@ -26,6 +26,9 @@ inputs:
   run-pub-get:
     description: Run flutter pub get
     default: "true"
+  rust-targets:
+    description: Comma-separated extra rustup targets for dtolnay/rust-toolchain
+    default: ""
 
 runs:
   using: composite
@@ -37,6 +40,8 @@ runs:
         cache: true
 
     - uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ inputs.rust-targets }}
 
     - uses: Swatinem/rust-cache@v2
       with:

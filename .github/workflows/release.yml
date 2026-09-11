@@ -315,11 +315,53 @@ jobs:
             echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
           fi
 
+      # Runner images / interrupted rustup can leave orphan rust-std files that
+      # make later `rustup target add` fail with "detected conflict".
+      - name: Clear partial Rust iOS std
+        run: |
+          set -euo pipefail
+          rustup_home="${RUSTUP_HOME:-$HOME/.rustup}"
+          target=aarch64-apple-ios
+          if command -v rustup >/dev/null 2>&1; then
+            rustup target remove "$target" 2>/dev/null || true
+          fi
+          shopt -s nullglob
+          for dir in "${rustup_home}/toolchains/"*/lib/rustlib/"${target}"; do
+            echo "Removing partial rustlib: $dir"
+            rm -rf "$dir"
+          done
+          for manifest in "${rustup_home}/toolchains/"*/lib/rustlib/manifest-rust-std-"${target}"; do
+            echo "Removing orphan manifest: $manifest"
+            rm -f "$manifest"
+          done
+
       - uses: ./.github/actions/flutter-frb-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
           run-build-runner: "true"
+          # Pre-install before Xcode/Cargokit so parallel pod scripts do not race
+          # rustup target add.
+          rust-targets: aarch64-apple-ios
+
+      - name: Ensure Rust iOS target
+        run: |
+          set -euo pipefail
+          target=aarch64-apple-ios
+          rustup_home="${RUSTUP_HOME:-$HOME/.rustup}"
+          toolchain="$(rustup show active-toolchain | awk '{print $1}')"
+          if rustup target list --installed | grep -qx "$target"; then
+            echo "$target already installed"
+          elif rustup target add "$target"; then
+            echo "$target installed"
+          else
+            echo "Cleaning partial rust-std for $target after install conflict"
+            rustup target remove "$target" 2>/dev/null || true
+            rm -rf "${rustup_home}/toolchains/${toolchain}/lib/rustlib/${target}"
+            rm -f "${rustup_home}/toolchains/${toolchain}/lib/rustlib/manifest-rust-std-${target}"
+            rustup target add "$target"
+          fi
+          rustup target list --installed | grep -E 'apple-ios' || true
 
       # Phase 2: add ExportOptions.plist and flutter build ipa when secrets are configured.
       - name: Configure iOS release signing
