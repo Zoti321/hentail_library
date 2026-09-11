@@ -65,7 +65,7 @@ void main() {
               actions: <Widget>[
                 TextButton(onPressed: () {}, child: const Text('稍后提醒')),
                 const SizedBox(width: 8),
-                TextButton(onPressed: () {}, child: const Text('查看详情')),
+                OutlinedButton(onPressed: () {}, child: const Text('查看详情')),
                 const SizedBox(width: 8),
                 FilledButton(onPressed: () {}, child: const Text('立即更新')),
               ],
@@ -94,14 +94,24 @@ void main() {
         ?.resolve(const <WidgetState>{});
     final OutlinedBorder? textShape = footerTheme.textButtonTheme.style?.shape
         ?.resolve(const <WidgetState>{});
+    final OutlinedBorder? outlinedShape = footerTheme
+        .outlinedButtonTheme
+        .style
+        ?.shape
+        ?.resolve(const <WidgetState>{});
     expect(filledShape, isA<RoundedRectangleBorder>());
     expect(textShape, isA<RoundedRectangleBorder>());
+    expect(outlinedShape, isA<RoundedRectangleBorder>());
     expect(
       (filledShape! as RoundedRectangleBorder).borderRadius,
       BorderRadius.circular(4),
     );
     expect(
       (textShape! as RoundedRectangleBorder).borderRadius,
+      BorderRadius.circular(4),
+    );
+    expect(
+      (outlinedShape! as RoundedRectangleBorder).borderRadius,
       BorderRadius.circular(4),
     );
   });

@@ -1373,9 +1373,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Try another keyword, or clear the search';
 
   @override
-  String metadataAttachmentCountLabel(String count) {
-    return 'Named facet attachment count: $count';
-  }
+  String get metadataAttachedComicsCaption => 'Attached comics';
 
   @override
   String get metadataLoadingMore => 'Loading more…';
@@ -1702,7 +1700,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String confirmDeleteNamedFacetContent(String name, int count) {
-    return 'Delete \"$name\" and affect $count named facet attachments. This cannot be undone.';
+    return 'This will delete \"$name\" and detach it from $count comics. This cannot be undone.';
   }
 
   @override

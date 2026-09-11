@@ -505,42 +505,49 @@ class _NamedFacetDetailSurfaceState
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final int? count = _attachmentCount;
+    final Object? countError = _countError;
+
     return AdaptiveFormSurface(
       title: _name,
+      maxDialogWidth: 360,
+      borderRadius: tokens.radius.xs,
+      fitContentHeight: true,
+      showFooterDivider: false,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
-            l10n.metadataNameLabel,
+            l10n.metadataAttachedComicsCaption,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: tokens.text.labelXs,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.hentai.textSecondary,
+              color: cs.hentai.textSecondary,
             ),
           ),
-          const SizedBox(height: 6),
-          Text(_name, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 18),
-          Text(
-            l10n.metadataAttachmentCountLabel(
-              _attachmentCount?.toString() ?? l10n.shellLoading,
-            ),
-            style: TextStyle(
-              fontSize: 13,
-              color: Theme.of(context).colorScheme.hentai.textSecondary,
-            ),
-          ),
-          if (_countError != null) ...<Widget>[
-            const SizedBox(height: 8),
+          SizedBox(height: tokens.spacing.xs),
+          if (countError != null)
             Text(
-              '$_countError',
+              '$countError',
               style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(context).colorScheme.error,
+                fontSize: tokens.text.bodySm,
+                color: cs.hentai.error,
+              ),
+            )
+          else
+            Text(
+              count?.toString() ?? l10n.shellLoading,
+              style: TextStyle(
+                fontSize: tokens.text.titleMd,
+                fontWeight: FontWeight.w600,
+                color: count == null
+                    ? cs.hentai.textSecondary
+                    : cs.hentai.textPrimary,
               ),
             ),
-          ],
         ],
       ),
       actions: <Widget>[
@@ -553,11 +560,10 @@ class _NamedFacetDetailSurfaceState
           child: Text(l10n.metadataRename),
         ),
         FilledButton(
-          onPressed: _busy || _attachmentCount == null ? null : _delete,
+          onPressed: _busy || count == null ? null : _delete,
           child: Text(l10n.metadataDelete),
         ),
       ],
-      fitContentHeight: true,
     );
   }
 }

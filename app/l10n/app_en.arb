@@ -635,12 +635,7 @@
   "metadataParodiesNoMatchTitle": "No matching parodies",
   "metadataCharactersNoMatchTitle": "No matching characters",
   "metadataSearchNoMatchHint": "Try another keyword, or clear the search",
-  "metadataAttachmentCountLabel": "Named facet attachment count: {count}",
-  "@metadataAttachmentCountLabel": {
-    "placeholders": {
-      "count": {"type": "String"}
-    }
-  },
+  "metadataAttachedComicsCaption": "Attached comics",
   "metadataLoadingMore": "Loading more…",
   "metadataScrollToLoadMore": "Scroll to load more",
   "metadataListEnd": "All items loaded",
@@ -793,7 +788,7 @@
     }
   },
   "confirmDeleteNamedFacetTitle": "Confirm deletion",
-  "confirmDeleteNamedFacetContent": "Delete \"{name}\" and affect {count} named facet attachments. This cannot be undone.",
+  "confirmDeleteNamedFacetContent": "This will delete \"{name}\" and detach it from {count} comics. This cannot be undone.",
   "@confirmDeleteNamedFacetContent": {
     "placeholders": {
       "name": {"type": "String"},

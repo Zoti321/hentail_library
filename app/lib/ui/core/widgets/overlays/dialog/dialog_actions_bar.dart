@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 
 /// Shared dialog / adaptive-form footer: end-aligned [Wrap], fixed spacing,
-/// and unified 4px button corners (independent of viewport breakpoint).
+/// and unified 4px button corners for Text / Outlined / Filled (independent of
+/// viewport breakpoint).
 class DialogActionsBar extends StatelessWidget {
   const DialogActionsBar({
     super.key,
@@ -26,6 +27,9 @@ class DialogActionsBar extends StatelessWidget {
     final ThemeData actionTheme = theme.copyWith(
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(shape: buttonShape),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(shape: buttonShape),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(shape: buttonShape),

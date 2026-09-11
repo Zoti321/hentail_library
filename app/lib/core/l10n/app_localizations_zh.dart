@@ -1339,9 +1339,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataSearchNoMatchHint => '试试其他关键词，或清空搜索';
 
   @override
-  String metadataAttachmentCountLabel(String count) {
-    return 'Named facet attachment count：$count';
-  }
+  String get metadataAttachedComicsCaption => '附着漫画数';
 
   @override
   String get metadataLoadingMore => '正在加载更多…';
@@ -1663,7 +1661,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String confirmDeleteNamedFacetContent(String name, int count) {
-    return '将删除「$name」，并影响 $count 个 Named facet attachment。此操作不可撤销。';
+    return '将删除「$name」，并解除与 $count 本漫画的附着。此操作不可撤销。';
   }
 
   @override

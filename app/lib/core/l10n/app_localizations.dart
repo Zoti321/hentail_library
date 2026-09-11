@@ -2516,11 +2516,11 @@ abstract class AppLocalizations {
   /// **'试试其他关键词，或清空搜索'**
   String get metadataSearchNoMatchHint;
 
-  /// No description provided for @metadataAttachmentCountLabel.
+  /// No description provided for @metadataAttachedComicsCaption.
   ///
   /// In zh, this message translates to:
-  /// **'Named facet attachment count：{count}'**
-  String metadataAttachmentCountLabel(String count);
+  /// **'附着漫画数'**
+  String get metadataAttachedComicsCaption;
 
   /// No description provided for @metadataLoadingMore.
   ///
@@ -3111,7 +3111,7 @@ abstract class AppLocalizations {
   /// No description provided for @confirmDeleteNamedFacetContent.
   ///
   /// In zh, this message translates to:
-  /// **'将删除「{name}」，并影响 {count} 个 Named facet attachment。此操作不可撤销。'**
+  /// **'将删除「{name}」，并解除与 {count} 本漫画的附着。此操作不可撤销。'**
   String confirmDeleteNamedFacetContent(String name, int count);
 
   /// No description provided for @confirmRemovePathTitle.

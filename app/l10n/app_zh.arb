@@ -635,14 +635,7 @@
   "metadataParodiesNoMatchTitle": "未找到匹配的原作",
   "metadataCharactersNoMatchTitle": "未找到匹配的角色",
   "metadataSearchNoMatchHint": "试试其他关键词，或清空搜索",
-  "metadataAttachmentCountLabel": "Named facet attachment count：{count}",
-  "@metadataAttachmentCountLabel": {
-    "placeholders": {
-      "count": {
-        "type": "String"
-      }
-    }
-  },
+  "metadataAttachedComicsCaption": "附着漫画数",
   "metadataLoadingMore": "正在加载更多…",
   "metadataScrollToLoadMore": "滚动到底部以加载更多",
   "metadataListEnd": "已显示全部",
@@ -795,7 +788,7 @@
     }
   },
   "confirmDeleteNamedFacetTitle": "确认删除",
-  "confirmDeleteNamedFacetContent": "将删除「{name}」，并影响 {count} 个 Named facet attachment。此操作不可撤销。",
+  "confirmDeleteNamedFacetContent": "将删除「{name}」，并解除与 {count} 本漫画的附着。此操作不可撤销。",
   "@confirmDeleteNamedFacetContent": {
     "placeholders": {
       "name": {"type": "String"},
