@@ -47,7 +47,7 @@ void main() {
       expect(find.text('管理'), findsOneWidget);
       expect(find.byType(CapsuleTabBar), findsOneWidget);
       expect(find.byType(ContentSwitcherBottomBar), findsNothing);
-      expect(find.byType(CountDigitChip), findsNothing);
+      expect(find.byType(CountDigitChip), findsOneWidget);
       expect(find.text('管理作者与标签'), findsNothing);
       expect(find.byTooltip('添加作者'), findsOneWidget);
       expect(find.textContaining('Ctrl+N'), findsNothing);
@@ -85,7 +85,9 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.byTooltip('重命名'), findsNothing);
       expect(find.byType(OutlinedMetaChip), findsNWidgets(2));
-      expect(find.text('共 2 条'), findsOneWidget);
+      expect(find.byType(CountDigitChip), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+      expect(find.text('共 2 条'), findsNothing);
     });
   });
 }

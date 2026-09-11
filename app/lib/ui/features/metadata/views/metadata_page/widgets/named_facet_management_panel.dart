@@ -4,7 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/core/widgets/chrome/status_card_shell.dart';
+import 'package:hentai_library/ui/core/widgets/element/chip/count_digit_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
@@ -12,7 +12,6 @@ import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dar
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/tag_name_editor_dialog.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/named_facet_management_controller.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
-import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_panel_shell.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class NamedFacetManagementSliverGroup extends ConsumerWidget {
@@ -86,7 +85,7 @@ class NamedFacetManagementSliverGroup extends ConsumerWidget {
       SliverToBoxAdapter(
         child: _alignedListChild(
           context,
-          _NamedFacetListCardContent(
+          _NamedFacetListSection(
             kind: kind,
             layoutTier: layoutTier,
             state: state,
@@ -119,8 +118,9 @@ class NamedFacetManagementSliverGroup extends ConsumerWidget {
   }
 }
 
-class _NamedFacetListCardContent extends ConsumerWidget {
-  const _NamedFacetListCardContent({
+/// Flat Fluent list section: no card shell — spacing + hairline only.
+class _NamedFacetListSection extends ConsumerWidget {
+  const _NamedFacetListSection({
     required this.kind,
     required this.layoutTier,
     required this.state,
@@ -133,52 +133,45 @@ class _NamedFacetListCardContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    return MetadataPanelListCard(
-      radius: 12,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          _NamedFacetListHeader(
-            kind: kind,
-            layoutTier: layoutTier,
-            totalCount: state.totalCount,
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: state.items
-                  .map(
-                    (String item) => OutlinedMetaChip(
-                      text: item,
-                      compact: true,
-                      onTap: () => showAdaptiveFormSurfaceWidget<void>(
-                        context: context,
-                        surface: _NamedFacetDetailSurface(
-                          kind: kind,
-                          initialName: item,
-                        ),
-                      ),
+    final AppThemeTokens tokens = context.tokens;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _NamedFacetListHeader(
+          kind: kind,
+          layoutTier: layoutTier,
+          totalCount: state.totalCount,
+        ),
+        SizedBox(height: tokens.spacing.md),
+        Wrap(
+          spacing: tokens.spacing.sm,
+          runSpacing: tokens.spacing.sm,
+          children: state.items
+              .map(
+                (String item) => OutlinedMetaChip(
+                  text: item,
+                  compact: true,
+                  onTap: () => showAdaptiveFormSurfaceWidget<void>(
+                    context: context,
+                    surface: _NamedFacetDetailSurface(
+                      kind: kind,
+                      initialName: item,
                     ),
-                  )
-                  .toList(),
-            ),
-          ),
-          if (state.error != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-              child: Text(
-                '${state.error}',
-                style: TextStyle(fontSize: 12, color: cs.error),
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-            child: _NamedFacetListFooter(state: state),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+        if (state.error != null) ...<Widget>[
+          SizedBox(height: tokens.spacing.md),
+          Text(
+            '${state.error}',
+            style: TextStyle(fontSize: tokens.text.labelXs, color: cs.error),
           ),
         ],
-      ),
+        SizedBox(height: tokens.spacing.lg),
+        _NamedFacetListFooter(state: state),
+      ],
     );
   }
 }
@@ -197,35 +190,36 @@ class _NamedFacetListHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
     final bool showTotalCount = metadataListHeaderShowsTotalCount(layoutTier);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
-        border: Border(bottom: BorderSide(color: cs.hentai.borderSubtle)),
-      ),
-      child: Row(
-        children: <Widget>[
-          Icon(_iconForKind(kind), size: 16, color: cs.onSurfaceVariant),
-          const SizedBox(width: 8),
-          Text(
-            l10n.metadataListTitle(kind),
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: cs.hentai.textSecondary,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            Icon(_iconForKind(kind), size: 16, color: cs.onSurfaceVariant),
+            SizedBox(width: tokens.spacing.sm),
+            Expanded(
+              child: Text(
+                l10n.metadataListTitle(kind),
+                style: TextStyle(
+                  fontSize: tokens.text.bodySm,
+                  fontWeight: FontWeight.w600,
+                  color: cs.hentai.textSecondary,
+                ),
+              ),
             ),
-          ),
-          if (showTotalCount) ...<Widget>[
-            const SizedBox(width: 12),
-            Text(
-              l10n.metadataTotalCount(totalCount),
-              style: TextStyle(fontSize: 13, color: cs.hentai.textTertiary),
-            ),
+            if (showTotalCount)
+              CountDigitChip(
+                count: totalCount,
+                semanticLabel: l10n.metadataTotalCount(totalCount),
+              ),
           ],
-        ],
-      ),
+        ),
+        SizedBox(height: tokens.spacing.sm),
+        Divider(height: 1, thickness: 1, color: cs.hentai.borderSubtle),
+      ],
     );
   }
 }
@@ -238,6 +232,7 @@ class _NamedFacetListFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
     final String message = state.hasSearchQuery
         ? l10n.metadataTotalCount(state.items.length)
@@ -249,7 +244,10 @@ class _NamedFacetListFooter extends StatelessWidget {
     return Text(
       message,
       textAlign: TextAlign.center,
-      style: TextStyle(fontSize: 12, color: cs.hentai.textTertiary),
+      style: TextStyle(
+        fontSize: tokens.text.labelXs,
+        color: cs.hentai.textTertiary,
+      ),
     );
   }
 }
@@ -259,14 +257,15 @@ class _NamedFacetManagementLoadingState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return StatusCardShell(
-      padding: const EdgeInsets.symmetric(vertical: 42),
-      borderRadius: 14,
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl * 2),
       child: Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 2.2,
-          color: theme.colorScheme.primary,
+        child: SizedBox(
+          width: 28,
+          height: 28,
+          child: CircularProgressIndicator(strokeWidth: 2.2, color: cs.primary),
         ),
       ),
     );
@@ -284,27 +283,35 @@ class _NamedFacetManagementErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return StatusCardShell(
-      padding: const EdgeInsets.all(20),
-      borderRadius: 14,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Text(
-            '$error',
-            style: TextStyle(
-              fontSize: kMetadataPanelSubtitleFontSize,
-              color: theme.colorScheme.hentai.textTertiary,
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl * 2),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(
+              LucideIcons.circleAlert,
+              size: 32,
+              color: cs.hentai.textTertiary,
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 12),
-          FilledButton(
-            onPressed: onRetry,
-            child: Text(context.l10n.commonRetry),
-          ),
-        ],
+            SizedBox(height: tokens.spacing.md),
+            Text(
+              '$error',
+              style: TextStyle(
+                fontSize: tokens.text.bodySm,
+                color: cs.hentai.textTertiary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: tokens.spacing.lg),
+            FilledButton(
+              onPressed: onRetry,
+              child: Text(context.l10n.commonRetry),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -323,46 +330,51 @@ class _NamedFacetManagementEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
-    return StatusCardShell(
-      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 20),
-      borderRadius: 14,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Icon(_iconForKind(kind), size: 32, color: cs.onSurfaceVariant),
-          const SizedBox(height: 12),
-          Text(
-            hasSearchQuery
-                ? l10n.metadataNoMatchTitle(kind)
-                : l10n.metadataEmptyTitle(kind),
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: cs.hentai.textPrimary,
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: tokens.spacing.xl * 2),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(
+              hasSearchQuery ? LucideIcons.searchX : _iconForKind(kind),
+              size: 32,
+              color: cs.hentai.textTertiary,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            hasSearchQuery
-                ? l10n.metadataSearchNoMatchHint
-                : l10n.metadataEmptyHint(kind),
-            style: TextStyle(
-              fontSize: kMetadataPanelSubtitleFontSize,
-              color: cs.hentai.textSecondary,
+            SizedBox(height: tokens.spacing.md),
+            Text(
+              hasSearchQuery
+                  ? l10n.metadataNoMatchTitle(kind)
+                  : l10n.metadataEmptyTitle(kind),
+              style: TextStyle(
+                fontSize: tokens.text.bodyMd,
+                fontWeight: FontWeight.w600,
+                color: cs.hentai.textPrimary,
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-          if (!hasSearchQuery) ...<Widget>[
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: onCreate,
-              child: Text(l10n.metadataAddLabel(kind)),
+            SizedBox(height: tokens.spacing.xs),
+            Text(
+              hasSearchQuery
+                  ? l10n.metadataSearchNoMatchHint
+                  : l10n.metadataEmptyHint(kind),
+              style: TextStyle(
+                fontSize: tokens.text.bodySm,
+                color: cs.hentai.textSecondary,
+              ),
+              textAlign: TextAlign.center,
             ),
+            if (!hasSearchQuery) ...<Widget>[
+              SizedBox(height: tokens.spacing.lg),
+              FilledButton(
+                onPressed: onCreate,
+                child: Text(l10n.metadataAddLabel(kind)),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
