@@ -1,55 +1,13 @@
-use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+mod common;
+
+use std::path::Path;
 
 use hentai_core::{
     comic_id_from_path, create_local_library, create_remote_library, create_sync_handle,
     delete_comics_by_ids, find_comic_by_id, init_db_at_path, sync_library, SyncScanMode,
 };
-use sea_orm::{ConnectionTrait, Database, Statement};
+use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    std::fs::read_to_string(
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/drift_v2.sql"),
-    )
-    .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
-
 fn write_image_comic(dir: &Path) {
     std::fs::create_dir_all(dir).expect("mkdir comic");
     std::fs::write(dir.join("01.jpg"), b"fake-jpeg").expect("jpg");
@@ -94,9 +52,9 @@ async fn insert_remote_comic(comic_id: &str, path: &str, library_id: &str) {
 
 #[test]
 fn local_file_deletion_removes_disk_resource_and_db_row() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root = temp.path().join("lib");
         std::fs::create_dir_all(&root).expect("mkdir");
         let comic_path = root.join("vol1.cbz");
@@ -136,9 +94,9 @@ fn local_file_deletion_removes_disk_resource_and_db_row() {
 
 #[test]
 fn local_dir_deletion_removes_directory_resource() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root = temp.path().join("lib");
         std::fs::create_dir_all(&root).expect("mkdir");
         let comic_dir = root.join("folder_comic");
@@ -178,9 +136,9 @@ fn local_dir_deletion_removes_directory_resource() {
 
 #[test]
 fn missing_local_resource_still_allows_library_removal() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root = temp.path().join("lib");
         std::fs::create_dir_all(&root).expect("mkdir");
         let comic_path = root.join("vol1.cbz");
@@ -217,9 +175,9 @@ fn missing_local_resource_still_allows_library_removal() {
 
 #[test]
 fn rejects_local_resource_outside_library_root() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root = temp.path().join("lib");
         let outside = temp.path().join("outside.cbz");
         std::fs::create_dir_all(&root).expect("mkdir");
@@ -256,9 +214,9 @@ fn rejects_local_resource_outside_library_root() {
 
 #[test]
 fn remote_deletion_only_clears_library_row() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let fake_remote_path = "https://example.com/library/vol1.cbz";
         let comic_id = comic_id_from_path(fake_remote_path);
 

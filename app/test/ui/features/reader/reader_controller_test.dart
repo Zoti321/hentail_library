@@ -1,13 +1,19 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/domain/reading/read_session_page.dart';
 import 'package:hentai_library/domain/reading/reader_session_snapshot.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_controller.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_series_navigation.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_providers.dart';
+import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_route_context.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -69,10 +75,90 @@ class _MemoryAppSettingRepository implements AppSettingRepository {
   Future<bool?> peekLegacyAutoScan() async => null;
 }
 
+class _RecordingSeriesNavigation extends ReaderSeriesNavigation {
+  final List<String> switchedTo = <String>[];
+
+  @override
+  void build() {}
+
+  @override
+  Future<void> switchComic({
+    required GoRouter router,
+    required ReadSessionRouteParams currentSession,
+    required String targetComicId,
+  }) async {
+    switchedTo.add(targetComicId);
+  }
+}
+
+class _FakePrefetchController extends ReaderPrefetchController {
+  final List<String> warmedOpen = <String>[];
+
+  @override
+  Map<String, int> build() => <String, int>{};
+
+  @override
+  Future<void> warmOpenComic({
+    required String comicId,
+    int? resumePageOneBased,
+  }) async {
+    warmedOpen.add(comicId);
+  }
+}
+
+GoRouter _testRouter() => GoRouter(
+  routes: <RouteBase>[
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) => const SizedBox(),
+    ),
+  ],
+);
+
+ReaderNavContextData _navContext({
+  String? previousComicId,
+  String? nextComicId,
+  String currentComicId = _comicId,
+}) {
+  final List<ReaderComicListItem> items = <ReaderComicListItem>[];
+  if (previousComicId != null) {
+    items.add(
+      ReaderComicListItem(
+        comicId: previousComicId,
+        title: 'Previous',
+        order: 0,
+      ),
+    );
+  }
+  items.add(
+    ReaderComicListItem(
+      comicId: currentComicId,
+      title: 'Current',
+      order: items.length,
+    ),
+  );
+  if (nextComicId != null) {
+    items.add(
+      ReaderComicListItem(
+        comicId: nextComicId,
+        title: 'Next',
+        order: items.length,
+      ),
+    );
+  }
+  return ReaderNavContextData(
+    items: items,
+    currentIndex: previousComicId == null ? 0 : 1,
+    preferredPageIndex: null,
+  );
+}
+
 ProviderContainer _createContainer({
   required AppSetting initialSetting,
   ReaderControllerKey key = _key,
   ReaderSessionSnapshot? snapshot,
+  _RecordingSeriesNavigation? seriesNavigation,
+  _FakePrefetchController? prefetch,
 }) {
   final ReaderSessionSnapshot session = snapshot ?? _snapshot();
   return ProviderContainer(
@@ -84,6 +170,10 @@ ProviderContainer _createContainer({
         comicId: key.comicId,
         incognito: key.incognito,
       ).overrideWith((Ref ref) async => session),
+      if (seriesNavigation != null)
+        readerSeriesNavigationProvider.overrideWith(() => seriesNavigation),
+      if (prefetch != null)
+        readerPrefetchControllerProvider.overrideWith(() => prefetch),
     ],
   );
 }
@@ -302,6 +392,150 @@ void main() {
 
       controller.setIndex(4);
       expect(_state(container, _incognitoKey)?.currentIndex, 4);
+    });
+  });
+
+  group('requestPrevPage series retreat', () {
+    const String previousComicId = 'previous-series-comic';
+    const ReadSessionRouteParams session = ReadSessionRouteParams(
+      comicId: _comicId,
+      incognito: true,
+    );
+
+    test(
+      'first call on first spread with previous comic arms retreat prompt',
+      () async {
+        final _RecordingSeriesNavigation navigation =
+            _RecordingSeriesNavigation();
+        final _FakePrefetchController prefetch = _FakePrefetchController();
+        final ProviderContainer container = _createContainer(
+          key: _incognitoKey,
+          initialSetting: AppSetting(readingMode: ReadingMode.paged),
+          snapshot: _snapshot(pageCount: 5, resumePage: 1),
+          seriesNavigation: navigation,
+          prefetch: prefetch,
+        );
+        addTearDown(container.dispose);
+
+        await container.read(readerControllerProvider(_incognitoKey).future);
+        final ReaderController controller = _controller(
+          container,
+          _incognitoKey,
+        );
+
+        await controller.requestPrevPage(
+          navContext: _navContext(previousComicId: previousComicId),
+          session: session,
+          router: _testRouter(),
+        );
+
+        expect(
+          _state(container, _incognitoKey)?.seriesBoundaryPrompt,
+          SeriesBoundaryPrompt.retreat,
+        );
+        expect(_state(container, _incognitoKey)?.currentIndex, 1);
+        expect(prefetch.warmedOpen, <String>[previousComicId]);
+        expect(navigation.switchedTo, isEmpty);
+      },
+    );
+
+    test('second call on first spread switches to previous comic', () async {
+      final _RecordingSeriesNavigation navigation =
+          _RecordingSeriesNavigation();
+      final _FakePrefetchController prefetch = _FakePrefetchController();
+      final ProviderContainer container = _createContainer(
+        key: _incognitoKey,
+        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        snapshot: _snapshot(pageCount: 5, resumePage: 1),
+        seriesNavigation: navigation,
+        prefetch: prefetch,
+      );
+      addTearDown(container.dispose);
+
+      await container.read(readerControllerProvider(_incognitoKey).future);
+      final ReaderController controller = _controller(container, _incognitoKey);
+      final GoRouter router = _testRouter();
+      final ReaderNavContextData nav = _navContext(
+        previousComicId: previousComicId,
+      );
+
+      await controller.requestPrevPage(
+        navContext: nav,
+        session: session,
+        router: router,
+      );
+      await controller.requestPrevPage(
+        navContext: nav,
+        session: session,
+        router: router,
+      );
+
+      expect(navigation.switchedTo, <String>[previousComicId]);
+      expect(
+        _state(container, _incognitoKey)?.seriesBoundaryPrompt,
+        SeriesBoundaryPrompt.none,
+      );
+    });
+
+    test('on first spread without previous comic is a no-op', () async {
+      final _RecordingSeriesNavigation navigation =
+          _RecordingSeriesNavigation();
+      final ProviderContainer container = _createContainer(
+        key: _incognitoKey,
+        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        snapshot: _snapshot(pageCount: 5, resumePage: 1),
+        seriesNavigation: navigation,
+        prefetch: _FakePrefetchController(),
+      );
+      addTearDown(container.dispose);
+
+      await container.read(readerControllerProvider(_incognitoKey).future);
+      final ReaderController controller = _controller(container, _incognitoKey);
+
+      await controller.requestPrevPage(
+        navContext: _navContext(),
+        session: session,
+        router: _testRouter(),
+      );
+
+      expect(
+        _state(container, _incognitoKey)?.seriesBoundaryPrompt,
+        SeriesBoundaryPrompt.none,
+      );
+      expect(_state(container, _incognitoKey)?.currentIndex, 1);
+      expect(navigation.switchedTo, isEmpty);
+    });
+
+    test('leaving first spread clears retreat prompt', () async {
+      final ProviderContainer container = _createContainer(
+        key: _incognitoKey,
+        initialSetting: AppSetting(readingMode: ReadingMode.paged),
+        snapshot: _snapshot(pageCount: 5, resumePage: 1),
+        seriesNavigation: _RecordingSeriesNavigation(),
+        prefetch: _FakePrefetchController(),
+      );
+      addTearDown(container.dispose);
+
+      await container.read(readerControllerProvider(_incognitoKey).future);
+      final ReaderController controller = _controller(container, _incognitoKey);
+
+      await controller.requestPrevPage(
+        navContext: _navContext(previousComicId: previousComicId),
+        session: session,
+        router: _testRouter(),
+      );
+      expect(
+        _state(container, _incognitoKey)?.seriesBoundaryPrompt,
+        SeriesBoundaryPrompt.retreat,
+      );
+
+      controller.nextPage();
+
+      expect(
+        _state(container, _incognitoKey)?.seriesBoundaryPrompt,
+        SeriesBoundaryPrompt.none,
+      );
+      expect(_state(container, _incognitoKey)?.currentIndex, 2);
     });
   });
 }

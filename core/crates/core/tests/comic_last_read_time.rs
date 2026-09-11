@@ -1,4 +1,5 @@
-use std::sync::Mutex;
+mod common;
+
 
 use hentai_core::{
     connection, find_comic_by_id, init_db_at_path, record_reading, ReadingHistoryDto,
@@ -6,14 +7,6 @@ use hentai_core::{
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
 
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .unwrap_or_else(|poisoned| poisoned.into_inner());
-    test();
-}
 
 fn seed_comic(comic_id: &str) {
     let runtime = tokio::runtime::Runtime::new().expect("runtime");
@@ -42,7 +35,7 @@ fn seed_comic(comic_id: &str) {
 
 #[test]
 fn find_comic_by_id_includes_last_read_time_when_history_exists() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = temp.path().join("comic_last_read.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");

@@ -18,6 +18,7 @@ class ReaderContent extends HookConsumerWidget {
     required this.preferredPageIndex,
     required this.readingMode,
     this.onRequestNextPage,
+    this.onRequestPrevPage,
   });
 
   final String comicId;
@@ -27,6 +28,7 @@ class ReaderContent extends HookConsumerWidget {
   final int? preferredPageIndex;
   final ReadingMode readingMode;
   final Future<void> Function()? onRequestNextPage;
+  final Future<void> Function()? onRequestPrevPage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -85,6 +87,7 @@ class ReaderContent extends HookConsumerWidget {
           preferredPageIndex: preferredPageIndex,
           readingMode: readingMode,
           onRequestNextPage: onRequestNextPage,
+          onRequestPrevPage: onRequestPrevPage,
         ),
       ),
     );

@@ -37,7 +37,6 @@ jobs:
   analyze:
     name: analyze
     runs-on: ubuntu-latest
-    continue-on-error: true
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -50,7 +49,7 @@ jobs:
 
       - name: Verify formatting
         working-directory: app
-        run: dart format --output=none --set-exit-if-changed .
+        run: dart format --output=none --set-exit-if-changed lib test
 
       - name: Analyze
         working-directory: app
@@ -71,10 +70,19 @@ jobs:
 
       - name: Run unit tests
         working-directory: app
-        run: flutter test test/domain test/core test/project_layout_test.dart
+        # Hard gate: domain/core/layout + data (FRB thin edge) + promoted fast UI.
+        # See docs/agents/testing.md dual-track promotion checklist.
+        run: >
+          flutter test
+          test/domain
+          test/core
+          test/data
+          test/project_layout_test.dart
+          test/ui/core/widgets/actions/destructive_filled_button_test.dart
+          test/ui/core/widgets/overlays/dialog/confirm
 
   test-widget:
-    name: test-widget
+    name: test-widget (soft)
     runs-on: ubuntu-latest
     continue-on-error: true
     timeout-minutes: 30

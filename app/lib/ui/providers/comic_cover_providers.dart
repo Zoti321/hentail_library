@@ -126,10 +126,18 @@ class ComicCover extends _$ComicCover {
     state = ComicCoverLoading(previous: previous);
     _loadInFlight = true;
     try {
+      if (!ref.mounted) {
+        return;
+      }
+      // Capture deps before the gate wait — provider may dispose while queued.
+      final comicRepo = ref.read(comicRepoProvider);
+      final thumbRepo = ref.read(comicThumbnailRepoProvider);
+
       await ComicCoverLoadGate.run(() async {
-        final Comic? comic = await ref
-            .read(comicRepoProvider)
-            .findById(comicId);
+        if (!ref.mounted) {
+          return;
+        }
+        final Comic? comic = await comicRepo.findById(comicId);
         if (!ref.mounted) {
           return;
         }
@@ -138,13 +146,12 @@ class ComicCover extends _$ComicCover {
           return;
         }
 
-        final repo = ref.read(comicThumbnailRepoProvider);
-        Uint8List? bytes = (await repo.findByComicId(comicId))?.thumbnail;
+        Uint8List? bytes = (await thumbRepo.findByComicId(comicId))?.thumbnail;
         if (!ref.mounted) {
           return;
         }
         if (bytes == null || bytes.isEmpty) {
-          final ensured = await repo.ensureByComicId(
+          final ensured = await thumbRepo.ensureByComicId(
             comicId: comicId,
             priority: _priority,
           );
@@ -161,15 +168,16 @@ class ComicCover extends _$ComicCover {
         state = ComicCoverReady(ComicCoverImage.bytes(bytes));
       });
     } on Object catch (error, stackTrace) {
+      if (!ref.mounted) {
+        return;
+      }
       logError(
         AppLog.ui('comic_cover'),
         '加载漫画封面失败: comicId=$comicId',
         error,
         stackTrace,
       );
-      if (ref.mounted) {
-        state = ComicCoverError(cause: error);
-      }
+      state = ComicCoverError(cause: error);
     } finally {
       _loadInFlight = false;
     }

@@ -1182,6 +1182,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readerSeriesAdvancePrompt => '再次翻页将进入下一卷';
 
   @override
+  String get readerSeriesRetreatPrompt => '再次翻页将进入上一卷';
+
+  @override
   String get readerNoImages => '暂无图片';
 
   @override

@@ -578,6 +578,7 @@
   "readerEnableAutoPlay": "开启自动播放",
   "readerInvalidParams": "阅读参数错误：缺少 comic_id",
   "readerSeriesAdvancePrompt": "再次翻页将进入下一卷",
+  "readerSeriesRetreatPrompt": "再次翻页将进入上一卷",
   "readerNoImages": "暂无图片",
   "metadataTabAuthors": "作者",
   "metadataTabTags": "标签",

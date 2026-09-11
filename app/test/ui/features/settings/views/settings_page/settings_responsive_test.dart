@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/domain/models/app_setting.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_loaded_view.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_header.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:riverpod/misc.dart' show Override;
+
+import '../../../../../support/fakes/settings_test_fakes.dart';
+import '../../../../../support/pump_localized_app.dart';
 
 void main() {
   group('Settings responsive layout', () {
@@ -90,21 +86,15 @@ Future<void> _pumpSettingsView(
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: _settingsViewTestOverrides(),
-      child: MaterialApp(
-        locale: const Locale('zh'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: buildAppTheme(Brightness.light),
-        home: Scaffold(
-          body: SizedBox(
-            width: viewportWidth,
-            height: 800,
-            child: const SettingsView(),
-          ),
-        ),
+  await pumpLocalizedApp(
+    tester,
+    wrapProviderScope: true,
+    overrides: settingsViewTestOverrides(),
+    home: Scaffold(
+      body: SizedBox(
+        width: viewportWidth,
+        height: 800,
+        child: const SettingsView(),
       ),
     ),
   );
@@ -118,23 +108,4 @@ void _expectMenuIcon(WidgetTester tester, Matcher matcher) {
     ),
     matcher,
   );
-}
-
-List<Override> _settingsViewTestOverrides() {
-  return <Override>[
-    settingsProvider.overrideWith(_FakeSettingsNotifier.new),
-    packageInfoProvider.overrideWith(
-      (Ref ref) async => PackageInfo(
-        appName: 'Hentai Library',
-        packageName: 'hentai_library',
-        version: '1.0.0',
-        buildNumber: '1',
-      ),
-    ),
-  ];
-}
-
-class _FakeSettingsNotifier extends SettingsNotifier {
-  @override
-  Future<AppSetting> build() async => AppSetting();
 }

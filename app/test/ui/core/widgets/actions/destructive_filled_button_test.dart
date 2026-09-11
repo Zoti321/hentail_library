@@ -3,19 +3,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/destructive_filled_button.dart';
 
+import '../../../../support/pump_localized_app.dart';
+
 void main() {
   group('DestructiveFilledButton', () {
     testWidgets('enabled uses destructive / onDestructive fill', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: buildAppTheme(Brightness.light),
-          home: const Scaffold(
-            body: DestructiveFilledButton(
-              onPressed: _noop,
-              child: Text('Delete'),
-            ),
+      await pumpLocalizedApp(
+        tester,
+        home: const Scaffold(
+          body: DestructiveFilledButton(
+            onPressed: _noop,
+            child: Text('Delete'),
           ),
         ),
       );
@@ -26,28 +26,17 @@ void main() {
       final FilledButton button = tester.widget(find.byType(FilledButton));
       final Set<WidgetState> enabled = <WidgetState>{};
 
-      expect(
-        button.style?.backgroundColor?.resolve(enabled),
-        h.destructive,
-      );
-      expect(
-        button.style?.foregroundColor?.resolve(enabled),
-        h.onDestructive,
-      );
+      expect(button.style?.backgroundColor?.resolve(enabled), h.destructive);
+      expect(button.style?.foregroundColor?.resolve(enabled), h.onDestructive);
     });
 
     testWidgets('disabled keeps destructive family instead of grey primary', (
       WidgetTester tester,
     ) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: buildAppTheme(Brightness.light),
-          home: const Scaffold(
-            body: DestructiveFilledButton(
-              onPressed: null,
-              child: Text('Delete'),
-            ),
-          ),
+      await pumpLocalizedApp(
+        tester,
+        home: const Scaffold(
+          body: DestructiveFilledButton(onPressed: null, child: Text('Delete')),
         ),
       );
 
