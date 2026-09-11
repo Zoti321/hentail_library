@@ -29,3 +29,7 @@ Widget state: prefer `StatelessWidget` / `HookWidget` / `ConsumerWidget` / `Hook
 ### UI style & responsive design
 
 Reuse custom components from `lib/ui/core/widgets/`; follow desktop Fluent-inspired design language. Target: single responsive UI (desktop style wins); do not add new mobile-only Material pages. See `docs/agents/ui-style.md`.
+
+### Testing
+
+CI hard gates vs local full suite, FRB thin-edge contracts (not real FRB), UI dual-track, and shared test harness rules: `docs/agents/testing.md`.

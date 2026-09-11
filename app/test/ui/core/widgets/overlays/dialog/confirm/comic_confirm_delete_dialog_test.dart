@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/destructive_filled_button.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/comic_confirm_delete_dialog.dart';
+
+import '../../../../../../support/pump_localized_app.dart';
 
 void main() {
   testWidgets('local delete requires acknowledgement before confirm', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('zh'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: buildAppTheme(Brightness.light),
-        home: const Scaffold(
-          body: ComicConfirmDeleteDialog(title: '本子A', isLocal: true),
-        ),
+    await pumpLocalizedApp(
+      tester,
+      home: const Scaffold(
+        body: ComicConfirmDeleteDialog(title: '本子A', isLocal: true),
       ),
     );
 
@@ -38,18 +33,11 @@ void main() {
   testWidgets(
     'remote delete shows library-only copy without acknowledgement gate',
     (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          locale: const Locale('en'),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          theme: buildAppTheme(Brightness.light),
-          home: const Scaffold(
-            body: ComicConfirmDeleteDialog(
-              title: 'Remote Comic',
-              isLocal: false,
-            ),
-          ),
+      await pumpLocalizedApp(
+        tester,
+        locale: const Locale('en'),
+        home: const Scaffold(
+          body: ComicConfirmDeleteDialog(title: 'Remote Comic', isLocal: false),
         ),
       );
 
@@ -72,15 +60,10 @@ void main() {
   testWidgets('confirm action uses DestructiveFilledButton', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('zh'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: buildAppTheme(Brightness.light),
-        home: const Scaffold(
-          body: ComicConfirmDeleteDialog(title: '本子A', isLocal: false),
-        ),
+    await pumpLocalizedApp(
+      tester,
+      home: const Scaffold(
+        body: ComicConfirmDeleteDialog(title: '本子A', isLocal: false),
       ),
     );
 

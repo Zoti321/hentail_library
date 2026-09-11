@@ -1,5 +1,6 @@
+mod common;
+
 use std::path::Path;
-use std::sync::Mutex;
 
 use hentai_core::{
     connection, fetch_reading_page, get_reading_by_comic_id, init_db_at_path, record_reading,
@@ -8,14 +9,6 @@ use hentai_core::{
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
 
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .unwrap_or_else(|poisoned| poisoned.into_inner());
-    test();
-}
 async fn create_reading_histories_table() {
     let db = connection().expect("connection");
     db.execute(Statement::from_string(
@@ -62,7 +55,7 @@ async fn seed_histories() {
 
 #[test]
 fn fetch_reading_page_returns_descending_pages() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         create_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
@@ -95,7 +88,7 @@ fn fetch_reading_page_returns_descending_pages() {
 
 #[test]
 fn fetch_reading_page_filters_by_keyword_case_insensitively() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         create_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
@@ -120,7 +113,7 @@ fn fetch_reading_page_filters_by_keyword_case_insensitively() {
 
 #[test]
 fn fetch_reading_page_treats_blank_keyword_as_unfiltered() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         create_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
@@ -138,7 +131,7 @@ fn fetch_reading_page_treats_blank_keyword_as_unfiltered() {
 
 #[test]
 fn record_reading_decodes_html_entities_in_title() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         create_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");

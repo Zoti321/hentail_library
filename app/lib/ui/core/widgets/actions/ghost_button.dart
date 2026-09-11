@@ -131,9 +131,7 @@ class GhostButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),
-          foregroundColor: isEnabled
-              ? enabledForeground
-              : disabledForeground,
+          foregroundColor: isEnabled ? enabledForeground : disabledForeground,
           disabledBackgroundColor: Colors.transparent,
           splashFactory: splashFactory,
         ).copyWith(

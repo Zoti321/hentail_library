@@ -3,8 +3,8 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 
 /// Applies zh (or [locale]) AppLocalizations delegates to a [MaterialApp].
 ///
-/// Prefer spreading these onto an existing MaterialApp rather than nesting
-/// another MaterialApp.
+/// Prefer [pumpLocalizedApp] from `pump_localized_app.dart` for new widget tests.
+/// Spread these onto an existing MaterialApp only when a custom shell is required.
 ({
   List<LocalizationsDelegate<dynamic>> delegates,
   List<Locale> locales,

@@ -1,8 +1,6 @@
 //! Named metadata facet seam: junction replace + dict list + library-scoped distinct.
 
-use std::fs;
-use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+mod common;
 
 use hentai_core::{
     add_named_facet_name, connection, count_all_named_facet_names, count_named_facet_attachments,
@@ -10,50 +8,8 @@ use hentai_core::{
     list_all_named_facet_names, list_distinct_named_facet_names, list_named_facet_for_form,
     rename_named_facet_name, replace_comic_named_facet, JunctionNamedFacet,
 };
-use sea_orm::{ConnectionTrait, Database, Statement};
+use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .unwrap_or_else(|poisoned| poisoned.into_inner());
-    test();
-}
-
-fn fixture_sql() -> String {
-    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    fs::read_to_string(manifest_dir.join("../../tests/fixtures/drift_v2.sql"))
-        .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
-
 async fn clear_facet_tables(db: &impl ConnectionTrait) {
     for table in [
         "comic_parodies",
@@ -119,11 +75,11 @@ async fn junction_names(
 
 #[test]
 fn replace_comic_named_facet_upserts_dict_and_replaces_junction() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let root = temp.path().join("lib");
         std::fs::create_dir_all(&root).expect("mkdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -182,13 +138,13 @@ fn replace_comic_named_facet_upserts_dict_and_replaces_junction() {
 
 #[test]
 fn list_distinct_named_facet_names_scopes_to_library() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let root_a = temp.path().join("lib_a");
         let root_b = temp.path().join("lib_b");
         std::fs::create_dir_all(&root_a).expect("mkdir a");
         std::fs::create_dir_all(&root_b).expect("mkdir b");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -241,11 +197,11 @@ fn list_distinct_named_facet_names_scopes_to_library() {
 
 #[test]
 fn list_named_facet_for_form_returns_attachment_counts_sorted_desc_then_name() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let root = temp.path().join("lib");
         std::fs::create_dir_all(&root).expect("mkdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -323,11 +279,11 @@ fn list_named_facet_for_form_returns_attachment_counts_sorted_desc_then_name() {
 
 #[test]
 fn replace_comic_named_facet_works_for_all_junction_facets() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let root = temp.path().join("lib");
         std::fs::create_dir_all(&root).expect("mkdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -363,11 +319,11 @@ fn replace_comic_named_facet_works_for_all_junction_facets() {
 
 #[test]
 fn generic_named_facet_dictionary_crud_and_paging_work_for_all_facets() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let root = temp.path().join("lib");
         std::fs::create_dir_all(&root).expect("mkdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");

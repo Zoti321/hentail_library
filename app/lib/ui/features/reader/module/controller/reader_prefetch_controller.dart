@@ -146,10 +146,7 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
       if (!isUsableReaderCacheFile(path)) {
         return null;
       }
-      return buildReaderImageProvider(
-        filePath: path,
-        cacheWidth: cacheWidth,
-      );
+      return buildReaderImageProvider(filePath: path, cacheWidth: cacheWidth);
     }
     if (imageData is! ReaderArchivePageImageData) {
       return null;
@@ -161,12 +158,10 @@ class ReaderPrefetchController extends _$ReaderPrefetchController {
       ).future,
     );
     return switch (page) {
-      ReaderPageFilePath(:final String path) => isUsableReaderCacheFile(path)
-          ? buildReaderImageProvider(
-              filePath: path,
-              cacheWidth: cacheWidth,
-            )
-          : null,
+      ReaderPageFilePath(:final String path) =>
+        isUsableReaderCacheFile(path)
+            ? buildReaderImageProvider(filePath: path, cacheWidth: cacheWidth)
+            : null,
       ReaderPageBytes(:final Uint8List data) => buildReaderImageProvider(
         memoryBytes: data,
         cacheWidth: cacheWidth,

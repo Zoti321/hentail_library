@@ -3,11 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
-import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/destructive_filled_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
@@ -18,64 +16,67 @@ import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:riverpod/misc.dart' show Override;
 
+import '../../../../../support/pump_localized_app.dart';
+
 void main() {
   group('Named facet management panel', () {
-    testWidgets('detail shows name title, attachment metric, and footer actions', (
-      WidgetTester tester,
-    ) async {
-      await _pumpPanel(tester, repo: _FakeRepo(authors: <String>['作者 A']));
+    testWidgets(
+      'detail shows name title, attachment metric, and footer actions',
+      (WidgetTester tester) async {
+        await _pumpPanel(tester, repo: _FakeRepo(authors: <String>['作者 A']));
 
-      expect(find.byType(OutlinedMetaChip), findsOneWidget);
-      await tester.tap(find.text('作者 A'));
-      await tester.pumpAndSettle();
+        expect(find.byType(OutlinedMetaChip), findsOneWidget);
+        await tester.tap(find.text('作者 A'));
+        await tester.pumpAndSettle();
 
-      expect(find.byType(AdaptiveFormSurface), findsOneWidget);
-      expect(
-        find.descendant(
-          of: find.byType(AdaptiveFormSurface),
-          matching: find.text('作者 A'),
-        ),
-        findsOneWidget,
-      );
-      expect(find.text('名称'), findsNothing);
-      expect(find.text('附着漫画数'), findsOneWidget);
-      expect(find.text('3'), findsOneWidget);
-      expect(
-        find.textContaining('Named facet attachment count'),
-        findsNothing,
-      );
-
-      final DialogActionsBar actionsBar = tester.widget(
-        find.descendant(
-          of: find.byType(AdaptiveFormSurface),
-          matching: find.byType(DialogActionsBar),
-        ),
-      );
-      expect(actionsBar.showDivider, isFalse);
-
-      expect(find.text('关闭'), findsOneWidget);
-      expect(find.text('重命名'), findsOneWidget);
-      expect(find.text('删除'), findsOneWidget);
-
-      final ThemeData footerTheme = Theme.of(
-        tester.element(
+        expect(find.byType(AdaptiveFormSurface), findsOneWidget);
+        expect(
           find.descendant(
-            of: find.byType(DialogActionsBar),
-            matching: find.byType(Wrap),
+            of: find.byType(AdaptiveFormSurface),
+            matching: find.text('作者 A'),
           ),
-        ),
-      );
-      final OutlinedBorder? outlinedShape = footerTheme
-          .outlinedButtonTheme
-          .style
-          ?.shape
-          ?.resolve(const <WidgetState>{});
-      expect(outlinedShape, isA<RoundedRectangleBorder>());
-      expect(
-        (outlinedShape! as RoundedRectangleBorder).borderRadius,
-        BorderRadius.circular(4),
-      );
-    });
+          findsOneWidget,
+        );
+        expect(find.text('名称'), findsNothing);
+        expect(find.text('附着漫画数'), findsOneWidget);
+        expect(find.text('3'), findsOneWidget);
+        expect(
+          find.textContaining('Named facet attachment count'),
+          findsNothing,
+        );
+
+        final DialogActionsBar actionsBar = tester.widget(
+          find.descendant(
+            of: find.byType(AdaptiveFormSurface),
+            matching: find.byType(DialogActionsBar),
+          ),
+        );
+        expect(actionsBar.showDivider, isFalse);
+
+        expect(find.text('关闭'), findsOneWidget);
+        expect(find.text('重命名'), findsOneWidget);
+        expect(find.text('删除'), findsOneWidget);
+
+        final ThemeData footerTheme = Theme.of(
+          tester.element(
+            find.descendant(
+              of: find.byType(DialogActionsBar),
+              matching: find.byType(Wrap),
+            ),
+          ),
+        );
+        final OutlinedBorder? outlinedShape = footerTheme
+            .outlinedButtonTheme
+            .style
+            ?.shape
+            ?.resolve(const <WidgetState>{});
+        expect(outlinedShape, isA<RoundedRectangleBorder>());
+        expect(
+          (outlinedShape! as RoundedRectangleBorder).borderRadius,
+          BorderRadius.circular(4),
+        );
+      },
+    );
 
     testWidgets('delete stays disabled until attachment count is ready', (
       WidgetTester tester,
@@ -179,10 +180,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(DestructiveFilledButton), findsOneWidget);
-        expect(
-          find.text('将删除「作者 A」，并解除与 3 本漫画的附着。此操作不可撤销。'),
-          findsOneWidget,
-        );
+        expect(find.text('将删除「作者 A」，并解除与 3 本漫画的附着。此操作不可撤销。'), findsOneWidget);
         expect(find.textContaining('Named facet attachment'), findsNothing);
       },
     );
@@ -223,39 +221,33 @@ Future<void> _pumpPanel(
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
 
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: <Override>[
-        namedFacetManagementRepoProvider.overrideWithValue(repo),
-      ],
-      child: MaterialApp(
-        locale: const Locale('zh'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: buildAppTheme(Brightness.light),
-        home: Scaffold(
-          body: Consumer(
-            builder: (BuildContext context, WidgetRef ref, Widget? child) {
-              onRef?.call(ref);
-              return CustomScrollView(
-                slivers: <Widget>[
-                  NamedFacetManagementSliverGroup(
-                    kind: ManagedNamedFacetKind.author,
-                    layoutTier: MetadataLayoutTier.expanded,
-                    viewportWidth: 1200,
-                    horizontalPadding: metadataContentHorizontalPadding(
-                      MetadataLayoutTier.expanded,
-                    ),
-                    contentMaxWidth: metadataInnerContentMaxWidth(
-                      MetadataLayoutTier.expanded,
-                      1200,
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
+  await pumpLocalizedApp(
+    tester,
+    wrapProviderScope: true,
+    overrides: <Override>[
+      namedFacetManagementRepoProvider.overrideWithValue(repo),
+    ],
+    home: Scaffold(
+      body: Consumer(
+        builder: (BuildContext context, WidgetRef ref, Widget? child) {
+          onRef?.call(ref);
+          return CustomScrollView(
+            slivers: <Widget>[
+              NamedFacetManagementSliverGroup(
+                kind: ManagedNamedFacetKind.author,
+                layoutTier: MetadataLayoutTier.expanded,
+                viewportWidth: 1200,
+                horizontalPadding: metadataContentHorizontalPadding(
+                  MetadataLayoutTier.expanded,
+                ),
+                contentMaxWidth: metadataInnerContentMaxWidth(
+                  MetadataLayoutTier.expanded,
+                  1200,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     ),
   );
