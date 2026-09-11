@@ -1,4 +1,3 @@
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +6,7 @@ import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/anchored_overlay_menu.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -25,7 +25,14 @@ class MetadataTagsOverflowMenuButton extends ConsumerStatefulWidget {
 
 class _MetadataTagsOverflowMenuButtonState
     extends ConsumerState<MetadataTagsOverflowMenuButton> {
-  final CustomPopupMenuController _controller = CustomPopupMenuController();
+  final AnchoredOverlayMenuController _controller =
+      AnchoredOverlayMenuController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,18 +44,19 @@ class _MetadataTagsOverflowMenuButtonState
     final l10n = context.l10n;
     final bool enabled = tagCount > 0;
 
+    // Material-aligned overlay coords (ancestor: overlay) — avoids
+    // custom_pop_up_menu misplacement when the desktop sidebar is expanded.
+    // `under` keeps the panel below the trigger like Comic/Series headers.
     return Padding(
       padding: const EdgeInsets.only(right: 8),
-      child: CustomPopupMenu(
+      child: AnchoredOverlayMenu(
         controller: _controller,
         barrierColor: Colors.transparent,
-        pressType: PressType.singleClick,
-        showArrow: false,
-        verticalMargin: -32,
-        menuBuilder: () => _MetadataTagsOverflowMenu(
+        position: AnchoredOverlayMenuPosition.under,
+        menuBuilder: (VoidCallback hideMenu) => _MetadataTagsOverflowMenu(
           onDeleteAllTags: enabled
               ? () {
-                  _controller.hideMenu();
+                  hideMenu();
                   widget.onDeleteAllTags();
                 }
               : null,
@@ -63,7 +71,7 @@ class _MetadataTagsOverflowMenuButtonState
           foregroundColor: cs.hentai.iconDefault,
           hoverColor: theme.hoverColor,
           overlayColor: theme.hoverColor,
-          onPressed: enabled ? _controller.showMenu : null,
+          onPressed: enabled ? () => _controller.toggleMenu() : null,
         ),
       ),
     );
