@@ -24,6 +24,9 @@ part 'reader_controller.g.dart';
 
 enum ReaderTapZone { left, center, right }
 
+/// 翻页越界切卷的二次确认方向（末页→下一卷 / 首页→上一卷）。
+enum SeriesBoundaryPrompt { none, advance, retreat }
+
 typedef ReaderControllerKey = ({
   String comicId,
   bool incognito,
@@ -48,7 +51,8 @@ abstract class ReaderState with _$ReaderState {
     @Default(false) bool showControls,
     @Default(1) int currentIndex,
     int? totalPagesOverride,
-    @Default(false) bool seriesAdvancePromptPending,
+    @Default(SeriesBoundaryPrompt.none)
+    SeriesBoundaryPrompt seriesBoundaryPrompt,
     @Default(false) bool autoPlayEnabled,
   }) = _ReaderState;
 
@@ -173,19 +177,39 @@ class ReaderController extends _$ReaderController {
     final current = state.asData?.value;
     if (current == null) return;
     ReaderState next = updater(current);
-    if (next.currentIndex != current.currentIndex &&
-        next.seriesAdvancePromptPending &&
-        !SpreadIndex.isOnLastSpread(
-          mode: next.readingMode,
-          totalPages: next.totalPages,
-          currentPageIndex: next.currentIndex,
-        )) {
-      next = next.copyWith(seriesAdvancePromptPending: false);
+    if (next.currentIndex != current.currentIndex) {
+      next = _clearStaleBoundaryPrompt(next);
     }
     if (next.currentIndex != current.currentIndex) {
       _notifyPageChanged(next.currentIndex);
     }
     state = AsyncData(next);
+  }
+
+  /// Clears advance/retreat prompt once the user leaves that boundary spread.
+  ReaderState _clearStaleBoundaryPrompt(ReaderState next) {
+    switch (next.seriesBoundaryPrompt) {
+      case SeriesBoundaryPrompt.none:
+        return next;
+      case SeriesBoundaryPrompt.advance:
+        if (SpreadIndex.isOnLastSpread(
+          mode: next.readingMode,
+          totalPages: next.totalPages,
+          currentPageIndex: next.currentIndex,
+        )) {
+          return next;
+        }
+        return next.copyWith(seriesBoundaryPrompt: SeriesBoundaryPrompt.none);
+      case SeriesBoundaryPrompt.retreat:
+        if (SpreadIndex.isOnFirstSpread(
+          mode: next.readingMode,
+          totalPages: next.totalPages,
+          currentPageIndex: next.currentIndex,
+        )) {
+          return next;
+        }
+        return next.copyWith(seriesBoundaryPrompt: SeriesBoundaryPrompt.none);
+    }
   }
 
   void toggleShowControls() {
@@ -242,42 +266,18 @@ class ReaderController extends _$ReaderController {
     if (current == null) {
       return;
     }
-    final bool onLastSpread = SpreadIndex.isOnLastSpread(
-      mode: current.readingMode,
-      totalPages: current.totalPages,
-      currentPageIndex: current.currentIndex,
+    await _requestSeriesBoundaryPage(
+      onBoundary: SpreadIndex.isOnLastSpread(
+        mode: current.readingMode,
+        totalPages: current.totalPages,
+        currentPageIndex: current.currentIndex,
+      ),
+      prompt: SeriesBoundaryPrompt.advance,
+      targetItem: navContext?.nextItem,
+      session: session,
+      router: router,
+      turnPage: nextPage,
     );
-    final ReaderComicListItem? nextItem = navContext?.nextItem;
-    if (onLastSpread && nextItem != null && session != null && router != null) {
-      if (!current.seriesAdvancePromptPending) {
-        _updateDataState(
-          (ReaderState s) => s.copyWith(seriesAdvancePromptPending: true),
-        );
-        try {
-          await ref
-              .read(readerPrefetchControllerProvider.notifier)
-              .warmOpenComic(comicId: nextItem.comicId);
-        } catch (_) {
-          // warm-open 失败不阻断提示。
-        }
-        return;
-      }
-      _updateDataState(
-        (ReaderState s) => s.copyWith(seriesAdvancePromptPending: false),
-      );
-      await ref
-          .read(readerSeriesNavigationProvider.notifier)
-          .switchComic(
-            router: router,
-            currentSession: session,
-            targetComicId: nextItem.comicId,
-          );
-      return;
-    }
-    if (onLastSpread) {
-      return;
-    }
-    nextPage();
   }
 
   void prevPage() {
@@ -292,6 +292,74 @@ class ReaderController extends _$ReaderController {
       }
       return s.copyWith(currentIndex: prev);
     });
+  }
+
+  Future<void> requestPrevPage({
+    ReaderNavContextData? navContext,
+    ReadSessionRouteParams? session,
+    GoRouter? router,
+  }) async {
+    final ReaderState? current = state.asData?.value;
+    if (current == null) {
+      return;
+    }
+    await _requestSeriesBoundaryPage(
+      onBoundary: SpreadIndex.isOnFirstSpread(
+        mode: current.readingMode,
+        totalPages: current.totalPages,
+        currentPageIndex: current.currentIndex,
+      ),
+      prompt: SeriesBoundaryPrompt.retreat,
+      targetItem: navContext?.previousItem,
+      session: session,
+      router: router,
+      turnPage: prevPage,
+    );
+  }
+
+  Future<void> _requestSeriesBoundaryPage({
+    required bool onBoundary,
+    required SeriesBoundaryPrompt prompt,
+    required ReaderComicListItem? targetItem,
+    required ReadSessionRouteParams? session,
+    required GoRouter? router,
+    required void Function() turnPage,
+  }) async {
+    final ReaderState? current = state.asData?.value;
+    if (current == null) {
+      return;
+    }
+    if (onBoundary && targetItem != null && session != null && router != null) {
+      if (current.seriesBoundaryPrompt != prompt) {
+        _updateDataState(
+          (ReaderState s) => s.copyWith(seriesBoundaryPrompt: prompt),
+        );
+        try {
+          await ref
+              .read(readerPrefetchControllerProvider.notifier)
+              .warmOpenComic(comicId: targetItem.comicId);
+        } catch (_) {
+          // warm-open 失败不阻断提示。
+        }
+        return;
+      }
+      _updateDataState(
+        (ReaderState s) =>
+            s.copyWith(seriesBoundaryPrompt: SeriesBoundaryPrompt.none),
+      );
+      await ref
+          .read(readerSeriesNavigationProvider.notifier)
+          .switchComic(
+            router: router,
+            currentSession: session,
+            targetComicId: targetItem.comicId,
+          );
+      return;
+    }
+    if (onBoundary) {
+      return;
+    }
+    turnPage();
   }
 
   void setIndex(int index) {
@@ -336,7 +404,11 @@ class ReaderController extends _$ReaderController {
     GoRouter? router,
   }) async {
     if (zone == ReaderTapZone.left) {
-      prevPage();
+      await requestPrevPage(
+        navContext: navContext,
+        session: session,
+        router: router,
+      );
     } else if (zone == ReaderTapZone.right) {
       await requestNextPage(
         navContext: navContext,

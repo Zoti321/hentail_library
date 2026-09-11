@@ -155,6 +155,43 @@ void main() {
     });
   });
 
+  group('SpreadIndex.isOnFirstSpread', () {
+    test('detects first spread for paged and dualPage', () {
+      expect(
+        SpreadIndex.isOnFirstSpread(
+          mode: ReadingMode.paged,
+          totalPages: 5,
+          currentPageIndex: 1,
+        ),
+        isTrue,
+      );
+      expect(
+        SpreadIndex.isOnFirstSpread(
+          mode: ReadingMode.paged,
+          totalPages: 5,
+          currentPageIndex: 2,
+        ),
+        isFalse,
+      );
+      expect(
+        SpreadIndex.isOnFirstSpread(
+          mode: ReadingMode.dualPage,
+          totalPages: 5,
+          currentPageIndex: 1,
+        ),
+        isTrue,
+      );
+      expect(
+        SpreadIndex.isOnFirstSpread(
+          mode: ReadingMode.dualPage,
+          totalPages: 5,
+          currentPageIndex: 3,
+        ),
+        isFalse,
+      );
+    });
+  });
+
   group('SpreadIndex.remapPageForModeSwitch', () {
     test('dualPage to paged uses max page in spread', () {
       expect(

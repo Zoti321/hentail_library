@@ -2216,6 +2216,12 @@ abstract class AppLocalizations {
   /// **'再次翻页将进入下一卷'**
   String get readerSeriesAdvancePrompt;
 
+  /// No description provided for @readerSeriesRetreatPrompt.
+  ///
+  /// In zh, this message translates to:
+  /// **'再次翻页将进入上一卷'**
+  String get readerSeriesRetreatPrompt;
+
   /// No description provided for @readerNoImages.
   ///
   /// In zh, this message translates to:

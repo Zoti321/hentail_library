@@ -578,6 +578,7 @@
   "readerEnableAutoPlay": "Enable auto-play",
   "readerInvalidParams": "Invalid reader params: missing comic_id",
   "readerSeriesAdvancePrompt": "Turn the page again to go to the next volume",
+  "readerSeriesRetreatPrompt": "Turn the page again to go to the previous volume",
   "readerNoImages": "No images",
   "metadataTabAuthors": "Authors",
   "metadataTabTags": "Tags",

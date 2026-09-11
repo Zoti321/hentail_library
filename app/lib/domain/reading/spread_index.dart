@@ -156,6 +156,25 @@ class SpreadIndex {
     return spread >= totalSpreads(mode: mode, totalPages: totalPages) - 1;
   }
 
+  static bool isOnFirstSpread({
+    required ReadingMode mode,
+    required int totalPages,
+    required int currentPageIndex,
+  }) {
+    if (totalPages <= 0 || currentPageIndex < 1) {
+      return true;
+    }
+    if (!mode.usesSpreadNavigation) {
+      return currentPageIndex <= 1;
+    }
+    final int spread = spreadIndexForPage(
+      mode: mode,
+      totalPages: totalPages,
+      pageIndex: currentPageIndex,
+    );
+    return spread <= 0;
+  }
+
   /// 阅读器会话内切换模式时，将当前页码映射到新模式的页码。
   static int remapPageForModeSwitch({
     required ReadingMode fromMode,

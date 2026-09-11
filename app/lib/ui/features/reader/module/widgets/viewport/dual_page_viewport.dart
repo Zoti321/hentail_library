@@ -26,6 +26,7 @@ class DualPageViewport extends HookConsumerWidget {
     required this.initialPage,
     required this.preferredPageIndex,
     this.onRequestNextPage,
+    this.onRequestPrevPage,
   });
 
   final String comicId;
@@ -35,6 +36,7 @@ class DualPageViewport extends HookConsumerWidget {
   final int initialPage;
   final int? preferredPageIndex;
   final Future<void> Function()? onRequestNextPage;
+  final Future<void> Function()? onRequestPrevPage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -226,7 +228,11 @@ class DualPageViewport extends HookConsumerWidget {
                 controller.nextPage();
               }
             } else {
-              controller.prevPage();
+              if (onRequestPrevPage != null) {
+                unawaited(onRequestPrevPage!());
+              } else {
+                controller.prevPage();
+              }
             }
           },
           child: PageView.builder(

@@ -155,10 +155,11 @@ class ReaderPage extends HookConsumerWidget {
     );
     final ObjectRef<bool> hasAppliedKeepControls = useRef<bool>(false);
     final bool readerFullscreen = ref.watch(readerFullscreenControllerProvider);
-    final bool seriesAdvancePromptPending = ref.watch(
+    final SeriesBoundaryPrompt seriesBoundaryPrompt = ref.watch(
       readerControllerProvider(viewKey).select(
         (AsyncValue<ReaderState> asyncState) =>
-            asyncState.asData?.value.seriesAdvancePromptPending ?? false,
+            asyncState.asData?.value.seriesBoundaryPrompt ??
+            SeriesBoundaryPrompt.none,
       ),
     );
     final GlobalKey<ScaffoldState> scaffoldKey = useMemoized(
@@ -192,17 +193,27 @@ class ReaderPage extends HookConsumerWidget {
     }, <Object?>[keepControlsOpen, readerReady, controller]);
 
     useEffect(() {
-      if (!seriesAdvancePromptPending) {
+      if (seriesBoundaryPrompt == SeriesBoundaryPrompt.none) {
         return null;
       }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) {
           return;
         }
-        showInfoToast(context, context.l10n.readerSeriesAdvancePrompt);
+        final String message = switch (seriesBoundaryPrompt) {
+          SeriesBoundaryPrompt.advance =>
+            context.l10n.readerSeriesAdvancePrompt,
+          SeriesBoundaryPrompt.retreat =>
+            context.l10n.readerSeriesRetreatPrompt,
+          SeriesBoundaryPrompt.none => '',
+        };
+        if (message.isEmpty) {
+          return;
+        }
+        showInfoToast(context, message);
       });
       return null;
-    }, <Object?>[seriesAdvancePromptPending, context]);
+    }, <Object?>[seriesBoundaryPrompt, context]);
 
     void dispatchReaderKeyboard(LogicalKeyboardKey key) {
       final bool showControls =
@@ -221,7 +232,16 @@ class ReaderPage extends HookConsumerWidget {
       }
       switch (command) {
         case ReaderKeyboardCommand.prevPage:
-          controller.prevPage();
+          final ReaderPageShellData? shell = shellAsync.asData?.value;
+          unawaited(
+            controller.requestPrevPage(
+              navContext: shell != null && shell.sessionContext.hasSeriesContext
+                  ? shell.sessionContext.navContext
+                  : null,
+              session: routeContext.session,
+              router: GoRouter.of(context),
+            ),
+          );
         case ReaderKeyboardCommand.nextPage:
           final ReaderPageShellData? shell = shellAsync.asData?.value;
           unawaited(
@@ -384,6 +404,11 @@ class _ReaderContentSlot extends ConsumerWidget {
       session: routeContext.session,
       router: GoRouter.of(context),
     );
+    Future<void> requestPrevPage() => controller.requestPrevPage(
+      navContext: seriesNavContext,
+      session: routeContext.session,
+      router: GoRouter.of(context),
+    );
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -413,6 +438,7 @@ class _ReaderContentSlot extends ConsumerWidget {
         preferredPageIndex: preferredPageIndex,
         readingMode: readingMode,
         onRequestNextPage: requestNextPage,
+        onRequestPrevPage: requestPrevPage,
       ),
     );
   }
@@ -508,6 +534,11 @@ class _ReaderBottomBarSlot extends ConsumerWidget {
       session: routeContext.session,
       router: GoRouter.of(context),
     );
+    Future<void> requestPrevPage() => controller.requestPrevPage(
+      navContext: seriesNavContext,
+      session: routeContext.session,
+      router: GoRouter.of(context),
+    );
 
     return ReaderBottomBar(
       showControls: chrome.showControls,
@@ -515,7 +546,9 @@ class _ReaderBottomBarSlot extends ConsumerWidget {
       totalPages: totalPages,
       readerAutoPlayEnabled: readerAutoPlayEnabled,
       showAutoPlayControls: chrome.readingMode.supportsAutoPlay,
-      onPrevPage: controller.prevPage,
+      onPrevPage: () {
+        unawaited(requestPrevPage());
+      },
       onNextPage: requestNextPage,
       onSetIndex: controller.setIndex,
       onReaderAutoPlayEnabledChanged: (bool value) {

@@ -23,6 +23,7 @@ class PagedViewport extends HookConsumerWidget {
     required this.initialPage,
     required this.preferredPageIndex,
     this.onRequestNextPage,
+    this.onRequestPrevPage,
   });
 
   final String comicId;
@@ -31,6 +32,7 @@ class PagedViewport extends HookConsumerWidget {
   final int initialPage;
   final int? preferredPageIndex;
   final Future<void> Function()? onRequestNextPage;
+  final Future<void> Function()? onRequestPrevPage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -200,7 +202,11 @@ class PagedViewport extends HookConsumerWidget {
                 notifier.nextPage();
               }
             } else {
-              notifier.prevPage();
+              if (onRequestPrevPage != null) {
+                unawaited(onRequestPrevPage!());
+              } else {
+                notifier.prevPage();
+              }
             }
           },
           child: PageView.builder(

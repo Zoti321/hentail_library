@@ -1212,6 +1212,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Turn the page again to go to the next volume';
 
   @override
+  String get readerSeriesRetreatPrompt =>
+      'Turn the page again to go to the previous volume';
+
+  @override
   String get readerNoImages => 'No images';
 
   @override
