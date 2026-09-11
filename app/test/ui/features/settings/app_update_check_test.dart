@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/util/semver_utils.dart';
 import 'package:hentai_library/data/services/app_update/app_update_service.dart';
 import 'package:hentai_library/domain/models/app_release_info.dart';
-import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/app_update_dialog.dart';
 import 'package:hentai_library/ui/features/settings/state/app_update_controller.dart';
-import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/services.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod/misc.dart' show Override;
+
+import '../../../support/fakes/settings_test_fakes.dart';
+import '../../../support/pump_localized_app.dart';
 
 class MockAppUpdateService extends Mock implements AppUpdateService {}
 
@@ -49,10 +48,11 @@ void main() {
         () => mockService.fetchLatestStableRelease(),
       ).thenAnswer((_) async => newerRelease);
 
-      await tester.pumpWidget(_buildHarness(mockService: mockService));
+      await _pumpHarness(tester, mockService: mockService);
       await tester.tap(find.text('检查更新'));
       await tester.pumpAndSettle();
 
+      expect(tester.takeException(), isNull);
       expect(find.byType(AppUpdateDialog), findsOneWidget);
       expect(find.text('发现新版本 v1.0.1'), findsOneWidget);
     });
@@ -72,10 +72,11 @@ void main() {
           () => mockService.fetchLatestStableRelease(),
         ).thenAnswer((_) async => olderRelease);
 
-        await tester.pumpWidget(_buildHarness(mockService: mockService));
+        await _pumpHarness(tester, mockService: mockService);
         await tester.tap(find.text('检查更新'));
         await tester.pumpAndSettle();
 
+        expect(tester.takeException(), isNull);
         expect(find.byType(AppUpdateDialog), findsNothing);
         expect(find.text('当前已是最新版本'), findsOneWidget);
       },
@@ -96,11 +97,10 @@ void main() {
           () => mockService.fetchLatestStableRelease(),
         ).thenAnswer((_) async => newerRelease);
 
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: _overrides(mockService),
-            child: const MaterialApp(home: SizedBox.shrink()),
-          ),
+        await pumpLocalizedApp(
+          tester,
+          home: const SizedBox.shrink(),
+          overrides: _overrides(mockService),
         );
 
         final ProviderContainer container = ProviderScope.containerOf(
@@ -111,55 +111,38 @@ void main() {
             .runManualCheck();
         await tester.pumpAndSettle();
 
+        expect(tester.takeException(), isNull);
         expect(find.byType(AppUpdateDialog), findsNothing);
       },
     );
   });
 }
 
-Widget _buildHarness({required MockAppUpdateService mockService}) {
-  return ProviderScope(
+Future<void> _pumpHarness(
+  WidgetTester tester, {
+  required MockAppUpdateService mockService,
+}) {
+  return pumpLocalizedApp(
+    tester,
     overrides: _overrides(mockService),
-    child: MaterialApp(
-      locale: const Locale('zh'),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: Builder(
-        builder: (BuildContext context) {
-          return ElevatedButton(
-            onPressed: () async {
-              await ProviderScope.containerOf(context)
-                  .read(appUpdateControllerProvider.notifier)
-                  .runManualCheck(context: context);
-            },
-            child: const Text('检查更新'),
-          );
-        },
-      ),
+    home: Builder(
+      builder: (BuildContext context) {
+        return ElevatedButton(
+          onPressed: () async {
+            await ProviderScope.containerOf(context)
+                .read(appUpdateControllerProvider.notifier)
+                .runManualCheck(context: context);
+          },
+          child: const Text('检查更新'),
+        );
+      },
     ),
   );
 }
 
 List<Override> _overrides(MockAppUpdateService mockService) {
-  return [
+  return <Override>[
     appUpdateServiceProvider.overrideWithValue(mockService),
-    packageInfoProvider.overrideWith(
-      (Ref ref) => Future<PackageInfo>.value(
-        PackageInfo(
-          appName: 'hentai_library',
-          packageName: 'hentai_library',
-          version: '1.0.0',
-          buildNumber: '1',
-          buildSignature: '',
-          installerStore: '',
-        ),
-      ),
-    ),
-    settingsProvider.overrideWith(() => _FakeSettingsNotifier()),
+    ...settingsViewTestOverrides(),
   ];
-}
-
-class _FakeSettingsNotifier extends SettingsNotifier {
-  @override
-  Future<AppSetting> build() async => AppSetting();
 }
