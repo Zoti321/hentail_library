@@ -193,6 +193,8 @@ class HentaiColorScheme {
     required this.success,
     required this.warning,
     required this.error,
+    required this.destructive,
+    required this.onDestructive,
     required this.serializationHiatus,
     required this.winBackground,
     required this.winSurface,
@@ -251,6 +253,8 @@ class HentaiColorScheme {
     success: Color(0xFF4CAF50),
     warning: Color(0xFFF59E0B),
     error: Color(0xFFEF4444),
+    destructive: Color(0xFFCF222E),
+    onDestructive: Colors.white,
     serializationHiatus: Color(0xFFF59E0B),
     winBackground: Color(0xFFF5F5F6),
     winSurface: Color.fromRGBO(245, 245, 247, 1),
@@ -309,6 +313,8 @@ class HentaiColorScheme {
     success: Color(0xFF4CAF50),
     warning: Color(0xFFF59E0B),
     error: Color(0xFFEF4444),
+    destructive: Color(0xFFF47067),
+    onDestructive: Color(0xFF1A0505),
     serializationHiatus: Color(0xFFF59E0B),
     winBackground: Color(0xFF1A1A1A),
     winSurface: Color.fromRGBO(45, 45, 47, 1),
@@ -366,6 +372,13 @@ class HentaiColorScheme {
   final Color success;
   final Color warning;
   final Color error;
+
+  /// Destructive action fill (delete / remove / clear confirms).
+  ///
+  /// Initial hue matches [contextMenuDanger]; confirm buttons use this token
+  /// via `DestructiveFilledButton`, while menus may keep [contextMenuDanger].
+  final Color destructive;
+  final Color onDestructive;
   final Color serializationHiatus;
   final Color winBackground;
   final Color winSurface;

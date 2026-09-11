@@ -18,5 +18,19 @@ void main() {
       ).colorScheme.hentai;
       expect(h.warning, isNot(h.error));
     });
+
+    test('destructive matches contextMenuDanger and has onDestructive', () {
+      final HentaiColorScheme light = buildAppTheme(
+        Brightness.light,
+      ).colorScheme.hentai;
+      final HentaiColorScheme dark = buildAppTheme(
+        Brightness.dark,
+      ).colorScheme.hentai;
+
+      expect(light.destructive, light.contextMenuDanger);
+      expect(dark.destructive, dark.contextMenuDanger);
+      expect(light.onDestructive, isNot(light.destructive));
+      expect(dark.onDestructive, isNot(dark.destructive));
+    });
   });
 }

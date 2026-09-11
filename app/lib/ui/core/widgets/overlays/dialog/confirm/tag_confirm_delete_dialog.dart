@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/ui/core/widgets/actions/destructive_filled_button.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 
 class TagConfirmDeleteDialog extends StatelessWidget {
@@ -19,7 +20,7 @@ class TagConfirmDeleteDialog extends StatelessWidget {
           child: Text(l10n.commonCancel),
         ),
         const SizedBox(width: 8),
-        FilledButton(
+        DestructiveFilledButton(
           onPressed: () => Navigator.of(context).pop(true),
           child: Text(l10n.commonDelete),
         ),

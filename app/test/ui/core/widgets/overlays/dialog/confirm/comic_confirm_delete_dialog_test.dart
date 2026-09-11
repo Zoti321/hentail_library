@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/actions/destructive_filled_button.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/comic_confirm_delete_dialog.dart';
 
 void main() {
@@ -22,22 +23,16 @@ void main() {
 
     expect(find.text('我了解磁盘上的资源将被永久删除'), findsOneWidget);
 
-    final FilledButton buttonBefore = tester.widget<FilledButton>(
-      find.byType(FilledButton),
-    );
+    final DestructiveFilledButton buttonBefore = tester
+        .widget<DestructiveFilledButton>(find.byType(DestructiveFilledButton));
     expect(buttonBefore.onPressed, isNull);
 
     await tester.tap(find.byType(CheckboxListTile));
     await tester.pumpAndSettle();
 
-    final FilledButton buttonAfter = tester.widget<FilledButton>(
-      find.byType(FilledButton),
-    );
+    final DestructiveFilledButton buttonAfter = tester
+        .widget<DestructiveFilledButton>(find.byType(DestructiveFilledButton));
     expect(buttonAfter.onPressed, isNotNull);
-    expect(
-      buttonAfter.style?.backgroundColor?.resolve(<WidgetState>{}),
-      Theme.of(tester.element(find.byType(FilledButton))).colorScheme.error,
-    );
   });
 
   testWidgets(
@@ -64,9 +59,31 @@ void main() {
       );
       expect(find.byType(CheckboxListTile), findsNothing);
       expect(
-        tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+        tester
+            .widget<DestructiveFilledButton>(
+              find.byType(DestructiveFilledButton),
+            )
+            .onPressed,
         isNotNull,
       );
     },
   );
+
+  testWidgets('confirm action uses DestructiveFilledButton', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('zh'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        theme: buildAppTheme(Brightness.light),
+        home: const Scaffold(
+          body: ComicConfirmDeleteDialog(title: '本子A', isLocal: false),
+        ),
+      ),
+    );
+
+    expect(find.byType(DestructiveFilledButton), findsOneWidget);
+  });
 }

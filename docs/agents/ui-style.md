@@ -86,8 +86,9 @@ Key semantic groups in `HentaiColorScheme`:
 | Cards | `cardShadow`, `cardShadowHover`, `hoverBackground` | Hover lift |
 | Inputs | `inputBackground`, `inputBorder`, `inputBorderActive` | `FluentTextField` |
 | Reader | `readerBackground`, `readerPanelBackground`, `floatingUiBackground` | Reader overlay UI |
-| Context menu | `contextMenuBackground`, `contextMenuHover`, `contextMenuDanger` | Right-click menus |
-| Status | `success`, `warning` | Toast, validation |
+| Context menu | `contextMenuBackground`, `contextMenuHover`, `contextMenuDanger` | Right-click menus (danger labels / icons; menu alignment follow-up is out of current scope) |
+| Status | `success`, `warning`, `error` | Toast, validation |
+| Destructive | `destructive`, `onDestructive` | Delete / remove / clear **confirm** filled buttons (`DestructiveFilledButton`). Hue initially matches `contextMenuDanger`; do not use Material `error` for these confirms. |
 
 **Primary accent:** light `#005FB8`, dark `#6EB3FF`. Secondary green for positive actions.
 
@@ -105,6 +106,7 @@ Key semantic groups in `HentaiColorScheme`:
 ### Interaction patterns
 
 - **Primary actions:** filled buttons with `tokens.radius.md` shape
+- **Destructive confirms:** delete / remove / clear confirmation dialogs use `DestructiveFilledButton` (`cs.hentai.destructive` / `onDestructive`). Cancel stays a plain `TextButton`. Do **not** paint non-delete confirms (e.g. save library root, disable all formats) with destructive. Menu / overflow / sidebar delete entry styling may still use `contextMenuDanger` until a follow-up issue.
 - **Secondary / toolbar:** `GhostButton.icon`, `.iconText`, `.text` — hover fill, no splash
 - **In-page tabs:** `CapsuleTabBar` (pill container, selected segment tinted with `primary`)
 - **Context actions:** right-click → `*ContextMenu.show` (comic, series, series item)
@@ -137,7 +139,7 @@ CatalogCoverCardShell
 
 | Category | Path | Examples |
 |----------|------|----------|
-| Actions | `actions/` | `GhostButton`, `FilterPopupButton`, `SortPopupButton`, `PopupMenuPanelShell` |
+| Actions | `actions/` | `GhostButton`, `DestructiveFilledButton`, `FilterPopupButton`, `SortPopupButton`, `PopupMenuPanelShell` |
 | Chrome | `chrome/` | `AppTitleBar`, `CapsuleTabBar`, `StatusCardShell` |
 | Elements | `element/` | `CatalogCoverCardShell` (internal), `ComicCard`, `SeriesCard`, `MetaChip`, `TagChip`, `ContentRatingChip`, `AppComicImage`, `AdaptiveCover` |
 | Feedback | `feedback/` | `custom_toast`, `TerminalSpinner` |

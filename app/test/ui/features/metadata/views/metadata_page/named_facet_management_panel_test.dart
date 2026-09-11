@@ -6,6 +6,7 @@ import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/actions/destructive_filled_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/named_facet_management_controller.dart';
@@ -87,6 +88,20 @@ void main() {
 
       expect(find.byType(OutlinedMetaChip), findsNWidgets(90));
       expect(repo.fetchPageCalls, greaterThanOrEqualTo(2));
+    });
+
+    testWidgets('delete confirm uses DestructiveFilledButton', (
+      WidgetTester tester,
+    ) async {
+      await _pumpPanel(tester, repo: _FakeRepo(authors: <String>['作者 A']));
+
+      await tester.tap(find.text('作者 A'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('删除'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DestructiveFilledButton), findsOneWidget);
     });
   });
 }

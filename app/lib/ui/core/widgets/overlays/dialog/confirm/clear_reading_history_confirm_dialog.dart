@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/ui/core/widgets/actions/destructive_filled_button.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 
 /// 清空全部阅读历史的确认对话框（与标签/系列删除确认对话框同一套 Fluent 壳层）。
@@ -23,13 +24,8 @@ class ClearReadingHistoryConfirmDialog extends StatelessWidget {
           child: Text(l10n.commonCancel),
         ),
         const SizedBox(width: 8),
-        FilledButton(
+        DestructiveFilledButton(
           onPressed: () => Navigator.of(context).pop(true),
-          style: FilledButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
           child: Text(l10n.commonClear),
         ),
       ],

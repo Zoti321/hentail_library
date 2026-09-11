@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/actions/destructive_filled_button.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/tag_confirm_delete_dialog.dart';
 
 void main() {
@@ -27,6 +28,23 @@ void main() {
       _resolvedButtonRadius(tester, find.byType(FilledButton)),
       BorderRadius.circular(4),
     );
+  });
+
+  testWidgets('confirm action uses DestructiveFilledButton', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        theme: buildAppTheme(Brightness.light),
+        home: const Scaffold(body: TagConfirmDeleteDialog(count: 1)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DestructiveFilledButton), findsOneWidget);
   });
 }
 

@@ -4,6 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/actions/destructive_filled_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/count_digit_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
@@ -582,7 +583,7 @@ class _NamedFacetConfirmDeleteDialog extends StatelessWidget {
           child: Text(l10n.commonCancel),
         ),
         const SizedBox(width: 8),
-        FilledButton(
+        DestructiveFilledButton(
           onPressed: () => Navigator.of(context).pop(true),
           child: Text(l10n.commonDelete),
         ),

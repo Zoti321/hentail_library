@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/actions/destructive_filled_button.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 
 /// 从已保存路径列表中移除单条路径前的确认对话框。
@@ -47,13 +48,8 @@ class RemoveSavedPathConfirmDialog extends StatelessWidget {
           child: Text(l10n.commonCancel),
         ),
         const SizedBox(width: 8),
-        FilledButton(
+        DestructiveFilledButton(
           onPressed: () => Navigator.of(context).pop(true),
-          style: FilledButton.styleFrom(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
           child: Text(l10n.commonRemove),
         ),
       ],
