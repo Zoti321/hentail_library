@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/ui/core/interaction/desktop_page_transition.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_detail_return_series_notifier.dart';
@@ -71,10 +72,12 @@ class ComicDetailBackHeader extends StatelessWidget {
       );
       if (seriesLocation != null) {
         clearComicDetailReturnSeriesFromContext(context);
+        // Series detail already uses fade-through pageBuilder.
         context.go(seriesLocation);
         return;
       }
     }
+    requestShellFadeThroughOnce();
     LibraryManagementActions.goCurrentLibraryBrowseFromContext(context);
   }
 
