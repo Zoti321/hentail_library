@@ -49,8 +49,8 @@ Comic 与资源位置键绑定，而非内容哈希。本地为规范化磁盘�
 _Avoid_: 内容 ID、文件指纹
 
 **Path migration**:
-位置键变化后仍判定为同一 Comic（或同一 Series）时，将库记录 rekey 到新身份并保留用户元数据、Metadata field lock、阅读历史等，而不是 orphan 删除后再当新条目导入。Library sync 内对 Comic 用资源弱指纹（类型 + 大小 + 页数）在 removed/added 间做 1:1 唯一配对；Local 改 Library root 且新根可读时，按相对旧根的路径前缀 remapping（含 Series 的 `folder_path` / `seriesId`）。指纹歧义、相对路径对不上、或新根不可读则不迁，交由后续 Library sync 对齐。不是 Metadata refresh，也不改变 Comic identity 的位置锚定。详见 ADR-0013。
-_Avoid_: 自动迁移身份、内容指纹身份、搬家、重命名保留、rekey（实现用语）
+位置键变化后仍判定为同一 Comic（或同一 Series）时，将库记录 rekey 到新身份并保留用户元数据、Metadata field lock、阅读历史等，而不是 orphan 删除后再当新条目导入。Library sync 内对 Comic 用资源弱指纹（类型 + 大小 + 页数）在 removed/added 间做 1:1 唯一配对；若某 Folder series 的全部成员均因此迁到同一新父路径，则将该 Series 一并 rekey（保留连载状态、计划总卷数、字段锁、自定义名与系列封面等；未锁的显示名可随新文件夹名更新）。Local 改 Library root 且新根可读时，按相对旧根的路径前缀 remapping（含 Series 的 `folder_path` / `seriesId`）。指纹歧义、成员未全部迁到同一新父、相对路径对不上、或新根不可读则不迁，交由后续 Library sync 对齐。不是 Metadata refresh，也不改变 Comic / Series identity 的位置锚定，也不引入文件夹内容哈希身份。详见 ADR-0013。
+_Avoid_: 自动迁移身份、内容指纹身份、系列内容哈希、搬家、重命名保留、rekey（实现用语）
 
 **Comic deletion**:
 用户主动删除 Comic：从 Library 移除该 Comic 及其库内关联数据；对 Local library 在路径安全校验后永久删除其 Resource（成功或路径已不存在后再清库；删盘失败则不改库）；对 Remote library 仅清库、不删远程 Resource。不是 Library sync 的 orphan 清理，也不是删除整个 Library（后两者仍只动库记录）。详见 ADR-0012。
