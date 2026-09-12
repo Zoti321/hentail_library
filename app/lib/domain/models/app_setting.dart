@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hentai_library/domain/library/format_group.dart';
+import 'package:hentai_library/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 
 part 'app_setting.freezed.dart';
@@ -28,6 +29,11 @@ Map<String, dynamic> _migrateAppSettingJson(Map<String, dynamic> json) {
   if (!migrated.containsKey('enabledFormatGroups')) {
     migrated['enabledFormatGroups'] = formatGroupsToStorage(FormatGroup.all);
   }
+  if (migrated.containsKey('autoPlayMode')) {
+    migrated['autoPlayMode'] = autoPlayModeToJson(
+      autoPlayModeFromJson(migrated['autoPlayMode']),
+    );
+  }
   return migrated;
 }
 
@@ -41,6 +47,10 @@ abstract class AppSetting with _$AppSetting {
     @Default(kDefaultWebtoonMarginPercent) int webtoonMarginPercent,
     @Default(kDefaultWebtoonZoomMode) WebtoonZoomMode webtoonZoomMode,
     @Default(5) int readerAutoPlayIntervalSeconds,
+    @Default(kDefaultAutoPlayMode)
+    // ignore: invalid_annotation_target
+    @JsonKey(fromJson: autoPlayModeFromJson, toJson: autoPlayModeToJson)
+    AutoPlayMode autoPlayMode,
     @Default(true) bool desktopSidebarExpanded,
 
     /// 启动时是否自动检查应用更新。

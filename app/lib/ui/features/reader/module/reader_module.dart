@@ -13,5 +13,4 @@ export 'widgets/viewport/reader_page_crossfade_policy.dart';
 export 'widgets/viewport/reader_image_filter_quality.dart';
 export 'widgets/viewport/reader_page_fade_in.dart';
 export 'widgets/viewport/reader_prefetch_hook.dart';
-export 'widgets/viewport/reader_scroll_activity.dart';
 export 'widgets/viewport/reader_viewport_constants.dart';

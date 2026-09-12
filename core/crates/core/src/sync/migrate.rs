@@ -1,6 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::comic::ComicDto;
+use crate::series_id::{folder_path_from_comic_path, series_id_from_folder_path};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ResourceFingerprint {
@@ -29,6 +30,13 @@ pub struct ComicMigrationPair {
 pub struct ComicMigration {
     pub from_comic_id: String,
     pub to_comic: ComicDto,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SeriesMigrationPair {
+    pub from_series_id: String,
+    pub to_series_id: String,
+    pub to_folder_path: String,
 }
 
 /// 在 removed / added 集合间按资源指纹做 1:1 唯一配对。
@@ -65,6 +73,77 @@ pub fn migrated_id_sets(pairs: &[ComicMigrationPair]) -> (HashSet<String>, HashS
         to_ids.insert(pair.to_comic_id.clone());
     }
     (from_ids, to_ids)
+}
+
+/// F0：Comic 弱指纹 1:1 配对已知后，若 Folder series 全部成员均迁到同一新父路径则 rekey Series。
+///
+/// - `members_by_series`：旧 series_id → 成员 comic_id
+/// - `from_comic_to_new_path`：迁出 comic_id → 新资源路径
+/// - `existing_series_ids`：库内现有 series_id（用于避开仍被占用的目标）
+pub fn detect_series_path_migration_pairs(
+    members_by_series: &HashMap<String, Vec<String>>,
+    from_comic_to_new_path: &HashMap<String, String>,
+    existing_series_ids: &HashSet<String>,
+) -> Vec<SeriesMigrationPair> {
+    let mut candidates: Vec<SeriesMigrationPair> = Vec::new();
+    for (from_series_id, members) in members_by_series {
+        if members.is_empty() {
+            continue;
+        }
+        let mut new_folders: HashSet<String> = HashSet::new();
+        let mut all_migrated = true;
+        for comic_id in members {
+            let Some(new_path) = from_comic_to_new_path.get(comic_id) else {
+                all_migrated = false;
+                break;
+            };
+            let Some(folder) = folder_path_from_comic_path(new_path) else {
+                all_migrated = false;
+                break;
+            };
+            new_folders.insert(folder);
+        }
+        if !all_migrated || new_folders.len() != 1 {
+            continue;
+        }
+        let to_folder_path = new_folders.into_iter().next().expect("len == 1");
+        let to_series_id = series_id_from_folder_path(&to_folder_path);
+        if to_series_id == *from_series_id {
+            continue;
+        }
+        candidates.push(SeriesMigrationPair {
+            from_series_id: from_series_id.clone(),
+            to_series_id,
+            to_folder_path,
+        });
+    }
+
+    let migrating_from: HashSet<String> = candidates
+        .iter()
+        .map(|p| p.from_series_id.clone())
+        .collect();
+
+    let mut target_counts: HashMap<String, usize> = HashMap::new();
+    for pair in &candidates {
+        *target_counts.entry(pair.to_series_id.clone()).or_default() += 1;
+    }
+
+    candidates
+        .into_iter()
+        .filter(|pair| target_counts.get(&pair.to_series_id).copied().unwrap_or(0) == 1)
+        .filter(|pair| {
+            !existing_series_ids.contains(&pair.to_series_id)
+                || migrating_from.contains(&pair.to_series_id)
+        })
+        .collect()
+}
+
+/// 由 Comic 迁移结果构造「旧 comic_id → 新资源路径」映射，供 F0 使用。
+pub fn comic_migration_new_paths(migrations: &[ComicMigration]) -> HashMap<String, String> {
+    migrations
+        .iter()
+        .map(|m| (m.from_comic_id.clone(), m.to_comic.path.clone()))
+        .collect()
 }
 
 fn group_ids_by_fingerprint(
@@ -176,5 +255,71 @@ mod tests {
         );
 
         assert!(detect_path_migration_pairs(&removed, &added).is_empty());
+    }
+
+    #[test]
+    fn detect_series_pairs_when_all_members_share_new_parent() {
+        let mut members = HashMap::new();
+        members.insert(
+            "series-old".to_string(),
+            vec!["c1".to_string(), "c2".to_string()],
+        );
+        let mut paths = HashMap::new();
+        paths.insert("c1".to_string(), "E:/lib/NewSeries/a.cbz".to_string());
+        paths.insert("c2".to_string(), "E:/lib/NewSeries/b.cbz".to_string());
+        let existing = HashSet::from(["series-old".to_string()]);
+
+        let pairs = detect_series_path_migration_pairs(&members, &paths, &existing);
+        assert_eq!(pairs.len(), 1);
+        assert_eq!(pairs[0].from_series_id, "series-old");
+        assert_eq!(
+            pairs[0].to_series_id,
+            series_id_from_folder_path("E:/lib/NewSeries")
+        );
+    }
+
+    #[test]
+    fn detect_series_pairs_skips_partial_member_move() {
+        let mut members = HashMap::new();
+        members.insert(
+            "series-old".to_string(),
+            vec!["c1".to_string(), "c2".to_string()],
+        );
+        let mut paths = HashMap::new();
+        paths.insert("c1".to_string(), "E:/lib/Other/a.cbz".to_string());
+        // c2 not migrated
+        let existing = HashSet::from(["series-old".to_string()]);
+
+        assert!(detect_series_path_migration_pairs(&members, &paths, &existing).is_empty());
+    }
+
+    #[test]
+    fn detect_series_pairs_skips_when_members_land_under_different_parents() {
+        let mut members = HashMap::new();
+        members.insert(
+            "series-old".to_string(),
+            vec!["c1".to_string(), "c2".to_string()],
+        );
+        let mut paths = HashMap::new();
+        paths.insert("c1".to_string(), "E:/lib/A/a.cbz".to_string());
+        paths.insert("c2".to_string(), "E:/lib/B/b.cbz".to_string());
+        let existing = HashSet::from(["series-old".to_string()]);
+
+        assert!(detect_series_path_migration_pairs(&members, &paths, &existing).is_empty());
+    }
+
+    #[test]
+    fn detect_series_pairs_skips_occupied_destination_not_being_vacated() {
+        let dest = series_id_from_folder_path("E:/lib/Dest");
+        let mut members = HashMap::new();
+        members.insert(
+            "series-old".to_string(),
+            vec!["c1".to_string()],
+        );
+        let mut paths = HashMap::new();
+        paths.insert("c1".to_string(), "E:/lib/Dest/a.cbz".to_string());
+        let existing = HashSet::from(["series-old".to_string(), dest.clone()]);
+
+        assert!(detect_series_path_migration_pairs(&members, &paths, &existing).is_empty());
     }
 }

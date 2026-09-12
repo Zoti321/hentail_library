@@ -46,10 +46,6 @@ const double _kEditMetadataShellChromeReserve = 120;
 
 const double _kEditMetadataBodyMinHeight = 240;
 
-const Duration _kEditMetadataTabTransitionDuration = Duration(
-  milliseconds: 180,
-);
-
 enum _EditMetadataTab { general, authorsAndTags }
 
 /// 打开漫画元数据编辑表面。有 Series 归属时在常规页展示成员排序区。
@@ -91,7 +87,6 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   late ComicMetaLocks _locks;
   ComicMetadataFormValidation? _validation;
   _EditMetadataTab _selectedTab = _EditMetadataTab.general;
-  int _previousTabIndex = 0;
   bool _saving = false;
   bool _lockBusy = false;
 
@@ -252,46 +247,8 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       return;
     }
     setState(() {
-      _previousTabIndex = _selectedTab.index;
       _selectedTab = _EditMetadataTab.values[index];
     });
-  }
-
-  String _tabChildKey(_EditMetadataTab tab) {
-    return switch (tab) {
-      _EditMetadataTab.general => 'general',
-      _EditMetadataTab.authorsAndTags => 'authors-tags',
-    };
-  }
-
-  Widget _buildTabTransition(Widget child, Animation<double> animation) {
-    final bool slideForward = _selectedTab.index > _previousTabIndex;
-    final double direction = slideForward ? 1 : -1;
-    final bool isIncoming =
-        child.key == ValueKey<String>(_tabChildKey(_selectedTab));
-    final Animation<double> curved = CurvedAnimation(
-      parent: animation,
-      curve: Curves.easeOutCubic,
-    );
-    final Animation<Offset> offsetAnimation = isIncoming
-        ? Tween<Offset>(
-            begin: Offset(0.08 * direction, 0),
-            end: Offset.zero,
-          ).animate(curved)
-        : Tween<Offset>(
-            begin: Offset.zero,
-            end: Offset(-0.08 * direction, 0),
-          ).animate(curved);
-
-    return ClipRect(
-      child: SlideTransition(
-        position: offsetAnimation,
-        child: FadeTransition(
-          opacity: isIncoming ? animation : ReverseAnimation(animation),
-          child: child,
-        ),
-      ),
-    );
   }
 
   void _updateForm(ComicMetadataForm Function(ComicMetadataForm) transform) {
@@ -306,7 +263,6 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     if (!validation.isValid) {
       setState(() {
         _validation = validation;
-        _previousTabIndex = _selectedTab.index;
         _selectedTab = _EditMetadataTab.general;
       });
       return;
@@ -320,7 +276,6 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       if (trimmed.isEmpty || parsed == null || !parsed.isFinite) {
         setState(() {
           _sortOrderError = context.l10n.formSeriesItemSortOrderInvalid;
-          _previousTabIndex = _selectedTab.index;
           _selectedTab = _EditMetadataTab.general;
         });
         return;
@@ -374,118 +329,96 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   }
 
   Widget _buildTabPane(AppThemeTokens tokens) {
-    return AnimatedSwitcher(
-      duration: _kEditMetadataTabTransitionDuration,
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeOutCubic,
-      layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
-        return Stack(
-          alignment: Alignment.topCenter,
-          clipBehavior: Clip.hardEdge,
-          children: <Widget>[
-            ...previousChildren,
-            if (currentChild != null) currentChild,
-          ],
-        );
-      },
-      transitionBuilder: _buildTabTransition,
-      child: switch (_selectedTab) {
-        _EditMetadataTab.general => _EditMetadataGeneralTab(
-          key: const ValueKey<String>('general'),
+    return switch (_selectedTab) {
+      _EditMetadataTab.general => _EditMetadataGeneralTab(
+        title: _form.title,
+        titleError: _validation?.titleError,
+        description: _form.description ?? '',
+        publishedAt: _form.publishedAt,
+        isR18: _form.isR18,
+        languages: _form.languages,
+        locks: _locks,
+        lockBusy: _lockBusy || _saving,
+        showSeriesSort: _seriesSortSeed != null,
+        sortOrderText: _sortOrderText,
+        sortOrderLocked: _sortOrderLocked,
+        sortOrderError: _sortOrderError,
+        onTitleChanged: (String value) {
+          setState(() {
+            _form = _form.copyWith(title: value);
+            if (_validation?.titleError != null) {
+              _validation = const ComicMetadataFormValidation();
+            }
+          });
+        },
+        onDescriptionChanged: (String value) {
+          _updateForm((ComicMetadataForm f) => f.copyWith(description: value));
+        },
+        onPublishedAtChanged: (DateTime? value) {
+          _updateForm((ComicMetadataForm f) => f.copyWith(publishedAt: value));
+        },
+        onIsR18Changed: (bool value) {
+          _updateForm((ComicMetadataForm f) => f.copyWith(isR18: value));
+        },
+        onAddLanguage: (String name) {
+          _updateForm((ComicMetadataForm f) => f.addLanguage(name));
+        },
+        onRemoveLanguage: (String name) {
+          _updateForm((ComicMetadataForm f) => f.removeLanguage(name));
+        },
+        onSortOrderChanged: (String value) {
+          setState(() {
+            _sortOrderText = value;
+            if (_sortOrderError != null) {
+              _sortOrderError = null;
+            }
+          });
+        },
+        onSortOrderLockedChanged: (bool locked) {
+          setState(() => _sortOrderLocked = locked);
+        },
+        onLockChanged: _setLock,
+      ),
+      _EditMetadataTab.authorsAndTags => _EditMetadataAuthorsTagsTab(
+        scope: (
+          comicId: widget.comic.comicId,
           title: _form.title,
-          titleError: _validation?.titleError,
-          description: _form.description ?? '',
-          publishedAt: _form.publishedAt,
-          isR18: _form.isR18,
-          languages: _form.languages,
-          locks: _locks,
-          lockBusy: _lockBusy || _saving,
-          showSeriesSort: _seriesSortSeed != null,
-          sortOrderText: _sortOrderText,
-          sortOrderLocked: _sortOrderLocked,
-          sortOrderError: _sortOrderError,
-          onTitleChanged: (String value) {
-            setState(() {
-              _form = _form.copyWith(title: value);
-              if (_validation?.titleError != null) {
-                _validation = const ComicMetadataFormValidation();
-              }
-            });
-          },
-          onDescriptionChanged: (String value) {
-            _updateForm(
-              (ComicMetadataForm f) => f.copyWith(description: value),
-            );
-          },
-          onPublishedAtChanged: (DateTime? value) {
-            _updateForm(
-              (ComicMetadataForm f) => f.copyWith(publishedAt: value),
-            );
-          },
-          onIsR18Changed: (bool value) {
-            _updateForm((ComicMetadataForm f) => f.copyWith(isR18: value));
-          },
-          onAddLanguage: (String name) {
-            _updateForm((ComicMetadataForm f) => f.addLanguage(name));
-          },
-          onRemoveLanguage: (String name) {
-            _updateForm((ComicMetadataForm f) => f.removeLanguage(name));
-          },
-          onSortOrderChanged: (String value) {
-            setState(() {
-              _sortOrderText = value;
-              if (_sortOrderError != null) {
-                _sortOrderError = null;
-              }
-            });
-          },
-          onSortOrderLockedChanged: (bool locked) {
-            setState(() => _sortOrderLocked = locked);
-          },
-          onLockChanged: _setLock,
+          resourcePath: widget.comic.path,
+          seriesId: _seriesSortSeed?.seriesId,
         ),
-        _EditMetadataTab.authorsAndTags => _EditMetadataAuthorsTagsTab(
-          key: const ValueKey<String>('authors-tags'),
-          scope: (
-            comicId: widget.comic.comicId,
-            title: _form.title,
-            resourcePath: widget.comic.path,
-            seriesId: _seriesSortSeed?.seriesId,
-          ),
-          authors: _form.authors,
-          tags: _form.tags,
-          parodies: _form.parodies,
-          characters: _form.characters,
-          locks: _locks,
-          lockBusy: _lockBusy || _saving,
-          onAddAuthor: (String name) {
-            _updateForm((ComicMetadataForm f) => f.addAuthor(name));
-          },
-          onRemoveAuthor: (String name) {
-            _updateForm((ComicMetadataForm f) => f.removeAuthor(name));
-          },
-          onAddTag: (String name) {
-            _updateForm((ComicMetadataForm f) => f.addTag(name));
-          },
-          onRemoveTag: (String name) {
-            _updateForm((ComicMetadataForm f) => f.removeTag(name));
-          },
-          onAddParody: (String name) {
-            _updateForm((ComicMetadataForm f) => f.addParody(name));
-          },
-          onRemoveParody: (String name) {
-            _updateForm((ComicMetadataForm f) => f.removeParody(name));
-          },
-          onAddCharacter: (String name) {
-            _updateForm((ComicMetadataForm f) => f.addCharacter(name));
-          },
-          onRemoveCharacter: (String name) {
-            _updateForm((ComicMetadataForm f) => f.removeCharacter(name));
-          },
-          onLockChanged: _setLock,
-        ),
-      },
-    );
+        authors: _form.authors,
+        tags: _form.tags,
+        parodies: _form.parodies,
+        characters: _form.characters,
+        locks: _locks,
+        lockBusy: _lockBusy || _saving,
+        onAddAuthor: (String name) {
+          _updateForm((ComicMetadataForm f) => f.addAuthor(name));
+        },
+        onRemoveAuthor: (String name) {
+          _updateForm((ComicMetadataForm f) => f.removeAuthor(name));
+        },
+        onAddTag: (String name) {
+          _updateForm((ComicMetadataForm f) => f.addTag(name));
+        },
+        onRemoveTag: (String name) {
+          _updateForm((ComicMetadataForm f) => f.removeTag(name));
+        },
+        onAddParody: (String name) {
+          _updateForm((ComicMetadataForm f) => f.addParody(name));
+        },
+        onRemoveParody: (String name) {
+          _updateForm((ComicMetadataForm f) => f.removeParody(name));
+        },
+        onAddCharacter: (String name) {
+          _updateForm((ComicMetadataForm f) => f.addCharacter(name));
+        },
+        onRemoveCharacter: (String name) {
+          _updateForm((ComicMetadataForm f) => f.removeCharacter(name));
+        },
+        onLockChanged: _setLock,
+      ),
+    };
   }
 
   @override
@@ -617,7 +550,6 @@ typedef _MetaLockChanged =
 
 class _EditMetadataGeneralTab extends StatelessWidget {
   const _EditMetadataGeneralTab({
-    super.key,
     required this.title,
     required this.titleError,
     required this.description,
@@ -818,7 +750,6 @@ String _formatSortOrder(double value) {
 
 class _EditMetadataAuthorsTagsTab extends ConsumerWidget {
   const _EditMetadataAuthorsTagsTab({
-    super.key,
     required this.scope,
     required this.authors,
     required this.tags,

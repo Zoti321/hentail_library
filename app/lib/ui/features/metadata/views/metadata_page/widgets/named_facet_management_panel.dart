@@ -5,6 +5,7 @@ import 'package:hentai_library/domain/repositories/named_facet_management_reposi
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/destructive_filled_button.dart';
+import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/count_digit_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
@@ -171,7 +172,7 @@ class _NamedFacetListSection extends ConsumerWidget {
           ),
         ],
         SizedBox(height: tokens.spacing.lg),
-        _NamedFacetListFooter(state: state),
+        _NamedFacetListFooter(kind: kind, state: state),
       ],
     );
   }
@@ -225,29 +226,53 @@ class _NamedFacetListHeader extends StatelessWidget {
   }
 }
 
-class _NamedFacetListFooter extends StatelessWidget {
-  const _NamedFacetListFooter({required this.state});
+class _NamedFacetListFooter extends ConsumerWidget {
+  const _NamedFacetListFooter({required this.kind, required this.state});
 
+  final ManagedNamedFacetKind kind;
   final NamedFacetManagementState state;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final l10n = context.l10n;
-    final String message = state.hasSearchQuery
-        ? l10n.metadataTotalCount(state.items.length)
-        : state.isLoadingMore
-        ? l10n.metadataLoadingMore
-        : state.hasMore
-        ? l10n.metadataScrollToLoadMore
-        : l10n.metadataListEnd;
-    return Text(
-      message,
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: tokens.text.labelXs,
-        color: cs.hentai.textTertiary,
+    final TextStyle footerStyle = TextStyle(
+      fontSize: tokens.text.labelXs,
+      color: cs.hentai.textTertiary,
+    );
+
+    if (state.hasSearchQuery) {
+      return Text(
+        l10n.metadataTotalCount(state.items.length),
+        textAlign: TextAlign.center,
+        style: footerStyle,
+      );
+    }
+
+    if (state.isLoadingMore) {
+      return Text(
+        l10n.metadataLoadingMore,
+        textAlign: TextAlign.center,
+        style: footerStyle,
+      );
+    }
+
+    if (!state.hasMore) {
+      return Text(
+        l10n.metadataListEnd,
+        textAlign: TextAlign.center,
+        style: footerStyle,
+      );
+    }
+
+    return Center(
+      child: GhostButton.iconText(
+        icon: LucideIcons.chevronDown,
+        text: l10n.metadataLoadMore,
+        onPressed: () => ref
+            .read(namedFacetManagementControllerProvider(kind).notifier)
+            .loadMore(),
       ),
     );
   }

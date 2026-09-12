@@ -74,9 +74,14 @@ A **Resource** is a file or directory (local) or WebDAV file (remote) that can b
 - Official hosted cloud library or accounts
 - Mirroring entire remote comics to disk as the primary remote model
 
+## Reading fidelity
+
+In-app **Read session** page images follow **Page image fidelity** in `CONTEXT.md`: show source page bitmaps faithfully. Do **not** trade page sampling quality for scroll FPS (no scroll-time `FilterQuality` downgrade / idle “upgrade”). Layout-constrained decode (`cacheWidth`) is allowed; dynamic or `FilterQuality.high` page sampling is not. This product rule **outranks** reader UI performance ideas in `docs/research/ui-performance-tuning.md` (notably superseded P2-1). Covers / library thumbnails are out of scope.
+
 ## Agent guidance
 
 - Describe the product as a **personal comic library** with optional **user-hosted WebDAV** roots — not a generic file manager, ebook app, or SaaS cloud reader.
 - Use **Library** / **Library root** / **Current library** / **Local library** / **Remote library** from `CONTEXT.md`; treat **Saved path** as the legacy name for a local root.
 - Prefer **Comic** / **Resource** / **Library sync** / **Resource access** in issues and PRs.
 - New reader or scan features should extend Resource access → Comic → Reader rather than Flutter-only protocol forks (e.g. do not put WebDAV page I/O primarily in `cached_network_image`).
+- Reader page rendering: honor **Page image fidelity** before applying performance tuning suggestions.

@@ -8,7 +8,7 @@ See **`docs/agents/rust-migration.md`** and **`docs/adr/0002-rust-core-via-frb.m
 
 ### Product positioning
 
-Cross-platform local comic reading & management app. Target formats: image dirs, comic archives (zip/cbz, rar/cbr, 7z/cb7), epub, pdf. See `docs/agents/product-positioning.md`.
+Cross-platform local comic reading & management app. Target formats: image dirs, comic archives (zip/cbz, rar/cbr, 7z/cb7), epub, pdf. See `docs/agents/product-positioning.md`. Read session pages follow **Page image fidelity** in `CONTEXT.md` (faithful source rendering outranks reader UI perf tweaks such as FilterQuality swing).
 
 ### Issue tracker
 

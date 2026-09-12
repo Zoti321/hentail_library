@@ -13,9 +13,10 @@ use crate::history::normalize_reading_history_titles;
 use crate::named_facet::{replace_comic_named_facet, JunctionNamedFacet};
 use crate::util::compute_sort_key;
 
-use super::migrate::ComicMigration;
+use super::migrate::{ComicMigration, SeriesMigrationPair};
 use super::plan::ComicScanReplacePlan;
 use super::series_rebuild::rebuild_series_from_comics;
+use crate::series_id::series_name_from_folder_path;
 
 pub async fn apply_scan_replace_plan(
     db: &DatabaseConnection,
@@ -24,6 +25,7 @@ pub async fn apply_scan_replace_plan(
 ) -> Result<(), HentaiError> {
     let txn = db.begin().await.map_err(map_db_err)?;
     apply_comic_rekeys(&txn, &plan.migrations).await?;
+    apply_series_rekeys(&txn, &plan.series_migrations).await?;
     if !plan.removed_ids.is_empty() {
         delete_comics_side_effects(&txn, &plan.removed_ids).await?;
     }
@@ -41,6 +43,88 @@ pub async fn apply_scan_replace_plan(
     normalize_reading_history_titles(&txn).await?;
     rebuild_series_from_comics(&txn, Some(library_id)).await?;
     txn.commit().await.map_err(map_db_err)?;
+    Ok(())
+}
+
+pub(crate) async fn apply_series_rekeys<C: ConnectionTrait>(
+    db: &C,
+    migrations: &[SeriesMigrationPair],
+) -> Result<(), HentaiError> {
+    if migrations.is_empty() {
+        return Ok(());
+    }
+    let mut pending: Vec<SeriesMigrationPair> = migrations.to_vec();
+    while !pending.is_empty() {
+        let before = pending.len();
+        let mut deferred = Vec::new();
+        for migration in pending {
+            let target_exists = Series::find_by_id(migration.to_series_id.clone())
+                .one(db)
+                .await
+                .map_err(map_db_err)?
+                .is_some();
+            if target_exists {
+                deferred.push(migration);
+                continue;
+            }
+            apply_series_rekey(db, &migration).await?;
+        }
+        pending = deferred;
+        if pending.len() == before {
+            // Target still occupied (cycle/conflict): skip; orphan + rebuild handles the rest.
+            break;
+        }
+    }
+    Ok(())
+}
+
+pub(crate) async fn apply_series_rekey<C: ConnectionTrait>(
+    db: &C,
+    migration: &SeriesMigrationPair,
+) -> Result<(), HentaiError> {
+    let from_id = &migration.from_series_id;
+    let to_id = &migration.to_series_id;
+    let Some(row) = Series::find_by_id(from_id.clone())
+        .one(db)
+        .await
+        .map_err(map_db_err)?
+    else {
+        return Ok(());
+    };
+
+    let new_name = if row.name_locked {
+        row.name.clone()
+    } else {
+        series_name_from_folder_path(&migration.to_folder_path)
+    };
+    let active = crate::entity::series::ActiveModel {
+        series_id: Set(to_id.clone()),
+        folder_path: Set(migration.to_folder_path.clone()),
+        name: Set(new_name.clone()),
+        name_sort_key: Set(compute_sort_key(&new_name)),
+        serialization_status: Set(row.serialization_status.clone()),
+        total_count: Set(row.total_count),
+        name_locked: Set(row.name_locked),
+        serialization_status_locked: Set(row.serialization_status_locked),
+        total_count_locked: Set(row.total_count_locked),
+        library_id: Set(row.library_id.clone()),
+    };
+    Series::insert(active).exec(db).await.map_err(map_db_err)?;
+    db.execute(Statement::from_sql_and_values(
+        sea_orm::DatabaseBackend::Sqlite,
+        "UPDATE series_items SET series_id = ? WHERE series_id = ?",
+        [
+            sea_orm::Value::String(Some(Box::new(to_id.clone()))),
+            sea_orm::Value::String(Some(Box::new(from_id.clone()))),
+        ],
+    ))
+    .await
+    .map_err(map_db_err)?;
+    rekey_reference_column(db, "series_thumbnails", "series_id", from_id, to_id).await?;
+    Series::delete_by_id(from_id.clone())
+        .exec(db)
+        .await
+        .map_err(map_db_err)?;
     Ok(())
 }
 
@@ -230,7 +314,7 @@ async fn count_comics(db: &DatabaseConnection) -> Result<i64, HentaiError> {
         ))
         .await
         .map_err(map_db_err)?
-        .ok_or_else(|| HentaiError::db_query_failed("count 无结果", None))?;
+        .ok_or_else(|| HentaiError::db_query_failed("count ???", None))?;
     row.try_get_by_index::<i64>(0)
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
 }

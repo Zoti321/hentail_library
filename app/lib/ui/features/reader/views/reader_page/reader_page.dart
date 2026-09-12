@@ -7,6 +7,9 @@ import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
+import 'package:hentai_library/domain/reading/auto_play_boundary.dart';
+import 'package:hentai_library/domain/reading/auto_play_mode.dart';
+import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/ui/core/interaction/app_motion.dart';
 import 'package:hentai_library/ui/core/interaction/reader_input.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -15,7 +18,6 @@ import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/read
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_content.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_route_context.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_top_bar.dart';
-import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -336,6 +338,7 @@ class ReaderPage extends HookConsumerWidget {
                       _ReaderAutoPlayBinder(
                         viewKey: viewKey,
                         routeContext: routeContext,
+                        seriesNavContext: seriesNavContext,
                       ),
                     ],
                   );
@@ -589,10 +592,12 @@ class _ReaderAutoPlayBinder extends HookConsumerWidget {
   const _ReaderAutoPlayBinder({
     required this.viewKey,
     required this.routeContext,
+    required this.seriesNavContext,
   });
 
   final ReaderControllerKey viewKey;
   final ReaderRouteContext routeContext;
+  final ReaderNavContextData? seriesNavContext;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -609,6 +614,12 @@ class _ReaderAutoPlayBinder extends HookConsumerWidget {
       settingsProvider.select(
         (AsyncValue<AppSetting> value) =>
             value.asData?.value.readerAutoPlayIntervalSeconds ?? 5,
+      ),
+    );
+    final AutoPlayMode autoPlayMode = ref.watch(
+      settingsProvider.select(
+        (AsyncValue<AppSetting> value) =>
+            value.asData?.value.autoPlayMode ?? kDefaultAutoPlayMode,
       ),
     );
     final ({int currentIndex, int totalPages, ReadingMode readingMode})?
@@ -628,6 +639,12 @@ class _ReaderAutoPlayBinder extends HookConsumerWidget {
       }),
     );
     final bool reduceMotion = reduceMotionOf(context);
+    final String? nextComicId = seriesNavContext?.nextItem?.comicId;
+    final List<ReaderComicListItem>? seriesItems = seriesNavContext?.items;
+    final String? firstComicId = seriesItems != null && seriesItems.isNotEmpty
+        ? seriesItems.first.comicId
+        : null;
+
     useEffect(
       () {
         final bool canStartAutoPlay =
@@ -637,12 +654,7 @@ class _ReaderAutoPlayBinder extends HookConsumerWidget {
             ) &&
             autoPlayState != null &&
             autoPlayState.readingMode.supportsAutoPlay &&
-            autoPlayState.totalPages > 0 &&
-            !SpreadIndex.isOnLastSpread(
-              mode: autoPlayState.readingMode,
-              totalPages: autoPlayState.totalPages,
-              currentPageIndex: autoPlayState.currentIndex,
-            );
+            autoPlayState.totalPages > 0;
         if (!canStartAutoPlay) {
           return null;
         }
@@ -658,19 +670,48 @@ class _ReaderAutoPlayBinder extends HookConsumerWidget {
           if (currentState == null) {
             return;
           }
-          final bool shouldStop =
-              !currentState.readingMode.supportsAutoPlay ||
-              currentState.totalPages <= 0 ||
-              SpreadIndex.isOnLastSpread(
-                mode: currentState.readingMode,
-                totalPages: currentState.totalPages,
-                currentPageIndex: currentState.currentIndex,
-              );
-          if (shouldStop) {
+          if (!currentState.readingMode.supportsAutoPlay ||
+              currentState.totalPages <= 0) {
             timer?.cancel();
             return;
           }
-          controller.nextPage();
+          final bool onLastSpread = SpreadIndex.isOnLastSpread(
+            mode: currentState.readingMode,
+            totalPages: currentState.totalPages,
+            currentPageIndex: currentState.currentIndex,
+          );
+          if (!onLastSpread) {
+            controller.nextPage();
+            return;
+          }
+          final AutoPlayBoundaryDecision decision = resolveAutoPlayBoundary(
+            mode: autoPlayMode,
+            currentComicId: routeContext.comicId,
+            nextComicId: nextComicId,
+            firstComicId: firstComicId,
+          );
+          switch (decision) {
+            case AutoPlayBoundaryStop():
+              controller.setAutoPlayEnabled(false);
+              timer?.cancel();
+            case AutoPlayBoundaryJumpToFirstPage():
+              controller.setIndex(1);
+            case AutoPlayBoundarySwitchComic(:final String comicId):
+              timer?.cancel();
+              final BuildContext? ctx = context.mounted ? context : null;
+              if (ctx == null) {
+                return;
+              }
+              unawaited(
+                ref
+                    .read(readerSeriesNavigationProvider.notifier)
+                    .switchComic(
+                      router: GoRouter.of(ctx),
+                      currentSession: routeContext.session,
+                      targetComicId: comicId,
+                    ),
+              );
+          }
         });
         return () {
           timer?.cancel();
@@ -679,9 +720,12 @@ class _ReaderAutoPlayBinder extends HookConsumerWidget {
       <Object?>[
         readerAutoPlayEnabled,
         readerAutoPlayIntervalSeconds,
+        autoPlayMode,
         autoPlayState?.currentIndex,
         autoPlayState?.totalPages,
         autoPlayState?.readingMode,
+        nextComicId,
+        firstComicId,
         routeContext.comicId,
         controller,
         ref,

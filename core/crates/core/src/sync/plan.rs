@@ -9,7 +9,8 @@ use crate::error::HentaiError;
 
 use crate::metadata_lock::merge_kept_scan_with_existing;
 use super::migrate::{
-    detect_path_migration_pairs, migrated_id_sets, ComicMigration, ComicMigrationPair,
+    comic_migration_new_paths, detect_path_migration_pairs, detect_series_path_migration_pairs,
+    migrated_id_sets, ComicMigration, ComicMigrationPair, SeriesMigrationPair,
 };
 use crate::resource::can_generate_thumbnail;
 use super::scanner::ScanItem;
@@ -20,6 +21,7 @@ pub struct ComicScanReplacePlan {
     pub kept_count: i32,
     pub migrated_count: i32,
     pub migrations: Vec<ComicMigration>,
+    pub series_migrations: Vec<SeriesMigrationPair>,
     pub to_upsert: Vec<ComicDto>,
     pub thumbnail_invalidated_comic_ids: Vec<String>,
     pub thumbnail_generation_targets: Vec<ComicDto>,
@@ -56,6 +58,8 @@ pub async fn build_scan_replace_plan(
     let migration_pairs = detect_path_migration_pairs(&removed_by_id, &added_by_id);
     let (migrated_from_ids, migrated_to_ids) = migrated_id_sets(&migration_pairs);
     let migrations = build_migrations(&migration_pairs, &existing_by_id, &unique);
+    let series_migrations =
+        detect_series_migrations_for_library(db, library_id, &migrations).await?;
     let removed_ids: Vec<String> = id_diff
         .removed_ids
         .difference(&migrated_from_ids)
@@ -96,10 +100,63 @@ pub async fn build_scan_replace_plan(
         kept_count: kept_ids.len() as i32,
         migrated_count: migrations.len() as i32,
         migrations,
+        series_migrations,
         to_upsert,
         thumbnail_invalidated_comic_ids: thumbnail_invalidated,
         thumbnail_generation_targets: thumbnail_targets,
     })
+}
+
+async fn detect_series_migrations_for_library(
+    db: &DatabaseConnection,
+    library_id: &str,
+    comic_migrations: &[ComicMigration],
+) -> Result<Vec<SeriesMigrationPair>, HentaiError> {
+    if comic_migrations.is_empty() {
+        return Ok(Vec::new());
+    }
+    let (members_by_series, existing_series_ids) =
+        load_series_membership_for_library(db, library_id).await?;
+    let from_comic_to_new_path = comic_migration_new_paths(comic_migrations);
+    Ok(detect_series_path_migration_pairs(
+        &members_by_series,
+        &from_comic_to_new_path,
+        &existing_series_ids,
+    ))
+}
+
+async fn load_series_membership_for_library(
+    db: &DatabaseConnection,
+    library_id: &str,
+) -> Result<(HashMap<String, Vec<String>>, HashSet<String>), HentaiError> {
+    use sea_orm::ColumnTrait;
+    use sea_orm::QueryFilter;
+    let series_rows = Series::find()
+        .filter(crate::entity::series::Column::LibraryId.eq(library_id))
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let existing_series_ids: HashSet<String> =
+        series_rows.iter().map(|r| r.series_id.clone()).collect();
+    if existing_series_ids.is_empty() {
+        return Ok((HashMap::new(), existing_series_ids));
+    }
+    let item_rows = SeriesItems::find()
+        .filter(crate::entity::series_items::Column::SeriesId.is_in(existing_series_ids.clone()))
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
+    let mut members_by_series: HashMap<String, Vec<String>> = HashMap::new();
+    for series_id in &existing_series_ids {
+        members_by_series.entry(series_id.clone()).or_default();
+    }
+    for item in item_rows {
+        members_by_series
+            .entry(item.series_id)
+            .or_default()
+            .push(item.comic_id);
+    }
+    Ok((members_by_series, existing_series_ids))
 }
 
 fn dedupe_scanned(scanned: Vec<ScanItem>) -> HashMap<String, ComicDto> {

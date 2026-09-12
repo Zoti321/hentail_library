@@ -1,8 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hentai_library/ui/core/interaction/desktop_page_transition.dart';
 
+class _FakeGoRouterState extends Fake implements GoRouterState {
+  @override
+  ValueKey<String> get pageKey => const ValueKey<String>('shell-page');
+
+  @override
+  String? get name => 'shell';
+}
+
 void main() {
+  tearDown(debugResetPendingShellFadeThrough);
+
+  group('shell nav pending fade-through', () {
+    test('library shell page stays NoTransition without a pending request', () {
+      final Page<void> page = buildShellNavPage(
+        state: _FakeGoRouterState(),
+        child: const SizedBox(),
+        allowPendingFadeThrough: true,
+      );
+
+      expect(page, isA<NoTransitionPage<void>>());
+    });
+
+    test(
+      'one-shot request makes the next allowPendingFadeThrough page fade-through',
+      () {
+        requestShellFadeThroughOnce();
+
+        final Page<void> animated = buildShellNavPage(
+          state: _FakeGoRouterState(),
+          child: const SizedBox(),
+          allowPendingFadeThrough: true,
+        );
+        expect(animated, isA<CustomTransitionPage<void>>());
+        final CustomTransitionPage<void> custom =
+            animated as CustomTransitionPage<void>;
+        expect(custom.transitionDuration, kDesktopPageTransitionDuration);
+        expect(
+          custom.reverseTransitionDuration,
+          kDesktopPageTransitionDuration,
+        );
+
+        final Page<void> next = buildShellNavPage(
+          state: _FakeGoRouterState(),
+          child: const SizedBox(),
+          allowPendingFadeThrough: true,
+        );
+        expect(next, isA<NoTransitionPage<void>>());
+      },
+    );
+
+    test(
+      'pending request is ignored when allowPendingFadeThrough is false',
+      () {
+        requestShellFadeThroughOnce();
+
+        final Page<void> page = buildShellNavPage(
+          state: _FakeGoRouterState(),
+          child: const SizedBox(),
+        );
+        expect(page, isA<NoTransitionPage<void>>());
+        expect(debugPendingShellFadeThrough, isTrue);
+      },
+    );
+  });
+
   group('desktop fade-through opacity curves', () {
     test('enter is zero for the first half then eases in', () {
       expect(desktopFadeThroughEnterOpacity(0.0), 0.0);

@@ -58,9 +58,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
     final Widget errorPlaceholder = _buildReaderImageErrorPlaceholder(context);
     final ReaderPageImageData imageData = widget.imageData;
     final int? cacheWidth = _readerDecodeCacheWidth(context);
-    final FilterQuality filterQuality = readerImageFilterQuality(
-      isScrolling: ReaderScrollActivity.isScrollingOf(context),
-    );
+    const FilterQuality filterQuality = kReaderPageFilterQuality;
 
     if (imageData is ReaderDirPageImageData) {
       final String dirPath = imageData.file.path.trim();

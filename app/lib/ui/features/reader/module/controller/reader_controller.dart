@@ -5,6 +5,7 @@ import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/domain/reading/reader_session_snapshot.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/domain/reading/spread_index.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_auto_play_carry.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_series_navigation.dart';
@@ -143,11 +144,15 @@ class ReaderController extends _$ReaderController {
       }
       setReadingMode(mode);
     });
+    final bool carryAutoPlay = ref
+        .read(readerAutoPlayCarryProvider.notifier)
+        .take();
     return ReaderState(
       comic: snapshot.comic,
       readingMode: initialMode,
       currentIndex: snapshot.resumePageIndex,
       totalPagesOverride: snapshot.totalPages > 0 ? snapshot.totalPages : null,
+      autoPlayEnabled: carryAutoPlay && initialMode.supportsAutoPlay,
     );
   }
 
