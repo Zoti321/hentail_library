@@ -62,7 +62,7 @@ class _ReaderImageItemState extends ConsumerState<ReaderImageItem> {
 
     if (imageData is ReaderDirPageImageData) {
       final String dirPath = imageData.file.path.trim();
-      if (dirPath.isEmpty) {
+      if (dirPath.isEmpty || !isUsableReaderCacheFile(dirPath)) {
         return _wrapWithContextMenu(context, errorPlaceholder);
       }
       return _wrapWithContextMenu(

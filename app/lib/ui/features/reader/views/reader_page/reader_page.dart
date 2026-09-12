@@ -16,6 +16,7 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_bottom_bar.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_content.dart';
+import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_open_error_panel.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_route_context.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_top_bar.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -299,7 +300,30 @@ class ReaderPage extends HookConsumerWidget {
               backgroundColor: theme.colorScheme.hentai.readerBackground,
               body: shellAsync.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (Object e, StackTrace st) => Center(child: Text('$e')),
+                error: (Object e, StackTrace st) => ReaderOpenErrorPanel(
+                  error: e,
+                  onBackToDetail: () {
+                    unawaited(
+                      controller.executeExitReader(
+                        context: context,
+                        routeContext: routeContext,
+                      ),
+                    );
+                  },
+                  onRetry: () {
+                    ref.invalidate(
+                      readerSessionOpenProvider(
+                        comicId: routeContext.comicId,
+                        incognito: routeContext.incognito,
+                        startFromFirstPage: routeContext.startFromFirstPage,
+                      ),
+                    );
+                    ref.invalidate(readerControllerProvider(viewKey));
+                    ref.invalidate(
+                      comicImagesProvider(comicId: routeContext.comicId),
+                    );
+                  },
+                ),
                 data: (ReaderPageShellData shell) {
                   if (shell.totalPages == 0) {
                     return Center(child: Text(context.l10n.readerNoImages));

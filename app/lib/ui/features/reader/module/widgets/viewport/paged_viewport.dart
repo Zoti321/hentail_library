@@ -9,6 +9,7 @@ import 'package:hentai_library/ui/features/reader/module/session/reader_session_
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_page_crossfade_policy.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_pages.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/resume_visible_sync_gate.dart';
 import 'package:hentai_library/ui/features/reader/view_models/read_session_page_data.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_image_item.dart';
@@ -60,12 +61,13 @@ class PagedViewport extends HookConsumerWidget {
     if (comic == null) {
       return const SizedBox.expand();
     }
-    final images = ref
-        .watch(comicImagesProvider(comicId: comicId))
-        .asData
-        ?.value;
-    final List<ReaderPageImageData> imageList =
-        images ?? const <ReaderPageImageData>[];
+    final ReaderViewportPages resolvedPages = resolveReaderViewportPages(
+      ref.watch(comicImagesProvider(comicId: comicId)),
+    );
+    final List<ReaderPageImageData> imageList = switch (resolvedPages) {
+      ReaderViewportPagesReady(:final List<ReaderPageImageData> pages) => pages,
+      _ => const <ReaderPageImageData>[],
+    };
     final Size viewportSize = MediaQuery.sizeOf(context);
     final PageController pageController = usePageController(
       initialPage: initialPage,
@@ -172,6 +174,10 @@ class PagedViewport extends HookConsumerWidget {
       slotLogicalWidth: readerPagedSlotLogicalWidth(viewportSize.width),
       imageList: imageList,
     );
+
+    if (resolvedPages is! ReaderViewportPagesReady) {
+      return ReaderViewportPagesFeedback(pages: resolvedPages);
+    }
 
     return Center(
       child: ConstrainedBox(

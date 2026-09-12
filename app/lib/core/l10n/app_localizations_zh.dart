@@ -1203,6 +1203,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readerNoImages => '暂无图片';
 
   @override
+  String get readerOpenResourceNotFound => '找不到漫画资源。文件可能已被移动或删除，或路径已失效。';
+
+  @override
+  String get readerOpenRemoteUnreachable => '无法连接远程书库。请检查网络与服务器地址。';
+
+  @override
+  String get readerOpenRemoteAuthFailed => '远程书库认证失败。请检查用户名与密码。';
+
+  @override
+  String get readerOpenTimedOut => '打开超时。资源所在位置可能不可达或响应过慢。';
+
+  @override
+  String get readerOpenInvalidContent => '漫画内容无效或没有可阅读的页面。';
+
+  @override
+  String get readerOpenLoadFailed => '打开阅读失败。';
+
+  @override
+  String get readerOpenBackToDetail => '返回详情';
+
+  @override
+  String get readerViewportPagesFailed => '无法加载页面列表。';
+
+  @override
   String get metadataTabAuthors => '作者';
 
   @override

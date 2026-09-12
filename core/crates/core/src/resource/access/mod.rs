@@ -3,6 +3,7 @@
 //! Local uses the filesystem; tests inject [FakeResourceAccess]. Remote
 //! uses [WebDavResourceAccess] (`reqwest_dav` + Basic).
 
+mod deadline;
 mod fake;
 mod local;
 mod webdav;

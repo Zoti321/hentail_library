@@ -10,12 +10,14 @@ pub enum HentaiErrorCode {
     ReaderUnsupportedType,
     ReaderInvalidContent,
     ReaderSessionNotOpen,
-    /// Remote library transport / DNS / timeout.
+    /// Remote library transport / DNS / connect failure.
     RemoteUnreachable,
     /// WebDAV Basic auth rejected.
     RemoteAuthFailed,
     /// TLS / certificate problems talking to Remote library.
     RemoteTlsFailed,
+    /// Resource access or reader open exceeded its deadline.
+    TimedOut,
 }
 
 #[derive(Debug, Clone, Error)]
@@ -110,6 +112,14 @@ impl HentaiError {
     pub fn remote_tls_failed(message: impl Into<String>) -> Self {
         Self {
             code: HentaiErrorCode::RemoteTlsFailed,
+            message: message.into(),
+            context: None,
+        }
+    }
+
+    pub fn timed_out(message: impl Into<String>) -> Self {
+        Self {
+            code: HentaiErrorCode::TimedOut,
             message: message.into(),
             context: None,
         }
