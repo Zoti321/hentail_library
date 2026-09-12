@@ -1383,7 +1383,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get metadataLoadingMore => 'Loading more…';
 
   @override
-  String get metadataScrollToLoadMore => 'Scroll to load more';
+  String get metadataLoadMore => 'Load more';
 
   @override
   String get metadataListEnd => 'All items loaded';

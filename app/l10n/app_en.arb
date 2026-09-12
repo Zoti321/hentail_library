@@ -638,7 +638,7 @@
   "metadataSearchNoMatchHint": "Try another keyword, or clear the search",
   "metadataAttachedComicsCaption": "Attached comics",
   "metadataLoadingMore": "Loading more…",
-  "metadataScrollToLoadMore": "Scroll to load more",
+  "metadataLoadMore": "Load more",
   "metadataListEnd": "All items loaded",
   "metadataDeleteAllTags": "Delete all",
   "metadataTagsDeletedAllToast": "All tags deleted",
