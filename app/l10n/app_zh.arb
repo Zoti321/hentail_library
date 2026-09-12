@@ -638,7 +638,7 @@
   "metadataSearchNoMatchHint": "试试其他关键词，或清空搜索",
   "metadataAttachedComicsCaption": "附着漫画数",
   "metadataLoadingMore": "正在加载更多…",
-  "metadataScrollToLoadMore": "滚动到底部以加载更多",
+  "metadataLoadMore": "加载更多",
   "metadataListEnd": "已显示全部",
   "metadataDeleteAllTags": "删除所有",
   "metadataTagsDeletedAllToast": "已删除全部标签",

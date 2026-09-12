@@ -1348,7 +1348,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get metadataLoadingMore => '正在加载更多…';
 
   @override
-  String get metadataScrollToLoadMore => '滚动到底部以加载更多';
+  String get metadataLoadMore => '加载更多';
 
   @override
   String get metadataListEnd => '已显示全部';

@@ -4,12 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_scroll_to_top_button.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_content_search.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_layout_constants.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/metadata_page_header.dart';
+import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/named_facet_fill_viewport.dart';
 import 'package:hentai_library/ui/features/metadata/views/metadata_page/widgets/named_facet_management_panel.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
@@ -193,6 +195,10 @@ class _MetadataManagementPageState
               ),
           ],
         ),
+        NamedFacetFillViewportBinder(
+          scrollController: _scrollController,
+          kind: metadataTabKind(selectedIndex),
+        ),
         LibraryScrollToTopButton(
           scrollController: _scrollController,
           isDrawerOpen: false,
@@ -262,17 +268,23 @@ class _MetadataManagementPageState
       return;
     }
     final ScrollPosition position = _scrollController.position;
-    if (position.maxScrollExtent - position.pixels > 240) {
+    final int selectedIndex = _selectedTabIndex ?? 1;
+    final ManagedNamedFacetKind kind = metadataTabKind(selectedIndex);
+    final NamedFacetManagementState state = ref.read(
+      namedFacetManagementControllerProvider(kind),
+    );
+    if (!namedFacetShouldAutoLoadMore(
+      hasMore: state.hasMore,
+      hasSearchQuery: state.hasSearchQuery,
+      isLoading: state.isLoading,
+      isLoadingMore: state.isLoadingMore,
+      hasError: false,
+      maxScrollExtent: position.maxScrollExtent,
+      pixels: position.pixels,
+    )) {
       return;
     }
-    final int selectedIndex = _selectedTabIndex ?? 1;
-    ref
-        .read(
-          namedFacetManagementControllerProvider(
-            metadataTabKind(selectedIndex),
-          ).notifier,
-        )
-        .loadMore();
+    ref.read(namedFacetManagementControllerProvider(kind).notifier).loadMore();
   }
 }
 

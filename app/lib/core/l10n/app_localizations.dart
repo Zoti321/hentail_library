@@ -2534,11 +2534,11 @@ abstract class AppLocalizations {
   /// **'正在加载更多…'**
   String get metadataLoadingMore;
 
-  /// No description provided for @metadataScrollToLoadMore.
+  /// No description provided for @metadataLoadMore.
   ///
   /// In zh, this message translates to:
-  /// **'滚动到底部以加载更多'**
-  String get metadataScrollToLoadMore;
+  /// **'加载更多'**
+  String get metadataLoadMore;
 
   /// No description provided for @metadataListEnd.
   ///

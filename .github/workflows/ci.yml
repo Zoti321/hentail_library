@@ -80,6 +80,7 @@ jobs:
           test/project_layout_test.dart
           test/ui/core/widgets/actions/destructive_filled_button_test.dart
           test/ui/core/widgets/overlays/dialog/confirm
+          test/ui/features/metadata/views/metadata_page/named_facet_fill_viewport_test.dart
 
   test-widget:
     name: test-widget (soft)
