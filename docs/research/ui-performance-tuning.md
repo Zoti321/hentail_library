@@ -252,7 +252,7 @@ ReaderPage（整包 watch readerPageViewModel → 含 currentIndex/showControls/
 
 | ID | 问题 | 证据要点 | 建议 |
 |----|------|----------|------|
-| P2-1 | 阅读器 `FilterQuality.high` | `reader_image_item.dart` | 滚动中 medium/low，静止再升 |
+| P2-1 | ~~阅读器 `FilterQuality.high`~~ | — | **已否决**：与 **Page image fidelity**（`CONTEXT.md`）冲突；禁止滚动降档/静止升到 `high`（网点摩尔纹）。页图固定 `kReaderPageFilterQuality`（`medium`） |
 | P2-2 | 分页模式 crossfade | `paged_viewport` + `reader_page_fade_in.dart` | 弱设备关 / 仅首帧 |
 | P2-3 | 排序 FLIP 常驻 ReorderableBuilder | `animated_library_catalog_grid_sliver.dart` | 非排序场景卸掉 |
 | P2-4 | 退出阅读器 sync `clearReaderPageCacheFrb` | `reader_prefetch_controller.dart`、`reader.dart` | async 清理 |
@@ -271,7 +271,7 @@ ReaderPage（整包 watch readerPageViewModel → 含 currentIndex/showControls/
 3. **扫描期 revision 节流 + 收窄 LibraryPage watch**（P0-4 / P1-5 / P1-6）。  
 4. **封面视口订阅粒度**（P0-5）。  
 5. **阅读器预取 cache key 对齐 + 拆分 `ReaderPage` watch**（P0-6 / P0-7）— 纯 Dart、收益大。  
-6. 阅读器 `existsSync` / 缓存条数 / autoDispose / FilterQuality（P1-2、P1-4、P2-1）。  
+6. 阅读器 `existsSync` / 缓存条数 / autoDispose（P1-2、P1-4）；**不要**再做 P2-1（Page image fidelity）。  
 7. 搜索分页与筛选抽屉（P1-1、P1-8）。
 
 ---

@@ -222,6 +222,10 @@ _Avoid_: Webtoon 模式（易与作品类型混淆）、卷轴模式
 阅读器分页翻页的版式；逐页切换而非连续滚动。
 _Avoid_: 翻页模式、单页模式
 
+**Page image fidelity**:
+Read session 中页图按源位图保真显示：不为滚动帧率升降 `FilterQuality`、不做锐化/美颜类「画质升级」，也不为性能故意降采样算法档位。为适配视口与内存可做 `cacheWidth` 等布局约束解码，但 GPU 采样须稳定、利于正确下采样（实现上固定 `FilterQuality.medium`；禁止静止态升到 `high`——网点漫画易出摩尔纹）。**本策略优先于**阅读器 UI 性能优化建议（含 `docs/research/ui-performance-tuning.md` 的 P2-1）。库封面/缩略图不在此约束内。
+_Avoid_: 滚动降画质、静止升画质、FilterQuality.high 页图、锐化增强阅读
+
 **Page image copy**:
 用户在 Read session 中，将某一页的位图写入系统剪贴板的动作（便于粘贴分享）；对象是页的位图，不是 Comic 封面或库缩略图。
 _Avoid_: 复制图片、分享图片、导出页面、保存图片（口语可用；领域与 issue 用 Page image copy）
