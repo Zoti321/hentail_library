@@ -26,6 +26,8 @@ import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
 
 import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
 
+import 'package:hentai_library/domain/reading/auto_play_mode.dart';
+
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 
 import 'package:intl/intl.dart';
@@ -292,6 +294,15 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       ReaderModeCategory.paged => readingModeCategoryPaged,
 
       ReaderModeCategory.webtoon => readingModeCategoryWebtoon,
+    };
+  }
+
+  String autoPlayModeLabel(AutoPlayMode mode) {
+    return switch (mode) {
+      AutoPlayMode.comicOnce => autoPlayModeComicOnce,
+      AutoPlayMode.comicLoop => autoPlayModeComicLoop,
+      AutoPlayMode.seriesOnce => autoPlayModeSeriesOnce,
+      AutoPlayMode.seriesLoop => autoPlayModeSeriesLoop,
     };
   }
 

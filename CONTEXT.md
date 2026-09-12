@@ -229,3 +229,7 @@ _Avoid_: 滚动降画质、静止升画质、FilterQuality.high 页图、锐化�
 **Page image copy**:
 用户在 Read session 中，将某一页的位图写入系统剪贴板的动作（便于粘贴分享）；对象是页的位图，不是 Comic 封面或库缩略图。
 _Avoid_: 复制图片、分享图片、导出页面、保存图片（口语可用；领域与 issue 用 Page image copy）
+
+**Auto-play mode**:
+应用级阅读偏好：末 spread 满间隔后的边界行为（单本播放 / 单本循环 / 系列播放 / 系列循环）。默认单本播放并持久化；自动播放开关本身是会话态、不持久化。系列能力派生自 Series reading context，不改变 Read session 模型。
+_Avoid_: 单本模式、系列模式、Series read、自动翻页模式（口语可用；领域与 issue 用 Auto-play mode）

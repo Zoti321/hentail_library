@@ -1904,6 +1904,12 @@ abstract class AppLocalizations {
   /// **'自动播放'**
   String get readerSettingsAutoPlay;
 
+  /// No description provided for @readerSettingsAutoPlayMode.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动播放模式'**
+  String get readerSettingsAutoPlayMode;
+
   /// No description provided for @readerSettingsPlayInterval.
   ///
   /// In zh, this message translates to:
@@ -1915,6 +1921,30 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'秒'**
   String get readerSettingsSecondsSuffix;
+
+  /// No description provided for @autoPlayModeComicOnce.
+  ///
+  /// In zh, this message translates to:
+  /// **'单本播放'**
+  String get autoPlayModeComicOnce;
+
+  /// No description provided for @autoPlayModeComicLoop.
+  ///
+  /// In zh, this message translates to:
+  /// **'单本循环'**
+  String get autoPlayModeComicLoop;
+
+  /// No description provided for @autoPlayModeSeriesOnce.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列播放'**
+  String get autoPlayModeSeriesOnce;
+
+  /// No description provided for @autoPlayModeSeriesLoop.
+  ///
+  /// In zh, this message translates to:
+  /// **'系列循环'**
+  String get autoPlayModeSeriesLoop;
 
   /// No description provided for @readerSettingsWebtoonMode.
   ///
