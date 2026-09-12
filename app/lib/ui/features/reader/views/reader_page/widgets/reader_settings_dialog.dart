@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/models.dart' show AppSetting;
+import 'package:hentai_library/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_select_field.dart';
@@ -105,7 +106,7 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                         spacing: 16,
                         children: <Widget>[
                           _ReaderSettingsSection(
-                            title: l10n.readerSettingsGeneral,
+                            title: l10n.readerSettingsReadingMode,
                             children: <Widget>[
                               FluentSelectField<ReaderModeCategory>(
                                 labelText: l10n.readerSettingsReadingMode,
@@ -131,24 +132,37 @@ class _ReaderSettingsDialogState extends ConsumerState<ReaderSettingsDialog> {
                               ),
                             ],
                           ),
-                          if (!readingMode.isWebtoon)
-                            _ReaderSettingsSection(
-                              title: l10n.readerSettingsAutoPlay,
-                              children: <Widget>[
-                                _ReaderSettingsNumberRow(
-                                  label: l10n.readerSettingsPlayInterval,
-                                  suffix: l10n.readerSettingsSecondsSuffix,
-                                  controller: _intervalController,
-                                  onCommit: (int value) {
-                                    ref
-                                        .read(settingsProvider.notifier)
-                                        .setReaderAutoPlayIntervalSeconds(
-                                          value,
-                                        );
-                                  },
-                                ),
-                              ],
-                            ),
+                          _ReaderSettingsSection(
+                            title: l10n.readerSettingsAutoPlay,
+                            children: <Widget>[
+                              FluentSelectField<AutoPlayMode>(
+                                labelText: l10n.readerSettingsAutoPlayMode,
+                                labelLayout: FluentSelectLabelLayout.inline,
+                                value: settings.autoPlayMode,
+                                items: AutoPlayMode.values,
+                                itemLabel: (AutoPlayMode value) =>
+                                    l10n.autoPlayModeLabel(value),
+                                onChanged: (AutoPlayMode? value) {
+                                  if (value == null) {
+                                    return;
+                                  }
+                                  ref
+                                      .read(settingsProvider.notifier)
+                                      .setAutoPlayMode(value);
+                                },
+                              ),
+                              _ReaderSettingsNumberRow(
+                                label: l10n.readerSettingsPlayInterval,
+                                suffix: l10n.readerSettingsSecondsSuffix,
+                                controller: _intervalController,
+                                onCommit: (int value) {
+                                  ref
+                                      .read(settingsProvider.notifier)
+                                      .setReaderAutoPlayIntervalSeconds(value);
+                                },
+                              ),
+                            ],
+                          ),
                           _ReaderSettingsSection(
                             title: readingMode.isWebtoon
                                 ? l10n.readerSettingsWebtoonMode
@@ -246,30 +260,45 @@ class _ReaderSettingsDialogHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
     return Material(
-      color: cs.primary,
-      child: SizedBox(
-        height: 36,
-        child: Row(
-          children: <Widget>[
-            IconButton(
-              onPressed: onClose,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-              icon: const Icon(LucideIcons.x, size: 18, color: Colors.white),
-            ),
-            Expanded(
-              child: Text(
-                l10n.readerSettingsTitle,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+      color: cs.hentai.readerBackground,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          SizedBox(
+            height: 40,
+            child: Row(
+              children: <Widget>[
+                IconButton(
+                  onPressed: onClose,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(
+                    width: 40,
+                    height: 40,
+                  ),
+                  tooltip: l10n.readerSettingsClose,
+                  icon: Icon(
+                    LucideIcons.x,
+                    size: 18,
+                    color: cs.hentai.readerTextIconPrimary,
+                  ),
                 ),
-              ),
+                Expanded(
+                  child: Text(
+                    l10n.readerSettingsTitle,
+                    style: TextStyle(
+                      fontSize: tokens.text.bodyMd,
+                      fontWeight: FontWeight.w600,
+                      color: cs.hentai.readerTextIconPrimary,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          Divider(height: 1, thickness: 1, color: cs.hentai.borderSubtle),
+        ],
       ),
     );
   }

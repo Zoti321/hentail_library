@@ -9,6 +9,7 @@ import 'package:hentai_library/domain/reading/read_session_page.dart';
 import 'package:hentai_library/domain/reading/reader_session_snapshot.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/domain/repositories/app_setting_repository.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_auto_play_carry.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_series_navigation.dart';
@@ -285,6 +286,57 @@ void main() {
 
       expect(_state(container, _key)?.autoPlayEnabled, isFalse);
       expect(_state(container, _key)?.readingMode, ReadingMode.webtoon);
+    });
+
+    test('armed autoplay carry restores on next ReaderController', () async {
+      const ReaderControllerKey otherKey = (
+        comicId: 'reader-controller-carry',
+        incognito: false,
+        startFromFirstPage: true,
+      );
+      final ReaderSessionSnapshot otherSnapshot = ReaderSessionSnapshot(
+        comic: Comic(
+          comicId: otherKey.comicId,
+          path: '/tmp/${otherKey.comicId}.cbz',
+          resourceType: ResourceType.cbz,
+          resourceSize: 1,
+          createdAt: DateTime.utc(2026, 1, 1),
+          lastUpdatedAt: DateTime.utc(2026, 1, 1),
+          title: 'Carry Comic',
+          pageCount: 5,
+        ),
+        pages: List<ReadSessionPage>.generate(
+          5,
+          (int index) => ReadSessionArchivePage(
+            comicId: otherKey.comicId,
+            pageIndex: index,
+          ),
+        ),
+        resumePageIndex: 1,
+      );
+      final ProviderContainer container = ProviderContainer(
+        overrides: <Override>[
+          appSettingRepoProvider.overrideWithValue(
+            _MemoryAppSettingRepository(
+              AppSetting(readingMode: ReadingMode.paged),
+            ),
+          ),
+          readerSessionOpenProvider(
+            comicId: otherKey.comicId,
+            incognito: otherKey.incognito,
+            startFromFirstPage: otherKey.startFromFirstPage,
+          ).overrideWith((Ref ref) async => otherSnapshot),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      container.read(readerAutoPlayCarryProvider.notifier).arm(true);
+      final ReaderState state = await container.read(
+        readerControllerProvider(otherKey).future,
+      );
+
+      expect(state.autoPlayEnabled, isTrue);
+      expect(container.read(readerAutoPlayCarryProvider), isFalse);
     });
   });
 

@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/domain/reading/read_session_coordinator.dart';
+import 'package:hentai_library/ui/features/reader/module/controller/reader_auto_play_carry.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_prefetch_controller.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
@@ -22,16 +23,25 @@ class ReaderSeriesNavigation extends _$ReaderSeriesNavigation {
     if (targetComicId == currentSession.comicId) {
       return;
     }
+    final ReaderControllerKey viewKey = readerControllerKey(
+      currentSession.comicId,
+      incognito: currentSession.incognito,
+      startFromFirstPage: currentSession.startFromFirstPage,
+    );
+    final bool carryAutoPlay =
+        ref
+            .read(readerControllerProvider(viewKey))
+            .asData
+            ?.value
+            .autoPlayEnabled ??
+        false;
+    ref.read(readerAutoPlayCarryProvider.notifier).arm(carryAutoPlay);
+
     final ReadSessionCoordinator coordinator = ref.read(
       readSessionCoordinatorProvider,
     );
     int? currentPageIndex;
     if (!currentSession.incognito) {
-      final ReaderControllerKey viewKey = readerControllerKey(
-        currentSession.comicId,
-        incognito: currentSession.incognito,
-        startFromFirstPage: currentSession.startFromFirstPage,
-      );
       currentPageIndex = ref
           .read(readerControllerProvider(viewKey))
           .asData

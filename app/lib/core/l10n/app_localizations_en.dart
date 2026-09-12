@@ -1049,10 +1049,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerSettingsAutoPlay => 'Auto-play';
 
   @override
+  String get readerSettingsAutoPlayMode => 'Auto-play mode';
+
+  @override
   String get readerSettingsPlayInterval => 'Play interval';
 
   @override
   String get readerSettingsSecondsSuffix => 'sec';
+
+  @override
+  String get autoPlayModeComicOnce => 'Comic once';
+
+  @override
+  String get autoPlayModeComicLoop => 'Comic loop';
+
+  @override
+  String get autoPlayModeSeriesOnce => 'Series once';
+
+  @override
+  String get autoPlayModeSeriesLoop => 'Series loop';
 
   @override
   String get readerSettingsWebtoonMode => 'Webtoon mode';

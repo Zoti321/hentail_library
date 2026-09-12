@@ -1020,10 +1020,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readerSettingsAutoPlay => '自动播放';
 
   @override
+  String get readerSettingsAutoPlayMode => '自动播放模式';
+
+  @override
   String get readerSettingsPlayInterval => '播放间隔';
 
   @override
   String get readerSettingsSecondsSuffix => '秒';
+
+  @override
+  String get autoPlayModeComicOnce => '单本播放';
+
+  @override
+  String get autoPlayModeComicLoop => '单本循环';
+
+  @override
+  String get autoPlayModeSeriesOnce => '系列播放';
+
+  @override
+  String get autoPlayModeSeriesLoop => '系列循环';
 
   @override
   String get readerSettingsWebtoonMode => 'Webtoon 模式';
