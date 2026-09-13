@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/page_size_menu.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_reorder_mode.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_header.dart';
+
+import '../../../../../support/localized_test_app.dart';
 
 Series _series() =>
     Series(id: 'series-1', name: 'Demo Series', folderPath: '/lib/Demo');
@@ -17,13 +18,14 @@ Future<ProviderContainer> _pumpHeader(WidgetTester tester) async {
   container.listen(seriesReorderModeProvider('series-1'), (_, _) {});
   container.read(seriesReorderModeProvider('series-1').notifier).enter();
 
+  final config = localizedTestAppConfig();
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
       child: MaterialApp(
-        locale: const Locale('zh'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
+        locale: config.locale,
+        localizationsDelegates: config.delegates,
+        supportedLocales: config.locales,
         theme: buildAppTheme(Brightness.light),
         home: Scaffold(body: SeriesDetailHeader(series: _series())),
       ),

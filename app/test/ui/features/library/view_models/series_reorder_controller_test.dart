@@ -23,7 +23,7 @@ class _ControllableLibraryRevision extends LibraryRevision {
 class _FakeSeriesRepo implements SeriesRepository {
   _FakeSeriesRepo(this.comics, {this.failSetOrder = false});
 
-  final List<Comic> comics;
+  List<Comic> comics;
   final bool failSetOrder;
   List<String>? lastSubmittedComicIds;
   int setOrderCalls = 0;
@@ -35,9 +35,14 @@ class _FakeSeriesRepo implements SeriesRepository {
   }) async {
     return PagedResult<SeriesComicPageItem>(
       items: comics
+          .asMap()
+          .entries
           .map(
-            (Comic comic) =>
-                (comic: comic, sortOrder: 0.0, sortOrderLocked: false),
+            (MapEntry<int, Comic> entry) => (
+              comic: entry.value,
+              sortOrder: entry.key + 1.0,
+              sortOrderLocked: true,
+            ),
           )
           .toList(),
       page: request.page,
@@ -58,6 +63,12 @@ class _FakeSeriesRepo implements SeriesRepository {
     if (failSetOrder) {
       throw StateError('persist failed');
     }
+    final Map<String, Comic> byId = <String, Comic>{
+      for (final Comic comic in comics) comic.comicId: comic,
+    };
+    comics = orderedItems
+        .map((SeriesItem item) => byId[item.comicId]!)
+        .toList();
   }
 
   @override
@@ -119,6 +130,7 @@ void main() {
     final List<SeriesComicPageItem> original = await container.read(
       seriesReorderControllerProvider('series-1').future,
     );
+    final int revisionBefore = container.read(libraryRevisionProvider).revision;
     final List<SeriesComicPageItem> reordered = <SeriesComicPageItem>[
       original[2],
       original[0],
@@ -135,10 +147,20 @@ void main() {
       'comic-1',
       'comic-2',
     ]);
+    expect(
+      container.read(libraryRevisionProvider).revision,
+      revisionBefore + 1,
+    );
     final List<SeriesComicPageItem> current = container
         .read(seriesReorderControllerProvider('series-1'))
         .value!;
     expect(_ids(current), <String>['comic-3', 'comic-1', 'comic-2']);
+    expect(
+      container
+          .read(seriesReorderControllerProvider('series-1').notifier)
+          .takeIgnoreNextRevisionAsExternal(),
+      isTrue,
+    );
   });
 
   test('reorder failure restores the previous visual order', () async {

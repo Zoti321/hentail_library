@@ -16,13 +16,25 @@ const int _kReorderFetchPageSize = 500;
 /// Series reorder mode 的成员列表状态（#121）。
 ///
 /// - 进入模式后关闭分页，一次性组合分页接口拉取「全部成员」，按 `sort_order` 有序；
-/// - [reorder] 立即（乐观）更新可视顺序并落库；失败回滚到落库前快照并向上抛错供 UI 提示。
+/// - [reorder] 立即（乐观）更新可视顺序并落库；失败回滚到落库前快照并向上抛错供 UI 提示；
+///   成功则 bump library revision（自身 bump 通过 [takeIgnoreNextRevisionAsExternal] 与外部变更区分）。
 ///
-/// 成功落库不在此 bump revision：普通系列详情目录会在退出 Series reorder mode 时随
-/// [SeriesReorderMode.exit] 的 revision 通知刷新（见 `series_reorder_mode.dart`）。
+/// 用户主动退出模式时 [SeriesReorderMode.exit] 仍会再 bump 一次，确保普通系列详情目录刷新。
 @riverpod
 class SeriesReorderController extends _$SeriesReorderController {
   late String _seriesId;
+
+  /// 本 notifier 落库成功后主动 bump revision 时置位，供系列详情区分「自身落库」与外部 sync/refresh。
+  bool _ignoreNextRevisionAsExternal = false;
+
+  /// 消费一次「忽略本次 revision 作为外部变更」标记（供 SeriesDetail 在模式内使用）。
+  bool takeIgnoreNextRevisionAsExternal() {
+    if (!_ignoreNextRevisionAsExternal) {
+      return false;
+    }
+    _ignoreNextRevisionAsExternal = false;
+    return true;
+  }
 
   @override
   Future<List<SeriesComicPageItem>> build(String seriesId) async {
@@ -56,6 +68,9 @@ class SeriesReorderController extends _$SeriesReorderController {
   }
 
   /// 落库一次拖拽结果：乐观更新可视顺序，失败回滚并抛错。
+  ///
+  /// 成功后 bump library revision，使其它 catalog / Series reading 消费者及时追上新序；
+  /// 并通过 [takeIgnoreNextRevisionAsExternal] 避免系列详情把这次 bump 误判为外部变更而退出模式。
   Future<void> reorder(List<SeriesComicPageItem> reordered) async {
     final List<SeriesComicPageItem>? previous = state.asData?.value;
     if (previous == null) {
@@ -82,6 +97,8 @@ class SeriesReorderController extends _$SeriesReorderController {
                 )
                 .toList(),
           );
+      _ignoreNextRevisionAsExternal = true;
+      ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
     } catch (error, stackTrace) {
       // 落库失败：回滚可视顺序到拖拽前快照，向上抛错供页面弹 toast。
       logError(AppLog.ui('series'), '系列成员重排落库失败', error, stackTrace);

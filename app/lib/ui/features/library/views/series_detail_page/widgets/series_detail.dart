@@ -11,6 +11,7 @@ import 'package:hentai_library/ui/core/widgets/responsive_layout/detail_primary_
 import 'package:hentai_library/ui/features/library/view_models/series_detail_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_comics_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/series_reorder_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_reorder_mode.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_comics_grid.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_cover.dart';
@@ -61,6 +62,7 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
 
     // #121：Series reorder mode 期间若 Library sync / Metadata refresh 使系列失效
     // （revision 变更），退出模式并回到普通系列详情（普通目录随 revision 重新加载）。
+    // 自身拖拽落库触发的 bump 由 controller 标记忽略，避免误退出模式。
     ref.listen<int>(
       libraryRevisionProvider.select(
         (LibraryRevisionState state) => state.revision,
@@ -69,11 +71,18 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
         if (previous == null || previous == next) {
           return;
         }
-        if (ref.read(seriesReorderModeProvider(widget.series.id))) {
-          ref
-              .read(seriesReorderModeProvider(widget.series.id).notifier)
-              .exitForExternalChange();
+        if (!ref.read(seriesReorderModeProvider(widget.series.id))) {
+          return;
         }
+        final SeriesReorderController controller = ref.read(
+          seriesReorderControllerProvider(widget.series.id).notifier,
+        );
+        if (controller.takeIgnoreNextRevisionAsExternal()) {
+          return;
+        }
+        ref
+            .read(seriesReorderModeProvider(widget.series.id).notifier)
+            .exitForExternalChange();
       },
     );
 
