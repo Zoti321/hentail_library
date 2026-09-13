@@ -14,7 +14,7 @@ What this app is, what it is not, and which comic resource formats are in scope.
 | Browse, search, filter within the Current library; Reading history global | Yes |
 | Read comics in-app (paged / scroll layouts) | Yes |
 | Manage metadata, series order, reading history | Yes |
-| Cross-platform desktop + mobile | Yes (UI converging to responsive desktop style) |
+| Cross-platform desktop + mobile | Yes (responsive desktop-style UI) |
 | Official cloud sync, accounts, storefront | No |
 | WebDAV backup of settings/DB (separate future issue) | Not in current WebDAV library-source work |
 | General-purpose ebook library (novels, textbooks) | No — comic-first |
@@ -26,7 +26,7 @@ Domain vocabulary (Library, Library root, Comic, Library sync, …) lives in **`
 | Platform | Status |
 |----------|--------|
 | Windows / macOS / Linux | Primary today (`isDesktop`) |
-| Android / iOS | Supported; legacy Material UI, migrating to responsive desktop-style UI |
+| Android / iOS | Supported; shared responsive shell (desktop visual language); remaining work is component-level polish |
 | Web | Not a current target (`isDesktop` treats web as non-desktop) |
 
 **Local libraries** remain offline-first after scan. **Remote (WebDAV) libraries** require network for reading and sync; generated thumbnails may be cached locally as derived data. Prefer HTTPS; users may explicitly allow HTTP for LAN NAS.

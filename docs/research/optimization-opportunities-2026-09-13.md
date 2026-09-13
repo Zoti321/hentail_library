@@ -120,12 +120,22 @@
 - **处理**：修订 ADR-0003 Context；更新 `ResourceEntry.location` 注释。未新开 ADR。
 - **风险/代价**：低。
 
-#### P2-A5 — 根目录遗留构建产物与「legacy mobile」UI 债
+#### P2-A5 — 根目录遗留构建产物与「legacy mobile」UI 债 — **已决策并文档对齐（2026-09-13）**
 
-- **现状证据**：仓库根仍有 `.dart_tool/`、`build/`（本机 `ls`）；`docs/agents/ui-style.md` L157/L182 标明 mobile Material 为 legacy、勿扩展；`product-positioning.md` L29 Android/iOS「legacy Material UI, migrating」。
-- **问题/机会**：根产物易混淆工作目录；移动端视觉收敛是长期债，非阻塞桌面主路径。
-- **建议方向**：`.gitignore`/清理规范确认；UI 收敛按 ui-style 渐进，勿新开 Material 页。
-- **风险/代价**：清理产物低；移动 UI 重构高。
+正文拆两条（互不阻塞）；无新 ADR。
+
+##### P2-A5a — 根目录 stale Flutter 产物 — **已确认，无代码改动**
+
+- **现状证据**：本机根目录可有 `.dart_tool/`、`build/`（旧 cwd / 无根 `pubspec` 时生成）；根 `.gitignore` 已含 `.dart_tool/`、`build/`；**git 未跟踪**。规范工程在 `app/`（`AGENTS.md` 已说明）。
+- **处理**：确认 ignore 契约足够；本机可删根产物。不新增清理脚本，不重复写 README。
+- **风险/代价**：无。
+
+##### P2-A5b — 「legacy mobile Material」叙事 vs 已统一响应式 shell — **文档已对齐**
+
+- **原现状证据**：`ui-style.md`「Today」仍写双 router / `mobile_material_theme` / `views/mobile/`；`product-positioning` 写 Android/iOS「legacy Material, migrating」。代码侧已是单 `appRouter` + `ResponsiveAppShell` + `buildAppTheme` + `AppLayoutBreakpoints`。
+- **决策**：架构迁移视为完成；剩余为组件级打磨（触达时收敛），**不开**专项大重构。
+- **处理**：已更新 `docs/agents/product-positioning.md`、`docs/agents/ui-style.md`；政策「勿新开 mobile-only Material 页」保留防回归。
+- **风险/代价**：低（纯文档）。
 
 ---
 
