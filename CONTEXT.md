@@ -37,8 +37,8 @@ _Avoid_: 云库、网盘库、在线书架（无官方云账号语义）
 _Avoid_: 扫描路径、挂载点；Saved path（旧称，仅指 Local 根）
 
 **Saved path**:
-Local library 的 Library root 之旧称；兼容文档与实现中仍可能出现，新表述优先用 Library root / Local library。
-_Avoid_: 在新设计中把 Saved path 扩成远程 URI
+Local library 的 Library root 之旧称；兼容文档与实现中仍可能出现，新表述优先用 Library root / Local library。用户侧创建与管理 Library 仅经 Library form 与侧栏入口，不以 Saved path / 路径页为产品概念。详见 ADR-0014。
+_Avoid_: 在新设计中把 Saved path 扩成远程 URI；选中路径页、Selected Paths、路径管理页
 
 **Comic**:
 某个 Library 中一条可阅读的独立作品，对应一个 Resource（本地文件/目录，或远程 WebDAV 上的文件）。身份由规范化后的资源位置键派生（`comicId`）；同一位置键始终是同一 Comic。
@@ -185,8 +185,8 @@ _Avoid_: 漫画表单、元数据 DTO
 _Avoid_: 系列表单、SeriesForm、编辑系列 DTO
 
 **Library form**:
-创建或编辑 Library 时的可提交草稿：显示名（必填）、Library root（Local 目录或 Remote WebDAV URL）、Remote 凭证（用户名/密码/allow HTTP；编辑时密码空表示保留）、Scan on startup、Scan interval、Supported resource formats。校验与落库规则集中在此；非法结果以字段级返回由 UI 展示。Local root 之间禁止相等或互相嵌套（对齐 Komga）。改 Local root 时保留 `libraryId`；若新根可读则按相对路径做 Path migration（含 Series），否则只写新根、不立刻迁移。不自动触发 Library sync。无变化则不写库。
-_Avoid_: 库表单、LibraryForm DTO、Library settings form（旧称）、编辑库元数据
+创建或编辑 Library 时的可提交草稿：显示名（必填）、Library root（Local 目录或 Remote WebDAV URL）、Remote 凭证（用户名/密码/allow HTTP；编辑时密码空表示保留）、Scan on startup、Scan interval、Supported resource formats。校验与落库规则集中在此；非法结果以字段级返回由 UI 展示。Local root 之间禁止相等或互相嵌套（对齐 Komga）。改 Local root 时保留 `libraryId`；若新根可读则按相对路径做 Path migration（含 Series），否则只写新根、不立刻迁移。不自动触发 Library sync。无变化则不写库。用户侧新建 Local / Remote library 均经此草稿（及侧栏入口），不以裸选目录或路径页捷径代替。详见 ADR-0014。
+_Avoid_: 库表单、LibraryForm DTO、Library settings form（旧称）、编辑库元数据；选中路径页作为建库入口
 
 **Metadata field lock**:
 Comic / Series 元数据字段上的布尔锁（Komga 式）。未锁定且 Library sync 或 Metadata refresh 解析出有值时用扫描结果覆盖；已锁定则保留库内值；扫描空/缺不清除。编辑某字段并保存会自动锁定该字段（仅变更字段）；也可不改值单独上锁/解锁。解锁不自动触发 sync / refresh。Series 成员排序锁（`sortOrderLocked`）同属此策略（见 ADR-0006）。合并与自动上锁规则集中一处，供 Library sync、Metadata refresh 与用户元数据写入共用。详见 ADR-0007。

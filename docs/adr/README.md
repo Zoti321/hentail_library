@@ -66,3 +66,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0011](./0011-tag-dictionary-no-ehtag.md) | 移除 EhTagTranslation 接入，保留通用标签字典导入 | Accepted |
 | [0012](./0012-comic-deletion-deletes-local-resource.md) | 用户 Comic deletion 删除 Local Resource；sync / 删库不删盘 | Accepted |
 | [0013](./0013-path-migration.md) | Path migration：弱指纹 + Local 库根相对路径 remapping | Accepted |
+| [0014](./0014-retire-saved-path-ui-and-api.md) | 退役 Saved path / Selected Paths UI 与 Path API | Accepted |

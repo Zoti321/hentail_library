@@ -85,16 +85,15 @@
 - **处理**：已对齐 `AGENTS.md`、`docs/agents/*`（含 `rust-migration` 现时架构、`product-positioning`、`coding-style`、`ui-style`、`issue-tracker`）、根 `README.md`；Multi-Library / WebDAV 标为已实现，Planned 仅保留 iOS PDF。
 - **仍须注意**：ADR Context 软刷新、代码注释漂移（如 `ResourceEntry`）不在该次文档对齐范围内。
 
-#### P1-A2 — Path / Selected Paths 与 Library 模型并存（Saved path 遗留面）
+#### P1-A2 — Path / Selected Paths 与 Library 模型并存（Saved path 遗留面）— **已决策（2026-09-13，ADR-0014）**
 
-- **现状证据**  
+- **现状证据**（决策前）  
   - `CONTEXT.md`：Saved path 为 Local root 旧称。  
   - 仍有 `/paths` → `SelectedPathsPage`、`PathRepositoryImpl`（`listAllPathsFrb` / `addPathFrb`），空库 CTA / Home hero 仍 `context.go('/paths')`。  
   - 同时侧栏用 `LibraryFormDialog` 创建 Local/Remote（`library_management_actions.dart`）。  
-  - Rust `path` 模块与 `library` 模块并存（`core/crates/core/src/lib.rs`）。
-- **问题/机会**：双入口增加心智与测试面；Path API 多为 sync FRB（`path.rs` 全 sync 属性抽样）。
-- **建议方向**：产品上明确「路径页 = 库根列表」的唯一叙事或收敛到 Library CRUD；评估废弃 `PathRepository` 薄封装。
-- **风险/代价**：中；涉及路由、空态 CTA、数据迁移故事。
+  - Rust `path` 模块与 `library` 模块并存（`core/crates/core/src/lib.rs`）；运行时 Path 已是 `libraries` 薄封装。
+- **决策**（详见 ADR-0014）：用户只认 Library；删除 `/paths`（redirect → Home）；空态/Hero 主 createLocal、次 createRemote（均经 Library form）；同一波删 Dart Path 面与 Rust/FRB path API；不占用 `/libraries`；`saved_paths` 表删除与 Path migration / All libraries browse / Library sync→async **不在本决策内**。实现排在明确 P0 之后。
+- **风险/代价**：中；涉及路由、空态 CTA、FRB codegen；无独立数据迁移（表已是 `libraries`）。
 
 #### P1-A3 — FRB 迁移「业务在 Rust」已成立，但 Dart 薄边与 sync 比例仍偏高
 
@@ -337,7 +336,7 @@
 3. **History / Library / Facet sync→async（P0/P1）**：接续已完成的 comic/thumbnail/reader 改造，去掉剩余 UI 热路径 `block_on`。  
 4. **FRB thin-edge 补测（P1）**：`mapRustComic` 等与 `frb_zone_guard`——符合现有测试哲学，挡回归。  
 5. **All libraries browse 产品决策（P0 产品）**：占位页已挂入口；要么排期聚合查询，要么降级入口，避免半成品体验。  
-6. **Path/Selected Paths vs Library Form 收敛（P1）**：减少 Saved path 遗留双模型。  
+6. ~~**Path/Selected Paths vs Library Form 收敛（P1）**~~ — **已决策（ADR-0014）**：退役路径页与 Path API；实现排在明确 P0 之后。  
 7. **iOS PDF 或显式降级（P1）**：stub 与「平台 ✅」叙事冲突；打包专项或格式层提示二选一。
 
 ---
