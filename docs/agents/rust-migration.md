@@ -12,6 +12,8 @@
 
 开发：clone 后在仓库根目录执行 `./scripts/setup-dev.sh`（Windows 可用 Git Bash），创建 `app/rust_builder/rust` → `core/crates/flutter` 链接并拉取 pdfium；然后 `cd app && flutter run`、`cd core && cargo test --workspace`。
 
+**PDF/pdfium**：桌面、Android、iOS 共用 `core/crates/core/src/formats/pdf.rs`（无平台 stub）。各平台的 pdfium 由 `core/vendor/` 管理，绑定/打包策略按平台区分（桌面 host 路径、Android jniLibs soname、iOS `pdfium.xcframework` 经 CocoaPods 嵌入后按 bundle 路径 dlopen）。iOS 详见 ADR-0015 与 `core/vendor/README.md`。
+
 **Rust 日志（ADR-0003 / ADR-0004）**：`tracing` 输出至 stderr，并在 `configure_rust_log_frb` 后写入 `{app_data}/logs/rust_log.txt`（5MB 轮转）。开发时可用 `RUST_LOG=hentai_core=debug flutter run`；`set_diagnostic_logging_frb` 临时调整级别。用户支持流程见 `docs/agents/log-support.md`。
 
 ## 架构要点

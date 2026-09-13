@@ -43,9 +43,7 @@ unrar-ng = "0.7"
 tempfile = "3"
 url = "2"
 reqwest_dav = { version = "0.3", default-features = false, features = ["rustls-tls"] }
-
-
-[target.'cfg(not(target_os = "ios"))'.dependencies]
+# PDF 后端跨平台共用：桌面/Android/iOS 均经 pdfium-render 运行时绑定 vendored pdfium。
 pdfium-render = "0.8"
 
 [dev-dependencies]

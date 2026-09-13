@@ -1,18 +1,10 @@
 use std::env;
 use std::path::{Path, PathBuf};
 
-fn needs_pdfium_vendor(target: &str) -> bool {
-    // iOS remains on the mobile_pdf stub until a dedicated packaging pass.
-    !target.contains("apple-ios")
-}
-
 fn main() {
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR"));
     let vendor_root = manifest_dir.join("../../vendor");
     let target = env::var("TARGET").expect("TARGET");
-    if !needs_pdfium_vendor(&target) {
-        return;
-    }
     let platform_dir = resolve_vendor_dir(&vendor_root, &target);
 
     if !platform_dir.is_dir() {
@@ -47,6 +39,13 @@ fn main() {
         return;
     }
 
+    if target.contains("apple-ios") {
+        // iOS：pdfium 以 vendored xcframework 经 CocoaPods 嵌入 App bundle 的 Frameworks/，
+        // 运行时按 bundle 路径 dlopen（见 formats/pdf.rs）。此处仅校验 vendor 存在（fail-fast），
+        // 不写入编译期链接标志或 HENTAI_PDFIUM_LIB_DIR（host 路径在设备/模拟器上无意义）。
+        return;
+    }
+
     println!("cargo:rustc-env=HENTAI_PDFIUM_LIB_DIR={lib_dir}");
 }
 
@@ -77,6 +76,18 @@ fn resolve_vendor_dir(vendor_root: &Path, target: &str) -> PathBuf {
             "linux-aarch64"
         } else {
             "linux-x86_64"
+        }
+    } else if target.contains("apple-ios") {
+        // 目标 triple：
+        //   aarch64-apple-ios      → 真机 arm64
+        //   aarch64-apple-ios-sim  → 模拟器 arm64（Apple Silicon）
+        //   x86_64-apple-ios       → 模拟器 x64（Intel）
+        if target.contains("sim") {
+            "ios-simulator-arm64"
+        } else if target.contains("x86_64") {
+            "ios-simulator-x64"
+        } else {
+            "ios-device-arm64"
         }
     } else if target.contains("apple") && target.contains("darwin") {
         if target.contains("aarch64") {
