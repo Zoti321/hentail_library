@@ -11,11 +11,14 @@ import 'package:hentai_library/ui/core/widgets/responsive_layout/detail_primary_
 import 'package:hentai_library/ui/features/library/view_models/series_detail_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_comics_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/series_reorder_mode.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_comics_grid.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_cover.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_header.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_info_sections.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_pagination_bar.dart';
+import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_reorder_body.dart';
+import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SeriesDetail extends ConsumerStatefulWidget {
@@ -52,6 +55,38 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
 
   @override
   Widget build(BuildContext context) {
+    final bool reorderMode = ref.watch(
+      seriesReorderModeProvider(widget.series.id),
+    );
+
+    // #121：Series reorder mode 期间若 Library sync / Metadata refresh 使系列失效
+    // （revision 变更），退出模式并回到普通系列详情（普通目录随 revision 重新加载）。
+    ref.listen<int>(
+      libraryRevisionProvider.select(
+        (LibraryRevisionState state) => state.revision,
+      ),
+      (int? previous, int next) {
+        if (previous == null || previous == next) {
+          return;
+        }
+        if (ref.read(seriesReorderModeProvider(widget.series.id))) {
+          ref
+              .read(seriesReorderModeProvider(widget.series.id).notifier)
+              .exitForExternalChange();
+        }
+      },
+    );
+
+    if (reorderMode) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          SeriesDetailHeader(series: widget.series),
+          Expanded(child: SeriesReorderBody(seriesId: widget.series.id)),
+        ],
+      );
+    }
+
     ref.listen<int?>(
       seriesDetailComicsCatalogControllerProvider(widget.series.id).select(
         (AsyncValue<SeriesDetailComicsCatalogState> async) =>

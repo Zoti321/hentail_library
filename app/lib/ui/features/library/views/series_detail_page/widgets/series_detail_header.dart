@@ -14,6 +14,7 @@ import 'package:hentai_library/ui/core/widgets/overlays/anchored_overlay_menu.da
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_series_dialog.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/series_reorder_mode.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_back_header.dart';
 import 'package:hentai_library/ui/features/shell/state/metadata_refresh_toasts.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -28,9 +29,7 @@ class SeriesDetailHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final ThemeData theme = Theme.of(context);
-    final int activePageSize = ref.watch(seriesDetailActivePageSizeProvider);
-    final AppLocalizations l10n = context.l10n;
+    final bool reorderMode = ref.watch(seriesReorderModeProvider(series.id));
     return DecoratedBox(
       decoration: BoxDecoration(
         color: cs.surface,
@@ -48,52 +47,104 @@ class SeriesDetailHeader extends ConsumerWidget {
           height: 48,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              children: <Widget>[
-                GhostButton.icon(
-                  icon: LucideIcons.arrowLeft,
-                  tooltip: l10n.shellBack,
-                  semanticLabel: l10n.shellBack,
-                  iconSize: 16,
-                  size: 32,
-                  borderRadius: 8,
-                  foregroundColor: cs.hentai.iconDefault,
-                  hoverColor: theme.hoverColor,
-                  overlayColor: theme.hoverColor,
-                  onPressed: () =>
-                      ComicDetailBackHeader.popOrGoLibrary(context),
-                ),
-                const SizedBox(width: 4),
-                _SeriesDetailOverflowMenuButton(series: series),
-                const SizedBox(width: 4),
-                GhostButton.icon(
-                  icon: LucideIcons.pencil,
-                  tooltip: l10n.seriesDetailEdit,
-                  semanticLabel: l10n.seriesDetailEdit,
-                  iconSize: 16,
-                  size: 32,
-                  borderRadius: 8,
-                  foregroundColor: cs.hentai.iconDefault,
-                  hoverColor: theme.hoverColor,
-                  overlayColor: theme.hoverColor,
-                  onPressed: () {
-                    showEditSeriesDialog(context: context, series: series);
-                  },
-                ),
-                const Spacer(),
-                PageSizeMenuButton(
-                  activePageSize: activePageSize,
-                  onSelected: (int pageSize) {
-                    ref
-                        .read(seriesDetailPageSizeProvider.notifier)
-                        .setPageSize(pageSize);
-                  },
-                ),
-              ],
-            ),
+            child: reorderMode
+                ? _buildReorderRow(context, ref)
+                : _buildNormalRow(context, ref),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildNormalRow(BuildContext context, WidgetRef ref) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final int activePageSize = ref.watch(seriesDetailActivePageSizeProvider);
+    final AppLocalizations l10n = context.l10n;
+    return Row(
+      children: <Widget>[
+        GhostButton.icon(
+          icon: LucideIcons.arrowLeft,
+          tooltip: l10n.shellBack,
+          semanticLabel: l10n.shellBack,
+          iconSize: 16,
+          size: 32,
+          borderRadius: 8,
+          foregroundColor: cs.hentai.iconDefault,
+          hoverColor: theme.hoverColor,
+          overlayColor: theme.hoverColor,
+          onPressed: () => ComicDetailBackHeader.popOrGoLibrary(context),
+        ),
+        const SizedBox(width: 4),
+        _SeriesDetailOverflowMenuButton(series: series),
+        const SizedBox(width: 4),
+        GhostButton.icon(
+          icon: LucideIcons.pencil,
+          tooltip: l10n.seriesDetailEdit,
+          semanticLabel: l10n.seriesDetailEdit,
+          iconSize: 16,
+          size: 32,
+          borderRadius: 8,
+          foregroundColor: cs.hentai.iconDefault,
+          hoverColor: theme.hoverColor,
+          overlayColor: theme.hoverColor,
+          onPressed: () {
+            showEditSeriesDialog(context: context, series: series);
+          },
+        ),
+        const Spacer(),
+        PageSizeMenuButton(
+          activePageSize: activePageSize,
+          onSelected: (int pageSize) {
+            ref
+                .read(seriesDetailPageSizeProvider.notifier)
+                .setPageSize(pageSize);
+          },
+        ),
+      ],
+    );
+  }
+
+  /// Series reorder mode header：退出控件 + 拖拽模式指示，隐藏返回/溢出/编辑/页大小。
+  Widget _buildReorderRow(BuildContext context, WidgetRef ref) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final ThemeData theme = Theme.of(context);
+    final AppThemeTokens tokens = context.tokens;
+    final AppLocalizations l10n = context.l10n;
+    return Row(
+      children: <Widget>[
+        GhostButton.icon(
+          icon: LucideIcons.x,
+          tooltip: l10n.seriesDetailExitReorder,
+          semanticLabel: l10n.seriesDetailExitReorder,
+          iconSize: 16,
+          size: 32,
+          borderRadius: 8,
+          foregroundColor: cs.hentai.iconDefault,
+          hoverColor: theme.hoverColor,
+          overlayColor: theme.hoverColor,
+          onPressed: () =>
+              ref.read(seriesReorderModeProvider(series.id).notifier).exit(),
+        ),
+        SizedBox(width: tokens.spacing.sm),
+        Icon(
+          LucideIcons.gripVertical,
+          size: 16,
+          color: cs.hentai.iconDefault,
+        ),
+        SizedBox(width: tokens.spacing.sm),
+        Text(
+          l10n.seriesDetailReorderModeTitle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: cs.hentai.textPrimary,
+            fontSize: tokens.text.bodyMd,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const Spacer(),
+      ],
     );
   }
 }
@@ -164,6 +215,18 @@ class _SeriesDetailOverflowMenuButtonState
                     return;
                   }
                   _refreshMetadata(context);
+                },
+              ),
+              _SeriesDetailOverflowMenuItem(
+                icon: LucideIcons.arrowUpDown,
+                label: l10n.seriesDetailReorder,
+                onTap: () {
+                  hideMenu();
+                  ref
+                      .read(
+                        seriesReorderModeProvider(widget.series.id).notifier,
+                      )
+                      .enter();
                 },
               ),
               _SeriesDetailOverflowMenuItem(

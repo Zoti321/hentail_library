@@ -938,6 +938,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get seriesDetailEdit => '编辑系列';
 
   @override
+  String get seriesDetailReorder => '重新排序';
+
+  @override
+  String get seriesDetailExitReorder => '退出排序';
+
+  @override
+  String get seriesDetailReorderModeTitle => '拖拽排序';
+
+  @override
+  String get seriesDetailReorderBadgeSemantic => '拖拽重排';
+
+  @override
+  String get seriesDetailReorderFailed => '保存排序失败';
+
+  @override
   String get formSeriesItemSortOrderLabel => '排序序号';
 
   @override

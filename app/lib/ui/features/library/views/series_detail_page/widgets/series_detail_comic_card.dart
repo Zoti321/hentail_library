@@ -15,6 +15,7 @@ import 'package:hentai_library/ui/core/widgets/overlays/context_menu/series_item
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
 import 'package:hentai_library/ui/features/library/comic_delete_flow.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
+import 'package:hentai_library/ui/features/library/view_models/series_reorder_mode.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -47,7 +48,8 @@ class SeriesDetailComicCard extends HookConsumerWidget {
         _showContextMenu(context, ref, details.globalPosition);
       },
       onLongPressStart: (LongPressStartDetails details) {
-        _showContextMenu(context, ref, details.globalPosition);
+        // #121：长按成员卡进入 Series reorder mode（桌面右键仍走上下文菜单）。
+        ref.read(seriesReorderModeProvider(seriesId).notifier).enter();
       },
       cover: _SeriesDetailComicCover(
         comicId: comic.comicId,
