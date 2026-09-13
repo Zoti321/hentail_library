@@ -355,26 +355,216 @@ pub async fn get_series_reading_context_by_comic_id(
     }))
 }
 
+/// 单个成员在批量重排里的先验状态（ADR-0006 / #121）。
+#[derive(Debug, Clone)]
+struct ReorderMember {
+    comic_id: String,
+    sort_order: f64,
+    locked: bool,
+}
+
+/// 锚点 + 夹缝插值：给定「新完整顺序」下各成员的先验 `(sort_order, locked)`，
+/// 计算落库用的新 `sort_order` 序列，尽量保留已锁成员的原数值。
+///
+/// 规则（#121）：
+/// - 从左到右贪心选锚点：已锁且其原 `sort_order` 严格大于「上一个已保留锚点」的成员保留原值；
+/// - 未锁成员、以及会破坏严格递增的已锁成员，改由锚点间夹缝线性插值重算；
+/// - 首锚点之前 / 末锚点之后按 1.0 步长外推；
+/// - 若无任何锚点，退化为 1..n 顺序编号。
+///
+/// 返回值与输入等长、严格递增。调用方负责把本次所有成员一律置为 `locked=true`。
+fn interpolate_reordered_values(members: &[ReorderMember]) -> Vec<f64> {
+    let n = members.len();
+    let mut result = vec![0.0_f64; n];
+
+    let mut anchor_indices: Vec<usize> = Vec::new();
+    let mut last_anchor_value = f64::NEG_INFINITY;
+    for (i, member) in members.iter().enumerate() {
+        if member.locked && member.sort_order.is_finite() && member.sort_order > last_anchor_value {
+            anchor_indices.push(i);
+            last_anchor_value = member.sort_order;
+            result[i] = member.sort_order;
+        }
+    }
+
+    if anchor_indices.is_empty() {
+        for (i, slot) in result.iter_mut().enumerate() {
+            *slot = (i + 1) as f64;
+        }
+        return result;
+    }
+
+    // 首锚点之前：向下外推，保持 < 首锚点值且严格递增。
+    let first = anchor_indices[0];
+    let first_value = members[first].sort_order;
+    for j in 0..first {
+        result[j] = first_value - (first - j) as f64;
+    }
+
+    // 相邻锚点之间：线性夹缝插值。
+    for window in anchor_indices.windows(2) {
+        let left = window[0];
+        let right = window[1];
+        let left_value = members[left].sort_order;
+        let right_value = members[right].sort_order;
+        let count = right - left - 1;
+        if count > 0 {
+            let step = (right_value - left_value) / (count as f64 + 1.0);
+            for t in 1..=count {
+                result[left + t] = left_value + step * t as f64;
+            }
+        }
+    }
+
+    // 末锚点之后：向上外推。
+    let last = *anchor_indices.last().expect("anchor_indices non-empty");
+    let last_value = members[last].sort_order;
+    for t in 1..=(n - 1 - last) {
+        result[last + t] = last_value + t as f64;
+    }
+
+    result
+}
+
+/// 批量按 `ordered_comic_ids` 重排系列成员（Series reorder mode 落库路径，#121）。
+///
+/// 语义：写入完整新序的 `sort_order`（锚点 + 夹缝插值，尽量保留已锁成员原值），
+/// 并将本次提交的所有成员一律置为 `sort_order_locked = true`，
+/// 使后续 Library sync 不再按文件名覆盖该顺序。整批在单事务内提交。
 pub async fn set_series_items_order(
     series_id: &str,
     ordered_comic_ids: Vec<String>,
 ) -> Result<(), HentaiError> {
+    let series_id = series_id.trim();
+    if series_id.is_empty() {
+        return Err(HentaiError::validation("系列标识无效".to_string()));
+    }
     let db = connection()?;
+
+    let existing_rows = SeriesItems::find()
+        .filter(series_items::Column::SeriesId.eq(series_id))
+        .all(&db)
+        .await
+        .map_err(map_db_err)?;
+    let state: HashMap<String, (f64, bool)> = existing_rows
+        .into_iter()
+        .map(|row| (row.comic_id, (row.sort_order, row.sort_order_locked)))
+        .collect();
+
+    let mut seen = HashSet::new();
+    let mut members: Vec<ReorderMember> = Vec::new();
+    for comic_id in ordered_comic_ids {
+        let comic_id = comic_id.trim().to_string();
+        if comic_id.is_empty() || !seen.insert(comic_id.clone()) {
+            continue;
+        }
+        let Some(&(sort_order, locked)) = state.get(&comic_id) else {
+            continue;
+        };
+        members.push(ReorderMember {
+            comic_id,
+            sort_order,
+            locked,
+        });
+    }
+
+    if members.is_empty() {
+        return Ok(());
+    }
+
+    let values = interpolate_reordered_values(&members);
+
     let txn = db.begin().await.map_err(map_db_err)?;
-    for (index, comic_id) in ordered_comic_ids.iter().enumerate() {
+    for (member, value) in members.iter().zip(values) {
         SeriesItems::update_many()
             .col_expr(
                 series_items::Column::SortOrder,
-                sea_orm::sea_query::Expr::value(index as f64),
+                sea_orm::sea_query::Expr::value(value),
+            )
+            .col_expr(
+                series_items::Column::SortOrderLocked,
+                sea_orm::sea_query::Expr::value(true),
             )
             .filter(series_items::Column::SeriesId.eq(series_id))
-            .filter(series_items::Column::ComicId.eq(comic_id))
+            .filter(series_items::Column::ComicId.eq(&member.comic_id))
             .exec(&txn)
             .await
             .map_err(map_db_err)?;
     }
     txn.commit().await.map_err(map_db_err)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod reorder_interpolation_tests {
+    use super::{interpolate_reordered_values, ReorderMember};
+
+    fn member(comic_id: &str, sort_order: f64, locked: bool) -> ReorderMember {
+        ReorderMember {
+            comic_id: comic_id.to_string(),
+            sort_order,
+            locked,
+        }
+    }
+
+    fn assert_strictly_increasing(values: &[f64]) {
+        for pair in values.windows(2) {
+            assert!(
+                pair[1] > pair[0],
+                "expected strictly increasing, got {pair:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn all_unlocked_gets_baseline_numbering() {
+        let members = vec![
+            member("c1", 5.0, false),
+            member("c2", 9.0, false),
+            member("c3", 2.0, false),
+        ];
+        let values = interpolate_reordered_values(&members);
+        assert_eq!(values, vec![1.0, 2.0, 3.0]);
+    }
+
+    #[test]
+    fn keeps_locked_anchor_values_when_order_unchanged() {
+        // c1 locked@1.0, c3 locked@3.0 stay; unlocked c2 interpolates between.
+        let members = vec![
+            member("c1", 1.0, true),
+            member("c2", 7.0, false),
+            member("c3", 3.0, true),
+        ];
+        let values = interpolate_reordered_values(&members);
+        assert_eq!(values[0], 1.0);
+        assert_eq!(values[2], 3.0);
+        assert!(values[1] > 1.0 && values[1] < 3.0);
+        assert_strictly_increasing(&values);
+    }
+
+    #[test]
+    fn locked_relative_reorder_reassigns_incompatible_anchor() {
+        // New order puts higher-valued locked member first; the second locked
+        // member is incompatible and must be reassigned above it.
+        let members = vec![member("b", 2.0, true), member("a", 1.0, true)];
+        let values = interpolate_reordered_values(&members);
+        assert_eq!(values[0], 2.0);
+        assert!(values[1] > 2.0);
+        assert_strictly_increasing(&values);
+    }
+
+    #[test]
+    fn unlocked_before_first_anchor_extrapolates_below() {
+        let members = vec![
+            member("c1", 0.0, false),
+            member("c2", 0.0, false),
+            member("c3", 5.0, true),
+        ];
+        let values = interpolate_reordered_values(&members);
+        assert_eq!(values[2], 5.0);
+        assert!(values[0] < 5.0 && values[1] < 5.0);
+        assert_strictly_increasing(&values);
+    }
 }
 
 pub async fn search_series_by_keyword(keyword: &str) -> Result<Vec<SeriesDto>, HentaiError> {
