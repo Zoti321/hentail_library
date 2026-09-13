@@ -18,6 +18,10 @@ class _ControllableLibraryRevision extends LibraryRevision {
   LibraryRevisionState build() {
     return const LibraryRevisionState(revision: 1, hasReceivedFirstEmit: true);
   }
+
+  void bump() {
+    state = state.copyWith(revision: state.revision + 1, streamError: null);
+  }
 }
 
 class _FakeSeriesRepo implements SeriesRepository {
@@ -27,12 +31,14 @@ class _FakeSeriesRepo implements SeriesRepository {
   final bool failSetOrder;
   List<String>? lastSubmittedComicIds;
   int setOrderCalls = 0;
+  int fetchCalls = 0;
 
   @override
   Future<PagedResult<SeriesComicPageItem>> fetchComicsPage({
     required String seriesId,
     required PageRequest request,
   }) async {
+    fetchCalls += 1;
     return PagedResult<SeriesComicPageItem>(
       items: comics
           .asMap()
@@ -186,5 +192,51 @@ void main() {
         .read(seriesReorderControllerProvider('series-1'))
         .value!;
     expect(_ids(current), <String>['comic-1', 'comic-2', 'comic-3']);
+  });
+
+  test('revision bumps alone do not refetch full members', () async {
+    final _FakeSeriesRepo repo = _FakeSeriesRepo(<Comic>[_comic(1), _comic(2)]);
+    final ProviderContainer container = _container(repo);
+    addTearDown(container.dispose);
+
+    await container.read(seriesReorderControllerProvider('series-1').future);
+    final int fetchesAfterBuild = repo.fetchCalls;
+
+    (container.read(libraryRevisionProvider.notifier)
+            as _ControllableLibraryRevision)
+        .bump();
+    await container.read(seriesReorderControllerProvider('series-1').future);
+
+    expect(repo.fetchCalls, fetchesAfterBuild);
+  });
+
+  test('reorder keeps optimistic order without extra fetch', () async {
+    final _FakeSeriesRepo repo = _FakeSeriesRepo(<Comic>[
+      _comic(1),
+      _comic(2),
+      _comic(3),
+    ]);
+    final ProviderContainer container = _container(repo);
+    addTearDown(container.dispose);
+
+    final List<SeriesComicPageItem> original = await container.read(
+      seriesReorderControllerProvider('series-1').future,
+    );
+    final int fetchesBefore = repo.fetchCalls;
+    final List<SeriesComicPageItem> reordered = <SeriesComicPageItem>[
+      original[2],
+      original[0],
+      original[1],
+    ];
+
+    await container
+        .read(seriesReorderControllerProvider('series-1').notifier)
+        .reorder(reordered);
+
+    expect(repo.fetchCalls, fetchesBefore);
+    expect(
+      _ids(container.read(seriesReorderControllerProvider('series-1')).value!),
+      <String>['comic-3', 'comic-1', 'comic-2'],
+    );
   });
 }

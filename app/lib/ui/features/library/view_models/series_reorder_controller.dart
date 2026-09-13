@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
@@ -10,29 +9,42 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'series_reorder_controller.g.dart';
 
-/// Series reorder mode 落库时单页拉取上限（远超常见系列成员数，避免真正翻页）。
+/// 系列详情预拉 / Series reorder mode 落库时单页拉取上限。
 const int _kReorderFetchPageSize = 500;
 
-/// Series reorder mode 的成员列表状态（#121）。
+/// 系列详情全量成员列表（打开详情即预拉；#121）。
 ///
-/// - 进入模式后关闭分页，一次性组合分页接口拉取「全部成员」，按 `sort_order` 有序；
-/// - [reorder] 立即（乐观）更新可视顺序并落库；失败回滚到落库前快照并向上抛错供 UI 提示；
-///   成功则 bump library revision，使其它 catalog / Series reading 消费者追上新序。
-///
-/// 用户主动退出模式时 [SeriesReorderMode.exit] 仍会再 bump 一次，确保普通系列详情目录刷新。
+/// - 供浏览态与 Series reorder mode 共用同一数据源（进入模式不换树）；
+/// - **不**监听裸 [libraryRevisionProvider]（缩略图写入也会 bump）；由详情页在
+///   sync / metadata refresh 完成或用户退出模式时 [invalidate] 重拉；
+/// - [beginDrag] / [endDrag]：拖拽与落库窗口内冻结，避免 children 被换掉；
+/// - [reorder] 乐观更新并落库；自身 bump 不触发本 notifier 重拉。
 @riverpod
 class SeriesReorderController extends _$SeriesReorderController {
   late String _seriesId;
+  bool _dragActive = false;
+  List<SeriesComicPageItem>? _dragSnapshot;
+
+  void beginDrag() {
+    _dragActive = true;
+    final List<SeriesComicPageItem>? current = state.asData?.value;
+    _dragSnapshot = current == null
+        ? null
+        : List<SeriesComicPageItem>.from(current);
+  }
+
+  void endDrag() {
+    _dragActive = false;
+    _dragSnapshot = null;
+  }
 
   @override
   Future<List<SeriesComicPageItem>> build(String seriesId) async {
     _seriesId = seriesId;
-    // 外部 Library sync / Metadata refresh 变更时重新加载全部成员。
-    ref.watch(
-      libraryRevisionProvider.select(
-        (LibraryRevisionState state) => state.revision,
-      ),
-    );
+    if (_dragActive && _dragSnapshot != null) {
+      // 保活：拖中若被 invalidate，仍返回快照（正常路径不 watch revision）。
+      return _dragSnapshot!;
+    }
     return _loadAllMembers(seriesId);
   }
 
@@ -56,8 +68,6 @@ class SeriesReorderController extends _$SeriesReorderController {
   }
 
   /// 落库一次拖拽结果：乐观更新可视顺序，失败回滚并抛错。
-  ///
-  /// 成功后 bump library revision，使其它 catalog / Series reading 消费者及时追上新序。
   Future<void> reorder(List<SeriesComicPageItem> reordered) async {
     final List<SeriesComicPageItem>? previous = state.asData?.value;
     if (previous == null) {
@@ -66,9 +76,13 @@ class SeriesReorderController extends _$SeriesReorderController {
     final List<SeriesComicPageItem> snapshot = List<SeriesComicPageItem>.from(
       previous,
     );
-    state = AsyncData<List<SeriesComicPageItem>>(
-      List<SeriesComicPageItem>.from(reordered),
+    final List<SeriesComicPageItem> next = List<SeriesComicPageItem>.from(
+      reordered,
     );
+    state = AsyncData<List<SeriesComicPageItem>>(next);
+    // 落库完成前保持冻结，避免 onDragEnd 已结束但 revision/重拉插入窗口。
+    _dragActive = true;
+    _dragSnapshot = next;
     try {
       await ref
           .read(seriesRepoProvider)
@@ -86,10 +100,11 @@ class SeriesReorderController extends _$SeriesReorderController {
           );
       ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
     } catch (error, stackTrace) {
-      // 落库失败：回滚可视顺序到拖拽前快照，向上抛错供页面弹 toast。
       logError(AppLog.ui('series'), '系列成员重排落库失败', error, stackTrace);
       state = AsyncData<List<SeriesComicPageItem>>(snapshot);
       rethrow;
+    } finally {
+      endDrag();
     }
   }
 }
