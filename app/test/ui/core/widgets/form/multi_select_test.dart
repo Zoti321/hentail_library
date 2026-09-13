@@ -1,4 +1,8 @@
+import 'dart:ui' show PointerDeviceKind;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
@@ -951,5 +955,314 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  bool isMenuRowHighlighted(WidgetTester tester, String name) {
+    final Finder menuText = find.descendant(
+      of: find.byKey(MultiSelect.menuPanelKey),
+      matching: find.text(name),
+    );
+    expect(menuText, findsOneWidget);
+    return tester.getSemantics(menuText).hasFlag(SemanticsFlag.isSelected);
+  }
+
+  testWidgets('opens menu with first remaining candidate highlighted', (
+    WidgetTester tester,
+  ) async {
+    await pumpMultiSelect(tester, selectedNames: const <String>['alpha']);
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+
+    expect(isMenuRowHighlighted(tester, 'beta'), isTrue);
+    expect(isMenuRowHighlighted(tester, 'gamma'), isFalse);
+  });
+
+  testWidgets('arrow keys move highlight and clamp at ends without wrap', (
+    WidgetTester tester,
+  ) async {
+    await pumpMultiSelect(tester);
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+
+    expect(isMenuRowHighlighted(tester, 'alpha'), isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(isMenuRowHighlighted(tester, 'beta'), isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(isMenuRowHighlighted(tester, 'gamma'), isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(isMenuRowHighlighted(tester, 'gamma'), isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    await tester.pumpAndSettle();
+    expect(isMenuRowHighlighted(tester, 'beta'), isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    await tester.pumpAndSettle();
+    expect(isMenuRowHighlighted(tester, 'alpha'), isTrue);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+    await tester.pumpAndSettle();
+    expect(isMenuRowHighlighted(tester, 'alpha'), isTrue);
+  });
+
+  testWidgets('arrow down opens closed menu and highlights first candidate', (
+    WidgetTester tester,
+  ) async {
+    await pumpMultiSelect(tester);
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.byKey(MultiSelect.menuPanelKey), findsNothing);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(MultiSelect.menuPanelKey), findsOneWidget);
+    expect(isMenuRowHighlighted(tester, 'alpha'), isTrue);
+  });
+
+  testWidgets(
+    'Tab confirms highlighted name not free text and keeps focus/menu',
+    (WidgetTester tester) async {
+      final List<String> selected = <String>[];
+      final List<String> added = <String>[];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            locale: const Locale('zh'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            theme: buildAppTheme(Brightness.light),
+            home: Scaffold(
+              body: Padding(
+                padding: const EdgeInsets.all(24),
+                child: StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return MultiSelect<String>(
+                      label: '标签',
+                      icon: LucideIcons.tag,
+                      selectedNames: selected,
+                      onAdd: (String name) {
+                        added.add(name);
+                        setState(() => selected.add(name));
+                      },
+                      onRemove: (String name) {
+                        setState(() => selected.remove(name));
+                      },
+                      itemsProvider: _catalogProvider,
+                      onRetry: () {},
+                      resolveName: (String name) => name,
+                      copy: const MultiSelectCopy(
+                        inputPlaceholder: '选择或输入标签…',
+                        listLoadFailed: '标签列表加载失败',
+                        emptyCatalog: '暂无标签',
+                        emptyRemaining: '没有更多可选',
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(TextField));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'alp');
+      await tester.pumpAndSettle();
+      expect(isMenuRowHighlighted(tester, 'alpha'), isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+
+      expect(added, <String>['alpha']);
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller?.text,
+        isEmpty,
+      );
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).focusNode?.hasFocus,
+        isTrue,
+      );
+      expect(find.byKey(MultiSelect.menuPanelKey), findsOneWidget);
+      expect(find.widgetWithText(OutlinedMetaChip, 'alpha'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(MultiSelect.menuPanelKey),
+          matching: find.text('alpha'),
+        ),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets('Enter still submits free text even when highlight exists', (
+    WidgetTester tester,
+  ) async {
+    final List<String> added = <String>[];
+    await pumpMultiSelect(tester, onAdd: added.add);
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'a');
+    await tester.pumpAndSettle();
+    expect(isMenuRowHighlighted(tester, 'alpha'), isTrue);
+
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(added, <String>['a']);
+  });
+
+  testWidgets('filter change resets highlight to the first visible candidate', (
+    WidgetTester tester,
+  ) async {
+    await pumpMultiSelect(tester);
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+    expect(isMenuRowHighlighted(tester, 'beta'), isTrue);
+
+    await tester.enterText(find.byType(TextField), 'g');
+    await tester.pumpAndSettle();
+
+    expect(isMenuRowHighlighted(tester, 'gamma'), isTrue);
+  });
+
+  testWidgets('keyboard highlight scrolls highlighted row into view', (
+    WidgetTester tester,
+  ) async {
+    await pumpMultiSelect(tester, itemsProvider: _longCatalogProvider);
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+
+    final Finder menu = find.byKey(MultiSelect.menuPanelKey);
+    final Rect menuRect = tester.getRect(menu);
+
+    for (int i = 0; i < 20; i++) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump();
+    }
+    await tester.pumpAndSettle();
+
+    expect(isMenuRowHighlighted(tester, 'item-20'), isTrue);
+    final Rect highlightedRect = tester.getRect(
+      find.descendant(of: menu, matching: find.text('item-20')),
+    );
+    expect(highlightedRect.top, greaterThanOrEqualTo(menuRect.top - 0.5));
+    expect(highlightedRect.bottom, lessThanOrEqualTo(menuRect.bottom + 0.5));
+  });
+
+  testWidgets('mouse hover syncs keyboard highlight to hovered row', (
+    WidgetTester tester,
+  ) async {
+    final List<String> added = <String>[];
+    await pumpMultiSelect(tester, onAdd: added.add);
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+    expect(isMenuRowHighlighted(tester, 'alpha'), isTrue);
+
+    final Finder gammaText = find.descendant(
+      of: find.byKey(MultiSelect.menuPanelKey),
+      matching: find.text('gamma'),
+    );
+    final TestGesture gesture = await tester.createGesture(
+      kind: PointerDeviceKind.mouse,
+    );
+    await gesture.addPointer(location: Offset.zero);
+    addTearDown(gesture.removePointer);
+    await gesture.moveTo(tester.getCenter(gammaText));
+    await tester.pumpAndSettle();
+
+    expect(isMenuRowHighlighted(tester, 'gamma'), isTrue);
+    expect(isMenuRowHighlighted(tester, 'alpha'), isFalse);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pumpAndSettle();
+    expect(added, <String>['gamma']);
+  });
+
+  // IME composing (↑/↓/Tab pass-through while composing): not asserted here —
+  // WidgetTester cannot reliably drive TextInput composing ranges. Manual check.
+
+  testWidgets('Tab without highlightable candidates moves focus forward', (
+    WidgetTester tester,
+  ) async {
+    final FocusNode nextFocus = FocusNode();
+    addTearDown(nextFocus.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(
+          locale: const Locale('zh'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: buildAppTheme(Brightness.light),
+          home: Scaffold(
+            body: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: <Widget>[
+                  MultiSelect<String>(
+                    label: '标签',
+                    icon: LucideIcons.tag,
+                    selectedNames: const <String>['alpha', 'beta', 'gamma'],
+                    onAdd: (_) {},
+                    onRemove: (_) {},
+                    itemsProvider: _catalogProvider,
+                    onRetry: () {},
+                    resolveName: (String name) => name,
+                    copy: const MultiSelectCopy(
+                      inputPlaceholder: '选择或输入标签…',
+                      listLoadFailed: '标签列表加载失败',
+                      emptyCatalog: '暂无标签',
+                      emptyRemaining: '没有更多可选',
+                    ),
+                  ),
+                  TextField(
+                    key: const Key('next_focus_target'),
+                    focusNode: nextFocus,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(TextField).first);
+    await tester.pumpAndSettle();
+    expect(find.byKey(MultiSelect.menuPanelKey), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(MultiSelect.menuPanelKey),
+        matching: find.text('没有更多可选'),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pumpAndSettle();
+
+    expect(nextFocus.hasFocus, isTrue);
   });
 }
