@@ -10,6 +10,7 @@ import 'package:hentai_library/ui/features/shell/di/ports.dart';
 import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/scan_library_controller.dart';
+import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';
@@ -90,17 +91,35 @@ class _ControllableScanLibraryController extends ScanLibraryController {
   }
 }
 
+class _ControllableThumbnailEventCoordinator extends ThumbnailEventCoordinator {
+  _ControllableThumbnailEventCoordinator({
+    ThumbnailBackgroundProgress progress = const ThumbnailBackgroundProgress(),
+  }) : _progress = progress;
+
+  ThumbnailBackgroundProgress _progress;
+
+  @override
+  ThumbnailBackgroundProgress build() => _progress;
+
+  void setProgress(ThumbnailBackgroundProgress progress) {
+    _progress = progress;
+    state = progress;
+  }
+}
+
 void main() {
   group('LibraryCatalogRevisionCoordinator', () {
     late StreamController<void> events;
     late _FakeCurrentLibraryNotifier currentLibrary;
     late _ControllableScanLibraryController scanLibrary;
+    late _ControllableThumbnailEventCoordinator thumbnails;
     late ProviderContainer container;
 
     setUp(() {
       events = StreamController<void>.broadcast();
       currentLibrary = _FakeCurrentLibraryNotifier(currentId: 'lib-a');
       scanLibrary = _ControllableScanLibraryController(running: false);
+      thumbnails = _ControllableThumbnailEventCoordinator();
       container = ProviderContainer(
         overrides: <Override>[
           libraryRevisionPortProvider.overrideWithValue(
@@ -108,12 +127,14 @@ void main() {
           ),
           currentLibraryProvider.overrideWith(() => currentLibrary),
           scanLibraryControllerProvider.overrideWith(() => scanLibrary),
+          thumbnailEventCoordinatorProvider.overrideWith(() => thumbnails),
         ],
       );
       // Warm keepAlive providers so listens are attached and notifiers init.
       container.read(currentLibraryProvider);
       container.read(libraryRevisionProvider);
       container.read(scanLibraryControllerProvider);
+      container.read(thumbnailEventCoordinatorProvider);
       container.read(libraryCatalogRevisionCoordinatorProvider);
     });
 
@@ -236,5 +257,117 @@ void main() {
         );
       },
     );
+
+    test(
+      'thumbnail background active throttles active catalog revision bumps',
+      () async {
+        thumbnails.setProgress(
+          const ThumbnailBackgroundProgress(done: 1, total: 10),
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        expect(
+          container.read(
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+          ),
+          1,
+        );
+
+        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        expect(
+          container.read(
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+          ),
+          1,
+          reason: 'subsequent bumps during thumbnail busy stay merged',
+        );
+
+        await Future<void>.delayed(
+          kLibrarySyncCatalogRevisionThrottle +
+              const Duration(milliseconds: 50),
+        );
+
+        expect(
+          container.read(
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+          ),
+          3,
+        );
+      },
+    );
+
+    test(
+      'thumbnail background settle flushes pending active catalog revision',
+      () async {
+        thumbnails.setProgress(
+          const ThumbnailBackgroundProgress(done: 0, total: 5),
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+        expect(
+          container.read(
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+          ),
+          1,
+        );
+
+        // Sync already idle; only thumbnails keep busy — settle should flush.
+        thumbnails.setProgress(
+          const ThumbnailBackgroundProgress(done: 5, total: 5),
+        );
+        await Future<void>.delayed(Duration.zero);
+
+        expect(
+          container.read(
+            libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+          ),
+          2,
+        );
+      },
+    );
+
+    test('sync settle while thumbnails active does not flush yet', () async {
+      scanLibrary.setRunning(true);
+      thumbnails.setProgress(
+        const ThumbnailBackgroundProgress(done: 0, total: 3),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+      container.read(libraryRevisionProvider.notifier).notifyExternalChange();
+      expect(
+        container.read(
+          libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+        ),
+        1,
+      );
+
+      scanLibrary.setRunning(false);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(
+        container.read(
+          libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+        ),
+        1,
+        reason: 'thumbnail backlog keeps busy after sync Done',
+      );
+
+      thumbnails.setProgress(
+        const ThumbnailBackgroundProgress(done: 3, total: 3),
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      expect(
+        container.read(
+          libraryCatalogWatchRevisionProvider(LibraryDisplayTarget.comics),
+        ),
+        2,
+      );
+    });
   });
 }

@@ -5,14 +5,14 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
 import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
-import 'package:hentai_library/ui/features/shell/state/scan_library_controller.dart';
+import 'package:hentai_library/ui/features/shell/state/library_revision_throttle_busy.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_catalog_revision_coordinator.g.dart';
 
 const Duration kLibraryInactiveCatalogRefreshDebounce = Duration(seconds: 3);
 
-/// Library sync 进行中：活跃 catalog revision 合并节流间隔。
+/// Catalog revision busy（Library sync 或缩略图后台活跃）时：活跃 revision 合并节流间隔。
 const Duration kLibrarySyncCatalogRevisionThrottle = Duration(seconds: 2);
 
 @immutable
@@ -37,7 +37,7 @@ class LibraryCatalogRevisionSnapshot {
 }
 
 /// Sync 后：活跃 Tab 立即刷新 catalog；非活跃 Tab debounce 后再刷新。
-/// Library sync 进行中：活跃 revision 合并节流，避免亚秒级全量重载。
+/// Library sync / 缩略图后台活跃：活跃 revision 合并节流，避免亚秒级全量重载。
 /// 切库时两侧立即对齐，避免 header 漫画/系列计数短暂互串。
 @Riverpod(keepAlive: true)
 class LibraryCatalogRevisionCoordinator
@@ -46,7 +46,7 @@ class LibraryCatalogRevisionCoordinator
   Timer? _syncThrottleTimer;
   int? _pendingActiveRevision;
   DateTime? _lastActivePushAt;
-  bool _librarySyncRunning = false;
+  bool _revisionThrottleBusy = false;
 
   @override
   LibraryCatalogRevisionSnapshot build() {
@@ -55,13 +55,13 @@ class LibraryCatalogRevisionCoordinator
       _syncThrottleTimer?.cancel();
     });
 
-    _librarySyncRunning = ref.read(scanLibraryControllerProvider).running;
-    ref.listen<ScanLibraryState>(scanLibraryControllerProvider, (
-      ScanLibraryState? previous,
-      ScanLibraryState next,
+    _revisionThrottleBusy = ref.read(libraryRevisionThrottleBusyProvider);
+    ref.listen<bool>(libraryRevisionThrottleBusyProvider, (
+      bool? previous,
+      bool next,
     ) {
-      _librarySyncRunning = next.running;
-      if ((previous?.running ?? false) && !next.running) {
+      _revisionThrottleBusy = next;
+      if ((previous ?? false) && !next) {
         _flushPendingActiveRevision();
       }
     });
@@ -107,7 +107,7 @@ class LibraryCatalogRevisionCoordinator
   void _onRevisionBumped(int revision) {
     _inactiveRefreshTimer?.cancel();
 
-    if (_librarySyncRunning) {
+    if (_revisionThrottleBusy) {
       _pendingActiveRevision = revision;
       final DateTime now = DateTime.now();
       final DateTime? lastPush = _lastActivePushAt;
