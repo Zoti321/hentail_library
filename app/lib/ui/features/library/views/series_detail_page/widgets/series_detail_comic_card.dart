@@ -27,7 +27,6 @@ class SeriesDetailComicCard extends HookConsumerWidget {
     required this.item,
     required this.onTap,
     this.gridIndex,
-    this.reorderMode = false,
   });
 
   final String seriesId;
@@ -35,57 +34,33 @@ class SeriesDetailComicCard extends HookConsumerWidget {
   final VoidCallback onTap;
   final int? gridIndex;
 
-  /// Series reorder mode：角标、禁点进详情/菜单/悬停编辑；拖拽由外层 ReorderableBuilder 处理。
-  final bool reorderMode;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final Comic comic = item.comic;
     final bool compact = AppLayoutBreakpoints.isCompact(
       MediaQuery.sizeOf(context).width,
     );
-    final l10n = context.l10n;
-    final AppThemeTokens tokens = context.tokens;
 
-    Widget card = CatalogCoverCardShell(
-      onTap: reorderMode ? null : onTap,
-      onSecondaryTapUp: reorderMode
-          ? null
-          : (TapUpDetails details) {
-              _showContextMenu(context, ref, details.globalPosition);
-            },
-      cover: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          _SeriesDetailComicCover(
-            comicId: comic.comicId,
-            gridIndex: gridIndex,
-            showEditOnHover: !reorderMode && !compact,
-            onEdit: () => _openEditMetadata(context, ref),
-          ),
-          if (reorderMode)
-            Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: EdgeInsets.all(tokens.spacing.xs),
-                child: _ReorderBadge(
-                  semanticLabel: l10n.seriesDetailReorderBadgeSemantic,
-                ),
-              ),
-            ),
-        ],
+    return CatalogCoverCardShell(
+      onTap: onTap,
+      onSecondaryTapUp: (TapUpDetails details) {
+        _showContextMenu(context, ref, details.globalPosition);
+      },
+      onLongPressStart: (LongPressStartDetails details) {
+        _showContextMenu(context, ref, details.globalPosition);
+      },
+      cover: _SeriesDetailComicCover(
+        comicId: comic.comicId,
+        gridIndex: gridIndex,
+        showEditOnHover: !compact,
+        onEdit: () => _openEditMetadata(context, ref),
       ),
       info: (bool isHover) => _SeriesDetailComicCardInfo(
         title: comic.title,
         pageCount: comic.pageCount,
-        isHover: isHover && !reorderMode,
+        isHover: isHover,
       ),
     );
-
-    if (reorderMode) {
-      card = MouseRegion(cursor: SystemMouseCursors.grab, child: card);
-    }
-    return card;
   }
 
   void _openEditMetadata(BuildContext context, WidgetRef ref) {
@@ -270,34 +245,6 @@ class _SeriesDetailComicCardInfo extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// 左上角拖拽模式角标：primaryContainer 背景 + gripVertical（#121）。
-class _ReorderBadge extends StatelessWidget {
-  const _ReorderBadge({required this.semanticLabel});
-
-  final String semanticLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return Semantics(
-      label: semanticLabel,
-      child: Container(
-        padding: EdgeInsets.all(tokens.spacing.xs),
-        decoration: BoxDecoration(
-          color: cs.primaryContainer,
-          borderRadius: BorderRadius.circular(tokens.radius.sm),
-        ),
-        child: Icon(
-          LucideIcons.gripVertical,
-          size: 14,
-          color: cs.onPrimaryContainer,
-        ),
-      ),
     );
   }
 }

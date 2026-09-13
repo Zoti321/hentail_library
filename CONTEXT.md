@@ -109,12 +109,8 @@ _Avoid_: 编辑模式、排序页、固定开关（pin 只能在此模式用拖�
 ### Organization & metadata
 
 **Series**:
-同一 Library 内有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。不跨 Library。用户可编辑连载状态与计划总卷数（各字段可有 Metadata field lock）；成员默认顺序由 sync 按文件名自然排序写入。用户可手动编辑单本排序值（`SeriesItem.order`，浮点数）；手动保存后会锁定该成员（`sortOrderLocked`），后续 sync 保留锁定项的排序值，未锁定项仍按文件名自然排序更新；也可解锁排序以在下次 sync 恢复文件名序。亦可经 Series reorder mode 拖拽批量改序（落库时锁定本次有序列表中的成员）。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series。Library sync 成功重建后，凡能解析出父路径的 Comic 恰好属于一个 Folder series（含 Library root series）；无父路径以致无归属视为异常/非常态，仍可容忍。
+同一 Library 内有名、有顺序的 Comic 集合；由 Library sync 根据 Comic 所在文件夹（直接父目录）自动生成与更新。不跨 Library。用户可编辑连载状态与计划总卷数（各字段可有 Metadata field lock）；成员默认顺序由 sync 按文件名自然排序写入。用户可手动编辑单本排序值（`SeriesItem.order`，浮点数）；手动保存后会锁定该成员（`sortOrderLocked`），后续 sync 保留锁定项的排序值，未锁定项仍按文件名自然排序更新；也可解锁排序以在下次 sync 恢复文件名序。顺序由 SeriesItem 的 order 决定，与 Comic 本身解耦。任一时刻一本 Comic 最多属于一个 Series。Library sync 成功重建后，凡能解析出父路径的 Comic 恰好属于一个 Folder series（含 Library root series）；无父路径以致无归属视为异常/非常态，仍可容忍。
 _Avoid_: 合集、专辑、套系
-
-**Series reorder mode**:
-系列详情页的短暂状态：header 左侧为退出与拖拽模式指示；上半区（封面、系列名、摘要元信息，及有则显示的 metadata 块）仍可见且在此状态下不作为导航/编辑入口；成员区在浏览态仍可分页展示预拉的全量成员窗口，进入本模式后关闭分页并展示全部成员以拖拽调整 SeriesItem.order（模式内外同一成员区，进入不拆掉成员卡）；成员封面左上角显示拖拽模式角标以标明可拖；打开系列详情即预拉全量成员以便长按可直接拖；拖拽进行中不因外部刷新替换成员列表；松手即落库，本次提交的有序成员一律 `sortOrderLocked=true`，且尽量保留原先已锁定成员的 `order` 数值（仅当已锁成员相对顺序变化或夹缝插入需要时才改其数值）；header 退出控件仅离开本模式并留在系列详情；系统返回 / 离开页面则清除本模式并按普通导航离开。不是 Series 上的持久字段。入口：成员卡长按（按下不抬起即进入并对该卡开始拖拽），或系列详情 header 竖三点菜单中的「重新排序」。
-_Avoid_: 编辑模式、排序页、拖拽模式（口语可用，领域用 Series reorder mode）；与 Library reorder mode 混称；进入后拆掉系列详情上半区或整棵成员区换树
 
 **Folder series**:
 Comic 的直接父目录对应一个 Series；Library root 下直接存放的 Comic 也会形成以根名命名的 Series。Series 身份由规范化 `folder_path`（含远程位置键时的父路径）派生（`seriesId`），且隶属于所属 Library。

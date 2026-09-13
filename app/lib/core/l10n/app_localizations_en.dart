@@ -966,21 +966,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get seriesDetailEdit => 'Edit series';
 
   @override
-  String get seriesDetailReorder => 'Reorder members';
-
-  @override
-  String get seriesDetailExitReorder => 'Done reordering';
-
-  @override
-  String get seriesDetailReorderModeTitle => 'Reorder mode';
-
-  @override
-  String get seriesDetailReorderBadgeSemantic => 'Drag to reorder';
-
-  @override
-  String get seriesDetailReorderFailed => 'Failed to save order';
-
-  @override
   String get formSeriesItemSortOrderLabel => 'Sort number';
 
   @override

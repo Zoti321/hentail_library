@@ -15,22 +15,12 @@ class SeriesDetailPaginationBar extends ConsumerWidget {
     required this.page,
     required this.totalPages,
     this.placement = LibraryPaginationPlacement.bottom,
-    this.onFirst,
-    this.onPrevious,
-    this.onNext,
-    this.onLast,
   });
 
   final String seriesId;
   final int page;
   final int totalPages;
   final LibraryPaginationPlacement placement;
-
-  /// 若提供，则不再驱动 [SeriesDetailComicsCatalogController]（全量网格滚动窗口）。
-  final VoidCallback? onFirst;
-  final VoidCallback? onPrevious;
-  final VoidCallback? onNext;
-  final VoidCallback? onLast;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -39,14 +29,12 @@ class SeriesDetailPaginationBar extends ConsumerWidget {
     }
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // Keep enabled during catalog reload so hover/cursor/clicks stay stable.
     final bool canGoPrevious = page > 1;
     final bool canGoNext = page < totalPages;
-    final bool useLocal = onFirst != null;
-    final SeriesDetailComicsCatalogController? catalog = useLocal
-        ? null
-        : ref.read(
-            seriesDetailComicsCatalogControllerProvider(seriesId).notifier,
-          );
+    final SeriesDetailComicsCatalogController notifier = ref.read(
+      seriesDetailComicsCatalogControllerProvider(seriesId).notifier,
+    );
     final AppLocalizations l10n = context.l10n;
     return Padding(
       padding: _paddingForPlacement(tokens),
@@ -56,16 +44,12 @@ class SeriesDetailPaginationBar extends ConsumerWidget {
           GhostButton.icon(
             icon: LucideIcons.chevronsLeft,
             tooltip: l10n.seriesDetailPaginationFirst,
-            onPressed: canGoPrevious
-                ? (onFirst ?? catalog!.goToFirstPage)
-                : null,
+            onPressed: canGoPrevious ? notifier.goToFirstPage : null,
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronLeft,
             tooltip: l10n.seriesDetailPaginationPrevious,
-            onPressed: canGoPrevious
-                ? (onPrevious ?? catalog!.goToPreviousPage)
-                : null,
+            onPressed: canGoPrevious ? notifier.goToPreviousPage : null,
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: tokens.spacing.md),
@@ -80,14 +64,14 @@ class SeriesDetailPaginationBar extends ConsumerWidget {
             icon: LucideIcons.chevronRight,
             tooltip: l10n.seriesDetailPaginationNext,
             onPressed: canGoNext
-                ? (onNext ?? () => catalog!.goToNextPage(totalPages))
+                ? () => notifier.goToNextPage(totalPages)
                 : null,
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronsRight,
             tooltip: l10n.seriesDetailPaginationLast,
             onPressed: canGoNext
-                ? (onLast ?? () => catalog!.goToLastPage(totalPages))
+                ? () => notifier.goToLastPage(totalPages)
                 : null,
           ),
         ],

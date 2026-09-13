@@ -62,9 +62,9 @@ abstract class SeriesRepository {
     bool? totalCount,
   });
 
-  /// Series reorder mode 批量重排落库（#121 / ADR-0006）：
-  /// 提交该系列的完整新序（仅使用 `comicId`）；core 侧按锚点 + 夹缝插值写入
-  /// `order`，并将本次提交的所有成员一律置为 `sortOrderLocked=true`。
+  /// 批量重排落库（ADR-0006）：提交该系列的完整新序（仅使用 `comicId`）；
+  /// core 侧按锚点 + 夹缝插值写入 `order`，并将本次提交的所有成员一律置为
+  /// `sortOrderLocked=true`。
   Future<void> setSeriesItemsOrder(
     String seriesId,
     List<SeriesItem> orderedItems,

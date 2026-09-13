@@ -25,11 +25,11 @@ Komga 等同类产品的常见做法是：用户编辑排序值后，将该条�
 - 新 API **`updateSeriesItemSortOrder(seriesId, comicId, sortOrder)`**：
   - 设置 `sort_order = sortOrder`；
   - 设置 **`sort_order_locked = true`**。
-- **`setSeriesItemsOrder`**（按 comicId 列表批量重排）为 **Series reorder mode**（#121）落库路径：
+- **`setSeriesItemsOrder`**（按 comicId 列表批量重排）为核心批量写序 API（无系列详情拖拽 UI；元数据对话框走单条 `updateSeriesItemSortOrder`）：
   - 入参为该 Series 的**完整新序** comicId 列表；仅对现存成员生效，重复/非成员忽略。
   - **锚点 + 夹缝插值**分配 `sort_order`：从左到右贪心保留「已锁且其原值严格大于上一保留锚点」的成员原 `sort_order` 作为锚点；未锁成员、以及会破坏严格递增的已锁成员，改由相邻锚点间线性夹缝插值重算；首锚点前 / 末锚点后按 1.0 步长外推；若无任何锚点，退化为 `1..n` 顺序编号。
   - 本次提交的**所有成员一律** `sort_order_locked = true`，使后续 Library sync 不再按文件名覆盖该顺序。
-  - 整批在**单事务**内提交，失败回滚保持 DB 一致（UI 侧同步回滚可视顺序并提示）。
+  - 整批在**单事务**内提交，失败回滚保持 DB 一致。
   - 结果 `sort_order` 序列严格递增；已锁成员在相对顺序未变且与已保留锚点相容时保留原数值。
 - Library sync / folder series rebuild：
   - **已锁定**成员：保留现有 `sort_order` 与 `sort_order_locked`；

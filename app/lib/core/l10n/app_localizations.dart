@@ -1766,36 +1766,6 @@ abstract class AppLocalizations {
   /// **'编辑系列'**
   String get seriesDetailEdit;
 
-  /// No description provided for @seriesDetailReorder.
-  ///
-  /// In zh, this message translates to:
-  /// **'重新排序'**
-  String get seriesDetailReorder;
-
-  /// No description provided for @seriesDetailExitReorder.
-  ///
-  /// In zh, this message translates to:
-  /// **'退出排序'**
-  String get seriesDetailExitReorder;
-
-  /// No description provided for @seriesDetailReorderModeTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'拖拽排序'**
-  String get seriesDetailReorderModeTitle;
-
-  /// No description provided for @seriesDetailReorderBadgeSemantic.
-  ///
-  /// In zh, this message translates to:
-  /// **'拖拽重排'**
-  String get seriesDetailReorderBadgeSemantic;
-
-  /// No description provided for @seriesDetailReorderFailed.
-  ///
-  /// In zh, this message translates to:
-  /// **'保存排序失败'**
-  String get seriesDetailReorderFailed;
-
   /// No description provided for @formSeriesItemSortOrderLabel.
   ///
   /// In zh, this message translates to:
