@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/form/series_metadata_form.dart';
@@ -75,7 +76,8 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
           totalCount: totalCount,
         );
       });
-    } catch (_) {
+    } catch (error, stackTrace) {
+      logError(AppLog.ui('editSeries'), '设置系列元数据字段锁失败', error, stackTrace);
       if (mounted) {
         showCustomToast(
           context,
@@ -112,7 +114,8 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
           showSuccessToast(context, context.l10n.commonSavedToast);
           Navigator.of(context).pop();
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      logError(AppLog.ui('editSeries'), '保存系列元数据失败', error, stackTrace);
       if (mounted) {
         showCustomToast(
           context,

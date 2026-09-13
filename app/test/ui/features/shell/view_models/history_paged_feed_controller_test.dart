@@ -174,6 +174,22 @@ void main() {
     expect(repo.requests, hasLength(2));
   });
 
+  test(
+    'loadMore failure clears isLoadingMore and keeps existing items',
+    () async {
+      await container.read(historyPagedFeedControllerProvider.future);
+      final HistoryPagedFeedState? before = state();
+
+      repo.failNextFetch = true;
+      await notifier().loadMore();
+
+      expect(state()?.isLoadingMore, isFalse);
+      expect(state()?.items, before?.items);
+      expect(state()?.loadedPage, before?.loadedPage);
+      expect(state()?.hasReachedEnd, isFalse);
+    },
+  );
+
   test('setKeyword reloads filtered first page after debounce', () async {
     await container.read(historyPagedFeedControllerProvider.future);
     notifier().setKeyword('alpha');
