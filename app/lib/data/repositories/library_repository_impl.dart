@@ -18,8 +18,11 @@ class LibraryRepositoryImpl implements LibraryRepository {
 
   @override
   Future<List<LocalLibrary>> list() async {
-    return guardFrbSync(
-      () => rust.listLibrariesFrb().map(_mapLibrary).toList(growable: false),
+    return guardFrb(
+      () async {
+        final List<rust.LibraryDto> rows = await rust.listLibrariesFrb();
+        return rows.map(_mapLibrary).toList(growable: false);
+      },
       fallbackMessage: '读取库列表失败',
     );
   }
@@ -130,7 +133,7 @@ class LibraryRepositoryImpl implements LibraryRepository {
 
   @override
   Future<String?> getCurrentId() async {
-    return guardFrbSync(
+    return guardFrb(
       rust.getCurrentLibraryIdFrb,
       fallbackMessage: '读取当前库失败',
     );
@@ -138,7 +141,7 @@ class LibraryRepositoryImpl implements LibraryRepository {
 
   @override
   Future<void> setCurrentId(String? libraryId) async {
-    guardFrbSync(
+    await guardFrb(
       () => rust.setCurrentLibraryIdFrb(libraryId: libraryId),
       fallbackMessage: '设置当前库失败',
     );

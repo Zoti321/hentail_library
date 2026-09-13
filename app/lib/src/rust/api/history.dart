@@ -12,12 +12,12 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 void recordReadingFrb({required ReadingHistoryDto history}) =>
     RustLib.instance.api.crateApiHistoryRecordReadingFrb(history: history);
 
-ReadingHistoryDto? getReadingByComicIdFrb({required String comicId}) => RustLib
-    .instance
-    .api
-    .crateApiHistoryGetReadingByComicIdFrb(comicId: comicId);
+Future<ReadingHistoryDto?> getReadingByComicIdFrb({required String comicId}) =>
+    RustLib.instance.api.crateApiHistoryGetReadingByComicIdFrb(
+      comicId: comicId,
+    );
 
-PagedReadingHistoryDto fetchReadingPageFrb({
+Future<PagedReadingHistoryDto> fetchReadingPageFrb({
   required int page,
   required int pageSize,
   String? keyword,

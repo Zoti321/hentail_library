@@ -11,7 +11,7 @@ import 'sync.dart';
 // These functions are ignored because they are not marked as `pub`: `map_format_group_core`, `map_format_group`, `map_scan_interval_core`, `map_scan_interval`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `from`
 
-List<LibraryDto> listLibrariesFrb() =>
+Future<List<LibraryDto>> listLibrariesFrb() =>
     RustLib.instance.api.crateApiLibraryListLibrariesFrb();
 
 LibraryDto createLocalLibraryFrb({required String rootPath, String? name}) =>
@@ -55,10 +55,10 @@ LibraryDto updateLocalLibraryRootFrb({
 void deleteLibraryFrb({required String libraryId}) =>
     RustLib.instance.api.crateApiLibraryDeleteLibraryFrb(libraryId: libraryId);
 
-String? getCurrentLibraryIdFrb() =>
+Future<String?> getCurrentLibraryIdFrb() =>
     RustLib.instance.api.crateApiLibraryGetCurrentLibraryIdFrb();
 
-void setCurrentLibraryIdFrb({String? libraryId}) => RustLib.instance.api
+Future<void> setCurrentLibraryIdFrb({String? libraryId}) => RustLib.instance.api
     .crateApiLibrarySetCurrentLibraryIdFrb(libraryId: libraryId);
 
 LibraryDto updateLibraryFormatGroupsFrb({

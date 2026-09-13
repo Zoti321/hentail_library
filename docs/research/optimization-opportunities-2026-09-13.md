@@ -92,19 +92,19 @@
   - 仍有 `/paths` → `SelectedPathsPage`、`PathRepositoryImpl`（`listAllPathsFrb` / `addPathFrb`），空库 CTA / Home hero 仍 `context.go('/paths')`。  
   - 同时侧栏用 `LibraryFormDialog` 创建 Local/Remote（`library_management_actions.dart`）。  
   - Rust `path` 模块与 `library` 模块并存（`core/crates/core/src/lib.rs`）；运行时 Path 已是 `libraries` 薄封装。
-- **决策**（详见 ADR-0014）：用户只认 Library；删除 `/paths`（redirect → Home）；空态/Hero 主 createLocal、次 createRemote（均经 Library form）；同一波删 Dart Path 面与 Rust/FRB path API；不占用 `/libraries`；`saved_paths` 表删除与 Path migration / All libraries browse / Library sync→async **不在本决策内**。实现排在明确 P0 之后。
+- **决策**（详见 ADR-0014）：用户只认 Library；删除 `/paths`（redirect → Home）；空态/Hero 主 createLocal、次 createRemote（均经 Library form）；同一波删 Dart Path 面与 Rust/FRB path API；不占用 `/libraries`；`saved_paths` 表删除与 Path migration / All libraries browse / Library **CRUD** FRB sync→async **不在本决策内**（Library 热读 async 已由 P0-B2 第一刀重开，见 ADR-0014 Consequences）。实现排在明确 P0 之后。
 - **风险/代价**：中；涉及路由、空态 CTA、FRB codegen；无独立数据迁移（表已是 `libraries`）。
 
-#### P1-A3 — FRB 迁移「业务在 Rust」已成立，但 Dart 薄边与 sync 比例仍偏高
+#### P1-A3 — FRB 迁移「业务在 Rust」已成立，但 Dart 薄边与 sync 比例仍偏高 — **第一刀已落地（2026-09-13）**
 
-- **现状证据**  
-  - `docs/agents/rust-migration.md`：无 Dart UseCase；Repository = FRB + DTO 映射。  
-  - 未发现 `*use_case*` 文件；`domain/` 含 models / ports / reading / library projection（符合 coding-style）。  
+- **总债**：sync 比例 / 薄边假异步 / 与「慢勿 sync」一致；父子关系下 **P0-B2 = 第一切片**。
+- **第一刀（已做）**：History 读（`fetch_reading_page` / `get_reading_by_comic_id`）、Named facet 读（分页 / form list）、Library 热读（`list` / `get_current` / `set_current`）→ 真 async；写路径与 Tag/Author、Series reading context、死 sync 清理 **不在第一刀**。
+- **后续切片意向**：Series reading context 读 → Tag/Author 等管理读 → 各模块写 → 死 sync（可与 ADR-0014 Path 退役重叠）。
+- **政策**：见 `docs/agents/rust-migration.md`「FRB sync vs async」；ADR-0014 已注明 Library 热读 async 已重开、CRUD 仍不在原决策内。
+- **原现状证据**（第一刀前）  
   - FRB：**70 sync / 36 async**；`guardFrbSync` **60** 处。  
-  - 交互热路径中 comic catalog 与 thumbnail 读已 async；**History 分页、Library CRUD、多数 Tag/Author/named facet、`get_all_series_frb`、系列 reading context** 仍 sync + `runtime::block_on`（见 `history.rs`、`series.rs` L285–320、`library.rs` 大量 sync）。
-- **问题/机会**：主 isolate 仍可能在历史页翻页、元数据管理、库表单保存时被 `block_on` 卡住；与 ADR-0002「I/O 在 core」不矛盾，但与 FRB 官方「慢函数勿 sync」冲突（旧性能报告已引用）。
-- **建议方向**：按「UI 热路径优先」继续 sync→async（History / Library list / Series context / facet 列表）；写操作可次优先。
-- **风险/代价**：中高；需同步改生成绑定、Repository、`guardFrb` 与可能的调用时序测试。
+  - comic catalog / thumbnail 读已 async；History / Library / facet 等仍 sync + `block_on`。
+- **风险/代价**：中高；需同步改生成绑定、Repository、`guardFrb`。
 
 #### P1-A4 — ADR 与实现总体一致，但注释/次要契约有漂移
 
@@ -138,11 +138,12 @@
 - **建议方向**：扫描进行中合并/降频 revision；或 sync 结束显式 bump + 扫描中节流（旧报告建议仍适用）。
 - **风险/代价**：中；节流过度会导致 UI 长时间陈旧。
 
-#### P0-B2 — 剩余 sync FRB 热路径（History / Library / Facet）
+#### P0-B2 — 剩余 sync FRB 热路径（History / Library / Facet）— **第一刀已落地（2026-09-13）**
 
-- **现状证据**：`fetch_reading_page_frb` 等 history API 均为 sync + `block_on`（`history.rs` L57–96）；`ReadingHistoryRepositoryImpl` 走 `guardFrbSync`；`library_repository_impl.dart` 大量 `guardFrbSync`。
-- **问题/机会**：历史页已是真虚拟滚动，但分页查询仍堵 UI isolate。
-- **建议方向**：对齐 comic/thumbnail 的 async 改造模式。
+- **范围（已做）**：History 分页与开读恢复读、Named facet 分页与 form list、Library `list` / `get_current` / `set_current` → 真 async（`guardFrb`）。属 P1-A3 第一切片。
+- **未进本刀**：History/Library/Facet **写**；Library CRUD；Tag/Author 管理读；Series reading context。
+- **验收**：契约以 async 入口为准；手工点验历史 loadMore、facet loadMore、侧栏切库。
+- **原现状证据**：`fetch_reading_page_frb` 等为 sync + `block_on`；历史页真虚拟滚动但查询堵 isolate。
 - **风险/代价**：中；面广但模式重复。
 
 #### P1-B3 — 阅读器仍有同步文件探测与预取细节债
@@ -333,7 +334,7 @@
 
 1. ~~**刷新文档真相源（P0）**~~ — **已做**：monorepo 完成态、多库/WebDAV、`setup-dev.sh` 对齐（见同日文档提交）。  
 2. **扫描期 revision 降频（P0）**：`watch_comic_changes` 400ms 仍是边扫边逛主因；库页网格虚拟化已修好，收益集中在订阅策略。  
-3. **History / Library / Facet sync→async（P0/P1）**：接续已完成的 comic/thumbnail/reader 改造，去掉剩余 UI 热路径 `block_on`。  
+3. ~~**History / Library / Facet sync→async（P0/P1）**~~ — **第一刀已做**（History 读 + Facet 读 + Library 热读）；写与其余模块见 P1-A3 后续切片。  
 4. **FRB thin-edge 补测（P1）**：`mapRustComic` 等与 `frb_zone_guard`——符合现有测试哲学，挡回归。  
 5. **All libraries browse 产品决策（P0 产品）**：占位页已挂入口；要么排期聚合查询，要么降级入口，避免半成品体验。  
 6. ~~**Path/Selected Paths vs Library Form 收敛（P1）**~~ — **已决策（ADR-0014）**：退役路径页与 Path API；实现排在明确 P0 之后。  

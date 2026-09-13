@@ -111,9 +111,10 @@ fn map_scan_interval_core(interval: ScanIntervalDto) -> CoreScanInterval {
     }
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn list_libraries_frb() -> Result<Vec<LibraryDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_list())
+#[flutter_rust_bridge::frb]
+pub async fn list_libraries_frb() -> Result<Vec<LibraryDto>, HentaiErrorDto> {
+    core_list()
+        .await
         .map(|rows| rows.into_iter().map(LibraryDto::from).collect())
         .map_err(HentaiErrorDto::from)
 }
@@ -177,14 +178,15 @@ pub fn delete_library_frb(library_id: String) -> Result<(), HentaiErrorDto> {
     hentai_core::runtime::block_on(core_delete(&library_id)).map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn get_current_library_id_frb() -> Result<Option<String>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_get_current()).map_err(HentaiErrorDto::from)
+#[flutter_rust_bridge::frb]
+pub async fn get_current_library_id_frb() -> Result<Option<String>, HentaiErrorDto> {
+    core_get_current().await.map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn set_current_library_id_frb(library_id: Option<String>) -> Result<(), HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_set_current(library_id.as_deref()))
+#[flutter_rust_bridge::frb]
+pub async fn set_current_library_id_frb(library_id: Option<String>) -> Result<(), HentaiErrorDto> {
+    core_set_current(library_id.as_deref())
+        .await
         .map_err(HentaiErrorDto::from)
 }
 

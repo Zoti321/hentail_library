@@ -41,9 +41,9 @@ class PathRepositoryImpl implements PathRepository {
   @override
   Future<void> remove(String path) async {
     try {
-      final String? libraryId = guardFrbSync(() {
+      final String? libraryId = await guardFrb(() async {
         for (final rust_library.LibraryDto lib
-            in rust_library.listLibrariesFrb()) {
+            in await rust_library.listLibrariesFrb()) {
           if (lib.rootPath == path) {
             return lib.libraryId;
           }

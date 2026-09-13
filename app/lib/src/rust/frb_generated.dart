@@ -182,12 +182,12 @@ abstract class RustLibApi extends BaseApi {
     required ComicSortOptionDto sort,
   });
 
-  NamedFacetPagedNamesDto crateApiNamedFacetFetchNamedFacetPageFrb({
+  Future<NamedFacetPagedNamesDto> crateApiNamedFacetFetchNamedFacetPageFrb({
     required JunctionNamedFacetFrb facet,
     required PageRequestDto request,
   });
 
-  PagedReadingHistoryDto crateApiHistoryFetchReadingPageFrb({
+  Future<PagedReadingHistoryDto> crateApiHistoryFetchReadingPageFrb({
     required int page,
     required int pageSize,
     String? keyword,
@@ -231,13 +231,13 @@ abstract class RustLibApi extends BaseApi {
     required bool excludeR18,
   });
 
-  String? crateApiLibraryGetCurrentLibraryIdFrb();
+  Future<String?> crateApiLibraryGetCurrentLibraryIdFrb();
 
   HomePageCountsDto crateApiHomeGetHomePageCountsFrb({
     required bool excludeR18,
   });
 
-  ReadingHistoryDto? crateApiHistoryGetReadingByComicIdFrb({
+  Future<ReadingHistoryDto?> crateApiHistoryGetReadingByComicIdFrb({
     required String comicId,
   });
 
@@ -276,9 +276,10 @@ abstract class RustLibApi extends BaseApi {
 
   List<String> crateApiParodyListDistinctParodiesFrb({String? libraryId});
 
-  List<LibraryDto> crateApiLibraryListLibrariesFrb();
+  Future<List<LibraryDto>> crateApiLibraryListLibrariesFrb();
 
-  List<NamedFacetFormEntryFrbDto> crateApiNamedFacetListNamedFacetForFormFrb({
+  Future<List<NamedFacetFormEntryFrbDto>>
+  crateApiNamedFacetListNamedFacetForFormFrb({
     required JunctionNamedFacetFrb facet,
   });
 
@@ -413,7 +414,7 @@ abstract class RustLibApi extends BaseApi {
     required int pageIndex,
   });
 
-  void crateApiLibrarySetCurrentLibraryIdFrb({String? libraryId});
+  Future<void> crateApiLibrarySetCurrentLibraryIdFrb({String? libraryId});
 
   void crateApiLoggingSetDiagnosticLoggingFrb({required bool verbose});
 
@@ -1346,17 +1347,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  NamedFacetPagedNamesDto crateApiNamedFacetFetchNamedFacetPageFrb({
+  Future<NamedFacetPagedNamesDto> crateApiNamedFacetFetchNamedFacetPageFrb({
     required JunctionNamedFacetFrb facet,
     required PageRequestDto request,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_junction_named_facet_frb(facet, serializer);
           sse_encode_box_autoadd_page_request_dto(request, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 30,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_named_facet_paged_names_dto,
@@ -1376,19 +1382,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  PagedReadingHistoryDto crateApiHistoryFetchReadingPageFrb({
+  Future<PagedReadingHistoryDto> crateApiHistoryFetchReadingPageFrb({
     required int page,
     required int pageSize,
     String? keyword,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_i_32(page, serializer);
           sse_encode_i_32(pageSize, serializer);
           sse_encode_opt_String(keyword, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 31,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_paged_reading_history_dto,
@@ -1718,12 +1729,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  String? crateApiLibraryGetCurrentLibraryIdFrb() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<String?> crateApiLibraryGetCurrentLibraryIdFrb() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 42)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 42,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_String,
@@ -1771,15 +1787,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  ReadingHistoryDto? crateApiHistoryGetReadingByComicIdFrb({
+  Future<ReadingHistoryDto?> crateApiHistoryGetReadingByComicIdFrb({
     required String comicId,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(comicId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 44)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 44,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_opt_box_autoadd_reading_history_dto,
@@ -2133,12 +2154,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  List<LibraryDto> crateApiLibraryListLibrariesFrb() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<List<LibraryDto>> crateApiLibraryListLibrariesFrb() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 58)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 58,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_library_dto,
@@ -2155,15 +2181,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "list_libraries_frb", argNames: []);
 
   @override
-  List<NamedFacetFormEntryFrbDto> crateApiNamedFacetListNamedFacetForFormFrb({
+  Future<List<NamedFacetFormEntryFrbDto>>
+  crateApiNamedFacetListNamedFacetForFormFrb({
     required JunctionNamedFacetFrb facet,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_junction_named_facet_frb(facet, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 59)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 59,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_named_facet_form_entry_frb_dto,
@@ -3152,13 +3184,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  void crateApiLibrarySetCurrentLibraryIdFrb({String? libraryId}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<void> crateApiLibrarySetCurrentLibraryIdFrb({String? libraryId}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_opt_String(libraryId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 89)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 89,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
