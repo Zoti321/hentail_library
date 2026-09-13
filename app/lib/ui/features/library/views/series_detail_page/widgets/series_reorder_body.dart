@@ -68,6 +68,9 @@ class _SeriesReorderGrid extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ScrollController scrollController = useScrollController();
+    // flutter_reorderable_grid_view casts the builder child's key to GlobalKey
+    // for drag-while-scroll; ValueKey/Key here throws at build time.
+    final GlobalKey gridViewKey = useMemoized(GlobalKey.new);
     final AppThemeTokens tokens = context.tokens;
     final LibraryLayoutTier layoutTier = libraryLayoutTierForWidth(
       MediaQuery.sizeOf(context).width,
@@ -98,7 +101,7 @@ class _SeriesReorderGrid extends HookConsumerWidget {
       children: children,
       builder: (List<Widget> reorderedChildren) {
         return GridView(
-          key: const Key('series-reorder-grid'),
+          key: gridViewKey,
           controller: scrollController,
           padding: EdgeInsets.fromLTRB(
             horizontalPadding,

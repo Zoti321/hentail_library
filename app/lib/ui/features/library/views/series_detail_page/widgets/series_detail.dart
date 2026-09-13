@@ -11,7 +11,7 @@ import 'package:hentai_library/ui/core/widgets/responsive_layout/detail_primary_
 import 'package:hentai_library/ui/features/library/view_models/series_detail_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_comics_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_providers.dart';
-import 'package:hentai_library/ui/features/library/view_models/series_reorder_controller.dart';
+import 'package:hentai_library/ui/features/library/view_models/series_reorder_external_exit.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_reorder_mode.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_comics_grid.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_cover.dart';
@@ -19,7 +19,8 @@ import 'package:hentai_library/ui/features/library/views/series_detail_page/widg
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_info_sections.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_pagination_bar.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_reorder_body.dart';
-import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
+import 'package:hentai_library/ui/features/shell/state/metadata_refresh_controller.dart';
+import 'package:hentai_library/ui/features/shell/state/scan_library_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SeriesDetail extends ConsumerStatefulWidget {
@@ -54,37 +55,49 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
     );
   }
 
+  void _exitReorderForExternalChange() {
+    if (!ref.read(seriesReorderModeProvider(widget.series.id))) {
+      return;
+    }
+    ref
+        .read(seriesReorderModeProvider(widget.series.id).notifier)
+        .exitForExternalChange();
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool reorderMode = ref.watch(
       seriesReorderModeProvider(widget.series.id),
     );
 
-    // #121：Series reorder mode 期间若 Library sync / Metadata refresh 使系列失效
-    // （revision 变更），退出模式并回到普通系列详情（普通目录随 revision 重新加载）。
-    // 自身拖拽落库触发的 bump 由 controller 标记忽略，避免误退出模式。
-    ref.listen<int>(
-      libraryRevisionProvider.select(
-        (LibraryRevisionState state) => state.revision,
-      ),
-      (int? previous, int next) {
-        if (previous == null || previous == next) {
+    // #121：仅在 Library sync / 本系列(或整库) Metadata refresh 完成时退出模式。
+    // 不能听裸 libraryRevision：SQLite data_version 含缩略图写入，进模式加载封面
+    // 时会亚秒级 churn 并误退出。
+    ref.listen<bool>(
+      scanLibraryControllerProvider.select((ScanLibraryState s) => s.running),
+      (bool? previous, bool next) {
+        if (!shouldExitSeriesReorderAfterScan(
+          previousRunning: previous,
+          nextRunning: next,
+        )) {
           return;
         }
-        if (!ref.read(seriesReorderModeProvider(widget.series.id))) {
-          return;
-        }
-        final SeriesReorderController controller = ref.read(
-          seriesReorderControllerProvider(widget.series.id).notifier,
-        );
-        if (controller.takeIgnoreNextRevisionAsExternal()) {
-          return;
-        }
-        ref
-            .read(seriesReorderModeProvider(widget.series.id).notifier)
-            .exitForExternalChange();
+        _exitReorderForExternalChange();
       },
     );
+    ref.listen<MetadataRefreshState>(metadataRefreshControllerProvider, (
+      MetadataRefreshState? previous,
+      MetadataRefreshState next,
+    ) {
+      if (!shouldExitSeriesReorderAfterMetadataRefresh(
+        previous: previous,
+        next: next,
+        seriesId: widget.series.id,
+      )) {
+        return;
+      }
+      _exitReorderForExternalChange();
+    });
 
     if (reorderMode) {
       return Column(

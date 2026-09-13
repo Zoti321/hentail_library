@@ -155,12 +155,6 @@ void main() {
         .read(seriesReorderControllerProvider('series-1'))
         .value!;
     expect(_ids(current), <String>['comic-3', 'comic-1', 'comic-2']);
-    expect(
-      container
-          .read(seriesReorderControllerProvider('series-1').notifier)
-          .takeIgnoreNextRevisionAsExternal(),
-      isTrue,
-    );
   });
 
   test('reorder failure restores the previous visual order', () async {
