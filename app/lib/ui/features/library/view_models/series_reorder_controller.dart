@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
@@ -81,8 +82,9 @@ class SeriesReorderController extends _$SeriesReorderController {
                 )
                 .toList(),
           );
-    } catch (_) {
+    } catch (error, stackTrace) {
       // 落库失败：回滚可视顺序到拖拽前快照，向上抛错供页面弹 toast。
+      logError(AppLog.ui('series'), '系列成员重排落库失败', error, stackTrace);
       state = AsyncData<List<SeriesComicPageItem>>(snapshot);
       rethrow;
     }

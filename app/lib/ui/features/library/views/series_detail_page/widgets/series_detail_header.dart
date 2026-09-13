@@ -127,11 +127,7 @@ class SeriesDetailHeader extends ConsumerWidget {
               ref.read(seriesReorderModeProvider(series.id).notifier).exit(),
         ),
         SizedBox(width: tokens.spacing.sm),
-        Icon(
-          LucideIcons.gripVertical,
-          size: 16,
-          color: cs.hentai.iconDefault,
-        ),
+        Icon(LucideIcons.gripVertical, size: 16, color: cs.hentai.iconDefault),
         SizedBox(width: tokens.spacing.sm),
         Text(
           l10n.seriesDetailReorderModeTitle,

@@ -8,8 +8,8 @@ Future<List<NamedFacetFormCandidate>> listNamedFacetForMetadataForm(
 ) async {
   return guardFrb(
     () async {
-      final List<rust.NamedFacetFormEntryFrbDto> rows =
-          await rust.listNamedFacetForFormFrb(facet: _toFrb(facet));
+      final List<rust.NamedFacetFormEntryFrbDto> rows = await rust
+          .listNamedFacetForFormFrb(facet: _toFrb(facet));
       return rows
           .map(
             (rust.NamedFacetFormEntryFrbDto e) => namedFacetFormCandidate(

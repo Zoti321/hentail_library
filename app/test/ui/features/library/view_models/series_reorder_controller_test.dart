@@ -92,9 +92,11 @@ List<String> _ids(List<SeriesComicPageItem> items) =>
 
 void main() {
   test('build loads all members ordered from the paged fetch', () async {
-    final _FakeSeriesRepo repo = _FakeSeriesRepo(
-      <Comic>[_comic(1), _comic(2), _comic(3)],
-    );
+    final _FakeSeriesRepo repo = _FakeSeriesRepo(<Comic>[
+      _comic(1),
+      _comic(2),
+      _comic(3),
+    ]);
     final ProviderContainer container = _container(repo);
     addTearDown(container.dispose);
 
@@ -106,9 +108,11 @@ void main() {
   });
 
   test('reorder submits full ordered comicId list and updates state', () async {
-    final _FakeSeriesRepo repo = _FakeSeriesRepo(
-      <Comic>[_comic(1), _comic(2), _comic(3)],
-    );
+    final _FakeSeriesRepo repo = _FakeSeriesRepo(<Comic>[
+      _comic(1),
+      _comic(2),
+      _comic(3),
+    ]);
     final ProviderContainer container = _container(repo);
     addTearDown(container.dispose);
 
@@ -126,7 +130,11 @@ void main() {
         .reorder(reordered);
 
     expect(repo.setOrderCalls, 1);
-    expect(repo.lastSubmittedComicIds, <String>['comic-3', 'comic-1', 'comic-2']);
+    expect(repo.lastSubmittedComicIds, <String>[
+      'comic-3',
+      'comic-1',
+      'comic-2',
+    ]);
     final List<SeriesComicPageItem> current = container
         .read(seriesReorderControllerProvider('series-1'))
         .value!;
@@ -134,10 +142,11 @@ void main() {
   });
 
   test('reorder failure restores the previous visual order', () async {
-    final _FakeSeriesRepo repo = _FakeSeriesRepo(
-      <Comic>[_comic(1), _comic(2), _comic(3)],
-      failSetOrder: true,
-    );
+    final _FakeSeriesRepo repo = _FakeSeriesRepo(<Comic>[
+      _comic(1),
+      _comic(2),
+      _comic(3),
+    ], failSetOrder: true);
     final ProviderContainer container = _container(repo);
     addTearDown(container.dispose);
 
