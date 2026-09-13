@@ -36,7 +36,7 @@ pub struct ResourceStat {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResourceEntry {
     pub name: String,
-    /// Full location key (local path string today; WebDAV URL later).
+    /// Full location key: local filesystem path, or absolute WebDAV URL under a Remote root.
     pub location: String,
     pub kind: ResourceKind,
 }

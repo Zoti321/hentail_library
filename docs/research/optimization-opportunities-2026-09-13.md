@@ -83,7 +83,7 @@
   - 根目录已无 `lib/`、`pubspec.yaml`；布局为 `app/` + `core/`。  
   - `AGENTS.md` / `product-positioning.md` / `README.md` 仍写「until move lands」「Planned: Multi-Library + WebDAV」或纯本地叙事。
 - **处理**：已对齐 `AGENTS.md`、`docs/agents/*`（含 `rust-migration` 现时架构、`product-positioning`、`coding-style`、`ui-style`、`issue-tracker`）、根 `README.md`；Multi-Library / WebDAV 标为已实现，Planned 仅保留 iOS PDF。
-- **仍须注意**：ADR Context 软刷新、代码注释漂移（如 `ResourceEntry`）不在该次文档对齐范围内。
+- **仍须注意**：代码注释/ADR Context 软刷新中与日志相关的部分已由 **P1-A4** 处理；其余个案仍按触达修订。
 
 #### P1-A2 — Path / Selected Paths 与 Library 模型并存（Saved path 遗留面）— **已决策（2026-09-13，ADR-0014）**
 
@@ -106,18 +106,18 @@
   - comic catalog / thumbnail 读已 async；History / Library / facet 等仍 sync + `block_on`。
 - **风险/代价**：中高；需同步改生成绑定、Repository、`guardFrb`。
 
-#### P1-A4 — ADR 与实现总体一致，但注释/次要契约有漂移
+#### P1-A4 — ADR 与实现总体一致，但注释/次要契约有漂移 — **已处理（2026-09-13）**
 
 | 主题 | ADR | 实现抽样 | 一致性 |
 |------|-----|----------|--------|
 | Comic deletion 删 Local Resource | ADR-0012 | `comic/write.rs` `maybe_delete_local_resource` | 一致 |
 | Path migration | ADR-0013 | `sync/migrate.rs`、`update_local_library_root` 测 | 一致；Remote 改根 remapping **明确不在决策内** |
 | Read session | ADR-0005 | 路由 comicId；`drop_series_reading_histories` 测 | 一致 |
-| Multi-library + WebDAV | ADR-0008 | `resource/access/webdav.rs`、remote 测 | 能力已有；产品文档仍写 Planned |
-| 日志 | ADR-0003 | `app/lib/core/logging/*` + `package:logging` | **Decision 已落地**；ADR Context 仍描述 Talker「当前」状态（过时） |
-| ResourceEntry 注释 | — | `resource/access/mod.rs` L39：「WebDAV URL later」 | **过时**（WebDAV 已用 URL 作 location key） |
+| Multi-library + WebDAV | ADR-0008 | `resource/access/webdav.rs`、remote 测 | 一致（产品文档 Planned 表述已由 P0-A1 对齐） |
+| 日志 | ADR-0003 | `app/lib/core/logging/*` + `package:logging` | **已对齐**：Context 改为决策前叙事 + 落地现状；Decision 原文保留 |
+| ResourceEntry 注释 | — | `resource/access/mod.rs` | **已对齐**：location 注明 Local path / WebDAV URL |
 
-- **建议方向**：修订 ADR-0003 Context 段与 `ResourceEntry` 注释；不必新开 ADR。
+- **处理**：修订 ADR-0003 Context；更新 `ResourceEntry.location` 注释。未新开 ADR。
 - **风险/代价**：低。
 
 #### P2-A5 — 根目录遗留构建产物与「legacy mobile」UI 债
