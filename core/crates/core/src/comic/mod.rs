@@ -9,8 +9,8 @@ pub use dto::{
     ComicSortFieldDto, ComicSortOptionDto, PageRequestDto, PagedComicResultDto,
 };
 pub use repository::{
-    count_all, fetch_comics_page, find_comic_by_id, load_comics_ordered, read_data_version,
-    search_by_keyword, search_by_keyword_page,
+    count_all, fetch_comics_page, find_comic_by_id, find_comics_by_ids, load_comics_ordered,
+    read_data_version, search_by_keyword, search_by_keyword_page,
 };
 pub use write::{
     delete_comics_by_ids, search_by_tag_expression, search_by_tag_expression_page,

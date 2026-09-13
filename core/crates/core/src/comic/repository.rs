@@ -110,6 +110,16 @@ pub async fn find_comic_by_id(comic_id: &str) -> Result<Option<ComicDto>, Hentai
     Ok(comics.into_iter().next())
 }
 
+/// Load full Comic records for the given ids, preserving request order among found rows.
+/// Missing ids are omitted (callers keep truncated-id title fallbacks).
+pub async fn find_comics_by_ids(comic_ids: Vec<String>) -> Result<Vec<ComicDto>, HentaiError> {
+    if comic_ids.is_empty() {
+        return Ok(vec![]);
+    }
+    let db = connection()?;
+    load_comics_ordered(&db, comic_ids).await
+}
+
 pub async fn search_by_keyword(keyword: &str) -> Result<Vec<ComicDto>, HentaiError> {
     let page = search_by_keyword_page(keyword, 1, i32::MAX).await?;
     Ok(page.items)

@@ -35,18 +35,19 @@ Future<List<ReaderComicListItem>> _buildNavItemsFromContext(
   Ref ref,
   SeriesReadingContext context,
 ) async {
-  final List<ReaderComicListItem> items = <ReaderComicListItem>[];
-  for (int index = 0; index < context.orderedComicIds.length; index++) {
-    final String memberId = context.orderedComicIds[index];
-    final String title = await resolveComicTitleForDisplay(
-      ref.read(comicRepoProvider),
-      memberId,
-    );
-    items.add(
-      ReaderComicListItem(comicId: memberId, title: title, order: index),
-    );
-  }
-  return items;
+  final List<String> orderedIds = context.orderedComicIds;
+  final Map<String, String> titlesById = await resolveComicTitlesForDisplay(
+    ref.read(comicRepoProvider),
+    orderedIds,
+  );
+  return <ReaderComicListItem>[
+    for (int index = 0; index < orderedIds.length; index++)
+      ReaderComicListItem(
+        comicId: orderedIds[index],
+        title: titlesById[orderedIds[index]]!,
+        order: index,
+      ),
+  ];
 }
 
 @riverpod

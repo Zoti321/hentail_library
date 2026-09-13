@@ -1,6 +1,6 @@
 use hentai_core::{
-    self, count_all, fetch_comics_page, find_comic_by_id, init_db, read_data_version,
-    search_by_keyword, search_by_keyword_page, search_by_tag_expression_page,
+    self, count_all, fetch_comics_page, find_comic_by_id, find_comics_by_ids, init_db,
+    read_data_version, search_by_keyword, search_by_keyword_page, search_by_tag_expression_page,
 };
 
 use super::init::HentaiErrorDto;
@@ -215,6 +215,16 @@ pub async fn find_comic_by_id_frb(comic_id: String) -> Result<Option<ComicDto>, 
     find_comic_by_id(&comic_id)
         .await
         .map(|opt| opt.map(ComicDto::from))
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn find_comics_by_ids_frb(
+    comic_ids: Vec<String>,
+) -> Result<Vec<ComicDto>, HentaiErrorDto> {
+    find_comics_by_ids(comic_ids)
+        .await
+        .map(|rows| rows.into_iter().map(ComicDto::from).collect())
         .map_err(HentaiErrorDto::from)
 }
 

@@ -15,6 +15,9 @@ abstract class ComicRepository {
 
   Future<Comic?> findById(String comicId);
 
+  /// Batch load by comic ids. Returns only found comics, preserving request order.
+  Future<List<Comic>> findByIds(List<String> comicIds);
+
   Future<PagedResult<Comic>> fetchComicsPage({
     required PageRequest request,
     required LibraryComicFilter filter,
