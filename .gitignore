@@ -67,6 +67,9 @@ core/vendor/**/pdfium.dll
 core/vendor/**/libpdfium.so
 core/vendor/**/libpdfium.dylib
 
+# iOS pdfium XCFramework (build via core/vendor/build-ios-xcframework.sh on macOS)
+app/rust_builder/ios/pdfium.xcframework/
+
 development.md
 .cursor
 /dist_installer/

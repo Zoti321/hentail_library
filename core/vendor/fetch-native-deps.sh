@@ -25,7 +25,7 @@ pdfium_lib_name() {
   local platform="$1"
   case "$platform" in
     windows-*) echo "pdfium.dll" ;;
-    macos-*) echo "libpdfium.dylib" ;;
+    macos-* | ios-*) echo "libpdfium.dylib" ;;
     *) echo "libpdfium.so" ;;
   esac
 }
@@ -85,6 +85,9 @@ else
       --android)
         platforms+=("android-arm" "android-arm64" "android-x86" "android-x64")
         ;;
+      --ios)
+        platforms+=("ios-device-arm64" "ios-simulator-arm64" "ios-simulator-x64")
+        ;;
       --platform=*)
         IFS=',' read -r -a keys <<< "${arg#--platform=}"
         for key in "${keys[@]}"; do
@@ -92,7 +95,7 @@ else
         done
         ;;
       *)
-        echo "未知参数: $arg（支持 --host、--android、--platform=key[,key...]）" >&2
+        echo "未知参数: $arg（支持 --host、--android、--ios、--platform=key[,key...]）" >&2
         exit 1
         ;;
     esac

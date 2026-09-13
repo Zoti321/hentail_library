@@ -1,7 +1,3 @@
-#[cfg(not(target_os = "ios"))]
-mod pdf;
-#[cfg(target_os = "ios")]
-#[path = "mobile_pdf.rs"]
 mod pdf;
 
 mod rar;

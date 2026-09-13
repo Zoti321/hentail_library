@@ -47,9 +47,9 @@ A **Resource** is a file or directory (local) or WebDAV file (remote) that can b
 | 7z archive | `.7z` | Comic archive | Supported | Supported |
 | CB7 | `.cb7` | Comic archive | Supported | Supported |
 | EPUB | `.epub` | Structured ebook | Supported | Supported |
-| PDF | `.pdf` | Document | Supported* | Supported* |
+| PDF | `.pdf` | Document | Supported | Supported |
 
-\* PDF: desktop + Android via pdfium; iOS still stub (local and remote).
+PDF is served by vendored **pdfium** across all platforms — desktop, Android, and **iOS** (device + simulator). See ADR-0015.
 
 “Comic archive” means a compressed file whose readable pages are **images**. Archives are not opaque blobs — the app extracts or streams page images for the reader.
 
@@ -62,9 +62,9 @@ A **Resource** is a file or directory (local) or WebDAV file (remote) that can b
 | `epub` | Yes | Yes | |
 | `cbr` / `rar` | Yes | Yes | `unrar-ng` |
 | `cb7` / `sevenz` | Yes | Yes | |
-| `pdf` | Yes* | Yes* | iOS stub |
+| `pdf` | Yes | Yes | pdfium on all platforms incl. iOS (ADR-0015) |
 
-**Planned:** PDF on iOS (local and remote still stub). Multi-Library and WebDAV remote libraries are in scope and implemented (ADR-0008). Core scan/read/DB live in Rust (`core/`) via FRB; see `docs/agents/rust-migration.md` and ADR-0002.
+Multi-Library and WebDAV remote libraries are in scope and implemented (ADR-0008). Core scan/read/DB live in Rust (`core/`) via FRB; see `docs/agents/rust-migration.md` and ADR-0002.
 
 ### Out of scope (unless explicitly requested)
 
