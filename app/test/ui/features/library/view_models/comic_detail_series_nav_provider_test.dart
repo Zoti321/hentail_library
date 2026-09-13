@@ -23,13 +23,10 @@ class _FakeComicRepo implements ComicRepository {
   _FakeComicRepo(this._titles);
 
   final Map<String, String> _titles;
+  final List<List<String>> findByIdsCalls = <List<String>>[];
+  int findByIdCalls = 0;
 
-  @override
-  Future<Comic?> findById(String comicId) async {
-    final String? title = _titles[comicId];
-    if (title == null) {
-      return null;
-    }
+  Comic _comic(String comicId, String title) {
     return Comic(
       comicId: comicId,
       path: '/comics/$comicId',
@@ -40,6 +37,29 @@ class _FakeComicRepo implements ComicRepository {
       title: title,
       pageCount: 1,
     );
+  }
+
+  @override
+  Future<Comic?> findById(String comicId) async {
+    findByIdCalls += 1;
+    final String? title = _titles[comicId];
+    if (title == null) {
+      return null;
+    }
+    return _comic(comicId, title);
+  }
+
+  @override
+  Future<List<Comic>> findByIds(List<String> comicIds) async {
+    findByIdsCalls.add(List<String>.from(comicIds));
+    final List<Comic> found = <Comic>[];
+    for (final String comicId in comicIds) {
+      final String? title = _titles[comicId];
+      if (title != null) {
+        found.add(_comic(comicId, title));
+      }
+    }
+    return found;
   }
 
   @override
@@ -106,20 +126,20 @@ Series _testSeries() {
 
 void main() {
   late Series series;
+  late _FakeComicRepo comicRepo;
   late ProviderContainer container;
 
   setUp(() {
     series = _testSeries();
+    comicRepo = _FakeComicRepo(<String, String>{
+      'comic-a': 'Alpha',
+      'comic-b': 'Beta',
+      'comic-c': 'Gamma',
+    });
     container = ProviderContainer(
       overrides: <Override>[
         libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
-        comicRepoProvider.overrideWith(
-          (Ref ref) => _FakeComicRepo(<String, String>{
-            'comic-a': 'Alpha',
-            'comic-b': 'Beta',
-            'comic-c': 'Gamma',
-          }),
-        ),
+        comicRepoProvider.overrideWith((Ref ref) => comicRepo),
         seriesRepoProvider.overrideWith(
           (Ref ref) => _FakeSeriesRepo(<Series>[series]),
         ),
@@ -147,6 +167,40 @@ void main() {
         'Beta',
         'Gamma',
       ]);
+      expect(comicRepo.findByIdsCalls, <List<String>>[
+        <String>['comic-a', 'comic-b', 'comic-c'],
+      ]);
+      expect(comicRepo.findByIdCalls, 0);
+    });
+
+    test('uses truncated id fallback for missing comics', () async {
+      comicRepo = _FakeComicRepo(<String, String>{
+        'comic-a': 'Alpha',
+        'comic-c': 'Gamma',
+      });
+      container.dispose();
+      container = ProviderContainer(
+        overrides: <Override>[
+          libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
+          comicRepoProvider.overrideWith((Ref ref) => comicRepo),
+          seriesRepoProvider.overrideWith(
+            (Ref ref) => _FakeSeriesRepo(<Series>[series]),
+          ),
+        ],
+      );
+
+      final ComicDetailSeriesNavSeriesData? data = await container.read(
+        comicDetailSeriesNavForSeriesProvider('series-1').future,
+      );
+
+      expect(data, isNotNull);
+      expect(data!.items.map((item) => item.title).toList(), <String>[
+        'Alpha',
+        comicTitleFallbackForDisplay('comic-b'),
+        'Gamma',
+      ]);
+      expect(comicRepo.findByIdsCalls.length, 1);
+      expect(comicRepo.findByIdCalls, 0);
     });
   });
 
@@ -201,6 +255,8 @@ void main() {
             result as ComicDetailSeriesNavReady;
         expect(ready.data.currentIndex, 1);
         expect(identical(ready.data.items, cachedSeriesData?.items), isTrue);
+        expect(comicRepo.findByIdsCalls.length, 1);
+        expect(comicRepo.findByIdCalls, 0);
       },
     );
 

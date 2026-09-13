@@ -1,3 +1,4 @@
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
@@ -86,8 +87,30 @@ Future<String> resolveComicTitleForDisplay(
   ComicRepository repo,
   String comicId,
 ) async {
-  final comic = await repo.findById(comicId);
-  return comic?.title ?? comicTitleFallbackForDisplay(comicId);
+  final Map<String, String> titles = await resolveComicTitlesForDisplay(
+    repo,
+    <String>[comicId],
+  );
+  return titles[comicId] ?? comicTitleFallbackForDisplay(comicId);
+}
+
+/// Resolves display titles for [comicIds] with one batch repository read.
+/// Missing ids keep the truncated-id fallback; found order follows [comicIds].
+Future<Map<String, String>> resolveComicTitlesForDisplay(
+  ComicRepository repo,
+  List<String> comicIds,
+) async {
+  if (comicIds.isEmpty) {
+    return const <String, String>{};
+  }
+  final List<Comic> comics = await repo.findByIds(comicIds);
+  final Map<String, String> titlesById = <String, String>{
+    for (final Comic comic in comics) comic.comicId: comic.title,
+  };
+  return <String, String>{
+    for (final String comicId in comicIds)
+      comicId: titlesById[comicId] ?? comicTitleFallbackForDisplay(comicId),
+  };
 }
 
 List<Series> findSeriesListContainingComic(
@@ -106,18 +129,21 @@ Future<ComicDetailSeriesNavSeriesData?> buildSeriesNavData(
   final List<SeriesItem> sortedItems = List<SeriesItem>.from(series.items)
     ..sort((SeriesItem a, SeriesItem b) => a.order.compareTo(b.order));
   final ComicRepository repo = ref.read(comicRepoProvider);
-  final List<ComicDetailSeriesNavItem> items = <ComicDetailSeriesNavItem>[];
-  for (int index = 0; index < sortedItems.length; index++) {
-    final SeriesItem item = sortedItems[index];
-    final String title = await resolveComicTitleForDisplay(repo, item.comicId);
-    items.add(
+  final List<String> comicIds = sortedItems
+      .map((SeriesItem item) => item.comicId)
+      .toList(growable: false);
+  final Map<String, String> titlesById = await resolveComicTitlesForDisplay(
+    repo,
+    comicIds,
+  );
+  final List<ComicDetailSeriesNavItem> items = <ComicDetailSeriesNavItem>[
+    for (int index = 0; index < sortedItems.length; index++)
       ComicDetailSeriesNavItem(
         displayIndex: index + 1,
-        comicId: item.comicId,
-        title: title,
+        comicId: sortedItems[index].comicId,
+        title: titlesById[sortedItems[index].comicId]!,
       ),
-    );
-  }
+  ];
   if (items.isEmpty) {
     return null;
   }
