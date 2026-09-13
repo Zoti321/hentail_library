@@ -7,7 +7,7 @@ Rust workspace：`hentai-core`（业务逻辑）+ `hentai_flutter`（FRB cdylib�
 
 ## 开发
 
-**推荐**：在仓库根目录运行 [`../scripts/setup-dev.ps1`](../scripts/setup-dev.ps1)（Windows）或 [`../scripts/setup-dev.sh`](../scripts/setup-dev.sh)（Unix），一次性完成 `rust_builder` 链接与 pdfium 下载。
+**推荐**：在仓库根目录运行 [`../scripts/setup-dev.sh`](../scripts/setup-dev.sh)（Linux / macOS / Windows Git Bash），一次性完成 `rust_builder` 链接与 pdfium 下载。
 
 仅 Rust 侧开发时，可单独获取原生依赖（详见 [`vendor/README.md`](vendor/README.md)）：
 

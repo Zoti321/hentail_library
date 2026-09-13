@@ -4,20 +4,18 @@ Project-specific conventions for UI widgets and lightweight data shapes. Agents 
 
 ## Project layout
 
-**Target monorepo** (see `docs/agents/rust-migration.md`):
+Monorepo layout (see `docs/agents/rust-migration.md`):
 
 | Path | Role |
 |------|------|
 | `app/lib/core/` | Cross-cutting Dart utilities (logging via `package:logging` + `AppLog`, l10n, path/format helpers). |
-| `app/lib/domain/` | Domain models (`models/`). Use cases are removed after Rust migration; library query **projection** (`library/`) may remain for UI filter building. |
-| `app/lib/data/` | Repositories (thin FRB adapters). No Drift, no `services/comic/` after migration. |
+| `app/lib/domain/` | Domain models (`models/`). No Dart use cases; library query **projection** (`library/`) may remain for UI filter building. |
+| `app/lib/data/` | Repositories (thin FRB adapters). No Drift, no `services/comic/`. |
 | `app/lib/ui/` | Shared widgets/theme and feature modules. |
 | `core/crates/core/` | Rust: SeaORM, scan, sync, reader, thumbnail, series inference. |
 | `core/crates/flutter/` | FRB glue (`#[frb]` API). |
 
-**Legacy (pre-migration):** layers under repo-root `lib/` — same roles as `app/lib/` above.
-
-Import canonical paths from `app/lib/` once the monorepo move lands. Do not add files under removed legacy roots (`presentation/`, `model/`, `repository/`, `services/`, `usecases/`, `database/`, `module/` at `lib/` root).
+Import canonical paths from `app/lib/`. Do not add Flutter sources at the repo root or under removed legacy roots (`presentation/`, `model/`, `repository/`, `services/`, `usecases/`, `database/`, `module/`).
 
 ## Widget state
 

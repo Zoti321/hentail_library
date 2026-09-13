@@ -1,8 +1,8 @@
-# Rust / FRB 迁移（Agent 指引）
+# Rust / FRB 架构（Agent 指引）
 
-将扫描、Library sync、阅读 I/O、SQLite 持久化等核心能力迁入 `core/`（Rust），Flutter 在 `app/` 仅保留 UI 与 Repository 薄层。完整 PRD 与任务拆分见 GitHub Issues（父 issue：Rust 核心层 FRB 迁移 PRD）。
+扫描、Library sync、阅读 I/O、SQLite 持久化等核心能力在 `core/`（Rust）；Flutter 在 `app/` 仅保留 UI 与 Repository 薄层。迁移已完成（父 PRD [#11](https://github.com/Zoti321/hentail_library/issues/11) 及 slices #12–#19 均已关闭）。决策背景见 ADR-0002。
 
-## 仓库布局（目标态）
+## 仓库布局
 
 | 路径 | 内容 |
 |------|------|
@@ -10,7 +10,7 @@
 | `core/` | Rust workspace：`crates/core`（业务）、`crates/flutter`（FRB cdylib） |
 | 根目录 | `README.md`、`AGENTS.md`、`CONTEXT.md`、`docs/`、`.github/` |
 
-开发：clone 后先在仓库根目录执行 `scripts/setup-dev.ps1`（Windows）或 `scripts/setup-dev.sh`（Unix），创建 `app/rust_builder/rust` → `core/crates/flutter` 链接并拉取 pdfium；然后 `cd app && flutter run`、`cd core && cargo test --workspace`。
+开发：clone 后在仓库根目录执行 `./scripts/setup-dev.sh`（Windows 可用 Git Bash），创建 `app/rust_builder/rust` → `core/crates/flutter` 链接并拉取 pdfium；然后 `cd app && flutter run`、`cd core && cargo test --workspace`。
 
 **Rust 日志（ADR-0003 / ADR-0004）**：`tracing` 输出至 stderr，并在 `configure_rust_log_frb` 后写入 `{app_data}/logs/rust_log.txt`（5MB 轮转）。开发时可用 `RUST_LOG=hentai_core=debug flutter run`；`set_diagnostic_logging_frb` 临时调整级别。用户支持流程见 `docs/agents/log-support.md`。
 
@@ -35,4 +35,4 @@
 
 ## 词汇
 
-继续使用 `CONTEXT.md`：Comic、Resource、Library sync、Saved path、Series inference 等。
+继续使用 `CONTEXT.md`：Comic、Resource、Library、Library root、Library sync、Series inference 等。

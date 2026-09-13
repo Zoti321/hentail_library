@@ -10,21 +10,21 @@ How agents should build UI in this project: reuse custom components, follow the 
 | Theme | Desktop: custom Fluent-inspired theme (`buildAppTheme`) | **Desktop theme everywhere** |
 | Theme | Mobile: stock Material 3 from seed (`buildMobileMaterialTheme`) | Retire mobile Material look |
 | Routing | `isDesktop ? desktopRouter : mobileRouter` | Single router; layout adapts inside shared pages |
-| Pages | `lib/ui/features/**/views/desktop/` vs `views/mobile/` | Shared views under `views/` (or desktop widgets reused responsively) |
+| Pages | `app/lib/ui/features/**/views/desktop/` vs `views/mobile/` | Shared views under `views/` (or desktop widgets reused responsively) |
 
 **Rule for new work:** Do not add new mobile-only Material pages. Build with desktop custom components and responsive layout. When touching mobile pages, prefer converging them toward the desktop look.
 
 Platform switch today lives in:
 
-- `lib/ui/features/shell/views/app.dart` — theme selection
-- `lib/ui/features/shell/views/routing/app_router.dart` — router selection
-- `lib/core/util/utils.dart` — `isDesktop` (Windows / macOS / Linux; not web)
+- `app/lib/ui/features/shell/views/app.dart` — theme selection
+- `app/lib/ui/features/shell/views/routing/app_router.dart` — router selection
+- `app/lib/core/util/utils.dart` — `isDesktop` (Windows / macOS / Linux; not web)
 
 ---
 
 ## Design language (desktop = source of truth)
 
-Desktop UI is a **custom, Fluent-inspired** surface — not stock Material. Extracted from `lib/ui/core/theme/`.
+Desktop UI is a **custom, Fluent-inspired** surface — not stock Material. Extracted from `app/lib/ui/core/theme/`.
 
 ### Overall feel
 
@@ -135,7 +135,7 @@ CatalogCoverCardShell
 
 ## Component catalog
 
-**Prefer these over raw Material widgets** when building or extending UI. All live under `lib/ui/core/widgets/`.
+**Prefer these over raw Material widgets** when building or extending UI. All live under `app/lib/ui/core/widgets/`.
 
 | Category | Path | Examples |
 |----------|------|----------|
@@ -152,9 +152,9 @@ CatalogCoverCardShell
 
 Theme entry points:
 
-- `lib/ui/core/theme/theme.dart` — `buildAppTheme`, `HentaiColorScheme`, extensions
-- `lib/ui/core/theme/theme_layout_tokens.dart` — `AppThemeTokens`, `context.tokens`
-- `lib/ui/core/theme/mobile_material_theme.dart` — **legacy mobile only; do not extend**
+- `app/lib/ui/core/theme/theme.dart` — `buildAppTheme`, `HentaiColorScheme`, extensions
+- `app/lib/ui/core/theme/theme_layout_tokens.dart` — `AppThemeTokens`, `context.tokens`
+- `app/lib/ui/core/theme/mobile_material_theme.dart` — **legacy mobile only; do not extend**
 
 ---
 
@@ -194,13 +194,13 @@ When narrowing: keep **desktop visual style** (colors, borders, GhostButton, cus
 
 ---
 
-## File layout convention (during migration)
+## File layout convention (responsive convergence)
 
 ```
-lib/ui/features/<feature>/views/
+app/lib/ui/features/<feature>/views/
   desktop/          # current primary implementation — design reference
   mobile/           # legacy Material implementations — converge away
-lib/ui/core/widgets/  # shared custom components — extend here first
+app/lib/ui/core/widgets/  # shared custom components — extend here first
 ```
 
 New shared screens: place widgets in `core/widgets` if cross-feature; keep feature-specific composition in `views/` without a `desktop/` / `mobile/` split when possible.

@@ -64,7 +64,7 @@ A **Resource** is a file or directory (local) or WebDAV file (remote) that can b
 | `cb7` / `sevenz` | Yes | Yes | |
 | `pdf` | Yes* | Yes* | iOS stub |
 
-**Planned:** Multi-Library + WebDAV Remote library (see ADR-0008); PDF on iOS. Core scan/read/DB live in Rust (`core/`) via FRB; see `docs/agents/rust-migration.md` and ADR-0002.
+**Planned:** PDF on iOS (local and remote still stub). Multi-Library and WebDAV remote libraries are in scope and implemented (ADR-0008). Core scan/read/DB live in Rust (`core/`) via FRB; see `docs/agents/rust-migration.md` and ADR-0002.
 
 ### Out of scope (unless explicitly requested)
 
