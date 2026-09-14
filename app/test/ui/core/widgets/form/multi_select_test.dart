@@ -1265,4 +1265,165 @@ void main() {
 
     expect(nextFocus.hasFocus, isTrue);
   });
+
+  testWidgets(
+    'empty input Backspace removes last selected name and keeps menu',
+    (WidgetTester tester) async {
+      final List<String> selected = <String>['alpha', 'beta'];
+      final List<String> removed = <String>[];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            locale: const Locale('zh'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            theme: buildAppTheme(Brightness.light),
+            home: Scaffold(
+              body: Padding(
+                padding: const EdgeInsets.all(24),
+                child: StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return MultiSelect<String>(
+                      label: '标签',
+                      icon: LucideIcons.tag,
+                      selectedNames: selected,
+                      onAdd: (String name) {
+                        setState(() => selected.add(name));
+                      },
+                      onRemove: (String name) {
+                        removed.add(name);
+                        setState(() => selected.remove(name));
+                      },
+                      itemsProvider: _catalogProvider,
+                      onRetry: () {},
+                      resolveName: (String name) => name,
+                      copy: const MultiSelectCopy(
+                        inputPlaceholder: '选择或输入标签…',
+                        listLoadFailed: '标签列表加载失败',
+                        emptyCatalog: '暂无标签',
+                        emptyRemaining: '没有更多可选',
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(TextField));
+      await tester.pumpAndSettle();
+      expect(find.byKey(MultiSelect.menuPanelKey), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+      await tester.pumpAndSettle();
+
+      expect(removed, <String>['beta']);
+      expect(find.widgetWithText(OutlinedMetaChip, 'beta'), findsNothing);
+      expect(find.widgetWithText(OutlinedMetaChip, 'alpha'), findsOneWidget);
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).focusNode?.hasFocus,
+        isTrue,
+      );
+      expect(find.byKey(MultiSelect.menuPanelKey), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byKey(MultiSelect.menuPanelKey),
+          matching: find.text('beta'),
+        ),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets('empty input Delete removes last selected name', (
+    WidgetTester tester,
+  ) async {
+    final List<String> removed = <String>[];
+    await pumpMultiSelect(
+      tester,
+      selectedNames: const <String>['alpha', 'gamma'],
+      onRemove: removed.add,
+    );
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.delete);
+    await tester.pumpAndSettle();
+
+    expect(removed, <String>['gamma']);
+  });
+
+  testWidgets('Backspace with non-empty input does not remove selected name', (
+    WidgetTester tester,
+  ) async {
+    final List<String> removed = <String>[];
+    await pumpMultiSelect(
+      tester,
+      selectedNames: const <String>['alpha', 'beta'],
+      onRemove: removed.add,
+    );
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'x');
+    await tester.pumpAndSettle();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+    await tester.pumpAndSettle();
+
+    expect(removed, isEmpty);
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller?.text,
+      isEmpty,
+    );
+    expect(find.widgetWithText(OutlinedMetaChip, 'beta'), findsOneWidget);
+  });
+
+  testWidgets('Backspace with no selected names is ignored', (
+    WidgetTester tester,
+  ) async {
+    final List<String> removed = <String>[];
+    await pumpMultiSelect(tester, onRemove: removed.add);
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+    await tester.pumpAndSettle();
+
+    expect(removed, isEmpty);
+  });
+
+  testWidgets('Backspace with text selection does not remove selected name', (
+    WidgetTester tester,
+  ) async {
+    final List<String> removed = <String>[];
+    await pumpMultiSelect(
+      tester,
+      selectedNames: const <String>['alpha', 'beta'],
+      onRemove: removed.add,
+    );
+
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'xy');
+    await tester.pumpAndSettle();
+
+    final TextEditingController controller = tester
+        .widget<TextField>(find.byType(TextField))
+        .controller!;
+    controller.selection = const TextSelection(baseOffset: 0, extentOffset: 2);
+    await tester.pump();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+    await tester.pumpAndSettle();
+
+    expect(removed, isEmpty);
+    expect(find.widgetWithText(OutlinedMetaChip, 'beta'), findsOneWidget);
+  });
 }

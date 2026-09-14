@@ -305,6 +305,20 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
       _addFromMenu(_visibleRemainingNames[index]);
       return KeyEventResult.handled;
     }
+    // Chip clear: KeyDown only (no KeyRepeat) so holding the key cannot wipe
+    // many selected names in one gesture.
+    if (event is KeyDownEvent &&
+        (key == LogicalKeyboardKey.backspace ||
+            key == LogicalKeyboardKey.delete)) {
+      final TextEditingValue value = _inputController.value;
+      if (value.text.isNotEmpty ||
+          !value.selection.isCollapsed ||
+          widget.selectedNames.isEmpty) {
+        return KeyEventResult.ignored;
+      }
+      _removeSelected(widget.selectedNames.last);
+      return KeyEventResult.handled;
+    }
     return KeyEventResult.ignored;
   }
 
