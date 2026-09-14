@@ -88,10 +88,13 @@ class MultiSelect<T> extends ConsumerStatefulWidget {
 class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
   final CustomPopupMenuController _menuController = CustomPopupMenuController();
   final TextEditingController _inputController = TextEditingController();
-  final FocusNode _inputFocusNode = FocusNode();
   final ScrollController _menuScrollController = ScrollController();
+  final GlobalKey _highlightedRowKey = GlobalKey();
+  late final FocusNode _inputFocusNode;
   late final ValueNotifier<List<String>> _selectedNamesNotifier;
   late final ValueNotifier<String> _filterQueryNotifier;
+  late final ValueNotifier<int?> _highlightedIndexNotifier;
+  List<String> _visibleRemainingNames = const <String>[];
   double _fieldWidth = 0;
   double _menuScrollOffset = 0;
   bool _menuSessionActive = false;
@@ -99,10 +102,12 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
   @override
   void initState() {
     super.initState();
+    _inputFocusNode = FocusNode(onKeyEvent: _handleInputKeyEvent);
     _selectedNamesNotifier = ValueNotifier<List<String>>(
       List<String>.of(widget.selectedNames),
     );
     _filterQueryNotifier = ValueNotifier<String>(_inputController.text);
+    _highlightedIndexNotifier = ValueNotifier<int?>(null);
     _inputController.addListener(_syncFilterQuery);
     _inputFocusNode.addListener(_handleInputFocusChange);
     _menuScrollController.addListener(_storeMenuScrollOffset);
@@ -124,6 +129,7 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
     _menuScrollController.dispose();
     _selectedNamesNotifier.dispose();
     _filterQueryNotifier.dispose();
+    _highlightedIndexNotifier.dispose();
     super.dispose();
   }
 
@@ -192,7 +198,128 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
         return;
       }
       _menuSessionActive = false;
+      _highlightedIndexNotifier.value = null;
     });
+  }
+
+  void _reportVisibleRemaining(List<String> names) {
+    final bool listChanged = !listEquals(names, _visibleRemainingNames);
+    _visibleRemainingNames = List<String>.of(names);
+
+    final int? current = _highlightedIndexNotifier.value;
+    final int? next;
+    if (names.isEmpty) {
+      next = null;
+    } else if (listChanged || current == null || current >= names.length) {
+      next = 0;
+    } else {
+      next = current;
+    }
+
+    if (_highlightedIndexNotifier.value != next) {
+      _highlightedIndexNotifier.value = next;
+    }
+  }
+
+  void _highlightAt(int index, {bool scrollIntoView = false}) {
+    if (index < 0 || index >= _visibleRemainingNames.length) {
+      return;
+    }
+    if (_highlightedIndexNotifier.value != index) {
+      _highlightedIndexNotifier.value = index;
+    }
+    if (scrollIntoView) {
+      _scrollHighlightIntoView();
+    }
+  }
+
+  void _scrollHighlightIntoView() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      final BuildContext? rowContext = _highlightedRowKey.currentContext;
+      if (rowContext == null) {
+        return;
+      }
+      Scrollable.ensureVisible(
+        rowContext,
+        alignment: 0.5,
+        duration: Duration.zero,
+      );
+    });
+  }
+
+  void _moveHighlight(int delta) {
+    if (!_menuController.menuIsShowing) {
+      if (delta <= 0) {
+        return;
+      }
+      _openMenu();
+      if (_visibleRemainingNames.isNotEmpty) {
+        _highlightAt(0, scrollIntoView: true);
+      }
+      return;
+    }
+    if (_visibleRemainingNames.isEmpty) {
+      return;
+    }
+    final int current = _highlightedIndexNotifier.value ?? 0;
+    final int next = (current + delta).clamp(
+      0,
+      _visibleRemainingNames.length - 1,
+    );
+    _highlightAt(next, scrollIntoView: true);
+  }
+
+  KeyEventResult _handleInputKeyEvent(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+    if (_inputController.value.isComposingRangeValid) {
+      return KeyEventResult.ignored;
+    }
+
+    final LogicalKeyboardKey key = event.logicalKey;
+    if (key == LogicalKeyboardKey.arrowDown) {
+      _moveHighlight(1);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowUp) {
+      if (!_menuController.menuIsShowing) {
+        return KeyEventResult.ignored;
+      }
+      _moveHighlight(-1);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.tab) {
+      if (HardwareKeyboard.instance.isShiftPressed) {
+        return KeyEventResult.ignored;
+      }
+      final int? index = _highlightedIndexNotifier.value;
+      if (index == null ||
+          index < 0 ||
+          index >= _visibleRemainingNames.length) {
+        return KeyEventResult.ignored;
+      }
+      _addFromMenu(_visibleRemainingNames[index]);
+      return KeyEventResult.handled;
+    }
+    // Chip clear: KeyDown only (no KeyRepeat) so holding the key cannot wipe
+    // many selected names in one gesture.
+    if (event is KeyDownEvent &&
+        (key == LogicalKeyboardKey.backspace ||
+            key == LogicalKeyboardKey.delete)) {
+      final TextEditingValue value = _inputController.value;
+      if (value.text.isNotEmpty ||
+          !value.selection.isCollapsed ||
+          widget.selectedNames.isEmpty) {
+        return KeyEventResult.ignored;
+      }
+      _removeSelected(widget.selectedNames.last);
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
   }
 
   void _submitInput() {
@@ -302,6 +429,12 @@ class _MultiSelectState<T> extends ConsumerState<MultiSelect<T>> {
                                 selectedNames: selectedNames,
                                 filterQuery: filterQuery,
                                 scrollController: _menuScrollController,
+                                highlightedIndexListenable:
+                                    _highlightedIndexNotifier,
+                                highlightedRowKey: _highlightedRowKey,
+                                onVisibleRemainingChanged:
+                                    _reportVisibleRemaining,
+                                onHighlightIndex: _highlightAt,
                                 onAdd: _addFromMenu,
                                 onRetry: widget.onRetry,
                                 resolveName: widget.resolveName,
@@ -468,6 +601,10 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
     required this.selectedNames,
     required this.filterQuery,
     required this.scrollController,
+    required this.highlightedIndexListenable,
+    required this.highlightedRowKey,
+    required this.onVisibleRemainingChanged,
+    required this.onHighlightIndex,
     required this.onAdd,
     required this.onRetry,
     required this.resolveName,
@@ -481,6 +618,10 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
   final List<String> selectedNames;
   final String filterQuery;
   final ScrollController scrollController;
+  final ValueListenable<int?> highlightedIndexListenable;
+  final GlobalKey highlightedRowKey;
+  final ValueChanged<List<String>> onVisibleRemainingChanged;
+  final void Function(int index, {bool scrollIntoView}) onHighlightIndex;
   final ValueChanged<String> onAdd;
   final VoidCallback onRetry;
   final String Function(T item) resolveName;
@@ -493,42 +634,52 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
     final l10n = context.l10n;
     final AsyncValue<List<T>> asyncItems = ref.watch(itemsProvider);
     return asyncItems.when(
-      loading: () => _MultiSelectMenuSizedShell(
-        width: width,
-        maxHeight: 108,
-        child: const Center(
-          child: Padding(
-            padding: EdgeInsets.all(18),
-            child: SizedBox(
-              width: 22,
-              height: 22,
-              child: CircularProgressIndicator(strokeWidth: 2),
+      loading: () {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          onVisibleRemainingChanged(const <String>[]);
+        });
+        return _MultiSelectMenuSizedShell(
+          width: width,
+          maxHeight: 108,
+          child: const Center(
+            child: Padding(
+              padding: EdgeInsets.all(18),
+              child: SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
             ),
           ),
-        ),
-      ),
-      error: (Object err, StackTrace? st) => _MultiSelectMenuSizedShell(
-        width: width,
-        maxHeight: 148,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                l10n.commonLoadFailed,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.hentai.textPrimary,
-                  fontWeight: FontWeight.w600,
+        );
+      },
+      error: (Object err, StackTrace? st) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          onVisibleRemainingChanged(const <String>[]);
+        });
+        return _MultiSelectMenuSizedShell(
+          width: width,
+          maxHeight: 148,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  l10n.commonLoadFailed,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.hentai.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              TextButton(onPressed: onRetry, child: Text(l10n.commonRetry)),
-            ],
+                const SizedBox(height: 8),
+                TextButton(onPressed: onRetry, child: Text(l10n.commonRetry)),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
       data: (List<T> items) {
         final Set<String> selected = selectedNames.toSet();
         final List<T> remaining = items
@@ -540,11 +691,20 @@ class _MultiSelectMenuPanel<T> extends ConsumerWidget {
               ),
             )
             .toList();
+        final List<String> remainingNames = remaining
+            .map(resolveName)
+            .toList(growable: false);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          onVisibleRemainingChanged(remainingNames);
+        });
         return _MultiSelectMenuList<T>(
           width: width,
           items: remaining,
           allCatalogEmpty: items.isEmpty,
           scrollController: scrollController,
+          highlightedIndexListenable: highlightedIndexListenable,
+          highlightedRowKey: highlightedRowKey,
+          onHighlightIndex: onHighlightIndex,
           onAdd: onAdd,
           resolveName: resolveName,
           resolveSmartMatched: resolveSmartMatched,
@@ -601,6 +761,9 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
     required this.items,
     required this.allCatalogEmpty,
     required this.scrollController,
+    required this.highlightedIndexListenable,
+    required this.highlightedRowKey,
+    required this.onHighlightIndex,
     required this.onAdd,
     required this.resolveName,
     required this.copy,
@@ -612,6 +775,9 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
   final List<T> items;
   final bool allCatalogEmpty;
   final ScrollController scrollController;
+  final ValueListenable<int?> highlightedIndexListenable;
+  final GlobalKey highlightedRowKey;
+  final void Function(int index, {bool scrollIntoView}) onHighlightIndex;
   final ValueChanged<String> onAdd;
   final String Function(T item) resolveName;
   final MultiSelectCopy copy;
@@ -647,27 +813,37 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
                 ),
               ),
             )
-          : ListView.builder(
-              controller: scrollController,
-              shrinkWrap: true,
-              physics: const ClampingScrollPhysics(),
-              padding: EdgeInsets.only(
-                top: tokens.spacing.sm,
-                bottom: tokens.spacing.md + 2,
-              ),
-              itemCount: items.length,
-              itemBuilder: (BuildContext context, int index) {
-                final T item = items[index];
-                final String name = resolveName(item);
-                final bool smartMatched =
-                    resolveSmartMatched?.call(item) ?? false;
-                return _MultiSelectDropdownRow(
-                  displayName: name,
-                  smartMatched: smartMatched,
-                  smartMatchedTooltip: smartMatchedTooltip,
-                  onSelect: () => onAdd(name),
-                );
-              },
+          : ValueListenableBuilder<int?>(
+              valueListenable: highlightedIndexListenable,
+              builder:
+                  (BuildContext context, int? highlightedIndex, Widget? _) {
+                    return ListView.builder(
+                      controller: scrollController,
+                      shrinkWrap: true,
+                      physics: const ClampingScrollPhysics(),
+                      padding: EdgeInsets.only(
+                        top: tokens.spacing.sm,
+                        bottom: tokens.spacing.md + 2,
+                      ),
+                      itemCount: items.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final T item = items[index];
+                        final String name = resolveName(item);
+                        final bool smartMatched =
+                            resolveSmartMatched?.call(item) ?? false;
+                        final bool isHighlighted = highlightedIndex == index;
+                        return _MultiSelectDropdownRow(
+                          key: isHighlighted ? highlightedRowKey : null,
+                          displayName: name,
+                          isHighlighted: isHighlighted,
+                          smartMatched: smartMatched,
+                          smartMatchedTooltip: smartMatchedTooltip,
+                          onHover: () => onHighlightIndex(index),
+                          onSelect: () => onAdd(name),
+                        );
+                      },
+                    );
+                  },
             ),
     );
   }
@@ -675,14 +851,19 @@ class _MultiSelectMenuList<T> extends StatelessWidget {
 
 class _MultiSelectDropdownRow extends StatelessWidget {
   const _MultiSelectDropdownRow({
+    super.key,
     required this.displayName,
     required this.onSelect,
+    required this.onHover,
+    this.isHighlighted = false,
     this.smartMatched = false,
     this.smartMatchedTooltip,
   });
 
   final String displayName;
   final VoidCallback onSelect;
+  final VoidCallback onHover;
+  final bool isHighlighted;
   final bool smartMatched;
   final String? smartMatchedTooltip;
 
@@ -691,13 +872,15 @@ class _MultiSelectDropdownRow extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final Color selectedFill = cs.primary.withAlpha(14);
+    final Color hoverFill = cs.primary.withAlpha(10);
 
     final Widget nameText = Text(
       displayName,
       style: TextStyle(
         fontSize: 14,
-        fontWeight: FontWeight.w500,
-        color: cs.hentai.textPrimary,
+        fontWeight: isHighlighted ? FontWeight.w600 : FontWeight.w500,
+        color: isHighlighted ? cs.primary : cs.hentai.textPrimary,
       ),
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
@@ -731,15 +914,38 @@ class _MultiSelectDropdownRow extends StatelessWidget {
         splashFactory: NoSplash.splashFactory,
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
-        hoverColor: cs.primary.withAlpha(10),
+        hoverColor: isHighlighted ? Colors.transparent : hoverFill,
       ),
-      child: Material(
-        color: cs.surface,
-        child: InkWell(
-          onTap: onSelect,
-          child: Padding(
-            padding: _MultiSelectDropdownListStyles.rowPadding,
-            child: rowChild,
+      child: Semantics(
+        selected: isHighlighted,
+        button: true,
+        label: displayName,
+        child: Material(
+          color: isHighlighted ? selectedFill : Colors.transparent,
+          child: InkWell(
+            onTap: onSelect,
+            onHover: (bool hovering) {
+              if (hovering) {
+                onHover();
+              }
+            },
+            hoverColor: isHighlighted ? Colors.transparent : hoverFill,
+            splashFactory: NoSplash.splashFactory,
+            overlayColor: WidgetStateProperty.resolveWith((
+              Set<WidgetState> states,
+            ) {
+              if (states.contains(WidgetState.pressed)) {
+                return selectedFill;
+              }
+              if (states.contains(WidgetState.hovered) && !isHighlighted) {
+                return hoverFill;
+              }
+              return Colors.transparent;
+            }),
+            child: Padding(
+              padding: _MultiSelectDropdownListStyles.rowPadding,
+              child: rowChild,
+            ),
           ),
         ),
       ),

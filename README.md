@@ -1,6 +1,6 @@
 # Hentai Library
 
-基于 Flutter 的本地漫画阅读与管理应用，聚焦离线阅读体验与个人库管理。
+基于 Flutter 的漫画阅读与管理应用，面向个人库（本地文件夹根或用户自建 WebDAV），聚焦阅读体验与库管理。
 
 ## 屏幕截图
 
@@ -21,7 +21,8 @@
 
 ### 书架与库管理
 
-- 指定路径扫描与导入
+- 多 Library：每个库一个根（本地文件夹，或用户自建 WebDAV）
+- 按库扫描与同步（本地可离线阅读；WebDAV 需网络）
 - 自定义元数据（作者、标签、内容分级、首发日期）
 - 创建系列管理相关漫画
 - 自动系列推断
@@ -45,13 +46,8 @@
 
 Cargokit 通过 `app/rust_builder/rust` 链接到 `core/crates/flutter` 来编译 Rust；该链接不会提交到 Git，需本地创建一次：
 
-```powershell
-# Windows PowerShell（仓库根目录）
-.\scripts\setup-dev.ps1
-```
-
 ```bash
-# Linux / macOS / Git Bash（仓库根目录）
+# 仓库根目录（Linux / macOS / Windows Git Bash）
 ./scripts/setup-dev.sh
 ```
 
@@ -60,7 +56,7 @@ Cargokit 通过 `app/rust_builder/rust` 链接到 `core/crates/flutter` 来编�
 1. 创建 `app/rust_builder/rust` → `core/crates/flutter` 的符号链接（Windows 为 junction）
 2. 下载 pdfium 等原生依赖到 `core/vendor/`
 
-仅需链接、跳过依赖下载时：`.\scripts\setup-dev.ps1 -SkipNativeDeps` 或 `./scripts/setup-dev.sh --skip-native-deps`。
+仅需链接、跳过依赖下载时：`./scripts/setup-dev.sh --skip-native-deps`。
 
 ### 日常开发
 
@@ -75,5 +71,5 @@ flutter run -d windows   # 或其他平台
 ```
 
 - 提交前至少执行：`dart format .`、`flutter analyze`、`flutter test`（均在 `app/` 下）
-- 新增模型/DAO/Provider 后同步更新生成代码
+- 新增/改动需代码生成的 Dart 模型或 Provider 后，同步跑 `build_runner`（业务持久化在 Rust/SeaORM，无 Drift DAO）
 - PR 说明建议包含：改动背景、核心改动点、测试方式、截图（UI 改动）

@@ -23,13 +23,51 @@ fn bind_pdfium() -> Result<Pdfium, HentaiError> {
             .map_err(|e| map_archive_err("pdfium 绑定失败", e))?;
         return Ok(Pdfium::new(bindings));
     }
-    #[cfg(not(target_os = "android"))]
+    #[cfg(target_os = "ios")]
+    {
+        return bind_pdfium_ios();
+    }
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
     {
         let lib_dir = env!("HENTAI_PDFIUM_LIB_DIR");
         let lib_path = Pdfium::pdfium_platform_library_name_at_path(lib_dir);
         let bindings = Pdfium::bind_to_library(lib_path)
             .map_err(|e| map_archive_err("pdfium 绑定失败", e))?;
         Ok(Pdfium::new(bindings))
+    }
+}
+
+/// iOS：libpdfium.dylib 以 vendored xcframework 经 CocoaPods 嵌入 App bundle 的
+/// `Frameworks/`（见 `app/rust_builder/ios/hentai_flutter.podspec`）。dlopen 无法可靠地
+/// 按 leaf 名解析 @rpath，故优先按可执行文件旁的 bundle 路径绑定，最后回退 leaf 名
+/// （若已随 Runner 链接，dyld 会命中已加载镜像）。
+#[cfg(target_os = "ios")]
+fn bind_pdfium_ios() -> Result<Pdfium, HentaiError> {
+    use std::path::PathBuf;
+
+    let mut candidates: Vec<PathBuf> = Vec::new();
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(dir) = exe.parent() {
+            candidates.push(dir.join("Frameworks/libpdfium.dylib"));
+            candidates.push(dir.join("libpdfium.dylib"));
+        }
+    }
+
+    let mut last_err: Option<PdfiumError> = None;
+    for path in &candidates {
+        match Pdfium::bind_to_library(path) {
+            Ok(bindings) => return Ok(Pdfium::new(bindings)),
+            Err(e) => last_err = Some(e),
+        }
+    }
+
+    // Fallback: leaf name resolved by dyld among already-loaded images.
+    match Pdfium::bind_to_library("libpdfium.dylib") {
+        Ok(bindings) => Ok(Pdfium::new(bindings)),
+        Err(e) => Err(map_archive_err(
+            "pdfium 绑定失败",
+            last_err.unwrap_or(e),
+        )),
     }
 }
 

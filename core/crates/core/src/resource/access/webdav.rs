@@ -2,7 +2,9 @@
 
 use std::io::Cursor;
 use std::sync::Mutex;
+use std::time::Duration;
 
+use reqwest_dav::re_exports::reqwest;
 use reqwest_dav::types::list_cmd::{ListEntity, ListFile, ListFolder};
 use reqwest_dav::{Auth, Client, ClientBuilder, Depth};
 
@@ -12,6 +14,10 @@ use crate::runtime::block_on;
 use super::{
     ResourceAccess, ResourceEntry, ResourceKind, ResourceStat, ResourceStream,
 };
+
+/// Default connect / overall request deadlines for Remote library I/O.
+pub const WEBDAV_CONNECT_TIMEOUT: Duration = Duration::from_secs(15);
+pub const WEBDAV_REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// WebDAV adapter. Location keys are absolute http(s) URLs under the library root.
 pub struct WebDavResourceAccess {
@@ -32,7 +38,13 @@ impl WebDavResourceAccess {
         if root_url.is_empty() {
             return Err(HentaiError::validation("WebDAV 根 URL 不能为空"));
         }
+        let agent = reqwest::Client::builder()
+            .connect_timeout(WEBDAV_CONNECT_TIMEOUT)
+            .timeout(WEBDAV_REQUEST_TIMEOUT)
+            .build()
+            .map_err(|e| HentaiError::remote_unreachable(format!("创建 WebDAV 客户端失败: {e}")))?;
         let client = ClientBuilder::new()
+            .set_agent(agent)
             .set_host(root_url.clone())
             .set_auth(Auth::Basic(username.to_string(), password.to_string()))
             .build()
@@ -223,6 +235,12 @@ fn map_dav_error(err: &reqwest_dav::Error) -> HentaiError {
         || lower.contains("handshake")
     {
         return HentaiError::remote_tls_failed(format!("WebDAV TLS 失败: {msg}"));
+    }
+    if lower.contains("timed out")
+        || lower.contains("timeout")
+        || lower.contains("deadline")
+    {
+        return HentaiError::timed_out(format!("WebDAV 超时: {msg}"));
     }
     HentaiError::remote_unreachable(format!("WebDAV 不可达: {msg}"))
 }

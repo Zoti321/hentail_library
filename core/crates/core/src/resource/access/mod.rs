@@ -3,6 +3,7 @@
 //! Local uses the filesystem; tests inject [FakeResourceAccess]. Remote
 //! uses [WebDavResourceAccess] (`reqwest_dav` + Basic).
 
+mod deadline;
 mod fake;
 mod local;
 mod webdav;
@@ -35,7 +36,7 @@ pub struct ResourceStat {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResourceEntry {
     pub name: String,
-    /// Full location key (local path string today; WebDAV URL later).
+    /// Full location key: local filesystem path, or absolute WebDAV URL under a Remote root.
     pub location: String,
     pub kind: ResourceKind,
 }

@@ -33,6 +33,9 @@ Future<PagedComicResultDto> fetchComicsPageFrb({
 Future<ComicDto?> findComicByIdFrb({required String comicId}) =>
     RustLib.instance.api.crateApiComicFindComicByIdFrb(comicId: comicId);
 
+Future<List<ComicDto>> findComicsByIdsFrb({required List<String> comicIds}) =>
+    RustLib.instance.api.crateApiComicFindComicsByIdsFrb(comicIds: comicIds);
+
 Future<List<ComicDto>> searchByKeywordFrb({required String keyword}) =>
     RustLib.instance.api.crateApiComicSearchByKeywordFrb(keyword: keyword);
 

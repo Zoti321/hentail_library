@@ -6,13 +6,15 @@ Accepted
 
 ## Context
 
-当前日志能力分裂且覆盖不足：
+决策前日志能力分裂且覆盖不足：
 
-- **Dart**：`app/lib/core/logging/log_manager.dart` 基于 Talker 单例；约 12 处仅在错误路径调用 `LogManager.instance.handle`；`main.dart`、`frb_zone_guard.dart` 等处仍用 `debugPrint` 旁路。`LogFileWriter` 监听 Talker stream 写 `logs/app_log.txt`（5MB 轮转）。
-- **Rust**：`core/` 无日志框架；错误经 `thiserror` + `Result<HentaiError>` 返回，Dart FRB 层映射。scan、reader、DB 内部行为在开发期不可见。
-- **FRB 迁移**（ADR-0002）持续推进，双栈可观测性缺口会随 Rust 代码量扩大。
+- **Dart**：曾用 Talker 单例（`LogManager`）；约 12 处仅在错误路径调用 `handle`；`main.dart`、`frb_zone_guard.dart` 等处仍用 `debugPrint` 旁路。`LogFileWriter` 曾监听 Talker stream 写 `logs/app_log.txt`（5MB 轮转）。
+- **Rust**：当时 `core/` 无日志框架；错误经 `thiserror` + `Result<HentaiError>` 返回，Dart FRB 层映射。scan、reader、DB 内部行为在开发期不可见。
+- **FRB 迁移**（ADR-0002）推进中，双栈可观测性缺口会随 Rust 代码量扩大。
 
-Phase 1 目标为**开发可观测性**；用户侧日志导出、设置页开关等生产诊断能力留待后续阶段。
+Phase 1 目标为**开发可观测性**。用户侧日志导出、设置页诊断开关等生产能力见后续 [ADR-0004](./0004-production-diagnostics.md)。
+
+**落地现状**：Decision 中 Dart `package:logging`（`app/lib/core/logging/`）与 Rust `tracing`（stderr + `configure_rust_log_frb` 文件 sink）已实现；Talker 已移除。下文 Decision 保留当时选型原文。
 
 ## Decision
 

@@ -93,10 +93,11 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
       state = AsyncData<HistoryPagedFeedState>(
         merged.copyWith(isLoadingMore: false),
       );
-    } catch (_) {
+    } catch (error, stackTrace) {
       if (generation != _fetchGeneration) {
         return;
       }
+      logError(AppLog.ui('history'), '加载更多阅读历史失败', error, stackTrace);
       final HistoryPagedFeedState? latest = state.asData?.value;
       if (latest != null) {
         state = AsyncData<HistoryPagedFeedState>(

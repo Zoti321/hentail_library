@@ -12,7 +12,10 @@
       "android-arm": "pdfium-android-arm.tgz",
       "android-arm64": "pdfium-android-arm64.tgz",
       "android-x86": "pdfium-android-x86.tgz",
-      "android-x64": "pdfium-android-x64.tgz"
+      "android-x64": "pdfium-android-x64.tgz",
+      "ios-device-arm64": "pdfium-ios-device-arm64.tgz",
+      "ios-simulator-arm64": "pdfium-ios-simulator-arm64.tgz",
+      "ios-simulator-x64": "pdfium-ios-simulator-x64.tgz"
     }
   },
   "unrar": {

@@ -1,30 +1,30 @@
 # UI Style & Responsive Design
 
-How agents should build UI in this project: reuse custom components, follow the desktop design language, and move toward a single responsive layout instead of platform-specific pages.
+How agents should build UI in this project: reuse custom components, follow the desktop design language, and keep a **single responsive** layout (viewport width), not platform-specific page trees.
 
 ## Current state vs target
 
-| Aspect | Today | Target |
-|--------|-------|--------|
-| Layout | Desktop and mobile use **separate** page trees and routers | **One responsive** UI that adapts to viewport width |
-| Theme | Desktop: custom Fluent-inspired theme (`buildAppTheme`) | **Desktop theme everywhere** |
-| Theme | Mobile: stock Material 3 from seed (`buildMobileMaterialTheme`) | Retire mobile Material look |
-| Routing | `isDesktop ? desktopRouter : mobileRouter` | Single router; layout adapts inside shared pages |
-| Pages | `lib/ui/features/**/views/desktop/` vs `views/mobile/` | Shared views under `views/` (or desktop widgets reused responsively) |
+| Aspect | Today | Remaining target |
+|--------|-------|------------------|
+| Layout | **One** responsive shell (`ResponsiveAppShell`) via `AppLayoutBreakpoints` | Compact density / placement polish where still awkward |
+| Theme | `buildAppTheme` everywhere (`app.dart`) | Keep desktop Fluent-inspired look on all widths |
+| Routing | Single `appRouter` | — |
+| Pages | Shared views under `views/` (no `desktop/` / `mobile/` trees) | Replace residual stock Material controls when touching a screen |
 
-**Rule for new work:** Do not add new mobile-only Material pages. Build with desktop custom components and responsive layout. When touching mobile pages, prefer converging them toward the desktop look.
+**Rule for new work:** Do not add new mobile-only Material pages or resurrect `views/mobile/`. Build with desktop custom components and responsive layout. When editing a screen, prefer converging leftover Material widgets toward the catalog below.
 
-Platform switch today lives in:
+Shell / theme entry points:
 
-- `lib/ui/features/shell/views/app.dart` — theme selection
-- `lib/ui/features/shell/views/routing/app_router.dart` — router selection
-- `lib/core/util/utils.dart` — `isDesktop` (Windows / macOS / Linux; not web)
+- `app/lib/ui/features/shell/views/app.dart` — `buildAppTheme` (light/dark)
+- `app/lib/ui/features/shell/views/routing/app_router.dart` — single `appRouter` + `ResponsiveAppShell`
+- `app/lib/ui/core/layout/app_layout_breakpoints.dart` — compact / medium / expanded
+- `app/lib/core/util/utils.dart` — `isDesktop` for **window chrome only** (Windows / macOS / Linux; not web); do not fork page trees on it
 
 ---
 
 ## Design language (desktop = source of truth)
 
-Desktop UI is a **custom, Fluent-inspired** surface — not stock Material. Extracted from `lib/ui/core/theme/`.
+Desktop UI is a **custom, Fluent-inspired** surface — not stock Material. Extracted from `app/lib/ui/core/theme/`.
 
 ### Overall feel
 
@@ -135,7 +135,7 @@ CatalogCoverCardShell
 
 ## Component catalog
 
-**Prefer these over raw Material widgets** when building or extending UI. All live under `lib/ui/core/widgets/`.
+**Prefer these over raw Material widgets** when building or extending UI. All live under `app/lib/ui/core/widgets/`.
 
 | Category | Path | Examples |
 |----------|------|----------|
@@ -152,9 +152,8 @@ CatalogCoverCardShell
 
 Theme entry points:
 
-- `lib/ui/core/theme/theme.dart` — `buildAppTheme`, `HentaiColorScheme`, extensions
-- `lib/ui/core/theme/theme_layout_tokens.dart` — `AppThemeTokens`, `context.tokens`
-- `lib/ui/core/theme/mobile_material_theme.dart` — **legacy mobile only; do not extend**
+- `app/lib/ui/core/theme/theme.dart` — `buildAppTheme`, `HentaiColorScheme`, extensions
+- `app/lib/ui/core/theme/theme_layout_tokens.dart` — `AppThemeTokens`, `context.tokens`
 
 ---
 
@@ -162,45 +161,48 @@ Theme entry points:
 
 ### Existing helpers
 
+- **`AppLayoutBreakpoints`** — canonical widths: compact `< 600`, medium `600–1024`, expanded `≥ 1024` (`app/lib/ui/core/layout/app_layout_breakpoints.dart`).
+- **`ResponsiveAppShell`** — compact drawer / medium collapsed sidebar / expanded sidebar; wraps all app routes.
 - **`DetailResponsiveLayout`** — centers detail content at 80% of parent, clamped width 980–1320, height 560–920. Use for comic/series detail bodies.
 - **`LibraryBlocksSliverGroup`** — standard library page sliver composition (series block + comics block).
-- **`LayoutBuilder` + `MediaQuery`** — preferred for new breakpoints; do not add new `isDesktop` page forks.
+- **`LayoutBuilder` + `MediaQuery`** — prefer for local density; do not add new `isDesktop` page forks.
 
-### Suggested breakpoints (not yet codified in code — follow when implementing responsive work)
+### Breakpoints (codified)
 
 | Width | Layout direction |
 |-------|------------------|
-| `< 600` | Single column; bottom or compact nav; full-width cards |
-| `600 – 1024` | Reduced sidebar or drawer; 2-column grids |
-| `≥ 1024` | Sidebar + main content (current desktop shell) |
+| `< 600` | Compact: drawer nav, single column, full-width surfaces |
+| `600 – 1024` | Medium: collapsed sidebar rail; denser grids |
+| `≥ 1024` | Expanded: full `DesktopSidebar` + main content |
 
 When narrowing: keep **desktop visual style** (colors, borders, GhostButton, custom cards) — only change **density and placement**, not Material defaults.
 
-### Navigation migration notes
+### Navigation
 
-- Desktop: `DesktopSidebar` + `AppTitleBar`
-- Mobile (legacy): `NavigationBar` + `AppBar` + Material `Icons` — replace with responsive shell using sidebar drawer or bottom bar styled with `HentaiColorScheme`
+- Expanded / medium: `DesktopSidebar` + `AppTitleBar` (rail vs full labels via shell).
+- Compact: same sidebar content in a **drawer** opened from the shell / page menu — do **not** add a separate Material `NavigationBar` stack or new Material-only nav chrome.
+- Icons: `LucideIcons` in shell and new UI; avoid Material `Icons.*`.
 
 ---
 
 ## Anti-patterns
 
-- Adding `Card` + `ListTile` + `OutlineInputBorder` pages (current mobile library pattern) in new code
+- Adding `Card` + `ListTile` + `OutlineInputBorder` pages in new code
 - Using `Color(0xFF…)` in widgets when `cs.hentai.*` or `colorScheme.*` exists
-- Creating `views/mobile/` duplicates instead of making desktop widgets responsive
+- Creating `views/mobile/` (or any platform page tree) instead of making shared widgets responsive
 - `SnackBar` on desktop — use `showCustomToast`
 - Material `Icons` in desktop-target UI — use `LucideIcons`
 - Stock `AlertDialog` for new flows — use `HentaiDialog` or confirm dialogs in `overlays/dialog/confirm/`
+- Reintroducing `mobileRouter` / a second theme for “phone only”
 
 ---
 
-## File layout convention (during migration)
+## File layout convention
 
 ```
-lib/ui/features/<feature>/views/
-  desktop/          # current primary implementation — design reference
-  mobile/           # legacy Material implementations — converge away
-lib/ui/core/widgets/  # shared custom components — extend here first
+app/lib/ui/features/<feature>/views/   # shared screens (no desktop/ vs mobile/ split)
+app/lib/ui/core/widgets/               # shared custom components — extend here first
+app/lib/ui/core/layout/                # breakpoints / layout primitives
 ```
 
-New shared screens: place widgets in `core/widgets` if cross-feature; keep feature-specific composition in `views/` without a `desktop/` / `mobile/` split when possible.
+New shared screens: place widgets in `core/widgets` if cross-feature; keep feature-specific composition under `views/` without a `desktop/` / `mobile/` split.

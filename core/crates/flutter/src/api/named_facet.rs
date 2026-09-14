@@ -59,39 +59,38 @@ pub fn list_all_named_facet_names_frb(
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn fetch_named_facet_page_frb(
+#[flutter_rust_bridge::frb]
+pub async fn fetch_named_facet_page_frb(
     facet: JunctionNamedFacetFrb,
     request: PageRequestDto,
 ) -> Result<NamedFacetPagedNamesDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(async {
-        let total = count_all_named_facet_names(facet.into()).await?;
-        let page_size = request.page_size.max(1);
-        if total <= 0 {
-            return Ok::<NamedFacetPagedNamesDto, hentai_core::HentaiError>(
-                NamedFacetPagedNamesDto {
-                    items: vec![],
-                    total_count: 0,
-                    page: 1,
-                    page_size,
-                },
-            );
-        }
-        let total_pages = (total + page_size as i64 - 1) / page_size as i64;
-        let mut page = request.page.max(1);
-        if page as i64 > total_pages {
-            page = total_pages as i32;
-        }
-        let offset = (page - 1) * page_size;
-        let items = fetch_named_facet_page(facet.into(), page_size, offset).await?;
-        Ok(NamedFacetPagedNamesDto {
-            items,
-            total_count: total,
-            page,
+    let total = count_all_named_facet_names(facet.into())
+        .await
+        .map_err(HentaiErrorDto::from)?;
+    let page_size = request.page_size.max(1);
+    if total <= 0 {
+        return Ok(NamedFacetPagedNamesDto {
+            items: vec![],
+            total_count: 0,
+            page: 1,
             page_size,
-        })
+        });
+    }
+    let total_pages = (total + page_size as i64 - 1) / page_size as i64;
+    let mut page = request.page.max(1);
+    if page as i64 > total_pages {
+        page = total_pages as i32;
+    }
+    let offset = (page - 1) * page_size;
+    let items = fetch_named_facet_page(facet.into(), page_size, offset)
+        .await
+        .map_err(HentaiErrorDto::from)?;
+    Ok(NamedFacetPagedNamesDto {
+        items,
+        total_count: total,
+        page,
+        page_size,
     })
-    .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]
@@ -132,11 +131,12 @@ pub fn count_named_facet_attachments_frb(
 }
 
 /// Comic metadata form candidates sorted by attachment count DESC, name ASC.
-#[flutter_rust_bridge::frb(sync)]
-pub fn list_named_facet_for_form_frb(
+#[flutter_rust_bridge::frb]
+pub async fn list_named_facet_for_form_frb(
     facet: JunctionNamedFacetFrb,
 ) -> Result<Vec<NamedFacetFormEntryFrbDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(list_named_facet_for_form(facet.into()))
+    list_named_facet_for_form(facet.into())
+        .await
         .map(|rows| {
             rows.into_iter()
                 .map(NamedFacetFormEntryFrbDto::from)

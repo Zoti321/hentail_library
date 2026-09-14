@@ -74,6 +74,18 @@ class ComicRepositoryImpl implements ComicRepository {
   }
 
   @override
+  Future<List<Comic>> findByIds(List<String> comicIds) async {
+    if (comicIds.isEmpty) {
+      return const <Comic>[];
+    }
+    final List<rust.ComicDto> rows = await guardFrb(
+      () => rust.findComicsByIdsFrb(comicIds: comicIds),
+      fallbackMessage: '批量读取漫画失败',
+    );
+    return rows.map(mapRustComic).toList();
+  }
+
+  @override
   Future<void> deleteByIds(List<String> comicIds) async {
     guardFrbSync(
       () => rust.deleteComicsByIdsFrb(comicIds: comicIds),

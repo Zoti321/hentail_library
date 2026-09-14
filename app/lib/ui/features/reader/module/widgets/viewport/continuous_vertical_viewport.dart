@@ -7,6 +7,7 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_prefetch_hook.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_constants.dart';
+import 'package:hentai_library/ui/features/reader/module/widgets/viewport/reader_viewport_pages.dart';
 import 'package:hentai_library/ui/features/reader/module/widgets/viewport/resume_visible_sync_gate.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
 import 'package:hentai_library/ui/features/reader/module/session/reader_session_bindings.dart';
@@ -52,12 +53,13 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
       return const SizedBox.expand();
     }
 
-    final images = ref
-        .watch(comicImagesProvider(comicId: comicId))
-        .asData
-        ?.value;
-    final List<ReaderPageImageData> imageList =
-        images ?? const <ReaderPageImageData>[];
+    final ReaderViewportPages resolvedPages = resolveReaderViewportPages(
+      ref.watch(comicImagesProvider(comicId: comicId)),
+    );
+    final List<ReaderPageImageData> imageList = switch (resolvedPages) {
+      ReaderViewportPagesReady(:final List<ReaderPageImageData> pages) => pages,
+      _ => const <ReaderPageImageData>[],
+    };
 
     final ReaderController controller = ref.read(
       readerControllerProvider(viewKey).notifier,
@@ -289,6 +291,9 @@ class ContinuousVerticalViewport extends HookConsumerWidget {
               child: pageList,
             ),
           );
+    if (resolvedPages is! ReaderViewportPagesReady) {
+      return ReaderViewportPagesFeedback(pages: resolvedPages);
+    }
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
       child: viewport,

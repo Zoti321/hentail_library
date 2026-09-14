@@ -16,7 +16,7 @@ List<String> listAllNamedFacetNamesFrb({
   facet: facet,
 );
 
-NamedFacetPagedNamesDto fetchNamedFacetPageFrb({
+Future<NamedFacetPagedNamesDto> fetchNamedFacetPageFrb({
   required JunctionNamedFacetFrb facet,
   required PageRequestDto request,
 }) => RustLib.instance.api.crateApiNamedFacetFetchNamedFacetPageFrb(
@@ -59,7 +59,7 @@ PlatformInt64 countNamedFacetAttachmentsFrb({
 );
 
 /// Comic metadata form candidates sorted by attachment count DESC, name ASC.
-List<NamedFacetFormEntryFrbDto> listNamedFacetForFormFrb({
+Future<List<NamedFacetFormEntryFrbDto>> listNamedFacetForFormFrb({
   required JunctionNamedFacetFrb facet,
 }) => RustLib.instance.api.crateApiNamedFacetListNamedFacetForFormFrb(
   facet: facet,

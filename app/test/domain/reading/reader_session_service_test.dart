@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
@@ -110,12 +111,19 @@ class _FakeComicPageSourcePort implements ComicPageSourcePort {
 }
 
 class _FakeReaderSessionPort implements ReaderSessionPort {
+  _FakeReaderSessionPort({this.openHang});
+
+  final Future<void>? openHang;
   final List<String> openedComicIds = <String>[];
   final List<String> closedComicIds = <String>[];
 
   @override
   Future<void> openComic(Comic comic) async {
     openedComicIds.add(comic.comicId);
+    final Future<void>? hang = openHang;
+    if (hang != null) {
+      await hang;
+    }
   }
 
   @override
@@ -243,6 +251,68 @@ void main() {
       expect(
         () => service.open(comicId: 'c1'),
         throwsA(isA<ReadSessionPageLoadException>()),
+      );
+    });
+
+    test('open times out when Resource access hang never completes', () async {
+      final _FakeReaderSessionPort sessionPort = _FakeReaderSessionPort(
+        openHang: Completer<void>().future,
+      );
+      final ReaderSessionService service = ReaderSessionService(
+        comicRepo: _FakeComicRepository(comic: _inputComic()),
+        pageSource: _FakeComicPageSourcePort(
+          pages: <ReadSessionPage>[
+            ReadSessionArchivePage(comicId: 'c1', pageIndex: 0),
+          ],
+        ),
+        readingHistoryRepo: _FakeReadingHistoryRepository(),
+        sessionPort: sessionPort,
+        openTimeout: const Duration(milliseconds: 40),
+      );
+
+      await expectLater(
+        service.open(comicId: 'c1'),
+        throwsA(
+          isA<ReadSessionPageLoadException>().having(
+            (ReadSessionPageLoadException e) => e.kind,
+            'kind',
+            ReadSessionFailureKind.timedOut,
+          ),
+        ),
+      );
+      expect(sessionPort.closedComicIds, <String>['c1']);
+    });
+
+    test('open classifies empty pages as invalidOrEmptyContent', () async {
+      final ReaderSessionService service = _service(pages: <ReadSessionPage>[]);
+      await expectLater(
+        service.open(comicId: 'c1'),
+        throwsA(
+          isA<ReadSessionPageLoadException>().having(
+            (ReadSessionPageLoadException e) => e.kind,
+            'kind',
+            ReadSessionFailureKind.invalidOrEmptyContent,
+          ),
+        ),
+      );
+    });
+
+    test('open classifies missing comic as resourceNotFound', () async {
+      final ReaderSessionService service = ReaderSessionService(
+        comicRepo: _FakeComicRepository(comic: null),
+        pageSource: _FakeComicPageSourcePort(pages: <ReadSessionPage>[]),
+        readingHistoryRepo: _FakeReadingHistoryRepository(),
+        sessionPort: _FakeReaderSessionPort(),
+      );
+      await expectLater(
+        service.open(comicId: 'missing'),
+        throwsA(
+          isA<ReadSessionPageLoadException>().having(
+            (ReadSessionPageLoadException e) => e.kind,
+            'kind',
+            ReadSessionFailureKind.resourceNotFound,
+          ),
+        ),
       );
     });
 

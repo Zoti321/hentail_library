@@ -60,22 +60,24 @@ pub fn record_reading_frb(history: ReadingHistoryDto) -> Result<(), HentaiErrorD
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn get_reading_by_comic_id_frb(
+#[flutter_rust_bridge::frb]
+pub async fn get_reading_by_comic_id_frb(
     comic_id: String,
 ) -> Result<Option<ReadingHistoryDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_get_reading(&comic_id))
+    core_get_reading(&comic_id)
+        .await
         .map(|opt| opt.map(ReadingHistoryDto::from))
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn fetch_reading_page_frb(
+#[flutter_rust_bridge::frb]
+pub async fn fetch_reading_page_frb(
     page: i32,
     page_size: i32,
     keyword: Option<String>,
 ) -> Result<PagedReadingHistoryDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_fetch_reading_page(page, page_size, keyword))
+    core_fetch_reading_page(page, page_size, keyword)
+        .await
         .map(PagedReadingHistoryDto::from)
         .map_err(HentaiErrorDto::from)
 }

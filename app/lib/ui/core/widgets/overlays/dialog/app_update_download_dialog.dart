@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/core/util/open_downloaded_file.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/models/app_release_info.dart';
@@ -67,13 +68,15 @@ class AppUpdateDownloadDialog extends HookConsumerWidget {
         }
         Navigator.of(context).pop();
         await openDownloadedUpdateFile(savedPath);
-      } on DioException catch (error) {
+      } on DioException catch (error, stackTrace) {
         if (CancelToken.isCancel(error)) {
           return;
         }
+        logError(AppLog.ui('appUpdate'), '下载更新失败', error, stackTrace);
         hasFailed.value = true;
         isDownloading.value = false;
-      } catch (_) {
+      } catch (error, stackTrace) {
+        logError(AppLog.ui('appUpdate'), '下载更新失败', error, stackTrace);
         hasFailed.value = true;
         isDownloading.value = false;
       } finally {

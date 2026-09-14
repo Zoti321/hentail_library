@@ -14,7 +14,7 @@ What this app is, what it is not, and which comic resource formats are in scope.
 | Browse, search, filter within the Current library; Reading history global | Yes |
 | Read comics in-app (paged / scroll layouts) | Yes |
 | Manage metadata, series order, reading history | Yes |
-| Cross-platform desktop + mobile | Yes (UI converging to responsive desktop style) |
+| Cross-platform desktop + mobile | Yes (responsive desktop-style UI) |
 | Official cloud sync, accounts, storefront | No |
 | WebDAV backup of settings/DB (separate future issue) | Not in current WebDAV library-source work |
 | General-purpose ebook library (novels, textbooks) | No — comic-first |
@@ -26,7 +26,7 @@ Domain vocabulary (Library, Library root, Comic, Library sync, …) lives in **`
 | Platform | Status |
 |----------|--------|
 | Windows / macOS / Linux | Primary today (`isDesktop`) |
-| Android / iOS | Supported; legacy Material UI, migrating to responsive desktop-style UI |
+| Android / iOS | Supported; shared responsive shell (desktop visual language); remaining work is component-level polish |
 | Web | Not a current target (`isDesktop` treats web as non-desktop) |
 
 **Local libraries** remain offline-first after scan. **Remote (WebDAV) libraries** require network for reading and sync; generated thumbnails may be cached locally as derived data. Prefer HTTPS; users may explicitly allow HTTP for LAN NAS.
@@ -47,9 +47,9 @@ A **Resource** is a file or directory (local) or WebDAV file (remote) that can b
 | 7z archive | `.7z` | Comic archive | Supported | Supported |
 | CB7 | `.cb7` | Comic archive | Supported | Supported |
 | EPUB | `.epub` | Structured ebook | Supported | Supported |
-| PDF | `.pdf` | Document | Supported* | Supported* |
+| PDF | `.pdf` | Document | Supported | Supported |
 
-\* PDF: desktop + Android via pdfium; iOS still stub (local and remote).
+PDF is served by vendored **pdfium** across all platforms — desktop, Android, and **iOS** (device + simulator). See ADR-0015.
 
 “Comic archive” means a compressed file whose readable pages are **images**. Archives are not opaque blobs — the app extracts or streams page images for the reader.
 
@@ -62,9 +62,9 @@ A **Resource** is a file or directory (local) or WebDAV file (remote) that can b
 | `epub` | Yes | Yes | |
 | `cbr` / `rar` | Yes | Yes | `unrar-ng` |
 | `cb7` / `sevenz` | Yes | Yes | |
-| `pdf` | Yes* | Yes* | iOS stub |
+| `pdf` | Yes | Yes | pdfium on all platforms incl. iOS (ADR-0015) |
 
-**Planned:** Multi-Library + WebDAV Remote library (see ADR-0008); PDF on iOS. Core scan/read/DB live in Rust (`core/`) via FRB; see `docs/agents/rust-migration.md` and ADR-0002.
+Multi-Library and WebDAV remote libraries are in scope and implemented (ADR-0008). Core scan/read/DB live in Rust (`core/`) via FRB; see `docs/agents/rust-migration.md` and ADR-0002.
 
 ### Out of scope (unless explicitly requested)
 

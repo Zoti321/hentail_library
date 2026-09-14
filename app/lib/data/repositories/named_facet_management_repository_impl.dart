@@ -23,7 +23,7 @@ class NamedFacetManagementRepositoryImpl
     ManagedNamedFacetKind kind,
     PageRequest request,
   ) async {
-    final rust_named_facet.NamedFacetPagedNamesDto page = guardFrbSync(
+    final rust_named_facet.NamedFacetPagedNamesDto page = await guardFrb(
       () => rust_named_facet.fetchNamedFacetPageFrb(
         facet: kind.toFrb(),
         request: rust_comic.PageRequestDto(

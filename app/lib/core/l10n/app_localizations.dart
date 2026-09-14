@@ -2258,6 +2258,54 @@ abstract class AppLocalizations {
   /// **'暂无图片'**
   String get readerNoImages;
 
+  /// No description provided for @readerOpenResourceNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'找不到漫画资源。文件可能已被移动或删除，或路径已失效。'**
+  String get readerOpenResourceNotFound;
+
+  /// No description provided for @readerOpenRemoteUnreachable.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法连接远程书库。请检查网络与服务器地址。'**
+  String get readerOpenRemoteUnreachable;
+
+  /// No description provided for @readerOpenRemoteAuthFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'远程书库认证失败。请检查用户名与密码。'**
+  String get readerOpenRemoteAuthFailed;
+
+  /// No description provided for @readerOpenTimedOut.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开超时。资源所在位置可能不可达或响应过慢。'**
+  String get readerOpenTimedOut;
+
+  /// No description provided for @readerOpenInvalidContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'漫画内容无效或没有可阅读的页面。'**
+  String get readerOpenInvalidContent;
+
+  /// No description provided for @readerOpenLoadFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开阅读失败。'**
+  String get readerOpenLoadFailed;
+
+  /// No description provided for @readerOpenBackToDetail.
+  ///
+  /// In zh, this message translates to:
+  /// **'返回详情'**
+  String get readerOpenBackToDetail;
+
+  /// No description provided for @readerViewportPagesFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法加载页面列表。'**
+  String get readerViewportPagesFailed;
+
   /// No description provided for @metadataTabAuthors.
   ///
   /// In zh, this message translates to:

@@ -42,7 +42,55 @@ void main() {
               (ReadSessionPageLoadException e) => e.cause,
               'cause',
               same(error),
+            )
+            .having(
+              (ReadSessionPageLoadException e) => e.kind,
+              'kind',
+              ReadSessionFailureKind.loadFailed,
             ),
+      ),
+    );
+  });
+
+  test('mapReaderErrorKind covers resource and remote categories', () {
+    expect(
+      mapReaderErrorKind('ReaderNotFound'),
+      ReadSessionFailureKind.resourceNotFound,
+    );
+    expect(
+      mapReaderErrorKind('RemoteUnreachable'),
+      ReadSessionFailureKind.remoteUnreachable,
+    );
+    expect(
+      mapReaderErrorKind('RemoteTlsFailed'),
+      ReadSessionFailureKind.remoteUnreachable,
+    );
+    expect(
+      mapReaderErrorKind('RemoteAuthFailed'),
+      ReadSessionFailureKind.remoteAuthFailed,
+    );
+    expect(mapReaderErrorKind('TimedOut'), ReadSessionFailureKind.timedOut);
+    expect(
+      mapReaderErrorKind('ReaderInvalidContent'),
+      ReadSessionFailureKind.invalidOrEmptyContent,
+    );
+  });
+
+  test('throwReaderException maps TimedOut code to timedOut kind', () {
+    const HentaiErrorDto error = HentaiErrorDto(
+      code: 'TimedOut',
+      message: 'deadline exceeded',
+      context: null,
+    );
+
+    expect(
+      () => throwReaderException(error, comicId: 'c1', path: '/tmp/a.cbz'),
+      throwsA(
+        isA<ReadSessionPageLoadException>().having(
+          (ReadSessionPageLoadException e) => e.kind,
+          'kind',
+          ReadSessionFailureKind.timedOut,
+        ),
       ),
     );
   });

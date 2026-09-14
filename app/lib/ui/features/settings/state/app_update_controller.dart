@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:hentai_library/core/constants/app_update_constants.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/core/util/app_root_navigator.dart';
 import 'package:hentai_library/core/util/semver_utils.dart';
 import 'package:hentai_library/domain/models/app_release_info.dart';
@@ -71,8 +72,9 @@ class AppUpdateController extends _$AppUpdateController {
         await _showUpdateDialogForContext(latestRelease, uiContext);
       }
       return AppUpdateCheckOutcome.updateAvailable;
-    } catch (_) {
+    } catch (error, stackTrace) {
       if (showFeedbackToasts) {
+        logError(AppLog.ui('appUpdate'), '检查更新失败', error, stackTrace);
         _showFeedbackToast(
           uiContext,
           (AppLocalizations l10n) => l10n.settingsUpdateCheckFailed,

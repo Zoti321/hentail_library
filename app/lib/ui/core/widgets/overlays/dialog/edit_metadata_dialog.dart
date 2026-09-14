@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
@@ -227,7 +228,8 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
           characters: characters,
         );
       });
-    } catch (_) {
+    } catch (error, stackTrace) {
+      logError(AppLog.ui('editMetadata'), '设置元数据字段锁失败', error, stackTrace);
       if (mounted) {
         showCustomToast(
           context,
@@ -297,7 +299,8 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
         showSuccessToast(context, context.l10n.commonSavedToast);
         Navigator.of(context).pop();
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      logError(AppLog.ui('editMetadata'), '保存漫画元数据失败', error, stackTrace);
       if (mounted) {
         showCustomToast(
           context,

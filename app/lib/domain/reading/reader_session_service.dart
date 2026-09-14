@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
@@ -20,15 +21,21 @@ class ReaderSessionService {
     required ComicPageSourcePort pageSource,
     required ReadingHistoryRepository readingHistoryRepo,
     required ReaderSessionPort sessionPort,
+    Duration openTimeout = defaultOpenTimeout,
   }) : _comicRepo = comicRepo,
        _pageSource = pageSource,
        _readingHistoryRepo = readingHistoryRepo,
-       _sessionPort = sessionPort;
+       _sessionPort = sessionPort,
+       _openTimeout = openTimeout;
+
+  /// Resource access / reader open 的默认有界时限（Local + Remote）。
+  static const Duration defaultOpenTimeout = Duration(seconds: 30);
 
   final ComicRepository _comicRepo;
   final ComicPageSourcePort _pageSource;
   final ReadingHistoryRepository _readingHistoryRepo;
   final ReaderSessionPort _sessionPort;
+  final Duration _openTimeout;
   final Map<String, ({Comic comic, List<ReadSessionPage> pages})> _openedPages =
       <String, ({Comic comic, List<ReadSessionPage> pages})>{};
 
@@ -149,30 +156,51 @@ class ReaderSessionService {
     if (comic == null) {
       throw ReadSessionPageLoadException.comicNotFound(comicId);
     }
-    await _sessionPort.openComic(comic);
     try {
-      final List<ReadSessionPage> pages = await _pageSource.loadPages(comic);
-      if (pages.isEmpty) {
-        throw ReadSessionPageLoadException.emptyPages(
-          comicId: comic.comicId,
-          path: comic.path,
-        );
-      }
-      final ({Comic comic, List<ReadSessionPage> pages}) opened = (
-        comic: comic,
-        pages: List<ReadSessionPage>.unmodifiable(pages),
-      );
+      final ({Comic comic, List<ReadSessionPage> pages}) opened =
+          await _openPagesUncached(comic).timeout(_openTimeout);
       _openedPages[comicId] = opened;
       return opened;
+    } on TimeoutException {
+      await _bestEffortClose(comic.comicId);
+      throw ReadSessionPageLoadException.timedOut(
+        comicId: comic.comicId,
+        path: comic.path,
+      );
     } on ReadSessionPageLoadException {
+      await _bestEffortClose(comic.comicId);
       rethrow;
     } on Object catch (error, stackTrace) {
+      await _bestEffortClose(comic.comicId);
       throw ReadSessionPageLoadException.loadFailed(
         comicId: comic.comicId,
         path: comic.path,
         cause: error,
         stackTrace: stackTrace,
       );
+    }
+  }
+
+  Future<({Comic comic, List<ReadSessionPage> pages})> _openPagesUncached(
+    Comic comic,
+  ) async {
+    await _sessionPort.openComic(comic);
+    final List<ReadSessionPage> pages = await _pageSource.loadPages(comic);
+    if (pages.isEmpty) {
+      throw ReadSessionPageLoadException.emptyPages(
+        comicId: comic.comicId,
+        path: comic.path,
+      );
+    }
+    return (comic: comic, pages: List<ReadSessionPage>.unmodifiable(pages));
+  }
+
+  Future<void> _bestEffortClose(String comicId) async {
+    _openedPages.remove(comicId);
+    try {
+      await _sessionPort.closeComic(comicId);
+    } on Object {
+      // Open failure cleanup must not mask the original error.
     }
   }
 }

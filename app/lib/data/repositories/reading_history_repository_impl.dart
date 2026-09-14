@@ -34,7 +34,7 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
 
   @override
   Future<entity.ReadingHistory?> getByComicId(String comicId) async {
-    final rust.ReadingHistoryDto? row = guardFrbSync(
+    final rust.ReadingHistoryDto? row = await guardFrb(
       () => rust.getReadingByComicIdFrb(comicId: comicId),
       fallbackMessage: '读取阅读进度失败',
     );
@@ -58,7 +58,7 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
     String? keyword,
   }) async {
     final String? normalizedKeyword = _normalizeKeyword(keyword);
-    final rust.PagedReadingHistoryDto page = guardFrbSync(
+    final rust.PagedReadingHistoryDto page = await guardFrb(
       () => rust.fetchReadingPageFrb(
         page: request.page,
         pageSize: request.pageSize,
@@ -80,7 +80,7 @@ class ReadingHistoryRepositoryImpl implements ReadingHistoryRepository {
         ? totalPages
         : request.page;
     if (effectivePage != request.page) {
-      final rust.PagedReadingHistoryDto adjusted = guardFrbSync(
+      final rust.PagedReadingHistoryDto adjusted = await guardFrb(
         () => rust.fetchReadingPageFrb(
           page: effectivePage,
           pageSize: request.pageSize,

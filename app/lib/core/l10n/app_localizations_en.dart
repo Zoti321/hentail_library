@@ -1234,6 +1234,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerNoImages => 'No images';
 
   @override
+  String get readerOpenResourceNotFound =>
+      'Comic resource not found. It may have been moved or deleted, or its path is stale.';
+
+  @override
+  String get readerOpenRemoteUnreachable =>
+      'Could not reach the remote library. Check the network and server URL.';
+
+  @override
+  String get readerOpenRemoteAuthFailed =>
+      'Remote library authentication failed. Check the username and password.';
+
+  @override
+  String get readerOpenTimedOut =>
+      'Opening timed out. The resource may be unreachable or too slow to respond.';
+
+  @override
+  String get readerOpenInvalidContent =>
+      'This comic has invalid or empty content.';
+
+  @override
+  String get readerOpenLoadFailed => 'Failed to open the reader.';
+
+  @override
+  String get readerOpenBackToDetail => 'Back to detail';
+
+  @override
+  String get readerViewportPagesFailed => 'Could not load the page list.';
+
+  @override
   String get metadataTabAuthors => 'Authors';
 
   @override

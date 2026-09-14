@@ -15,7 +15,7 @@ function Get-HostPlatformKey {
 function Get-PdfiumLibraryFilter {
     param([string]$PlatformKey)
     if ($PlatformKey -like "windows-*") { return "pdfium.dll" }
-    if ($PlatformKey -like "macos-*") { return "libpdfium.dylib" }
+    if ($PlatformKey -like "macos-*" -or $PlatformKey -like "ios-*") { return "libpdfium.dylib" }
     return "libpdfium.so"
 }
 
@@ -81,12 +81,14 @@ $Platforms = @()
 foreach ($arg in $args) {
     if ($arg -eq "--android") {
         $Platforms += @("android-arm", "android-arm64", "android-x86", "android-x64")
+    } elseif ($arg -eq "--ios") {
+        $Platforms += @("ios-device-arm64", "ios-simulator-arm64", "ios-simulator-x64")
     } elseif ($arg -eq "--host") {
         $Platforms += Get-HostPlatformKey
     } elseif ($arg.StartsWith("--platform=")) {
         $Platforms += ($arg.Substring("--platform=".Length) -split ",") | ForEach-Object { $_.Trim() } | Where-Object { $_ }
     } else {
-        throw "Unknown arg: $arg (supported: --host, --android, --platform=key[,key...])"
+        throw "Unknown arg: $arg (supported: --host, --android, --ios, --platform=key[,key...])"
     }
 }
 

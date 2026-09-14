@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 use crate::error::HentaiError;
 
+use super::deadline::{run_with_deadline, LOCAL_IO_TIMEOUT};
 use super::{
     system_time_to_ms, ResourceAccess, ResourceEntry, ResourceKind, ResourceStat, ResourceStream,
 };
@@ -39,71 +40,95 @@ impl LocalResourceAccess {
 
 impl ResourceAccess for LocalResourceAccess {
     fn list(&self, location: &str) -> Result<Vec<ResourceEntry>, HentaiError> {
-        let dir = Path::new(location);
-        let entries = std::fs::read_dir(dir).map_err(|e| {
-            HentaiError::validation(format!("目录扫描失败: {} ({})", dir.display(), e))
-        })?;
-        let mut out = Vec::new();
-        for entry in entries {
-            let entry = entry.map_err(|e| HentaiError::validation(e.to_string()))?;
-            let path = entry.path();
-            let file_type = entry
-                .file_type()
-                .map_err(|e| HentaiError::validation(e.to_string()))?;
-            let kind = if file_type.is_dir() {
-                ResourceKind::Dir
-            } else if file_type.is_file() {
-                ResourceKind::File
-            } else {
-                continue;
-            };
-            let name = entry.file_name().to_string_lossy().into_owned();
-            out.push(ResourceEntry {
-                name,
-                location: path.to_string_lossy().into_owned(),
-                kind,
-            });
-        }
-        Ok(out)
+        let location = location.to_string();
+        run_with_deadline(LOCAL_IO_TIMEOUT, move || list_unbounded(&location))
     }
 
     fn stat(&self, location: &str) -> Result<Option<ResourceStat>, HentaiError> {
-        let path = Path::new(location);
-        let meta = match std::fs::metadata(path) {
-            Ok(meta) => meta,
-            Err(e) if e.kind() == ErrorKind::NotFound => return Ok(None),
-            Err(e) => {
-                return Err(HentaiError::validation(format!(
-                    "stat 失败: {} ({})",
-                    path.display(),
-                    e
-                )));
-            }
-        };
-        let kind = if meta.is_dir() {
-            ResourceKind::Dir
-        } else if meta.is_file() {
-            ResourceKind::File
-        } else {
-            return Ok(None);
-        };
-        let modified_ms = meta
-            .modified()
-            .ok()
-            .map(system_time_to_ms)
-            .unwrap_or(0);
-        Ok(Some(ResourceStat {
-            kind,
-            size: meta.len(),
-            modified_ms,
-        }))
+        let location = location.to_string();
+        run_with_deadline(LOCAL_IO_TIMEOUT, move || stat_unbounded(&location))
     }
 
     fn open_stream(&self, location: &str) -> Result<ResourceStream, HentaiError> {
-        let path = Path::new(location);
-        let file = File::open(path).map_err(|e| {
-            HentaiError::validation(format!("打开失败: {} ({})", path.display(), e))
-        })?;
-        Ok(Box::new(BufReader::new(file)))
+        let location = location.to_string();
+        run_with_deadline(LOCAL_IO_TIMEOUT, move || open_stream_unbounded(&location))
     }
+}
+
+fn list_unbounded(location: &str) -> Result<Vec<ResourceEntry>, HentaiError> {
+    let dir = Path::new(location);
+    let entries = std::fs::read_dir(dir).map_err(|e| map_local_io_error("目录扫描失败", dir, e))?;
+    let mut out = Vec::new();
+    for entry in entries {
+        let entry = entry.map_err(|e| HentaiError::validation(e.to_string()))?;
+        let path = entry.path();
+        let file_type = entry
+            .file_type()
+            .map_err(|e| HentaiError::validation(e.to_string()))?;
+        let kind = if file_type.is_dir() {
+            ResourceKind::Dir
+        } else if file_type.is_file() {
+            ResourceKind::File
+        } else {
+            continue;
+        };
+        let name = entry.file_name().to_string_lossy().into_owned();
+        out.push(ResourceEntry {
+            name,
+            location: path.to_string_lossy().into_owned(),
+            kind,
+        });
+    }
+    Ok(out)
+}
+
+fn stat_unbounded(location: &str) -> Result<Option<ResourceStat>, HentaiError> {
+    let path = Path::new(location);
+    let meta = match std::fs::metadata(path) {
+        Ok(meta) => meta,
+        Err(e) if e.kind() == ErrorKind::NotFound => return Ok(None),
+        Err(e) => {
+            return Err(map_local_io_error("stat 失败", path, e));
+        }
+    };
+    let kind = if meta.is_dir() {
+        ResourceKind::Dir
+    } else if meta.is_file() {
+        ResourceKind::File
+    } else {
+        return Ok(None);
+    };
+    let modified_ms = meta
+        .modified()
+        .ok()
+        .map(system_time_to_ms)
+        .unwrap_or(0);
+    Ok(Some(ResourceStat {
+        kind,
+        size: meta.len(),
+        modified_ms,
+    }))
+}
+
+fn open_stream_unbounded(location: &str) -> Result<ResourceStream, HentaiError> {
+    let path = Path::new(location);
+    let file = File::open(path).map_err(|e| map_local_io_error("打开失败", path, e))?;
+    Ok(Box::new(BufReader::new(file)))
+}
+
+fn map_local_io_error(prefix: &str, path: &Path, err: std::io::Error) -> HentaiError {
+    let kind = err.kind();
+    if kind == ErrorKind::NotFound {
+        return HentaiError::reader_not_found(path.display().to_string());
+    }
+    if matches!(
+        kind,
+        ErrorKind::TimedOut | ErrorKind::WouldBlock | ErrorKind::Interrupted
+    ) {
+        return HentaiError::timed_out(format!(
+            "{prefix}: {} ({err})",
+            path.display()
+        ));
+    }
+    HentaiError::validation(format!("{prefix}: {} ({err})", path.display()))
 }
