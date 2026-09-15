@@ -37,8 +37,8 @@ fn bind_pdfium() -> Result<Pdfium, HentaiError> {
     }
 }
 
-/// iOS：libpdfium.dylib 以 vendored xcframework 经 CocoaPods 嵌入 App bundle 的
-/// `Frameworks/`（见 `app/rust_builder/ios/hentai_flutter.podspec`）。dlopen 无法可靠地
+/// iOS：libpdfium.dylib 由 `embed_pdfium.sh` 复制到 App bundle 的 `Frameworks/`
+/// （见 `app/ios/Podfile`）。dlopen 无法可靠地
 /// 按 leaf 名解析 @rpath，故优先按可执行文件旁的 bundle 路径绑定，最后回退 leaf 名
 /// （若已随 Runner 链接，dyld 会命中已加载镜像）。
 #[cfg(target_os = "ios")]

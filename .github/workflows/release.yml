@@ -363,12 +363,11 @@ jobs:
           fi
           rustup target list --installed | grep -E 'apple-ios' || true
 
-      - name: Fetch iOS pdfium and build XCFramework
+      - name: Fetch iOS pdfium vendor libraries
         run: |
           set -euo pipefail
           bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh" --ios
-          bash "${GITHUB_WORKSPACE}/core/vendor/build-ios-xcframework.sh"
-          test -d "${GITHUB_WORKSPACE}/app/rust_builder/ios/pdfium.xcframework"
+          test -f "${GITHUB_WORKSPACE}/core/vendor/ios-device-arm64/libpdfium.dylib"
 
       # Phase 2: add ExportOptions.plist and flutter build ipa when secrets are configured.
       - name: Configure iOS release signing

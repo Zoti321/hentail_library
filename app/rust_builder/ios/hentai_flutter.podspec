@@ -23,13 +23,10 @@ A new Flutter FFI plugin project.
   s.platform = :ios, '13.0'
   s.swift_version = '5.0'
 
-  # PDF：vendored pdfium 动态库经 XCFramework 嵌入 App bundle 的 Frameworks/，
-  # 运行时由 core/ 的 pdfium-render 按 bundle 路径 dlopen 绑定（无 Dart 侧插件）。
-  # 生成方式（仅 macOS）：
-  #   ./core/vendor/fetch-native-deps.sh --ios
-  #   ./core/vendor/build-ios-xcframework.sh
-  # 产物 pdfium.xcframework 位于本 podspec 同级目录（未提交，随 vendor 二进制忽略）。
-  s.vendored_frameworks = 'pdfium.xcframework'
+  # PDF：libpdfium.dylib 由 ios/Podfile 注入 Runner 构建阶段复制到 App Frameworks/
+  # （见 app/rust_builder/ios/embed_pdfium.sh）。CocoaPods 不支持 vendored_frameworks
+  # 引用含 .dylib 的 xcframework。运行时由 core/pdf.rs 按 bundle 路径 dlopen。
+  # 构建前：./core/vendor/fetch-native-deps.sh --ios
 
   s.script_phase = {
     :name => 'Build Rust library',

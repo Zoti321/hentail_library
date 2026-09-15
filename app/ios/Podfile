@@ -35,17 +35,34 @@ target 'Runner' do
   end
 end
 
+def embed_pdfium_phase(runner_target)
+  phase_name = '[HL] Embed pdfium dylib'
+  return if runner_target.shell_script_build_phases.any? { |p| p.name == phase_name }
+
+  phase = runner_target.new_shell_script_build_phase(phase_name)
+  phase.shell_script = <<~SCRIPT
+    /bin/bash "${SRCROOT}/../rust_builder/ios/embed_pdfium.sh"
+  SCRIPT
+end
+
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
     # Release CD uses `flutter build ios --no-codesign`; disable pod/bundle signing so
-    # vendored frameworks (pdfium.xcframework) and resource bundles do not require
-    # DEVELOPMENT_TEAM on CI runners.
+    # resource bundles do not require DEVELOPMENT_TEAM on CI runners.
     target.build_configurations.each do |config|
       config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
       config.build_settings['CODE_SIGNING_REQUIRED'] = 'NO'
       config.build_settings['CODE_SIGNING_IDENTITY'] = ''
       config.build_settings['EXPANDED_CODE_SIGN_IDENTITY'] = ''
     end
+  end
+
+  installer.aggregate_targets.map(&:user_project).uniq.each do |project|
+    runner = project.targets.find { |t| t.name == 'Runner' }
+    next unless runner
+
+    embed_pdfium_phase(runner)
+    project.save
   end
 end
