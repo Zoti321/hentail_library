@@ -128,10 +128,6 @@ _Avoid_: 置顶系列、pin series（易与 Pinned library 混淆）
 Comics 浏览列表的应用级偏好：开启时仍为扁平 Comic 列表，但按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 块内按 SeriesItem.order；无 Series 归属的 Comic 整块垫底、块内标题升序」展开；开启时忽略 Comics 排序字段。默认开启；非视觉分组/折叠，也不共用 Prefer library root series 开关。
 _Avoid_: 分组浏览、按系列折叠、group by series、系列模式列表
 
-**Immersive cover header**:
-Comic / Series 详情页顶部的展示区：以与前景封面同源的封面图作模糊背景，高度对齐前景封面底边，横向铺满主内容区，随页滚动；底边短渐隐到页面底色；无封面时不出现。不是阅读器磨砂面板，也不是库网格卡片封面。
-_Avoid_: hero、毛玻璃头图、blur backdrop（实现用语）、沉浸式头部（太泛）
-
 **Settings list–detail**:
 设置页在隐藏应用侧栏后的响应式主从：宽屏（≥ compact 断点）左侧设置主栏与右侧分类 detail 并排且默认选中第一项；窄屏先全宽主列表，再进入分类 detail。顶栏标题为「设置」并提供返回：宽屏或窄屏主列表时离开设置；窄屏 detail 时先回到主列表。不是 Libraries 应用侧栏，也不是 Library form / 阅读器设置对话框。
 _Avoid_: 设置侧边栏（易与应用侧栏混淆）、AdaptiveScaffold、settings split view（实现用语）
