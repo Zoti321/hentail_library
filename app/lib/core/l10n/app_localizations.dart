@@ -1880,12 +1880,6 @@ abstract class AppLocalizations {
   /// **'阅读设置'**
   String get readerSettingsTitle;
 
-  /// No description provided for @readerSettingsClose.
-  ///
-  /// In zh, this message translates to:
-  /// **'关闭'**
-  String get readerSettingsClose;
-
   /// No description provided for @readerSettingsGeneral.
   ///
   /// In zh, this message translates to:
@@ -2161,54 +2155,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'系列目录'**
   String get readerSeriesCatalog;
-
-  /// No description provided for @readerPrevVolume.
-  ///
-  /// In zh, this message translates to:
-  /// **'上一卷'**
-  String get readerPrevVolume;
-
-  /// No description provided for @readerPrevVolumeSemantic.
-  ///
-  /// In zh, this message translates to:
-  /// **'系列上一卷'**
-  String get readerPrevVolumeSemantic;
-
-  /// No description provided for @readerFirstPage.
-  ///
-  /// In zh, this message translates to:
-  /// **'首页'**
-  String get readerFirstPage;
-
-  /// No description provided for @readerFirstPageSemantic.
-  ///
-  /// In zh, this message translates to:
-  /// **'跳转到首页'**
-  String get readerFirstPageSemantic;
-
-  /// No description provided for @readerNextVolume.
-  ///
-  /// In zh, this message translates to:
-  /// **'下一卷'**
-  String get readerNextVolume;
-
-  /// No description provided for @readerNextVolumeSemantic.
-  ///
-  /// In zh, this message translates to:
-  /// **'系列下一卷'**
-  String get readerNextVolumeSemantic;
-
-  /// No description provided for @readerLastPage.
-  ///
-  /// In zh, this message translates to:
-  /// **'尾页'**
-  String get readerLastPage;
-
-  /// No description provided for @readerLastPageSemantic.
-  ///
-  /// In zh, this message translates to:
-  /// **'跳转到尾页'**
-  String get readerLastPageSemantic;
 
   /// No description provided for @readerPrevPage.
   ///

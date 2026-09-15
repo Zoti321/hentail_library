@@ -78,45 +78,4 @@ void main() {
     );
     expect(panel.width, compactViewport.width);
   });
-
-  testWidgets(
-    'compact bottom bar with series nav and autoplay does not overflow',
-    (WidgetTester tester) async {
-      // Phone-narrow; series + autoplay used to overflow a single 44px-hit row.
-      const Size compactViewport = Size(320, 800);
-      await tester.binding.setSurfaceSize(compactViewport);
-      addTearDown(() => tester.binding.setSurfaceSize(null));
-
-      await pumpLocalizedApp(
-        tester,
-        wrapProviderScope: true,
-        home: MediaQuery(
-          data: const MediaQueryData(size: compactViewport),
-          child: Scaffold(
-            body: Stack(
-              children: <Widget>[
-                ReaderBottomBar(
-                  showControls: true,
-                  currentIndex: 1,
-                  totalPages: 28,
-                  readerAutoPlayEnabled: false,
-                  showAutoPlayControls: true,
-                  showSeriesComicNav: true,
-                  onPrevPage: () {},
-                  onNextPage: () async {},
-                  onSetIndex: (_) {},
-                  onReaderAutoPlayEnabledChanged: (_) {},
-                  onPrevSeriesComic: () {},
-                  onNextSeriesComic: () {},
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(tester.takeException(), isNull);
-    },
-  );
 }

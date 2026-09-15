@@ -20,9 +20,6 @@ class ReaderBottomBar extends StatefulWidget {
     required this.onNextPage,
     required this.onSetIndex,
     required this.onReaderAutoPlayEnabledChanged,
-    this.showSeriesComicNav = false,
-    this.onPrevSeriesComic,
-    this.onNextSeriesComic,
   });
 
   final bool showControls;
@@ -34,9 +31,6 @@ class ReaderBottomBar extends StatefulWidget {
   final Future<void> Function() onNextPage;
   final ValueChanged<int> onSetIndex;
   final ValueChanged<bool> onReaderAutoPlayEnabledChanged;
-  final bool showSeriesComicNav;
-  final VoidCallback? onPrevSeriesComic;
-  final VoidCallback? onNextSeriesComic;
 
   @override
   State<ReaderBottomBar> createState() => _ReaderBottomBarState();
@@ -153,11 +147,7 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
               ),
             ],
           ),
-          _buildActionControls(
-            compact: compact,
-            cs: cs,
-            l10n: l10n,
-          ),
+          Center(child: _buildNavActionGroup(cs, l10n)),
         ],
       ),
     );
@@ -178,132 +168,6 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
           opacity: widget.showControls ? 1.0 : 0.0,
           child: compact ? panel : Center(child: panel),
         ),
-      ),
-    );
-  }
-
-  /// Compact: stack side jumps above page nav so 44px hit targets do not
-  /// overflow a single row when series + autoplay controls are all visible.
-  Widget _buildActionControls({
-    required bool compact,
-    required ColorScheme cs,
-    required AppLocalizations l10n,
-  }) {
-    final Widget leading = _buildSideActionGroup(
-      cs: cs,
-      children: _buildLeadingSideActions(cs, l10n),
-    );
-    final Widget trailing = _buildSideActionGroup(
-      cs: cs,
-      children: _buildTrailingSideActions(cs, l10n),
-    );
-    final Widget nav = _buildNavActionGroup(cs, l10n);
-
-    if (compact) {
-      return Column(
-        spacing: 8,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              leading,
-              const Spacer(),
-              trailing,
-            ],
-          ),
-          Center(child: nav),
-        ],
-      );
-    }
-
-    return Row(
-      children: <Widget>[
-        leading,
-        Expanded(child: Center(child: nav)),
-        trailing,
-      ],
-    );
-  }
-
-  List<Widget> _buildLeadingSideActions(ColorScheme cs, AppLocalizations l10n) {
-    return <Widget>[
-      if (widget.showSeriesComicNav)
-        GhostButton.icon(
-          icon: LucideIcons.skipBack,
-          tooltip: l10n.readerPrevVolume,
-          semanticLabel: l10n.readerPrevVolumeSemantic,
-          iconSize: 16,
-          size: 28,
-          borderRadius: 8,
-          foregroundColor: cs.hentai.readerTextIconPrimary,
-          hoverColor: cs.hentai.readerPanelSubtle,
-          overlayColor: cs.hentai.readerPanelSubtle,
-          onPressed: widget.onPrevSeriesComic,
-        ),
-      GhostButton.icon(
-        icon: LucideIcons.chevronsLeft,
-        tooltip: l10n.readerFirstPage,
-        semanticLabel: l10n.readerFirstPageSemantic,
-        iconSize: 16,
-        size: 28,
-        borderRadius: 8,
-        foregroundColor: cs.hentai.readerTextIconPrimary,
-        hoverColor: cs.hentai.readerPanelSubtle,
-        overlayColor: cs.hentai.readerPanelSubtle,
-        onPressed: widget.totalPages > 0 ? () => widget.onSetIndex(1) : null,
-      ),
-    ];
-  }
-
-  List<Widget> _buildTrailingSideActions(
-    ColorScheme cs,
-    AppLocalizations l10n,
-  ) {
-    return <Widget>[
-      GhostButton.icon(
-        icon: LucideIcons.chevronsRight,
-        tooltip: l10n.readerLastPage,
-        semanticLabel: l10n.readerLastPageSemantic,
-        iconSize: 16,
-        size: 28,
-        borderRadius: 8,
-        foregroundColor: cs.hentai.readerTextIconPrimary,
-        hoverColor: cs.hentai.readerPanelSubtle,
-        overlayColor: cs.hentai.readerPanelSubtle,
-        onPressed: widget.totalPages > 0
-            ? () => widget.onSetIndex(widget.totalPages)
-            : null,
-      ),
-      if (widget.showSeriesComicNav)
-        GhostButton.icon(
-          icon: LucideIcons.skipForward,
-          tooltip: l10n.readerNextVolume,
-          semanticLabel: l10n.readerNextVolumeSemantic,
-          iconSize: 16,
-          size: 28,
-          borderRadius: 8,
-          foregroundColor: cs.hentai.readerTextIconPrimary,
-          hoverColor: cs.hentai.readerPanelSubtle,
-          overlayColor: cs.hentai.readerPanelSubtle,
-          onPressed: widget.onNextSeriesComic,
-        ),
-    ];
-  }
-
-  Widget _buildSideActionGroup({
-    required ColorScheme cs,
-    required List<Widget> children,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-      decoration: BoxDecoration(
-        color: cs.hentai.readerPanelSubtle,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 2,
-        children: children,
       ),
     );
   }

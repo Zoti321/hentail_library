@@ -22,7 +22,7 @@ void main() {
   });
 
   group('readerKeyboardCommandFor', () {
-    test('arrows and space turn pages', () {
+    test('arrows turn pages and space toggles auto-play', () {
       expect(
         readerKeyboardCommandFor(
           LogicalKeyboardKey.arrowLeft,
@@ -39,7 +39,7 @@ void main() {
       );
       expect(
         readerKeyboardCommandFor(LogicalKeyboardKey.space, showControls: false),
-        ReaderKeyboardCommand.nextPage,
+        ReaderKeyboardCommand.toggleAutoPlay,
       );
     });
 
