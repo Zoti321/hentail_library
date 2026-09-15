@@ -90,19 +90,23 @@ class SettingsView extends HookWidget {
           }
         }
 
+        final AppLocalizations l10n = context.l10n;
+        final bool narrowShowingDetail = !isWide && showingNarrowDetail.value;
+        final String? headerTitle = narrowShowingDetail
+            ? _categoryLabel(l10n, selectedCategory.value)
+            : null;
+
         final Widget headerSection = SettingsPageHeaderSection(
           layoutTier: layoutTier,
           horizontalPadding: horizontalPadding,
           contentMaxWidth: innerMaxWidth,
           onBack: onBack,
+          title: headerTitle,
         );
         final Widget header = KeyedSubtree(
           key: headerMeasureKey,
           child: headerSection,
         );
-
-        final bool showMaster = isWide || !showingNarrowDetail.value;
-        final bool showDetail = isWide || showingNarrowDetail.value;
 
         final Widget masterList = _SettingsMasterList(
           layoutTier: layoutTier,
@@ -110,13 +114,12 @@ class SettingsView extends HookWidget {
           showChevron: !isWide,
           onSelect: selectCategory,
         );
-        final Widget detailPane = showDetail
-            ? _SettingsDetailPane(
-                category: selectedCategory.value,
-                layoutTier: layoutTier,
-                viewportWidth: viewportWidth,
-              )
-            : const SizedBox.shrink();
+        final Widget detailPane = _SettingsDetailPane(
+          category: selectedCategory.value,
+          layoutTier: layoutTier,
+          viewportWidth: viewportWidth,
+          showTitle: isWide,
+        );
 
         final Widget body = Padding(
           padding: EdgeInsets.only(
@@ -137,7 +140,11 @@ class SettingsView extends HookWidget {
                     Expanded(child: detailPane),
                   ],
                 )
-              : (showMaster ? masterList : detailPane),
+              : _SettingsNarrowPaneSwitcher(
+                  showingDetail: showingNarrowDetail.value,
+                  masterList: masterList,
+                  detailPane: detailPane,
+                ),
         );
 
         return CustomScrollView(
@@ -163,6 +170,67 @@ class SettingsView extends HookWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// Narrow master ↔ detail: slide + fade (detail from right, list from left).
+class _SettingsNarrowPaneSwitcher extends StatelessWidget {
+  const _SettingsNarrowPaneSwitcher({
+    required this.showingDetail,
+    required this.masterList,
+    required this.detailPane,
+  });
+
+  final bool showingDetail;
+  final Widget masterList;
+  final Widget detailPane;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return showingDetail ? detailPane : masterList;
+    }
+
+    return ClipRect(
+      child: AnimatedSwitcher(
+        duration: kSettingsNarrowPaneTransitionDuration,
+        reverseDuration: kSettingsNarrowPaneTransitionDuration,
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+          return Stack(
+            alignment: Alignment.topLeft,
+            children: <Widget>[
+              ...previousChildren,
+              if (currentChild != null) currentChild,
+            ],
+          );
+        },
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          final bool isIncoming = child.key == ValueKey<bool>(showingDetail);
+          final Offset begin;
+          if (isIncoming) {
+            begin = showingDetail
+                ? const Offset(0.12, 0)
+                : const Offset(-0.08, 0);
+          } else {
+            begin = showingDetail
+                ? const Offset(-0.08, 0)
+                : const Offset(0.12, 0);
+          }
+          return SlideTransition(
+            position: Tween<Offset>(begin: begin, end: Offset.zero).animate(
+              animation,
+            ),
+            child: FadeTransition(opacity: animation, child: child),
+          );
+        },
+        child: KeyedSubtree(
+          key: ValueKey<bool>(showingDetail),
+          child: showingDetail ? detailPane : masterList,
+        ),
+      ),
     );
   }
 }
@@ -245,17 +313,31 @@ class _SettingsDetailPane extends StatelessWidget {
     required this.category,
     required this.layoutTier,
     required this.viewportWidth,
+    required this.showTitle,
   });
 
   final SettingsCategory category;
   final SettingsLayoutTier layoutTier;
   final double viewportWidth;
 
+  /// Wide layout keeps the category title in the pane; narrow moves it to header.
+  final bool showTitle;
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
+    final Widget group = SettingsGroup(
+      children: _detailRows(
+        category: category,
+        layoutTier: layoutTier,
+        viewportWidth: viewportWidth,
+      ),
+    );
+    if (!showTitle) {
+      return group;
+    }
     final String title = _categoryLabel(l10n, category);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,13 +352,7 @@ class _SettingsDetailPane extends StatelessWidget {
             color: cs.hentai.textPrimary,
           ),
         ),
-        SettingsGroup(
-          children: _detailRows(
-            category: category,
-            layoutTier: layoutTier,
-            viewportWidth: viewportWidth,
-          ),
-        ),
+        group,
       ],
     );
   }

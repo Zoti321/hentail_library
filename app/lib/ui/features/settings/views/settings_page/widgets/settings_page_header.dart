@@ -8,7 +8,9 @@ import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_constants.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Sticky header: back + 「设置」; full-bleed background from [SettingsPinnedHeaderDelegate].
+/// Sticky header: back + title; full-bleed background from [SettingsPinnedHeaderDelegate].
+///
+/// [title] defaults to 「设置」; on narrow detail pass the selected category label.
 class SettingsPageHeaderSection extends StatelessWidget {
   const SettingsPageHeaderSection({
     super.key,
@@ -16,12 +18,16 @@ class SettingsPageHeaderSection extends StatelessWidget {
     required this.horizontalPadding,
     required this.contentMaxWidth,
     required this.onBack,
+    this.title,
   });
 
   final SettingsLayoutTier layoutTier;
   final double horizontalPadding;
   final double contentMaxWidth;
   final VoidCallback onBack;
+
+  /// When null, uses [AppLocalizations.navSettings].
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +41,7 @@ class SettingsPageHeaderSection extends StatelessWidget {
         child: SettingsPageHeaderToolbar(
           layoutTier: layoutTier,
           onBack: onBack,
+          title: title,
         ),
       ),
     );
@@ -46,16 +53,21 @@ class SettingsPageHeaderToolbar extends StatelessWidget {
     super.key,
     required this.layoutTier,
     required this.onBack,
+    this.title,
   });
 
   final SettingsLayoutTier layoutTier;
   final VoidCallback onBack;
+
+  /// When null, uses [AppLocalizations.navSettings].
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final l10n = context.l10n;
+    final String resolvedTitle = title ?? l10n.navSettings;
 
     return SizedBox(
       height: 44,
@@ -81,9 +93,32 @@ class SettingsPageHeaderToolbar extends StatelessWidget {
                     onPressed: onBack,
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    l10n.navSettings,
-                    style: buildSettingsPageTitleStyle(cs, layoutTier),
+                  AnimatedSwitcher(
+                    duration: kSettingsNarrowPaneTransitionDuration,
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    layoutBuilder:
+                        (Widget? currentChild, List<Widget> previousChildren) {
+                          return Stack(
+                            alignment: Alignment.centerLeft,
+                            children: <Widget>[
+                              ...previousChildren,
+                              if (currentChild != null) currentChild,
+                            ],
+                          );
+                        },
+                    transitionBuilder:
+                        (Widget child, Animation<double> animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          );
+                        },
+                    child: Text(
+                      resolvedTitle,
+                      key: ValueKey<String>(resolvedTitle),
+                      style: buildSettingsPageTitleStyle(cs, layoutTier),
+                    ),
                   ),
                 ],
               ),

@@ -74,12 +74,15 @@ void main() {
         await tester.tap(find.text('关于'));
         await tester.pumpAndSettle();
 
+        // Header title becomes category; body no longer repeats it.
+        expect(find.text('设置'), findsNothing);
+        expect(find.text('关于'), findsOneWidget);
         expect(find.text('检查更新'), findsOneWidget);
-        expect(find.text('关于'), findsWidgets);
 
         await tester.tap(_backButtonFinder());
         await tester.pumpAndSettle();
 
+        expect(find.text('设置'), findsOneWidget);
         expect(find.text('检查更新'), findsNothing);
         expect(find.text('个性化'), findsOneWidget);
         expect(find.text('关于'), findsOneWidget);
@@ -127,7 +130,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('详细诊断'), findsOneWidget);
-      expect(find.text('诊断与支持'), findsWidgets);
+      // Narrow detail: category title lives in header only (not body).
+      expect(find.text('诊断与支持'), findsOneWidget);
+      expect(find.text('设置'), findsNothing);
 
       await _setViewport(tester, 700);
       await tester.pumpAndSettle();
