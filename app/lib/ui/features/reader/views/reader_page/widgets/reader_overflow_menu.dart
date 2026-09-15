@@ -44,39 +44,45 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,
       showArrow: false,
-      verticalMargin: -14,
-      menuBuilder: () => ReaderFloatingMenuPanel(
-        width: 240,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            _ReaderOverflowMenuItem(
-              icon: LucideIcons.image,
-              label: l10n.readerSetComicCover,
-              onTap: () {
-                menuController.hideMenu();
-                _setComicCover(context, ref, l10n);
-              },
-            ),
-            if (isSeriesRead)
+      verticalMargin: kReaderPopupMenuVerticalMargin,
+      menuBuilder: () {
+        final double viewportWidth = MediaQuery.sizeOf(context).width;
+        return ReaderFloatingMenuPanel(
+          width: readerClampedPopupMenuWidth(
+            designWidth: kReaderOverflowMenuDesignWidth,
+            viewportWidth: viewportWidth,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
               _ReaderOverflowMenuItem(
-                icon: LucideIcons.images,
-                label: l10n.readerSetSeriesCover,
+                icon: LucideIcons.image,
+                label: l10n.readerSetComicCover,
                 onTap: () {
                   menuController.hideMenu();
-                  _setSeriesCover(context, ref, l10n);
+                  _setComicCover(context, ref, l10n);
                 },
               ),
-          ],
-        ),
-      ),
+              if (isSeriesRead)
+                _ReaderOverflowMenuItem(
+                  icon: LucideIcons.images,
+                  label: l10n.readerSetSeriesCover,
+                  onTap: () {
+                    menuController.hideMenu();
+                    _setSeriesCover(context, ref, l10n);
+                  },
+                ),
+            ],
+          ),
+        );
+      },
       child: GhostButton.icon(
         icon: LucideIcons.ellipsisVertical,
         tooltip: l10n.readerMore,
         semanticLabel: l10n.readerMoreSemantic,
         iconSize: 16,
-        size: 32,
+        size: kReaderTopBarActionSize,
         borderRadius: 8,
         foregroundColor: cs.hentai.readerTextIconPrimary,
         hoverColor: cs.hentai.readerPanelSubtle,

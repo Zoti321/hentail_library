@@ -9,7 +9,7 @@
 | `test-rust` | `cargo test --manifest-path core/Cargo.toml` | Rust 核心（sync / reader / DB）回归 |
 | `analyze` · format | `cd app && dart format --output=none --set-exit-if-changed lib test` | 格式漂移 |
 | `analyze` · analyze | `cd app && flutter analyze` | 静态分析问题 |
-| `test-unit` | `cd app && flutter test test/domain test/core test/data test/project_layout_test.dart test/ui/core/widgets/actions/destructive_filled_button_test.dart test/ui/core/widgets/overlays/dialog/confirm test/ui/features/metadata/views/metadata_page/named_facet_fill_viewport_test.dart test/ui/features/reader/reader_viewport_pages_test.dart test/ui/features/reader/reader_open_error_message_test.dart` | domain / core / data 契约 / monorepo layout / 已晋升快轨 UI |
+| `test-unit` | `cd app && flutter test test/domain test/core test/data test/project_layout_test.dart test/ui/core/widgets/actions/destructive_filled_button_test.dart test/ui/core/widgets/overlays/dialog/confirm test/ui/features/metadata/views/metadata_page/named_facet_fill_viewport_test.dart test/ui/features/reader/reader_viewport_pages_test.dart test/ui/features/reader/reader_open_error_message_test.dart test/ui/features/reader/views/reader_page/reader_chrome_layout_test.dart` | domain / core / data 契约 / monorepo layout / 已晋升快轨 UI |
 
 新增 **data 契约测** 或 **已晋升的快轨 UI/纯逻辑测** 时：扩展 `test-unit` 的路径列表（或把文件放进已有 `test/data` / 已列入的快轨路径），不要另开「假绿」软门禁冒充硬跑。
 
