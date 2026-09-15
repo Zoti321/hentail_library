@@ -326,6 +326,8 @@ class LabeledMetaChipRow extends StatelessWidget {
     required this.label,
     required this.items,
     this.maxRows = kDetailMetaChipBandMaxRowsSingle,
+    this.rowHeight = kDetailMetaChipRowHeight,
+    this.chipCompact = false,
     this.onItemTap,
   });
 
@@ -334,6 +336,12 @@ class LabeledMetaChipRow extends StatelessWidget {
 
   /// Wrap row cap before the chip band scrolls horizontally as a whole.
   final int maxRows;
+
+  /// Band row height (Comic vs Series compact metrics).
+  final double rowHeight;
+
+  /// When true, chips use Series compact height metrics.
+  final bool chipCompact;
 
   /// 为 null 时走库页精确元数据搜索（Author/Tag/Parody/Character）；非 null 时由调用方处理。
   final ValueChanged<String>? onItemTap;
@@ -363,10 +371,12 @@ class LabeledMetaChipRow extends StatelessWidget {
         Expanded(
           child: DetailMetaChipBand(
             maxRows: maxRows,
+            rowHeight: rowHeight,
             children: items
                 .map(
                   (String item) => OutlinedMetaChip(
                     text: item,
+                    compact: chipCompact,
                     onTap: () {
                       final ValueChanged<String>? custom = onItemTap;
                       if (custom != null) {

@@ -255,10 +255,11 @@ class _SettingsDetailPane extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
     final String title = _categoryLabel(l10n, category);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 16,
+      spacing: tokens.spacing.lg,
       children: <Widget>[
         Text(
           title,

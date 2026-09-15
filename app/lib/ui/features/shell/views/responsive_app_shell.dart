@@ -187,8 +187,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
   }
 }
 
-bool _isSettingsRoute(String path) =>
-    path == '/settings' || path.startsWith('/settings/');
+bool _isSettingsRoute(String path) => path == '/settings';
 
 class _ShellTitleBar extends ConsumerWidget {
   const _ShellTitleBar({required this.isReaderRoute});

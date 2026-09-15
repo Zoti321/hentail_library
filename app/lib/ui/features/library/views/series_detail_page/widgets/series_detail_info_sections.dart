@@ -131,6 +131,8 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
           label: l10n.comicDetailParodies,
           items: parodies,
           maxRows: kDetailMetaChipBandMaxRowsSingle,
+          rowHeight: kSeriesDetailMetaChipRowHeight,
+          chipCompact: true,
         ),
       );
     }
@@ -140,6 +142,8 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
           label: l10n.comicDetailAuthors,
           items: authors,
           maxRows: kDetailMetaChipBandMaxRowsSingle,
+          rowHeight: kSeriesDetailMetaChipRowHeight,
+          chipCompact: true,
         ),
       );
     }
@@ -149,6 +153,8 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
           label: l10n.comicDetailCharacters,
           items: characters,
           maxRows: kDetailMetaChipBandMaxRowsCharacter,
+          rowHeight: kSeriesDetailMetaChipRowHeight,
+          chipCompact: true,
         ),
       );
     }
@@ -158,6 +164,8 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
           label: l10n.comicDetailTags,
           items: tags,
           maxRows: kDetailMetaChipBandMaxRowsTag,
+          rowHeight: kSeriesDetailMetaChipRowHeight,
+          chipCompact: true,
         ),
       );
     }
