@@ -35,6 +35,7 @@ void main() {
     test('keeps header chrome constants aligned with home/history', () {
       expect(kSettingsHeaderVerticalPadding, 6);
       expect(kSettingsHeaderShadowGradientHeight, 6);
+      expect(kSettingsMasterPaneWidth, 260);
     });
 
     test('toggles compact-only theme chevron action', () {

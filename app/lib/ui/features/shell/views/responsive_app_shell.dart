@@ -95,6 +95,8 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
     final String path = GoRouterState.of(context).uri.path;
     final String sidebarActiveId = AppNavigation.activeNavIdForPath(path);
     final bool isReaderRoute = path.startsWith('/reader');
+    // Settings list–detail hides app Libraries sidebar/drawer like the reader.
+    final bool hideAppSidebar = isReaderRoute || _isSettingsRoute(path);
     final bool isSidebarExpandedPref = ref.watch(
       settingsProvider.select(
         (AsyncValue<AppSetting> asyncValue) =>
@@ -113,7 +115,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
           _ShellLayoutMode.medium ||
           _ShellLayoutMode.expanded => isSidebarExpandedPref,
         };
-        final bool showSidebarRail = !isReaderRoute && !useDrawer;
+        final bool showSidebarRail = !hideAppSidebar && !useDrawer;
         // Fullscreen transitions can briefly report a tiny content height while
         // fixed chrome (title bar 36) is still in the tree.
         final bool showShellChrome =
@@ -121,7 +123,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
 
         return Scaffold(
           key: appShellScaffoldKey,
-          drawer: useDrawer && !isReaderRoute
+          drawer: useDrawer && !hideAppSidebar
               ? Drawer(
                   width: DesktopSidebar.expandedWidth,
                   shape: RoundedRectangleBorder(
@@ -150,7 +152,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
               if (showShellChrome) const DiagnosticModeBanner(),
               if (showShellChrome) const LibraryScanShellFeedback(),
               Expanded(
-                child: isReaderRoute
+                child: hideAppSidebar
                     ? widget.routeChild
                     : Row(
                         children: <Widget>[
@@ -184,6 +186,9 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
     );
   }
 }
+
+bool _isSettingsRoute(String path) =>
+    path == '/settings' || path.startsWith('/settings/');
 
 class _ShellTitleBar extends ConsumerWidget {
   const _ShellTitleBar({required this.isReaderRoute});

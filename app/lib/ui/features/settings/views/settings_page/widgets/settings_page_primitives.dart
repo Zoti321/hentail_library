@@ -3,29 +3,32 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
 
 class SettingsGroup extends StatelessWidget {
-  const SettingsGroup({super.key, required this.title, required this.children});
+  const SettingsGroup({super.key, this.title, required this.children});
 
-  final String title;
+  /// Small section label above the card; omit or empty to hide.
+  final String? title;
   final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final String? sectionTitle = title;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.hentai.textTertiary,
-              letterSpacing: 1.0,
+        if (sectionTitle != null && sectionTitle.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 8),
+            child: Text(
+              sectionTitle,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.hentai.textTertiary,
+                letterSpacing: 1.0,
+              ),
             ),
           ),
-        ),
         Container(
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,

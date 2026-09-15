@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -7,20 +8,20 @@ import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_constants.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// 粘连 header：左汉堡(仅 compact)+标题；右侧留空。通栏背景由 [SettingsPinnedHeaderDelegate] 提供。
+/// Sticky header: back + 「设置」; full-bleed background from [SettingsPinnedHeaderDelegate].
 class SettingsPageHeaderSection extends StatelessWidget {
   const SettingsPageHeaderSection({
     super.key,
     required this.layoutTier,
     required this.horizontalPadding,
     required this.contentMaxWidth,
-    this.onOpenNavigation,
+    required this.onBack,
   });
 
   final SettingsLayoutTier layoutTier;
   final double horizontalPadding;
   final double contentMaxWidth;
-  final VoidCallback? onOpenNavigation;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class SettingsPageHeaderSection extends StatelessWidget {
         ),
         child: SettingsPageHeaderToolbar(
           layoutTier: layoutTier,
-          onOpenNavigation: onOpenNavigation,
+          onBack: onBack,
         ),
       ),
     );
@@ -44,11 +45,11 @@ class SettingsPageHeaderToolbar extends StatelessWidget {
   const SettingsPageHeaderToolbar({
     super.key,
     required this.layoutTier,
-    this.onOpenNavigation,
+    required this.onBack,
   });
 
   final SettingsLayoutTier layoutTier;
-  final VoidCallback? onOpenNavigation;
+  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -67,21 +68,19 @@ class SettingsPageHeaderToolbar extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  if (onOpenNavigation != null) ...<Widget>[
-                    GhostButton.icon(
-                      icon: LucideIcons.menu,
-                      semanticLabel: l10n.shellOpenNavMenu,
-                      tooltip: '',
-                      iconSize: 16,
-                      size: 32,
-                      borderRadius: 8,
-                      foregroundColor: cs.hentai.iconDefault,
-                      hoverColor: theme.hoverColor,
-                      overlayColor: theme.hoverColor,
-                      onPressed: onOpenNavigation,
-                    ),
-                    const SizedBox(width: 8),
-                  ],
+                  GhostButton.icon(
+                    icon: LucideIcons.arrowLeft,
+                    semanticLabel: l10n.shellBack,
+                    tooltip: l10n.shellBack,
+                    iconSize: 16,
+                    size: 32,
+                    borderRadius: 8,
+                    foregroundColor: cs.hentai.iconDefault,
+                    hoverColor: theme.hoverColor,
+                    overlayColor: theme.hoverColor,
+                    onPressed: onBack,
+                  ),
+                  const SizedBox(width: 8),
                   Text(
                     l10n.navSettings,
                     style: buildSettingsPageTitleStyle(cs, layoutTier),
@@ -93,6 +92,15 @@ class SettingsPageHeaderToolbar extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Leave settings: pop when possible, otherwise go home.
+  static void popOrGoHome(BuildContext context) {
+    if (context.canPop()) {
+      context.pop();
+      return;
+    }
+    context.go('/home');
   }
 }
 
