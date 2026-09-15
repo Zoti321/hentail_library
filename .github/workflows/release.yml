@@ -363,6 +363,13 @@ jobs:
           fi
           rustup target list --installed | grep -E 'apple-ios' || true
 
+      - name: Fetch iOS pdfium and build XCFramework
+        run: |
+          set -euo pipefail
+          bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh" --ios
+          bash "${GITHUB_WORKSPACE}/core/vendor/build-ios-xcframework.sh"
+          test -d "${GITHUB_WORKSPACE}/app/rust_builder/ios/pdfium.xcframework"
+
       # Phase 2: add ExportOptions.plist and flutter build ipa when secrets are configured.
       - name: Configure iOS release signing
         if: env.IOS_DISTRIBUTION_CERTIFICATE_BASE64 != ''
@@ -395,6 +402,10 @@ jobs:
           if [ "$status" -ne 0 ]; then
             echo "::group::flutter ios build (tail)"
             tail -n 120 /tmp/flutter_ios_build.log || true
+            echo "::endgroup::"
+            echo "::group::signing / pdfium diagnostics"
+            grep -iE 'Code Sign|Codesign|Signing|Development Team|pdfium|xcframework|Provisioning|SEVERE|PhaseScriptExecution failed' \
+              /tmp/flutter_ios_build.log | tail -n 120 || true
             echo "::endgroup::"
             echo "::group::linker / ld diagnostics"
             grep -E 'Undefined symbols|library not found|clang: error|ld:|error: |Linker command|FAILED' \
