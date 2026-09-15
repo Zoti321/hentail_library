@@ -5,7 +5,11 @@ import 'package:hentai_library/domain/models/value_objects/series_comic_page_ite
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/domain/thumbnail/series_cover_source.dart';
+import 'package:hentai_library/ui/core/dto/comic_cover_image.dart';
+import 'package:hentai_library/ui/core/dto/comic_cover_state.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/element/image/immersive_cover_header.dart';
 import 'package:hentai_library/ui/core/widgets/pagination/library_pagination_bar.dart';
 import 'package:hentai_library/ui/core/widgets/responsive_layout/detail_primary_row_layout.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_comics_catalog_controller.dart';
@@ -16,6 +20,7 @@ import 'package:hentai_library/ui/features/library/views/series_detail_page/widg
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_header.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_info_sections.dart';
 import 'package:hentai_library/ui/features/library/views/series_detail_page/widgets/series_detail_pagination_bar.dart';
+import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SeriesDetail extends ConsumerStatefulWidget {
@@ -96,12 +101,7 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
             controller: _scrollController,
             slivers: <Widget>[
               SliverPadding(
-                padding: EdgeInsets.fromLTRB(
-                  horizontalPadding,
-                  tokens.spacing.xl,
-                  horizontalPadding,
-                  0,
-                ),
+                padding: EdgeInsets.fromLTRB(0, tokens.spacing.xl, 0, 0),
                 sliver: SliverToBoxAdapter(
                   child:
                       Column(
@@ -111,25 +111,37 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
                                 context,
                                 tokens,
                                 cs,
+                                horizontalPadding: horizontalPadding,
                                 hasR18: metadata?.hasR18 ?? false,
                                 languages:
                                     metadata?.languages ?? const <String>[],
                               ),
                               SizedBox(height: sectionGap),
                               if (hasMetadata) ...<Widget>[
-                                SeriesDetailMetadataBlock(
-                                  authors: metadata!.authors,
-                                  tags: metadata.tags,
-                                  parodies: metadata.parodies,
-                                  characters: metadata.characters,
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: horizontalPadding,
+                                  ),
+                                  child: SeriesDetailMetadataBlock(
+                                    authors: metadata!.authors,
+                                    tags: metadata.tags,
+                                    parodies: metadata.parodies,
+                                    characters: metadata.characters,
+                                  ),
                                 ),
                                 SizedBox(height: sectionGap),
                               ],
-                              Divider(
-                                height: 1,
-                                thickness:
-                                    1 / MediaQuery.devicePixelRatioOf(context),
-                                color: cs.hentai.borderSubtle,
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: horizontalPadding,
+                                ),
+                                child: Divider(
+                                  height: 1,
+                                  thickness:
+                                      1 /
+                                      MediaQuery.devicePixelRatioOf(context),
+                                  color: cs.hentai.borderSubtle,
+                                ),
                               ),
                               SizedBox(height: tokens.spacing.lg),
                             ],
@@ -163,10 +175,16 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
     BuildContext context,
     AppThemeTokens tokens,
     ColorScheme cs, {
+    required double horizontalPadding,
     required bool hasR18,
     required List<String> languages,
   }) {
-    return DetailPrimaryRowLayout(
+    final ComicCoverImage? backdropCover = _resolveImmersiveBackdrop(ref);
+
+    return ImmersiveCoverHeader(
+      backdropCover: backdropCover,
+      coverAspectRatio: SeriesDetailCover.containerAspectRatio,
+      contentPadding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       cover: SeriesDetailCover(series: widget.series),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,6 +213,28 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
         ],
       ),
     );
+  }
+
+  /// Same resolution path as [SeriesDetailCover] foreground; Ready only.
+  ComicCoverImage? _resolveImmersiveBackdrop(WidgetRef ref) {
+    final AsyncValue<SeriesCoverSource> async = ref.watch(
+      seriesCoverSourceProvider(widget.series.id),
+    );
+    return switch (async) {
+      AsyncData(:final value) => switch (value) {
+        SeriesCoverCustomThumbnail(:final thumbnail) => ComicCoverImage.bytes(
+          thumbnail,
+        ),
+        SeriesCoverFallbackComic(:final comicId) => switch (ref.watch(
+          comicCoverProvider(comicId),
+        )) {
+          ComicCoverReady(:final data) => data,
+          _ => null,
+        },
+        SeriesCoverMissing() => null,
+      },
+      _ => null,
+    };
   }
 
   Widget _buildComicsSectionSliver(
