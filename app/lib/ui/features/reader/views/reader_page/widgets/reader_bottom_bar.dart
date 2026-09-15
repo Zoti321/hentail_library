@@ -153,18 +153,10 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
               ),
             ],
           ),
-          Row(
-            children: <Widget>[
-              _buildSideActionGroup(
-                cs: cs,
-                children: _buildLeadingSideActions(cs, l10n),
-              ),
-              Expanded(child: Center(child: _buildNavActionGroup(cs, l10n))),
-              _buildSideActionGroup(
-                cs: cs,
-                children: _buildTrailingSideActions(cs, l10n),
-              ),
-            ],
+          _buildActionControls(
+            compact: compact,
+            cs: cs,
+            l10n: l10n,
           ),
         ],
       ),
@@ -187,6 +179,49 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
           child: compact ? panel : Center(child: panel),
         ),
       ),
+    );
+  }
+
+  /// Compact: stack side jumps above page nav so 44px hit targets do not
+  /// overflow a single row when series + autoplay controls are all visible.
+  Widget _buildActionControls({
+    required bool compact,
+    required ColorScheme cs,
+    required AppLocalizations l10n,
+  }) {
+    final Widget leading = _buildSideActionGroup(
+      cs: cs,
+      children: _buildLeadingSideActions(cs, l10n),
+    );
+    final Widget trailing = _buildSideActionGroup(
+      cs: cs,
+      children: _buildTrailingSideActions(cs, l10n),
+    );
+    final Widget nav = _buildNavActionGroup(cs, l10n);
+
+    if (compact) {
+      return Column(
+        spacing: 8,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              leading,
+              const Spacer(),
+              trailing,
+            ],
+          ),
+          Center(child: nav),
+        ],
+      );
+    }
+
+    return Row(
+      children: <Widget>[
+        leading,
+        Expanded(child: Center(child: nav)),
+        trailing,
+      ],
     );
   }
 
