@@ -18,7 +18,13 @@ ReaderTapZone resolveReaderTapZone({
   return ReaderTapZone.center;
 }
 
-enum ReaderKeyboardCommand { prevPage, nextPage, hideControls, exit }
+enum ReaderKeyboardCommand {
+  prevPage,
+  nextPage,
+  toggleAutoPlay,
+  hideControls,
+  exit,
+}
 
 ReaderKeyboardCommand? readerKeyboardCommandFor(
   LogicalKeyboardKey key, {
@@ -27,8 +33,11 @@ ReaderKeyboardCommand? readerKeyboardCommandFor(
   if (key == LogicalKeyboardKey.arrowLeft) {
     return ReaderKeyboardCommand.prevPage;
   }
-  if (key == LogicalKeyboardKey.arrowRight || key == LogicalKeyboardKey.space) {
+  if (key == LogicalKeyboardKey.arrowRight) {
     return ReaderKeyboardCommand.nextPage;
+  }
+  if (key == LogicalKeyboardKey.space) {
+    return ReaderKeyboardCommand.toggleAutoPlay;
   }
   if (key == LogicalKeyboardKey.escape) {
     return showControls

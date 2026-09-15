@@ -219,13 +219,11 @@ class ReaderPage extends HookConsumerWidget {
     }, <Object?>[seriesBoundaryPrompt, context]);
 
     void dispatchReaderKeyboard(LogicalKeyboardKey key) {
-      final bool showControls =
-          ref
-              .read(readerControllerProvider(viewKey))
-              .asData
-              ?.value
-              .showControls ??
-          false;
+      final ReaderState? readerState = ref
+          .read(readerControllerProvider(viewKey))
+          .asData
+          ?.value;
+      final bool showControls = readerState?.showControls ?? false;
       final ReaderKeyboardCommand? command = readerKeyboardCommandFor(
         key,
         showControls: showControls,
@@ -256,6 +254,12 @@ class ReaderPage extends HookConsumerWidget {
               router: GoRouter.of(context),
             ),
           );
+        case ReaderKeyboardCommand.toggleAutoPlay:
+          final ReaderState? state = readerState;
+          if (state == null || !state.readingMode.supportsAutoPlay) {
+            return;
+          }
+          controller.setAutoPlayEnabled(!state.autoPlayEnabled);
         case ReaderKeyboardCommand.hideControls:
           controller.setShowControls(false);
         case ReaderKeyboardCommand.exit:
@@ -581,32 +585,6 @@ class _ReaderBottomBarSlot extends ConsumerWidget {
       onReaderAutoPlayEnabledChanged: (bool value) {
         controller.setAutoPlayEnabled(value);
       },
-      showSeriesComicNav: seriesNavContext != null,
-      onPrevSeriesComic: seriesNavContext?.previousItem != null
-          ? () async {
-              final String targetComicId =
-                  seriesNavContext!.previousItem!.comicId;
-              await ref
-                  .read(readerSeriesNavigationProvider.notifier)
-                  .switchComic(
-                    router: GoRouter.of(context),
-                    currentSession: routeContext.session,
-                    targetComicId: targetComicId,
-                  );
-            }
-          : null,
-      onNextSeriesComic: seriesNavContext?.nextItem != null
-          ? () async {
-              final String targetComicId = seriesNavContext!.nextItem!.comicId;
-              await ref
-                  .read(readerSeriesNavigationProvider.notifier)
-                  .switchComic(
-                    router: GoRouter.of(context),
-                    currentSession: routeContext.session,
-                    targetComicId: targetComicId,
-                  );
-            }
-          : null,
     );
   }
 }

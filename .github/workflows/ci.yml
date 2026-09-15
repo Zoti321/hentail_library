@@ -83,6 +83,7 @@ jobs:
           test/ui/features/metadata/views/metadata_page/named_facet_fill_viewport_test.dart
           test/ui/features/reader/reader_viewport_pages_test.dart
           test/ui/features/reader/reader_open_error_message_test.dart
+          test/ui/features/reader/views/reader_page/reader_chrome_layout_test.dart
 
   test-widget:
     name: test-widget (soft)

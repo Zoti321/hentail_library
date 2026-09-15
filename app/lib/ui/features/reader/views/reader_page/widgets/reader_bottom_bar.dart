@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/interaction/app_motion.dart';
+import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_floating_panel.dart';
@@ -19,9 +20,6 @@ class ReaderBottomBar extends StatefulWidget {
     required this.onNextPage,
     required this.onSetIndex,
     required this.onReaderAutoPlayEnabledChanged,
-    this.showSeriesComicNav = false,
-    this.onPrevSeriesComic,
-    this.onNextSeriesComic,
   });
 
   final bool showControls;
@@ -33,9 +31,6 @@ class ReaderBottomBar extends StatefulWidget {
   final Future<void> Function() onNextPage;
   final ValueChanged<int> onSetIndex;
   final ValueChanged<bool> onReaderAutoPlayEnabledChanged;
-  final bool showSeriesComicNav;
-  final VoidCallback? onPrevSeriesComic;
-  final VoidCallback? onNextSeriesComic;
 
   @override
   State<ReaderBottomBar> createState() => _ReaderBottomBarState();
@@ -63,20 +58,108 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final double bottomPadding = MediaQuery.of(context).padding.bottom + 32;
+    final MediaQueryData media = MediaQuery.of(context);
+    final double bottomPadding = media.padding.bottom + kReaderChromeEdgeGap;
     final double targetWidth = ReaderFloatingPanel.targetBarWidth(context);
+    final bool compact = AppLayoutBreakpoints.isCompact(media.size.width);
     final int safeTotalPages = widget.totalPages > 0 ? widget.totalPages : 1;
     final double sliderValue = _sliderValue.clamp(1, safeTotalPages).toDouble();
     final int displayIndex = _isSliding
         ? sliderValue.round()
         : widget.currentIndex;
 
+    final Widget panel = ReaderFloatingPanel(
+      width: targetWidth,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      child: Column(
+        spacing: 8,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Row(
+            spacing: 12,
+            children: <Widget>[
+              Text(
+                '$displayIndex',
+                style: TextStyle(
+                  fontFamily: 'RobotoMono',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: cs.hentai.readerTextIconPrimary,
+                ),
+              ),
+              Expanded(
+                child: SizedBox(
+                  height: 26,
+                  child: SliderTheme(
+                    data: SliderThemeData(
+                      trackHeight: 3,
+                      activeTrackColor: cs.primary,
+                      inactiveTrackColor: cs.hentai.sliderInactive,
+                      thumbColor: cs.primary,
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 7,
+                        elevation: 3,
+                      ),
+                      overlayColor: cs.hentai.readerSliderOverlay,
+                      overlayShape: const RoundSliderOverlayShape(
+                        overlayRadius: 14,
+                      ),
+                      trackShape: const RoundedRectSliderTrackShape(),
+                    ),
+                    child: Slider(
+                      value: sliderValue,
+                      min: 1,
+                      max: safeTotalPages.toDouble(),
+                      onChangeStart: (double value) {
+                        setState(() {
+                          _isSliding = true;
+                          _sliderValue = value;
+                        });
+                      },
+                      onChanged: (double val) {
+                        setState(() {
+                          _sliderValue = val;
+                        });
+                      },
+                      onChangeEnd: (double val) {
+                        final int nextIndex = val.round().clamp(
+                          1,
+                          safeTotalPages,
+                        );
+                        setState(() {
+                          _isSliding = false;
+                          _sliderValue = nextIndex.toDouble();
+                        });
+                        widget.onSetIndex(nextIndex);
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              Text(
+                '${widget.totalPages}',
+                style: TextStyle(
+                  fontFamily: 'RobotoMono',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: cs.hentai.readerTextIconPrimary,
+                ),
+              ),
+            ],
+          ),
+          Center(child: _buildNavActionGroup(cs, l10n)),
+        ],
+      ),
+    );
+
     return AnimatedPositioned(
       duration: motionDurationOf(context, const Duration(milliseconds: 300)),
       curve: Curves.easeOutCubic,
-      bottom: widget.showControls ? bottomPadding : bottomPadding - 32,
-      left: 0,
-      right: 0,
+      bottom: widget.showControls
+          ? bottomPadding
+          : bottomPadding - kReaderChromeHideSlide,
+      left: compact ? media.padding.left : 0,
+      right: compact ? media.padding.right : 0,
       child: IgnorePointer(
         ignoring: !widget.showControls,
         child: AnimatedOpacity(
@@ -85,189 +168,8 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
             const Duration(milliseconds: 300),
           ),
           opacity: widget.showControls ? 1.0 : 0.0,
-          child: Center(
-            child: ReaderFloatingPanel(
-              width: targetWidth,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              child: Column(
-                spacing: 10,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Row(
-                    spacing: 12,
-                    children: <Widget>[
-                      Text(
-                        '$displayIndex',
-                        style: TextStyle(
-                          fontFamily: 'RobotoMono',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: cs.hentai.readerTextIconPrimary,
-                        ),
-                      ),
-                      Expanded(
-                        child: SizedBox(
-                          height: 26,
-                          child: SliderTheme(
-                            data: SliderThemeData(
-                              trackHeight: 3,
-                              activeTrackColor: cs.primary,
-                              inactiveTrackColor: cs.hentai.sliderInactive,
-                              thumbColor: cs.primary,
-                              thumbShape: const RoundSliderThumbShape(
-                                enabledThumbRadius: 7,
-                                elevation: 3,
-                              ),
-                              overlayColor: cs.hentai.readerSliderOverlay,
-                              overlayShape: const RoundSliderOverlayShape(
-                                overlayRadius: 14,
-                              ),
-                              trackShape: const RoundedRectSliderTrackShape(),
-                            ),
-                            child: Slider(
-                              value: sliderValue,
-                              min: 1,
-                              max: safeTotalPages.toDouble(),
-                              onChangeStart: (double value) {
-                                setState(() {
-                                  _isSliding = true;
-                                  _sliderValue = value;
-                                });
-                              },
-                              onChanged: (double val) {
-                                setState(() {
-                                  _sliderValue = val;
-                                });
-                              },
-                              onChangeEnd: (double val) {
-                                final int nextIndex = val.round().clamp(
-                                  1,
-                                  safeTotalPages,
-                                );
-                                setState(() {
-                                  _isSliding = false;
-                                  _sliderValue = nextIndex.toDouble();
-                                });
-                                widget.onSetIndex(nextIndex);
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      Text(
-                        '${widget.totalPages}',
-                        style: TextStyle(
-                          fontFamily: 'RobotoMono',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: cs.hentai.readerTextIconPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      _buildSideActionGroup(
-                        cs: cs,
-                        children: _buildLeadingSideActions(cs, l10n),
-                      ),
-                      Expanded(
-                        child: Center(child: _buildNavActionGroup(cs, l10n)),
-                      ),
-                      _buildSideActionGroup(
-                        cs: cs,
-                        children: _buildTrailingSideActions(cs, l10n),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+          child: compact ? panel : Center(child: panel),
         ),
-      ),
-    );
-  }
-
-  List<Widget> _buildLeadingSideActions(ColorScheme cs, AppLocalizations l10n) {
-    return <Widget>[
-      if (widget.showSeriesComicNav)
-        GhostButton.icon(
-          icon: LucideIcons.skipBack,
-          tooltip: l10n.readerPrevVolume,
-          semanticLabel: l10n.readerPrevVolumeSemantic,
-          iconSize: 16,
-          size: 28,
-          borderRadius: 8,
-          foregroundColor: cs.hentai.readerTextIconPrimary,
-          hoverColor: cs.hentai.readerPanelSubtle,
-          overlayColor: cs.hentai.readerPanelSubtle,
-          onPressed: widget.onPrevSeriesComic,
-        ),
-      GhostButton.icon(
-        icon: LucideIcons.chevronsLeft,
-        tooltip: l10n.readerFirstPage,
-        semanticLabel: l10n.readerFirstPageSemantic,
-        iconSize: 16,
-        size: 28,
-        borderRadius: 8,
-        foregroundColor: cs.hentai.readerTextIconPrimary,
-        hoverColor: cs.hentai.readerPanelSubtle,
-        overlayColor: cs.hentai.readerPanelSubtle,
-        onPressed: widget.totalPages > 0 ? () => widget.onSetIndex(1) : null,
-      ),
-    ];
-  }
-
-  List<Widget> _buildTrailingSideActions(
-    ColorScheme cs,
-    AppLocalizations l10n,
-  ) {
-    return <Widget>[
-      GhostButton.icon(
-        icon: LucideIcons.chevronsRight,
-        tooltip: l10n.readerLastPage,
-        semanticLabel: l10n.readerLastPageSemantic,
-        iconSize: 16,
-        size: 28,
-        borderRadius: 8,
-        foregroundColor: cs.hentai.readerTextIconPrimary,
-        hoverColor: cs.hentai.readerPanelSubtle,
-        overlayColor: cs.hentai.readerPanelSubtle,
-        onPressed: widget.totalPages > 0
-            ? () => widget.onSetIndex(widget.totalPages)
-            : null,
-      ),
-      if (widget.showSeriesComicNav)
-        GhostButton.icon(
-          icon: LucideIcons.skipForward,
-          tooltip: l10n.readerNextVolume,
-          semanticLabel: l10n.readerNextVolumeSemantic,
-          iconSize: 16,
-          size: 28,
-          borderRadius: 8,
-          foregroundColor: cs.hentai.readerTextIconPrimary,
-          hoverColor: cs.hentai.readerPanelSubtle,
-          overlayColor: cs.hentai.readerPanelSubtle,
-          onPressed: widget.onNextSeriesComic,
-        ),
-    ];
-  }
-
-  Widget _buildSideActionGroup({
-    required ColorScheme cs,
-    required List<Widget> children,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-      decoration: BoxDecoration(
-        color: cs.hentai.readerPanelSubtle,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 2,
-        children: children,
       ),
     );
   }

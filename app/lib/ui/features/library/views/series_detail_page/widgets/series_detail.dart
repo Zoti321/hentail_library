@@ -108,7 +108,6 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: <Widget>[
                               _buildPrimarySection(
-                                context,
                                 tokens,
                                 cs,
                                 hasR18: metadata?.hasR18 ?? false,
@@ -160,7 +159,6 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
   }
 
   Widget _buildPrimarySection(
-    BuildContext context,
     AppThemeTokens tokens,
     ColorScheme cs, {
     required bool hasR18,

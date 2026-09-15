@@ -18,8 +18,12 @@ class ReaderSeriesMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double viewportWidth = MediaQuery.sizeOf(context).width;
     return ReaderFloatingMenuPanel(
-      width: kReaderSeriesMenuWidth,
+      width: readerClampedPopupMenuWidth(
+        designWidth: kReaderSeriesMenuWidth,
+        viewportWidth: viewportWidth,
+      ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(
           maxHeight: kReaderSeriesMenuMaxHeight,

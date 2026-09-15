@@ -5,6 +5,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/reading/read_session.dart';
 import 'package:hentai_library/ui/core/interaction/app_motion.dart';
+import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_series_navigation.dart';
@@ -42,15 +43,94 @@ class ReaderTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
-    final double topPadding = MediaQuery.of(context).padding.top + 24;
+    final MediaQueryData media = MediaQuery.of(context);
+    final double topPadding = media.padding.top + kReaderChromeEdgeGap;
     final double targetWidth = ReaderFloatingPanel.targetBarWidth(context);
+    final bool compact = AppLayoutBreakpoints.isCompact(media.size.width);
+
+    final Widget panel = ReaderFloatingPanel(
+      width: targetWidth,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        spacing: 8,
+        children: <Widget>[
+          GhostButton.icon(
+            icon: LucideIcons.arrowLeft,
+            tooltip: l10n.shellBack,
+            semanticLabel: l10n.readerBackSemantic,
+            iconSize: 16,
+            size: kReaderTopBarActionSize,
+            borderRadius: 8,
+            foregroundColor: cs.hentai.readerTextIconPrimary,
+            hoverColor: cs.hentai.readerPanelSubtle,
+            overlayColor: cs.hentai.readerPanelSubtle,
+            onPressed: () async {
+              await onExit();
+            },
+          ),
+          Expanded(
+            child: _ReaderTopBarTitle(
+              title: title,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: cs.hentai.readerTextIconPrimary,
+                letterSpacing: 0.6,
+              ),
+            ),
+          ),
+          GhostButton.icon(
+            icon: readerFullscreen
+                ? LucideIcons.minimize2
+                : LucideIcons.maximize2,
+            tooltip: readerFullscreen
+                ? l10n.readerExitFullscreen
+                : l10n.readerEnterFullscreen,
+            semanticLabel: readerFullscreen
+                ? l10n.readerExitFullscreenSemantic
+                : l10n.readerEnterFullscreenSemantic,
+            iconSize: 16,
+            size: kReaderTopBarActionSize,
+            borderRadius: 8,
+            foregroundColor: cs.hentai.readerTextIconPrimary,
+            hoverColor: cs.hentai.readerPanelSubtle,
+            overlayColor: cs.hentai.readerPanelSubtle,
+            onPressed: () async {
+              await onToggleFullscreen();
+            },
+          ),
+          if (navContext != null && session != null)
+            ReaderSeriesMenuButton(navContext: navContext!, session: session!),
+          GhostButton.icon(
+            icon: LucideIcons.settings,
+            tooltip: l10n.readerSettingsTitle,
+            semanticLabel: l10n.readerOpenSettingsSemantic,
+            iconSize: 16,
+            size: kReaderTopBarActionSize,
+            borderRadius: 8,
+            foregroundColor: cs.hentai.readerTextIconPrimary,
+            hoverColor: cs.hentai.readerPanelSubtle,
+            overlayColor: cs.hentai.readerPanelSubtle,
+            onPressed: () {
+              showReaderSettingsDialog(context);
+            },
+          ),
+          ReaderOverflowMenuButton(
+            comicId: session?.comicId ?? '',
+            seriesId: seriesId,
+            incognito: session?.incognito ?? false,
+            startFromFirstPage: session?.startFromFirstPage ?? false,
+          ),
+        ],
+      ),
+    );
 
     return AnimatedPositioned(
       duration: motionDurationOf(context, const Duration(milliseconds: 300)),
       curve: Curves.easeOutCubic,
-      top: showControls ? topPadding : topPadding - 20,
-      left: 0,
-      right: 0,
+      top: showControls ? topPadding : topPadding - kReaderChromeHideSlide,
+      left: compact ? media.padding.left : 0,
+      right: compact ? media.padding.right : 0,
       child: IgnorePointer(
         ignoring: !showControls,
         child: AnimatedOpacity(
@@ -59,87 +139,7 @@ class ReaderTopBar extends StatelessWidget {
             const Duration(milliseconds: 300),
           ),
           opacity: showControls ? 1.0 : 0.0,
-          child: Center(
-            child: ReaderFloatingPanel(
-              width: targetWidth,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                spacing: 8,
-                children: <Widget>[
-                  GhostButton.icon(
-                    icon: LucideIcons.arrowLeft,
-                    tooltip: l10n.shellBack,
-                    semanticLabel: l10n.readerBackSemantic,
-                    iconSize: 16,
-                    size: 28,
-                    borderRadius: 8,
-                    foregroundColor: cs.hentai.readerTextIconPrimary,
-                    hoverColor: cs.hentai.readerPanelSubtle,
-                    overlayColor: cs.hentai.readerPanelSubtle,
-                    onPressed: () async {
-                      await onExit();
-                    },
-                  ),
-                  Expanded(
-                    child: _ReaderTopBarTitle(
-                      title: title,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: cs.hentai.readerTextIconPrimary,
-                        letterSpacing: 0.6,
-                      ),
-                    ),
-                  ),
-                  GhostButton.icon(
-                    icon: readerFullscreen
-                        ? LucideIcons.minimize2
-                        : LucideIcons.maximize2,
-                    tooltip: readerFullscreen
-                        ? l10n.readerExitFullscreen
-                        : l10n.readerEnterFullscreen,
-                    semanticLabel: readerFullscreen
-                        ? l10n.readerExitFullscreenSemantic
-                        : l10n.readerEnterFullscreenSemantic,
-                    iconSize: 16,
-                    size: 32,
-                    borderRadius: 8,
-                    foregroundColor: cs.hentai.readerTextIconPrimary,
-                    hoverColor: cs.hentai.readerPanelSubtle,
-                    overlayColor: cs.hentai.readerPanelSubtle,
-                    onPressed: () async {
-                      await onToggleFullscreen();
-                    },
-                  ),
-                  if (navContext != null && session != null)
-                    ReaderSeriesMenuButton(
-                      navContext: navContext!,
-                      session: session!,
-                    ),
-                  GhostButton.icon(
-                    icon: LucideIcons.settings,
-                    tooltip: l10n.readerSettingsTitle,
-                    semanticLabel: l10n.readerOpenSettingsSemantic,
-                    iconSize: 16,
-                    size: 32,
-                    borderRadius: 8,
-                    foregroundColor: cs.hentai.readerTextIconPrimary,
-                    hoverColor: cs.hentai.readerPanelSubtle,
-                    overlayColor: cs.hentai.readerPanelSubtle,
-                    onPressed: () {
-                      showReaderSettingsDialog(context);
-                    },
-                  ),
-                  ReaderOverflowMenuButton(
-                    comicId: session?.comicId ?? '',
-                    seriesId: seriesId,
-                    incognito: session?.incognito ?? false,
-                    startFromFirstPage: session?.startFromFirstPage ?? false,
-                  ),
-                ],
-              ),
-            ),
-          ),
+          child: compact ? panel : Center(child: panel),
         ),
       ),
     );
@@ -232,7 +232,7 @@ class _ReaderSeriesMenuButtonState
       barrierColor: Colors.transparent,
       pressType: PressType.singleClick,
       showArrow: false,
-      verticalMargin: -14,
+      verticalMargin: kReaderPopupMenuVerticalMargin,
       menuBuilder: () => ReaderSeriesMenu(
         navContext: widget.navContext,
         onSelect: (String targetComicId) {
@@ -245,7 +245,7 @@ class _ReaderSeriesMenuButtonState
         tooltip: l10n.readerSeriesCatalog,
         semanticLabel: l10n.readerSeriesCatalog,
         iconSize: 16,
-        size: 32,
+        size: kReaderTopBarActionSize,
         borderRadius: 8,
         foregroundColor: cs.hentai.readerTextIconPrimary,
         hoverColor: cs.hentai.readerPanelSubtle,

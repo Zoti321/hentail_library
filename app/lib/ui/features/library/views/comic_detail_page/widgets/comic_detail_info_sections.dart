@@ -4,9 +4,10 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/ui/core/layout/detail_meta_chip_band_layout.dart';
 import 'package:hentai_library/ui/core/layout/detail_meta_chip_row_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/core/widgets/foundation/horizontal_wheel_scroll_listener.dart';
+import 'package:hentai_library/ui/core/widgets/element/chip/detail_meta_chip_band.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/r18_rating_chip.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
@@ -226,12 +227,17 @@ class ComicDetailMetadataBlock extends StatelessWidget {
         LabeledMetaChipRow(
           label: l10n.comicDetailParodies,
           items: comic.parodies,
+          maxRows: kDetailMetaChipBandMaxRowsSingle,
         ),
       );
     }
     if (authors.isNotEmpty) {
       rows.add(
-        LabeledMetaChipRow(label: l10n.comicDetailAuthors, items: authors),
+        LabeledMetaChipRow(
+          label: l10n.comicDetailAuthors,
+          items: authors,
+          maxRows: kDetailMetaChipBandMaxRowsSingle,
+        ),
       );
     }
     if (comic.characters.isNotEmpty) {
@@ -239,11 +245,18 @@ class ComicDetailMetadataBlock extends StatelessWidget {
         LabeledMetaChipRow(
           label: l10n.comicDetailCharacters,
           items: comic.characters,
+          maxRows: kDetailMetaChipBandMaxRowsCharacter,
         ),
       );
     }
     if (tags.isNotEmpty) {
-      rows.add(LabeledMetaChipRow(label: l10n.comicDetailTags, items: tags));
+      rows.add(
+        LabeledMetaChipRow(
+          label: l10n.comicDetailTags,
+          items: tags,
+          maxRows: kDetailMetaChipBandMaxRowsTag,
+        ),
+      );
     }
     rows.add(
       ComicDetailInfoRow(
@@ -307,25 +320,39 @@ String formatComicResourceSize(int bytes) {
   return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
 }
 
-class LabeledMetaChipRow extends HookWidget {
+class LabeledMetaChipRow extends StatelessWidget {
   const LabeledMetaChipRow({
     super.key,
     required this.label,
     required this.items,
+    this.maxRows = kDetailMetaChipBandMaxRowsSingle,
+    this.rowHeight = kDetailMetaChipRowHeight,
+    this.chipCompact = false,
     this.onItemTap,
   });
 
   final String label;
   final List<String> items;
 
+  /// Wrap row cap before the chip band scrolls horizontally as a whole.
+  final int maxRows;
+
+  /// Band row height (Comic vs Series compact metrics).
+  final double rowHeight;
+
+  /// When true, chips use Series compact height metrics.
+  final bool chipCompact;
+
   /// 为 null 时走库页精确元数据搜索（Author/Tag/Parody/Character）；非 null 时由调用方处理。
   final ValueChanged<String>? onItemTap;
 
   @override
   Widget build(BuildContext context) {
+    if (items.isEmpty) {
+      return const SizedBox.shrink();
+    }
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
-    final ScrollController scrollController = useScrollController();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -342,35 +369,29 @@ class LabeledMetaChipRow extends HookWidget {
         ),
         SizedBox(width: tokens.spacing.lg),
         Expanded(
-          child: HorizontalWheelScrollListener(
-            controller: scrollController,
-            child: SingleChildScrollView(
-              controller: scrollController,
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                spacing: tokens.spacing.sm,
-                children: items
-                    .map(
-                      (String item) => OutlinedMetaChip(
-                        text: item,
-                        onTap: () {
-                          final ValueChanged<String>? custom = onItemTap;
-                          if (custom != null) {
-                            custom(item);
-                            return;
-                          }
-                          final String query =
-                              formatLibrarySearchExactMetaQuery(item);
-                          final String encoded = Uri.encodeQueryComponent(
-                            query,
-                          );
-                          appRouter.push('/searched?q=$encoded');
-                        },
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
+          child: DetailMetaChipBand(
+            maxRows: maxRows,
+            rowHeight: rowHeight,
+            children: items
+                .map(
+                  (String item) => OutlinedMetaChip(
+                    text: item,
+                    compact: chipCompact,
+                    onTap: () {
+                      final ValueChanged<String>? custom = onItemTap;
+                      if (custom != null) {
+                        custom(item);
+                        return;
+                      }
+                      final String query = formatLibrarySearchExactMetaQuery(
+                        item,
+                      );
+                      final String encoded = Uri.encodeQueryComponent(query);
+                      appRouter.push('/searched?q=$encoded');
+                    },
+                  ),
+                )
+                .toList(),
           ),
         ),
       ],

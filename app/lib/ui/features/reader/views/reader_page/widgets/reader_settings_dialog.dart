@@ -277,7 +277,7 @@ class _ReaderSettingsDialogHeader extends StatelessWidget {
                     width: 40,
                     height: 40,
                   ),
-                  tooltip: l10n.readerSettingsClose,
+                  tooltip: '',
                   icon: Icon(
                     LucideIcons.x,
                     size: 18,

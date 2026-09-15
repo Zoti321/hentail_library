@@ -1037,9 +1037,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerSettingsTitle => 'Reading settings';
 
   @override
-  String get readerSettingsClose => 'Close';
-
-  @override
   String get readerSettingsGeneral => 'General';
 
   @override
@@ -1182,30 +1179,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get readerSeriesCatalog => 'Series catalog';
-
-  @override
-  String get readerPrevVolume => 'Previous volume';
-
-  @override
-  String get readerPrevVolumeSemantic => 'Previous volume in series';
-
-  @override
-  String get readerFirstPage => 'First page';
-
-  @override
-  String get readerFirstPageSemantic => 'Go to first page';
-
-  @override
-  String get readerNextVolume => 'Next volume';
-
-  @override
-  String get readerNextVolumeSemantic => 'Next volume in series';
-
-  @override
-  String get readerLastPage => 'Last page';
-
-  @override
-  String get readerLastPageSemantic => 'Go to last page';
 
   @override
   String get readerPrevPage => 'Previous page';

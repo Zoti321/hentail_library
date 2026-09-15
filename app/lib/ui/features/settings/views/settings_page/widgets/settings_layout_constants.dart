@@ -6,6 +6,15 @@ import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 const double settingsThemeMenuWidthMedium = 224;
 const double kSettingsHeaderVerticalPadding = 6;
 const double kSettingsHeaderShadowGradientHeight = 6;
+const double kSettingsMasterPaneWidth = 260;
+
+/// Narrow master ↔ detail drill-in (matches short desktop UI motion).
+const Duration kSettingsNarrowPaneTransitionDuration = Duration(
+  milliseconds: 220,
+);
+
+/// Settings list–detail master categories (existing three groups).
+enum SettingsCategory { personalization, diagnostics, about }
 
 enum SettingsLayoutTier { compact, medium, expanded }
 

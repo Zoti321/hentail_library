@@ -3,6 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/ui/core/layout/detail_meta_chip_band_layout.dart';
 import 'package:hentai_library/ui/core/layout/detail_meta_chip_row_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
@@ -126,12 +127,24 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
     // Order: Parody → Author → Character → Tag（与 Comic 一致）。
     if (parodies.isNotEmpty) {
       rows.add(
-        LabeledMetaChipRow(label: l10n.comicDetailParodies, items: parodies),
+        LabeledMetaChipRow(
+          label: l10n.comicDetailParodies,
+          items: parodies,
+          maxRows: kDetailMetaChipBandMaxRowsSingle,
+          rowHeight: kSeriesDetailMetaChipRowHeight,
+          chipCompact: true,
+        ),
       );
     }
     if (authors.isNotEmpty) {
       rows.add(
-        LabeledMetaChipRow(label: l10n.comicDetailAuthors, items: authors),
+        LabeledMetaChipRow(
+          label: l10n.comicDetailAuthors,
+          items: authors,
+          maxRows: kDetailMetaChipBandMaxRowsSingle,
+          rowHeight: kSeriesDetailMetaChipRowHeight,
+          chipCompact: true,
+        ),
       );
     }
     if (characters.isNotEmpty) {
@@ -139,11 +152,22 @@ class SeriesDetailMetadataBlock extends StatelessWidget {
         LabeledMetaChipRow(
           label: l10n.comicDetailCharacters,
           items: characters,
+          maxRows: kDetailMetaChipBandMaxRowsCharacter,
+          rowHeight: kSeriesDetailMetaChipRowHeight,
+          chipCompact: true,
         ),
       );
     }
     if (tags.isNotEmpty) {
-      rows.add(LabeledMetaChipRow(label: l10n.comicDetailTags, items: tags));
+      rows.add(
+        LabeledMetaChipRow(
+          label: l10n.comicDetailTags,
+          items: tags,
+          maxRows: kDetailMetaChipBandMaxRowsTag,
+          rowHeight: kSeriesDetailMetaChipRowHeight,
+          chipCompact: true,
+        ),
+      );
     }
     if (rows.isEmpty) {
       return const SizedBox.shrink();

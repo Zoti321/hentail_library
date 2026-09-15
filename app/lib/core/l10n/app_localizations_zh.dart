@@ -1008,9 +1008,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get readerSettingsTitle => '阅读设置';
 
   @override
-  String get readerSettingsClose => '关闭';
-
-  @override
   String get readerSettingsGeneral => '常规';
 
   @override
@@ -1153,30 +1150,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get readerSeriesCatalog => '系列目录';
-
-  @override
-  String get readerPrevVolume => '上一卷';
-
-  @override
-  String get readerPrevVolumeSemantic => '系列上一卷';
-
-  @override
-  String get readerFirstPage => '首页';
-
-  @override
-  String get readerFirstPageSemantic => '跳转到首页';
-
-  @override
-  String get readerNextVolume => '下一卷';
-
-  @override
-  String get readerNextVolumeSemantic => '系列下一卷';
-
-  @override
-  String get readerLastPage => '尾页';
-
-  @override
-  String get readerLastPageSemantic => '跳转到尾页';
 
   @override
   String get readerPrevPage => '上一页';
