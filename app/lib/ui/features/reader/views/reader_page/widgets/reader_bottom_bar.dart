@@ -59,7 +59,7 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
     final AppLocalizations l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final MediaQueryData media = MediaQuery.of(context);
-    final double bottomPadding = media.padding.bottom + 32;
+    final double bottomPadding = media.padding.bottom + kReaderChromeEdgeGap;
     final double targetWidth = ReaderFloatingPanel.targetBarWidth(context);
     final bool compact = AppLayoutBreakpoints.isCompact(media.size.width);
     final int safeTotalPages = widget.totalPages > 0 ? widget.totalPages : 1;
@@ -70,9 +70,9 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
 
     final Widget panel = ReaderFloatingPanel(
       width: targetWidth,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       child: Column(
-        spacing: 10,
+        spacing: 8,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Row(
@@ -155,7 +155,9 @@ class _ReaderBottomBarState extends State<ReaderBottomBar> {
     return AnimatedPositioned(
       duration: motionDurationOf(context, const Duration(milliseconds: 300)),
       curve: Curves.easeOutCubic,
-      bottom: widget.showControls ? bottomPadding : bottomPadding - 32,
+      bottom: widget.showControls
+          ? bottomPadding
+          : bottomPadding - kReaderChromeHideSlide,
       left: compact ? media.padding.left : 0,
       right: compact ? media.padding.right : 0,
       child: IgnorePointer(

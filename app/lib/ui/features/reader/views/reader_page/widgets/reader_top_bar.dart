@@ -44,7 +44,7 @@ class ReaderTopBar extends StatelessWidget {
     final AppLocalizations l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final MediaQueryData media = MediaQuery.of(context);
-    final double topPadding = media.padding.top + 24;
+    final double topPadding = media.padding.top + kReaderChromeEdgeGap;
     final double targetWidth = ReaderFloatingPanel.targetBarWidth(context);
     final bool compact = AppLayoutBreakpoints.isCompact(media.size.width);
 
@@ -128,7 +128,7 @@ class ReaderTopBar extends StatelessWidget {
     return AnimatedPositioned(
       duration: motionDurationOf(context, const Duration(milliseconds: 300)),
       curve: Curves.easeOutCubic,
-      top: showControls ? topPadding : topPadding - 20,
+      top: showControls ? topPadding : topPadding - kReaderChromeHideSlide,
       left: compact ? media.padding.left : 0,
       right: compact ? media.padding.right : 0,
       child: IgnorePointer(

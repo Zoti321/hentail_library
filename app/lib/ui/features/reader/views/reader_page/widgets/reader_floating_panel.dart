@@ -8,6 +8,15 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 /// Unified visual size for reader top-bar action [GhostButton]s (including back).
 const double kReaderTopBarActionSize = 32;
 
+/// Extra gap beyond [MediaQueryData.padding] for floating reader chrome.
+///
+/// System safe-area (notch / home indicator) stays intact; this only adds a
+/// small float margin so bars are not flush against the viewport edge.
+const double kReaderChromeEdgeGap = 8;
+
+/// Slide distance when reader chrome hides (top/bottom [AnimatedPositioned]).
+const double kReaderChromeHideSlide = 16;
+
 /// Shared vertical margin for reader overflow + series popup menus.
 ///
 /// Matches library toolbar / detail precedents (`verticalMargin: -32`) so the

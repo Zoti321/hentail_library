@@ -61,6 +61,13 @@ void main() {
     });
   });
 
+  group('reader chrome edge inset', () {
+    test('keeps a small float gap beyond system safe-area', () {
+      expect(kReaderChromeEdgeGap, 8);
+      expect(kReaderChromeHideSlide, 16);
+    });
+  });
+
   group('reader top bar action size', () {
     test('exports unified action size of 32', () {
       expect(kReaderTopBarActionSize, 32);
