@@ -18,7 +18,13 @@ ReaderTapZone resolveReaderTapZone({
   return ReaderTapZone.center;
 }
 
-enum ReaderKeyboardCommand { prevPage, nextPage, toggleAutoPlay, hideControls, exit }
+enum ReaderKeyboardCommand {
+  prevPage,
+  nextPage,
+  toggleAutoPlay,
+  hideControls,
+  exit,
+}
 
 ReaderKeyboardCommand? readerKeyboardCommandFor(
   LogicalKeyboardKey key, {

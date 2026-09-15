@@ -127,8 +127,7 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
                               Divider(
                                 height: 1,
                                 thickness:
-                                    1 /
-                                    MediaQuery.devicePixelRatioOf(context),
+                                    1 / MediaQuery.devicePixelRatioOf(context),
                                 color: cs.hentai.borderSubtle,
                               ),
                               SizedBox(height: tokens.spacing.lg),

@@ -220,9 +220,10 @@ class _SettingsNarrowPaneSwitcher extends StatelessWidget {
                 : const Offset(0.12, 0);
           }
           return SlideTransition(
-            position: Tween<Offset>(begin: begin, end: Offset.zero).animate(
-              animation,
-            ),
+            position: Tween<Offset>(
+              begin: begin,
+              end: Offset.zero,
+            ).animate(animation),
             child: FadeTransition(opacity: animation, child: child),
           );
         },
