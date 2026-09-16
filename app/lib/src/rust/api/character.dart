@@ -7,10 +7,10 @@ import '../frb_generated.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-List<String> listAllCharactersFrb() =>
+Future<List<String>> listAllCharactersFrb() =>
     RustLib.instance.api.crateApiCharacterListAllCharactersFrb();
 
-List<String> listDistinctCharactersFrb({String? libraryId}) => RustLib
+Future<List<String>> listDistinctCharactersFrb({String? libraryId}) => RustLib
     .instance
     .api
     .crateApiCharacterListDistinctCharactersFrb(libraryId: libraryId);

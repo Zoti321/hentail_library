@@ -34,7 +34,7 @@ Future<SeriesItemDto?> findSeriesItemByComicIdFrb({required String comicId}) =>
       comicId: comicId,
     );
 
-SeriesReadingContextDto? getSeriesReadingContextByComicIdFrb({
+Future<SeriesReadingContextDto?> getSeriesReadingContextByComicIdFrb({
   required String comicId,
 }) => RustLib.instance.api.crateApiSeriesGetSeriesReadingContextByComicIdFrb(
   comicId: comicId,
@@ -48,7 +48,7 @@ Future<PagedSeriesComicsResultDto> fetchSeriesComicsPageFrb({
   request: request,
 );
 
-SeriesComicsMetadataDto fetchSeriesComicsMetadataFrb({
+Future<SeriesComicsMetadataDto> fetchSeriesComicsMetadataFrb({
   required String seriesId,
 }) => RustLib.instance.api.crateApiSeriesFetchSeriesComicsMetadataFrb(
   seriesId: seriesId,

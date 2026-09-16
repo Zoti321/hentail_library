@@ -11,12 +11,12 @@ class NamedFacetDictionaryRepositoryImpl
 
   @override
   Future<List<String>> listAll() async {
-    return guardFrbSync(_listAllFrb, fallbackMessage: _listFallbackMessage);
+    return guardFrb(_listAllFrb, fallbackMessage: _listFallbackMessage);
   }
 
   @override
   Future<List<String>> listDistinct({String? libraryId}) async {
-    return guardFrbSync(
+    return guardFrb(
       () => _listDistinctFrb(libraryId),
       fallbackMessage: _listFallbackMessage,
     );
@@ -27,12 +27,12 @@ class NamedFacetDictionaryRepositoryImpl
     NamedFacetKind.character => '读取角色列表失败',
   };
 
-  List<String> _listAllFrb() => switch (kind) {
+  Future<List<String>> _listAllFrb() => switch (kind) {
     NamedFacetKind.parody => rust_parody.listAllParodiesFrb(),
     NamedFacetKind.character => rust_character.listAllCharactersFrb(),
   };
 
-  List<String> _listDistinctFrb(String? libraryId) => switch (kind) {
+  Future<List<String>> _listDistinctFrb(String? libraryId) => switch (kind) {
     NamedFacetKind.parody => rust_parody.listDistinctParodiesFrb(
       libraryId: libraryId,
     ),

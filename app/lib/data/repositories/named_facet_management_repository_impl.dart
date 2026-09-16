@@ -12,7 +12,7 @@ class NamedFacetManagementRepositoryImpl
 
   @override
   Future<List<String>> listAll(ManagedNamedFacetKind kind) async {
-    return guardFrbSync(
+    return guardFrb(
       () => rust_named_facet.listAllNamedFacetNamesFrb(facet: kind.toFrb()),
       fallbackMessage: _listFallbackMessage(kind),
     );
@@ -84,7 +84,7 @@ class NamedFacetManagementRepositoryImpl
 
   @override
   Future<int> countAttachments(ManagedNamedFacetKind kind, String name) async {
-    final result = guardFrbSync(
+    final result = await guardFrb(
       () => rust_named_facet.countNamedFacetAttachmentsFrb(
         facet: kind.toFrb(),
         name: name,

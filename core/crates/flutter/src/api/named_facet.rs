@@ -51,11 +51,12 @@ pub struct NamedFacetPagedNamesDto {
     pub page_size: i32,
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn list_all_named_facet_names_frb(
+#[flutter_rust_bridge::frb]
+pub async fn list_all_named_facet_names_frb(
     facet: JunctionNamedFacetFrb,
 ) -> Result<Vec<String>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(list_all_named_facet_names(facet.into()))
+    list_all_named_facet_names(facet.into())
+        .await
         .map_err(HentaiErrorDto::from)
 }
 
@@ -121,12 +122,13 @@ pub fn rename_named_facet_name_frb(
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn count_named_facet_attachments_frb(
+#[flutter_rust_bridge::frb]
+pub async fn count_named_facet_attachments_frb(
     facet: JunctionNamedFacetFrb,
     name: String,
 ) -> Result<i64, HentaiErrorDto> {
-    hentai_core::runtime::block_on(count_named_facet_attachments(facet.into(), &name))
+    count_named_facet_attachments(facet.into(), &name)
+        .await
         .map_err(HentaiErrorDto::from)
 }
 

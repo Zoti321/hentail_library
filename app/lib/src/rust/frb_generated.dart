@@ -121,7 +121,7 @@ abstract class RustLibApi extends BaseApi {
 
   Future<PlatformInt64> crateApiSeriesCountAllSeriesFrb();
 
-  PlatformInt64 crateApiNamedFacetCountNamedFacetAttachmentsFrb({
+  Future<PlatformInt64> crateApiNamedFacetCountNamedFacetAttachmentsFrb({
     required JunctionNamedFacetFrb facet,
     required String name,
   });
@@ -190,7 +190,7 @@ abstract class RustLibApi extends BaseApi {
     String? keyword,
   });
 
-  SeriesComicsMetadataDto crateApiSeriesFetchSeriesComicsMetadataFrb({
+  Future<SeriesComicsMetadataDto> crateApiSeriesFetchSeriesComicsMetadataFrb({
     required String seriesId,
   });
 
@@ -244,9 +244,8 @@ abstract class RustLibApi extends BaseApi {
     required String comicId,
   });
 
-  SeriesReadingContextDto? crateApiSeriesGetSeriesReadingContextByComicIdFrb({
-    required String comicId,
-  });
+  Future<SeriesReadingContextDto?>
+  crateApiSeriesGetSeriesReadingContextByComicIdFrb({required String comicId});
 
   TagDictionaryImportResultDto crateApiTagImportTagDictionaryFrb({
     required List<int> jsonBytes,
@@ -263,19 +262,23 @@ abstract class RustLibApi extends BaseApi {
 
   List<String> crateApiAuthorListAllAuthorsFrb();
 
-  List<String> crateApiCharacterListAllCharactersFrb();
+  Future<List<String>> crateApiCharacterListAllCharactersFrb();
 
-  List<String> crateApiNamedFacetListAllNamedFacetNamesFrb({
+  Future<List<String>> crateApiNamedFacetListAllNamedFacetNamesFrb({
     required JunctionNamedFacetFrb facet,
   });
 
-  List<String> crateApiParodyListAllParodiesFrb();
+  Future<List<String>> crateApiParodyListAllParodiesFrb();
 
   List<String> crateApiTagListAllTagsFrb();
 
-  List<String> crateApiCharacterListDistinctCharactersFrb({String? libraryId});
+  Future<List<String>> crateApiCharacterListDistinctCharactersFrb({
+    String? libraryId,
+  });
 
-  List<String> crateApiParodyListDistinctParodiesFrb({String? libraryId});
+  Future<List<String>> crateApiParodyListDistinctParodiesFrb({
+    String? libraryId,
+  });
 
   Future<List<LibraryDto>> crateApiLibraryListLibrariesFrb();
 
@@ -879,17 +882,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "count_all_series_frb", argNames: []);
 
   @override
-  PlatformInt64 crateApiNamedFacetCountNamedFacetAttachmentsFrb({
+  Future<PlatformInt64> crateApiNamedFacetCountNamedFacetAttachmentsFrb({
     required JunctionNamedFacetFrb facet,
     required String name,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_junction_named_facet_frb(facet, serializer);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 14,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_i_64,
@@ -1386,15 +1394,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  SeriesComicsMetadataDto crateApiSeriesFetchSeriesComicsMetadataFrb({
+  Future<SeriesComicsMetadataDto> crateApiSeriesFetchSeriesComicsMetadataFrb({
     required String seriesId,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(seriesId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 31,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_series_comics_metadata_dto,
@@ -1831,15 +1844,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  SeriesReadingContextDto? crateApiSeriesGetSeriesReadingContextByComicIdFrb({
-    required String comicId,
-  }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<SeriesReadingContextDto?>
+  crateApiSeriesGetSeriesReadingContextByComicIdFrb({required String comicId}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(comicId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 45)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 45,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData:
@@ -1997,12 +2014,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "list_all_authors_frb", argNames: []);
 
   @override
-  List<String> crateApiCharacterListAllCharactersFrb() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<List<String>> crateApiCharacterListAllCharactersFrb() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 51)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 51,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_String,
@@ -2019,15 +2041,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "list_all_characters_frb", argNames: []);
 
   @override
-  List<String> crateApiNamedFacetListAllNamedFacetNamesFrb({
+  Future<List<String>> crateApiNamedFacetListAllNamedFacetNamesFrb({
     required JunctionNamedFacetFrb facet,
   }) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_junction_named_facet_frb(facet, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 52)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 52,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_String,
@@ -2047,12 +2074,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  List<String> crateApiParodyListAllParodiesFrb() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<List<String>> crateApiParodyListAllParodiesFrb() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 53)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 53,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_String,
@@ -2091,13 +2123,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "list_all_tags_frb", argNames: []);
 
   @override
-  List<String> crateApiCharacterListDistinctCharactersFrb({String? libraryId}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<List<String>> crateApiCharacterListDistinctCharactersFrb({
+    String? libraryId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_opt_String(libraryId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 55)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 55,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_String,
@@ -2117,13 +2156,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  List<String> crateApiParodyListDistinctParodiesFrb({String? libraryId}) {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
+  Future<List<String>> crateApiParodyListDistinctParodiesFrb({
+    String? libraryId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_opt_String(libraryId, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 56)!;
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 56,
+            port: port_,
+          );
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_String,

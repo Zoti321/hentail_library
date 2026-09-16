@@ -306,11 +306,12 @@ pub async fn find_series_item_by_comic_id_frb(
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn get_series_reading_context_by_comic_id_frb(
+#[flutter_rust_bridge::frb]
+pub async fn get_series_reading_context_by_comic_id_frb(
     comic_id: String,
 ) -> Result<Option<SeriesReadingContextDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_get_reading_context(&comic_id))
+    core_get_reading_context(&comic_id)
+        .await
         .map(|opt| {
             opt.map(|v: CoreSeriesReadingContext| SeriesReadingContextDto {
                 series_id: v.series_id,
@@ -333,11 +334,12 @@ pub async fn fetch_series_comics_page_frb(
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn fetch_series_comics_metadata_frb(
+#[flutter_rust_bridge::frb]
+pub async fn fetch_series_comics_metadata_frb(
     series_id: String,
 ) -> Result<SeriesComicsMetadataDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_fetch_series_comics_metadata(&series_id))
+    core_fetch_series_comics_metadata(&series_id)
+        .await
         .map(SeriesComicsMetadataDto::from)
         .map_err(HentaiErrorDto::from)
 }
