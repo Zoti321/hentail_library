@@ -367,7 +367,7 @@ sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改�
 - iOS PDF：`core/crates/core/src/formats/pdf.rs`；`core/vendor/{manifest.json,build-ios-xcframework.sh}`；`app/rust_builder/ios/{hentai_flutter.podspec,embed_pdfium.sh}`；`app/ios/Podfile`
 - Remote：`core/crates/core/src/resource/access/webdav.rs`；`core/crates/core/tests/remote_library_*.rs`
 - 占位产品：`app/lib/ui/features/shell/views/all_libraries_browse_page.dart`
-- 死/悬空路径：`app/lib/ui/features/shell/state/library_series_providers.dart`；`series_repository_impl.dart` `setSeriesItemsOrder`；`reading_history_repository_impl.dart` `clearExpiredHistory`
+- 死/悬空路径：`app/lib/ui/features/shell/state/library_series_providers.dart`；~~`series_repository_impl.dart` `setSeriesItemsOrder`~~（2026-09-16 已删，降级 core-only）；`reading_history_repository_impl.dart` `clearExpiredHistory`
 
 ---
 

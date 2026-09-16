@@ -3,7 +3,6 @@ import 'package:hentai_library/data/adapters/series_frb_mapper.dart';
 import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
@@ -172,20 +171,6 @@ class SeriesRepositoryImpl implements SeriesRepository {
         ),
       ),
       fallbackMessage: '更新系列元数据锁失败',
-    );
-  }
-
-  @override
-  Future<void> setSeriesItemsOrder(
-    String seriesId,
-    List<SeriesItem> orderedItems,
-  ) async {
-    guardFrbSync(
-      () => rust_series.setSeriesItemsOrderFrb(
-        seriesId: seriesId,
-        orderedComicIds: orderedItems.map((SeriesItem i) => i.comicId).toList(),
-      ),
-      fallbackMessage: '更新系列排序失败',
     );
   }
 

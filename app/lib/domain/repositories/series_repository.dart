@@ -1,7 +1,6 @@
 import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
@@ -61,14 +60,6 @@ abstract class SeriesRepository {
     bool? serializationStatus,
     bool? totalCount,
   });
-
-  /// 批量重排落库（ADR-0006）：提交该系列的完整新序（仅使用 `comicId`）；
-  /// core 侧按锚点 + 夹缝插值写入 `order`，并将本次提交的所有成员一律置为
-  /// `sortOrderLocked=true`。
-  Future<void> setSeriesItemsOrder(
-    String seriesId,
-    List<SeriesItem> orderedItems,
-  );
 
   Future<List<Series>> searchByKeyword(String keyword);
 

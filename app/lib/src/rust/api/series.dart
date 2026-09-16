@@ -70,14 +70,6 @@ void setSeriesMetaLocksFrb({
   locks: locks,
 );
 
-void setSeriesItemsOrderFrb({
-  required String seriesId,
-  required List<String> orderedComicIds,
-}) => RustLib.instance.api.crateApiSeriesSetSeriesItemsOrderFrb(
-  seriesId: seriesId,
-  orderedComicIds: orderedComicIds,
-);
-
 void updateSeriesItemSortOrderFrb({
   required String seriesId,
   required String comicId,

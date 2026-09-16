@@ -6,7 +6,6 @@ use hentai_core::{
     load_home_series_comic_order_map, search_series_by_keyword,
     search_series_by_tag_expression,
     set_series_item_sort_order_locked as core_set_item_sort_locked,
-    set_series_items_order as core_set_order,
     set_series_meta_locks as core_set_meta_locks,
     update_series_item_sort_order as core_update_item_sort_order,
     update_series_user_meta as core_update_meta, watch_all_series, watch_home_series_comic_order_map,
@@ -373,15 +372,6 @@ pub fn set_series_meta_locks_frb(
         },
     ))
     .map_err(HentaiErrorDto::from)
-}
-
-#[flutter_rust_bridge::frb(sync)]
-pub fn set_series_items_order_frb(
-    series_id: String,
-    ordered_comic_ids: Vec<String>,
-) -> Result<(), HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_set_order(&series_id, ordered_comic_ids))
-        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb(sync)]
