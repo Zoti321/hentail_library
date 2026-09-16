@@ -54,7 +54,7 @@
 | Rust `core/crates/core/src` | **116**（117）`.rs` | `mobile_pdf.rs` 随 ADR-0015 删除 |
 | `core/crates/core/tests` 集成测文件 | **35**（34） | `find core/crates/core/tests -name '*.rs'` |
 | Flutter `*_test.dart` | **178**（172） | `find app/test -name '*_test.dart'`；2026-09-16 新增 `frb_zone_guard_test.dart` |
-| `#[flutter_rust_bridge::frb(sync)]` | **50**（70） | `grep -r ... core/crates/flutter/src/api`；2026-09-16 晚间 P0-B2 第二刀后 |
+| `#[flutter_rust_bridge::frb(sync)]` | **48**（70） | `grep -r ... core/crates/flutter/src/api`；2026-09-16 晚间 P0-B2 第二刀 + 首页死 sync 删除后 |
 | 纯 `#[flutter_rust_bridge::frb]`（async 入口） | **51**（36） | 同行匹配 `^#\[flutter_rust_bridge::frb\]$`；**async 首次成为多数** |
 | `guardFrbSync(` 调用点 | **40**（60） | `app/lib`，排除生成码与 `frb_call_guard` 定义；第二刀后 |
 | `extends StatefulWidget` 文件 | **19**（20） | `app/lib` |
@@ -63,7 +63,7 @@
 | `TODO`/`FIXME`/`HACK`/`XXX` | **0**（0） | 债仍以注释/ADR/文档表达 |
 | GitHub open issues | **0** | `gh issue list --state open`（#11 PRD、#108 切片2 均 CLOSED） |
 
-sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 → ADR-0014 退役 Path API 60:43 → #131 删 `get_all_series_frb` 58:43 → **P0-B2 第二刀（2026-09-16 晚间）50:51**。第二刀把 series reading context / comics metadata / facet 名称列表 / facet attachment count / character·parody 的 4 个字典读共 8 个入口改成真 async，**async 自此成为多数**。
+sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 → ADR-0014 退役 Path API 60:43 → #131 删 `get_all_series_frb` 58:43 → **P0-B2 第二刀（2026-09-16 晚间）50:51 → 删首页死 sync 读 48:51**。第二刀把 series reading context / comics metadata / facet 名称列表 / facet attachment count / character·parody 的 4 个字典读共 8 个入口改成真 async，**async 自此成为多数**；随后删掉 `home.rs` 两个无消费方的一次性读（首页消费的是 async watch 流）。
 
 ### FRB 入口分布（按模块，2026-09-16 第二刀后）
 
@@ -77,7 +77,7 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 | `history.rs` | 4 | 3 | 全部写（分页/开读恢复读已 async） |
 | `reader.rs` | 3 | 5 | `load_page_bytes` 读（见 P1-B3）、`close/clear_sessions` |
 | `thumbnail.rs` | 3 | 5 | 写/清理 |
-| `sync.rs` / `home.rs` / `logging.rs` | 3 / 2 / 2 | 1 / 2 / 0 | 轻量控制面；`home.rs` 2 个 sync 读**已无 app 消费方** |
+| `sync.rs` / `home.rs` / `logging.rs` | 3 / 0 / 2 | 1 / 2 / 0 | 轻量控制面；`home.rs` 2 个无消费方的 sync 读已删除 |
 | `character.rs` / `parody.rs` | 0 / 0 | 2 / 2 | 第二刀已全部 async |
 
 > `path.rs`（3 sync / 1 async）随 ADR-0014 于 2026-09-16 删除。
@@ -93,7 +93,7 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 | 原 ID | 结论（2026-09-16 复核） | 证据 |
 |-------|------------------------|------|
 | **P0-1** shrinkWrap 网格 | **已落地**（稳态真 `SliverGrid`；仅排序 FLIP 短暂 shrinkWrap） | `animated_library_catalog_grid_sliver.dart` |
-| **P0-2** 热路径 sync FRB | **热路径已清零**：comic 分页/find/search、thumbnail 读、reader open/page list、history 读、library 热读、facet 分页与名称列表、series reading context / comics metadata、character·parody 字典读均已 async；剩余 sync 集中在写路径与 Tag/Author 管理读（50 sync / 51 async） | 见上表 |
+| **P0-2** 热路径 sync FRB | **热路径已清零**：comic 分页/find/search、thumbnail 读、reader open/page list、history 读、library 热读、facet 分页与名称列表、series reading context / comics metadata、character·parody 字典读均已 async；剩余 sync 集中在写路径与 Tag/Author 管理读（48 sync / 51 async） | 见上表 |
 | **P0-3** 封面 sync | **已落地** | `thumbnail.rs` find/ensure async；`comic_thumbnail_repository_impl.dart` 用 `guardFrb` |
 | **P0-4** 扫描期 revision 400ms | **仍开放** | `comic.rs` L369–372：`read_data_version` + `sleep(400ms)` |
 | **P0-5** 封面视口全量 watch | **已落地** | `comic_cover_content.dart` `viewport.select(...contains(index))` |
@@ -132,8 +132,8 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 
 - **第一刀（2026-09-13）**：History 读、Named facet 分页/form list、Library `list`/`get_current`/`set_current` → 真 async。
 - **本次复核补充**：`comic.findComicsByIdsFrb` 批量读为 async（P1-B4 的落地副产品），async 入口升至 44。
-- **第二刀（2026-09-16）**：见 P0-B2；Dart 侧 `guardFrbSync` 从 9 个 repository impl 收窄到 8 个（`named_facet_dictionary_repository_impl` 已全 async），50:51 且 async 反超。
-- **后续切片意向（未开）**：Tag/Author 管理读 → 各模块写 → 死 sync 清理（`home.rs` 两个读 + `load_home_series_comic_order_map`，宜删不宜迁）。
+- **第二刀（2026-09-16）**：见 P0-B2；Dart 侧 `guardFrbSync` 从 9 个 repository impl 收窄到 8 个（`named_facet_dictionary_repository_impl` 已全 async），50:51 且 async 反超；随后删首页死 sync 读至 48:51。
+- **后续切片意向（未开）**：Tag/Author 管理读 → 各模块写；死 sync 清理只剩 `load_home_series_comic_order_map`（`home.rs` 两个读已删）。
 - **政策**：`docs/agents/rust-migration.md`「FRB sync vs async」；Library **CRUD** 仍在 ADR-0014 决策外。
 - **风险/代价**：剩余部分中；需同步改生成绑定、Repository、`guardFrb`。
 
@@ -181,7 +181,7 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 - **未做（按收益排序）**：Tag/Author 管理读（`tag.rs` `list_all_tags` / `fetch_tags_page`、`author.rs` 同构 2 个）→ 各模块写（History 4、Library 9、**Series 4**：`update_series_user_meta` / `set_series_meta_locks` / `update_series_item_sort_order` / `set_series_item_sort_order_locked`）。
 - **计数订正（2026-09-16）**：本条此前写的「Series 7 写」是把 `series.rs` 的 sync **总数**当成了写数量；扣掉两个在第二刀范围内的读与 `load_home_series_comic_order_map` 读后，实际写路径当时是 5、删 `set_series_items_order_frb` 后是 4。
 - **清单减项（2026-09-16 决策，见 P2-C6）**：`set_series_items_order_frb` 不必改 async 而是**直接删除**（无消费方，API 降级为 core-only）。
-- **余留死 sync 读**：`home.rs` `get_home_page_counts_frb` / `get_continue_reading_top5_frb`（首页走 watch 流，`app/lib` 内无消费方）与 `series.rs` `load_home_series_comic_order_map_frb`（与 [#121](https://github.com/Zoti321/hentail_library/issues/121) 对齐后处理）——宜**删除**而非迁 async。
+- **死 sync 读处置**：`home.rs` `get_home_page_counts_frb` / `get_continue_reading_top5_frb` **已删除**（2026-09-16）——首页消费的是 async `watch_home_page_counts_frb` / `watch_continue_reading_top5_frb`，这两个一次性读是功能重复且 `app/lib` 内无调用方；连带删掉 core 的 `get_home_page_counts` / `get_continue_reading_top5`（原本只是 `load_counts` / `load_continue_reading` 的薄包装，watch 版直接用后者）与 `lib.rs` 再导出。余 `series.rs` `load_home_series_comic_order_map_frb`，与 [#121](https://github.com/Zoti321/hentail_library/issues/121) 对齐后处理。
 - **验收**：契约以 async 入口为准；第二刀已过 `cargo check`/`cargo test`、`flutter analyze`、`flutter test test/domain test/core test/data` 及系列导航/阅读器/系列详情三组 UI 测。
 - **风险/代价**：剩余部分低～中；模式已固化。
 
@@ -353,7 +353,7 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 已完成：FRB 薄边补测（P1-D2）、ADR-0015 回写（P1-A6）、`card_settings_ui` 与 Drift 错注释（P2-C4 / P1-C3 一半）。剩余按下述顺序推进：
 
 1. **扫描期 revision 降频** — [#128](https://github.com/Zoti321/hentail_library/issues/128)；唯一仍在的可感卡顿源，且与 #131 的潜伏全量查询叠加。
-2. ~~**sync→async 第二刀** — [#129](https://github.com/Zoti321/hentail_library/issues/129)~~ — **已完成（2026-09-16）**：8 个读入口转 async，50:51；下一刀为 Tag/Author 管理读与各模块写，另加 `home.rs` / `load_home_series_comic_order_map` 死 sync 删除。
+2. ~~**sync→async 第二刀** — [#129](https://github.com/Zoti321/hentail_library/issues/129)~~ — **已完成（2026-09-16）**：8 个读入口转 async + 删 `home.rs` 两个死 sync 读，48:51；下一刀为 Tag/Author 管理读与各模块写，死 sync 只剩 `load_home_series_comic_order_map`（待 #121 对齐）。
 3. **死路径与回退遗留清理** — [#131](https://github.com/Zoti321/hentail_library/issues/131)（`allSeriesProvider`）+ [#130](https://github.com/Zoti321/hentail_library/issues/130)（系列重排去留，需产品决策）。
 4. **All libraries browse 产品决策（P0-F1）** — 占位页已挂入口；排期聚合查询或降级入口，别留半成品。**尚无 issue**。
 5. ~~**ADR-0014 实现（P1-A2）**~~ — **已完成（2026-09-16）**。

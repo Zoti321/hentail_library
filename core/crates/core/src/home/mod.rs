@@ -65,11 +65,6 @@ ORDER BY h.last_read_time DESC
 LIMIT 5
 "#;
 
-pub async fn get_home_page_counts(exclude_r18: bool) -> Result<HomePageCountsDto, HentaiError> {
-    let db = connection()?;
-    load_counts(&db, exclude_r18).await
-}
-
 pub async fn watch_home_page_counts(
     exclude_r18: bool,
     mut emit: impl FnMut(HomePageCountsDto) -> Result<(), HentaiError>,
@@ -85,13 +80,6 @@ pub async fn watch_home_page_counts(
             emit(load_counts(&db, exclude_r18).await?)?;
         }
     }
-}
-
-pub async fn get_continue_reading_top5(
-    exclude_r18: bool,
-) -> Result<Vec<HomeContinueReadingDto>, HentaiError> {
-    let db = connection()?;
-    load_continue_reading(&db, exclude_r18).await
 }
 
 pub async fn watch_continue_reading_top5(

@@ -1,5 +1,4 @@
 use hentai_core::{
-    get_continue_reading_top5 as core_get_top5, get_home_page_counts as core_get_counts,
     watch_continue_reading_top5 as core_watch_top5, watch_home_page_counts as core_watch_counts,
     HomeContinueReadingDto as CoreContinue, HomePageCountsDto as CoreCounts,
 };
@@ -45,13 +44,6 @@ impl From<CoreContinue> for HomeContinueReadingDto {
     }
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn get_home_page_counts_frb(exclude_r18: bool) -> Result<HomePageCountsDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_get_counts(exclude_r18))
-        .map(HomePageCountsDto::from)
-        .map_err(HentaiErrorDto::from)
-}
-
 #[flutter_rust_bridge::frb]
 pub async fn watch_home_page_counts_frb(
     exclude_r18: bool,
@@ -63,15 +55,6 @@ pub async fn watch_home_page_counts_frb(
         })
         .await,
     )
-}
-
-#[flutter_rust_bridge::frb(sync)]
-pub fn get_continue_reading_top5_frb(
-    exclude_r18: bool,
-) -> Result<Vec<HomeContinueReadingDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_get_top5(exclude_r18))
-        .map(|rows| rows.into_iter().map(HomeContinueReadingDto::from).collect())
-        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb]

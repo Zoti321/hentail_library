@@ -44,8 +44,8 @@ pub use history::{
     PagedReadingHistoryDto, ReadingHistoryDto,
 };
 pub use home::{
-    get_continue_reading_top5, get_home_page_counts, watch_continue_reading_top5,
-    watch_home_page_counts, HomeContinueReadingDto, HomePageCountsDto,
+    watch_continue_reading_top5, watch_home_page_counts, HomeContinueReadingDto,
+    HomePageCountsDto,
 };
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,

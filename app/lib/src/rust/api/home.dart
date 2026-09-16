@@ -9,21 +9,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`, `from`
 
-HomePageCountsDto getHomePageCountsFrb({required bool excludeR18}) => RustLib
-    .instance
-    .api
-    .crateApiHomeGetHomePageCountsFrb(excludeR18: excludeR18);
-
 Stream<HomePageCountsDto> watchHomePageCountsFrb({required bool excludeR18}) =>
     RustLib.instance.api.crateApiHomeWatchHomePageCountsFrb(
       excludeR18: excludeR18,
     );
-
-List<HomeContinueReadingDto> getContinueReadingTop5Frb({
-  required bool excludeR18,
-}) => RustLib.instance.api.crateApiHomeGetContinueReadingTop5Frb(
-  excludeR18: excludeR18,
-);
 
 Stream<List<HomeContinueReadingDto>> watchContinueReadingTop5Frb({
   required bool excludeR18,
