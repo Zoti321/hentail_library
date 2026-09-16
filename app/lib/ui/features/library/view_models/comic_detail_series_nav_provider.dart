@@ -73,6 +73,7 @@ final class ComicDetailSeriesNavReady extends ComicDetailSeriesNavResult {
   final ComicDetailSeriesNavData data;
 }
 
+/// 暂无产出方：reading context SQL 用 `.one()`，多系列归属已降级为取首个系列。
 final class ComicDetailSeriesNavConflict extends ComicDetailSeriesNavResult {
   const ComicDetailSeriesNavConflict(this.seriesNames);
 
@@ -113,15 +114,6 @@ Future<Map<String, String>> resolveComicTitlesForDisplay(
   };
 }
 
-List<Series> findSeriesListContainingComic(
-  List<Series> allSeries,
-  String comicId,
-) {
-  return allSeries
-      .where((Series series) => series.containsComic(comicId))
-      .toList();
-}
-
 Future<ComicDetailSeriesNavSeriesData?> buildSeriesNavData(
   Ref ref,
   Series series,
@@ -151,42 +143,6 @@ Future<ComicDetailSeriesNavSeriesData?> buildSeriesNavData(
     seriesId: series.id,
     seriesName: series.name,
     items: items,
-  );
-}
-
-ComicDetailSeriesNavResult resolveComicDetailSeriesNavResult(
-  List<Series> allSeries,
-  String comicId,
-  ComicDetailSeriesNavSeriesData? seriesData,
-) {
-  final List<Series> matches = findSeriesListContainingComic(
-    allSeries,
-    comicId,
-  );
-  if (matches.isEmpty) {
-    return const ComicDetailSeriesNavNone();
-  }
-  if (matches.length > 1) {
-    return ComicDetailSeriesNavConflict(
-      matches.map((Series series) => series.name).toList(),
-    );
-  }
-  if (seriesData == null) {
-    return const ComicDetailSeriesNavNone();
-  }
-  final int currentIndex = seriesData.items.indexWhere(
-    (ComicDetailSeriesNavItem item) => item.comicId == comicId,
-  );
-  if (currentIndex < 0) {
-    return const ComicDetailSeriesNavNone();
-  }
-  return ComicDetailSeriesNavReady(
-    ComicDetailSeriesNavData(
-      seriesId: seriesData.seriesId,
-      seriesName: seriesData.seriesName,
-      items: seriesData.items,
-      currentIndex: currentIndex,
-    ),
   );
 }
 

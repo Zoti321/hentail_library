@@ -16,9 +16,10 @@ import 'package:hentai_library/ui/features/library/view_models/library_tab_filte
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
-import 'package:hentai_library/ui/features/shell/state/library_series_providers.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
+
+import '../../../support/fakes/revision_throttle_test_fakes.dart';
 
 class _ComicsSortRevision extends Notifier<int> {
   @override
@@ -85,7 +86,7 @@ void main() {
   ProviderContainer createContainer() {
     return ProviderContainer(
       overrides: <Override>[
-        allSeriesProvider.overrideWith((Ref ref) async => <Series>[]),
+        ...idleRevisionThrottleOverrides(),
         libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
         comicRepoProvider.overrideWith((Ref ref) => _FakeComicRepo()),
         seriesRepoProvider.overrideWith((Ref ref) => _FakeSeriesRepo()),
