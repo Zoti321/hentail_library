@@ -5,6 +5,37 @@
 #include "flutter_window.h"
 #include "utils.h"
 
+namespace {
+
+// The window is shown on the first Flutter frame, which happens before any
+// Dart-side window setup can run. Place it before the message loop starts so
+// the user never sees the window at its creation position.
+void CenterWindowOnWorkArea(HWND hwnd) {
+  RECT window_rect;
+  if (!::GetWindowRect(hwnd, &window_rect)) {
+    return;
+  }
+
+  MONITORINFO monitor_info = {};
+  monitor_info.cbSize = sizeof(MONITORINFO);
+  if (!::GetMonitorInfo(::MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST),
+                        &monitor_info)) {
+    return;
+  }
+
+  const RECT& work_area = monitor_info.rcWork;
+  const LONG x = work_area.left + ((work_area.right - work_area.left) -
+                                   (window_rect.right - window_rect.left)) /
+                                      2;
+  const LONG y = work_area.top + ((work_area.bottom - work_area.top) -
+                                  (window_rect.bottom - window_rect.top)) /
+                                     2;
+  ::SetWindowPos(hwnd, nullptr, x, y, 0, 0,
+                 SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
+}  // namespace
+
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
   // Attach to console when present (e.g., 'flutter run') or create a
@@ -36,6 +67,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);
+  CenterWindowOnWorkArea(window.GetHandle());
 
   ::MSG msg;
   while (::GetMessage(&msg, nullptr, 0, 0)) {

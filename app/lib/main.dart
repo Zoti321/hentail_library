@@ -29,6 +29,12 @@ Future<void> main() async {
 }
 
 Future<void> _prepareApp() async {
+  // Window chrome first: it must not wait for the (slow) Rust/DB init, or the
+  // user sees an unconfigured window during startup.
+  if (supportsDesktopWindowChrome) {
+    await _initWindow();
+  }
+
   try {
     await configureAppLogging();
   } catch (e, st) {
@@ -52,10 +58,6 @@ Future<void> _prepareApp() async {
   }
 
   configureGlobalImageCache();
-
-  if (supportsDesktopWindowChrome) {
-    await _initWindow();
-  }
 }
 
 class _BootstrapApp extends StatelessWidget {
@@ -111,23 +113,22 @@ class _BootstrapApp extends StatelessWidget {
 Future<void> _initWindow() async {
   await WindowManager.instance.ensureInitialized();
 
-  windowManager.waitUntilReadyToShow().then((_) async {
-    await windowManager.setTitle(appWindowTitle());
-    await windowManager.setTitleBarStyle(
-      TitleBarStyle.hidden,
-      windowButtonVisibility: true,
-    );
-    await windowManager.setMinimumSize(
-      const Size(
-        AppLayoutBreakpoints.minWindowWidth,
-        AppLayoutBreakpoints.minWindowHeight,
-      ),
-    );
-    await windowManager.center();
-    await windowManager.show();
-    await windowManager.setPreventClose(true);
-    await windowManager.setSkipTaskbar(false);
-  });
+  await windowManager.waitUntilReadyToShow();
+  await windowManager.setTitle(appWindowTitle());
+  await windowManager.setTitleBarStyle(
+    TitleBarStyle.hidden,
+    windowButtonVisibility: true,
+  );
+  await windowManager.setMinimumSize(
+    const Size(
+      AppLayoutBreakpoints.minWindowWidth,
+      AppLayoutBreakpoints.minWindowHeight,
+    ),
+  );
+  await windowManager.center();
+  await windowManager.show();
+  await windowManager.setPreventClose(true);
+  await windowManager.setSkipTaskbar(false);
 
   await Window.initialize();
   await Window.setEffect(
