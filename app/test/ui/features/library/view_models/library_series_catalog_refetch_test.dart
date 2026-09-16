@@ -14,6 +14,8 @@ import 'package:hentai_library/ui/features/shell/state/library_revision_notifier
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
 
+import '../../../../support/fakes/revision_throttle_test_fakes.dart';
+
 class _ControllableLibraryRevision extends LibraryRevision {
   @override
   LibraryRevisionState build() {
@@ -66,6 +68,7 @@ void main() {
       final _CountingSeriesRepo repo = _CountingSeriesRepo();
       final ProviderContainer container = ProviderContainer(
         overrides: <Override>[
+          ...idleRevisionThrottleOverrides(),
           seriesRepoProvider.overrideWith((Ref ref) => repo),
           libraryRevisionProvider.overrideWith(
             _ControllableLibraryRevision.new,
@@ -92,6 +95,7 @@ void main() {
     final _CountingSeriesRepo repo = _CountingSeriesRepo();
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        ...idleRevisionThrottleOverrides(),
         seriesRepoProvider.overrideWith((Ref ref) => repo),
         libraryRevisionProvider.overrideWith(_ControllableLibraryRevision.new),
         librarySeriesTabSortOptionProvider.overrideWith(
@@ -115,6 +119,7 @@ void main() {
     final _CountingSeriesRepo repo = _CountingSeriesRepo();
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        ...idleRevisionThrottleOverrides(),
         seriesRepoProvider.overrideWith((Ref ref) => repo),
         libraryRevisionProvider.overrideWith(_ControllableLibraryRevision.new),
         librarySeriesTabSortOptionProvider.overrideWith(
