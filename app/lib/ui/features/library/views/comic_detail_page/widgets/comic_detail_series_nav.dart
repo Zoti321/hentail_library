@@ -46,8 +46,7 @@ class _ComicDetailSeriesNavState extends ConsumerState<ComicDetailSeriesNav> {
               data: data,
               menuController: _menuController,
             ),
-          ComicDetailSeriesNavNone() ||
-          ComicDetailSeriesNavConflict() => const SizedBox.shrink(),
+          ComicDetailSeriesNavNone() => const SizedBox.shrink(),
         };
       },
       loading: () => const _ComicDetailSeriesNavPlaceholder(),

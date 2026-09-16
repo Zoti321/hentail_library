@@ -903,10 +903,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get comicDetailGoToLibrary => 'Go to library';
 
   @override
-  String get comicDetailSeriesNavConflict =>
-      'Series data error: this comic belongs to multiple series; series navigation is unavailable.';
-
-  @override
   String get comicDetailSeriesPrev => 'Previous in series';
 
   @override

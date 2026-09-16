@@ -877,9 +877,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get comicDetailGoToLibrary => '前往漫画库';
 
   @override
-  String get comicDetailSeriesNavConflict => '系列数据异常：该漫画同时属于多个系列，无法使用系列导航';
-
-  @override
   String get comicDetailSeriesPrev => '上一本';
 
   @override

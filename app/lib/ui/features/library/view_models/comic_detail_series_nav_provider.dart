@@ -73,14 +73,6 @@ final class ComicDetailSeriesNavReady extends ComicDetailSeriesNavResult {
   final ComicDetailSeriesNavData data;
 }
 
-/// 暂无产出方：reading context SQL 用 `.one()`，多系列归属已降级为取首个系列。
-/// 去留决策见 issue #133（其 l10n 文案同样未被使用）。
-final class ComicDetailSeriesNavConflict extends ComicDetailSeriesNavResult {
-  const ComicDetailSeriesNavConflict(this.seriesNames);
-
-  final List<String> seriesNames;
-}
-
 String comicTitleFallbackForDisplay(String comicId) {
   return comicId.length > 12 ? '${comicId.substring(0, 12)}…' : comicId;
 }
@@ -164,8 +156,6 @@ Future<ComicDetailSeriesNavResult> comicDetailSeriesNav(
   Ref ref,
   String comicId,
 ) async {
-  // Interim: reading context SQL uses `.one()`, so multi-series membership
-  // degrades to the first series only (no Conflict).
   final SeriesReadingContext? ctx = await ref
       .read(seriesRepoProvider)
       .getReadingContextByComicId(comicId);
