@@ -81,7 +81,7 @@ In-app **Read session** page images follow **Page image fidelity** in `CONTEXT.m
 ## Agent guidance
 
 - Describe the product as a **personal comic library** with optional **user-hosted WebDAV** roots — not a generic file manager, ebook app, or SaaS cloud reader.
-- Use **Library** / **Library root** / **Current library** / **Local library** / **Remote library** from `CONTEXT.md`; treat **Saved path** as the legacy name for a local root.
+- Use **Library** / **Library root** / **Current library** / **Local library** / **Remote library** from `CONTEXT.md`; treat **Saved path** as the legacy name for a local root — its UI and FRB surface was retired in ADR-0014, so it now only survives in the `saved_paths` table and migrations.
 - Prefer **Comic** / **Resource** / **Library sync** / **Resource access** in issues and PRs.
 - New reader or scan features should extend Resource access → Comic → Reader rather than Flutter-only protocol forks (e.g. do not put WebDAV page I/O primarily in `cached_network_image`).
 - Reader page rendering: honor **Page image fidelity** before applying performance tuning suggestions.

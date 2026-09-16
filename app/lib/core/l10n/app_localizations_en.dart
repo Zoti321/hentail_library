@@ -229,9 +229,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pageTitleSeriesDetail => 'Series details';
 
   @override
-  String get pageTitlePaths => 'Library paths';
-
-  @override
   String get pageTitleSearchResults => 'Search results';
 
   @override
@@ -299,9 +296,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get homeEmptyHint =>
       'Add library folders in Settings and scan. If already configured, check Selected Paths or scan again.';
-
-  @override
-  String get pathsTitle => 'Local libraries';
 
   @override
   String get homeStatSeries => 'Series';
@@ -401,42 +395,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historyDeletedToast => 'Entry removed';
 
   @override
-  String get pathsSavedHeading => 'Saved paths';
+  String get libraryLocalAddedToast => 'Local library added';
 
   @override
-  String pathsTotalCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count paths',
-      one: '1 path',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get pathsEmptyHint => 'No paths yet. Add a folder.';
-
-  @override
-  String get pathsAddButton => 'Add path';
-
-  @override
-  String get pathsAddedOneToast => 'Path added';
-
-  @override
-  String get pathsRemovedToast => 'Path removed';
-
-  @override
-  String get pathsRemoveAction => 'Remove path';
-
-  @override
-  String get pathsLoadFailed => 'Failed to load paths';
-
-  @override
-  String get pathsLibraryKindLocal => 'Local';
-
-  @override
-  String get pathsLibraryKindRemote => 'Remote';
+  String get libraryRemovedToast => 'Library removed';
 
   @override
   String get remoteLibraryAddButton => 'Add remote library';
@@ -616,9 +578,6 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
-
-  @override
-  String get libraryManageScanPaths => 'Manage scan paths';
 
   @override
   String get librarySearchHint => 'Search…';

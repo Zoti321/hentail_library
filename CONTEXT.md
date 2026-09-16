@@ -37,7 +37,7 @@ _Avoid_: 云库、网盘库、在线书架（无官方云账号语义）
 _Avoid_: 扫描路径、挂载点；Saved path（旧称，仅指 Local 根）
 
 **Saved path**:
-Local library 的 Library root 之旧称；兼容文档与实现中仍可能出现，新表述优先用 Library root / Local library。用户侧创建与管理 Library 仅经 Library form 与侧栏入口，不以 Saved path / 路径页为产品概念。详见 ADR-0014。
+Local library 的 Library root 之旧称。UI 与 FRB 的 Path 面已按 ADR-0014 退役（`/paths` 现重定向至 Home，`PathRepository` 与 Rust `path` 模块已删除）；仅 `saved_paths` 表与迁移代码保留该名。新表述一律用 Library root / Local library。用户侧创建与管理 Library 仅经 Library form 与侧栏入口。
 _Avoid_: 在新设计中把 Saved path 扩成远程 URI；选中路径页、Selected Paths、路径管理页
 
 **Comic**:

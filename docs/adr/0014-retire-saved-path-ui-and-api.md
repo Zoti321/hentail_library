@@ -17,4 +17,6 @@ Accepted
 
 - 无「管库」专页；管理面收敛到侧栏 + Library form。
 - 去掉 sync Path FRB 消费面；实现排在明确 P0 之后，可按 ADR → UX/redirect → 删 Dart Path 面 → 删 Rust/FRB path 拆 PR。
+- **已实现（2026-09-16）**：`/paths` 改为 `redirect → /home`；空库 CTA 与 Home hero 改为 createLocal + createRemote（经 `LibraryManagementActions`）；删除 `SelectedPathsPage` 及其 widgets、`SelectedPathsPageNotifier`、`PathRepository(+Impl)` 与 `pathRepoProvider`、Rust `core/src/path/`、`flutter/src/api/path.rs`（FRB 绑定已重生成）。user-facing 的最后两处 Path 文案改为 Library 措辞（`libraryLocalAddedToast` / `libraryRemovedToast`）。FRB 入口随之降到 60 sync / 43 async。
+- **仍按原决策保留**：`saved_paths` 表与相关 migration / 迁移测试；`RemoveSavedPathConfirmDialog` 的类名（文案已是 Library 措辞，改名可另排）。
 - **后续补充**：Library **热读**（`list` / `get_current` / `set_current`）已由 P0-B2 / P1-A3 第一刀改为真 async；Library CRUD 写路径仍不在本决策内，可另排。

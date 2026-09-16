@@ -27,7 +27,8 @@
 |------|------|
 | **已做** | P1-D2 薄边补测（`mapRustComic` 全字段/空可选字段、`mapPagedResult`、`mapPagedSeriesComicsResult`、新增 `frb_zone_guard_test` 三条）；P1-A6 文档回写（ADR-0015 加「实现修订」小节 + `core/vendor/README.md` + `rust-migration.md`）；P2-C4 移除 `card_settings_ui`；P1-C3 的 Drift 错注释订正；`testing.md` Slice 2 缺口清单更新 |
 | **已开 issue** | [#128](https://github.com/Zoti321/hentail_library/issues/128) revision 降频（P0-B1）· [#129](https://github.com/Zoti321/hentail_library/issues/129) sync→async 第二刀（P0-B2）· [#130](https://github.com/Zoti321/hentail_library/issues/130) 系列重排去留决策（P2-C6）· [#131](https://github.com/Zoti321/hentail_library/issues/131) `allSeriesProvider` 死路径（P2-B5）· [#132](https://github.com/Zoti321/hentail_library/issues/132) iOS `build-ios-xcframework.sh` 去留 |
-| **仍未承载** | P0-F1 All libraries browse、P1-A2 ADR-0014 实现、P1-B3 阅读器同步探测、P1-C1 Stateful 收敛、P1-C3 的 `clearExpiredHistory` 去留、P1-E2 README 门禁对照 |
+| **已实现** | P1-A2 ADR-0014 的 `/paths` 退役（2026-09-16）：路由重定向 + 空态/Hero 双 CTA + 删 Dart/Rust Path 面 |
+| **仍未承载** | P0-F1 All libraries browse、P1-B3 阅读器同步探测、P1-C1 Stateful 收敛、P1-C3 的 `clearExpiredHistory` 去留、P1-E2 README 门禁对照 |
 
 ---
 
@@ -119,14 +120,11 @@ sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改�
 - **处理**：`AGENTS.md`、`docs/agents/*`、根 `README.md` 已按 monorepo 完成态与「多库 + WebDAV 已实现」重写。
 - **复验**：`product-positioning.md` L29 写「Android / iOS Supported; 剩余为组件级打磨」；L50–52 PDF 全平台 Supported；README L24–25 写多 Library 与 WebDAV。**Planned 清单现已为空**（原唯一保留项 iOS PDF 已交付，见 P1-F3）。
 
-#### P1-A2 — Path / Selected Paths 与 Library 模型并存 — **已决策（ADR-0014），实现仍未开始**
+#### P1-A2 — Path / Selected Paths 与 Library 模型并存 — **已实现（2026-09-16，ADR-0014）**
 
-- **现状证据（2026-09-16，未变）**
-  - `shared_content_routes.dart` L46–51 仍注册 `/paths` → `SelectedPathsPage`（`ConsumerStatefulWidget`）。
-  - 空库 CTA `library_comic_empty_slivers.dart` L101 与 Home hero `home_page_hero.dart` L197 仍 `context.go('/paths')`。
-  - `PathRepositoryImpl` 与 DI `pathRepo`（`di/repos.dart` L60）在册；Rust `core/src/path.rs`、`api/path.rs`（3 sync / 1 async）并存。
-- **决策**（ADR-0014）：用户只认 Library；删 `/paths`（redirect → Home）；空态/Hero 主 createLocal、次 createRemote；同波删 Dart Path 面与 Rust/FRB path API；不占用 `/libraries`；`saved_paths` 表删除、Path migration、All libraries browse、Library CRUD sync→async 均不在该决策内。
-- **风险/代价**：中；涉及路由、空态 CTA、FRB codegen；无独立数据迁移。
+- **处理**：`/paths` 改为 `redirect → /home`（新增 `retired_paths_route_test.dart` 挡回归）；空库 CTA 与 Home hero 改为 createLocal + createRemote（走 `LibraryManagementActions`）；删除 `SelectedPathsPage` 及 widgets、`SelectedPathsPageNotifier`、`PathRepository(+Impl)`、`pathRepoProvider`、Rust `core/src/path/` 与 `flutter/src/api/path.rs`，并重跑 FRB codegen / build_runner / gen-l10n；Path 页专属 l10n 键删除，`pathsAddedOneToast` / `pathsRemovedToast` 改名为 `libraryLocalAddedToast` / `libraryRemovedToast` 并改成 Library 措辞。
+- **效果**：FRB 入口 60 sync / 43 async（此前 63 / 44），`guardFrbSync` 48（此前 51），Dart 手写源 444（此前 456），`ConsumerStatefulWidget` 25（此前 28）。
+- **按原决策保留**：`saved_paths` 表与 migration / 迁移测试；`RemoveSavedPathConfirmDialog` 类名（文案已是 Library 措辞，改名可另排）。Path migration（ADR-0013）、`/libraries/all` 实现、Library CRUD sync→async 仍在决策外。
 
 #### P1-A3 — Dart 薄边 sync 比例仍偏高 — **第一刀已落地，后续切片未开**
 
@@ -351,7 +349,7 @@ sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改�
 2. **sync→async 第二刀** — [#129](https://github.com/Zoti321/hentail_library/issues/129)；优先开读路径的 `get_series_reading_context_by_comic_id_frb`。
 3. **死路径与回退遗留清理** — [#131](https://github.com/Zoti321/hentail_library/issues/131)（`allSeriesProvider`）+ [#130](https://github.com/Zoti321/hentail_library/issues/130)（系列重排去留，需产品决策）。
 4. **All libraries browse 产品决策（P0-F1）** — 占位页已挂入口；排期聚合查询或降级入口，别留半成品。**尚无 issue**。
-5. **ADR-0014 实现（P1-A2）** — 决策已就位，`/paths` 面仍完整存在；一波删除同时清掉 Path sync FRB 与一个 `ConsumerStatefulWidget`。**尚无 issue**。
+5. ~~**ADR-0014 实现（P1-A2）**~~ — **已完成（2026-09-16）**。
 6. **iOS 构建链收口** — [#132](https://github.com/Zoti321/hentail_library/issues/132)；需 Mac 验证后再动，顺带在 Mac 上跑一次 `integration_test/pdf_reader_smoke_test.dart`。
 7. **阅读器同步文件探测（P1-B3）** 与 **`clearExpiredHistory` 去留（P1-C3 余留）** — 低优先，触达时处理。
 

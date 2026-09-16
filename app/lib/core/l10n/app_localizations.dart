@@ -500,12 +500,6 @@ abstract class AppLocalizations {
   /// **'系列详情'**
   String get pageTitleSeriesDetail;
 
-  /// No description provided for @pageTitlePaths.
-  ///
-  /// In zh, this message translates to:
-  /// **'库路径'**
-  String get pageTitlePaths;
-
   /// No description provided for @pageTitleSearchResults.
   ///
   /// In zh, this message translates to:
@@ -638,12 +632,6 @@ abstract class AppLocalizations {
   /// **'请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。'**
   String get homeEmptyHint;
 
-  /// No description provided for @pathsTitle.
-  ///
-  /// In zh, this message translates to:
-  /// **'本地库'**
-  String get pathsTitle;
-
   /// No description provided for @homeStatSeries.
   ///
   /// In zh, this message translates to:
@@ -758,65 +746,17 @@ abstract class AppLocalizations {
   /// **'已删除记录'**
   String get historyDeletedToast;
 
-  /// No description provided for @pathsSavedHeading.
+  /// No description provided for @libraryLocalAddedToast.
   ///
   /// In zh, this message translates to:
-  /// **'已保存路径'**
-  String get pathsSavedHeading;
+  /// **'已添加本地库'**
+  String get libraryLocalAddedToast;
 
-  /// No description provided for @pathsTotalCount.
+  /// No description provided for @libraryRemovedToast.
   ///
   /// In zh, this message translates to:
-  /// **'{count, plural, other{共 {count} 项}}'**
-  String pathsTotalCount(int count);
-
-  /// No description provided for @pathsEmptyHint.
-  ///
-  /// In zh, this message translates to:
-  /// **'暂无路径，请添加文件夹'**
-  String get pathsEmptyHint;
-
-  /// No description provided for @pathsAddButton.
-  ///
-  /// In zh, this message translates to:
-  /// **'添加路径'**
-  String get pathsAddButton;
-
-  /// No description provided for @pathsAddedOneToast.
-  ///
-  /// In zh, this message translates to:
-  /// **'已添加 1 个路径'**
-  String get pathsAddedOneToast;
-
-  /// No description provided for @pathsRemovedToast.
-  ///
-  /// In zh, this message translates to:
-  /// **'已移除路径'**
-  String get pathsRemovedToast;
-
-  /// No description provided for @pathsRemoveAction.
-  ///
-  /// In zh, this message translates to:
-  /// **'移除路径'**
-  String get pathsRemoveAction;
-
-  /// No description provided for @pathsLoadFailed.
-  ///
-  /// In zh, this message translates to:
-  /// **'路径加载失败'**
-  String get pathsLoadFailed;
-
-  /// No description provided for @pathsLibraryKindLocal.
-  ///
-  /// In zh, this message translates to:
-  /// **'本地'**
-  String get pathsLibraryKindLocal;
-
-  /// No description provided for @pathsLibraryKindRemote.
-  ///
-  /// In zh, this message translates to:
-  /// **'远程'**
-  String get pathsLibraryKindRemote;
+  /// **'已移除库'**
+  String get libraryRemovedToast;
 
   /// No description provided for @remoteLibraryAddButton.
   ///
@@ -1135,12 +1075,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'{count, plural, other{{count} 个系列}}'**
   String librarySeriesCount(int count);
-
-  /// No description provided for @libraryManageScanPaths.
-  ///
-  /// In zh, this message translates to:
-  /// **'管理扫描路径'**
-  String get libraryManageScanPaths;
 
   /// No description provided for @librarySearchHint.
   ///

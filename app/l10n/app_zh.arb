@@ -86,7 +86,6 @@
   "pageTitleReader": "阅读",
   "pageTitleComicDetail": "漫画详情",
   "pageTitleSeriesDetail": "系列详情",
-  "pageTitlePaths": "库路径",
   "pageTitleSearchResults": "搜索结果",
   "pageTitleNotFound": "页面不存在",
   "shellOpenNavMenu": "打开导航菜单",
@@ -116,7 +115,6 @@
   },
   "homeEmptyTitle": "尚未导入漫画",
   "homeEmptyHint": "请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。",
-  "pathsTitle": "本地库",
   "homeStatSeries": "系列",
   "homeStatTags": "标签",
   "homeStatAuthors": "作者",
@@ -171,23 +169,8 @@
   "historyEmpty": "暂无阅读历史",
   "historyNoMatch": "没有匹配的历史记录",
   "historyDeletedToast": "已删除记录",
-  "pathsSavedHeading": "已保存路径",
-  "pathsTotalCount": "{count, plural, other{共 {count} 项}}",
-  "@pathsTotalCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "pathsEmptyHint": "暂无路径，请添加文件夹",
-  "pathsAddButton": "添加路径",
-  "pathsAddedOneToast": "已添加 1 个路径",
-  "pathsRemovedToast": "已移除路径",
-  "pathsRemoveAction": "移除路径",
-  "pathsLoadFailed": "路径加载失败",
-  "pathsLibraryKindLocal": "本地",
-  "pathsLibraryKindRemote": "远程",
+  "libraryLocalAddedToast": "已添加本地库",
+  "libraryRemovedToast": "已移除库",
   "remoteLibraryAddButton": "添加远程库",
   "remoteLibraryAddedToast": "已添加远程库",
   "remoteLibraryUpdatedToast": "已更新远程库",
@@ -255,7 +238,6 @@
       }
     }
   },
-  "libraryManageScanPaths": "管理扫描路径",
   "librarySearchHint": "搜索…",
   "librarySearchKeywordEmpty": "关键词不能为空",
   "libraryFilterSortTooltip": "筛选与排序",

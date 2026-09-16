@@ -7,6 +7,7 @@ import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hentai_library/ui/features/shell/views/home_page/widgets/home_page_constants.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HomePageHeroSection extends ConsumerWidget {
@@ -28,7 +29,14 @@ class HomePageHeroSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (isLibraryEmpty) {
-      return _EmptyLibraryHero(layoutTier: layoutTier, onScan: onScan);
+      return _EmptyLibraryHero(
+        layoutTier: layoutTier,
+        onScan: onScan,
+        onAddLocalLibrary: () =>
+            LibraryManagementActions.addLocalLibrary(ref, context),
+        onAddRemoteLibrary: () =>
+            LibraryManagementActions.addRemoteLibrary(ref, context),
+      );
     }
     if (!enableHeavyStats) {
       return _StatsCardsPlaceholder(
@@ -41,10 +49,17 @@ class HomePageHeroSection extends ConsumerWidget {
 }
 
 class _EmptyLibraryHero extends StatelessWidget {
-  const _EmptyLibraryHero({required this.layoutTier, required this.onScan});
+  const _EmptyLibraryHero({
+    required this.layoutTier,
+    required this.onScan,
+    required this.onAddLocalLibrary,
+    required this.onAddRemoteLibrary,
+  });
 
   final HomePageLayoutTier layoutTier;
   final VoidCallback onScan;
+  final VoidCallback onAddLocalLibrary;
+  final VoidCallback onAddRemoteLibrary;
 
   @override
   Widget build(BuildContext context) {
@@ -194,9 +209,15 @@ class _EmptyLibraryHero extends StatelessWidget {
                         ),
                       ),
                       OutlinedButton.icon(
-                        onPressed: () => context.go('/paths'),
-                        icon: const Icon(LucideIcons.folderTree, size: 18),
-                        label: Text(l10n.pathsTitle),
+                        onPressed: onAddLocalLibrary,
+                        icon: const Icon(LucideIcons.folderPlus, size: 18),
+                        label: Text(l10n.sidebarAddLocalLibrary),
+                        style: outlinedActionStyle,
+                      ),
+                      OutlinedButton.icon(
+                        onPressed: onAddRemoteLibrary,
+                        icon: const Icon(LucideIcons.cloudUpload, size: 18),
+                        label: Text(l10n.sidebarAddRemoteLibrary),
                         style: outlinedActionStyle,
                       ),
                       OutlinedButton.icon(

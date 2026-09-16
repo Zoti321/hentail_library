@@ -41,8 +41,6 @@ abstract final class AppNavigation {
         return navIdHome;
       case '/local':
         return '';
-      case '/paths':
-        return '';
       case '/searched':
         return '';
       case '/metadata':

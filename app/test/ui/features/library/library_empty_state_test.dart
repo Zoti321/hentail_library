@@ -17,7 +17,7 @@ void main() {
       expect(content.title, l10n.libraryEmptyTitle);
       expect(content.hint, l10n.libraryEmptyHint);
       expect(content.icon, LibraryEmptyStateIcon.library);
-      expect(content.showManagePathsEntry, isTrue);
+      expect(content.showCreateLibraryEntries, isTrue);
       expect(content.showClearFilters, isFalse);
     });
 
@@ -31,7 +31,7 @@ void main() {
       expect(content.title, l10n.libraryNoMatchTitle);
       expect(content.hint, l10n.libraryNoMatchFilterHintComics);
       expect(content.icon, LibraryEmptyStateIcon.listFilter);
-      expect(content.showManagePathsEntry, isFalse);
+      expect(content.showCreateLibraryEntries, isFalse);
       expect(content.showClearFilters, isTrue);
     });
 
@@ -45,7 +45,7 @@ void main() {
       expect(content.title, l10n.librarySeriesEmptyTitle);
       expect(content.hint, l10n.librarySeriesEmptyHint);
       expect(content.icon, LibraryEmptyStateIcon.library);
-      expect(content.showManagePathsEntry, isTrue);
+      expect(content.showCreateLibraryEntries, isTrue);
       expect(content.showClearFilters, isFalse);
     });
 
@@ -59,7 +59,7 @@ void main() {
       expect(content.title, l10n.libraryNoMatchTitle);
       expect(content.hint, l10n.libraryNoMatchFilterHintSeries);
       expect(content.icon, LibraryEmptyStateIcon.listFilter);
-      expect(content.showManagePathsEntry, isFalse);
+      expect(content.showCreateLibraryEntries, isFalse);
       expect(content.showClearFilters, isTrue);
     });
   });

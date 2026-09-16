@@ -223,9 +223,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pageTitleSeriesDetail => '系列详情';
 
   @override
-  String get pageTitlePaths => '库路径';
-
-  @override
   String get pageTitleSearchResults => '搜索结果';
 
   @override
@@ -292,9 +289,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homeEmptyHint => '请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。';
-
-  @override
-  String get pathsTitle => '本地库';
 
   @override
   String get homeStatSeries => '系列';
@@ -389,41 +383,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get historyDeletedToast => '已删除记录';
 
   @override
-  String get pathsSavedHeading => '已保存路径';
+  String get libraryLocalAddedToast => '已添加本地库';
 
   @override
-  String pathsTotalCount(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '共 $count 项',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get pathsEmptyHint => '暂无路径，请添加文件夹';
-
-  @override
-  String get pathsAddButton => '添加路径';
-
-  @override
-  String get pathsAddedOneToast => '已添加 1 个路径';
-
-  @override
-  String get pathsRemovedToast => '已移除路径';
-
-  @override
-  String get pathsRemoveAction => '移除路径';
-
-  @override
-  String get pathsLoadFailed => '路径加载失败';
-
-  @override
-  String get pathsLibraryKindLocal => '本地';
-
-  @override
-  String get pathsLibraryKindRemote => '远程';
+  String get libraryRemovedToast => '已移除库';
 
   @override
   String get remoteLibraryAddButton => '添加远程库';
@@ -596,9 +559,6 @@ class AppLocalizationsZh extends AppLocalizations {
     );
     return '$_temp0';
   }
-
-  @override
-  String get libraryManageScanPaths => '管理扫描路径';
 
   @override
   String get librarySearchHint => '搜索…';

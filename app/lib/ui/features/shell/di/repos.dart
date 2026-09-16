@@ -5,7 +5,6 @@ import 'package:hentai_library/data/repositories/comic_repository_impl.dart';
 import 'package:hentai_library/data/repositories/library_repository_impl.dart';
 import 'package:hentai_library/data/repositories/named_facet_dictionary_repository_impl.dart';
 import 'package:hentai_library/data/repositories/named_facet_management_repository_impl.dart';
-import 'package:hentai_library/data/repositories/path_repository_impl.dart';
 import 'package:hentai_library/data/repositories/reading_history_repository_impl.dart';
 import 'package:hentai_library/data/repositories/series_repository_impl.dart';
 import 'package:hentai_library/data/repositories/home_page_repository_impl.dart';
@@ -17,7 +16,6 @@ import 'package:hentai_library/domain/repositories/comic_thumbnail_repository.da
 import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:hentai_library/domain/repositories/named_facet_dictionary_repository.dart';
 import 'package:hentai_library/domain/repositories/named_facet_management_repository.dart';
-import 'package:hentai_library/domain/repositories/path_repository.dart';
 import 'package:hentai_library/domain/repositories/reading_history_repository.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
 import 'package:hentai_library/domain/repositories/home_page_repository.dart';
@@ -55,9 +53,6 @@ NamedFacetDictionaryRepository parodyRepo(Ref ref) =>
 @Riverpod(keepAlive: true)
 NamedFacetDictionaryRepository characterRepo(Ref ref) =>
     const NamedFacetDictionaryRepositoryImpl(NamedFacetKind.character);
-
-@Riverpod(keepAlive: true)
-PathRepository pathRepo(Ref ref) => const PathRepositoryImpl();
 
 @Riverpod(keepAlive: true)
 LibraryRepository libraryRepo(Ref ref) => const LibraryRepositoryImpl();

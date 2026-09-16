@@ -4,7 +4,6 @@ import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_reorderable_grid_view/widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hentai_library/domain/library/library_age_restriction_filter.dart';
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
@@ -37,6 +36,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_series_fi
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/library_empty_state.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_catalog_grid_animation.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 part 'animated_library_catalog_grid_sliver.dart';

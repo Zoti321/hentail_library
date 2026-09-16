@@ -86,7 +86,6 @@
   "pageTitleReader": "Reading",
   "pageTitleComicDetail": "Comic details",
   "pageTitleSeriesDetail": "Series details",
-  "pageTitlePaths": "Library paths",
   "pageTitleSearchResults": "Search results",
   "pageTitleNotFound": "Page not found",
   "shellOpenNavMenu": "Open navigation menu",
@@ -116,7 +115,6 @@
   },
   "homeEmptyTitle": "No comics imported yet",
   "homeEmptyHint": "Add library folders in Settings and scan. If already configured, check Selected Paths or scan again.",
-  "pathsTitle": "Local libraries",
   "homeStatSeries": "Series",
   "homeStatTags": "Tags",
   "homeStatAuthors": "Authors",
@@ -171,23 +169,8 @@
   "historyEmpty": "No reading history yet",
   "historyNoMatch": "No matching entries",
   "historyDeletedToast": "Entry removed",
-  "pathsSavedHeading": "Saved paths",
-  "pathsTotalCount": "{count, plural, one{1 path} other{{count} paths}}",
-  "@pathsTotalCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "pathsEmptyHint": "No paths yet. Add a folder.",
-  "pathsAddButton": "Add path",
-  "pathsAddedOneToast": "Path added",
-  "pathsRemovedToast": "Path removed",
-  "pathsRemoveAction": "Remove path",
-  "pathsLoadFailed": "Failed to load paths",
-  "pathsLibraryKindLocal": "Local",
-  "pathsLibraryKindRemote": "Remote",
+  "libraryLocalAddedToast": "Local library added",
+  "libraryRemovedToast": "Library removed",
   "remoteLibraryAddButton": "Add remote library",
   "remoteLibraryAddedToast": "Remote library added",
   "remoteLibraryUpdatedToast": "Remote library updated",
@@ -255,7 +238,6 @@
       }
     }
   },
-  "libraryManageScanPaths": "Manage scan paths",
   "librarySearchHint": "Search…",
   "librarySearchKeywordEmpty": "Keyword cannot be empty",
   "libraryFilterSortTooltip": "Filter & sort",

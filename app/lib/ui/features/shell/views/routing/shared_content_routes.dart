@@ -7,7 +7,6 @@ import 'package:hentai_library/ui/features/metadata/views/metadata_page/metadata
 import 'package:hentai_library/ui/features/reader/reader.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/reader_route_args.dart';
 import 'package:hentai_library/ui/features/shell/views/routing/route_not_found_page.dart';
-import 'package:hentai_library/ui/features/shell/views/selected_paths_page/selected_paths_page.dart';
 
 typedef ComicDetailBuilder =
     Widget Function(BuildContext context, String comicId);
@@ -42,14 +41,10 @@ List<RouteBase> buildSharedContentRoutes({
         );
       },
     ),
+    // Saved path / Selected Paths 已退役（ADR-0014）；旧深链回 Home。
     GoRoute(
       path: '/paths',
-      name: '选中路径',
-      pageBuilder: (BuildContext context, GoRouterState state) =>
-          buildDesktopFadeThroughPage(
-            state: state,
-            child: const SelectedPathsPage(),
-          ),
+      redirect: (BuildContext context, GoRouterState state) => '/home',
     ),
     GoRoute(
       path: '/metadata',

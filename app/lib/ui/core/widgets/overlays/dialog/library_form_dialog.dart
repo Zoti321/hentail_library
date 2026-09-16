@@ -340,7 +340,7 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
             return;
           }
           final String toast = switch (widget.mode) {
-            LibraryFormMode.createLocal => context.l10n.pathsAddedOneToast,
+            LibraryFormMode.createLocal => context.l10n.libraryLocalAddedToast,
             LibraryFormMode.createRemote =>
               context.l10n.remoteLibraryAddedToast,
             LibraryFormMode.edit => context.l10n.commonSavedToast,

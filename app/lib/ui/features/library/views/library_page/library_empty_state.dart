@@ -7,7 +7,7 @@ typedef LibraryEmptyStateContent = ({
   String title,
   String hint,
   LibraryEmptyStateIcon icon,
-  bool showManagePathsEntry,
+  bool showCreateLibraryEntries,
   bool showClearFilters,
 });
 
@@ -22,14 +22,14 @@ LibraryEmptyStateContent resolveLibraryEmptyStateContent({
         title: l10n.libraryEmptyTitle,
         hint: l10n.libraryEmptyHint,
         icon: LibraryEmptyStateIcon.library,
-        showManagePathsEntry: true,
+        showCreateLibraryEntries: true,
         showClearFilters: false,
       ),
       LibraryDisplayTarget.series => (
         title: l10n.librarySeriesEmptyTitle,
         hint: l10n.librarySeriesEmptyHint,
         icon: LibraryEmptyStateIcon.library,
-        showManagePathsEntry: true,
+        showCreateLibraryEntries: true,
         showClearFilters: false,
       ),
     };
@@ -42,7 +42,7 @@ LibraryEmptyStateContent resolveLibraryEmptyStateContent({
       LibraryDisplayTarget.series => l10n.libraryNoMatchFilterHintSeries,
     },
     icon: LibraryEmptyStateIcon.listFilter,
-    showManagePathsEntry: false,
+    showCreateLibraryEntries: false,
     showClearFilters: true,
   );
 }

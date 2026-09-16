@@ -81,7 +81,7 @@ abstract final class LibraryManagementActions {
     if (!context.mounted) {
       return;
     }
-    showSuccessToast(context, context.l10n.pathsRemovedToast);
+    showSuccessToast(context, context.l10n.libraryRemovedToast);
 
     if (!navigateAfter || !wasViewing) {
       return;

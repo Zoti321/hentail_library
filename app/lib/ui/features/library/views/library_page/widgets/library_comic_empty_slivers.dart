@@ -94,12 +94,20 @@ class _LibraryCatalogEmptySliver extends ConsumerWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              if (content.showManagePathsEntry)
+              if (content.showCreateLibraryEntries) ...<Widget>[
                 emptyAction(
-                  actionIcon: LucideIcons.folderTree,
-                  label: context.l10n.libraryManageScanPaths,
-                  onPressed: () => context.go('/paths'),
+                  actionIcon: LucideIcons.folderPlus,
+                  label: context.l10n.sidebarAddLocalLibrary,
+                  onPressed: () =>
+                      LibraryManagementActions.addLocalLibrary(ref, context),
                 ),
+                emptyAction(
+                  actionIcon: LucideIcons.cloudUpload,
+                  label: context.l10n.sidebarAddRemoteLibrary,
+                  onPressed: () =>
+                      LibraryManagementActions.addRemoteLibrary(ref, context),
+                ),
+              ],
               if (content.showClearFilters)
                 emptyAction(
                   actionIcon: LucideIcons.listFilter,

@@ -13,7 +13,6 @@ import 'api/library.dart';
 import 'api/logging.dart';
 import 'api/named_facet.dart';
 import 'api/parody.dart';
-import 'api/path.dart';
 import 'api/reader.dart';
 import 'api/series.dart';
 import 'api/sync.dart';

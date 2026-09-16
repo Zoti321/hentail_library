@@ -115,9 +115,6 @@ extension AppLocalizationsLabelsX on AppLocalizations {
       case '/local':
         return libraryTitle;
 
-      case '/paths':
-        return pageTitlePaths;
-
       case '/searched':
         return pageTitleSearchResults;
 

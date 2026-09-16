@@ -44,7 +44,7 @@ Prefer stateless widget variants. Avoid Flutter's built-in stateful widgets unle
 **Examples already in this repo:**
 
 - `ReaderPage` → `HookConsumerWidget`
-- `SelectedPathsListCard` → `ConsumerWidget`
+- `ComicCard` → `ConsumerWidget`
 - `ParsedResource` flow widgets → prefer the table above over new `StatefulWidget`s
 
 ## Lightweight data shapes

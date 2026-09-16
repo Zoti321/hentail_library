@@ -13,7 +13,6 @@ pub mod metadata_lock;
 pub mod migration;
 pub mod named_facet;
 pub mod parody;
-pub mod path;
 pub mod reader;
 pub mod resource;
 pub mod runtime;
@@ -65,7 +64,6 @@ pub use named_facet::{
     replace_comic_named_facet, JunctionNamedFacet, NamedFacetFormEntry,
 };
 pub use parody::{list_all_parodies, list_distinct_parodies};
-pub use path::{add_path, list_all_paths, remove_path, watch_paths};
 pub use reader::{
     clear_reader_page_cache, clear_reader_sessions, close_reader, load_page_bytes, load_page_list,
     load_reader_page, open_reader, open_reader_with, prefetch_reader_pages, writeback_after_open,
