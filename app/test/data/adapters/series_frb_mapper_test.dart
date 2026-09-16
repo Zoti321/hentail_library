@@ -7,8 +7,10 @@ import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
+import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
 import 'package:hentai_library/domain/reading/series_reading_context.dart';
+import 'package:hentai_library/src/rust/api/comic.dart' as rust_comic;
 import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 
 void main() {
@@ -204,6 +206,44 @@ void main() {
     expect(mapped.pageSize, 20);
   });
 
+  test('mapPagedSeriesComicsResult keeps per-item sort order and lock', () {
+    final rust_series.PagedSeriesComicsResultDto page =
+        rust_series.PagedSeriesComicsResultDto(
+          items: <rust_series.SeriesComicPageItemDto>[
+            rust_series.SeriesComicPageItemDto(
+              comic: _comicDto('c1'),
+              sortOrder: 1.5,
+              sortOrderLocked: true,
+            ),
+            rust_series.SeriesComicPageItemDto(
+              comic: _comicDto('c2'),
+              sortOrder: 2,
+              sortOrderLocked: false,
+            ),
+          ],
+          totalCount: PlatformInt64Util.from(7),
+          page: 1,
+          pageSize: 2,
+        );
+
+    final PagedResult<SeriesComicPageItem> mapped = mapPagedSeriesComicsResult(
+      page,
+    );
+
+    expect(
+      mapped.items.map((SeriesComicPageItem item) => item.comic.comicId),
+      <String>['c1', 'c2'],
+    );
+    expect(mapped.items.first.comic.title, 'Title c1');
+    expect(mapped.items.first.sortOrder, 1.5);
+    expect(mapped.items.first.sortOrderLocked, isTrue);
+    expect(mapped.items.last.sortOrder, 2);
+    expect(mapped.items.last.sortOrderLocked, isFalse);
+    expect(mapped.totalCount, 7);
+    expect(mapped.page, 1);
+    expect(mapped.pageSize, 2);
+  });
+
   test('mapSeriesPageRequest maps PageRequest', () {
     final mapped = mapSeriesPageRequest((page: 1, pageSize: 40));
     expect(mapped.page, 1);
@@ -223,4 +263,35 @@ void main() {
     expect(dto.totalCount, 8);
     expect(dto.clearTotalCount, isTrue);
   });
+}
+
+rust_comic.ComicDto _comicDto(String comicId) {
+  return rust_comic.ComicDto(
+    comicId: comicId,
+    path: '/lib/$comicId.cbz',
+    resourceType: 'cbz',
+    resourceSize: PlatformInt64Util.from(1024),
+    createdAt: PlatformInt64Util.from(1700000000000),
+    lastUpdatedAt: PlatformInt64Util.from(1700000000000),
+    title: 'Title $comicId',
+    contentRating: 'safe',
+    pageCount: 3,
+    authors: const <String>[],
+    tags: const <String>[],
+    languages: const <String>[],
+    parodies: const <String>[],
+    characters: const <String>[],
+    locks: const rust_comic.ComicMetaLocksDto(
+      title: false,
+      description: false,
+      publishedAt: false,
+      contentRating: false,
+      authors: false,
+      tags: false,
+      languages: false,
+      parodies: false,
+      characters: false,
+    ),
+    libraryId: 'lib-1',
+  );
 }

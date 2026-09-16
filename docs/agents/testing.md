@@ -92,4 +92,6 @@ fn example() {
 
 **新增契约测：** `series_frb_mapper`、`history_frb_mapper`、`reader_frb_mapper`、`thumbnail_frb_mapper`。
 
-**残留缺口（有意延后）：** `frb_zone_guard`；`comic_frb_mapper` 仍仅覆盖 sort/filter（缺 `mapRustComic` / page 映射等）；`mapPagedSeriesComicsResult`；真 FRB / `*_repository_impl`（本波不做）。
+**补齐（2026-09-16）：** `frb_zone_guard`（三条：映射后 present、非 FRB 错误忽略、benign stream closed 忽略）；`comic_frb_mapper` 的 `mapRustComic`（全字段 + 可选字段为空）与 `mapPagedResult`；`series_frb_mapper` 的 `mapPagedSeriesComicsResult`。
+
+**残留缺口（有意延后）：** 真 FRB / `*_repository_impl` 集成测（按 ADR-0002 不做）。

@@ -3,7 +3,7 @@ import 'package:hentai_library/core/utils/name_pinyin_assisted_filter.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 
-/// 全部作者列表（用于作者管理页面）；监听 Drift `authors` 表变化。
+/// 全部作者列表（用于作者管理页面）；经 FRB stream 监听 Rust 侧作者变化。
 final allAuthorsProvider = StreamProvider<List<Author>>((ref) {
   return ref.watch(authorRepoProvider).watchAll();
 });
