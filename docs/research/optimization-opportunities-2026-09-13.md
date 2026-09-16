@@ -17,7 +17,17 @@
 | **已落地（本次可关闭）** | P1-B4 系列导航标题 N 次查询 → 批量 `findByIds`；P1-F3 iOS PDF stub → 真实 pdfium（ADR-0015）；P2-F5 README 能力表述已对齐；P2-E4 issue 债 → 已核实**当前 0 个 open issue** |
 | **新增发现** | **P1-A6** ADR-0015 Decision 与 iOS pdfium 实际嵌入方式已漂移（`vendored_frameworks` → Podfile script phase + dynamic linkage）；**P2-C6** #121 系列成员重排被回退，留下无 UI 消费的 `setSeriesItemsOrder` 写路径 |
 | **仍开放（优先级不变）** | P0-B1 扫描期 400ms revision 轮询；P0-B2 剩余 sync FRB（写路径 / Library CRUD / Tag·Author / Series reading context）；P0-F1 All libraries browse 占位；P1-A2 `/paths` 退役（ADR-0014 已决策未实现）；P1-B3 阅读器同步文件探测；P1-C1/C2/C3、P1-D2 薄边补测、P2-B5/C4 |
-| **文档现状注意** | `docs/research/ui-performance-tuning.md` **已在工作区删除且尚未提交**（`git status` 显示 ` D`）；其结论对照见下节，原文需从 git 历史（`1751e962` 之前）取回 |
+| **文档现状注意** | `docs/research/ui-performance-tuning.md` 已随 `0a3c0806` 删除；其结论对照见下节，原文需从 git 历史取回 |
+
+### 复核后的处置（提交 `47292e94`）
+
+低风险项已直接落地，需决策或需 Mac 验证的已开 issue：
+
+| 处置 | 内容 |
+|------|------|
+| **已做** | P1-D2 薄边补测（`mapRustComic` 全字段/空可选字段、`mapPagedResult`、`mapPagedSeriesComicsResult`、新增 `frb_zone_guard_test` 三条）；P1-A6 文档回写（ADR-0015 加「实现修订」小节 + `core/vendor/README.md` + `rust-migration.md`）；P2-C4 移除 `card_settings_ui`；P1-C3 的 Drift 错注释订正；`testing.md` Slice 2 缺口清单更新 |
+| **已开 issue** | [#128](https://github.com/Zoti321/hentail_library/issues/128) revision 降频（P0-B1）· [#129](https://github.com/Zoti321/hentail_library/issues/129) sync→async 第二刀（P0-B2）· [#130](https://github.com/Zoti321/hentail_library/issues/130) 系列重排去留决策（P2-C6）· [#131](https://github.com/Zoti321/hentail_library/issues/131) `allSeriesProvider` 死路径（P2-B5）· [#132](https://github.com/Zoti321/hentail_library/issues/132) iOS `build-ios-xcframework.sh` 去留 |
+| **仍未承载** | P0-F1 All libraries browse、P1-A2 ADR-0014 实现、P1-B3 阅读器同步探测、P1-C1 Stateful 收敛、P1-C3 的 `clearExpiredHistory` 去留、P1-E2 README 门禁对照 |
 
 ---
 
@@ -42,7 +52,7 @@
 | Dart 生成文件（`*.g.dart` + `*.freezed.dart`） | **78**（78） | 同上路径 |
 | Rust `core/crates/core/src` | **116**（117）`.rs` | `mobile_pdf.rs` 随 ADR-0015 删除 |
 | `core/crates/core/tests` 集成测文件 | **35**（34） | `find core/crates/core/tests -name '*.rs'` |
-| Flutter `*_test.dart` | **177**（172） | `find app/test -name '*_test.dart'` |
+| Flutter `*_test.dart` | **178**（172） | `find app/test -name '*_test.dart'`；2026-09-16 新增 `frb_zone_guard_test.dart` |
 | `#[flutter_rust_bridge::frb(sync)]` | **63**（70） | `grep -r ... core/crates/flutter/src/api` |
 | 纯 `#[flutter_rust_bridge::frb]`（async 入口） | **44**（36） | 同行匹配 `^#\[flutter_rust_bridge::frb\]$` |
 | `guardFrbSync(` 调用点 | **51**（60） | `app/lib`，排除生成码与 `frb_call_guard` 定义 |
@@ -138,14 +148,14 @@ sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改�
 | ResourceEntry 注释 | — | `resource/access/mod.rs` | 已对齐 |
 | **iOS PDF 打包** | **ADR-0015** | **`podspec` / `Podfile` / `embed_pdfium.sh`** | **漂移 → 见 P1-A6** |
 
-#### P1-A6 — 新增：ADR-0015 Decision 与 iOS pdfium 实际嵌入方式不一致
+#### P1-A6 — ADR-0015 Decision 与 iOS pdfium 实际嵌入方式不一致 — **已处理（2026-09-16，`47292e94`）**
 
 - **现状证据**
   - ADR-0015 Decision 写：「`hentai_flutter.podspec` 以 `vendored_frameworks` 嵌入并代签」。
   - 实现（9-15 三连修后）：`hentai_flutter.podspec` L26–29 注释明确「CocoaPods 不支持 `vendored_frameworks` 引用含 `.dylib` 的 xcframework」，改由 `app/ios/Podfile` L30–31 `use_frameworks! :linkage => :dynamic` + L39–45 `[HL] Embed pdfium dylib` script phase 调 `app/rust_builder/ios/embed_pdfium.sh` 拷进 App `Frameworks/`；运行时仍按 `pdf.rs` L26–28 / L44+ `bind_pdfium_ios()` 从 bundle `dlopen`。
 - **问题/机会**：ADR 是打包链的真相源，且本次改动把**整个 iOS pod 图切成 dynamic linkage**（副作用范围远超 PDF），Consequences 未记录；下次 iOS 构建失败排查会先读错文档。
-- **建议方向**：修订 ADR-0015 Decision/Consequences 为 script-phase + dynamic linkage 事实，并记录「dynamic linkage 影响全部 Pod」这一代价；无需新开 ADR。
-- **风险/代价**：低（纯文档），但应在下次触碰 iOS 构建前完成。
+- **处理**：ADR-0015 Decision 改写为 script phase 事实并加「实现修订」小节，Consequences 补记 dynamic linkage 影响全部 Pod、选片逻辑自维护；`core/vendor/README.md` 与 `docs/agents/rust-migration.md` 同步。未新开 ADR。
+- **连带发现**：`core/vendor/build-ios-xcframework.sh` 的产物 `pdfium.xcframework` **已无消费方**（`embed_pdfium.sh` 直取 `core/vendor/ios-*/` 下的 dylib），`install_name` 归一化不再作用于入包文件；因 `dlopen` 走绝对路径，功能不受影响。去留需 Mac 验证 → [#132](https://github.com/Zoti321/hentail_library/issues/132)。
 
 #### P2-A5 — 根目录遗留产物与「legacy mobile」叙事 — **已决策并文档对齐（2026-09-13）**
 
@@ -156,14 +166,14 @@ sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改�
 
 ### 性能
 
-#### P0-B1 — 扫描写入期 `data_version` ~400ms 轮询仍驱动 UI 刷新 — **仍开放（最高性价比 P0）**
+#### P0-B1 — 扫描写入期 `data_version` ~400ms 轮询仍驱动 UI 刷新 — **仍开放，见 [#128](https://github.com/Zoti321/hentail_library/issues/128)**
 
 - **现状证据（未变）**：`core/crates/flutter/src/api/comic.rs` L369–372：`read_data_version()` 后 `tokio::time::sleep(400ms)` 循环比对版本号。`LibraryPage` 已不整页 watch coordinator，但 catalog / Home counts 仍吃这条 revision 流。
 - **问题/机会**：「边扫边逛」仍可能高频重载；`allSeriesProvider`（`keepAlive` + watch revision，见 P2-B5）一旦被消费会放大该成本。
 - **建议方向**：扫描进行中合并/降频 revision；或 sync 结束显式 bump + 扫描期节流。
 - **风险/代价**：中；节流过度会让 UI 长时间陈旧。
 
-#### P0-B2 — 剩余 sync FRB — **第一刀已落地，第二刀未开**
+#### P0-B2 — 剩余 sync FRB — **第一刀已落地；第二刀见 [#129](https://github.com/Zoti321/hentail_library/issues/129)**
 
 - **已做**：History 读、Named facet 分页/form list、Library 热读 → async。
 - **未做（按收益排序）**：`get_series_reading_context_by_comic_id_frb`（开读路径，L317）、`fetch_series_comics_metadata_frb`（L344）、`list_all_named_facet_names_frb`（L54）、Tag/Author 管理读、各模块写（History 4、Library 9、Series 7 写）。
@@ -181,7 +191,7 @@ sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改�
 - **证据**：`comic_detail_series_nav_provider.dart` L99–116 新增 `resolveComicTitlesForDisplay`，`buildSeriesNavData`（L125+）改为一次批量读；`comic_repository_impl.dart` L77–86 `findByIds` 走 async `findComicsByIdsFrb`，缺失 id 保留截断兜底。
 - **余留**：单条 `resolveComicTitleForDisplay` 现是批量版的薄封装，无额外往返。
 
-#### P2-B5 — `allSeriesProvider` / `get_all_series_frb` 死路径且是潜伏热点 — **仍开放**
+#### P2-B5 — `allSeriesProvider` / `get_all_series_frb` 死路径且是潜伏热点 — **仍开放，见 [#131](https://github.com/Zoti321/hentail_library/issues/131)**
 
 - **现状证据**：`library_series_providers.dart` L9–18 `allSeries` 为 `@Riverpod(keepAlive: true)`，watch `libraryRevisionProvider.revision` 后 `seriesRepo.getAll()`（sync `get_all_series_frb`，`series.rs` L285）并在 Dart 侧排序；`app/lib` 内除生成码**无消费者**（仅 `library_comics_page_index_test.dart` L88 做 override）。
 - **问题/机会**：死代码占 sync 面；一旦被 watch，就是「全量拉系列 × 每次 revision 变化」，与 P0-B1 叠加。
@@ -210,27 +220,23 @@ sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改�
 - **建议方向**：剩余点至少 `logError` + 用户可见失败；区分「预期取消」与真实错误。
 - **风险/代价**：低。
 
-#### P1-C3 — Drift 时代注释与空实现残留 — **未变**
+#### P1-C3 — Drift 时代注释与空实现残留 — **部分处理（2026-09-16）**
 
-- **现状证据**
-  - `author_management_notifier.dart` L6：「监听 Drift `authors` 表变化」——实为 FRB stream。
-  - `reading_history_repository_impl.dart` L162–164 `clearExpiredHistory` 仍空实现，注释「365 天清理…后续 slice 补齐；当前无 UI 调用」。
-  - （`migration/m20240630_000002_drift_v2_seed.rs` 提到 Drift 属历史迁移语义，**正确**，勿改。）
-- **建议方向**：改注释；`clearExpiredHistory` 要么实现 Rust SQL + UI，要么从接口删除并记产品决定。
+- **已改**：`author_management_notifier.dart` L6 注释订正为「经 FRB stream 监听 Rust 侧作者变化」。
+- **仍开放**：`reading_history_repository_impl.dart` L162–164 `clearExpiredHistory` 仍是空实现，注释「365 天清理…后续 slice 补齐；当前无 UI 调用」——要么实现 Rust SQL + UI 入口，要么从接口删除并记产品决定；暂未开 issue。
+- （`migration/m20240630_000002_drift_v2_seed.rs` 提到 Drift 属历史迁移语义，**正确**，勿改。）
 - **风险/代价**：低。
 
-#### P2-C4 — 未使用的 pub 依赖 — **未变**
+#### P2-C4 — 未使用的 pub 依赖 — **已处理（2026-09-16，`47292e94`）**
 
-- **现状证据**：`app/pubspec.yaml` L22 仍有 `card_settings_ui: ^2.0.1`；`app/lib` 内无 import。`archive` 仍被 `log_export_service.dart` 使用（非死依赖）。
-- **建议方向**：移除 `card_settings_ui`（#124 设置页重做后更无需要）。
-- **风险/代价**：低。
+- **处理**：`card_settings_ui` 已从 `app/pubspec.yaml` 移除（`flutter pub get` + `analyze` 验证无引用）。`archive` 仍被 `log_export_service.dart` 使用，保留。
 
 #### P2-C5 — Dart data 层 `services/` 仍存在（非 comic I/O）
 
 - **现状**：`data/services/app_update`、`tag_dictionary` 符合 rust-migration「设置/更新/下载可留 Dart」。
 - **标注**：**不建议**为分层纯度迁入 Rust。
 
-#### P2-C6 — 新增：#121 系列成员重排回退后留下无消费的写路径
+#### P2-C6 — #121 系列成员重排回退后留下无消费的写路径 — **待决策，见 [#130](https://github.com/Zoti321/hentail_library/issues/130)**
 
 - **现状证据**：`c8d3f8fb` 提交信息标注「#121 已回退」，issue #121 CLOSED；`app/lib` 内无 series reorder mode UI（仅侧栏 `sidebarReorderLibraries` 与 `librariesReorderMenuEnabled` 属库排序，另一回事）。但 `series_repository_impl.dart` L179–186 `setSeriesItemsOrder` 与 domain L68 声明仍在，Rust `set_series_items_order_frb`（`series.rs` L378，sync）亦在册，**无 UI 调用点**。
 - **问题/机会**：接口悬空，读代码时会以为该能力已交付；同时占 sync 面（与 P0-B2 死 sync 清理重叠）。
@@ -248,11 +254,11 @@ sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改�
 - **建议方向**：继续按 testing.md 双轨清单晋升稳定快轨（晋升机制本身运转正常）；PDF 关键路径考虑 Rust 侧最小 smoke 或 macOS 手工清单。
 - **风险/代价**：中；保持 soft 是有意权衡，**扩大硬门禁需评审**。
 
-#### P1-D2 — FRB thin-edge 缺口 — **未变（#108 已关闭，缺口仍在）**
+#### P1-D2 — FRB thin-edge 缺口 — **已处理（2026-09-16，`47292e94`）**
 
-- **现状证据**：`app/test/data/adapters/` 已有 `frb_call_guard` / `frb_error_mapper` / `history` / `reader` / `series` / `thumbnail` / `sync_library` 测。**残留**：`frb_zone_guard.dart`（`main.dart` 生产引用）无任何测试；`comic_frb_mapper_test.dart` 仍只有 2 个测（`mapSortOption`、`mapLibraryFilter`），**`mapRustComic` 未覆盖**，而它被 `comic_repository_impl` 6 处与分页映射调用；`series_frb_mapper_test.dart` 覆盖 `mapPagedSeriesResult`，**不含 `mapPagedSeriesComicsResult`**。
-- **建议方向**：补 `mapRustComic`、`mapPagedSeriesComicsResult` 与 zone guard 单测（不引入真 FRB），新增文件直接落 `test/data` 即进硬门禁。
-- **风险/代价**：低。**这是当前最便宜的 P1**。
+- **原缺口**：`frb_zone_guard.dart`（`main.dart` 生产引用）无测试；`comic_frb_mapper_test.dart` 仅覆盖 sort/filter，`mapRustComic` 未覆盖；`series_frb_mapper_test.dart` 不含 `mapPagedSeriesComicsResult`。
+- **处理**：新增 `app/test/data/adapters/frb_zone_guard_test.dart`（映射后 present / 非 FRB 错误忽略 / benign stream closed 忽略）；`comic_frb_mapper_test.dart` 补 `mapRustComic` 全字段与空可选字段、`mapPagedResult` 分页信封；`series_frb_mapper_test.dart` 补 `mapPagedSeriesComicsResult` 逐项 sortOrder/锁。`test/data` 已在 `test-unit` 硬门禁路径内，无需改 CI 命令；`testing.md` Slice 2 清单同步更新。
+- **余留**：真 FRB / `*_repository_impl` 集成测按 ADR-0002 不做。
 
 #### P1-D3 — WebDAV：Rust Fake 覆盖好，端到端薄
 
@@ -337,17 +343,17 @@ sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改�
 
 ---
 
-## 结论：最值得跟进的机会（2026-09-16 重排）
+## 结论：最值得跟进的机会（2026-09-16 处置后）
 
-1. **扫描期 revision 降频（P0-B1）** — 唯一仍在的可感卡顿源；`watch_comic_changes` 400ms 轮询未动，且与 P2-B5 潜伏全量查询叠加。
-2. **FRB 薄边补测（P1-D2）** — 最便宜的一项：`mapRustComic`、`mapPagedSeriesComicsResult`、`frb_zone_guard` 三个单测，落 `test/data` 即自动进硬门禁。
-3. **sync→async 第二刀（P0-B2）** — 优先 `get_series_reading_context_by_comic_id_frb`（开读路径）与 `fetch_series_comics_metadata_frb`、`list_all_named_facet_names_frb`。
-4. **ADR-0015 回写实现事实（P1-A6）** — iOS 打包是新引入且只能在 Mac 验证的链路，文档错了代价最高；顺手记录 dynamic linkage 的全局副作用。
-5. **All libraries browse 产品决策（P0-F1）** — 占位页已挂入口；排期聚合查询或降级入口，别留半成品。
-6. **ADR-0014 实现（P1-A2）** — 决策已就位，`/paths` 面仍完整存在；一波删除同时清掉 Path sync FRB 与一个 `ConsumerStatefulWidget`。
-7. **回退遗留与死路径清理（P2-C6 / P2-B5 / P2-C4）** — `setSeriesItemsOrder`、`allSeriesProvider`、`card_settings_ui` 可合并为一个小 PR。
+已完成：FRB 薄边补测（P1-D2）、ADR-0015 回写（P1-A6）、`card_settings_ui` 与 Drift 错注释（P2-C4 / P1-C3 一半）。剩余按下述顺序推进：
 
-> 推进前提：仓库当前 **0 个 open issue**，以上任一项都需要先按 `docs/agents/issue-tracker.md` 开 issue 承载。
+1. **扫描期 revision 降频** — [#128](https://github.com/Zoti321/hentail_library/issues/128)；唯一仍在的可感卡顿源，且与 #131 的潜伏全量查询叠加。
+2. **sync→async 第二刀** — [#129](https://github.com/Zoti321/hentail_library/issues/129)；优先开读路径的 `get_series_reading_context_by_comic_id_frb`。
+3. **死路径与回退遗留清理** — [#131](https://github.com/Zoti321/hentail_library/issues/131)（`allSeriesProvider`）+ [#130](https://github.com/Zoti321/hentail_library/issues/130)（系列重排去留，需产品决策）。
+4. **All libraries browse 产品决策（P0-F1）** — 占位页已挂入口；排期聚合查询或降级入口，别留半成品。**尚无 issue**。
+5. **ADR-0014 实现（P1-A2）** — 决策已就位，`/paths` 面仍完整存在；一波删除同时清掉 Path sync FRB 与一个 `ConsumerStatefulWidget`。**尚无 issue**。
+6. **iOS 构建链收口** — [#132](https://github.com/Zoti321/hentail_library/issues/132)；需 Mac 验证后再动，顺带在 Mac 上跑一次 `integration_test/pdf_reader_smoke_test.dart`。
+7. **阅读器同步文件探测（P1-B3）** 与 **`clearExpiredHistory` 去留（P1-C3 余留）** — 低优先，触达时处理。
 
 ---
 
