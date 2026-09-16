@@ -74,6 +74,7 @@ final class ComicDetailSeriesNavReady extends ComicDetailSeriesNavResult {
 }
 
 /// 暂无产出方：reading context SQL 用 `.one()`，多系列归属已降级为取首个系列。
+/// 去留决策见 issue #133（其 l10n 文案同样未被使用）。
 final class ComicDetailSeriesNavConflict extends ComicDetailSeriesNavResult {
   const ComicDetailSeriesNavConflict(this.seriesNames);
 
