@@ -1,6 +1,5 @@
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement, Value};
 
-use crate::comic::read_data_version;
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
 use crate::library::get_current_library_id;
@@ -70,16 +69,12 @@ pub async fn watch_home_page_counts(
     mut emit: impl FnMut(HomePageCountsDto) -> Result<(), HentaiError>,
 ) -> Result<(), HentaiError> {
     let db = connection()?;
-    let mut last = crate::comic::read_data_version().await?;
+    let mut changes = crate::revision::subscribe();
     emit(load_counts(&db, exclude_r18).await?)?;
-    loop {
-        tokio::time::sleep(std::time::Duration::from_millis(400)).await;
-        let version = crate::comic::read_data_version().await?;
-        if version != last {
-            last = version;
-            emit(load_counts(&db, exclude_r18).await?)?;
-        }
+    while changes.changed().await.is_ok() {
+        emit(load_counts(&db, exclude_r18).await?)?;
     }
+    Ok(())
 }
 
 pub async fn watch_continue_reading_top5(
@@ -87,16 +82,12 @@ pub async fn watch_continue_reading_top5(
     mut emit: impl FnMut(Vec<HomeContinueReadingDto>) -> Result<(), HentaiError>,
 ) -> Result<(), HentaiError> {
     let db = connection()?;
-    let mut last = read_data_version().await?;
+    let mut changes = crate::revision::subscribe();
     emit(load_continue_reading(&db, exclude_r18).await?)?;
-    loop {
-        tokio::time::sleep(std::time::Duration::from_millis(400)).await;
-        let version = read_data_version().await?;
-        if version != last {
-            last = version;
-            emit(load_continue_reading(&db, exclude_r18).await?)?;
-        }
+    while changes.changed().await.is_ok() {
+        emit(load_continue_reading(&db, exclude_r18).await?)?;
     }
+    Ok(())
 }
 
 async fn load_continue_reading(

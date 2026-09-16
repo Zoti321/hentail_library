@@ -5,7 +5,6 @@ use sea_orm::{
     TransactionTrait,
 };
 
-use crate::comic::read_data_version;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_tags, prelude::*, tags};
 use crate::error::HentaiError;
@@ -100,16 +99,12 @@ pub async fn rename_tag(old_name: &str, new_name: &str) -> Result<(), HentaiErro
 }
 
 pub async fn watch_tags(mut emit: impl FnMut(Vec<String>) -> Result<(), HentaiError>) -> Result<(), HentaiError> {
-    let mut last = read_data_version().await?;
+    let mut changes = crate::revision::subscribe();
     emit(list_all_tags().await?)?;
-    loop {
-        tokio::time::sleep(std::time::Duration::from_millis(400)).await;
-        let version = read_data_version().await?;
-        if version != last {
-            last = version;
-            emit(list_all_tags().await?)?;
-        }
+    while changes.changed().await.is_ok() {
+        emit(list_all_tags().await?)?;
     }
+    Ok(())
 }
 
 pub use dictionary_import::{import_tag_dictionary, TagDictionaryImportResult};

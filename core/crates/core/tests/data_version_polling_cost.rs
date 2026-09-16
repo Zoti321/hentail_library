@@ -23,17 +23,11 @@ mod common;
 
 use std::time::{Duration, Instant};
 
-use hentai_core::{init_db_at_path, read_data_version};
+use hentai_core::{init_db_at_path, read_data_version, revision};
 use tempfile::TempDir;
 
-/// 稳态并发轮询者数量。
+/// 稳态活跃 watch 循环数量（改造后它们共用一条 poller）。
 const WATCH_LOOPS: usize = 5;
-/// 每条循环的轮询间隔（`sleep(Duration::from_millis(400))`）。
-const POLL_INTERVAL: Duration = Duration::from_millis(400);
-
-fn polls_per_second() -> f64 {
-    WATCH_LOOPS as f64 / POLL_INTERVAL.as_secs_f64()
-}
 
 #[test]
 #[ignore = "measurement only; run manually with --ignored --nocapture"]
@@ -60,19 +54,14 @@ fn measure_idle_polling_cost() {
             let serial_elapsed = started.elapsed();
             let per_call = serial_elapsed / SAMPLES as u32;
 
-            // 并发基线：5 条循环同时读，暴露单连接（max_connections(1)）串行化的影响。
-            const ROUNDS: usize = 400;
-            let concurrent_started = Instant::now();
-            for _ in 0..ROUNDS {
-                futures::future::join_all(
-                    (0..WATCH_LOOPS)
-                        .map(|_| async { read_data_version().await.expect("concurrent read") }),
-                )
-                .await;
-            }
-            let concurrent_elapsed = concurrent_started.elapsed();
-            let per_round = concurrent_elapsed / ROUNDS as u32;
-            let per_concurrent_call = concurrent_elapsed / (ROUNDS * WATCH_LOOPS) as u32;
+            // 端到端：挂 5 个订阅者模拟稳态，量共享 poller 的真实轮询频率。
+            const WINDOW: Duration = Duration::from_secs(4);
+            let subscribers: Vec<_> = (0..WATCH_LOOPS).map(|_| revision::subscribe()).collect();
+            let before = revision::poll_count();
+            tokio::time::sleep(WINDOW).await;
+            let polls = revision::poll_count() - before;
+            drop(subscribers);
+            let measured_rate = polls as f64 / WINDOW.as_secs_f64();
 
             let distinct = {
                 let mut v = observed.clone();
@@ -80,18 +69,17 @@ fn measure_idle_polling_cost() {
                 v.dedup();
                 v
             };
-            let idle_cost_per_sec = per_call.as_secs_f64() * polls_per_second();
+            let idle_cost_per_sec = per_call.as_secs_f64() * measured_rate;
+            let legacy_rate = WATCH_LOOPS as f64 / revision::POLL_INTERVAL.as_secs_f64();
 
             println!("\n===== read_data_version 空闲开销基线 =====");
             println!("串行 {SAMPLES} 次：总 {serial_elapsed:?}，单次均值 {per_call:?}");
             println!(
-                "并发 {WATCH_LOOPS} 路 × {ROUNDS} 轮：总 {concurrent_elapsed:?}，\
-                 每轮 {per_round:?}，摊到单次 {per_concurrent_call:?}"
+                "{WATCH_LOOPS} 个订阅者 / {WINDOW:?} 窗口：实测 {polls} 次轮询 = {measured_rate:.2} 次/秒"
             );
             println!(
-                "稳态轮询频率：{:.1} 次/秒（{WATCH_LOOPS} 条循环 × {:?} 间隔）",
-                polls_per_second(),
-                POLL_INTERVAL
+                "改造前（每条循环各自轮询）：{legacy_rate:.1} 次/秒 → 降低 {:.1}×",
+                legacy_rate / measured_rate.max(f64::MIN_POSITIVE)
             );
             println!(
                 "推算空闲 CPU 占用：{:.6} 秒/秒 = {:.4}%",

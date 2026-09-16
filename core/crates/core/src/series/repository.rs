@@ -6,7 +6,7 @@ use sea_orm::{
 };
 
 use crate::comic::{
-    load_comics_ordered, read_data_version, search_comic_ids_by_tag_expression, ComicDto,
+    load_comics_ordered, search_comic_ids_by_tag_expression, ComicDto,
     PageRequestDto,
 };
 use crate::db::{connection, map_db_err};
@@ -874,14 +874,10 @@ pub async fn load_home_series_comic_order_map() -> Result<HashMap<String, f64>, 
 pub async fn watch_home_series_comic_order_map(
     mut emit: impl FnMut(HashMap<String, f64>) -> Result<(), HentaiError>,
 ) -> Result<(), HentaiError> {
-    let mut last = read_data_version().await?;
+    let mut changes = crate::revision::subscribe();
     emit(load_home_series_comic_order_map().await?)?;
-    loop {
-        tokio::time::sleep(std::time::Duration::from_millis(400)).await;
-        let version = read_data_version().await?;
-        if version != last {
-            last = version;
-            emit(load_home_series_comic_order_map().await?)?;
-        }
+    while changes.changed().await.is_ok() {
+        emit(load_home_series_comic_order_map().await?)?;
     }
+    Ok(())
 }

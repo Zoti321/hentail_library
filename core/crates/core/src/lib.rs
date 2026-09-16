@@ -15,6 +15,7 @@ pub mod named_facet;
 pub mod parody;
 pub mod reader;
 pub mod resource;
+pub mod revision;
 pub mod runtime;
 pub mod series;
 pub mod series_id;
