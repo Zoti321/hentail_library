@@ -26,7 +26,7 @@
 | 处置 | 内容 |
 |------|------|
 | **已做** | P1-D2 薄边补测（`mapRustComic` 全字段/空可选字段、`mapPagedResult`、`mapPagedSeriesComicsResult`、新增 `frb_zone_guard_test` 三条）；P1-A6 文档回写（ADR-0015 加「实现修订」小节 + `core/vendor/README.md` + `rust-migration.md`）；P2-C4 移除 `card_settings_ui`；P1-C3 的 Drift 错注释订正；`testing.md` Slice 2 缺口清单更新 |
-| **已开 issue** | [#128](https://github.com/Zoti321/hentail_library/issues/128) revision 降频（P0-B1）· [#129](https://github.com/Zoti321/hentail_library/issues/129) sync→async 第二刀（P0-B2）· [#130](https://github.com/Zoti321/hentail_library/issues/130) 系列重排去留决策（P2-C6）→ **已决策并关闭（2026-09-16）**，实施承载转重开的 [#121](https://github.com/Zoti321/hentail_library/issues/121) · [#131](https://github.com/Zoti321/hentail_library/issues/131) `allSeriesProvider` 死路径（P2-B5）· [#132](https://github.com/Zoti321/hentail_library/issues/132) iOS `build-ios-xcframework.sh` 去留 |
+| **已开 issue** | [#128](https://github.com/Zoti321/hentail_library/issues/128) revision 降频（P0-B1）· [#129](https://github.com/Zoti321/hentail_library/issues/129) sync→async 第二刀（P0-B2）· [#130](https://github.com/Zoti321/hentail_library/issues/130) 系列重排去留决策（P2-C6）→ **已决策并关闭（2026-09-16）**，实施承载转重开的 [#121](https://github.com/Zoti321/hentail_library/issues/121) · [#131](https://github.com/Zoti321/hentail_library/issues/131) `allSeriesProvider` 死路径（P2-B5）→ **已落地（2026-09-16）** · [#132](https://github.com/Zoti321/hentail_library/issues/132) iOS `build-ios-xcframework.sh` 去留 |
 | **已实现** | P1-A2 ADR-0014 的 `/paths` 退役（2026-09-16）：路由重定向 + 空态/Hero 双 CTA + 删 Dart/Rust Path 面 |
 | **仍未承载** | P0-F1 All libraries browse、P1-B3 阅读器同步探测、P1-C1 Stateful 收敛、P1-C3 的 `clearExpiredHistory` 去留、P1-E2 README 门禁对照 |
 
@@ -63,14 +63,14 @@
 | `TODO`/`FIXME`/`HACK`/`XXX` | **0**（0） | 债仍以注释/ADR/文档表达 |
 | GitHub open issues | **0** | `gh issue list --state open`（#11 PRD、#108 切片2 均 CLOSED） |
 
-sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改造的累积效果；**仍是 sync 多数**。
+sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改造的累积效果；**仍是 sync 多数**。#131 落地后 `series.rs` 的 sync 再 -1（`get_all_series_frb` 删除，新增的 `find_series_item_by_comic_id_frb` 是 async），总计 62:44。
 
 ### FRB 入口分布（按模块，2026-09-16）
 
 | 模块 | sync | async | 仍 sync 的性质 |
 |------|------|-------|----------------|
 | `comic.rs` | 5 | 10 | 主要写 + revision 流辅助 |
-| `series.rs` | 9 | 10 | reading context 读、comics metadata 读、全部 order/lock 写、`get_all_series` |
+| `series.rs` | 8 | 10 | reading context 读、comics metadata 读、全部 order/lock 写 |
 | `library.rs` | 9 | 3 | 全部 CRUD 与设置写（热读 list/current 已 async） |
 | `tag.rs` / `author.rs` | 6 / 5 | 1 / 1 | 管理读 + 写 |
 | `named_facet.rs` | 5 | 2 | `list_all_named_facet_names` 读 + 管理写 |
@@ -190,12 +190,12 @@ sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改�
 - **证据**：`comic_detail_series_nav_provider.dart` L99–116 新增 `resolveComicTitlesForDisplay`，`buildSeriesNavData`（L125+）改为一次批量读；`comic_repository_impl.dart` L77–86 `findByIds` 走 async `findComicsByIdsFrb`，缺失 id 保留截断兜底。
 - **余留**：单条 `resolveComicTitleForDisplay` 现是批量版的薄封装，无额外往返。
 
-#### P2-B5 — `allSeriesProvider` / `get_all_series_frb` 死路径且是潜伏热点 — **仍开放，见 [#131](https://github.com/Zoti321/hentail_library/issues/131)**
+#### P2-B5 — `allSeriesProvider` / `get_all_series_frb` 死路径且是潜伏热点 — **已落地（2026-09-16 完成，[#131](https://github.com/Zoti321/hentail_library/issues/131)）**
 
-- **现状证据**：`library_series_providers.dart` L9–18 `allSeries` 为 `@Riverpod(keepAlive: true)`，watch `libraryRevisionProvider.revision` 后 `seriesRepo.getAll()`（sync `get_all_series_frb`，`series.rs` L285）并在 Dart 侧排序；`app/lib` 内除生成码**无消费者**（仅 `library_comics_page_index_test.dart` L88 做 override）。
-- **问题/机会**：死代码占 sync 面；一旦被 watch，就是「全量拉系列 × 每次 revision 变化」，与 P0-B1 叠加。
-- **建议方向**：确认无引用后删 provider，并评估移除 `get_all_series_frb`；若保留则改 async + 明确管理用途。
-- **风险/代价**：低（需连测试一并确认）。
+- **原证据**：`library_series_providers.dart` L9–18 `allSeries` 为 `@Riverpod(keepAlive: true)`，watch `libraryRevisionProvider.revision` 后 `seriesRepo.getAll()`（sync `get_all_series_frb`）并在 Dart 侧排序；`app/lib` 内除生成码无消费者。
+- **复核修正**：`getAll` 本身仍有生产消费者 `edit_metadata_dialog._loadSeriesSortMembership`，它为查一本漫画的成员归属拉全库系列 + 全部 `items` 再线性扫，因此不能直接删。
+- **处置**：删除 `allSeriesProvider` 与 Dart 侧 `watchAll`；core 新增窄查询 `find_series_item_by_comic_id`（FRB `find_series_item_by_comic_id_frb`，async），对话框改走该接口；随后移除 `getAll` / `get_all_series_frb` / `watch_all_series_frb` 及 core 的 `get_all_series` / `watch_all_series`。
+- **余留**：`load_home_series_comic_order_map_frb` / `watch_home_series_comic_order_map_frb` 仍无 app 侧调用方，去留待与 [#121](https://github.com/Zoti321/hentail_library/issues/121) 对齐。
 
 #### P2-B6 — WebDAV / 大库扫描吞吐 — **建议先测量**
 

@@ -8,6 +8,7 @@ import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/domain/models/value_objects/series_meta_locks.dart';
 import 'package:hentai_library/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust;
@@ -34,6 +35,17 @@ SeriesItem mapRustSeriesItem(rust_series.SeriesItemDto dto) {
   return SeriesItem(
     comicId: dto.comicId,
     order: dto.sortOrder,
+    sortOrderLocked: dto.sortOrderLocked,
+  );
+}
+
+SeriesItemMembership mapRustSeriesItemMembership(
+  rust_series.SeriesItemDto dto,
+) {
+  return (
+    seriesId: dto.seriesId,
+    comicId: dto.comicId,
+    sortOrder: dto.sortOrder,
     sortOrderLocked: dto.sortOrderLocked,
   );
 }

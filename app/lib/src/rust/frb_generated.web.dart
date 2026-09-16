@@ -84,11 +84,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   dco_decode_StreamSink_list_series_comic_order_entry_dto_Sse(dynamic raw);
 
   @protected
-  RustStreamSink<List<SeriesDto>> dco_decode_StreamSink_list_series_dto_Sse(
-    dynamic raw,
-  );
-
-  @protected
   RustStreamSink<SyncLibraryProgressDto>
   dco_decode_StreamSink_sync_library_progress_dto_Sse(dynamic raw);
 
@@ -137,6 +132,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesFilterDto dco_decode_box_autoadd_series_filter_dto(dynamic raw);
+
+  @protected
+  SeriesItemDto dco_decode_box_autoadd_series_item_dto(dynamic raw);
 
   @protected
   SeriesReadingContextDto dco_decode_box_autoadd_series_reading_context_dto(
@@ -318,6 +316,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesDto? dco_decode_opt_box_autoadd_series_dto(dynamic raw);
+
+  @protected
+  SeriesItemDto? dco_decode_opt_box_autoadd_series_item_dto(dynamic raw);
 
   @protected
   SeriesReadingContextDto?
@@ -517,11 +518,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  RustStreamSink<List<SeriesDto>> sse_decode_StreamSink_list_series_dto_Sse(
-    SseDeserializer deserializer,
-  );
-
-  @protected
   RustStreamSink<SyncLibraryProgressDto>
   sse_decode_StreamSink_sync_library_progress_dto_Sse(
     SseDeserializer deserializer,
@@ -584,6 +580,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesFilterDto sse_decode_box_autoadd_series_filter_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SeriesItemDto sse_decode_box_autoadd_series_item_dto(
     SseDeserializer deserializer,
   );
 
@@ -795,6 +796,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SeriesDto? sse_decode_opt_box_autoadd_series_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SeriesItemDto? sse_decode_opt_box_autoadd_series_item_dto(
     SseDeserializer deserializer,
   );
 
@@ -1052,12 +1058,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
-  void sse_encode_StreamSink_list_series_dto_Sse(
-    RustStreamSink<List<SeriesDto>> self,
-    SseSerializer serializer,
-  );
-
-  @protected
   void sse_encode_StreamSink_sync_library_progress_dto_Sse(
     RustStreamSink<SyncLibraryProgressDto> self,
     SseSerializer serializer,
@@ -1138,6 +1138,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_series_filter_dto(
     SeriesFilterDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_series_item_dto(
+    SeriesItemDto self,
     SseSerializer serializer,
   );
 
@@ -1411,6 +1417,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_series_dto(
     SeriesDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_series_item_dto(
+    SeriesItemDto? self,
     SseSerializer serializer,
   );
 

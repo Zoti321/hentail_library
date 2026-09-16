@@ -8,20 +8,13 @@ import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
 import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 
 class SeriesRepositoryImpl implements SeriesRepository {
   const SeriesRepositoryImpl();
-
-  @override
-  Future<List<Series>> getAll() async {
-    return guardFrbSync(
-      () => rust_series.getAllSeriesFrb().map(mapRustSeries).toList(),
-      fallbackMessage: '读取系列列表失败',
-    );
-  }
 
   @override
   Future<int> countAll() async => guardFrb(
@@ -53,6 +46,15 @@ class SeriesRepositoryImpl implements SeriesRepository {
       fallbackMessage: '读取系列失败',
     );
     return dto == null ? null : mapRustSeries(dto);
+  }
+
+  @override
+  Future<SeriesItemMembership?> findItemByComicId(String comicId) async {
+    final rust_series.SeriesItemDto? dto = await guardFrb(
+      () => rust_series.findSeriesItemByComicIdFrb(comicId: comicId),
+      fallbackMessage: '读取系列成员归属失败',
+    );
+    return dto == null ? null : mapRustSeriesItemMembership(dto);
   }
 
   @override

@@ -80,7 +80,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => 89529920;
+  int get rustContentHash => 1660756359;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -219,14 +219,16 @@ abstract class RustLibApi extends BaseApi {
     required String seriesId,
   });
 
+  Future<SeriesItemDto?> crateApiSeriesFindSeriesItemByComicIdFrb({
+    required String comicId,
+  });
+
   Future<SeriesThumbnailDto?>
   crateApiThumbnailFindSeriesThumbnailBySeriesIdFrb({required String seriesId});
 
   Future<ComicThumbnailDto?> crateApiThumbnailFindThumbnailByComicIdFrb({
     required String comicId,
   });
-
-  List<SeriesDto> crateApiSeriesGetAllSeriesFrb();
 
   List<HomeContinueReadingDto> crateApiHomeGetContinueReadingTop5Frb({
     required bool excludeR18,
@@ -498,8 +500,6 @@ abstract class RustLibApi extends BaseApi {
     required String seriesId,
     required UpdateSeriesUserMetaDto meta,
   });
-
-  Stream<List<SeriesDto>> crateApiSeriesWatchAllSeriesFrb();
 
   Stream<List<String>> crateApiAuthorWatchAuthorsFrb();
 
@@ -1611,6 +1611,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<SeriesItemDto?> crateApiSeriesFindSeriesItemByComicIdFrb({
+    required String comicId,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(comicId, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 38,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_box_autoadd_series_item_dto,
+          decodeErrorData: sse_decode_hentai_error_dto,
+        ),
+        constMeta: kCrateApiSeriesFindSeriesItemByComicIdFrbConstMeta,
+        argValues: [comicId],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiSeriesFindSeriesItemByComicIdFrbConstMeta =>
+      const TaskConstMeta(
+        debugName: "find_series_item_by_comic_id_frb",
+        argNames: ["comicId"],
+      );
+
+  @override
   Future<SeriesThumbnailDto?>
   crateApiThumbnailFindSeriesThumbnailBySeriesIdFrb({
     required String seriesId,
@@ -1623,7 +1656,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 38,
+            funcId: 39,
             port: port_,
           );
         },
@@ -1657,7 +1690,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 39,
+            funcId: 40,
             port: port_,
           );
         },
@@ -1677,28 +1710,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         debugName: "find_thumbnail_by_comic_id_frb",
         argNames: ["comicId"],
       );
-
-  @override
-  List<SeriesDto> crateApiSeriesGetAllSeriesFrb() {
-    return handler.executeSync(
-      SyncTask(
-        callFfi: () {
-          final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 40)!;
-        },
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_series_dto,
-          decodeErrorData: sse_decode_hentai_error_dto,
-        ),
-        constMeta: kCrateApiSeriesGetAllSeriesFrbConstMeta,
-        argValues: [],
-        apiImpl: this,
-      ),
-    );
-  }
-
-  TaskConstMeta get kCrateApiSeriesGetAllSeriesFrbConstMeta =>
-      const TaskConstMeta(debugName: "get_all_series_frb", argNames: []);
 
   @override
   List<HomeContinueReadingDto> crateApiHomeGetContinueReadingTop5Frb({
@@ -3760,41 +3771,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Stream<List<SeriesDto>> crateApiSeriesWatchAllSeriesFrb() {
-    final sink = RustStreamSink<List<SeriesDto>>();
-    unawaited(
-      handler.executeNormal(
-        NormalTask(
-          callFfi: (port_) {
-            final serializer = SseSerializer(generalizedFrbRustBinding);
-            sse_encode_StreamSink_list_series_dto_Sse(sink, serializer);
-            pdeCallFfi(
-              generalizedFrbRustBinding,
-              serializer,
-              funcId: 105,
-              port: port_,
-            );
-          },
-          codec: SseCodec(
-            decodeSuccessData: sse_decode_unit,
-            decodeErrorData: sse_decode_hentai_error_dto,
-          ),
-          constMeta: kCrateApiSeriesWatchAllSeriesFrbConstMeta,
-          argValues: [sink],
-          apiImpl: this,
-        ),
-      ),
-    );
-    return sink.stream;
-  }
-
-  TaskConstMeta get kCrateApiSeriesWatchAllSeriesFrbConstMeta =>
-      const TaskConstMeta(
-        debugName: "watch_all_series_frb",
-        argNames: ["sink"],
-      );
-
-  @override
   Stream<List<String>> crateApiAuthorWatchAuthorsFrb() {
     final sink = RustStreamSink<List<String>>();
     unawaited(
@@ -3806,7 +3782,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 106,
+              funcId: 105,
               port: port_,
             );
           },
@@ -3838,7 +3814,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 107,
+              funcId: 106,
               port: port_,
             );
           },
@@ -3876,7 +3852,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 108,
+              funcId: 107,
               port: port_,
             );
           },
@@ -3914,7 +3890,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 109,
+              funcId: 108,
               port: port_,
             );
           },
@@ -3953,7 +3929,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 110,
+              funcId: 109,
               port: port_,
             );
           },
@@ -3991,7 +3967,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 111,
+              funcId: 110,
               port: port_,
             );
           },
@@ -4026,7 +4002,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 112,
+              funcId: 111,
               port: port_,
             );
           },
@@ -4058,7 +4034,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             pdeCallFfi(
               generalizedFrbRustBinding,
               serializer,
-              funcId: 113,
+              funcId: 112,
               port: port_,
             );
           },
@@ -4160,14 +4136,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   RustStreamSink<List<SeriesComicOrderEntryDto>>
   dco_decode_StreamSink_list_series_comic_order_entry_dto_Sse(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    throw UnimplementedError();
-  }
-
-  @protected
-  RustStreamSink<List<SeriesDto>> dco_decode_StreamSink_list_series_dto_Sse(
-    dynamic raw,
-  ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     throw UnimplementedError();
   }
@@ -4276,6 +4244,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SeriesFilterDto dco_decode_box_autoadd_series_filter_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_series_filter_dto(raw);
+  }
+
+  @protected
+  SeriesItemDto dco_decode_box_autoadd_series_item_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_series_item_dto(raw);
   }
 
   @protected
@@ -4763,6 +4737,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SeriesDto? dco_decode_opt_box_autoadd_series_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_series_dto(raw);
+  }
+
+  @protected
+  SeriesItemDto? dco_decode_opt_box_autoadd_series_item_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_series_item_dto(raw);
   }
 
   @protected
@@ -5398,14 +5378,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  RustStreamSink<List<SeriesDto>> sse_decode_StreamSink_list_series_dto_Sse(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    throw UnimplementedError('Unreachable ()');
-  }
-
-  @protected
   RustStreamSink<SyncLibraryProgressDto>
   sse_decode_StreamSink_sync_library_progress_dto_Sse(
     SseDeserializer deserializer,
@@ -5527,6 +5499,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_series_filter_dto(deserializer));
+  }
+
+  @protected
+  SeriesItemDto sse_decode_box_autoadd_series_item_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_series_item_dto(deserializer));
   }
 
   @protected
@@ -6203,6 +6183,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_series_dto(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  SeriesItemDto? sse_decode_opt_box_autoadd_series_item_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_series_item_dto(deserializer));
     } else {
       return null;
     }
@@ -6996,23 +6989,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_StreamSink_list_series_dto_Sse(
-    RustStreamSink<List<SeriesDto>> self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(
-      self.setupAndSerialize(
-        codec: SseCodec(
-          decodeSuccessData: sse_decode_list_series_dto,
-          decodeErrorData: sse_decode_AnyhowException,
-        ),
-      ),
-      serializer,
-    );
-  }
-
-  @protected
   void sse_encode_StreamSink_sync_library_progress_dto_Sse(
     RustStreamSink<SyncLibraryProgressDto> self,
     SseSerializer serializer,
@@ -7161,6 +7137,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_series_filter_dto(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_series_item_dto(
+    SeriesItemDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_series_item_dto(self, serializer);
   }
 
   @protected
@@ -7747,6 +7732,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_series_dto(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_series_item_dto(
+    SeriesItemDto? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_series_item_dto(self, serializer);
     }
   }
 
