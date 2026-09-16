@@ -1,11 +1,5 @@
+import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
-
-/// 打开对话框时已知的 Series 成员排序种子（领域上仍属 SeriesItem，非 Comic 元数据）。
-typedef SeriesItemSortEditSeed = ({
-  String seriesId,
-  double sortOrder,
-  bool sortOrderLocked,
-});
 
 /// 在 Comic 元数据保存路径中，按草稿与种子差异写入 Series 成员排序 / 锁。
 ///
@@ -15,7 +9,7 @@ typedef SeriesItemSortEditSeed = ({
 Future<bool> persistSeriesItemSortIfChanged({
   required SeriesRepository repo,
   required String comicId,
-  required SeriesItemSortEditSeed seed,
+  required SeriesItemMembership seed,
   required double sortOrder,
   required bool draftLocked,
 }) async {

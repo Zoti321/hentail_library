@@ -86,7 +86,6 @@ void main() {
 
     final SeriesItemMembership membership = mapRustSeriesItemMembership(dto);
     expect(membership.seriesId, 's7');
-    expect(membership.comicId, 'c9');
     expect(membership.sortOrder, 7.5);
     expect(membership.sortOrderLocked, isTrue);
   });

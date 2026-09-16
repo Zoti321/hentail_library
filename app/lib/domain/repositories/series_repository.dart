@@ -21,8 +21,8 @@ abstract class SeriesRepository {
 
   Future<Series?> findById(String seriesId);
 
-  /// 按 comicId 反查成员归属（排序值与锁状态）；无归属返回 null。
-  Future<SeriesItemMembership?> findItemByComicId(String comicId);
+  /// 按 comicId 反查成员归属（所属 series + 排序值与锁）；无归属返回 null。
+  Future<SeriesItemMembership?> findMembershipByComicId(String comicId);
 
   /// 按 comicId 派生 Series reading context；无归属返回 null。
   Future<SeriesReadingContext?> getReadingContextByComicId(String comicId);

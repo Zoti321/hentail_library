@@ -44,7 +44,6 @@ SeriesItemMembership mapRustSeriesItemMembership(
 ) {
   return (
     seriesId: dto.seriesId,
-    comicId: dto.comicId,
     sortOrder: dto.sortOrder,
     sortOrderLocked: dto.sortOrderLocked,
   );

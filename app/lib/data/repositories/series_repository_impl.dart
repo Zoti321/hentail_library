@@ -49,7 +49,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
   }
 
   @override
-  Future<SeriesItemMembership?> findItemByComicId(String comicId) async {
+  Future<SeriesItemMembership?> findMembershipByComicId(String comicId) async {
     final rust_series.SeriesItemDto? dto = await guardFrb(
       () => rust_series.findSeriesItemByComicIdFrb(comicId: comicId),
       fallbackMessage: '读取系列成员归属失败',

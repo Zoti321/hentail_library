@@ -86,7 +86,7 @@ class _FakeSeriesRepo implements SeriesRepository {
     String comicId,
   ) async {
     for (final Series series in _series) {
-      if (!series.containsComic(comicId)) {
+      if (!series.items.any((SeriesItem item) => item.comicId == comicId)) {
         continue;
       }
       final List<SeriesItem> sorted = List<SeriesItem>.from(series.items)

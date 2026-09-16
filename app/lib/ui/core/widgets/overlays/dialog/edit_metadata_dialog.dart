@@ -53,7 +53,7 @@ Future<void> showEditMetadataDialog({
   required BuildContext context,
   required Comic comic,
   required Future<void> Function(ComicMetadataForm) onSave,
-  SeriesItemSortEditSeed? seriesItemSort,
+  SeriesItemMembership? seriesItemSort,
 }) {
   return showAdaptiveFormSurfaceWidget<void>(
     context: context,
@@ -75,7 +75,7 @@ class EditMetadataDialog extends StatefulHookConsumerWidget {
 
   final Comic comic;
   final Future<void> Function(ComicMetadataForm) onSave;
-  final SeriesItemSortEditSeed? seriesItemSort;
+  final SeriesItemMembership? seriesItemSort;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -91,7 +91,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   bool _lockBusy = false;
 
   /// null = 无归属或尚未加载到归属。
-  SeriesItemSortEditSeed? _seriesSortSeed;
+  SeriesItemMembership? _seriesSortSeed;
   late String _sortOrderText;
   late bool _sortOrderLocked;
   String? _sortOrderError;
@@ -124,7 +124,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     super.initState();
     _form = ComicMetadataForm.fromComic(widget.comic);
     _locks = widget.comic.locks;
-    final SeriesItemSortEditSeed? seed = widget.seriesItemSort;
+    final SeriesItemMembership? seed = widget.seriesItemSort;
     if (seed != null) {
       _applySeriesSortSeed(seed);
     } else {
@@ -136,7 +136,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     }
   }
 
-  void _applySeriesSortSeed(SeriesItemSortEditSeed seed) {
+  void _applySeriesSortSeed(SeriesItemMembership seed) {
     _seriesSortSeed = seed;
     _sortOrderText = _formatSortOrder(seed.sortOrder);
     _sortOrderLocked = seed.sortOrderLocked;
@@ -146,17 +146,13 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     try {
       final SeriesItemMembership? membership = await ref
           .read(seriesRepoProvider)
-          .findItemByComicId(widget.comic.comicId);
+          .findMembershipByComicId(widget.comic.comicId);
       if (!mounted) {
         return;
       }
       setState(() {
         if (membership != null) {
-          _applySeriesSortSeed((
-            seriesId: membership.seriesId,
-            sortOrder: membership.sortOrder,
-            sortOrderLocked: membership.sortOrderLocked,
-          ));
+          _applySeriesSortSeed(membership);
         } else {
           _seriesSortSeed = null;
         }
@@ -259,7 +255,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       return;
     }
 
-    final SeriesItemSortEditSeed? seed = _seriesSortSeed;
+    final SeriesItemMembership? seed = _seriesSortSeed;
     double? parsedSortOrder;
     if (seed != null) {
       final String trimmed = _sortOrderText.trim();
@@ -305,7 +301,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   }
 
   Future<void> _persistSeriesSortIfChanged(
-    SeriesItemSortEditSeed seed,
+    SeriesItemMembership seed,
     double sortOrder,
   ) async {
     final bool wrote = await persistSeriesItemSortIfChanged(
