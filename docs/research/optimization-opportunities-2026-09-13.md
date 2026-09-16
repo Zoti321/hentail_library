@@ -26,7 +26,7 @@
 | 处置 | 内容 |
 |------|------|
 | **已做** | P1-D2 薄边补测（`mapRustComic` 全字段/空可选字段、`mapPagedResult`、`mapPagedSeriesComicsResult`、新增 `frb_zone_guard_test` 三条）；P1-A6 文档回写（ADR-0015 加「实现修订」小节 + `core/vendor/README.md` + `rust-migration.md`）；P2-C4 移除 `card_settings_ui`；P1-C3 的 Drift 错注释订正；`testing.md` Slice 2 缺口清单更新 |
-| **已开 issue** | [#128](https://github.com/Zoti321/hentail_library/issues/128) revision 降频（P0-B1）· [#129](https://github.com/Zoti321/hentail_library/issues/129) sync→async 第二刀（P0-B2）· [#130](https://github.com/Zoti321/hentail_library/issues/130) 系列重排去留决策（P2-C6）· [#131](https://github.com/Zoti321/hentail_library/issues/131) `allSeriesProvider` 死路径（P2-B5）· [#132](https://github.com/Zoti321/hentail_library/issues/132) iOS `build-ios-xcframework.sh` 去留 |
+| **已开 issue** | [#128](https://github.com/Zoti321/hentail_library/issues/128) revision 降频（P0-B1）· [#129](https://github.com/Zoti321/hentail_library/issues/129) sync→async 第二刀（P0-B2）· [#130](https://github.com/Zoti321/hentail_library/issues/130) 系列重排去留决策（P2-C6）→ **已决策并关闭（2026-09-16）**，实施承载转重开的 [#121](https://github.com/Zoti321/hentail_library/issues/121) · [#131](https://github.com/Zoti321/hentail_library/issues/131) `allSeriesProvider` 死路径（P2-B5）· [#132](https://github.com/Zoti321/hentail_library/issues/132) iOS `build-ios-xcframework.sh` 去留 |
 | **已实现** | P1-A2 ADR-0014 的 `/paths` 退役（2026-09-16）：路由重定向 + 空态/Hero 双 CTA + 删 Dart/Rust Path 面 |
 | **仍未承载** | P0-F1 All libraries browse、P1-B3 阅读器同步探测、P1-C1 Stateful 收敛、P1-C3 的 `clearExpiredHistory` 去留、P1-E2 README 门禁对照 |
 
@@ -175,6 +175,7 @@ sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改�
 
 - **已做**：History 读、Named facet 分页/form list、Library 热读 → async。
 - **未做（按收益排序）**：`get_series_reading_context_by_comic_id_frb`（开读路径，L317）、`fetch_series_comics_metadata_frb`（L344）、`list_all_named_facet_names_frb`（L54）、Tag/Author 管理读、各模块写（History 4、Library 9、Series 7 写）。
+- **清单减项（2026-09-16 决策，见 P2-C6）**：`set_series_items_order_frb` 不必改 async 而是**直接删除**（无消费方，API 降级为 core-only），Series 写从 7 降为 6，sync 面少一个入口。
 - **验收**：契约以 async 入口为准；手工点验历史 loadMore、facet loadMore、侧栏切库、系列内翻篇。
 - **风险/代价**：中；面广但模式重复。
 
@@ -234,11 +235,11 @@ sync/async 比从 70:36 变为 63:44，属 P0-B2 第一刀 + 后续批量读改�
 - **现状**：`data/services/app_update`、`tag_dictionary` 符合 rust-migration「设置/更新/下载可留 Dart」。
 - **标注**：**不建议**为分层纯度迁入 Rust。
 
-#### P2-C6 — #121 系列成员重排回退后留下无消费的写路径 — **待决策，见 [#130](https://github.com/Zoti321/hentail_library/issues/130)**
+#### P2-C6 — #121 系列成员重排回退后留下无消费的写路径 — **已决策（2026-09-16），#130 关闭，实施承载转 [#121](https://github.com/Zoti321/hentail_library/issues/121)**
 
-- **现状证据**：`c8d3f8fb` 提交信息标注「#121 已回退」，issue #121 CLOSED；`app/lib` 内无 series reorder mode UI（仅侧栏 `sidebarReorderLibraries` 与 `librariesReorderMenuEnabled` 属库排序，另一回事）。但 `series_repository_impl.dart` L179–186 `setSeriesItemsOrder` 与 domain L68 声明仍在，Rust `set_series_items_order_frb`（`series.rs` L378，sync）亦在册，**无 UI 调用点**。
-- **问题/机会**：接口悬空，读代码时会以为该能力已交付；同时占 sync 面（与 P0-B2 死 sync 清理重叠）。
-- **建议方向**：明确产品意向——重排要重做就记 issue 并保留 API，不做则连 Dart/Rust 写路径一并删（ADR-0006 仅约束 sort order lock 语义，不要求手动重排入口）。
+- **现状证据**：`c8d3f8fb` 提交信息标注「#121 已回退」；`app/lib` 内无 series reorder mode UI（仅侧栏 `sidebarReorderLibraries` 与 `librariesReorderMenuEnabled` 属库排序，另一回事）。但 `series_repository_impl.dart` L179–186 `setSeriesItemsOrder` 与 domain L68 声明仍在，Rust `set_series_items_order_frb`（`series.rs` L378，sync）亦在册，**无 UI 调用点**。
+- **决策（重做，但阻塞）**：产品需求保留——#121 已重开并挂「[阻塞]」前缀 + `help wanted`，阻塞原因是缺少满足要求的网格拖拽方案：已在依赖的 `flutter_reorderable_grid_view`（5.7.0）只支持 `GridView` / `GridView.builder`，**无 sliver 支持**，用它会让重排模式下的全量成员失去虚拟化（本仓库现有用法即 `enableDraggable: false` + `shrinkWrap` 仅做排序 FLIP 动画）；`reorderable_grid`（1.0.13，含 `SliverReorderableGrid`）是唯一 sliver 原生候选但未验证；`reorderable_plus`（0.0.2，两年未更新）与 `sliver_dashboard`（缩放/碰撞引擎，量级过大）均否决。准入条件与自研兜底见 #121 body。
+- **API 处置**：`setSeriesItemsOrder` **降级为 core-only**——删 Dart domain / data 声明与 `set_series_items_order_frb`，保留 `core` 实现与 `series_item_sort_order.rs` 测试；ADR-0006 已加「实现修订（2026-09-16）」记录。代码删除作为独立一刀执行（要跑 FRB codegen，不与 ADR-0014 Path 退役的生成产物混在同一 diff）。
 - **风险/代价**：低。
 
 ---

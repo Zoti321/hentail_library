@@ -44,6 +44,8 @@ Komga 等同类产品的常见做法是：用户编辑排序值后，将该条�
 - 校验：必填、有限数字；允许负数与重复值（由用户自行承担语义）。
 - 排序有变更时保存后 bump library revision（系列漫画 catalog 随之刷新）。
 
+> **实现修订（2026-09-16）**：`setSeriesItemsOrder` 的语义（完整新序入参、锚点 + 夹缝插值、全员加锁、单事务）不变，但它**降级为 core-only**：#121 的系列详情拖拽 UI 被回退后该 API 无任何消费方，故删除 Dart `SeriesRepository` 声明 / `SeriesRepositoryImpl` 实现与 `set_series_items_order_frb`（顺带少一个 sync FRB 写入口，见 #129），仅保留 `core` 实现与 `core/crates/core/tests/series_item_sort_order.rs` 的测试守护。重排 UI 阻塞于缺少满足要求的网格拖拽方案（见 #121），解除阻塞时经 FRB codegen 重新上桥即可。
+
 ## Consequences
 
 ### Positive
