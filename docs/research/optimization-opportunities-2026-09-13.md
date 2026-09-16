@@ -16,7 +16,7 @@
 |------|------|
 | **已落地（本次可关闭）** | P1-B4 系列导航标题 N 次查询 → 批量 `findByIds`；P1-F3 iOS PDF stub → 真实 pdfium（ADR-0015）；P2-F5 README 能力表述已对齐；P2-E4 issue 债 → 已核实**当前 0 个 open issue** |
 | **新增发现** | **P1-A6** ADR-0015 Decision 与 iOS pdfium 实际嵌入方式已漂移（`vendored_frameworks` → Podfile script phase + dynamic linkage）；**P2-C6** #121 系列成员重排被回退，留下无 UI 消费的 `setSeriesItemsOrder` 写路径 |
-| **仍开放（优先级不变）** | P0-B1 扫描期 400ms revision 轮询；P0-B2 剩余 sync FRB（**第二刀已落地**，余写路径 / Library CRUD / Tag·Author 管理读）；P0-F1 All libraries browse 占位；P1-A2 `/paths` 退役（ADR-0014 已决策未实现）；P1-B3 阅读器同步文件探测；P1-C1/C2/C3、P1-D2 薄边补测、P2-B5/C4 |
+| **仍开放（优先级不变）** | P0-B1 400ms revision 轮询（**2026-09-16 范围重写**：扫描期降频已由 `c8d3f8f` 落地，剩余为 7 条轮询循环的常驻成本与未节流消费者）；P0-B2 剩余 sync FRB（**第二刀已落地**，余写路径 / Library CRUD / Tag·Author 管理读）；P0-F1 All libraries browse 占位；P1-A2 `/paths` 退役（ADR-0014 已决策未实现）；P1-B3 阅读器同步文件探测；P1-C1/C2/C3、P1-D2 薄边补测、P2-B5/C4 |
 | **文档现状注意** | `docs/research/ui-performance-tuning.md` 已随 `0a3c0806` 删除；其结论对照见下节，原文需从 git 历史取回 |
 
 ### 复核后的处置（提交 `47292e94`）
@@ -167,12 +167,15 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 
 ### 性能
 
-#### P0-B1 — 扫描写入期 `data_version` ~400ms 轮询仍驱动 UI 刷新 — **仍开放，见 [#128](https://github.com/Zoti321/hentail_library/issues/128)**
+#### P0-B1 — `data_version` 400ms 轮询 — **仍开放但范围已重写，见 [#128](https://github.com/Zoti321/hentail_library/issues/128)（2026-09-16 复核）**
 
-- **现状证据（未变）**：`core/crates/flutter/src/api/comic.rs` L369–372：`read_data_version()` 后 `tokio::time::sleep(400ms)` 循环比对版本号。`LibraryPage` 已不整页 watch coordinator，但 catalog / Home counts 仍吃这条 revision 流。
-- **问题/机会**：「边扫边逛」仍可能高频重载；`allSeriesProvider`（`keepAlive` + watch revision，见 P2-B5）一旦被消费会放大该成本。
-- **建议方向**：扫描进行中合并/降频 revision；或 sync 结束显式 bump + 扫描期节流。
-- **风险/代价**：中；节流过度会让 UI 长时间陈旧。
+- **现状证据（订正后）**：不止一处轮询——core 侧共 **7 条独立 400ms `PRAGMA data_version` 循环**：`flutter/src/api/comic.rs` L366–383、`home/mod.rs` L73–82 与 L90–99、`tag/mod.rs` L102–106、`author/mod.rs` L103–109、`history/repository.rs` L154–159、`series/repository.rs` L874–880。`read_data_version`（`comic/repository.rs` L195–207）每次都是独立查询，订阅全开时空闲态约每秒 15 次 DB 查询。
+- **原依据已失效（两条）**：①「扫描期 catalog / Home counts 被反复重载」已由 `c8d3f8f`（2026-09-14）修掉——`LibraryCatalogRevisionCoordinator` busy 期活跃 revision 合并 2s、非活跃 Tab debounce 3s，Home 两条流 `throttleWhile` 2s，busy 判定见 `library_revision_throttle_busy.dart`；这等价于原「扫描期降频」方案，只是落在 Dart 层。② `allSeriesProvider` 放大项随 #131 删除，已不存在。
+- **仍存在的问题**：轮询常驻成本未降（空闲功耗/唤醒 + 400ms 延迟地板）；`seriesById`、`libraryComicDetail`、`librarySearchVocabulary`、`series_detail_comics_catalog_controller` 仍直接 watch 原始 revision，`watch_authors` / `watch_reading_histories` 每次 bump 全表重载且无 throttle。
+- **待验证疑点**：`db.rs` L120–127 为 `max_connections(5)`，而 `PRAGMA data_version` 是逐连接计数器、仅对其他连接的提交递增；循环跨池化连接比对 `last` 理论上可能漏 bump 或误 bump。未实测。
+- **建议方向**：改为写路径 / sync 事件驱动的共享 revision 广播源，去掉 7 条 `sleep`；若保留兜底轮询则合并为单一 poller。
+- **风险/代价**：中；显式 bump 遗漏比轮询漏一拍更严重，需覆盖全部写路径。
+- **验收注意**：原验收条「扫描大库时库页/Home 不再高频重载」现状即已满足，不可作为完成判据。
 
 #### P0-B2 — 剩余 sync FRB — **第一刀 + 第二刀均已落地（[#129](https://github.com/Zoti321/hentail_library/issues/129)，2026-09-16）；剩余为写路径与 Tag/Author 管理读**
 
