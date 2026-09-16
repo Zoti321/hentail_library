@@ -6,7 +6,7 @@ use sea_orm::{
 };
 use sea_orm::sea_query::Expr;
 
-use crate::db::{connection, map_db_err};
+use crate::db::{connection, map_db_err, version_connection};
 use crate::entity::{
     comic_authors, comic_characters, comic_meta, comic_parodies, comic_reading_histories,
     comic_tags, comics, prelude::*,
@@ -193,7 +193,7 @@ pub async fn search_by_keyword_page(
 }
 
 pub async fn read_data_version() -> Result<i32, HentaiError> {
-    let db = connection()?;
+    let db = version_connection()?;
     let row = db
         .query_one(Statement::from_string(
             sea_orm::DatabaseBackend::Sqlite,
