@@ -75,6 +75,17 @@ fn a_single_commit_wakes_every_subscriber() {
 
             let mut subscribers: Vec<_> = (0..4).map(|_| revision::subscribe()).collect();
 
+            // 写入必须晚于 poller 异步基线读取；否则 insert 与基线读竞态会导致
+            // last 已等于新版本，后续轮询永远检测不到变更（CI 上更易触发）。
+            let polls_before = revision::poll_count();
+            tokio::time::timeout(Duration::from_secs(2), async {
+                while revision::poll_count() <= polls_before {
+                    tokio::time::sleep(Duration::from_millis(20)).await;
+                }
+            })
+            .await
+            .expect("poller 未在时限内完成首轮");
+
             let db = connection().expect("connection");
             insert_comic(&db, "broadcast-1").await;
 
