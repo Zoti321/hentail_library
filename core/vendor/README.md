@@ -66,8 +66,6 @@ Flutter 本地开发推荐在仓库根目录运行 `scripts/setup-dev.sh`（含�
 
 嵌入由 `app/ios/Podfile` 的 `post_install` 向 Runner 注入 `[HL] Embed pdfium dylib` script phase 完成：`app/rust_builder/ios/embed_pdfium.sh` 按 `EFFECTIVE_PLATFORM_NAME` / `ARCHS` 选真机 arm64 或模拟器 arm64/x64 的 `libpdfium.dylib`，拷入 `${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}`；运行时由 `pdfium-render` 按 bundle 路径 `dlopen`。Runner 需 `use_frameworks! :linkage => :dynamic`。
 
-`./core/vendor/build-ios-xcframework.sh`（产物 `app/rust_builder/ios/pdfium.xcframework`）保留自最初的 `vendored_frameworks` 方案，**当前构建链已不消费该产物**；`scripts/setup-dev.sh` 在 macOS 检测到 `xcodebuild` 时仍会顺带执行。去留待 Mac 上验证后决定（见 ADR-0015 实现修订）。产物未提交（随 vendor 二进制 gitignore）。
-
 脚本从 [bblanchon/pdfium-binaries](https://github.com/bblanchon/pdfium-binaries/releases) 下载与 `manifest.json` 对齐的版本。
 
 若目标平台目录缺失或不含 pdfium 动态库，`cargo build` 将**失败**（不会静默跳过）。

@@ -3,12 +3,8 @@
 # 由 ios/Podfile post_install 注入 Runner 构建阶段；CI 需先 fetch-native-deps --ios。
 set -euo pipefail
 
-if [[ -z "${SRCROOT:-}" ]]; then
-  echo "error: SRCROOT 未设置" >&2
-  exit 1
-fi
-
-VENDOR="${SRCROOT}/../../../core/vendor"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENDOR="${SCRIPT_DIR}/../../../core/vendor"
 
 if [[ "${EFFECTIVE_PLATFORM_NAME:-}" == "-iphonesimulator" ]]; then
   if [[ "${ARCHS:-}" == *"x86_64"* ]]; then

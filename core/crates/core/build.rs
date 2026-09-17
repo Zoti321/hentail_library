@@ -40,7 +40,7 @@ fn main() {
     }
 
     if target.contains("apple-ios") {
-        // iOS：pdfium 以 vendored xcframework 经 CocoaPods 嵌入 App bundle 的 Frameworks/，
+        // iOS：pdfium 由 embed_pdfium.sh 复制到 App bundle 的 Frameworks/（见 app/ios/Podfile），
         // 运行时按 bundle 路径 dlopen（见 formats/pdf.rs）。此处仅校验 vendor 存在（fail-fast），
         // 不写入编译期链接标志或 HENTAI_PDFIUM_LIB_DIR（host 路径在设备/模拟器上无意义）。
         return;
