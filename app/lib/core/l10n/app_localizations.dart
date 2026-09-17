@@ -1658,12 +1658,6 @@ abstract class AppLocalizations {
   /// **'前往漫画库'**
   String get comicDetailGoToLibrary;
 
-  /// No description provided for @comicDetailSeriesNavConflict.
-  ///
-  /// In zh, this message translates to:
-  /// **'系列数据异常：该漫画同时属于多个系列，无法使用系列导航'**
-  String get comicDetailSeriesNavConflict;
-
   /// No description provided for @comicDetailSeriesPrev.
   ///
   /// In zh, this message translates to:

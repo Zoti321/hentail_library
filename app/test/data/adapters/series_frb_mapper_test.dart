@@ -9,6 +9,7 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/src/rust/api/comic.dart' as rust_comic;
 import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
@@ -74,6 +75,20 @@ void main() {
       expect(mapped.items, isEmpty);
     },
   );
+
+  test('mapRustSeriesItemMembership keeps seriesId alongside sort state', () {
+    const rust_series.SeriesItemDto dto = rust_series.SeriesItemDto(
+      seriesId: 's7',
+      comicId: 'c9',
+      sortOrder: 7.5,
+      sortOrderLocked: true,
+    );
+
+    final SeriesItemMembership membership = mapRustSeriesItemMembership(dto);
+    expect(membership.seriesId, 's7');
+    expect(membership.sortOrder, 7.5);
+    expect(membership.sortOrderLocked, isTrue);
+  });
 
   test('mapRustSeriesItem maps order and lock flag', () {
     const rust_series.SeriesItemDto dto = rust_series.SeriesItemDto(

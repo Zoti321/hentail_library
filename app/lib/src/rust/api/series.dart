@@ -12,12 +12,6 @@ import 'sync.dart';
 // These functions are ignored because they are not marked as `pub`: `map_series_list`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
-Stream<List<SeriesDto>> watchAllSeriesFrb() =>
-    RustLib.instance.api.crateApiSeriesWatchAllSeriesFrb();
-
-List<SeriesDto> getAllSeriesFrb() =>
-    RustLib.instance.api.crateApiSeriesGetAllSeriesFrb();
-
 Future<PlatformInt64> countAllSeriesFrb() =>
     RustLib.instance.api.crateApiSeriesCountAllSeriesFrb();
 
@@ -34,7 +28,13 @@ Future<PagedSeriesResultDto> fetchSeriesPageFrb({
 Future<SeriesDto?> findSeriesByIdFrb({required String seriesId}) =>
     RustLib.instance.api.crateApiSeriesFindSeriesByIdFrb(seriesId: seriesId);
 
-SeriesReadingContextDto? getSeriesReadingContextByComicIdFrb({
+/// 按 comicId 反查系列成员归属（元数据对话框的排序种子）；无归属返回 None。
+Future<SeriesItemDto?> findSeriesItemByComicIdFrb({required String comicId}) =>
+    RustLib.instance.api.crateApiSeriesFindSeriesItemByComicIdFrb(
+      comicId: comicId,
+    );
+
+Future<SeriesReadingContextDto?> getSeriesReadingContextByComicIdFrb({
   required String comicId,
 }) => RustLib.instance.api.crateApiSeriesGetSeriesReadingContextByComicIdFrb(
   comicId: comicId,
@@ -48,7 +48,7 @@ Future<PagedSeriesComicsResultDto> fetchSeriesComicsPageFrb({
   request: request,
 );
 
-SeriesComicsMetadataDto fetchSeriesComicsMetadataFrb({
+Future<SeriesComicsMetadataDto> fetchSeriesComicsMetadataFrb({
   required String seriesId,
 }) => RustLib.instance.api.crateApiSeriesFetchSeriesComicsMetadataFrb(
   seriesId: seriesId,

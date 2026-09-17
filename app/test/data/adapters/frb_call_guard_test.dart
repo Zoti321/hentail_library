@@ -24,6 +24,36 @@ void main() {
     );
   });
 
+  test('guardFrb maps HentaiErrorDto to AppException', () async {
+    await expectLater(
+      guardFrb<int>(
+        () async => throw const HentaiErrorDto(
+          code: 'DbQueryFailed',
+          message: 'no such table',
+          context: null,
+        ),
+        fallbackMessage: '查询失败',
+      ),
+      throwsA(
+        isA<AppException>().having(
+          (AppException e) => e.message,
+          'message',
+          'no such table',
+        ),
+      ),
+    );
+  });
+
+  test('guardFrb passes through non-HentaiErrorDto errors', () async {
+    await expectLater(
+      guardFrb<int>(
+        () async => throw StateError('boom'),
+        fallbackMessage: '查询失败',
+      ),
+      throwsA(isA<StateError>()),
+    );
+  });
+
   test('guardFrbStream maps stream errors to AppException', () async {
     final Stream<int> stream = guardFrbStream(
       () => Stream<int>.error(

@@ -6,14 +6,11 @@ import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/domain/reading/series_reading_context.dart';
 
 /// Series 仓储：文件夹 sync 自动生成；用户可编辑连载状态与计划总卷数。
 abstract class SeriesRepository {
-  Stream<List<Series>> watchAll();
-
-  Future<List<Series>> getAll();
-
   Future<int> countAll();
 
   Future<PagedResult<Series>> fetchPage({
@@ -23,6 +20,9 @@ abstract class SeriesRepository {
   });
 
   Future<Series?> findById(String seriesId);
+
+  /// 按 comicId 反查成员归属（所属 series + 排序值与锁）；无归属返回 null。
+  Future<SeriesItemMembership?> findMembershipByComicId(String comicId);
 
   /// 按 comicId 派生 Series reading context；无归属返回 null。
   Future<SeriesReadingContext?> getReadingContextByComicId(String comicId);

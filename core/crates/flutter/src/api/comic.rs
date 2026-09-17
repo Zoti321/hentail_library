@@ -1,6 +1,5 @@
 use hentai_core::{
-    self, count_all, fetch_comics_page, find_comic_by_id, find_comics_by_ids, init_db,
-    read_data_version, search_by_keyword, search_by_keyword_page, search_by_tag_expression_page,
+    self, count_all, fetch_comics_page, find_comic_by_id, find_comics_by_ids, init_db, search_by_keyword, search_by_keyword_page, search_by_tag_expression_page,
 };
 
 use super::init::HentaiErrorDto;
@@ -366,17 +365,13 @@ pub async fn count_all_comics_frb() -> Result<i64, HentaiErrorDto> {
 pub async fn watch_comic_changes(
     sink: crate::frb_generated::StreamSink<i32>,
 ) -> Result<(), HentaiErrorDto> {
-    let mut last = read_data_version().await.map_err(HentaiErrorDto::from)?;
-    loop {
-        tokio::time::sleep(std::time::Duration::from_millis(400)).await;
-        let Ok(version) = read_data_version().await else {
-            continue;
-        };
-        if version != last {
-            last = version;
-            if sink.add(version).is_err() {
-                break;
-            }
+    let mut changes = hentai_core::revision::subscribe();
+    while changes.changed().await.is_ok() {
+        // Dart 侧只关心「变了」（`watchComicChanges().map((_) {})`），
+        // 故推送 generation 而非 data_version 本身。
+        let generation = *changes.borrow_and_update();
+        if sink.add((generation & 0x7fff_ffff) as i32).is_err() {
+            break;
         }
     }
     Ok(())

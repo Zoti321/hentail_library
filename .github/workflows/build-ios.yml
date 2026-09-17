@@ -1,0 +1,153 @@
+name: Build iOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semantic version without v prefix (default: pubspec version)"
+        required: false
+        type: string
+        default: ""
+
+concurrency:
+  group: build-ios-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: false
+
+env:
+  FLUTTER_VERSION: "3.38.5"
+  FRB_CODEGEN_VERSION: "2.12.0"
+
+jobs:
+  build-ios:
+    name: build-ios
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "name=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            name="$(sed -n 's/^version:[[:space:]]*\([^+[:space:]]*\).*/\1/p' app/pubspec.yaml | head -n1)"
+            if [ -z "$name" ]; then
+              echo "Failed to parse version from app/pubspec.yaml" >&2
+              exit 1
+            fi
+            echo "name=${name}" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Runner images / interrupted rustup can leave orphan rust-std files that
+      # make later `rustup target add` fail with "detected conflict".
+      - name: Clear partial Rust iOS std
+        run: |
+          set -euo pipefail
+          rustup_home="${RUSTUP_HOME:-$HOME/.rustup}"
+          target=aarch64-apple-ios
+          if command -v rustup >/dev/null 2>&1; then
+            rustup target remove "$target" 2>/dev/null || true
+          fi
+          shopt -s nullglob
+          for dir in "${rustup_home}/toolchains/"*/lib/rustlib/"${target}"; do
+            echo "Removing partial rustlib: $dir"
+            rm -rf "$dir"
+          done
+          for manifest in "${rustup_home}/toolchains/"*/lib/rustlib/manifest-rust-std-"${target}"; do
+            echo "Removing orphan manifest: $manifest"
+            rm -f "$manifest"
+          done
+
+      - uses: ./.github/actions/flutter-frb-setup
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
+          rust-targets: aarch64-apple-ios
+
+      - name: Ensure Rust iOS target
+        run: |
+          set -euo pipefail
+          target=aarch64-apple-ios
+          rustup_home="${RUSTUP_HOME:-$HOME/.rustup}"
+          toolchain="$(rustup show active-toolchain | awk '{print $1}')"
+          if rustup target list --installed | grep -qx "$target"; then
+            echo "$target already installed"
+          elif rustup target add "$target"; then
+            echo "$target installed"
+          else
+            echo "Cleaning partial rust-std for $target after install conflict"
+            rustup target remove "$target" 2>/dev/null || true
+            rm -rf "${rustup_home}/toolchains/${toolchain}/lib/rustlib/${target}"
+            rm -f "${rustup_home}/toolchains/${toolchain}/lib/rustlib/manifest-rust-std-${target}"
+            rustup target add "$target"
+          fi
+          rustup target list --installed | grep -E 'apple-ios' || true
+
+      - name: Fetch iOS pdfium vendor libraries
+        run: |
+          set -euo pipefail
+          bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh" --ios
+          test -f "${GITHUB_WORKSPACE}/core/vendor/ios-device-arm64/libpdfium.dylib"
+
+      - name: flutter build ios (unsigned)
+        working-directory: app
+        run: |
+          set +e
+          flutter build ios --release --no-codesign \
+            --build-name=${{ steps.version.outputs.name }} \
+            --build-number=${{ github.run_number }} \
+            --verbose > /tmp/flutter_ios_build.log 2>&1
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            echo "::group::flutter ios build (tail)"
+            tail -n 120 /tmp/flutter_ios_build.log || true
+            echo "::endgroup::"
+            echo "::group::signing / pdfium diagnostics"
+            grep -iE 'Code Sign|Codesign|Signing|Development Team|pdfium|Provisioning|SEVERE|PhaseScriptExecution failed|Embed pdfium' \
+              /tmp/flutter_ios_build.log | tail -n 120 || true
+            echo "::endgroup::"
+            echo "::group::linker / ld diagnostics"
+            grep -E 'Undefined symbols|library not found|clang: error|ld:|error: |Linker command|FAILED' \
+              /tmp/flutter_ios_build.log | tail -n 200 || true
+            echo "::endgroup::"
+          else
+            tail -n 40 /tmp/flutter_ios_build.log || true
+          fi
+          exit "$status"
+
+      - name: Verify pdfium embedded in app bundle
+        run: |
+          set -euo pipefail
+          APP="app/build/ios/iphoneos/Runner.app"
+          DYLIB="${APP}/Frameworks/libpdfium.dylib"
+          if [ ! -d "$APP" ]; then
+            echo "Missing $APP" >&2
+            exit 1
+          fi
+          if [ ! -f "$DYLIB" ]; then
+            echo "Missing embedded pdfium: $DYLIB" >&2
+            ls -la "${APP}/Frameworks/" 2>/dev/null || true
+            exit 1
+          fi
+          echo "Embedded pdfium OK: $DYLIB ($(stat -f%z "$DYLIB" 2>/dev/null || stat -c%s "$DYLIB") bytes)"
+
+      - name: Package unsigned iOS app
+        id: package
+        run: |
+          VERSION="${{ steps.version.outputs.name }}"
+          mkdir -p dist
+          OUT="dist/hentai_library_${VERSION}_ios-arm64-nosign.zip"
+          ditto -c -k --sequesterRsrc --keepParent \
+            "app/build/ios/iphoneos/Runner.app" \
+            "$OUT"
+          echo "path=${OUT}" >> "$GITHUB_OUTPUT"
+          ls -lh "$OUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-arm64-nosign
+          path: ${{ steps.package.outputs.path }}
+          if-no-files-found: error
+          retention-days: 14

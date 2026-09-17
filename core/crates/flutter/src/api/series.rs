@@ -2,13 +2,14 @@ use hentai_core::{
     count_all_series, fetch_series_comics_metadata as core_fetch_series_comics_metadata,
     fetch_series_comics_page as core_fetch_series_comics_page,
     fetch_series_page as core_fetch_page, find_series_by_id as core_find,
-    get_all_series, get_series_reading_context_by_comic_id as core_get_reading_context,
+    find_series_item_by_comic_id as core_find_series_item,
+    get_series_reading_context_by_comic_id as core_get_reading_context,
     load_home_series_comic_order_map, search_series_by_keyword,
     search_series_by_tag_expression,
     set_series_item_sort_order_locked as core_set_item_sort_locked,
     set_series_meta_locks as core_set_meta_locks,
     update_series_item_sort_order as core_update_item_sort_order,
-    update_series_user_meta as core_update_meta, watch_all_series, watch_home_series_comic_order_map,
+    update_series_user_meta as core_update_meta, watch_home_series_comic_order_map,
     PagedSeriesComicsResultDto as CorePagedSeriesComics,
     PagedSeriesResultDto as CorePagedSeries, SeriesComicsMetadataDto as CoreSeriesComicsMetadata,
     SeriesDto as CoreSeries, SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
@@ -270,25 +271,6 @@ fn map_series_list(rows: Vec<CoreSeries>) -> Vec<SeriesDto> {
 }
 
 #[flutter_rust_bridge::frb]
-pub async fn watch_all_series_frb(
-    sink: crate::frb_generated::StreamSink<Vec<SeriesDto>>,
-) -> Result<(), HentaiErrorDto> {
-    normalize_watch_result(
-        watch_all_series(|items| {
-            emit_or_closed(&sink, map_series_list(items))
-        })
-        .await,
-    )
-}
-
-#[flutter_rust_bridge::frb(sync)]
-pub fn get_all_series_frb() -> Result<Vec<SeriesDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(get_all_series())
-        .map(map_series_list)
-        .map_err(HentaiErrorDto::from)
-}
-
-#[flutter_rust_bridge::frb]
 pub async fn count_all_series_frb() -> Result<i64, HentaiErrorDto> {
     count_all_series().await.map_err(HentaiErrorDto::from)
 }
@@ -313,11 +295,23 @@ pub async fn find_series_by_id_frb(series_id: String) -> Result<Option<SeriesDto
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn get_series_reading_context_by_comic_id_frb(
+/// 按 comicId 反查系列成员归属（元数据对话框的排序种子）；无归属返回 None。
+#[flutter_rust_bridge::frb]
+pub async fn find_series_item_by_comic_id_frb(
+    comic_id: String,
+) -> Result<Option<SeriesItemDto>, HentaiErrorDto> {
+    core_find_series_item(&comic_id)
+        .await
+        .map(|opt| opt.map(SeriesItemDto::from))
+        .map_err(HentaiErrorDto::from)
+}
+
+#[flutter_rust_bridge::frb]
+pub async fn get_series_reading_context_by_comic_id_frb(
     comic_id: String,
 ) -> Result<Option<SeriesReadingContextDto>, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_get_reading_context(&comic_id))
+    core_get_reading_context(&comic_id)
+        .await
         .map(|opt| {
             opt.map(|v: CoreSeriesReadingContext| SeriesReadingContextDto {
                 series_id: v.series_id,
@@ -340,11 +334,12 @@ pub async fn fetch_series_comics_page_frb(
         .map_err(HentaiErrorDto::from)
 }
 
-#[flutter_rust_bridge::frb(sync)]
-pub fn fetch_series_comics_metadata_frb(
+#[flutter_rust_bridge::frb]
+pub async fn fetch_series_comics_metadata_frb(
     series_id: String,
 ) -> Result<SeriesComicsMetadataDto, HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_fetch_series_comics_metadata(&series_id))
+    core_fetch_series_comics_metadata(&series_id)
+        .await
         .map(SeriesComicsMetadataDto::from)
         .map_err(HentaiErrorDto::from)
 }

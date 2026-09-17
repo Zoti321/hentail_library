@@ -41,14 +41,9 @@ fi
 if [[ $SKIP_NATIVE_DEPS -eq 0 ]]; then
   bash "$REPO_ROOT/core/vendor/fetch-native-deps.sh"
   bash "$REPO_ROOT/core/vendor/fetch-native-deps.sh" --android
-  # macOS：额外拉取 iOS pdfium 并在有 Xcode 时打包 XCFramework（供 Flutter iOS 构建）。
+  # macOS：额外拉取 iOS pdfium（供 embed_pdfium.sh 嵌入 App bundle）。
   if [[ "$(uname -s)" == "Darwin" ]]; then
     bash "$REPO_ROOT/core/vendor/fetch-native-deps.sh" --ios
-    if command -v xcodebuild >/dev/null 2>&1; then
-      bash "$REPO_ROOT/core/vendor/build-ios-xcframework.sh"
-    else
-      echo "未检测到 xcodebuild，跳过 iOS pdfium.xcframework 打包（如需 iOS 构建请安装 Xcode 后运行 core/vendor/build-ios-xcframework.sh）。"
-    fi
   fi
 fi
 

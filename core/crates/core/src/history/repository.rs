@@ -4,7 +4,6 @@ use sea_orm::{
 };
 use sea_orm::sea_query::{Expr, Func};
 
-use crate::comic::read_data_version;
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_reading_histories, prelude::*};
 use crate::error::HentaiError;
@@ -154,15 +153,11 @@ pub async fn clear_all_reading() -> Result<i32, HentaiError> {
 pub async fn watch_reading_histories(
     mut emit: impl FnMut(Vec<ReadingHistoryDto>) -> Result<(), HentaiError>,
 ) -> Result<(), HentaiError> {
-    let mut last = read_data_version().await?;
-    loop {
-        tokio::time::sleep(std::time::Duration::from_millis(400)).await;
-        let version = read_data_version().await?;
-        if version != last {
-            last = version;
-            emit(list_all_reading().await?)?;
-        }
+    let mut changes = crate::revision::subscribe();
+    while changes.changed().await.is_ok() {
+        emit(list_all_reading().await?)?;
     }
+    Ok(())
 }
 
 fn map_reading_row(row: comic_reading_histories::Model) -> ReadingHistoryDto {

@@ -28,7 +28,7 @@ iOS 与桌面/Android **共用** `pdf.rs`，删除 `mobile_pdf.rs` stub；`pdfiu
 - **运行时绑定**：`pdf.rs` iOS 分支按 `current_exe()` 旁的 `Frameworks/libpdfium.dylib` `dlopen`，回退 leaf 名。
 - 不支持 Mac Catalyst；不引入 Dart pdfium 插件；不新增 CI iOS 硬门禁（Mac 上人工/后续 CI 验证）。
 
-> **实现修订（2026-09-15，提交 `8dea3318` / `51273d16`）**：本决策初版写的是「`hentai_flutter.podspec` 以 `vendored_frameworks` 嵌入 `pdfium.xcframework` 并代签」。实测 CocoaPods **拒绝引用含 `.dylib`（而非 `.framework`）的 XCFramework**，改为上述 Runner script phase 直拷 + dynamic linkage。副作用：`core/vendor/build-ios-xcframework.sh` 产出的 `app/rust_builder/ios/pdfium.xcframework` **当前已无消费方**（`embed_pdfium.sh` 直接取 `core/vendor/` 下的 dylib），其 `install_name` 归一化也不再作用于实际入包的文件；因 `dlopen` 走绝对路径，功能上不受影响。该步骤的去留需在 Mac 上验证后单独决定。
+> **实现修订（2026-09-15，提交 `8dea3318` / `51273d16`）**：本决策初版写的是「`hentai_flutter.podspec` 以 `vendored_frameworks` 嵌入 `pdfium.xcframework` 并代签」。实测 CocoaPods **拒绝引用含 `.dylib`（而非 `.framework`）的 XCFramework**，改为上述 Runner script phase 直拷 + dynamic linkage。初版的 `build-ios-xcframework.sh` 已于 2026-09-17 删除（[#132](https://github.com/Zoti321/hentail_library/issues/132) 决策：无消费方）；`embed_pdfium.sh` 直接取 `core/vendor/` 下的 dylib，`dlopen` 走 bundle 绝对路径。
 
 ## Consequences
 
@@ -40,7 +40,7 @@ iOS 与桌面/Android **共用** `pdf.rs`，删除 `mobile_pdf.rs` stub；`pdfiu
 
 ### Negative
 
-- iOS 构建新增前置步骤：`fetch-native-deps.sh --ios`（`setup-dev.sh` 在 macOS 上自动执行，并在有 Xcode 时附带跑 `build-ios-xcframework.sh`）。
+- iOS 构建新增前置步骤：`fetch-native-deps.sh --ios`（`setup-dev.sh` 在 macOS 上自动执行）。
 - **选片与嵌入是自维护逻辑**：`embed_pdfium.sh` 自行按 `EFFECTIVE_PLATFORM_NAME` / `ARCHS` 判真机/模拟器，Xcode 构建变量语义变化会直接打断构建；代签依赖 Podfile 里统一关掉 pod 签名（Release CD 用 `--no-codesign`）。
 - **Runner 被切到 `use_frameworks! :linkage => :dynamic`**，影响**全部 Pod** 的链接方式（不只 pdfium），后续引入插件时若与静态链接假设冲突需在此处排查。
 - 该路径的编译与打包/运行**无法在 Windows/Linux 验证**，需 Mac 补验（`cargo check --target aarch64-apple-ios` 及真机/模拟器运行）。

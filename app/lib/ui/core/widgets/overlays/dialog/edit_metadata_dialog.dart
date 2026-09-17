@@ -6,12 +6,11 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/domain/models/entity/comic/author.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/entity/comic/series.dart';
-import 'package:hentai_library/domain/models/entity/comic/series_item.dart';
 import 'package:hentai_library/domain/models/entity/comic/tag.dart';
 import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/domain/models/value_objects/comic_meta_locks.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
@@ -54,7 +53,7 @@ Future<void> showEditMetadataDialog({
   required BuildContext context,
   required Comic comic,
   required Future<void> Function(ComicMetadataForm) onSave,
-  SeriesItemSortEditSeed? seriesItemSort,
+  SeriesItemMembership? seriesItemSort,
 }) {
   return showAdaptiveFormSurfaceWidget<void>(
     context: context,
@@ -76,7 +75,7 @@ class EditMetadataDialog extends StatefulHookConsumerWidget {
 
   final Comic comic;
   final Future<void> Function(ComicMetadataForm) onSave;
-  final SeriesItemSortEditSeed? seriesItemSort;
+  final SeriesItemMembership? seriesItemSort;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -92,7 +91,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   bool _lockBusy = false;
 
   /// null = 无归属或尚未加载到归属。
-  SeriesItemSortEditSeed? _seriesSortSeed;
+  SeriesItemMembership? _seriesSortSeed;
   late String _sortOrderText;
   late bool _sortOrderLocked;
   String? _sortOrderError;
@@ -125,7 +124,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     super.initState();
     _form = ComicMetadataForm.fromComic(widget.comic);
     _locks = widget.comic.locks;
-    final SeriesItemSortEditSeed? seed = widget.seriesItemSort;
+    final SeriesItemMembership? seed = widget.seriesItemSort;
     if (seed != null) {
       _applySeriesSortSeed(seed);
     } else {
@@ -137,7 +136,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     }
   }
 
-  void _applySeriesSortSeed(SeriesItemSortEditSeed seed) {
+  void _applySeriesSortSeed(SeriesItemMembership seed) {
     _seriesSortSeed = seed;
     _sortOrderText = _formatSortOrder(seed.sortOrder);
     _sortOrderLocked = seed.sortOrderLocked;
@@ -145,29 +144,15 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
 
   Future<void> _loadSeriesSortMembership() async {
     try {
-      final List<Series> all = await ref.read(seriesRepoProvider).getAll();
-      SeriesItemSortEditSeed? found;
-      for (final Series series in all) {
-        for (final SeriesItem item in series.items) {
-          if (item.comicId == widget.comic.comicId) {
-            found = (
-              seriesId: series.id,
-              sortOrder: item.order,
-              sortOrderLocked: item.sortOrderLocked,
-            );
-            break;
-          }
-        }
-        if (found != null) {
-          break;
-        }
-      }
+      final SeriesItemMembership? membership = await ref
+          .read(seriesRepoProvider)
+          .findMembershipByComicId(widget.comic.comicId);
       if (!mounted) {
         return;
       }
       setState(() {
-        if (found != null) {
-          _applySeriesSortSeed(found);
+        if (membership != null) {
+          _applySeriesSortSeed(membership);
         } else {
           _seriesSortSeed = null;
         }
@@ -270,7 +255,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       return;
     }
 
-    final SeriesItemSortEditSeed? seed = _seriesSortSeed;
+    final SeriesItemMembership? seed = _seriesSortSeed;
     double? parsedSortOrder;
     if (seed != null) {
       final String trimmed = _sortOrderText.trim();
@@ -316,7 +301,7 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   }
 
   Future<void> _persistSeriesSortIfChanged(
-    SeriesItemSortEditSeed seed,
+    SeriesItemMembership seed,
     double sortOrder,
   ) async {
     final bool wrote = await persistSeriesItemSortIfChanged(

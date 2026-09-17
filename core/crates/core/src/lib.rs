@@ -15,6 +15,7 @@ pub mod named_facet;
 pub mod parody;
 pub mod reader;
 pub mod resource;
+pub mod revision;
 pub mod runtime;
 pub mod series;
 pub mod series_id;
@@ -44,8 +45,8 @@ pub use history::{
     PagedReadingHistoryDto, ReadingHistoryDto,
 };
 pub use home::{
-    get_continue_reading_top5, get_home_page_counts, watch_continue_reading_top5,
-    watch_home_page_counts, HomeContinueReadingDto, HomePageCountsDto,
+    watch_continue_reading_top5, watch_home_page_counts, HomeContinueReadingDto,
+    HomePageCountsDto,
 };
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,
@@ -71,10 +72,11 @@ pub use reader::{
 };
 pub use series::{
     count_all_series, fetch_series_comics_metadata, fetch_series_comics_page, fetch_series_page,
-    find_series_by_id, get_all_series, get_series_reading_context_by_comic_id,
-    load_home_series_comic_order_map, search_series_by_keyword, search_series_by_tag_expression,
+    find_series_by_id, find_series_item_by_comic_id,
+    get_series_reading_context_by_comic_id, load_home_series_comic_order_map,
+    search_series_by_keyword, search_series_by_tag_expression,
     set_series_item_sort_order_locked, set_series_items_order, set_series_meta_locks,
-    update_series_item_sort_order, update_series_user_meta, watch_all_series,
+    update_series_item_sort_order, update_series_user_meta,
     watch_home_series_comic_order_map, PagedSeriesComicsResultDto, PagedSeriesResultDto,
     SeriesComicPageItemDto, SeriesComicsMetadataDto, SeriesDto, SeriesFilterDto, SeriesItemDto,
     SeriesMetaLocks, SeriesReadingContextDto, SeriesSortFieldDto, SeriesSortOptionDto,

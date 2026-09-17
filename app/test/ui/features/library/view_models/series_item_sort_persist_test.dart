@@ -1,3 +1,4 @@
+import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_item_sort_persist.dart';
 import 'package:test/test.dart';
@@ -35,7 +36,7 @@ class _LockObservingSeriesRepository implements SeriesRepository {
 }
 
 void main() {
-  const SeriesItemSortEditSeed unlockedSeed = (
+  const SeriesItemMembership unlockedSeed = (
     seriesId: 'series-1',
     sortOrder: 1.0,
     sortOrderLocked: false,
@@ -63,7 +64,7 @@ void main() {
     test('order change while already locked stays locked', () async {
       final _LockObservingSeriesRepository repo =
           _LockObservingSeriesRepository()..sortOrderLocked = true;
-      const SeriesItemSortEditSeed seed = (
+      const SeriesItemMembership seed = (
         seriesId: 'series-1',
         sortOrder: 2.0,
         sortOrderLocked: true,
@@ -87,7 +88,7 @@ void main() {
           _LockObservingSeriesRepository()
             ..sortOrderLocked = true
             ..sortOrder = 3.0;
-      const SeriesItemSortEditSeed seed = (
+      const SeriesItemMembership seed = (
         seriesId: 'series-1',
         sortOrder: 3.0,
         sortOrderLocked: true,

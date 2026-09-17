@@ -72,9 +72,6 @@ class _FakeSeriesRepo implements SeriesRepository {
   final List<Series> _series;
 
   @override
-  Future<List<Series>> getAll() async => _series;
-
-  @override
   Future<Series?> findById(String seriesId) async {
     for (final Series series in _series) {
       if (series.id == seriesId) {
@@ -89,7 +86,7 @@ class _FakeSeriesRepo implements SeriesRepository {
     String comicId,
   ) async {
     for (final Series series in _series) {
-      if (!series.containsComic(comicId)) {
+      if (!series.items.any((SeriesItem item) => item.comicId == comicId)) {
         continue;
       }
       final List<SeriesItem> sorted = List<SeriesItem>.from(series.items)
@@ -201,39 +198,6 @@ void main() {
       ]);
       expect(comicRepo.findByIdsCalls.length, 1);
       expect(comicRepo.findByIdCalls, 0);
-    });
-  });
-
-  group('resolveComicDetailSeriesNavResult', () {
-    test('updates current index without rebuilding series items', () async {
-      final ComicDetailSeriesNavSeriesData seriesData =
-          await container.read(
-                comicDetailSeriesNavForSeriesProvider('series-1').future,
-              )
-              as ComicDetailSeriesNavSeriesData;
-
-      final ComicDetailSeriesNavResult resultA =
-          resolveComicDetailSeriesNavResult(
-            <Series>[series],
-            'comic-a',
-            seriesData,
-          );
-      final ComicDetailSeriesNavResult resultB =
-          resolveComicDetailSeriesNavResult(
-            <Series>[series],
-            'comic-b',
-            seriesData,
-          );
-
-      expect(resultA, isA<ComicDetailSeriesNavReady>());
-      expect(resultB, isA<ComicDetailSeriesNavReady>());
-      final ComicDetailSeriesNavReady readyA =
-          resultA as ComicDetailSeriesNavReady;
-      final ComicDetailSeriesNavReady readyB =
-          resultB as ComicDetailSeriesNavReady;
-      expect(readyA.data.currentIndex, 0);
-      expect(readyB.data.currentIndex, 1);
-      expect(identical(readyA.data.items, readyB.data.items), isTrue);
     });
   });
 

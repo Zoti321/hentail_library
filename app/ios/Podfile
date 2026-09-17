@@ -27,7 +27,7 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 flutter_ios_podfile_setup
 
 target 'Runner' do
-  # pdfium.xcframework 为动态 dylib；静态 linkage 下 CocoaPods 会拒绝 vendored xcframework。
+  # libpdfium.dylib 为动态库；静态 linkage 下 CocoaPods 无法集成，需 dynamic。
   use_frameworks! :linkage => :dynamic
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))

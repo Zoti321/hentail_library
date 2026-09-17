@@ -423,7 +423,6 @@
   "comicDetailNotFound": "Comic not found or removed",
   "comicDetailLoadFailedRetry": "Failed to load. Please retry.",
   "comicDetailGoToLibrary": "Go to library",
-  "comicDetailSeriesNavConflict": "Series data error: this comic belongs to multiple series; series navigation is unavailable.",
   "comicDetailSeriesPrev": "Previous in series",
   "comicDetailSeriesPrevSemantic": "Previous in series",
   "comicDetailSeriesCatalog": "Series catalog",

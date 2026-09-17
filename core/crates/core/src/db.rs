@@ -16,6 +16,7 @@ pub struct DbConfig {
 
 static DB_CONFIG: OnceLock<RwLock<Option<DbConfig>>> = OnceLock::new();
 static DB_CONN: OnceLock<RwLock<Option<DatabaseConnection>>> = OnceLock::new();
+static DB_VERSION_CONN: OnceLock<RwLock<Option<DatabaseConnection>>> = OnceLock::new();
 
 fn db_config_slot() -> &'static RwLock<Option<DbConfig>> {
     DB_CONFIG.get_or_init(|| RwLock::new(None))
@@ -23,6 +24,10 @@ fn db_config_slot() -> &'static RwLock<Option<DbConfig>> {
 
 fn db_conn_slot() -> &'static RwLock<Option<DatabaseConnection>> {
     DB_CONN.get_or_init(|| RwLock::new(None))
+}
+
+fn db_version_conn_slot() -> &'static RwLock<Option<DatabaseConnection>> {
+    DB_VERSION_CONN.get_or_init(|| RwLock::new(None))
 }
 
 pub fn init_db(app_data_dir: &str, db_file_name: &str) -> Result<(), HentaiError> {
@@ -68,6 +73,7 @@ pub async fn init_db_async(app_data_dir: &str, db_file_name: &str) -> Result<(),
             .map_err(|_| HentaiError::db_init_failed("DB 状态锁失败", None))?;
         *guard = Some(conn);
     }
+    register_version_connection(&db_file_path).await?;
     tracing::info!(path = %db_file_path.display(), "database initialized");
     Ok(())
 }
@@ -94,6 +100,35 @@ pub fn connection() -> Result<DatabaseConnection, HentaiError> {
     })
 }
 
+/// 单连接池，专用于 `PRAGMA data_version` 观测。
+///
+/// `data_version` 是每连接局部计数器，只有比较同一连接在两个时点的值才有意义
+/// （SQLite pragma 文档）。若改用共享的 [`connection`]，相邻两次读可能落在不同
+/// 池化连接上，比较的是彼此无关的计数器——一次并发写入（库扫描）就会让各连接
+/// 计数器发生分歧，此后空闲期每次轮询都误判「库已变更」。
+pub fn version_connection() -> Result<DatabaseConnection, HentaiError> {
+    let guard = db_version_conn_slot()
+        .read()
+        .map_err(|_| HentaiError::db_init_failed("DB 状态锁失败", None))?;
+    guard.clone().ok_or_else(|| HentaiError {
+        code: HentaiErrorCode::DbInitFailed,
+        message: "init_db 尚未调用".to_string(),
+        context: None,
+    })
+}
+
+/// 迁移完成后打开版本观测专用连接并登记。
+async fn register_version_connection(db_file_path: &Path) -> Result<(), HentaiError> {
+    let conn = open_version_connection(db_file_path)
+        .await
+        .map_err(map_db_err)?;
+    let mut guard = db_version_conn_slot()
+        .write()
+        .map_err(|_| HentaiError::db_init_failed("DB 状态锁失败", None))?;
+    *guard = Some(conn);
+    Ok(())
+}
+
 /// 测试专用：打开任意 SQLite 文件并登记连接。
 pub async fn init_db_at_path(db_file_path: impl AsRef<Path>) -> Result<(), HentaiError> {
     let db_file_path = db_file_path.as_ref().to_path_buf();
@@ -112,6 +147,7 @@ pub async fn init_db_at_path(db_file_path: impl AsRef<Path>) -> Result<(), Henta
             .map_err(|_| HentaiError::db_init_failed("DB 状态锁失败", None))?;
         *guard = Some(conn);
     }
+    register_version_connection(&db_file_path).await?;
     Ok(())
 }
 
@@ -136,6 +172,20 @@ async fn open_connection(db_file_path: &Path) -> Result<DatabaseConnection, DbEr
     tracing::debug!("applying database migrations");
     Migrator::up(&conn, None).await?;
     Ok(conn)
+}
+
+/// 版本观测连接：池上限锁定为 1，保证每次 `PRAGMA data_version` 都来自同一连接。
+/// 不建表、不跑迁移——调用方须在主连接迁移完成后再打开它。
+async fn open_version_connection(db_file_path: &Path) -> Result<DatabaseConnection, DbErr> {
+    let mut options = ConnectOptions::new(format!(
+        "sqlite://{}?mode=rwc",
+        db_file_path.to_string_lossy().replace('\\', "/")
+    ));
+    options
+        .max_connections(1)
+        .min_connections(1)
+        .sqlx_logging(false);
+    Database::connect(options).await
 }
 
 async fn seed_drift_v2_if_needed(conn: &DatabaseConnection) -> Result<(), DbErr> {

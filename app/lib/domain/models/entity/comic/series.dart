@@ -40,8 +40,6 @@ abstract class Series with _$Series {
     return best;
   }
 
-  bool containsComic(String comicId) => items.any((e) => e.comicId == comicId);
-
   bool hasR18Comic({required Map<String, Comic> comicsById}) {
     for (final SeriesItem item in items) {
       final Comic? comic = comicsById[item.comicId];

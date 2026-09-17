@@ -423,7 +423,6 @@
   "comicDetailNotFound": "漫画不存在或已移除",
   "comicDetailLoadFailedRetry": "加载失败，请重试",
   "comicDetailGoToLibrary": "前往漫画库",
-  "comicDetailSeriesNavConflict": "系列数据异常：该漫画同时属于多个系列，无法使用系列导航",
   "comicDetailSeriesPrev": "上一本",
   "comicDetailSeriesPrevSemantic": "系列上一本",
   "comicDetailSeriesCatalog": "系列目录",

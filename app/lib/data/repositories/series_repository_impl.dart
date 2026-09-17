@@ -8,30 +8,13 @@ import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comics_metadata.dart';
+import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
 import 'package:hentai_library/src/rust/api/series.dart' as rust_series;
 
 class SeriesRepositoryImpl implements SeriesRepository {
   const SeriesRepositoryImpl();
-
-  @override
-  Stream<List<Series>> watchAll() {
-    return guardFrbStream(
-      () => rust_series.watchAllSeriesFrb().map(
-        (List<rust_series.SeriesDto> rows) => rows.map(mapRustSeries).toList(),
-      ),
-      fallbackMessage: '监听系列列表失败',
-    );
-  }
-
-  @override
-  Future<List<Series>> getAll() async {
-    return guardFrbSync(
-      () => rust_series.getAllSeriesFrb().map(mapRustSeries).toList(),
-      fallbackMessage: '读取系列列表失败',
-    );
-  }
 
   @override
   Future<int> countAll() async => guardFrb(
@@ -66,10 +49,19 @@ class SeriesRepositoryImpl implements SeriesRepository {
   }
 
   @override
+  Future<SeriesItemMembership?> findMembershipByComicId(String comicId) async {
+    final rust_series.SeriesItemDto? dto = await guardFrb(
+      () => rust_series.findSeriesItemByComicIdFrb(comicId: comicId),
+      fallbackMessage: '读取系列成员归属失败',
+    );
+    return dto == null ? null : mapRustSeriesItemMembership(dto);
+  }
+
+  @override
   Future<SeriesReadingContext?> getReadingContextByComicId(
     String comicId,
   ) async {
-    final rust_series.SeriesReadingContextDto? dto = guardFrbSync(
+    final rust_series.SeriesReadingContextDto? dto = await guardFrb(
       () => rust_series.getSeriesReadingContextByComicIdFrb(comicId: comicId),
       fallbackMessage: '读取系列阅读上下文失败',
     );
@@ -125,7 +117,7 @@ class SeriesRepositoryImpl implements SeriesRepository {
 
   @override
   Future<SeriesComicsMetadata> fetchComicsMetadata(String seriesId) async {
-    final rust_series.SeriesComicsMetadataDto dto = guardFrbSync(
+    final rust_series.SeriesComicsMetadataDto dto = await guardFrb(
       () => rust_series.fetchSeriesComicsMetadataFrb(seriesId: seriesId),
       fallbackMessage: '读取系列漫画元数据失败',
     );

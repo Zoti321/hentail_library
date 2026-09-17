@@ -73,12 +73,6 @@ final class ComicDetailSeriesNavReady extends ComicDetailSeriesNavResult {
   final ComicDetailSeriesNavData data;
 }
 
-final class ComicDetailSeriesNavConflict extends ComicDetailSeriesNavResult {
-  const ComicDetailSeriesNavConflict(this.seriesNames);
-
-  final List<String> seriesNames;
-}
-
 String comicTitleFallbackForDisplay(String comicId) {
   return comicId.length > 12 ? '${comicId.substring(0, 12)}…' : comicId;
 }
@@ -113,15 +107,6 @@ Future<Map<String, String>> resolveComicTitlesForDisplay(
   };
 }
 
-List<Series> findSeriesListContainingComic(
-  List<Series> allSeries,
-  String comicId,
-) {
-  return allSeries
-      .where((Series series) => series.containsComic(comicId))
-      .toList();
-}
-
 Future<ComicDetailSeriesNavSeriesData?> buildSeriesNavData(
   Ref ref,
   Series series,
@@ -154,42 +139,6 @@ Future<ComicDetailSeriesNavSeriesData?> buildSeriesNavData(
   );
 }
 
-ComicDetailSeriesNavResult resolveComicDetailSeriesNavResult(
-  List<Series> allSeries,
-  String comicId,
-  ComicDetailSeriesNavSeriesData? seriesData,
-) {
-  final List<Series> matches = findSeriesListContainingComic(
-    allSeries,
-    comicId,
-  );
-  if (matches.isEmpty) {
-    return const ComicDetailSeriesNavNone();
-  }
-  if (matches.length > 1) {
-    return ComicDetailSeriesNavConflict(
-      matches.map((Series series) => series.name).toList(),
-    );
-  }
-  if (seriesData == null) {
-    return const ComicDetailSeriesNavNone();
-  }
-  final int currentIndex = seriesData.items.indexWhere(
-    (ComicDetailSeriesNavItem item) => item.comicId == comicId,
-  );
-  if (currentIndex < 0) {
-    return const ComicDetailSeriesNavNone();
-  }
-  return ComicDetailSeriesNavReady(
-    ComicDetailSeriesNavData(
-      seriesId: seriesData.seriesId,
-      seriesName: seriesData.seriesName,
-      items: seriesData.items,
-      currentIndex: currentIndex,
-    ),
-  );
-}
-
 @Riverpod(keepAlive: true)
 Future<ComicDetailSeriesNavSeriesData?> comicDetailSeriesNavForSeries(
   Ref ref,
@@ -207,8 +156,6 @@ Future<ComicDetailSeriesNavResult> comicDetailSeriesNav(
   Ref ref,
   String comicId,
 ) async {
-  // Interim: reading context SQL uses `.one()`, so multi-series membership
-  // degrades to the first series only (no Conflict).
   final SeriesReadingContext? ctx = await ref
       .read(seriesRepoProvider)
       .getReadingContextByComicId(comicId);

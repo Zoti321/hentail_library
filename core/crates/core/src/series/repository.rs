@@ -6,7 +6,7 @@ use sea_orm::{
 };
 
 use crate::comic::{
-    load_comics_ordered, read_data_version, search_comic_ids_by_tag_expression, ComicDto,
+    load_comics_ordered, search_comic_ids_by_tag_expression, ComicDto,
     PageRequestDto,
 };
 use crate::db::{connection, map_db_err};
@@ -86,26 +86,6 @@ pub struct SeriesReadingContextDto {
     pub series_name: String,
     pub ordered_comic_ids: Vec<String>,
     pub current_index: i32,
-}
-
-pub async fn watch_all_series(
-    mut emit: impl FnMut(Vec<SeriesDto>) -> Result<(), HentaiError>,
-) -> Result<(), HentaiError> {
-    let mut last = read_data_version().await?;
-    emit(get_all_series().await?)?;
-    loop {
-        tokio::time::sleep(std::time::Duration::from_millis(400)).await;
-        let version = read_data_version().await?;
-        if version != last {
-            last = version;
-            emit(get_all_series().await?)?;
-        }
-    }
-}
-
-pub async fn get_all_series() -> Result<Vec<SeriesDto>, HentaiError> {
-    let db = connection()?;
-    load_all_series(&db).await
 }
 
 pub async fn count_all_series() -> Result<i64, HentaiError> {
@@ -316,6 +296,28 @@ pub async fn find_series_by_id(series_id: &str) -> Result<Option<SeriesDto>, Hen
     }
     let mut list = load_series_by_ids(&db, vec![series_id.to_string()]).await?;
     Ok(list.pop())
+}
+
+/// 按 comicId 反查成员归属（`series_items.comic_id` 唯一，故至多一行）；无归属返回 None。
+pub async fn find_series_item_by_comic_id(
+    comic_id: &str,
+) -> Result<Option<SeriesItemDto>, HentaiError> {
+    let comic_id = comic_id.trim();
+    if comic_id.is_empty() {
+        return Ok(None);
+    }
+    let db = connection()?;
+    let row = SeriesItems::find()
+        .filter(series_items::Column::ComicId.eq(comic_id))
+        .one(&db)
+        .await
+        .map_err(map_db_err)?;
+    Ok(row.map(|row| SeriesItemDto {
+        series_id: row.series_id,
+        comic_id: row.comic_id,
+        sort_order: row.sort_order,
+        sort_order_locked: row.sort_order_locked,
+    }))
 }
 
 pub async fn get_series_reading_context_by_comic_id(
@@ -800,16 +802,6 @@ async fn query_string_column(
         .collect()
 }
 
-async fn load_all_series(db: &DatabaseConnection) -> Result<Vec<SeriesDto>, HentaiError> {
-    let rows = Series::find()
-        .order_by_asc(series::Column::Name)
-        .all(db)
-        .await
-        .map_err(map_db_err)?;
-    let ids: Vec<String> = rows.into_iter().map(|r| r.series_id).collect();
-    load_series_by_ids(db, ids).await
-}
-
 async fn load_series_by_ids(
     db: &DatabaseConnection,
     ids: Vec<String>,
@@ -882,14 +874,10 @@ pub async fn load_home_series_comic_order_map() -> Result<HashMap<String, f64>, 
 pub async fn watch_home_series_comic_order_map(
     mut emit: impl FnMut(HashMap<String, f64>) -> Result<(), HentaiError>,
 ) -> Result<(), HentaiError> {
-    let mut last = read_data_version().await?;
+    let mut changes = crate::revision::subscribe();
     emit(load_home_series_comic_order_map().await?)?;
-    loop {
-        tokio::time::sleep(std::time::Duration::from_millis(400)).await;
-        let version = read_data_version().await?;
-        if version != last {
-            last = version;
-            emit(load_home_series_comic_order_map().await?)?;
-        }
+    while changes.changed().await.is_ok() {
+        emit(load_home_series_comic_order_map().await?)?;
     }
+    Ok(())
 }
