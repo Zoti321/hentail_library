@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.14)
 project(runner LANGUAGES CXX)
 
+# Launcher icon source of truth: app/assets/icons/windows/app_icon.ico
+file(
+    COPY
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../assets/icons/windows/app_icon.ico"
+    DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/resources"
+)
+
 # Define the application target. To change its name, change BINARY_NAME in the
 # top-level CMakeLists.txt, not the value here, or `flutter run` will no longer
 # work.

@@ -1,5 +1,8 @@
 flutter/ephemeral/
 
+# Synced from app/assets/icons/windows/ at build time.
+runner/resources/app_icon.ico
+
 # Visual Studio user-specific files.
 *.suo
 *.user

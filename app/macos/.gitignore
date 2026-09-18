@@ -5,3 +5,6 @@
 # Xcode-related
 **/dgph
 **/xcuserdata/
+
+# Synced from app/assets/icons/macos/ at build time.
+Runner/Assets.xcassets/AppIcon.appiconset/app_icon_*.png

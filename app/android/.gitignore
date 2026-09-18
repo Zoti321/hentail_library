@@ -12,3 +12,6 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# Synced from app/assets/icons/android/ at build time.
+app/src/main/res/mipmap-*/ic_launcher.png

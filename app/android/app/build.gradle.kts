@@ -66,6 +66,29 @@ android {
     }
 }
 
+val syncLauncherIcons =
+    tasks.register("syncLauncherIcons") {
+        doLast {
+            val appRoot = file("../../")
+            val assetsRoot = appRoot.resolve("assets/icons/android")
+            val resRoot = file("src/main/res")
+            listOf(
+                "mipmap-mdpi",
+                "mipmap-hdpi",
+                "mipmap-xhdpi",
+                "mipmap-xxhdpi",
+                "mipmap-xxxhdpi",
+            ).forEach { density ->
+                copy {
+                    from(assetsRoot.resolve("$density/ic_launcher.png"))
+                    into(resRoot.resolve(density))
+                }
+            }
+        }
+    }
+
+tasks.named("preBuild").configure { dependsOn(syncLauncherIcons) }
+
 flutter {
     source = "../.."
 }
