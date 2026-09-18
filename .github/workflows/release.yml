@@ -107,6 +107,18 @@ jobs:
             "/DOutputDir=$dist" `
             "app\windows\packaging\installer.iss"
 
+      - name: Sign Windows release artifacts (self-signed)
+        shell: pwsh
+        env:
+          WINDOWS_CODESIGN_PFX_BASE64: ${{ secrets.WINDOWS_CODESIGN_PFX_BASE64 }}
+          WINDOWS_CODESIGN_PFX_PASSWORD: ${{ secrets.WINDOWS_CODESIGN_PFX_PASSWORD }}
+        run: |
+          $version = "${{ steps.version.outputs.name }}"
+          $dist = Join-Path $env:GITHUB_WORKSPACE "dist"
+          $exe = Join-Path $env:GITHUB_WORKSPACE "app\build\windows\x64\runner\Release\hentai_library.exe"
+          $setup = Join-Path $dist "hentai_library_Setup_${version}_x64.exe"
+          & "${{ github.workspace }}/app/tool/sign_windows_release.ps1" -Files @($exe, $setup)
+
       - name: Package portable zip
         shell: pwsh
         run: |
@@ -502,10 +514,11 @@ jobs:
             -f "target_commitish=${GITHUB_SHA}" \
             --jq .body)"
           ios_notice="> **iOS：** \`ios-arm64-nosign\` 为未签名包，无法直接安装到设备，仅供验证 CI 构建。"
+          windows_notice="> **Windows：** 安装包与 portable zip 内 exe 已 Authenticode 签名（CI 自签证书）。SmartScreen 仍可能提示未知发布者；可选配置 Secrets \`WINDOWS_CODESIGN_PFX_BASE64\` / \`WINDOWS_CODESIGN_PFX_PASSWORD\` 复用同一自签 PFX。"
           if [ -n "${header}" ]; then
-            printf '%s\n\n%s\n\n%s' "${header}" "${ios_notice}" "${generated}" > release_body.md
+            printf '%s\n\n%s\n\n%s\n\n%s' "${header}" "${ios_notice}" "${windows_notice}" "${generated}" > release_body.md
           else
-            printf '%s\n\n%s' "${ios_notice}" "${generated}" > release_body.md
+            printf '%s\n\n%s\n\n%s' "${ios_notice}" "${windows_notice}" "${generated}" > release_body.md
           fi
 
       - name: Publish GitHub Release
