@@ -1,4 +1,4 @@
-package com.example.hentai_library
+package com.zoti321.hentailibrary
 
 import io.flutter.embedding.android.FlutterActivity
 

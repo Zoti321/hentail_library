@@ -59,9 +59,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   Win32Window::Point origin(10, 10);
   Win32Window::Size size(1280, 720);
 #ifdef APP_DATA_PROFILE_DEV
-  const wchar_t *window_title = L"hentai library [dev]";
+  const wchar_t *window_title = L"Hentai Library [dev]";
 #else
-  const wchar_t *window_title = L"hentai library";
+  const wchar_t *window_title = L"Hentai Library";
 #endif
   if (!window.Create(window_title, origin, size)) {
     return EXIT_FAILURE;

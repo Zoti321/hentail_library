@@ -12,7 +12,7 @@
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage"/>
     <application
-        android:label="hentai_library"
+        android:label="Hentai Library"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="true">
@@ -45,7 +45,7 @@
             android:value="2" />
         <provider
             android:name="com.superlist.super_native_extensions.DataProvider"
-            android:authorities="com.example.hentai_library.SuperClipboardDataProvider"
+            android:authorities="com.zoti321.hentailibrary.SuperClipboardDataProvider"
             android:exported="true"
             android:grantUriPermissions="true" />
     </application>

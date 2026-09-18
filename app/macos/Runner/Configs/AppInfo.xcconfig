@@ -8,7 +8,7 @@
 PRODUCT_NAME = hentai_library
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.hentaiLibrary
+PRODUCT_BUNDLE_IDENTIFIER = com.zoti321.hentailibrary
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2025 com.example. All rights reserved.
