@@ -16,7 +16,7 @@ Issues live in GitHub Issues for this repo (`Zoti321/hentail_library`). See `doc
 
 ### Triage labels
 
-Triage labels are not used in this repo — do not create or apply `needs-triage`, `ready-for-agent`, or other triage role labels. See `docs/agents/triage-labels.md`.
+Five canonical triage roles (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
