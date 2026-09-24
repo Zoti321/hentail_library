@@ -69,3 +69,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0014](./0014-retire-saved-path-ui-and-api.md) | 退役 Saved path / Selected Paths UI 与 Path API | Accepted |
 | [0015](./0015-ios-pdf-via-vendored-pdfium.md) | iOS PDF 经 vendored pdfium 一等支持（去除 stub） | Accepted |
 | [0016](./0016-app-preferences-via-shared-preferences.md) | App preference 经 SharedPreferences 持久化（取代 settings.json） | Accepted |
+| [0017](./0017-ui-mvvm-presentation-layer.md) | Flutter UI 层 MVVM（Riverpod）命名与 View/Repository 边界 | Accepted |

@@ -17,6 +17,30 @@ Monorepo layout (see `docs/agents/rust-migration.md`):
 
 Import canonical paths from `app/lib/`. Do not add Flutter sources at the repo root or under removed legacy roots (`presentation/`, `model/`, `repository/`, `services/`, `usecases/`, `database/`, `module/`).
 
+## UI architecture (MVVM)
+
+Presentation layer follows **MVVM with Riverpod** (ADR-0017). State management is **Riverpod 3 only** (`flutter_riverpod`, `hooks_riverpod`, `riverpod_annotation`) — not the legacy `package:provider`.
+
+| Layer | Path | Role |
+|-------|------|------|
+| View | `ui/features/**/views/`, `ui/core/widgets/` | Render; `ref.watch` ViewModel/Facade; fire commands via Notifier or callbacks |
+| ViewModel | `ui/features/**/view_models/` | UI state, Repository/Service orchestration, command API |
+| Model | `domain/models/`, `domain/repositories/` | Entities and repository interfaces |
+
+**Hard rules**
+
+- **View must not call Repository** — no `*RepoProvider` in `views/` or `ui/core/widgets/`. Shared widgets use constructor callbacks; feature pages delegate to ViewModel.
+- **ViewModel lives under `view_models/`** — do not add new `state/` directories (migrate existing when touching a feature).
+- **Complex pages** may keep internal intent→derive chains; expose a **Facade Provider** to the page root. Leaf widgets may still `select` fine-grained fields.
+
+**Class naming**
+
+| Suffix | Use |
+|--------|-----|
+| `{Noun}Notifier` | Mutable UI state (`SettingsNotifier`) |
+| `{noun}ViewModel` provider | Read-only aggregate (`readerPageViewModel`) |
+| `{Noun}Controller` | Pagination catalog or long-running orchestration only (`ScanLibraryController`, `LibraryComicsCatalogController`) |
+
 ## Widget state
 
 Prefer stateless widget variants. Avoid Flutter's built-in stateful widgets unless there is a concrete reason hooks or Riverpod cannot cover the case.
