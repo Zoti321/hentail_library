@@ -121,15 +121,27 @@ _Avoid_: 标题推断、自动分组
 _Avoid_: 根系列置顶实体、isRoot 标志、Pinned series
 
 **Prefer library root series**:
-Series 浏览列表的应用级偏好：开启时，若 Library root series 仍落在当前筛选结果中，则固定排在列表最前；其余条目仍按当前排序字段排列。默认开启；非 Series 身份或 pin。
+Library browse preference：Series 浏览列表中，开启时若 Library root series 仍落在当前筛选结果中，则固定排在列表最前；其余条目仍按当前排序字段排列。默认开启；非 Series 身份或 pin。
 _Avoid_: 置顶系列、pin series（易与 Pinned library 混淆）
 
 **Expand by series**:
-Comics 浏览列表的应用级偏好：开启时仍为扁平 Comic 列表，但按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 块内按 SeriesItem.order；无 Series 归属的 Comic 整块垫底、块内标题升序」展开；开启时忽略 Comics 排序字段。默认开启；非视觉分组/折叠，也不共用 Prefer library root series 开关。
+Library browse preference：Comics 浏览列表中，开启时仍为扁平 Comic 列表，但按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 块内按 SeriesItem.order；无 Series 归属的 Comic 整块垫底、块内标题升序」展开；开启时忽略 Comics 排序字段。默认开启；非视觉分组/折叠，也不共用 Prefer library root series 开关。
 _Avoid_: 分组浏览、按系列折叠、group by series、系列模式列表
 
+**App preference**:
+应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
+_Avoid_: 全局设置、settings.json（实现用语）、AppSetting DTO（实现用语）
+
+**Library browse preference**:
+库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Expand by series、Prefer library root series、Smart facet match、年龄限制筛选等。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页。
+_Avoid_: 库设置、client settings（Komga 用语）、筛选状态（口语）
+
+**Library property**:
+绑定某一 Library 实体的配置，由 Library form 或侧栏操作读写，经 FRB 落入 Rust SQLite。包括 Scan on startup、Scan interval、Supported resource formats（per-library）、Pinned、sidebar order、Current library id 等。与 App preference、Library browse preference 区分。
+_Avoid_: 库偏好、Library settings form（旧称）
+
 **Settings list–detail**:
-设置页在隐藏应用侧栏后的响应式主从：宽屏（≥ compact 断点）左侧设置主栏与右侧分类 detail 并排且默认选中第一项；窄屏先全宽主列表，再进入分类 detail。顶栏标题为「设置」并提供返回：宽屏或窄屏主列表时离开设置；窄屏 detail 时先回到主列表。不是 Libraries 应用侧栏，也不是 Library form / 阅读器设置对话框。
+设置页在隐藏应用侧栏后的响应式主从：宽屏（≥ compact 断点）左侧设置主栏与右侧分类 detail 并排且默认选中第一项；窄屏先全宽主列表，再进入分类 detail。顶栏标题为「设置」并提供返回：宽屏或窄屏主列表时离开设置；窄屏 detail 时先回到主列表。不是 Libraries 应用侧栏，也不是 Library form / 阅读器设置对话框。设置页所改项属于 App preference。
 _Avoid_: 设置侧边栏（易与应用侧栏混淆）、AdaptiveScaffold、settings split view（实现用语）
 
 **Tag**:

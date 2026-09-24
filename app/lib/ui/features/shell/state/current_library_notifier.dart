@@ -1,9 +1,7 @@
 import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/library/library_sidebar_layout.dart';
-import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/domain/repositories/library_repository.dart';
-import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -101,15 +99,20 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
   }
 
   Future<CurrentLibraryState> _load() async {
-    await _migrateFormatGroupsFromAppSettingIfNeeded();
-    await _migrateAutoScanFromAppSettingIfNeeded();
+    await _migrateFormatGroupsFromLegacyIfNeeded();
+    await _migrateAutoScanFromLegacyIfNeeded();
+    try {
+      await ref.read(appSettingRepoProvider).clearLegacyImportPayload();
+    } catch (_) {
+      // Best-effort cleanup of staged legacy import keys.
+    }
     final List<LocalLibrary> libraries = await _repo.list();
     final String? currentId = await _repo.getCurrentId();
     return CurrentLibraryState(libraries: libraries, currentId: currentId);
   }
 
   /// One-shot: copy legacy app-global format groups onto each Local library.
-  Future<void> _migrateFormatGroupsFromAppSettingIfNeeded() async {
+  Future<void> _migrateFormatGroupsFromLegacyIfNeeded() async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       if (prefs.getBool(_kMigratedFormatGroupsPref) == true) {
@@ -120,8 +123,11 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
         await prefs.setBool(_kMigratedFormatGroupsPref, true);
         return;
       }
-      final AppSetting setting = await ref.read(settingsProvider.future);
-      final List<FormatGroup> groups = setting.enabledFormatGroups;
+      final List<FormatGroup>? legacyGroups = await ref
+          .read(appSettingRepoProvider)
+          .peekLegacyEnabledFormatGroups();
+      final List<FormatGroup> groups =
+          legacyGroups ?? List<FormatGroup>.from(FormatGroup.all);
       for (final LocalLibrary library in libraries) {
         await _repo.updateFormatGroups(
           libraryId: library.libraryId,
@@ -135,7 +141,7 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
   }
 
   /// One-shot: legacy app-level autoScan → all libraries Scan on startup.
-  Future<void> _migrateAutoScanFromAppSettingIfNeeded() async {
+  Future<void> _migrateAutoScanFromLegacyIfNeeded() async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       if (prefs.getBool(_kMigratedAutoScanPref) == true) {
@@ -147,9 +153,6 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
       if (legacy == true) {
         await _repo.setAllScanOnStartup(true);
       }
-      // Rewrite settings.json without autoScan when settings next load/save.
-      final AppSetting setting = await ref.read(settingsProvider.future);
-      await ref.read(appSettingRepoProvider).save(setting);
       await prefs.setBool(_kMigratedAutoScanPref, true);
     } catch (_) {
       // Best-effort; libraries keep scan_on_startup defaults.

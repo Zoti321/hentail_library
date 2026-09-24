@@ -1,41 +1,10 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hentai_library/domain/library/format_group.dart';
+import 'package:hentai_library/domain/models/app_setting_migration.dart';
 import 'package:hentai_library/domain/reading/auto_play_mode.dart';
 import 'package:hentai_library/domain/reading/reading_mode.dart';
 
 part 'app_setting.freezed.dart';
 part 'app_setting.g.dart';
-
-Map<String, dynamic> _migrateAppSettingJson(Map<String, dynamic> json) {
-  final Map<String, dynamic> migrated = Map<String, dynamic>.from(json);
-  if (migrated.containsKey('readingMode')) {
-    final Object? rawMode = migrated['readingMode'];
-    if (rawMode == 'continuousVertical') {
-      migrated['readingMode'] = readingModeToJson(ReadingMode.webtoon);
-    } else {
-      migrated['readingMode'] = readingModeToJson(readingModeFromJson(rawMode));
-    }
-  }
-  if (!migrated.containsKey('readingMode') &&
-      migrated.containsKey('readerIsVertical')) {
-    migrated['readingMode'] = migrated['readerIsVertical'] == true
-        ? readingModeToJson(ReadingMode.webtoon)
-        : readingModeToJson(kDefaultReadingMode);
-  }
-  migrated.remove('readerIsVertical');
-  migrated.remove('readerDimLevel');
-  migrated.remove('readerAutoPlayEnabled');
-  migrated.remove('autoScan');
-  if (!migrated.containsKey('enabledFormatGroups')) {
-    migrated['enabledFormatGroups'] = formatGroupsToStorage(FormatGroup.all);
-  }
-  if (migrated.containsKey('autoPlayMode')) {
-    migrated['autoPlayMode'] = autoPlayModeToJson(
-      autoPlayModeFromJson(migrated['autoPlayMode']),
-    );
-  }
-  return migrated;
-}
 
 @freezed
 abstract class AppSetting with _$AppSetting {
@@ -58,16 +27,10 @@ abstract class AppSetting with _$AppSetting {
 
     /// 用户选择「稍后提醒」所忽略的远程版本号；空字符串表示未忽略。
     @Default('') String dismissedUpdateVersion,
-
-    /// Supported resource formats：下次 Library sync 启用的格式分组。
-    @Default(FormatGroup.all)
-    // ignore: invalid_annotation_target
-    @JsonKey(fromJson: formatGroupsFromStorage, toJson: formatGroupsToStorage)
-    List<FormatGroup> enabledFormatGroups,
   }) = _AppSetting;
 
   factory AppSetting.fromJson(Map<String, dynamic> json) =>
-      _$AppSettingFromJson(_migrateAppSettingJson(json));
+      _$AppSettingFromJson(migrateAppSettingJson(json));
 }
 
 /// 应用外观：浅色 / 深色 / 跟随系统。

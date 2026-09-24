@@ -22,7 +22,7 @@
 - **Repository**：`frb.*` + DTO → Entity 映射；无 Drift DAO。
 - **FRB sync vs async**：UI / I/O 读路径默认 `#[frb]` async（Dart 用 `guardFrb`）；`#[frb(sync)]` 仅留给纯计算或极轻控制面（如 `comic_id_from_path`）。慢查询勿 `runtime::block_on` 堵 Dart UI isolate。写路径可次优先迁 async。
 - **筛选**：`LibraryComicProjection` 留 Dart 构 `ComicFilterDto`；查询在 Rust（SeaORM）。
-- **设置**：`settings.json` 永久留 Dart（主题、Healthy mode 等）。Library 的 Scan on startup / Scan interval 在 SQLite（每库属性），由 Flutter 编排触发。
+- **设置**：App preference 与 Library browse preference 经 SharedPreferences 留 Dart（ADR-0016）；Library 的 Scan on startup / Scan interval 在 SQLite（每库属性），由 Flutter 编排触发。
 - **错误**：Rust `HentaiError { code, message, context }` → Dart `AppException` 子类。
 - **取消**：`create_sync_handle` / `sync_library` / `cancel_sync`；取消语义对齐原 Dart sync。
 
