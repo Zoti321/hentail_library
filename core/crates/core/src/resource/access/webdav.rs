@@ -11,9 +11,7 @@ use reqwest_dav::{Auth, Client, ClientBuilder, Depth};
 use crate::error::HentaiError;
 use crate::runtime::block_on;
 
-use super::{
-    ResourceAccess, ResourceEntry, ResourceKind, ResourceStat, ResourceStream,
-};
+use super::{ResourceAccess, ResourceEntry, ResourceKind, ResourceStat, ResourceStream};
 
 /// Default connect / overall request deadlines for Remote library I/O.
 pub const WEBDAV_CONNECT_TIMEOUT: Duration = Duration::from_secs(15);
@@ -29,11 +27,7 @@ pub struct WebDavResourceAccess {
 }
 
 impl WebDavResourceAccess {
-    pub fn connect(
-        root_url: &str,
-        username: &str,
-        password: &str,
-    ) -> Result<Self, HentaiError> {
+    pub fn connect(root_url: &str, username: &str, password: &str) -> Result<Self, HentaiError> {
         let root_url = root_url.trim().trim_end_matches('/').to_string();
         if root_url.is_empty() {
             return Err(HentaiError::validation("WebDAV 根 URL 不能为空"));
@@ -116,8 +110,8 @@ impl ResourceAccess for WebDavResourceAccess {
         }
 
         let path = self.path_for_request(location);
-        let entities = block_on(self.client.list(&path, Depth::Number(1)))
-            .map_err(|e| map_dav_error(&e))?;
+        let entities =
+            block_on(self.client.list(&path, Depth::Number(1))).map_err(|e| map_dav_error(&e))?;
 
         let mut out = Vec::new();
         for entity in entities {
@@ -164,8 +158,8 @@ impl ResourceAccess for WebDavResourceAccess {
     fn stat(&self, location: &str) -> Result<Option<ResourceStat>, HentaiError> {
         let location = location.trim().trim_end_matches('/');
         let path = self.path_for_request(location);
-        let entities = block_on(self.client.list(&path, Depth::Number(0)))
-            .map_err(|e| map_dav_error(&e))?;
+        let entities =
+            block_on(self.client.list(&path, Depth::Number(0))).map_err(|e| map_dav_error(&e))?;
         for entity in entities {
             match entity {
                 ListEntity::File(ListFile {
@@ -209,10 +203,15 @@ impl ResourceAccess for WebDavResourceAccess {
     fn open_stream(&self, location: &str) -> Result<ResourceStream, HentaiError> {
         let path = self.path_for_request(location);
         let bytes = block_on(async {
-            let response = self.client.get(&path).await.map_err(|e| map_dav_error(&e))?;
-            let bytes = response.bytes().await.map_err(|e| {
-                HentaiError::remote_unreachable(format!("读取远程资源失败: {e}"))
-            })?;
+            let response = self
+                .client
+                .get(&path)
+                .await
+                .map_err(|e| map_dav_error(&e))?;
+            let bytes = response
+                .bytes()
+                .await
+                .map_err(|e| HentaiError::remote_unreachable(format!("读取远程资源失败: {e}")))?;
             Ok::<Vec<u8>, HentaiError>(bytes.to_vec())
         })?;
         Ok(Box::new(Cursor::new(bytes)))
@@ -236,10 +235,7 @@ fn map_dav_error(err: &reqwest_dav::Error) -> HentaiError {
     {
         return HentaiError::remote_tls_failed(format!("WebDAV TLS 失败: {msg}"));
     }
-    if lower.contains("timed out")
-        || lower.contains("timeout")
-        || lower.contains("deadline")
-    {
+    if lower.contains("timed out") || lower.contains("timeout") || lower.contains("deadline") {
         return HentaiError::timed_out(format!("WebDAV 超时: {msg}"));
     }
     HentaiError::remote_unreachable(format!("WebDAV 不可达: {msg}"))

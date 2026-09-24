@@ -1,10 +1,10 @@
 use hentai_core::{
-    self, RemoteLibraryCredential as CoreRemoteCredential, SyncHandle as CoreHandle,
-    SyncLibraryPhaseDto as CorePhase, SyncLibraryProgressDto as CoreProgress,
-    SyncLibraryRouteDto as CoreRoute, SyncScanMode as CoreScanMode,
-    cancel_sync as core_cancel_sync, create_sync_handle as core_create_sync_handle,
+    self, cancel_sync as core_cancel_sync, create_sync_handle as core_create_sync_handle,
     set_remote_library_credentials as core_set_remote_credentials,
-    sync_library as core_sync_library,
+    sync_library as core_sync_library, RemoteLibraryCredential as CoreRemoteCredential,
+    SyncHandle as CoreHandle, SyncLibraryPhaseDto as CorePhase,
+    SyncLibraryProgressDto as CoreProgress, SyncLibraryRouteDto as CoreRoute,
+    SyncScanMode as CoreScanMode,
 };
 
 use super::init::HentaiErrorDto;

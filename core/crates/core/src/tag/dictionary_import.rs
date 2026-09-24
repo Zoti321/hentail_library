@@ -1,4 +1,4 @@
-use std::collections::{HashSet};
+use std::collections::HashSet;
 
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, Set, TransactionTrait};
 
@@ -135,10 +135,9 @@ mod tests {
 
     #[test]
     fn collect_candidate_names_accepts_wrapped_and_flat_payloads() {
-        let wrapped: TagDictionaryPayload = serde_json::from_str(
-            r#"{"tags": ["全彩", "  ", "NTR", "NTR"]}"#,
-        )
-        .expect("wrapped fixture");
+        let wrapped: TagDictionaryPayload =
+            serde_json::from_str(r#"{"tags": ["全彩", "  ", "NTR", "NTR"]}"#)
+                .expect("wrapped fixture");
         let (wrapped_names, wrapped_skipped) = collect_candidate_names(wrapped);
         assert_eq!(wrapped_names, vec!["全彩".to_string(), "NTR".to_string()]);
         assert_eq!(wrapped_skipped, 2);

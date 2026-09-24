@@ -5,13 +5,13 @@ use hentai_core::resource::{FakeResourceAccess, ResourceAccess};
 use hentai_core::sync::format_group::FormatGroup;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::sync::plan::build_scan_replace_plan;
-use hentai_core::sync::scanner::ScanContext;
-use hentai_core::sync::remote::{comic_id_for_remote_location, scan_remote_lightweight, RemoteScanOutcome};
-use hentai_core::{
-    connection, create_remote_library, find_comic_by_id, init_db_at_path,
+use hentai_core::sync::remote::{
+    comic_id_for_remote_location, scan_remote_lightweight, RemoteScanOutcome,
 };
-use std::collections::HashMap;
+use hentai_core::sync::scanner::ScanContext;
+use hentai_core::{connection, create_remote_library, find_comic_by_id, init_db_at_path};
 use sea_orm::{ConnectionTrait, Database, Statement};
+use std::collections::HashMap;
 use tempfile::TempDir;
 
 static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
@@ -171,9 +171,9 @@ fn remote_reachable_plan_adds_and_orphans_without_deleting_on_unreachable() {
                 &access,
                 &lib.root_path,
                 &ScanContext {
-            existing_by_id: HashMap::new(),
-            thumbnail_stats: HashMap::new(),
-        },
+                    existing_by_id: HashMap::new(),
+                    thumbnail_stats: HashMap::new(),
+                },
                 &handle,
                 &lib.enabled_format_groups,
             )
@@ -203,9 +203,9 @@ fn remote_reachable_plan_adds_and_orphans_without_deleting_on_unreachable() {
                 &pruned,
                 &lib.root_path,
                 &ScanContext {
-            existing_by_id: HashMap::new(),
-            thumbnail_stats: HashMap::new(),
-        },
+                    existing_by_id: HashMap::new(),
+                    thumbnail_stats: HashMap::new(),
+                },
                 &handle,
                 &lib.enabled_format_groups,
             )
@@ -233,9 +233,9 @@ fn remote_reachable_plan_adds_and_orphans_without_deleting_on_unreachable() {
                 &down,
                 &lib.root_path,
                 &ScanContext {
-            existing_by_id: HashMap::new(),
-            thumbnail_stats: HashMap::new(),
-        },
+                    existing_by_id: HashMap::new(),
+                    thumbnail_stats: HashMap::new(),
+                },
                 &handle,
                 &lib.enabled_format_groups,
             )

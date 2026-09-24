@@ -2,6 +2,10 @@
 //!
 //! New integration tests must use these helpers instead of copying
 //! `DB_INIT_LOCK` / `create_fixture_db` boilerplate.
+//!
+//! Each integration test binary compiles this module separately and uses only
+//! a subset of helpers.
+#![allow(dead_code)]
 
 use std::fs;
 use std::path::{Path, PathBuf};

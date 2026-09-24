@@ -28,7 +28,10 @@ fn main() {
         .display()
         .to_string();
 
-    println!("cargo:rerun-if-changed={}", vendor_root.join("manifest.json").display());
+    println!(
+        "cargo:rerun-if-changed={}",
+        vendor_root.join("manifest.json").display()
+    );
     println!("cargo:rerun-if-env-changed=TARGET");
     println!("cargo:rerun-if-env-changed=HENTAI_VENDOR_DIR");
 

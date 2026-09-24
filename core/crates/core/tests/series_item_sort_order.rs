@@ -92,14 +92,15 @@ fn update_series_item_sort_order_sets_value_locks_and_reorders() {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_three_comics(&db).await;
-            rebuild_series_from_comics(&db, None).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild");
 
-            let series = find_series_by_id(
-                &hentai_core::series_id_from_folder_path("E:/lib/Series"),
-            )
-            .await
-            .expect("find")
-            .expect("series exists");
+            let series =
+                find_series_by_id(&hentai_core::series_id_from_folder_path("E:/lib/Series"))
+                    .await
+                    .expect("find")
+                    .expect("series exists");
             assert_eq!(series.items.len(), 3);
 
             update_series_item_sort_order(&series.series_id, "c3", 1.5)
@@ -197,7 +198,9 @@ fn unlock_sort_order_allows_rebuild_to_renumber() {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_three_comics(&db).await;
-            rebuild_series_from_comics(&db, None).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild");
 
             let series_id = hentai_core::series_id_from_folder_path("E:/lib/Series");
             update_series_item_sort_order(&series_id, "c3", 1.5)
@@ -208,7 +211,9 @@ fn unlock_sort_order_allows_rebuild_to_renumber() {
                 .await
                 .expect("unlock c3");
 
-            rebuild_series_from_comics(&db, None).await.expect("rebuild again");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild again");
 
             let series = find_series_by_id(&series_id)
                 .await
@@ -237,7 +242,9 @@ fn set_series_items_order_reorders_all_unlocked_and_locks_all() {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_three_comics(&db).await;
-            rebuild_series_from_comics(&db, None).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild");
 
             let series_id = hentai_core::series_id_from_folder_path("E:/lib/Series");
             set_series_items_order(
@@ -278,7 +285,9 @@ fn set_series_items_order_preserves_locked_anchor_values() {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_three_comics(&db).await;
-            rebuild_series_from_comics(&db, None).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild");
 
             let series_id = hentai_core::series_id_from_folder_path("E:/lib/Series");
             // c1 锁在 1.0，c3 锁在 3.0；c2 保持未锁。
@@ -312,7 +321,10 @@ fn set_series_items_order_preserves_locked_anchor_values() {
             assert!((by_id.get("c1").unwrap().sort_order - 1.0).abs() < f64::EPSILON);
             assert!((by_id.get("c3").unwrap().sort_order - 3.0).abs() < f64::EPSILON);
             let c2 = by_id.get("c2").unwrap().sort_order;
-            assert!(c2 > 1.0 && c2 < 3.0, "c2 should interpolate between anchors: {c2}");
+            assert!(
+                c2 > 1.0 && c2 < 3.0,
+                "c2 should interpolate between anchors: {c2}"
+            );
             // 全部加锁。
             assert!(series.items.iter().all(|i| i.sort_order_locked));
             let ordered: Vec<&str> = series.items.iter().map(|i| i.comic_id.as_str()).collect();
@@ -331,7 +343,9 @@ fn set_series_items_order_reassigns_locked_when_relative_order_changes() {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_three_comics(&db).await;
-            rebuild_series_from_comics(&db, None).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild");
 
             let series_id = hentai_core::series_id_from_folder_path("E:/lib/Series");
             update_series_item_sort_order(&series_id, "c1", 1.0)

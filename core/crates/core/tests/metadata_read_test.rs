@@ -13,7 +13,8 @@ fn create_cbz_with_comic_info(path: &Path, comic_info_xml: &str) {
     let options = SimpleFileOptions::default();
 
     zip.start_file("ComicInfo.xml", options).expect("comicinfo");
-    zip.write_all(comic_info_xml.as_bytes()).expect("write comicinfo");
+    zip.write_all(comic_info_xml.as_bytes())
+        .expect("write comicinfo");
 
     zip.start_file("01.jpg", options).expect("page");
     zip.write_all(b"fake-jpeg").expect("write page");
@@ -125,10 +126,8 @@ fn utc_ms(year: i32, month: u32, day: u32) -> i64 {
 fn utc_ms_at(year: i32, month: u32, day: u32, hour: u32, minute: u32, second: u32) -> i64 {
     use std::time::{Duration, UNIX_EPOCH};
     let days_from_ce = days_from_civil(year, month, day).expect("valid date");
-    let secs = days_from_ce as i64 * 86_400
-        + hour as i64 * 3600
-        + minute as i64 * 60
-        + second as i64;
+    let secs =
+        days_from_ce as i64 * 86_400 + hour as i64 * 3600 + minute as i64 * 60 + second as i64;
     UNIX_EPOCH
         .checked_add(Duration::from_secs(secs.max(0) as u64))
         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
@@ -186,7 +185,11 @@ fn parse_cbz_reads_comic_info_metadata() {
     assert_eq!(parsed.title, "漫画标题");
     assert_eq!(
         parsed.authors,
-        vec!["作者甲".to_string(), "作者乙".to_string(), "画师丙".to_string()]
+        vec![
+            "作者甲".to_string(),
+            "作者乙".to_string(),
+            "画师丙".to_string()
+        ]
     );
     assert_eq!(parsed.description.as_deref(), Some("这是概要"));
     assert_eq!(parsed.published_at, Some(utc_ms(2024, 6, 15)));
@@ -298,7 +301,11 @@ fn parse_epub_creator_splits_separators_and_deduplicates() {
 
     assert_eq!(
         parsed.authors,
-        vec!["作者A".to_string(), "作者B".to_string(), "作者C".to_string()]
+        vec![
+            "作者A".to_string(),
+            "作者B".to_string(),
+            "作者C".to_string()
+        ]
     );
 }
 
@@ -339,7 +346,10 @@ fn parse_pdf_reads_embedded_metadata() {
 
     assert_eq!(parsed.resource_type, "pdf");
     assert_eq!(parsed.title, "PDF 标题");
-    assert_eq!(parsed.authors, vec!["作者甲".to_string(), "作者乙".to_string()]);
+    assert_eq!(
+        parsed.authors,
+        vec!["作者甲".to_string(), "作者乙".to_string()]
+    );
     assert_eq!(parsed.description.as_deref(), Some("PDF 概要"));
     assert_eq!(parsed.published_at, Some(utc_ms_at(2024, 6, 15, 12, 0, 0)));
     assert!(parsed.page_count >= 1);

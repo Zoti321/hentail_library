@@ -2,12 +2,11 @@ use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
 use hentai_core::{
-    comic_id_from_path, connection, create_local_library, find_comic_by_id,
-    find_series_by_id, find_series_thumbnail_by_series_id, get_reading_by_comic_id,
-    init_db_at_path, list_libraries, record_reading, series_id_from_folder_path,
-    try_acquire_library_write_lock, update_comic_user_meta, update_local_library_root,
-    update_series_item_sort_order, update_series_user_meta, ReadingHistoryDto,
-    UpdateComicUserMetaDto, UpdateSeriesUserMetaDto,
+    comic_id_from_path, connection, create_local_library, find_comic_by_id, find_series_by_id,
+    find_series_thumbnail_by_series_id, get_reading_by_comic_id, init_db_at_path, list_libraries,
+    record_reading, series_id_from_folder_path, try_acquire_library_write_lock,
+    update_comic_user_meta, update_local_library_root, update_series_item_sort_order,
+    update_series_user_meta, ReadingHistoryDto, UpdateComicUserMetaDto, UpdateSeriesUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, Database, DatabaseConnection, Statement};
 use tempfile::TempDir;
@@ -120,32 +119,26 @@ fn update_local_library_root_keeps_library_id_and_rejects_nesting() {
                 .await
                 .expect("create b");
 
-            let nested_other = update_local_library_root(
-                &lib_a.library_id,
-                &root_b_child.to_string_lossy(),
-            )
-            .await
-            .expect_err("nested under other library should fail");
+            let nested_other =
+                update_local_library_root(&lib_a.library_id, &root_b_child.to_string_lossy())
+                    .await
+                    .expect_err("nested under other library should fail");
             assert!(
                 nested_other.to_string().contains("嵌套"),
                 "unexpected: {nested_other}"
             );
 
             // Moving into a child of the current root is allowed (Komga warns; sync may orphan).
-            let into_child = update_local_library_root(
-                &lib_a.library_id,
-                &root_a_child.to_string_lossy(),
-            )
-            .await
-            .expect("move into own child");
+            let into_child =
+                update_local_library_root(&lib_a.library_id, &root_a_child.to_string_lossy())
+                    .await
+                    .expect("move into own child");
             assert_eq!(into_child.library_id, lib_a.library_id);
 
-            let updated = update_local_library_root(
-                &lib_a.library_id,
-                &root_a_moved.to_string_lossy(),
-            )
-            .await
-            .expect("move root");
+            let updated =
+                update_local_library_root(&lib_a.library_id, &root_a_moved.to_string_lossy())
+                    .await
+                    .expect("move root");
             assert_eq!(updated.library_id, lib_a.library_id);
             assert_eq!(updated.name, "Alpha");
             assert_eq!(
@@ -368,18 +361,28 @@ fn update_local_library_root_skips_missing_relative_paths_but_commits_root_chang
             )
             .await;
 
-            let updated = update_local_library_root(&library.library_id, &new_root.to_string_lossy())
-                .await
-                .expect("update root");
+            let updated =
+                update_local_library_root(&library.library_id, &new_root.to_string_lossy())
+                    .await
+                    .expect("update root");
             assert_eq!(
                 updated.root_path.replace('\\', "/"),
                 new_root.to_string_lossy().replace('\\', "/")
             );
 
             let keep_new_id = comic_id_from_path(&new_root.join("keep.cbz").to_string_lossy());
-            assert!(find_comic_by_id(&keep_old_id).await.expect("old keep").is_none());
-            assert!(find_comic_by_id(&keep_new_id).await.expect("new keep").is_some());
-            assert!(find_comic_by_id(&miss_old_id).await.expect("miss old").is_some());
+            assert!(find_comic_by_id(&keep_old_id)
+                .await
+                .expect("old keep")
+                .is_none());
+            assert!(find_comic_by_id(&keep_new_id)
+                .await
+                .expect("new keep")
+                .is_some());
+            assert!(find_comic_by_id(&miss_old_id)
+                .await
+                .expect("miss old")
+                .is_some());
         });
     });
 }
@@ -421,7 +424,10 @@ fn update_local_library_root_saves_unreadable_root_without_migration() {
                 updated.root_path.replace('\\', "/"),
                 unreadable_root.to_string_lossy().replace('\\', "/")
             );
-            assert!(find_comic_by_id(&old_comic_id).await.expect("old comic").is_some());
+            assert!(find_comic_by_id(&old_comic_id)
+                .await
+                .expect("old comic")
+                .is_some());
         });
     });
 }

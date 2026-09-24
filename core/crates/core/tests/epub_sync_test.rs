@@ -25,9 +25,10 @@ fn with_global_db(test: impl FnOnce()) {
 }
 
 fn fixture_sql() -> String {
-    fs::read_to_string(std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(
-        "../../tests/fixtures/drift_v2.sql",
-    ))
+    fs::read_to_string(
+        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../tests/fixtures/drift_v2.sql"),
+    )
     .expect("read drift_v2.sql")
 }
 

@@ -81,8 +81,7 @@ pub fn resolve_access_for_comic(comic: &ComicDto) -> Result<ResolvedAccess, Hent
             library.root_path
         )));
     };
-    let access =
-        WebDavResourceAccess::connect(&library.root_path, &library.username, &password)?;
+    let access = WebDavResourceAccess::connect(&library.root_path, &library.username, &password)?;
     Ok(ResolvedAccess::Remote(access))
 }
 

@@ -4,8 +4,8 @@ use std::sync::Mutex;
 
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::{
-    connection, find_series_by_id, init_db_at_path, set_series_meta_locks,
-    update_series_user_meta, SetSeriesMetaLocksDto, UpdateSeriesUserMetaDto,
+    connection, find_series_by_id, init_db_at_path, set_series_meta_locks, update_series_user_meta,
+    SetSeriesMetaLocksDto, UpdateSeriesUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, Database, DatabaseConnection, Statement};
 use tempfile::TempDir;
@@ -106,7 +106,9 @@ fn rebuild_series_groups_comics_by_parent_folder() {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_minimal_comics(&db).await;
-            rebuild_series_from_comics(&db, None).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild");
 
             let row = db
                 .query_one(Statement::from_string(

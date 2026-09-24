@@ -1,7 +1,7 @@
 use hentai_core::{
-    add_tag as core_add, count_all_tags as core_count, delete_tags_by_names, fetch_tags_page as core_fetch,
-    import_tag_dictionary as core_import_tag_dictionary, list_all_tags, rename_tag as core_rename, watch_tags,
-    TagDictionaryImportResult,
+    add_tag as core_add, count_all_tags as core_count, delete_tags_by_names,
+    fetch_tags_page as core_fetch, import_tag_dictionary as core_import_tag_dictionary,
+    list_all_tags, rename_tag as core_rename, watch_tags, TagDictionaryImportResult,
 };
 
 use super::comic::PageRequestDto;
@@ -34,7 +34,9 @@ impl From<TagDictionaryImportResult> for TagDictionaryImportResultDto {
 }
 
 #[flutter_rust_bridge::frb(sync)]
-pub fn import_tag_dictionary_frb(json_bytes: Vec<u8>) -> Result<TagDictionaryImportResultDto, HentaiErrorDto> {
+pub fn import_tag_dictionary_frb(
+    json_bytes: Vec<u8>,
+) -> Result<TagDictionaryImportResultDto, HentaiErrorDto> {
     hentai_core::runtime::block_on(core_import_tag_dictionary(&json_bytes))
         .map(TagDictionaryImportResultDto::from)
         .map_err(HentaiErrorDto::from)
@@ -91,6 +93,8 @@ pub fn rename_tag_frb(old_name: String, new_name: String) -> Result<(), HentaiEr
 }
 
 #[flutter_rust_bridge::frb]
-pub async fn watch_tags_frb(sink: crate::frb_generated::StreamSink<Vec<String>>) -> Result<(), HentaiErrorDto> {
+pub async fn watch_tags_frb(
+    sink: crate::frb_generated::StreamSink<Vec<String>>,
+) -> Result<(), HentaiErrorDto> {
     normalize_watch_result(watch_tags(|items| emit_or_closed(&sink, items)).await)
 }

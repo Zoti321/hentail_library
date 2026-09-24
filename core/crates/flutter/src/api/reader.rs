@@ -43,14 +43,14 @@ pub async fn open_reader_frb(
     path: String,
     resource_type: String,
 ) -> Result<(), HentaiErrorDto> {
-    tokio::task::spawn_blocking(move || {
-        open_reader(&comic_id, &path, &resource_type)
-    })
-    .await
-    .map_err(|error| {
-        HentaiErrorDto::from(hentai_core::HentaiError::reader_invalid_content(error.to_string()))
-    })?
-    .map_err(HentaiErrorDto::from)
+    tokio::task::spawn_blocking(move || open_reader(&comic_id, &path, &resource_type))
+        .await
+        .map_err(|error| {
+            HentaiErrorDto::from(hentai_core::HentaiError::reader_invalid_content(
+                error.to_string(),
+            ))
+        })?
+        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb]
@@ -64,7 +64,9 @@ pub async fn load_page_list_frb(
     })
     .await
     .map_err(|error| {
-        HentaiErrorDto::from(hentai_core::HentaiError::reader_invalid_content(error.to_string()))
+        HentaiErrorDto::from(hentai_core::HentaiError::reader_invalid_content(
+            error.to_string(),
+        ))
     })?
     .map_err(HentaiErrorDto::from)
 }
@@ -91,7 +93,9 @@ pub async fn load_reader_page_frb(
     })
     .await
     .map_err(|error| {
-        HentaiErrorDto::from(hentai_core::HentaiError::reader_invalid_content(error.to_string()))
+        HentaiErrorDto::from(hentai_core::HentaiError::reader_invalid_content(
+            error.to_string(),
+        ))
     })?
     .map_err(HentaiErrorDto::from)
 }
@@ -106,13 +110,7 @@ pub async fn prefetch_reader_pages_frb(
 ) -> Result<(), HentaiErrorDto> {
     tokio::spawn(async move {
         let _ = tokio::task::spawn_blocking(move || {
-            prefetch_reader_pages(
-                &comic_id,
-                &path,
-                &resource_type,
-                &page_indexes,
-                generation,
-            )
+            prefetch_reader_pages(&comic_id, &path, &resource_type, &page_indexes, generation)
         })
         .await;
     });
@@ -124,7 +122,9 @@ pub async fn clear_reader_page_cache_frb(comic_id: String) -> Result<(), HentaiE
     tokio::task::spawn_blocking(move || clear_reader_page_cache(&comic_id))
         .await
         .map_err(|error| {
-            HentaiErrorDto::from(hentai_core::HentaiError::reader_invalid_content(error.to_string()))
+            HentaiErrorDto::from(hentai_core::HentaiError::reader_invalid_content(
+                error.to_string(),
+            ))
         })?
         .map_err(HentaiErrorDto::from)
 }

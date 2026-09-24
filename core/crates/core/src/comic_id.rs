@@ -66,8 +66,11 @@ fn normalize_like_dart_path(path: &str) -> String {
         }
         None => body,
     };
-    if rooted && !has_drive && !result.is_empty()
-        && !result.starts_with('\\') && !result.starts_with('/')
+    if rooted
+        && !has_drive
+        && !result.is_empty()
+        && !result.starts_with('\\')
+        && !result.starts_with('/')
     {
         result.insert(0, '\\');
     }
@@ -127,9 +130,7 @@ fn normalize_posix(path: &str) -> String {
 }
 
 fn trim_trailing_slash(normalized_posix_path: &str) -> String {
-    if normalized_posix_path == "/"
-        || regex_drive_root(normalized_posix_path)
-    {
+    if normalized_posix_path == "/" || regex_drive_root(normalized_posix_path) {
         return normalized_posix_path.to_string();
     }
     let mut current = normalized_posix_path.to_string();
@@ -141,10 +142,7 @@ fn trim_trailing_slash(normalized_posix_path: &str) -> String {
 
 fn regex_drive_root(path: &str) -> bool {
     let bytes = path.as_bytes();
-    bytes.len() == 3
-        && bytes[1] == b':'
-        && bytes[2] == b'/'
-        && bytes[0].is_ascii_alphabetic()
+    bytes.len() == 3 && bytes[1] == b':' && bytes[2] == b'/' && bytes[0].is_ascii_alphabetic()
 }
 
 #[cfg(test)]
@@ -168,7 +166,9 @@ mod tests {
             let description = case["description"].as_str().unwrap_or("?");
             let input = case["raw"].as_str().expect("raw");
             let expected_normalized = case["normalized"].as_str().expect("normalized");
-            let expected_id = case["expected_comic_id"].as_str().expect("expected_comic_id");
+            let expected_id = case["expected_comic_id"]
+                .as_str()
+                .expect("expected_comic_id");
 
             let normalized = normalize_path_for_key(input);
             assert_eq!(

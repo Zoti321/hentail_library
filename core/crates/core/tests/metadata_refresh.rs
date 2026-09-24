@@ -70,7 +70,8 @@ fn create_cbz_with_title(path: &Path, title: &str) {
 </ComicInfo>"#
     );
     zip.start_file("ComicInfo.xml", options).expect("comicinfo");
-    zip.write_all(comic_info.as_bytes()).expect("write comicinfo");
+    zip.write_all(comic_info.as_bytes())
+        .expect("write comicinfo");
     zip.start_file("01.jpg", options).expect("page");
     zip.write_all(b"fake-jpeg").expect("write page");
     zip.finish().expect("finish");
@@ -88,7 +89,9 @@ async fn upsert_paths(db: &DatabaseConnection, paths: &[&Path]) {
         });
     }
     let plan = build_scan_replace_plan(db, items, "").await.expect("plan");
-    apply_scan_replace_plan(db, &plan, "").await.expect("upsert");
+    apply_scan_replace_plan(db, &plan, "")
+        .await
+        .expect("upsert");
 }
 
 async fn upsert_path(db: &DatabaseConnection, path: &Path) {
@@ -225,9 +228,7 @@ fn refresh_comic_metadata_rejects_when_library_write_lock_held() {
             let comic_id = comic_id_from_path(&cbz.to_string_lossy());
 
             let _guard = try_acquire_library_write_lock().expect("hold lock");
-            let err = refresh_comic_metadata(&comic_id)
-                .await
-                .expect_err("busy");
+            let err = refresh_comic_metadata(&comic_id).await.expect_err("busy");
             assert_eq!(err.code, HentaiErrorCode::Validation);
         });
     });
@@ -362,11 +363,19 @@ fn refresh_series_metadata_preserves_locked_name_and_continues_after_member_fail
             assert_eq!(result.failed, 1);
             assert!(!result.cancelled);
             assert_eq!(
-                find_comic_by_id(&id_a).await.expect("a").expect("exists").title,
+                find_comic_by_id(&id_a)
+                    .await
+                    .expect("a")
+                    .expect("exists")
+                    .title,
                 "OldA"
             );
             assert_eq!(
-                find_comic_by_id(&id_b).await.expect("b").expect("exists").title,
+                find_comic_by_id(&id_b)
+                    .await
+                    .expect("b")
+                    .expect("exists")
+                    .title,
                 "DiskB"
             );
             let series = find_series_by_id(&series_id)
@@ -533,8 +542,16 @@ fn refresh_library_metadata_stops_on_cancel_and_keeps_partial_writes() {
             assert!(result.cancelled);
             assert_eq!(result.succeeded + result.failed, 1);
             let titles = [
-                find_comic_by_id(&id_a).await.expect("a").expect("exists").title,
-                find_comic_by_id(&id_b).await.expect("b").expect("exists").title,
+                find_comic_by_id(&id_a)
+                    .await
+                    .expect("a")
+                    .expect("exists")
+                    .title,
+                find_comic_by_id(&id_b)
+                    .await
+                    .expect("b")
+                    .expect("exists")
+                    .title,
             ];
             assert!(
                 titles.iter().filter(|t| t.as_str() == "Old").count() == 1,
@@ -709,11 +726,19 @@ fn refresh_library_metadata_continues_after_comic_failure() {
             assert_eq!(result.failed, 1);
             assert!(!result.cancelled);
             assert_eq!(
-                find_comic_by_id(&id_a).await.expect("a").expect("exists").title,
+                find_comic_by_id(&id_a)
+                    .await
+                    .expect("a")
+                    .expect("exists")
+                    .title,
                 "Old"
             );
             assert_eq!(
-                find_comic_by_id(&id_b).await.expect("b").expect("exists").title,
+                find_comic_by_id(&id_b)
+                    .await
+                    .expect("b")
+                    .expect("exists")
+                    .title,
                 "DiskB"
             );
         });
@@ -777,4 +802,3 @@ fn refresh_series_metadata_stops_on_cancel_and_keeps_partial_writes() {
         });
     });
 }
-

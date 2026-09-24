@@ -223,7 +223,10 @@ fn sync_current_library_does_not_remove_other_library_comics() {
                 find_comic_by_id(&id_b).await.unwrap().is_some(),
                 "library B comic must survive sync of A"
             );
-            assert_eq!(lib_b.library_id, library_id_from_root(&root_b.to_string_lossy()));
+            assert_eq!(
+                lib_b.library_id,
+                library_id_from_root(&root_b.to_string_lossy())
+            );
         });
     });
 }

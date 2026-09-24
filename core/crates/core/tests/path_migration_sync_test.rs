@@ -8,7 +8,7 @@ use hentai_core::comic::UpdateComicUserMetaDto;
 use hentai_core::sync::format_group::FormatGroup;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::sync::plan::build_scan_replace_plan;
-use hentai_core::sync::scanner::{ScanContext, scan_roots};
+use hentai_core::sync::scanner::{scan_roots, ScanContext};
 use hentai_core::sync::writer::apply_scan_replace_plan;
 use hentai_core::{
     comic_id_from_path, connection, find_comic_by_id, get_reading_by_comic_id, init_db_at_path,
@@ -154,12 +154,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
                 .await
                 .expect("second apply");
 
-            assert!(
-                find_comic_by_id(&old_id)
-                    .await
-                    .expect("find old")
-                    .is_none()
-            );
+            assert!(find_comic_by_id(&old_id).await.expect("find old").is_none());
             let migrated = find_comic_by_id(&new_id)
                 .await
                 .expect("find new")
@@ -262,18 +257,14 @@ fn ambiguous_same_fingerprint_moves_do_not_migrate() {
                 .await
                 .expect("second apply");
 
-            assert!(
-                find_comic_by_id(&first_id)
-                    .await
-                    .expect("find old first")
-                    .is_none()
-            );
-            assert!(
-                find_comic_by_id(&second_id)
-                    .await
-                    .expect("find old second")
-                    .is_none()
-            );
+            assert!(find_comic_by_id(&first_id)
+                .await
+                .expect("find old first")
+                .is_none());
+            assert!(find_comic_by_id(&second_id)
+                .await
+                .expect("find old second")
+                .is_none());
         });
     });
 }

@@ -41,11 +41,7 @@ impl SeriesAutoLocks {
         self.name || self.serialization_status || self.total_count
     }
 
-    pub fn from_written_fields(
-        name: bool,
-        serialization_status: bool,
-        total_count: bool,
-    ) -> Self {
+    pub fn from_written_fields(name: bool, serialization_status: bool, total_count: bool) -> Self {
         Self {
             name,
             serialization_status,

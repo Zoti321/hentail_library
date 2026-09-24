@@ -3,13 +3,13 @@ use std::sync::Arc;
 use std::sync::OnceLock;
 use std::time::{Duration, Instant};
 
-use tokio::sync::{broadcast, Mutex, Notify, oneshot};
+use tokio::sync::{broadcast, oneshot, Mutex, Notify};
 
 use crate::comic::find_comic_by_id;
 use crate::db::connection;
 use crate::error::HentaiError;
 use crate::thumbnail::generate::{store_thumbnail_for_comic, thumbnail_needs_generation};
-use crate::thumbnail::{ComicThumbnailDto, find_thumbnail_by_comic_id};
+use crate::thumbnail::{find_thumbnail_by_comic_id, ComicThumbnailDto};
 
 const WORKER_COUNT: usize = 2;
 const NEGATIVE_CACHE_RETRY: Duration = Duration::from_secs(600);
@@ -25,11 +25,7 @@ pub enum ThumbnailPriority {
 #[derive(Debug, Clone)]
 pub enum ThumbnailEvent {
     Ready { comic_id: String },
-    Progress {
-        done: i32,
-        total: i32,
-        failed: i32,
-    },
+    Progress { done: i32, total: i32, failed: i32 },
 }
 
 #[derive(Debug, Default)]
@@ -154,13 +150,17 @@ impl ThumbnailQueue {
                     (true, true)
                 }
                 Ok(false) => {
-                    inner.negative_cache.insert(comic_id.to_string(), Instant::now());
+                    inner
+                        .negative_cache
+                        .insert(comic_id.to_string(), Instant::now());
                     inner.stats.failed += 1;
                     inner.stats.done += 1;
                     (false, true)
                 }
                 Err(_) => {
-                    inner.negative_cache.insert(comic_id.to_string(), Instant::now());
+                    inner
+                        .negative_cache
+                        .insert(comic_id.to_string(), Instant::now());
                     inner.stats.failed += 1;
                     inner.stats.done += 1;
                     (false, true)
@@ -230,7 +230,11 @@ impl ThumbnailQueue {
     async fn register_waiter(&self, comic_id: &str) -> oneshot::Receiver<()> {
         let (tx, rx) = oneshot::channel();
         let mut inner = self.inner.lock().await;
-        inner.waiters.entry(comic_id.to_string()).or_default().push(tx);
+        inner
+            .waiters
+            .entry(comic_id.to_string())
+            .or_default()
+            .push(tx);
         rx
     }
 
@@ -257,7 +261,9 @@ impl ThumbnailQueue {
             if inner.priorities.contains_key(&comic_id) || inner.in_flight.contains(&comic_id) {
                 continue;
             }
-            inner.priorities.insert(comic_id.clone(), ThumbnailPriority::Low);
+            inner
+                .priorities
+                .insert(comic_id.clone(), ThumbnailPriority::Low);
             inner.low.push_back(comic_id);
             newly_added += 1;
         }

@@ -65,14 +65,18 @@ async fn clear_library(db: &DatabaseConnection) {
 }
 
 async fn stamp_all_to_current_library(db: &DatabaseConnection, root: &str) {
-    let lib = create_local_library(root, None).await.expect("create library");
+    let lib = create_local_library(root, None)
+        .await
+        .expect("create library");
     set_current_library_id(Some(&lib.library_id))
         .await
         .expect("set current");
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "UPDATE comics SET library_id = ?",
-        [sea_orm::Value::String(Some(Box::new(lib.library_id.clone())))],
+        [sea_orm::Value::String(Some(Box::new(
+            lib.library_id.clone(),
+        )))],
     ))
     .await
     .expect("stamp comics");
@@ -214,22 +218,39 @@ fn fetch_comics_page_expand_by_series_flattens_series_blocks() {
             insert_comic(&db, "loose-b", "E:/lib/loose-b.cbz", "Loose B").await;
             insert_comic(&db, "loose-a", "E:/lib/loose-a.cbz", "Loose A").await;
 
-            let lib = create_local_library("E:/lib", None).await.expect("create library");
+            let lib = create_local_library("E:/lib", None)
+                .await
+                .expect("create library");
             set_current_library_id(Some(&lib.library_id))
                 .await
                 .expect("set current");
             db.execute(Statement::from_sql_and_values(
                 sea_orm::DatabaseBackend::Sqlite,
                 "UPDATE comics SET library_id = ?",
-                [sea_orm::Value::String(Some(Box::new(lib.library_id.clone())))],
+                [sea_orm::Value::String(Some(Box::new(
+                    lib.library_id.clone(),
+                )))],
             ))
             .await
             .expect("stamp comics");
 
             insert_series(&db, "series-root", "E:/lib", "Root Series", &lib.library_id).await;
-            insert_series(&db, "series-beta", "E:/lib/beta", "Beta Series", &lib.library_id).await;
-            insert_series(&db, "series-alpha", "E:/lib/alpha", "Alpha Series", &lib.library_id)
-                .await;
+            insert_series(
+                &db,
+                "series-beta",
+                "E:/lib/beta",
+                "Beta Series",
+                &lib.library_id,
+            )
+            .await;
+            insert_series(
+                &db,
+                "series-alpha",
+                "E:/lib/alpha",
+                "Alpha Series",
+                &lib.library_id,
+            )
+            .await;
             insert_series_item(&db, "series-root", "root-1", 1.0).await;
             insert_series_item(&db, "series-root", "root-2", 2.0).await;
             insert_series_item(&db, "series-beta", "beta-1", 10.0).await;
@@ -257,15 +278,7 @@ fn fetch_comics_page_expand_by_series_flattens_series_blocks() {
             let ids: Vec<&str> = page.items.iter().map(|c| c.comic_id.as_str()).collect();
             assert_eq!(
                 ids,
-                vec![
-                    "root-1",
-                    "root-2",
-                    "alpha-1",
-                    "beta-1",
-                    "beta-2",
-                    "loose-a",
-                    "loose-b",
-                ]
+                vec!["root-1", "root-2", "alpha-1", "beta-1", "beta-2", "loose-a", "loose-b",]
             );
         });
     });
@@ -284,7 +297,9 @@ fn fetch_series_page_name_asc_uses_natural_order() {
             insert_comic(&db, "c10", "E:/lib/Vol 10/a.cbz", "a").await;
             insert_comic(&db, "c2", "E:/lib/Vol 2/a.cbz", "a").await;
             insert_comic(&db, "c1", "E:/lib/Vol 1/a.cbz", "a").await;
-            rebuild_series_from_comics(&db, None).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild");
             stamp_all_to_current_library(&db, "E:/lib").await;
 
             let page = fetch_series_page(

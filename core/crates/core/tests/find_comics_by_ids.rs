@@ -1,8 +1,6 @@
 mod common;
 
-use hentai_core::{
-    connection, find_comics_by_ids, init_db_at_path,
-};
+use hentai_core::{connection, find_comics_by_ids, init_db_at_path};
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
 use tempfile::TempDir;
 
@@ -78,9 +76,7 @@ fn find_comics_by_ids_empty_returns_empty_without_rows() {
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
-            let rows = find_comics_by_ids(vec![])
-                .await
-                .expect("empty batch find");
+            let rows = find_comics_by_ids(vec![]).await.expect("empty batch find");
             assert!(rows.is_empty());
         });
     });

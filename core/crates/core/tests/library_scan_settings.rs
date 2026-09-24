@@ -150,14 +150,9 @@ fn remote_library_shares_scan_setting_defaults() {
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
-            let lib = create_remote_library(
-                "https://example.com/dav/comics",
-                "user",
-                false,
-                None,
-            )
-            .await
-            .expect("create remote");
+            let lib = create_remote_library("https://example.com/dav/comics", "user", false, None)
+                .await
+                .expect("create remote");
             assert!(!lib.scan_on_startup);
             assert_eq!(lib.scan_interval, ScanInterval::Disabled);
             assert_eq!(lib.kind, "remote");

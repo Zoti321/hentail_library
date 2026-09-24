@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 
-use hentai_core::{load_page_bytes, load_page_list, open_reader};
 use hentai_core::formats::read_rar_cover_bytes;
 use hentai_core::resource::parse_file;
+use hentai_core::{load_page_bytes, load_page_list, open_reader};
 
 fn fixtures_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/comics")

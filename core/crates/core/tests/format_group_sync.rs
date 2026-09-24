@@ -7,7 +7,7 @@ use std::sync::Mutex;
 use hentai_core::sync::format_group::FormatGroup;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::sync::plan::build_scan_replace_plan;
-use hentai_core::sync::scanner::{ScanContext, scan_roots};
+use hentai_core::sync::scanner::{scan_roots, ScanContext};
 use hentai_core::sync::writer::apply_scan_replace_plan;
 use hentai_core::{connection, find_comic_by_id, init_db_at_path};
 use sea_orm::{ConnectionTrait, Database, Statement};
@@ -109,18 +109,14 @@ fn disabling_archive_format_group_removes_existing_archive_comic_on_resync() {
 
             let archive_id = hentai_core::comic_id_from_path(&cbz_path.to_string_lossy());
             let folder_id = hentai_core::comic_id_from_path(&folder.to_string_lossy());
-            assert!(
-                find_comic_by_id(&archive_id)
-                    .await
-                    .expect("find archive")
-                    .is_some()
-            );
-            assert!(
-                find_comic_by_id(&folder_id)
-                    .await
-                    .expect("find folder")
-                    .is_some()
-            );
+            assert!(find_comic_by_id(&archive_id)
+                .await
+                .expect("find archive")
+                .is_some());
+            assert!(find_comic_by_id(&folder_id)
+                .await
+                .expect("find folder")
+                .is_some());
 
             let second_scan = scan_roots(
                 std::slice::from_ref(&root),
@@ -141,18 +137,14 @@ fn disabling_archive_format_group_removes_existing_archive_comic_on_resync() {
                 .await
                 .expect("second apply");
 
-            assert!(
-                find_comic_by_id(&archive_id)
-                    .await
-                    .expect("find archive after")
-                    .is_none()
-            );
-            assert!(
-                find_comic_by_id(&folder_id)
-                    .await
-                    .expect("find folder after")
-                    .is_some()
-            );
+            assert!(find_comic_by_id(&archive_id)
+                .await
+                .expect("find archive after")
+                .is_none());
+            assert!(find_comic_by_id(&folder_id)
+                .await
+                .expect("find folder after")
+                .is_some());
         });
     });
 }

@@ -12,8 +12,9 @@ use hentai_core::sync::scanner::{scan_roots, ScanContext};
 use hentai_core::sync::writer::apply_scan_replace_plan;
 use hentai_core::{
     comic_id_from_path, connection, find_series_by_id, find_series_thumbnail_by_series_id,
-    init_db_at_path, series_id_from_folder_path, set_series_meta_locks, update_series_item_sort_order,
-    update_series_user_meta, SetSeriesMetaLocksDto, UpdateSeriesUserMetaDto,
+    init_db_at_path, series_id_from_folder_path, set_series_meta_locks,
+    update_series_item_sort_order, update_series_user_meta, SetSeriesMetaLocksDto,
+    UpdateSeriesUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -27,7 +28,8 @@ fn write_cbz_pages(path: &Path, page_count: usize) {
     for i in 1..=page_count {
         zip.start_file(format!("{i:02}.jpg"), SimpleFileOptions::default())
             .expect("start");
-        zip.write_all(format!("page-{i}").as_bytes()).expect("write");
+        zip.write_all(format!("page-{i}").as_bytes())
+            .expect("write");
     }
     zip.finish().expect("finish");
 }
@@ -111,11 +113,7 @@ async fn seed_series_user_state(
     .expect("series thumb");
 }
 
-fn assert_locked_orders(
-    series: &hentai_core::SeriesDto,
-    comic_a: &str,
-    comic_b: &str,
-) {
+fn assert_locked_orders(series: &hentai_core::SeriesDto, comic_a: &str, comic_b: &str) {
     let by_id: HashMap<_, _> = series
         .items
         .iter()

@@ -117,7 +117,10 @@ async fn load_continue_reading(
         .collect()
 }
 
-async fn load_counts(db: &DatabaseConnection, exclude_r18: bool) -> Result<HomePageCountsDto, HentaiError> {
+async fn load_counts(
+    db: &DatabaseConnection,
+    exclude_r18: bool,
+) -> Result<HomePageCountsDto, HentaiError> {
     let Some(library_id) = get_current_library_id().await? else {
         return Ok(HomePageCountsDto {
             comic_count: 0,

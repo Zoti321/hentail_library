@@ -5,9 +5,7 @@ use sea_orm::{
 
 use crate::comic::{now_ms, ComicDto};
 use crate::db::map_db_err;
-use crate::entity::{
-    comic_authors, comic_meta, comic_tags, comic_thumbnails, comics, prelude::*,
-};
+use crate::entity::{comic_authors, comic_meta, comic_tags, comic_thumbnails, comics, prelude::*};
 use crate::error::HentaiError;
 use crate::history::normalize_reading_history_titles;
 use crate::named_facet::{replace_comic_named_facet, JunctionNamedFacet};
@@ -155,7 +153,10 @@ pub(crate) async fn apply_comic_rekey<C: ConnectionTrait>(
         last_updated_at: Set(comic.last_updated_at),
         library_id: Set(comic.library_id.clone()),
     };
-    Comics::insert(comic_active).exec(db).await.map_err(map_db_err)?;
+    Comics::insert(comic_active)
+        .exec(db)
+        .await
+        .map_err(map_db_err)?;
 
     let meta_active = comic_meta::ActiveModel {
         comic_id: Set(to_id.clone()),
@@ -242,11 +243,7 @@ pub async fn clear_all_comics(db: &DatabaseConnection) -> Result<i32, HentaiErro
         return Ok(0);
     }
     let txn = db.begin().await.map_err(map_db_err)?;
-    for table in [
-        "comic_reading_histories",
-        "series_items",
-        "comics",
-    ] {
+    for table in ["comic_reading_histories", "series_items", "comics"] {
         txn.execute(Statement::from_string(
             sea_orm::DatabaseBackend::Sqlite,
             format!("DELETE FROM {table}"),
@@ -278,7 +275,9 @@ pub async fn clear_comics_for_library(
     txn.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "DELETE FROM series WHERE library_id = ?",
-        [sea_orm::Value::String(Some(Box::new(library_id.to_string())))],
+        [sea_orm::Value::String(Some(Box::new(
+            library_id.to_string(),
+        )))],
     ))
     .await
     .map_err(map_db_err)?;
@@ -294,7 +293,9 @@ async fn load_comic_ids_for_library(
         .query_all(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
             "SELECT comic_id FROM comics WHERE library_id = ?",
-            [sea_orm::Value::String(Some(Box::new(library_id.to_string())))],
+            [sea_orm::Value::String(Some(Box::new(
+                library_id.to_string(),
+            )))],
         ))
         .await
         .map_err(map_db_err)?;
@@ -340,11 +341,7 @@ async fn delete_comics_side_effects_batch<C: ConnectionTrait>(
     if comic_ids.is_empty() {
         return Ok(());
     }
-    let placeholders = comic_ids
-        .iter()
-        .map(|_| "?")
-        .collect::<Vec<_>>()
-        .join(",");
+    let placeholders = comic_ids.iter().map(|_| "?").collect::<Vec<_>>().join(",");
     let values: Vec<sea_orm::Value> = comic_ids
         .iter()
         .map(|id| sea_orm::Value::String(Some(Box::new(id.clone()))))
@@ -391,11 +388,7 @@ pub(crate) async fn upsert_comics<C: ConnectionTrait>(
             .map_err(map_db_err)?;
         let is_new = existing_comic.is_none();
         let now = now_ms();
-        let created_at = if is_new {
-            now
-        } else {
-            comic.created_at
-        };
+        let created_at = if is_new { now } else { comic.created_at };
         let mut changed = is_new;
         if let Some(ref row) = existing_comic {
             changed |= row.path != comic.path

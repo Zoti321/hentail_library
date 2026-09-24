@@ -30,9 +30,7 @@ pub fn init_tracing_subscriber() {
         let (filter_layer, reload_handle) = reload::Layer::new(env_filter);
         let _ = FILTER_HANDLE.set(reload_handle);
 
-        let stderr_layer = fmt::layer()
-            .with_writer(std::io::stderr)
-            .with_target(true);
+        let stderr_layer = fmt::layer().with_writer(std::io::stderr).with_target(true);
 
         let file_layer = fmt::layer()
             .with_writer(SharedLogFileWriter::from_slot)

@@ -98,10 +98,7 @@ fn update_comic_user_meta_locks_only_written_fields() {
             .await
             .expect("update");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(comic.title, "新标题");
             assert!(comic.locks.title);
             assert!(!comic.locks.description);
@@ -126,20 +123,14 @@ fn update_comic_user_meta_persists_languages_and_auto_locks() {
             update_comic_user_meta(
                 "c1",
                 UpdateComicUserMetaDto {
-                    languages: Some(vec![
-                        "Chinese".to_string(),
-                        "Japanese".to_string(),
-                    ]),
+                    languages: Some(vec!["Chinese".to_string(), "Japanese".to_string()]),
                     ..Default::default()
                 },
             )
             .await
             .expect("update");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(
                 comic.languages,
                 vec!["Chinese".to_string(), "Japanese".to_string()]
@@ -157,10 +148,7 @@ fn update_comic_user_meta_persists_languages_and_auto_locks() {
             .await
             .expect("clear languages");
 
-            let cleared = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let cleared = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert!(cleared.languages.is_empty());
             assert!(cleared.locks.languages);
         });
@@ -188,16 +176,10 @@ fn update_comic_user_meta_persists_parodies_and_auto_locks() {
             .await
             .expect("update");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             let mut names = comic.parodies.clone();
             names.sort();
-            assert_eq!(
-                names,
-                vec!["Fate".to_string(), "原创".to_string()]
-            );
+            assert_eq!(names, vec!["Fate".to_string(), "原创".to_string()]);
             assert!(comic.locks.parodies);
             assert!(!comic.locks.title);
 
@@ -211,10 +193,7 @@ fn update_comic_user_meta_persists_parodies_and_auto_locks() {
             .await
             .expect("clear parodies");
 
-            let cleared = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let cleared = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert!(cleared.parodies.is_empty());
             assert!(cleared.locks.parodies);
         });
@@ -242,16 +221,10 @@ fn update_comic_user_meta_persists_characters_and_auto_locks() {
             .await
             .expect("update");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             let mut names = comic.characters.clone();
             names.sort();
-            assert_eq!(
-                names,
-                vec!["Rin".to_string(), "Saber".to_string()]
-            );
+            assert_eq!(names, vec!["Rin".to_string(), "Saber".to_string()]);
             assert!(comic.locks.characters);
             assert!(!comic.locks.title);
 
@@ -265,10 +238,7 @@ fn update_comic_user_meta_persists_characters_and_auto_locks() {
             .await
             .expect("clear characters");
 
-            let cleared = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let cleared = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert!(cleared.characters.is_empty());
             assert!(cleared.locks.characters);
         });
@@ -306,10 +276,7 @@ fn set_comic_meta_locks_characters_without_changing_values() {
             .await
             .expect("set locks");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(comic.characters, vec!["Saber".to_string()]);
             assert!(!comic.locks.characters);
         });
@@ -347,10 +314,7 @@ fn set_comic_meta_locks_parodies_without_changing_values() {
             .await
             .expect("set locks");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(comic.parodies, vec!["Fate".to_string()]);
             assert!(!comic.locks.parodies);
         });
@@ -388,10 +352,7 @@ fn set_comic_meta_locks_languages_without_changing_values() {
             .await
             .expect("set locks");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(comic.languages, vec!["English".to_string()]);
             assert!(!comic.locks.languages);
         });
@@ -430,10 +391,7 @@ fn set_comic_meta_locks_changes_flags_without_changing_values() {
             .await
             .expect("set locks");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(comic.title, "锁定标题");
             assert!(!comic.locks.title);
             assert!(comic.locks.description);

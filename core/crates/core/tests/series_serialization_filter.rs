@@ -87,7 +87,9 @@ async fn seed_two_series(db: &DatabaseConnection) -> (String, String) {
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "UPDATE comics SET library_id = ?",
-        [sea_orm::Value::String(Some(Box::new(lib.library_id.clone())))],
+        [sea_orm::Value::String(Some(Box::new(
+            lib.library_id.clone(),
+        )))],
     ))
     .await
     .expect("stamp comics");

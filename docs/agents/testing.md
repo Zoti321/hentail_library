@@ -2,35 +2,44 @@
 
 单一事实来源：PR 硬门禁保证什么、本地还应跑什么、Dart data 测什么、UI 快/慢轨如何晋升。对齐 ADR-0002（业务在 Rust `cargo test`；Dart 测 UI + FRB 薄边）。
 
-## CI hard gates（必须绿）
+## CI tier 命名
 
-| Job | 命令（可本地复现） | 失败含义 |
-|-----|-------------------|----------|
-| `test-rust` | `cargo test --manifest-path core/Cargo.toml` | Rust 核心（sync / reader / DB）回归 |
-| `analyze` · format | `cd app && dart format --output=none --set-exit-if-changed lib test` | 格式漂移 |
-| `analyze` · analyze | `cd app && flutter analyze` | 静态分析问题 |
-| `test-unit` | `cd app && flutter test test/domain test/core test/data test/project_layout_test.dart test/ui/core/widgets/actions/destructive_filled_button_test.dart test/ui/core/widgets/overlays/dialog/confirm test/ui/features/metadata/views/metadata_page/named_facet_fill_viewport_test.dart test/ui/features/reader/reader_viewport_pages_test.dart test/ui/features/reader/reader_open_error_message_test.dart test/ui/features/reader/views/reader_page/reader_chrome_layout_test.dart` | domain / core / data 契约 / monorepo layout / 已晋升快轨 UI |
+| Tier | Workflow | Job 前缀 | 是否挡合并 |
+|------|----------|----------|------------|
+| **Gate** | `ci.yml`（name: `Gate`） | `gate-*` | 是：PR 绿 = 全部 `gate-*` 已过 |
 
-新增 **data 契约测** 或 **已晋升的快轨 UI/纯逻辑测** 时：扩展 `test-unit` 的路径列表（或把文件放进已有 `test/data` / 已列入的快轨路径），不要另开「假绿」软门禁冒充硬跑。
+所有 `gate-*` job 都只调用 `scripts/run-gate.sh <子命令>`，本地与 CI 命令同源。Composite action 统一为 `.github/actions/setup-flutter-frb`。
 
-## Soft / 非阻塞
+## Gate tier（必须绿）
 
-| Job | 命令 | 说明 |
-|-----|------|------|
-| `test-widget (soft)` | `cd app && flutter test test/widget_test.dart` | Smoke only；`continue-on-error`。**绿 PR 不代表全量 UI 测已过。** |
+| Job | 本地复现 | 内容 | 失败含义 |
+|-----|----------|------|----------|
+| `gate-rust-lint` | `./scripts/run-gate.sh rust-lint` | `cargo fmt --check` + `cargo clippy --workspace --all-targets -D warnings` | Rust 格式 / lint |
+| `gate-rust-test` | `./scripts/run-gate.sh rust-test` | `cargo test --manifest-path core/Cargo.toml` | Rust 核心（sync / reader / DB）回归 |
+| `gate-codegen-drift` | `./scripts/run-gate.sh codegen-drift` | FRB generate + build_runner，随后 `git status` 须干净 | 提交的生成产物与源码不一致 |
+| `gate-dart-static` | `./scripts/run-gate.sh dart-static` | `dart format --set-exit-if-changed lib test` + `flutter analyze` | Dart 格式 / 静态分析 |
+| `gate-dart-test` | `./scripts/run-gate.sh dart-test` | `flutter test` ← `app/test/gate/manifest.txt` | manifest 内硬门禁 Dart 测试 |
 
-慢轨 viewport / shell / 大 widget（如 `test/ui/features/reader/*viewport*`、大面积 responsive shell）默认留在本地或 soft，除非按下方双轨规则显式晋升。
+`./scripts/run-gate.sh`（无参数）按顺序跑全部；可传多个子命令跑子集，如 `./scripts/run-gate.sh dart-static dart-test`。`codegen-drift` 会就地重生成产物，本地运行前请先提交或暂存改动。
+
+### Gate manifest
+
+`app/test/gate/manifest.txt` 是 `gate-dart-test` 的**唯一**路径来源（每行一个相对 `app/` 的文件或目录，`#` 为注释）。它覆盖 domain / core / data 薄边、monorepo layout、app smoke（`test/widget_test.dart`）与已晋升快轨 UI。`test/gate/manifest_test.dart` 自检每条路径存在且无重复。
+
+新增 **data 契约测** 或 **已晋升的快轨 UI/纯逻辑测** 时：把路径加进 manifest（或把文件放进已列入的目录），并在 PR 说明中列出；不要另开 `continue-on-error` 软门禁冒充硬跑。
+
+慢轨 viewport / shell / 大 widget（如 `test/ui/features/reader/*viewport*`、大面积 responsive shell）默认只在本地跑，除非按下方双轨规则显式晋升。
 
 ## 本地全量
 
 合并前若你改了 UI 或怀疑 widget 回归，本地再跑：
 
 ```bash
-cd app && flutter test
-cargo test --manifest-path core/Cargo.toml
+./scripts/run-gate.sh          # 完整 Gate
+cd app && flutter test         # 全量 Dart（含慢轨 test/ui）
 ```
 
-CI **不会**跑全量 `test/ui`、不会跑 `integration_test`、不上 coverage 门禁。
+Gate **不会**跑全量 `test/ui`、不会跑 `integration_test`、不上 coverage 门禁。
 
 ## ADR-0002 测试含义
 
@@ -42,15 +51,15 @@ CI **不会**跑全量 `test/ui`、不会跑 `integration_test`、不上 coverag
 
 | 轨 | 进入条件 | CI |
 |----|----------|-----|
-| **快轨** | 低 timing、少 `pumpAndSettle`、无脆弱 viewport 尺寸依赖；优先纯逻辑 unit 或极薄 smoke | 可列入 `test-unit` 硬门禁 |
-| **慢轨** | 大壳、侧栏、多断点 responsive、阅读器 viewport 手势/时序 | soft 或仅本地；全量 `test/ui` **本波不硬门禁** |
+| **快轨** | 低 timing、少 `pumpAndSettle`、无脆弱 viewport 尺寸依赖；优先纯逻辑 unit 或极薄 smoke | 可列入 gate manifest 硬门禁 |
+| **慢轨** | 大壳、侧栏、多断点 responsive、阅读器 viewport 手势/时序 | 仅本地；全量 `test/ui` **不进 Gate** |
 
 ### 晋升快轨检查清单
 
 1. 测的是可观察契约，不绑私有结构。
 2. 本地连续跑稳定（无偶发 timeout）。
 3. 已改用共享 harness（见下），无新复制的 MaterialApp / `_Fake*` 样板。
-4. 在 PR 中显式列出路径，并改 `.github/workflows/ci.yml` 的 `test-unit` 命令。
+4. 把路径加入 `app/test/gate/manifest.txt`，并在 PR 中显式列出。
 5. 评审确认后合入；失败必须挡合并。
 
 ## 共享 harness（强制）

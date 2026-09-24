@@ -58,7 +58,9 @@ fn set_comic_thumbnail_from_page_marks_user_set_cover() {
         let temp = TempDir::new().expect("tempdir");
         let db_path = temp.path().join("cover.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
-        runtime.block_on(init_db_at_path(&db_path)).expect("init db");
+        runtime
+            .block_on(init_db_at_path(&db_path))
+            .expect("init db");
 
         let comic_dir = temp.path().join("comic");
         fs::create_dir_all(&comic_dir).expect("mkdir");
@@ -71,10 +73,7 @@ fn set_comic_thumbnail_from_page_marks_user_set_cover() {
 
         runtime
             .block_on(set_comic_thumbnail_from_page(
-                comic_id,
-                &path,
-                "dir",
-                1, // 0-based: second page (blue)
+                comic_id, &path, "dir", 1, // 0-based: second page (blue)
             ))
             .expect("set cover");
 
@@ -93,7 +92,9 @@ fn sync_does_not_regenerate_user_set_comic_thumbnail_after_source_change() {
         let temp = TempDir::new().expect("tempdir");
         let db_path = temp.path().join("cover.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
-        runtime.block_on(init_db_at_path(&db_path)).expect("init db");
+        runtime
+            .block_on(init_db_at_path(&db_path))
+            .expect("init db");
 
         let comic_dir = temp.path().join("comic");
         fs::create_dir_all(&comic_dir).expect("mkdir");
@@ -185,7 +186,9 @@ fn series_custom_thumbnail_is_preferred_over_fallback() {
         let temp = TempDir::new().expect("tempdir");
         let db_path = temp.path().join("cover.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
-        runtime.block_on(init_db_at_path(&db_path)).expect("init db");
+        runtime
+            .block_on(init_db_at_path(&db_path))
+            .expect("init db");
 
         let comic_dir = temp.path().join("series_comic");
         fs::create_dir_all(&comic_dir).expect("mkdir");
@@ -229,7 +232,9 @@ fn series_cover_falls_back_to_latest_sort_order_comic() {
         let temp = TempDir::new().expect("tempdir");
         let db_path = temp.path().join("cover.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
-        runtime.block_on(init_db_at_path(&db_path)).expect("init db");
+        runtime
+            .block_on(init_db_at_path(&db_path))
+            .expect("init db");
 
         let older_dir = temp.path().join("vol1");
         let newer_dir = temp.path().join("vol2");

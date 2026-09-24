@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./.github/actions/flutter-frb-setup
+      - uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
@@ -73,7 +73,7 @@ jobs:
             echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: ./.github/actions/flutter-frb-setup
+      - uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
@@ -151,7 +151,7 @@ jobs:
             echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: ./.github/actions/flutter-frb-setup
+      - uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
@@ -211,7 +211,7 @@ jobs:
           echo "::error::Failed to install Linux build dependencies after retries."
           exit 1
 
-      - uses: ./.github/actions/flutter-frb-setup
+      - uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
@@ -258,7 +258,7 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - uses: ./.github/actions/flutter-frb-setup
+      - uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
@@ -347,7 +347,7 @@ jobs:
             rm -f "$manifest"
           done
 
-      - uses: ./.github/actions/flutter-frb-setup
+      - uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}

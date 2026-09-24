@@ -4,13 +4,7 @@ use hentai_core::metadata_lock::{
     series_name_needs_write, ComicAutoLocks,
 };
 
-fn comic(
-    id: &str,
-    path: &str,
-    resource_type: &str,
-    title: &str,
-    page_count: i32,
-) -> ComicDto {
+fn comic(id: &str, path: &str, resource_type: &str, title: &str, page_count: i32) -> ComicDto {
     ComicDto {
         comic_id: id.to_string(),
         path: path.to_string(),
@@ -174,19 +168,13 @@ fn merge_kept_always_overwrites_resource_size_from_scan() {
 
 #[test]
 fn series_name_unlocked_takes_folder_name() {
-    assert_eq!(
-        merge_series_name(false, "旧名", "文件夹名"),
-        "文件夹名"
-    );
+    assert_eq!(merge_series_name(false, "旧名", "文件夹名"), "文件夹名");
     assert!(series_name_needs_write(false, "旧名", "文件夹名"));
 }
 
 #[test]
 fn series_name_locked_preserves_existing() {
-    assert_eq!(
-        merge_series_name(true, "用户名", "文件夹名"),
-        "用户名"
-    );
+    assert_eq!(merge_series_name(true, "用户名", "文件夹名"), "用户名");
     assert!(!series_name_needs_write(true, "用户名", "文件夹名"));
 }
 
@@ -203,10 +191,7 @@ fn series_name_needs_write_false_when_unchanged() {
 
 #[test]
 fn member_sort_order_locked_keeps_value() {
-    assert_eq!(
-        resolve_member_sort_order(Some(3.5), 1.0),
-        (3.5, true)
-    );
+    assert_eq!(resolve_member_sort_order(Some(3.5), 1.0), (3.5, true));
 }
 
 #[test]

@@ -15,9 +15,10 @@ pub struct ReaderCache {
 impl ReaderCache {
     pub fn app() -> Result<Self, HentaiError> {
         let config = db::db_config()?;
-        let parent = config.db_file_path.parent().ok_or_else(|| {
-            HentaiError::reader_invalid_content("无法解析应用数据目录")
-        })?;
+        let parent = config
+            .db_file_path
+            .parent()
+            .ok_or_else(|| HentaiError::reader_invalid_content("无法解析应用数据目录"))?;
         Ok(Self {
             root: parent.join("reader_cache"),
         })
@@ -102,7 +103,8 @@ impl ReaderCache {
             if !entry.file_type().map_err(map_io_err)?.is_file() {
                 continue;
             }
-            let Some(index) = page_index_from_file_name(&entry.file_name().to_string_lossy()) else {
+            let Some(index) = page_index_from_file_name(&entry.file_name().to_string_lossy())
+            else {
                 continue;
             };
             if !keep.contains(&index) {
@@ -233,11 +235,7 @@ fn remove_existing_page_files(dir: &Path, page_index: i32) -> Result<(), HentaiE
     let prefix = format!("{page_index:0PAGE_FILE_WIDTH$}.");
     for entry in fs::read_dir(dir).map_err(map_io_err)? {
         let entry = entry.map_err(map_io_err)?;
-        if entry
-            .file_name()
-            .to_string_lossy()
-            .starts_with(&prefix)
-        {
+        if entry.file_name().to_string_lossy().starts_with(&prefix) {
             fs::remove_file(entry.path()).map_err(map_io_err)?;
         }
     }
@@ -357,7 +355,12 @@ mod tests {
             .write_page("comic-1", &source.to_string_lossy(), 2, b"\xFF\xD8\xFFtwo")
             .expect("write2");
         cache
-            .write_page("comic-1", &source.to_string_lossy(), 8, b"\xFF\xD8\xFFeight")
+            .write_page(
+                "comic-1",
+                &source.to_string_lossy(),
+                8,
+                b"\xFF\xD8\xFFeight",
+            )
             .expect("write8");
 
         cache
@@ -424,12 +427,7 @@ mod tests {
                 let cache = ReaderCache::with_root(cache_root);
                 let mut page = worker;
                 while !stop.load(Ordering::Relaxed) {
-                    let _ = cache.write_page(
-                        "comic-1",
-                        &source_str,
-                        page,
-                        b"\xFF\xD8\xFFpage",
-                    );
+                    let _ = cache.write_page("comic-1", &source_str, page, b"\xFF\xD8\xFFpage");
                     page = (page + 4) % 200;
                 }
             }));

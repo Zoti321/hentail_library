@@ -64,11 +64,7 @@ async fn table_exists(manager: &SchemaManager<'_>, table: &str) -> Result<bool, 
         manager.get_database_backend(),
         format!("SELECT 1 FROM sqlite_master WHERE type='table' AND name='{table}' LIMIT 1"),
     );
-    Ok(manager
-        .get_connection()
-        .query_one(stmt)
-        .await?
-        .is_some())
+    Ok(manager.get_connection().query_one(stmt).await?.is_some())
 }
 
 async fn column_exists(

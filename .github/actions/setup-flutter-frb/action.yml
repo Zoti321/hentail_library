@@ -1,4 +1,4 @@
-name: Flutter FRB setup
+name: Setup Flutter FRB toolchain
 description: Install Flutter/Rust, fetch pdfium, link rust_builder, run FRB/build_runner codegen
 
 inputs:
@@ -17,6 +17,9 @@ inputs:
   fetch-native-deps:
     description: Download pdfium native libraries into core/vendor
     default: "true"
+  install-frb-codegen:
+    description: Install flutter_rust_bridge_codegen even when run-frb-codegen is false
+    default: "false"
   run-frb-codegen:
     description: Run flutter_rust_bridge_codegen generate
     default: "true"
@@ -28,6 +31,9 @@ inputs:
     default: "true"
   rust-targets:
     description: Comma-separated extra rustup targets for dtolnay/rust-toolchain
+    default: ""
+  rust-components:
+    description: Comma-separated extra rustup components (e.g. rustfmt, clippy)
     default: ""
 
 runs:
@@ -42,6 +48,7 @@ runs:
     - uses: dtolnay/rust-toolchain@stable
       with:
         targets: ${{ inputs.rust-targets }}
+        components: ${{ inputs.rust-components }}
 
     - uses: Swatinem/rust-cache@v2
       with:
@@ -64,7 +71,7 @@ runs:
       run: bash scripts/link-rust-builder.sh
 
     - uses: taiki-e/cache-cargo-install-action@v2
-      if: inputs.run-frb-codegen == 'true'
+      if: inputs.run-frb-codegen == 'true' || inputs.install-frb-codegen == 'true'
       with:
         tool: flutter_rust_bridge_codegen
         tag: ${{ inputs.frb-codegen-version }}

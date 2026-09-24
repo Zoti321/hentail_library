@@ -60,14 +60,9 @@ fn create_remote_library_defaults_https_and_remote_format_groups() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
 
-            let lib = create_remote_library(
-                "nas.local/webdav/comics",
-                "alice",
-                false,
-                None,
-            )
-            .await
-            .expect("create remote");
+            let lib = create_remote_library("nas.local/webdav/comics", "alice", false, None)
+                .await
+                .expect("create remote");
 
             assert_eq!(lib.kind, "remote");
             assert_eq!(lib.root_path, "https://nas.local/webdav/comics");
@@ -83,7 +78,9 @@ fn create_remote_library_defaults_https_and_remote_format_groups() {
                 .query_one(Statement::from_sql_and_values(
                     sea_orm::DatabaseBackend::Sqlite,
                     "SELECT username, allow_http, kind FROM libraries WHERE library_id = ?",
-                    [sea_orm::Value::String(Some(Box::new(lib.library_id.clone())))],
+                    [sea_orm::Value::String(Some(Box::new(
+                        lib.library_id.clone(),
+                    )))],
                 ))
                 .await
                 .expect("query")
@@ -166,14 +163,10 @@ fn update_and_delete_remote_library_keeps_id_and_clears_row() {
             let created = create_remote_library("https://a.example/dav", "old", false, None)
                 .await
                 .expect("create");
-            let updated = update_remote_library(
-                &created.library_id,
-                "https://b.example/comics",
-                "new",
-                true,
-            )
-            .await
-            .expect("update");
+            let updated =
+                update_remote_library(&created.library_id, "https://b.example/comics", "new", true)
+                    .await
+                    .expect("update");
 
             assert_eq!(updated.library_id, created.library_id);
             assert_eq!(updated.root_path, "https://b.example/comics");

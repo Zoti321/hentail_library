@@ -4,7 +4,7 @@ use sea_orm::{
 };
 
 use crate::db::{connection, map_db_err};
-use crate::entity::{comic_authors, prelude::*, authors};
+use crate::entity::{authors, comic_authors, prelude::*};
 use crate::error::HentaiError;
 
 pub async fn list_all_authors() -> Result<Vec<String>, HentaiError> {
@@ -19,7 +19,11 @@ pub async fn list_all_authors() -> Result<Vec<String>, HentaiError> {
 
 pub async fn count_all_authors() -> Result<i64, HentaiError> {
     let db = connection()?;
-    Authors::find().count(&db).await.map_err(map_db_err).map(|c| c as i64)
+    Authors::find()
+        .count(&db)
+        .await
+        .map_err(map_db_err)
+        .map(|c| c as i64)
 }
 
 pub async fn fetch_authors_page(limit: i32, offset: i32) -> Result<Vec<String>, HentaiError> {

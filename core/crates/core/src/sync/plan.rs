@@ -7,13 +7,13 @@ use crate::db::map_db_err;
 use crate::entity::prelude::*;
 use crate::error::HentaiError;
 
-use crate::metadata_lock::merge_kept_scan_with_existing;
 use super::migrate::{
     comic_migration_new_paths, detect_path_migration_pairs, detect_series_path_migration_pairs,
     migrated_id_sets, ComicMigration, ComicMigrationPair, SeriesMigrationPair,
 };
-use crate::resource::can_generate_thumbnail;
 use super::scanner::ScanItem;
+use crate::metadata_lock::merge_kept_scan_with_existing;
+use crate::resource::can_generate_thumbnail;
 
 pub struct ComicScanReplacePlan {
     pub removed_ids: Vec<String>,
@@ -41,14 +41,20 @@ pub async fn build_scan_replace_plan(
     let unique = dedupe_scanned(scanned);
     let scanned_ids: HashSet<String> = unique.keys().cloned().collect();
     let existing = load_comics_for_library(db, library_id).await?;
-    let existing_by_id: HashMap<String, ComicDto> =
-        existing.into_iter().map(|c| (c.comic_id.clone(), c)).collect();
+    let existing_by_id: HashMap<String, ComicDto> = existing
+        .into_iter()
+        .map(|c| (c.comic_id.clone(), c))
+        .collect();
     let existing_ids: HashSet<String> = existing_by_id.keys().cloned().collect();
     let id_diff = compute_id_diff(&existing_ids, &scanned_ids);
     let removed_by_id: HashMap<String, ComicDto> = id_diff
         .removed_ids
         .iter()
-        .filter_map(|id| existing_by_id.get(id).map(|comic| (id.clone(), comic.clone())))
+        .filter_map(|id| {
+            existing_by_id
+                .get(id)
+                .map(|comic| (id.clone(), comic.clone()))
+        })
         .collect();
     let added_by_id: HashMap<String, ComicDto> = id_diff
         .added_ids
@@ -196,10 +202,10 @@ fn build_migrations(
 }
 
 async fn load_all_comics(db: &DatabaseConnection) -> Result<Vec<ComicDto>, HentaiError> {
-  use crate::comic::repository::load_comics_ordered;
-  let rows = Comics::find().all(db).await.map_err(map_db_err)?;
-  let ids: Vec<String> = rows.into_iter().map(|r| r.comic_id).collect();
-  load_comics_ordered(db, ids).await
+    use crate::comic::repository::load_comics_ordered;
+    let rows = Comics::find().all(db).await.map_err(map_db_err)?;
+    let ids: Vec<String> = rows.into_iter().map(|r| r.comic_id).collect();
+    load_comics_ordered(db, ids).await
 }
 
 async fn load_comics_for_library(
@@ -266,7 +272,10 @@ pub async fn load_existing_comics_map(
     db: &DatabaseConnection,
 ) -> Result<HashMap<String, ComicDto>, HentaiError> {
     let comics = load_all_comics(db).await?;
-    Ok(comics.into_iter().map(|c| (c.comic_id.clone(), c)).collect())
+    Ok(comics
+        .into_iter()
+        .map(|c| (c.comic_id.clone(), c))
+        .collect())
 }
 
 pub async fn load_saved_paths(db: &DatabaseConnection) -> Result<Vec<String>, HentaiError> {
@@ -282,7 +291,9 @@ pub async fn count_comic_ids_for_library(
         .query_one(Statement::from_sql_and_values(
             sea_orm::DatabaseBackend::Sqlite,
             "SELECT COUNT(*) FROM comics WHERE library_id = ?",
-            [sea_orm::Value::String(Some(Box::new(library_id.to_string())))],
+            [sea_orm::Value::String(Some(Box::new(
+                library_id.to_string(),
+            )))],
         ))
         .await
         .map_err(map_db_err)?

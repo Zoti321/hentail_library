@@ -141,11 +141,7 @@ fn fetch_series_comics_metadata_aggregates_language_parody_character_first_seen_
             );
             assert_eq!(
                 metadata.characters,
-                vec![
-                    "Zelda".to_string(),
-                    "Alice".to_string(),
-                    "Bob".to_string(),
-                ],
+                vec!["Zelda".to_string(), "Alice".to_string(), "Bob".to_string(),],
                 "characters: member order + first-seen (not alpha)"
             );
         });

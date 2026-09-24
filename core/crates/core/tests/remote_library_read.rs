@@ -101,8 +101,13 @@ fn fake_unreachable_open_fails_clearly() {
     let mut fake = FakeResourceAccess::new();
     fake.insert_file("https://nas.example/dav/book.cbz", b"x");
     fake.set_unreachable("认证失败: 401 Unauthorized");
-    let err = open_reader_with(&fake, "c-unreach", "https://nas.example/dav/book.cbz", "cbz")
-        .expect_err("must fail");
+    let err = open_reader_with(
+        &fake,
+        "c-unreach",
+        "https://nas.example/dav/book.cbz",
+        "cbz",
+    )
+    .expect_err("must fail");
     assert!(
         err.is_remote_access_failure()
             || err.code == HentaiErrorCode::ReaderNotFound

@@ -17,9 +17,7 @@ where
 
 /// 将 watch 循环结果中的「流已关闭」规范为成功退出。
 #[flutter_rust_bridge::frb(ignore)]
-pub fn normalize_watch_result(
-    result: Result<(), HentaiError>,
-) -> Result<(), HentaiErrorDto> {
+pub fn normalize_watch_result(result: Result<(), HentaiError>) -> Result<(), HentaiErrorDto> {
     match result {
         Ok(()) => Ok(()),
         Err(error) if error.message == STREAM_CLOSED => Ok(()),
@@ -39,8 +37,7 @@ mod tests {
 
     #[test]
     fn normalize_watch_result_preserves_real_errors() {
-        let result =
-            normalize_watch_result(Err(HentaiError::db_query_failed("boom", None)));
+        let result = normalize_watch_result(Err(HentaiError::db_query_failed("boom", None)));
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().message, "boom");
     }

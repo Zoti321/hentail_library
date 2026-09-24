@@ -191,8 +191,8 @@ fn load_reader_page_without_open_returns_session_not_open() {
         use std::fs::File;
         let file = File::create(&zip_path).expect("create");
         let mut zip = zip::ZipWriter::new(file);
-        let options =
-            zip::write::SimpleFileOptions::default().compression_method(zip::CompressionMethod::Stored);
+        let options = zip::write::SimpleFileOptions::default()
+            .compression_method(zip::CompressionMethod::Stored);
         zip.start_file("001.jpg", options).expect("start");
         zip.write_all(b"page-one").expect("write");
         zip.finish().expect("finish");

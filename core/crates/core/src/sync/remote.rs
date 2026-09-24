@@ -6,16 +6,16 @@ use crate::comic::{now_ms, ComicDto};
 use crate::comic_id::comic_id_from_normalized_path;
 use crate::error::HentaiError;
 use crate::library::normalize_webdav_root;
-use crate::resource::{
-    basename_without_extension, extension_lower, ResourceAccess, ResourceKind,
-};
+use crate::resource::{basename_without_extension, extension_lower, ResourceAccess, ResourceKind};
 
 use super::format_group::{resource_type_enabled, FormatGroup};
 use super::handle::SyncHandle;
 use super::scanner::{ScanContext, ScanItem};
 
 pub enum RemoteScanOutcome {
-    Unreachable { message: String },
+    Unreachable {
+        message: String,
+    },
     /// Caller must not apply a replace plan (would orphan-delete).
     Cancelled,
     Scanned(Vec<ScanItem>),
@@ -144,9 +144,8 @@ fn register_remote_file(
     }
 
     let path = normalize_remote_location_key(location);
-    let title = basename_without_extension(Path::new(
-        path.rsplit('/').next().unwrap_or(path.as_str()),
-    ));
+    let title =
+        basename_without_extension(Path::new(path.rsplit('/').next().unwrap_or(path.as_str())));
     let title = if title.is_empty() {
         path.clone()
     } else {

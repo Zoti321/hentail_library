@@ -1,9 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::path::Path;
 
-use sea_orm::{
-    ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, QueryFilter, Set,
-};
+use sea_orm::{ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, QueryFilter, Set};
 
 use crate::entity::{prelude::*, series, series_items};
 use crate::error::HentaiError;
@@ -20,14 +18,15 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
     library_id: Option<&str>,
 ) -> Result<(), HentaiError> {
     let comics = match library_id {
-        Some(id) => {
-            Comics::find()
-                .filter(crate::entity::comics::Column::LibraryId.eq(id))
-                .all(db)
-                .await
-                .map_err(crate::db::map_db_err)?
-        }
-        None => Comics::find().all(db).await.map_err(crate::db::map_db_err)?,
+        Some(id) => Comics::find()
+            .filter(crate::entity::comics::Column::LibraryId.eq(id))
+            .all(db)
+            .await
+            .map_err(crate::db::map_db_err)?,
+        None => Comics::find()
+            .all(db)
+            .await
+            .map_err(crate::db::map_db_err)?,
     };
     let mut groups: HashMap<String, Vec<(String, String)>> = HashMap::new();
     let mut group_library: HashMap<String, String> = HashMap::new();
@@ -50,14 +49,15 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
         .collect();
 
     let existing_rows = match library_id {
-        Some(id) => {
-            Series::find()
-                .filter(crate::entity::series::Column::LibraryId.eq(id))
-                .all(db)
-                .await
-                .map_err(crate::db::map_db_err)?
-        }
-        None => Series::find().all(db).await.map_err(crate::db::map_db_err)?,
+        Some(id) => Series::find()
+            .filter(crate::entity::series::Column::LibraryId.eq(id))
+            .all(db)
+            .await
+            .map_err(crate::db::map_db_err)?,
+        None => Series::find()
+            .all(db)
+            .await
+            .map_err(crate::db::map_db_err)?,
     };
     for row in existing_rows {
         if !active_series_ids.contains(&row.series_id) {
@@ -108,10 +108,7 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
         entries.sort_by(|a, b| compare_paths_by_filename(&a.1, &b.1));
         let series_id = series_id_from_folder_path(&folder_path);
         let name = series_name_from_folder_path(&folder_path);
-        let series_library_id = group_library
-            .get(&folder_path)
-            .cloned()
-            .unwrap_or_default();
+        let series_library_id = group_library.get(&folder_path).cloned().unwrap_or_default();
         let existing = Series::find_by_id(series_id.clone())
             .one(db)
             .await
@@ -122,11 +119,8 @@ pub async fn rebuild_series_from_comics<C: ConnectionTrait>(
             active.folder_path = Set(folder_path.clone());
             active.library_id = Set(series_library_id);
             // serialization_status / total_count have no scan source → never overwritten.
-            let merged_name = merge_series_name(
-                existing_row.name_locked,
-                &existing_row.name,
-                &name,
-            );
+            let merged_name =
+                merge_series_name(existing_row.name_locked, &existing_row.name, &name);
             active.name_sort_key = Set(compute_sort_key(&merged_name));
             active.name = Set(merged_name);
             active.update(db).await.map_err(crate::db::map_db_err)?;

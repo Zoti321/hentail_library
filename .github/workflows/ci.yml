@@ -1,4 +1,4 @@
-name: CI
+name: Gate
 
 on:
   pull_request:
@@ -7,22 +7,48 @@ on:
       - main
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
   FLUTTER_VERSION: "3.38.5"
   FRB_CODEGEN_VERSION: "2.12.0"
 
+# Every job runs `scripts/run-gate.sh <subcommand>` so contributors can
+# reproduce the exact gate locally. See docs/agents/testing.md.
 jobs:
-  test-rust:
-    name: test-rust
+  gate-rust-lint:
+    name: gate · rust lint
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: ./.github/actions/flutter-frb-setup
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          rust-components: rustfmt, clippy
+          link-rust-builder: "false"
+          run-frb-codegen: "false"
+          run-build-runner: "false"
+          run-pub-get: "false"
+
+      - name: Check Rust formatting and Clippy
+        run: bash scripts/run-gate.sh rust-lint
+
+  gate-rust-test:
+    name: gate · rust test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
@@ -32,73 +58,60 @@ jobs:
           run-pub-get: "false"
 
       - name: Run Rust workspace tests
-        run: cargo test --manifest-path core/Cargo.toml
+        run: bash scripts/run-gate.sh rust-test
 
-  analyze:
-    name: analyze
+  gate-codegen-drift:
+    name: gate · codegen drift
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: ./.github/actions/flutter-frb-setup
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          install-frb-codegen: "true"
+          run-frb-codegen: "false"
+          run-build-runner: "false"
+
+      - name: Check codegen drift
+        run: bash scripts/run-gate.sh codegen-drift
+
+  gate-dart-static:
+    name: gate · dart static
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
           run-build-runner: "true"
 
-      - name: Verify formatting
-        working-directory: app
-        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Check Dart formatting and analysis
+        run: bash scripts/run-gate.sh dart-static
 
-      - name: Analyze
-        working-directory: app
-        run: flutter analyze
-
-  test-unit:
-    name: test-unit
+  gate-dart-test:
+    name: gate · dart test (hard manifest)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: ./.github/actions/flutter-frb-setup
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
           run-build-runner: "true"
 
-      - name: Run unit tests
-        working-directory: app
-        # Hard gate: domain/core/layout + data (FRB thin edge) + promoted fast UI.
-        # See docs/agents/testing.md dual-track promotion checklist.
-        run: >
-          flutter test
-          test/domain
-          test/core
-          test/data
-          test/project_layout_test.dart
-          test/ui/core/widgets/actions/destructive_filled_button_test.dart
-          test/ui/core/widgets/overlays/dialog/confirm
-          test/ui/features/metadata/views/metadata_page/named_facet_fill_viewport_test.dart
-          test/ui/features/reader/reader_viewport_pages_test.dart
-          test/ui/features/reader/reader_open_error_message_test.dart
-          test/ui/features/reader/views/reader_page/reader_chrome_layout_test.dart
-
-  test-widget:
-    name: test-widget (soft)
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: ./.github/actions/flutter-frb-setup
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
-          run-build-runner: "true"
-
-      - name: Run widget smoke test
-        working-directory: app
-        run: flutter test test/widget_test.dart
+      - name: Run Dart hard-gate tests
+        run: bash scripts/run-gate.sh dart-test

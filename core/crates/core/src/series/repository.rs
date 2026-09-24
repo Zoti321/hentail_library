@@ -6,8 +6,7 @@ use sea_orm::{
 };
 
 use crate::comic::{
-    load_comics_ordered, search_comic_ids_by_tag_expression, ComicDto,
-    PageRequestDto,
+    load_comics_ordered, search_comic_ids_by_tag_expression, ComicDto, PageRequestDto,
 };
 use crate::db::{connection, map_db_err};
 use crate::entity::{prelude::*, series, series_items};
@@ -171,11 +170,8 @@ async fn count_filtered_series(
     filter: &SeriesFilterDto,
 ) -> Result<i64, HentaiError> {
     let query = build_count_query(filter);
-    let stmt = Statement::from_sql_and_values(
-        sea_orm::DatabaseBackend::Sqlite,
-        query.sql,
-        query.values,
-    );
+    let stmt =
+        Statement::from_sql_and_values(sea_orm::DatabaseBackend::Sqlite, query.sql, query.values);
     let row = db
         .query_one(stmt)
         .await
@@ -236,8 +232,7 @@ pub async fn fetch_series_comics_page(
         });
     }
     let offset = (effective_page - 1) * page_size;
-    let id_orders =
-        query_series_comic_id_orders_page(&db, series_id, page_size, offset).await?;
+    let id_orders = query_series_comic_id_orders_page(&db, series_id, page_size, offset).await?;
     let comic_ids: Vec<String> = id_orders.iter().map(|(id, _, _)| id.clone()).collect();
     let order_by_id: HashMap<String, (f64, bool)> = id_orders
         .into_iter()
@@ -399,8 +394,8 @@ fn interpolate_reordered_values(members: &[ReorderMember]) -> Vec<f64> {
     // 首锚点之前：向下外推，保持 < 首锚点值且严格递增。
     let first = anchor_indices[0];
     let first_value = members[first].sort_order;
-    for j in 0..first {
-        result[j] = first_value - (first - j) as f64;
+    for (j, slot) in result.iter_mut().enumerate().take(first) {
+        *slot = first_value - (first - j) as f64;
     }
 
     // 相邻锚点之间：线性夹缝插值。
@@ -497,78 +492,6 @@ pub async fn set_series_items_order(
     Ok(())
 }
 
-#[cfg(test)]
-mod reorder_interpolation_tests {
-    use super::{interpolate_reordered_values, ReorderMember};
-
-    fn member(comic_id: &str, sort_order: f64, locked: bool) -> ReorderMember {
-        ReorderMember {
-            comic_id: comic_id.to_string(),
-            sort_order,
-            locked,
-        }
-    }
-
-    fn assert_strictly_increasing(values: &[f64]) {
-        for pair in values.windows(2) {
-            assert!(
-                pair[1] > pair[0],
-                "expected strictly increasing, got {pair:?}"
-            );
-        }
-    }
-
-    #[test]
-    fn all_unlocked_gets_baseline_numbering() {
-        let members = vec![
-            member("c1", 5.0, false),
-            member("c2", 9.0, false),
-            member("c3", 2.0, false),
-        ];
-        let values = interpolate_reordered_values(&members);
-        assert_eq!(values, vec![1.0, 2.0, 3.0]);
-    }
-
-    #[test]
-    fn keeps_locked_anchor_values_when_order_unchanged() {
-        // c1 locked@1.0, c3 locked@3.0 stay; unlocked c2 interpolates between.
-        let members = vec![
-            member("c1", 1.0, true),
-            member("c2", 7.0, false),
-            member("c3", 3.0, true),
-        ];
-        let values = interpolate_reordered_values(&members);
-        assert_eq!(values[0], 1.0);
-        assert_eq!(values[2], 3.0);
-        assert!(values[1] > 1.0 && values[1] < 3.0);
-        assert_strictly_increasing(&values);
-    }
-
-    #[test]
-    fn locked_relative_reorder_reassigns_incompatible_anchor() {
-        // New order puts higher-valued locked member first; the second locked
-        // member is incompatible and must be reassigned above it.
-        let members = vec![member("b", 2.0, true), member("a", 1.0, true)];
-        let values = interpolate_reordered_values(&members);
-        assert_eq!(values[0], 2.0);
-        assert!(values[1] > 2.0);
-        assert_strictly_increasing(&values);
-    }
-
-    #[test]
-    fn unlocked_before_first_anchor_extrapolates_below() {
-        let members = vec![
-            member("c1", 0.0, false),
-            member("c2", 0.0, false),
-            member("c3", 5.0, true),
-        ];
-        let values = interpolate_reordered_values(&members);
-        assert_eq!(values[2], 5.0);
-        assert!(values[0] < 5.0 && values[1] < 5.0);
-        assert_strictly_increasing(&values);
-    }
-}
-
 pub async fn search_series_by_keyword(keyword: &str) -> Result<Vec<SeriesDto>, HentaiError> {
     let q = keyword.trim().to_lowercase();
     if q.is_empty() {
@@ -627,14 +550,13 @@ async fn series_exists(db: &DatabaseConnection, series_id: &str) -> Result<bool,
         .map(|row| row.is_some())
 }
 
-async fn count_series_items(
-    db: &DatabaseConnection,
-    series_id: &str,
-) -> Result<i64, HentaiError> {
+async fn count_series_items(db: &DatabaseConnection, series_id: &str) -> Result<i64, HentaiError> {
     let stmt = Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "SELECT COUNT(*) FROM series_items WHERE series_id = ?",
-        vec![sea_orm::Value::String(Some(Box::new(series_id.to_string())))],
+        vec![sea_orm::Value::String(Some(Box::new(
+            series_id.to_string(),
+        )))],
     );
     let row = db
         .query_one(stmt)
@@ -654,7 +576,9 @@ async fn query_all_series_comic_ids(
         "SELECT comic_id FROM series_items \
          WHERE series_id = ? \
          ORDER BY sort_order ASC, comic_id ASC",
-        vec![sea_orm::Value::String(Some(Box::new(series_id.to_string())))],
+        vec![sea_orm::Value::String(Some(Box::new(
+            series_id.to_string(),
+        )))],
     );
     let rows = db.query_all(stmt).await.map_err(map_db_err)?;
     rows.into_iter()
@@ -744,7 +668,9 @@ async fn query_series_author_names(
          INNER JOIN comic_authors ca ON ca.comic_id = si.comic_id \
          WHERE si.series_id = ? \
          ORDER BY ca.author_name ASC",
-        vec![sea_orm::Value::String(Some(Box::new(series_id.to_string())))],
+        vec![sea_orm::Value::String(Some(Box::new(
+            series_id.to_string(),
+        )))],
     );
     query_string_column(db, stmt).await
 }
@@ -760,7 +686,9 @@ async fn query_series_tag_names(
          INNER JOIN comic_tags ct ON ct.comic_id = si.comic_id \
          WHERE si.series_id = ? \
          ORDER BY ct.tag_name ASC",
-        vec![sea_orm::Value::String(Some(Box::new(series_id.to_string())))],
+        vec![sea_orm::Value::String(Some(Box::new(
+            series_id.to_string(),
+        )))],
     );
     query_string_column(db, stmt).await
 }
@@ -777,7 +705,9 @@ async fn query_series_has_r18(
            INNER JOIN comic_meta cm ON cm.comic_id = si.comic_id \
            WHERE si.series_id = ? AND cm.content_rating = 'r18' \
          )",
-        vec![sea_orm::Value::String(Some(Box::new(series_id.to_string())))],
+        vec![sea_orm::Value::String(Some(Box::new(
+            series_id.to_string(),
+        )))],
     );
     let row = db
         .query_one(stmt)
@@ -849,16 +779,11 @@ async fn load_series_by_ids(
                     serialization_status: row.serialization_status_locked,
                     total_count: row.total_count_locked,
                 },
-                items: items_by_series
-                    .remove(&row.series_id)
-                    .unwrap_or_default(),
+                items: items_by_series.remove(&row.series_id).unwrap_or_default(),
             },
         );
     }
-    Ok(ids
-        .into_iter()
-        .filter_map(|id| by_id.remove(&id))
-        .collect())
+    Ok(ids.into_iter().filter_map(|id| by_id.remove(&id)).collect())
 }
 
 pub async fn load_home_series_comic_order_map() -> Result<HashMap<String, f64>, HentaiError> {
@@ -866,7 +791,10 @@ pub async fn load_home_series_comic_order_map() -> Result<HashMap<String, f64>, 
     let rows = SeriesItems::find().all(&db).await.map_err(map_db_err)?;
     let mut map = HashMap::new();
     for row in rows {
-        map.insert(format!("{}|{}", row.series_id, row.comic_id), row.sort_order);
+        map.insert(
+            format!("{}|{}", row.series_id, row.comic_id),
+            row.sort_order,
+        );
     }
     Ok(map)
 }
@@ -880,4 +808,76 @@ pub async fn watch_home_series_comic_order_map(
         emit(load_home_series_comic_order_map().await?)?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod reorder_interpolation_tests {
+    use super::{interpolate_reordered_values, ReorderMember};
+
+    fn member(comic_id: &str, sort_order: f64, locked: bool) -> ReorderMember {
+        ReorderMember {
+            comic_id: comic_id.to_string(),
+            sort_order,
+            locked,
+        }
+    }
+
+    fn assert_strictly_increasing(values: &[f64]) {
+        for pair in values.windows(2) {
+            assert!(
+                pair[1] > pair[0],
+                "expected strictly increasing, got {pair:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn all_unlocked_gets_baseline_numbering() {
+        let members = vec![
+            member("c1", 5.0, false),
+            member("c2", 9.0, false),
+            member("c3", 2.0, false),
+        ];
+        let values = interpolate_reordered_values(&members);
+        assert_eq!(values, vec![1.0, 2.0, 3.0]);
+    }
+
+    #[test]
+    fn keeps_locked_anchor_values_when_order_unchanged() {
+        // c1 locked@1.0, c3 locked@3.0 stay; unlocked c2 interpolates between.
+        let members = vec![
+            member("c1", 1.0, true),
+            member("c2", 7.0, false),
+            member("c3", 3.0, true),
+        ];
+        let values = interpolate_reordered_values(&members);
+        assert_eq!(values[0], 1.0);
+        assert_eq!(values[2], 3.0);
+        assert!(values[1] > 1.0 && values[1] < 3.0);
+        assert_strictly_increasing(&values);
+    }
+
+    #[test]
+    fn locked_relative_reorder_reassigns_incompatible_anchor() {
+        // New order puts higher-valued locked member first; the second locked
+        // member is incompatible and must be reassigned above it.
+        let members = vec![member("b", 2.0, true), member("a", 1.0, true)];
+        let values = interpolate_reordered_values(&members);
+        assert_eq!(values[0], 2.0);
+        assert!(values[1] > 2.0);
+        assert_strictly_increasing(&values);
+    }
+
+    #[test]
+    fn unlocked_before_first_anchor_extrapolates_below() {
+        let members = vec![
+            member("c1", 0.0, false),
+            member("c2", 0.0, false),
+            member("c3", 5.0, true),
+        ];
+        let values = interpolate_reordered_values(&members);
+        assert_eq!(values[2], 5.0);
+        assert!(values[0] < 5.0 && values[1] < 5.0);
+        assert_strictly_increasing(&values);
+    }
 }

@@ -92,7 +92,12 @@ fn push_sqlite_text(values: &mut Vec<Value>, text: String) {
     values.push(Value::String(Some(Box::new(text))));
 }
 
-fn push_facet_eq(parts: &mut Vec<String>, values: &mut Vec<Value>, facet: ComicNameFacet, name: &str) {
+fn push_facet_eq(
+    parts: &mut Vec<String>,
+    values: &mut Vec<Value>,
+    facet: ComicNameFacet,
+    name: &str,
+) {
     parts.push(facet.exists_eq_sql().to_string());
     push_sqlite_text(values, name.to_string());
 }
@@ -130,7 +135,10 @@ fn push_facet_exclude_in(
 }
 
 /// Catalog page / count WHERE (AND-combined predicates).
-pub(super) fn build_catalog_where_clause(filter: &ComicFilterDto, values: &mut Vec<Value>) -> String {
+pub(super) fn build_catalog_where_clause(
+    filter: &ComicFilterDto,
+    values: &mut Vec<Value>,
+) -> String {
     let mut parts = vec!["1=1".to_string()];
     if let Some(library_id) = &filter.library_id {
         parts.push("c.library_id = ?".to_string());
@@ -174,7 +182,12 @@ pub(super) fn build_catalog_where_clause(filter: &ComicFilterDto, values: &mut V
         push_facet_eq(&mut parts, values, ComicNameFacet::Tag, tag);
     }
     push_facet_any_in(&mut parts, values, ComicNameFacet::Tag, &filter.tags_any);
-    push_facet_exclude_in(&mut parts, values, ComicNameFacet::Tag, &filter.tags_exclude);
+    push_facet_exclude_in(
+        &mut parts,
+        values,
+        ComicNameFacet::Tag,
+        &filter.tags_exclude,
+    );
     for author in &filter.authors_all {
         push_facet_eq(&mut parts, values, ComicNameFacet::Author, author);
     }
@@ -353,8 +366,7 @@ mod tests {
             },
             &mut catalog_values,
         );
-        let (search, _) =
-            build_metadata_expression_predicate_sql(&["solo".to_string()], &[], &[]);
+        let (search, _) = build_metadata_expression_predicate_sql(&["solo".to_string()], &[], &[]);
         assert!(catalog.contains(ComicNameFacet::Tag.exists_eq_sql()));
         assert!(search.contains(ComicNameFacet::Tag.exists_eq_sql()));
     }

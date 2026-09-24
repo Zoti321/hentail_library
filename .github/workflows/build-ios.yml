@@ -59,7 +59,7 @@ jobs:
             rm -f "$manifest"
           done
 
-      - uses: ./.github/actions/flutter-frb-setup
+      - uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}

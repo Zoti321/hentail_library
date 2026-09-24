@@ -62,24 +62,18 @@ fn fetch_reading_page_returns_descending_pages() {
         runtime.block_on(async {
             seed_histories().await;
 
-            let page1 = fetch_reading_page(1, 2, None)
-                .await
-                .expect("page1");
+            let page1 = fetch_reading_page(1, 2, None).await.expect("page1");
             assert_eq!(page1.total_count, 5);
             assert_eq!(page1.items.len(), 2);
             assert_eq!(page1.items[0].comic_id, "c1");
             assert_eq!(page1.items[1].comic_id, "c2");
 
-            let page2 = fetch_reading_page(2, 2, None)
-                .await
-                .expect("page2");
+            let page2 = fetch_reading_page(2, 2, None).await.expect("page2");
             assert_eq!(page2.items.len(), 2);
             assert_eq!(page2.items[0].comic_id, "c3");
             assert_eq!(page2.items[1].comic_id, "c4");
 
-            let page3 = fetch_reading_page(3, 2, None)
-                .await
-                .expect("page3");
+            let page3 = fetch_reading_page(3, 2, None).await.expect("page3");
             assert_eq!(page3.items.len(), 1);
             assert_eq!(page3.items[0].comic_id, "c5");
         });

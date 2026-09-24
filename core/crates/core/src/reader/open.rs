@@ -78,9 +78,8 @@ pub fn load_page_bytes(
         ));
     }
     let _ = path; // kept for API symmetry with open/list; bytes come from session
-    let page_index = usize::try_from(page_index).map_err(|_| {
-        HentaiError::reader_invalid_content(format!("页索引无效: {page_index}"))
-    })?;
+    let page_index = usize::try_from(page_index)
+        .map_err(|_| HentaiError::reader_invalid_content(format!("页索引无效: {page_index}")))?;
     with_session(comic_id, |backend| match backend {
         ReaderBackend::Dir(_) => Err(HentaiError::reader_invalid_content(
             "目录资源请通过 dir_page_paths 读取文件",

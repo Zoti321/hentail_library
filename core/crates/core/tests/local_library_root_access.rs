@@ -2,8 +2,9 @@ use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
 use hentai_core::{
-    comic_id_from_path, create_local_library, find_comic_by_id, init_db_at_path, set_current_library_id,
-    sync_library, SyncLibraryPhaseDto, SyncLibraryProgressDto, SyncScanMode, create_sync_handle,
+    comic_id_from_path, create_local_library, create_sync_handle, find_comic_by_id,
+    init_db_at_path, set_current_library_id, sync_library, SyncLibraryPhaseDto,
+    SyncLibraryProgressDto, SyncScanMode,
 };
 use sea_orm::{ConnectionTrait, Database, Statement};
 use tempfile::TempDir;
@@ -82,14 +83,9 @@ fn local_sync_missing_root_ends_with_warning_not_silent_empty_align() {
 
             let handle = create_sync_handle();
             let mut events = Vec::new();
-            sync_library(
-                handle,
-                SyncScanMode::Full,
-                false,
-                None,
-                vec![],
-                |p| events.push(p),
-            )
+            sync_library(handle, SyncScanMode::Full, false, None, vec![], |p| {
+                events.push(p)
+            })
             .await
             .expect("sync");
 
@@ -141,14 +137,9 @@ fn local_sync_unreadable_root_keeps_existing_comics() {
 
             let handle = create_sync_handle();
             let mut events = Vec::new();
-            sync_library(
-                handle,
-                SyncScanMode::Full,
-                false,
-                None,
-                vec![],
-                |p| events.push(p),
-            )
+            sync_library(handle, SyncScanMode::Full, false, None, vec![], |p| {
+                events.push(p)
+            })
             .await
             .expect("second sync");
 

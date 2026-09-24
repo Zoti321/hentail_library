@@ -22,14 +22,18 @@ fn with_global_db(test: impl FnOnce()) {
 }
 
 async fn stamp_fixture_to_current_library(db: &DatabaseConnection) {
-    let lib = create_local_library("C:/漫画", None).await.expect("library");
+    let lib = create_local_library("C:/漫画", None)
+        .await
+        .expect("library");
     set_current_library_id(Some(&lib.library_id))
         .await
         .expect("current");
     db.execute(Statement::from_sql_and_values(
         sea_orm::DatabaseBackend::Sqlite,
         "UPDATE comics SET library_id = ?",
-        [sea_orm::Value::String(Some(Box::new(lib.library_id.clone())))],
+        [sea_orm::Value::String(Some(Box::new(
+            lib.library_id.clone(),
+        )))],
     ))
     .await
     .expect("stamp comics");
@@ -171,7 +175,9 @@ fn fetch_series_page_hides_r18_series_by_default() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
-            rebuild_series_from_comics(&db, None).await.expect("rebuild series");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild series");
             stamp_fixture_to_current_library(&db).await;
             use hentai_core::{fetch_series_page, SeriesFilterDto, SeriesSortOptionDto};
             let page = fetch_series_page(
@@ -193,9 +199,9 @@ fn fetch_series_page_hides_r18_series_by_default() {
             .expect("page");
             assert!(page.total_count >= 1);
             assert!(page.items.iter().all(|s| {
-                !s.items.iter().any(|i| {
-                    i.comic_id == "e931fd412112e427f7335e127af79c8b0f87887b"
-                })
+                !s.items
+                    .iter()
+                    .any(|i| i.comic_id == "e931fd412112e427f7335e127af79c8b0f87887b")
             }));
         });
     });
@@ -210,7 +216,9 @@ fn fetch_series_page_returns_series_with_items() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
-            rebuild_series_from_comics(&db, None).await.expect("rebuild series");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild series");
             stamp_fixture_to_current_library(&db).await;
             use hentai_core::{fetch_series_page, SeriesFilterDto, SeriesSortOptionDto};
             let page = fetch_series_page(
@@ -231,9 +239,10 @@ fn fetch_series_page_returns_series_with_items() {
             .await
             .expect("page");
             assert!(page.total_count >= 1);
-            assert!(page.items.iter().any(|s| s.items.iter().any(|i| {
-                i.comic_id == "af738b6b1b3bbfab9a0fd591459572509d7ef4d5"
-            })));
+            assert!(page.items.iter().any(|s| s
+                .items
+                .iter()
+                .any(|i| { i.comic_id == "af738b6b1b3bbfab9a0fd591459572509d7ef4d5" })));
         });
     });
 }
@@ -247,7 +256,9 @@ fn fetch_series_comics_page_returns_ordered_comics() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
-            rebuild_series_from_comics(&db, None).await.expect("rebuild series");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild series");
             stamp_fixture_to_current_library(&db).await;
             use hentai_core::{
                 fetch_series_comics_metadata, fetch_series_comics_page, fetch_series_page,
@@ -274,9 +285,9 @@ fn fetch_series_comics_page_returns_ordered_comics() {
                 .items
                 .iter()
                 .find(|s| {
-                    s.items.iter().any(|i| {
-                        i.comic_id == "86408880d30b0de95ca959feb60a3b72dcb1889b"
-                    })
+                    s.items
+                        .iter()
+                        .any(|i| i.comic_id == "86408880d30b0de95ca959feb60a3b72dcb1889b")
                 })
                 .map(|s| s.series_id.clone())
                 .expect("series with author comic");
@@ -310,9 +321,9 @@ fn fetch_series_comics_page_returns_ordered_comics() {
                 .items
                 .iter()
                 .find(|s| {
-                    s.items.iter().any(|i| {
-                        i.comic_id == "e931fd412112e427f7335e127af79c8b0f87887b"
-                    })
+                    s.items
+                        .iter()
+                        .any(|i| i.comic_id == "e931fd412112e427f7335e127af79c8b0f87887b")
                 })
                 .map(|s| s.series_id.clone())
                 .expect("series with r18 comic");
@@ -333,7 +344,9 @@ fn fetch_series_page_random_order_varies_between_queries() {
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
-            rebuild_series_from_comics(&db, None).await.expect("rebuild series");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild series");
             stamp_fixture_to_current_library(&db).await;
             use hentai_core::{
                 fetch_series_page, SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto,
@@ -363,8 +376,7 @@ fn fetch_series_page_random_order_varies_between_queries() {
                 .await
                 .expect("page random");
                 assert!(page.total_count >= 2);
-                let ids: Vec<String> =
-                    page.items.iter().map(|s| s.series_id.clone()).collect();
+                let ids: Vec<String> = page.items.iter().map(|s| s.series_id.clone()).collect();
                 orders.insert(ids);
             }
             assert!(

@@ -50,7 +50,10 @@ fn compute_dir_image_files_size(
     Ok(Some(total))
 }
 
-pub fn read_source_stat(path: &Path, resource_type: &str) -> Result<Option<(i64, i64)>, HentaiError> {
+pub fn read_source_stat(
+    path: &Path,
+    resource_type: &str,
+) -> Result<Option<(i64, i64)>, HentaiError> {
     read_source_stat_with(local_access(), &path.to_string_lossy(), resource_type)
 }
 
