@@ -58,4 +58,18 @@ void main() {
       expect(actualNames, expectedNames);
     });
   });
+
+  group('UI presentation layout (ADR-0017)', () {
+    test('features keep ViewModels under view_models/, not state/', () {
+      final List<String> stateDirs = <String>['lib', 'test']
+          .map((String root) => Directory(p.join(root, 'ui', 'features')))
+          .where((Directory dir) => dir.existsSync())
+          .expand((Directory dir) => dir.listSync(recursive: true))
+          .whereType<Directory>()
+          .where((Directory dir) => p.basename(dir.path) == 'state')
+          .map((Directory dir) => p.posix.joinAll(p.split(dir.path)))
+          .toList();
+      expect(stateDirs, isEmpty);
+    });
+  });
 }

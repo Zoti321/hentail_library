@@ -7,8 +7,8 @@ import 'package:hentai_library/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/domain/library/scan_interval.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
-import 'package:hentai_library/ui/features/shell/state/library_reorder_mode.dart';
+import 'package:hentai_library/ui/features/shell/view_models/current_library_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_reorder_mode_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_sidebar_reorder_pane.dart';
 import 'package:riverpod/misc.dart' show Override;
 

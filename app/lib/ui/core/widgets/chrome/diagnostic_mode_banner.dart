@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/settings/state/diagnostic_mode_notifier.dart';
+import 'package:hentai_library/ui/features/settings/view_models/diagnostic_mode_notifier.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class DiagnosticModeBanner extends ConsumerWidget {

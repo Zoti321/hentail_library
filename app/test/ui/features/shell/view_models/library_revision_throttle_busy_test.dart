@@ -1,4 +1,4 @@
-import 'package:hentai_library/ui/features/shell/state/library_revision_throttle_busy.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_throttle_busy.dart';
 import 'package:test/test.dart';
 
 void main() {

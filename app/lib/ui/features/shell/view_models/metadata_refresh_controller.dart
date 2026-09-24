@@ -3,7 +3,7 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/domain/library/metadata_refresh_types.dart';
 import 'package:hentai_library/ui/features/shell/di/metadata_refresh.dart';
-import 'package:hentai_library/ui/features/shell/state/scan_library_controller.dart';
+import 'package:hentai_library/ui/features/shell/view_models/scan_library_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'metadata_refresh_controller.freezed.dart';

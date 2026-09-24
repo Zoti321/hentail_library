@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:riverpod/riverpod.dart';
 import 'package:hentai_library/domain/ports/library_revision_port.dart';
 import 'package:hentai_library/ui/features/shell/di/ports.dart';
-import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
 
@@ -17,7 +17,7 @@ class _FakeLibraryRevisionPort implements LibraryRevisionPort {
 }
 
 void main() {
-  group('LibraryRevision', () {
+  group('LibraryRevisionNotifier', () {
     test('starts at revision 0 before first emit', () {
       final StreamController<void> events = StreamController<void>.broadcast();
       final ProviderContainer container = ProviderContainer(

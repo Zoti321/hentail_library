@@ -9,7 +9,7 @@ import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
 import 'package:hentai_library/ui/features/library/view_models/smart_facet_match_preference_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
-import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/current_library_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Scope for Smart facet match on Comic metadata form.

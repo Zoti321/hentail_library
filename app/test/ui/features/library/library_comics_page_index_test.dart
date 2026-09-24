@@ -15,7 +15,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_query_int
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
-import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
 
@@ -30,7 +30,7 @@ final _comicsSortRevisionProvider = NotifierProvider<_ComicsSortRevision, int>(
   _ComicsSortRevision.new,
 );
 
-class _FakeLibraryRevision extends LibraryRevision {
+class _FakeLibraryRevision extends LibraryRevisionNotifier {
   @override
   LibraryRevisionState build() {
     return const LibraryRevisionState(revision: 1, hasReceivedFirstEmit: true);

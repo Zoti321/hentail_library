@@ -1,5 +1,5 @@
 import 'package:hentai_library/core/l10n/app_localizations_zh.dart';
-import 'package:hentai_library/ui/features/shell/state/metadata_refresh_toasts.dart';
+import 'package:hentai_library/ui/features/shell/view_models/metadata_refresh_toasts.dart';
 import 'package:test/test.dart';
 
 void main() {

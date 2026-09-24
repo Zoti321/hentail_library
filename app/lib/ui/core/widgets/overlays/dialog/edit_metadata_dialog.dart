@@ -33,7 +33,7 @@ import 'package:hentai_library/ui/features/library/view_models/comic_metadata_sm
 import 'package:hentai_library/ui/features/library/view_models/series_item_sort_persist.dart';
 import 'package:hentai_library/ui/features/library/view_models/smart_facet_match_preference_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

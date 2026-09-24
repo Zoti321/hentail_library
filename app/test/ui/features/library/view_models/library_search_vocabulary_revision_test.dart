@@ -13,8 +13,8 @@ import 'package:hentai_library/ui/features/library/view_models/library_search_pa
 import 'package:hentai_library/ui/features/library/view_models/library_search_query_parser.dart';
 import 'package:hentai_library/ui/features/shell/di/ports.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
-import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
-import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/current_library_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:test/test.dart';

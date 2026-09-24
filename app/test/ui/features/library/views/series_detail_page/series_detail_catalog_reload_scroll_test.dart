@@ -14,7 +14,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_page_snap
 import 'package:hentai_library/ui/features/library/view_models/series_detail_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_comics_catalog_state.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
-import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 
 /// Mirrors [SeriesDetail._buildComicsSection]'s AsyncValue.when usage.
@@ -53,7 +53,7 @@ class _SeriesDetailCatalogWhenHarness extends StatelessWidget {
   }
 }
 
-class _ControllableLibraryRevision extends LibraryRevision {
+class _ControllableLibraryRevision extends LibraryRevisionNotifier {
   @override
   LibraryRevisionState build() {
     return const LibraryRevisionState(revision: 1, hasReceivedFirstEmit: true);

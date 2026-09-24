@@ -6,7 +6,7 @@ import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/domain/repositories/app_setting_repository.dart';
 import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
-import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/current_library_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:riverpod/riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';

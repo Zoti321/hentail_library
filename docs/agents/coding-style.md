@@ -30,7 +30,7 @@ Presentation layer follows **MVVM with Riverpod** (ADR-0017). State management i
 **Hard rules**
 
 - **View must not call Repository** — no `*RepoProvider` in `views/` or `ui/core/widgets/`. Shared widgets use constructor callbacks; feature pages delegate to ViewModel.
-- **ViewModel lives under `view_models/`** — do not add new `state/` directories (migrate existing when touching a feature).
+- **ViewModel lives under `view_models/`** — `state/` directories are gone (e.g. `shell/view_models/current_library_notifier.dart`, `settings/view_models/diagnostic_mode_notifier.dart`); `test/project_layout_test.dart` fails if one reappears under `ui/features/`.
 - **Complex pages** may keep internal intent→derive chains; expose a **Facade Provider** to the page root. Leaf widgets may still `select` fine-grained fields.
 
 **Class naming**

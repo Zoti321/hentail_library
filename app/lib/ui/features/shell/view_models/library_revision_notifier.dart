@@ -34,7 +34,7 @@ class LibraryRevisionState {
 const Object _unsetStreamError = Object();
 
 @Riverpod(keepAlive: true)
-class LibraryRevision extends _$LibraryRevision {
+class LibraryRevisionNotifier extends _$LibraryRevisionNotifier {
   StreamSubscription<void>? _subscription;
 
   @override

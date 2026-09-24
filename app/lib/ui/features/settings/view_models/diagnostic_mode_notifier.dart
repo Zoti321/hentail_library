@@ -5,7 +5,7 @@ part 'diagnostic_mode_notifier.g.dart';
 
 /// 详细诊断开关：仅内存状态，冷启动自动恢复为关闭（ADR-0004）。
 @Riverpod(keepAlive: true)
-class DiagnosticMode extends _$DiagnosticMode {
+class DiagnosticModeNotifier extends _$DiagnosticModeNotifier {
   @override
   bool build() => false;
 

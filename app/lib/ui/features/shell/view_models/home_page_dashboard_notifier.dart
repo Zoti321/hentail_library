@@ -2,7 +2,7 @@ import 'package:hentai_library/domain/models/read_models/home_page_read_models.d
 import 'package:hentai_library/domain/repositories/home_page_repository.dart';
 import 'package:hentai_library/ui/core/dto/history_grid_item.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/state/library_revision_throttle_busy.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_throttle_busy.dart';
 import 'package:hentai_library/ui/features/shell/view_models/stream_throttle.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

@@ -5,7 +5,7 @@ import 'package:hentai_library/core/util/semver_utils.dart';
 import 'package:hentai_library/data/services/app_update/app_update_service.dart';
 import 'package:hentai_library/domain/models/app_release_info.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/app_update_dialog.dart';
-import 'package:hentai_library/ui/features/settings/state/app_update_controller.dart';
+import 'package:hentai_library/ui/features/settings/view_models/app_update_controller.dart';
 import 'package:hentai_library/ui/features/shell/di/services.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:riverpod/misc.dart' show Override;

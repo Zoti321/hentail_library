@@ -3,7 +3,7 @@ import 'package:hentai_library/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
-import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

@@ -6,8 +6,8 @@ import 'package:hentai_library/domain/library/library_scan_scheduler.dart';
 import 'package:hentai_library/domain/library/scan_interval.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
-import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
-import 'package:hentai_library/ui/features/shell/state/scan_library_controller.dart';
+import 'package:hentai_library/ui/features/shell/view_models/current_library_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/scan_library_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_startup_coordinator_notifier.g.dart';

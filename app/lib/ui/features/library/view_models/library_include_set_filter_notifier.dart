@@ -1,5 +1,5 @@
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
-import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/current_library_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_include_set_filter_notifier.g.dart';

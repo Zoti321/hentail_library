@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LibraryReorderMode extends Notifier<bool> {
+class LibraryReorderModeNotifier extends Notifier<bool> {
   @override
   bool build() => false;
 
@@ -13,6 +13,7 @@ class LibraryReorderMode extends Notifier<bool> {
   }
 }
 
-final libraryReorderModeProvider = NotifierProvider<LibraryReorderMode, bool>(
-  LibraryReorderMode.new,
-);
+final libraryReorderModeProvider =
+    NotifierProvider<LibraryReorderModeNotifier, bool>(
+      LibraryReorderModeNotifier.new,
+    );
