@@ -30,13 +30,14 @@ void main() {
       expect(entries.toSet().length, entries.length);
     });
 
-    test('covers the thin-edge seams, layout and app smoke', () {
+    test('covers the thin-edge seams, FRB wire, layout and app smoke', () {
       expect(
         readGateManifestEntries(),
         containsAll(<String>[
           'test/domain',
           'test/core',
           'test/data',
+          'test/frb_wire',
           'test/project_layout_test.dart',
           'test/widget_test.dart',
         ]),

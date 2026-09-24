@@ -9,6 +9,9 @@ test/domain
 test/core
 test/data
 
+# FRB 线缝冒烟（真实 cdylib；run-gate.sh dart-test 会先 cargo build）
+test/frb_wire
+
 # Monorepo layout
 test/project_layout_test.dart
 

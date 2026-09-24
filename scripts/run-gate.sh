@@ -17,7 +17,7 @@ usage() {
   rust-test       cargo test（core/ workspace）
   codegen-drift   FRB generate + build_runner，随后检查 git 工作区无漂移
   dart-static     dart format --set-exit-if-changed + flutter analyze
-  dart-test       flutter test ← app/test/gate/manifest.txt
+  dart-test       cargo build hentai_flutter（FRB 线缝用）+ flutter test ← app/test/gate/manifest.txt
   all             以上全部
 
 示例:
@@ -75,6 +75,7 @@ run_dart_test() {
     echo "gate manifest 为空: $GATE_MANIFEST" >&2
     return 1
   fi
+  cargo build --manifest-path "$CORE_MANIFEST" -p hentai_flutter
   (cd "$APP_DIR" && flutter test "${entries[@]}")
 }
 

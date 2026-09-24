@@ -1,12 +1,26 @@
-# Testing guide（CI vs 本地 · FRB 薄边 · UI 双轨）
+# Testing guide（Gate tier · 三层缝 · UI 双轨）
 
-单一事实来源：PR 硬门禁保证什么、本地还应跑什么、Dart data 测什么、UI 快/慢轨如何晋升。对齐 ADR-0002（业务在 Rust `cargo test`；Dart 测 UI + FRB 薄边）。
+单一事实来源：PR 硬门禁保证什么、本地还应跑什么、Dart data 测什么、UI 快/慢轨如何晋升。决策依据见 **ADR-0018**（三层缝 + CI tier 命名）与 ADR-0002（业务在 Rust `cargo test`；Dart 测 UI + FRB 薄边）。
+
+## 三层缝
+
+| 缝 | 断言什么 | 位置 | Job |
+|----|----------|------|-----|
+| Rust 业务真值缝 | sync / reader / DB / path migration 业务行为 | `core/`（`tests/common/` harness） | `gate-rust-test` |
+| FRB 线缝 | `RustLib.init` 加载真实 cdylib；sync / async / 错误 DTO 跨线缝可通 | `app/test/frb_wire/` | `gate-dart-test` |
+| Dart 薄边缝 | mapper / guard / adapter、domain / core 纯逻辑 | `app/test/{domain,core,data}/` | `gate-dart-test` |
+| UI 双轨 | 快轨 = Dart hard-manifest UI；慢轨 = Dart slow-track UI | `app/test/ui/` | `gate-dart-test` / `nightly-dart-ui` |
 
 ## CI tier 命名
+
+Job id 形如 `{tier}-{domain}-{intent}`（词汇表见 ADR-0018）。
 
 | Tier | Workflow | Job 前缀 | 是否挡合并 |
 |------|----------|----------|------------|
 | **Gate** | `ci.yml`（name: `Gate`） | `gate-*` | 是：PR 绿 = 全部 `gate-*` 已过 |
+| **Watch** | 手动 / 发布触发 | `watch-*` | 否（平台级冒烟） |
+| **Nightly** | 定时 / `workflow_dispatch` | `nightly-*` | 否 |
+| **Release** | `release.yml` | `release-*` | 发布流水线专用 |
 
 所有 `gate-*` job 都只调用 `scripts/run-gate.sh <子命令>`，本地与 CI 命令同源。Composite action 统一为 `.github/actions/setup-flutter-frb`。
 
@@ -18,13 +32,13 @@
 | `gate-rust-test` | `./scripts/run-gate.sh rust-test` | `cargo test --manifest-path core/Cargo.toml` | Rust 核心（sync / reader / DB）回归 |
 | `gate-codegen-drift` | `./scripts/run-gate.sh codegen-drift` | FRB generate + build_runner，随后 `git status` 须干净 | 提交的生成产物与源码不一致 |
 | `gate-dart-static` | `./scripts/run-gate.sh dart-static` | `dart format --set-exit-if-changed lib test` + `flutter analyze` | Dart 格式 / 静态分析 |
-| `gate-dart-test` | `./scripts/run-gate.sh dart-test` | `flutter test` ← `app/test/gate/manifest.txt` | manifest 内硬门禁 Dart 测试 |
+| `gate-dart-test` | `./scripts/run-gate.sh dart-test` | `cargo build -p hentai_flutter` + `flutter test` ← `app/test/gate/manifest.txt` | manifest 内硬门禁 Dart 测试（含 FRB 线缝） |
 
 `./scripts/run-gate.sh`（无参数）按顺序跑全部；可传多个子命令跑子集，如 `./scripts/run-gate.sh dart-static dart-test`。`codegen-drift` 会就地重生成产物，本地运行前请先提交或暂存改动。
 
 ### Gate manifest
 
-`app/test/gate/manifest.txt` 是 `gate-dart-test` 的**唯一**路径来源（每行一个相对 `app/` 的文件或目录，`#` 为注释）。它覆盖 domain / core / data 薄边、monorepo layout、app smoke（`test/widget_test.dart`）与已晋升快轨 UI。`test/gate/manifest_test.dart` 自检每条路径存在且无重复。
+`app/test/gate/manifest.txt` 是 `gate-dart-test` 的**唯一**路径来源（每行一个相对 `app/` 的文件或目录，`#` 为注释）。它覆盖 domain / core / data 薄边、FRB 线缝（`test/frb_wire`）、monorepo layout、app smoke（`test/widget_test.dart`）与已晋升快轨 UI。`test/gate/manifest_test.dart` 自检每条路径存在且无重复。
 
 新增 **data 契约测** 或 **已晋升的快轨 UI/纯逻辑测** 时：把路径加进 manifest（或把文件放进已列入的目录），并在 PR 说明中列出；不要另开 `continue-on-error` 软门禁冒充硬跑。
 
@@ -44,15 +58,16 @@ Gate **不会**跑全量 `test/ui`、不会跑 `integration_test`、不上 cover
 ## ADR-0002 测试含义
 
 - **信任 `cargo test`**：Library sync / 阅读 I/O / DB / series 业务行为以 Rust 集成为准。
-- **Dart data**：只测 FRB ↔ domain 的 **mapper / error·call guard / adapter**（见 `app/test/data/`）。**不要**对真 FRB 或 `*_repository_impl` 写集成测（避免第二套集成栈）。
+- **Dart data**：只测 FRB ↔ domain 的 **mapper / error·call guard / adapter**（见 `app/test/data/`）。**不要**对真 FRB 或 `*_repository_impl` 写全流程集成测（避免第二套集成栈）。
+- **FRB 线缝**：唯一碰真实 cdylib 的 Dart 测试，只保留 1–3 条直调 API 的冒烟（`app/test/frb_wire/`），不断言业务。新线缝测必须走 `frb_wire_harness.dart` 的 `initRustLibForWireTest()`；本地需先 `cargo build --manifest-path core/Cargo.toml -p hentai_flutter`（或设置 `HENTAI_FLUTTER_LIB` 指向动态库）。
 - **Dart UI**：widget / 交互；优先薄 smoke + 抽纯逻辑到 unit。
 
 ## UI 双轨（快硬 / 慢软）
 
 | 轨 | 进入条件 | CI |
 |----|----------|-----|
-| **快轨** | 低 timing、少 `pumpAndSettle`、无脆弱 viewport 尺寸依赖；优先纯逻辑 unit 或极薄 smoke | 可列入 gate manifest 硬门禁 |
-| **慢轨** | 大壳、侧栏、多断点 responsive、阅读器 viewport 手势/时序 | 仅本地；全量 `test/ui` **不进 Gate** |
+| **快轨**（Dart hard-manifest UI） | 低 timing、少 `pumpAndSettle`、无脆弱 viewport 尺寸依赖；优先纯逻辑 unit 或极薄 smoke | 列入 gate manifest 硬门禁 |
+| **慢轨**（Dart slow-track UI） | 大壳、侧栏、多断点 responsive、阅读器 viewport 手势/时序 | 本地 + `nightly-dart-ui`；全量 `test/ui` **不进 Gate** |
 
 ### 晋升快轨检查清单
 
