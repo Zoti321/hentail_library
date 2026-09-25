@@ -1,9 +1,10 @@
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
-import 'package:hentai_library/ui/features/metadata/view_models/named_facet_dictionary_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
+import 'package:hentai_library/ui/features/metadata/view_models/named_facet_dictionary_providers.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
+import 'package:hentai_library/ui/features/settings/view_models/metadata_auto_backup_coordinator_notifier.dart';
 import 'package:riverpod/misc.dart' show ProviderOrFamily;
 
 /// 按 [ComicMetadataApplySucceeded] 中实际写入的字典字段，使对应列表缓存失效。
@@ -34,6 +35,7 @@ Future<ComicMetadataApplyResult> applyComicMetadataForm(
   Comic original, {
   required void Function(ProviderOrFamily provider) invalidate,
   required void Function() notifyExternalChange,
+  void Function()? notifyMetadataSavedForAutoBackup,
 }) async {
   final ComicMetadataApplyResult result = await form.applyTo(
     repository,
@@ -43,6 +45,7 @@ Future<ComicMetadataApplyResult> applyComicMetadataForm(
     refreshComicMetadataDictionaries(invalidate, result);
     if (result.persisted) {
       notifyExternalChange();
+      notifyMetadataSavedForAutoBackup?.call();
     }
   }
   return result;

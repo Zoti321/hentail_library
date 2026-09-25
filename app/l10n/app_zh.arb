@@ -208,7 +208,36 @@
   "settingsMetadataBackupLastBackupLabel": "上次备份",
   "settingsMetadataBackupLastBackupEmpty": "尚无自动备份",
   "settingsMetadataBackupNowLabel": "立即备份",
-  "settingsMetadataBackupNowDescription": "自动备份调度将在后续版本提供",
+  "settingsMetadataBackupNowDescription": "立即写入 gzip 备份到应用轮转目录",
+  "settingsMetadataBackupNowSuccess": "已更新自动备份目录",
+  "settingsMetadataBackupLastBackupAt": "上次备份：{timestamp}",
+  "@settingsMetadataBackupLastBackupAt": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsMetadataBackupOpenFolderLabel": "打开备份文件夹",
+  "settingsMetadataBackupOpenFolderDescription": "在文件管理器中打开自动备份目录",
+  "settingsMetadataBackupImportLabel": "导入元数据",
+  "settingsMetadataBackupImportDescription": "从备份文件恢复 Comic 用户元数据",
+  "settingsMetadataBackupImportPickDialogTitle": "选择元数据备份文件",
+  "settingsMetadataBackupImportInvalidFile": "请选择 .hlmeta.json 或 .hlmeta.json.gz 文件",
+  "settingsMetadataBackupImportConfirmTitle": "导入元数据备份？",
+  "settingsMetadataBackupImportConfirmWarning": "匹配的 Comic 将被覆盖，且全部 Metadata field lock 将上锁；未匹配项会跳过。",
+  "settingsMetadataBackupImportConfirmAction": "导入",
+  "settingsMetadataBackupImportManifestSchema": "Schema 版本",
+  "settingsMetadataBackupImportManifestExportedAt": "导出时间",
+  "settingsMetadataBackupImportManifestComicCount": "Comic 数量",
+  "settingsMetadataBackupImportManifestAppVersion": "应用版本",
+  "settingsMetadataBackupImportRunningTitle": "正在导入元数据",
+  "settingsMetadataBackupImportRunningBody": "正在将备份应用到匹配的 Comic…",
+  "settingsMetadataBackupImportResultTitle": "导入完成",
+  "settingsMetadataBackupImportResultApplied": "已恢复",
+  "settingsMetadataBackupImportResultSkippedNotFound": "跳过（未匹配）",
+  "settingsMetadataBackupImportResultSkippedAmbiguous": "跳过（歧义）",
+  "settingsMetadataBackupImportResultErrors": "错误",
   "settingsMetadataBackupExportLabel": "导出元数据",
   "settingsMetadataBackupExportDescription": "将 Comic 用户元数据导出为 JSON，便于外置保存",
   "settingsMetadataBackupExportDialogTitle": "导出元数据",

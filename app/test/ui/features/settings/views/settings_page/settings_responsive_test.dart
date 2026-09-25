@@ -60,6 +60,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('导出元数据'), findsOneWidget);
+      expect(find.text('导入元数据'), findsOneWidget);
       expect(find.text('元数据自动备份'), findsOneWidget);
       expect(find.text('导出日志'), findsNothing);
     });

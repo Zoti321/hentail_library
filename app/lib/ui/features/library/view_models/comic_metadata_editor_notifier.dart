@@ -3,6 +3,7 @@ import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_f
 import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_item_sort_persist.dart';
+import 'package:hentai_library/ui/features/settings/view_models/metadata_auto_backup_coordinator_notifier.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -25,6 +26,9 @@ class ComicMetadataEditorNotifier extends _$ComicMetadataEditorNotifier {
       original,
       invalidate: ref.invalidate,
       notifyExternalChange: _notifyExternalChange,
+      notifyMetadataSavedForAutoBackup: () => ref
+          .read(metadataAutoBackupCoordinatorProvider.notifier)
+          .notifyMetadataSaved(),
     );
   }
 

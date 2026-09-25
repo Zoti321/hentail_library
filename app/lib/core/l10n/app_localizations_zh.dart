@@ -502,7 +502,77 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsMetadataBackupNowLabel => '立即备份';
 
   @override
-  String get settingsMetadataBackupNowDescription => '自动备份调度将在后续版本提供';
+  String get settingsMetadataBackupNowDescription => '立即写入 gzip 备份到应用轮转目录';
+
+  @override
+  String get settingsMetadataBackupNowSuccess => '已更新自动备份目录';
+
+  @override
+  String settingsMetadataBackupLastBackupAt(String timestamp) {
+    return '上次备份：$timestamp';
+  }
+
+  @override
+  String get settingsMetadataBackupOpenFolderLabel => '打开备份文件夹';
+
+  @override
+  String get settingsMetadataBackupOpenFolderDescription => '在文件管理器中打开自动备份目录';
+
+  @override
+  String get settingsMetadataBackupImportLabel => '导入元数据';
+
+  @override
+  String get settingsMetadataBackupImportDescription => '从备份文件恢复 Comic 用户元数据';
+
+  @override
+  String get settingsMetadataBackupImportPickDialogTitle => '选择元数据备份文件';
+
+  @override
+  String get settingsMetadataBackupImportInvalidFile =>
+      '请选择 .hlmeta.json 或 .hlmeta.json.gz 文件';
+
+  @override
+  String get settingsMetadataBackupImportConfirmTitle => '导入元数据备份？';
+
+  @override
+  String get settingsMetadataBackupImportConfirmWarning =>
+      '匹配的 Comic 将被覆盖，且全部 Metadata field lock 将上锁；未匹配项会跳过。';
+
+  @override
+  String get settingsMetadataBackupImportConfirmAction => '导入';
+
+  @override
+  String get settingsMetadataBackupImportManifestSchema => 'Schema 版本';
+
+  @override
+  String get settingsMetadataBackupImportManifestExportedAt => '导出时间';
+
+  @override
+  String get settingsMetadataBackupImportManifestComicCount => 'Comic 数量';
+
+  @override
+  String get settingsMetadataBackupImportManifestAppVersion => '应用版本';
+
+  @override
+  String get settingsMetadataBackupImportRunningTitle => '正在导入元数据';
+
+  @override
+  String get settingsMetadataBackupImportRunningBody => '正在将备份应用到匹配的 Comic…';
+
+  @override
+  String get settingsMetadataBackupImportResultTitle => '导入完成';
+
+  @override
+  String get settingsMetadataBackupImportResultApplied => '已恢复';
+
+  @override
+  String get settingsMetadataBackupImportResultSkippedNotFound => '跳过（未匹配）';
+
+  @override
+  String get settingsMetadataBackupImportResultSkippedAmbiguous => '跳过（歧义）';
+
+  @override
+  String get settingsMetadataBackupImportResultErrors => '错误';
 
   @override
   String get settingsMetadataBackupExportLabel => '导出元数据';

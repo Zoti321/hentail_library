@@ -519,7 +519,85 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsMetadataBackupNowDescription =>
-      'Automatic backup scheduling arrives in a later update';
+      'Write a gzip backup to the app rotation folder';
+
+  @override
+  String get settingsMetadataBackupNowSuccess =>
+      'Automatic backup folder updated';
+
+  @override
+  String settingsMetadataBackupLastBackupAt(String timestamp) {
+    return 'Last backup: $timestamp';
+  }
+
+  @override
+  String get settingsMetadataBackupOpenFolderLabel => 'Open backup folder';
+
+  @override
+  String get settingsMetadataBackupOpenFolderDescription =>
+      'Reveal the automatic backup directory in your file manager';
+
+  @override
+  String get settingsMetadataBackupImportLabel => 'Import metadata';
+
+  @override
+  String get settingsMetadataBackupImportDescription =>
+      'Restore Comic user metadata from a backup file';
+
+  @override
+  String get settingsMetadataBackupImportPickDialogTitle =>
+      'Select metadata backup';
+
+  @override
+  String get settingsMetadataBackupImportInvalidFile =>
+      'Please choose a .hlmeta.json or .hlmeta.json.gz file';
+
+  @override
+  String get settingsMetadataBackupImportConfirmTitle =>
+      'Import metadata backup?';
+
+  @override
+  String get settingsMetadataBackupImportConfirmWarning =>
+      'Matching Comics will be overwritten and all metadata fields will be locked. Unmatched entries are skipped.';
+
+  @override
+  String get settingsMetadataBackupImportConfirmAction => 'Import';
+
+  @override
+  String get settingsMetadataBackupImportManifestSchema => 'Schema version';
+
+  @override
+  String get settingsMetadataBackupImportManifestExportedAt => 'Exported at';
+
+  @override
+  String get settingsMetadataBackupImportManifestComicCount => 'Comics';
+
+  @override
+  String get settingsMetadataBackupImportManifestAppVersion => 'App version';
+
+  @override
+  String get settingsMetadataBackupImportRunningTitle => 'Importing metadata';
+
+  @override
+  String get settingsMetadataBackupImportRunningBody =>
+      'Applying backup to matching Comics…';
+
+  @override
+  String get settingsMetadataBackupImportResultTitle => 'Import complete';
+
+  @override
+  String get settingsMetadataBackupImportResultApplied => 'Restored';
+
+  @override
+  String get settingsMetadataBackupImportResultSkippedNotFound =>
+      'Skipped (not found)';
+
+  @override
+  String get settingsMetadataBackupImportResultSkippedAmbiguous =>
+      'Skipped (ambiguous)';
+
+  @override
+  String get settingsMetadataBackupImportResultErrors => 'Errors';
 
   @override
   String get settingsMetadataBackupExportLabel => 'Export metadata';

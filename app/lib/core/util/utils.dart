@@ -40,6 +40,47 @@ bool shouldTreatExplorerSelectAsFailure({
 @visibleForTesting
 String toWindowsExplorerPath(String path) => path.replaceAll('/', r'\');
 
+Future<void> openDirectoryInFileExplorer(String directoryPath) async {
+  final String normalizedPath = directoryPath.trim();
+  if (normalizedPath.isEmpty) {
+    throw ValidationException('无法打开文件夹：路径为空');
+  }
+  if (Platform.isWindows) {
+    await Process.run('explorer.exe', <String>[
+      toWindowsExplorerPath(normalizedPath),
+    ]);
+    return;
+  }
+  if (Platform.isMacOS) {
+    final ProcessResult result = await Process.run('open', <String>[
+      normalizedPath,
+    ]);
+    if (result.exitCode == 0) {
+      return;
+    }
+    throw AppException(
+      '无法打开文件夹',
+      cause: 'macos exitCode=${result.exitCode}, stderr=${result.stderr}',
+    );
+  }
+  if (Platform.isLinux) {
+    final ProcessResult result = await Process.run('xdg-open', <String>[
+      normalizedPath,
+    ]);
+    if (result.exitCode == 0) {
+      return;
+    }
+    throw AppException(
+      '无法打开文件夹',
+      cause: 'linux exitCode=${result.exitCode}, stderr=${result.stderr}',
+    );
+  }
+  throw AppException(
+    '无法打开文件夹',
+    cause: 'unsupported platform: $defaultTargetPlatform',
+  );
+}
+
 Future<void> showInFileExplorer(String path) async {
   final String normalizedPath = path.trim();
   if (normalizedPath.isEmpty) {

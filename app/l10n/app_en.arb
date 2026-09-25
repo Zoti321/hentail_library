@@ -208,7 +208,36 @@
   "settingsMetadataBackupLastBackupLabel": "Last backup",
   "settingsMetadataBackupLastBackupEmpty": "No automatic backup yet",
   "settingsMetadataBackupNowLabel": "Back up now",
-  "settingsMetadataBackupNowDescription": "Automatic backup scheduling arrives in a later update",
+  "settingsMetadataBackupNowDescription": "Write a gzip backup to the app rotation folder",
+  "settingsMetadataBackupNowSuccess": "Automatic backup folder updated",
+  "settingsMetadataBackupLastBackupAt": "Last backup: {timestamp}",
+  "@settingsMetadataBackupLastBackupAt": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsMetadataBackupOpenFolderLabel": "Open backup folder",
+  "settingsMetadataBackupOpenFolderDescription": "Reveal the automatic backup directory in your file manager",
+  "settingsMetadataBackupImportLabel": "Import metadata",
+  "settingsMetadataBackupImportDescription": "Restore Comic user metadata from a backup file",
+  "settingsMetadataBackupImportPickDialogTitle": "Select metadata backup",
+  "settingsMetadataBackupImportInvalidFile": "Please choose a .hlmeta.json or .hlmeta.json.gz file",
+  "settingsMetadataBackupImportConfirmTitle": "Import metadata backup?",
+  "settingsMetadataBackupImportConfirmWarning": "Matching Comics will be overwritten and all metadata fields will be locked. Unmatched entries are skipped.",
+  "settingsMetadataBackupImportConfirmAction": "Import",
+  "settingsMetadataBackupImportManifestSchema": "Schema version",
+  "settingsMetadataBackupImportManifestExportedAt": "Exported at",
+  "settingsMetadataBackupImportManifestComicCount": "Comics",
+  "settingsMetadataBackupImportManifestAppVersion": "App version",
+  "settingsMetadataBackupImportRunningTitle": "Importing metadata",
+  "settingsMetadataBackupImportRunningBody": "Applying backup to matching Comics…",
+  "settingsMetadataBackupImportResultTitle": "Import complete",
+  "settingsMetadataBackupImportResultApplied": "Restored",
+  "settingsMetadataBackupImportResultSkippedNotFound": "Skipped (not found)",
+  "settingsMetadataBackupImportResultSkippedAmbiguous": "Skipped (ambiguous)",
+  "settingsMetadataBackupImportResultErrors": "Errors",
   "settingsMetadataBackupExportLabel": "Export metadata",
   "settingsMetadataBackupExportDescription": "Save Comic user metadata as JSON for off-device safekeeping",
   "settingsMetadataBackupExportDialogTitle": "Export metadata",
