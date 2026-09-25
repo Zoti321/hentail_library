@@ -19,7 +19,7 @@ class LibrarySeriesBlock extends ConsumerWidget {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
     final AsyncValue<LibrarySeriesCatalogState> catalogAsync = ref.watch(
-      librarySeriesCatalogContentProvider,
+      librarySeriesCatalogControllerProvider,
     );
     if (catalogAsync.hasError) {
       return catalogAsync.when(
@@ -66,7 +66,7 @@ class LibrarySeriesBlock extends ConsumerWidget {
         slivers: <Widget>[
           if (showPagination)
             const LibraryPaginationBarSliver(
-              target: LibraryPaginationTarget.series,
+              target: LibraryDisplayTarget.series,
               placement: LibraryPaginationPlacement.top,
             ),
           _LibrarySeriesGridSliver(
@@ -79,7 +79,7 @@ class LibrarySeriesBlock extends ConsumerWidget {
           ),
           if (showPagination)
             const LibraryPaginationBarSliver(
-              target: LibraryPaginationTarget.series,
+              target: LibraryDisplayTarget.series,
               placement: LibraryPaginationPlacement.bottom,
             ),
         ],

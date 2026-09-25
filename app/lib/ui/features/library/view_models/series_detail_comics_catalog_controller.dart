@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/domain/models/value_objects/page_jump.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
@@ -66,26 +67,10 @@ class SeriesDetailComicsCatalogController
     }
   }
 
-  void goToFirstPage() {
-    if (_pagination.goToFirstPage()) {
-      ref.invalidateSelf();
-    }
-  }
-
-  void goToLastPage(int totalPages) {
-    if (_pagination.goToLastPage(totalPages)) {
-      ref.invalidateSelf();
-    }
-  }
-
-  void goToPreviousPage() {
-    if (_pagination.goToPreviousPage()) {
-      ref.invalidateSelf();
-    }
-  }
-
-  void goToNextPage(int totalPages) {
-    if (_pagination.goToNextPage(totalPages)) {
+  /// 以当前已加载的总页数为界；目录尚未加载时忽略。
+  void jump(PageJump jump) {
+    final int? totalPages = state.value?.pagination.totalPages;
+    if (totalPages != null && _pagination.jump(jump, totalPages)) {
       ref.invalidateSelf();
     }
   }

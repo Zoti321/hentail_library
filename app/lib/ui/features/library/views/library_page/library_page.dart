@@ -6,8 +6,9 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_cover_viewport_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_inactive_subscription.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_facade_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/core/widgets/responsive_layout/library_blocks_layout.dart';
@@ -104,9 +105,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
         .displayTarget;
     final int itemCount = switch (target) {
       LibraryDisplayTarget.comics =>
-        ref.read(libraryComicsCatalogContentProvider).value?.items.length ?? 0,
+        ref.read(libraryComicsCatalogControllerProvider).value?.items.length ??
+            0,
       LibraryDisplayTarget.series =>
-        ref.read(librarySeriesCatalogContentProvider).value?.items.length ?? 0,
+        ref.read(librarySeriesCatalogControllerProvider).value?.items.length ??
+            0,
     };
     if (itemCount <= 0) {
       ref.read(libraryCatalogCoverViewportProvider.notifier).clear();

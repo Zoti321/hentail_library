@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
+import 'package:hentai_library/domain/models/value_objects/page_jump.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_filter_reset_notifier.dart';
@@ -14,8 +14,6 @@ import 'package:hentai_library/ui/features/library/view_models/library_tab_page_
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_page_facade_notifier.g.dart';
-
-enum LibraryPageJump { first, previous, next, last }
 
 /// 页码为 null 表示对应 Tab 的目录尚未加载出首帧。
 typedef LibraryPageFacadeState = ({
@@ -49,7 +47,6 @@ bool libraryPageShouldScrollToTop(
 /// 库页 Facade：View 的统一订阅与命令入口。
 ///
 /// 只做命令转发与聚合 watch；查询意图、筛选、分页加载仍由各子 Notifier 负责。
-/// 目录相关字段读自可被 override 的 `*CatalogContentProvider`。
 @riverpod
 class LibraryPageFacadeNotifier extends _$LibraryPageFacadeNotifier {
   @override
@@ -62,13 +59,13 @@ class LibraryPageFacadeNotifier extends _$LibraryPageFacadeNotifier {
         libraryActiveFilterSortIsCustomizedProvider,
       ),
       comicsPage: ref.watch(
-        libraryComicsCatalogContentProvider.select(
+        libraryComicsCatalogControllerProvider.select(
           (AsyncValue<LibraryComicsCatalogState> async) =>
               async.value?.pagination.page,
         ),
       ),
       seriesPage: ref.watch(
-        librarySeriesCatalogContentProvider.select(
+        librarySeriesCatalogControllerProvider.select(
           (AsyncValue<LibrarySeriesCatalogState> async) =>
               async.value?.pagination.page,
         ),
@@ -111,52 +108,12 @@ class LibraryPageFacadeNotifier extends _$LibraryPageFacadeNotifier {
   }
 
   /// 越界跳转（如末页再下一页）为 no-op；目录未加载时忽略。
-  void jumpPage(LibraryDisplayTarget target, LibraryPageJump jump) {
+  void jumpPage(LibraryDisplayTarget target, PageJump jump) {
     switch (target) {
       case LibraryDisplayTarget.comics:
-        final int? totalPages = ref
-            .read(libraryComicsCatalogContentProvider)
-            .value
-            ?.pagination
-            .totalPages;
-        if (totalPages == null) {
-          return;
-        }
-        final LibraryComicsCatalogController catalog = ref.read(
-          libraryComicsCatalogControllerProvider.notifier,
-        );
-        switch (jump) {
-          case LibraryPageJump.first:
-            catalog.goToFirstPage();
-          case LibraryPageJump.previous:
-            catalog.goToPreviousPage();
-          case LibraryPageJump.next:
-            catalog.goToNextPage(totalPages);
-          case LibraryPageJump.last:
-            catalog.goToLastPage(totalPages);
-        }
+        ref.read(libraryComicsCatalogControllerProvider.notifier).jump(jump);
       case LibraryDisplayTarget.series:
-        final int? totalPages = ref
-            .read(librarySeriesCatalogContentProvider)
-            .value
-            ?.pagination
-            .totalPages;
-        if (totalPages == null) {
-          return;
-        }
-        final LibrarySeriesCatalogController catalog = ref.read(
-          librarySeriesCatalogControllerProvider.notifier,
-        );
-        switch (jump) {
-          case LibraryPageJump.first:
-            catalog.goToFirstPage();
-          case LibraryPageJump.previous:
-            catalog.goToPreviousPage();
-          case LibraryPageJump.next:
-            catalog.goToNextPage(totalPages);
-          case LibraryPageJump.last:
-            catalog.goToLastPage(totalPages);
-        }
+        ref.read(librarySeriesCatalogControllerProvider.notifier).jump(jump);
     }
   }
 }

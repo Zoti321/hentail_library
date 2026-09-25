@@ -8,13 +8,16 @@ import 'package:hentai_library/domain/library/library_series_sort_option.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/value_objects/page_jump.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/domain/repositories/series_repository.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_age_restriction_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_facade_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_snapshot.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_sort_notifier.dart';
@@ -79,6 +82,30 @@ class _FakeSeriesRepo implements SeriesRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+/// 模拟被 override 的漫画目录（如搜索页换用另一数据源）。
+class _OverriddenComicsCatalog extends LibraryComicsCatalogController {
+  final List<PageJump> jumps = <PageJump>[];
+
+  @override
+  Future<LibraryComicsCatalogState> build() async {
+    return const LibraryComicsCatalogState(
+      items: <Comic>[],
+      pagination: LibraryPagination(
+        page: 3,
+        totalPages: 7,
+        totalCount: 140,
+        isLoading: false,
+      ),
+      filterQuery: '',
+      hasReceivedFirstEmit: true,
+      isComicTableEmpty: false,
+    );
+  }
+
+  @override
+  void jump(PageJump jump) => jumps.add(jump);
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -86,9 +113,12 @@ void main() {
     SharedPreferences.setMockInitialValues(<String, Object>{});
   });
 
-  ProviderContainer createContainer() {
+  ProviderContainer createContainer({
+    List<Override> extraOverrides = const <Override>[],
+  }) {
     final ProviderContainer container = ProviderContainer(
       overrides: <Override>[
+        ...extraOverrides,
         ...idleRevisionThrottleOverrides(),
         libraryRevisionProvider.overrideWith(_FakeLibraryRevision.new),
         comicRepoProvider.overrideWith((Ref ref) => _FakeComicRepo()),
@@ -209,7 +239,7 @@ void main() {
     final LibraryPageFacadeNotifier facade = container.read(
       libraryPageFacadeProvider.notifier,
     );
-    Future<int?> comicsPageAfter(LibraryPageJump jump) async {
+    Future<int?> comicsPageAfter(PageJump jump) async {
       facade.jumpPage(LibraryDisplayTarget.comics, jump);
       await container.read(libraryComicsCatalogControllerProvider.future);
       return container.read(libraryPageFacadeProvider).comicsPage;
@@ -218,11 +248,11 @@ void main() {
     await container.read(libraryComicsCatalogControllerProvider.future);
     expect(container.read(libraryPageFacadeProvider).comicsPage, 1);
 
-    expect(await comicsPageAfter(LibraryPageJump.next), 2);
-    expect(await comicsPageAfter(LibraryPageJump.last), 5);
-    expect(await comicsPageAfter(LibraryPageJump.next), 5);
-    expect(await comicsPageAfter(LibraryPageJump.previous), 4);
-    expect(await comicsPageAfter(LibraryPageJump.first), 1);
+    expect(await comicsPageAfter(PageJump.next), 2);
+    expect(await comicsPageAfter(PageJump.last), 5);
+    expect(await comicsPageAfter(PageJump.next), 5);
+    expect(await comicsPageAfter(PageJump.previous), 4);
+    expect(await comicsPageAfter(PageJump.first), 1);
   });
 
   test('jumpPage on series leaves the comics page alone', () async {
@@ -232,7 +262,7 @@ void main() {
 
     container
         .read(libraryPageFacadeProvider.notifier)
-        .jumpPage(LibraryDisplayTarget.series, LibraryPageJump.next);
+        .jumpPage(LibraryDisplayTarget.series, PageJump.next);
     await container.read(librarySeriesCatalogControllerProvider.future);
 
     final LibraryPageFacadeState state = container.read(
@@ -330,4 +360,25 @@ void main() {
       );
     });
   });
+
+  test(
+    'reads and commands an overridden catalog through the same seam',
+    () async {
+      final _OverriddenComicsCatalog catalog = _OverriddenComicsCatalog();
+      final ProviderContainer container = createContainer(
+        extraOverrides: <Override>[
+          libraryComicsCatalogControllerProvider.overrideWith(() => catalog),
+        ],
+      );
+      await container.read(libraryComicsCatalogControllerProvider.future);
+
+      expect(container.read(libraryPageFacadeProvider).comicsPage, 3);
+
+      container
+          .read(libraryPageFacadeProvider.notifier)
+          .jumpPage(LibraryDisplayTarget.comics, PageJump.next);
+
+      expect(catalog.jumps, <PageJump>[PageJump.next]);
+    },
+  );
 }
