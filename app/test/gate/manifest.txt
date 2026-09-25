@@ -26,7 +26,7 @@ test/ui/features/reader/reader_viewport_pages_test.dart
 test/ui/features/reader/reader_open_error_message_test.dart
 test/ui/features/reader/views/reader_page/reader_chrome_layout_test.dart
 
-# Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec（#154 晋升批次）
+# Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec
 test/ui/core/interaction/app_motion_test.dart
 test/ui/core/interaction/interactive_target_test.dart
 test/ui/core/interaction/reader_input_test.dart
@@ -36,19 +36,23 @@ test/ui/features/library/stable_page_count_test.dart
 test/ui/features/library/view_models/catalog_pagination_engine_test.dart
 test/ui/features/library/view_models/comic_detail_return_series_notifier_test.dart
 test/ui/features/library/view_models/comic_metadata_apply_test.dart
+test/ui/features/library/view_models/comic_metadata_editor_notifier_test.dart
 test/ui/features/library/view_models/library_comics_filter_reset_notifier_test.dart
 test/ui/features/library/view_models/library_page_facade_test.dart
 test/ui/features/library/view_models/library_search_query_parser_test.dart
 test/ui/features/library/view_models/library_series_filter_reset_notifier_test.dart
 test/ui/features/library/view_models/library_tab_sort_notifier_test.dart
 test/ui/features/library/view_models/series_item_sort_persist_test.dart
+test/ui/features/library/view_models/series_metadata_editor_notifier_test.dart
 test/ui/features/reader/reader_exit_location_test.dart
 test/ui/features/reader/reader_image_cache_test.dart
 test/ui/features/reader/reader_page_crossfade_policy_test.dart
 test/ui/features/reader/reader_prefetch_generation_test.dart
 test/ui/features/reader/resume_visible_sync_gate_test.dart
+test/ui/features/reader/view_models/reader_cover_editor_notifier_test.dart
 test/ui/features/settings/view_models/locale_preference_persist_test.dart
 test/ui/features/settings/view_models/reading_mode_persist_test.dart
+test/ui/features/shell/view_models/current_library_notifier_commands_test.dart
 test/ui/features/shell/view_models/history_load_more_throttle_test.dart
 test/ui/features/shell/view_models/library_revision_throttle_busy_test.dart
 test/ui/features/shell/view_models/library_scan_toasts_test.dart
