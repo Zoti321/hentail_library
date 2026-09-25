@@ -73,8 +73,7 @@ runs:
     - uses: taiki-e/cache-cargo-install-action@v2
       if: inputs.run-frb-codegen == 'true' || inputs.install-frb-codegen == 'true'
       with:
-        tool: flutter_rust_bridge_codegen
-        tag: ${{ inputs.frb-codegen-version }}
+        tool: flutter_rust_bridge_codegen@${{ inputs.frb-codegen-version }}
 
     - name: FRB codegen
       if: inputs.run-frb-codegen == 'true'
