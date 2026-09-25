@@ -1,6 +1,6 @@
 # Gate：PR 硬门禁。跑完整 gate-*（Rust lint/test、codegen 漂移、Dart 静态分析与 hard-manifest 测试）。
 # 本地复现：scripts/run-gate.sh。详见 docs/agents/testing.md。
-# 触发：打开/更新 PR，或 push 到 main。失败挡合并。
+# 触发：打开/更新 PR、push 到 main，或手动 workflow_dispatch。失败挡合并。
 name: Gate
 
 on:
@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
