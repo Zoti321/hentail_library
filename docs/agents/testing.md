@@ -17,12 +17,12 @@ Job id 形如 `{tier}-{domain}-{intent}`（词汇表见 ADR-0018）。
 
 | Tier | Workflow | Job 前缀 | 是否挡合并 |
 |------|----------|----------|------------|
-| **Gate** | `ci.yml`（name: `Gate`） | `gate-*` | 是：PR 绿 = 全部 `gate-*` 已过 |
+| **Gate** | `gate.yml`（name: `Gate`） | `gate-*` | 是：PR 绿 = 全部 `gate-*` 已过 |
 | **Watch** | `watch.yml`（手动；或由 `release.yml` 调用） | `watch-*` | 否（平台级冒烟） |
 | **Nightly** | `nightly.yml`（每日 UTC 18:00 / `workflow_dispatch`） | `nightly-*` | 否 |
 | **Release** | `release.yml`（tag `v*` / 手动） | `release-*` | 发布流水线专用 |
 
-所有 `gate-*` job 与 `release-verify` 都只调用 `scripts/run-gate.sh`，本地与 CI 命令同源。Composite action 统一为 `.github/actions/setup-flutter-frb`。
+所有 `gate-*` job 与 `release-verify` 都只调用 `scripts/run-gate.sh`，本地与 CI 命令同源。Composite action 统一为 `.github/actions/setup-flutter-frb`。单平台手动打包（不走 Release 拓扑）是 `manual-build-android.yml` / `manual-build-ios.yml`。
 
 ## Nightly / Watch / Release tier（不挡 PR）
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 本地复现 Gate workflow（.github/workflows/ci.yml）的 gate-* 硬门禁。
+# 本地复现 Gate workflow（.github/workflows/gate.yml）的 gate-* 硬门禁。
 # CI 各 job 直接调用本脚本对应子命令，保证本地与 CI 命令同源。
 set -euo pipefail
 

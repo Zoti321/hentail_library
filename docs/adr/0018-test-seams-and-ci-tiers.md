@@ -48,7 +48,7 @@ Job id 是稳定契约，与文档、本地脚本一致；display name 用 `tier
 Gate workflow 拓扑：
 
 ```
-Gate (ci.yml)
+Gate (gate.yml)
 ├── gate-rust-lint
 ├── gate-rust-test
 ├── gate-codegen-drift
@@ -72,6 +72,10 @@ Release (release.yml)            tag v* / workflow_dispatch
 ├── release-build-{windows,macos,linux,android,ios}   needs release-verify
 ├── release-publish              needs 全部 release-build-*
 └── release-manual-summary       手动构建且不发布时
+
+Manual build（非 tier；仅 workflow_dispatch）
+├── manual-build-android.yml
+└── manual-build-ios.yml
 ```
 
 ### 3. 单一事实来源
