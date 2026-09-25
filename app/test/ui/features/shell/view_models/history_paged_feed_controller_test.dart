@@ -62,6 +62,29 @@ class _FakeReadingHistoryRepo implements ReadingHistoryRepository {
     return '$page:${keyword ?? ''}';
   }
 
+  final List<String> deletedComicIds = <String>[];
+  int clearAllCalls = 0;
+  bool failNextWrite = false;
+
+  void _maybeFailWrite() {
+    if (failNextWrite) {
+      failNextWrite = false;
+      throw Exception('write failed');
+    }
+  }
+
+  @override
+  Future<void> deleteByComicId(String comicId) async {
+    _maybeFailWrite();
+    deletedComicIds.add(comicId);
+  }
+
+  @override
+  Future<void> clearAllHistory() async {
+    _maybeFailWrite();
+    clearAllCalls++;
+  }
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -201,21 +224,43 @@ void main() {
     expect(repo.keywords.last, 'alpha');
   });
 
-  test('removeItem updates local list and totalCount', () async {
-    await container.read(historyPagedFeedControllerProvider.future);
-    notifier().removeItem('c1');
+  test(
+    'deleteHistory deletes in repository and drops the item locally',
+    () async {
+      await container.read(historyPagedFeedControllerProvider.future);
+      await notifier().deleteHistory('c1');
 
-    expect(state()?.items.single.comicId, 'c2');
-    expect(state()?.totalCount, 2);
+      expect(repo.deletedComicIds, <String>['c1']);
+      expect(state()?.items.single.comicId, 'c2');
+      expect(state()?.totalCount, 2);
+    },
+  );
+
+  test('deleteHistory failure rethrows and keeps the item', () async {
+    await container.read(historyPagedFeedControllerProvider.future);
+    repo.failNextWrite = true;
+
+    await expectLater(notifier().deleteHistory('c1'), throwsException);
+    expect(state()?.items, hasLength(2));
+    expect(state()?.totalCount, 3);
   });
 
-  test('clearAllLocal resets feed', () async {
+  test('clearAllHistory clears repository and resets feed', () async {
     await container.read(historyPagedFeedControllerProvider.future);
-    notifier().clearAllLocal();
+    await notifier().clearAllHistory();
 
+    expect(repo.clearAllCalls, 1);
     expect(state()?.items, isEmpty);
     expect(state()?.totalCount, 0);
     expect(state()?.hasReachedEnd, isTrue);
+  });
+
+  test('clearAllHistory failure rethrows and keeps the feed', () async {
+    await container.read(historyPagedFeedControllerProvider.future);
+    repo.failNextWrite = true;
+
+    await expectLater(notifier().clearAllHistory(), throwsException);
+    expect(state()?.items, hasLength(2));
   });
 
   test(

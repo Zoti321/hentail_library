@@ -314,15 +314,12 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
       _saving = true;
     });
     try {
-      final LibraryFormApplyResult result;
-      if (_isCreate) {
-        result = await _form.create(ref.read(libraryRepoProvider));
-      } else {
-        result = await _form.applyTo(
-          ref.read(libraryRepoProvider),
-          widget.library!,
-        );
-      }
+      final LibraryFormApplyResult result = await ref
+          .read(currentLibraryProvider.notifier)
+          .submitLibraryForm(
+            _form,
+            original: _isCreate ? null : widget.library!,
+          );
       if (!mounted) {
         return;
       }
@@ -334,8 +331,6 @@ class _LibraryFormDialogState extends ConsumerState<LibraryFormDialog> {
             _selectedTab = _tabForValidation(validation);
           });
         case LibraryFormApplySucceeded():
-          await ref.read(currentLibraryProvider.notifier).refresh();
-          ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
           if (!mounted) {
             return;
           }

@@ -6,7 +6,7 @@ import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/confirm/remove_saved_path_confirm_dialog.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/library_form_dialog.dart';
+import 'package:hentai_library/ui/features/shell/views/navigation/library_form_dialog.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/providers.dart';
 
@@ -75,9 +75,7 @@ abstract final class LibraryManagementActions {
         LibrariesRoutes.libraryIdFromPath(path) == deletedId ||
         ref.read(currentLibraryProvider).asData?.value.currentId == deletedId;
 
-    await ref.read(libraryRepoProvider).delete(deletedId);
-    await ref.read(currentLibraryProvider.notifier).refresh();
-    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
+    await ref.read(currentLibraryProvider.notifier).deleteLibrary(deletedId);
     if (!context.mounted) {
       return;
     }

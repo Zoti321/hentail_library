@@ -3,13 +3,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/ui/core/widgets/form/multi_select.dart';
 import 'package:hentai_library/ui/core/widgets/form/named_facet_multi_select_field.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_smart_facet_providers.dart';
-import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-/// Name-ASC dictionary for management / non-form callers.
-final allParodiesProvider = FutureProvider.autoDispose<List<String>>((Ref ref) {
-  return ref.watch(parodyRepoProvider).listAll();
-});
 
 /// Parody 多选：字段内 chip + 内联输入；浮层列出未选字典项（对齐 Author/Tag）。
 class ParodyLibraryMultiSelectField extends ConsumerWidget {

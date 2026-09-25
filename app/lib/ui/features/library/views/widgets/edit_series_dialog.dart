@@ -11,7 +11,7 @@ import 'package:hentai_library/ui/core/widgets/form/fluent_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/metadata_lock_button.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
+import 'package:hentai_library/ui/features/library/view_models/series_metadata_editor_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// 打开系列编辑表面：medium/expanded 为 dialog，compact 为全页。
@@ -59,9 +59,9 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
     setState(() => _lockBusy = true);
     try {
       await ref
-          .read(seriesRepoProvider)
-          .setMetaLocks(
-            seriesId: widget.series.id,
+          .read(seriesMetadataEditorProvider.notifier)
+          .setLocks(
+            widget.series.id,
             name: name,
             serializationStatus: serializationStatus,
             totalCount: totalCount,
@@ -98,10 +98,9 @@ class _EditSeriesDialogState extends ConsumerState<EditSeriesDialog> {
     }
     setState(() => _saving = true);
     try {
-      final SeriesMetadataApplyResult result = await _form.applyTo(
-        ref.read(seriesRepoProvider),
-        widget.series,
-      );
+      final SeriesMetadataApplyResult result = await ref
+          .read(seriesMetadataEditorProvider.notifier)
+          .apply(_form, widget.series);
       if (!mounted) {
         return;
       }

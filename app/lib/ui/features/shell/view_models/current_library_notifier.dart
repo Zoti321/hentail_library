@@ -1,6 +1,7 @@
 import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/library/library_sidebar_layout.dart';
 import 'package:hentai_library/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/domain/models/value_objects/form/library_form.dart';
 import 'package:hentai_library/domain/repositories/library_repository.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
@@ -86,6 +87,28 @@ class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
     state = AsyncData(
       CurrentLibraryState(libraries: libraries, currentId: previous?.currentId),
     );
+  }
+
+  /// 提交 Library 表单：[original] 为空时新建，否则编辑。成功后重载列表并通知 revision。
+  Future<LibraryFormApplyResult> submitLibraryForm(
+    LibraryForm form, {
+    LocalLibrary? original,
+  }) async {
+    final LibraryFormApplyResult result = original == null
+        ? await form.create(_repo)
+        : await form.applyTo(_repo, original);
+    if (result is LibraryFormApplySucceeded) {
+      await refresh();
+      ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
+    }
+    return result;
+  }
+
+  /// 删除 Library（不删盘，ADR-0012）并重载列表；失败时抛出，状态保持不变。
+  Future<void> deleteLibrary(String libraryId) async {
+    await _repo.delete(libraryId);
+    await refresh();
+    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
   }
 
   Future<void> clear() async {

@@ -4,7 +4,6 @@ import 'package:hentai_library/core/errors/app_exception.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/domain/models/value_objects/series_comic_page_item.dart';
 import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -12,11 +11,8 @@ import 'package:hentai_library/ui/core/widgets/element/card/catalog_cover_card_s
 import 'package:hentai_library/ui/core/widgets/element/image/comic_cover_content.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/context_menu/series_item_context_menu.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/ui/features/library/views/widgets/edit_metadata_dialog.dart';
 import 'package:hentai_library/ui/features/library/comic_delete_flow.dart';
-import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -73,16 +69,6 @@ class SeriesDetailComicCard extends HookConsumerWidget {
         sortOrder: item.sortOrder,
         sortOrderLocked: item.sortOrderLocked,
       ),
-      onSave: (ComicMetadataForm data) async {
-        await applyComicMetadataForm(
-          ref.read(comicRepoProvider),
-          data,
-          comic,
-          invalidate: ref.invalidate,
-          notifyExternalChange: () =>
-              ref.read(libraryRevisionProvider.notifier).notifyExternalChange(),
-        );
-      },
     );
   }
 

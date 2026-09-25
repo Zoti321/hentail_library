@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/ui/features/library/views/widgets/edit_metadata_dialog.dart';
 
 import '../../../../../support/pump_localized_app.dart';
 
@@ -31,7 +31,6 @@ void main() {
             title: 'Title',
             pageCount: 1,
           ),
-          onSave: (_) async {},
           seriesItemSort: (
             seriesId: 's1',
             sortOrder: 1,

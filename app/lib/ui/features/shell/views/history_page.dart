@@ -399,8 +399,9 @@ class _HistoryListSliver extends ConsumerWidget {
     required String comicId,
   }) async {
     try {
-      await ref.read(readingHistoryRepoProvider).deleteByComicId(comicId);
-      ref.read(historyPagedFeedControllerProvider.notifier).removeItem(comicId);
+      await ref
+          .read(historyPagedFeedControllerProvider.notifier)
+          .deleteHistory(comicId);
       if (context.mounted) {
         showSuccessToast(context, context.l10n.historyDeletedToast);
       }

@@ -11,7 +11,7 @@ import 'package:hentai_library/ui/core/widgets/actions/page_size_menu.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/anchored_overlay_menu.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_series_dialog.dart';
+import 'package:hentai_library/ui/features/library/views/widgets/edit_series_dialog.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/series_detail_page_size_providers.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_back_header.dart';

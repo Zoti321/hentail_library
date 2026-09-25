@@ -30,10 +30,8 @@ import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_sur
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_side_tab_bar.dart';
 import 'package:hentai_library/domain/library/smart_facet_match_preference.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_smart_facet_providers.dart';
-import 'package:hentai_library/ui/features/library/view_models/series_item_sort_persist.dart';
+import 'package:hentai_library/ui/features/library/view_models/comic_metadata_editor_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/smart_facet_match_preference_notifier.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -52,16 +50,11 @@ enum _EditMetadataTab { general, authorsAndTags }
 Future<void> showEditMetadataDialog({
   required BuildContext context,
   required Comic comic,
-  required Future<void> Function(ComicMetadataForm) onSave,
   SeriesItemMembership? seriesItemSort,
 }) {
   return showAdaptiveFormSurfaceWidget<void>(
     context: context,
-    surface: EditMetadataDialog(
-      comic: comic,
-      onSave: onSave,
-      seriesItemSort: seriesItemSort,
-    ),
+    surface: EditMetadataDialog(comic: comic, seriesItemSort: seriesItemSort),
   );
 }
 
@@ -69,12 +62,10 @@ class EditMetadataDialog extends StatefulHookConsumerWidget {
   const EditMetadataDialog({
     super.key,
     required this.comic,
-    required this.onSave,
     this.seriesItemSort,
   });
 
   final Comic comic;
-  final Future<void> Function(ComicMetadataForm) onSave;
   final SeriesItemMembership? seriesItemSort;
 
   @override
@@ -145,8 +136,8 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
   Future<void> _loadSeriesSortMembership() async {
     try {
       final SeriesItemMembership? membership = await ref
-          .read(seriesRepoProvider)
-          .findMembershipByComicId(widget.comic.comicId);
+          .read(comicMetadataEditorProvider.notifier)
+          .findSeriesMembership(widget.comic.comicId);
       if (!mounted) {
         return;
       }
@@ -184,8 +175,8 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
     setState(() => _lockBusy = true);
     try {
       await ref
-          .read(comicRepoProvider)
-          .setMetaLocks(
+          .read(comicMetadataEditorProvider.notifier)
+          .setLocks(
             widget.comic.comicId,
             title: title,
             description: description,
@@ -276,9 +267,17 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       _saving = true;
     });
     try {
-      await widget.onSave(_form.normalized);
+      final ComicMetadataEditorNotifier editor = ref.read(
+        comicMetadataEditorProvider.notifier,
+      );
+      await editor.apply(_form.normalized, widget.comic);
       if (seed != null && parsedSortOrder != null) {
-        await _persistSeriesSortIfChanged(seed, parsedSortOrder);
+        await editor.persistSeriesSort(
+          comicId: widget.comic.comicId,
+          seed: seed,
+          sortOrder: parsedSortOrder,
+          draftLocked: _sortOrderLocked,
+        );
       }
       if (mounted) {
         showSuccessToast(context, context.l10n.commonSavedToast);
@@ -297,22 +296,6 @@ class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
       if (mounted) {
         setState(() => _saving = false);
       }
-    }
-  }
-
-  Future<void> _persistSeriesSortIfChanged(
-    SeriesItemMembership seed,
-    double sortOrder,
-  ) async {
-    final bool wrote = await persistSeriesItemSortIfChanged(
-      repo: ref.read(seriesRepoProvider),
-      comicId: widget.comic.comicId,
-      seed: seed,
-      sortOrder: sortOrder,
-      draftLocked: _sortOrderLocked,
-    );
-    if (wrote) {
-      ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
     }
   }
 

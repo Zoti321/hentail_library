@@ -130,6 +130,8 @@ class _LibraryComicsGridSliver extends StatelessWidget {
           child: ComicCard(
             comic: manga,
             gridIndex: index,
+            onEditMetadata: () =>
+                showEditMetadataDialog(context: context, comic: manga),
             onTap: () {
               ProviderScope.containerOf(
                 context,
