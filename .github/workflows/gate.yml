@@ -1,3 +1,6 @@
+# Gate：PR 硬门禁。跑完整 gate-*（Rust lint/test、codegen 漂移、Dart 静态分析与 hard-manifest 测试）。
+# 本地复现：scripts/run-gate.sh。详见 docs/agents/testing.md。
+# 触发：打开/更新 PR，或 push 到 main。失败挡合并。
 name: Gate
 
 on:
@@ -14,8 +17,6 @@ env:
   FLUTTER_VERSION: "3.38.5"
   FRB_CODEGEN_VERSION: "2.12.0"
 
-# Every job runs `scripts/run-gate.sh <subcommand>` so contributors can
-# reproduce the exact gate locally. See docs/agents/testing.md.
 jobs:
   gate-rust-lint:
     name: gate · rust lint

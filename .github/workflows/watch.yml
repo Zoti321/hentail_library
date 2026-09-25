@@ -1,6 +1,7 @@
+# Watch：平台级冒烟，不挡 PR。在 Android x86_64 模拟器上跑 PDF 阅读 integration_test。
+# 触发：手动 workflow_dispatch；或由 release.yml 以 workflow_call 并行调用（失败不挡发布）。
 name: Watch
 
-# Platform smoke that never blocks PRs: run manually, or via release.yml.
 on:
   workflow_dispatch:
   workflow_call:

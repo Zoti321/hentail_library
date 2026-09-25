@@ -1,6 +1,7 @@
+# Nightly：不挡 PR 的慢轨。全量 test/ui，以及 Dart 覆盖率趋势（Step Summary + lcov artifact，非门禁）。
+# 触发：每天 UTC 18:00（仅默认分支 main 会跑定时任务）；也可手动 workflow_dispatch。
 name: Nightly
 
-# Scheduled runs only fire on the default branch.
 on:
   schedule:
     - cron: "0 18 * * *"

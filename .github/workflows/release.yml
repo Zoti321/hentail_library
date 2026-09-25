@@ -1,3 +1,5 @@
+# Release：发布流水线。先跑完整 Gate，再打包 Windows / macOS / Linux / Android / iOS；并行调用 Watch（失败不挡发布）。
+# 触发：推送 v* tag（自动发布 GitHub Release）；或手动 workflow_dispatch（默认只出 artifact，勾选 publish_release 才发 Release）。
 name: Release
 
 on:
@@ -35,8 +37,7 @@ env:
   FRB_CODEGEN_VERSION: "2.12.0"
 
 jobs:
-  # Same topology as the Gate workflow: every gate-* subcommand of
-  # scripts/run-gate.sh (incl. codegen drift and the FRB wire smoke).
+  # 与 Gate 拓扑相同：跑 scripts/run-gate.sh 全部子命令（含 codegen 漂移与 FRB 线缝）。
   release-verify:
     name: release · verify
     runs-on: ubuntu-latest

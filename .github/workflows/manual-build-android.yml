@@ -1,3 +1,5 @@
+# Manual Build Android：单平台手动打 release APK，不走 Release 拓扑（不跑 Gate、不发 GitHub Release）。
+# 触发：仅手动 workflow_dispatch。可指定版本（默认取 pubspec）与 ABI（默认 android-arm64）。
 name: Build Android
 
 on:
