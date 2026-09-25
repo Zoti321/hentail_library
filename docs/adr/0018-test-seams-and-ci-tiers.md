@@ -43,7 +43,7 @@ Job id 是稳定契约，与文档、本地脚本一致；display name 用 `tier
 - **Domain**：`rust`（`core/`）、`dart`（`app/`）、`codegen`（FRB + build_runner 产物）、`platform-*`（各平台构建）。
 - **Intent**：`test`、`lint`（Rust fmt + Clippy）、`static`（Dart format + analyze，不含 test）、`drift`（重新生成后 git 须干净）、`smoke`、`build`、`verify`（发布前复跑 gate 等价命令）、`coverage`（趋势报告，不挡合并）。
 - **名实相符**：名含 `static` 不得跑测试；不以 `(soft)` 后缀或 `continue-on-error` 表达门禁强度，改用 tier。
-- Step 名统一 `Checkout` / `Setup Flutter FRB toolchain` / `Check {object}` / `Run {object}`。
+- Step 名统一 `Checkout` / `Setup Flutter FRB toolchain` / `Check {object}` / `Run {object}`；其他环境准备步骤（JDK、KVM、pdfium、签名配置等）用 `Setup {tool}`。每个 step 都显式命名，不留裸 `uses:`。
 
 Gate workflow 拓扑：
 

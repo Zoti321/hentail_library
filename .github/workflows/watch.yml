@@ -18,14 +18,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Enable KVM
+      - name: Setup KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
             | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Setup Java
+      - name: Setup Java toolchain
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -39,10 +39,10 @@ jobs:
           run-build-runner: "true"
           rust-targets: x86_64-linux-android
 
-      - name: Fetch Android pdfium
+      - name: Setup Android pdfium
         run: bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh" --android
 
-      - name: Accept Android SDK licenses
+      - name: Setup Android SDK licenses
         run: yes | flutter doctor --android-licenses
 
       - name: Run Android PDF smoke test

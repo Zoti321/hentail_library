@@ -50,7 +50,7 @@ jobs:
           run-build-runner: "true"
 
       # test/frb_wire loads the host cdylib.
-      - name: Run Rust FRB library build
+      - name: Run hentai_flutter cdylib build
         run: cargo build --manifest-path core/Cargo.toml -p hentai_flutter
 
       - name: Run Dart tests with coverage
@@ -65,7 +65,7 @@ jobs:
             printf "Dart line coverage: %.1f%% (%d / %d lines)\n", pct, hit, found
           }' coverage/lcov.info | tee -a "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload coverage report
+      - name: Run coverage report upload
         uses: actions/upload-artifact@v4
         with:
           name: dart-coverage-lcov

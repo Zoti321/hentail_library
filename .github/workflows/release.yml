@@ -67,9 +67,10 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Parse version
+      - name: Run version parse
         id: version
         shell: bash
         run: |
@@ -79,23 +80,24 @@ jobs:
             echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: ./.github/actions/setup-flutter-frb
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
           run-build-runner: "true"
 
-      - name: flutter build windows
+      - name: Run Flutter Windows build
         working-directory: app
         run: >
           flutter build windows --release
           --build-name=${{ steps.version.outputs.name }}
           --build-number=${{ github.run_number }}
 
-      - name: Install Inno Setup
+      - name: Setup Inno Setup
         run: choco install innosetup -y --no-progress
 
-      - name: Build installer
+      - name: Run Windows installer build
         shell: pwsh
         run: |
           $version = "${{ steps.version.outputs.name }}"
@@ -113,7 +115,7 @@ jobs:
             "/DOutputDir=$dist" `
             "app\windows\packaging\installer.iss"
 
-      - name: Sign Windows release artifacts (self-signed)
+      - name: Run Windows artifact signing (self-signed)
         shell: pwsh
         env:
           WINDOWS_CODESIGN_PFX_BASE64: ${{ secrets.WINDOWS_CODESIGN_PFX_BASE64 }}
@@ -125,7 +127,7 @@ jobs:
           $setup = Join-Path $dist "hentai_library_Setup_${version}_x64.exe"
           & "${{ github.workspace }}/app/tool/sign_windows_release.ps1" -Files @($exe, $setup)
 
-      - name: Package portable zip
+      - name: Run Windows portable zip packaging
         shell: pwsh
         run: |
           $version = "${{ steps.version.outputs.name }}"
@@ -133,7 +135,8 @@ jobs:
           $zip = Join-Path $dist "hentai_library_${version}_windows_x64_portable.zip"
           Compress-Archive -Path "app\build\windows\x64\runner\Release\*" -DestinationPath $zip
 
-      - uses: actions/upload-artifact@v4
+      - name: Run artifact upload
+        uses: actions/upload-artifact@v4
         with:
           name: windows
           path: |
@@ -146,9 +149,10 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Parse version
+      - name: Run version parse
         id: version
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -157,20 +161,21 @@ jobs:
             echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: ./.github/actions/setup-flutter-frb
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
           run-build-runner: "true"
 
-      - name: flutter build macos
+      - name: Run Flutter macOS build
         working-directory: app
         run: >
           flutter build macos --release
           --build-name=${{ steps.version.outputs.name }}
           --build-number=${{ github.run_number }}
 
-      - name: Package macOS DMG
+      - name: Run macOS DMG packaging
         run: |
           VERSION="${{ steps.version.outputs.name }}"
           APP="app/build/macos/Build/Products/Release/hentai_library.app"
@@ -178,7 +183,8 @@ jobs:
           hdiutil create -volname "hentai_library" -srcfolder "$APP" -ov -format UDZO \
             "dist/hentai_library_${VERSION}_macos.dmg"
 
-      - uses: actions/upload-artifact@v4
+      - name: Run artifact upload
+        uses: actions/upload-artifact@v4
         with:
           name: macos
           path: dist/hentai_library_*_macos.dmg
@@ -189,9 +195,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Parse version
+      - name: Run version parse
         id: version
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -200,7 +207,7 @@ jobs:
             echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Install Linux build dependencies
+      - name: Setup Linux build dependencies
         run: |
           export DEBIAN_FRONTEND=noninteractive
           for attempt in 1 2 3; do
@@ -217,27 +224,29 @@ jobs:
           echo "::error::Failed to install Linux build dependencies after retries."
           exit 1
 
-      - uses: ./.github/actions/setup-flutter-frb
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
           run-build-runner: "true"
 
-      - name: flutter build linux
+      - name: Run Flutter Linux build
         working-directory: app
         run: >
           flutter build linux --release
           --build-name=${{ steps.version.outputs.name }}
           --build-number=${{ github.run_number }}
 
-      - name: Package Linux bundle
+      - name: Run Linux bundle packaging
         run: |
           VERSION="${{ steps.version.outputs.name }}"
           mkdir -p dist
           tar -czf "dist/hentai_library_${VERSION}_linux_x64.tar.gz" \
             -C app/build/linux/x64/release bundle
 
-      - uses: actions/upload-artifact@v4
+      - name: Run artifact upload
+        uses: actions/upload-artifact@v4
         with:
           name: linux
           path: dist/hentai_library_*_linux_x64.tar.gz
@@ -248,9 +257,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Parse version
+      - name: Run version parse
         id: version
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -259,12 +269,14 @@ jobs:
             echo "name=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/setup-java@v4
+      - name: Setup Java toolchain
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
-      - uses: ./.github/actions/setup-flutter-frb
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
@@ -272,10 +284,10 @@ jobs:
           # FRB codegen cargo-expands hentai-core for the *host* (needs linux pdfium);
           # Android ABIs are fetched in the next step for the APK link.
 
-      - name: Fetch Android pdfium
+      - name: Setup Android pdfium
         run: bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh" --android
 
-      - name: Configure Android release signing
+      - name: Setup Android release signing
         if: secrets.ANDROID_KEYSTORE_BASE64 != ''
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -288,10 +300,10 @@ jobs:
             "$ANDROID_KEYSTORE_PASSWORD" "$ANDROID_KEY_PASSWORD" "$ANDROID_KEY_ALIAS" \
             > app/android/key.properties
 
-      - name: Accept Android SDK licenses
+      - name: Setup Android SDK licenses
         run: yes | flutter doctor --android-licenses
 
-      - name: flutter build apk
+      - name: Run Flutter Android APK build
         working-directory: app
         run: >
           flutter build apk --release
@@ -299,14 +311,15 @@ jobs:
           --build-name=${{ steps.version.outputs.name }}
           --build-number=${{ github.run_number }}
 
-      - name: Package Android APK
+      - name: Run Android APK packaging
         run: |
           VERSION="${{ steps.version.outputs.name }}"
           mkdir -p dist
           cp app/build/app/outputs/flutter-apk/app-release.apk \
             "dist/hentai_library_${VERSION}_android-arm64.apk"
 
-      - uses: actions/upload-artifact@v4
+      - name: Run artifact upload
+        uses: actions/upload-artifact@v4
         with:
           name: android
           path: dist/hentai_library_*_android-arm64.apk
@@ -322,9 +335,10 @@ jobs:
       IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
       IOS_KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Parse version
+      - name: Run version parse
         id: version
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -335,7 +349,7 @@ jobs:
 
       # Runner images / interrupted rustup can leave orphan rust-std files that
       # make later `rustup target add` fail with "detected conflict".
-      - name: Clear partial Rust iOS std
+      - name: Run partial Rust iOS std cleanup
         run: |
           set -euo pipefail
           rustup_home="${RUSTUP_HOME:-$HOME/.rustup}"
@@ -353,7 +367,8 @@ jobs:
             rm -f "$manifest"
           done
 
-      - uses: ./.github/actions/setup-flutter-frb
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
@@ -362,7 +377,7 @@ jobs:
           # rustup target add.
           rust-targets: aarch64-apple-ios
 
-      - name: Ensure Rust iOS target
+      - name: Setup Rust iOS target
         run: |
           set -euo pipefail
           target=aarch64-apple-ios
@@ -381,14 +396,14 @@ jobs:
           fi
           rustup target list --installed | grep -E 'apple-ios' || true
 
-      - name: Fetch iOS pdfium vendor libraries
+      - name: Setup iOS pdfium vendor libraries
         run: |
           set -euo pipefail
           bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh" --ios
           test -f "${GITHUB_WORKSPACE}/core/vendor/ios-device-arm64/libpdfium.dylib"
 
       # Phase 2: add ExportOptions.plist and flutter build ipa when secrets are configured.
-      - name: Configure iOS release signing
+      - name: Setup iOS release signing
         if: env.IOS_DISTRIBUTION_CERTIFICATE_BASE64 != ''
         run: |
           KEYCHAIN_PATH="$RUNNER_TEMP/ios-build.keychain-db"
@@ -406,7 +421,7 @@ jobs:
           cp "$RUNNER_TEMP/profile.mobileprovision" \
             "$HOME/Library/MobileDevice/Provisioning Profiles/${PROFILE_UUID}.mobileprovision"
 
-      - name: flutter build ios (unsigned)
+      - name: Run Flutter iOS build (unsigned)
         if: env.IOS_DISTRIBUTION_CERTIFICATE_BASE64 == ''
         working-directory: app
         run: |
@@ -433,14 +448,14 @@ jobs:
           fi
           exit "$status"
 
-      - name: flutter build ipa (signed)
+      - name: Run Flutter iOS IPA build (signed)
         if: env.IOS_DISTRIBUTION_CERTIFICATE_BASE64 != ''
         working-directory: app
         run: |
           echo "::error::Signed iOS IPA requires ExportOptions.plist (phase 2)."
           exit 1
 
-      - name: Package unsigned iOS app
+      - name: Run unsigned iOS app packaging
         if: env.IOS_DISTRIBUTION_CERTIFICATE_BASE64 == ''
         run: |
           VERSION="${{ steps.version.outputs.name }}"
@@ -449,7 +464,8 @@ jobs:
             "app/build/ios/iphoneos/Runner.app" \
             "dist/hentai_library_${VERSION}_ios-arm64-nosign.zip"
 
-      - uses: actions/upload-artifact@v4
+      - name: Run artifact upload
+        uses: actions/upload-artifact@v4
         with:
           name: ios
           path: |
@@ -471,15 +487,16 @@ jobs:
       contents: write
       pull-requests: read
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Run artifact download
+        uses: actions/download-artifact@v4
         with:
           path: dist
           merge-multiple: true
 
-      - name: List release assets
+      - name: Run release asset listing
         run: find dist -type f | sort
 
-      - name: Resolve release metadata
+      - name: Run release metadata resolution
         id: meta
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -507,7 +524,7 @@ jobs:
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
           echo "prerelease=${prerelease}" >> "$GITHUB_OUTPUT"
 
-      - name: Compose release notes
+      - name: Run release notes composition
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -527,7 +544,7 @@ jobs:
             printf '%s\n\n%s\n\n%s' "${ios_notice}" "${windows_notice}" "${generated}" > release_body.md
           fi
 
-      - name: Publish GitHub Release
+      - name: Run GitHub Release publish
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
@@ -548,7 +565,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.publish_release != true
     runs-on: ubuntu-latest
     steps:
-      - name: Manual build summary
+      - name: Run manual build summary
         run: |
           echo "Manual release build completed."
           echo "Download platform artifacts from this workflow run (Artifacts tab)."
