@@ -465,10 +465,74 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsGroupPersonalization => '个性化';
 
   @override
+  String get settingsGroupMetadataBackup => '元数据备份';
+
+  @override
   String get settingsGroupDiagnostics => '诊断与支持';
 
   @override
   String get settingsGroupAbout => '关于';
+
+  @override
+  String get settingsMetadataBackupAutoGroupTitle => '自动备份';
+
+  @override
+  String get settingsMetadataBackupManualGroupTitle => '手动备份';
+
+  @override
+  String get settingsMetadataBackupAutoToggleLabel => '元数据自动备份';
+
+  @override
+  String get settingsMetadataBackupAutoToggleDescription =>
+      '在应用数据目录轮转保留 gzip 备份（默认开启）';
+
+  @override
+  String get settingsMetadataBackupStoragePathLabel => '备份目录';
+
+  @override
+  String get settingsMetadataBackupStoragePathLoading => '正在读取路径…';
+
+  @override
+  String get settingsMetadataBackupLastBackupLabel => '上次备份';
+
+  @override
+  String get settingsMetadataBackupLastBackupEmpty => '尚无自动备份';
+
+  @override
+  String get settingsMetadataBackupNowLabel => '立即备份';
+
+  @override
+  String get settingsMetadataBackupNowDescription => '自动备份调度将在后续版本提供';
+
+  @override
+  String get settingsMetadataBackupExportLabel => '导出元数据';
+
+  @override
+  String get settingsMetadataBackupExportDescription =>
+      '将 Comic 用户元数据导出为 JSON，便于外置保存';
+
+  @override
+  String get settingsMetadataBackupExportDialogTitle => '导出元数据';
+
+  @override
+  String get settingsMetadataBackupExportGzipLabel => '使用 gzip 压缩';
+
+  @override
+  String get settingsMetadataBackupExportOrphanFacetsLabel => '包含孤立标签与字典项';
+
+  @override
+  String get settingsMetadataBackupExportCurrentLibraryLabel => '仅当前 Library';
+
+  @override
+  String get settingsMetadataBackupExportConfirm => '继续';
+
+  @override
+  String get settingsMetadataBackupExportSaveDialogTitle => '保存元数据备份';
+
+  @override
+  String settingsMetadataBackupExportSuccess(String fileName) {
+    return '元数据已导出至 $fileName';
+  }
 
   @override
   String get settingsDiagnosticModeLabel => '详细诊断';

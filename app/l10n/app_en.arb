@@ -196,8 +196,35 @@
   "notFoundGoHome": "Back to home",
   "notFoundGoLibrary": "Go to library",
   "settingsGroupPersonalization": "Personalization",
+  "settingsGroupMetadataBackup": "Metadata backup",
   "settingsGroupDiagnostics": "Diagnostics & support",
   "settingsGroupAbout": "About",
+  "settingsMetadataBackupAutoGroupTitle": "Automatic backup",
+  "settingsMetadataBackupManualGroupTitle": "Manual backup",
+  "settingsMetadataBackupAutoToggleLabel": "Automatic metadata backup",
+  "settingsMetadataBackupAutoToggleDescription": "Keep rotating gzip backups under app data (enabled by default)",
+  "settingsMetadataBackupStoragePathLabel": "Backup folder",
+  "settingsMetadataBackupStoragePathLoading": "Loading path…",
+  "settingsMetadataBackupLastBackupLabel": "Last backup",
+  "settingsMetadataBackupLastBackupEmpty": "No automatic backup yet",
+  "settingsMetadataBackupNowLabel": "Back up now",
+  "settingsMetadataBackupNowDescription": "Automatic backup scheduling arrives in a later update",
+  "settingsMetadataBackupExportLabel": "Export metadata",
+  "settingsMetadataBackupExportDescription": "Save Comic user metadata as JSON for off-device safekeeping",
+  "settingsMetadataBackupExportDialogTitle": "Export metadata",
+  "settingsMetadataBackupExportGzipLabel": "Compress with gzip",
+  "settingsMetadataBackupExportOrphanFacetsLabel": "Include orphan tags and facets",
+  "settingsMetadataBackupExportCurrentLibraryLabel": "Current library only",
+  "settingsMetadataBackupExportConfirm": "Continue",
+  "settingsMetadataBackupExportSaveDialogTitle": "Save metadata backup",
+  "settingsMetadataBackupExportSuccess": "Metadata exported to {fileName}",
+  "@settingsMetadataBackupExportSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
   "settingsDiagnosticModeLabel": "Verbose diagnostics",
   "settingsDiagnosticModeDescriptionEnabled": "Enabled: Dart and Rust log more detail",
   "settingsDiagnosticModeDescriptionDisabled": "Temporarily increase log verbosity to help reproduce issues",

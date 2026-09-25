@@ -480,10 +480,79 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsGroupPersonalization => 'Personalization';
 
   @override
+  String get settingsGroupMetadataBackup => 'Metadata backup';
+
+  @override
   String get settingsGroupDiagnostics => 'Diagnostics & support';
 
   @override
   String get settingsGroupAbout => 'About';
+
+  @override
+  String get settingsMetadataBackupAutoGroupTitle => 'Automatic backup';
+
+  @override
+  String get settingsMetadataBackupManualGroupTitle => 'Manual backup';
+
+  @override
+  String get settingsMetadataBackupAutoToggleLabel =>
+      'Automatic metadata backup';
+
+  @override
+  String get settingsMetadataBackupAutoToggleDescription =>
+      'Keep rotating gzip backups under app data (enabled by default)';
+
+  @override
+  String get settingsMetadataBackupStoragePathLabel => 'Backup folder';
+
+  @override
+  String get settingsMetadataBackupStoragePathLoading => 'Loading path…';
+
+  @override
+  String get settingsMetadataBackupLastBackupLabel => 'Last backup';
+
+  @override
+  String get settingsMetadataBackupLastBackupEmpty => 'No automatic backup yet';
+
+  @override
+  String get settingsMetadataBackupNowLabel => 'Back up now';
+
+  @override
+  String get settingsMetadataBackupNowDescription =>
+      'Automatic backup scheduling arrives in a later update';
+
+  @override
+  String get settingsMetadataBackupExportLabel => 'Export metadata';
+
+  @override
+  String get settingsMetadataBackupExportDescription =>
+      'Save Comic user metadata as JSON for off-device safekeeping';
+
+  @override
+  String get settingsMetadataBackupExportDialogTitle => 'Export metadata';
+
+  @override
+  String get settingsMetadataBackupExportGzipLabel => 'Compress with gzip';
+
+  @override
+  String get settingsMetadataBackupExportOrphanFacetsLabel =>
+      'Include orphan tags and facets';
+
+  @override
+  String get settingsMetadataBackupExportCurrentLibraryLabel =>
+      'Current library only';
+
+  @override
+  String get settingsMetadataBackupExportConfirm => 'Continue';
+
+  @override
+  String get settingsMetadataBackupExportSaveDialogTitle =>
+      'Save metadata backup';
+
+  @override
+  String settingsMetadataBackupExportSuccess(String fileName) {
+    return 'Metadata exported to $fileName';
+  }
 
   @override
   String get settingsDiagnosticModeLabel => 'Verbose diagnostics';

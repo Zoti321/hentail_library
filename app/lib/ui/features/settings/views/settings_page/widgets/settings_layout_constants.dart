@@ -14,7 +14,7 @@ const Duration kSettingsNarrowPaneTransitionDuration = Duration(
 );
 
 /// Settings list–detail master categories (existing three groups).
-enum SettingsCategory { personalization, diagnostics, about }
+enum SettingsCategory { personalization, metadataBackup, diagnostics, about }
 
 enum SettingsLayoutTier { compact, medium, expanded }
 

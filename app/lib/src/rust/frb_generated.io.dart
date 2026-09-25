@@ -216,6 +216,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
+  ImportComicMetadataResultDto dco_decode_import_comic_metadata_result_dto(
+    dynamic raw,
+  );
+
+  @protected
   JunctionNamedFacetFrb dco_decode_junction_named_facet_frb(dynamic raw);
 
   @protected
@@ -288,6 +293,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<SeriesItemDto> dco_decode_list_series_item_dto(dynamic raw);
+
+  @protected
+  MetadataBackupManifestDto dco_decode_metadata_backup_manifest_dto(
+    dynamic raw,
+  );
 
   @protected
   NamedFacetFormEntryFrbDto dco_decode_named_facet_form_entry_frb_dto(
@@ -695,6 +705,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
   @protected
+  ImportComicMetadataResultDto sse_decode_import_comic_metadata_result_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   JunctionNamedFacetFrb sse_decode_junction_named_facet_frb(
     SseDeserializer deserializer,
   );
@@ -775,6 +790,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<SeriesItemDto> sse_decode_list_series_item_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  MetadataBackupManifestDto sse_decode_metadata_backup_manifest_dto(
     SseDeserializer deserializer,
   );
 
@@ -1287,6 +1307,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
+  void sse_encode_import_comic_metadata_result_dto(
+    ImportComicMetadataResultDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_junction_named_facet_frb(
     JunctionNamedFacetFrb self,
     SseSerializer serializer,
@@ -1397,6 +1423,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_series_item_dto(
     List<SeriesItemDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_metadata_backup_manifest_dto(
+    MetadataBackupManifestDto self,
     SseSerializer serializer,
   );
 

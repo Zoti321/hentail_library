@@ -196,8 +196,35 @@
   "notFoundGoHome": "返回首页",
   "notFoundGoLibrary": "去漫画库",
   "settingsGroupPersonalization": "个性化",
+  "settingsGroupMetadataBackup": "元数据备份",
   "settingsGroupDiagnostics": "诊断与支持",
   "settingsGroupAbout": "关于",
+  "settingsMetadataBackupAutoGroupTitle": "自动备份",
+  "settingsMetadataBackupManualGroupTitle": "手动备份",
+  "settingsMetadataBackupAutoToggleLabel": "元数据自动备份",
+  "settingsMetadataBackupAutoToggleDescription": "在应用数据目录轮转保留 gzip 备份（默认开启）",
+  "settingsMetadataBackupStoragePathLabel": "备份目录",
+  "settingsMetadataBackupStoragePathLoading": "正在读取路径…",
+  "settingsMetadataBackupLastBackupLabel": "上次备份",
+  "settingsMetadataBackupLastBackupEmpty": "尚无自动备份",
+  "settingsMetadataBackupNowLabel": "立即备份",
+  "settingsMetadataBackupNowDescription": "自动备份调度将在后续版本提供",
+  "settingsMetadataBackupExportLabel": "导出元数据",
+  "settingsMetadataBackupExportDescription": "将 Comic 用户元数据导出为 JSON，便于外置保存",
+  "settingsMetadataBackupExportDialogTitle": "导出元数据",
+  "settingsMetadataBackupExportGzipLabel": "使用 gzip 压缩",
+  "settingsMetadataBackupExportOrphanFacetsLabel": "包含孤立标签与字典项",
+  "settingsMetadataBackupExportCurrentLibraryLabel": "仅当前 Library",
+  "settingsMetadataBackupExportConfirm": "继续",
+  "settingsMetadataBackupExportSaveDialogTitle": "保存元数据备份",
+  "settingsMetadataBackupExportSuccess": "元数据已导出至 {fileName}",
+  "@settingsMetadataBackupExportSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
   "settingsDiagnosticModeLabel": "详细诊断",
   "settingsDiagnosticModeDescriptionEnabled": "已开启：Dart 与 Rust 记录更详细日志",
   "settingsDiagnosticModeDescriptionDisabled": "临时提高日志详细程度，便于复现问题",

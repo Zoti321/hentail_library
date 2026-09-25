@@ -908,6 +908,12 @@ abstract class AppLocalizations {
   /// **'个性化'**
   String get settingsGroupPersonalization;
 
+  /// No description provided for @settingsGroupMetadataBackup.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据备份'**
+  String get settingsGroupMetadataBackup;
+
   /// No description provided for @settingsGroupDiagnostics.
   ///
   /// In zh, this message translates to:
@@ -919,6 +925,120 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'关于'**
   String get settingsGroupAbout;
+
+  /// No description provided for @settingsMetadataBackupAutoGroupTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动备份'**
+  String get settingsMetadataBackupAutoGroupTitle;
+
+  /// No description provided for @settingsMetadataBackupManualGroupTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'手动备份'**
+  String get settingsMetadataBackupManualGroupTitle;
+
+  /// No description provided for @settingsMetadataBackupAutoToggleLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据自动备份'**
+  String get settingsMetadataBackupAutoToggleLabel;
+
+  /// No description provided for @settingsMetadataBackupAutoToggleDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'在应用数据目录轮转保留 gzip 备份（默认开启）'**
+  String get settingsMetadataBackupAutoToggleDescription;
+
+  /// No description provided for @settingsMetadataBackupStoragePathLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份目录'**
+  String get settingsMetadataBackupStoragePathLabel;
+
+  /// No description provided for @settingsMetadataBackupStoragePathLoading.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在读取路径…'**
+  String get settingsMetadataBackupStoragePathLoading;
+
+  /// No description provided for @settingsMetadataBackupLastBackupLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'上次备份'**
+  String get settingsMetadataBackupLastBackupLabel;
+
+  /// No description provided for @settingsMetadataBackupLastBackupEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'尚无自动备份'**
+  String get settingsMetadataBackupLastBackupEmpty;
+
+  /// No description provided for @settingsMetadataBackupNowLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'立即备份'**
+  String get settingsMetadataBackupNowLabel;
+
+  /// No description provided for @settingsMetadataBackupNowDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动备份调度将在后续版本提供'**
+  String get settingsMetadataBackupNowDescription;
+
+  /// No description provided for @settingsMetadataBackupExportLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出元数据'**
+  String get settingsMetadataBackupExportLabel;
+
+  /// No description provided for @settingsMetadataBackupExportDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'将 Comic 用户元数据导出为 JSON，便于外置保存'**
+  String get settingsMetadataBackupExportDescription;
+
+  /// No description provided for @settingsMetadataBackupExportDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出元数据'**
+  String get settingsMetadataBackupExportDialogTitle;
+
+  /// No description provided for @settingsMetadataBackupExportGzipLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用 gzip 压缩'**
+  String get settingsMetadataBackupExportGzipLabel;
+
+  /// No description provided for @settingsMetadataBackupExportOrphanFacetsLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'包含孤立标签与字典项'**
+  String get settingsMetadataBackupExportOrphanFacetsLabel;
+
+  /// No description provided for @settingsMetadataBackupExportCurrentLibraryLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅当前 Library'**
+  String get settingsMetadataBackupExportCurrentLibraryLabel;
+
+  /// No description provided for @settingsMetadataBackupExportConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'继续'**
+  String get settingsMetadataBackupExportConfirm;
+
+  /// No description provided for @settingsMetadataBackupExportSaveDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存元数据备份'**
+  String get settingsMetadataBackupExportSaveDialogTitle;
+
+  /// No description provided for @settingsMetadataBackupExportSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据已导出至 {fileName}'**
+  String settingsMetadataBackupExportSuccess(String fileName);
 
   /// No description provided for @settingsDiagnosticModeLabel.
   ///

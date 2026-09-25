@@ -27,6 +27,10 @@ name = "metadata_backup_export"
 path = "tests/metadata_backup_export_test.rs"
 
 [[test]]
+name = "metadata_backup_import"
+path = "tests/metadata_backup_import_test.rs"
+
+[[test]]
 name = "db_snapshot"
 path = "tests/db_snapshot_test.rs"
 

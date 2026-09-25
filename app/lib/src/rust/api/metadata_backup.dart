@@ -7,12 +7,24 @@ import '../frb_generated.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `fmt`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`
 
 Uint8List exportComicMetadataFrb({
   required ExportComicMetadataOptionsDto options,
 }) => RustLib.instance.api.crateApiMetadataBackupExportComicMetadataFrb(
   options: options,
+);
+
+MetadataBackupManifestDto peekMetadataBackupManifestFrb({
+  required List<int> bytes,
+}) => RustLib.instance.api.crateApiMetadataBackupPeekMetadataBackupManifestFrb(
+  bytes: bytes,
+);
+
+ImportComicMetadataResultDto importComicMetadataFrb({
+  required List<int> bytes,
+}) => RustLib.instance.api.crateApiMetadataBackupImportComicMetadataFrb(
+  bytes: bytes,
 );
 
 class ExportComicMetadataOptionsDto {
@@ -34,4 +46,74 @@ class ExportComicMetadataOptionsDto {
           runtimeType == other.runtimeType &&
           libraryId == other.libraryId &&
           includeOrphanFacets == other.includeOrphanFacets;
+}
+
+class ImportComicMetadataResultDto {
+  final int applied;
+  final int skippedNotFound;
+  final int skippedAmbiguous;
+  final List<String> errors;
+
+  const ImportComicMetadataResultDto({
+    required this.applied,
+    required this.skippedNotFound,
+    required this.skippedAmbiguous,
+    required this.errors,
+  });
+
+  @override
+  int get hashCode =>
+      applied.hashCode ^
+      skippedNotFound.hashCode ^
+      skippedAmbiguous.hashCode ^
+      errors.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImportComicMetadataResultDto &&
+          runtimeType == other.runtimeType &&
+          applied == other.applied &&
+          skippedNotFound == other.skippedNotFound &&
+          skippedAmbiguous == other.skippedAmbiguous &&
+          errors == other.errors;
+}
+
+class MetadataBackupManifestDto {
+  final int schemaVersion;
+  final String exportedAt;
+  final String appVersion;
+  final int comicCount;
+  final bool includeOrphanFacets;
+  final String? libraryId;
+
+  const MetadataBackupManifestDto({
+    required this.schemaVersion,
+    required this.exportedAt,
+    required this.appVersion,
+    required this.comicCount,
+    required this.includeOrphanFacets,
+    this.libraryId,
+  });
+
+  @override
+  int get hashCode =>
+      schemaVersion.hashCode ^
+      exportedAt.hashCode ^
+      appVersion.hashCode ^
+      comicCount.hashCode ^
+      includeOrphanFacets.hashCode ^
+      libraryId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MetadataBackupManifestDto &&
+          runtimeType == other.runtimeType &&
+          schemaVersion == other.schemaVersion &&
+          exportedAt == other.exportedAt &&
+          appVersion == other.appVersion &&
+          comicCount == other.comicCount &&
+          includeOrphanFacets == other.includeOrphanFacets &&
+          libraryId == other.libraryId;
 }

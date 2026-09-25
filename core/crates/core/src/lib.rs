@@ -50,7 +50,9 @@ pub use home::{
     watch_continue_reading_top5, watch_home_page_counts, HomeContinueReadingDto, HomePageCountsDto,
 };
 pub use metadata_backup::{
-    export_comic_metadata, ExportComicMetadataOptions, MetadataBackupPayload, SCHEMA_VERSION,
+    export_comic_metadata, import_comic_metadata, peek_metadata_backup_manifest,
+    ExportComicMetadataOptions, ImportComicMetadataResult, MetadataBackupManifest,
+    MetadataBackupPayload, SCHEMA_VERSION,
 };
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,

@@ -1,14 +1,13 @@
 use std::collections::HashMap;
-use std::path::Path;
 
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement, Value};
 
 use crate::comic::repository::load_comics_ordered;
-use crate::comic_id::normalize_path_for_key;
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
 use crate::named_facet::JunctionNamedFacet;
 
+use super::path_util::compute_relative_path;
 use super::types::{
     ComicExportRecord, ComicMetaExportRecord, ExportOptionsRecord, MetadataBackupPayload,
     OrphanFacetsRecord, SCHEMA_VERSION,
@@ -172,21 +171,6 @@ async fn load_orphan_names(
                 .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
         })
         .collect()
-}
-
-fn compute_relative_path(comic_path: &str, library_root: &str) -> Option<String> {
-    let normalized_path = normalize_path_for_key(comic_path);
-    let normalized_root = normalize_path_for_key(library_root);
-    if normalized_path.is_empty() || normalized_root.is_empty() {
-        return None;
-    }
-    let rel = Path::new(&normalized_path)
-        .strip_prefix(Path::new(&normalized_root))
-        .ok()?;
-    if rel.as_os_str().is_empty() {
-        return None;
-    }
-    Some(rel.to_string_lossy().into_owned())
 }
 
 fn utc_now_rfc3339() -> String {
