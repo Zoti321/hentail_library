@@ -46,10 +46,18 @@ fn start_poller() {
     });
 }
 
+/// 读取 `(连接代号, data_version)`；读取期间版本连接被替换则视为无效。
+async fn read_versioned() -> Option<(u64, i32)> {
+    let epoch = crate::db::version_connection_epoch();
+    let version = crate::comic::read_data_version().await.ok()?;
+    (crate::db::version_connection_epoch() == epoch).then_some((epoch, version))
+}
+
 async fn poll_loop() {
     let sender = sender();
     // init_db 可能尚未调用，此时先记 None，待首次读成功再作为基线（不视为变更）。
-    let mut last: Option<i32> = crate::comic::read_data_version().await.ok();
+    // 版本连接被替换（重新 init_db）时同样重设基线：跨连接的计数器不可比较。
+    let mut last: Option<(u64, i32)> = read_versioned().await;
 
     loop {
         tokio::time::sleep(POLL_INTERVAL).await;
@@ -60,16 +68,16 @@ async fn poll_loop() {
         }
         POLL_COUNT.fetch_add(1, Ordering::Relaxed);
 
-        let Ok(version) = crate::comic::read_data_version().await else {
+        let Some(current) = read_versioned().await else {
             continue;
         };
         match last {
-            None => last = Some(version),
-            Some(previous) if previous != version => {
-                last = Some(version);
+            Some((epoch, previous)) if epoch == current.0 && previous != current.1 => {
+                last = Some(current);
                 sender.send_modify(|generation| *generation = generation.wrapping_add(1));
             }
-            Some(_) => {}
+            Some(previous) if previous == current => {}
+            _ => last = Some(current),
         }
     }
 }

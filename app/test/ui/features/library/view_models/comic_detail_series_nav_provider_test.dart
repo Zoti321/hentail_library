@@ -8,11 +8,11 @@ import 'package:hentai_library/domain/repositories/series_repository.dart';
 import 'package:hentai_library/domain/reading/series_reading_context.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_detail_series_nav_provider.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
-import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:test/test.dart';
 
-class _FakeLibraryRevision extends LibraryRevision {
+class _FakeLibraryRevision extends LibraryRevisionNotifier {
   @override
   LibraryRevisionState build() {
     return const LibraryRevisionState(revision: 1, hasReceivedFirstEmit: true);

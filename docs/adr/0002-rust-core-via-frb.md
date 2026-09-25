@@ -24,4 +24,4 @@ Dart 在压缩包、EPUB、PDF 等格式上库支持弱；全库扫描与全量�
 - 构建与 CI 复杂度上升（Rust、vendor 原生库、多平台）。
 - 大爆炸切换前须完成全量迁移与 comicId/DB 兼容性验证。
 
-详见 `docs/agents/rust-migration.md` 与 GitHub PRD issue。
+详见 `docs/agents/rust-core.md`。

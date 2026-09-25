@@ -98,11 +98,7 @@ fn stat_unbounded(location: &str) -> Result<Option<ResourceStat>, HentaiError> {
     } else {
         return Ok(None);
     };
-    let modified_ms = meta
-        .modified()
-        .ok()
-        .map(system_time_to_ms)
-        .unwrap_or(0);
+    let modified_ms = meta.modified().ok().map(system_time_to_ms).unwrap_or(0);
     Ok(Some(ResourceStat {
         kind,
         size: meta.len(),
@@ -125,10 +121,7 @@ fn map_local_io_error(prefix: &str, path: &Path, err: std::io::Error) -> HentaiE
         kind,
         ErrorKind::TimedOut | ErrorKind::WouldBlock | ErrorKind::Interrupted
     ) {
-        return HentaiError::timed_out(format!(
-            "{prefix}: {} ({err})",
-            path.display()
-        ));
+        return HentaiError::timed_out(format!("{prefix}: {} ({err})", path.display()));
     }
     HentaiError::validation(format!("{prefix}: {} ({err})", path.display()))
 }

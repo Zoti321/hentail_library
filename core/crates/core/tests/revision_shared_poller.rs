@@ -126,6 +126,50 @@ fn observation_stops_when_no_subscriber_remains() {
     });
 }
 
+async fn wait_for_next_poll() {
+    let polls_before = revision::poll_count();
+    tokio::time::timeout(Duration::from_secs(2), async {
+        while revision::poll_count() <= polls_before {
+            tokio::time::sleep(Duration::from_millis(20)).await;
+        }
+    })
+    .await
+    .expect("poller 未在时限内完成一轮");
+}
+
+/// 换库（重新 init_db）不得被当成一次变更：`data_version` 是连接局部计数器，
+/// 旧版本连接上的基线与新连接的值没有可比性。
+#[test]
+fn reopening_the_database_does_not_wake_new_subscribers() {
+    common::with_global_db(|| {
+        let first = TempDir::new().expect("tempdir");
+        let second = TempDir::new().expect("tempdir");
+        let first_db = common::create_fixture_db(first.path());
+        let second_db = common::create_fixture_db(second.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&first_db).await.expect("init first db");
+            let mut rx = revision::subscribe();
+            wait_for_next_poll().await;
+            let db = connection().expect("connection");
+            for index in 0..3 {
+                insert_comic(&db, &format!("reopen-{index}")).await;
+            }
+            tokio::time::timeout(Duration::from_secs(5), rx.changed())
+                .await
+                .expect("首个库的写入未唤醒订阅者")
+                .expect("sender dropped");
+            drop(rx);
+
+            init_db_at_path(&second_db).await.expect("init second db");
+            let mut rx = revision::subscribe();
+            let woken = tokio::time::timeout(Duration::from_millis(1600), rx.changed()).await;
+
+            assert!(woken.is_err(), "换库后无写入却被唤醒：{woken:?}");
+        });
+    });
+}
+
 /// 无写入时订阅者不得被唤醒——否则退回成本次修复前的误报重载。
 #[test]
 fn subscribers_are_not_woken_without_a_commit() {

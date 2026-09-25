@@ -1,5 +1,6 @@
+mod common;
+
 use std::path::{Path, PathBuf};
-use std::sync::Mutex;
 
 use hentai_core::{
     create_local_library, init_db_at_path, list_libraries, update_library_sidebar_layout,
@@ -7,48 +8,6 @@ use hentai_core::{
 };
 use sea_orm::{ConnectionTrait, Database, Statement};
 use tempfile::TempDir;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    std::fs::read_to_string(
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/drift_v2.sql"),
-    )
-    .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
 
 fn mkdir_lib(dir: &Path, name: &str) -> PathBuf {
     let root = dir.join(name);
@@ -58,9 +17,9 @@ fn mkdir_lib(dir: &Path, name: &str) -> PathBuf {
 
 #[test]
 fn new_libraries_are_pinned_and_append_in_create_order() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let zebra = mkdir_lib(temp.path(), "zebra");
         let apple = mkdir_lib(temp.path(), "apple");
 
@@ -88,9 +47,9 @@ fn new_libraries_are_pinned_and_append_in_create_order() {
 
 #[test]
 fn list_libraries_returns_pinned_then_unpinned_by_sidebar_order() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let a = mkdir_lib(temp.path(), "a");
         let b = mkdir_lib(temp.path(), "b");
         let c = mkdir_lib(temp.path(), "c");
@@ -142,9 +101,9 @@ fn list_libraries_returns_pinned_then_unpinned_by_sidebar_order() {
 
 #[test]
 fn new_library_appends_to_pinned_end_when_unpinned_exist() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let a = mkdir_lib(temp.path(), "a");
         let b = mkdir_lib(temp.path(), "b");
         let c = mkdir_lib(temp.path(), "c");
@@ -192,9 +151,9 @@ fn new_library_appends_to_pinned_end_when_unpinned_exist() {
 
 #[test]
 fn update_library_sidebar_layout_rejects_incomplete_set() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let a = mkdir_lib(temp.path(), "a");
         let b = mkdir_lib(temp.path(), "b");
 
@@ -222,11 +181,11 @@ fn update_library_sidebar_layout_rejects_incomplete_set() {
 
 #[test]
 fn saved_paths_migrate_to_pinned_in_root_path_order() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let zebra = mkdir_lib(temp.path(), "zebra");
         let apple = mkdir_lib(temp.path(), "apple");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
 
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {

@@ -11,9 +11,10 @@ What this app is, what it is not, and which comic resource formats are in scope.
 | Scan & sync comic files into a Library (local disk) | Yes |
 | Remote Library via user-hosted WebDAV (streamed read) | Yes |
 | Multiple Libraries with per-Library config (e.g. format groups) | Yes |
-| Browse, search, filter within the Current library; Reading history global | Yes |
+| Browse, search, filter within the Current library; Home dashboard; Reading history global | Yes |
 | Read comics in-app (paged / scroll layouts) | Yes |
-| Manage metadata, series order, reading history | Yes |
+| Manage metadata (Tag / Author / Parody / Character / Language), series order, reading history | Yes |
+| In-app update check | Yes |
 | Cross-platform desktop + mobile | Yes (responsive desktop-style UI) |
 | Official cloud sync, accounts, storefront | No |
 | WebDAV backup of settings/DB (separate future issue) | Not in current WebDAV library-source work |
@@ -37,9 +38,9 @@ A **Resource** is a file or directory (local) or WebDAV file (remote) that can b
 
 ### Target format matrix
 
-| Format | Extensions | Category | Local | Remote (WebDAV) first slice |
-|--------|------------|----------|-------|------------------------------|
-| Image directory | _(folder)_ | Loose images | Supported | Out of scope (first slice) |
+| Format | Extensions | Category | Local | Remote (WebDAV) |
+|--------|------------|----------|-------|-----------------|
+| Image directory | _(folder)_ | Loose images | Supported | Out of scope |
 | ZIP archive | `.zip` | Comic archive | Supported | Supported |
 | CBZ | `.cbz` | Comic archive | Supported | Supported |
 | RAR archive | `.rar` | Comic archive | Supported | Supported |
@@ -64,7 +65,7 @@ PDF is served by vendored **pdfium** across all platforms — desktop, Android, 
 | `cb7` / `sevenz` | Yes | Yes | |
 | `pdf` | Yes | Yes | pdfium on all platforms incl. iOS (ADR-0015) |
 
-Multi-Library and WebDAV remote libraries are in scope and implemented (ADR-0008). Core scan/read/DB live in Rust (`core/`) via FRB; see `docs/agents/rust-migration.md` and ADR-0002.
+Multi-Library and WebDAV remote libraries are in scope and implemented (ADR-0008). Core scan/read/DB live in Rust (`core/`) via FRB; see `docs/agents/rust-core.md` and ADR-0002.
 
 ### Out of scope (unless explicitly requested)
 
@@ -76,7 +77,7 @@ Multi-Library and WebDAV remote libraries are in scope and implemented (ADR-0008
 
 ## Reading fidelity
 
-In-app **Read session** page images follow **Page image fidelity** in `CONTEXT.md`: show source page bitmaps faithfully. Do **not** trade page sampling quality for scroll FPS (no scroll-time `FilterQuality` downgrade / idle “upgrade”). Layout-constrained decode (`cacheWidth`) is allowed; dynamic or `FilterQuality.high` page sampling is not. This product rule **outranks** reader UI performance ideas in `docs/research/ui-performance-tuning.md` (notably superseded P2-1). Covers / library thumbnails are out of scope.
+In-app **Read session** page images follow **Page image fidelity** in `CONTEXT.md`: show source page bitmaps faithfully. Do **not** trade page sampling quality for scroll FPS (no scroll-time `FilterQuality` downgrade / idle “upgrade”). Layout-constrained decode (`cacheWidth`) is allowed; dynamic or `FilterQuality.high` page sampling is not. This product rule **outranks** reader UI performance tweaks. Covers / library thumbnails are out of scope.
 
 ## Agent guidance
 

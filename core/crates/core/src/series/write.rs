@@ -79,10 +79,7 @@ pub async fn set_series_meta_locks(
     series_id: &str,
     locks: SetSeriesMetaLocksDto,
 ) -> Result<(), HentaiError> {
-    if locks.name.is_none()
-        && locks.serialization_status.is_none()
-        && locks.total_count.is_none()
-    {
+    if locks.name.is_none() && locks.serialization_status.is_none() && locks.total_count.is_none() {
         return Ok(());
     }
     let db = connection()?;
@@ -120,9 +117,7 @@ pub async fn update_series_item_sort_order(
     let series_id = series_id.trim();
     let comic_id = comic_id.trim();
     if series_id.is_empty() || comic_id.is_empty() {
-        return Err(HentaiError::validation(
-            "系列或漫画标识无效".to_string(),
-        ));
+        return Err(HentaiError::validation("系列或漫画标识无效".to_string()));
     }
     let db = connection()?;
     let existing = SeriesItems::find()
@@ -132,9 +127,7 @@ pub async fn update_series_item_sort_order(
         .await
         .map_err(map_db_err)?
         .ok_or_else(|| {
-            HentaiError::validation(format!(
-                "系列成员不存在: {series_id}/{comic_id}"
-            ))
+            HentaiError::validation(format!("系列成员不存在: {series_id}/{comic_id}"))
         })?;
 
     let mut active: series_items::ActiveModel = existing.into();
@@ -153,9 +146,7 @@ pub async fn set_series_item_sort_order_locked(
     let series_id = series_id.trim();
     let comic_id = comic_id.trim();
     if series_id.is_empty() || comic_id.is_empty() {
-        return Err(HentaiError::validation(
-            "系列或漫画标识无效".to_string(),
-        ));
+        return Err(HentaiError::validation("系列或漫画标识无效".to_string()));
     }
     let db = connection()?;
     let existing = SeriesItems::find()
@@ -165,9 +156,7 @@ pub async fn set_series_item_sort_order_locked(
         .await
         .map_err(map_db_err)?
         .ok_or_else(|| {
-            HentaiError::validation(format!(
-                "系列成员不存在: {series_id}/{comic_id}"
-            ))
+            HentaiError::validation(format!("系列成员不存在: {series_id}/{comic_id}"))
         })?;
 
     let mut active: series_items::ActiveModel = existing.into();

@@ -57,15 +57,3 @@ final libraryDisplayedSeriesCountProvider = Provider<int>((Ref ref) {
     readCount: (LibrarySeriesCatalogState state) => state.displayedCount,
   );
 });
-
-/// 漫画目录展示层：默认转发 controller，搜索页可 override。
-final libraryComicsCatalogContentProvider =
-    Provider<AsyncValue<LibraryComicsCatalogState>>((Ref ref) {
-      return ref.watch(libraryComicsCatalogControllerProvider);
-    });
-
-/// 系列目录展示层：默认转发 controller，搜索页可 override。
-final librarySeriesCatalogContentProvider =
-    Provider<AsyncValue<LibrarySeriesCatalogState>>((Ref ref) {
-      return ref.watch(librarySeriesCatalogControllerProvider);
-    });

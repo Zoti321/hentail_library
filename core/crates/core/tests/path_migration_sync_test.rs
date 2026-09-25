@@ -1,65 +1,23 @@
+mod common;
+
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
-use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+use std::path::Path;
 
 use hentai_core::comic::UpdateComicUserMetaDto;
 use hentai_core::sync::format_group::FormatGroup;
 use hentai_core::sync::handle::create_sync_handle;
 use hentai_core::sync::plan::build_scan_replace_plan;
-use hentai_core::sync::scanner::{ScanContext, scan_roots};
+use hentai_core::sync::scanner::{scan_roots, ScanContext};
 use hentai_core::sync::writer::apply_scan_replace_plan;
 use hentai_core::{
     comic_id_from_path, connection, find_comic_by_id, get_reading_by_comic_id, init_db_at_path,
     record_reading, update_comic_user_meta, ReadingHistoryDto,
 };
-use sea_orm::{ConnectionTrait, Database, Statement};
 use tempfile::TempDir;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    std::fs::read_to_string(
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/drift_v2.sql"),
-    )
-    .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
 
 fn write_cbz(path: &Path) {
     let file = File::create(path).expect("create");
@@ -72,9 +30,9 @@ fn write_cbz(path: &Path) {
 
 #[test]
 fn rename_cbz_migrates_user_metadata_and_reading_history() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root = temp.path().join("library");
         std::fs::create_dir(&root).expect("mkdir root");
 
@@ -154,12 +112,7 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
                 .await
                 .expect("second apply");
 
-            assert!(
-                find_comic_by_id(&old_id)
-                    .await
-                    .expect("find old")
-                    .is_none()
-            );
+            assert!(find_comic_by_id(&old_id).await.expect("find old").is_none());
             let migrated = find_comic_by_id(&new_id)
                 .await
                 .expect("find new")
@@ -180,9 +133,9 @@ fn rename_cbz_migrates_user_metadata_and_reading_history() {
 
 #[test]
 fn ambiguous_same_fingerprint_moves_do_not_migrate() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root = temp.path().join("library");
         std::fs::create_dir(&root).expect("mkdir root");
 
@@ -262,18 +215,14 @@ fn ambiguous_same_fingerprint_moves_do_not_migrate() {
                 .await
                 .expect("second apply");
 
-            assert!(
-                find_comic_by_id(&first_id)
-                    .await
-                    .expect("find old first")
-                    .is_none()
-            );
-            assert!(
-                find_comic_by_id(&second_id)
-                    .await
-                    .expect("find old second")
-                    .is_none()
-            );
+            assert!(find_comic_by_id(&first_id)
+                .await
+                .expect("find old first")
+                .is_none());
+            assert!(find_comic_by_id(&second_id)
+                .await
+                .expect("find old second")
+                .is_none());
         });
     });
 }

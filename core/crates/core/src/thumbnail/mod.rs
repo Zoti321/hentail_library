@@ -6,7 +6,7 @@ pub use generate::{
     store_thumbnail_for_comic, store_thumbnail_for_comic_with, thumbnail_needs_generation,
 };
 pub use queue::{
-    ensure_thumbnail, enqueue_thumbnails_low, watch_thumbnail_events, ThumbnailEvent,
+    enqueue_thumbnails_low, ensure_thumbnail, watch_thumbnail_events, ThumbnailEvent,
     ThumbnailPriority, CRITICAL_WAIT_TIMEOUT,
 };
 

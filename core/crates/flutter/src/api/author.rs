@@ -1,6 +1,7 @@
 use hentai_core::{
     add_author as core_add, count_all_authors as core_count, delete_authors_by_names,
-    fetch_authors_page as core_fetch, list_all_authors, rename_author as core_rename, watch_authors,
+    fetch_authors_page as core_fetch, list_all_authors, rename_author as core_rename,
+    watch_authors,
 };
 
 use super::comic::PageRequestDto;
@@ -21,7 +22,9 @@ pub fn list_all_authors_frb() -> Result<Vec<String>, HentaiErrorDto> {
 }
 
 #[flutter_rust_bridge::frb(sync)]
-pub fn fetch_authors_page_frb(request: PageRequestDto) -> Result<AuthorPagedNamesDto, HentaiErrorDto> {
+pub fn fetch_authors_page_frb(
+    request: PageRequestDto,
+) -> Result<AuthorPagedNamesDto, HentaiErrorDto> {
     hentai_core::runtime::block_on(async {
         let total = core_count().await?;
         let page_size = request.page_size.max(1);
@@ -66,8 +69,8 @@ pub fn rename_author_frb(old_name: String, new_name: String) -> Result<(), Henta
 }
 
 #[flutter_rust_bridge::frb]
-pub async fn watch_authors_frb(sink: crate::frb_generated::StreamSink<Vec<String>>) -> Result<(), HentaiErrorDto> {
-    normalize_watch_result(
-        watch_authors(|items| emit_or_closed(&sink, items)).await,
-    )
+pub async fn watch_authors_frb(
+    sink: crate::frb_generated::StreamSink<Vec<String>>,
+) -> Result<(), HentaiErrorDto> {
+    normalize_watch_result(watch_authors(|items| emit_or_closed(&sink, items)).await)
 }

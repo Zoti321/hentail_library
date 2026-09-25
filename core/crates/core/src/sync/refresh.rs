@@ -266,27 +266,28 @@ fn probe_remote_library_skip(library: &LibraryDto) -> Result<Option<String>, Hen
         return Ok(Some(warning));
     };
     match WebDavResourceAccess::connect(&library.root_path, &library.username, &password) {
-        Ok(access) => {
-            match access.stat(&normalize_remote_location_key(&library.root_path)) {
-                Err(err) if err.is_remote_access_failure() => {
-                    let warning = format!(
-                        "已跳过远程库（不可达）: {} — {}",
-                        library.root_path, err.message
-                    );
-                    tracing::warn!(library_id = %library.library_id, "{warning}");
-                    Ok(Some(warning))
-                }
-                Err(err) => Err(err),
-                Ok(None) => {
-                    let warning = format!("已跳过远程库（不可达）: {}", library.root_path);
-                    tracing::warn!(library_id = %library.library_id, "{warning}");
-                    Ok(Some(warning))
-                }
-                Ok(Some(_)) => Ok(None),
+        Ok(access) => match access.stat(&normalize_remote_location_key(&library.root_path)) {
+            Err(err) if err.is_remote_access_failure() => {
+                let warning = format!(
+                    "已跳过远程库（不可达）: {} — {}",
+                    library.root_path, err.message
+                );
+                tracing::warn!(library_id = %library.library_id, "{warning}");
+                Ok(Some(warning))
             }
-        }
+            Err(err) => Err(err),
+            Ok(None) => {
+                let warning = format!("已跳过远程库（不可达）: {}", library.root_path);
+                tracing::warn!(library_id = %library.library_id, "{warning}");
+                Ok(Some(warning))
+            }
+            Ok(Some(_)) => Ok(None),
+        },
         Err(err) if err.is_remote_access_failure() => {
-            let warning = format!("已跳过远程库（不可达）: {} — {}", library.root_path, err.message);
+            let warning = format!(
+                "已跳过远程库（不可达）: {} — {}",
+                library.root_path, err.message
+            );
             tracing::warn!(library_id = %library.library_id, "{warning}");
             Ok(Some(warning))
         }

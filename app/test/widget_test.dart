@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
-import 'package:hentai_library/ui/features/settings/state/app_update_coordinator_notifier.dart';
+import 'package:hentai_library/ui/features/settings/view_models/app_update_coordinator_notifier.dart';
 import 'package:hentai_library/ui/features/settings/view_models/settings_notifier.dart';
-import 'package:hentai_library/ui/features/shell/state/app_startup_coordinator_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/app_startup_coordinator_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/app.dart';
 import 'package:riverpod/misc.dart' show Override;
 

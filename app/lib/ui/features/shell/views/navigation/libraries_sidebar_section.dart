@@ -14,7 +14,7 @@ import 'package:hentai_library/ui/core/widgets/navigation/desktop_sidebar.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_routes.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/library_sidebar_overflow_actions.dart';
-import 'package:hentai_library/ui/features/shell/state/metadata_refresh_toasts.dart';
+import 'package:hentai_library/ui/features/shell/view_models/metadata_refresh_toasts.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

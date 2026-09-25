@@ -61,17 +61,13 @@ fn decode_named(name: &str) -> Option<char> {
 }
 
 fn decode_numeric(body: &str) -> Option<char> {
-    let (radix, digits) = if let Some(hex) = body.strip_prefix('#') {
-        if let Some(hex_digits) = hex
-            .strip_prefix('x')
-            .or_else(|| hex.strip_prefix('X'))
-        {
+    let (radix, digits) = {
+        let hex = body.strip_prefix('#')?;
+        if let Some(hex_digits) = hex.strip_prefix('x').or_else(|| hex.strip_prefix('X')) {
             (16, hex_digits)
         } else {
             (10, hex)
         }
-    } else {
-        return None;
     };
 
     if digits.is_empty() {

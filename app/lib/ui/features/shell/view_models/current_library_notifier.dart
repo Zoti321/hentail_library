@@ -1,0 +1,184 @@
+import 'package:hentai_library/domain/library/format_group.dart';
+import 'package:hentai_library/domain/library/library_sidebar_layout.dart';
+import 'package:hentai_library/domain/models/entity/library/local_library.dart';
+import 'package:hentai_library/domain/models/value_objects/form/library_form.dart';
+import 'package:hentai_library/domain/repositories/library_repository.dart';
+import 'package:hentai_library/ui/features/shell/di/repos.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+part 'current_library_notifier.g.dart';
+
+const String _kMigratedFormatGroupsPref =
+    'migrated_enabled_format_groups_to_libraries_v1';
+const String _kMigratedAutoScanPref = 'migrated_auto_scan_to_libraries_v1';
+
+class CurrentLibraryState {
+  const CurrentLibraryState({required this.libraries, required this.currentId});
+
+  final List<LocalLibrary> libraries;
+  final String? currentId;
+
+  LocalLibrary? get current {
+    final String? id = currentId;
+    if (id == null) {
+      return null;
+    }
+    for (final LocalLibrary library in libraries) {
+      if (library.libraryId == id) {
+        return library;
+      }
+    }
+    return null;
+  }
+
+  LocalLibrary? findByRootPath(String rootPath) {
+    for (final LocalLibrary library in libraries) {
+      if (library.rootPath == rootPath) {
+        return library;
+      }
+    }
+    return null;
+  }
+
+  CurrentLibraryState copyWith({
+    List<LocalLibrary>? libraries,
+    String? currentId,
+    bool clearCurrentId = false,
+  }) {
+    return CurrentLibraryState(
+      libraries: libraries ?? this.libraries,
+      currentId: clearCurrentId ? null : (currentId ?? this.currentId),
+    );
+  }
+}
+
+@Riverpod(keepAlive: true)
+class CurrentLibraryNotifier extends _$CurrentLibraryNotifier {
+  LibraryRepository get _repo => ref.read(libraryRepoProvider);
+
+  @override
+  Future<CurrentLibraryState> build() async {
+    return _load();
+  }
+
+  Future<void> refresh() async {
+    state = await AsyncValue.guard(_load);
+  }
+
+  Future<void> select(String libraryId) async {
+    final CurrentLibraryState? previous = state.asData?.value;
+    await _repo.setCurrentId(libraryId);
+    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
+    if (previous != null) {
+      state = AsyncData(previous.copyWith(currentId: libraryId));
+    }
+    await refresh();
+  }
+
+  Future<void> updateSidebarLayout(
+    List<LibrarySidebarPlacement> placements,
+  ) async {
+    final List<LocalLibrary> libraries = await _repo.updateSidebarLayout(
+      placements,
+    );
+    final CurrentLibraryState? previous = state.asData?.value;
+    state = AsyncData(
+      CurrentLibraryState(libraries: libraries, currentId: previous?.currentId),
+    );
+  }
+
+  /// 提交 Library 表单：[original] 为空时新建，否则编辑。成功后重载列表并通知 revision。
+  Future<LibraryFormApplyResult> submitLibraryForm(
+    LibraryForm form, {
+    LocalLibrary? original,
+  }) async {
+    final LibraryFormApplyResult result = original == null
+        ? await form.create(_repo)
+        : await form.applyTo(_repo, original);
+    if (result is LibraryFormApplySucceeded) {
+      await refresh();
+      ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
+    }
+    return result;
+  }
+
+  /// 删除 Library（不删盘，ADR-0012）并重载列表；失败时抛出，状态保持不变。
+  Future<void> deleteLibrary(String libraryId) async {
+    await _repo.delete(libraryId);
+    await refresh();
+    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
+  }
+
+  Future<void> clear() async {
+    final CurrentLibraryState? previous = state.asData?.value;
+    await _repo.setCurrentId(null);
+    ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
+    if (previous != null) {
+      state = AsyncData(previous.copyWith(clearCurrentId: true));
+    }
+    await refresh();
+  }
+
+  Future<CurrentLibraryState> _load() async {
+    await _migrateFormatGroupsFromLegacyIfNeeded();
+    await _migrateAutoScanFromLegacyIfNeeded();
+    try {
+      await ref.read(appSettingRepoProvider).clearLegacyImportPayload();
+    } catch (_) {
+      // Best-effort cleanup of staged legacy import keys.
+    }
+    final List<LocalLibrary> libraries = await _repo.list();
+    final String? currentId = await _repo.getCurrentId();
+    return CurrentLibraryState(libraries: libraries, currentId: currentId);
+  }
+
+  /// One-shot: copy legacy app-global format groups onto each Local library.
+  Future<void> _migrateFormatGroupsFromLegacyIfNeeded() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool(_kMigratedFormatGroupsPref) == true) {
+        return;
+      }
+      final List<LocalLibrary> libraries = await _repo.list();
+      if (libraries.isEmpty) {
+        await prefs.setBool(_kMigratedFormatGroupsPref, true);
+        return;
+      }
+      final List<FormatGroup>? legacyGroups = await ref
+          .read(appSettingRepoProvider)
+          .peekLegacyEnabledFormatGroups();
+      final List<FormatGroup> groups =
+          legacyGroups ?? List<FormatGroup>.from(FormatGroup.all);
+      for (final LocalLibrary library in libraries) {
+        await _repo.updateFormatGroups(
+          libraryId: library.libraryId,
+          groups: groups,
+        );
+      }
+      await prefs.setBool(_kMigratedFormatGroupsPref, true);
+    } catch (_) {
+      // Best-effort upgrade path; browse still works with DB defaults.
+    }
+  }
+
+  /// One-shot: legacy app-level autoScan → all libraries Scan on startup.
+  Future<void> _migrateAutoScanFromLegacyIfNeeded() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool(_kMigratedAutoScanPref) == true) {
+        return;
+      }
+      final bool? legacy = await ref
+          .read(appSettingRepoProvider)
+          .peekLegacyAutoScan();
+      if (legacy == true) {
+        await _repo.setAllScanOnStartup(true);
+      }
+      await prefs.setBool(_kMigratedAutoScanPref, true);
+    } catch (_) {
+      // Best-effort; libraries keep scan_on_startup defaults.
+    }
+  }
+}

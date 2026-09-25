@@ -4,18 +4,47 @@ Project-specific conventions for UI widgets and lightweight data shapes. Agents 
 
 ## Project layout
 
-Monorepo layout (see `docs/agents/rust-migration.md`):
+Monorepo (`app/` Flutter, `core/` Rust): see `docs/agents/rust-core.md`. Dart layers under `app/lib/`:
 
 | Path | Role |
 |------|------|
-| `app/lib/core/` | Cross-cutting Dart utilities (logging via `package:logging` + `AppLog`, l10n, path/format helpers). |
-| `app/lib/domain/` | Domain models (`models/`). No Dart use cases; library query **projection** (`library/`) may remain for UI filter building. |
-| `app/lib/data/` | Repositories (thin FRB adapters). No Drift, no `services/comic/`. |
-| `app/lib/ui/` | Shared widgets/theme and feature modules. |
-| `core/crates/core/` | Rust: SeaORM, scan, sync, reader, thumbnail, series inference. |
-| `core/crates/flutter/` | FRB glue (`#[frb]` API). |
+| `core/` | Cross-cutting utilities (`logging` + `AppLog`, l10n, path/format helpers). |
+| `domain/models/` | Entities and value objects. |
+| `domain/repositories/` | Repository interfaces. |
+| `domain/library/` | Filter / projection plus sync / refresh / deletion coordinators (FRB orchestration, not a second business core). |
+| `domain/reading/` | Read session types and coordinators. |
+| `domain/ports/` | UI-facing ports (clipboard, page source). |
+| `data/repositories/` | Thin FRB adapters. No Drift. |
+| `data/adapters/` | Mapper / guard / FRB call adapters. |
+| `data/services/` | Dart-only services (app update, tag dictionary download). |
+| `ui/` | Shared widgets/theme and feature modules (`features/*/view_models/`, `features/shell/di/`). |
+| `src/rust/` | FRB generated — do not hand-edit. |
 
-Import canonical paths from `app/lib/`. Do not add Flutter sources at the repo root or under removed legacy roots (`presentation/`, `model/`, `repository/`, `services/`, `usecases/`, `database/`, `module/`).
+Import canonical paths from `app/lib/`. Do not add Flutter sources at the repo root or under removed legacy roots (`presentation/`, `model/`, `repository/`, `services/`, `usecases/`, `database/`).
+
+## UI architecture (MVVM)
+
+Presentation layer follows **MVVM with Riverpod** (ADR-0017). State management is **Riverpod 3 only** (`flutter_riverpod`, `hooks_riverpod`, `riverpod_annotation`) — not the legacy `package:provider`.
+
+| Layer | Path | Role |
+|-------|------|------|
+| View | `ui/features/**/views/`, `ui/core/widgets/` | Render; `ref.watch` ViewModel/Facade; fire commands via Notifier or callbacks |
+| ViewModel | `ui/features/**/view_models/` | UI state, Repository/Service orchestration, command API |
+| Model | `domain/models/`, `domain/repositories/` | Entities and repository interfaces |
+
+**Hard rules**
+
+- **View must not call Repository** — no `*RepoProvider` in `views/` or `ui/core/widgets/`. Shared widgets use constructor callbacks; feature pages delegate to ViewModel.
+- **ViewModel lives under `view_models/`** — `state/` directories are gone (e.g. `shell/view_models/current_library_notifier.dart`, `settings/view_models/diagnostic_mode_notifier.dart`); `test/project_layout_test.dart` fails if one reappears under `ui/features/`.
+- **Complex pages** may keep internal intent→derive chains; expose a **Facade Provider** to the page root. Leaf widgets may still `select` fine-grained fields.
+
+**Class naming**
+
+| Suffix | Use |
+|--------|-----|
+| `{Noun}Notifier` | Mutable UI state (`SettingsNotifier`) |
+| `{noun}ViewModel` provider | Read-only aggregate (`readerPageViewModel`) |
+| `{Noun}Controller` | Pagination catalog or long-running orchestration only (`ScanLibraryController`, `LibraryComicsCatalogController`) |
 
 ## Widget state
 
@@ -102,21 +131,4 @@ Rules:
 - **Stateful UI:** sealed `{Noun}State` consumed by widgets.
 - **Plain data bundle** (no persistence / wire format): prefer `typedef` + record per [Lightweight data shapes](#lightweight-data-shapes).
 - `*Dto` suffix: FRB / JSON / serialization boundaries only — not general UI pass-through types.
-
-### Completed renames (reference)
-
-| Former | Current |
-|--------|---------|
-| `librarySeriesRepo` | `seriesRepo` |
-| `libraryTagRepo` | `tagRepo` |
-| `libraryAuthorRepo` | `authorRepo` |
-| `settings_theme_row.dart` / `ThemePreferenceRow` | `theme_preference_row.dart` |
-| `rename_tag_dialog.dart` / `TagNameEditorDialog` | `tag_name_editor_dialog.dart` |
-| `ComicCoverDisplayData` | `ComicCoverImage`（`comic_cover_image.dart`） |
-| `HistoryGridItemDto`（freezed） | `HistoryGridItem`（typedef record + `historyGridItem()`） |
-| `PageRequest` class | `PageRequest` typedef record + `pageRequest()` |
-| `comicCoverDisplayDataOrPrevious` | `comicCoverImageOrPrevious` |
-| `MyToggleSwitch` / `my_toggle_switch.dart` | `ToggleSwitch` / `toggle_switch.dart` |
-| `DebouncedActionRunner` / `debounced_action_runner.dart` | `Debouncer` / `debouncer.dart` |
-| `MetadataPanelHeightCalculator` | `metadataPanelCardHeight()` + `kMetadataPanelHeightDefaultConfig` |
 

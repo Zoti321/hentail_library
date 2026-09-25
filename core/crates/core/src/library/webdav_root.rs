@@ -25,9 +25,8 @@ pub fn normalize_webdav_root(raw: &str, allow_http: bool) -> Result<String, Hent
         format!("https://{trimmed}")
     };
 
-    let mut parsed = Url::parse(&with_scheme).map_err(|_| {
-        HentaiError::validation("WebDAV 根 URL 无效")
-    })?;
+    let mut parsed =
+        Url::parse(&with_scheme).map_err(|_| HentaiError::validation("WebDAV 根 URL 无效"))?;
 
     match parsed.scheme() {
         "https" => {}

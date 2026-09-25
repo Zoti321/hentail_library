@@ -38,12 +38,8 @@ pub(crate) fn is_comic_image_name(name: &str) -> bool {
 }
 
 pub(crate) fn sort_archive_entry_names(mut names: Vec<String>) -> Vec<String> {
-    names.sort_by(|a, b| {
-        compare_filename_natural(
-            &basename(Path::new(a)),
-            &basename(Path::new(b)),
-        )
-    });
+    names
+        .sort_by(|a, b| compare_filename_natural(&basename(Path::new(a)), &basename(Path::new(b))));
     names
 }
 

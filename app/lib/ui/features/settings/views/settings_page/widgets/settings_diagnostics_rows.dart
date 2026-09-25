@@ -4,7 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/log_export_flow.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
-import 'package:hentai_library/ui/features/settings/state/diagnostic_mode_notifier.dart';
+import 'package:hentai_library/ui/features/settings/view_models/diagnostic_mode_notifier.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';

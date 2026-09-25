@@ -27,9 +27,7 @@ use crate::series_id::series_id_from_folder_path;
 use crate::sync::format_group::FormatGroup;
 use crate::sync::migrate::ComicMigration;
 use crate::sync::try_acquire_library_write_lock;
-use crate::sync::writer::{
-    apply_comic_rekeys, delete_comics_side_effects, rekey_reference_column,
-};
+use crate::sync::writer::{apply_comic_rekeys, delete_comics_side_effects, rekey_reference_column};
 
 const PREF_CURRENT_LIBRARY_ID: &str = "current_library_id";
 const KIND_LOCAL: &str = "local";
@@ -513,7 +511,8 @@ async fn migrate_local_library_root_rows<C: ConnectionTrait>(
     old_root: &str,
     new_root: &str,
 ) -> Result<(), HentaiError> {
-    let comic_migrations = load_local_root_comic_migrations(db, library_id, old_root, new_root).await?;
+    let comic_migrations =
+        load_local_root_comic_migrations(db, library_id, old_root, new_root).await?;
     apply_comic_rekeys(db, &comic_migrations).await?;
     rekey_local_root_series(db, library_id, old_root, new_root).await?;
     Ok(())
@@ -562,7 +561,8 @@ async fn rekey_local_root_series<C: ConnectionTrait>(
         .await
         .map_err(map_db_err)?;
     for row in rows {
-        let Some(new_folder_path) = remap_root_relative_path(&row.folder_path, old_root, new_root) else {
+        let Some(new_folder_path) = remap_root_relative_path(&row.folder_path, old_root, new_root)
+        else {
             continue;
         };
         if !target_resource_is_dir(&new_folder_path)? {
@@ -596,8 +596,14 @@ async fn rekey_local_root_series<C: ConnectionTrait>(
         ))
         .await
         .map_err(map_db_err)?;
-        rekey_reference_column(db, "series_thumbnails", "series_id", &from_series_id, &new_series_id)
-            .await?;
+        rekey_reference_column(
+            db,
+            "series_thumbnails",
+            "series_id",
+            &from_series_id,
+            &new_series_id,
+        )
+        .await?;
         Series::delete_by_id(from_series_id)
             .exec(db)
             .await
@@ -658,10 +664,22 @@ async fn load_comics_ordered_for_connection<C: ConnectionTrait>(
         .all(db)
         .await
         .map_err(map_db_err)?;
-    let author_map =
-        load_named_rows(db, "comic_authors", "author_name", comic_ids, "ORDER BY author_name ASC").await?;
-    let tag_map =
-        load_named_rows(db, "comic_tags", "tag_name", comic_ids, "ORDER BY tag_name ASC").await?;
+    let author_map = load_named_rows(
+        db,
+        "comic_authors",
+        "author_name",
+        comic_ids,
+        "ORDER BY author_name ASC",
+    )
+    .await?;
+    let tag_map = load_named_rows(
+        db,
+        "comic_tags",
+        "tag_name",
+        comic_ids,
+        "ORDER BY tag_name ASC",
+    )
+    .await?;
     let parody_map = load_named_rows(
         db,
         "comic_parodies",
@@ -680,8 +698,10 @@ async fn load_comics_ordered_for_connection<C: ConnectionTrait>(
     .await?;
     let last_read_map = load_last_read_times_for_comics(db, comic_ids).await?;
 
-    let mut by_id: HashMap<String, crate::entity::comics::Model> =
-        models.into_iter().map(|m| (m.comic_id.clone(), m)).collect();
+    let mut by_id: HashMap<String, crate::entity::comics::Model> = models
+        .into_iter()
+        .map(|m| (m.comic_id.clone(), m))
+        .collect();
     let meta_by_id: HashMap<String, crate::entity::comic_meta::Model> = meta_models
         .into_iter()
         .map(|m| (m.comic_id.clone(), m))
@@ -711,7 +731,10 @@ async fn load_comics_ordered_for_connection<C: ConnectionTrait>(
             tags: tag_map.get(&model.comic_id).cloned().unwrap_or_default(),
             languages: crate::comic::parse_languages_json(&meta.languages),
             parodies: parody_map.get(&model.comic_id).cloned().unwrap_or_default(),
-            characters: character_map.get(&model.comic_id).cloned().unwrap_or_default(),
+            characters: character_map
+                .get(&model.comic_id)
+                .cloned()
+                .unwrap_or_default(),
             locks: crate::comic::ComicMetaLocks {
                 title: meta.title_locked,
                 description: meta.description_locked,

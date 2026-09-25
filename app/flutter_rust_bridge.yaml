@@ -1,3 +1,4 @@
+auto_upgrade_dependency: false
 rust_input: crate::api
 rust_root: rust_builder/rust/
 dart_output: lib/src/rust

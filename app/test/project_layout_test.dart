@@ -58,4 +58,36 @@ void main() {
       expect(actualNames, expectedNames);
     });
   });
+
+  group('UI presentation layout (ADR-0017)', () {
+    test('features keep ViewModels under view_models/, not state/', () {
+      final List<String> stateDirs = <String>['lib', 'test']
+          .map((String root) => Directory(p.join(root, 'ui', 'features')))
+          .where((Directory dir) => dir.existsSync())
+          .expand((Directory dir) => dir.listSync(recursive: true))
+          .whereType<Directory>()
+          .where((Directory dir) => p.basename(dir.path) == 'state')
+          .map((Directory dir) => p.posix.joinAll(p.split(dir.path)))
+          .toList();
+      expect(stateDirs, isEmpty);
+    });
+
+    test('views and ui/core widgets never touch Repository providers', () {
+      final RegExp repoProvider = RegExp(r'\b\w+RepoProvider\b');
+      final List<String> offenders = Directory(p.join('lib', 'ui'))
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((File file) => file.path.endsWith('.dart'))
+          .where((File file) {
+            final List<String> segments = p.split(file.path);
+            final bool isView = segments.contains('views');
+            final bool isCoreUi = segments.length > 2 && segments[2] == 'core';
+            return isView || isCoreUi;
+          })
+          .where((File file) => repoProvider.hasMatch(file.readAsStringSync()))
+          .map((File file) => p.posix.joinAll(p.split(file.path)))
+          .toList();
+      expect(offenders, isEmpty);
+    });
+  });
 }

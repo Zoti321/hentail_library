@@ -3,9 +3,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// History 网格中应使用 high 优先级加载封面的索引集合（对齐 catalog 视口分级）。
 final historyCoverViewportProvider =
-    NotifierProvider<HistoryCoverViewport, Set<int>>(HistoryCoverViewport.new);
+    NotifierProvider<HistoryCoverViewportNotifier, Set<int>>(
+      HistoryCoverViewportNotifier.new,
+    );
 
-class HistoryCoverViewport extends Notifier<Set<int>> {
+class HistoryCoverViewportNotifier extends Notifier<Set<int>> {
   @override
   Set<int> build() => const <int>{};
 

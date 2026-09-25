@@ -13,9 +13,7 @@ impl LibraryWriteGuard {
             .compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
             .is_err()
         {
-            return Err(HentaiError::validation(
-                "库写入操作进行中，请稍后再试",
-            ));
+            return Err(HentaiError::validation("库写入操作进行中，请稍后再试"));
         }
         Ok(Self)
     }

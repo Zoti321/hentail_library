@@ -1,9 +1,10 @@
 use hentai_core::{
     self, clear_all_reading as core_clear_all, delete_reading_by_comic_id as core_delete_reading,
-    delete_reading_by_comic_ids as core_delete_readings, fetch_reading_page as core_fetch_reading_page,
-    get_reading_by_comic_id as core_get_reading, list_all_reading,
-    record_reading as core_record_reading, watch_reading_histories as core_watch_reading,
-    PagedReadingHistoryDto as CorePagedReading, ReadingHistoryDto as CoreReading,
+    delete_reading_by_comic_ids as core_delete_readings,
+    fetch_reading_page as core_fetch_reading_page, get_reading_by_comic_id as core_get_reading,
+    list_all_reading, record_reading as core_record_reading,
+    watch_reading_histories as core_watch_reading, PagedReadingHistoryDto as CorePagedReading,
+    ReadingHistoryDto as CoreReading,
 };
 
 use super::init::HentaiErrorDto;

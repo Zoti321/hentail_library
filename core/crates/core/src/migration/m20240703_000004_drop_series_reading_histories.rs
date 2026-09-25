@@ -44,10 +44,16 @@ impl MigrationTrait for Migration {
         }
         let conn = manager.get_connection();
         let backend = conn.get_database_backend();
-        conn.execute(Statement::from_string(backend, SQL_INSERT_MISSING.to_string()))
-            .await?;
-        conn.execute(Statement::from_string(backend, SQL_UPDATE_NEWER.to_string()))
-            .await?;
+        conn.execute(Statement::from_string(
+            backend,
+            SQL_INSERT_MISSING.to_string(),
+        ))
+        .await?;
+        conn.execute(Statement::from_string(
+            backend,
+            SQL_UPDATE_NEWER.to_string(),
+        ))
+        .await?;
         conn.execute(Statement::from_string(
             backend,
             "DROP TABLE IF EXISTS series_reading_histories".to_string(),
@@ -64,13 +70,7 @@ impl MigrationTrait for Migration {
 async fn table_exists(manager: &SchemaManager<'_>, table: &str) -> Result<bool, DbErr> {
     let stmt = Statement::from_string(
         manager.get_database_backend(),
-        format!(
-            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='{table}' LIMIT 1"
-        ),
+        format!("SELECT 1 FROM sqlite_master WHERE type='table' AND name='{table}' LIMIT 1"),
     );
-    Ok(manager
-        .get_connection()
-        .query_one(stmt)
-        .await?
-        .is_some())
+    Ok(manager.get_connection().query_one(stmt).await?.is_some())
 }

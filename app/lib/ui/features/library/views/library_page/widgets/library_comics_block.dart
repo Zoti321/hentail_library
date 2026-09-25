@@ -19,7 +19,7 @@ class LibraryComicsBlock extends ConsumerWidget {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
     final AsyncValue<LibraryComicsCatalogState> catalogAsync = ref.watch(
-      libraryComicsCatalogContentProvider,
+      libraryComicsCatalogControllerProvider,
     );
     if (catalogAsync.hasError) {
       return catalogAsync.when(
@@ -66,7 +66,7 @@ class LibraryComicsBlock extends ConsumerWidget {
         slivers: <Widget>[
           if (showPagination)
             const LibraryPaginationBarSliver(
-              target: LibraryPaginationTarget.comics,
+              target: LibraryDisplayTarget.comics,
               placement: LibraryPaginationPlacement.top,
             ),
           _LibraryComicsGridSliver(
@@ -79,7 +79,7 @@ class LibraryComicsBlock extends ConsumerWidget {
           ),
           if (showPagination)
             const LibraryPaginationBarSliver(
-              target: LibraryPaginationTarget.comics,
+              target: LibraryDisplayTarget.comics,
               placement: LibraryPaginationPlacement.bottom,
             ),
         ],
@@ -130,6 +130,8 @@ class _LibraryComicsGridSliver extends StatelessWidget {
           child: ComicCard(
             comic: manga,
             gridIndex: index,
+            onEditMetadata: () =>
+                showEditMetadataDialog(context: context, comic: manga),
             onTap: () {
               ProviderScope.containerOf(
                 context,

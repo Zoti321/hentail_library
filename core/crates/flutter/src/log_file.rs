@@ -23,7 +23,9 @@ pub fn open_log_file(app_data_dir: &str) -> io::Result<PathBuf> {
         .create(true)
         .append(true)
         .open(&log_path)?;
-    *log_file_slot().lock().map_err(|e| io::Error::other(e.to_string()))? = Some(file);
+    *log_file_slot()
+        .lock()
+        .map_err(|e| io::Error::other(e.to_string()))? = Some(file);
     Ok(log_path)
 }
 
@@ -82,10 +84,7 @@ impl SharedLogFileWriter {
 
 impl Write for SharedLogFileWriter {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        let mut guard = self
-            .0
-            .lock()
-            .map_err(|e| io::Error::other(e.to_string()))?;
+        let mut guard = self.0.lock().map_err(|e| io::Error::other(e.to_string()))?;
         match guard.as_mut() {
             Some(file) => file.write(buf),
             None => Ok(buf.len()),
@@ -93,10 +92,7 @@ impl Write for SharedLogFileWriter {
     }
 
     fn flush(&mut self) -> io::Result<()> {
-        let mut guard = self
-            .0
-            .lock()
-            .map_err(|e| io::Error::other(e.to_string()))?;
+        let mut guard = self.0.lock().map_err(|e| io::Error::other(e.to_string()))?;
         if let Some(file) = guard.as_mut() {
             file.flush()?;
         }
@@ -122,12 +118,7 @@ mod tests {
         let backup_count = fs::read_dir(dir.path())
             .expect("read_dir")
             .filter_map(Result::ok)
-            .filter(|entry| {
-                entry
-                    .path()
-                    .extension()
-                    .is_some_and(|ext| ext == "bak")
-            })
+            .filter(|entry| entry.path().extension().is_some_and(|ext| ext == "bak"))
             .count();
         assert_eq!(backup_count, 1);
     }

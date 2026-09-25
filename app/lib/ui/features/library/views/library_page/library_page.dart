@@ -6,11 +6,9 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_cover_viewport_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_inactive_subscription.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/core/widgets/responsive_layout/library_blocks_layout.dart';
@@ -102,12 +100,16 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       return;
     }
 
-    final LibraryDisplayTarget target = ref.read(libraryDisplayTargetProvider);
+    final LibraryDisplayTarget target = ref
+        .read(libraryPageFacadeProvider)
+        .displayTarget;
     final int itemCount = switch (target) {
       LibraryDisplayTarget.comics =>
-        ref.read(libraryComicsCatalogContentProvider).value?.items.length ?? 0,
+        ref.read(libraryComicsCatalogControllerProvider).value?.items.length ??
+            0,
       LibraryDisplayTarget.series =>
-        ref.read(librarySeriesCatalogContentProvider).value?.items.length ?? 0,
+        ref.read(librarySeriesCatalogControllerProvider).value?.items.length ??
+            0,
     };
     if (itemCount <= 0) {
       ref.read(libraryCatalogCoverViewportProvider.notifier).clear();
@@ -186,69 +188,19 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     // Keep inactive-tab catalog warm; do not watch revision coordinator here —
     // catalog controllers already select watchRevision leaves.
     ref.watch(libraryCatalogInactiveSubscriptionProvider);
-    ref.listen<LibraryDisplayTarget>(libraryDisplayTargetProvider, (
-      LibraryDisplayTarget? previous,
-      LibraryDisplayTarget next,
+    ref.listen<LibraryPageFacadeState>(libraryPageFacadeProvider, (
+      LibraryPageFacadeState? previous,
+      LibraryPageFacadeState next,
     ) {
-      if (previous == null || previous == next) {
+      if (!libraryPageShouldScrollToTop(previous, next)) {
         return;
       }
       _scrollToContentTop();
       _catalogGridContentStartOffset = null;
       _scheduleCoverViewportUpdate();
-      if (_isEndDrawerOpen) {
+      if (_isEndDrawerOpen && previous?.displayTarget != next.displayTarget) {
         _scaffoldKey.currentState?.closeEndDrawer();
       }
-    });
-    ref.listen<int?>(
-      libraryComicsCatalogControllerProvider.select(
-        (AsyncValue<LibraryComicsCatalogState> async) =>
-            async.value?.pagination.page,
-      ),
-      (int? previous, int? next) {
-        if (previous == null || next == null || previous == next) {
-          return;
-        }
-        _scrollToContentTop();
-        _catalogGridContentStartOffset = null;
-        _scheduleCoverViewportUpdate();
-      },
-    );
-    ref.listen<int?>(
-      librarySeriesCatalogControllerProvider.select(
-        (AsyncValue<LibrarySeriesCatalogState> async) =>
-            async.value?.pagination.page,
-      ),
-      (int? previous, int? next) {
-        if (previous == null || next == null || previous == next) {
-          return;
-        }
-        _scrollToContentTop();
-        _catalogGridContentStartOffset = null;
-        _scheduleCoverViewportUpdate();
-      },
-    );
-    ref.listen<int>(libraryComicsTabPageSizeProvider, (
-      int? previous,
-      int next,
-    ) {
-      if (previous == null || previous == next) {
-        return;
-      }
-      _scrollToContentTop();
-      _catalogGridContentStartOffset = null;
-      _scheduleCoverViewportUpdate();
-    });
-    ref.listen<int>(librarySeriesTabPageSizeProvider, (
-      int? previous,
-      int next,
-    ) {
-      if (previous == null || previous == next) {
-        return;
-      }
-      _scrollToContentTop();
-      _catalogGridContentStartOffset = null;
-      _scheduleCoverViewportUpdate();
     });
 
     return LayoutBuilder(

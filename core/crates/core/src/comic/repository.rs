@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 
-use sea_orm::{
-    ConnectionTrait, DatabaseConnection, EntityTrait, QueryFilter, QueryOrder, Statement,
-    Value,
-};
 use sea_orm::sea_query::Expr;
+use sea_orm::{
+    ConnectionTrait, DatabaseConnection, EntityTrait, QueryFilter, QueryOrder, Statement, Value,
+};
 
 use crate::db::{connection, map_db_err, version_connection};
 use crate::entity::{
@@ -101,7 +100,9 @@ async fn resolve_library_root_path(
     let Some(library) = crate::library::find_library_by_id(library_id).await? else {
         return Ok(None);
     };
-    Ok(Some(crate::comic_id::normalize_path_for_key(&library.root_path)))
+    Ok(Some(crate::comic_id::normalize_path_for_key(
+        &library.root_path,
+    )))
 }
 
 pub async fn find_comic_by_id(comic_id: &str) -> Result<Option<ComicDto>, HentaiError> {
@@ -206,13 +207,13 @@ pub async fn read_data_version() -> Result<i32, HentaiError> {
         .map_err(|e| HentaiError::db_query_failed(e.to_string(), None))
 }
 
-async fn count_filtered(db: &DatabaseConnection, filter: &ComicFilterDto) -> Result<i64, HentaiError> {
+async fn count_filtered(
+    db: &DatabaseConnection,
+    filter: &ComicFilterDto,
+) -> Result<i64, HentaiError> {
     let query = build_count_query(filter);
-    let stmt = Statement::from_sql_and_values(
-        sea_orm::DatabaseBackend::Sqlite,
-        query.sql,
-        query.values,
-    );
+    let stmt =
+        Statement::from_sql_and_values(sea_orm::DatabaseBackend::Sqlite, query.sql, query.values);
     let row = db
         .query_one(stmt)
         .await
@@ -264,8 +265,10 @@ pub async fn load_comics_ordered(
         .all(db)
         .await
         .map_err(map_db_err)?;
-    let mut by_id: HashMap<String, comics::Model> =
-        models.into_iter().map(|m| (m.comic_id.clone(), m)).collect();
+    let mut by_id: HashMap<String, comics::Model> = models
+        .into_iter()
+        .map(|m| (m.comic_id.clone(), m))
+        .collect();
     let meta_by_id: HashMap<String, comic_meta::Model> = meta_models
         .into_iter()
         .map(|m| (m.comic_id.clone(), m))
@@ -299,10 +302,7 @@ pub async fn load_comics_ordered(
             authors: author_map.get(&model.comic_id).cloned().unwrap_or_default(),
             tags: tag_map.get(&model.comic_id).cloned().unwrap_or_default(),
             languages: crate::comic::parse_languages_json(&meta.languages),
-            parodies: parody_map
-                .get(&model.comic_id)
-                .cloned()
-                .unwrap_or_default(),
+            parodies: parody_map.get(&model.comic_id).cloned().unwrap_or_default(),
             characters: character_map
                 .get(&model.comic_id)
                 .cloned()
@@ -405,7 +405,9 @@ async fn load_character_names(
         .map_err(map_db_err)?;
     let mut map: HashMap<String, Vec<String>> = HashMap::new();
     for row in rows {
-        map.entry(row.comic_id).or_default().push(row.character_name);
+        map.entry(row.comic_id)
+            .or_default()
+            .push(row.character_name);
     }
     Ok(map)
 }

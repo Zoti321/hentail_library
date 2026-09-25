@@ -4,18 +4,16 @@ use hentai_core::{
     fetch_series_page as core_fetch_page, find_series_by_id as core_find,
     find_series_item_by_comic_id as core_find_series_item,
     get_series_reading_context_by_comic_id as core_get_reading_context,
-    load_home_series_comic_order_map, search_series_by_keyword,
-    search_series_by_tag_expression,
+    load_home_series_comic_order_map, search_series_by_keyword, search_series_by_tag_expression,
     set_series_item_sort_order_locked as core_set_item_sort_locked,
     set_series_meta_locks as core_set_meta_locks,
     update_series_item_sort_order as core_update_item_sort_order,
     update_series_user_meta as core_update_meta, watch_home_series_comic_order_map,
-    PagedSeriesComicsResultDto as CorePagedSeriesComics,
-    PagedSeriesResultDto as CorePagedSeries, SeriesComicsMetadataDto as CoreSeriesComicsMetadata,
-    SeriesDto as CoreSeries, SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
-    SeriesReadingContextDto as CoreSeriesReadingContext,
-    SeriesSortFieldDto as CoreSeriesSortField, SeriesSortOptionDto as CoreSeriesSort,
-    SetSeriesMetaLocksDto as CoreSetSeriesMetaLocks,
+    PagedSeriesComicsResultDto as CorePagedSeriesComics, PagedSeriesResultDto as CorePagedSeries,
+    SeriesComicsMetadataDto as CoreSeriesComicsMetadata, SeriesDto as CoreSeries,
+    SeriesFilterDto as CoreSeriesFilter, SeriesItemDto as CoreItem,
+    SeriesReadingContextDto as CoreSeriesReadingContext, SeriesSortFieldDto as CoreSeriesSortField,
+    SeriesSortOptionDto as CoreSeriesSort, SetSeriesMetaLocksDto as CoreSetSeriesMetaLocks,
     UpdateSeriesUserMetaDto as CoreUpdateSeriesUserMeta,
 };
 
@@ -376,9 +374,7 @@ pub fn update_series_item_sort_order_frb(
     sort_order: f64,
 ) -> Result<(), HentaiErrorDto> {
     hentai_core::runtime::block_on(core_update_item_sort_order(
-        &series_id,
-        &comic_id,
-        sort_order,
+        &series_id, &comic_id, sort_order,
     ))
     .map_err(HentaiErrorDto::from)
 }
@@ -389,16 +385,14 @@ pub fn set_series_item_sort_order_locked_frb(
     comic_id: String,
     locked: bool,
 ) -> Result<(), HentaiErrorDto> {
-    hentai_core::runtime::block_on(core_set_item_sort_locked(
-        &series_id,
-        &comic_id,
-        locked,
-    ))
-    .map_err(HentaiErrorDto::from)
+    hentai_core::runtime::block_on(core_set_item_sort_locked(&series_id, &comic_id, locked))
+        .map_err(HentaiErrorDto::from)
 }
 
 #[flutter_rust_bridge::frb]
-pub async fn search_series_by_keyword_frb(keyword: String) -> Result<Vec<SeriesDto>, HentaiErrorDto> {
+pub async fn search_series_by_keyword_frb(
+    keyword: String,
+) -> Result<Vec<SeriesDto>, HentaiErrorDto> {
     search_series_by_keyword(&keyword)
         .await
         .map(map_series_list)
@@ -418,7 +412,8 @@ pub async fn search_series_by_tag_expression_frb(
 }
 
 #[flutter_rust_bridge::frb(sync)]
-pub fn load_home_series_comic_order_map_frb() -> Result<Vec<SeriesComicOrderEntryDto>, HentaiErrorDto> {
+pub fn load_home_series_comic_order_map_frb(
+) -> Result<Vec<SeriesComicOrderEntryDto>, HentaiErrorDto> {
     hentai_core::runtime::block_on(load_home_series_comic_order_map())
         .map(|map| {
             map.into_iter()

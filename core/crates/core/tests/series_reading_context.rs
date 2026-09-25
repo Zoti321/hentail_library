@@ -1,8 +1,6 @@
 mod common;
 
-use hentai_core::{
-    connection, get_series_reading_context_by_comic_id, init_db_at_path,
-};
+use hentai_core::{connection, get_series_reading_context_by_comic_id, init_db_at_path};
 use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
 use tempfile::TempDir;
 async fn clear_library(db: &DatabaseConnection) {

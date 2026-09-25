@@ -14,9 +14,7 @@ pub fn build_count_query(filter: &ComicFilterDto) -> PageSqlQuery {
     let mut values = Vec::new();
     let where_clause = build_catalog_where_clause(filter, &mut values);
     PageSqlQuery {
-        sql: format!(
-            "SELECT COUNT(*) AS c FROM comics c {COMIC_META_JOIN} WHERE {where_clause}"
-        ),
+        sql: format!("SELECT COUNT(*) AS c FROM comics c {COMIC_META_JOIN} WHERE {where_clause}"),
         values,
     }
 }
@@ -127,7 +125,9 @@ mod tests {
             0,
         );
         assert!(sql.sql.contains("LEFT JOIN comic_reading_histories rh"));
-        assert!(sql.sql.contains("ORDER BY rh.last_read_time DESC NULLS LAST"));
+        assert!(sql
+            .sql
+            .contains("ORDER BY rh.last_read_time DESC NULLS LAST"));
         assert!(sql.sql.contains(", m.title_sort_key ASC, c.comic_id ASC"));
     }
 
@@ -144,9 +144,9 @@ mod tests {
             10,
             5,
         );
-        assert!(sql.sql.contains(
-            "ORDER BY m.page_count ASC, m.title_sort_key ASC, c.comic_id ASC"
-        ));
+        assert!(sql
+            .sql
+            .contains("ORDER BY m.page_count ASC, m.title_sort_key ASC, c.comic_id ASC"));
         assert!(!sql.sql.contains("comic_reading_histories"));
     }
 
@@ -163,9 +163,9 @@ mod tests {
             10,
             0,
         );
-        assert!(sql.sql.contains(
-            "ORDER BY m.title_sort_key ASC, c.comic_id ASC"
-        ));
+        assert!(sql
+            .sql
+            .contains("ORDER BY m.title_sort_key ASC, c.comic_id ASC"));
     }
 
     #[test]
@@ -300,8 +300,12 @@ mod tests {
             10,
             0,
         );
-        assert!(sql.sql.contains("LEFT JOIN series_items si ON si.comic_id = c.comic_id"));
-        assert!(sql.sql.contains("LEFT JOIN series s ON s.series_id = si.series_id"));
+        assert!(sql
+            .sql
+            .contains("LEFT JOIN series_items si ON si.comic_id = c.comic_id"));
+        assert!(sql
+            .sql
+            .contains("LEFT JOIN series s ON s.series_id = si.series_id"));
         assert!(sql.sql.contains("WHEN s.folder_path = ? THEN 0"));
         assert!(sql.sql.contains("s.name_sort_key END ASC NULLS LAST"));
         assert!(sql.sql.contains("si.sort_order END ASC NULLS LAST"));

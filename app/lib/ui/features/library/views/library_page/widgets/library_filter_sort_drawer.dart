@@ -2,13 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_comics_filter_reset_notifier.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_series_filter_reset_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_expand_by_series_controls.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_filter_controls.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_metadata_filter_section.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/library_layout_constants.dart';
@@ -32,11 +28,10 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
     final AppLocalizations l10n = context.l10n;
-    final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
-    );
     final bool isCustomized = ref.watch(
-      libraryActiveFilterSortIsCustomizedProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.isFilterSortCustomized,
+      ),
     );
     return Drawer(
       width: widthFor(context),
@@ -69,22 +64,9 @@ class LibraryFilterSortDrawer extends ConsumerWidget {
                     ),
                     if (isCustomized)
                       TextButton(
-                        onPressed: () {
-                          switch (displayTarget) {
-                            case LibraryDisplayTarget.comics:
-                              ref
-                                  .read(
-                                    libraryComicsFilterResetProvider.notifier,
-                                  )
-                                  .resetAll();
-                            case LibraryDisplayTarget.series:
-                              ref
-                                  .read(
-                                    librarySeriesFilterResetProvider.notifier,
-                                  )
-                                  .resetAll();
-                          }
-                        },
+                        onPressed: () => ref
+                            .read(libraryPageFacadeProvider.notifier)
+                            .resetFilters(),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           minimumSize: Size.zero,

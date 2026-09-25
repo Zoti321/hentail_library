@@ -1,54 +1,11 @@
-use std::fs;
-use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+mod common;
 
 use hentai_core::{
     connection, find_comic_by_id, init_db_at_path, set_comic_meta_locks, update_comic_user_meta,
     SetComicMetaLocksDto, UpdateComicUserMetaDto,
 };
-use sea_orm::{ConnectionTrait, Database, Statement};
+use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    fs::read_to_string(manifest_dir.join("../../tests/fixtures/drift_v2.sql"))
-        .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
 
 async fn seed_comic(db: &impl ConnectionTrait) {
     db.execute(Statement::from_string(
@@ -79,9 +36,9 @@ async fn seed_comic(db: &impl ConnectionTrait) {
 
 #[test]
 fn update_comic_user_meta_locks_only_written_fields() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -98,10 +55,7 @@ fn update_comic_user_meta_locks_only_written_fields() {
             .await
             .expect("update");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(comic.title, "新标题");
             assert!(comic.locks.title);
             assert!(!comic.locks.description);
@@ -114,9 +68,9 @@ fn update_comic_user_meta_locks_only_written_fields() {
 
 #[test]
 fn update_comic_user_meta_persists_languages_and_auto_locks() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -126,20 +80,14 @@ fn update_comic_user_meta_persists_languages_and_auto_locks() {
             update_comic_user_meta(
                 "c1",
                 UpdateComicUserMetaDto {
-                    languages: Some(vec![
-                        "Chinese".to_string(),
-                        "Japanese".to_string(),
-                    ]),
+                    languages: Some(vec!["Chinese".to_string(), "Japanese".to_string()]),
                     ..Default::default()
                 },
             )
             .await
             .expect("update");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(
                 comic.languages,
                 vec!["Chinese".to_string(), "Japanese".to_string()]
@@ -157,10 +105,7 @@ fn update_comic_user_meta_persists_languages_and_auto_locks() {
             .await
             .expect("clear languages");
 
-            let cleared = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let cleared = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert!(cleared.languages.is_empty());
             assert!(cleared.locks.languages);
         });
@@ -169,9 +114,9 @@ fn update_comic_user_meta_persists_languages_and_auto_locks() {
 
 #[test]
 fn update_comic_user_meta_persists_parodies_and_auto_locks() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -188,16 +133,10 @@ fn update_comic_user_meta_persists_parodies_and_auto_locks() {
             .await
             .expect("update");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             let mut names = comic.parodies.clone();
             names.sort();
-            assert_eq!(
-                names,
-                vec!["Fate".to_string(), "原创".to_string()]
-            );
+            assert_eq!(names, vec!["Fate".to_string(), "原创".to_string()]);
             assert!(comic.locks.parodies);
             assert!(!comic.locks.title);
 
@@ -211,10 +150,7 @@ fn update_comic_user_meta_persists_parodies_and_auto_locks() {
             .await
             .expect("clear parodies");
 
-            let cleared = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let cleared = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert!(cleared.parodies.is_empty());
             assert!(cleared.locks.parodies);
         });
@@ -223,9 +159,9 @@ fn update_comic_user_meta_persists_parodies_and_auto_locks() {
 
 #[test]
 fn update_comic_user_meta_persists_characters_and_auto_locks() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -242,16 +178,10 @@ fn update_comic_user_meta_persists_characters_and_auto_locks() {
             .await
             .expect("update");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             let mut names = comic.characters.clone();
             names.sort();
-            assert_eq!(
-                names,
-                vec!["Rin".to_string(), "Saber".to_string()]
-            );
+            assert_eq!(names, vec!["Rin".to_string(), "Saber".to_string()]);
             assert!(comic.locks.characters);
             assert!(!comic.locks.title);
 
@@ -265,10 +195,7 @@ fn update_comic_user_meta_persists_characters_and_auto_locks() {
             .await
             .expect("clear characters");
 
-            let cleared = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let cleared = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert!(cleared.characters.is_empty());
             assert!(cleared.locks.characters);
         });
@@ -277,9 +204,9 @@ fn update_comic_user_meta_persists_characters_and_auto_locks() {
 
 #[test]
 fn set_comic_meta_locks_characters_without_changing_values() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -306,10 +233,7 @@ fn set_comic_meta_locks_characters_without_changing_values() {
             .await
             .expect("set locks");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(comic.characters, vec!["Saber".to_string()]);
             assert!(!comic.locks.characters);
         });
@@ -318,9 +242,9 @@ fn set_comic_meta_locks_characters_without_changing_values() {
 
 #[test]
 fn set_comic_meta_locks_parodies_without_changing_values() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -347,10 +271,7 @@ fn set_comic_meta_locks_parodies_without_changing_values() {
             .await
             .expect("set locks");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(comic.parodies, vec!["Fate".to_string()]);
             assert!(!comic.locks.parodies);
         });
@@ -359,9 +280,9 @@ fn set_comic_meta_locks_parodies_without_changing_values() {
 
 #[test]
 fn set_comic_meta_locks_languages_without_changing_values() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -388,10 +309,7 @@ fn set_comic_meta_locks_languages_without_changing_values() {
             .await
             .expect("set locks");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(comic.languages, vec!["English".to_string()]);
             assert!(!comic.locks.languages);
         });
@@ -400,9 +318,9 @@ fn set_comic_meta_locks_languages_without_changing_values() {
 
 #[test]
 fn set_comic_meta_locks_changes_flags_without_changing_values() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -430,10 +348,7 @@ fn set_comic_meta_locks_changes_flags_without_changing_values() {
             .await
             .expect("set locks");
 
-            let comic = find_comic_by_id("c1")
-                .await
-                .expect("find")
-                .expect("exists");
+            let comic = find_comic_by_id("c1").await.expect("find").expect("exists");
             assert_eq!(comic.title, "锁定标题");
             assert!(!comic.locks.title);
             assert!(comic.locks.description);

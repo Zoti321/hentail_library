@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hentai_library/domain/library/format_group.dart';
 import 'package:hentai_library/domain/models/app_setting.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
@@ -74,6 +75,12 @@ class _MemoryAppSettingRepository implements AppSettingRepository {
 
   @override
   Future<bool?> peekLegacyAutoScan() async => null;
+
+  @override
+  Future<List<FormatGroup>?> peekLegacyEnabledFormatGroups() async => null;
+
+  @override
+  Future<void> clearLegacyImportPayload() async {}
 }
 
 class _RecordingSeriesNavigation extends ReaderSeriesNavigation {

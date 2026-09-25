@@ -64,9 +64,7 @@ fn build_order_by_clause(
     match prefer_root_folder_path {
         Some(root) => {
             push_sqlite_text(values, root.to_string());
-            format!(
-                "CASE WHEN s.folder_path = ? THEN 0 ELSE 1 END ASC, {secondary}"
-            )
+            format!("CASE WHEN s.folder_path = ? THEN 0 ELSE 1 END ASC, {secondary}")
         }
         None => secondary,
     }
@@ -164,11 +162,9 @@ mod tests {
             20,
             0,
         );
-        assert!(
-            query
-                .sql
-                .contains("CASE WHEN s.folder_path = ? THEN 0 ELSE 1 END ASC")
-        );
+        assert!(query
+            .sql
+            .contains("CASE WHEN s.folder_path = ? THEN 0 ELSE 1 END ASC"));
         assert!(query.sql.contains("s.name_sort_key ASC"));
         // prefer root path is bound before LIMIT/OFFSET
         assert_eq!(query.values.len(), 3);

@@ -138,7 +138,8 @@ async fn migrate_saved_paths_to_libraries(manager: &SchemaManager<'_>) -> Result
         .await?;
     }
 
-    if table_exists(manager, "comics").await? && column_exists(manager, "comics", "library_id").await?
+    if table_exists(manager, "comics").await?
+        && column_exists(manager, "comics", "library_id").await?
     {
         let comic_rows = db
             .query_all(Statement::from_string(
@@ -168,7 +169,8 @@ async fn migrate_saved_paths_to_libraries(manager: &SchemaManager<'_>) -> Result
         }
     }
 
-    if table_exists(manager, "series").await? && column_exists(manager, "series", "library_id").await?
+    if table_exists(manager, "series").await?
+        && column_exists(manager, "series", "library_id").await?
     {
         let series_rows = db
             .query_all(Statement::from_string(
@@ -278,7 +280,11 @@ fn longest_matching_library(path: &str, roots: &[(String, String)]) -> Option<St
         }
         if path_key == *root_key || path_key.starts_with(&format!("{root_key}/")) {
             let len = root_key.len();
-            if best.as_ref().map(|(best_len, _)| len > *best_len).unwrap_or(true) {
+            if best
+                .as_ref()
+                .map(|(best_len, _)| len > *best_len)
+                .unwrap_or(true)
+            {
                 best = Some((len, library_id.clone()));
             }
         }
@@ -291,11 +297,7 @@ async fn table_exists(manager: &SchemaManager<'_>, table: &str) -> Result<bool, 
         manager.get_database_backend(),
         format!("SELECT 1 FROM sqlite_master WHERE type='table' AND name='{table}' LIMIT 1"),
     );
-    Ok(manager
-        .get_connection()
-        .query_one(stmt)
-        .await?
-        .is_some())
+    Ok(manager.get_connection().query_one(stmt).await?.is_some())
 }
 
 async fn column_exists(

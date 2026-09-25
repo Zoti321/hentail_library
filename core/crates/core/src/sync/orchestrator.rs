@@ -2,9 +2,7 @@ use std::collections::HashMap;
 
 use crate::db::connection;
 use crate::error::HentaiError;
-use crate::library::{
-    find_library_by_id, get_current_library_id, list_libraries, LibraryDto,
-};
+use crate::library::{find_library_by_id, get_current_library_id, list_libraries, LibraryDto};
 use crate::reader::clear_reader_sessions;
 use crate::resource::{local_access, normalize_roots, WebDavResourceAccess};
 
@@ -14,14 +12,12 @@ use super::dto::{
 };
 use super::handle::SyncHandle;
 use super::library_lock::try_acquire_library_write_lock;
-use super::plan::{
-    build_scan_replace_plan, load_existing_comics_map, load_thumbnail_stats,
-};
+use super::plan::{build_scan_replace_plan, load_existing_comics_map, load_thumbnail_stats};
 use super::remote::{scan_remote_lightweight, RemoteScanOutcome};
 use super::scanner::{scan_roots_excluding, ScanContext, ScanItem};
 use super::writer::apply_scan_replace_plan;
-use crate::thumbnail::enqueue_thumbnails_low;
 use crate::library::{set_remote_library_credentials, RemoteLibraryCredential};
+use crate::thumbnail::enqueue_thumbnails_low;
 
 fn return_if_cancelled(handle: &SyncHandle, phase: &str) -> bool {
     if handle.is_cancelled() {
@@ -53,22 +49,23 @@ pub async fn sync_library(
         .map(|c| (c.library_id, c.password))
         .collect();
 
-    let targets: Vec<LibraryDto> = if let Some(id) = target_library_id.map(str::trim).filter(|s| !s.is_empty()) {
-        match find_library_by_id(id).await? {
-            Some(lib) => vec![lib],
-            None => Vec::new(),
-        }
-    } else if sync_all {
-        list_libraries().await?
-    } else {
-        match get_current_library_id().await? {
-            Some(id) => match find_library_by_id(&id).await? {
+    let targets: Vec<LibraryDto> =
+        if let Some(id) = target_library_id.map(str::trim).filter(|s| !s.is_empty()) {
+            match find_library_by_id(id).await? {
                 Some(lib) => vec![lib],
                 None => Vec::new(),
-            },
-            None => Vec::new(),
-        }
-    };
+            }
+        } else if sync_all {
+            list_libraries().await?
+        } else {
+            match get_current_library_id().await? {
+                Some(id) => match find_library_by_id(&id).await? {
+                    Some(lib) => vec![lib],
+                    None => Vec::new(),
+                },
+                None => Vec::new(),
+            }
+        };
 
     if targets.is_empty() {
         return sync_noop(&mut emit).await;
@@ -143,9 +140,7 @@ enum SyncOneOutcome {
     None,
 }
 
-async fn sync_noop(
-    emit: &mut impl FnMut(SyncLibraryProgressDto),
-) -> Result<(), HentaiError> {
+async fn sync_noop(emit: &mut impl FnMut(SyncLibraryProgressDto)) -> Result<(), HentaiError> {
     log_sync_phase(SyncLibraryPhaseDto::Done, SyncLibraryRouteDto::NoRootsNoop);
     emit(progress(
         SyncLibraryPhaseDto::Done,
@@ -237,10 +232,7 @@ async fn sync_remote_library(
 ) -> Result<SyncOneOutcome, HentaiError> {
     emit_scanning(emit);
     let Some(password) = password.filter(|p| !p.is_empty()) else {
-        let warning = format!(
-            "已跳过远程库（缺少凭证）: {}",
-            library.root_path
-        );
+        let warning = format!("已跳过远程库（缺少凭证）: {}", library.root_path);
         tracing::warn!(library_id = %library.library_id, "{warning}");
         emit(progress(
             SyncLibraryPhaseDto::Scanning,
@@ -260,18 +252,15 @@ async fn sync_remote_library(
         return Ok(SyncOneOutcome::Skipped { warning });
     };
 
-    let access = match WebDavResourceAccess::connect(
-        &library.root_path,
-        &library.username,
-        password,
-    ) {
-        Ok(access) => access,
-        Err(err) if err.is_remote_access_failure() => {
-            let warning = emit_remote_skip(emit, &library.root_path, &err.message);
-            return Ok(SyncOneOutcome::Skipped { warning });
-        }
-        Err(err) => return Err(err),
-    };
+    let access =
+        match WebDavResourceAccess::connect(&library.root_path, &library.username, password) {
+            Ok(access) => access,
+            Err(err) if err.is_remote_access_failure() => {
+                let warning = emit_remote_skip(emit, &library.root_path, &err.message);
+                return Ok(SyncOneOutcome::Skipped { warning });
+            }
+            Err(err) => return Err(err),
+        };
 
     let existing_by_id = load_existing_comics_map(db).await?;
     let thumbnail_stats = load_thumbnail_stats(db).await?;
@@ -319,7 +308,10 @@ fn map_finish_outcome(progress: Option<SyncLibraryProgressDto>) -> SyncOneOutcom
 }
 
 fn emit_scanning(emit: &mut impl FnMut(SyncLibraryProgressDto)) {
-    log_sync_phase(SyncLibraryPhaseDto::Scanning, SyncLibraryRouteDto::WithRoots);
+    log_sync_phase(
+        SyncLibraryPhaseDto::Scanning,
+        SyncLibraryRouteDto::WithRoots,
+    );
     emit(progress(
         SyncLibraryPhaseDto::Scanning,
         SyncLibraryRouteDto::WithRoots,
@@ -423,7 +415,10 @@ async fn finish_scan_write(
         return Ok(None);
     }
 
-    log_sync_phase(SyncLibraryPhaseDto::WritingDb, SyncLibraryRouteDto::WithRoots);
+    log_sync_phase(
+        SyncLibraryPhaseDto::WritingDb,
+        SyncLibraryRouteDto::WithRoots,
+    );
     emit(progress(
         SyncLibraryPhaseDto::WritingDb,
         SyncLibraryRouteDto::WithRoots,

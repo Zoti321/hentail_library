@@ -44,8 +44,7 @@ pub async fn thumbnail_needs_generation(
     if cached.is_user_set {
         return Ok(false);
     }
-    Ok(cached.source_modified_ms != Some(modified_ms)
-        || cached.source_size != Some(size))
+    Ok(cached.source_modified_ms != Some(modified_ms) || cached.source_size != Some(size))
 }
 
 pub async fn store_thumbnail_for_comic(
@@ -103,7 +102,10 @@ pub async fn store_thumbnail_for_comic_with(
     Ok(true)
 }
 
-pub fn generate_thumbnail_jpeg(path: &Path, resource_type: &str) -> Result<Option<Vec<u8>>, HentaiError> {
+pub fn generate_thumbnail_jpeg(
+    path: &Path,
+    resource_type: &str,
+) -> Result<Option<Vec<u8>>, HentaiError> {
     generate_thumbnail_jpeg_with(
         crate::resource::local_access(),
         &path.to_string_lossy(),
@@ -124,7 +126,8 @@ pub fn generate_thumbnail_jpeg_with(
 }
 
 pub fn encode_thumbnail_jpeg(source_bytes: &[u8]) -> Result<Option<Vec<u8>>, HentaiError> {
-    let img = image::load_from_memory(source_bytes).map_err(|e| HentaiError::validation(e.to_string()))?;
+    let img = image::load_from_memory(source_bytes)
+        .map_err(|e| HentaiError::validation(e.to_string()))?;
     let flattened = flatten_alpha_on_white(&img);
     let resized = resize_to_max_long_edge(&flattened, MAX_LONG_EDGE);
     let mut buf = Vec::new();

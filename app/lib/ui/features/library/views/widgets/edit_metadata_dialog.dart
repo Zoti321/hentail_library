@@ -1,0 +1,864 @@
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:hentai_library/core/l10n/app_localizations.dart';
+import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/core/logging/app_log.dart';
+import 'package:hentai_library/domain/models/entity/comic/author.dart';
+import 'package:hentai_library/domain/models/entity/comic/comic.dart';
+import 'package:hentai_library/domain/models/entity/comic/tag.dart';
+import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
+import 'package:hentai_library/domain/models/value_objects/comic_meta_locks.dart';
+import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
+import 'package:hentai_library/domain/models/value_objects/series_item_membership.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
+import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/core/widgets/form/author_library_multi_select_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/fluent_date_picker_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/fluent_number_stepper_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/fluent_toggle_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/metadata_lock_button.dart';
+import 'package:hentai_library/ui/core/widgets/form/character_library_multi_select_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/parody_library_multi_select_field.dart';
+import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
+import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
+import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
+import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_side_tab_bar.dart';
+import 'package:hentai_library/domain/library/smart_facet_match_preference.dart';
+import 'package:hentai_library/ui/features/library/view_models/comic_metadata_smart_facet_providers.dart';
+import 'package:hentai_library/ui/features/library/view_models/comic_metadata_editor_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/smart_facet_match_preference_notifier.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+/// 漫画元数据编辑：medium/expanded 为 dialog，compact 为全页（[AdaptiveFormSurface]）。
+const double _kEditMetadataDialogWidth = 720;
+const double _kEditMetadataDialogRadius = 4;
+
+/// 壳标题区与底栏的近似高度，用于限制 dialog body 最大滚动区。
+const double _kEditMetadataShellChromeReserve = 120;
+
+const double _kEditMetadataBodyMinHeight = 240;
+
+enum _EditMetadataTab { general, authorsAndTags }
+
+/// 打开漫画元数据编辑表面。有 Series 归属时在常规页展示成员排序区。
+Future<void> showEditMetadataDialog({
+  required BuildContext context,
+  required Comic comic,
+  SeriesItemMembership? seriesItemSort,
+}) {
+  return showAdaptiveFormSurfaceWidget<void>(
+    context: context,
+    surface: EditMetadataDialog(comic: comic, seriesItemSort: seriesItemSort),
+  );
+}
+
+class EditMetadataDialog extends StatefulHookConsumerWidget {
+  const EditMetadataDialog({
+    super.key,
+    required this.comic,
+    this.seriesItemSort,
+  });
+
+  final Comic comic;
+  final SeriesItemMembership? seriesItemSort;
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _EditMetadataDialogState();
+}
+
+class _EditMetadataDialogState extends ConsumerState<EditMetadataDialog> {
+  late ComicMetadataForm _form;
+  late ComicMetaLocks _locks;
+  ComicMetadataFormValidation? _validation;
+  _EditMetadataTab _selectedTab = _EditMetadataTab.general;
+  bool _saving = false;
+  bool _lockBusy = false;
+
+  /// null = 无归属或尚未加载到归属。
+  SeriesItemMembership? _seriesSortSeed;
+  late String _sortOrderText;
+  late bool _sortOrderLocked;
+  String? _sortOrderError;
+
+  List<DialogSideTabItem> _sideTabs(AppLocalizations l10n) =>
+      <DialogSideTabItem>[
+        DialogSideTabItem(
+          label: l10n.dialogEditMetadataTabGeneral,
+          icon: LucideIcons.textAlignCenter,
+        ),
+        DialogSideTabItem(
+          label: l10n.dialogEditMetadataTabAuthorsTags,
+          icon: LucideIcons.users,
+        ),
+      ];
+
+  List<CapsuleTabItem> _capsuleTabs(AppLocalizations l10n) => <CapsuleTabItem>[
+    CapsuleTabItem(
+      label: l10n.dialogEditMetadataTabGeneral,
+      icon: LucideIcons.textAlignCenter,
+    ),
+    CapsuleTabItem(
+      label: l10n.dialogEditMetadataTabAuthorsTags,
+      icon: LucideIcons.users,
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _form = ComicMetadataForm.fromComic(widget.comic);
+    _locks = widget.comic.locks;
+    final SeriesItemMembership? seed = widget.seriesItemSort;
+    if (seed != null) {
+      _applySeriesSortSeed(seed);
+    } else {
+      _sortOrderText = '';
+      _sortOrderLocked = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadSeriesSortMembership();
+      });
+    }
+  }
+
+  void _applySeriesSortSeed(SeriesItemMembership seed) {
+    _seriesSortSeed = seed;
+    _sortOrderText = _formatSortOrder(seed.sortOrder);
+    _sortOrderLocked = seed.sortOrderLocked;
+  }
+
+  Future<void> _loadSeriesSortMembership() async {
+    try {
+      final SeriesItemMembership? membership = await ref
+          .read(comicMetadataEditorProvider.notifier)
+          .findSeriesMembership(widget.comic.comicId);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        if (membership != null) {
+          _applySeriesSortSeed(membership);
+        } else {
+          _seriesSortSeed = null;
+        }
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _seriesSortSeed = null;
+      });
+    }
+  }
+
+  Future<void> _setLock({
+    bool? title,
+    bool? description,
+    bool? publishedAt,
+    bool? contentRating,
+    bool? authors,
+    bool? tags,
+    bool? languages,
+    bool? parodies,
+    bool? characters,
+  }) async {
+    if (_lockBusy) {
+      return;
+    }
+    setState(() => _lockBusy = true);
+    try {
+      await ref
+          .read(comicMetadataEditorProvider.notifier)
+          .setLocks(
+            widget.comic.comicId,
+            title: title,
+            description: description,
+            publishedAt: publishedAt,
+            contentRating: contentRating,
+            authors: authors,
+            tags: tags,
+            languages: languages,
+            parodies: parodies,
+            characters: characters,
+          );
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _locks = _locks.copyWith(
+          title: title,
+          description: description,
+          publishedAt: publishedAt,
+          contentRating: contentRating,
+          authors: authors,
+          tags: tags,
+          languages: languages,
+          parodies: parodies,
+          characters: characters,
+        );
+      });
+    } catch (error, stackTrace) {
+      logError(AppLog.ui('editMetadata'), '设置元数据字段锁失败', error, stackTrace);
+      if (mounted) {
+        showCustomToast(
+          context,
+          message: context.l10n.commonSaveFailedToast,
+          type: AppToastType.error,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _lockBusy = false);
+      }
+    }
+  }
+
+  void _selectTab(int index) {
+    if (index == _selectedTab.index) {
+      return;
+    }
+    setState(() {
+      _selectedTab = _EditMetadataTab.values[index];
+    });
+  }
+
+  void _updateForm(ComicMetadataForm Function(ComicMetadataForm) transform) {
+    setState(() => _form = transform(_form));
+  }
+
+  Future<void> _handleSave() async {
+    if (_saving) {
+      return;
+    }
+    final ComicMetadataFormValidation validation = _form.validate();
+    if (!validation.isValid) {
+      setState(() {
+        _validation = validation;
+        _selectedTab = _EditMetadataTab.general;
+      });
+      return;
+    }
+
+    final SeriesItemMembership? seed = _seriesSortSeed;
+    double? parsedSortOrder;
+    if (seed != null) {
+      final String trimmed = _sortOrderText.trim();
+      final double? parsed = double.tryParse(trimmed);
+      if (trimmed.isEmpty || parsed == null || !parsed.isFinite) {
+        setState(() {
+          _sortOrderError = context.l10n.formSeriesItemSortOrderInvalid;
+          _selectedTab = _EditMetadataTab.general;
+        });
+        return;
+      }
+      parsedSortOrder = parsed;
+    }
+
+    setState(() {
+      _validation = null;
+      _sortOrderError = null;
+      _saving = true;
+    });
+    try {
+      final ComicMetadataEditorNotifier editor = ref.read(
+        comicMetadataEditorProvider.notifier,
+      );
+      await editor.apply(_form.normalized, widget.comic);
+      if (seed != null && parsedSortOrder != null) {
+        await editor.persistSeriesSort(
+          comicId: widget.comic.comicId,
+          seed: seed,
+          sortOrder: parsedSortOrder,
+          draftLocked: _sortOrderLocked,
+        );
+      }
+      if (mounted) {
+        showSuccessToast(context, context.l10n.commonSavedToast);
+        Navigator.of(context).pop();
+      }
+    } catch (error, stackTrace) {
+      logError(AppLog.ui('editMetadata'), '保存漫画元数据失败', error, stackTrace);
+      if (mounted) {
+        showCustomToast(
+          context,
+          message: context.l10n.commonSaveFailedToast,
+          type: AppToastType.error,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _saving = false);
+      }
+    }
+  }
+
+  Widget _buildTabPane(AppThemeTokens tokens) {
+    return switch (_selectedTab) {
+      _EditMetadataTab.general => _EditMetadataGeneralTab(
+        title: _form.title,
+        titleError: _validation?.titleError,
+        description: _form.description ?? '',
+        publishedAt: _form.publishedAt,
+        isR18: _form.isR18,
+        languages: _form.languages,
+        locks: _locks,
+        lockBusy: _lockBusy || _saving,
+        showSeriesSort: _seriesSortSeed != null,
+        sortOrderText: _sortOrderText,
+        sortOrderLocked: _sortOrderLocked,
+        sortOrderError: _sortOrderError,
+        onTitleChanged: (String value) {
+          setState(() {
+            _form = _form.copyWith(title: value);
+            if (_validation?.titleError != null) {
+              _validation = const ComicMetadataFormValidation();
+            }
+          });
+        },
+        onDescriptionChanged: (String value) {
+          _updateForm((ComicMetadataForm f) => f.copyWith(description: value));
+        },
+        onPublishedAtChanged: (DateTime? value) {
+          _updateForm((ComicMetadataForm f) => f.copyWith(publishedAt: value));
+        },
+        onIsR18Changed: (bool value) {
+          _updateForm((ComicMetadataForm f) => f.copyWith(isR18: value));
+        },
+        onAddLanguage: (String name) {
+          _updateForm((ComicMetadataForm f) => f.addLanguage(name));
+        },
+        onRemoveLanguage: (String name) {
+          _updateForm((ComicMetadataForm f) => f.removeLanguage(name));
+        },
+        onSortOrderChanged: (String value) {
+          setState(() {
+            _sortOrderText = value;
+            if (_sortOrderError != null) {
+              _sortOrderError = null;
+            }
+          });
+        },
+        onSortOrderLockedChanged: (bool locked) {
+          setState(() => _sortOrderLocked = locked);
+        },
+        onLockChanged: _setLock,
+      ),
+      _EditMetadataTab.authorsAndTags => _EditMetadataAuthorsTagsTab(
+        scope: (
+          comicId: widget.comic.comicId,
+          title: _form.title,
+          resourcePath: widget.comic.path,
+          seriesId: _seriesSortSeed?.seriesId,
+        ),
+        authors: _form.authors,
+        tags: _form.tags,
+        parodies: _form.parodies,
+        characters: _form.characters,
+        locks: _locks,
+        lockBusy: _lockBusy || _saving,
+        onAddAuthor: (String name) {
+          _updateForm((ComicMetadataForm f) => f.addAuthor(name));
+        },
+        onRemoveAuthor: (String name) {
+          _updateForm((ComicMetadataForm f) => f.removeAuthor(name));
+        },
+        onAddTag: (String name) {
+          _updateForm((ComicMetadataForm f) => f.addTag(name));
+        },
+        onRemoveTag: (String name) {
+          _updateForm((ComicMetadataForm f) => f.removeTag(name));
+        },
+        onAddParody: (String name) {
+          _updateForm((ComicMetadataForm f) => f.addParody(name));
+        },
+        onRemoveParody: (String name) {
+          _updateForm((ComicMetadataForm f) => f.removeParody(name));
+        },
+        onAddCharacter: (String name) {
+          _updateForm((ComicMetadataForm f) => f.addCharacter(name));
+        },
+        onRemoveCharacter: (String name) {
+          _updateForm((ComicMetadataForm f) => f.removeCharacter(name));
+        },
+        onLockChanged: _setLock,
+      ),
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+    final int selectedTabIndex = _selectedTab.index;
+    final bool compact = AppLayoutBreakpoints.isCompact(
+      MediaQuery.sizeOf(context).width,
+    );
+
+    final Widget body;
+    if (compact) {
+      body = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              tokens.spacing.lg,
+              0,
+              tokens.spacing.lg,
+              tokens.spacing.md,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: CapsuleTabBar(
+                items: _capsuleTabs(l10n),
+                selectedIndex: selectedTabIndex,
+                onSelected: _selectTab,
+              ),
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(
+                tokens.spacing.lg,
+                0,
+                tokens.spacing.lg,
+                tokens.spacing.xs,
+              ),
+              child: _buildTabPane(tokens),
+            ),
+          ),
+        ],
+      );
+    } else {
+      body = ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: _kEditMetadataBodyMinHeight,
+          maxHeight: math.max(
+            _kEditMetadataBodyMinHeight,
+            MediaQuery.sizeOf(context).height * 0.88 -
+                _kEditMetadataShellChromeReserve,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            DialogSideTabBar(
+              items: _sideTabs(l10n),
+              selectedIndex: selectedTabIndex,
+              showDivider: false,
+              onSelected: _selectTab,
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  tokens.spacing.lg,
+                  0,
+                  18,
+                  tokens.spacing.xs,
+                ),
+                child: _buildTabPane(tokens),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return AdaptiveFormSurface(
+      title: l10n.dialogEditMetadataTitle,
+      maxDialogWidth: _kEditMetadataDialogWidth,
+      borderRadius: _kEditMetadataDialogRadius,
+      scrollableBody: false,
+      bodyPadding: EdgeInsets.zero,
+      backgroundColor: cs.surface,
+      showFooterDivider: false,
+      fitContentHeight: true,
+      actionsPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      body: body,
+      actions: <Widget>[
+        TextButton(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(),
+          child: Text(l10n.commonCancel),
+        ),
+        const SizedBox(width: 8),
+        FilledButton(
+          onPressed: _saving ? null : _handleSave,
+          child: _saving
+              ? SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: cs.onPrimary,
+                  ),
+                )
+              : Text(l10n.commonSaveChanges),
+        ),
+      ],
+    );
+  }
+}
+
+typedef _MetaLockChanged =
+    Future<void> Function({
+      bool? title,
+      bool? description,
+      bool? publishedAt,
+      bool? contentRating,
+      bool? authors,
+      bool? tags,
+      bool? languages,
+      bool? parodies,
+      bool? characters,
+    });
+
+class _EditMetadataGeneralTab extends StatelessWidget {
+  const _EditMetadataGeneralTab({
+    required this.title,
+    required this.titleError,
+    required this.description,
+    required this.publishedAt,
+    required this.isR18,
+    required this.languages,
+    required this.locks,
+    required this.lockBusy,
+    required this.showSeriesSort,
+    required this.sortOrderText,
+    required this.sortOrderLocked,
+    required this.sortOrderError,
+    required this.onTitleChanged,
+    required this.onDescriptionChanged,
+    required this.onPublishedAtChanged,
+    required this.onIsR18Changed,
+    required this.onAddLanguage,
+    required this.onRemoveLanguage,
+    required this.onSortOrderChanged,
+    required this.onSortOrderLockedChanged,
+    required this.onLockChanged,
+  });
+
+  final String title;
+  final String? titleError;
+  final String description;
+  final DateTime? publishedAt;
+  final bool isR18;
+  final List<String> languages;
+  final ComicMetaLocks locks;
+  final bool lockBusy;
+  final bool showSeriesSort;
+  final String sortOrderText;
+  final bool sortOrderLocked;
+  final String? sortOrderError;
+  final ValueChanged<String> onTitleChanged;
+  final ValueChanged<String> onDescriptionChanged;
+  final ValueChanged<DateTime?> onPublishedAtChanged;
+  final ValueChanged<bool> onIsR18Changed;
+  final ValueChanged<String> onAddLanguage;
+  final ValueChanged<String> onRemoveLanguage;
+  final ValueChanged<String> onSortOrderChanged;
+  final ValueChanged<bool> onSortOrderLockedChanged;
+  final _MetaLockChanged onLockChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final bool compact = AppLayoutBreakpoints.isCompact(
+      MediaQuery.sizeOf(context).width,
+    );
+
+    final Widget publishedAtField = FluentDatePickerField(
+      labelText: l10n.formPublishedDateLabel,
+      labelTrailing: MetadataLockButton(
+        locked: locks.publishedAt,
+        enabled: !lockBusy,
+        onChanged: (bool locked) => onLockChanged(publishedAt: locked),
+      ),
+      value: publishedAt,
+      onChanged: onPublishedAtChanged,
+    );
+    final Widget contentRatingField = FluentToggleField(
+      labelText: l10n.formAgeRestrictionLabel,
+      labelTrailing: MetadataLockButton(
+        locked: locks.contentRating,
+        enabled: !lockBusy,
+        onChanged: (bool locked) => onLockChanged(contentRating: locked),
+      ),
+      value: isR18,
+      onChanged: onIsR18Changed,
+      checkedLabel: 'R18',
+      uncheckedLabel: l10n.filterAgeAllAges,
+    );
+
+    final List<String> languageChoices = <String>[
+      ...ComicLanguageNames.closedSet,
+      ...languages.where(
+        (String name) => !ComicLanguageNames.closedSet.contains(name),
+      ),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: tokens.spacing.lg,
+      children: <Widget>[
+        FluentTextField(
+          labelText: l10n.formComicTitleLabel,
+          labelTrailing: MetadataLockButton(
+            locked: locks.title,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(title: locked),
+          ),
+          initialValue: title,
+          errorText: titleError,
+          onChanged: onTitleChanged,
+          hintText: l10n.formComicTitleHint,
+        ),
+        FluentTextField(
+          labelText: l10n.formComicDescriptionLabel,
+          labelTrailing: MetadataLockButton(
+            locked: locks.description,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(description: locked),
+          ),
+          initialValue: description,
+          maxLines: 4,
+          onChanged: onDescriptionChanged,
+          hintText: l10n.formComicDescriptionHint,
+        ),
+        if (compact)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: tokens.spacing.lg,
+            children: <Widget>[publishedAtField, contentRatingField],
+          )
+        else
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: tokens.spacing.md,
+            children: <Widget>[
+              Expanded(flex: 3, child: publishedAtField),
+              Expanded(flex: 2, child: contentRatingField),
+            ],
+          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: tokens.spacing.sm,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    l10n.formLanguagesLabel,
+                    style: TextStyle(
+                      fontSize: tokens.text.bodySm,
+                      color: cs.hentai.textPrimary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                MetadataLockButton(
+                  locked: locks.languages,
+                  enabled: !lockBusy,
+                  onChanged: (bool locked) => onLockChanged(languages: locked),
+                ),
+              ],
+            ),
+            Wrap(
+              spacing: tokens.spacing.sm,
+              runSpacing: tokens.spacing.sm,
+              children: languageChoices.map((String canonical) {
+                final bool selected = languages.contains(canonical);
+                return OutlinedMetaChip(
+                  text: l10n.comicLanguageLabel(canonical),
+                  compact: true,
+                  borderColor: selected ? cs.primary : null,
+                  textColor: selected ? cs.primary : null,
+                  onTap: () {
+                    if (selected) {
+                      onRemoveLanguage(canonical);
+                    } else {
+                      onAddLanguage(canonical);
+                    }
+                  },
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+        if (showSeriesSort)
+          FluentNumberStepperField(
+            initialValue: sortOrderText,
+            labelText: l10n.formSeriesItemSortOrderLabel,
+            labelTrailing: MetadataLockButton(
+              locked: sortOrderLocked,
+              enabled: !lockBusy,
+              onChanged: onSortOrderLockedChanged,
+            ),
+            errorText: sortOrderError,
+            hintText: l10n.formSeriesItemSortOrderHint,
+            isDense: true,
+            onChanged: onSortOrderChanged,
+          ),
+      ],
+    );
+  }
+}
+
+String _formatSortOrder(double value) {
+  if (value == value.roundToDouble()) {
+    return value.round().toString();
+  }
+  return value.toString();
+}
+
+class _EditMetadataAuthorsTagsTab extends ConsumerWidget {
+  const _EditMetadataAuthorsTagsTab({
+    required this.scope,
+    required this.authors,
+    required this.tags,
+    required this.parodies,
+    required this.characters,
+    required this.locks,
+    required this.lockBusy,
+    required this.onAddAuthor,
+    required this.onRemoveAuthor,
+    required this.onAddTag,
+    required this.onRemoveTag,
+    required this.onAddParody,
+    required this.onRemoveParody,
+    required this.onAddCharacter,
+    required this.onRemoveCharacter,
+    required this.onLockChanged,
+  });
+
+  final ComicMetadataSmartFacetScope scope;
+  final List<Author> authors;
+  final List<Tag> tags;
+  final List<String> parodies;
+  final List<String> characters;
+  final ComicMetaLocks locks;
+  final bool lockBusy;
+  final ValueChanged<String> onAddAuthor;
+  final ValueChanged<String> onRemoveAuthor;
+  final ValueChanged<String> onAddTag;
+  final ValueChanged<String> onRemoveTag;
+  final ValueChanged<String> onAddParody;
+  final ValueChanged<String> onRemoveParody;
+  final ValueChanged<String> onAddCharacter;
+  final ValueChanged<String> onRemoveCharacter;
+  final _MetaLockChanged onLockChanged;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final bool smartMatchEnabled =
+        ref.watch(smartFacetMatchPreferenceProvider).asData?.value ??
+        SmartFacetMatchPreference.defaultValue;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: tokens.spacing.lg,
+      children: <Widget>[
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                ref
+                    .read(smartFacetMatchPreferenceProvider.notifier)
+                    .setEnabled(!smartMatchEnabled);
+              },
+              borderRadius: BorderRadius.circular(tokens.radius.sm),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: tokens.spacing.sm,
+                  vertical: tokens.spacing.xs,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      l10n.smartFacetMatchToggleLabel,
+                      style: TextStyle(
+                        fontSize: tokens.text.bodySm,
+                        fontWeight: FontWeight.w500,
+                        color: cs.hentai.textPrimary,
+                      ),
+                    ),
+                    SizedBox(width: tokens.spacing.sm),
+                    IgnorePointer(
+                      child: ToggleSwitch(checked: smartMatchEnabled),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        AuthorLibraryMultiSelectField(
+          label: l10n.comicDetailAuthors,
+          labelTrailing: MetadataLockButton(
+            locked: locks.authors,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(authors: locked),
+          ),
+          icon: LucideIcons.penTool,
+          selectedNames: authors.map((Author a) => a.name).toList(),
+          onAdd: onAddAuthor,
+          onRemove: onRemoveAuthor,
+          scope: scope,
+        ),
+        TagLibraryMultiSelectField(
+          label: l10n.comicDetailTags,
+          labelTrailing: MetadataLockButton(
+            locked: locks.tags,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(tags: locked),
+          ),
+          icon: LucideIcons.tag,
+          selectedNames: tags.map((Tag t) => t.name).toList(),
+          onAdd: onAddTag,
+          onRemove: onRemoveTag,
+          scope: scope,
+        ),
+        ParodyLibraryMultiSelectField(
+          label: l10n.comicDetailParodies,
+          labelTrailing: MetadataLockButton(
+            locked: locks.parodies,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(parodies: locked),
+          ),
+          icon: LucideIcons.bookMarked,
+          selectedNames: parodies,
+          onAdd: onAddParody,
+          onRemove: onRemoveParody,
+          scope: scope,
+        ),
+        CharacterLibraryMultiSelectField(
+          label: l10n.comicDetailCharacters,
+          labelTrailing: MetadataLockButton(
+            locked: locks.characters,
+            enabled: !lockBusy,
+            onChanged: (bool locked) => onLockChanged(characters: locked),
+          ),
+          icon: LucideIcons.userRound,
+          selectedNames: characters,
+          onAdd: onAddCharacter,
+          onRemove: onRemoveCharacter,
+          scope: scope,
+        ),
+      ],
+    );
+  }
+}

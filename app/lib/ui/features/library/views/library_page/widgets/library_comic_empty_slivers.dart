@@ -112,20 +112,9 @@ class _LibraryCatalogEmptySliver extends ConsumerWidget {
                 emptyAction(
                   actionIcon: LucideIcons.listFilter,
                   label: context.l10n.libraryClearFilters,
-                  onPressed: () {
-                    ref
-                        .read(libraryQueryIntentProvider.notifier)
-                        .clearKeyword();
-                    if (entity == LibraryDisplayTarget.comics) {
-                      ref
-                          .read(libraryComicsFilterResetProvider.notifier)
-                          .resetAll();
-                    } else {
-                      ref
-                          .read(librarySeriesFilterResetProvider.notifier)
-                          .resetAll();
-                    }
-                  },
+                  onPressed: () => ref
+                      .read(libraryPageFacadeProvider.notifier)
+                      .resetFilters(clearKeyword: true),
                 ),
             ],
           ),

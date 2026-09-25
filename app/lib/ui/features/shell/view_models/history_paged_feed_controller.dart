@@ -119,7 +119,19 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     });
   }
 
-  void removeItem(String comicId) {
+  /// 删除单本漫画的阅读历史；失败时抛出，本地列表保持不变。
+  Future<void> deleteHistory(String comicId) async {
+    await ref.read(readingHistoryRepoProvider).deleteByComicId(comicId);
+    _removeItem(comicId);
+  }
+
+  /// 清空全部阅读历史；失败时抛出，本地列表保持不变。
+  Future<void> clearAllHistory() async {
+    await ref.read(readingHistoryRepoProvider).clearAllHistory();
+    _clearAllLocal();
+  }
+
+  void _removeItem(String comicId) {
     final HistoryPagedFeedState? current = state.asData?.value;
     if (current == null) {
       return;
@@ -135,7 +147,7 @@ class HistoryPagedFeedController extends _$HistoryPagedFeedController {
     );
   }
 
-  void clearAllLocal() {
+  void _clearAllLocal() {
     state = AsyncData<HistoryPagedFeedState>(
       HistoryPagedFeedState(
         items: const <HistoryGridItem>[],

@@ -1,8 +1,7 @@
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
-import 'package:hentai_library/ui/core/widgets/form/character_library_multi_select_field.dart';
-import 'package:hentai_library/ui/core/widgets/form/parody_library_multi_select_field.dart';
+import 'package:hentai_library/ui/features/metadata/view_models/named_facet_dictionary_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_include_set_filter_notifier.dart';
 import 'package:hentai_library/ui/features/metadata/view_models/tag_management_notifier.dart';
 import 'package:riverpod/misc.dart' show ProviderOrFamily;

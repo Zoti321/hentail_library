@@ -31,8 +31,8 @@ fn bind_pdfium() -> Result<Pdfium, HentaiError> {
     {
         let lib_dir = env!("HENTAI_PDFIUM_LIB_DIR");
         let lib_path = Pdfium::pdfium_platform_library_name_at_path(lib_dir);
-        let bindings = Pdfium::bind_to_library(lib_path)
-            .map_err(|e| map_archive_err("pdfium 绑定失败", e))?;
+        let bindings =
+            Pdfium::bind_to_library(lib_path).map_err(|e| map_archive_err("pdfium 绑定失败", e))?;
         Ok(Pdfium::new(bindings))
     }
 }
@@ -64,10 +64,7 @@ fn bind_pdfium_ios() -> Result<Pdfium, HentaiError> {
     // Fallback: leaf name resolved by dyld among already-loaded images.
     match Pdfium::bind_to_library("libpdfium.dylib") {
         Ok(bindings) => Ok(Pdfium::new(bindings)),
-        Err(e) => Err(map_archive_err(
-            "pdfium 绑定失败",
-            last_err.unwrap_or(e),
-        )),
+        Err(e) => Err(map_archive_err("pdfium 绑定失败", last_err.unwrap_or(e))),
     }
 }
 
@@ -83,12 +80,7 @@ pub fn count_pdf_pages(file: &Path) -> Result<Option<i32>, HentaiError> {
     Ok(Some(count as i32))
 }
 
-type PdfEmbeddedMeta = (
-    Option<String>,
-    Vec<String>,
-    Option<String>,
-    Option<i64>,
-);
+type PdfEmbeddedMeta = (Option<String>, Vec<String>, Option<String>, Option<i64>);
 
 pub fn read_pdf_embedded_meta(file: &Path) -> Result<PdfEmbeddedMeta, HentaiError> {
     let pdfium = bind_pdfium()?;
@@ -133,7 +125,11 @@ fn parse_pdf_date_to_ms(raw: &str) -> Option<i64> {
     if trimmed.len() < 8 {
         return None;
     }
-    let digits: String = trimmed.chars().take(14).filter(|c| c.is_ascii_digit()).collect();
+    let digits: String = trimmed
+        .chars()
+        .take(14)
+        .filter(|c| c.is_ascii_digit())
+        .collect();
     if digits.len() < 8 {
         return None;
     }
@@ -156,11 +152,9 @@ fn date_to_utc_ms(
 ) -> Option<i64> {
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     let days_from_ce = days_from_civil(year, month, day)?;
-    let secs = days_from_ce as i64 * 86_400
-        + hour as i64 * 3600
-        + minute as i64 * 60
-        + second as i64;
-    SystemTime::    UNIX_EPOCH
+    let secs =
+        days_from_ce as i64 * 86_400 + hour as i64 * 3600 + minute as i64 * 60 + second as i64;
+    SystemTime::UNIX_EPOCH
         .checked_add(Duration::from_secs(secs.max(0) as u64))
         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
         .map(|d| d.as_millis() as i64)

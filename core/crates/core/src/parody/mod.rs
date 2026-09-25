@@ -1,7 +1,7 @@
+use crate::error::HentaiError;
 use crate::named_facet::{
     list_all_named_facet_names, list_distinct_named_facet_names, JunctionNamedFacet,
 };
-use crate::error::HentaiError;
 
 pub fn distinct_parodies_sql() -> String {
     JunctionNamedFacet::Parody.distinct_attached_sql()

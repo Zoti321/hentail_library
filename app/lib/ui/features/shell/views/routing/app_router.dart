@@ -5,7 +5,7 @@ import 'package:hentai_library/ui/core/interaction/desktop_page_transition.dart'
 import 'package:hentai_library/ui/features/library/views/library_page/library_page.dart';
 import 'package:hentai_library/ui/features/library/views/searched_page.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/settings_page.dart';
-import 'package:hentai_library/ui/features/shell/state/current_library_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/current_library_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/all_libraries_browse_page.dart';
 import 'package:hentai_library/ui/features/shell/views/home_page/home_page.dart';
 import 'package:hentai_library/ui/features/shell/views/history_page.dart';

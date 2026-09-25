@@ -1,7 +1,5 @@
 import 'package:hentai_library/domain/library/library_comic_sort_option.dart';
 import 'package:hentai_library/domain/library/library_series_sort_option.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_sort_codec.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_settings.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -87,7 +85,6 @@ class LibraryTabSortNotifier extends _$LibraryTabSortNotifier {
     } else {
       await prefs.setString(_comicsStorageKey, _encodeComicSortOption(option));
     }
-    ref.invalidate(libraryComicsCatalogControllerProvider);
   }
 
   Future<void> _updateSeriesSort(LibrarySeriesSortOption option) async {
@@ -106,7 +103,6 @@ class LibraryTabSortNotifier extends _$LibraryTabSortNotifier {
         encodeLibrarySeriesSortOption(option),
       );
     }
-    ref.invalidate(librarySeriesCatalogControllerProvider);
   }
 
   Future<void> resetComicsSortToDefault() async {

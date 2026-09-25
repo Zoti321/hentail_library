@@ -130,7 +130,10 @@ pub fn parse_directory_with(
     )
 }
 
-pub fn parse_zip_archive(file: &Path, resource_type: &str) -> Result<Option<ParsedResource>, HentaiError> {
+pub fn parse_zip_archive(
+    file: &Path,
+    resource_type: &str,
+) -> Result<Option<ParsedResource>, HentaiError> {
     parse_zip_archive_with(local_access(), &file.to_string_lossy(), resource_type)
 }
 
@@ -330,15 +333,18 @@ fn parse_path_bound_with(
         .map_err(|e| HentaiError::validation(format!("创建临时文件失败: {e}")))?;
     std::io::copy(&mut stream, &mut temp)
         .map_err(|e| HentaiError::remote_unreachable(format!("下载远程资源失败: {e}")))?;
-            let mut parsed = parse(temp.path())?;
-            if let Some(ref mut p) = parsed {
-                // Keep identity keyed on the remote URL, not the temp path.
-                p.path = location.to_string();
-            }
-            Ok(parsed)
-        }
+    let mut parsed = parse(temp.path())?;
+    if let Some(ref mut p) = parsed {
+        // Keep identity keyed on the remote URL, not the temp path.
+        p.path = location.to_string();
+    }
+    Ok(parsed)
+}
 
-pub fn parse_rar_archive(file: &Path, resource_type: &str) -> Result<Option<ParsedResource>, HentaiError> {
+pub fn parse_rar_archive(
+    file: &Path,
+    resource_type: &str,
+) -> Result<Option<ParsedResource>, HentaiError> {
     let page_count = count_rar_images(file)?;
     let Some(page_count) = page_count else {
         return Ok(None);
@@ -526,10 +532,8 @@ fn date_to_utc_ms(
     second: u32,
 ) -> Option<i64> {
     let days_from_ce = days_from_civil(year, month, day)?;
-    let secs = days_from_ce as i64 * 86_400
-        + hour as i64 * 3600
-        + minute as i64 * 60
-        + second as i64;
+    let secs =
+        days_from_ce as i64 * 86_400 + hour as i64 * 3600 + minute as i64 * 60 + second as i64;
     UNIX_EPOCH
         .checked_add(Duration::from_secs(secs.max(0) as u64))
         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
@@ -697,14 +701,15 @@ mod tests {
         assert_eq!(meta.title, "标题");
         assert_eq!(meta.authors, vec!["作者A", "作者B"]);
         assert_eq!(meta.description.as_deref(), Some("概要"));
-        assert_eq!(meta.published_at, Some(date_to_utc_ms(2022, 3, 9, 0, 0, 0).unwrap()));
+        assert_eq!(
+            meta.published_at,
+            Some(date_to_utc_ms(2022, 3, 9, 0, 0, 0).unwrap())
+        );
     }
 
     #[test]
     fn parse_comic_info_xml_year_only_keeps_published_at_empty() {
-        let meta = parse_comic_info_xml(
-            r#"<ComicInfo><Year>2020</Year></ComicInfo>"#,
-        );
+        let meta = parse_comic_info_xml(r#"<ComicInfo><Year>2020</Year></ComicInfo>"#);
         assert_eq!(meta.published_at, None);
     }
 
@@ -741,9 +746,6 @@ mod tests {
   </metadata>
 </package>"#,
         );
-        assert_eq!(
-            meta.authors,
-            vec!["作者A", "作者B", "作者C"]
-        );
+        assert_eq!(meta.authors, vec!["作者A", "作者B", "作者C"]);
     }
 }

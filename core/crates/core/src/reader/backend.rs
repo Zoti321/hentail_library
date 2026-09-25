@@ -11,8 +11,8 @@ use crate::formats::{
     open_sevenz_backend, open_sevenz_backend_kept, PdfBackend, RarBackend, SevenZBackend,
 };
 use crate::resource::{
-    basename, extension_lower, is_comic_image_extension, local_access, ResourceAccess, ResourceKind,
-    ResourceStream,
+    basename, extension_lower, is_comic_image_extension, local_access, ResourceAccess,
+    ResourceKind, ResourceStream,
 };
 use crate::sync::remote::normalize_remote_location_key;
 use crate::util::natural_sort::compare_filename_natural;

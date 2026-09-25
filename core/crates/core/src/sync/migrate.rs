@@ -312,10 +312,7 @@ mod tests {
     fn detect_series_pairs_skips_occupied_destination_not_being_vacated() {
         let dest = series_id_from_folder_path("E:/lib/Dest");
         let mut members = HashMap::new();
-        members.insert(
-            "series-old".to_string(),
-            vec!["c1".to_string()],
-        );
+        members.insert("series-old".to_string(), vec!["c1".to_string()]);
         let mut paths = HashMap::new();
         paths.insert("c1".to_string(), "E:/lib/Dest/a.cbz".to_string());
         let existing = HashSet::from(["series-old".to_string(), dest.clone()]);

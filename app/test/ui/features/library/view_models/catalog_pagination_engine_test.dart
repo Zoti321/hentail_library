@@ -1,3 +1,4 @@
+import 'package:hentai_library/domain/models/value_objects/page_jump.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/ui/features/library/view_models/catalog_pagination_engine.dart';
@@ -39,17 +40,23 @@ void main() {
   });
 
   test('navigation methods return false at boundaries', () {
-    expect(engine.goToPreviousPage(), isFalse);
-    expect(engine.goToFirstPage(), isFalse);
-    expect(engine.goToNextPage(3), isTrue);
-    expect(engine.goToNextPage(3), isTrue);
-    expect(engine.goToNextPage(3), isFalse);
-    expect(engine.goToLastPage(3), isFalse);
-    expect(engine.goToPreviousPage(), isTrue);
+    expect(engine.jump(PageJump.previous, 3), isFalse);
+    expect(engine.jump(PageJump.first, 3), isFalse);
+    expect(engine.jump(PageJump.next, 3), isTrue);
+    expect(engine.jump(PageJump.next, 3), isTrue);
+    expect(engine.jump(PageJump.next, 3), isFalse);
+    expect(engine.jump(PageJump.last, 3), isFalse);
+    expect(engine.jump(PageJump.previous, 3), isTrue);
     expect(engine.pageIndex, 2);
     expect(engine.setPage(3), isTrue);
     expect(engine.setPage(3), isFalse);
     expect(engine.setPage(0), isFalse);
+  });
+
+  test('jump is a no-op while total pages are unknown', () {
+    expect(engine.jump(PageJump.next, 0), isFalse);
+    expect(engine.jump(PageJump.last, 0), isFalse);
+    expect(engine.pageIndex, 1);
   });
 
   test('refresh clears query key and resets page', () {

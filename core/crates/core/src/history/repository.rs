@@ -1,8 +1,8 @@
+use sea_orm::sea_query::{Expr, Func};
 use sea_orm::{
     ActiveModelTrait, ColumnTrait, ConnectionTrait, EntityTrait, PaginatorTrait, QueryFilter,
     QueryOrder, Set,
 };
-use sea_orm::sea_query::{Expr, Func};
 
 use crate::db::{connection, map_db_err};
 use crate::entity::{comic_reading_histories, prelude::*};
@@ -57,7 +57,9 @@ pub async fn normalize_reading_history_titles<C: ConnectionTrait>(
     Ok(updated)
 }
 
-pub async fn get_reading_by_comic_id(comic_id: &str) -> Result<Option<ReadingHistoryDto>, HentaiError> {
+pub async fn get_reading_by_comic_id(
+    comic_id: &str,
+) -> Result<Option<ReadingHistoryDto>, HentaiError> {
     let db = connection()?;
     let row = ComicReadingHistories::find_by_id(comic_id)
         .one(&db)
@@ -104,16 +106,16 @@ pub async fn fetch_reading_page(
     })
 }
 
-fn reading_history_list_query(
-    keyword: Option<&str>,
-) -> sea_orm::Select<ComicReadingHistories> {
+fn reading_history_list_query(keyword: Option<&str>) -> sea_orm::Select<ComicReadingHistories> {
     let mut query = ComicReadingHistories::find();
     let normalized = keyword.map(str::trim).filter(|value| !value.is_empty());
     if let Some(keyword) = normalized {
         let pattern = format!("%{}%", keyword.to_lowercase());
         query = query.filter(
-            Expr::expr(Func::lower(Expr::col(comic_reading_histories::Column::Title)))
-                .like(pattern),
+            Expr::expr(Func::lower(Expr::col(
+                comic_reading_histories::Column::Title,
+            )))
+            .like(pattern),
         );
     }
     query

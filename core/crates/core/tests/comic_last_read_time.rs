@@ -1,12 +1,10 @@
 mod common;
 
-
 use hentai_core::{
     connection, find_comic_by_id, init_db_at_path, record_reading, ReadingHistoryDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
-
 
 fn seed_comic(comic_id: &str) {
     let runtime = tokio::runtime::Runtime::new().expect("runtime");
@@ -39,7 +37,9 @@ fn find_comic_by_id_includes_last_read_time_when_history_exists() {
         let temp = TempDir::new().expect("tempdir");
         let db_path = temp.path().join("comic_last_read.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
-        runtime.block_on(init_db_at_path(&db_path)).expect("init db");
+        runtime
+            .block_on(init_db_at_path(&db_path))
+            .expect("init db");
 
         seed_comic("read-comic");
         seed_comic("unread-comic");

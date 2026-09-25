@@ -1,56 +1,12 @@
-use std::fs;
-use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+mod common;
 
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::{
     connection, find_series_by_id, init_db_at_path, set_series_item_sort_order_locked,
     set_series_items_order, update_series_item_sort_order,
 };
-use sea_orm::{ConnectionTrait, Database, DatabaseConnection, Statement};
+use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
 use tempfile::TempDir;
-
-/// `init_db_at_path` 使用进程级全局连接，并行测试会互相覆盖。
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    fs::read_to_string(manifest_dir.join("../../tests/fixtures/drift_v2.sql"))
-        .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
 
 async fn seed_three_comics(db: &DatabaseConnection) {
     db.execute(Statement::from_string(
@@ -84,22 +40,23 @@ async fn seed_three_comics(db: &DatabaseConnection) {
 
 #[test]
 fn update_series_item_sort_order_sets_value_locks_and_reorders() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_three_comics(&db).await;
-            rebuild_series_from_comics(&db, None).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild");
 
-            let series = find_series_by_id(
-                &hentai_core::series_id_from_folder_path("E:/lib/Series"),
-            )
-            .await
-            .expect("find")
-            .expect("series exists");
+            let series =
+                find_series_by_id(&hentai_core::series_id_from_folder_path("E:/lib/Series"))
+                    .await
+                    .expect("find")
+                    .expect("series exists");
             assert_eq!(series.items.len(), 3);
 
             update_series_item_sort_order(&series.series_id, "c3", 1.5)
@@ -127,9 +84,9 @@ fn update_series_item_sort_order_sets_value_locks_and_reorders() {
 
 #[test]
 fn rebuild_preserves_locked_sort_order_and_renumbers_unlocked() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -189,15 +146,17 @@ fn rebuild_preserves_locked_sort_order_and_renumbers_unlocked() {
 
 #[test]
 fn unlock_sort_order_allows_rebuild_to_renumber() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_three_comics(&db).await;
-            rebuild_series_from_comics(&db, None).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild");
 
             let series_id = hentai_core::series_id_from_folder_path("E:/lib/Series");
             update_series_item_sort_order(&series_id, "c3", 1.5)
@@ -208,7 +167,9 @@ fn unlock_sort_order_allows_rebuild_to_renumber() {
                 .await
                 .expect("unlock c3");
 
-            rebuild_series_from_comics(&db, None).await.expect("rebuild again");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild again");
 
             let series = find_series_by_id(&series_id)
                 .await
@@ -229,15 +190,17 @@ fn unlock_sort_order_allows_rebuild_to_renumber() {
 
 #[test]
 fn set_series_items_order_reorders_all_unlocked_and_locks_all() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_three_comics(&db).await;
-            rebuild_series_from_comics(&db, None).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild");
 
             let series_id = hentai_core::series_id_from_folder_path("E:/lib/Series");
             set_series_items_order(
@@ -270,15 +233,17 @@ fn set_series_items_order_reorders_all_unlocked_and_locks_all() {
 
 #[test]
 fn set_series_items_order_preserves_locked_anchor_values() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_three_comics(&db).await;
-            rebuild_series_from_comics(&db, None).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild");
 
             let series_id = hentai_core::series_id_from_folder_path("E:/lib/Series");
             // c1 锁在 1.0，c3 锁在 3.0；c2 保持未锁。
@@ -312,7 +277,10 @@ fn set_series_items_order_preserves_locked_anchor_values() {
             assert!((by_id.get("c1").unwrap().sort_order - 1.0).abs() < f64::EPSILON);
             assert!((by_id.get("c3").unwrap().sort_order - 3.0).abs() < f64::EPSILON);
             let c2 = by_id.get("c2").unwrap().sort_order;
-            assert!(c2 > 1.0 && c2 < 3.0, "c2 should interpolate between anchors: {c2}");
+            assert!(
+                c2 > 1.0 && c2 < 3.0,
+                "c2 should interpolate between anchors: {c2}"
+            );
             // 全部加锁。
             assert!(series.items.iter().all(|i| i.sort_order_locked));
             let ordered: Vec<&str> = series.items.iter().map(|i| i.comic_id.as_str()).collect();
@@ -323,15 +291,17 @@ fn set_series_items_order_preserves_locked_anchor_values() {
 
 #[test]
 fn set_series_items_order_reassigns_locked_when_relative_order_changes() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
             let db = connection().expect("connection");
             seed_three_comics(&db).await;
-            rebuild_series_from_comics(&db, None).await.expect("rebuild");
+            rebuild_series_from_comics(&db, None)
+                .await
+                .expect("rebuild");
 
             let series_id = hentai_core::series_id_from_folder_path("E:/lib/Series");
             update_series_item_sort_order(&series_id, "c1", 1.0)

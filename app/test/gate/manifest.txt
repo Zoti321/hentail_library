@@ -1,0 +1,59 @@
+# Gate tier: gate-dart-test 硬门禁清单（路径相对 app/，文件或目录均可）。
+# 扩硬门禁只改本文件 + 在 PR 说明中列出新增路径；规则见 docs/agents/testing.md。
+
+# Gate 自检
+test/gate
+
+# Dart 薄边缝：domain / core / data（FRB mapper · guard · adapter）
+test/domain
+test/core
+test/data
+
+# FRB 线缝冒烟（真实 cdylib；run-gate.sh dart-test 会先 cargo build）
+test/frb_wire
+
+# Monorepo layout
+test/project_layout_test.dart
+
+# App smoke
+test/widget_test.dart
+
+# Dart hard-manifest UI（已晋升快轨）
+test/ui/core/widgets/actions/destructive_filled_button_test.dart
+test/ui/core/widgets/overlays/dialog/confirm
+test/ui/features/metadata/views/metadata_page/named_facet_fill_viewport_test.dart
+test/ui/features/reader/reader_viewport_pages_test.dart
+test/ui/features/reader/reader_open_error_message_test.dart
+test/ui/features/reader/views/reader_page/reader_chrome_layout_test.dart
+
+# Dart hard-manifest UI — 纯逻辑 ViewModel / policy / codec
+test/ui/core/interaction/app_motion_test.dart
+test/ui/core/interaction/interactive_target_test.dart
+test/ui/core/interaction/reader_input_test.dart
+test/ui/core/theme/hentai_color_scheme_tokens_test.dart
+test/ui/features/library/library_series_sort_codec_test.dart
+test/ui/features/library/stable_page_count_test.dart
+test/ui/features/library/view_models/catalog_pagination_engine_test.dart
+test/ui/features/library/view_models/comic_detail_return_series_notifier_test.dart
+test/ui/features/library/view_models/comic_metadata_apply_test.dart
+test/ui/features/library/view_models/comic_metadata_editor_notifier_test.dart
+test/ui/features/library/view_models/library_comics_filter_reset_notifier_test.dart
+test/ui/features/library/view_models/library_page_facade_test.dart
+test/ui/features/library/view_models/library_search_query_parser_test.dart
+test/ui/features/library/view_models/library_series_filter_reset_notifier_test.dart
+test/ui/features/library/view_models/library_tab_sort_notifier_test.dart
+test/ui/features/library/view_models/series_item_sort_persist_test.dart
+test/ui/features/library/view_models/series_metadata_editor_notifier_test.dart
+test/ui/features/reader/reader_exit_location_test.dart
+test/ui/features/reader/reader_image_cache_test.dart
+test/ui/features/reader/reader_page_crossfade_policy_test.dart
+test/ui/features/reader/reader_prefetch_generation_test.dart
+test/ui/features/reader/resume_visible_sync_gate_test.dart
+test/ui/features/reader/view_models/reader_cover_editor_notifier_test.dart
+test/ui/features/settings/view_models/locale_preference_persist_test.dart
+test/ui/features/settings/view_models/reading_mode_persist_test.dart
+test/ui/features/shell/view_models/current_library_notifier_commands_test.dart
+test/ui/features/shell/view_models/history_load_more_throttle_test.dart
+test/ui/features/shell/view_models/library_revision_throttle_busy_test.dart
+test/ui/features/shell/view_models/library_scan_toasts_test.dart
+test/ui/features/shell/view_models/metadata_refresh_toasts_test.dart

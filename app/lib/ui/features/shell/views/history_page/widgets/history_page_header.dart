@@ -148,8 +148,9 @@ class HistoryPageHeaderToolbar extends ConsumerWidget {
       return;
     }
     try {
-      await ref.read(readingHistoryRepoProvider).clearAllHistory();
-      ref.read(historyPagedFeedControllerProvider.notifier).clearAllLocal();
+      await ref
+          .read(historyPagedFeedControllerProvider.notifier)
+          .clearAllHistory();
       if (context.mounted) {
         showSuccessToast(context, l10n.historyClearedToast);
       }

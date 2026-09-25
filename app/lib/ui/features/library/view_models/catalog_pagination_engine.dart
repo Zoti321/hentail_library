@@ -1,3 +1,4 @@
+import 'package:hentai_library/domain/models/value_objects/page_jump.dart';
 import 'package:hentai_library/domain/models/value_objects/page_request.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 
@@ -28,35 +29,18 @@ class CatalogPaginationEngine {
     return true;
   }
 
-  bool goToFirstPage() {
-    if (_pageIndex == 1) {
+  /// 越界（首页再上一页、末页再下一页、总页数未知）返回 false。
+  bool jump(PageJump jump, int totalPages) {
+    final int target = switch (jump) {
+      PageJump.first => 1,
+      PageJump.previous => _pageIndex - 1,
+      PageJump.next => _pageIndex + 1,
+      PageJump.last => totalPages,
+    };
+    if (target < 1 || target > totalPages || target == _pageIndex) {
       return false;
     }
-    _pageIndex = 1;
-    return true;
-  }
-
-  bool goToLastPage(int totalPages) {
-    if (totalPages <= 0 || _pageIndex == totalPages) {
-      return false;
-    }
-    _pageIndex = totalPages;
-    return true;
-  }
-
-  bool goToPreviousPage() {
-    if (_pageIndex <= 1) {
-      return false;
-    }
-    _pageIndex -= 1;
-    return true;
-  }
-
-  bool goToNextPage(int totalPages) {
-    if (totalPages <= 0 || _pageIndex >= totalPages) {
-      return false;
-    }
-    _pageIndex += 1;
+    _pageIndex = target;
     return true;
   }
 

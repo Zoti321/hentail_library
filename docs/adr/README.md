@@ -4,7 +4,7 @@
 
 ## 何时写 ADR
 
-满足以下三点时再新增 ADR（参见 `docs/agents/domain.md`）：
+满足以下三点时再新增 ADR：
 
 1. 做出了有长期影响的架构或技术决策
 2. 备选方案曾认真权衡过
@@ -68,3 +68,6 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0013](./0013-path-migration.md) | Path migration：弱指纹 + Local 库根相对路径 remapping | Accepted |
 | [0014](./0014-retire-saved-path-ui-and-api.md) | 退役 Saved path / Selected Paths UI 与 Path API | Accepted |
 | [0015](./0015-ios-pdf-via-vendored-pdfium.md) | iOS PDF 经 vendored pdfium 一等支持（去除 stub） | Accepted |
+| [0016](./0016-app-preferences-via-shared-preferences.md) | App preference 经 SharedPreferences 持久化（取代 settings.json） | Accepted |
+| [0017](./0017-ui-mvvm-presentation-layer.md) | Flutter UI 层 MVVM（Riverpod）命名与 View/Repository 边界 | Accepted |
+| [0018](./0018-test-seams-and-ci-tiers.md) | 测试三层缝（Rust 真值 / FRB 线缝 / Dart 薄边）与 CI tier 命名 | Accepted |

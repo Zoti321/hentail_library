@@ -4,8 +4,8 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/library/sync_library_types.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/terminal_spinner.dart';
-import 'package:hentai_library/ui/features/shell/state/library_scan_toasts.dart';
-import 'package:hentai_library/ui/features/shell/state/scan_library_controller.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_scan_toasts.dart';
+import 'package:hentai_library/ui/features/shell/view_models/scan_library_controller.dart';
 
 /// Shell-global silent Library sync completion Toasts + visible busy strip.
 ///

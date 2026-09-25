@@ -6,15 +6,13 @@ import 'package:hentai_library/core/util/utils.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
-import 'package:hentai_library/domain/models/value_objects/form/comic_metadata_form.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/actions/popup_menu_panel_shell.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/anchored_overlay_menu.dart';
-import 'package:hentai_library/ui/core/widgets/overlays/dialog/edit_metadata_dialog.dart';
+import 'package:hentai_library/ui/features/library/views/widgets/edit_metadata_dialog.dart';
 import 'package:hentai_library/ui/features/library/comic_delete_flow.dart';
-import 'package:hentai_library/ui/features/library/view_models/comic_metadata_apply.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_back_header.dart';
 import 'package:hentai_library/ui/features/library/views/comic_detail_page/widgets/comic_detail_series_nav.dart';
 import 'package:hentai_library/ui/providers.dart';
@@ -89,20 +87,7 @@ class ComicDetailHeader extends ConsumerWidget {
   }
 
   void _openEditMetadata(BuildContext context, WidgetRef ref) {
-    showEditMetadataDialog(
-      context: context,
-      comic: comic,
-      onSave: (ComicMetadataForm data) async {
-        await applyComicMetadataForm(
-          ref.read(comicRepoProvider),
-          data,
-          comic,
-          invalidate: ref.invalidate,
-          notifyExternalChange: () =>
-              ref.read(libraryRevisionProvider.notifier).notifyExternalChange(),
-        );
-      },
-    );
+    showEditMetadataDialog(context: context, comic: comic);
   }
 }
 

@@ -9,10 +9,7 @@ use crate::resource::{parse_file_with, parsed_to_comic, ResourceAccess};
 use crate::sync::writer::upsert_comics;
 
 /// After a successful reader page-list, reconcile DB `page_count` (and parse merge).
-pub async fn writeback_after_open(
-    comic_id: &str,
-    page_count: i32,
-) -> Result<(), HentaiError> {
+pub async fn writeback_after_open(comic_id: &str, page_count: i32) -> Result<(), HentaiError> {
     if page_count <= 0 {
         return Ok(());
     }

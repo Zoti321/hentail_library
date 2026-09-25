@@ -169,7 +169,12 @@ class LibraryDisplayTargetTabs extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
+    );
+    final LibraryPageFacadeNotifier facade = ref.read(
+      libraryPageFacadeProvider.notifier,
     );
     final AppLocalizations l10n = context.l10n;
     return Row(
@@ -178,17 +183,13 @@ class LibraryDisplayTargetTabs extends ConsumerWidget {
         _UnderlineTab(
           label: l10n.libraryTabComics,
           isSelected: displayTarget == LibraryDisplayTarget.comics,
-          onTap: () => ref
-              .read(libraryQueryIntentProvider.notifier)
-              .setDisplayTarget(LibraryDisplayTarget.comics),
+          onTap: () => facade.selectDisplayTarget(LibraryDisplayTarget.comics),
         ),
         const SizedBox(width: 16),
         _UnderlineTab(
           label: l10n.libraryTabSeries,
           isSelected: displayTarget == LibraryDisplayTarget.series,
-          onTap: () => ref
-              .read(libraryQueryIntentProvider.notifier)
-              .setDisplayTarget(LibraryDisplayTarget.series),
+          onTap: () => facade.selectDisplayTarget(LibraryDisplayTarget.series),
         ),
       ],
     );
@@ -201,7 +202,9 @@ class LibraryDisplayTargetBottomBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.displayTarget,
+      ),
     );
     final AppLocalizations l10n = context.l10n;
     return ContentSwitcherBottomBar(
@@ -212,8 +215,8 @@ class LibraryDisplayTargetBottomBar extends ConsumerWidget {
       selectedIndex: displayTarget == LibraryDisplayTarget.comics ? 0 : 1,
       onSelected: (int index) {
         ref
-            .read(libraryQueryIntentProvider.notifier)
-            .setDisplayTarget(
+            .read(libraryPageFacadeProvider.notifier)
+            .selectDisplayTarget(
               index == 0
                   ? LibraryDisplayTarget.comics
                   : LibraryDisplayTarget.series,
@@ -285,7 +288,9 @@ class _LibraryCompactToolbar extends ConsumerWidget {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final bool isCustomized = ref.watch(
-      libraryActiveFilterSortIsCustomizedProvider,
+      libraryPageFacadeProvider.select(
+        (LibraryPageFacadeState state) => state.isFilterSortCustomized,
+      ),
     );
     final AppLocalizations l10n = context.l10n;
     return Row(
@@ -344,9 +349,6 @@ class _LibraryPageSizeMenuButtonState
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final ThemeData theme = Theme.of(context);
-    final LibraryDisplayTarget displayTarget = ref.watch(
-      libraryDisplayTargetProvider,
-    );
     final int activePageSize = ref.watch(libraryActivePageSizeProvider);
     final AppLocalizations l10n = context.l10n;
     return CustomPopupMenu(
@@ -360,9 +362,7 @@ class _LibraryPageSizeMenuButtonState
         activePageSize: activePageSize,
         onSelected: (int pageSize) {
           _controller.hideMenu();
-          ref
-              .read(libraryTabPageSizeProvider.notifier)
-              .setPageSize(displayTarget, pageSize);
+          ref.read(libraryPageFacadeProvider.notifier).setPageSize(pageSize);
         },
       ),
       child: GhostButton.icon(

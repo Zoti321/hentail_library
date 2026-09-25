@@ -21,7 +21,11 @@ pub async fn list_all_tags() -> Result<Vec<String>, HentaiError> {
 
 pub async fn count_all_tags() -> Result<i64, HentaiError> {
     let db = connection()?;
-    Tags::find().count(&db).await.map_err(map_db_err).map(|c| c as i64)
+    Tags::find()
+        .count(&db)
+        .await
+        .map_err(map_db_err)
+        .map(|c| c as i64)
 }
 
 pub async fn fetch_tags_page(limit: i32, offset: i32) -> Result<Vec<String>, HentaiError> {
@@ -84,7 +88,10 @@ pub async fn rename_tag(old_name: &str, new_name: &str) -> Result<(), HentaiErro
         .await
         .map_err(map_db_err)?;
     ComicTags::update_many()
-        .col_expr(comic_tags::Column::TagName, sea_orm::sea_query::Expr::value(new_name))
+        .col_expr(
+            comic_tags::Column::TagName,
+            sea_orm::sea_query::Expr::value(new_name),
+        )
         .filter(comic_tags::Column::TagName.eq(old_name))
         .exec(&txn)
         .await
@@ -98,7 +105,9 @@ pub async fn rename_tag(old_name: &str, new_name: &str) -> Result<(), HentaiErro
     Ok(())
 }
 
-pub async fn watch_tags(mut emit: impl FnMut(Vec<String>) -> Result<(), HentaiError>) -> Result<(), HentaiError> {
+pub async fn watch_tags(
+    mut emit: impl FnMut(Vec<String>) -> Result<(), HentaiError>,
+) -> Result<(), HentaiError> {
     let mut changes = crate::revision::subscribe();
     emit(list_all_tags().await?)?;
     while changes.changed().await.is_ok() {

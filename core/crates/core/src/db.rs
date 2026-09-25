@@ -1,9 +1,8 @@
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{OnceLock, RwLock};
 
-use sea_orm::{
-    ConnectOptions, ConnectionTrait, Database, DatabaseConnection, DbErr, Statement,
-};
+use sea_orm::{ConnectOptions, ConnectionTrait, Database, DatabaseConnection, DbErr, Statement};
 use sea_orm_migration::MigratorTrait;
 
 use crate::error::{HentaiError, HentaiErrorCode};
@@ -17,6 +16,7 @@ pub struct DbConfig {
 static DB_CONFIG: OnceLock<RwLock<Option<DbConfig>>> = OnceLock::new();
 static DB_CONN: OnceLock<RwLock<Option<DatabaseConnection>>> = OnceLock::new();
 static DB_VERSION_CONN: OnceLock<RwLock<Option<DatabaseConnection>>> = OnceLock::new();
+static VERSION_CONNECTION_EPOCH: AtomicU64 = AtomicU64::new(0);
 
 fn db_config_slot() -> &'static RwLock<Option<DbConfig>> {
     DB_CONFIG.get_or_init(|| RwLock::new(None))
@@ -117,6 +117,13 @@ pub fn version_connection() -> Result<DatabaseConnection, HentaiError> {
     })
 }
 
+/// 版本观测连接的代号：每次登记新连接递增。
+///
+/// 不同连接上的 `data_version` 不可比较，观测方须在代号变化时重设基线。
+pub fn version_connection_epoch() -> u64 {
+    VERSION_CONNECTION_EPOCH.load(Ordering::Acquire)
+}
+
 /// 迁移完成后打开版本观测专用连接并登记。
 async fn register_version_connection(db_file_path: &Path) -> Result<(), HentaiError> {
     let conn = open_version_connection(db_file_path)
@@ -126,6 +133,7 @@ async fn register_version_connection(db_file_path: &Path) -> Result<(), HentaiEr
         .write()
         .map_err(|_| HentaiError::db_init_failed("DB 状态锁失败", None))?;
     *guard = Some(conn);
+    VERSION_CONNECTION_EPOCH.fetch_add(1, Ordering::AcqRel);
     Ok(())
 }
 
@@ -232,9 +240,7 @@ fn chrono_like_unix_ms() -> i64 {
 async fn table_exists(conn: &DatabaseConnection, table: &str) -> Result<bool, DbErr> {
     let stmt = Statement::from_string(
         sea_orm::DatabaseBackend::Sqlite,
-        format!(
-            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='{table}' LIMIT 1"
-        ),
+        format!("SELECT 1 FROM sqlite_master WHERE type='table' AND name='{table}' LIMIT 1"),
     );
     Ok(conn.query_one(stmt).await?.is_some())
 }

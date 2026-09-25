@@ -34,7 +34,7 @@ Desktop UI is a **custom, Fluent-inspired** surface — not stock Material. Extr
 - Short **easeOutCubic** transitions (~180–220 ms) for hover, sidebar, tabs
 - Hover states on desktop (`MouseRegion`, `GhostButton` hover backgrounds)
 - **Lucide** icons (`lucide_icons_flutter`) on desktop — avoid Material `Icons.*` in new desktop-style UI
-- Locale: `zh_CN`; copy is Chinese in product UI
+- Locale: Chinese-first product copy; `zh` and `en` l10n exist, driven by App preference
 
 ### Typography
 
@@ -135,20 +135,22 @@ CatalogCoverCardShell
 
 ## Component catalog
 
-**Prefer these over raw Material widgets** when building or extending UI. All live under `app/lib/ui/core/widgets/`.
+Reuse widgets under `app/lib/ui/core/widgets/` before adding a new primitive. The directory is the source of truth — do not maintain a filename inventory here.
 
-| Category | Path | Examples |
-|----------|------|----------|
-| Actions | `actions/` | `GhostButton`, `DestructiveFilledButton`, `FilterPopupButton`, `SortPopupButton`, `PopupMenuPanelShell` |
-| Chrome | `chrome/` | `AppTitleBar`, `CapsuleTabBar`, `StatusCardShell` |
-| Elements | `element/` | `CatalogCoverCardShell` (internal), `ComicCard`, `SeriesCard`, `MetaChip`, `TagChip`, `ContentRatingChip`, `AppComicImage`, `AdaptiveCover` |
-| Feedback | `feedback/` | `custom_toast`, `TerminalSpinner` |
-| Form | `form/` | `FluentTextField`, `CustomTextField`, `DatePicker`, `DatePickerField`, `FluentToggleField`, `MultiSelect`, `AuthorLibraryMultiSelectField`, `TagLibraryMultiSelectField` |
-| Foundation | `foundation/` | `MyToggleSwitch` |
-| Navigation | `navigation/` | `DesktopSidebar`, `LibraryReturnBreadcrumb` |
-| Overlays | `overlays/dialog/` | `HentaiDialog`, `AdaptiveFormSurface`, `EditMetadataDialog`, `EditSeriesDialog`, `ScanProgressDialog`, … |
-| Overlays | `overlays/context_menu/` | `ComicContextMenu`, `SeriesContextMenu`, … |
-| Layout | `responsive_layout/` | `DetailResponsiveLayout`, `LibraryBlocksSliverGroup`, `LibrarySectionSliver` |
+| Category | Path |
+|----------|------|
+| Actions | `actions/` |
+| Chrome | `chrome/` |
+| Elements | `element/` |
+| Feedback | `feedback/` |
+| Form | `form/` |
+| Foundation | `foundation/` (`ToggleSwitch`, …) |
+| Navigation | `navigation/` |
+| Overlays | `overlays/dialog/`, `overlays/context_menu/` |
+| Pagination | `pagination/` |
+| Layout | `responsive_layout/` |
+
+Feature-only editors (`EditMetadataDialog`, `EditSeriesDialog`) live under `ui/features/library/views/widgets/`, not the shared overlay catalog.
 
 Theme entry points:
 
@@ -163,8 +165,9 @@ Theme entry points:
 
 - **`AppLayoutBreakpoints`** — canonical widths: compact `< 600`, medium `600–1024`, expanded `≥ 1024` (`app/lib/ui/core/layout/app_layout_breakpoints.dart`).
 - **`ResponsiveAppShell`** — compact drawer / medium collapsed sidebar / expanded sidebar; wraps all app routes.
-- **`DetailResponsiveLayout`** — centers detail content at 80% of parent, clamped width 980–1320, height 560–920. Use for comic/series detail bodies.
+- **`DetailPrimaryRowLayout`** — comic/series detail cover + info: single column on compact, row on wider widths.
 - **`LibraryBlocksSliverGroup`** — standard library page sliver composition (series block + comics block).
+- **Settings list–detail** — settings hide the app sidebar and use a responsive master/detail (see **Settings list–detail** in `CONTEXT.md`).
 - **`LayoutBuilder` + `MediaQuery`** — prefer for local density; do not add new `isDesktop` page forks.
 
 ### Breakpoints (codified)

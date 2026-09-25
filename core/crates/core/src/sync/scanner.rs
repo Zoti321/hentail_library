@@ -9,8 +9,8 @@ use crate::error::HentaiError;
 use super::format_group::{resource_type_enabled, FormatGroup};
 use super::handle::SyncHandle;
 use crate::resource::{
-    comic_id_for_path, local_access, parse_directory_with, parse_file_with, read_resource_size_with,
-    read_source_stat_with, ResourceAccess, ResourceKind,
+    comic_id_for_path, local_access, parse_directory_with, parse_file_with,
+    read_resource_size_with, read_source_stat_with, ResourceAccess, ResourceKind,
 };
 
 pub struct ScanContext {
@@ -230,7 +230,8 @@ fn try_reuse_existing(
     if existing.path != path {
         return false;
     }
-    let Ok(Some((modified_ms, size))) = read_source_stat_with(access, path, &existing.resource_type)
+    let Ok(Some((modified_ms, size))) =
+        read_source_stat_with(access, path, &existing.resource_type)
     else {
         return false;
     };
@@ -383,4 +384,3 @@ mod tests {
         assert!(items.iter().any(|i| i.resource_type == "cbz"));
     }
 }
-

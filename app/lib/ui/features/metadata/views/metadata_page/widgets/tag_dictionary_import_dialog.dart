@@ -4,7 +4,7 @@ import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/tag_dictionary_import_result.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
-import 'package:hentai_library/ui/features/metadata/state/tag_dictionary_import_controller.dart';
+import 'package:hentai_library/ui/features/metadata/view_models/tag_dictionary_import_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Future<TagDictionaryImportResult?> showTagDictionaryImportDialog({

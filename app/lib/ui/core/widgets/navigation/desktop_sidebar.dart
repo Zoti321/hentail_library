@@ -5,7 +5,7 @@ import 'package:hentai_library/ui/core/dto/nav_item_data.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/app_navigation.dart';
-import 'package:hentai_library/ui/features/shell/state/library_reorder_mode.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_reorder_mode_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 

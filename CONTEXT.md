@@ -121,15 +121,27 @@ _Avoid_: 标题推断、自动分组
 _Avoid_: 根系列置顶实体、isRoot 标志、Pinned series
 
 **Prefer library root series**:
-Series 浏览列表的应用级偏好：开启时，若 Library root series 仍落在当前筛选结果中，则固定排在列表最前；其余条目仍按当前排序字段排列。默认开启；非 Series 身份或 pin。
+Library browse preference：Series 浏览列表中，开启时若 Library root series 仍落在当前筛选结果中，则固定排在列表最前；其余条目仍按当前排序字段排列。默认开启；非 Series 身份或 pin。
 _Avoid_: 置顶系列、pin series（易与 Pinned library 混淆）
 
 **Expand by series**:
-Comics 浏览列表的应用级偏好：开启时仍为扁平 Comic 列表，但按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 块内按 SeriesItem.order；无 Series 归属的 Comic 整块垫底、块内标题升序」展开；开启时忽略 Comics 排序字段。默认开启；非视觉分组/折叠，也不共用 Prefer library root series 开关。
+Library browse preference：Comics 浏览列表中，开启时仍为扁平 Comic 列表，但按「Library root series 成员块优先 → 其余 Folder series 按名称升序成块 → 块内按 SeriesItem.order；无 Series 归属的 Comic 整块垫底、块内标题升序」展开；开启时忽略 Comics 排序字段。默认开启；非视觉分组/折叠，也不共用 Prefer library root series 开关。
 _Avoid_: 分组浏览、按系列折叠、group by series、系列模式列表
 
+**App preference**:
+应用级偏好，跨所有 Library 生效；由设置页与阅读器设置对话框读写。包括主题、语言、阅读模式、Webtoon 参数、自动播放、桌面侧栏展开、应用更新偏好等。持久化在 Dart 侧（SharedPreferences）；不进入 Rust SQLite。与 Library browse preference、Library property 区分。
+_Avoid_: 全局设置、settings.json（实现用语）、AppSetting DTO（实现用语）
+
+**Library browse preference**:
+库浏览 UI 偏好，跨所有 Library 共享；由库页筛选/排序/分页控件读写。包括排序字段、分页大小、Tag/Author 筛选、Expand by series、Prefer library root series、Smart facet match、年龄限制筛选等。持久化在 SharedPreferences；不进入 Rust SQLite，也不经设置页。
+_Avoid_: 库设置、client settings（Komga 用语）、筛选状态（口语）
+
+**Library property**:
+绑定某一 Library 实体的配置，由 Library form 或侧栏操作读写，经 FRB 落入 Rust SQLite。包括 Scan on startup、Scan interval、Supported resource formats（per-library）、Pinned、sidebar order、Current library id 等。与 App preference、Library browse preference 区分。
+_Avoid_: 库偏好、Library settings form（旧称）
+
 **Settings list–detail**:
-设置页在隐藏应用侧栏后的响应式主从：宽屏（≥ compact 断点）左侧设置主栏与右侧分类 detail 并排且默认选中第一项；窄屏先全宽主列表，再进入分类 detail。顶栏标题为「设置」并提供返回：宽屏或窄屏主列表时离开设置；窄屏 detail 时先回到主列表。不是 Libraries 应用侧栏，也不是 Library form / 阅读器设置对话框。
+设置页在隐藏应用侧栏后的响应式主从：宽屏（≥ compact 断点）左侧设置主栏与右侧分类 detail 并排且默认选中第一项；窄屏先全宽主列表，再进入分类 detail。顶栏标题为「设置」并提供返回：宽屏或窄屏主列表时离开设置；窄屏 detail 时先回到主列表。不是 Libraries 应用侧栏，也不是 Library form / 阅读器设置对话框。设置页所改项属于 App preference。
 _Avoid_: 设置侧边栏（易与应用侧栏混淆）、AdaptiveScaffold、settings split view（实现用语）
 
 **Tag**:
@@ -137,7 +149,7 @@ _Avoid_: 设置侧边栏（易与应用侧栏混淆）、AdaptiveScaffold、sett
 _Avoid_: 分类、关键词、Eh 标签（口语可用；领域与 issue 用 Tag）
 
 **Tag dictionary import**:
-从外部 JSON 标签字典（经网络下载或本地字节）将标签名幂等写入全局 Tag 字典的操作；不附着到 Comic，不删除本机已有 Tag。JSON 格式见 `docs/agents/tag-dictionary-import.md`。UI 入口待接入自维护词库后启用。
+从外部 JSON 标签字典（经网络下载或本地字节）将标签名幂等写入全局 Tag 字典的操作；不附着到 Comic，不删除本机已有 Tag。JSON 格式见 `docs/agents/operations/tag-dictionary-import.md`。UI 入口待接入自维护词库后启用。
 _Avoid_: ehentai 导入、EhTagTranslation、标签同步、画廊导入（易被理解成给 Comic 打标或镜像删除）
 
 **Author**:
@@ -177,8 +189,8 @@ Comic 文本所用语言的规范英文名有序列表（闭集首批：`Chinese
 _Avoid_: 界面语言、locale、译文语言；把 Language 做成自由 Tag
 
 **Content rating**:
-Comic 的内容分级：`unknown`、`safe`、`r18`；主要由用户设定，也可通过路径关键词自动检测为 `r18`。
-_Avoid_: 分级、年龄限制
+Comic 的内容分级：`unknown`、`safe`、`r18`；由用户设定。路径关键词自动检测（`auto_detect_content_rating`）已移除，勿恢复。浏览层隐藏 r18 用 **Healthy mode**，不改 Comic 自身分级。
+_Avoid_: 分级、年龄限制、路径自动标 r18
 
 **Comic metadata form**:
 编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag、Parody、Character、Language）时的可提交草稿；校验与 normalize、多值名增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
@@ -227,7 +239,7 @@ _Avoid_: Webtoon 模式（易与作品类型混淆）、卷轴模式
 _Avoid_: 翻页模式、单页模式
 
 **Page image fidelity**:
-Read session 中页图按源位图保真显示：不为滚动帧率升降 `FilterQuality`、不做锐化/美颜类「画质升级」，也不为性能故意降采样算法档位。为适配视口与内存可做 `cacheWidth` 等布局约束解码，但 GPU 采样须稳定、利于正确下采样（实现上固定 `FilterQuality.medium`；禁止静止态升到 `high`——网点漫画易出摩尔纹）。**本策略优先于**阅读器 UI 性能优化建议（含 `docs/research/ui-performance-tuning.md` 的 P2-1）。库封面/缩略图不在此约束内。
+Read session 中页图按源位图保真显示：不为滚动帧率升降 `FilterQuality`、不做锐化/美颜类「画质升级」，也不为性能故意降采样算法档位。为适配视口与内存可做 `cacheWidth` 等布局约束解码，但 GPU 采样须稳定、利于正确下采样（实现上固定 `FilterQuality.medium`；禁止静止态升到 `high`——网点漫画易出摩尔纹）。**本策略优先于**阅读器 UI 性能优化建议。库封面/缩略图不在此约束内。
 _Avoid_: 滚动降画质、静止升画质、FilterQuality.high 页图、锐化增强阅读
 
 **Page image copy**:

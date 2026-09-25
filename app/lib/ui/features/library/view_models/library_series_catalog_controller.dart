@@ -5,6 +5,7 @@ import 'package:hentai_library/domain/library/library_series_projection.dart';
 import 'package:hentai_library/domain/library/library_serialization_status_filter.dart';
 import 'package:hentai_library/domain/models/entity/comic/series.dart';
 import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/domain/models/value_objects/page_jump.dart';
 import 'package:hentai_library/domain/models/value_objects/paged_result.dart';
 import 'package:hentai_library/ui/features/library/view_models/catalog_pagination_engine.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_revision_coordinator.dart';
@@ -15,7 +16,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_query_int
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_page_size_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/features/shell/state/library_revision_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/library_revision_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'library_series_catalog_controller.g.dart';
@@ -117,26 +118,10 @@ class LibrarySeriesCatalogController extends _$LibrarySeriesCatalogController {
     }
   }
 
-  void goToFirstPage() {
-    if (_pagination.goToFirstPage()) {
-      ref.invalidateSelf();
-    }
-  }
-
-  void goToLastPage(int totalPages) {
-    if (_pagination.goToLastPage(totalPages)) {
-      ref.invalidateSelf();
-    }
-  }
-
-  void goToPreviousPage() {
-    if (_pagination.goToPreviousPage()) {
-      ref.invalidateSelf();
-    }
-  }
-
-  void goToNextPage(int totalPages) {
-    if (_pagination.goToNextPage(totalPages)) {
+  /// 以当前已加载的总页数为界；目录尚未加载时忽略。
+  void jump(PageJump jump) {
+    final int? totalPages = state.value?.pagination.totalPages;
+    if (totalPages != null && _pagination.jump(jump, totalPages)) {
       ref.invalidateSelf();
     }
   }

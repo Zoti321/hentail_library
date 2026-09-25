@@ -3,16 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
-import 'package:hentai_library/data/adapters/reader_frb_mapper.dart';
-import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/features/reader/module/controller/reader_controller.dart';
+import 'package:hentai_library/ui/features/reader/view_models/reader_cover_editor_notifier.dart';
 import 'package:hentai_library/ui/features/reader/views/reader_page/widgets/reader_floating_panel.dart';
-import 'package:hentai_library/ui/features/shell/di/deps.dart';
-import 'package:hentai_library/ui/providers/comic_cover_providers.dart';
-import 'package:hentai_library/ui/providers/series_cover_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -105,24 +101,9 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
       return;
     }
     try {
-      final Comic comic = state.comic;
-      final int pageIndex = (state.currentIndex - 1).clamp(0, 1 << 30);
       await ref
-          .read(comicThumbnailRepoProvider)
-          .setComicCoverFromPage(
-            comicId: comic.comicId,
-            path: comic.path,
-            resourceType: mapResourceType(comic.resourceType),
-            pageIndex: pageIndex,
-          );
-      final bytes =
-          (await ref
-                  .read(comicThumbnailRepoProvider)
-                  .findByComicId(comic.comicId))
-              ?.thumbnail;
-      if (bytes != null && bytes.isNotEmpty) {
-        ref.read(comicCoverProvider(comic.comicId).notifier).setReady(bytes);
-      }
+          .read(readerCoverEditorProvider.notifier)
+          .setComicCover(state.comic, pageIndex: _currentPageIndex(state));
       if (context.mounted) {
         showCustomToast(context, message: l10n.readerComicCoverSet);
       }
@@ -153,18 +134,13 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
       return;
     }
     try {
-      final Comic comic = state.comic;
-      final int pageIndex = (state.currentIndex - 1).clamp(0, 1 << 30);
       await ref
-          .read(comicThumbnailRepoProvider)
-          .setSeriesCoverFromPage(
-            seriesId: sid,
-            comicId: comic.comicId,
-            path: comic.path,
-            resourceType: mapResourceType(comic.resourceType),
-            pageIndex: pageIndex,
+          .read(readerCoverEditorProvider.notifier)
+          .setSeriesCover(
+            sid,
+            state.comic,
+            pageIndex: _currentPageIndex(state),
           );
-      ref.invalidate(seriesCoverSourceProvider(sid));
       if (context.mounted) {
         showCustomToast(context, message: l10n.readerSeriesCoverSet);
       }
@@ -192,6 +168,9 @@ class ReaderOverflowMenuButton extends HookConsumerWidget {
         .asData
         ?.value;
   }
+
+  int _currentPageIndex(ReaderState state) =>
+      (state.currentIndex - 1).clamp(0, 1 << 30);
 }
 
 class _ReaderOverflowMenuItem extends StatelessWidget {

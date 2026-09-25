@@ -1,5 +1,6 @@
 use hentai_core::{
-    self, count_all, fetch_comics_page, find_comic_by_id, find_comics_by_ids, init_db, search_by_keyword, search_by_keyword_page, search_by_tag_expression_page,
+    self, count_all, fetch_comics_page, find_comic_by_id, find_comics_by_ids, init_db,
+    search_by_keyword, search_by_keyword_page, search_by_tag_expression_page,
 };
 
 use super::init::HentaiErrorDto;
@@ -162,9 +163,7 @@ impl From<ComicSortOptionDto> for hentai_core::ComicSortOptionDto {
             field: match value.field {
                 ComicSortFieldDto::Title => hentai_core::ComicSortFieldDto::Title,
                 ComicSortFieldDto::CreatedAt => hentai_core::ComicSortFieldDto::CreatedAt,
-                ComicSortFieldDto::LastUpdatedAt => {
-                    hentai_core::ComicSortFieldDto::LastUpdatedAt
-                }
+                ComicSortFieldDto::LastUpdatedAt => hentai_core::ComicSortFieldDto::LastUpdatedAt,
                 ComicSortFieldDto::PublishedAt => hentai_core::ComicSortFieldDto::PublishedAt,
                 ComicSortFieldDto::ReadAt => hentai_core::ComicSortFieldDto::ReadAt,
                 ComicSortFieldDto::FileSize => hentai_core::ComicSortFieldDto::FileSize,

@@ -45,7 +45,8 @@ impl FakeResourceAccess {
             {
                 return Err(HentaiError::remote_auth_failed(message.clone()));
             }
-            if lower.contains("tls") || lower.contains("certificate") || message.contains("证书") {
+            if lower.contains("tls") || lower.contains("certificate") || message.contains("证书")
+            {
                 return Err(HentaiError::remote_tls_failed(message.clone()));
             }
             return Err(HentaiError::remote_unreachable(message.clone()));
@@ -156,10 +157,7 @@ impl ResourceAccess for FakeResourceAccess {
                 size: 0,
                 modified_ms: 0,
             }),
-            Some(FakeNode::File {
-                bytes,
-                modified_ms,
-            }) => Some(ResourceStat {
+            Some(FakeNode::File { bytes, modified_ms }) => Some(ResourceStat {
                 kind: ResourceKind::File,
                 size: bytes.len() as u64,
                 modified_ms: *modified_ms,

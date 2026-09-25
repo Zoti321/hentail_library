@@ -25,7 +25,7 @@ pub use dto::{
     SyncScanMode,
 };
 pub use format_group::FormatGroup;
-pub use handle::{SyncHandle, cancel_sync, create_sync_handle};
+pub use handle::{cancel_sync, create_sync_handle, SyncHandle};
 pub use library_lock::try_acquire_library_write_lock;
 pub use orchestrator::sync_library;
 pub use refresh::{

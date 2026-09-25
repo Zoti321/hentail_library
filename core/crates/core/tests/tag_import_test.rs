@@ -1,18 +1,9 @@
-use std::sync::Mutex;
+mod common;
 
 use hentai_core::{
     add_tag, import_tag_dictionary, init_db_at_path, list_all_tags, TagDictionaryImportResult,
 };
 use tempfile::TempDir;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
 
 const FIXTURE_JSON: &str = r#"{
   "tags": ["巨乳", "", "   ", "肌肉", "巨乳"]
@@ -20,7 +11,7 @@ const FIXTURE_JSON: &str = r#"{
 
 #[test]
 fn import_tag_dictionary_adds_names_from_wrapped_payload() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = temp.path().join("tag_import.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
@@ -60,7 +51,7 @@ fn import_tag_dictionary_adds_names_from_wrapped_payload() {
 
 #[test]
 fn import_tag_dictionary_accepts_flat_array_payload() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = temp.path().join("tag_import_flat.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
@@ -84,7 +75,7 @@ fn import_tag_dictionary_accepts_flat_array_payload() {
 
 #[test]
 fn import_tag_dictionary_respects_existing_tags() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = temp.path().join("tag_import_existing.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
@@ -109,7 +100,7 @@ fn import_tag_dictionary_respects_existing_tags() {
 
 #[test]
 fn import_tag_dictionary_rejects_invalid_json() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = temp.path().join("tag_import_invalid.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
@@ -126,7 +117,7 @@ fn import_tag_dictionary_rejects_invalid_json() {
 
 #[test]
 fn import_tag_dictionary_batch_inserts_more_than_one_chunk() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let db_path = temp.path().join("tag_import_batch.sqlite");
         let runtime = tokio::runtime::Runtime::new().expect("runtime");

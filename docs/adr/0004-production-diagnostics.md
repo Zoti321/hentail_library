@@ -76,7 +76,7 @@ Dart 在 `init_db` 同级调用 `configure_rust_log_frb(app_data_dir)` 打开 Ru
 | **②** | zip 打包、脱敏、`diagnostics.json`、另存为 |
 | **③** | 设置页「诊断与支持」、verbose provider、顶栏提示 |
 
-维护者指引见 `docs/agents/log-support.md`。
+维护者指引见 `docs/agents/operations/log-support.md`。
 
 ## Related
 
