@@ -56,6 +56,24 @@ Gate (ci.yml)
 └── gate-dart-test      ← app/test/gate/manifest.txt（薄边 + frb_wire + 快轨 UI + smoke）
 ```
 
+其余 tier 拓扑：
+
+```
+Nightly (nightly.yml)            定时 / workflow_dispatch
+├── nightly-dart-ui              全量 test/ui（慢轨）
+└── nightly-coverage             全量 Dart 覆盖率趋势（非门禁）
+
+Watch (watch.yml)                workflow_dispatch / workflow_call
+└── watch-platform-android-pdf   integration_test/pdf_reader_smoke_test.dart（Android 模拟器）
+
+Release (release.yml)            tag v* / workflow_dispatch
+├── release-verify               scripts/run-gate.sh（= 完整 Gate）
+├── watch-platform-android-pdf   调用 watch.yml；并行跑，不挡发布
+├── release-build-{windows,macos,linux,android,ios}   needs release-verify
+├── release-publish              needs 全部 release-build-*
+└── release-manual-summary       手动构建且不发布时
+```
+
 ### 3. 单一事实来源
 
 - `app/test/gate/manifest.txt` 是 `gate-dart-test` 的唯一路径来源；扩硬门禁只改 manifest 并在 PR 中列出。

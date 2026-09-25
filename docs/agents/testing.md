@@ -18,11 +18,24 @@ Job id 形如 `{tier}-{domain}-{intent}`（词汇表见 ADR-0018）。
 | Tier | Workflow | Job 前缀 | 是否挡合并 |
 |------|----------|----------|------------|
 | **Gate** | `ci.yml`（name: `Gate`） | `gate-*` | 是：PR 绿 = 全部 `gate-*` 已过 |
-| **Watch** | 手动 / 发布触发 | `watch-*` | 否（平台级冒烟） |
-| **Nightly** | 定时 / `workflow_dispatch` | `nightly-*` | 否 |
-| **Release** | `release.yml` | `release-*` | 发布流水线专用 |
+| **Watch** | `watch.yml`（手动；或由 `release.yml` 调用） | `watch-*` | 否（平台级冒烟） |
+| **Nightly** | `nightly.yml`（每日 UTC 18:00 / `workflow_dispatch`） | `nightly-*` | 否 |
+| **Release** | `release.yml`（tag `v*` / 手动） | `release-*` | 发布流水线专用 |
 
-所有 `gate-*` job 都只调用 `scripts/run-gate.sh <子命令>`，本地与 CI 命令同源。Composite action 统一为 `.github/actions/setup-flutter-frb`。
+所有 `gate-*` job 与 `release-verify` 都只调用 `scripts/run-gate.sh`，本地与 CI 命令同源。Composite action 统一为 `.github/actions/setup-flutter-frb`。
+
+## Nightly / Watch / Release tier（不挡 PR）
+
+| Job | Workflow | 本地复现 | 内容 |
+|-----|----------|----------|------|
+| `nightly-dart-ui` | `nightly.yml` | `cd app && flutter test test/ui` | 全量 `test/ui`（含慢轨） |
+| `nightly-coverage` | `nightly.yml` | `cargo build --manifest-path core/Cargo.toml -p hentai_flutter && cd app && flutter test --coverage` | 全量 Dart 覆盖率趋势：Step Summary 行覆盖率 + `lcov.info` artifact；**不是**门禁 |
+| `watch-platform-android-pdf` | `watch.yml` | 连接 Android 设备/模拟器后 `cd app && flutter test integration_test/pdf_reader_smoke_test.dart` | x86_64 模拟器上真机链路打开 PDF 并读首页；发布时并行跑，失败不挡 `release-publish` |
+| `release-verify` | `release.yml` | `./scripts/run-gate.sh` | 完整 Gate 拓扑（含 codegen 漂移与 FRB 线缝）；`release-build-*` 均 `needs` 它 |
+| `release-build-{windows,macos,linux,android,ios}` | `release.yml` | — | 各平台打包产物 |
+| `release-publish` / `release-manual-summary` | `release.yml` | — | 发布 GitHub Release / 手动构建仅产出 artifact |
+
+Nightly 的定时触发只在默认分支（`main`）生效；其他分支用 `workflow_dispatch` 手动跑。
 
 ## Gate tier（必须绿）
 
@@ -53,7 +66,7 @@ Job id 形如 `{tier}-{domain}-{intent}`（词汇表见 ADR-0018）。
 cd app && flutter test         # 全量 Dart（含慢轨 test/ui）
 ```
 
-Gate **不会**跑全量 `test/ui`、不会跑 `integration_test`、不上 coverage 门禁。
+Gate **不会**跑全量 `test/ui`（由 `nightly-dart-ui` 覆盖）、不会跑 `integration_test`（由 `watch-platform-android-pdf` 覆盖）、不上 coverage 门禁（`nightly-coverage` 只出趋势）。
 
 ## ADR-0002 测试含义
 

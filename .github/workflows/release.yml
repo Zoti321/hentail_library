@@ -35,29 +35,35 @@ env:
   FRB_CODEGEN_VERSION: "2.12.0"
 
 jobs:
-  verify:
-    name: verify
+  # Same topology as the Gate workflow: every gate-* subcommand of
+  # scripts/run-gate.sh (incl. codegen drift and the FRB wire smoke).
+  release-verify:
+    name: release · verify
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: ./.github/actions/setup-flutter-frb
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
-          run-build-runner: "true"
+          rust-components: rustfmt, clippy
+          install-frb-codegen: "true"
+          run-frb-codegen: "false"
+          run-build-runner: "false"
 
-      - name: cargo test
-        run: cargo test --manifest-path core/Cargo.toml
+      - name: Run full gate
+        run: bash scripts/run-gate.sh
 
-      - name: flutter analyze
-        working-directory: app
-        run: flutter analyze
+  watch-platform-android-pdf:
+    uses: ./.github/workflows/watch.yml
 
-  build-windows:
-    name: build-windows
-    needs: verify
+  release-build-windows:
+    name: release · build windows
+    needs: release-verify
     runs-on: windows-latest
     timeout-minutes: 60
     steps:
@@ -134,9 +140,9 @@ jobs:
             dist/hentai_library_*_windows_x64*.zip
             dist/hentai_library_*Setup*.exe
 
-  build-macos:
-    name: build-macos
-    needs: verify
+  release-build-macos:
+    name: release · build macos
+    needs: release-verify
     runs-on: macos-latest
     timeout-minutes: 60
     steps:
@@ -177,9 +183,9 @@ jobs:
           name: macos
           path: dist/hentai_library_*_macos.dmg
 
-  build-linux:
-    name: build-linux
-    needs: verify
+  release-build-linux:
+    name: release · build linux
+    needs: release-verify
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -236,9 +242,9 @@ jobs:
           name: linux
           path: dist/hentai_library_*_linux_x64.tar.gz
 
-  build-android:
-    name: build-android
-    needs: verify
+  release-build-android:
+    name: release · build android
+    needs: release-verify
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -305,9 +311,9 @@ jobs:
           name: android
           path: dist/hentai_library_*_android-arm64.apk
 
-  build-ios:
-    name: build-ios
-    needs: verify
+  release-build-ios:
+    name: release · build ios
+    needs: release-verify
     runs-on: macos-latest
     timeout-minutes: 60
     env:
@@ -450,14 +456,14 @@ jobs:
             dist/hentai_library_*_ios-arm64-nosign.zip
             dist/hentai_library_*_ios-arm64.ipa
 
-  release:
-    name: release
+  release-publish:
+    name: release · publish
     needs:
-      - build-windows
-      - build-macos
-      - build-linux
-      - build-android
-      - build-ios
+      - release-build-windows
+      - release-build-macos
+      - release-build-linux
+      - release-build-android
+      - release-build-ios
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish_release == true)
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -531,14 +537,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-  manual-summary:
-    name: manual-summary
+  release-manual-summary:
+    name: release · manual summary
     needs:
-      - build-windows
-      - build-macos
-      - build-linux
-      - build-android
-      - build-ios
+      - release-build-windows
+      - release-build-macos
+      - release-build-linux
+      - release-build-android
+      - release-build-ios
     if: github.event_name == 'workflow_dispatch' && inputs.publish_release != true
     runs-on: ubuntu-latest
     steps:
