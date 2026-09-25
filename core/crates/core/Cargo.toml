@@ -22,6 +22,14 @@ path = "tests/metadata_read_test.rs"
 name = "tag_import"
 path = "tests/tag_import_test.rs"
 
+[[test]]
+name = "metadata_backup_export"
+path = "tests/metadata_backup_export_test.rs"
+
+[[test]]
+name = "db_snapshot"
+path = "tests/db_snapshot_test.rs"
+
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -45,6 +53,7 @@ url = "2"
 reqwest_dav = { version = "0.3", default-features = false, features = ["rustls-tls"] }
 # PDF 后端跨平台共用：桌面/Android/iOS 均经 pdfium-render 运行时绑定 vendored pdfium。
 pdfium-render = "0.8"
+rusqlite = { version = "0.32", features = ["backup"] }
 
 [dev-dependencies]
 serde_json = "1"

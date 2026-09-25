@@ -161,6 +161,13 @@ pub async fn init_db_at_path(db_file_path: impl AsRef<Path>) -> Result<(), Henta
 
 #[tracing::instrument(err, skip(db_file_path))]
 async fn open_connection(db_file_path: &Path) -> Result<DatabaseConnection, DbErr> {
+    if let Err(err) = crate::db_snapshot::maybe_snapshot_before_migration(db_file_path).await {
+        tracing::error!(
+            path = %db_file_path.display(),
+            error = %err,
+            "internal db snapshot pre-check failed; continuing migration"
+        );
+    }
     let mut options = ConnectOptions::new(format!(
         "sqlite://{}?mode=rwc",
         db_file_path.to_string_lossy().replace('\\', "/")

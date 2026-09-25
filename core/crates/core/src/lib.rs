@@ -3,12 +3,14 @@ pub mod character;
 pub mod comic;
 pub mod comic_id;
 pub mod db;
+pub mod db_snapshot;
 pub mod entity;
 pub mod error;
 pub mod formats;
 pub mod history;
 pub mod home;
 pub mod library;
+pub mod metadata_backup;
 pub mod metadata_lock;
 pub mod migration;
 pub mod named_facet;
@@ -46,6 +48,9 @@ pub use history::{
 };
 pub use home::{
     watch_continue_reading_top5, watch_home_page_counts, HomeContinueReadingDto, HomePageCountsDto,
+};
+pub use metadata_backup::{
+    export_comic_metadata, ExportComicMetadataOptions, MetadataBackupPayload, SCHEMA_VERSION,
 };
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,

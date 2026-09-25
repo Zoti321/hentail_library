@@ -14,6 +14,7 @@ import 'api/home.dart';
 import 'api/init.dart';
 import 'api/library.dart';
 import 'api/logging.dart';
+import 'api/metadata_backup.dart';
 import 'api/named_facet.dart';
 import 'api/parody.dart';
 import 'api/reader.dart';
@@ -116,6 +117,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicThumbnailDto dco_decode_box_autoadd_comic_thumbnail_dto(dynamic raw);
 
   @protected
+  ExportComicMetadataOptionsDto
+  dco_decode_box_autoadd_export_comic_metadata_options_dto(dynamic raw);
+
+  @protected
   int dco_decode_box_autoadd_i_32(dynamic raw);
 
   @protected
@@ -185,6 +190,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ComicThumbnailDto dco_decode_comic_thumbnail_dto(dynamic raw);
+
+  @protected
+  ExportComicMetadataOptionsDto dco_decode_export_comic_metadata_options_dto(
+    dynamic raw,
+  );
 
   @protected
   double dco_decode_f_64(dynamic raw);
@@ -560,6 +570,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ExportComicMetadataOptionsDto
+  sse_decode_box_autoadd_export_comic_metadata_options_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   int sse_decode_box_autoadd_i_32(SseDeserializer deserializer);
 
   @protected
@@ -647,6 +663,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ComicThumbnailDto sse_decode_comic_thumbnail_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ExportComicMetadataOptionsDto sse_decode_export_comic_metadata_options_dto(
     SseDeserializer deserializer,
   );
 
@@ -1109,6 +1130,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_export_comic_metadata_options_dto(
+    ExportComicMetadataOptionsDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer);
 
   @protected
@@ -1219,6 +1246,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_comic_thumbnail_dto(
     ComicThumbnailDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_export_comic_metadata_options_dto(
+    ExportComicMetadataOptionsDto self,
     SseSerializer serializer,
   );
 
