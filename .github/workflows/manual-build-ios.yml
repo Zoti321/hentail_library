@@ -1,3 +1,5 @@
+# Manual Build iOS：单平台手动打未签名 iOS 包（ios-arm64-nosign），不走 Release 拓扑（不跑 Gate、不发 GitHub Release）。
+# 触发：仅手动 workflow_dispatch。可指定版本（默认取 pubspec）。
 name: Build iOS
 
 on:
@@ -59,7 +61,7 @@ jobs:
             rm -f "$manifest"
           done
 
-      - uses: ./.github/actions/flutter-frb-setup
+      - uses: ./.github/actions/setup-flutter-frb
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}

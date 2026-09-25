@@ -1,0 +1,119 @@
+# Gate：PR 硬门禁。跑完整 gate-*（Rust lint/test、codegen 漂移、Dart 静态分析与 hard-manifest 测试）。
+# 本地复现：scripts/run-gate.sh。详见 docs/agents/testing.md。
+# 触发：打开/更新 PR、push 到 main，或手动 workflow_dispatch。失败挡合并。
+name: Gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.38.5"
+  FRB_CODEGEN_VERSION: "2.12.0"
+
+jobs:
+  gate-rust-lint:
+    name: gate · rust lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          rust-components: rustfmt, clippy
+          link-rust-builder: "false"
+          run-frb-codegen: "false"
+          run-build-runner: "false"
+          run-pub-get: "false"
+
+      - name: Check Rust formatting and Clippy
+        run: bash scripts/run-gate.sh rust-lint
+
+  gate-rust-test:
+    name: gate · rust test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          link-rust-builder: "false"
+          run-frb-codegen: "false"
+          run-build-runner: "false"
+          run-pub-get: "false"
+
+      - name: Run Rust workspace tests
+        run: bash scripts/run-gate.sh rust-test
+
+  gate-codegen-drift:
+    name: gate · codegen drift
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          install-frb-codegen: "true"
+          run-frb-codegen: "false"
+          run-build-runner: "false"
+
+      - name: Check codegen drift
+        run: bash scripts/run-gate.sh codegen-drift
+
+  gate-dart-static:
+    name: gate · dart static
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
+
+      - name: Check Dart formatting and analysis
+        run: bash scripts/run-gate.sh dart-static
+
+  gate-dart-test:
+    name: gate · dart test (hard manifest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
+
+      - name: Run Dart hard-gate tests
+        run: bash scripts/run-gate.sh dart-test

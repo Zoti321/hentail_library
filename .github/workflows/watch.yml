@@ -1,0 +1,57 @@
+# Watch：平台级冒烟，不挡 PR。在 Android x86_64 模拟器上跑 PDF 阅读 integration_test。
+# 触发：手动 workflow_dispatch；或由 release.yml 以 workflow_call 并行调用（失败不挡发布）。
+name: Watch
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+env:
+  FLUTTER_VERSION: "3.38.5"
+  FRB_CODEGEN_VERSION: "2.12.0"
+
+jobs:
+  watch-platform-android-pdf:
+    name: watch · android pdf smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Setup Java toolchain
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
+          rust-targets: x86_64-linux-android
+
+      - name: Setup Android pdfium
+        run: bash "${GITHUB_WORKSPACE}/core/vendor/fetch-native-deps.sh" --android
+
+      - name: Setup Android SDK licenses
+        run: yes | flutter doctor --android-licenses
+
+      - name: Run Android PDF smoke test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          working-directory: app
+          script: flutter test integration_test/pdf_reader_smoke_test.dart -d emulator-5554

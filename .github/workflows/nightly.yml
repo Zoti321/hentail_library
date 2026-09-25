@@ -1,0 +1,74 @@
+# Nightly：不挡 PR 的慢轨。全量 test/ui，以及 Dart 覆盖率趋势（Step Summary + lcov artifact，非门禁）。
+# 触发：每天 UTC 18:00（仅默认分支 main 会跑定时任务）；也可手动 workflow_dispatch。
+name: Nightly
+
+on:
+  schedule:
+    - cron: "0 18 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.38.5"
+  FRB_CODEGEN_VERSION: "2.12.0"
+
+jobs:
+  nightly-dart-ui:
+    name: nightly · dart ui (slow track)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
+
+      - name: Run Dart slow-track UI tests
+        working-directory: app
+        run: flutter test test/ui
+
+  nightly-coverage:
+    name: nightly · coverage report
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter FRB toolchain
+        uses: ./.github/actions/setup-flutter-frb
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          frb-codegen-version: ${{ env.FRB_CODEGEN_VERSION }}
+          run-build-runner: "true"
+
+      # test/frb_wire loads the host cdylib.
+      - name: Run hentai_flutter cdylib build
+        run: cargo build --manifest-path core/Cargo.toml -p hentai_flutter
+
+      - name: Run Dart tests with coverage
+        working-directory: app
+        run: flutter test --coverage
+
+      - name: Run coverage summary
+        working-directory: app
+        run: |
+          awk -F: '/^LF:/{found+=$2} /^LH:/{hit+=$2} END {
+            pct = found ? hit * 100 / found : 0
+            printf "Dart line coverage: %.1f%% (%d / %d lines)\n", pct, hit, found
+          }' coverage/lcov.info | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Run coverage report upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: dart-coverage-lcov
+          path: app/coverage/lcov.info
+          retention-days: 30
