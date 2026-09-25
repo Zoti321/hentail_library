@@ -71,11 +71,15 @@ Gate **不会**跑全量 `test/ui`、不会跑 `integration_test`、不上 cover
 
 ### 晋升快轨检查清单
 
+`app/test/gate/manifest.txt` 是扩 Gate 的**唯一入口**：不改 workflow、不加新 job，也不另起白名单文件。
+
 1. 测的是可观察契约，不绑私有结构。
-2. 本地连续跑稳定（无偶发 timeout）。
+2. 本地连续跑 3 遍稳定（无偶发 timeout）；时间相关逻辑用注入的 `now` / clock，不依赖真实计时。
 3. 已改用共享 harness（见下），无新复制的 MaterialApp / `_Fake*` 样板。
-4. 把路径加入 `app/test/gate/manifest.txt`，并在 PR 中显式列出。
-5. 评审确认后合入；失败必须挡合并。
+4. 把路径加入 manifest 对应分节，并在 PR 中显式列出新增路径。
+5. 评审确认后合入；此后失败必须挡合并。
+
+慢轨测试**不**写进 manifest；它们由 `nightly-dart-ui` 覆盖。
 
 ## 共享 harness（强制）
 
@@ -86,7 +90,7 @@ Gate **不会**跑全量 `test/ui`、不会跑 `integration_test`、不上 cover
 | Flutter | `app/test/support/`（如 `pump_localized_app.dart`、`fakes/`） | 本地化 pump、常用 overrides/fakes |
 | Rust | `core/crates/core/tests/common/` | DB init 锁、`create_fixture_db`、fixture SQL |
 
-迁移存量测试时顺手改到 harness；`test/features` 遗留路径被触及时迁到镜像的 `test/ui` / `test/data`，不要继续扩张 `test/features`。
+`core/crates/core/tests/*.rs` 中凡涉及全局 DB 或 `drift_v2.sql` fixture 的集成测已统一走 `mod common;`（#154）；纯解析 / 纯函数测试（如 `metadata_read_test.rs`、`metadata_lock_test.rs`、`rar_comic_formats.rs`）无需引入。迁移存量 Dart 测试时顺手改到 harness；`test/features` 遗留路径被触及时迁到镜像的 `test/ui` / `test/data`，不要继续扩张 `test/features`。
 
 ### Flutter 示例
 

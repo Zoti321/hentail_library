@@ -1,6 +1,4 @@
-use std::fs;
-use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+mod common;
 
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::util::compute_sort_key;
@@ -10,49 +8,8 @@ use hentai_core::{
     ComicSortOptionDto, PageRequestDto, SeriesFilterDto, SeriesSortFieldDto, SeriesSortOptionDto,
     UpdateComicUserMetaDto,
 };
-use sea_orm::{ConnectionTrait, Database, DatabaseConnection, Statement};
+use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
 use tempfile::TempDir;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    fs::read_to_string(manifest_dir.join("../../tests/fixtures/drift_v2.sql"))
-        .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
 
 async fn clear_library(db: &DatabaseConnection) {
     db.execute(Statement::from_string(
@@ -162,9 +119,9 @@ async fn insert_series_item(
 
 #[test]
 fn fetch_comics_page_title_asc_uses_natural_order() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -201,9 +158,9 @@ fn fetch_comics_page_title_asc_uses_natural_order() {
 
 #[test]
 fn fetch_comics_page_expand_by_series_flattens_series_blocks() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -286,9 +243,9 @@ fn fetch_comics_page_expand_by_series_flattens_series_blocks() {
 
 #[test]
 fn fetch_series_page_name_asc_uses_natural_order() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -328,9 +285,9 @@ fn fetch_series_page_name_asc_uses_natural_order() {
 
 #[test]
 fn update_comic_title_refreshes_title_sort_key() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");

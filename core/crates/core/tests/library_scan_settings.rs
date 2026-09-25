@@ -1,61 +1,17 @@
-use std::path::PathBuf;
-use std::sync::Mutex;
+mod common;
 
 use hentai_core::sync::format_group::FormatGroup;
 use hentai_core::{
     create_local_library, create_remote_library, init_db_at_path, list_libraries,
     parse_scan_interval, update_library_settings, ScanInterval,
 };
-use sea_orm::{ConnectionTrait, Database, Statement};
 use tempfile::TempDir;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    std::fs::read_to_string(
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/drift_v2.sql"),
-    )
-    .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &std::path::Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
 
 #[test]
 fn new_local_library_defaults_scan_settings_off() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root = temp.path().join("lib_root");
         std::fs::create_dir_all(&root).expect("mkdir");
 
@@ -74,9 +30,9 @@ fn new_local_library_defaults_scan_settings_off() {
 
 #[test]
 fn create_local_library_accepts_optional_name() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root = temp.path().join("disk_folder");
         std::fs::create_dir_all(&root).expect("mkdir");
 
@@ -94,9 +50,9 @@ fn create_local_library_accepts_optional_name() {
 
 #[test]
 fn update_library_settings_renames_without_changing_identity_or_root() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root = temp.path().join("lib_root");
         std::fs::create_dir_all(&root).expect("mkdir");
 
@@ -143,9 +99,9 @@ fn update_library_settings_rejects_invalid_interval_string_helper() {
 
 #[test]
 fn remote_library_shares_scan_setting_defaults() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
 
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
@@ -162,9 +118,9 @@ fn remote_library_shares_scan_setting_defaults() {
 
 #[test]
 fn set_all_libraries_scan_on_startup_enables_every_library() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root_a = temp.path().join("a");
         let root_b = temp.path().join("b");
         std::fs::create_dir_all(&root_a).expect("mkdir a");

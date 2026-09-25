@@ -1,5 +1,4 @@
-use std::path::PathBuf;
-use std::sync::Mutex;
+mod common;
 
 use hentai_core::resource::{FakeResourceAccess, ResourceAccess};
 use hentai_core::sync::format_group::FormatGroup;
@@ -10,51 +9,8 @@ use hentai_core::sync::remote::{
 };
 use hentai_core::sync::scanner::ScanContext;
 use hentai_core::{connection, create_remote_library, find_comic_by_id, init_db_at_path};
-use sea_orm::{ConnectionTrait, Database, Statement};
 use std::collections::HashMap;
 use tempfile::TempDir;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    std::fs::read_to_string(
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/drift_v2.sql"),
-    )
-    .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &std::path::Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
 
 fn reachable_tree() -> FakeResourceAccess {
     let mut fake = FakeResourceAccess::new();
@@ -155,9 +111,9 @@ fn remote_unreachable_probe_does_not_surface_as_scanned() {
 
 #[test]
 fn remote_reachable_plan_adds_and_orphans_without_deleting_on_unreachable() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");

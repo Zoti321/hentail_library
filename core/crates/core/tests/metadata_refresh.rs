@@ -1,7 +1,8 @@
+mod common;
+
 use std::fs::{self, File};
 use std::io::Write;
-use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+use std::path::Path;
 
 use hentai_core::resource::{parse_file, parsed_to_comic};
 use hentai_core::sync::plan::build_scan_replace_plan;
@@ -13,51 +14,10 @@ use hentai_core::{
     refresh_comic_metadata, refresh_library_metadata, refresh_series_metadata,
     series_id_from_folder_path, try_acquire_library_write_lock, HentaiErrorCode,
 };
-use sea_orm::{ConnectionTrait, Database, DatabaseConnection, Statement};
+use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
 use tempfile::TempDir;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    fs::read_to_string(manifest_dir.join("../../tests/fixtures/drift_v2.sql"))
-        .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
 
 fn create_cbz_with_title(path: &Path, title: &str) {
     let file = File::create(path).expect("create cbz");
@@ -100,9 +60,9 @@ async fn upsert_path(db: &DatabaseConnection, path: &Path) {
 
 #[test]
 fn refresh_comic_metadata_overwrites_unlocked_title_from_disk() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -137,9 +97,9 @@ fn refresh_comic_metadata_overwrites_unlocked_title_from_disk() {
 
 #[test]
 fn refresh_comic_metadata_preserves_locked_title() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -175,9 +135,9 @@ fn refresh_comic_metadata_preserves_locked_title() {
 
 #[test]
 fn refresh_comic_metadata_fails_when_file_missing_without_changing_db() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -214,9 +174,9 @@ fn refresh_comic_metadata_fails_when_file_missing_without_changing_db() {
 
 #[test]
 fn refresh_comic_metadata_rejects_when_library_write_lock_held() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -236,9 +196,9 @@ fn refresh_comic_metadata_rejects_when_library_write_lock_held() {
 
 #[test]
 fn refresh_series_metadata_refreshes_members_and_unlocked_name() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -309,9 +269,9 @@ fn refresh_series_metadata_refreshes_members_and_unlocked_name() {
 
 #[test]
 fn refresh_series_metadata_preserves_locked_name_and_continues_after_member_failure() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -390,9 +350,9 @@ fn refresh_series_metadata_preserves_locked_name_and_continues_after_member_fail
 
 #[test]
 fn refresh_series_metadata_rejects_when_library_write_lock_held() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -408,11 +368,11 @@ fn refresh_series_metadata_rejects_when_library_write_lock_held() {
 
 #[test]
 fn refresh_library_metadata_refreshes_comics_and_unlocked_series_name() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let root = temp.path().join("lib_root");
         fs::create_dir_all(&root).expect("mkdir root");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -493,11 +453,11 @@ fn refresh_library_metadata_refreshes_comics_and_unlocked_series_name() {
 
 #[test]
 fn refresh_library_metadata_stops_on_cancel_and_keeps_partial_writes() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let root = temp.path().join("lib_cancel");
         fs::create_dir_all(&root).expect("mkdir root");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -563,13 +523,13 @@ fn refresh_library_metadata_stops_on_cancel_and_keeps_partial_writes() {
 
 #[test]
 fn refresh_library_metadata_scopes_to_target_library_only() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let root_a = temp.path().join("lib_a");
         let root_b = temp.path().join("lib_b");
         fs::create_dir_all(&root_a).expect("mkdir a");
         fs::create_dir_all(&root_b).expect("mkdir b");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -636,9 +596,9 @@ fn refresh_library_metadata_scopes_to_target_library_only() {
 
 #[test]
 fn refresh_library_metadata_skips_remote_without_credentials() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -661,9 +621,9 @@ fn refresh_library_metadata_skips_remote_without_credentials() {
 
 #[test]
 fn refresh_library_metadata_rejects_when_library_write_lock_held() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -679,11 +639,11 @@ fn refresh_library_metadata_rejects_when_library_write_lock_held() {
 
 #[test]
 fn refresh_library_metadata_continues_after_comic_failure() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let root = temp.path().join("lib_partial");
         fs::create_dir_all(&root).expect("mkdir root");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -747,9 +707,9 @@ fn refresh_library_metadata_continues_after_comic_failure() {
 
 #[test]
 fn refresh_series_metadata_stops_on_cancel_and_keeps_partial_writes() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");

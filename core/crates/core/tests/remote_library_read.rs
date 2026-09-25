@@ -1,6 +1,6 @@
+mod common;
+
 use std::io::{Cursor, Write};
-use std::path::PathBuf;
-use std::sync::Mutex;
 
 use hentai_core::resource::{FakeResourceAccess, ResourceAccess};
 use hentai_core::sync::refresh_comic_metadata_with;
@@ -10,52 +10,10 @@ use hentai_core::{
     load_page_bytes, load_page_list, open_reader_with, writeback_with_access, HentaiErrorCode,
 };
 use image::{ImageBuffer, Rgb};
-use sea_orm::{ConnectionTrait, Database, Statement};
+use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    std::fs::read_to_string(
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/drift_v2.sql"),
-    )
-    .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &std::path::Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
 
 fn solid_jpeg_bytes(r: u8, g: u8, b: u8) -> Vec<u8> {
     let img: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::from_pixel(24, 24, Rgb([r, g, b]));
@@ -119,9 +77,9 @@ fn fake_unreachable_open_fails_clearly() {
 
 #[test]
 fn writeback_updates_page_count_and_keeps_locked_title() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("temp");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("rt");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");
@@ -184,9 +142,9 @@ fn fake_thumbnail_generates_from_remote_cbz() {
 
 #[test]
 fn refresh_with_fake_updates_page_count() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("temp");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("rt");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init");

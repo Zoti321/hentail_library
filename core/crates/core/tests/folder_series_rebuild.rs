@@ -1,56 +1,12 @@
-use std::fs;
-use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+mod common;
 
 use hentai_core::sync::series_rebuild::rebuild_series_from_comics;
 use hentai_core::{
     connection, find_series_by_id, init_db_at_path, set_series_meta_locks, update_series_user_meta,
     SetSeriesMetaLocksDto, UpdateSeriesUserMetaDto,
 };
-use sea_orm::{ConnectionTrait, Database, DatabaseConnection, Statement};
+use sea_orm::{ConnectionTrait, DatabaseConnection, Statement};
 use tempfile::TempDir;
-
-/// `init_db_at_path` 使用进程级全局连接，并行测试会互相覆盖。
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    fs::read_to_string(manifest_dir.join("../../tests/fixtures/drift_v2.sql"))
-        .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
 
 async fn seed_minimal_comics(db: &DatabaseConnection) {
     db.execute(Statement::from_string(
@@ -98,9 +54,9 @@ async fn seed_minimal_comics(db: &DatabaseConnection) {
 
 #[test]
 fn rebuild_series_groups_comics_by_parent_folder() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -135,9 +91,9 @@ fn rebuild_series_groups_comics_by_parent_folder() {
 
 #[test]
 fn update_series_user_meta_preserves_fields_on_rebuild() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -223,9 +179,9 @@ fn update_series_user_meta_preserves_fields_on_rebuild() {
 
 #[test]
 fn rebuild_migrates_comic_between_folder_series_without_unique_conflict() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
@@ -339,9 +295,9 @@ async fn update_series_item_sort_order_via_sql(
 
 #[test]
 fn rebuild_overwrites_unlocked_series_name_from_folder() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");

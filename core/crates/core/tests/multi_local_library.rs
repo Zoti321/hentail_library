@@ -1,7 +1,8 @@
+mod common;
+
 use std::fs::File;
 use std::io::Write;
-use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+use std::path::Path;
 
 use hentai_core::sync::format_group::FormatGroup;
 use hentai_core::sync::handle::create_sync_handle;
@@ -15,48 +16,6 @@ use sea_orm::{ConnectionTrait, Database, Statement};
 use tempfile::TempDir;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    std::fs::read_to_string(
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/drift_v2.sql"),
-    )
-    .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
 
 fn write_cbz(path: &Path) {
     let file = File::create(path).expect("create");
@@ -74,7 +33,7 @@ fn write_image_comic(dir: &Path) {
 
 #[test]
 fn saved_paths_migrate_to_local_libraries_preserving_comic_ids() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
         let root_a = temp.path().join("lib_a");
         let root_b = temp.path().join("lib_b");
@@ -90,7 +49,7 @@ fn saved_paths_migrate_to_local_libraries_preserving_comic_ids() {
         let lib_a_id = library_id_from_root(&root_a.to_string_lossy());
         let lib_b_id = library_id_from_root(&root_b.to_string_lossy());
 
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             let conn = Database::connect(format!(
@@ -172,9 +131,9 @@ fn saved_paths_migrate_to_local_libraries_preserving_comic_ids() {
 
 #[test]
 fn sync_current_library_does_not_remove_other_library_comics() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root_a = temp.path().join("lib_a");
         let root_b = temp.path().join("lib_b");
         std::fs::create_dir_all(&root_a).expect("mkdir a");
@@ -233,9 +192,9 @@ fn sync_current_library_does_not_remove_other_library_comics() {
 
 #[test]
 fn per_library_format_groups_only_affect_that_library_on_sync() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root_a = temp.path().join("lib_a");
         let root_b = temp.path().join("lib_b");
         std::fs::create_dir_all(&root_a).expect("mkdir a");
@@ -286,9 +245,9 @@ fn per_library_format_groups_only_affect_that_library_on_sync() {
 
 #[test]
 fn delete_library_clears_only_that_library_comics_and_series() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root_a = temp.path().join("lib_a");
         let root_b = temp.path().join("lib_b");
         std::fs::create_dir_all(&root_a).expect("mkdir a");
@@ -358,9 +317,9 @@ fn delete_library_clears_only_that_library_comics_and_series() {
 
 #[test]
 fn browse_defaults_to_current_library_scope() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root_a = temp.path().join("lib_a");
         let root_b = temp.path().join("lib_b");
         std::fs::create_dir_all(&root_a).expect("mkdir a");

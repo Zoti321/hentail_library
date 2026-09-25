@@ -1,8 +1,8 @@
-use std::fs;
+mod common;
+
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
-use std::sync::Mutex;
 
 use hentai_core::comic::ComicDto;
 use hentai_core::resource::{parse_epub, parsed_to_comic};
@@ -10,53 +10,9 @@ use hentai_core::sync::plan::build_scan_replace_plan;
 use hentai_core::sync::scanner::ScanItem;
 use hentai_core::sync::writer::apply_scan_replace_plan;
 use hentai_core::{connection, init_db_at_path};
-use sea_orm::{ConnectionTrait, Database, Statement};
 use tempfile::TempDir;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    fs::read_to_string(
-        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../../tests/fixtures/drift_v2.sql"),
-    )
-    .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &Path) -> std::path::PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
 
 fn create_epub(path: &Path, author: &str) {
     let file = File::create(path).expect("create epub");
@@ -106,9 +62,9 @@ fn parse_epub_reads_author_metadata() {
 
 #[test]
 fn upsert_epub_author_twice_does_not_fail_when_author_exists() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");

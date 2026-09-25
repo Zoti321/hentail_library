@@ -1,55 +1,13 @@
-use std::path::{Path, PathBuf};
-use std::sync::Mutex;
+mod common;
+
+use std::path::Path;
 
 use hentai_core::{
     comic_id_from_path, create_local_library, create_sync_handle, find_comic_by_id,
     init_db_at_path, set_current_library_id, sync_library, SyncLibraryPhaseDto,
     SyncLibraryProgressDto, SyncScanMode,
 };
-use sea_orm::{ConnectionTrait, Database, Statement};
 use tempfile::TempDir;
-
-static DB_INIT_LOCK: Mutex<()> = Mutex::new(());
-
-fn with_global_db(test: impl FnOnce()) {
-    let _guard = DB_INIT_LOCK
-        .lock()
-        .expect("global db tests must run serially");
-    test();
-}
-
-fn fixture_sql() -> String {
-    std::fs::read_to_string(
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/drift_v2.sql"),
-    )
-    .expect("read drift_v2.sql")
-}
-
-fn create_fixture_db(dir: &Path) -> PathBuf {
-    let db_path = dir.join("fixture.sqlite");
-    let runtime = tokio::runtime::Runtime::new().expect("runtime");
-    runtime.block_on(async {
-        let conn = Database::connect(format!(
-            "sqlite://{}?mode=rwc",
-            db_path.to_string_lossy().replace('\\', "/")
-        ))
-        .await
-        .expect("connect");
-        for stmt in fixture_sql().split(';') {
-            let sql = stmt.trim();
-            if sql.is_empty() || sql.starts_with("--") {
-                continue;
-            }
-            conn.execute(Statement::from_string(
-                sea_orm::DatabaseBackend::Sqlite,
-                sql.to_string(),
-            ))
-            .await
-            .expect("execute sql");
-        }
-    });
-    db_path
-}
 
 fn write_image_comic(dir: &Path) {
     std::fs::create_dir_all(dir).expect("mkdir comic");
@@ -66,9 +24,9 @@ fn last_done(events: &[SyncLibraryProgressDto]) -> &SyncLibraryProgressDto {
 
 #[test]
 fn local_sync_missing_root_ends_with_warning_not_silent_empty_align() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let missing = temp.path().join("does_not_exist");
 
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
@@ -108,9 +66,9 @@ fn local_sync_missing_root_ends_with_warning_not_silent_empty_align() {
 
 #[test]
 fn local_sync_unreadable_root_keeps_existing_comics() {
-    with_global_db(|| {
+    common::with_global_db(|| {
         let temp = TempDir::new().expect("tempdir");
-        let db_path = create_fixture_db(temp.path());
+        let db_path = common::create_fixture_db(temp.path());
         let root = temp.path().join("lib");
         std::fs::create_dir_all(&root).expect("mkdir");
         let comic_dir = root.join("vol1");
