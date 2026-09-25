@@ -9,7 +9,9 @@ import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/core/metadata/metadata_export_options.dart';
 import 'package:hentai_library/data/adapters/metadata_backup_frb_adapter.dart';
 import 'package:hentai_library/src/rust/api/metadata_backup.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
+import 'package:hentai_library/ui/core/widgets/form/fluent_toggle_field.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
@@ -110,33 +112,52 @@ class _MetadataExportOptionsDialogState extends State<MetadataExportOptionsDialo
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+
     return HentaiDialog(
       title: l10n.settingsMetadataBackupExportDialogTitle,
+      fitContentHeight: true,
       content: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.settingsMetadataBackupExportGzipLabel),
+          Text(
+            l10n.settingsMetadataBackupExportDescription,
+            style: TextStyle(
+              fontSize: tokens.text.bodyMd,
+              color: cs.hentai.textSecondary,
+              height: 1.45,
+            ),
+          ),
+          SizedBox(height: tokens.spacing.lg),
+          FluentToggleField(
+            labelText: l10n.settingsMetadataBackupExportGzipLabel,
             value: _gzip,
+            checkedLabel: l10n.commonToggleOn,
+            uncheckedLabel: l10n.commonToggleOff,
             onChanged: (bool value) => setState(() => _gzip = value),
           ),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(l10n.settingsMetadataBackupExportOrphanFacetsLabel),
+          SizedBox(height: tokens.spacing.lg),
+          FluentToggleField(
+            labelText: l10n.settingsMetadataBackupExportOrphanFacetsLabel,
             value: _includeOrphanFacets,
+            checkedLabel: l10n.commonToggleOn,
+            uncheckedLabel: l10n.commonToggleOff,
             onChanged: (bool value) =>
                 setState(() => _includeOrphanFacets = value),
           ),
-          if (widget.initialOptions.libraryId != null)
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text(l10n.settingsMetadataBackupExportCurrentLibraryLabel),
+          if (widget.initialOptions.libraryId != null) ...<Widget>[
+            SizedBox(height: tokens.spacing.lg),
+            FluentToggleField(
+              labelText: l10n.settingsMetadataBackupExportCurrentLibraryLabel,
               value: _currentLibraryOnly,
+              checkedLabel: l10n.commonToggleOn,
+              uncheckedLabel: l10n.commonToggleOff,
               onChanged: (bool value) =>
                   setState(() => _currentLibraryOnly = value),
             ),
+          ],
         ],
       ),
       actions: <Widget>[

@@ -2790,6 +2790,18 @@ abstract class AppLocalizations {
   /// **'取消'**
   String get commonCancel;
 
+  /// No description provided for @commonToggleOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启'**
+  String get commonToggleOn;
+
+  /// No description provided for @commonToggleOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get commonToggleOff;
+
   /// No description provided for @commonSave.
   ///
   /// In zh, this message translates to:

@@ -1533,6 +1533,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonCancel => 'Cancel';
 
   @override
+  String get commonToggleOn => 'On';
+
+  @override
+  String get commonToggleOff => 'Off';
+
+  @override
   String get commonSave => 'Save';
 
   @override

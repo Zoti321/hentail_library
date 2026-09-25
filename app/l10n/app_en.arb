@@ -694,6 +694,8 @@
     }
   },
   "commonCancel": "Cancel",
+  "commonToggleOn": "On",
+  "commonToggleOff": "Off",
   "commonSave": "Save",
   "commonSaveChanges": "Save changes",
   "commonClose": "Close",

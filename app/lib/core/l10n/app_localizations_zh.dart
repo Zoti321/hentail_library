@@ -1481,6 +1481,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get commonCancel => '取消';
 
   @override
+  String get commonToggleOn => '开启';
+
+  @override
+  String get commonToggleOff => '关闭';
+
+  @override
   String get commonSave => '保存';
 
   @override

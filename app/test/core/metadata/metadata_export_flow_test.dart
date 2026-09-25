@@ -36,8 +36,9 @@ void main() {
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
 
-    expect(find.text('使用 gzip 压缩'), findsOneWidget);
-    expect(find.text('仅当前 Library'), findsOneWidget);
+    expect(find.text('使用 GZIP 压缩'), findsOneWidget);
+    expect(find.text('仅当前 LIBRARY'), findsOneWidget);
+    expect(find.text('开启'), findsWidgets);
 
     await tester.tap(find.text('继续'));
     await tester.pumpAndSettle();

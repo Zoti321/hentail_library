@@ -694,6 +694,8 @@
     }
   },
   "commonCancel": "取消",
+  "commonToggleOn": "开启",
+  "commonToggleOff": "关闭",
   "commonSave": "保存",
   "commonSaveChanges": "保存更改",
   "commonClose": "关闭",
