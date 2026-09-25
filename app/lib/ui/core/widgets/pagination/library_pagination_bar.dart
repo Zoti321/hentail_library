@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
+import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/actions/ghost_button.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_state.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
-import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_facade_notifier.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 enum LibraryPaginationPlacement { top, bottom }
@@ -48,32 +48,14 @@ class LibraryPaginationBar extends ConsumerWidget {
             icon: LucideIcons.chevronsLeft,
             tooltip: l10n.seriesDetailPaginationFirst,
             onPressed: canGoPrevious
-                ? () => switch (target) {
-                    LibraryPaginationTarget.comics =>
-                      ref
-                          .read(libraryComicsCatalogControllerProvider.notifier)
-                          .goToFirstPage(),
-                    LibraryPaginationTarget.series =>
-                      ref
-                          .read(librarySeriesCatalogControllerProvider.notifier)
-                          .goToFirstPage(),
-                  }
+                ? () => _jump(ref, LibraryPageJump.first)
                 : null,
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronLeft,
             tooltip: l10n.seriesDetailPaginationPrevious,
             onPressed: canGoPrevious
-                ? () => switch (target) {
-                    LibraryPaginationTarget.comics =>
-                      ref
-                          .read(libraryComicsCatalogControllerProvider.notifier)
-                          .goToPreviousPage(),
-                    LibraryPaginationTarget.series =>
-                      ref
-                          .read(librarySeriesCatalogControllerProvider.notifier)
-                          .goToPreviousPage(),
-                  }
+                ? () => _jump(ref, LibraryPageJump.previous)
                 : null,
           ),
           Padding(
@@ -89,37 +71,27 @@ class LibraryPaginationBar extends ConsumerWidget {
             icon: LucideIcons.chevronRight,
             tooltip: l10n.seriesDetailPaginationNext,
             onPressed: canGoNext
-                ? () => switch (target) {
-                    LibraryPaginationTarget.comics =>
-                      ref
-                          .read(libraryComicsCatalogControllerProvider.notifier)
-                          .goToNextPage(totalPages),
-                    LibraryPaginationTarget.series =>
-                      ref
-                          .read(librarySeriesCatalogControllerProvider.notifier)
-                          .goToNextPage(totalPages),
-                  }
+                ? () => _jump(ref, LibraryPageJump.next)
                 : null,
           ),
           GhostButton.icon(
             icon: LucideIcons.chevronsRight,
             tooltip: l10n.seriesDetailPaginationLast,
             onPressed: canGoNext
-                ? () => switch (target) {
-                    LibraryPaginationTarget.comics =>
-                      ref
-                          .read(libraryComicsCatalogControllerProvider.notifier)
-                          .goToLastPage(totalPages),
-                    LibraryPaginationTarget.series =>
-                      ref
-                          .read(librarySeriesCatalogControllerProvider.notifier)
-                          .goToLastPage(totalPages),
-                  }
+                ? () => _jump(ref, LibraryPageJump.last)
                 : null,
           ),
         ],
       ),
     );
+  }
+
+  void _jump(WidgetRef ref, LibraryPageJump jump) {
+    final LibraryDisplayTarget displayTarget = switch (target) {
+      LibraryPaginationTarget.comics => LibraryDisplayTarget.comics,
+      LibraryPaginationTarget.series => LibraryDisplayTarget.series,
+    };
+    ref.read(libraryPageFacadeProvider.notifier).jumpPage(displayTarget, jump);
   }
 
   EdgeInsets _paddingForPlacement(AppThemeTokens tokens) {
