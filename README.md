@@ -70,6 +70,7 @@ flutter test
 flutter run -d windows   # 或其他平台
 ```
 
-- 提交前至少执行：`dart format .`、`flutter analyze`、`flutter test`（均在 `app/` 下）
+- PR 硬门禁与本地 Gate：仓库根执行 `./scripts/run-gate.sh`（见 `docs/agents/testing.md`）
+- 合并前若改了 UI 或怀疑 widget 回归，再跑全量：`cd app && flutter test`
 - 新增/改动需代码生成的 Dart 模型或 Provider 后，同步跑 `build_runner`（业务持久化在 Rust/SeaORM，无 Drift DAO）
 - PR 说明建议包含：改动背景、核心改动点、测试方式、截图（UI 改动）

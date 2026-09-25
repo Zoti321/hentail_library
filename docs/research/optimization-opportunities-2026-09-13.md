@@ -1,6 +1,6 @@
 # 全库可优化点调研报告
 
-> 首次调研：2026-09-13 ｜ **最近复核：2026-09-16**（对照 `HEAD = 8ec741c7`）｜ FRB sync/async 计数与 P0-B2·P1-A3 于 2026-09-16 晚间按第二刀（#129）回写
+> **快照，不代表 HEAD。** 首次调研：2026-09-13 ｜ **最近复核：2026-09-16**（对照当时 `HEAD = 8ec741c7`）｜ FRB sync/async 计数与 P0-B2·P1-A3 于 2026-09-16 晚间按第二刀（#129）回写。现行架构见 `docs/agents/rust-core.md`，测试门禁见 `docs/agents/testing.md`。
 > 范围：`e:\projects\hentai_library` 产品/架构债、性能、代码质量、测试/CI、DX、产品缺口
 > 落盘约定：本仓库 research 约定目录为 `docs/research/`
 > 性质：**只读调研**；结论按「已落地 / 部分落地 / 仍开放 / 不建议现在做」标注
@@ -38,7 +38,7 @@
 
 | 区域 | 覆盖 |
 |------|------|
-| A 产品与架构债 | `CONTEXT.md`、`AGENTS.md`、`docs/adr/*`、`docs/agents/rust-migration.md`、monorepo `app/` / `core/`、FRB 边界、ADR 与实现抽样对照 |
+| A 产品与架构债 | `CONTEXT.md`、`AGENTS.md`、`docs/adr/*`、`docs/agents/rust-core.md`、monorepo `app/` / `core/`、FRB 边界、ADR 与实现抽样对照 |
 | B 性能与阅读体验 | 阅读会话、缩略图、revision 流、扫描订阅；对照已删除的 `ui-performance-tuning.md` 结论 |
 | C 代码质量 | `app/lib` 分层、StatefulWidget、sync FRB / `guardFrbSync`、过宽 catch、文档/注释漂移 |
 | D 测试与 CI | `docs/agents/testing.md` vs `.github/workflows/ci.yml`、Rust/Dart 测布局 |
@@ -134,7 +134,7 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 - **本次复核补充**：`comic.findComicsByIdsFrb` 批量读为 async（P1-B4 的落地副产品），async 入口升至 44。
 - **第二刀（2026-09-16）**：见 P0-B2；Dart 侧 `guardFrbSync` 从 9 个 repository impl 收窄到 8 个（`named_facet_dictionary_repository_impl` 已全 async），50:51 且 async 反超；随后删首页死 sync 读至 48:51。
 - **后续切片意向（未开）**：Tag/Author 管理读 → 各模块写；死 sync 清理只剩 `load_home_series_comic_order_map`（`home.rs` 两个读已删）。
-- **政策**：`docs/agents/rust-migration.md`「FRB sync vs async」；Library **CRUD** 仍在 ADR-0014 决策外。
+- **政策**：`docs/agents/rust-core.md`「FRB sync vs async」；Library **CRUD** 仍在 ADR-0014 决策外。
 - **风险/代价**：剩余部分中；需同步改生成绑定、Repository、`guardFrb`。
 
 #### P1-A4 — ADR 与实现总体一致，注释/次要契约漂移 — **首版条目已处理**
@@ -367,7 +367,7 @@ sync/async 比的演进：首版 70:36 → 第一刀 + 批量读改造后 63:44 
 
 ## 附录：一手来源索引（抽样）
 
-- 领域与产品：`CONTEXT.md`；`docs/agents/{product-positioning,rust-migration,testing,coding-style,ui-style,tag-dictionary-import,issue-tracker}.md`
+- 领域与产品：`CONTEXT.md`；`docs/agents/{product-positioning,rust-core,testing,coding-style,ui-style,issue-tracker}.md`；`docs/agents/operations/{log-support,tag-dictionary-import}.md`
 - ADR：`docs/adr/0002`–`0015`、`docs/adr/README.md`
 - CI：`.github/workflows/ci.yml`（`test-unit` 白名单、`test-widget` soft）
 - FRB API：`core/crates/flutter/src/api/{comic,reader,thumbnail,history,series,library,named_facet,path}.rs`

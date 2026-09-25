@@ -31,4 +31,4 @@ ADR-0002 将应用级设置留在 Dart 侧，实现为手动维护的 `settings.
 
 - 需一次性迁移路径；老用户 `settings.json` 须在首启迁移中无损，且迁移成功后旧文件即删、不可回滚至文件级备份。
 - `AppSetting` 作为 aggregate 仍可在内存与 repository 层保留，但持久化键设计与版本迁移须明确（建议单 key 存 JSON blob + schema version）。
-- 文档与 ADR-0002 / `rust-migration.md` 须同步修订。
+- 文档与 ADR-0002 / `rust-core.md` 须同步修订。

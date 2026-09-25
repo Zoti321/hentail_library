@@ -149,7 +149,7 @@ _Avoid_: 设置侧边栏（易与应用侧栏混淆）、AdaptiveScaffold、sett
 _Avoid_: 分类、关键词、Eh 标签（口语可用；领域与 issue 用 Tag）
 
 **Tag dictionary import**:
-从外部 JSON 标签字典（经网络下载或本地字节）将标签名幂等写入全局 Tag 字典的操作；不附着到 Comic，不删除本机已有 Tag。JSON 格式见 `docs/agents/tag-dictionary-import.md`。UI 入口待接入自维护词库后启用。
+从外部 JSON 标签字典（经网络下载或本地字节）将标签名幂等写入全局 Tag 字典的操作；不附着到 Comic，不删除本机已有 Tag。JSON 格式见 `docs/agents/operations/tag-dictionary-import.md`。UI 入口待接入自维护词库后启用。
 _Avoid_: ehentai 导入、EhTagTranslation、标签同步、画廊导入（易被理解成给 Comic 打标或镜像删除）
 
 **Author**:
@@ -189,8 +189,8 @@ Comic 文本所用语言的规范英文名有序列表（闭集首批：`Chinese
 _Avoid_: 界面语言、locale、译文语言；把 Language 做成自由 Tag
 
 **Content rating**:
-Comic 的内容分级：`unknown`、`safe`、`r18`；主要由用户设定，也可通过路径关键词自动检测为 `r18`。
-_Avoid_: 分级、年龄限制
+Comic 的内容分级：`unknown`、`safe`、`r18`；由用户设定。路径关键词自动检测（`auto_detect_content_rating`）已移除，勿恢复。浏览层隐藏 r18 用 **Healthy mode**，不改 Comic 自身分级。
+_Avoid_: 分级、年龄限制、路径自动标 r18
 
 **Comic metadata form**:
 编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag、Parody、Character、Language）时的可提交草稿；校验与 normalize、多值名增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
@@ -239,7 +239,7 @@ _Avoid_: Webtoon 模式（易与作品类型混淆）、卷轴模式
 _Avoid_: 翻页模式、单页模式
 
 **Page image fidelity**:
-Read session 中页图按源位图保真显示：不为滚动帧率升降 `FilterQuality`、不做锐化/美颜类「画质升级」，也不为性能故意降采样算法档位。为适配视口与内存可做 `cacheWidth` 等布局约束解码，但 GPU 采样须稳定、利于正确下采样（实现上固定 `FilterQuality.medium`；禁止静止态升到 `high`——网点漫画易出摩尔纹）。**本策略优先于**阅读器 UI 性能优化建议（含 `docs/research/ui-performance-tuning.md` 的 P2-1）。库封面/缩略图不在此约束内。
+Read session 中页图按源位图保真显示：不为滚动帧率升降 `FilterQuality`、不做锐化/美颜类「画质升级」，也不为性能故意降采样算法档位。为适配视口与内存可做 `cacheWidth` 等布局约束解码，但 GPU 采样须稳定、利于正确下采样（实现上固定 `FilterQuality.medium`；禁止静止态升到 `high`——网点漫画易出摩尔纹）。**本策略优先于**阅读器 UI 性能优化建议。库封面/缩略图不在此约束内。
 _Avoid_: 滚动降画质、静止升画质、FilterQuality.high 页图、锐化增强阅读
 
 **Page image copy**:

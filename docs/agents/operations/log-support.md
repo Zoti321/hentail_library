@@ -1,6 +1,6 @@
 # 用户日志与支持（维护者指引）
 
-面向维护者：引导用户收集诊断日志。设计见 [ADR-0004](../adr/0004-production-diagnostics.md)。
+面向维护者：引导用户收集诊断日志。设计见 [ADR-0004](../../adr/0004-production-diagnostics.md)。
 
 ## 快速流程
 
@@ -20,7 +20,7 @@
 
 ## 性能复现（流畅度排查）
 
-复现 UI 卡顿时请**关闭详细诊断**（Verbose / Dart `FINE` + Rust `debug`）。热路径日志本身会污染 Timeline（见 ADR-0004、issue #80 P2-7）。
+复现 UI 卡顿时请**关闭详细诊断**（Verbose / Dart `FINE` + Rust `debug`）。热路径日志本身会污染 Timeline（见 ADR-0004）。
 
 1. 确认设置里 **详细诊断** 为关（冷启动默认关）。
 2. 使用 **Profile** 模式：`flutter run --profile`。
@@ -31,10 +31,12 @@
 ```bash
 # 仅 stderr
 RUST_LOG=hentai_core::sync=debug flutter run
-
-# 用户机器上文件路径（Windows 示例）
-# %APPDATA%\...\logs\rust_log.txt
 ```
+
+Windows 本机文件（`path_provider` Application Support，见 ADR-0010）：
+
+- Release：`%APPDATA%\com.example\hentai_library\logs\rust_log.txt`
+- Debug / Profile：`%APPDATA%\com.example\hentai_library_dev\logs\rust_log.txt`
 
 ## 脱敏说明
 

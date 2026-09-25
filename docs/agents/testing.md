@@ -103,7 +103,7 @@ Gate **不会**跑全量 `test/ui`（由 `nightly-dart-ui` 覆盖）、不会跑
 | Flutter | `app/test/support/`（如 `pump_localized_app.dart`、`fakes/`） | 本地化 pump、常用 overrides/fakes |
 | Rust | `core/crates/core/tests/common/` | DB init 锁、`create_fixture_db`、fixture SQL |
 
-`core/crates/core/tests/*.rs` 中凡涉及全局 DB 或 `drift_v2.sql` fixture 的集成测已统一走 `mod common;`（#154）；纯解析 / 纯函数测试（如 `metadata_read_test.rs`、`metadata_lock_test.rs`、`rar_comic_formats.rs`）无需引入。迁移存量 Dart 测试时顺手改到 harness；`test/features` 遗留路径被触及时迁到镜像的 `test/ui` / `test/data`，不要继续扩张 `test/features`。
+触及全局 DB 或 `drift_v2.sql` fixture 的 Rust 集成测走 `mod common;`；纯解析 / 纯函数测试不必引入。新 Dart 测试放在 `test/ui`、`test/data`、`test/domain` 或 `test/core`。
 
 ### Flutter 示例
 
@@ -128,11 +128,3 @@ fn example() {
     });
 }
 ```
-
-## Slice 2 inventory（#108）
-
-**新增契约测：** `series_frb_mapper`、`history_frb_mapper`、`reader_frb_mapper`、`thumbnail_frb_mapper`。
-
-**补齐（2026-09-16）：** `frb_zone_guard`（三条：映射后 present、非 FRB 错误忽略、benign stream closed 忽略）；`comic_frb_mapper` 的 `mapRustComic`（全字段 + 可选字段为空）与 `mapPagedResult`；`series_frb_mapper` 的 `mapPagedSeriesComicsResult`。
-
-**残留缺口（有意延后）：** 真 FRB / `*_repository_impl` 集成测（按 ADR-0002 不做）。

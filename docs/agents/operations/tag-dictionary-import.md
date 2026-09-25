@@ -10,7 +10,7 @@
 - 禁漫天堂、哔咔等平台无对等开源标签库，EhTag 无法作为跨平台通用词库
 - 后续改由维护者自建精选标签仓库并接入
 
-详见 [ADR-0011](../adr/0011-tag-dictionary-no-ehtag.md)。
+详见 [ADR-0011](../../adr/0011-tag-dictionary-no-ehtag.md)。
 
 ## 仍保留的基础能力
 

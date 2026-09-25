@@ -1,24 +1,26 @@
 # Issue tracker: GitHub
 
-Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
+Issues live as GitHub issues. Use the `gh` CLI inside the clone — `gh` infers the repo from `git remote`.
 
-## Conventions
+## Commands
 
-- **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
-- **Rust FRB / monorepo** (completed): parent PRD [#11](https://github.com/Zoti321/hentail_library/issues/11) and slices #12–#19 are **closed**. Current architecture: `docs/agents/rust-migration.md` and ADR-0002.
-- **Read an issue**: `gh issue view <number> --comments`, filtering comments by `jq` and also fetching labels.
-- **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
-- **Comment on an issue**: `gh issue comment <number> --body "..."`
-- **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
-- **Triage labels**: five canonical roles mapped in `docs/agents/triage-labels.md` (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). Apply exactly one triage label per open issue when its readiness is known.
+- **Create**: `gh issue create --title "..." --body "..."` (heredoc for multi-line bodies).
+- **Read**: `gh issue view <number> --comments`
+- **List**: `gh issue list --state open --json number,title,body,labels --jq '[.[] | {number, title, labels: [.labels[].name]}]'` plus `--label` / `--state` as needed.
+- **Comment**: `gh issue comment <number> --body "..."`
+- **Labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
 - **Close**: `gh issue close <number> --comment "..."`
 
-Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
+When a skill says "publish to the issue tracker", create a GitHub issue. When it says "fetch the relevant ticket", run `gh issue view <number> --comments`.
 
-## When a skill says "publish to the issue tracker"
+## Triage
 
-Create a GitHub issue.
+Apply **exactly one** of these labels when readiness is known:
 
-## When a skill says "fetch the relevant ticket"
-
-Run `gh issue view <number> --comments`.
+| Label | Meaning |
+| ----- | ------- |
+| `needs-triage` | Maintainer needs to evaluate this issue |
+| `needs-info` | Waiting on reporter for more information |
+| `ready-for-agent` | Fully specified, ready for an AFK agent |
+| `ready-for-human` | Requires human implementation |
+| `wontfix` | Will not be actioned |
