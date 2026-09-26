@@ -82,6 +82,34 @@ void main() {
       },
     );
 
+    testWidgets('dialog shows short bullets without markdown noise', (
+      WidgetTester tester,
+    ) async {
+      final AppReleaseInfo newerRelease = (
+        version: '2.0.0',
+        publishedAt: DateTime.utc(2026, 9, 1),
+        releaseNotes: <String>[
+          '支持 WebDAV 同步 (#1141)',
+          '修复搜索页面布局问题',
+        ],
+        htmlUrl:
+            'https://github.com/Zoti321/hentail_library/releases/tag/v2.0.0',
+        assets: <AppReleaseAsset>[],
+      );
+      when(
+        () => mockService.fetchLatestStableRelease(),
+      ).thenAnswer((_) async => newerRelease);
+
+      await _pumpHarness(tester, mockService: mockService);
+      await tester.tap(find.text('检查更新'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('- 支持 WebDAV 同步 (#1141)'), findsOneWidget);
+      expect(find.text('- 修复搜索页面布局问题'), findsOneWidget);
+      expect(find.textContaining('## Build status'), findsNothing);
+      expect(find.textContaining('Full Changelog'), findsNothing);
+    });
+
     testWidgets(
       'root navigator key alone does not show dialog without context param',
       (WidgetTester tester) async {
