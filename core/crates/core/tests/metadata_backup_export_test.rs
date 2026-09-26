@@ -80,7 +80,7 @@ fn export_comic_metadata_emits_schema_v1_json() {
             let payload: MetadataBackupPayload =
                 serde_json::from_slice(&bytes).expect("parse json");
             assert_eq!(payload.schema_version, SCHEMA_VERSION);
-            assert_eq!(payload.options.include_orphan_facets, true);
+            assert!(payload.options.include_orphan_facets);
             assert_eq!(payload.comics.len(), 1);
 
             let comic = &payload.comics[0];
