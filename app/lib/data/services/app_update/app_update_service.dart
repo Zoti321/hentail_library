@@ -93,10 +93,20 @@ class AppUpdateService {
     return body
         .split('\n')
         .map((String line) => line.trim())
-        .where((String line) => line.isNotEmpty)
-        .map((String line) => line.replaceFirst(RegExp(r'^[-*]\s*'), '').trim())
+        .where((String line) => RegExp(r'^[-*]\s+').hasMatch(line))
+        .map(_cleanReleaseNoteBullet)
         .where((String line) => line.isNotEmpty)
         .toList();
+  }
+
+  static String _cleanReleaseNoteBullet(String line) {
+    var cleaned = line.replaceFirst(RegExp(r'^[-*]\s+'), '').trim();
+    cleaned = cleaned.replaceFirst(
+      RegExp(r' by @\S+ in https://github\.com/\S+$'),
+      '',
+    );
+    cleaned = cleaned.replaceFirst(RegExp(r'(?:\s\(@[^)]+\))+$'), '');
+    return cleaned.trim();
   }
 
   Future<String> downloadAsset({

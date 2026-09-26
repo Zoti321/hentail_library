@@ -465,10 +465,187 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsGroupPersonalization => '个性化';
 
   @override
+  String get settingsGroupMetadataBackup => '元数据备份';
+
+  @override
   String get settingsGroupDiagnostics => '诊断与支持';
 
   @override
   String get settingsGroupAbout => '关于';
+
+  @override
+  String get settingsMetadataBackupAutoGroupTitle => '自动备份';
+
+  @override
+  String get settingsMetadataBackupManualGroupTitle => '手动备份';
+
+  @override
+  String get settingsMetadataBackupAutoToggleLabel => '元数据自动备份';
+
+  @override
+  String get settingsMetadataBackupAutoToggleDescription =>
+      '在应用数据目录轮转保留 gzip 备份（默认开启）';
+
+  @override
+  String get settingsMetadataBackupStoragePathLabel => '备份目录';
+
+  @override
+  String get settingsMetadataBackupStoragePathLoading => '正在读取路径…';
+
+  @override
+  String get settingsMetadataBackupLastBackupLabel => '上次备份';
+
+  @override
+  String get settingsMetadataBackupLastBackupEmpty => '尚无自动备份';
+
+  @override
+  String get settingsMetadataBackupNowLabel => '立即备份';
+
+  @override
+  String get settingsMetadataBackupNowDescription => '立即写入 gzip 备份到应用轮转目录';
+
+  @override
+  String get settingsMetadataBackupNowSuccess => '已更新自动备份目录';
+
+  @override
+  String settingsMetadataBackupLastBackupAt(String timestamp) {
+    return '上次备份：$timestamp';
+  }
+
+  @override
+  String get settingsMetadataBackupOpenFolderLabel => '打开备份文件夹';
+
+  @override
+  String get settingsMetadataBackupOpenFolderDescription => '在文件管理器中打开自动备份目录';
+
+  @override
+  String get settingsMetadataBackupImportLabel => '导入元数据';
+
+  @override
+  String get settingsMetadataBackupImportDescription => '从备份文件恢复 Comic 用户元数据';
+
+  @override
+  String get settingsMetadataBackupImportPickDialogTitle => '选择元数据备份文件';
+
+  @override
+  String get settingsMetadataBackupImportInvalidFile =>
+      '请选择 .hlmeta.json 或 .hlmeta.json.gz 文件';
+
+  @override
+  String get settingsMetadataBackupImportConfirmTitle => '导入元数据备份？';
+
+  @override
+  String get settingsMetadataBackupImportConfirmWarning =>
+      '匹配的 Comic 将被覆盖，且全部 Metadata field lock 将上锁；未匹配项会跳过。';
+
+  @override
+  String get settingsMetadataBackupImportConfirmAction => '导入';
+
+  @override
+  String get settingsMetadataBackupImportManifestSchema => 'Schema 版本';
+
+  @override
+  String get settingsMetadataBackupImportManifestExportedAt => '导出时间';
+
+  @override
+  String get settingsMetadataBackupImportManifestComicCount => 'Comic 数量';
+
+  @override
+  String get settingsMetadataBackupImportManifestAppVersion => '应用版本';
+
+  @override
+  String get settingsMetadataBackupImportRunningTitle => '正在导入元数据';
+
+  @override
+  String get settingsMetadataBackupImportRunningBody => '正在将备份应用到匹配的 Comic…';
+
+  @override
+  String get settingsMetadataBackupImportResultTitle => '导入完成';
+
+  @override
+  String get settingsMetadataBackupImportResultApplied => '已恢复';
+
+  @override
+  String get settingsMetadataBackupImportResultSkippedNotFound => '跳过（未匹配）';
+
+  @override
+  String get settingsMetadataBackupImportResultSkippedAmbiguous => '跳过（歧义）';
+
+  @override
+  String get settingsMetadataBackupImportResultErrors => '错误';
+
+  @override
+  String get settingsMetadataBackupImportPreviewRunningTitle => '正在预演匹配…';
+
+  @override
+  String get settingsMetadataBackupImportPreviewRunningBody =>
+      '正在分析备份与库内 Comic 的匹配关系…';
+
+  @override
+  String get settingsMetadataBackupImportConfirmManifestSection => '备份文件';
+
+  @override
+  String get settingsMetadataBackupImportConfirmPreviewSection => '匹配预演';
+
+  @override
+  String get settingsMetadataBackupImportPreviewWouldApply => '将恢复';
+
+  @override
+  String get settingsMetadataBackupImportPreviewSkippedNotFound => '未找到';
+
+  @override
+  String get settingsMetadataBackupImportPreviewSkippedAmbiguous => '歧义';
+
+  @override
+  String get settingsMetadataBackupImportPreviewOrphanFacets => '将新增字典项';
+
+  @override
+  String get settingsMetadataBackupImportConfirmDetailsTitle => '详情';
+
+  @override
+  String settingsMetadataBackupImportConfirmActionWithCount(int count) {
+    return '导入 $count';
+  }
+
+  @override
+  String get settingsMetadataBackupImportConfirmActionDisabled => '无法导入';
+
+  @override
+  String get settingsMetadataBackupImportPreviewMatchTierPath => '路径匹配';
+
+  @override
+  String get settingsMetadataBackupImportPreviewMatchTierLibraryRelative =>
+      '库相对路径匹配';
+
+  @override
+  String get settingsMetadataBackupExportLabel => '导出元数据';
+
+  @override
+  String get settingsMetadataBackupExportDescription =>
+      '将 Comic 用户元数据导出为 JSON，便于外置保存';
+
+  @override
+  String get settingsMetadataBackupExportDialogTitle => '导出元数据';
+
+  @override
+  String get settingsMetadataBackupExportGzipLabel => '使用 gzip 压缩';
+
+  @override
+  String get settingsMetadataBackupExportOrphanFacetsLabel => '包含孤立标签与字典项';
+
+  @override
+  String get settingsMetadataBackupExportCurrentLibraryLabel => '仅当前 Library';
+
+  @override
+  String get settingsMetadataBackupExportConfirm => '继续';
+
+  @override
+  String get settingsMetadataBackupExportSaveDialogTitle => '保存元数据备份';
+
+  @override
+  String settingsMetadataBackupExportSuccess(String fileName) {
+    return '元数据已导出至 $fileName';
+  }
 
   @override
   String get settingsDiagnosticModeLabel => '详细诊断';
@@ -488,6 +665,46 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settingsExportLogsDescription => '打包应用与核心日志，便于问题反馈';
+
+  @override
+  String get settingsClearApplicationDataLabel => '清除全部应用数据';
+
+  @override
+  String get settingsClearApplicationDataDescription =>
+      '删除数据库、自动元数据备份、日志与缓存；不删除库根目录中的漫画文件';
+
+  @override
+  String get settingsClearApplicationDataDisabledSyncRunning => '库同步进行中，请稍后再试';
+
+  @override
+  String get settingsUninstallDataInfoLabel => '卸载与数据保留';
+
+  @override
+  String get settingsUninstallDataInfoDescription =>
+      '卸载应用可能删除应用沙箱数据；桌面版卸载默认保留应用数据目录，也可在卸载向导中勾选删除';
+
+  @override
+  String get confirmClearApplicationDataTitle => '清除全部应用数据？';
+
+  @override
+  String get confirmClearApplicationDataContent =>
+      '将删除当前应用数据目录中的全部本机状态（含 SQLite、自动元数据备份、日志与缓存），以及应用偏好设置。不会删除库根目录中的漫画文件，也不会删除您手动导出到外置目录的元数据备份。';
+
+  @override
+  String confirmClearApplicationDataRecentBackup(String timestamp) {
+    return '最近自动元数据备份：$timestamp';
+  }
+
+  @override
+  String get confirmClearApplicationDataRecentBackupEmpty => '尚无自动元数据备份记录';
+
+  @override
+  String get wipeCompleteRestartMessage => '应用数据已清除。请重新启动应用以完成重置。';
+
+  @override
+  String wipeFailedManualDeleteMessage(String path) {
+    return '无法完全删除应用数据目录。请关闭应用后手动删除以下目录，然后重启应用：\n$path';
+  }
 
   @override
   String get settingsAutoScanLabel => '自动扫描';
@@ -1345,6 +1562,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get commonCancel => '取消';
+
+  @override
+  String get commonToggleOn => '开启';
+
+  @override
+  String get commonToggleOff => '关闭';
 
   @override
   String get commonSave => '保存';

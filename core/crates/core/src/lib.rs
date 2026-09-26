@@ -3,12 +3,14 @@ pub mod character;
 pub mod comic;
 pub mod comic_id;
 pub mod db;
+pub mod db_snapshot;
 pub mod entity;
 pub mod error;
 pub mod formats;
 pub mod history;
 pub mod home;
 pub mod library;
+pub mod metadata_backup;
 pub mod metadata_lock;
 pub mod migration;
 pub mod named_facet;
@@ -37,7 +39,7 @@ pub use comic::{
     PagedComicResultDto, SetComicMetaLocksDto, UpdateComicUserMetaDto,
 };
 pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_path_for_key};
-pub use db::{connection, db_config, init_db, init_db_at_path};
+pub use db::{connection, db_config, init_db, init_db_at_path, shutdown_db};
 pub use error::{HentaiError, HentaiErrorCode};
 pub use history::{
     clear_all_reading, delete_reading_by_comic_id, delete_reading_by_comic_ids, fetch_reading_page,
@@ -56,6 +58,13 @@ pub use library::{
     update_library_settings, update_library_sidebar_layout, update_local_library_root,
     update_remote_library, LibraryDto, LibrarySidebarPlacement, RemoteLibraryCredential,
     ResolvedAccess, ScanInterval,
+};
+pub use metadata_backup::{
+    export_comic_metadata, import_comic_metadata, peek_metadata_backup_manifest,
+    preview_import_comic_metadata, AmbiguousSample, ComicExportRecord, ComicMetaExportRecord,
+    ExportComicMetadataOptions, ExportOptionsRecord, ImportComicMetadataResult, ImportPlan,
+    MatchTier, MetadataBackupManifest, MetadataBackupPayload, NotFoundSample, OrphanFacetsRecord,
+    WouldApplySample, SCHEMA_VERSION,
 };
 pub use named_facet::{
     add_named_facet_name, count_all_named_facet_names, count_named_facet_attachments,

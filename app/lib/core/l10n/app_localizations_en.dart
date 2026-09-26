@@ -480,10 +480,206 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsGroupPersonalization => 'Personalization';
 
   @override
+  String get settingsGroupMetadataBackup => 'Metadata backup';
+
+  @override
   String get settingsGroupDiagnostics => 'Diagnostics & support';
 
   @override
   String get settingsGroupAbout => 'About';
+
+  @override
+  String get settingsMetadataBackupAutoGroupTitle => 'Automatic backup';
+
+  @override
+  String get settingsMetadataBackupManualGroupTitle => 'Manual backup';
+
+  @override
+  String get settingsMetadataBackupAutoToggleLabel =>
+      'Automatic metadata backup';
+
+  @override
+  String get settingsMetadataBackupAutoToggleDescription =>
+      'Keep rotating gzip backups under app data (enabled by default)';
+
+  @override
+  String get settingsMetadataBackupStoragePathLabel => 'Backup folder';
+
+  @override
+  String get settingsMetadataBackupStoragePathLoading => 'Loading path…';
+
+  @override
+  String get settingsMetadataBackupLastBackupLabel => 'Last backup';
+
+  @override
+  String get settingsMetadataBackupLastBackupEmpty => 'No automatic backup yet';
+
+  @override
+  String get settingsMetadataBackupNowLabel => 'Back up now';
+
+  @override
+  String get settingsMetadataBackupNowDescription =>
+      'Write a gzip backup to the app rotation folder';
+
+  @override
+  String get settingsMetadataBackupNowSuccess =>
+      'Automatic backup folder updated';
+
+  @override
+  String settingsMetadataBackupLastBackupAt(String timestamp) {
+    return 'Last backup: $timestamp';
+  }
+
+  @override
+  String get settingsMetadataBackupOpenFolderLabel => 'Open backup folder';
+
+  @override
+  String get settingsMetadataBackupOpenFolderDescription =>
+      'Reveal the automatic backup directory in your file manager';
+
+  @override
+  String get settingsMetadataBackupImportLabel => 'Import metadata';
+
+  @override
+  String get settingsMetadataBackupImportDescription =>
+      'Restore Comic user metadata from a backup file';
+
+  @override
+  String get settingsMetadataBackupImportPickDialogTitle =>
+      'Select metadata backup';
+
+  @override
+  String get settingsMetadataBackupImportInvalidFile =>
+      'Please choose a .hlmeta.json or .hlmeta.json.gz file';
+
+  @override
+  String get settingsMetadataBackupImportConfirmTitle =>
+      'Import metadata backup?';
+
+  @override
+  String get settingsMetadataBackupImportConfirmWarning =>
+      'Matching Comics will be overwritten and all metadata fields will be locked. Unmatched entries are skipped.';
+
+  @override
+  String get settingsMetadataBackupImportConfirmAction => 'Import';
+
+  @override
+  String get settingsMetadataBackupImportManifestSchema => 'Schema version';
+
+  @override
+  String get settingsMetadataBackupImportManifestExportedAt => 'Exported at';
+
+  @override
+  String get settingsMetadataBackupImportManifestComicCount => 'Comics';
+
+  @override
+  String get settingsMetadataBackupImportManifestAppVersion => 'App version';
+
+  @override
+  String get settingsMetadataBackupImportRunningTitle => 'Importing metadata';
+
+  @override
+  String get settingsMetadataBackupImportRunningBody =>
+      'Applying backup to matching Comics…';
+
+  @override
+  String get settingsMetadataBackupImportResultTitle => 'Import complete';
+
+  @override
+  String get settingsMetadataBackupImportResultApplied => 'Restored';
+
+  @override
+  String get settingsMetadataBackupImportResultSkippedNotFound =>
+      'Skipped (not found)';
+
+  @override
+  String get settingsMetadataBackupImportResultSkippedAmbiguous =>
+      'Skipped (ambiguous)';
+
+  @override
+  String get settingsMetadataBackupImportResultErrors => 'Errors';
+
+  @override
+  String get settingsMetadataBackupImportPreviewRunningTitle =>
+      'Previewing matches';
+
+  @override
+  String get settingsMetadataBackupImportPreviewRunningBody =>
+      'Analyzing how backup entries match Comics in your library…';
+
+  @override
+  String get settingsMetadataBackupImportConfirmManifestSection =>
+      'Backup file';
+
+  @override
+  String get settingsMetadataBackupImportConfirmPreviewSection =>
+      'Match preview';
+
+  @override
+  String get settingsMetadataBackupImportPreviewWouldApply => 'Will restore';
+
+  @override
+  String get settingsMetadataBackupImportPreviewSkippedNotFound => 'Not found';
+
+  @override
+  String get settingsMetadataBackupImportPreviewSkippedAmbiguous => 'Ambiguous';
+
+  @override
+  String get settingsMetadataBackupImportPreviewOrphanFacets =>
+      'New dictionary entries';
+
+  @override
+  String get settingsMetadataBackupImportConfirmDetailsTitle => 'Details';
+
+  @override
+  String settingsMetadataBackupImportConfirmActionWithCount(int count) {
+    return 'Import $count';
+  }
+
+  @override
+  String get settingsMetadataBackupImportConfirmActionDisabled =>
+      'Cannot import';
+
+  @override
+  String get settingsMetadataBackupImportPreviewMatchTierPath =>
+      'Matched by path';
+
+  @override
+  String get settingsMetadataBackupImportPreviewMatchTierLibraryRelative =>
+      'Matched by library-relative path';
+
+  @override
+  String get settingsMetadataBackupExportLabel => 'Export metadata';
+
+  @override
+  String get settingsMetadataBackupExportDescription =>
+      'Save Comic user metadata as JSON for off-device safekeeping';
+
+  @override
+  String get settingsMetadataBackupExportDialogTitle => 'Export metadata';
+
+  @override
+  String get settingsMetadataBackupExportGzipLabel => 'Compress with gzip';
+
+  @override
+  String get settingsMetadataBackupExportOrphanFacetsLabel =>
+      'Include orphan tags and facets';
+
+  @override
+  String get settingsMetadataBackupExportCurrentLibraryLabel =>
+      'Current library only';
+
+  @override
+  String get settingsMetadataBackupExportConfirm => 'Continue';
+
+  @override
+  String get settingsMetadataBackupExportSaveDialogTitle =>
+      'Save metadata backup';
+
+  @override
+  String settingsMetadataBackupExportSuccess(String fileName) {
+    return 'Metadata exported to $fileName';
+  }
 
   @override
   String get settingsDiagnosticModeLabel => 'Verbose diagnostics';
@@ -505,6 +701,49 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsExportLogsDescription =>
       'Bundle app and core logs for troubleshooting';
+
+  @override
+  String get settingsClearApplicationDataLabel => 'Clear all application data';
+
+  @override
+  String get settingsClearApplicationDataDescription =>
+      'Removes the database, automatic metadata backups, logs, and cache; does not delete comics in library roots';
+
+  @override
+  String get settingsClearApplicationDataDisabledSyncRunning =>
+      'Library sync is running; try again later';
+
+  @override
+  String get settingsUninstallDataInfoLabel => 'Uninstall and data retention';
+
+  @override
+  String get settingsUninstallDataInfoDescription =>
+      'Uninstalling may remove the app sandbox on mobile. On desktop, uninstall keeps application data by default; you can opt in to delete it in the uninstaller';
+
+  @override
+  String get confirmClearApplicationDataTitle => 'Clear all application data?';
+
+  @override
+  String get confirmClearApplicationDataContent =>
+      'This removes all on-device app state in the current application data directory (SQLite, automatic metadata backups, logs, and cache), plus app preferences. Library root files and manually exported metadata backups are not deleted.';
+
+  @override
+  String confirmClearApplicationDataRecentBackup(String timestamp) {
+    return 'Latest automatic metadata backup: $timestamp';
+  }
+
+  @override
+  String get confirmClearApplicationDataRecentBackupEmpty =>
+      'No automatic metadata backup on record';
+
+  @override
+  String get wipeCompleteRestartMessage =>
+      'Application data cleared. Restart the app to finish resetting.';
+
+  @override
+  String wipeFailedManualDeleteMessage(String path) {
+    return 'Could not fully delete the application data directory. Close the app, manually delete this folder, then restart:\n$path';
+  }
 
   @override
   String get settingsAutoScanLabel => 'Auto scan';
@@ -1384,6 +1623,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonCancel => 'Cancel';
+
+  @override
+  String get commonToggleOn => 'On';
+
+  @override
+  String get commonToggleOff => 'Off';
 
   @override
   String get commonSave => 'Save';

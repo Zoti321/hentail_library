@@ -28,6 +28,7 @@ void main() {
         expect(find.text('设置'), findsWidgets);
         expect(find.text('个性化'), findsWidgets);
         expect(find.text('诊断与支持'), findsOneWidget);
+        expect(find.text('元数据备份'), findsOneWidget);
         expect(find.text('关于'), findsOneWidget);
         expect(find.text('应用主题'), findsOneWidget);
         expect(find.text('检查更新'), findsNothing);
@@ -50,6 +51,20 @@ void main() {
       expect(find.text('应用主题'), findsNothing);
     });
 
+    testWidgets('wide metadata backup category shows export row', (
+      WidgetTester tester,
+    ) async {
+      await _pumpSettingsView(tester, viewportWidth: 700);
+
+      await tester.tap(_masterCategoryFinder('元数据备份'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('导出元数据'), findsOneWidget);
+      expect(find.text('导入元数据'), findsOneWidget);
+      expect(find.text('元数据自动备份'), findsOneWidget);
+      expect(find.text('导出日志'), findsNothing);
+    });
+
     testWidgets('narrow starts on master list without detail rows', (
       WidgetTester tester,
     ) async {
@@ -59,6 +74,7 @@ void main() {
       expect(find.text('设置'), findsOneWidget);
       expect(find.text('个性化'), findsOneWidget);
       expect(find.text('诊断与支持'), findsOneWidget);
+      expect(find.text('元数据备份'), findsOneWidget);
       expect(find.text('关于'), findsOneWidget);
       expect(find.text('应用主题'), findsNothing);
       expect(find.text('检查更新'), findsNothing);

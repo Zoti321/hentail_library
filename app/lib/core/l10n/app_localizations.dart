@@ -908,6 +908,12 @@ abstract class AppLocalizations {
   /// **'个性化'**
   String get settingsGroupPersonalization;
 
+  /// No description provided for @settingsGroupMetadataBackup.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据备份'**
+  String get settingsGroupMetadataBackup;
+
   /// No description provided for @settingsGroupDiagnostics.
   ///
   /// In zh, this message translates to:
@@ -919,6 +925,330 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'关于'**
   String get settingsGroupAbout;
+
+  /// No description provided for @settingsMetadataBackupAutoGroupTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动备份'**
+  String get settingsMetadataBackupAutoGroupTitle;
+
+  /// No description provided for @settingsMetadataBackupManualGroupTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'手动备份'**
+  String get settingsMetadataBackupManualGroupTitle;
+
+  /// No description provided for @settingsMetadataBackupAutoToggleLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据自动备份'**
+  String get settingsMetadataBackupAutoToggleLabel;
+
+  /// No description provided for @settingsMetadataBackupAutoToggleDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'在应用数据目录轮转保留 gzip 备份（默认开启）'**
+  String get settingsMetadataBackupAutoToggleDescription;
+
+  /// No description provided for @settingsMetadataBackupStoragePathLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份目录'**
+  String get settingsMetadataBackupStoragePathLabel;
+
+  /// No description provided for @settingsMetadataBackupStoragePathLoading.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在读取路径…'**
+  String get settingsMetadataBackupStoragePathLoading;
+
+  /// No description provided for @settingsMetadataBackupLastBackupLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'上次备份'**
+  String get settingsMetadataBackupLastBackupLabel;
+
+  /// No description provided for @settingsMetadataBackupLastBackupEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'尚无自动备份'**
+  String get settingsMetadataBackupLastBackupEmpty;
+
+  /// No description provided for @settingsMetadataBackupNowLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'立即备份'**
+  String get settingsMetadataBackupNowLabel;
+
+  /// No description provided for @settingsMetadataBackupNowDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'立即写入 gzip 备份到应用轮转目录'**
+  String get settingsMetadataBackupNowDescription;
+
+  /// No description provided for @settingsMetadataBackupNowSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'已更新自动备份目录'**
+  String get settingsMetadataBackupNowSuccess;
+
+  /// No description provided for @settingsMetadataBackupLastBackupAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'上次备份：{timestamp}'**
+  String settingsMetadataBackupLastBackupAt(String timestamp);
+
+  /// No description provided for @settingsMetadataBackupOpenFolderLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开备份文件夹'**
+  String get settingsMetadataBackupOpenFolderLabel;
+
+  /// No description provided for @settingsMetadataBackupOpenFolderDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'在文件管理器中打开自动备份目录'**
+  String get settingsMetadataBackupOpenFolderDescription;
+
+  /// No description provided for @settingsMetadataBackupImportLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入元数据'**
+  String get settingsMetadataBackupImportLabel;
+
+  /// No description provided for @settingsMetadataBackupImportDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'从备份文件恢复 Comic 用户元数据'**
+  String get settingsMetadataBackupImportDescription;
+
+  /// No description provided for @settingsMetadataBackupImportPickDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择元数据备份文件'**
+  String get settingsMetadataBackupImportPickDialogTitle;
+
+  /// No description provided for @settingsMetadataBackupImportInvalidFile.
+  ///
+  /// In zh, this message translates to:
+  /// **'请选择 .hlmeta.json 或 .hlmeta.json.gz 文件'**
+  String get settingsMetadataBackupImportInvalidFile;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入元数据备份？'**
+  String get settingsMetadataBackupImportConfirmTitle;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmWarning.
+  ///
+  /// In zh, this message translates to:
+  /// **'匹配的 Comic 将被覆盖，且全部 Metadata field lock 将上锁；未匹配项会跳过。'**
+  String get settingsMetadataBackupImportConfirmWarning;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmAction.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入'**
+  String get settingsMetadataBackupImportConfirmAction;
+
+  /// No description provided for @settingsMetadataBackupImportManifestSchema.
+  ///
+  /// In zh, this message translates to:
+  /// **'Schema 版本'**
+  String get settingsMetadataBackupImportManifestSchema;
+
+  /// No description provided for @settingsMetadataBackupImportManifestExportedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出时间'**
+  String get settingsMetadataBackupImportManifestExportedAt;
+
+  /// No description provided for @settingsMetadataBackupImportManifestComicCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'Comic 数量'**
+  String get settingsMetadataBackupImportManifestComicCount;
+
+  /// No description provided for @settingsMetadataBackupImportManifestAppVersion.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用版本'**
+  String get settingsMetadataBackupImportManifestAppVersion;
+
+  /// No description provided for @settingsMetadataBackupImportRunningTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在导入元数据'**
+  String get settingsMetadataBackupImportRunningTitle;
+
+  /// No description provided for @settingsMetadataBackupImportRunningBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在将备份应用到匹配的 Comic…'**
+  String get settingsMetadataBackupImportRunningBody;
+
+  /// No description provided for @settingsMetadataBackupImportResultTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入完成'**
+  String get settingsMetadataBackupImportResultTitle;
+
+  /// No description provided for @settingsMetadataBackupImportResultApplied.
+  ///
+  /// In zh, this message translates to:
+  /// **'已恢复'**
+  String get settingsMetadataBackupImportResultApplied;
+
+  /// No description provided for @settingsMetadataBackupImportResultSkippedNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'跳过（未匹配）'**
+  String get settingsMetadataBackupImportResultSkippedNotFound;
+
+  /// No description provided for @settingsMetadataBackupImportResultSkippedAmbiguous.
+  ///
+  /// In zh, this message translates to:
+  /// **'跳过（歧义）'**
+  String get settingsMetadataBackupImportResultSkippedAmbiguous;
+
+  /// No description provided for @settingsMetadataBackupImportResultErrors.
+  ///
+  /// In zh, this message translates to:
+  /// **'错误'**
+  String get settingsMetadataBackupImportResultErrors;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewRunningTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在预演匹配…'**
+  String get settingsMetadataBackupImportPreviewRunningTitle;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewRunningBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在分析备份与库内 Comic 的匹配关系…'**
+  String get settingsMetadataBackupImportPreviewRunningBody;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmManifestSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份文件'**
+  String get settingsMetadataBackupImportConfirmManifestSection;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmPreviewSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'匹配预演'**
+  String get settingsMetadataBackupImportConfirmPreviewSection;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewWouldApply.
+  ///
+  /// In zh, this message translates to:
+  /// **'将恢复'**
+  String get settingsMetadataBackupImportPreviewWouldApply;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewSkippedNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到'**
+  String get settingsMetadataBackupImportPreviewSkippedNotFound;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewSkippedAmbiguous.
+  ///
+  /// In zh, this message translates to:
+  /// **'歧义'**
+  String get settingsMetadataBackupImportPreviewSkippedAmbiguous;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewOrphanFacets.
+  ///
+  /// In zh, this message translates to:
+  /// **'将新增字典项'**
+  String get settingsMetadataBackupImportPreviewOrphanFacets;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmDetailsTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'详情'**
+  String get settingsMetadataBackupImportConfirmDetailsTitle;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmActionWithCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入 {count}'**
+  String settingsMetadataBackupImportConfirmActionWithCount(int count);
+
+  /// No description provided for @settingsMetadataBackupImportConfirmActionDisabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法导入'**
+  String get settingsMetadataBackupImportConfirmActionDisabled;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewMatchTierPath.
+  ///
+  /// In zh, this message translates to:
+  /// **'路径匹配'**
+  String get settingsMetadataBackupImportPreviewMatchTierPath;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewMatchTierLibraryRelative.
+  ///
+  /// In zh, this message translates to:
+  /// **'库相对路径匹配'**
+  String get settingsMetadataBackupImportPreviewMatchTierLibraryRelative;
+
+  /// No description provided for @settingsMetadataBackupExportLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出元数据'**
+  String get settingsMetadataBackupExportLabel;
+
+  /// No description provided for @settingsMetadataBackupExportDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'将 Comic 用户元数据导出为 JSON，便于外置保存'**
+  String get settingsMetadataBackupExportDescription;
+
+  /// No description provided for @settingsMetadataBackupExportDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'导出元数据'**
+  String get settingsMetadataBackupExportDialogTitle;
+
+  /// No description provided for @settingsMetadataBackupExportGzipLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'使用 gzip 压缩'**
+  String get settingsMetadataBackupExportGzipLabel;
+
+  /// No description provided for @settingsMetadataBackupExportOrphanFacetsLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'包含孤立标签与字典项'**
+  String get settingsMetadataBackupExportOrphanFacetsLabel;
+
+  /// No description provided for @settingsMetadataBackupExportCurrentLibraryLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'仅当前 Library'**
+  String get settingsMetadataBackupExportCurrentLibraryLabel;
+
+  /// No description provided for @settingsMetadataBackupExportConfirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'继续'**
+  String get settingsMetadataBackupExportConfirm;
+
+  /// No description provided for @settingsMetadataBackupExportSaveDialogTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'保存元数据备份'**
+  String get settingsMetadataBackupExportSaveDialogTitle;
+
+  /// No description provided for @settingsMetadataBackupExportSuccess.
+  ///
+  /// In zh, this message translates to:
+  /// **'元数据已导出至 {fileName}'**
+  String settingsMetadataBackupExportSuccess(String fileName);
 
   /// No description provided for @settingsDiagnosticModeLabel.
   ///
@@ -955,6 +1285,72 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'打包应用与核心日志，便于问题反馈'**
   String get settingsExportLogsDescription;
+
+  /// No description provided for @settingsClearApplicationDataLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除全部应用数据'**
+  String get settingsClearApplicationDataLabel;
+
+  /// No description provided for @settingsClearApplicationDataDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除数据库、自动元数据备份、日志与缓存；不删除库根目录中的漫画文件'**
+  String get settingsClearApplicationDataDescription;
+
+  /// No description provided for @settingsClearApplicationDataDisabledSyncRunning.
+  ///
+  /// In zh, this message translates to:
+  /// **'库同步进行中，请稍后再试'**
+  String get settingsClearApplicationDataDisabledSyncRunning;
+
+  /// No description provided for @settingsUninstallDataInfoLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'卸载与数据保留'**
+  String get settingsUninstallDataInfoLabel;
+
+  /// No description provided for @settingsUninstallDataInfoDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'卸载应用可能删除应用沙箱数据；桌面版卸载默认保留应用数据目录，也可在卸载向导中勾选删除'**
+  String get settingsUninstallDataInfoDescription;
+
+  /// No description provided for @confirmClearApplicationDataTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除全部应用数据？'**
+  String get confirmClearApplicationDataTitle;
+
+  /// No description provided for @confirmClearApplicationDataContent.
+  ///
+  /// In zh, this message translates to:
+  /// **'将删除当前应用数据目录中的全部本机状态（含 SQLite、自动元数据备份、日志与缓存），以及应用偏好设置。不会删除库根目录中的漫画文件，也不会删除您手动导出到外置目录的元数据备份。'**
+  String get confirmClearApplicationDataContent;
+
+  /// No description provided for @confirmClearApplicationDataRecentBackup.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近自动元数据备份：{timestamp}'**
+  String confirmClearApplicationDataRecentBackup(String timestamp);
+
+  /// No description provided for @confirmClearApplicationDataRecentBackupEmpty.
+  ///
+  /// In zh, this message translates to:
+  /// **'尚无自动元数据备份记录'**
+  String get confirmClearApplicationDataRecentBackupEmpty;
+
+  /// No description provided for @wipeCompleteRestartMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'应用数据已清除。请重新启动应用以完成重置。'**
+  String get wipeCompleteRestartMessage;
+
+  /// No description provided for @wipeFailedManualDeleteMessage.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法完全删除应用数据目录。请关闭应用后手动删除以下目录，然后重启应用：\n{path}'**
+  String wipeFailedManualDeleteMessage(String path);
 
   /// No description provided for @settingsAutoScanLabel.
   ///
@@ -2537,6 +2933,18 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'取消'**
   String get commonCancel;
+
+  /// No description provided for @commonToggleOn.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启'**
+  String get commonToggleOn;
+
+  /// No description provided for @commonToggleOff.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get commonToggleOff;
 
   /// No description provided for @commonSave.
   ///

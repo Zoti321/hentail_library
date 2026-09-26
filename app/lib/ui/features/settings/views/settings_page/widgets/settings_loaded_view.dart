@@ -7,6 +7,7 @@ import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_about_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_diagnostics_rows.dart';
+import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_metadata_backup_rows.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_header.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
@@ -326,6 +327,13 @@ class _SettingsDetailPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (category == SettingsCategory.metadataBackup) {
+      return MetadataBackupSettingsDetail(
+        layoutTier: layoutTier,
+        showTitle: showTitle,
+      );
+    }
+
     final AppLocalizations l10n = context.l10n;
     final ColorScheme cs = Theme.of(context).colorScheme;
     final AppThemeTokens tokens = context.tokens;
@@ -369,9 +377,12 @@ List<Widget> _detailRows({
       ThemePreferenceRow(layoutTier: layoutTier, viewportWidth: viewportWidth),
       LocalePreferenceRow(layoutTier: layoutTier, viewportWidth: viewportWidth),
     ],
+    SettingsCategory.metadataBackup => const <Widget>[],
     SettingsCategory.diagnostics => <Widget>[
       DiagnosticModeRow(layoutTier: layoutTier),
       ExportLogsRow(layoutTier: layoutTier),
+      ClearApplicationDataRow(layoutTier: layoutTier),
+      UninstallDataInfoRow(layoutTier: layoutTier),
     ],
     SettingsCategory.about => <Widget>[
       AutoUpdateRow(layoutTier: layoutTier),
@@ -383,6 +394,7 @@ List<Widget> _detailRows({
 String _categoryLabel(AppLocalizations l10n, SettingsCategory category) {
   return switch (category) {
     SettingsCategory.personalization => l10n.settingsGroupPersonalization,
+    SettingsCategory.metadataBackup => l10n.settingsGroupMetadataBackup,
     SettingsCategory.diagnostics => l10n.settingsGroupDiagnostics,
     SettingsCategory.about => l10n.settingsGroupAbout,
   };
@@ -391,6 +403,7 @@ String _categoryLabel(AppLocalizations l10n, SettingsCategory category) {
 IconData _categoryIcon(SettingsCategory category) {
   return switch (category) {
     SettingsCategory.personalization => LucideIcons.palette,
+    SettingsCategory.metadataBackup => LucideIcons.databaseBackup,
     SettingsCategory.diagnostics => LucideIcons.bug,
     SettingsCategory.about => LucideIcons.info,
   };

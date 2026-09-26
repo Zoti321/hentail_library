@@ -196,14 +196,115 @@
   "notFoundGoHome": "返回首页",
   "notFoundGoLibrary": "去漫画库",
   "settingsGroupPersonalization": "个性化",
+  "settingsGroupMetadataBackup": "元数据备份",
   "settingsGroupDiagnostics": "诊断与支持",
   "settingsGroupAbout": "关于",
+  "settingsMetadataBackupAutoGroupTitle": "自动备份",
+  "settingsMetadataBackupManualGroupTitle": "手动备份",
+  "settingsMetadataBackupAutoToggleLabel": "元数据自动备份",
+  "settingsMetadataBackupAutoToggleDescription": "在应用数据目录轮转保留 gzip 备份（默认开启）",
+  "settingsMetadataBackupStoragePathLabel": "备份目录",
+  "settingsMetadataBackupStoragePathLoading": "正在读取路径…",
+  "settingsMetadataBackupLastBackupLabel": "上次备份",
+  "settingsMetadataBackupLastBackupEmpty": "尚无自动备份",
+  "settingsMetadataBackupNowLabel": "立即备份",
+  "settingsMetadataBackupNowDescription": "立即写入 gzip 备份到应用轮转目录",
+  "settingsMetadataBackupNowSuccess": "已更新自动备份目录",
+  "settingsMetadataBackupLastBackupAt": "上次备份：{timestamp}",
+  "@settingsMetadataBackupLastBackupAt": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsMetadataBackupOpenFolderLabel": "打开备份文件夹",
+  "settingsMetadataBackupOpenFolderDescription": "在文件管理器中打开自动备份目录",
+  "settingsMetadataBackupImportLabel": "导入元数据",
+  "settingsMetadataBackupImportDescription": "从备份文件恢复 Comic 用户元数据",
+  "settingsMetadataBackupImportPickDialogTitle": "选择元数据备份文件",
+  "settingsMetadataBackupImportInvalidFile": "请选择 .hlmeta.json 或 .hlmeta.json.gz 文件",
+  "settingsMetadataBackupImportConfirmTitle": "导入元数据备份？",
+  "settingsMetadataBackupImportConfirmWarning": "匹配的 Comic 将被覆盖，且全部 Metadata field lock 将上锁；未匹配项会跳过。",
+  "settingsMetadataBackupImportConfirmAction": "导入",
+  "settingsMetadataBackupImportManifestSchema": "Schema 版本",
+  "settingsMetadataBackupImportManifestExportedAt": "导出时间",
+  "settingsMetadataBackupImportManifestComicCount": "Comic 数量",
+  "settingsMetadataBackupImportManifestAppVersion": "应用版本",
+  "settingsMetadataBackupImportRunningTitle": "正在导入元数据",
+  "settingsMetadataBackupImportRunningBody": "正在将备份应用到匹配的 Comic…",
+  "settingsMetadataBackupImportResultTitle": "导入完成",
+  "settingsMetadataBackupImportResultApplied": "已恢复",
+  "settingsMetadataBackupImportResultSkippedNotFound": "跳过（未匹配）",
+  "settingsMetadataBackupImportResultSkippedAmbiguous": "跳过（歧义）",
+  "settingsMetadataBackupImportResultErrors": "错误",
+  "settingsMetadataBackupImportPreviewRunningTitle": "正在预演匹配…",
+  "settingsMetadataBackupImportPreviewRunningBody": "正在分析备份与库内 Comic 的匹配关系…",
+  "settingsMetadataBackupImportConfirmManifestSection": "备份文件",
+  "settingsMetadataBackupImportConfirmPreviewSection": "匹配预演",
+  "settingsMetadataBackupImportPreviewWouldApply": "将恢复",
+  "settingsMetadataBackupImportPreviewSkippedNotFound": "未找到",
+  "settingsMetadataBackupImportPreviewSkippedAmbiguous": "歧义",
+  "settingsMetadataBackupImportPreviewOrphanFacets": "将新增字典项",
+  "settingsMetadataBackupImportConfirmDetailsTitle": "详情",
+  "settingsMetadataBackupImportConfirmActionWithCount": "导入 {count}",
+  "@settingsMetadataBackupImportConfirmActionWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsMetadataBackupImportConfirmActionDisabled": "无法导入",
+  "settingsMetadataBackupImportPreviewMatchTierPath": "路径匹配",
+  "settingsMetadataBackupImportPreviewMatchTierLibraryRelative": "库相对路径匹配",
+  "settingsMetadataBackupExportLabel": "导出元数据",
+  "settingsMetadataBackupExportDescription": "将 Comic 用户元数据导出为 JSON，便于外置保存",
+  "settingsMetadataBackupExportDialogTitle": "导出元数据",
+  "settingsMetadataBackupExportGzipLabel": "使用 gzip 压缩",
+  "settingsMetadataBackupExportOrphanFacetsLabel": "包含孤立标签与字典项",
+  "settingsMetadataBackupExportCurrentLibraryLabel": "仅当前 Library",
+  "settingsMetadataBackupExportConfirm": "继续",
+  "settingsMetadataBackupExportSaveDialogTitle": "保存元数据备份",
+  "settingsMetadataBackupExportSuccess": "元数据已导出至 {fileName}",
+  "@settingsMetadataBackupExportSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
   "settingsDiagnosticModeLabel": "详细诊断",
   "settingsDiagnosticModeDescriptionEnabled": "已开启：Dart 与 Rust 记录更详细日志",
   "settingsDiagnosticModeDescriptionDisabled": "临时提高日志详细程度，便于复现问题",
   "settingsDiagnosticModeEnabledBadge": "已开启",
   "settingsExportLogsLabel": "导出日志",
   "settingsExportLogsDescription": "打包应用与核心日志，便于问题反馈",
+  "settingsClearApplicationDataLabel": "清除全部应用数据",
+  "settingsClearApplicationDataDescription": "删除数据库、自动元数据备份、日志与缓存；不删除库根目录中的漫画文件",
+  "settingsClearApplicationDataDisabledSyncRunning": "库同步进行中，请稍后再试",
+  "settingsUninstallDataInfoLabel": "卸载与数据保留",
+  "settingsUninstallDataInfoDescription": "卸载应用可能删除应用沙箱数据；桌面版卸载默认保留应用数据目录，也可在卸载向导中勾选删除",
+  "confirmClearApplicationDataTitle": "清除全部应用数据？",
+  "confirmClearApplicationDataContent": "将删除当前应用数据目录中的全部本机状态（含 SQLite、自动元数据备份、日志与缓存），以及应用偏好设置。不会删除库根目录中的漫画文件，也不会删除您手动导出到外置目录的元数据备份。",
+  "confirmClearApplicationDataRecentBackup": "最近自动元数据备份：{timestamp}",
+  "@confirmClearApplicationDataRecentBackup": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmClearApplicationDataRecentBackupEmpty": "尚无自动元数据备份记录",
+  "wipeCompleteRestartMessage": "应用数据已清除。请重新启动应用以完成重置。",
+  "wipeFailedManualDeleteMessage": "无法完全删除应用数据目录。请关闭应用后手动删除以下目录，然后重启应用：\n{path}",
+  "@wipeFailedManualDeleteMessage": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
   "settingsAutoScanLabel": "自动扫描",
   "settingsSupportedFormatsDescription": "取消勾选的格式会在下次库同步时从当前本地库中移除；未同步前已入库的漫画仍可阅读。",
   "settingsSupportedFormatsGroupTitle": "格式分组",
@@ -638,6 +739,8 @@
     }
   },
   "commonCancel": "取消",
+  "commonToggleOn": "开启",
+  "commonToggleOff": "关闭",
   "commonSave": "保存",
   "commonSaveChanges": "保存更改",
   "commonClose": "关闭",

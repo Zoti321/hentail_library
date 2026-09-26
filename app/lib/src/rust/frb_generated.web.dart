@@ -14,10 +14,12 @@ import 'api/home.dart';
 import 'api/init.dart';
 import 'api/library.dart';
 import 'api/logging.dart';
+import 'api/metadata_backup.dart';
 import 'api/named_facet.dart';
 import 'api/parody.dart';
 import 'api/reader.dart';
 import 'api/series.dart';
+import 'api/shutdown.dart';
 import 'api/sync.dart';
 import 'api/tag.dart';
 import 'api/thumbnail.dart';
@@ -95,6 +97,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String dco_decode_String(dynamic raw);
 
   @protected
+  AmbiguousSampleDto dco_decode_ambiguous_sample_dto(dynamic raw);
+
+  @protected
   AuthorPagedNamesDto dco_decode_author_paged_names_dto(dynamic raw);
 
   @protected
@@ -116,10 +121,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicThumbnailDto dco_decode_box_autoadd_comic_thumbnail_dto(dynamic raw);
 
   @protected
+  ExportComicMetadataOptionsDto
+  dco_decode_box_autoadd_export_comic_metadata_options_dto(dynamic raw);
+
+  @protected
   int dco_decode_box_autoadd_i_32(dynamic raw);
 
   @protected
   PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
+
+  @protected
+  MatchTierDto dco_decode_box_autoadd_match_tier_dto(dynamic raw);
 
   @protected
   PageRequestDto dco_decode_box_autoadd_page_request_dto(dynamic raw);
@@ -187,6 +199,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicThumbnailDto dco_decode_comic_thumbnail_dto(dynamic raw);
 
   @protected
+  ExportComicMetadataOptionsDto dco_decode_export_comic_metadata_options_dto(
+    dynamic raw,
+  );
+
+  @protected
   double dco_decode_f_64(dynamic raw);
 
   @protected
@@ -208,6 +225,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 dco_decode_i_64(dynamic raw);
 
   @protected
+  ImportComicMetadataResultDto dco_decode_import_comic_metadata_result_dto(
+    dynamic raw,
+  );
+
+  @protected
   JunctionNamedFacetFrb dco_decode_junction_named_facet_frb(dynamic raw);
 
   @protected
@@ -223,6 +245,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<String> dco_decode_list_String(dynamic raw);
+
+  @protected
+  List<AmbiguousSampleDto> dco_decode_list_ambiguous_sample_dto(dynamic raw);
 
   @protected
   List<ComicDto> dco_decode_list_comic_dto(dynamic raw);
@@ -245,6 +270,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<NamedFacetFormEntryFrbDto>
   dco_decode_list_named_facet_form_entry_frb_dto(dynamic raw);
+
+  @protected
+  List<NotFoundSampleDto> dco_decode_list_not_found_sample_dto(dynamic raw);
 
   @protected
   List<int> dco_decode_list_prim_i_32_loose(dynamic raw);
@@ -282,12 +310,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<SeriesItemDto> dco_decode_list_series_item_dto(dynamic raw);
 
   @protected
+  List<WouldApplySampleDto> dco_decode_list_would_apply_sample_dto(dynamic raw);
+
+  @protected
+  MatchTierDto dco_decode_match_tier_dto(dynamic raw);
+
+  @protected
+  MetadataBackupManifestDto dco_decode_metadata_backup_manifest_dto(
+    dynamic raw,
+  );
+
+  @protected
   NamedFacetFormEntryFrbDto dco_decode_named_facet_form_entry_frb_dto(
     dynamic raw,
   );
 
   @protected
   NamedFacetPagedNamesDto dco_decode_named_facet_paged_names_dto(dynamic raw);
+
+  @protected
+  NotFoundSampleDto dco_decode_not_found_sample_dto(dynamic raw);
 
   @protected
   String? dco_decode_opt_String(dynamic raw);
@@ -308,6 +350,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
+
+  @protected
+  MatchTierDto? dco_decode_opt_box_autoadd_match_tier_dto(dynamic raw);
 
   @protected
   ReadingHistoryDto? dco_decode_opt_box_autoadd_reading_history_dto(
@@ -348,6 +393,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PagedSeriesResultDto dco_decode_paged_series_result_dto(dynamic raw);
+
+  @protected
+  PreviewImportComicMetadataResultDto
+  dco_decode_preview_import_comic_metadata_result_dto(dynamic raw);
 
   @protected
   ReaderPageDto dco_decode_reader_page_dto(dynamic raw);
@@ -465,6 +514,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt dco_decode_usize(dynamic raw);
 
   @protected
+  WouldApplySampleDto dco_decode_would_apply_sample_dto(dynamic raw);
+
+  @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
 
   @protected
@@ -531,6 +583,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
+  AmbiguousSampleDto sse_decode_ambiguous_sample_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   AuthorPagedNamesDto sse_decode_author_paged_names_dto(
     SseDeserializer deserializer,
   );
@@ -560,10 +617,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ExportComicMetadataOptionsDto
+  sse_decode_box_autoadd_export_comic_metadata_options_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   int sse_decode_box_autoadd_i_32(SseDeserializer deserializer);
 
   @protected
   PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
+
+  @protected
+  MatchTierDto sse_decode_box_autoadd_match_tier_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   PageRequestDto sse_decode_box_autoadd_page_request_dto(
@@ -651,6 +719,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ExportComicMetadataOptionsDto sse_decode_export_comic_metadata_options_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   double sse_decode_f_64(SseDeserializer deserializer);
 
   @protected
@@ -676,6 +749,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
   @protected
+  ImportComicMetadataResultDto sse_decode_import_comic_metadata_result_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   JunctionNamedFacetFrb sse_decode_junction_named_facet_frb(
     SseDeserializer deserializer,
   );
@@ -695,6 +773,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<String> sse_decode_list_String(SseDeserializer deserializer);
+
+  @protected
+  List<AmbiguousSampleDto> sse_decode_list_ambiguous_sample_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<ComicDto> sse_decode_list_comic_dto(SseDeserializer deserializer);
@@ -719,6 +802,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<NamedFacetFormEntryFrbDto>
   sse_decode_list_named_facet_form_entry_frb_dto(SseDeserializer deserializer);
+
+  @protected
+  List<NotFoundSampleDto> sse_decode_list_not_found_sample_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<int> sse_decode_list_prim_i_32_loose(SseDeserializer deserializer);
@@ -760,12 +848,30 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<WouldApplySampleDto> sse_decode_list_would_apply_sample_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  MatchTierDto sse_decode_match_tier_dto(SseDeserializer deserializer);
+
+  @protected
+  MetadataBackupManifestDto sse_decode_metadata_backup_manifest_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   NamedFacetFormEntryFrbDto sse_decode_named_facet_form_entry_frb_dto(
     SseDeserializer deserializer,
   );
 
   @protected
   NamedFacetPagedNamesDto sse_decode_named_facet_paged_names_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  NotFoundSampleDto sse_decode_not_found_sample_dto(
     SseDeserializer deserializer,
   );
 
@@ -788,6 +894,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
+
+  @protected
+  MatchTierDto? sse_decode_opt_box_autoadd_match_tier_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   ReadingHistoryDto? sse_decode_opt_box_autoadd_reading_history_dto(
@@ -838,6 +949,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PagedSeriesResultDto sse_decode_paged_series_result_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  PreviewImportComicMetadataResultDto
+  sse_decode_preview_import_comic_metadata_result_dto(
     SseDeserializer deserializer,
   );
 
@@ -995,6 +1112,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt sse_decode_usize(SseDeserializer deserializer);
 
   @protected
+  WouldApplySampleDto sse_decode_would_apply_sample_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   void sse_encode_AnyhowException(
     AnyhowException self,
     SseSerializer serializer,
@@ -1073,6 +1195,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
+  void sse_encode_ambiguous_sample_dto(
+    AmbiguousSampleDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_author_paged_names_dto(
     AuthorPagedNamesDto self,
     SseSerializer serializer,
@@ -1109,11 +1237,23 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_export_comic_metadata_options_dto(
+    ExportComicMetadataOptionsDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_i_64(
     PlatformInt64 self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_match_tier_dto(
+    MatchTierDto self,
     SseSerializer serializer,
   );
 
@@ -1223,6 +1363,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_export_comic_metadata_options_dto(
+    ExportComicMetadataOptionsDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_f_64(double self, SseSerializer serializer);
 
   @protected
@@ -1256,6 +1402,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
   @protected
+  void sse_encode_import_comic_metadata_result_dto(
+    ImportComicMetadataResultDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_junction_named_facet_frb(
     JunctionNamedFacetFrb self,
     SseSerializer serializer,
@@ -1278,6 +1430,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_list_String(List<String> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_ambiguous_sample_dto(
+    List<AmbiguousSampleDto> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_comic_dto(List<ComicDto> self, SseSerializer serializer);
@@ -1309,6 +1467,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_named_facet_form_entry_frb_dto(
     List<NamedFacetFormEntryFrbDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_not_found_sample_dto(
+    List<NotFoundSampleDto> self,
     SseSerializer serializer,
   );
 
@@ -1370,6 +1534,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_would_apply_sample_dto(
+    List<WouldApplySampleDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_match_tier_dto(MatchTierDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_metadata_backup_manifest_dto(
+    MetadataBackupManifestDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_named_facet_form_entry_frb_dto(
     NamedFacetFormEntryFrbDto self,
     SseSerializer serializer,
@@ -1378,6 +1557,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_named_facet_paged_names_dto(
     NamedFacetPagedNamesDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_not_found_sample_dto(
+    NotFoundSampleDto self,
     SseSerializer serializer,
   );
 
@@ -1405,6 +1590,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_i_64(
     PlatformInt64? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_match_tier_dto(
+    MatchTierDto? self,
     SseSerializer serializer,
   );
 
@@ -1468,6 +1659,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_paged_series_result_dto(
     PagedSeriesResultDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_preview_import_comic_metadata_result_dto(
+    PreviewImportComicMetadataResultDto self,
     SseSerializer serializer,
   );
 
@@ -1659,6 +1856,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_would_apply_sample_dto(
+    WouldApplySampleDto self,
+    SseSerializer serializer,
+  );
 }
 
 // Section: wire_class

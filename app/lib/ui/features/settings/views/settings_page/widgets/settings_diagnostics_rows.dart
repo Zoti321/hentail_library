@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/core/app_data/app_data_wipe_flow.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/core/logging/log_export_flow.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
@@ -7,6 +8,7 @@ import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/ui/features/settings/view_models/diagnostic_mode_notifier.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_layout_constants.dart';
 import 'package:hentai_library/ui/features/settings/views/settings_page/widgets/settings_page_primitives.dart';
+import 'package:hentai_library/ui/features/shell/view_models/scan_library_controller.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class DiagnosticModeRow extends ConsumerWidget {
@@ -88,6 +90,58 @@ class ExportLogsRow extends ConsumerWidget {
         size: 16,
         color: theme.colorScheme.hentai.iconSecondary,
       ),
+    );
+  }
+}
+
+class ClearApplicationDataRow extends ConsumerWidget {
+  const ClearApplicationDataRow({required this.layoutTier, super.key});
+
+  final SettingsLayoutTier layoutTier;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ThemeData theme = Theme.of(context);
+    final l10n = context.l10n;
+    final bool syncRunning = ref.watch(
+      scanLibraryControllerProvider.select((state) => state.running),
+    );
+    return SettingsRow(
+      layoutTier: layoutTier,
+      isDestructive: true,
+      icon: Icon(LucideIcons.trash2, size: 20, color: theme.colorScheme.error),
+      label: l10n.settingsClearApplicationDataLabel,
+      description: syncRunning
+          ? l10n.settingsClearApplicationDataDisabledSyncRunning
+          : l10n.settingsClearApplicationDataDescription,
+      onRowTap: syncRunning ? null : () => runAppDataWipeFlow(context),
+      action: Icon(
+        LucideIcons.chevronRight,
+        size: 16,
+        color: theme.colorScheme.hentai.iconSecondary,
+      ),
+    );
+  }
+}
+
+class UninstallDataInfoRow extends ConsumerWidget {
+  const UninstallDataInfoRow({required this.layoutTier, super.key});
+
+  final SettingsLayoutTier layoutTier;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ThemeData theme = Theme.of(context);
+    final l10n = context.l10n;
+    return SettingsRow(
+      layoutTier: layoutTier,
+      icon: Icon(
+        LucideIcons.info,
+        size: 20,
+        color: theme.colorScheme.hentai.iconDefault,
+      ),
+      label: l10n.settingsUninstallDataInfoLabel,
+      description: l10n.settingsUninstallDataInfoDescription,
     );
   }
 }

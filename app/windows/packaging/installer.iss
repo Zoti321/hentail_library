@@ -50,3 +50,45 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "启动 {#MyAppName}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+var
+  DeleteUserDataCheckBox: TNewCheckBox;
+  DeleteUserDataHintLabel: TNewStaticText;
+
+procedure InitializeUninstallProgressForm();
+begin
+  DeleteUserDataHintLabel := TNewStaticText.Create(UninstallProgressForm);
+  DeleteUserDataHintLabel.Parent := UninstallProgressForm;
+  DeleteUserDataHintLabel.Caption := '请先关闭应用以确保数据完全删除。';
+  DeleteUserDataHintLabel.Left := ScaleX(8);
+  DeleteUserDataHintLabel.Top := UninstallProgressForm.ProgressBar.Top + ScaleY(24);
+  DeleteUserDataHintLabel.Width := UninstallProgressForm.Width - ScaleX(16);
+  DeleteUserDataHintLabel.AutoSize := False;
+  DeleteUserDataHintLabel.WordWrap := True;
+
+  DeleteUserDataCheckBox := TNewCheckBox.Create(UninstallProgressForm);
+  DeleteUserDataCheckBox.Parent := UninstallProgressForm;
+  DeleteUserDataCheckBox.Caption := '同时删除用户数据（数据库、元数据备份、日志与缓存）';
+  DeleteUserDataCheckBox.Left := ScaleX(8);
+  DeleteUserDataCheckBox.Top := DeleteUserDataHintLabel.Top + ScaleY(28);
+  DeleteUserDataCheckBox.Width := UninstallProgressForm.Width - ScaleX(16);
+  DeleteUserDataCheckBox.Checked := False;
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+var
+  UserDataDir: String;
+begin
+  if CurUninstallStep = usPostUninstall then
+  begin
+    if DeleteUserDataCheckBox.Checked then
+    begin
+      UserDataDir := ExpandConstant('{userappdata}\com.example\hentai_library');
+      if DirExists(UserDataDir) then
+      begin
+        DelTree(UserDataDir, True, True, True);
+      end;
+    end;
+  end;
+end;
