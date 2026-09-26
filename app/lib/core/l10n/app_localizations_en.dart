@@ -600,6 +600,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsMetadataBackupImportResultErrors => 'Errors';
 
   @override
+  String get settingsMetadataBackupImportPreviewRunningTitle =>
+      'Previewing matches';
+
+  @override
+  String get settingsMetadataBackupImportPreviewRunningBody =>
+      'Analyzing how backup entries match Comics in your library…';
+
+  @override
+  String get settingsMetadataBackupImportConfirmManifestSection =>
+      'Backup file';
+
+  @override
+  String get settingsMetadataBackupImportConfirmPreviewSection =>
+      'Match preview';
+
+  @override
+  String get settingsMetadataBackupImportPreviewWouldApply => 'Will restore';
+
+  @override
+  String get settingsMetadataBackupImportPreviewSkippedNotFound => 'Not found';
+
+  @override
+  String get settingsMetadataBackupImportPreviewSkippedAmbiguous => 'Ambiguous';
+
+  @override
+  String get settingsMetadataBackupImportPreviewOrphanFacets =>
+      'New dictionary entries';
+
+  @override
+  String get settingsMetadataBackupImportConfirmDetailsTitle => 'Details';
+
+  @override
+  String settingsMetadataBackupImportConfirmActionWithCount(int count) {
+    return 'Import $count';
+  }
+
+  @override
+  String get settingsMetadataBackupImportConfirmActionDisabled =>
+      'Cannot import';
+
+  @override
+  String get settingsMetadataBackupImportPreviewMatchTierPath =>
+      'Matched by path';
+
+  @override
+  String get settingsMetadataBackupImportPreviewMatchTierLibraryRelative =>
+      'Matched by library-relative path';
+
+  @override
   String get settingsMetadataBackupExportLabel => 'Export metadata';
 
   @override

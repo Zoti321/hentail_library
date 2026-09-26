@@ -7,7 +7,7 @@ import '../frb_generated.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `from`, `from`
 
 Uint8List exportComicMetadataFrb({
   required ExportComicMetadataOptionsDto options,
@@ -21,11 +21,48 @@ MetadataBackupManifestDto peekMetadataBackupManifestFrb({
   bytes: bytes,
 );
 
+PreviewImportComicMetadataResultDto previewImportComicMetadataFrb({
+  required List<int> bytes,
+}) => RustLib.instance.api.crateApiMetadataBackupPreviewImportComicMetadataFrb(
+  bytes: bytes,
+);
+
 ImportComicMetadataResultDto importComicMetadataFrb({
   required List<int> bytes,
 }) => RustLib.instance.api.crateApiMetadataBackupImportComicMetadataFrb(
   bytes: bytes,
 );
+
+class AmbiguousSampleDto {
+  final String comicId;
+  final String path;
+  final String title;
+  final List<String> candidateComicIds;
+
+  const AmbiguousSampleDto({
+    required this.comicId,
+    required this.path,
+    required this.title,
+    required this.candidateComicIds,
+  });
+
+  @override
+  int get hashCode =>
+      comicId.hashCode ^
+      path.hashCode ^
+      title.hashCode ^
+      candidateComicIds.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AmbiguousSampleDto &&
+          runtimeType == other.runtimeType &&
+          comicId == other.comicId &&
+          path == other.path &&
+          title == other.title &&
+          candidateComicIds == other.candidateComicIds;
+}
 
 class ExportComicMetadataOptionsDto {
   final String? libraryId;
@@ -79,6 +116,8 @@ class ImportComicMetadataResultDto {
           errors == other.errors;
 }
 
+enum MatchTierDto { path, libraryRelative }
+
 class MetadataBackupManifestDto {
   final int schemaVersion;
   final String exportedAt;
@@ -116,4 +155,106 @@ class MetadataBackupManifestDto {
           comicCount == other.comicCount &&
           includeOrphanFacets == other.includeOrphanFacets &&
           libraryId == other.libraryId;
+}
+
+class NotFoundSampleDto {
+  final String comicId;
+  final String path;
+  final String title;
+
+  const NotFoundSampleDto({
+    required this.comicId,
+    required this.path,
+    required this.title,
+  });
+
+  @override
+  int get hashCode => comicId.hashCode ^ path.hashCode ^ title.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NotFoundSampleDto &&
+          runtimeType == other.runtimeType &&
+          comicId == other.comicId &&
+          path == other.path &&
+          title == other.title;
+}
+
+class PreviewImportComicMetadataResultDto {
+  final int wouldApply;
+  final int skippedNotFound;
+  final int skippedAmbiguous;
+  final int wouldUpsertOrphanFacetCount;
+  final List<WouldApplySampleDto> samplesWouldApply;
+  final List<NotFoundSampleDto> samplesNotFound;
+  final List<AmbiguousSampleDto> samplesAmbiguous;
+
+  const PreviewImportComicMetadataResultDto({
+    required this.wouldApply,
+    required this.skippedNotFound,
+    required this.skippedAmbiguous,
+    required this.wouldUpsertOrphanFacetCount,
+    required this.samplesWouldApply,
+    required this.samplesNotFound,
+    required this.samplesAmbiguous,
+  });
+
+  @override
+  int get hashCode =>
+      wouldApply.hashCode ^
+      skippedNotFound.hashCode ^
+      skippedAmbiguous.hashCode ^
+      wouldUpsertOrphanFacetCount.hashCode ^
+      samplesWouldApply.hashCode ^
+      samplesNotFound.hashCode ^
+      samplesAmbiguous.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PreviewImportComicMetadataResultDto &&
+          runtimeType == other.runtimeType &&
+          wouldApply == other.wouldApply &&
+          skippedNotFound == other.skippedNotFound &&
+          skippedAmbiguous == other.skippedAmbiguous &&
+          wouldUpsertOrphanFacetCount == other.wouldUpsertOrphanFacetCount &&
+          samplesWouldApply == other.samplesWouldApply &&
+          samplesNotFound == other.samplesNotFound &&
+          samplesAmbiguous == other.samplesAmbiguous;
+}
+
+class WouldApplySampleDto {
+  final String comicId;
+  final String path;
+  final String title;
+  final String matchedComicId;
+  final MatchTierDto? matchTier;
+
+  const WouldApplySampleDto({
+    required this.comicId,
+    required this.path,
+    required this.title,
+    required this.matchedComicId,
+    this.matchTier,
+  });
+
+  @override
+  int get hashCode =>
+      comicId.hashCode ^
+      path.hashCode ^
+      title.hashCode ^
+      matchedComicId.hashCode ^
+      matchTier.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is WouldApplySampleDto &&
+          runtimeType == other.runtimeType &&
+          comicId == other.comicId &&
+          path == other.path &&
+          title == other.title &&
+          matchedComicId == other.matchedComicId &&
+          matchTier == other.matchTier;
 }

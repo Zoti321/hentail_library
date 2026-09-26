@@ -51,8 +51,10 @@ pub use home::{
 };
 pub use metadata_backup::{
     export_comic_metadata, import_comic_metadata, peek_metadata_backup_manifest,
-    ExportComicMetadataOptions, ImportComicMetadataResult, MetadataBackupManifest,
-    MetadataBackupPayload, SCHEMA_VERSION,
+    preview_import_comic_metadata, AmbiguousSample, ComicExportRecord, ComicMetaExportRecord,
+    ExportComicMetadataOptions, ExportOptionsRecord, ImportComicMetadataResult, ImportPlan,
+    MatchTier, MetadataBackupManifest, MetadataBackupPayload, NotFoundSample, OrphanFacetsRecord,
+    SCHEMA_VERSION, WouldApplySample,
 };
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,

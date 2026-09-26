@@ -212,6 +212,18 @@ _Avoid_: 只读标记、冻结、保护位（口语可用，领域用 Metadata f
 从 Resource 重解析元数据并按 Metadata field lock 写回的操作（对齐 Komga「Refresh metadata」），作用对象可为单个 Comic、单个 Series，或指定 Library（侧栏该库的 `libraryId`，可非 Current library，且不切换 Current）。Comic：经 Resource access 重解析，更新物理字段，不动缩略图。Series：对每个成员执行 Comic 刷新，并在 `name` 未锁定时用文件夹名覆盖；不改连载状态、计划总卷数、成员排序与缩略图。Library：对该库全部 Comic 执行 Comic 刷新，并对该库 Series 在 `name` 未锁定时用文件夹名覆盖（其余 Series 字段规则同 Series 级）。部分成员失败则跳过并汇总；可取消（已写回保留、不回滚）。Remote library 根不可达时跳过该库且不改已有数据。与 Library sync 共用 core 库级写锁（全局单飞，占用则立即失败不排队）；互斥不在 Flutter 编排层重复实现。UI 不展示实时进度，仅 busy 态与结束汇总。不是库页工具栏的「刷新」（后者仅重载 UI catalog），也不是 Library sync（不 orphan 删除、不重建成员排序、不再生缩略图）。
 _Avoid_: 刷新、重新扫描、同步（易与 UI catalog refresh / Library sync 混淆）
 
+**Metadata backup**:
+Comic 用户元数据（含 Metadata field lock 状态与 orphan 字典项）的 JSON 快照文件（`.hlmeta.json` / `.hlmeta.json.gz`），由用户手动导出或自动备份产生，用于外置保存与跨库恢复。
+_Avoid_: 元数据导出文件（口语可用，领域与 UI 用 Metadata backup）
+
+**Metadata backup import**:
+从 Metadata backup 文件恢复 Comic 用户元数据的手动操作：按三级匹配（comic_id → normalized_path → library_id+relative_path）定位库内 Comic，匹配成功则覆盖元数据并强制全部 Metadata field lock；未匹配或歧义项跳过。设置页单行入口。
+_Avoid_: 导入备份、dry-run（用户文案不用；代码内部可用 preview）
+
+**Metadata backup import preview**:
+Metadata backup import 写入前的只读预演：执行与 import 相同的匹配规划，返回将恢复 / 未找到 / 歧义计数与示例摘要，不写入 SQLite（含 orphan 字典项）。确认 dialog 展示预演结果后再决定是否 import。
+_Avoid_: dry-run（用户文案用「导入预演」）
+
 **Healthy mode**:
 应用级浏览过滤：开启后库、搜索、历史等视图隐藏 `contentRating == r18` 的 Comic；不修改 Comic 自身的分级。
 _Avoid_: 安全模式、青少年模式、R18 过滤

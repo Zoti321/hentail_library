@@ -5,8 +5,9 @@ mod types;
 
 pub use export::{export_comic_metadata, ExportComicMetadataOptions};
 pub use import::{
-    import_comic_metadata, peek_metadata_backup_manifest, ImportComicMetadataResult,
-    MetadataBackupManifest,
+    import_comic_metadata, peek_metadata_backup_manifest, preview_import_comic_metadata,
+    AmbiguousSample, ImportComicMetadataResult, ImportPlan, MatchTier, MetadataBackupManifest,
+    NotFoundSample, WouldApplySample,
 };
 pub use types::{
     ComicExportRecord, ComicMetaExportRecord, ExportOptionsRecord, MetadataBackupPayload,

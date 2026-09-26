@@ -21,6 +21,13 @@ class MetadataBackupFrbAdapter {
     );
   }
 
+  PreviewImportComicMetadataResultDto preview({required Uint8List bytes}) {
+    return guardFrbSync(
+      () => previewImportComicMetadataFrb(bytes: bytes),
+      fallbackMessage: '元数据导入预演失败',
+    );
+  }
+
   ImportComicMetadataResultDto import({required Uint8List bytes}) {
     return guardFrbSync(
       () => importComicMetadataFrb(bytes: bytes),

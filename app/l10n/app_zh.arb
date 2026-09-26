@@ -238,6 +238,26 @@
   "settingsMetadataBackupImportResultSkippedNotFound": "跳过（未匹配）",
   "settingsMetadataBackupImportResultSkippedAmbiguous": "跳过（歧义）",
   "settingsMetadataBackupImportResultErrors": "错误",
+  "settingsMetadataBackupImportPreviewRunningTitle": "正在预演匹配…",
+  "settingsMetadataBackupImportPreviewRunningBody": "正在分析备份与库内 Comic 的匹配关系…",
+  "settingsMetadataBackupImportConfirmManifestSection": "备份文件",
+  "settingsMetadataBackupImportConfirmPreviewSection": "匹配预演",
+  "settingsMetadataBackupImportPreviewWouldApply": "将恢复",
+  "settingsMetadataBackupImportPreviewSkippedNotFound": "未找到",
+  "settingsMetadataBackupImportPreviewSkippedAmbiguous": "歧义",
+  "settingsMetadataBackupImportPreviewOrphanFacets": "将新增字典项",
+  "settingsMetadataBackupImportConfirmDetailsTitle": "详情",
+  "settingsMetadataBackupImportConfirmActionWithCount": "导入 {count}",
+  "@settingsMetadataBackupImportConfirmActionWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsMetadataBackupImportConfirmActionDisabled": "无法导入",
+  "settingsMetadataBackupImportPreviewMatchTierPath": "路径匹配",
+  "settingsMetadataBackupImportPreviewMatchTierLibraryRelative": "库相对路径匹配",
   "settingsMetadataBackupExportLabel": "导出元数据",
   "settingsMetadataBackupExportDescription": "将 Comic 用户元数据导出为 JSON，便于外置保存",
   "settingsMetadataBackupExportDialogTitle": "导出元数据",

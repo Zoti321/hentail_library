@@ -238,6 +238,26 @@
   "settingsMetadataBackupImportResultSkippedNotFound": "Skipped (not found)",
   "settingsMetadataBackupImportResultSkippedAmbiguous": "Skipped (ambiguous)",
   "settingsMetadataBackupImportResultErrors": "Errors",
+  "settingsMetadataBackupImportPreviewRunningTitle": "Previewing matches",
+  "settingsMetadataBackupImportPreviewRunningBody": "Analyzing how backup entries match Comics in your library…",
+  "settingsMetadataBackupImportConfirmManifestSection": "Backup file",
+  "settingsMetadataBackupImportConfirmPreviewSection": "Match preview",
+  "settingsMetadataBackupImportPreviewWouldApply": "Will restore",
+  "settingsMetadataBackupImportPreviewSkippedNotFound": "Not found",
+  "settingsMetadataBackupImportPreviewSkippedAmbiguous": "Ambiguous",
+  "settingsMetadataBackupImportPreviewOrphanFacets": "New dictionary entries",
+  "settingsMetadataBackupImportConfirmDetailsTitle": "Details",
+  "settingsMetadataBackupImportConfirmActionWithCount": "Import {count}",
+  "@settingsMetadataBackupImportConfirmActionWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsMetadataBackupImportConfirmActionDisabled": "Cannot import",
+  "settingsMetadataBackupImportPreviewMatchTierPath": "Matched by path",
+  "settingsMetadataBackupImportPreviewMatchTierLibraryRelative": "Matched by library-relative path",
   "settingsMetadataBackupExportLabel": "Export metadata",
   "settingsMetadataBackupExportDescription": "Save Comic user metadata as JSON for off-device safekeeping",
   "settingsMetadataBackupExportDialogTitle": "Export metadata",

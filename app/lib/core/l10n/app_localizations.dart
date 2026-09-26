@@ -1118,6 +1118,84 @@ abstract class AppLocalizations {
   /// **'错误'**
   String get settingsMetadataBackupImportResultErrors;
 
+  /// No description provided for @settingsMetadataBackupImportPreviewRunningTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在预演匹配…'**
+  String get settingsMetadataBackupImportPreviewRunningTitle;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewRunningBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在分析备份与库内 Comic 的匹配关系…'**
+  String get settingsMetadataBackupImportPreviewRunningBody;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmManifestSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'备份文件'**
+  String get settingsMetadataBackupImportConfirmManifestSection;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmPreviewSection.
+  ///
+  /// In zh, this message translates to:
+  /// **'匹配预演'**
+  String get settingsMetadataBackupImportConfirmPreviewSection;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewWouldApply.
+  ///
+  /// In zh, this message translates to:
+  /// **'将恢复'**
+  String get settingsMetadataBackupImportPreviewWouldApply;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewSkippedNotFound.
+  ///
+  /// In zh, this message translates to:
+  /// **'未找到'**
+  String get settingsMetadataBackupImportPreviewSkippedNotFound;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewSkippedAmbiguous.
+  ///
+  /// In zh, this message translates to:
+  /// **'歧义'**
+  String get settingsMetadataBackupImportPreviewSkippedAmbiguous;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewOrphanFacets.
+  ///
+  /// In zh, this message translates to:
+  /// **'将新增字典项'**
+  String get settingsMetadataBackupImportPreviewOrphanFacets;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmDetailsTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'详情'**
+  String get settingsMetadataBackupImportConfirmDetailsTitle;
+
+  /// No description provided for @settingsMetadataBackupImportConfirmActionWithCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'导入 {count}'**
+  String settingsMetadataBackupImportConfirmActionWithCount(int count);
+
+  /// No description provided for @settingsMetadataBackupImportConfirmActionDisabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'无法导入'**
+  String get settingsMetadataBackupImportConfirmActionDisabled;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewMatchTierPath.
+  ///
+  /// In zh, this message translates to:
+  /// **'路径匹配'**
+  String get settingsMetadataBackupImportPreviewMatchTierPath;
+
+  /// No description provided for @settingsMetadataBackupImportPreviewMatchTierLibraryRelative.
+  ///
+  /// In zh, this message translates to:
+  /// **'库相对路径匹配'**
+  String get settingsMetadataBackupImportPreviewMatchTierLibraryRelative;
+
   /// No description provided for @settingsMetadataBackupExportLabel.
   ///
   /// In zh, this message translates to:

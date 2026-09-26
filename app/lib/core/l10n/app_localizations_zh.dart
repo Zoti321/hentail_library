@@ -575,6 +575,49 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsMetadataBackupImportResultErrors => '错误';
 
   @override
+  String get settingsMetadataBackupImportPreviewRunningTitle => '正在预演匹配…';
+
+  @override
+  String get settingsMetadataBackupImportPreviewRunningBody =>
+      '正在分析备份与库内 Comic 的匹配关系…';
+
+  @override
+  String get settingsMetadataBackupImportConfirmManifestSection => '备份文件';
+
+  @override
+  String get settingsMetadataBackupImportConfirmPreviewSection => '匹配预演';
+
+  @override
+  String get settingsMetadataBackupImportPreviewWouldApply => '将恢复';
+
+  @override
+  String get settingsMetadataBackupImportPreviewSkippedNotFound => '未找到';
+
+  @override
+  String get settingsMetadataBackupImportPreviewSkippedAmbiguous => '歧义';
+
+  @override
+  String get settingsMetadataBackupImportPreviewOrphanFacets => '将新增字典项';
+
+  @override
+  String get settingsMetadataBackupImportConfirmDetailsTitle => '详情';
+
+  @override
+  String settingsMetadataBackupImportConfirmActionWithCount(int count) {
+    return '导入 $count';
+  }
+
+  @override
+  String get settingsMetadataBackupImportConfirmActionDisabled => '无法导入';
+
+  @override
+  String get settingsMetadataBackupImportPreviewMatchTierPath => '路径匹配';
+
+  @override
+  String get settingsMetadataBackupImportPreviewMatchTierLibraryRelative =>
+      '库相对路径匹配';
+
+  @override
   String get settingsMetadataBackupExportLabel => '导出元数据';
 
   @override
