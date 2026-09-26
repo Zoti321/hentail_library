@@ -538,6 +538,7 @@ jobs:
             -f "target_commitish=${GITHUB_SHA}" \
             --jq .body)"
           normalized_bullets="$(printf '%s\n' "${generated}" | bash scripts/normalize-changelog-bullets.sh)"
+          generated_footer="$(printf '%s\n' "${generated}" | bash scripts/strip-changelog-bullets.sh)"
           ios_notice="> **iOS：** \`ios-arm64-nosign\` 为未签名包，无法直接安装到设备，仅供验证 CI 构建。"
           windows_notice="> **Windows：** 安装包与 portable zip 内 exe 已 Authenticode 签名（CI 自签证书）。SmartScreen 仍可能提示未知发布者；可选配置 Secrets \`WINDOWS_CODESIGN_PFX_BASE64\` / \`WINDOWS_CODESIGN_PFX_PASSWORD\` 复用同一自签 PFX。"
           {
@@ -552,7 +553,7 @@ jobs:
             fi
             printf '%s\n\n' "${ios_notice}"
             printf '%s\n\n' "${windows_notice}"
-            printf '%s\n' "${generated}"
+            printf '%s\n' "${generated_footer}"
           } > release_body.md
 
       - name: Run GitHub Release publish

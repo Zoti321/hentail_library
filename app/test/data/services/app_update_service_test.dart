@@ -98,6 +98,26 @@ void main() {
       );
     });
 
+    test('composed release body keeps bullets only under 更新内容', () {
+      const String body = '''
+## 更新内容
+- 集成 #111–#113：Path migration、Named facet 续载与 Auto-play
+
+> **iOS：** notice
+
+## What's Changed
+
+**Full Changelog**: https://github.com/Zoti321/hentail_library/compare/v0.2.5...v0.2.6
+''';
+
+      expect(
+        service.parseReleaseNotes(body),
+        <String>[
+          '集成 #111–#113：Path migration、Named facet 续载与 Auto-play',
+        ],
+      );
+    });
+
     test('ignores tables, headings, and blockquotes without list markers', () {
       const String body = '''
 ## Build status
