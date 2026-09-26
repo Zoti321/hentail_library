@@ -9,8 +9,10 @@ import 'package:hentai_library/core/logging/app_log.dart';
 import 'package:hentai_library/core/metadata/metadata_backup_bytes.dart';
 import 'package:hentai_library/data/adapters/metadata_backup_frb_adapter.dart';
 import 'package:hentai_library/src/rust/api/metadata_backup.dart';
+import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/hentai_dialog.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 typedef MetadataPeekInvoker =
     MetadataBackupManifestDto Function(Uint8List bytes);
@@ -239,18 +241,14 @@ class _MetadataImportConfirmDialogState extends State<MetadataImportConfirmDialo
           ),
           if (_hasPreviewDetails(preview)) ...<Widget>[
             const SizedBox(height: 8),
-            Theme(
-              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-              child: ExpansionTile(
-                tilePadding: EdgeInsets.zero,
-                initiallyExpanded: _detailsExpanded,
-                onExpansionChanged: (bool expanded) {
-                  setState(() => _detailsExpanded = expanded);
-                },
-                title: Text(
-                  l10n.settingsMetadataBackupImportConfirmDetailsTitle,
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
+            _MetadataImportDetailsAccordion(
+              expanded: _detailsExpanded,
+              title: l10n.settingsMetadataBackupImportConfirmDetailsTitle,
+              onExpandedChanged: (bool expanded) {
+                setState(() => _detailsExpanded = expanded);
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   for (final WouldApplySampleDto sample
                       in preview.samplesWouldApply)
@@ -369,6 +367,77 @@ class MetadataImportResultDialog extends StatelessWidget {
         FilledButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l10n.commonOk),
+        ),
+      ],
+    );
+  }
+}
+
+/// 详情折叠区：避免 Material [ExpansionTile] 在 Windows 上触发
+/// `SemanticsService.sendAnnouncement` 回归（Flutter #179563）。
+class _MetadataImportDetailsAccordion extends StatelessWidget {
+  const _MetadataImportDetailsAccordion({
+    required this.expanded,
+    required this.title,
+    required this.onExpandedChanged,
+    required this.child,
+  });
+
+  final bool expanded;
+  final String title;
+  final ValueChanged<bool> onExpandedChanged;
+  final Widget child;
+
+  static const Duration _duration = Duration(milliseconds: 200);
+  static const Curve _curve = Curves.easeOutCubic;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final AppThemeTokens tokens = context.tokens;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => onExpandedChanged(!expanded),
+            hoverColor: theme.hoverColor,
+            splashColor: theme.splashColor,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: tokens.spacing.sm),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  AnimatedRotation(
+                    turns: expanded ? 0.5 : 0,
+                    duration: _duration,
+                    curve: _curve,
+                    child: Icon(
+                      LucideIcons.chevronDown,
+                      size: 16,
+                      color: cs.hentai.iconSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        AnimatedSize(
+          duration: _duration,
+          curve: _curve,
+          alignment: Alignment.topCenter,
+          child: expanded ? child : const SizedBox.shrink(),
         ),
       ],
     );
