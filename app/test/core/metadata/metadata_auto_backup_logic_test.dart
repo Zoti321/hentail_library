@@ -55,9 +55,7 @@ void main() {
           '${tempDir.path}/$metadataBackupFilePrefix$index$metadataBackupExtension',
         );
         file.writeAsStringSync('backup-$index');
-        file.setLastModifiedSync(
-          DateTime(2026, 1, 1, 12, 0, index),
-        );
+        file.setLastModifiedSync(DateTime(2026, 1, 1, 12, 0, index));
       }
 
       pruneMetadataBackupFiles(tempDir.path, maxFiles: 3);

@@ -93,20 +93,13 @@ fn create_snapshot(source: &Path, snapshot_dir: &Path) -> Result<PathBuf, Hentai
     let dest = snapshot_dir.join(snapshot_file_name());
     {
         let src_conn = Connection::open(source).map_err(|err| {
-            HentaiError::validation(format!(
-                "无法打开源数据库 {}: {err}",
-                source.display()
-            ))
+            HentaiError::validation(format!("无法打开源数据库 {}: {err}", source.display()))
         })?;
         let mut dest_conn = Connection::open(&dest).map_err(|err| {
-            HentaiError::validation(format!(
-                "无法创建快照文件 {}: {err}",
-                dest.display()
-            ))
+            HentaiError::validation(format!("无法创建快照文件 {}: {err}", dest.display()))
         })?;
-        let backup = rusqlite::backup::Backup::new(&src_conn, &mut dest_conn).map_err(|err| {
-            HentaiError::validation(format!("SQLite backup 初始化失败: {err}"))
-        })?;
+        let backup = rusqlite::backup::Backup::new(&src_conn, &mut dest_conn)
+            .map_err(|err| HentaiError::validation(format!("SQLite backup 初始化失败: {err}")))?;
         backup
             .run_to_completion(512, std::time::Duration::from_millis(100), None)
             .map_err(|err| HentaiError::validation(format!("SQLite backup 失败: {err}")))?;
@@ -127,9 +120,7 @@ fn snapshot_file_name() -> String {
     let minutes = (day_seconds % 3_600) / 60;
     let seconds = day_seconds % 60;
     let (year, month, day) = civil_from_days(days as i64);
-    format!(
-        "snapshot-{year:04}{month:02}{day:02}-{hours:02}{minutes:02}{seconds:02}.sqlite"
-    )
+    format!("snapshot-{year:04}{month:02}{day:02}-{hours:02}{minutes:02}{seconds:02}.sqlite")
 }
 
 fn prune_old_snapshots(snapshot_dir: &Path, max_files: usize) -> Result<(), HentaiError> {
@@ -140,9 +131,8 @@ fn prune_old_snapshots(snapshot_dir: &Path, max_files: usize) -> Result<(), Hent
             snapshot_dir.display()
         ))
     })? {
-        let entry = entry.map_err(|err| {
-            HentaiError::validation(format!("读取快照目录项失败: {err}"))
-        })?;
+        let entry =
+            entry.map_err(|err| HentaiError::validation(format!("读取快照目录项失败: {err}")))?;
         let path = entry.path();
         if path.is_file()
             && path
@@ -194,8 +184,10 @@ mod tests {
         let source = temp.path().join("source.sqlite");
         {
             let conn = Connection::open(&source).expect("open source");
-            conn.execute_batch("PRAGMA foreign_keys = ON; CREATE TABLE t (id INTEGER PRIMARY KEY);")
-                .expect("seed");
+            conn.execute_batch(
+                "PRAGMA foreign_keys = ON; CREATE TABLE t (id INTEGER PRIMARY KEY);",
+            )
+            .expect("seed");
         }
         let snapshot_path = create_snapshot(&source, temp.path()).expect("snapshot");
         assert!(snapshot_path.exists());

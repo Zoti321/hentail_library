@@ -30,9 +30,8 @@ Future<void> runAppDataWipeFlow(
   final bool confirmed =
       await showDialog<bool>(
         context: context,
-        builder: (BuildContext context) => ClearApplicationDataConfirmDialog(
-          recentBackupAt: recentBackupAt,
-        ),
+        builder: (BuildContext context) =>
+            ClearApplicationDataConfirmDialog(recentBackupAt: recentBackupAt),
       ) ??
       false;
   if (!confirmed || !context.mounted) {
@@ -117,8 +116,7 @@ Future<AppDataWipeResult> wipeApplicationData({
     await (deleteAppDataDirectory ?? _defaultDeleteAppDataDirectory)(
       appDataPath,
     );
-    final bool cleared =
-        await (clearPreferences ?? _defaultClearPreferences)();
+    final bool cleared = await (clearPreferences ?? _defaultClearPreferences)();
     if (!cleared) {
       return AppDataWipeResult.deleteFailed;
     }

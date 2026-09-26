@@ -36,12 +36,9 @@ void main() {
 **Full Changelog**: https://github.com/Zoti321/hentail_library/compare/v0.2.5...v0.2.6
 ''';
 
-      expect(
-        service.parseReleaseNotes(body),
-        <String>[
-          '集成 #111–#113：Path migration、Named facet 续载与 Auto-play',
-        ],
-      );
+      expect(service.parseReleaseNotes(body), <String>[
+        '集成 #111–#113：Path migration、Named facet 续载与 Auto-play',
+      ]);
     });
 
     test('v0.2.5 body keeps three change bullets', () {
@@ -57,18 +54,17 @@ void main() {
 **Full Changelog**: https://github.com/Zoti321/hentail_library/compare/v0.2.4...v0.2.5
 ''';
 
-      expect(
-        service.parseReleaseNotes(body),
-        <String>[
-          '体验修复：库同步/启动扫描、搜索与阅读器跳页 (#90–#95)',
-          '库/阅读器/管理页：#97–#101 功能集成',
-          '加固测试体系：CI 硬门禁、FRB 契约测与共享 harness (#106)',
-        ],
-      );
+      expect(service.parseReleaseNotes(body), <String>[
+        '体验修复：库同步/启动扫描、搜索与阅读器跳页 (#90–#95)',
+        '库/阅读器/管理页：#97–#101 功能集成',
+        '加固测试体系：CI 硬门禁、FRB 契约测与共享 harness (#106)',
+      ]);
     });
 
-    test('Kazumi 2.3.2 style body keeps ten bullets without contributor tags', () {
-      const String body = '''
+    test(
+      'Kazumi 2.3.2 style body keeps ten bullets without contributor tags',
+      () {
+        const String body = '''
 - 优化平板电脑与折叠屏布局适配 (@Predidit)
 - 设置页面现在支持宽屏分栏布局 (@LiggMax) (@Predidit)
 - 支持通过 WebDAV 同步弹幕屏蔽规则 (#1141 #2503) (@Predidit)
@@ -81,9 +77,7 @@ void main() {
 - 其他 UI 调整 (@Predidit)
 ''';
 
-      expect(
-        service.parseReleaseNotes(body),
-        <String>[
+        expect(service.parseReleaseNotes(body), <String>[
           '优化平板电脑与折叠屏布局适配',
           '设置页面现在支持宽屏分栏布局',
           '支持通过 WebDAV 同步弹幕屏蔽规则 (#1141 #2503)',
@@ -94,9 +88,9 @@ void main() {
           '修复未启用 WebDAV 观看历史同步时启动仍自动同步的问题',
           '修复退出播放页面时加载指示器一闪而过的问题',
           '其他 UI 调整',
-        ],
-      );
-    });
+        ]);
+      },
+    );
 
     test('composed release body keeps bullets only under 更新内容', () {
       const String body = '''
@@ -110,12 +104,9 @@ void main() {
 **Full Changelog**: https://github.com/Zoti321/hentail_library/compare/v0.2.5...v0.2.6
 ''';
 
-      expect(
-        service.parseReleaseNotes(body),
-        <String>[
-          '集成 #111–#113：Path migration、Named facet 续载与 Auto-play',
-        ],
-      );
+      expect(service.parseReleaseNotes(body), <String>[
+        '集成 #111–#113：Path migration、Named facet 续载与 Auto-play',
+      ]);
     });
 
     test('ignores tables, headings, and blockquotes without list markers', () {

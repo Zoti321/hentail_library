@@ -63,9 +63,7 @@ fn export_comic_metadata_emits_schema_v1_json() {
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
-            let lib = create_local_library("E:/lib", None)
-                .await
-                .expect("library");
+            let lib = create_local_library("E:/lib", None).await.expect("library");
             set_current_library_id(Some(&lib.library_id))
                 .await
                 .expect("current");

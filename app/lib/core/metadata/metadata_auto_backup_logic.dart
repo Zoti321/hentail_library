@@ -26,15 +26,12 @@ List<File> listMetadataBackupFiles(String directoryPath) {
       .listSync()
       .whereType<File>()
       .where(
-        (File file) => p
-            .basename(file.path)
-            .startsWith(metadataBackupFilePrefix),
+        (File file) =>
+            p.basename(file.path).startsWith(metadataBackupFilePrefix),
       )
       .toList();
   files.sort((File a, File b) {
-    final int modified = b.lastModifiedSync().compareTo(
-      a.lastModifiedSync(),
-    );
+    final int modified = b.lastModifiedSync().compareTo(a.lastModifiedSync());
     if (modified != 0) {
       return modified;
     }

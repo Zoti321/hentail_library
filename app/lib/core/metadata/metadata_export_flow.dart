@@ -25,11 +25,12 @@ Future<void> runMetadataExportFlow(
   required MetadataExportOptions initialOptions,
   MetadataExportInvoker? exportInvoker,
 }) async {
-  final MetadataExportOptions? options = await showDialog<MetadataExportOptions>(
-    context: context,
-    builder: (BuildContext context) =>
-        MetadataExportOptionsDialog(initialOptions: initialOptions),
-  );
+  final MetadataExportOptions? options =
+      await showDialog<MetadataExportOptions>(
+        context: context,
+        builder: (BuildContext context) =>
+            MetadataExportOptionsDialog(initialOptions: initialOptions),
+      );
   if (options == null || !context.mounted) {
     return;
   }
@@ -53,7 +54,8 @@ Future<void> runMetadataExportFlow(
       libraryId: options.currentLibraryOnly ? options.libraryId : null,
       includeOrphanFacets: options.includeOrphanFacets,
     );
-    final MetadataExportInvoker invoke = exportInvoker ??
+    final MetadataExportInvoker invoke =
+        exportInvoker ??
         (ExportComicMetadataOptionsDto options) =>
             const MetadataBackupFrbAdapter().export(options: options);
     final Uint8List raw = invoke(dto);
@@ -96,7 +98,8 @@ class MetadataExportOptionsDialog extends StatefulWidget {
       _MetadataExportOptionsDialogState();
 }
 
-class _MetadataExportOptionsDialogState extends State<MetadataExportOptionsDialog> {
+class _MetadataExportOptionsDialogState
+    extends State<MetadataExportOptionsDialog> {
   late bool _gzip;
   late bool _includeOrphanFacets;
   late bool _currentLibraryOnly;

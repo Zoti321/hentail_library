@@ -49,13 +49,6 @@ pub use history::{
 pub use home::{
     watch_continue_reading_top5, watch_home_page_counts, HomeContinueReadingDto, HomePageCountsDto,
 };
-pub use metadata_backup::{
-    export_comic_metadata, import_comic_metadata, peek_metadata_backup_manifest,
-    preview_import_comic_metadata, AmbiguousSample, ComicExportRecord, ComicMetaExportRecord,
-    ExportComicMetadataOptions, ExportOptionsRecord, ImportComicMetadataResult, ImportPlan,
-    MatchTier, MetadataBackupManifest, MetadataBackupPayload, NotFoundSample, OrphanFacetsRecord,
-    SCHEMA_VERSION, WouldApplySample,
-};
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,
     get_current_library_id, library_id_from_root, library_id_from_webdav_root, list_libraries,
@@ -65,6 +58,13 @@ pub use library::{
     update_library_settings, update_library_sidebar_layout, update_local_library_root,
     update_remote_library, LibraryDto, LibrarySidebarPlacement, RemoteLibraryCredential,
     ResolvedAccess, ScanInterval,
+};
+pub use metadata_backup::{
+    export_comic_metadata, import_comic_metadata, peek_metadata_backup_manifest,
+    preview_import_comic_metadata, AmbiguousSample, ComicExportRecord, ComicMetaExportRecord,
+    ExportComicMetadataOptions, ExportOptionsRecord, ImportComicMetadataResult, ImportPlan,
+    MatchTier, MetadataBackupManifest, MetadataBackupPayload, NotFoundSample, OrphanFacetsRecord,
+    WouldApplySample, SCHEMA_VERSION,
 };
 pub use named_facet::{
     add_named_facet_name, count_all_named_facet_names, count_named_facet_attachments,

@@ -126,9 +126,8 @@ class MetadataAutoBackupToggleRow extends ConsumerWidget {
       description: l10n.settingsMetadataBackupAutoToggleDescription,
       action: ToggleSwitch(
         checked: enabled,
-        onChange: () => ref
-            .read(metadataAutoBackupProvider.notifier)
-            .setEnabled(!enabled),
+        onChange: () =>
+            ref.read(metadataAutoBackupProvider.notifier).setEnabled(!enabled),
       ),
     );
   }
@@ -170,8 +169,10 @@ class MetadataBackupLastBackupRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = context.l10n;
     final ThemeData theme = Theme.of(context);
-    final DateTime? lastBackup =
-        ref.watch(metadataLastAutoBackupProvider).asData?.value;
+    final DateTime? lastBackup = ref
+        .watch(metadataLastAutoBackupProvider)
+        .asData
+        ?.value;
     final String description = lastBackup == null
         ? l10n.settingsMetadataBackupLastBackupEmpty
         : l10n.settingsMetadataBackupLastBackupAt(
@@ -292,9 +293,7 @@ class MetadataExportRow extends ConsumerWidget {
       description: l10n.settingsMetadataBackupExportDescription,
       onRowTap: () => runMetadataExportFlow(
         context,
-        initialOptions: MetadataExportOptions(
-          libraryId: currentLibraryId,
-        ),
+        initialOptions: MetadataExportOptions(libraryId: currentLibraryId),
       ),
       action: Icon(
         LucideIcons.chevronRight,

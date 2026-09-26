@@ -10,9 +10,7 @@ use crate::error::HentaiError;
 use crate::named_facet::JunctionNamedFacet;
 
 use super::path_util::compute_relative_path;
-use super::types::{
-    ComicExportRecord, MetadataBackupPayload, OrphanFacetsRecord, SCHEMA_VERSION,
-};
+use super::types::{ComicExportRecord, MetadataBackupPayload, OrphanFacetsRecord, SCHEMA_VERSION};
 
 const MAX_SAMPLES: usize = 5;
 const MAX_AMBIGUOUS_CANDIDATES: usize = 3;
@@ -224,9 +222,8 @@ async fn plan_comic_metadata_import(bytes: &[u8]) -> Result<ImportPlan, HentaiEr
 }
 
 fn parse_payload(bytes: &[u8]) -> Result<MetadataBackupPayload, HentaiError> {
-    let payload: MetadataBackupPayload = serde_json::from_slice(bytes).map_err(|err| {
-        HentaiError::validation(format!("无效的元数据备份 JSON: {err}"))
-    })?;
+    let payload: MetadataBackupPayload = serde_json::from_slice(bytes)
+        .map_err(|err| HentaiError::validation(format!("无效的元数据备份 JSON: {err}")))?;
     if payload.schema_version != SCHEMA_VERSION {
         return Err(HentaiError::validation(format!(
             "不支持的 schema_version {}（仅支持 {SCHEMA_VERSION}）",
@@ -565,6 +562,9 @@ mod tests {
     fn resolve_match_not_found_when_no_tier_matches() {
         let index = index_with(&[]);
         let record = sample_record("missing", "E:/lib/none.cbz");
-        assert!(matches!(resolve_match(&index, &record), MatchOutcome::NotFound));
+        assert!(matches!(
+            resolve_match(&index, &record),
+            MatchOutcome::NotFound
+        ));
     }
 }

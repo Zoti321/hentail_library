@@ -53,8 +53,10 @@ Future<void> runMetadataImportFlow(
     final List<int> rawBytes = file.bytes ?? await File(path).readAsBytes();
     final Uint8List jsonBytes = decodeMetadataBackupFileBytes(rawBytes, path);
 
-    final MetadataPeekInvoker peek = peekInvoker ??
-        (Uint8List bytes) => const MetadataBackupFrbAdapter().peek(bytes: bytes);
+    final MetadataPeekInvoker peek =
+        peekInvoker ??
+        (Uint8List bytes) =>
+            const MetadataBackupFrbAdapter().peek(bytes: bytes);
     final MetadataBackupManifestDto manifest = peek(jsonBytes);
 
     if (!context.mounted) {
@@ -73,7 +75,9 @@ Future<void> runMetadataImportFlow(
               const CircularProgressIndicator(),
               const SizedBox(width: 16),
               Expanded(
-                child: Text(l10n.settingsMetadataBackupImportPreviewRunningBody),
+                child: Text(
+                  l10n.settingsMetadataBackupImportPreviewRunningBody,
+                ),
               ),
             ],
           ),
@@ -84,10 +88,13 @@ Future<void> runMetadataImportFlow(
       ),
     );
 
-    final MetadataPreviewInvoker preview = previewInvoker ??
+    final MetadataPreviewInvoker preview =
+        previewInvoker ??
         (Uint8List bytes) =>
             const MetadataBackupFrbAdapter().preview(bytes: bytes);
-    final PreviewImportComicMetadataResultDto previewResult = preview(jsonBytes);
+    final PreviewImportComicMetadataResultDto previewResult = preview(
+      jsonBytes,
+    );
 
     if (context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
@@ -122,7 +129,9 @@ Future<void> runMetadataImportFlow(
             children: <Widget>[
               const CircularProgressIndicator(),
               const SizedBox(width: 16),
-              Expanded(child: Text(l10n.settingsMetadataBackupImportRunningBody)),
+              Expanded(
+                child: Text(l10n.settingsMetadataBackupImportRunningBody),
+              ),
             ],
           ),
           actions: const <Widget>[],
@@ -132,7 +141,8 @@ Future<void> runMetadataImportFlow(
       ),
     );
 
-    final MetadataImportInvoker import = importInvoker ??
+    final MetadataImportInvoker import =
+        importInvoker ??
         (Uint8List bytes) =>
             const MetadataBackupFrbAdapter().import(bytes: bytes);
     final ImportComicMetadataResultDto result = import(jsonBytes);
@@ -147,9 +157,8 @@ Future<void> runMetadataImportFlow(
 
     await showDialog<void>(
       context: context,
-      builder: (BuildContext context) => MetadataImportResultDialog(
-        result: result,
-      ),
+      builder: (BuildContext context) =>
+          MetadataImportResultDialog(result: result),
     );
   } catch (e, st) {
     logError(AppLog.core('metadata_backup'), '导入元数据失败', e, st);
@@ -175,7 +184,8 @@ class MetadataImportConfirmDialog extends StatefulWidget {
       _MetadataImportConfirmDialogState();
 }
 
-class _MetadataImportConfirmDialogState extends State<MetadataImportConfirmDialog> {
+class _MetadataImportConfirmDialogState
+    extends State<MetadataImportConfirmDialog> {
   late bool _detailsExpanded;
 
   @override
@@ -257,7 +267,8 @@ class _MetadataImportConfirmDialogState extends State<MetadataImportConfirmDialo
                       secondary: _wouldApplySecondary(l10n, sample),
                       path: sample.path,
                     ),
-                  for (final NotFoundSampleDto sample in preview.samplesNotFound)
+                  for (final NotFoundSampleDto sample
+                      in preview.samplesNotFound)
                     _PreviewSampleLine(
                       primary: sample.title,
                       secondary: sample.comicId,
@@ -310,14 +321,12 @@ class _MetadataImportConfirmDialogState extends State<MetadataImportConfirmDialo
     final MatchTierDto? tier = sample.matchTier;
     if (tier != null) {
       buffer.write(' · ');
-      buffer.write(
-        switch (tier) {
-          MatchTierDto.path =>
-            l10n.settingsMetadataBackupImportPreviewMatchTierPath,
-          MatchTierDto.libraryRelative =>
-            l10n.settingsMetadataBackupImportPreviewMatchTierLibraryRelative,
-        },
-      );
+      buffer.write(switch (tier) {
+        MatchTierDto.path =>
+          l10n.settingsMetadataBackupImportPreviewMatchTierPath,
+        MatchTierDto.libraryRelative =>
+          l10n.settingsMetadataBackupImportPreviewMatchTierLibraryRelative,
+      });
     }
     return buffer.toString();
   }
@@ -455,9 +464,9 @@ class _SectionHeading extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+        style: Theme.of(
+          context,
+        ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
       ),
     );
   }

@@ -25,44 +25,50 @@ void main() {
       }
     });
 
-    test('deletes app data directory and clears preferences on success', () async {
-      final File marker = File('${tempDir.path}/marker.txt');
-      await marker.writeAsString('keep-me-deleted');
+    test(
+      'deletes app data directory and clears preferences on success',
+      () async {
+        final File marker = File('${tempDir.path}/marker.txt');
+        await marker.writeAsString('keep-me-deleted');
 
-      final AppDataWipeResult result = await wipeApplicationData(
-        appDataPath: tempDir.path,
-        shutdownAppData: () => shutdownCalled = true,
-      );
+        final AppDataWipeResult result = await wipeApplicationData(
+          appDataPath: tempDir.path,
+          shutdownAppData: () => shutdownCalled = true,
+        );
 
-      expect(result, AppDataWipeResult.success);
-      expect(shutdownCalled, isTrue);
-      expect(tempDir.existsSync(), isFalse);
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      expect(prefs.getKeys(), isEmpty);
-    });
+        expect(result, AppDataWipeResult.success);
+        expect(shutdownCalled, isTrue);
+        expect(tempDir.existsSync(), isFalse);
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        expect(prefs.getKeys(), isEmpty);
+      },
+    );
 
-    test('returns deleteFailed without clearing preferences when delete fails', () async {
-      final File marker = File('${tempDir.path}/marker.txt');
-      await marker.writeAsString('blocked');
-      var clearCalled = false;
+    test(
+      'returns deleteFailed without clearing preferences when delete fails',
+      () async {
+        final File marker = File('${tempDir.path}/marker.txt');
+        await marker.writeAsString('blocked');
+        var clearCalled = false;
 
-      final AppDataWipeResult result = await wipeApplicationData(
-        appDataPath: tempDir.path,
-        shutdownAppData: () => shutdownCalled = true,
-        deleteAppDataDirectory: (_) async {
-          throw const FileSystemException('blocked');
-        },
-        clearPreferences: () async {
-          clearCalled = true;
-          return true;
-        },
-      );
+        final AppDataWipeResult result = await wipeApplicationData(
+          appDataPath: tempDir.path,
+          shutdownAppData: () => shutdownCalled = true,
+          deleteAppDataDirectory: (_) async {
+            throw const FileSystemException('blocked');
+          },
+          clearPreferences: () async {
+            clearCalled = true;
+            return true;
+          },
+        );
 
-      expect(result, AppDataWipeResult.deleteFailed);
-      expect(shutdownCalled, isTrue);
-      expect(clearCalled, isFalse);
-      expect(marker.existsSync(), isTrue);
-    });
+        expect(result, AppDataWipeResult.deleteFailed);
+        expect(shutdownCalled, isTrue);
+        expect(clearCalled, isFalse);
+        expect(marker.existsSync(), isTrue);
+      },
+    );
 
     test('treats missing directory as success after shutdown', () async {
       await tempDir.delete(recursive: true);

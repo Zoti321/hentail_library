@@ -37,10 +37,7 @@ Future<MetadataAutoBackupRunResult> runMetadataAutoBackup({
   final String outputPath = p.join(directoryPath, fileName);
   await File(outputPath).writeAsBytes(compressed, flush: true);
 
-  pruneMetadataBackupFiles(
-    directoryPath,
-    maxFiles: metadataAutoBackupMaxFiles,
-  );
+  pruneMetadataBackupFiles(directoryPath, maxFiles: metadataAutoBackupMaxFiles);
 
   return MetadataAutoBackupRunResult(
     outputPath: outputPath,

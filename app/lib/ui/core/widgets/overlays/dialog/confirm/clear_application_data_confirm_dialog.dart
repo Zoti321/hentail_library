@@ -26,10 +26,7 @@ class ClearApplicationDataConfirmDialog extends StatelessWidget {
         children: <Widget>[
           Text(l10n.confirmClearApplicationDataContent),
           const SizedBox(height: 12),
-          Text(
-            recentBackupText,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
+          Text(recentBackupText, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
       actions: <Widget>[

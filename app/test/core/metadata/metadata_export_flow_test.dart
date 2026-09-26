@@ -19,12 +19,11 @@ void main() {
             onPressed: () async {
               confirmed = await showDialog<MetadataExportOptions>(
                 context: context,
-                builder: (BuildContext context) =>
-                    MetadataExportOptionsDialog(
-                      initialOptions: const MetadataExportOptions(
-                        libraryId: 'lib-1',
-                      ),
-                    ),
+                builder: (BuildContext context) => MetadataExportOptionsDialog(
+                  initialOptions: const MetadataExportOptions(
+                    libraryId: 'lib-1',
+                  ),
+                ),
               );
             },
             child: const Text('open'),

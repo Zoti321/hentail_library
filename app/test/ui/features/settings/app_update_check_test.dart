@@ -88,10 +88,7 @@ void main() {
       final AppReleaseInfo newerRelease = (
         version: '2.0.0',
         publishedAt: DateTime.utc(2026, 9, 1),
-        releaseNotes: <String>[
-          '支持 WebDAV 同步 (#1141)',
-          '修复搜索页面布局问题',
-        ],
+        releaseNotes: <String>['支持 WebDAV 同步 (#1141)', '修复搜索页面布局问题'],
         htmlUrl:
             'https://github.com/Zoti321/hentail_library/releases/tag/v2.0.0',
         assets: <AppReleaseAsset>[],

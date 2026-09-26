@@ -48,9 +48,7 @@ fn export_import_round_trip_restores_user_metadata_and_locks() {
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
-            let lib = create_local_library("E:/lib", None)
-                .await
-                .expect("library");
+            let lib = create_local_library("E:/lib", None).await.expect("library");
             set_current_library_id(Some(&lib.library_id))
                 .await
                 .expect("current");
@@ -173,9 +171,7 @@ fn preview_import_does_not_write_db_including_orphan_facets() {
         let runtime = tokio::runtime::Runtime::new().expect("runtime");
         runtime.block_on(async {
             init_db_at_path(&db_path).await.expect("init_db");
-            let lib = create_local_library("E:/lib", None)
-                .await
-                .expect("library");
+            let lib = create_local_library("E:/lib", None).await.expect("library");
             set_current_library_id(Some(&lib.library_id))
                 .await
                 .expect("current");
@@ -193,6 +189,14 @@ fn preview_import_does_not_write_db_including_orphan_facets() {
             .await
             .expect("seed user meta");
 
+            // 断开关联后再导出，标签才会进入 orphan_facets 载荷。
+            db.execute(Statement::from_string(
+                sea_orm::DatabaseBackend::Sqlite,
+                "DELETE FROM comic_tags".to_string(),
+            ))
+            .await
+            .expect("unlink tags");
+
             let bytes = export_comic_metadata(ExportComicMetadataOptions {
                 library_id: None,
                 include_orphan_facets: true,
@@ -200,10 +204,10 @@ fn preview_import_does_not_write_db_including_orphan_facets() {
             .await
             .expect("export");
 
+            // 预览前移除字典中的孤儿标签，使 would_upsert_orphan_facet_count > 0。
             db.execute(Statement::from_string(
                 sea_orm::DatabaseBackend::Sqlite,
-                "UPDATE comic_meta SET title = '旧标题'; DELETE FROM comic_tags"
-                    .to_string(),
+                "UPDATE comic_meta SET title = '旧标题'; DELETE FROM tags".to_string(),
             ))
             .await
             .expect("reset meta");

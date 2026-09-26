@@ -12,9 +12,7 @@ void main() {
     await pumpLocalizedApp(
       tester,
       home: const Scaffold(
-        body: ClearApplicationDataConfirmDialog(
-          recentBackupAt: null,
-        ),
+        body: ClearApplicationDataConfirmDialog(recentBackupAt: null),
       ),
     );
     await tester.pumpAndSettle();

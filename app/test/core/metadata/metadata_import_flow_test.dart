@@ -20,46 +20,46 @@ void main() {
 
   const PreviewImportComicMetadataResultDto previewWithMatches =
       PreviewImportComicMetadataResultDto(
-    wouldApply: 2,
-    skippedNotFound: 0,
-    skippedAmbiguous: 0,
-    wouldUpsertOrphanFacetCount: 3,
-    samplesWouldApply: <WouldApplySampleDto>[
-      WouldApplySampleDto(
-        comicId: 'backup-1',
-        path: 'E:/very/long/library/root/folder/subfolder/comic.cbz',
-        title: 'Sample Comic',
-        matchedComicId: 'c1',
-        matchTier: MatchTierDto.path,
-      ),
-    ],
-    samplesNotFound: <NotFoundSampleDto>[],
-    samplesAmbiguous: <AmbiguousSampleDto>[],
-  );
+        wouldApply: 2,
+        skippedNotFound: 0,
+        skippedAmbiguous: 0,
+        wouldUpsertOrphanFacetCount: 3,
+        samplesWouldApply: <WouldApplySampleDto>[
+          WouldApplySampleDto(
+            comicId: 'backup-1',
+            path: 'E:/very/long/library/root/folder/subfolder/comic.cbz',
+            title: 'Sample Comic',
+            matchedComicId: 'c1',
+            matchTier: MatchTierDto.path,
+          ),
+        ],
+        samplesNotFound: <NotFoundSampleDto>[],
+        samplesAmbiguous: <AmbiguousSampleDto>[],
+      );
 
   const PreviewImportComicMetadataResultDto previewWithSkips =
       PreviewImportComicMetadataResultDto(
-    wouldApply: 0,
-    skippedNotFound: 1,
-    skippedAmbiguous: 1,
-    wouldUpsertOrphanFacetCount: 5,
-    samplesWouldApply: <WouldApplySampleDto>[],
-    samplesNotFound: <NotFoundSampleDto>[
-      NotFoundSampleDto(
-        comicId: 'missing',
-        path: 'E:/lib/gone.cbz',
-        title: 'Missing Comic',
-      ),
-    ],
-    samplesAmbiguous: <AmbiguousSampleDto>[
-      AmbiguousSampleDto(
-        comicId: 'dup',
-        path: 'E:/lib/dup.cbz',
-        title: 'Dup Comic',
-        candidateComicIds: <String>['c2', 'c3'],
-      ),
-    ],
-  );
+        wouldApply: 0,
+        skippedNotFound: 1,
+        skippedAmbiguous: 1,
+        wouldUpsertOrphanFacetCount: 5,
+        samplesWouldApply: <WouldApplySampleDto>[],
+        samplesNotFound: <NotFoundSampleDto>[
+          NotFoundSampleDto(
+            comicId: 'missing',
+            path: 'E:/lib/gone.cbz',
+            title: 'Missing Comic',
+          ),
+        ],
+        samplesAmbiguous: <AmbiguousSampleDto>[
+          AmbiguousSampleDto(
+            comicId: 'dup',
+            path: 'E:/lib/dup.cbz',
+            title: 'Dup Comic',
+            candidateComicIds: <String>['c2', 'c3'],
+          ),
+        ],
+      );
 
   testWidgets('confirm dialog cancels without calling import', (
     WidgetTester tester,
@@ -76,9 +76,9 @@ void main() {
                 context: context,
                 builder: (BuildContext context) =>
                     const MetadataImportConfirmDialog(
-                  manifest: manifest,
-                  preview: previewWithMatches,
-                ),
+                      manifest: manifest,
+                      preview: previewWithMatches,
+                    ),
               );
               if (confirmed == true) {
                 importCalls += 1;
@@ -115,9 +115,9 @@ void main() {
                 context: context,
                 builder: (BuildContext context) =>
                     const MetadataImportConfirmDialog(
-                  manifest: manifest,
-                  preview: previewWithMatches,
-                ),
+                      manifest: manifest,
+                      preview: previewWithMatches,
+                    ),
               );
               if (confirmed != true || !context.mounted) {
                 return;
@@ -156,8 +156,7 @@ void main() {
     expect(
       find.byWidgetPredicate(
         (Widget widget) =>
-            widget is RichText &&
-            widget.text.toPlainText().contains('将恢复: 2'),
+            widget is RichText && widget.text.toPlainText().contains('将恢复: 2'),
       ),
       findsOneWidget,
     );
@@ -183,9 +182,9 @@ void main() {
                 context: context,
                 builder: (BuildContext context) =>
                     const MetadataImportConfirmDialog(
-                  manifest: manifest,
-                  preview: previewWithSkips,
-                ),
+                      manifest: manifest,
+                      preview: previewWithSkips,
+                    ),
               );
             },
             child: const Text('open'),
@@ -216,9 +215,9 @@ void main() {
                 context: context,
                 builder: (BuildContext context) =>
                     const MetadataImportConfirmDialog(
-                  manifest: manifest,
-                  preview: previewWithSkips,
-                ),
+                      manifest: manifest,
+                      preview: previewWithSkips,
+                    ),
               );
             },
             child: const Text('open'),

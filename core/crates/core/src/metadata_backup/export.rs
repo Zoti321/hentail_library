@@ -79,9 +79,8 @@ pub async fn export_comic_metadata(
         comics: export_comics,
     };
 
-    serde_json::to_vec(&payload).map_err(|err| {
-        HentaiError::validation(format!("元数据备份 JSON 序列化失败: {err}"))
-    })
+    serde_json::to_vec(&payload)
+        .map_err(|err| HentaiError::validation(format!("元数据备份 JSON 序列化失败: {err}")))
 }
 
 async fn load_export_comic_ids(
@@ -186,9 +185,7 @@ fn utc_now_rfc3339() -> String {
     let seconds = day_seconds % 60;
 
     let (year, month, day) = civil_from_days(days as i64);
-    format!(
-        "{year:04}-{month:02}-{day:02}T{hours:02}:{minutes:02}:{seconds:02}.{millis:03}Z"
-    )
+    format!("{year:04}-{month:02}-{day:02}T{hours:02}:{minutes:02}:{seconds:02}.{millis:03}Z")
 }
 
 /// Converts days since Unix epoch to (year, month, day) in UTC (civil calendar).

@@ -34,13 +34,14 @@ class MetadataAutoBackupCoordinatorNotifier
   }
 
   void notifyMetadataSaved() {
-    final bool enabled = ref.read(metadataAutoBackupProvider).asData?.value ??
-        true;
+    final bool enabled =
+        ref.read(metadataAutoBackupProvider).asData?.value ?? true;
     if (!enabled) {
       return;
     }
-    _metadataSaveDebouncer ??=
-        Debouncer(duration: metadataAutoBackupSaveDebounce);
+    _metadataSaveDebouncer ??= Debouncer(
+      duration: metadataAutoBackupSaveDebounce,
+    );
     _metadataSaveDebouncer!.run(() {
       unawaited(_tryAutoBackup(fromStartup: false));
     });
@@ -68,15 +69,17 @@ class MetadataAutoBackupCoordinatorNotifier
       return;
     }
 
-    final bool enabled = ref.read(metadataAutoBackupProvider).asData?.value ??
-        true;
+    final bool enabled =
+        ref.read(metadataAutoBackupProvider).asData?.value ?? true;
     if (!enabled && !force) {
       return;
     }
 
     if (!force && fromStartup) {
-      final DateTime? lastBackup =
-          ref.read(metadataLastAutoBackupProvider).asData?.value;
+      final DateTime? lastBackup = ref
+          .read(metadataLastAutoBackupProvider)
+          .asData
+          ?.value;
       if (!shouldRunStartupMetadataAutoBackup(
         now: _now(),
         lastBackupAt: lastBackup,

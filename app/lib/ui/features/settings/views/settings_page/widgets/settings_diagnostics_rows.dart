@@ -109,18 +109,12 @@ class ClearApplicationDataRow extends ConsumerWidget {
     return SettingsRow(
       layoutTier: layoutTier,
       isDestructive: true,
-      icon: Icon(
-        LucideIcons.trash2,
-        size: 20,
-        color: theme.colorScheme.error,
-      ),
+      icon: Icon(LucideIcons.trash2, size: 20, color: theme.colorScheme.error),
       label: l10n.settingsClearApplicationDataLabel,
       description: syncRunning
           ? l10n.settingsClearApplicationDataDisabledSyncRunning
           : l10n.settingsClearApplicationDataDescription,
-      onRowTap: syncRunning
-          ? null
-          : () => runAppDataWipeFlow(context),
+      onRowTap: syncRunning ? null : () => runAppDataWipeFlow(context),
       action: Icon(
         LucideIcons.chevronRight,
         size: 16,
