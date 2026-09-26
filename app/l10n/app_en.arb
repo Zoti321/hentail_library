@@ -280,6 +280,31 @@
   "settingsDiagnosticModeEnabledBadge": "Enabled",
   "settingsExportLogsLabel": "Export logs",
   "settingsExportLogsDescription": "Bundle app and core logs for troubleshooting",
+  "settingsClearApplicationDataLabel": "Clear all application data",
+  "settingsClearApplicationDataDescription": "Removes the database, automatic metadata backups, logs, and cache; does not delete comics in library roots",
+  "settingsClearApplicationDataDisabledSyncRunning": "Library sync is running; try again later",
+  "settingsUninstallDataInfoLabel": "Uninstall and data retention",
+  "settingsUninstallDataInfoDescription": "Uninstalling may remove the app sandbox on mobile. On desktop, uninstall keeps application data by default; you can opt in to delete it in the uninstaller",
+  "confirmClearApplicationDataTitle": "Clear all application data?",
+  "confirmClearApplicationDataContent": "This removes all on-device app state in the current application data directory (SQLite, automatic metadata backups, logs, and cache), plus app preferences. Library root files and manually exported metadata backups are not deleted.",
+  "confirmClearApplicationDataRecentBackup": "Latest automatic metadata backup: {timestamp}",
+  "@confirmClearApplicationDataRecentBackup": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmClearApplicationDataRecentBackupEmpty": "No automatic metadata backup on record",
+  "wipeCompleteRestartMessage": "Application data cleared. Restart the app to finish resetting.",
+  "wipeFailedManualDeleteMessage": "Could not fully delete the application data directory. Close the app, manually delete this folder, then restart:\n{path}",
+  "@wipeFailedManualDeleteMessage": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
   "settingsAutoScanLabel": "Auto scan",
   "settingsSupportedFormatsDescription": "Unchecked formats are removed from the current local library on the next library sync. Comics already in the library remain readable until then.",
   "settingsSupportedFormatsGroupTitle": "Format groups",

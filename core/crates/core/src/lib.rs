@@ -39,7 +39,7 @@ pub use comic::{
     PagedComicResultDto, SetComicMetaLocksDto, UpdateComicUserMetaDto,
 };
 pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_path_for_key};
-pub use db::{connection, db_config, init_db, init_db_at_path};
+pub use db::{connection, db_config, init_db, init_db_at_path, shutdown_db};
 pub use error::{HentaiError, HentaiErrorCode};
 pub use history::{
     clear_all_reading, delete_reading_by_comic_id, delete_reading_by_comic_ids, fetch_reading_page,

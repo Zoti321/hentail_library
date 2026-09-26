@@ -16,6 +16,7 @@ import 'api/named_facet.dart';
 import 'api/parody.dart';
 import 'api/reader.dart';
 import 'api/series.dart';
+import 'api/shutdown.dart';
 import 'api/sync.dart';
 import 'api/tag.dart';
 import 'api/thumbnail.dart';

@@ -34,6 +34,38 @@ pub fn init_db(app_data_dir: &str, db_file_name: &str) -> Result<(), HentaiError
     crate::runtime::block_on(init_db_async(app_data_dir, db_file_name))
 }
 
+pub fn shutdown_db() {
+    crate::runtime::block_on(shutdown_db_async())
+}
+
+pub async fn shutdown_db_async() {
+    let main_conn = {
+        let mut guard = match db_conn_slot().write() {
+            Ok(guard) => guard,
+            Err(_) => return,
+        };
+        guard.take()
+    };
+    if let Some(conn) = main_conn {
+        let _ = conn.close().await;
+    }
+
+    let version_conn = {
+        let mut guard = match db_version_conn_slot().write() {
+            Ok(guard) => guard,
+            Err(_) => return,
+        };
+        guard.take()
+    };
+    if let Some(conn) = version_conn {
+        let _ = conn.close().await;
+    }
+
+    if let Ok(mut guard) = db_config_slot().write() {
+        *guard = None;
+    }
+}
+
 #[tracing::instrument(err, fields(app_data_dir, db_file_name))]
 pub async fn init_db_async(app_data_dir: &str, db_file_name: &str) -> Result<(), HentaiError> {
     let app_data_dir = app_data_dir.trim();

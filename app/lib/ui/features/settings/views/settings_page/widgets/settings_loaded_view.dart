@@ -381,6 +381,8 @@ List<Widget> _detailRows({
     SettingsCategory.diagnostics => <Widget>[
       DiagnosticModeRow(layoutTier: layoutTier),
       ExportLogsRow(layoutTier: layoutTier),
+      ClearApplicationDataRow(layoutTier: layoutTier),
+      UninstallDataInfoRow(layoutTier: layoutTier),
     ],
     SettingsCategory.about => <Widget>[
       AutoUpdateRow(layoutTier: layoutTier),

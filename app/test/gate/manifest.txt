@@ -7,6 +7,7 @@ test/gate
 # Dart 薄边缝：domain / core / data（FRB mapper · guard · adapter）
 test/domain
 test/core
+test/core/app_data/app_data_wipe_flow_test.dart
 test/data
 
 # FRB 线缝冒烟（真实 cdylib；run-gate.sh dart-test 会先 cargo build）

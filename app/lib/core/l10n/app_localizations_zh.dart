@@ -667,6 +667,46 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsExportLogsDescription => '打包应用与核心日志，便于问题反馈';
 
   @override
+  String get settingsClearApplicationDataLabel => '清除全部应用数据';
+
+  @override
+  String get settingsClearApplicationDataDescription =>
+      '删除数据库、自动元数据备份、日志与缓存；不删除库根目录中的漫画文件';
+
+  @override
+  String get settingsClearApplicationDataDisabledSyncRunning => '库同步进行中，请稍后再试';
+
+  @override
+  String get settingsUninstallDataInfoLabel => '卸载与数据保留';
+
+  @override
+  String get settingsUninstallDataInfoDescription =>
+      '卸载应用可能删除应用沙箱数据；桌面版卸载默认保留应用数据目录，也可在卸载向导中勾选删除';
+
+  @override
+  String get confirmClearApplicationDataTitle => '清除全部应用数据？';
+
+  @override
+  String get confirmClearApplicationDataContent =>
+      '将删除当前应用数据目录中的全部本机状态（含 SQLite、自动元数据备份、日志与缓存），以及应用偏好设置。不会删除库根目录中的漫画文件，也不会删除您手动导出到外置目录的元数据备份。';
+
+  @override
+  String confirmClearApplicationDataRecentBackup(String timestamp) {
+    return '最近自动元数据备份：$timestamp';
+  }
+
+  @override
+  String get confirmClearApplicationDataRecentBackupEmpty => '尚无自动元数据备份记录';
+
+  @override
+  String get wipeCompleteRestartMessage => '应用数据已清除。请重新启动应用以完成重置。';
+
+  @override
+  String wipeFailedManualDeleteMessage(String path) {
+    return '无法完全删除应用数据目录。请关闭应用后手动删除以下目录，然后重启应用：\n$path';
+  }
+
+  @override
   String get settingsAutoScanLabel => '自动扫描';
 
   @override

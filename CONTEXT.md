@@ -10,6 +10,10 @@
 与应用身份绑定的一整份本机应用数据树（含库文件、本地设置、日志与缓存等）。日常发布使用 `default`；非正式构建（Debug / Profile）使用独立的 `dev`，二者互不共享。与 Library（同一库文件内的多根集合）无关。详见 ADR-0010。
 _Avoid_: 开发库、发布库、数据库环境（易与 Library 混淆）
 
+**Application data wipe**:
+用户主动清除当前 **App data profile** 下全部本机应用状态（SQLite、自动元数据备份 `metadata_backups/`、日志、缓存及 App preference / Library browse preference）。不删除 Library root Resource，不删除用户目录手动导出的 `.hlmeta.json.gz`；不是 Comic deletion，也不是卸载应用本身。详见 ADR-0019。
+_Avoid_: 卸载应用、删库、清空漫画
+
 ### Library & resources
 
 **Library**:

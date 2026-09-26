@@ -280,6 +280,31 @@
   "settingsDiagnosticModeEnabledBadge": "已开启",
   "settingsExportLogsLabel": "导出日志",
   "settingsExportLogsDescription": "打包应用与核心日志，便于问题反馈",
+  "settingsClearApplicationDataLabel": "清除全部应用数据",
+  "settingsClearApplicationDataDescription": "删除数据库、自动元数据备份、日志与缓存；不删除库根目录中的漫画文件",
+  "settingsClearApplicationDataDisabledSyncRunning": "库同步进行中，请稍后再试",
+  "settingsUninstallDataInfoLabel": "卸载与数据保留",
+  "settingsUninstallDataInfoDescription": "卸载应用可能删除应用沙箱数据；桌面版卸载默认保留应用数据目录，也可在卸载向导中勾选删除",
+  "confirmClearApplicationDataTitle": "清除全部应用数据？",
+  "confirmClearApplicationDataContent": "将删除当前应用数据目录中的全部本机状态（含 SQLite、自动元数据备份、日志与缓存），以及应用偏好设置。不会删除库根目录中的漫画文件，也不会删除您手动导出到外置目录的元数据备份。",
+  "confirmClearApplicationDataRecentBackup": "最近自动元数据备份：{timestamp}",
+  "@confirmClearApplicationDataRecentBackup": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmClearApplicationDataRecentBackupEmpty": "尚无自动元数据备份记录",
+  "wipeCompleteRestartMessage": "应用数据已清除。请重新启动应用以完成重置。",
+  "wipeFailedManualDeleteMessage": "无法完全删除应用数据目录。请关闭应用后手动删除以下目录，然后重启应用：\n{path}",
+  "@wipeFailedManualDeleteMessage": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
   "settingsAutoScanLabel": "自动扫描",
   "settingsSupportedFormatsDescription": "取消勾选的格式会在下次库同步时从当前本地库中移除；未同步前已入库的漫画仍可阅读。",
   "settingsSupportedFormatsGroupTitle": "格式分组",

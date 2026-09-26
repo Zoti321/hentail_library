@@ -71,3 +71,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0016](./0016-app-preferences-via-shared-preferences.md) | App preference 经 SharedPreferences 持久化（取代 settings.json） | Accepted |
 | [0017](./0017-ui-mvvm-presentation-layer.md) | Flutter UI 层 MVVM（Riverpod）命名与 View/Repository 边界 | Accepted |
 | [0018](./0018-test-seams-and-ci-tiers.md) | 测试三层缝（Rust 真值 / FRB 线缝 / Dart 薄边）与 CI tier 命名 | Accepted |
+| [0019](./0019-application-data-wipe-and-uninstall-options.md) | 应用数据清除与卸载数据选项 | Accepted |

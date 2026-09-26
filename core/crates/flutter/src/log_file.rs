@@ -13,6 +13,14 @@ pub fn log_file_slot() -> &'static Arc<Mutex<Option<File>>> {
     LOG_FILE.get_or_init(|| Arc::new(Mutex::new(None)))
 }
 
+pub fn close_log_file() {
+    if let Ok(mut guard) = log_file_slot().lock() {
+        if let Some(mut file) = guard.take() {
+            let _ = file.flush();
+        }
+    }
+}
+
 pub fn open_log_file(app_data_dir: &str) -> io::Result<PathBuf> {
     let logs_dir = PathBuf::from(app_data_dir.trim()).join("logs");
     fs::create_dir_all(&logs_dir)?;
