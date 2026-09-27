@@ -122,6 +122,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ComicFilterDto dco_decode_box_autoadd_comic_filter_dto(dynamic raw);
 
   @protected
+  ComicMetadataBulkPatchFrbDto
+  dco_decode_box_autoadd_comic_metadata_bulk_patch_frb_dto(dynamic raw);
+
+  @protected
   ComicSortOptionDto dco_decode_box_autoadd_comic_sort_option_dto(dynamic raw);
 
   @protected
@@ -139,6 +143,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   MatchTierDto dco_decode_box_autoadd_match_tier_dto(dynamic raw);
+
+  @protected
+  MultiValuePatchFrbDto dco_decode_box_autoadd_multi_value_patch_frb_dto(
+    dynamic raw,
+  );
 
   @protected
   PageRequestDto dco_decode_box_autoadd_page_request_dto(dynamic raw);
@@ -188,6 +197,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  BulkPatchResultFrbDto dco_decode_bulk_patch_result_frb_dto(dynamic raw);
+
+  @protected
   ComicDto dco_decode_comic_dto(dynamic raw);
 
   @protected
@@ -195,6 +207,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ComicMetaLocksDto dco_decode_comic_meta_locks_dto(dynamic raw);
+
+  @protected
+  ComicMetadataBulkPatchFrbDto dco_decode_comic_metadata_bulk_patch_frb_dto(
+    dynamic raw,
+  );
 
   @protected
   ComicSortFieldDto dco_decode_comic_sort_field_dto(dynamic raw);
@@ -348,6 +365,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  MultiValueOpFrbDto dco_decode_multi_value_op_frb_dto(dynamic raw);
+
+  @protected
+  MultiValuePatchFrbDto dco_decode_multi_value_patch_frb_dto(dynamic raw);
+
+  @protected
   NamedFacetFormEntryFrbDto dco_decode_named_facet_form_entry_frb_dto(
     dynamic raw,
   );
@@ -380,6 +403,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   MatchTierDto? dco_decode_opt_box_autoadd_match_tier_dto(dynamic raw);
+
+  @protected
+  MultiValuePatchFrbDto? dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(
+    dynamic raw,
+  );
 
   @protected
   ReadingHistoryDto? dco_decode_opt_box_autoadd_reading_history_dto(
@@ -646,6 +674,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ComicMetadataBulkPatchFrbDto
+  sse_decode_box_autoadd_comic_metadata_bulk_patch_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ComicSortOptionDto sse_decode_box_autoadd_comic_sort_option_dto(
     SseDeserializer deserializer,
   );
@@ -669,6 +703,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   MatchTierDto sse_decode_box_autoadd_match_tier_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  MultiValuePatchFrbDto sse_decode_box_autoadd_multi_value_patch_frb_dto(
     SseDeserializer deserializer,
   );
 
@@ -732,6 +771,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  BulkPatchResultFrbDto sse_decode_bulk_patch_result_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ComicDto sse_decode_comic_dto(SseDeserializer deserializer);
 
   @protected
@@ -739,6 +783,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ComicMetaLocksDto sse_decode_comic_meta_locks_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ComicMetadataBulkPatchFrbDto sse_decode_comic_metadata_bulk_patch_frb_dto(
     SseDeserializer deserializer,
   );
 
@@ -930,6 +979,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  MultiValueOpFrbDto sse_decode_multi_value_op_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  MultiValuePatchFrbDto sse_decode_multi_value_patch_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   NamedFacetFormEntryFrbDto sse_decode_named_facet_form_entry_frb_dto(
     SseDeserializer deserializer,
   );
@@ -966,6 +1025,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   MatchTierDto? sse_decode_opt_box_autoadd_match_tier_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  MultiValuePatchFrbDto? sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(
     SseDeserializer deserializer,
   );
 
@@ -1306,6 +1370,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_comic_metadata_bulk_patch_frb_dto(
+    ComicMetadataBulkPatchFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_comic_sort_option_dto(
     ComicSortOptionDto self,
     SseSerializer serializer,
@@ -1335,6 +1405,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_match_tier_dto(
     MatchTierDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_multi_value_patch_frb_dto(
+    MultiValuePatchFrbDto self,
     SseSerializer serializer,
   );
 
@@ -1411,6 +1487,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_bulk_patch_result_frb_dto(
+    BulkPatchResultFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_comic_dto(ComicDto self, SseSerializer serializer);
 
   @protected
@@ -1422,6 +1504,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_comic_meta_locks_dto(
     ComicMetaLocksDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_comic_metadata_bulk_patch_frb_dto(
+    ComicMetadataBulkPatchFrbDto self,
     SseSerializer serializer,
   );
 
@@ -1666,6 +1754,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_multi_value_op_frb_dto(
+    MultiValueOpFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_multi_value_patch_frb_dto(
+    MultiValuePatchFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_named_facet_form_entry_frb_dto(
     NamedFacetFormEntryFrbDto self,
     SseSerializer serializer,
@@ -1713,6 +1813,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_match_tier_dto(
     MatchTierDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(
+    MultiValuePatchFrbDto? self,
     SseSerializer serializer,
   );
 

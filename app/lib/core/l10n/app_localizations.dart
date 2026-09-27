@@ -3659,6 +3659,130 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'启动失败：{error}'**
   String bootstrapStartupFailed(String error);
+
+  /// No description provided for @catalogSelectionEnter.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择漫画'**
+  String get catalogSelectionEnter;
+
+  /// No description provided for @catalogSelectionExit.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消'**
+  String get catalogSelectionExit;
+
+  /// No description provided for @catalogSelectionSelectPage.
+  ///
+  /// In zh, this message translates to:
+  /// **'全选本页'**
+  String get catalogSelectionSelectPage;
+
+  /// No description provided for @catalogSelectionClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除选择'**
+  String get catalogSelectionClear;
+
+  /// No description provided for @catalogSelectionEditMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑元数据'**
+  String get catalogSelectionEditMetadata;
+
+  /// No description provided for @catalogSelectionSelectedCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'已选 {count} 本'**
+  String catalogSelectionSelectedCount(int count);
+
+  /// No description provided for @bulkEditMetadataTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'批量编辑元数据（{count} 本）'**
+  String bulkEditMetadataTitle(int count);
+
+  /// No description provided for @bulkEditMetadataConfirmTitle.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认批量保存？'**
+  String get bulkEditMetadataConfirmTitle;
+
+  /// No description provided for @bulkEditMetadataConfirmBody.
+  ///
+  /// In zh, this message translates to:
+  /// **'将对 {comicCount} 本漫画应用 {fieldCount} 个启用字段。'**
+  String bulkEditMetadataConfirmBody(int comicCount, int fieldCount);
+
+  /// No description provided for @bulkEditMetadataFieldTags.
+  ///
+  /// In zh, this message translates to:
+  /// **'标签'**
+  String get bulkEditMetadataFieldTags;
+
+  /// No description provided for @bulkEditMetadataFieldAuthors.
+  ///
+  /// In zh, this message translates to:
+  /// **'作者'**
+  String get bulkEditMetadataFieldAuthors;
+
+  /// No description provided for @bulkEditMetadataOpAdd.
+  ///
+  /// In zh, this message translates to:
+  /// **'添加'**
+  String get bulkEditMetadataOpAdd;
+
+  /// No description provided for @bulkEditMetadataOpRemove.
+  ///
+  /// In zh, this message translates to:
+  /// **'移除'**
+  String get bulkEditMetadataOpRemove;
+
+  /// No description provided for @bulkEditMetadataOpReplace.
+  ///
+  /// In zh, this message translates to:
+  /// **'替换'**
+  String get bulkEditMetadataOpReplace;
+
+  /// No description provided for @bulkEditMetadataMixedValues.
+  ///
+  /// In zh, this message translates to:
+  /// **'多种值'**
+  String get bulkEditMetadataMixedValues;
+
+  /// No description provided for @bulkEditMetadataOperationLabel.
+  ///
+  /// In zh, this message translates to:
+  /// **'操作'**
+  String get bulkEditMetadataOperationLabel;
+
+  /// No description provided for @bulkEditMetadataCancelBatch.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消批量编辑'**
+  String get bulkEditMetadataCancelBatch;
+
+  /// No description provided for @bulkEditMetadataBusy.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在批量编辑 {count} 本漫画…'**
+  String bulkEditMetadataBusy(int count);
+
+  /// No description provided for @bulkEditMetadataBatchDone.
+  ///
+  /// In zh, this message translates to:
+  /// **'批量编辑完成：已更新 {succeeded}，失败 {failed}，无变化 {unchanged}'**
+  String bulkEditMetadataBatchDone(int succeeded, int failed, int unchanged);
+
+  /// No description provided for @bulkEditMetadataBatchCancelled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已取消批量编辑（已更新 {succeeded}，失败 {failed}，无变化 {unchanged}）'**
+  String bulkEditMetadataBatchCancelled(
+    int succeeded,
+    int failed,
+    int unchanged,
+  );
 }
 
 class _AppLocalizationsDelegate

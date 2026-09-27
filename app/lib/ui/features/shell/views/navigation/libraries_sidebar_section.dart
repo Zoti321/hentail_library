@@ -460,6 +460,7 @@ class _SectionOverflowMenuButton extends HookConsumerWidget {
                 enabled: reorderEnabled,
                 onTap: () {
                   controller.hideMenu();
+                  ref.read(catalogSelectionProvider.notifier).exit();
                   ref.read(libraryReorderModeProvider.notifier).enter();
                 },
               ),

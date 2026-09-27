@@ -495,6 +495,10 @@ class _LibraryOverflowMenuButtonState
             _controller.hideMenu();
             ref.read(libraryRefreshActionProvider).call();
           },
+          onEnterSelection: () {
+            _controller.hideMenu();
+            ref.read(catalogSelectionProvider.notifier).enter();
+          },
           onScan: () {
             _controller.hideMenu();
             ref
@@ -598,12 +602,14 @@ class _LibraryOverflowMenu extends StatelessWidget {
     required this.onRefresh,
     required this.onScan,
     required this.onDeepScan,
+    required this.onEnterSelection,
   });
 
   final LibraryLayoutTier layoutTier;
   final VoidCallback onRefresh;
   final VoidCallback onScan;
   final VoidCallback onDeepScan;
+  final VoidCallback onEnterSelection;
 
   @override
   Widget build(BuildContext context) {
@@ -625,6 +631,11 @@ class _LibraryOverflowMenu extends StatelessWidget {
               icon: LucideIcons.rotateCw,
               label: l10n.libraryRefresh,
               onTap: onRefresh,
+            ),
+            _LibraryOverflowMenuItem(
+              icon: LucideIcons.checkSquare,
+              label: l10n.catalogSelectionEnter,
+              onTap: onEnterSelection,
             ),
             _LibraryOverflowMenuItem(
               icon: LucideIcons.scanSearch,

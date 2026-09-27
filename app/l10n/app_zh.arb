@@ -970,5 +970,60 @@
     "placeholders": {
       "error": {"type": "String"}
     }
+  },
+  "catalogSelectionEnter": "选择漫画",
+  "catalogSelectionExit": "取消",
+  "catalogSelectionSelectPage": "全选本页",
+  "catalogSelectionClear": "清除选择",
+  "catalogSelectionEditMetadata": "编辑元数据",
+  "catalogSelectionSelectedCount": "已选 {count} 本",
+  "@catalogSelectionSelectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataTitle": "批量编辑元数据（{count} 本）",
+  "@bulkEditMetadataTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataConfirmTitle": "确认批量保存？",
+  "bulkEditMetadataConfirmBody": "将对 {comicCount} 本漫画应用 {fieldCount} 个启用字段。",
+  "@bulkEditMetadataConfirmBody": {
+    "placeholders": {
+      "comicCount": {"type": "int"},
+      "fieldCount": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataFieldTags": "标签",
+  "bulkEditMetadataFieldAuthors": "作者",
+  "bulkEditMetadataOpAdd": "添加",
+  "bulkEditMetadataOpRemove": "移除",
+  "bulkEditMetadataOpReplace": "替换",
+  "bulkEditMetadataMixedValues": "多种值",
+  "bulkEditMetadataOperationLabel": "操作",
+  "bulkEditMetadataCancelBatch": "取消批量编辑",
+  "bulkEditMetadataBusy": "正在批量编辑 {count} 本漫画…",
+  "@bulkEditMetadataBusy": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataBatchDone": "批量编辑完成：已更新 {succeeded}，失败 {failed}，无变化 {unchanged}",
+  "@bulkEditMetadataBatchDone": {
+    "placeholders": {
+      "succeeded": {"type": "int"},
+      "failed": {"type": "int"},
+      "unchanged": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataBatchCancelled": "已取消批量编辑（已更新 {succeeded}，失败 {failed}，无变化 {unchanged}）",
+  "@bulkEditMetadataBatchCancelled": {
+    "placeholders": {
+      "succeeded": {"type": "int"},
+      "failed": {"type": "int"},
+      "unchanged": {"type": "int"}
+    }
   }
 }

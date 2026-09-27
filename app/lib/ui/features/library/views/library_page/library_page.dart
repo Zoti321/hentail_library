@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/features/library/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_cover_viewport_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_inactive_subscription.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
@@ -43,6 +44,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   void dispose() {
+    ref.read(catalogSelectionProvider.notifier).exit();
     _coverViewportThrottleTimer?.cancel();
     _scrollController.removeListener(_scheduleCoverViewportUpdate);
     _scrollController.dispose();

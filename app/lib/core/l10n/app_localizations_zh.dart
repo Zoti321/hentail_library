@@ -1990,4 +1990,80 @@ class AppLocalizationsZh extends AppLocalizations {
   String bootstrapStartupFailed(String error) {
     return '启动失败：$error';
   }
+
+  @override
+  String get catalogSelectionEnter => '选择漫画';
+
+  @override
+  String get catalogSelectionExit => '取消';
+
+  @override
+  String get catalogSelectionSelectPage => '全选本页';
+
+  @override
+  String get catalogSelectionClear => '清除选择';
+
+  @override
+  String get catalogSelectionEditMetadata => '编辑元数据';
+
+  @override
+  String catalogSelectionSelectedCount(int count) {
+    return '已选 $count 本';
+  }
+
+  @override
+  String bulkEditMetadataTitle(int count) {
+    return '批量编辑元数据（$count 本）';
+  }
+
+  @override
+  String get bulkEditMetadataConfirmTitle => '确认批量保存？';
+
+  @override
+  String bulkEditMetadataConfirmBody(int comicCount, int fieldCount) {
+    return '将对 $comicCount 本漫画应用 $fieldCount 个启用字段。';
+  }
+
+  @override
+  String get bulkEditMetadataFieldTags => '标签';
+
+  @override
+  String get bulkEditMetadataFieldAuthors => '作者';
+
+  @override
+  String get bulkEditMetadataOpAdd => '添加';
+
+  @override
+  String get bulkEditMetadataOpRemove => '移除';
+
+  @override
+  String get bulkEditMetadataOpReplace => '替换';
+
+  @override
+  String get bulkEditMetadataMixedValues => '多种值';
+
+  @override
+  String get bulkEditMetadataOperationLabel => '操作';
+
+  @override
+  String get bulkEditMetadataCancelBatch => '取消批量编辑';
+
+  @override
+  String bulkEditMetadataBusy(int count) {
+    return '正在批量编辑 $count 本漫画…';
+  }
+
+  @override
+  String bulkEditMetadataBatchDone(int succeeded, int failed, int unchanged) {
+    return '批量编辑完成：已更新 $succeeded，失败 $failed，无变化 $unchanged';
+  }
+
+  @override
+  String bulkEditMetadataBatchCancelled(
+    int succeeded,
+    int failed,
+    int unchanged,
+  ) {
+    return '已取消批量编辑（已更新 $succeeded，失败 $failed，无变化 $unchanged）';
+  }
 }

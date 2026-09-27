@@ -970,5 +970,60 @@
     "placeholders": {
       "error": {"type": "String"}
     }
+  },
+  "catalogSelectionEnter": "Select comics",
+  "catalogSelectionExit": "Cancel",
+  "catalogSelectionSelectPage": "Select page",
+  "catalogSelectionClear": "Clear selection",
+  "catalogSelectionEditMetadata": "Edit metadata",
+  "catalogSelectionSelectedCount": "{count} selected",
+  "@catalogSelectionSelectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataTitle": "Bulk edit metadata ({count} comics)",
+  "@bulkEditMetadataTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataConfirmTitle": "Save bulk changes?",
+  "bulkEditMetadataConfirmBody": "Apply {fieldCount} enabled field(s) to {comicCount} comics.",
+  "@bulkEditMetadataConfirmBody": {
+    "placeholders": {
+      "comicCount": {"type": "int"},
+      "fieldCount": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataFieldTags": "Tags",
+  "bulkEditMetadataFieldAuthors": "Authors",
+  "bulkEditMetadataOpAdd": "Add",
+  "bulkEditMetadataOpRemove": "Remove",
+  "bulkEditMetadataOpReplace": "Replace",
+  "bulkEditMetadataMixedValues": "Mixed values",
+  "bulkEditMetadataOperationLabel": "Operation",
+  "bulkEditMetadataCancelBatch": "Cancel bulk edit",
+  "bulkEditMetadataBusy": "Bulk editing {count} comics…",
+  "@bulkEditMetadataBusy": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataBatchDone": "Bulk edit done: {succeeded} updated, {failed} failed, {unchanged} unchanged",
+  "@bulkEditMetadataBatchDone": {
+    "placeholders": {
+      "succeeded": {"type": "int"},
+      "failed": {"type": "int"},
+      "unchanged": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataBatchCancelled": "Bulk edit cancelled ({succeeded} updated, {failed} failed, {unchanged} unchanged)",
+  "@bulkEditMetadataBatchCancelled": {
+    "placeholders": {
+      "succeeded": {"type": "int"},
+      "failed": {"type": "int"},
+      "unchanged": {"type": "int"}
+    }
   }
 }

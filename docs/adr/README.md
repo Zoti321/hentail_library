@@ -74,3 +74,4 @@ Accepted | Superseded by ADR-000N | Deprecated
 | [0019](./0019-application-data-wipe-and-uninstall-options.md) | 应用数据清除与卸载数据选项 | Accepted |
 | [0020](./0020-home-page-multi-library-entry.md) | 首页 reposition 为多库阅读入口 | Accepted |
 | [0021](./0021-library-resource-probe.md) | Library resource probe：轻量发现未入库 Resource | Accepted |
+| [0022](./0022-comic-metadata-bulk-patch.md) | Comic metadata bulk patch（core 批量用户元数据写入） | Accepted |

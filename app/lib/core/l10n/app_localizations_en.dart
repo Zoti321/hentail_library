@@ -2062,4 +2062,80 @@ class AppLocalizationsEn extends AppLocalizations {
   String bootstrapStartupFailed(String error) {
     return 'Startup failed: $error';
   }
+
+  @override
+  String get catalogSelectionEnter => 'Select comics';
+
+  @override
+  String get catalogSelectionExit => 'Cancel';
+
+  @override
+  String get catalogSelectionSelectPage => 'Select page';
+
+  @override
+  String get catalogSelectionClear => 'Clear selection';
+
+  @override
+  String get catalogSelectionEditMetadata => 'Edit metadata';
+
+  @override
+  String catalogSelectionSelectedCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String bulkEditMetadataTitle(int count) {
+    return 'Bulk edit metadata ($count comics)';
+  }
+
+  @override
+  String get bulkEditMetadataConfirmTitle => 'Save bulk changes?';
+
+  @override
+  String bulkEditMetadataConfirmBody(int comicCount, int fieldCount) {
+    return 'Apply $fieldCount enabled field(s) to $comicCount comics.';
+  }
+
+  @override
+  String get bulkEditMetadataFieldTags => 'Tags';
+
+  @override
+  String get bulkEditMetadataFieldAuthors => 'Authors';
+
+  @override
+  String get bulkEditMetadataOpAdd => 'Add';
+
+  @override
+  String get bulkEditMetadataOpRemove => 'Remove';
+
+  @override
+  String get bulkEditMetadataOpReplace => 'Replace';
+
+  @override
+  String get bulkEditMetadataMixedValues => 'Mixed values';
+
+  @override
+  String get bulkEditMetadataOperationLabel => 'Operation';
+
+  @override
+  String get bulkEditMetadataCancelBatch => 'Cancel bulk edit';
+
+  @override
+  String bulkEditMetadataBusy(int count) {
+    return 'Bulk editing $count comics…';
+  }
+
+  @override
+  String bulkEditMetadataBatchDone(int succeeded, int failed, int unchanged) {
+    return 'Bulk edit done: $succeeded updated, $failed failed, $unchanged unchanged';
+  }
+
+  @override
+  String bulkEditMetadataBatchCancelled(
+    int succeeded,
+    int failed,
+    int unchanged,
+  ) {
+    return 'Bulk edit cancelled ($succeeded updated, $failed failed, $unchanged unchanged)';
+  }
 }

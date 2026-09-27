@@ -7,6 +7,7 @@ import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/app_title_bar.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/diagnostic_mode_banner.dart';
 import 'package:hentai_library/ui/core/widgets/navigation/desktop_sidebar.dart';
+import 'package:hentai_library/ui/features/shell/views/comic_metadata_bulk_patch_shell_feedback.dart';
 import 'package:hentai_library/ui/features/shell/views/library_scan_shell_feedback.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/app_navigation.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/libraries_sidebar_section.dart';
@@ -151,6 +152,7 @@ class _ResponsiveAppShellState extends ConsumerState<ResponsiveAppShell> {
               if (showShellChrome) _ShellTitleBar(isReaderRoute: isReaderRoute),
               if (showShellChrome) const DiagnosticModeBanner(),
               if (showShellChrome) const LibraryScanShellFeedback(),
+              if (showShellChrome) const ComicMetadataBulkPatchShellFeedback(),
               Expanded(
                 child: hideAppSidebar
                     ? widget.routeChild

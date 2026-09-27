@@ -6,8 +6,10 @@
 import '../frb_generated.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'sync.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
+// These functions are ignored because they are not marked as `pub`: `map_bulk_patch`, `map_multi_value_op`, `map_multi_value_patch`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_fields_are_eq`, `assert_fields_are_eq`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `clone`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
 
 void initDbFrb({required String appDataDir, required String dbFileName}) =>
     RustLib.instance.api.crateApiComicInitDbFrb(
@@ -71,6 +73,16 @@ void setComicMetaLocksFrb({
 Future<void> refreshComicMetadataFrb({required String comicId}) =>
     RustLib.instance.api.crateApiComicRefreshComicMetadataFrb(comicId: comicId);
 
+Future<BulkPatchResultFrbDto> applyComicMetadataBulkPatchFrb({
+  required List<String> comicIds,
+  required ComicMetadataBulkPatchFrbDto patch,
+  required SyncHandleDto handle,
+}) => RustLib.instance.api.crateApiComicApplyComicMetadataBulkPatchFrb(
+  comicIds: comicIds,
+  patch: patch,
+  handle: handle,
+);
+
 Future<List<ComicDto>> searchByTagExpressionFrb({
   required List<String> mustInclude,
   required List<String> optionalOr,
@@ -100,6 +112,44 @@ Future<PlatformInt64> countAllComicsFrb() =>
 
 Stream<int> watchComicChanges() =>
     RustLib.instance.api.crateApiComicWatchComicChanges();
+
+class BulkPatchResultFrbDto {
+  final int succeeded;
+  final int failed;
+  final int unchanged;
+  final bool cancelled;
+  final List<String> errorSamples;
+
+  const BulkPatchResultFrbDto({
+    required this.succeeded,
+    required this.failed,
+    required this.unchanged,
+    required this.cancelled,
+    required this.errorSamples,
+  });
+
+  static Future<BulkPatchResultFrbDto> default_() =>
+      RustLib.instance.api.crateApiComicBulkPatchResultFrbDtoDefault();
+
+  @override
+  int get hashCode =>
+      succeeded.hashCode ^
+      failed.hashCode ^
+      unchanged.hashCode ^
+      cancelled.hashCode ^
+      errorSamples.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BulkPatchResultFrbDto &&
+          runtimeType == other.runtimeType &&
+          succeeded == other.succeeded &&
+          failed == other.failed &&
+          unchanged == other.unchanged &&
+          cancelled == other.cancelled &&
+          errorSamples == other.errorSamples;
+}
 
 class ComicDto {
   final String comicId;
@@ -314,6 +364,27 @@ class ComicMetaLocksDto {
           characters == other.characters;
 }
 
+class ComicMetadataBulkPatchFrbDto {
+  final MultiValuePatchFrbDto? tags;
+  final MultiValuePatchFrbDto? authors;
+
+  const ComicMetadataBulkPatchFrbDto({this.tags, this.authors});
+
+  static Future<ComicMetadataBulkPatchFrbDto> default_() =>
+      RustLib.instance.api.crateApiComicComicMetadataBulkPatchFrbDtoDefault();
+
+  @override
+  int get hashCode => tags.hashCode ^ authors.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ComicMetadataBulkPatchFrbDto &&
+          runtimeType == other.runtimeType &&
+          tags == other.tags &&
+          authors == other.authors;
+}
+
 enum ComicSortFieldDto {
   title,
   createdAt,
@@ -343,6 +414,26 @@ class ComicSortOptionDto {
           runtimeType == other.runtimeType &&
           field == other.field &&
           descending == other.descending;
+}
+
+enum MultiValueOpFrbDto { add, remove, replace }
+
+class MultiValuePatchFrbDto {
+  final MultiValueOpFrbDto op;
+  final List<String> values;
+
+  const MultiValuePatchFrbDto({required this.op, required this.values});
+
+  @override
+  int get hashCode => op.hashCode ^ values.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MultiValuePatchFrbDto &&
+          runtimeType == other.runtimeType &&
+          op == other.op &&
+          values == other.values;
 }
 
 class PageRequestDto {
