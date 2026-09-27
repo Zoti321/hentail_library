@@ -6,6 +6,7 @@ import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
+import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
 import 'package:hentai_library/ui/core/widgets/form/author_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/character_library_multi_select_field.dart';
@@ -645,28 +646,17 @@ class _BulkMultiValueFieldEditor extends StatelessWidget {
           ],
         ),
         if (state.enabled) ...<Widget>[
-          DropdownButtonFormField<ComicMetadataBulkMultiValueOp>(
-            value: state.op,
-            decoration: InputDecoration(
-              labelText: context.l10n.bulkEditMetadataOperationLabel,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(tokens.radius.xs),
-              ),
-            ),
+          _BulkEditOperationSelector(
+            label: context.l10n.bulkEditMetadataOperationLabel,
             items: ComicMetadataBulkMultiValueOp.values
                 .map(
                   (ComicMetadataBulkMultiValueOp op) =>
-                      DropdownMenuItem<ComicMetadataBulkMultiValueOp>(
-                        value: op,
-                        child: Text(opLabels[op] ?? op.name),
-                      ),
+                      CapsuleTabItem(label: opLabels[op] ?? op.name),
                 )
-                .toList(),
-            onChanged: (ComicMetadataBulkMultiValueOp? op) {
-              if (op == null) {
-                return;
-              }
-              state.op = op;
+                .toList(growable: false),
+            selectedIndex: ComicMetadataBulkMultiValueOp.values.indexOf(state.op),
+            onSelected: (int index) {
+              state.op = ComicMetadataBulkMultiValueOp.values[index];
               onChanged();
             },
           ),
@@ -733,33 +723,64 @@ class _BulkScalarFieldEditor extends StatelessWidget {
           ],
         ),
         if (state.enabled) ...<Widget>[
-          DropdownButtonFormField<ComicMetadataBulkScalarOp>(
-            value: state.op,
-            decoration: InputDecoration(
-              labelText: context.l10n.bulkEditMetadataOperationLabel,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(tokens.radius.xs),
-              ),
-            ),
+          _BulkEditOperationSelector(
+            label: context.l10n.bulkEditMetadataOperationLabel,
             items: ComicMetadataBulkScalarOp.values
                 .map(
                   (ComicMetadataBulkScalarOp op) =>
-                      DropdownMenuItem<ComicMetadataBulkScalarOp>(
-                        value: op,
-                        child: Text(opLabels[op] ?? op.name),
-                      ),
+                      CapsuleTabItem(label: opLabels[op] ?? op.name),
                 )
-                .toList(),
-            onChanged: (ComicMetadataBulkScalarOp? op) {
-              if (op == null) {
-                return;
-              }
-              state.op = op;
+                .toList(growable: false),
+            selectedIndex: ComicMetadataBulkScalarOp.values.indexOf(state.op),
+            onSelected: (int index) {
+              state.op = ComicMetadataBulkScalarOp.values[index];
               onChanged();
             },
           ),
           child,
         ],
+      ],
+    );
+  }
+}
+
+class _BulkEditOperationSelector extends StatelessWidget {
+  const _BulkEditOperationSelector({
+    required this.label,
+    required this.items,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final String label;
+  final List<CapsuleTabItem> items;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: tokens.spacing.xs,
+      children: <Widget>[
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: tokens.text.bodySm,
+            fontWeight: FontWeight.w500,
+            color: cs.hentai.textPrimary,
+          ),
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: CapsuleTabBar(
+            items: items,
+            selectedIndex: selectedIndex,
+            onSelected: onSelected,
+          ),
+        ),
       ],
     );
   }

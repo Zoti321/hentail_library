@@ -1005,7 +1005,7 @@
   "bulkEditMetadataFieldDescription": "Description",
   "bulkEditMetadataFieldPublishedAt": "Published date",
   "bulkEditMetadataOpClear": "Clear",
-  "seriesDetailEditMembersMetadata": "Edit member metadata…",
+  "seriesDetailEditMembersMetadata": "Bulk edit metadata",
   "bulkEditMetadataOpAdd": "Add",
   "bulkEditMetadataOpRemove": "Remove",
   "bulkEditMetadataOpReplace": "Replace",

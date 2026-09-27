@@ -45,7 +45,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   void dispose() {
-    ref.read(catalogSelectionProvider.notifier).exit();
+    exitCatalogSelectionFromContext(context);
     _coverViewportThrottleTimer?.cancel();
     _scrollController.removeListener(_scheduleCoverViewportUpdate);
     _scrollController.dispose();

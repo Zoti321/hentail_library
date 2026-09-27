@@ -3771,7 +3771,7 @@ abstract class AppLocalizations {
   /// No description provided for @seriesDetailEditMembersMetadata.
   ///
   /// In zh, this message translates to:
-  /// **'编辑成员元数据…'**
+  /// **'批量编辑元数据'**
   String get seriesDetailEditMembersMetadata;
 
   /// No description provided for @bulkEditMetadataOpAdd.

@@ -2124,7 +2124,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bulkEditMetadataOpClear => 'Clear';
 
   @override
-  String get seriesDetailEditMembersMetadata => 'Edit member metadata…';
+  String get seriesDetailEditMembersMetadata => 'Bulk edit metadata';
 
   @override
   String get bulkEditMetadataOpAdd => 'Add';

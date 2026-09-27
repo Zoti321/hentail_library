@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
@@ -110,3 +111,12 @@ final catalogSelectionProvider =
     NotifierProvider<CatalogSelectionNotifier, CatalogSelectionState>(
       CatalogSelectionNotifier.new,
     );
+
+/// 离库页路由时退出选择模式；[ConsumerState.dispose] 中 [Ref] 已失效，须走 [ProviderScope]。
+void exitCatalogSelectionFromContext(BuildContext context) {
+  try {
+    ProviderScope.containerOf(
+      context,
+    ).read(catalogSelectionProvider.notifier).exit();
+  } catch (_) {}
+}

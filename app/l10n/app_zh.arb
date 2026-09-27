@@ -1005,7 +1005,7 @@
   "bulkEditMetadataFieldDescription": "概要",
   "bulkEditMetadataFieldPublishedAt": "发布日期",
   "bulkEditMetadataOpClear": "清除",
-  "seriesDetailEditMembersMetadata": "编辑成员元数据…",
+  "seriesDetailEditMembersMetadata": "批量编辑元数据",
   "bulkEditMetadataOpAdd": "添加",
   "bulkEditMetadataOpRemove": "移除",
   "bulkEditMetadataOpReplace": "替换",

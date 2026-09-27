@@ -2052,7 +2052,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get bulkEditMetadataOpClear => '清除';
 
   @override
-  String get seriesDetailEditMembersMetadata => '编辑成员元数据…';
+  String get seriesDetailEditMembersMetadata => '批量编辑元数据';
 
   @override
   String get bulkEditMetadataOpAdd => '添加';
