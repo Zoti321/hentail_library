@@ -73,7 +73,7 @@ class SearchedPageHeaderSection extends ConsumerWidget {
           MetaChip(icon: LucideIcons.search, label: '$resultCount'),
           const Spacer(),
           GhostButton.icon(
-            icon: LucideIcons.checkSquare,
+            icon: LucideIcons.squareCheck,
             tooltip: context.l10n.catalogSelectionEnter,
             semanticLabel: context.l10n.catalogSelectionEnter,
             iconSize: 16,

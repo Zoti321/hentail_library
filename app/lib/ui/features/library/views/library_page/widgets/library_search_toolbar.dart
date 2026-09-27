@@ -633,7 +633,7 @@ class _LibraryOverflowMenu extends StatelessWidget {
               onTap: onRefresh,
             ),
             _LibraryOverflowMenuItem(
-              icon: LucideIcons.checkSquare,
+              icon: LucideIcons.squareCheck,
               label: l10n.catalogSelectionEnter,
               onTap: onEnterSelection,
             ),
