@@ -28,6 +28,26 @@ _Avoid_: 活动库、选中书架
 跨多个 Library 的聚合浏览面（趋近 Komga「全部库」）；不是一个 Library。路由占位为 `/libraries/all`；本阶段仅占位提示，不实现聚合目录。
 _Avoid_: 全部库（若被理解成一个 Library）、合并库、全局书架
 
+**Home page**:
+应用启动后的默认路由（`/home`）：全局阅读入口与多库态势摘要。展示继续阅读、Recently added on Home、全库聚合统计、Home library alert；**不**展示 Current library 指示，**不**提供常驻 Library sync 入口。详见 ADR-0020。
+_Avoid_: 当前库仪表盘、首页扫描、Home dashboard（口语可用；文档与 issue 用 Home page）
+
+**Home library alert**:
+Home page 上可 dismiss 的、按 Library 粒度的态势条：远程根不可达、上次 Library sync 失败、距上次成功 sync 过久而建议再次 sync、Library resource probe 发现待同步 Resource 等。用户可从 alert 对该 Library 触发 Library sync；非常驻全局扫描按钮。
+_Avoid_: 首页扫描按钮、当前库健康面板、库通知中心
+
+**Library resource probe**:
+对某 Library 的 Library root 做只读枚举，与 **Library resource snapshot** diff，得到新增/变更/移除 Resource 计数；不解析 archive、不写 Comic/Series、不持 library 写锁。结果供 Home library alert 等 UI；用户确认后再执行 Library sync。详见 ADR-0021。
+_Avoid_: 轻量扫描、预扫描、自动 sync、文件监听（口语可用；领域与 issue 用 Library resource probe）
+
+**Library resource snapshot**:
+某 Library 在 **上次成功 Library sync 结束** 时持久化的 Resource 索引（规范化 location_key + modified_ms + size + resource_type）；供 Library resource probe diff。sync 失败或取消不更新；不是 Metadata backup，也不是 Comic 身份。
+_Avoid_: 扫描缓存、thumbnail stat、内容哈希索引
+
+**Recently added on Home**:
+Home page 横滑区块：跨全部 Library 取最近入库的 Comic（按库内记录时间降序，Top N），卡片标注来源 Library 显示名；点击进 Comic 详情或 Read session。不是推荐算法流。
+_Avoid_: 首页推荐、发现流、For you
+
 **Local library**:
 Library root 为本机目录的 Library；Resource 来自本地文件系统；入库后可离线阅读。
 _Avoid_: 本地书架、磁盘库（口语可用，文档用 Local library）
