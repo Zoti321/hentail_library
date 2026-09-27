@@ -4,6 +4,11 @@ import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 
 enum LibraryLayoutTier { compact, medium, expanded }
 
+/// 库页常规顶栏 ↔ 选择模式顶栏切换时长（对齐桌面短动效）。
+const Duration kLibraryHeaderModeTransitionDuration = Duration(
+  milliseconds: 180,
+);
+
 LibraryLayoutTier libraryLayoutTierForWidth(double width) {
   if (AppLayoutBreakpoints.isCompact(width)) {
     return LibraryLayoutTier.compact;

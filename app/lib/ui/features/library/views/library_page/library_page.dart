@@ -10,7 +10,6 @@ import 'package:hentai_library/ui/features/library/view_models/library_catalog_i
 import 'package:hentai_library/ui/features/library/view_models/library_comics_catalog_controller.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_page_facade_notifier.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_series_catalog_controller.dart';
-import 'package:hentai_library/ui/features/library/views/widgets/catalog_selection_header_section.dart';
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 import 'package:hentai_library/ui/core/widgets/responsive_layout/library_blocks_layout.dart';
@@ -235,19 +234,14 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                       .toList(growable: false) ??
                   const <String>[]
             : const <String>[];
-        final Widget headerSection = selectionActive
-            ? CatalogSelectionHeaderSection(
-                layoutTier: layoutTier,
-                horizontalPadding: horizontalPadding,
-                pageComicIds: pageComicIds,
-                onOpenNavigation: appShellPageNavigationOpener(context),
-              )
-            : LibraryPageHeaderSection(
-                layoutTier: layoutTier,
-                horizontalPadding: horizontalPadding,
-                onOpenFilterSort: _openFilterSortDrawer,
-                onOpenNavigation: appShellPageNavigationOpener(context),
-              );
+        final Widget headerSection = LibraryPageAnimatedHeader(
+          selectionActive: selectionActive,
+          layoutTier: layoutTier,
+          horizontalPadding: horizontalPadding,
+          pageComicIds: pageComicIds,
+          onOpenFilterSort: _openFilterSortDrawer,
+          onOpenNavigation: appShellPageNavigationOpener(context),
+        );
         final Widget header = KeyedSubtree(
           key: _headerMeasureKey,
           child: headerSection,
