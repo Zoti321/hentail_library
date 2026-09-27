@@ -4695,9 +4695,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PublishedAtPatchFrbDto dco_decode_box_autoadd_published_at_patch_frb_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_published_at_patch_frb_dto(raw);
+  }
+
+  @protected
   ReadingHistoryDto dco_decode_box_autoadd_reading_history_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_reading_history_dto(raw);
+  }
+
+  @protected
+  ScalarPatchFrbDto dco_decode_box_autoadd_scalar_patch_frb_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_scalar_patch_frb_dto(raw);
   }
 
   @protected
@@ -4864,11 +4878,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
     return ComicMetadataBulkPatchFrbDto(
       tags: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[0]),
       authors: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[1]),
+      languages: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[2]),
+      parodies: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[3]),
+      characters: dco_decode_opt_box_autoadd_multi_value_patch_frb_dto(arr[4]),
+      contentRating: dco_decode_opt_String(arr[5]),
+      description: dco_decode_opt_box_autoadd_scalar_patch_frb_dto(arr[6]),
+      publishedAt: dco_decode_opt_box_autoadd_published_at_patch_frb_dto(
+        arr[7],
+      ),
     );
   }
 
@@ -5421,11 +5443,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PublishedAtPatchFrbDto? dco_decode_opt_box_autoadd_published_at_patch_frb_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_published_at_patch_frb_dto(raw);
+  }
+
+  @protected
   ReadingHistoryDto? dco_decode_opt_box_autoadd_reading_history_dto(
     dynamic raw,
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_reading_history_dto(raw);
+  }
+
+  @protected
+  ScalarPatchFrbDto? dco_decode_opt_box_autoadd_scalar_patch_frb_dto(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_scalar_patch_frb_dto(raw);
   }
 
   @protected
@@ -5552,6 +5594,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PublishedAtPatchFrbDto dco_decode_published_at_patch_frb_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return PublishedAtPatchFrbDto_Replace(dco_decode_i_64(raw[1]));
+      case 1:
+        return PublishedAtPatchFrbDto_Clear();
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
   ReaderPageDto dco_decode_reader_page_dto(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     switch (raw[0]) {
@@ -5637,6 +5692,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       libraryId: dco_decode_String(arr[0]),
       password: dco_decode_String(arr[1]),
     );
+  }
+
+  @protected
+  ScalarPatchFrbDto dco_decode_scalar_patch_frb_dto(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return ScalarPatchFrbDto_Replace(dco_decode_String(raw[1]));
+      case 1:
+        return ScalarPatchFrbDto_Clear();
+      default:
+        throw Exception("unreachable");
+    }
   }
 
   @protected
@@ -6277,11 +6345,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PublishedAtPatchFrbDto sse_decode_box_autoadd_published_at_patch_frb_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_published_at_patch_frb_dto(deserializer));
+  }
+
+  @protected
   ReadingHistoryDto sse_decode_box_autoadd_reading_history_dto(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_reading_history_dto(deserializer));
+  }
+
+  @protected
+  ScalarPatchFrbDto sse_decode_box_autoadd_scalar_patch_frb_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_scalar_patch_frb_dto(deserializer));
   }
 
   @protected
@@ -6500,7 +6584,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_authors = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(
       deserializer,
     );
-    return ComicMetadataBulkPatchFrbDto(tags: var_tags, authors: var_authors);
+    var var_languages = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(
+      deserializer,
+    );
+    var var_parodies = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(
+      deserializer,
+    );
+    var var_characters = sse_decode_opt_box_autoadd_multi_value_patch_frb_dto(
+      deserializer,
+    );
+    var var_contentRating = sse_decode_opt_String(deserializer);
+    var var_description = sse_decode_opt_box_autoadd_scalar_patch_frb_dto(
+      deserializer,
+    );
+    var var_publishedAt = sse_decode_opt_box_autoadd_published_at_patch_frb_dto(
+      deserializer,
+    );
+    return ComicMetadataBulkPatchFrbDto(
+      tags: var_tags,
+      authors: var_authors,
+      languages: var_languages,
+      parodies: var_parodies,
+      characters: var_characters,
+      contentRating: var_contentRating,
+      description: var_description,
+      publishedAt: var_publishedAt,
+    );
   }
 
   @protected
@@ -7261,6 +7370,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PublishedAtPatchFrbDto? sse_decode_opt_box_autoadd_published_at_patch_frb_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_published_at_patch_frb_dto(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   ReadingHistoryDto? sse_decode_opt_box_autoadd_reading_history_dto(
     SseDeserializer deserializer,
   ) {
@@ -7268,6 +7390,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_reading_history_dto(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ScalarPatchFrbDto? sse_decode_opt_box_autoadd_scalar_patch_frb_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_scalar_patch_frb_dto(deserializer));
     } else {
       return null;
     }
@@ -7437,6 +7572,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PublishedAtPatchFrbDto sse_decode_published_at_patch_frb_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_field0 = sse_decode_i_64(deserializer);
+        return PublishedAtPatchFrbDto_Replace(var_field0);
+      case 1:
+        return PublishedAtPatchFrbDto_Clear();
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
   ReaderPageDto sse_decode_reader_page_dto(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -7530,6 +7683,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       libraryId: var_libraryId,
       password: var_password,
     );
+  }
+
+  @protected
+  ScalarPatchFrbDto sse_decode_scalar_patch_frb_dto(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_field0 = sse_decode_String(deserializer);
+        return ScalarPatchFrbDto_Replace(var_field0);
+      case 1:
+        return ScalarPatchFrbDto_Clear();
+      default:
+        throw UnimplementedError('');
+    }
   }
 
   @protected
@@ -8342,12 +8513,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_published_at_patch_frb_dto(
+    PublishedAtPatchFrbDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_published_at_patch_frb_dto(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_reading_history_dto(
     ReadingHistoryDto self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_reading_history_dto(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_scalar_patch_frb_dto(
+    ScalarPatchFrbDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_scalar_patch_frb_dto(self, serializer);
   }
 
   @protected
@@ -8525,6 +8714,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(self.tags, serializer);
     sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(
       self.authors,
+      serializer,
+    );
+    sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(
+      self.languages,
+      serializer,
+    );
+    sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(
+      self.parodies,
+      serializer,
+    );
+    sse_encode_opt_box_autoadd_multi_value_patch_frb_dto(
+      self.characters,
+      serializer,
+    );
+    sse_encode_opt_String(self.contentRating, serializer);
+    sse_encode_opt_box_autoadd_scalar_patch_frb_dto(
+      self.description,
+      serializer,
+    );
+    sse_encode_opt_box_autoadd_published_at_patch_frb_dto(
+      self.publishedAt,
       serializer,
     );
   }
@@ -9177,6 +9387,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_published_at_patch_frb_dto(
+    PublishedAtPatchFrbDto? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_published_at_patch_frb_dto(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_reading_history_dto(
     ReadingHistoryDto? self,
     SseSerializer serializer,
@@ -9186,6 +9409,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_reading_history_dto(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_scalar_patch_frb_dto(
+    ScalarPatchFrbDto? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_scalar_patch_frb_dto(self, serializer);
     }
   }
 
@@ -9326,6 +9562,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_published_at_patch_frb_dto(
+    PublishedAtPatchFrbDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case PublishedAtPatchFrbDto_Replace(field0: final field0):
+        sse_encode_i_32(0, serializer);
+        sse_encode_i_64(field0, serializer);
+      case PublishedAtPatchFrbDto_Clear():
+        sse_encode_i_32(1, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_reader_page_dto(
     ReaderPageDto self,
     SseSerializer serializer,
@@ -9396,6 +9647,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.libraryId, serializer);
     sse_encode_String(self.password, serializer);
+  }
+
+  @protected
+  void sse_encode_scalar_patch_frb_dto(
+    ScalarPatchFrbDto self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case ScalarPatchFrbDto_Replace(field0: final field0):
+        sse_encode_i_32(0, serializer);
+        sse_encode_String(field0, serializer);
+      case ScalarPatchFrbDto_Clear():
+        sse_encode_i_32(1, serializer);
+    }
   }
 
   @protected

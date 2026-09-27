@@ -4755,9 +4755,26 @@ impl SseDecode for crate::api::comic::ComicMetadataBulkPatchFrbDto {
             <Option<crate::api::comic::MultiValuePatchFrbDto>>::sse_decode(deserializer);
         let mut var_authors =
             <Option<crate::api::comic::MultiValuePatchFrbDto>>::sse_decode(deserializer);
+        let mut var_languages =
+            <Option<crate::api::comic::MultiValuePatchFrbDto>>::sse_decode(deserializer);
+        let mut var_parodies =
+            <Option<crate::api::comic::MultiValuePatchFrbDto>>::sse_decode(deserializer);
+        let mut var_characters =
+            <Option<crate::api::comic::MultiValuePatchFrbDto>>::sse_decode(deserializer);
+        let mut var_contentRating = <Option<String>>::sse_decode(deserializer);
+        let mut var_description =
+            <Option<crate::api::comic::ScalarPatchFrbDto>>::sse_decode(deserializer);
+        let mut var_publishedAt =
+            <Option<crate::api::comic::PublishedAtPatchFrbDto>>::sse_decode(deserializer);
         return crate::api::comic::ComicMetadataBulkPatchFrbDto {
             tags: var_tags,
             authors: var_authors,
+            languages: var_languages,
+            parodies: var_parodies,
+            characters: var_characters,
+            content_rating: var_contentRating,
+            description: var_description,
+            published_at: var_publishedAt,
         };
     }
 }
@@ -5534,11 +5551,37 @@ impl SseDecode for Option<crate::api::comic::MultiValuePatchFrbDto> {
     }
 }
 
+impl SseDecode for Option<crate::api::comic::PublishedAtPatchFrbDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::api::comic::PublishedAtPatchFrbDto>::sse_decode(
+                deserializer,
+            ));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<crate::api::history::ReadingHistoryDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         if (<bool>::sse_decode(deserializer)) {
             return Some(<crate::api::history::ReadingHistoryDto>::sse_decode(
+                deserializer,
+            ));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::api::comic::ScalarPatchFrbDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::api::comic::ScalarPatchFrbDto>::sse_decode(
                 deserializer,
             ));
         } else {
@@ -5706,6 +5749,25 @@ impl SseDecode for crate::api::metadata_backup::PreviewImportComicMetadataResult
     }
 }
 
+impl SseDecode for crate::api::comic::PublishedAtPatchFrbDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_field0 = <i64>::sse_decode(deserializer);
+                return crate::api::comic::PublishedAtPatchFrbDto::Replace(var_field0);
+            }
+            1 => {
+                return crate::api::comic::PublishedAtPatchFrbDto::Clear;
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
 impl SseDecode for crate::api::reader::ReaderPageDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5797,6 +5859,25 @@ impl SseDecode for crate::api::sync::RemoteLibraryCredentialDto {
             library_id: var_libraryId,
             password: var_password,
         };
+    }
+}
+
+impl SseDecode for crate::api::comic::ScalarPatchFrbDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut tag_ = <i32>::sse_decode(deserializer);
+        match tag_ {
+            0 => {
+                let mut var_field0 = <String>::sse_decode(deserializer);
+                return crate::api::comic::ScalarPatchFrbDto::Replace(var_field0);
+            }
+            1 => {
+                return crate::api::comic::ScalarPatchFrbDto::Clear;
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 
@@ -6981,6 +7062,12 @@ impl flutter_rust_bridge::IntoDart for crate::api::comic::ComicMetadataBulkPatch
         [
             self.tags.into_into_dart().into_dart(),
             self.authors.into_into_dart().into_dart(),
+            self.languages.into_into_dart().into_dart(),
+            self.parodies.into_into_dart().into_dart(),
+            self.characters.into_into_dart().into_dart(),
+            self.content_rating.into_into_dart().into_dart(),
+            self.description.into_into_dart().into_dart(),
+            self.published_at.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -7705,6 +7792,31 @@ impl
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::comic::PublishedAtPatchFrbDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            crate::api::comic::PublishedAtPatchFrbDto::Replace(field0) => {
+                [0.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::api::comic::PublishedAtPatchFrbDto::Clear => [1.into_dart()].into_dart(),
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::comic::PublishedAtPatchFrbDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::PublishedAtPatchFrbDto>
+    for crate::api::comic::PublishedAtPatchFrbDto
+{
+    fn into_into_dart(self) -> crate::api::comic::PublishedAtPatchFrbDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::reader::ReaderPageDto {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
@@ -7840,6 +7952,31 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::sync::RemoteLibraryCredential
     for crate::api::sync::RemoteLibraryCredentialDto
 {
     fn into_into_dart(self) -> crate::api::sync::RemoteLibraryCredentialDto {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::comic::ScalarPatchFrbDto {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            crate::api::comic::ScalarPatchFrbDto::Replace(field0) => {
+                [0.into_dart(), field0.into_into_dart().into_dart()].into_dart()
+            }
+            crate::api::comic::ScalarPatchFrbDto::Clear => [1.into_dart()].into_dart(),
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::comic::ScalarPatchFrbDto
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::comic::ScalarPatchFrbDto>
+    for crate::api::comic::ScalarPatchFrbDto
+{
+    fn into_into_dart(self) -> crate::api::comic::ScalarPatchFrbDto {
         self
     }
 }
@@ -8721,6 +8858,15 @@ impl SseEncode for crate::api::comic::ComicMetadataBulkPatchFrbDto {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Option<crate::api::comic::MultiValuePatchFrbDto>>::sse_encode(self.tags, serializer);
         <Option<crate::api::comic::MultiValuePatchFrbDto>>::sse_encode(self.authors, serializer);
+        <Option<crate::api::comic::MultiValuePatchFrbDto>>::sse_encode(self.languages, serializer);
+        <Option<crate::api::comic::MultiValuePatchFrbDto>>::sse_encode(self.parodies, serializer);
+        <Option<crate::api::comic::MultiValuePatchFrbDto>>::sse_encode(self.characters, serializer);
+        <Option<String>>::sse_encode(self.content_rating, serializer);
+        <Option<crate::api::comic::ScalarPatchFrbDto>>::sse_encode(self.description, serializer);
+        <Option<crate::api::comic::PublishedAtPatchFrbDto>>::sse_encode(
+            self.published_at,
+            serializer,
+        );
     }
 }
 
@@ -9326,12 +9472,32 @@ impl SseEncode for Option<crate::api::comic::MultiValuePatchFrbDto> {
     }
 }
 
+impl SseEncode for Option<crate::api::comic::PublishedAtPatchFrbDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::api::comic::PublishedAtPatchFrbDto>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<crate::api::history::ReadingHistoryDto> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <crate::api::history::ReadingHistoryDto>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::api::comic::ScalarPatchFrbDto> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::api::comic::ScalarPatchFrbDto>::sse_encode(value, serializer);
         }
     }
 }
@@ -9454,6 +9620,24 @@ impl SseEncode for crate::api::metadata_backup::PreviewImportComicMetadataResult
     }
 }
 
+impl SseEncode for crate::api::comic::PublishedAtPatchFrbDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            crate::api::comic::PublishedAtPatchFrbDto::Replace(field0) => {
+                <i32>::sse_encode(0, serializer);
+                <i64>::sse_encode(field0, serializer);
+            }
+            crate::api::comic::PublishedAtPatchFrbDto::Clear => {
+                <i32>::sse_encode(1, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
+    }
+}
+
 impl SseEncode for crate::api::reader::ReaderPageDto {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -9517,6 +9701,24 @@ impl SseEncode for crate::api::sync::RemoteLibraryCredentialDto {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.library_id, serializer);
         <String>::sse_encode(self.password, serializer);
+    }
+}
+
+impl SseEncode for crate::api::comic::ScalarPatchFrbDto {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        match self {
+            crate::api::comic::ScalarPatchFrbDto::Replace(field0) => {
+                <i32>::sse_encode(0, serializer);
+                <String>::sse_encode(field0, serializer);
+            }
+            crate::api::comic::ScalarPatchFrbDto::Clear => {
+                <i32>::sse_encode(1, serializer);
+            }
+            _ => {
+                unimplemented!("");
+            }
+        }
     }
 }
 

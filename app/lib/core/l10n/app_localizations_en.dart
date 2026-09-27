@@ -2103,6 +2103,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bulkEditMetadataFieldAuthors => 'Authors';
 
   @override
+  String get bulkEditMetadataFieldLanguages => 'Languages';
+
+  @override
+  String get bulkEditMetadataFieldParodies => 'Parodies';
+
+  @override
+  String get bulkEditMetadataFieldCharacters => 'Characters';
+
+  @override
+  String get bulkEditMetadataFieldContentRating => 'Content rating';
+
+  @override
+  String get bulkEditMetadataFieldDescription => 'Description';
+
+  @override
+  String get bulkEditMetadataFieldPublishedAt => 'Published date';
+
+  @override
+  String get bulkEditMetadataOpClear => 'Clear';
+
+  @override
+  String get seriesDetailEditMembersMetadata => 'Edit member metadata…';
+
+  @override
   String get bulkEditMetadataOpAdd => 'Add';
 
   @override

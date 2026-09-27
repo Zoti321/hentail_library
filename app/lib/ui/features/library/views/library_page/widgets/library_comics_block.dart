@@ -44,9 +44,6 @@ class LibraryComicsBlock extends ConsumerWidget {
       );
     }
     final List<Comic> comics = catalog.items;
-    final List<String> pageComicIds = comics
-        .map((Comic c) => c.comicId)
-        .toList(growable: false);
     final bool isComicTableEmpty = catalog.isComicTableEmpty;
     final bool showPagination = catalog.showPagination;
     final LibraryComicSortOption sortOption = ref.watch(
@@ -67,9 +64,6 @@ class LibraryComicsBlock extends ConsumerWidget {
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
       sliver: SliverMainAxisGroup(
         slivers: <Widget>[
-          SliverToBoxAdapter(
-            child: CatalogSelectionToolbar(pageComicIds: pageComicIds),
-          ),
           if (showPagination)
             const LibraryPaginationBarSliver(
               target: LibraryDisplayTarget.comics,

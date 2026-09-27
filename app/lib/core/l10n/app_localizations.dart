@@ -3726,6 +3726,54 @@ abstract class AppLocalizations {
   /// **'作者'**
   String get bulkEditMetadataFieldAuthors;
 
+  /// No description provided for @bulkEditMetadataFieldLanguages.
+  ///
+  /// In zh, this message translates to:
+  /// **'语言'**
+  String get bulkEditMetadataFieldLanguages;
+
+  /// No description provided for @bulkEditMetadataFieldParodies.
+  ///
+  /// In zh, this message translates to:
+  /// **'原作'**
+  String get bulkEditMetadataFieldParodies;
+
+  /// No description provided for @bulkEditMetadataFieldCharacters.
+  ///
+  /// In zh, this message translates to:
+  /// **'角色'**
+  String get bulkEditMetadataFieldCharacters;
+
+  /// No description provided for @bulkEditMetadataFieldContentRating.
+  ///
+  /// In zh, this message translates to:
+  /// **'内容分级'**
+  String get bulkEditMetadataFieldContentRating;
+
+  /// No description provided for @bulkEditMetadataFieldDescription.
+  ///
+  /// In zh, this message translates to:
+  /// **'概要'**
+  String get bulkEditMetadataFieldDescription;
+
+  /// No description provided for @bulkEditMetadataFieldPublishedAt.
+  ///
+  /// In zh, this message translates to:
+  /// **'发布日期'**
+  String get bulkEditMetadataFieldPublishedAt;
+
+  /// No description provided for @bulkEditMetadataOpClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除'**
+  String get bulkEditMetadataOpClear;
+
+  /// No description provided for @seriesDetailEditMembersMetadata.
+  ///
+  /// In zh, this message translates to:
+  /// **'编辑成员元数据…'**
+  String get seriesDetailEditMembersMetadata;
+
   /// No description provided for @bulkEditMetadataOpAdd.
   ///
   /// In zh, this message translates to:

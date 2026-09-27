@@ -153,7 +153,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PageRequestDto dco_decode_box_autoadd_page_request_dto(dynamic raw);
 
   @protected
+  PublishedAtPatchFrbDto dco_decode_box_autoadd_published_at_patch_frb_dto(
+    dynamic raw,
+  );
+
+  @protected
   ReadingHistoryDto dco_decode_box_autoadd_reading_history_dto(dynamic raw);
+
+  @protected
+  ScalarPatchFrbDto dco_decode_box_autoadd_scalar_patch_frb_dto(dynamic raw);
 
   @protected
   SeriesDto dco_decode_box_autoadd_series_dto(dynamic raw);
@@ -410,7 +418,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  PublishedAtPatchFrbDto? dco_decode_opt_box_autoadd_published_at_patch_frb_dto(
+    dynamic raw,
+  );
+
+  @protected
   ReadingHistoryDto? dco_decode_opt_box_autoadd_reading_history_dto(
+    dynamic raw,
+  );
+
+  @protected
+  ScalarPatchFrbDto? dco_decode_opt_box_autoadd_scalar_patch_frb_dto(
     dynamic raw,
   );
 
@@ -454,6 +472,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   dco_decode_preview_import_comic_metadata_result_dto(dynamic raw);
 
   @protected
+  PublishedAtPatchFrbDto dco_decode_published_at_patch_frb_dto(dynamic raw);
+
+  @protected
   ReaderPageDto dco_decode_reader_page_dto(dynamic raw);
 
   @protected
@@ -476,6 +497,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RemoteLibraryCredentialDto dco_decode_remote_library_credential_dto(
     dynamic raw,
   );
+
+  @protected
+  ScalarPatchFrbDto dco_decode_scalar_patch_frb_dto(dynamic raw);
 
   @protected
   ScanIntervalDto dco_decode_scan_interval_dto(dynamic raw);
@@ -717,7 +741,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  PublishedAtPatchFrbDto sse_decode_box_autoadd_published_at_patch_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ReadingHistoryDto sse_decode_box_autoadd_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ScalarPatchFrbDto sse_decode_box_autoadd_scalar_patch_frb_dto(
     SseDeserializer deserializer,
   );
 
@@ -1034,7 +1068,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  PublishedAtPatchFrbDto? sse_decode_opt_box_autoadd_published_at_patch_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ReadingHistoryDto? sse_decode_opt_box_autoadd_reading_history_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ScalarPatchFrbDto? sse_decode_opt_box_autoadd_scalar_patch_frb_dto(
     SseDeserializer deserializer,
   );
 
@@ -1092,6 +1136,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  PublishedAtPatchFrbDto sse_decode_published_at_patch_frb_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ReaderPageDto sse_decode_reader_page_dto(SseDeserializer deserializer);
 
   @protected
@@ -1116,6 +1165,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RemoteLibraryCredentialDto sse_decode_remote_library_credential_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ScalarPatchFrbDto sse_decode_scalar_patch_frb_dto(
     SseDeserializer deserializer,
   );
 
@@ -1421,8 +1475,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_published_at_patch_frb_dto(
+    PublishedAtPatchFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_box_autoadd_reading_history_dto(
     ReadingHistoryDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_scalar_patch_frb_dto(
+    ScalarPatchFrbDto self,
     SseSerializer serializer,
   );
 
@@ -1823,8 +1889,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_opt_box_autoadd_published_at_patch_frb_dto(
+    PublishedAtPatchFrbDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_opt_box_autoadd_reading_history_dto(
     ReadingHistoryDto? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_scalar_patch_frb_dto(
+    ScalarPatchFrbDto? self,
     SseSerializer serializer,
   );
 
@@ -1892,6 +1970,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_published_at_patch_frb_dto(
+    PublishedAtPatchFrbDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_reader_page_dto(ReaderPageDto self, SseSerializer serializer);
 
   @protected
@@ -1921,6 +2005,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_remote_library_credential_dto(
     RemoteLibraryCredentialDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_scalar_patch_frb_dto(
+    ScalarPatchFrbDto self,
     SseSerializer serializer,
   );
 

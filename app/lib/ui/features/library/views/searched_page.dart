@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hentai_library/ui/features/library/view_models/catalog_selection_notifier.dart';
-import 'package:hentai_library/ui/features/library/views/widgets/catalog_selectable_comic_card.dart';
-import 'package:hentai_library/ui/features/library/views/widgets/catalog_selection_toolbar.dart';
-import 'package:hentai_library/ui/features/library/views/widgets/edit_metadata_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/ui/features/library/views/widgets/edit_metadata_dialog.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
@@ -33,12 +30,6 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
   final GlobalKey _headerMeasureKey = GlobalKey();
   double? _headerExtent;
   DateTime? _lastLoadMoreAttemptAt;
-
-  @override
-  void dispose() {
-    ref.read(catalogSelectionProvider.notifier).exit();
-    super.dispose();
-  }
 
   @override
   void didChangeDependencies() {
@@ -218,14 +209,7 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                   ),
                 ),
               )
-            else ...<Widget>[
-              SliverToBoxAdapter(
-                child: CatalogSelectionToolbar(
-                  pageComicIds: comics
-                      .map((Comic c) => c.comicId)
-                      .toList(growable: false),
-                ),
-              ),
+            else
               SliverPadding(
                 padding: EdgeInsets.fromLTRB(
                   horizontalPadding,
@@ -244,15 +228,14 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                   ) {
                     final Comic comic = comics[index];
                     return Center(
-                      child: CatalogSelectableComicCard(
+                      child: ComicCard(
                         key: Key('search-comic-${comic.comicId}'),
                         comic: comic,
-                        gridIndex: index,
                         onEditMetadata: () => showEditMetadataDialog(
                           context: context,
                           comic: comic,
                         ),
-                        onOpenDetail: () {
+                        onTap: () {
                           ref
                               .read(comicDetailReturnSeriesProvider.notifier)
                               .clear();
@@ -268,7 +251,6 @@ class _SearchedPageState extends ConsumerState<SearchedPage> {
                   }, childCount: comics.length),
                 ),
               ),
-            ],
           ],
         ],
       ),

@@ -6,7 +6,12 @@ class ComicMetadataBulkPatchCoordinator {
   const ComicMetadataBulkPatchCoordinator({
     required ComicMetadataBulkPatchFrbAdapter adapter,
     required void Function() onSucceeded,
-    required void Function({required bool tagsWritten, required bool authorsWritten})
+    required void Function({
+      required bool tagsWritten,
+      required bool authorsWritten,
+      required bool parodiesWritten,
+      required bool charactersWritten,
+    })
     onDictionariesChanged,
   }) : _adapter = adapter,
        _onSucceeded = onSucceeded,
@@ -14,7 +19,12 @@ class ComicMetadataBulkPatchCoordinator {
 
   final ComicMetadataBulkPatchFrbAdapter _adapter;
   final void Function() _onSucceeded;
-  final void Function({required bool tagsWritten, required bool authorsWritten})
+  final void Function({
+    required bool tagsWritten,
+    required bool authorsWritten,
+    required bool parodiesWritten,
+    required bool charactersWritten,
+  })
   _onDictionariesChanged;
 
   Future<ComicMetadataBulkPatchResult> apply({
@@ -30,6 +40,8 @@ class ComicMetadataBulkPatchCoordinator {
       _onDictionariesChanged(
         tagsWritten: patch.tags != null,
         authorsWritten: patch.authors != null,
+        parodiesWritten: patch.parodies != null,
+        charactersWritten: patch.characters != null,
       );
     }
     return result;

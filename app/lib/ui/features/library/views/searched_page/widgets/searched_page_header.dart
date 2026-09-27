@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hentai_library/ui/features/library/view_models/catalog_selection_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/navigation/library_management_actions.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
@@ -12,7 +10,7 @@ import 'package:hentai_library/ui/features/library/view_models/library_search_qu
 import 'package:hentai_library/ui/features/library/views/library_page/widgets/widgets.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class SearchedPageHeaderSection extends ConsumerWidget {
+class SearchedPageHeaderSection extends StatelessWidget {
   const SearchedPageHeaderSection({
     super.key,
     required this.layoutTier,
@@ -29,7 +27,7 @@ class SearchedPageHeaderSection extends ConsumerWidget {
   final bool showQuotes;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme cs = theme.colorScheme;
     final String displayQuery =
@@ -71,19 +69,6 @@ class SearchedPageHeaderSection extends ConsumerWidget {
           ),
           const SizedBox(width: 12),
           MetaChip(icon: LucideIcons.search, label: '$resultCount'),
-          const Spacer(),
-          GhostButton.icon(
-            icon: LucideIcons.squareCheck,
-            tooltip: context.l10n.catalogSelectionEnter,
-            semanticLabel: context.l10n.catalogSelectionEnter,
-            iconSize: 16,
-            size: 32,
-            borderRadius: 8,
-            foregroundColor: cs.hentai.iconDefault,
-            hoverColor: theme.hoverColor,
-            overlayColor: theme.hoverColor,
-            onPressed: () => ref.read(catalogSelectionProvider.notifier).enter(),
-          ),
         ],
       ),
     );

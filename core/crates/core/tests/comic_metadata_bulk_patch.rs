@@ -4,7 +4,7 @@ use hentai_core::{
     apply_comic_metadata_bulk_patch, cancel_sync, connection, create_local_library,
     create_sync_handle, find_comic_by_id, init_db_at_path, set_current_library_id,
     try_acquire_library_write_lock, update_comic_user_meta, ComicMetadataBulkPatch, MultiValueOp,
-    MultiValuePatch, UpdateComicUserMetaDto,
+    MultiValuePatch, PublishedAtPatch, ScalarPatch, UpdateComicUserMetaDto,
 };
 use sea_orm::{ConnectionTrait, Statement};
 use tempfile::TempDir;
@@ -454,6 +454,124 @@ fn bulk_patch_rejects_over_cap_ids() {
             .expect_err("cap");
 
             assert!(err.to_string().contains("2000"));
+        });
+    });
+}
+
+#[test]
+fn bulk_patch_m2_languages_parodies_characters_merge() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = common::create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            seed_two_comics_in_one_library().await;
+
+            let handle = create_sync_handle();
+            let result = apply_comic_metadata_bulk_patch(
+                vec!["c1".to_string(), "c2".to_string()],
+                ComicMetadataBulkPatch {
+                    languages: Some(MultiValuePatch {
+                        op: MultiValueOp::Add,
+                        values: vec!["Japanese".to_string()],
+                    }),
+                    parodies: Some(MultiValuePatch {
+                        op: MultiValueOp::Add,
+                        values: vec!["Touhou".to_string()],
+                    }),
+                    characters: Some(MultiValuePatch {
+                        op: MultiValueOp::Add,
+                        values: vec!["Reimu".to_string()],
+                    }),
+                    ..Default::default()
+                },
+                &handle,
+            )
+            .await
+            .expect("bulk patch");
+
+            assert_eq!(result.succeeded, 2);
+            let c1 = find_comic_by_id("c1").await.expect("find").expect("exists");
+            assert_eq!(c1.languages, vec!["Japanese"]);
+            assert_eq!(c1.parodies, vec!["Touhou"]);
+            assert_eq!(c1.characters, vec!["Reimu"]);
+            assert!(c1.locks.languages);
+            assert!(c1.locks.parodies);
+            assert!(c1.locks.characters);
+        });
+    });
+}
+
+#[test]
+fn bulk_patch_m2_content_rating_description_published_at() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = common::create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            seed_two_comics_in_one_library().await;
+
+            update_comic_user_meta(
+                "c1",
+                UpdateComicUserMetaDto {
+                    description: Some("old".to_string()),
+                    published_at: Some(1_700_000_000_000),
+                    ..Default::default()
+                },
+            )
+            .await
+            .expect("seed meta");
+
+            let handle = create_sync_handle();
+            apply_comic_metadata_bulk_patch(
+                vec!["c1".to_string()],
+                ComicMetadataBulkPatch {
+                    content_rating: Some("r18".to_string()),
+                    description: Some(ScalarPatch::Replace("new summary".to_string())),
+                    published_at: Some(PublishedAtPatch::Clear),
+                    ..Default::default()
+                },
+                &handle,
+            )
+            .await
+            .expect("bulk patch");
+
+            let c1 = find_comic_by_id("c1").await.expect("find").expect("exists");
+            assert_eq!(c1.content_rating, "r18");
+            assert_eq!(c1.description.as_deref(), Some("new summary"));
+            assert!(c1.published_at.is_none());
+            assert!(c1.locks.content_rating);
+            assert!(c1.locks.description);
+            assert!(c1.locks.published_at);
+        });
+    });
+}
+
+#[test]
+fn bulk_patch_m2_rejects_invalid_content_rating() {
+    common::with_global_db(|| {
+        let temp = TempDir::new().expect("tempdir");
+        let db_path = common::create_fixture_db(temp.path());
+        let runtime = tokio::runtime::Runtime::new().expect("runtime");
+        runtime.block_on(async {
+            init_db_at_path(&db_path).await.expect("init_db");
+            seed_two_comics_in_one_library().await;
+
+            let handle = create_sync_handle();
+            let err = apply_comic_metadata_bulk_patch(
+                vec!["c1".to_string()],
+                ComicMetadataBulkPatch {
+                    content_rating: Some("unknown".to_string()),
+                    ..Default::default()
+                },
+                &handle,
+            )
+            .await
+            .expect_err("invalid rating");
+
+            assert!(err.to_string().contains("safe / r18"));
         });
     });
 }

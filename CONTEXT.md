@@ -220,8 +220,12 @@ _Avoid_: 分级、年龄限制、路径自动标 r18
 编辑 Comic 用户元数据（标题、概要、发布日期、Content rating、Author、Tag、Parody、Character、Language）时的可提交草稿；校验与 normalize、多值名增减与落库规则集中在此，非法结果以字段级返回由 UI 展示。保存时只提交相对打开时**值变化**的字段，这些字段会自动加上 Metadata field lock；无变化则不写库。表单旁可单独切换锁而不改值。
 _Avoid_: 漫画表单、元数据 DTO
 
+**Catalog selection mode**:
+库页 Comics Tab 漫画网格上短暂多选 Comic 的 UI 模式；跨页 `Set<comicId>` 供 **Comic metadata bulk patch** 编排；与 **Library reorder mode**、Series reorder mode 互斥。换库、筛选/排序变化或离库页路由时清空。不含搜索页。
+_Avoid_: 多选模式（口语可用）、批量选择（易与 bulk patch 混淆）
+
 **Comic metadata bulk patch**:
-对同一 Library 内选中 Comic 集合的一次稀疏用户元数据变更：用户仅启用需要修改的字段（多值字段可为添加、移除或整字段替换）；core 逐本 merge 后写库，实际写入的字段自动加上 Metadata field lock。Metadata field lock 不阻挡本次写入（锁防的是 Library sync / Metadata refresh 覆盖）。单次 batch 不可跨 Library。不是 Metadata refresh、Library sync，也不是单本 Comic metadata form。详见 ADR-0022。
+对同一 Library 内 Comic 集合的一次稀疏用户元数据变更：用户仅启用需要修改的字段（多值字段可为添加、移除或整字段替换；标量字段可为替换或清除）。core 逐本 merge 后写库，实际写入的字段自动加上 Metadata field lock。Metadata field lock 不阻挡本次写入（锁防的是 Library sync / Metadata refresh 覆盖）。单次 batch 不可跨 Library。用户入口：**库页**（经 Catalog selection mode）与 **Series 详情**（成员快捷入口，跳过选择模式）。不是 Metadata refresh、Library sync，也不是单本 Comic metadata form。详见 ADR-0022。
 _Avoid_: 批量编辑（口语可用）、批量刷新、批量表单
 
 **Series metadata form**:

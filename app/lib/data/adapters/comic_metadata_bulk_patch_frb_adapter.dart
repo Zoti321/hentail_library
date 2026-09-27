@@ -53,6 +53,16 @@ class ComicMetadataBulkPatchFrbAdapter {
     return comic_rust.ComicMetadataBulkPatchFrbDto(
       tags: patch.tags == null ? null : _mapMultiValue(patch.tags!),
       authors: patch.authors == null ? null : _mapMultiValue(patch.authors!),
+      languages: patch.languages == null ? null : _mapMultiValue(patch.languages!),
+      parodies: patch.parodies == null ? null : _mapMultiValue(patch.parodies!),
+      characters: patch.characters == null ? null : _mapMultiValue(patch.characters!),
+      contentRating: patch.contentRating,
+      description: patch.description == null
+          ? null
+          : _mapDescription(patch.description!),
+      publishedAt: patch.publishedAt == null
+          ? null
+          : _mapPublishedAt(patch.publishedAt!),
     );
   }
 
@@ -70,5 +80,27 @@ class ComicMetadataBulkPatchFrbAdapter {
       },
       values: patch.values,
     );
+  }
+
+  comic_rust.ScalarPatchFrbDto _mapDescription(
+    ComicMetadataBulkDescriptionPatch patch,
+  ) {
+    return switch (patch.op) {
+      ComicMetadataBulkScalarOp.replace => comic_rust.ScalarPatchFrbDto.replace(
+        patch.value ?? '',
+      ),
+      ComicMetadataBulkScalarOp.clear => comic_rust.ScalarPatchFrbDto.clear(),
+    };
+  }
+
+  comic_rust.PublishedAtPatchFrbDto _mapPublishedAt(
+    ComicMetadataBulkPublishedAtPatch patch,
+  ) {
+    return switch (patch.op) {
+      ComicMetadataBulkScalarOp.replace =>
+        comic_rust.PublishedAtPatchFrbDto.replace(patch.value ?? 0),
+      ComicMetadataBulkScalarOp.clear =>
+        comic_rust.PublishedAtPatchFrbDto.clear(),
+    };
   }
 }

@@ -123,6 +123,28 @@ void main() {
     expect(find.byKey(const Key('search-comic-c2')), findsOneWidget);
   });
 
+  testWidgets('search header has no catalog selection entry', (
+    WidgetTester tester,
+  ) async {
+    const String query = 'foo';
+    final LibrarySearchComicsPage page = (
+      items: <Comic>[_comic('c1', 'Comic One')],
+      totalCount: 1,
+      hasMore: false,
+      loadingMore: false,
+    );
+    final _FixedComicsController controller = _FixedComicsController(page);
+
+    await _pumpSearchedPage(
+      tester,
+      query: query,
+      comicsPage: page,
+      controller: controller,
+    );
+
+    expect(find.text(l10n.catalogSelectionEnter), findsNothing);
+  });
+
   testWidgets('result count chip uses comic total only', (
     WidgetTester tester,
   ) async {

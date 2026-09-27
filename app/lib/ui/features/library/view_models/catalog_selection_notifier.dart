@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hentai_library/domain/models/enums.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_catalog_selectors.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_query_intent_notifier.dart';
 import 'package:hentai_library/ui/features/shell/view_models/current_library_notifier.dart';
@@ -50,6 +52,11 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
     ref.listen(libraryComicsTabParodyFilterProvider, (_, __) => _reset());
     ref.listen(libraryComicsTabCharacterFilterProvider, (_, __) => _reset());
     ref.listen(libraryComicsTabExpandBySeriesProvider, (_, __) => _reset());
+    ref.listen(libraryDisplayTargetProvider, (_, LibraryDisplayTarget target) {
+      if (target == LibraryDisplayTarget.series && state.active) {
+        exit();
+      }
+    });
     return const CatalogSelectionState();
   }
 

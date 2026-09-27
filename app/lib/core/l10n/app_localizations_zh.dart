@@ -2031,6 +2031,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get bulkEditMetadataFieldAuthors => '作者';
 
   @override
+  String get bulkEditMetadataFieldLanguages => '语言';
+
+  @override
+  String get bulkEditMetadataFieldParodies => '原作';
+
+  @override
+  String get bulkEditMetadataFieldCharacters => '角色';
+
+  @override
+  String get bulkEditMetadataFieldContentRating => '内容分级';
+
+  @override
+  String get bulkEditMetadataFieldDescription => '概要';
+
+  @override
+  String get bulkEditMetadataFieldPublishedAt => '发布日期';
+
+  @override
+  String get bulkEditMetadataOpClear => '清除';
+
+  @override
+  String get seriesDetailEditMembersMetadata => '编辑成员元数据…';
+
+  @override
   String get bulkEditMetadataOpAdd => '添加';
 
   @override

@@ -342,10 +342,28 @@ pub struct MultiValuePatchFrbDto {
     pub values: Vec<String>,
 }
 
+#[derive(Debug, Clone)]
+pub enum ScalarPatchFrbDto {
+    Replace(String),
+    Clear,
+}
+
+#[derive(Debug, Clone)]
+pub enum PublishedAtPatchFrbDto {
+    Replace(i64),
+    Clear,
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct ComicMetadataBulkPatchFrbDto {
     pub tags: Option<MultiValuePatchFrbDto>,
     pub authors: Option<MultiValuePatchFrbDto>,
+    pub languages: Option<MultiValuePatchFrbDto>,
+    pub parodies: Option<MultiValuePatchFrbDto>,
+    pub characters: Option<MultiValuePatchFrbDto>,
+    pub content_rating: Option<String>,
+    pub description: Option<ScalarPatchFrbDto>,
+    pub published_at: Option<PublishedAtPatchFrbDto>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -374,10 +392,30 @@ fn map_multi_value_patch(
     }
 }
 
+fn map_scalar_patch(patch: ScalarPatchFrbDto) -> hentai_core::ScalarPatch {
+    match patch {
+        ScalarPatchFrbDto::Replace(value) => hentai_core::ScalarPatch::Replace(value),
+        ScalarPatchFrbDto::Clear => hentai_core::ScalarPatch::Clear,
+    }
+}
+
+fn map_published_at_patch(patch: PublishedAtPatchFrbDto) -> hentai_core::PublishedAtPatch {
+    match patch {
+        PublishedAtPatchFrbDto::Replace(value) => hentai_core::PublishedAtPatch::Replace(value),
+        PublishedAtPatchFrbDto::Clear => hentai_core::PublishedAtPatch::Clear,
+    }
+}
+
 fn map_bulk_patch(patch: ComicMetadataBulkPatchFrbDto) -> hentai_core::ComicMetadataBulkPatch {
     hentai_core::ComicMetadataBulkPatch {
         tags: patch.tags.map(map_multi_value_patch),
         authors: patch.authors.map(map_multi_value_patch),
+        languages: patch.languages.map(map_multi_value_patch),
+        parodies: patch.parodies.map(map_multi_value_patch),
+        characters: patch.characters.map(map_multi_value_patch),
+        content_rating: patch.content_rating,
+        description: patch.description.map(map_scalar_patch),
+        published_at: patch.published_at.map(map_published_at_patch),
     }
 }
 

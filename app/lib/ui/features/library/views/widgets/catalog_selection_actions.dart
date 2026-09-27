@@ -19,14 +19,30 @@ Future<void> openCatalogSelectionMetadataEditor(
   if (selection.count == 0) {
     return;
   }
-  final List<String> ids = selection.selectedIds.toList(growable: false);
+  await openComicMetadataEditorForIds(
+    context,
+    ref,
+    selection.selectedIds.toList(growable: false),
+    exitSelectionOnDone: true,
+  );
+}
+
+Future<void> openComicMetadataEditorForIds(
+  BuildContext context,
+  WidgetRef ref,
+  List<String> ids, {
+  bool exitSelectionOnDone = false,
+}) async {
+  if (ids.isEmpty) {
+    return;
+  }
   if (ids.length == 1) {
     final Comic? comic = await ref.read(comicRepoProvider).findById(ids.first);
     if (!context.mounted || comic == null) {
       return;
     }
     await showEditMetadataDialog(context: context, comic: comic);
-    if (context.mounted) {
+    if (context.mounted && exitSelectionOnDone) {
       ref.read(catalogSelectionProvider.notifier).exit();
     }
     return;
@@ -48,7 +64,9 @@ Future<void> openCatalogSelectionMetadataEditor(
       return;
     }
     showComicMetadataBulkPatchToast(context, result);
-    ref.read(catalogSelectionProvider.notifier).exit();
+    if (exitSelectionOnDone) {
+      ref.read(catalogSelectionProvider.notifier).exit();
+    }
   } catch (err) {
     if (!context.mounted) {
       return;

@@ -23,10 +23,28 @@ pub struct MultiValuePatch {
     pub values: Vec<String>,
 }
 
+#[derive(Debug, Clone)]
+pub enum ScalarPatch {
+    Replace(String),
+    Clear,
+}
+
+#[derive(Debug, Clone)]
+pub enum PublishedAtPatch {
+    Replace(i64),
+    Clear,
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct ComicMetadataBulkPatch {
     pub tags: Option<MultiValuePatch>,
     pub authors: Option<MultiValuePatch>,
+    pub languages: Option<MultiValuePatch>,
+    pub parodies: Option<MultiValuePatch>,
+    pub characters: Option<MultiValuePatch>,
+    pub content_rating: Option<String>,
+    pub description: Option<ScalarPatch>,
+    pub published_at: Option<PublishedAtPatch>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -45,7 +63,14 @@ enum PatchOutcome {
 
 impl ComicMetadataBulkPatch {
     fn has_fields(&self) -> bool {
-        self.tags.is_some() || self.authors.is_some()
+        self.tags.is_some()
+            || self.authors.is_some()
+            || self.languages.is_some()
+            || self.parodies.is_some()
+            || self.characters.is_some()
+            || self.content_rating.is_some()
+            || self.description.is_some()
+            || self.published_at.is_some()
     }
 }
 
@@ -96,6 +121,57 @@ async fn apply_patch_to_one(
             changed = true;
         }
     }
+    if let Some(languages_patch) = &patch.languages {
+        let merged = merge_multi_value(&comic.languages, languages_patch);
+        if merged != comic.languages {
+            meta.languages = Some(merged);
+            changed = true;
+        }
+    }
+    if let Some(parodies_patch) = &patch.parodies {
+        let merged = merge_multi_value(&comic.parodies, parodies_patch);
+        if merged != comic.parodies {
+            meta.parodies = Some(merged);
+            changed = true;
+        }
+    }
+    if let Some(characters_patch) = &patch.characters {
+        let merged = merge_multi_value(&comic.characters, characters_patch);
+        if merged != comic.characters {
+            meta.characters = Some(merged);
+            changed = true;
+        }
+    }
+    if let Some(rating) = &patch.content_rating {
+        if rating != &comic.content_rating {
+            meta.content_rating = Some(rating.clone());
+            changed = true;
+        }
+    }
+    if let Some(desc_patch) = &patch.description {
+        let target = match desc_patch {
+            ScalarPatch::Replace(value) => value.clone(),
+            ScalarPatch::Clear => String::new(),
+        };
+        let current = comic.description.clone().unwrap_or_default();
+        if current != target {
+            meta.description = Some(target);
+            changed = true;
+        }
+    }
+    if let Some(pub_patch) = &patch.published_at {
+        let target = match pub_patch {
+            PublishedAtPatch::Replace(value) => Some(*value),
+            PublishedAtPatch::Clear => None,
+        };
+        if comic.published_at != target {
+            meta.published_at = Some(match pub_patch {
+                PublishedAtPatch::Replace(value) => *value,
+                PublishedAtPatch::Clear => -1,
+            });
+            changed = true;
+        }
+    }
 
     if !changed {
         return Ok(PatchOutcome::Unchanged);
@@ -122,6 +198,13 @@ pub async fn apply_comic_metadata_bulk_patch(
     }
     if !patch.has_fields() {
         return Err(HentaiError::validation("批量 patch 未包含任何字段"));
+    }
+    if let Some(rating) = &patch.content_rating {
+        if rating != "safe" && rating != "r18" {
+            return Err(HentaiError::validation(
+                "content_rating 批量编辑仅支持 safe / r18",
+            ));
+        }
     }
 
     let _guard = try_acquire_library_write_lock()?;

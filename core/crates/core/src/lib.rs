@@ -38,7 +38,8 @@ pub use comic::{
     search_by_keyword_page, search_by_tag_expression, search_by_tag_expression_page,
     set_comic_meta_locks, update_comic_user_meta, BulkPatchResultDto, ComicDto, ComicFilterDto,
     ComicMetadataBulkPatch, ComicMetaLocks, ComicSortFieldDto, ComicSortOptionDto, MultiValueOp,
-    MultiValuePatch, PageRequestDto, PagedComicResultDto, SetComicMetaLocksDto,
+    MultiValuePatch, PageRequestDto, PagedComicResultDto, PublishedAtPatch, ScalarPatch,
+    SetComicMetaLocksDto,
     UpdateComicUserMetaDto, BULK_PATCH_MAX_IDS,
 };
 pub use comic_id::{comic_id_from_normalized_path, comic_id_from_path, normalize_path_for_key};

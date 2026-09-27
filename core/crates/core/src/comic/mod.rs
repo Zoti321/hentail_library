@@ -7,7 +7,7 @@ pub mod write;
 
 pub use bulk_patch::{
     apply_comic_metadata_bulk_patch, BulkPatchResultDto, ComicMetadataBulkPatch, MultiValueOp,
-    MultiValuePatch, BULK_PATCH_MAX_IDS,
+    MultiValuePatch, PublishedAtPatch, ScalarPatch, BULK_PATCH_MAX_IDS,
 };
 pub use dto::{
     now_ms, parse_languages_json, serialize_languages, ComicDto, ComicFilterDto, ComicMetaLocks,

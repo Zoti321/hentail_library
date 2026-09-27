@@ -57,7 +57,7 @@ Bulk patch **不**重解析 Resource、**不** orphan 删除、**不**改 Series
 
 ### Flutter UI（概要）
 
-- **Catalog selection mode**：Library 漫画网格与搜索页；跨页 `Set<comicId>`；换库/筛选/排序/离路由清空。
+- **Catalog selection mode**：库页 Comics Tab 漫画网格；跨页 `Set<comicId>`；换库/筛选/排序/离路由清空；不含搜索页。
 - **BulkEditMetadataDialog**：稀疏 patch 表单（启用 × 操作 × 值）；N=1 开单本 `EditMetadataDialog`。
 - **Series 详情**（M1）：overflow「编辑成员元数据…」直接预填成员 ids，跳过选择模式。
 - **Series reorder mode**（ADR-0006 / #121）与 catalog selection mode **互斥**。
