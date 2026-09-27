@@ -8,8 +8,10 @@ use crate::error::HentaiError;
 
 use super::format_group::{resource_type_enabled, FormatGroup};
 use super::handle::SyncHandle;
+use std::path::Path;
+
 use crate::resource::{
-    comic_id_for_path, local_access, parse_directory_with, parse_file_with,
+    comic_id_for_path, extension_lower, local_access, parse_directory_with, parse_file_with,
     read_resource_size_with, read_source_stat_with, ResourceAccess, ResourceKind,
 };
 
@@ -18,10 +20,19 @@ pub struct ScanContext {
     pub thumbnail_stats: HashMap<String, (i64, i64)>,
 }
 
+#[derive(Clone)]
 pub struct ScanItem {
     pub path: String,
     pub resource_type: String,
     pub comic: ComicDto,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EnumeratedResource {
+    pub location_key: String,
+    pub resource_type: String,
+    pub modified_ms: i64,
+    pub size: i64,
 }
 
 pub fn scan_roots(
@@ -113,6 +124,130 @@ pub fn scan_roots_with(
         }
     }
     Ok(items)
+}
+
+pub fn enumerate_local_resources(
+    roots: &[PathBuf],
+    exclude_roots: &[String],
+    handle: &SyncHandle,
+    enabled_groups: &[FormatGroup],
+) -> Result<Vec<EnumeratedResource>, HentaiError> {
+    let root_locs: Vec<String> = roots
+        .iter()
+        .map(|r| r.to_string_lossy().into_owned())
+        .collect();
+    enumerate_resources_with(
+        local_access(),
+        &root_locs,
+        exclude_roots,
+        handle,
+        enabled_groups,
+        crate::comic_id::normalize_path_for_key,
+    )
+}
+
+pub fn enumerate_resources_with(
+    access: &dyn ResourceAccess,
+    roots: &[String],
+    exclude_roots: &[String],
+    handle: &SyncHandle,
+    enabled_groups: &[FormatGroup],
+    normalize_key: fn(&str) -> String,
+) -> Result<Vec<EnumeratedResource>, HentaiError> {
+    let exclude_keys: Vec<String> = exclude_roots
+        .iter()
+        .map(|r| crate::comic_id::normalize_path_for_key(r))
+        .filter(|k| !k.is_empty())
+        .collect();
+    let mut candidates: Vec<String> = Vec::new();
+    for root in roots {
+        if handle.is_cancelled() {
+            return Ok(vec![]);
+        }
+        let Some(stat) = access.stat(root)? else {
+            continue;
+        };
+        match stat.kind {
+            ResourceKind::Dir => {
+                collect_from_directory(
+                    access,
+                    root,
+                    &exclude_keys,
+                    &mut candidates,
+                    handle,
+                    enabled_groups,
+                )?;
+            }
+            ResourceKind::File => candidates.push(root.clone()),
+        }
+    }
+    if handle.is_cancelled() {
+        return Ok(vec![]);
+    }
+    let mut out = Vec::new();
+    for path in candidates {
+        if handle.is_cancelled() {
+            return Ok(out);
+        }
+        if let Some(resource) =
+            enumerate_candidate(access, &path, enabled_groups, normalize_key)?
+        {
+            out.push(resource);
+        }
+    }
+    Ok(out)
+}
+
+fn enumerate_candidate(
+    access: &dyn ResourceAccess,
+    path: &str,
+    enabled_groups: &[FormatGroup],
+    normalize_key: fn(&str) -> String,
+) -> Result<Option<EnumeratedResource>, HentaiError> {
+    let resource_type = match access.stat(path)? {
+        Some(stat) if stat.kind == ResourceKind::Dir => {
+            let Some(parsed) = parse_directory_with(access, path)? else {
+                return Ok(None);
+            };
+            parsed.resource_type
+        }
+        Some(stat) if stat.kind == ResourceKind::File => {
+            let Some(resource_type) = resource_type_from_file_path(path) else {
+                return Ok(None);
+            };
+            let _ = stat;
+            resource_type.to_string()
+        }
+        _ => return Ok(None),
+    };
+    if !resource_type_enabled(&resource_type, enabled_groups) {
+        return Ok(None);
+    }
+    let Some((modified_ms, size)) = read_source_stat_with(access, path, &resource_type)? else {
+        return Ok(None);
+    };
+    Ok(Some(EnumeratedResource {
+        location_key: normalize_key(path),
+        resource_type,
+        modified_ms,
+        size,
+    }))
+}
+
+fn resource_type_from_file_path(path: &str) -> Option<&'static str> {
+    let name = path.rsplit(['/', '\\']).next().unwrap_or(path);
+    let ext = extension_lower(Path::new(name));
+    match ext.as_str() {
+        ".pdf" => Some("pdf"),
+        ".epub" => Some("epub"),
+        ".zip" => Some("zip"),
+        ".cbz" => Some("cbz"),
+        ".cbr" => Some("cbr"),
+        ".rar" => Some("rar"),
+        ".cb7" => Some("cb7"),
+        ".7z" => Some("sevenz"),
+        _ => None,
+    }
 }
 
 fn is_excluded_root(location: &str, exclude_keys: &[String]) -> bool {

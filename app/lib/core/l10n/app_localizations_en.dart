@@ -291,11 +291,40 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get homeEmptyTitle => 'No comics imported yet';
+  String get homeEmptyTitle => 'Start building your library';
 
   @override
   String get homeEmptyHint =>
-      'Add library folders in Settings and scan. If already configured, check Selected Paths or scan again.';
+      'Add a local or remote Library, then run Library sync from the sidebar.';
+
+  @override
+  String get homeRecentlyAdded => 'Recently added';
+
+  @override
+  String get homeViewAllHistory => 'View all';
+
+  @override
+  String get homeAlertDismissLater => 'Later';
+
+  @override
+  String homeAlertRemoteUnreachable(String libraryName) {
+    return '$libraryName is unreachable — check network or credentials';
+  }
+
+  @override
+  String homeAlertSyncFailed(String libraryName) {
+    return '$libraryName sync failed — retry when ready';
+  }
+
+  @override
+  String homeAlertStaleSync(String libraryName, int days) {
+    return '$libraryName last synced $days days ago — sync recommended';
+  }
+
+  @override
+  String homeAlertPendingResources(String libraryName, int count) {
+    return '$libraryName: $count new/changed Resources detected — sync recommended';
+  }
 
   @override
   String get homeStatSeries => 'Series';

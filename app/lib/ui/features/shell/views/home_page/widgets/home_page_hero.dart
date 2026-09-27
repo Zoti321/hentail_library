@@ -15,23 +15,20 @@ class HomePageHeroSection extends ConsumerWidget {
     super.key,
     required this.layoutTier,
     required this.comicCount,
-    required this.isLibraryEmpty,
-    required this.onScan,
+    required this.showEmptyOnboarding,
     required this.enableHeavyStats,
   });
 
   final HomePageLayoutTier layoutTier;
   final int comicCount;
-  final bool isLibraryEmpty;
-  final VoidCallback onScan;
+  final bool showEmptyOnboarding;
   final bool enableHeavyStats;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (isLibraryEmpty) {
+    if (showEmptyOnboarding) {
       return _EmptyLibraryHero(
         layoutTier: layoutTier,
-        onScan: onScan,
         onAddLocalLibrary: () =>
             LibraryManagementActions.addLocalLibrary(ref, context),
         onAddRemoteLibrary: () =>
@@ -51,13 +48,11 @@ class HomePageHeroSection extends ConsumerWidget {
 class _EmptyLibraryHero extends StatelessWidget {
   const _EmptyLibraryHero({
     required this.layoutTier,
-    required this.onScan,
     required this.onAddLocalLibrary,
     required this.onAddRemoteLibrary,
   });
 
   final HomePageLayoutTier layoutTier;
-  final VoidCallback onScan;
   final VoidCallback onAddLocalLibrary;
   final VoidCallback onAddRemoteLibrary;
 
@@ -192,9 +187,9 @@ class _EmptyLibraryHero extends StatelessWidget {
                     runSpacing: tokens.spacing.sm,
                     children: <Widget>[
                       FilledButton.icon(
-                        onPressed: onScan,
-                        icon: const Icon(LucideIcons.scanSearch, size: 18),
-                        label: Text(l10n.homeScanLibrary),
+                        onPressed: onAddLocalLibrary,
+                        icon: const Icon(LucideIcons.folderPlus, size: 18),
+                        label: Text(l10n.sidebarAddLocalLibrary),
                         style: FilledButton.styleFrom(
                           backgroundColor: colorScheme.primary,
                           foregroundColor: colorScheme.onPrimary,
@@ -209,21 +204,9 @@ class _EmptyLibraryHero extends StatelessWidget {
                         ),
                       ),
                       OutlinedButton.icon(
-                        onPressed: onAddLocalLibrary,
-                        icon: const Icon(LucideIcons.folderPlus, size: 18),
-                        label: Text(l10n.sidebarAddLocalLibrary),
-                        style: outlinedActionStyle,
-                      ),
-                      OutlinedButton.icon(
                         onPressed: onAddRemoteLibrary,
                         icon: const Icon(LucideIcons.cloudUpload, size: 18),
                         label: Text(l10n.sidebarAddRemoteLibrary),
-                        style: outlinedActionStyle,
-                      ),
-                      OutlinedButton.icon(
-                        onPressed: () => context.go('/settings'),
-                        icon: const Icon(LucideIcons.settings, size: 18),
-                        label: Text(l10n.navSettings),
                         style: outlinedActionStyle,
                       ),
                     ],
@@ -277,22 +260,30 @@ class _StatsCards extends ConsumerWidget {
           icon: LucideIcons.library,
           accentColor: accents.series,
         )),
-        tagsCard: _buildStatCard(context, (
-          label: l10n.homeStatTags,
-          valueText: '${c.tagCount}',
-          caption: l10n.homeTagCount(c.tagCount),
-          icon: LucideIcons.tags,
-          accentColor: accents.tags,
-        )),
-        authorCard: _buildStatCard(context, (
-          label: l10n.homeStatAuthors,
-          valueText: '${c.authorCount}',
-          caption: c.authorCount == 0
-              ? l10n.homeNoAuthors
-              : l10n.homeAuthorCount(c.authorCount),
-          icon: LucideIcons.penLine,
-          accentColor: accents.authors,
-        )),
+        tagsCard: _buildStatCard(
+          context,
+          (
+            label: l10n.homeStatTags,
+            valueText: '${c.tagCount}',
+            caption: l10n.homeTagCount(c.tagCount),
+            icon: LucideIcons.tags,
+            accentColor: accents.tags,
+          ),
+          onTap: () => context.go('/metadata?tab=tags'),
+        ),
+        authorCard: _buildStatCard(
+          context,
+          (
+            label: l10n.homeStatAuthors,
+            valueText: '${c.authorCount}',
+            caption: c.authorCount == 0
+                ? l10n.homeNoAuthors
+                : l10n.homeAuthorCount(c.authorCount),
+            icon: LucideIcons.penLine,
+            accentColor: accents.authors,
+          ),
+          onTap: () => context.go('/metadata?tab=authors'),
+        ),
       ),
       loading: () => _HomeStatsCardLayout(
         layoutTier: layoutTier,
@@ -421,13 +412,18 @@ class _HomeStatAccentColors {
   final Color authors;
 }
 
-Widget _buildStatCard(BuildContext context, _HomeStatCardData data) {
+Widget _buildStatCard(
+  BuildContext context,
+  _HomeStatCardData data, {
+  VoidCallback? onTap,
+}) {
   return _StatSummaryCard(
     label: data.label,
     valueText: data.valueText,
     caption: data.caption,
     icon: data.icon,
     accentColor: data.accentColor,
+    onTap: onTap,
   );
 }
 
@@ -495,6 +491,7 @@ class _StatSummaryCard extends StatefulWidget {
     required this.caption,
     required this.icon,
     required this.accentColor,
+    this.onTap,
   });
 
   final String label;
@@ -502,6 +499,7 @@ class _StatSummaryCard extends StatefulWidget {
   final String caption;
   final IconData icon;
   final Color accentColor;
+  final VoidCallback? onTap;
 
   @override
   State<_StatSummaryCard> createState() => _StatSummaryCardState();
@@ -517,10 +515,7 @@ class _StatSummaryCardState extends State<_StatSummaryCard> {
     final ColorScheme colorScheme = theme.colorScheme;
     final Color accent = widget.accentColor;
     final Curve curve = Curves.easeOutCubic;
-    return MouseRegion(
-      onEnter: (_) => setState(() => isHovered = true),
-      onExit: (_) => setState(() => isHovered = false),
-      child: AnimatedContainer(
+    final Widget card = AnimatedContainer(
         duration: heroStatCardHoverDuration,
         curve: curve,
         transformAlignment: Alignment.bottomCenter,
@@ -639,7 +634,16 @@ class _StatSummaryCardState extends State<_StatSummaryCard> {
             ],
           ),
         ),
-      ),
+      );
+    return MouseRegion(
+      onEnter: (_) => setState(() => isHovered = true),
+      onExit: (_) => setState(() => isHovered = false),
+      cursor: widget.onTap == null
+          ? SystemMouseCursors.basic
+          : SystemMouseCursors.click,
+      child: widget.onTap == null
+          ? card
+          : GestureDetector(onTap: widget.onTap, child: card),
     );
   }
 }

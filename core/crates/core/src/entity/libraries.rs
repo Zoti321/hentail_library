@@ -23,6 +23,10 @@ pub struct Model {
     pub pinned: i32,
     /// Order within the pin group (Library sidebar order).
     pub sidebar_order: i32,
+    /// Last successful Library sync timestamp (ms since epoch); null if never succeeded.
+    pub last_successful_sync_at: Option<i64>,
+    /// Last sync failure message; null after a successful sync.
+    pub last_sync_error: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

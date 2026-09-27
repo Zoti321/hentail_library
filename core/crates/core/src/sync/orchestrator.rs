@@ -2,7 +2,11 @@ use std::collections::HashMap;
 
 use crate::db::connection;
 use crate::error::HentaiError;
-use crate::library::{find_library_by_id, get_current_library_id, list_libraries, LibraryDto};
+use crate::library::{
+    find_library_by_id, get_current_library_id, list_libraries, record_library_sync_failure,
+    record_library_sync_success, LibraryDto,
+};
+use crate::probe::rebuild_snapshot_from_scan_items;
 use crate::reader::clear_reader_sessions;
 use crate::resource::{local_access, normalize_roots, WebDavResourceAccess};
 
@@ -183,6 +187,7 @@ async fn sync_one_library(
     }
     if let Err(err) = local_access().probe_root(&library.root_path) {
         let warning = emit_local_skip(emit, &library.root_path, &err.message);
+        record_library_sync_failure(&library.library_id, &warning).await?;
         return Ok(SyncOneOutcome::Skipped { warning });
     }
     let exclude_roots: Vec<String> = list_libraries()
@@ -214,7 +219,7 @@ async fn sync_one_library(
         finish_scan_write(
             db,
             handle,
-            &library.library_id,
+            library,
             scan_items,
             /*enqueue_thumbs=*/ true,
             emit,
@@ -249,6 +254,7 @@ async fn sync_remote_library(
             None,
             Some(warning.clone()),
         ));
+        record_library_sync_failure(&library.library_id, &warning).await?;
         return Ok(SyncOneOutcome::Skipped { warning });
     };
 
@@ -257,6 +263,7 @@ async fn sync_remote_library(
             Ok(access) => access,
             Err(err) if err.is_remote_access_failure() => {
                 let warning = emit_remote_skip(emit, &library.root_path, &err.message);
+                record_library_sync_failure(&library.library_id, &warning).await?;
                 return Ok(SyncOneOutcome::Skipped { warning });
             }
             Err(err) => return Err(err),
@@ -278,6 +285,7 @@ async fn sync_remote_library(
     let mut scan_items = match outcome {
         RemoteScanOutcome::Unreachable { message } => {
             let warning = emit_remote_skip(emit, &library.root_path, &message);
+            record_library_sync_failure(&library.library_id, &warning).await?;
             return Ok(SyncOneOutcome::Skipped { warning });
         }
         RemoteScanOutcome::Cancelled => return Ok(SyncOneOutcome::None),
@@ -291,7 +299,7 @@ async fn sync_remote_library(
         finish_scan_write(
             db,
             handle,
-            &library.library_id,
+            library,
             scan_items,
             /*enqueue_thumbs=*/ false,
             emit,
@@ -382,11 +390,12 @@ fn emit_remote_skip(
 async fn finish_scan_write(
     db: &sea_orm::DatabaseConnection,
     handle: &SyncHandle,
-    library_id: &str,
+    library: &LibraryDto,
     scan_items: Vec<ScanItem>,
     enqueue_thumbs: bool,
     emit: &mut impl FnMut(SyncLibraryProgressDto),
 ) -> Result<Option<SyncLibraryProgressDto>, HentaiError> {
+    let library_id = &library.library_id;
     if return_if_cancelled(handle, "scanning") {
         return Ok(None);
     }
@@ -435,11 +444,14 @@ async fn finish_scan_write(
         None,
     ));
 
+    let snapshot_items = scan_items.clone();
     let plan = build_scan_replace_plan(db, scan_items, library_id).await?;
     if return_if_cancelled(handle, "writing_db") {
         return Ok(None);
     }
     apply_scan_replace_plan(db, &plan, library_id).await?;
+    rebuild_snapshot_from_scan_items(db, library_id, library, &snapshot_items).await?;
+    record_library_sync_success(library_id).await?;
     clear_reader_sessions();
 
     let thumb_total = if enqueue_thumbs {

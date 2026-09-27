@@ -623,14 +623,56 @@ abstract class AppLocalizations {
   /// No description provided for @homeEmptyTitle.
   ///
   /// In zh, this message translates to:
-  /// **'尚未导入漫画'**
+  /// **'开始建立你的漫画库'**
   String get homeEmptyTitle;
 
   /// No description provided for @homeEmptyHint.
   ///
   /// In zh, this message translates to:
-  /// **'请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。'**
+  /// **'添加本地或远程 Library 后即可在侧栏对该库执行 Library sync。'**
   String get homeEmptyHint;
+
+  /// No description provided for @homeRecentlyAdded.
+  ///
+  /// In zh, this message translates to:
+  /// **'最近入库'**
+  String get homeRecentlyAdded;
+
+  /// No description provided for @homeViewAllHistory.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看全部'**
+  String get homeViewAllHistory;
+
+  /// No description provided for @homeAlertDismissLater.
+  ///
+  /// In zh, this message translates to:
+  /// **'稍后'**
+  String get homeAlertDismissLater;
+
+  /// No description provided for @homeAlertRemoteUnreachable.
+  ///
+  /// In zh, this message translates to:
+  /// **'{libraryName} 无法连接，建议检查网络或凭证'**
+  String homeAlertRemoteUnreachable(String libraryName);
+
+  /// No description provided for @homeAlertSyncFailed.
+  ///
+  /// In zh, this message translates to:
+  /// **'{libraryName} 同步失败，建议重试'**
+  String homeAlertSyncFailed(String libraryName);
+
+  /// No description provided for @homeAlertStaleSync.
+  ///
+  /// In zh, this message translates to:
+  /// **'{libraryName} 距上次同步已 {days} 天，建议同步'**
+  String homeAlertStaleSync(String libraryName, int days);
+
+  /// No description provided for @homeAlertPendingResources.
+  ///
+  /// In zh, this message translates to:
+  /// **'{libraryName} 发现 {count} 个新/变更 Resource，建议同步'**
+  String homeAlertPendingResources(String libraryName, int count);
 
   /// No description provided for @homeStatSeries.
   ///

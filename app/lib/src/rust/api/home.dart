@@ -7,7 +7,7 @@ import '../frb_generated.dart';
 import 'init.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `fmt`, `fmt`, `from`, `from`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`
 
 Stream<HomePageCountsDto> watchHomePageCountsFrb({required bool excludeR18}) =>
     RustLib.instance.api.crateApiHomeWatchHomePageCountsFrb(
@@ -17,6 +17,15 @@ Stream<HomePageCountsDto> watchHomePageCountsFrb({required bool excludeR18}) =>
 Stream<List<HomeContinueReadingDto>> watchContinueReadingTop5Frb({
   required bool excludeR18,
 }) => RustLib.instance.api.crateApiHomeWatchContinueReadingTop5Frb(
+  excludeR18: excludeR18,
+);
+
+Stream<List<HomeLibraryAlertDto>> watchHomeLibraryAlertsFrb() =>
+    RustLib.instance.api.crateApiHomeWatchHomeLibraryAlertsFrb();
+
+Stream<List<HomeRecentlyAddedDto>> watchRecentlyAddedOnHomeFrb({
+  required bool excludeR18,
+}) => RustLib.instance.api.crateApiHomeWatchRecentlyAddedOnHomeFrb(
   excludeR18: excludeR18,
 );
 
@@ -51,17 +60,69 @@ class HomeContinueReadingDto {
           pageIndex == other.pageIndex;
 }
 
+class HomeLibraryAlertDto {
+  final String libraryId;
+  final String displayName;
+  final HomeLibraryAlertKindDto kind;
+  final PlatformInt64? lastSuccessAtMs;
+  final String? lastErrorMessage;
+  final int? staleDays;
+  final int? pendingResourceCount;
+
+  const HomeLibraryAlertDto({
+    required this.libraryId,
+    required this.displayName,
+    required this.kind,
+    this.lastSuccessAtMs,
+    this.lastErrorMessage,
+    this.staleDays,
+    this.pendingResourceCount,
+  });
+
+  @override
+  int get hashCode =>
+      libraryId.hashCode ^
+      displayName.hashCode ^
+      kind.hashCode ^
+      lastSuccessAtMs.hashCode ^
+      lastErrorMessage.hashCode ^
+      staleDays.hashCode ^
+      pendingResourceCount.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HomeLibraryAlertDto &&
+          runtimeType == other.runtimeType &&
+          libraryId == other.libraryId &&
+          displayName == other.displayName &&
+          kind == other.kind &&
+          lastSuccessAtMs == other.lastSuccessAtMs &&
+          lastErrorMessage == other.lastErrorMessage &&
+          staleDays == other.staleDays &&
+          pendingResourceCount == other.pendingResourceCount;
+}
+
+enum HomeLibraryAlertKindDto {
+  remoteUnreachable,
+  syncFailed,
+  staleSync,
+  pendingResourcesDetected,
+}
+
 class HomePageCountsDto {
   final int comicCount;
   final int tagCount;
   final int seriesCount;
   final int authorCount;
+  final int libraryCount;
 
   const HomePageCountsDto({
     required this.comicCount,
     required this.tagCount,
     required this.seriesCount,
     required this.authorCount,
+    required this.libraryCount,
   });
 
   @override
@@ -69,7 +130,8 @@ class HomePageCountsDto {
       comicCount.hashCode ^
       tagCount.hashCode ^
       seriesCount.hashCode ^
-      authorCount.hashCode;
+      authorCount.hashCode ^
+      libraryCount.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -79,5 +141,41 @@ class HomePageCountsDto {
           comicCount == other.comicCount &&
           tagCount == other.tagCount &&
           seriesCount == other.seriesCount &&
-          authorCount == other.authorCount;
+          authorCount == other.authorCount &&
+          libraryCount == other.libraryCount;
+}
+
+class HomeRecentlyAddedDto {
+  final String comicId;
+  final String title;
+  final String libraryId;
+  final String libraryDisplayName;
+  final PlatformInt64 createdAtMs;
+
+  const HomeRecentlyAddedDto({
+    required this.comicId,
+    required this.title,
+    required this.libraryId,
+    required this.libraryDisplayName,
+    required this.createdAtMs,
+  });
+
+  @override
+  int get hashCode =>
+      comicId.hashCode ^
+      title.hashCode ^
+      libraryId.hashCode ^
+      libraryDisplayName.hashCode ^
+      createdAtMs.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HomeRecentlyAddedDto &&
+          runtimeType == other.runtimeType &&
+          comicId == other.comicId &&
+          title == other.title &&
+          libraryId == other.libraryId &&
+          libraryDisplayName == other.libraryDisplayName &&
+          createdAtMs == other.createdAtMs;
 }

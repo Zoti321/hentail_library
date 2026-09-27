@@ -14,6 +14,7 @@ import 'api/logging.dart';
 import 'api/metadata_backup.dart';
 import 'api/named_facet.dart';
 import 'api/parody.dart';
+import 'api/probe.dart';
 import 'api/reader.dart';
 import 'api/series.dart';
 import 'api/shutdown.dart';
@@ -74,6 +75,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   RustStreamSink<List<HomeContinueReadingDto>>
   dco_decode_StreamSink_list_home_continue_reading_dto_Sse(dynamic raw);
+
+  @protected
+  RustStreamSink<List<HomeLibraryAlertDto>>
+  dco_decode_StreamSink_list_home_library_alert_dto_Sse(dynamic raw);
+
+  @protected
+  RustStreamSink<List<HomeRecentlyAddedDto>>
+  dco_decode_StreamSink_list_home_recently_added_dto_Sse(dynamic raw);
 
   @protected
   RustStreamSink<List<ReadingHistoryDto>>
@@ -214,7 +223,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   HomeContinueReadingDto dco_decode_home_continue_reading_dto(dynamic raw);
 
   @protected
+  HomeLibraryAlertDto dco_decode_home_library_alert_dto(dynamic raw);
+
+  @protected
+  HomeLibraryAlertKindDto dco_decode_home_library_alert_kind_dto(dynamic raw);
+
+  @protected
   HomePageCountsDto dco_decode_home_page_counts_dto(dynamic raw);
+
+  @protected
+  HomeRecentlyAddedDto dco_decode_home_recently_added_dto(dynamic raw);
 
   @protected
   int dco_decode_i_32(dynamic raw);
@@ -232,6 +250,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   LibraryDto dco_decode_library_dto(dynamic raw);
+
+  @protected
+  LibraryProbeResultDto dco_decode_library_probe_result_dto(dynamic raw);
 
   @protected
   LibrarySidebarPlacementDto dco_decode_library_sidebar_placement_dto(
@@ -255,6 +276,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<HomeContinueReadingDto> dco_decode_list_home_continue_reading_dto(
+    dynamic raw,
+  );
+
+  @protected
+  List<HomeLibraryAlertDto> dco_decode_list_home_library_alert_dto(dynamic raw);
+
+  @protected
+  List<HomeRecentlyAddedDto> dco_decode_list_home_recently_added_dto(
     dynamic raw,
   );
 
@@ -556,6 +585,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  RustStreamSink<List<HomeLibraryAlertDto>>
+  sse_decode_StreamSink_list_home_library_alert_dto_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  RustStreamSink<List<HomeRecentlyAddedDto>>
+  sse_decode_StreamSink_list_home_recently_added_dto_Sse(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   RustStreamSink<List<ReadingHistoryDto>>
   sse_decode_StreamSink_list_reading_history_dto_Sse(
     SseDeserializer deserializer,
@@ -736,7 +777,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  HomeLibraryAlertDto sse_decode_home_library_alert_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  HomeLibraryAlertKindDto sse_decode_home_library_alert_kind_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   HomePageCountsDto sse_decode_home_page_counts_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  HomeRecentlyAddedDto sse_decode_home_recently_added_dto(
     SseDeserializer deserializer,
   );
 
@@ -758,6 +814,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   LibraryDto sse_decode_library_dto(SseDeserializer deserializer);
+
+  @protected
+  LibraryProbeResultDto sse_decode_library_probe_result_dto(
+    SseDeserializer deserializer,
+  );
 
   @protected
   LibrarySidebarPlacementDto sse_decode_library_sidebar_placement_dto(
@@ -787,6 +848,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<HomeContinueReadingDto> sse_decode_list_home_continue_reading_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<HomeLibraryAlertDto> sse_decode_list_home_library_alert_dto(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<HomeRecentlyAddedDto> sse_decode_list_home_recently_added_dto(
     SseDeserializer deserializer,
   );
 
@@ -1166,6 +1237,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_StreamSink_list_home_library_alert_dto_Sse(
+    RustStreamSink<List<HomeLibraryAlertDto>> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_StreamSink_list_home_recently_added_dto_Sse(
+    RustStreamSink<List<HomeRecentlyAddedDto>> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_StreamSink_list_reading_history_dto_Sse(
     RustStreamSink<List<ReadingHistoryDto>> self,
     SseSerializer serializer,
@@ -1388,8 +1471,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_home_library_alert_dto(
+    HomeLibraryAlertDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_home_library_alert_kind_dto(
+    HomeLibraryAlertKindDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_home_page_counts_dto(
     HomePageCountsDto self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_home_recently_added_dto(
+    HomeRecentlyAddedDto self,
     SseSerializer serializer,
   );
 
@@ -1413,6 +1514,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_library_dto(LibraryDto self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_library_probe_result_dto(
+    LibraryProbeResultDto self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_library_sidebar_placement_dto(
@@ -1447,6 +1554,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_home_continue_reading_dto(
     List<HomeContinueReadingDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_home_library_alert_dto(
+    List<HomeLibraryAlertDto> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_home_recently_added_dto(
+    List<HomeRecentlyAddedDto> self,
     SseSerializer serializer,
   );
 

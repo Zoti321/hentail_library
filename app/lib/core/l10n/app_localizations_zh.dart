@@ -285,10 +285,39 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get homeEmptyTitle => '尚未导入漫画';
+  String get homeEmptyTitle => '开始建立你的漫画库';
 
   @override
-  String get homeEmptyHint => '请先在设置中添加库文件夹并扫描；若已配置，可检查选中路径或重新扫描。';
+  String get homeEmptyHint => '添加本地或远程 Library 后即可在侧栏对该库执行 Library sync。';
+
+  @override
+  String get homeRecentlyAdded => '最近入库';
+
+  @override
+  String get homeViewAllHistory => '查看全部';
+
+  @override
+  String get homeAlertDismissLater => '稍后';
+
+  @override
+  String homeAlertRemoteUnreachable(String libraryName) {
+    return '$libraryName 无法连接，建议检查网络或凭证';
+  }
+
+  @override
+  String homeAlertSyncFailed(String libraryName) {
+    return '$libraryName 同步失败，建议重试';
+  }
+
+  @override
+  String homeAlertStaleSync(String libraryName, int days) {
+    return '$libraryName 距上次同步已 $days 天，建议同步';
+  }
+
+  @override
+  String homeAlertPendingResources(String libraryName, int count) {
+    return '$libraryName 发现 $count 个新/变更 Resource，建议同步';
+  }
 
   @override
   String get homeStatSeries => '系列';

@@ -9,6 +9,7 @@ pub mod error;
 pub mod formats;
 pub mod history;
 pub mod home;
+pub mod probe;
 pub mod library;
 pub mod metadata_backup;
 pub mod metadata_lock;
@@ -47,12 +48,16 @@ pub use history::{
     PagedReadingHistoryDto, ReadingHistoryDto,
 };
 pub use home::{
-    watch_continue_reading_top5, watch_home_page_counts, HomeContinueReadingDto, HomePageCountsDto,
+    watch_continue_reading_top5, watch_home_library_alerts, watch_home_page_counts,
+    watch_recently_added_on_home, HomeContinueReadingDto, HomeLibraryAlertDto,
+    HomeLibraryAlertKindDto, HomePageCountsDto, HomeRecentlyAddedDto,
 };
+pub use probe::{probe_library, rebuild_snapshot_from_scan_items, LibraryProbeResultDto};
 pub use library::{
     clear_remote_library_credentials, create_local_library, create_remote_library, delete_library,
     get_current_library_id, library_id_from_root, library_id_from_webdav_root, list_libraries,
-    normalize_webdav_root, parse_format_groups_json, parse_scan_interval, resolve_access_for_comic,
+    normalize_webdav_root, parse_format_groups_json, parse_scan_interval,
+    record_library_sync_failure, record_library_sync_success, resolve_access_for_comic,
     resolve_browse_library_id, serialize_format_groups, set_all_libraries_scan_on_startup,
     set_current_library_id, set_remote_library_credentials, update_library_format_groups,
     update_library_settings, update_library_sidebar_layout, update_local_library_root,

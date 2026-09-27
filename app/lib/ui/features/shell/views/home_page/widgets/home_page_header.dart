@@ -25,21 +25,19 @@ TextStyle homePageSubtitleStyle(ColorScheme colorScheme) {
   return TextStyle(color: colorScheme.hentai.textTertiary, fontSize: 13);
 }
 
-/// 粘连 header：左汉堡(仅 compact)+标题，右扫描按钮；通栏背景由 [HomePinnedHeaderDelegate] 提供。
+/// 粘连 header：左汉堡(仅 compact)+标题；无扫描按钮。
 class HomePageHeaderSection extends StatelessWidget {
   const HomePageHeaderSection({
     super.key,
     required this.layoutTier,
     required this.horizontalPadding,
     required this.contentMaxWidth,
-    required this.onScan,
     this.onOpenNavigation,
   });
 
   final HomePageLayoutTier layoutTier;
   final double horizontalPadding;
   final double contentMaxWidth;
-  final VoidCallback onScan;
   final VoidCallback? onOpenNavigation;
 
   @override
@@ -53,7 +51,6 @@ class HomePageHeaderSection extends StatelessWidget {
         ),
         child: HomePageHeaderToolbar(
           layoutTier: layoutTier,
-          onScan: onScan,
           onOpenNavigation: onOpenNavigation,
         ),
       ),
@@ -65,12 +62,10 @@ class HomePageHeaderToolbar extends StatelessWidget {
   const HomePageHeaderToolbar({
     super.key,
     required this.layoutTier,
-    required this.onScan,
     this.onOpenNavigation,
   });
 
   final HomePageLayoutTier layoutTier;
-  final VoidCallback onScan;
   final VoidCallback? onOpenNavigation;
 
   @override
@@ -84,47 +79,24 @@ class HomePageHeaderToolbar extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Expanded(
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  if (onOpenNavigation != null) ...<Widget>[
-                    GhostButton.icon(
-                      icon: LucideIcons.menu,
-                      semanticLabel: l10n.shellOpenNavMenu,
-                      tooltip: '',
-                      iconSize: 16,
-                      size: 32,
-                      borderRadius: 8,
-                      foregroundColor: colorScheme.hentai.iconDefault,
-                      hoverColor: theme.hoverColor,
-                      overlayColor: theme.hoverColor,
-                      onPressed: onOpenNavigation,
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  Text(
-                    l10n.homeTitle,
-                    style: homePageTitleStyle(colorScheme, layoutTier),
-                  ),
-                ],
-              ),
+          if (onOpenNavigation != null) ...<Widget>[
+            GhostButton.icon(
+              icon: LucideIcons.menu,
+              semanticLabel: l10n.shellOpenNavMenu,
+              tooltip: '',
+              iconSize: 16,
+              size: 32,
+              borderRadius: 8,
+              foregroundColor: colorScheme.hentai.iconDefault,
+              hoverColor: theme.hoverColor,
+              overlayColor: theme.hoverColor,
+              onPressed: onOpenNavigation,
             ),
-          ),
-          FilledButton.icon(
-            onPressed: onScan,
-            icon: const Icon(LucideIcons.scanSearch, size: 18),
-            label: Text(l10n.homeScanLibrary),
-            style: FilledButton.styleFrom(
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+            const SizedBox(width: 8),
+          ],
+          Text(
+            l10n.homeTitle,
+            style: homePageTitleStyle(colorScheme, layoutTier),
           ),
         ],
       ),

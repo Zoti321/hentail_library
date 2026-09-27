@@ -113,8 +113,37 @@
       }
     }
   },
-  "homeEmptyTitle": "No comics imported yet",
-  "homeEmptyHint": "Add library folders in Settings and scan. If already configured, check Selected Paths or scan again.",
+  "homeEmptyTitle": "Start building your library",
+  "homeEmptyHint": "Add a local or remote Library, then run Library sync from the sidebar.",
+  "homeRecentlyAdded": "Recently added",
+  "homeViewAllHistory": "View all",
+  "homeAlertDismissLater": "Later",
+  "homeAlertRemoteUnreachable": "{libraryName} is unreachable — check network or credentials",
+  "@homeAlertRemoteUnreachable": {
+    "placeholders": {
+      "libraryName": { "type": "String" }
+    }
+  },
+  "homeAlertSyncFailed": "{libraryName} sync failed — retry when ready",
+  "@homeAlertSyncFailed": {
+    "placeholders": {
+      "libraryName": { "type": "String" }
+    }
+  },
+  "homeAlertStaleSync": "{libraryName} last synced {days} days ago — sync recommended",
+  "@homeAlertStaleSync": {
+    "placeholders": {
+      "libraryName": { "type": "String" },
+      "days": { "type": "int" }
+    }
+  },
+  "homeAlertPendingResources": "{libraryName}: {count} new/changed Resources detected — sync recommended",
+  "@homeAlertPendingResources": {
+    "placeholders": {
+      "libraryName": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
   "homeStatSeries": "Series",
   "homeStatTags": "Tags",
   "homeStatAuthors": "Authors",
