@@ -8,6 +8,8 @@ part 'home_alert_dismiss_notifier.g.dart';
 
 const String _kHomeAlertDismissedKey = 'home_alert_dismissed';
 
+typedef HomeAlertDismissEntry = ({int dismissedAtMs, String fingerprint});
+
 @Riverpod(keepAlive: true)
 class HomeAlertDismissRevision extends _$HomeAlertDismissRevision {
   @override
@@ -19,72 +21,116 @@ class HomeAlertDismissRevision extends _$HomeAlertDismissRevision {
 @Riverpod(keepAlive: true)
 class HomeAlertDismissStore extends _$HomeAlertDismissStore {
   @override
-  Future<Map<String, int>> build() async {
+  Future<Map<String, HomeAlertDismissEntry>> build() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return _readMap(prefs);
   }
 
   Future<void> dismiss(HomeLibraryAlert alert) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final Map<String, int> map = _readMap(prefs);
-    map[alert.dismissKey()] = DateTime.now().millisecondsSinceEpoch;
-    await prefs.setString(_kHomeAlertDismissedKey, jsonEncode(map));
+    final Map<String, HomeAlertDismissEntry> map = _readMap(prefs);
+    map[alert.dismissKey()] = (
+      dismissedAtMs: DateTime.now().millisecondsSinceEpoch,
+      fingerprint: alert.dismissFingerprint(),
+    );
+    await _writeMap(prefs, map);
     ref.invalidateSelf();
     ref.read(homeAlertDismissRevisionProvider.notifier).bump();
   }
 
   Future<void> clearForLibrary(String libraryId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final Map<String, int> map = _readMap(prefs);
+    final Map<String, HomeAlertDismissEntry> map = _readMap(prefs);
     map.removeWhere((String key, _) => key.startsWith('$libraryId:'));
-    await prefs.setString(_kHomeAlertDismissedKey, jsonEncode(map));
+    await _writeMap(prefs, map);
     ref.invalidateSelf();
     ref.read(homeAlertDismissRevisionProvider.notifier).bump();
   }
 
   Future<void> clearForLibraryKind(String libraryId, HomeLibraryAlertKind kind) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final Map<String, int> map = _readMap(prefs);
+    final Map<String, HomeAlertDismissEntry> map = _readMap(prefs);
     map.remove('$libraryId:${kind.name}');
-    await prefs.setString(_kHomeAlertDismissedKey, jsonEncode(map));
+    await _writeMap(prefs, map);
     ref.invalidateSelf();
     ref.read(homeAlertDismissRevisionProvider.notifier).bump();
   }
 
-  Map<String, int> _readMap(SharedPreferences prefs) {
+  Future<void> _writeMap(
+    SharedPreferences prefs,
+    Map<String, HomeAlertDismissEntry> map,
+  ) async {
+    final Map<String, Map<String, Object>> encoded = map.map(
+      (String key, HomeAlertDismissEntry entry) => MapEntry<String, Map<String, Object>>(
+        key,
+        <String, Object>{
+          'dismissedAtMs': entry.dismissedAtMs,
+          'fingerprint': entry.fingerprint,
+        },
+      ),
+    );
+    await prefs.setString(_kHomeAlertDismissedKey, jsonEncode(encoded));
+  }
+
+  Map<String, HomeAlertDismissEntry> _readMap(SharedPreferences prefs) {
     final String? raw = prefs.getString(_kHomeAlertDismissedKey);
     if (raw == null || raw.isEmpty) {
-      return <String, int>{};
+      return <String, HomeAlertDismissEntry>{};
     }
     try {
       final Object? decoded = jsonDecode(raw);
       if (decoded is! Map) {
-        return <String, int>{};
+        return <String, HomeAlertDismissEntry>{};
       }
-      return Map<String, int>.fromEntries(
-        decoded.entries.map(
-          (MapEntry<dynamic, dynamic> entry) => MapEntry<String, int>(
+      return Map<String, HomeAlertDismissEntry>.fromEntries(
+        decoded.entries.map((MapEntry<dynamic, dynamic> entry) {
+          final Object? value = entry.value;
+          if (value is int) {
+            return MapEntry<String, HomeAlertDismissEntry>(
+              entry.key.toString(),
+              (dismissedAtMs: value, fingerprint: ''),
+            );
+          }
+          if (value is Map) {
+            return MapEntry<String, HomeAlertDismissEntry>(
+              entry.key.toString(),
+              (
+                dismissedAtMs: value['dismissedAtMs'] is int
+                    ? value['dismissedAtMs'] as int
+                    : int.tryParse('${value['dismissedAtMs']}') ?? 0,
+                fingerprint: '${value['fingerprint'] ?? ''}',
+              ),
+            );
+          }
+          return MapEntry<String, HomeAlertDismissEntry>(
             entry.key.toString(),
-            entry.value is int
-                ? entry.value as int
-                : int.tryParse('${entry.value}') ?? 0,
-          ),
-        ),
+            (dismissedAtMs: 0, fingerprint: ''),
+          );
+        }),
       );
     } catch (_) {
-      return <String, int>{};
+      return <String, HomeAlertDismissEntry>{};
     }
   }
 }
 
 List<HomeLibraryAlert> filterDismissedHomeAlerts({
   required List<HomeLibraryAlert> alerts,
-  required Map<String, int> dismissed,
+  required Map<String, HomeAlertDismissEntry> dismissed,
 }) {
   if (dismissed.isEmpty) {
     return alerts;
   }
   return alerts
-      .where((HomeLibraryAlert alert) => !dismissed.containsKey(alert.dismissKey()))
+      .where((HomeLibraryAlert alert) {
+        final HomeAlertDismissEntry? entry = dismissed[alert.dismissKey()];
+        if (entry == null) {
+          return true;
+        }
+        if (entry.fingerprint.isEmpty) {
+          return false;
+        }
+        return entry.fingerprint != alert.dismissFingerprint();
+      })
       .toList(growable: false);
 }

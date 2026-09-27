@@ -953,6 +953,7 @@ pub async fn delete_library(library_id: &str) -> Result<(), HentaiError> {
     }
 
     let txn = db.begin().await.map_err(map_db_err)?;
+    crate::probe::delete_snapshots_for_library(&txn, id).await?;
     let comic_ids = load_comic_ids_for_library(&txn, id).await?;
     delete_comics_side_effects(&txn, &comic_ids).await?;
     txn.execute(Statement::from_sql_and_values(

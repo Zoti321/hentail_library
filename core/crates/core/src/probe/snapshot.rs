@@ -79,8 +79,8 @@ pub async fn rebuild_snapshot_from_scan_items(
     Ok(())
 }
 
-pub async fn delete_snapshots_for_library(
-    db: &DatabaseConnection,
+pub async fn delete_snapshots_for_library<C: ConnectionTrait>(
+    db: &C,
     library_id: &str,
 ) -> Result<(), HentaiError> {
     LibraryResourceSnapshots::delete_many()

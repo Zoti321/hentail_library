@@ -4,7 +4,9 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
 
-use hentai_core::probe::{load_snapshot_map, probe_library, rebuild_snapshot_from_scan_items};
+use hentai_core::probe::{
+    diff_enumerated, load_snapshot_map, probe_library, rebuild_snapshot_from_scan_items,
+};
 use hentai_core::resource::FakeResourceAccess;
 use hentai_core::sync::format_group::FormatGroup;
 use hentai_core::sync::handle::create_sync_handle;
@@ -46,28 +48,10 @@ fn probe_diff_counts_added_changed_removed_with_fake_access() {
         (100_i64, 10_i64, "cbz".to_string()),
     );
 
-    let mut added = 0;
-    let mut changed = 0;
-    let mut removed = 0;
-    let mut seen = HashMap::new();
-    for item in &enumerated {
-        seen.insert(item.location_key.clone(), (item.modified_ms, item.size));
-        match snapshot.get(&item.location_key) {
-            None => added += 1,
-            Some((modified_ms, size, _)) if *modified_ms != item.modified_ms || *size != item.size => {
-                changed += 1
-            }
-            Some(_) => {}
-        }
-    }
-    for key in snapshot.keys() {
-        if !seen.contains_key(key) {
-            removed += 1;
-        }
-    }
-    assert_eq!(added, 1);
-    assert!(changed >= 1, "expected at least one changed resource");
-    assert_eq!(removed, 0);
+    let diff = diff_enumerated(&snapshot, &enumerated);
+    assert_eq!(diff.added, 1);
+    assert!(diff.changed >= 1, "expected at least one changed resource");
+    assert_eq!(diff.removed, 0);
 }
 
 #[test]

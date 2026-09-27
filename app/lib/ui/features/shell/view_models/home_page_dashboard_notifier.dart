@@ -5,6 +5,7 @@ import 'package:hentai_library/ui/core/dto/history_grid_item.dart';
 import 'package:hentai_library/ui/features/library/view_models/library_tab_filter_sort_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/deps.dart';
 import 'package:hentai_library/ui/features/shell/view_models/home_alert_dismiss_notifier.dart';
+import 'package:hentai_library/ui/features/shell/view_models/current_library_notifier.dart';
 import 'package:hentai_library/ui/features/shell/view_models/home_probe_coordinator_notifier.dart';
 import 'package:hentai_library/ui/features/shell/view_models/library_revision_throttle_busy.dart';
 import 'package:hentai_library/ui/features/shell/view_models/stream_throttle.dart';
@@ -66,20 +67,30 @@ Stream<List<HomeLibraryAlert>> homeLibraryAlertsStream(Ref ref) {
   ref.watch(libraryRevisionThrottleBusyProvider);
   ref.watch(homeProbeResultsProvider);
   ref.watch(homeAlertDismissRevisionProvider);
-  final AsyncValue<Map<String, int>> dismissedAsync = ref.watch(
+  final AsyncValue<Map<String, HomeAlertDismissEntry>> dismissedAsync = ref.watch(
     homeAlertDismissStoreProvider,
   );
   final Map<String, LibraryProbeResult> probeResults = ref.watch(
     homeProbeResultsProvider,
   );
+  final Map<String, String> libraryDisplayNames =
+      ref.watch(currentLibraryProvider).maybeWhen(
+        data: (CurrentLibraryState state) => Map<String, String>.fromEntries(
+          state.libraries.map(
+            (lib) => MapEntry<String, String>(lib.libraryId, lib.name),
+          ),
+        ),
+        orElse: () => const <String, String>{},
+      );
   return throttleWhile(
     repository.watchHomeLibraryAlerts().map((List<HomeLibraryAlert> alerts) {
       final List<HomeLibraryAlert> merged = _mergeProbeAlerts(
         alerts,
         probeResults,
+        libraryDisplayNames,
       );
-      final Map<String, int> dismissed =
-          dismissedAsync.asData?.value ?? const <String, int>{};
+      final Map<String, HomeAlertDismissEntry> dismissed =
+          dismissedAsync.asData?.value ?? const <String, HomeAlertDismissEntry>{};
       return filterDismissedHomeAlerts(
         alerts: merged,
         dismissed: dismissed,
@@ -93,6 +104,7 @@ Stream<List<HomeLibraryAlert>> homeLibraryAlertsStream(Ref ref) {
 List<HomeLibraryAlert> _mergeProbeAlerts(
   List<HomeLibraryAlert> base,
   Map<String, LibraryProbeResult> probeResults,
+  Map<String, String> libraryDisplayNames,
 ) {
   if (probeResults.isEmpty) {
     return base;
@@ -118,7 +130,7 @@ List<HomeLibraryAlert> _mergeProbeAlerts(
       libraryId: result.libraryId,
       displayName: existingIndex >= 0
           ? merged[existingIndex].displayName
-          : result.libraryId,
+          : libraryDisplayNames[result.libraryId] ?? result.libraryId,
       kind: HomeLibraryAlertKind.pendingResourcesDetected,
       pendingResourceCount: pending,
     );

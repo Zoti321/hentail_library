@@ -56,6 +56,16 @@ class HomeLibraryAlert {
   final int? pendingResourceCount;
 
   String dismissKey() => '$libraryId:${kind.name}';
+
+  /// Fingerprint of alert payload; dismiss is ignored when this changes.
+  String dismissFingerprint() {
+    return switch (kind) {
+      HomeLibraryAlertKind.pendingResourcesDetected =>
+        'probe:${pendingResourceCount ?? 0}',
+      _ =>
+        'sync:${lastSuccessAt?.millisecondsSinceEpoch ?? 0}:${lastErrorMessage ?? ''}',
+    };
+  }
 }
 
 class HomeRecentlyAddedEntry {

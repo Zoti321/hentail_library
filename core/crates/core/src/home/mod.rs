@@ -3,7 +3,7 @@ use sea_orm::{ConnectionTrait, DatabaseConnection, EntityTrait, Statement, Value
 use crate::comic::now_ms;
 use crate::db::{connection, map_db_err};
 use crate::error::HentaiError;
-use crate::library::{list_libraries, ScanInterval};
+use crate::library::ScanInterval;
 
 #[derive(Debug, Clone, Default)]
 pub struct HomePageCountsDto {
@@ -252,21 +252,17 @@ async fn load_counts(
 async fn load_home_library_alerts(
     db: &DatabaseConnection,
 ) -> Result<Vec<HomeLibraryAlertDto>, HentaiError> {
-    let libraries = list_libraries().await?;
+    let models = crate::entity::prelude::Libraries::find()
+        .all(db)
+        .await
+        .map_err(map_db_err)?;
     let now = now_ms();
     let mut alerts = Vec::new();
-    for library in libraries {
-        let model = crate::entity::prelude::Libraries::find_by_id(library.library_id.clone())
-            .one(db)
-            .await
-            .map_err(map_db_err)?;
-        let Some(model) = model else {
-            continue;
-        };
+    for model in models {
         if let Some(kind) = classify_sync_alert(&model, now, db).await? {
             alerts.push(HomeLibraryAlertDto {
-                library_id: library.library_id,
-                display_name: library.name,
+                library_id: model.library_id.clone(),
+                display_name: model.name.clone(),
                 kind,
                 last_success_at_ms: model.last_successful_sync_at,
                 last_error_message: model.last_sync_error.clone(),
@@ -346,4 +342,54 @@ async fn count_comics_for_library(
     Ok(row
         .and_then(|r| r.try_get::<i32>("", "c").ok())
         .unwrap_or(0))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn library_model(
+        last_sync_error: Option<&str>,
+        last_successful_sync_at: Option<i64>,
+        scan_interval: &str,
+    ) -> crate::entity::libraries::Model {
+        crate::entity::libraries::Model {
+            library_id: "lib-1".to_string(),
+            name: "Test".to_string(),
+            kind: "local".to_string(),
+            root_path: "/tmp/lib".to_string(),
+            username: String::new(),
+            allow_http: 0,
+            scan_on_startup: 0,
+            scan_interval: scan_interval.to_string(),
+            enabled_format_groups: "[]".to_string(),
+            created_at: 0,
+            pinned: 0,
+            sidebar_order: 0,
+            last_successful_sync_at,
+            last_sync_error: last_sync_error.map(str::to_string),
+        }
+    }
+
+    #[test]
+    fn remote_unreachable_classified_from_error_message() {
+        let model = library_model(Some("远程库不可达: timeout"), None, "disabled");
+        assert!(is_remote_unreachable_message(
+            model.last_sync_error.as_deref().unwrap()
+        ));
+    }
+
+    #[test]
+    fn sync_failed_when_error_not_unreachable() {
+        let model = library_model(Some("解析 CBZ 失败"), None, "disabled");
+        let error = model.last_sync_error.as_deref().unwrap();
+        assert!(!is_remote_unreachable_message(error));
+    }
+
+    #[test]
+    fn stale_days_at_least_one() {
+        let model = library_model(None, Some(0), "weekly");
+        let days = stale_days_for(&model, 3 * 24 * 60 * 60 * 1000).unwrap();
+        assert!(days >= 1);
+    }
 }

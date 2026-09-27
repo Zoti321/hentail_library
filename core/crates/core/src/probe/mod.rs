@@ -2,8 +2,6 @@ mod snapshot;
 
 use std::collections::HashMap;
 
-use sea_orm::DatabaseConnection;
-
 use crate::comic::now_ms;
 use crate::db::connection;
 use crate::error::HentaiError;
@@ -81,13 +79,15 @@ pub async fn probe_library(
     })
 }
 
-struct ProbeDiff {
-    added: i32,
-    changed: i32,
-    removed: i32,
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ProbeDiff {
+    pub added: i32,
+    pub changed: i32,
+    pub removed: i32,
 }
 
-fn diff_enumerated(
+/// Diff snapshot vs freshly enumerated resources (exported for integration tests).
+pub fn diff_enumerated(
     snapshot: &HashMap<String, (i64, i64, String)>,
     enumerated: &[EnumeratedResource],
 ) -> ProbeDiff {
@@ -259,10 +259,3 @@ pub(crate) fn scan_item_location_key(library: &LibraryDto, item: &ScanItem) -> S
     }
 }
 
-pub async fn rebuild_snapshot_after_sync(
-    db: &DatabaseConnection,
-    library: &LibraryDto,
-    scan_items: &[ScanItem],
-) -> Result<(), HentaiError> {
-    rebuild_snapshot_from_scan_items(db, &library.library_id, library, scan_items).await
-}
