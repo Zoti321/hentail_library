@@ -18,7 +18,6 @@ import 'package:hentai_library/ui/core/widgets/form/fluent_text_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/fluent_toggle_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/parody_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
-import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_side_tab_bar.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_smart_facet_providers.dart';
@@ -63,14 +62,12 @@ extension _BulkEditTabFields on _BulkEditTab {
 }
 
 class _BulkMultiValueFieldState {
-  bool enabled = false;
   ComicMetadataBulkMultiValueOp op = ComicMetadataBulkMultiValueOp.add;
   List<String> values = const <String>[];
   bool mixedValues = false;
 }
 
 class _BulkScalarFieldState {
-  bool enabled = false;
   ComicMetadataBulkScalarOp op = ComicMetadataBulkScalarOp.replace;
   bool mixedValues = false;
   String description = '';
@@ -78,7 +75,6 @@ class _BulkScalarFieldState {
 }
 
 class _BulkContentRatingFieldState {
-  bool enabled = false;
   bool isR18 = false;
   bool mixedValues = false;
 }
@@ -122,6 +118,7 @@ class _BulkEditMetadataDialogState
       _BulkContentRatingFieldState();
   _BulkEditTab _selectedTab = _BulkEditTab.general;
   _BulkFieldKind? _selectedField;
+  final Set<_BulkFieldKind> _dirtyFields = <_BulkFieldKind>{};
   bool _loading = true;
   ComicMetadataSmartFacetScope? _scope;
 
@@ -180,9 +177,18 @@ class _BulkEditMetadataDialogState
           seriesId: null,
         );
       }
+      _selectedField = _BulkFieldKind.description;
       _loading = false;
     });
   }
+
+  void _markDirty(_BulkFieldKind kind) {
+    if (_dirtyFields.add(kind)) {
+      setState(() {});
+    }
+  }
+
+  bool _isFieldDirty(_BulkFieldKind kind) => _dirtyFields.contains(kind);
 
   bool _isMixed(Iterable<List<String>> lists) {
     final Iterator<List<String>> it = lists.iterator;
@@ -211,37 +217,7 @@ class _BulkEditMetadataDialogState
     return true;
   }
 
-  bool _isFieldEnabled(_BulkFieldKind kind) {
-    return switch (kind) {
-      _BulkFieldKind.description => _descriptionField.enabled,
-      _BulkFieldKind.publishedAt => _publishedAtField.enabled,
-      _BulkFieldKind.contentRating => _contentRatingField.enabled,
-      _BulkFieldKind.languages ||
-      _BulkFieldKind.authors ||
-      _BulkFieldKind.tags ||
-      _BulkFieldKind.parodies ||
-      _BulkFieldKind.characters => _multiFields[kind]!.enabled,
-    };
-  }
-
-  int get _enabledFieldCount {
-    int count = 0;
-    for (final _BulkFieldKind kind in _BulkFieldKind.values) {
-      if (_isFieldEnabled(kind)) {
-        count += 1;
-      }
-    }
-    return count;
-  }
-
-  _BulkFieldKind _defaultFieldForTab(_BulkEditTab tab) {
-    for (final _BulkFieldKind kind in tab.fields) {
-      if (_isFieldEnabled(kind)) {
-        return kind;
-      }
-    }
-    return tab.fields.first;
-  }
+  _BulkFieldKind _defaultFieldForTab(_BulkEditTab tab) => tab.fields.first;
 
   void _selectTab(int index) {
     final _BulkEditTab tab = _BulkEditTab.values[index];
@@ -261,25 +237,6 @@ class _BulkEditMetadataDialogState
     setState(() => _selectedField = kind);
   }
 
-  void _setFieldEnabled(_BulkFieldKind kind, bool enabled) {
-    setState(() {
-      switch (kind) {
-        case _BulkFieldKind.description:
-          _descriptionField.enabled = enabled;
-        case _BulkFieldKind.publishedAt:
-          _publishedAtField.enabled = enabled;
-        case _BulkFieldKind.contentRating:
-          _contentRatingField.enabled = enabled;
-        case _BulkFieldKind.languages:
-        case _BulkFieldKind.authors:
-        case _BulkFieldKind.tags:
-        case _BulkFieldKind.parodies:
-        case _BulkFieldKind.characters:
-          _multiFields[kind]!.enabled = enabled;
-      }
-    });
-  }
-
   String _fieldLabel(AppLocalizations l10n, _BulkFieldKind kind) {
     return switch (kind) {
       _BulkFieldKind.tags => l10n.bulkEditMetadataFieldTags,
@@ -294,7 +251,7 @@ class _BulkEditMetadataDialogState
   }
 
   String? _fieldSummary(AppLocalizations l10n, _BulkFieldKind kind) {
-    if (!_isFieldEnabled(kind)) {
+    if (!_isFieldDirty(kind)) {
       return null;
     }
     return switch (kind) {
@@ -334,55 +291,48 @@ class _BulkEditMetadataDialogState
         _multiFields[_BulkFieldKind.parodies]!;
     final _BulkMultiValueFieldState characters =
         _multiFields[_BulkFieldKind.characters]!;
-    if (!tags.enabled &&
-        !authors.enabled &&
-        !languages.enabled &&
-        !parodies.enabled &&
-        !characters.enabled &&
-        !_contentRatingField.enabled &&
-        !_descriptionField.enabled &&
-        !_publishedAtField.enabled) {
+    if (_dirtyFields.isEmpty) {
       return null;
     }
     return ComicMetadataBulkPatch(
-      tags: tags.enabled
+      tags: _dirtyFields.contains(_BulkFieldKind.tags)
           ? ComicMetadataBulkMultiValuePatch(op: tags.op, values: tags.values)
           : null,
-      authors: authors.enabled
+      authors: _dirtyFields.contains(_BulkFieldKind.authors)
           ? ComicMetadataBulkMultiValuePatch(
               op: authors.op,
               values: authors.values,
             )
           : null,
-      languages: languages.enabled
+      languages: _dirtyFields.contains(_BulkFieldKind.languages)
           ? ComicMetadataBulkMultiValuePatch(
               op: languages.op,
               values: languages.values,
             )
           : null,
-      parodies: parodies.enabled
+      parodies: _dirtyFields.contains(_BulkFieldKind.parodies)
           ? ComicMetadataBulkMultiValuePatch(
               op: parodies.op,
               values: parodies.values,
             )
           : null,
-      characters: characters.enabled
+      characters: _dirtyFields.contains(_BulkFieldKind.characters)
           ? ComicMetadataBulkMultiValuePatch(
               op: characters.op,
               values: characters.values,
             )
           : null,
-      contentRating: _contentRatingField.enabled
+      contentRating: _dirtyFields.contains(_BulkFieldKind.contentRating)
           ? (_contentRatingField.isR18 ? 'r18' : 'safe')
           : null,
-      description: _descriptionField.enabled
+      description: _dirtyFields.contains(_BulkFieldKind.description)
           ? (_descriptionField.op == ComicMetadataBulkScalarOp.clear
                 ? const ComicMetadataBulkDescriptionPatch.clear()
                 : ComicMetadataBulkDescriptionPatch.replace(
                     _descriptionField.description,
                   ))
           : null,
-      publishedAt: _publishedAtField.enabled
+      publishedAt: _dirtyFields.contains(_BulkFieldKind.publishedAt)
           ? (_publishedAtField.op == ComicMetadataBulkScalarOp.clear
                 ? const ComicMetadataBulkPublishedAtPatch.clear()
                 : ComicMetadataBulkPublishedAtPatch.replace(
@@ -464,12 +414,11 @@ class _BulkEditMetadataDialogState
             fields: _selectedTab.fields,
             selectedField: _selectedField,
             labelFor: (_BulkFieldKind kind) => _fieldLabel(l10n, kind),
-            isEnabled: _isFieldEnabled,
+            isDirty: _isFieldDirty,
             isMixed: _isFieldMixed,
             summaryFor: (_BulkFieldKind kind) => _fieldSummary(l10n, kind),
             mixedLabel: l10n.bulkEditMetadataMixedValues,
             onSelect: _selectField,
-            onToggle: _setFieldEnabled,
           ),
         ),
         VerticalDivider(
@@ -486,12 +435,8 @@ class _BulkEditMetadataDialogState
             ),
             child: _BulkEditFieldDetail(
               selectedField: _selectedField,
-              isEnabled: _selectedField == null
-                  ? false
-                  : _isFieldEnabled(_selectedField!),
               selectHint: l10n.bulkEditMetadataSelectFieldHint,
-              enableHint: l10n.bulkEditMetadataEnableFieldHint,
-              child: _selectedField == null || !_isFieldEnabled(_selectedField!)
+              child: _selectedField == null
                   ? null
                   : _buildFieldEditor(l10n, scope, _selectedField!),
             ),
@@ -527,7 +472,10 @@ class _BulkEditMetadataDialogState
       _BulkFieldKind.characters => _BulkMultiValueFieldDetail(
         state: _multiFields[kind]!,
         opLabels: _multiOpLabels(l10n),
-        onChanged: () => setState(() {}),
+        onChanged: () {
+          _markDirty(kind);
+          setState(() {});
+        },
         child: _buildMultiValueInput(l10n, scope, kind),
       ),
       _BulkFieldKind.description || _BulkFieldKind.publishedAt => () {
@@ -539,7 +487,10 @@ class _BulkEditMetadataDialogState
         return _BulkScalarFieldDetail(
           state: state,
           opLabels: _scalarOpLabels(l10n),
-          onChanged: () => setState(() {}),
+          onChanged: () {
+            _markDirty(kind);
+            setState(() {});
+          },
           child: kind == _BulkFieldKind.description
               ? FluentTextField(
                   labelText: l10n.bulkEditMetadataFieldDescription,
@@ -549,6 +500,7 @@ class _BulkEditMetadataDialogState
                       _descriptionField.op == ComicMetadataBulkScalarOp.replace,
                   onChanged: (String value) {
                     _descriptionField.description = value;
+                    _markDirty(_BulkFieldKind.description);
                   },
                 )
               : FluentDatePickerField(
@@ -558,6 +510,7 @@ class _BulkEditMetadataDialogState
                       _publishedAtField.op == ComicMetadataBulkScalarOp.replace,
                   onChanged: (DateTime? value) {
                     _publishedAtField.publishedAt = value;
+                    _markDirty(_BulkFieldKind.publishedAt);
                   },
                 ),
         );
@@ -566,7 +519,10 @@ class _BulkEditMetadataDialogState
         label: l10n.bulkEditMetadataFieldContentRating,
         state: _contentRatingField,
         allAgesLabel: l10n.filterAgeAllAges,
-        onChanged: () => setState(() {}),
+        onChanged: () {
+          _markDirty(_BulkFieldKind.contentRating);
+          setState(() {});
+        },
       ),
     };
   }
@@ -630,6 +586,7 @@ class _BulkEditMetadataDialogState
       if (!field.values.contains(name)) {
         field.values = <String>[...field.values, name];
       }
+      _dirtyFields.add(kind);
     });
   }
 
@@ -638,6 +595,7 @@ class _BulkEditMetadataDialogState
       _multiFields[kind]!.values = _multiFields[kind]!.values
           .where((String v) => v != name)
           .toList();
+      _dirtyFields.add(kind);
     });
   }
 
@@ -704,13 +662,12 @@ class _BulkEditMetadataDialogState
                     fields: _selectedTab.fields,
                     selectedField: _selectedField,
                     labelFor: (_BulkFieldKind kind) => _fieldLabel(l10n, kind),
-                    isEnabled: _isFieldEnabled,
+                    isDirty: _isFieldDirty,
                     isMixed: _isFieldMixed,
                     summaryFor: (_BulkFieldKind kind) =>
                         _fieldSummary(l10n, kind),
                     mixedLabel: l10n.bulkEditMetadataMixedValues,
                     onSelect: _selectField,
-                    onToggle: _setFieldEnabled,
                   ),
                 ),
                 Expanded(
@@ -723,14 +680,8 @@ class _BulkEditMetadataDialogState
                     ),
                     child: _BulkEditFieldDetail(
                       selectedField: _selectedField,
-                      isEnabled: _selectedField == null
-                          ? false
-                          : _isFieldEnabled(_selectedField!),
                       selectHint: l10n.bulkEditMetadataSelectFieldHint,
-                      enableHint: l10n.bulkEditMetadataEnableFieldHint,
-                      child:
-                          _selectedField == null ||
-                              !_isFieldEnabled(_selectedField!)
+                      child: _selectedField == null
                           ? null
                           : _buildFieldEditor(l10n, scope, _selectedField!),
                     ),
@@ -778,18 +729,7 @@ class _BulkEditMetadataDialogState
       actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Expanded(child: loadedBody),
-                _BulkEditSummaryBar(
-                  label: l10n.bulkEditMetadataSummaryBar(
-                    _enabledFieldCount,
-                    widget.comicIds.length,
-                  ),
-                ),
-              ],
-            ),
+          : loadedBody,
       actions: <Widget>[
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
@@ -807,23 +747,21 @@ class _BulkEditFieldList extends StatelessWidget {
     required this.fields,
     required this.selectedField,
     required this.labelFor,
-    required this.isEnabled,
+    required this.isDirty,
     required this.isMixed,
     required this.summaryFor,
     required this.mixedLabel,
     required this.onSelect,
-    required this.onToggle,
   });
 
   final List<_BulkFieldKind> fields;
   final _BulkFieldKind? selectedField;
   final String Function(_BulkFieldKind kind) labelFor;
-  final bool Function(_BulkFieldKind kind) isEnabled;
+  final bool Function(_BulkFieldKind kind) isDirty;
   final bool Function(_BulkFieldKind kind) isMixed;
   final String? Function(_BulkFieldKind kind) summaryFor;
   final String mixedLabel;
   final ValueChanged<_BulkFieldKind> onSelect;
-  final void Function(_BulkFieldKind kind, bool enabled) onToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -835,13 +773,12 @@ class _BulkEditFieldList extends StatelessWidget {
           .map(
             (_BulkFieldKind kind) => _BulkEditFieldListRow(
               label: labelFor(kind),
-              enabled: isEnabled(kind),
+              dirty: isDirty(kind),
               selected: selectedField == kind,
               mixed: isMixed(kind),
               summary: summaryFor(kind),
               mixedLabel: mixedLabel,
               onSelect: () => onSelect(kind),
-              onToggle: (bool value) => onToggle(kind, value),
             ),
           )
           .toList(growable: false),
@@ -852,23 +789,21 @@ class _BulkEditFieldList extends StatelessWidget {
 class _BulkEditFieldListRow extends StatelessWidget {
   const _BulkEditFieldListRow({
     required this.label,
-    required this.enabled,
+    required this.dirty,
     required this.selected,
     required this.mixed,
     required this.summary,
     required this.mixedLabel,
     required this.onSelect,
-    required this.onToggle,
   });
 
   final String label;
-  final bool enabled;
+  final bool dirty;
   final bool selected;
   final bool mixed;
   final String? summary;
   final String mixedLabel;
   final VoidCallback onSelect;
-  final ValueChanged<bool> onToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -876,7 +811,7 @@ class _BulkEditFieldListRow extends StatelessWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     final Color? background = selected
         ? cs.primary.withAlpha(20)
-        : enabled
+        : dirty
         ? cs.hentai.hoverBackground.withAlpha(80)
         : null;
 
@@ -891,7 +826,7 @@ class _BulkEditFieldListRow extends StatelessWidget {
             borderRadius: BorderRadius.circular(tokens.radius.sm),
             border: Border(
               left: BorderSide(
-                color: enabled ? cs.primary : Colors.transparent,
+                color: selected ? cs.primary : Colors.transparent,
                 width: 2,
               ),
             ),
@@ -901,59 +836,47 @@ class _BulkEditFieldListRow extends StatelessWidget {
               horizontal: tokens.spacing.sm,
               vertical: tokens.spacing.sm,
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: tokens.spacing.xs,
               children: <Widget>[
-                ToggleSwitch(
-                  checked: enabled,
-                  onChange: () => onToggle(!enabled),
-                ),
-                SizedBox(width: tokens.spacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: tokens.spacing.xs,
-                    children: <Widget>[
-                      Text(
-                        label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: tokens.text.bodySm,
-                          fontWeight: FontWeight.w600,
-                          color: cs.hentai.textPrimary,
-                        ),
-                      ),
-                      if (summary != null || mixed)
-                        Row(
-                          children: <Widget>[
-                            if (summary != null)
-                              Flexible(
-                                child: Text(
-                                  summary!,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: tokens.text.labelXs,
-                                    color: cs.hentai.textSecondary,
-                                  ),
-                                ),
-                              ),
-                            if (mixed) ...<Widget>[
-                              if (summary != null)
-                                SizedBox(width: tokens.spacing.xs),
-                              Text(
-                                mixedLabel,
-                                style: TextStyle(
-                                  fontSize: tokens.text.labelXs,
-                                  color: cs.hentai.textTertiary,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                    ],
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: tokens.text.bodySm,
+                    fontWeight: FontWeight.w600,
+                    color: cs.hentai.textPrimary,
                   ),
                 ),
+                if (summary != null || mixed)
+                  Row(
+                    children: <Widget>[
+                      if (summary != null)
+                        Flexible(
+                          child: Text(
+                            summary!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: tokens.text.labelXs,
+                              color: cs.hentai.textSecondary,
+                            ),
+                          ),
+                        ),
+                      if (mixed) ...<Widget>[
+                        if (summary != null) SizedBox(width: tokens.spacing.xs),
+                        Text(
+                          mixedLabel,
+                          style: TextStyle(
+                            fontSize: tokens.text.labelXs,
+                            color: cs.hentai.textTertiary,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
               ],
             ),
           ),
@@ -966,25 +889,18 @@ class _BulkEditFieldListRow extends StatelessWidget {
 class _BulkEditFieldDetail extends StatelessWidget {
   const _BulkEditFieldDetail({
     required this.selectedField,
-    required this.isEnabled,
     required this.selectHint,
-    required this.enableHint,
     required this.child,
   });
 
   final _BulkFieldKind? selectedField;
-  final bool isEnabled;
   final String selectHint;
-  final String enableHint;
   final Widget? child;
 
   @override
   Widget build(BuildContext context) {
-    if (selectedField == null) {
+    if (selectedField == null || child == null) {
       return _BulkEditDetailPlaceholder(message: selectHint);
-    }
-    if (!isEnabled) {
-      return _BulkEditDetailPlaceholder(message: enableHint);
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1012,38 +928,6 @@ class _BulkEditDetailPlaceholder extends StatelessWidget {
           style: TextStyle(
             fontSize: tokens.text.bodySm,
             color: cs.hentai.textTertiary,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _BulkEditSummaryBar extends StatelessWidget {
-  const _BulkEditSummaryBar({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: cs.hentai.borderSubtle)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          tokens.spacing.lg,
-          tokens.spacing.sm,
-          tokens.spacing.lg,
-          tokens.spacing.sm,
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: tokens.text.bodySm,
-            color: cs.hentai.textSecondary,
           ),
         ),
       ),

@@ -6,7 +6,6 @@ import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/repositories/comic_repository.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
-import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_side_tab_bar.dart';
 import 'package:hentai_library/ui/features/library/views/widgets/bulk_edit_metadata_dialog.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
@@ -73,20 +72,6 @@ Future<void> _pumpDialog(
   await tester.pumpAndSettle();
 }
 
-Future<void> _enableField(WidgetTester tester, String fieldLabel) async {
-  final Finder row = find.ancestor(
-    of: find.text(fieldLabel),
-    matching: find.byType(InkWell),
-  );
-  expect(row, findsOneWidget);
-  final Finder toggle = find.descendant(
-    of: row,
-    matching: find.byType(ToggleSwitch),
-  );
-  await tester.tap(toggle);
-  await tester.pumpAndSettle();
-}
-
 Future<void> _selectFieldRow(WidgetTester tester, String fieldLabel) async {
   final Finder row = find.ancestor(
     of: find.text(fieldLabel),
@@ -97,49 +82,39 @@ Future<void> _selectFieldRow(WidgetTester tester, String fieldLabel) async {
 }
 
 void main() {
+  testWidgets('dialog title uses comic count with middle dot separator', (
+    WidgetTester tester,
+  ) async {
+    await _pumpDialog(tester, viewport: const Size(1200, 800));
+
+    expect(find.text('批量编辑 · 2 本'), findsOneWidget);
+  });
+
   testWidgets('authors tab lists taxonomy fields without general editors', (
     WidgetTester tester,
   ) async {
     await _pumpDialog(tester, viewport: const Size(1200, 800));
 
     expect(find.byType(DialogSideTabBar), findsOneWidget);
-    expect(find.text('概要'), findsOneWidget);
     expect(find.text('作者'), findsNothing);
 
     await tester.tap(find.text('作者&标签'));
     await tester.pumpAndSettle();
 
-    expect(find.text('作者'), findsOneWidget);
-    expect(find.text('标签'), findsOneWidget);
+    expect(find.text('标签'), findsWidgets);
+    expect(find.text('概要'), findsNothing);
     expect(find.byType(TagLibraryMultiSelectField), findsNothing);
   });
 
-  testWidgets('detail shows enable hint until field is toggled on', (
+  testWidgets('selected field shows editor without enable toggle', (
     WidgetTester tester,
   ) async {
     await _pumpDialog(tester, viewport: const Size(1200, 800));
 
-    await _selectFieldRow(tester, '概要');
-    expect(find.text('请先启用该字段'), findsOneWidget);
-    expect(find.text('操作'), findsNothing);
-
-    await _enableField(tester, '概要');
-    expect(find.text('请先启用该字段'), findsNothing);
     expect(find.text('操作'), findsOneWidget);
-  });
 
-  testWidgets('summary bar reflects enabled field count and comic count', (
-    WidgetTester tester,
-  ) async {
-    await _pumpDialog(tester, viewport: const Size(1200, 800));
-
-    expect(find.text('已启用 0 个字段 · 2 本漫画'), findsOneWidget);
-
-    await _enableField(tester, '概要');
-    expect(find.text('已启用 1 个字段 · 2 本漫画'), findsOneWidget);
-
-    await _enableField(tester, '发布日期');
-    expect(find.text('已启用 2 个字段 · 2 本漫画'), findsOneWidget);
+    await _selectFieldRow(tester, '发布日期');
+    expect(find.text('操作'), findsOneWidget);
   });
 
   testWidgets('compact layout uses capsule tabs instead of side tabs', (
@@ -147,7 +122,7 @@ void main() {
   ) async {
     await _pumpDialog(tester, viewport: const Size(500, 800));
 
-    expect(find.byType(CapsuleTabBar), findsOneWidget);
     expect(find.byType(DialogSideTabBar), findsNothing);
+    expect(find.text('常规'), findsOneWidget);
   });
 }

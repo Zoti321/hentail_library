@@ -2085,7 +2085,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String bulkEditMetadataTitle(int count) {
-    return 'Bulk edit metadata ($count comics)';
+    return 'Bulk edit · $count comics';
   }
 
   @override
@@ -2166,14 +2166,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get bulkEditMetadataSelectFieldHint =>
       'Select a field on the left to edit';
-
-  @override
-  String get bulkEditMetadataEnableFieldHint => 'Enable this field first';
-
-  @override
-  String bulkEditMetadataSummaryBar(int fieldCount, int comicCount) {
-    return '$fieldCount enabled field(s) · $comicCount comics';
-  }
 
   @override
   String bulkEditMetadataFieldSummaryCount(String opLabel, int count) {

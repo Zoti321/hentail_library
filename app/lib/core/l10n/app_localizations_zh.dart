@@ -2013,7 +2013,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String bulkEditMetadataTitle(int count) {
-    return '批量编辑元数据（$count 本）';
+    return '批量编辑 · $count 本';
   }
 
   @override
@@ -2093,14 +2093,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get bulkEditMetadataSelectFieldHint => '在左侧选择要编辑的字段';
-
-  @override
-  String get bulkEditMetadataEnableFieldHint => '请先启用该字段';
-
-  @override
-  String bulkEditMetadataSummaryBar(int fieldCount, int comicCount) {
-    return '已启用 $fieldCount 个字段 · $comicCount 本漫画';
-  }
 
   @override
   String bulkEditMetadataFieldSummaryCount(String opLabel, int count) {

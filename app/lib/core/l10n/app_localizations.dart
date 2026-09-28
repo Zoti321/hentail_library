@@ -3699,7 +3699,7 @@ abstract class AppLocalizations {
   /// No description provided for @bulkEditMetadataTitle.
   ///
   /// In zh, this message translates to:
-  /// **'批量编辑元数据（{count} 本）'**
+  /// **'批量编辑 · {count} 本'**
   String bulkEditMetadataTitle(int count);
 
   /// No description provided for @bulkEditMetadataConfirmTitle.
@@ -3837,18 +3837,6 @@ abstract class AppLocalizations {
   /// In zh, this message translates to:
   /// **'在左侧选择要编辑的字段'**
   String get bulkEditMetadataSelectFieldHint;
-
-  /// No description provided for @bulkEditMetadataEnableFieldHint.
-  ///
-  /// In zh, this message translates to:
-  /// **'请先启用该字段'**
-  String get bulkEditMetadataEnableFieldHint;
-
-  /// No description provided for @bulkEditMetadataSummaryBar.
-  ///
-  /// In zh, this message translates to:
-  /// **'已启用 {fieldCount} 个字段 · {comicCount} 本漫画'**
-  String bulkEditMetadataSummaryBar(int fieldCount, int comicCount);
 
   /// No description provided for @bulkEditMetadataFieldSummaryCount.
   ///

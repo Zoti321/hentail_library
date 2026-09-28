@@ -982,7 +982,7 @@
       "count": {"type": "int"}
     }
   },
-  "bulkEditMetadataTitle": "Bulk edit metadata ({count} comics)",
+  "bulkEditMetadataTitle": "Bulk edit · {count} comics",
   "@bulkEditMetadataTitle": {
     "placeholders": {
       "count": {"type": "int"}
@@ -1035,14 +1035,6 @@
     }
   },
   "bulkEditMetadataSelectFieldHint": "Select a field on the left to edit",
-  "bulkEditMetadataEnableFieldHint": "Enable this field first",
-  "bulkEditMetadataSummaryBar": "{fieldCount} enabled field(s) · {comicCount} comics",
-  "@bulkEditMetadataSummaryBar": {
-    "placeholders": {
-      "fieldCount": {"type": "int"},
-      "comicCount": {"type": "int"}
-    }
-  },
   "bulkEditMetadataFieldSummaryCount": "{opLabel} · {count} item(s)",
   "@bulkEditMetadataFieldSummaryCount": {
     "placeholders": {

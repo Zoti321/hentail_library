@@ -982,7 +982,7 @@
       "count": {"type": "int"}
     }
   },
-  "bulkEditMetadataTitle": "批量编辑元数据（{count} 本）",
+  "bulkEditMetadataTitle": "批量编辑 · {count} 本",
   "@bulkEditMetadataTitle": {
     "placeholders": {
       "count": {"type": "int"}
@@ -1035,14 +1035,6 @@
     }
   },
   "bulkEditMetadataSelectFieldHint": "在左侧选择要编辑的字段",
-  "bulkEditMetadataEnableFieldHint": "请先启用该字段",
-  "bulkEditMetadataSummaryBar": "已启用 {fieldCount} 个字段 · {comicCount} 本漫画",
-  "@bulkEditMetadataSummaryBar": {
-    "placeholders": {
-      "fieldCount": {"type": "int"},
-      "comicCount": {"type": "int"}
-    }
-  },
   "bulkEditMetadataFieldSummaryCount": "{opLabel} · {count} 项",
   "@bulkEditMetadataFieldSummaryCount": {
     "placeholders": {
