@@ -5,7 +5,6 @@ import 'package:hentai_library/ui/core/layout/page_content_width_layout.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/domain/models/read_models/home_page_read_models.dart';
 import 'package:hentai_library/ui/providers.dart';
-import 'package:hentai_library/ui/features/shell/view_models/home_probe_coordinator_notifier.dart';
 import 'package:hentai_library/ui/features/shell/views/home_page/widgets/widgets.dart';
 import 'package:hentai_library/ui/features/shell/views/responsive_app_shell.dart';
 
@@ -24,7 +23,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
-    ref.read(homePageVisibleProvider.notifier).setVisible(true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
@@ -32,12 +30,6 @@ class _HomePageState extends ConsumerState<HomePage> {
       setState(() => deferredSectionsReady = true);
     });
     WidgetsBinding.instance.addPostFrameCallback(_measureHeaderExtent);
-  }
-
-  @override
-  void dispose() {
-    ref.read(homePageVisibleProvider.notifier).setVisible(false);
-    super.dispose();
   }
 
   @override
@@ -60,6 +52,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(homePageVisibilityLifecycleProvider);
     final AppThemeTokens tokens = context.tokens;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final ({int comicCount, int libraryCount, bool showEmptyOnboarding})
