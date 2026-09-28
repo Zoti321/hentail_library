@@ -421,10 +421,6 @@ class _BulkEditMetadataDialogState
             onSelect: _selectField,
           ),
         ),
-        VerticalDivider(
-          width: 1,
-          color: Theme.of(context).colorScheme.hentai.borderSubtle,
-        ),
         Expanded(
           child: SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(
