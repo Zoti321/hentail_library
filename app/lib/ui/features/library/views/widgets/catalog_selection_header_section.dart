@@ -111,12 +111,19 @@ class CatalogSelectionHeaderToolbar extends ConsumerWidget {
             ),
           ),
           const SizedBox(width: 8),
-          FilledButton.icon(
+          GhostButton.icon(
+            icon: LucideIcons.pencil,
+            tooltip: '',
+            semanticLabel: l10n.catalogSelectionEditMetadata,
+            iconSize: 16,
+            size: 32,
+            borderRadius: 8,
+            foregroundColor: cs.hentai.iconDefault,
+            hoverColor: theme.hoverColor,
+            overlayColor: theme.hoverColor,
             onPressed: selection.count == 0
                 ? null
                 : () => openCatalogSelectionMetadataEditor(context, ref),
-            icon: const Icon(LucideIcons.pencil, size: 16),
-            label: Text(l10n.catalogSelectionEditMetadata),
           ),
           const Spacer(),
           Text(

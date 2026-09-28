@@ -145,7 +145,9 @@ void main() {
     );
 
     expect(find.text(l10n.catalogSelectionSelectedCount(1)), findsOneWidget);
-    expect(find.text(l10n.catalogSelectionEditMetadata), findsOneWidget);
+    expect(find.byIcon(LucideIcons.pencil), findsOneWidget);
+    expect(find.text(l10n.catalogSelectionEditMetadata), findsNothing);
+    expect(find.bySemanticsLabel(l10n.catalogSelectionEditMetadata), findsOneWidget);
   });
 
   testWidgets('shows zero selected count when selection is empty', (
@@ -157,7 +159,9 @@ void main() {
     );
 
     expect(find.text(l10n.catalogSelectionSelectedCount(0)), findsOneWidget);
-    expect(find.text(l10n.catalogSelectionEditMetadata), findsOneWidget);
+    expect(find.byIcon(LucideIcons.pencil), findsOneWidget);
+    expect(find.text(l10n.catalogSelectionEditMetadata), findsNothing);
+    expect(find.bySemanticsLabel(l10n.catalogSelectionEditMetadata), findsOneWidget);
     expect(find.text(l10n.catalogSelectionSelectPage), findsOneWidget);
   });
 
