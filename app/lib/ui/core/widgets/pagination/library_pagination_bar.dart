@@ -139,11 +139,7 @@ class _LibraryPaginationPageIndicator extends StatelessWidget {
           ),
         );
       },
-      child: Text(
-        key: ValueKey<int>(page),
-        label,
-        style: style,
-      ),
+      child: Text(key: ValueKey<int>(page), label, style: style),
     );
   }
 }

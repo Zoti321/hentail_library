@@ -32,9 +32,7 @@ class ComicMetadataBulkPatchShellFeedback extends ConsumerWidget {
         height: 30,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: cs.hentai.borderSubtle),
-          ),
+          border: Border(bottom: BorderSide(color: cs.hentai.borderSubtle)),
         ),
         child: Row(
           children: <Widget>[

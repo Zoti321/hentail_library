@@ -21,7 +21,7 @@ import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_fie
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_side_tab_bar.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_smart_facet_providers.dart';
-import 'package:hentai_library/ui/features/shell/di/repos.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -129,9 +129,9 @@ class _BulkEditMetadataDialogState
   }
 
   Future<void> _loadMixedHints() async {
-    final List<Comic> comics = await ref
-        .read(comicRepoProvider)
-        .findByIds(widget.comicIds);
+    final List<Comic> comics = await ref.read(
+      bulkEditComicsByIdsProvider(widget.comicIds).future,
+    );
     if (!mounted) {
       return;
     }

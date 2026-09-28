@@ -85,9 +85,10 @@ class _AnimatedLibraryCatalogGridSliverState
         _kPageTransitionSlideBackward,
       LibraryCatalogPageTransitionDirection.none => Offset.zero,
     };
-    _pageSlide = Tween<Offset>(begin: slideBegin, end: Offset.zero).animate(
-      CurvedAnimation(parent: controller, curve: Curves.easeOutCubic),
-    );
+    _pageSlide = Tween<Offset>(
+      begin: slideBegin,
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeOutCubic));
   }
 
   void _maybeStartPageTransition(
@@ -122,9 +123,7 @@ class _AnimatedLibraryCatalogGridSliverState
   }
 
   Widget _wrapGridItem(Widget child) {
-    if (!_pageTransitionActive ||
-        _pageOpacity == null ||
-        _pageSlide == null) {
+    if (!_pageTransitionActive || _pageOpacity == null || _pageSlide == null) {
       return child;
     }
     return AnimatedBuilder(

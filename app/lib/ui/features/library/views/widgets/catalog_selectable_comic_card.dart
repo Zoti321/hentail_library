@@ -50,9 +50,7 @@ class CatalogSelectableComicCard extends ConsumerWidget {
           top: tokens.spacing.xs,
           left: tokens.spacing.xs,
           child: Material(
-            color: selected
-                ? cs.primary
-                : cs.surface.withValues(alpha: 0.92),
+            color: selected ? cs.primary : cs.surface.withValues(alpha: 0.92),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(tokens.radius.xs),
               side: BorderSide(
@@ -60,8 +58,9 @@ class CatalogSelectableComicCard extends ConsumerWidget {
               ),
             ),
             child: InkWell(
-              onTap: () =>
-                  ref.read(catalogSelectionProvider.notifier).toggle(comic.comicId),
+              onTap: () => ref
+                  .read(catalogSelectionProvider.notifier)
+                  .toggle(comic.comicId),
               child: SizedBox(
                 width: 22,
                 height: 22,

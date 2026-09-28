@@ -160,11 +160,7 @@ class _HomeLibraryAlertCard extends ConsumerWidget {
   }
 
   Future<void> _scanLibrary(BuildContext context, WidgetRef ref) async {
-    await LibraryManagementActions.scanLibrary(
-      ref,
-      context,
-      alert.libraryId,
-    );
+    await LibraryManagementActions.scanLibrary(ref, context, alert.libraryId);
     if (!context.mounted) {
       return;
     }

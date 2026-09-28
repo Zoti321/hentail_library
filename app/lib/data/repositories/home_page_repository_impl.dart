@@ -10,9 +10,7 @@ class HomePageRepositoryImpl implements HomePageRepository {
   @override
   Stream<HomePageCounts> watchHomePageCounts({required bool excludeR18}) {
     return guardFrbStream(
-      () => rust
-          .watchHomePageCountsFrb(excludeR18: excludeR18)
-          .map(_mapCounts),
+      () => rust.watchHomePageCountsFrb(excludeR18: excludeR18).map(_mapCounts),
       fallbackMessage: '读取首页统计失败',
     );
   }

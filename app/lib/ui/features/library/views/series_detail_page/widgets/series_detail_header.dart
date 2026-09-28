@@ -62,7 +62,9 @@ class SeriesDetailHeader extends ConsumerWidget {
             switchOutCurve: Curves.easeInCubic,
             child: selectionActive
                 ? Padding(
-                    key: const ValueKey<String>('series-detail-selection-header'),
+                    key: const ValueKey<String>(
+                      'series-detail-selection-header',
+                    ),
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: CatalogSelectionHeaderToolbar(
                       layoutTier: layoutTier,

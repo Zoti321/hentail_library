@@ -18,10 +18,7 @@ class CatalogSelectionState {
 
   int get count => selectedIds.length;
 
-  CatalogSelectionState copyWith({
-    bool? active,
-    Set<String>? selectedIds,
-  }) {
+  CatalogSelectionState copyWith({bool? active, Set<String>? selectedIds}) {
     return CatalogSelectionState(
       active: active ?? this.active,
       selectedIds: selectedIds ?? this.selectedIds,
@@ -32,12 +29,12 @@ class CatalogSelectionState {
 class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
   @override
   CatalogSelectionState build() {
-    ref.listen(currentLibraryProvider.select((s) => s.asData?.value.currentId), (
-      _,
-      __,
-    ) {
-      _reset();
-    });
+    ref.listen(
+      currentLibraryProvider.select((s) => s.asData?.value.currentId),
+      (_, __) {
+        _reset();
+      },
+    );
     ref.listen(libraryQueryIntentProvider.select((intent) => intent.keyword), (
       _,
       __,
@@ -45,7 +42,10 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
       _reset();
     });
     ref.listen(libraryComicsTabSortOptionProvider, (_, __) => _reset());
-    ref.listen(libraryComicsTabAgeRestrictionFilterProvider, (_, __) => _reset());
+    ref.listen(
+      libraryComicsTabAgeRestrictionFilterProvider,
+      (_, __) => _reset(),
+    );
     ref.listen(libraryComicsTabMediaTypeFilterProvider, (_, __) => _reset());
     ref.listen(libraryComicsTabTagFilterProvider, (_, __) => _reset());
     ref.listen(libraryComicsTabAuthorFilterProvider, (_, __) => _reset());
@@ -87,7 +87,8 @@ class CatalogSelectionNotifier extends Notifier<CatalogSelectionState> {
     if (!state.active) {
       return;
     }
-    final Set<String> next = Set<String>.from(state.selectedIds)..addAll(comicIds);
+    final Set<String> next = Set<String>.from(state.selectedIds)
+      ..addAll(comicIds);
     state = state.copyWith(selectedIds: next);
   }
 

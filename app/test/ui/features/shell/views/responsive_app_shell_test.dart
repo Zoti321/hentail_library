@@ -122,9 +122,8 @@ List<Override> _shellHomeOverrides() {
       ),
     ),
     homeLibraryAlertsStreamProvider.overrideWith(
-      (Ref ref) => Stream<List<HomeLibraryAlert>>.value(
-        const <HomeLibraryAlert>[],
-      ),
+      (Ref ref) =>
+          Stream<List<HomeLibraryAlert>>.value(const <HomeLibraryAlert>[]),
     ),
     scanLibraryControllerProvider.overrideWith(_IdleScanLibraryController.new),
   ];

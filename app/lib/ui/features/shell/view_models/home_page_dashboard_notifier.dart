@@ -67,14 +67,14 @@ Stream<List<HomeLibraryAlert>> homeLibraryAlertsStream(Ref ref) {
   ref.watch(libraryRevisionThrottleBusyProvider);
   ref.watch(homeProbeResultsProvider);
   ref.watch(homeAlertDismissRevisionProvider);
-  final AsyncValue<Map<String, HomeAlertDismissEntry>> dismissedAsync = ref.watch(
-    homeAlertDismissStoreProvider,
-  );
+  final AsyncValue<Map<String, HomeAlertDismissEntry>> dismissedAsync = ref
+      .watch(homeAlertDismissStoreProvider);
   final Map<String, LibraryProbeResult> probeResults = ref.watch(
     homeProbeResultsProvider,
   );
-  final Map<String, String> libraryDisplayNames =
-      ref.watch(currentLibraryProvider).maybeWhen(
+  final Map<String, String> libraryDisplayNames = ref
+      .watch(currentLibraryProvider)
+      .maybeWhen(
         data: (CurrentLibraryState state) => Map<String, String>.fromEntries(
           state.libraries.map(
             (lib) => MapEntry<String, String>(lib.libraryId, lib.name),
@@ -90,11 +90,9 @@ Stream<List<HomeLibraryAlert>> homeLibraryAlertsStream(Ref ref) {
         libraryDisplayNames,
       );
       final Map<String, HomeAlertDismissEntry> dismissed =
-          dismissedAsync.asData?.value ?? const <String, HomeAlertDismissEntry>{};
-      return filterDismissedHomeAlerts(
-        alerts: merged,
-        dismissed: dismissed,
-      );
+          dismissedAsync.asData?.value ??
+          const <String, HomeAlertDismissEntry>{};
+      return filterDismissedHomeAlerts(alerts: merged, dismissed: dismissed);
     }),
     shouldThrottle: () => ref.read(libraryRevisionThrottleBusyProvider),
     interval: _kHomeScanThrottleInterval,

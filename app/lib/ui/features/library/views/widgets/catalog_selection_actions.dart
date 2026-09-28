@@ -4,9 +4,9 @@ import 'package:hentai_library/domain/library/comic_metadata_bulk_patch_types.da
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/ui/core/widgets/feedback/custom_toast.dart';
 import 'package:hentai_library/ui/features/library/view_models/catalog_selection_notifier.dart';
+import 'package:hentai_library/ui/features/library/view_models/library_page_comics_providers.dart';
 import 'package:hentai_library/ui/features/library/views/widgets/bulk_edit_metadata_dialog.dart';
 import 'package:hentai_library/ui/features/library/views/widgets/edit_metadata_dialog.dart';
-import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hentai_library/ui/features/shell/view_models/comic_metadata_bulk_patch_controller.dart';
 import 'package:hentai_library/ui/features/shell/view_models/comic_metadata_bulk_patch_toasts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -37,7 +37,9 @@ Future<void> openComicMetadataEditorForIds(
     return;
   }
   if (ids.length == 1) {
-    final Comic? comic = await ref.read(comicRepoProvider).findById(ids.first);
+    final Comic? comic = await ref.read(
+      libraryComicDetailProvider(ids.first).future,
+    );
     if (!context.mounted || comic == null) {
       return;
     }

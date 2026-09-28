@@ -29,17 +29,21 @@ class HomePageVisibleNotifier extends Notifier<bool> {
   }
 }
 
-final homePageVisibleProvider =
-    NotifierProvider<HomePageVisibleNotifier, bool>(HomePageVisibleNotifier.new);
+final homePageVisibleProvider = NotifierProvider<HomePageVisibleNotifier, bool>(
+  HomePageVisibleNotifier.new,
+);
 
 /// [HomePage] 挂载期间保持 `homePageVisibleProvider` 为 true；卸载后自动复位。
-final homePageVisibilityLifecycleProvider = Provider.autoDispose<void>((Ref ref) {
-  final HomePageVisibleNotifier visibleNotifier =
-      ref.read(homePageVisibleProvider.notifier);
+final homePageVisibilityLifecycleProvider = Provider.autoDispose<void>((
+  Ref ref,
+) {
+  final HomePageVisibleNotifier visibleNotifier = ref.read(
+    homePageVisibleProvider.notifier,
+  );
   ref.onDispose(() {
-    Future<void>(() => visibleNotifier.setVisible(false));
+    visibleNotifier.setVisible(false);
   });
-  Future<void>(() {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
     if (ref.mounted) {
       visibleNotifier.setVisible(true);
     }
@@ -123,8 +127,9 @@ class HomeProbeCoordinator extends _$HomeProbeCoordinator {
       return;
     }
     _visibleTimer?.cancel();
-    final Duration visibleDelay =
-        immediate ? Duration.zero : homeVisibleDebounceForTests;
+    final Duration visibleDelay = immediate
+        ? Duration.zero
+        : homeVisibleDebounceForTests;
     _visibleTimer = Timer(visibleDelay, () {
       if (!ref.read(homePageVisibleProvider)) {
         return;
@@ -138,8 +143,9 @@ class HomeProbeCoordinator extends _$HomeProbeCoordinator {
     bool immediate = false,
   }) {
     _idleTimer?.cancel();
-    final Duration delay =
-        immediate ? Duration.zero : (idleDelayForTests ?? const Duration(seconds: 2));
+    final Duration delay = immediate
+        ? Duration.zero
+        : (idleDelayForTests ?? const Duration(seconds: 2));
     _idleTimer = Timer(delay, () {
       if (!ref.read(homePageVisibleProvider)) {
         return;

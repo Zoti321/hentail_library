@@ -92,9 +92,7 @@ class SeriesDetailComicCard extends HookConsumerWidget {
           top: tokens.spacing.xs,
           left: tokens.spacing.xs,
           child: Material(
-            color: selected
-                ? cs.primary
-                : cs.surface.withValues(alpha: 0.92),
+            color: selected ? cs.primary : cs.surface.withValues(alpha: 0.92),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(tokens.radius.xs),
               side: BorderSide(

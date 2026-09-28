@@ -189,9 +189,7 @@ pub fn enumerate_resources_with(
         if handle.is_cancelled() {
             return Ok(out);
         }
-        if let Some(resource) =
-            enumerate_candidate(access, &path, enabled_groups, normalize_key)?
-        {
+        if let Some(resource) = enumerate_candidate(access, &path, enabled_groups, normalize_key)? {
             out.push(resource);
         }
     }

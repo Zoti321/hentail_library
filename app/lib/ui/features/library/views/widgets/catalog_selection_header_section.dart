@@ -97,8 +97,9 @@ class CatalogSelectionHeaderToolbar extends ConsumerWidget {
           const SizedBox(width: 8),
           TextButton(
             onPressed: showClear
-                ? () =>
-                      ref.read(catalogSelectionProvider.notifier).clearSelection()
+                ? () => ref
+                      .read(catalogSelectionProvider.notifier)
+                      .clearSelection()
                 : pageComicIds.isEmpty
                 ? null
                 : () => ref

@@ -223,7 +223,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           layoutTier,
         );
         final bool selectionActive = ref.watch(
-          catalogSelectionProvider.select((CatalogSelectionState s) => s.active),
+          catalogSelectionProvider.select(
+            (CatalogSelectionState s) => s.active,
+          ),
         );
         final List<String> pageComicIds = selectionActive
             ? ref

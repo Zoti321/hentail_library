@@ -128,7 +128,9 @@ class SettingsNotifier extends _$SettingsNotifier {
   Future<void> setLibraryCatalogSortFlipEnabled(bool value) async {
     final AppSetting? current = state.asData?.value;
     if (current == null) return;
-    await updateSettings(current.copyWith(libraryCatalogSortFlipEnabled: value));
+    await updateSettings(
+      current.copyWith(libraryCatalogSortFlipEnabled: value),
+    );
   }
 
   Future<void> setDesktopSidebarExpanded(bool value) async {

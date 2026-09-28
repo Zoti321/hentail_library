@@ -1,10 +1,10 @@
 use hentai_core::{
-    watch_continue_reading_top5 as core_watch_top5,
-    watch_home_library_alerts as core_watch_alerts,
+    watch_continue_reading_top5 as core_watch_top5, watch_home_library_alerts as core_watch_alerts,
     watch_home_page_counts as core_watch_counts,
-    watch_recently_added_on_home as core_watch_recently_added, HomeContinueReadingDto as CoreContinue,
-    HomeLibraryAlertDto as CoreAlert, HomeLibraryAlertKindDto as CoreAlertKind,
-    HomePageCountsDto as CoreCounts, HomeRecentlyAddedDto as CoreRecentlyAdded,
+    watch_recently_added_on_home as core_watch_recently_added,
+    HomeContinueReadingDto as CoreContinue, HomeLibraryAlertDto as CoreAlert,
+    HomeLibraryAlertKindDto as CoreAlertKind, HomePageCountsDto as CoreCounts,
+    HomeRecentlyAddedDto as CoreRecentlyAdded,
 };
 
 use super::init::HentaiErrorDto;
@@ -161,10 +161,7 @@ pub async fn watch_recently_added_on_home_frb(
 ) -> Result<(), HentaiErrorDto> {
     normalize_watch_result(
         core_watch_recently_added(exclude_r18, |rows| {
-            let mapped = rows
-                .into_iter()
-                .map(HomeRecentlyAddedDto::from)
-                .collect();
+            let mapped = rows.into_iter().map(HomeRecentlyAddedDto::from).collect();
             emit_or_closed(&sink, mapped)
         })
         .await,

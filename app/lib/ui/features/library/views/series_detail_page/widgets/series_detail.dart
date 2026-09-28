@@ -97,10 +97,7 @@ class _SeriesDetailState extends ConsumerState<SeriesDetail> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        SeriesDetailHeader(
-          series: widget.series,
-          pageComicIds: pageComicIds,
-        ),
+        SeriesDetailHeader(series: widget.series, pageComicIds: pageComicIds),
         Expanded(
           child: CustomScrollView(
             controller: _scrollController,

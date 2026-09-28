@@ -283,9 +283,6 @@ mod tests {
             op: MultiValueOp::Replace,
             values: vec!["x".to_string()],
         };
-        assert_eq!(
-            merge_multi_value(&current, &patch),
-            vec!["x".to_string()]
-        );
+        assert_eq!(merge_multi_value(&current, &patch), vec!["x".to_string()]);
     }
 }

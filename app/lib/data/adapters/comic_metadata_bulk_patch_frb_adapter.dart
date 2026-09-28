@@ -6,8 +6,9 @@ import 'package:hentai_library/src/rust/api/comic.dart' as comic_rust;
 import 'package:hentai_library/src/rust/api/sync.dart' as sync_rust;
 
 class ComicMetadataBulkPatchFrbAdapter {
-  ComicMetadataBulkPatchFrbAdapter({required LibraryRepository libraryRepository})
-    : _libraryRepository = libraryRepository;
+  ComicMetadataBulkPatchFrbAdapter({
+    required LibraryRepository libraryRepository,
+  }) : _libraryRepository = libraryRepository;
 
   final LibraryRepository _libraryRepository;
   sync_rust.SyncHandleDto? _activeHandle;
@@ -53,9 +54,13 @@ class ComicMetadataBulkPatchFrbAdapter {
     return comic_rust.ComicMetadataBulkPatchFrbDto(
       tags: patch.tags == null ? null : _mapMultiValue(patch.tags!),
       authors: patch.authors == null ? null : _mapMultiValue(patch.authors!),
-      languages: patch.languages == null ? null : _mapMultiValue(patch.languages!),
+      languages: patch.languages == null
+          ? null
+          : _mapMultiValue(patch.languages!),
       parodies: patch.parodies == null ? null : _mapMultiValue(patch.parodies!),
-      characters: patch.characters == null ? null : _mapMultiValue(patch.characters!),
+      characters: patch.characters == null
+          ? null
+          : _mapMultiValue(patch.characters!),
       contentRating: patch.contentRating,
       description: patch.description == null
           ? null
@@ -71,8 +76,7 @@ class ComicMetadataBulkPatchFrbAdapter {
   ) {
     return comic_rust.MultiValuePatchFrbDto(
       op: switch (patch.op) {
-        ComicMetadataBulkMultiValueOp.add =>
-          comic_rust.MultiValueOpFrbDto.add,
+        ComicMetadataBulkMultiValueOp.add => comic_rust.MultiValueOpFrbDto.add,
         ComicMetadataBulkMultiValueOp.remove =>
           comic_rust.MultiValueOpFrbDto.remove,
         ComicMetadataBulkMultiValueOp.replace =>

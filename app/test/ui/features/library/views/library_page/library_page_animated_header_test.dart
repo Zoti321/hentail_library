@@ -68,22 +68,26 @@ void main() {
     await _pumpAnimatedHeader(tester, selectionActive: false);
 
     expect(tester.takeException(), isNull);
-    expect(find.byKey(const ValueKey<String>('library-header')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey<String>('library-header')),
+      findsOneWidget,
+    );
     expect(find.byType(LibraryPageHeaderSection), findsOneWidget);
     expect(find.byType(CatalogSelectionHeaderSection), findsNothing);
   });
 
-  testWidgets('selection mode replaces pinned header with catalog selection chrome', (
-    WidgetTester tester,
-  ) async {
-    await _pumpAnimatedHeader(tester, selectionActive: true);
+  testWidgets(
+    'selection mode replaces pinned header with catalog selection chrome',
+    (WidgetTester tester) async {
+      await _pumpAnimatedHeader(tester, selectionActive: true);
 
-    expect(tester.takeException(), isNull);
-    expect(
-      find.byKey(const ValueKey<String>('catalog-selection-header')),
-      findsOneWidget,
-    );
-    expect(find.byType(CatalogSelectionHeaderSection), findsOneWidget);
-    expect(find.byType(LibraryPageHeaderSection), findsNothing);
-  });
+      expect(tester.takeException(), isNull);
+      expect(
+        find.byKey(const ValueKey<String>('catalog-selection-header')),
+        findsOneWidget,
+      );
+      expect(find.byType(CatalogSelectionHeaderSection), findsOneWidget);
+      expect(find.byType(LibraryPageHeaderSection), findsNothing);
+    },
+  );
 }

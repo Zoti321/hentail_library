@@ -111,8 +111,9 @@ void main() {
     tearDown(() {
       container.dispose();
       HomeProbeCoordinator.idleDelayForTests = null;
-      HomeProbeCoordinator.homeVisibleDebounceForTests =
-          const Duration(milliseconds: 500);
+      HomeProbeCoordinator.homeVisibleDebounceForTests = const Duration(
+        milliseconds: 500,
+      );
       HomeProbeCoordinator.probeDebounceForTests = const Duration(minutes: 15);
       HomeProbeCoordinator.scheduleProbeAtIdleForTests = true;
     });
@@ -186,8 +187,9 @@ void main() {
     });
 
     test('waits for home visibility debounce before probing', () async {
-      HomeProbeCoordinator.homeVisibleDebounceForTests =
-          const Duration(milliseconds: 80);
+      HomeProbeCoordinator.homeVisibleDebounceForTests = const Duration(
+        milliseconds: 80,
+      );
       container = ProviderContainer(
         overrides: <Override>[
           homePageRepoProvider.overrideWithValue(repo),

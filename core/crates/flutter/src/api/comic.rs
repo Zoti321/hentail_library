@@ -383,9 +383,7 @@ fn map_multi_value_op(op: MultiValueOpFrbDto) -> hentai_core::MultiValueOp {
     }
 }
 
-fn map_multi_value_patch(
-    patch: MultiValuePatchFrbDto,
-) -> hentai_core::MultiValuePatch {
+fn map_multi_value_patch(patch: MultiValuePatchFrbDto) -> hentai_core::MultiValuePatch {
     hentai_core::MultiValuePatch {
         op: map_multi_value_op(patch.op),
         values: patch.values,

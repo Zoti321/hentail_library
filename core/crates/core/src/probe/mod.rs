@@ -98,7 +98,9 @@ pub fn diff_enumerated(
         seen.insert(item.location_key.clone(), (item.modified_ms, item.size));
         match snapshot.get(&item.location_key) {
             None => added += 1,
-            Some((modified_ms, size, _)) if *modified_ms != item.modified_ms || *size != item.size => {
+            Some((modified_ms, size, _))
+                if *modified_ms != item.modified_ms || *size != item.size =>
+            {
                 changed += 1
             }
             Some(_) => {}
@@ -169,17 +171,14 @@ fn probe_enumerate_remote(
             "缺少远程库凭证".to_string(),
         ));
     };
-    let access = match WebDavResourceAccess::connect(
-        &library.root_path,
-        &library.username,
-        &password,
-    ) {
-        Ok(access) => access,
-        Err(err) if err.is_remote_access_failure() => {
-            return Ok(ProbeEnumerateOutcome::Unreachable(err.message));
-        }
-        Err(err) => return Err(err),
-    };
+    let access =
+        match WebDavResourceAccess::connect(&library.root_path, &library.username, &password) {
+            Ok(access) => access,
+            Err(err) if err.is_remote_access_failure() => {
+                return Ok(ProbeEnumerateOutcome::Unreachable(err.message));
+            }
+            Err(err) => return Err(err),
+        };
     match enumerate_remote_resources(
         &access,
         &library.root_path,
@@ -236,9 +235,7 @@ fn enumerate_remote_resources(
             continue;
         }
         let path = normalize_remote_location_key(&location);
-        let Some((modified_ms, size)) =
-            read_source_stat_with(access, &path, resource_type)?
-        else {
+        let Some((modified_ms, size)) = read_source_stat_with(access, &path, resource_type)? else {
             continue;
         };
         out.push(EnumeratedResource {
@@ -258,4 +255,3 @@ pub(crate) fn scan_item_location_key(library: &LibraryDto, item: &ScanItem) -> S
         crate::comic_id::normalize_path_for_key(&item.path)
     }
 }
-

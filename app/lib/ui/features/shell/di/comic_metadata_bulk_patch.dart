@@ -24,26 +24,27 @@ ComicMetadataBulkPatchCoordinator comicMetadataBulkPatchCoordinator(Ref ref) {
     onSucceeded: () {
       ref.read(libraryRevisionProvider.notifier).notifyExternalChange();
     },
-    onDictionariesChanged: ({
-      required bool tagsWritten,
-      required bool authorsWritten,
-      required bool parodiesWritten,
-      required bool charactersWritten,
-    }) {
-      if (tagsWritten) {
-        ref.invalidate(allTagsProvider);
-      }
-      if (authorsWritten) {
-        ref.invalidate(allAuthorsProvider);
-      }
-      if (parodiesWritten) {
-        ref.invalidate(allParodiesProvider);
-        ref.invalidate(libraryDistinctParodiesProvider);
-      }
-      if (charactersWritten) {
-        ref.invalidate(allCharactersProvider);
-        ref.invalidate(libraryDistinctCharactersProvider);
-      }
-    },
+    onDictionariesChanged:
+        ({
+          required bool tagsWritten,
+          required bool authorsWritten,
+          required bool parodiesWritten,
+          required bool charactersWritten,
+        }) {
+          if (tagsWritten) {
+            ref.invalidate(allTagsProvider);
+          }
+          if (authorsWritten) {
+            ref.invalidate(allAuthorsProvider);
+          }
+          if (parodiesWritten) {
+            ref.invalidate(allParodiesProvider);
+            ref.invalidate(libraryDistinctParodiesProvider);
+          }
+          if (charactersWritten) {
+            ref.invalidate(allCharactersProvider);
+            ref.invalidate(libraryDistinctCharactersProvider);
+          }
+        },
   );
 }

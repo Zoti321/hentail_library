@@ -50,10 +50,7 @@ void main() {
       final List<HomeLibraryAlert> filtered = filterDismissedHomeAlerts(
         alerts: const <HomeLibraryAlert>[pending],
         dismissed: <String, HomeAlertDismissEntry>{
-          pending.dismissKey(): (
-            dismissedAtMs: 1,
-            fingerprint: 'probe:3',
-          ),
+          pending.dismissKey(): (dismissedAtMs: 1, fingerprint: 'probe:3'),
         },
       );
 

@@ -55,10 +55,7 @@ pub async fn rebuild_snapshot_from_scan_items(
             continue;
         }
         let (modified_ms, size) = if library.kind == "remote" {
-            (
-                item.comic.last_updated_at,
-                item.comic.resource_size,
-            )
+            (item.comic.last_updated_at, item.comic.resource_size)
         } else {
             read_source_stat_with(access, &item.path, &item.resource_type)?
                 .unwrap_or((item.comic.last_updated_at, item.comic.resource_size))
@@ -99,7 +96,9 @@ pub async fn snapshot_row_count(
         .query_one(Statement::from_sql_and_values(
             db.get_database_backend(),
             "SELECT COUNT(*) AS c FROM library_resource_snapshots WHERE library_id = ?",
-            [sea_orm::Value::String(Some(Box::new(library_id.to_string())))],
+            [sea_orm::Value::String(Some(Box::new(
+                library_id.to_string(),
+            )))],
         ))
         .await
         .map_err(map_db_err)?;

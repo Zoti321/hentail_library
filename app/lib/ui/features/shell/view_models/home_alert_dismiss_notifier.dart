@@ -47,7 +47,10 @@ class HomeAlertDismissStore extends _$HomeAlertDismissStore {
     ref.read(homeAlertDismissRevisionProvider.notifier).bump();
   }
 
-  Future<void> clearForLibraryKind(String libraryId, HomeLibraryAlertKind kind) async {
+  Future<void> clearForLibraryKind(
+    String libraryId,
+    HomeLibraryAlertKind kind,
+  ) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final Map<String, HomeAlertDismissEntry> map = _readMap(prefs);
     map.remove('$libraryId:${kind.name}');
@@ -61,13 +64,11 @@ class HomeAlertDismissStore extends _$HomeAlertDismissStore {
     Map<String, HomeAlertDismissEntry> map,
   ) async {
     final Map<String, Map<String, Object>> encoded = map.map(
-      (String key, HomeAlertDismissEntry entry) => MapEntry<String, Map<String, Object>>(
-        key,
-        <String, Object>{
-          'dismissedAtMs': entry.dismissedAtMs,
-          'fingerprint': entry.fingerprint,
-        },
-      ),
+      (String key, HomeAlertDismissEntry entry) =>
+          MapEntry<String, Map<String, Object>>(key, <String, Object>{
+            'dismissedAtMs': entry.dismissedAtMs,
+            'fingerprint': entry.fingerprint,
+          }),
     );
     await prefs.setString(_kHomeAlertDismissedKey, jsonEncode(encoded));
   }
@@ -102,10 +103,10 @@ class HomeAlertDismissStore extends _$HomeAlertDismissStore {
               ),
             );
           }
-          return MapEntry<String, HomeAlertDismissEntry>(
-            entry.key.toString(),
-            (dismissedAtMs: 0, fingerprint: ''),
-          );
+          return MapEntry<String, HomeAlertDismissEntry>(entry.key.toString(), (
+            dismissedAtMs: 0,
+            fingerprint: '',
+          ));
         }),
       );
     } catch (_) {

@@ -260,30 +260,22 @@ class _StatsCards extends ConsumerWidget {
           icon: LucideIcons.library,
           accentColor: accents.series,
         )),
-        tagsCard: _buildStatCard(
-          context,
-          (
-            label: l10n.homeStatTags,
-            valueText: '${c.tagCount}',
-            caption: l10n.homeTagCount(c.tagCount),
-            icon: LucideIcons.tags,
-            accentColor: accents.tags,
-          ),
-          onTap: () => context.go('/metadata?tab=tags'),
-        ),
-        authorCard: _buildStatCard(
-          context,
-          (
-            label: l10n.homeStatAuthors,
-            valueText: '${c.authorCount}',
-            caption: c.authorCount == 0
-                ? l10n.homeNoAuthors
-                : l10n.homeAuthorCount(c.authorCount),
-            icon: LucideIcons.penLine,
-            accentColor: accents.authors,
-          ),
-          onTap: () => context.go('/metadata?tab=authors'),
-        ),
+        tagsCard: _buildStatCard(context, (
+          label: l10n.homeStatTags,
+          valueText: '${c.tagCount}',
+          caption: l10n.homeTagCount(c.tagCount),
+          icon: LucideIcons.tags,
+          accentColor: accents.tags,
+        ), onTap: () => context.go('/metadata?tab=tags')),
+        authorCard: _buildStatCard(context, (
+          label: l10n.homeStatAuthors,
+          valueText: '${c.authorCount}',
+          caption: c.authorCount == 0
+              ? l10n.homeNoAuthors
+              : l10n.homeAuthorCount(c.authorCount),
+          icon: LucideIcons.penLine,
+          accentColor: accents.authors,
+        ), onTap: () => context.go('/metadata?tab=authors')),
       ),
       loading: () => _HomeStatsCardLayout(
         layoutTier: layoutTier,
@@ -516,125 +508,125 @@ class _StatSummaryCardState extends State<_StatSummaryCard> {
     final Color accent = widget.accentColor;
     final Curve curve = Curves.easeOutCubic;
     final Widget card = AnimatedContainer(
-        duration: heroStatCardHoverDuration,
-        curve: curve,
-        transformAlignment: Alignment.bottomCenter,
-        transform: Matrix4.identity()..translate(0.0, isHovered ? -3.0 : 0.0),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(heroStatCardRadius),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: <Color>[
-              Color.alphaBlend(accent.withAlpha(26), colorScheme.surface),
-              Color.alphaBlend(accent.withAlpha(8), colorScheme.surface),
-              colorScheme.surface,
-            ],
-            stops: const <double>[0, 0.38, 1],
+      duration: heroStatCardHoverDuration,
+      curve: curve,
+      transformAlignment: Alignment.bottomCenter,
+      transform: Matrix4.identity()..translate(0.0, isHovered ? -3.0 : 0.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(heroStatCardRadius),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Color.alphaBlend(accent.withAlpha(26), colorScheme.surface),
+            Color.alphaBlend(accent.withAlpha(8), colorScheme.surface),
+            colorScheme.surface,
+          ],
+          stops: const <double>[0, 0.38, 1],
+        ),
+        border: Border.all(
+          color: Color.alphaBlend(
+            accent.withAlpha(52),
+            colorScheme.hentai.borderSubtle,
           ),
-          border: Border.all(
-            color: Color.alphaBlend(
-              accent.withAlpha(52),
-              colorScheme.hentai.borderSubtle,
-            ),
+        ),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: colorScheme.shadow.withAlpha(36),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
           ),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: colorScheme.shadow.withAlpha(36),
-              blurRadius: 14,
-              offset: const Offset(0, 6),
+          BoxShadow(
+            color: accent.withAlpha(14),
+            blurRadius: 0,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(heroStatCardRadius),
+        child: Stack(
+          children: <Widget>[
+            Positioned(
+              right: -8,
+              bottom: -12,
+              child: Icon(widget.icon, size: 88, color: accent.withAlpha(16)),
             ),
-            BoxShadow(
-              color: accent.withAlpha(14),
-              blurRadius: 0,
-              offset: const Offset(0, 4),
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                tokens.spacing.lg + 4,
+                tokens.spacing.lg + 6,
+                tokens.spacing.lg + 4,
+                tokens.spacing.lg + 4,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          widget.label,
+                          style: TextStyle(
+                            fontSize: tokens.text.labelXs,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.8,
+                            color: Color.alphaBlend(
+                              accent.withAlpha(200),
+                              colorScheme.hentai.textTertiary,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: tokens.spacing.sm + 2),
+                        Text(
+                          widget.valueText,
+                          style: TextStyle(
+                            fontSize: tokens.text.titleLg + 6,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.8,
+                            height: 1.05,
+                            color: colorScheme.hentai.textPrimary,
+                          ),
+                        ),
+                        SizedBox(height: tokens.spacing.sm - 1),
+                        Text(
+                          widget.caption,
+                          style: TextStyle(
+                            fontSize: tokens.text.bodySm,
+                            color: colorScheme.hentai.textSecondary,
+                            height: 1.35,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  AnimatedContainer(
+                    duration: heroStatCardHoverDuration,
+                    curve: curve,
+                    padding: const EdgeInsets.all(11),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: <Color>[
+                          accent.withAlpha(30),
+                          accent.withAlpha(14),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: accent.withAlpha(58)),
+                      boxShadow: const <BoxShadow>[],
+                    ),
+                    child: Icon(widget.icon, size: 28, color: accent),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(heroStatCardRadius),
-          child: Stack(
-            children: <Widget>[
-              Positioned(
-                right: -8,
-                bottom: -12,
-                child: Icon(widget.icon, size: 88, color: accent.withAlpha(16)),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  tokens.spacing.lg + 4,
-                  tokens.spacing.lg + 6,
-                  tokens.spacing.lg + 4,
-                  tokens.spacing.lg + 4,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            widget.label,
-                            style: TextStyle(
-                              fontSize: tokens.text.labelXs,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.8,
-                              color: Color.alphaBlend(
-                                accent.withAlpha(200),
-                                colorScheme.hentai.textTertiary,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: tokens.spacing.sm + 2),
-                          Text(
-                            widget.valueText,
-                            style: TextStyle(
-                              fontSize: tokens.text.titleLg + 6,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.8,
-                              height: 1.05,
-                              color: colorScheme.hentai.textPrimary,
-                            ),
-                          ),
-                          SizedBox(height: tokens.spacing.sm - 1),
-                          Text(
-                            widget.caption,
-                            style: TextStyle(
-                              fontSize: tokens.text.bodySm,
-                              color: colorScheme.hentai.textSecondary,
-                              height: 1.35,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    AnimatedContainer(
-                      duration: heroStatCardHoverDuration,
-                      curve: curve,
-                      padding: const EdgeInsets.all(11),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: <Color>[
-                            accent.withAlpha(30),
-                            accent.withAlpha(14),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: accent.withAlpha(58)),
-                        boxShadow: const <BoxShadow>[],
-                      ),
-                      child: Icon(widget.icon, size: 28, color: accent),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+      ),
+    );
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),

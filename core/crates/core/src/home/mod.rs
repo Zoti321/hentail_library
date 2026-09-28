@@ -202,11 +202,8 @@ async fn load_recently_added(
         );
         db.query_all(stmt).await.map_err(map_db_err)?
     } else {
-        let stmt = Statement::from_sql_and_values(
-            db.get_database_backend(),
-            SQL_RECENTLY_ADDED,
-            [],
-        );
+        let stmt =
+            Statement::from_sql_and_values(db.get_database_backend(), SQL_RECENTLY_ADDED, []);
         db.query_all(stmt).await.map_err(map_db_err)?
     };
     rows.into_iter()
@@ -309,8 +306,8 @@ async fn is_stale_sync(
     now_ms: i64,
     db: &DatabaseConnection,
 ) -> Result<bool, HentaiError> {
-    let scan_interval = crate::library::parse_scan_interval(&model.scan_interval)
-        .unwrap_or(ScanInterval::Disabled);
+    let scan_interval =
+        crate::library::parse_scan_interval(&model.scan_interval).unwrap_or(ScanInterval::Disabled);
     let Some(threshold_ms) = scan_interval.staleness_threshold_ms() else {
         return Ok(false);
     };

@@ -217,12 +217,7 @@ async fn sync_one_library(
     }
     Ok(map_finish_outcome(
         finish_scan_write(
-            db,
-            handle,
-            library,
-            scan_items,
-            /*enqueue_thumbs=*/ true,
-            emit,
+            db, handle, library, scan_items, /*enqueue_thumbs=*/ true, emit,
         )
         .await?,
     ))
@@ -297,12 +292,7 @@ async fn sync_remote_library(
     // ADR-0008: no thumbnail generation during remote sync.
     Ok(map_finish_outcome(
         finish_scan_write(
-            db,
-            handle,
-            library,
-            scan_items,
-            /*enqueue_thumbs=*/ false,
-            emit,
+            db, handle, library, scan_items, /*enqueue_thumbs=*/ false, emit,
         )
         .await?,
     ))

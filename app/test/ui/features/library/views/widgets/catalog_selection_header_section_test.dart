@@ -48,8 +48,9 @@ Future<ProviderContainer> _pumpHeader(
   List<String> pageComicIds = const <String>['c1', 'c2'],
   List<Override> extraOverrides = const <Override>[],
 }) async {
-  final _TestCatalogSelectionNotifier notifier =
-      _TestCatalogSelectionNotifier(selectionState);
+  final _TestCatalogSelectionNotifier notifier = _TestCatalogSelectionNotifier(
+    selectionState,
+  );
   final ProviderContainer container = ProviderContainer(
     overrides: <Override>[
       catalogSelectionProvider.overrideWith(() => notifier),
@@ -147,7 +148,10 @@ void main() {
     expect(find.text(l10n.catalogSelectionSelectedCount(1)), findsOneWidget);
     expect(find.byIcon(LucideIcons.pencil), findsOneWidget);
     expect(find.text(l10n.catalogSelectionEditMetadata), findsNothing);
-    expect(find.bySemanticsLabel(l10n.catalogSelectionEditMetadata), findsOneWidget);
+    expect(
+      find.bySemanticsLabel(l10n.catalogSelectionEditMetadata),
+      findsOneWidget,
+    );
   });
 
   testWidgets('shows zero selected count when selection is empty', (
@@ -161,7 +165,10 @@ void main() {
     expect(find.text(l10n.catalogSelectionSelectedCount(0)), findsOneWidget);
     expect(find.byIcon(LucideIcons.pencil), findsOneWidget);
     expect(find.text(l10n.catalogSelectionEditMetadata), findsNothing);
-    expect(find.bySemanticsLabel(l10n.catalogSelectionEditMetadata), findsOneWidget);
+    expect(
+      find.bySemanticsLabel(l10n.catalogSelectionEditMetadata),
+      findsOneWidget,
+    );
     expect(find.text(l10n.catalogSelectionSelectPage), findsOneWidget);
   });
 

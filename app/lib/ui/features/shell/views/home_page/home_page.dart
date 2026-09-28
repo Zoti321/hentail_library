@@ -64,11 +64,8 @@ class _HomePageState extends ConsumerState<HomePage> {
             libraryCount: c.libraryCount,
             showEmptyOnboarding: c.libraryCount == 0 || c.comicCount == 0,
           ),
-          orElse: () => (
-            comicCount: 0,
-            libraryCount: 0,
-            showEmptyOnboarding: false,
-          ),
+          orElse: () =>
+              (comicCount: 0, libraryCount: 0, showEmptyOnboarding: false),
         );
       }),
     );
