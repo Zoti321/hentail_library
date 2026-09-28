@@ -2162,4 +2162,27 @@ class AppLocalizationsEn extends AppLocalizations {
   ) {
     return 'Bulk edit cancelled ($succeeded updated, $failed failed, $unchanged unchanged)';
   }
+
+  @override
+  String get bulkEditMetadataSelectFieldHint =>
+      'Select a field on the left to edit';
+
+  @override
+  String get bulkEditMetadataEnableFieldHint => 'Enable this field first';
+
+  @override
+  String bulkEditMetadataSummaryBar(int fieldCount, int comicCount) {
+    return '$fieldCount enabled field(s) · $comicCount comics';
+  }
+
+  @override
+  String bulkEditMetadataFieldSummaryCount(String opLabel, int count) {
+    return '$opLabel · $count item(s)';
+  }
+
+  @override
+  String get bulkEditMetadataFieldSummaryReplace => 'Replace';
+
+  @override
+  String get bulkEditMetadataFieldSummaryClear => 'Clear';
 }

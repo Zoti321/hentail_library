@@ -3831,6 +3831,42 @@ abstract class AppLocalizations {
     int failed,
     int unchanged,
   );
+
+  /// No description provided for @bulkEditMetadataSelectFieldHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'在左侧选择要编辑的字段'**
+  String get bulkEditMetadataSelectFieldHint;
+
+  /// No description provided for @bulkEditMetadataEnableFieldHint.
+  ///
+  /// In zh, this message translates to:
+  /// **'请先启用该字段'**
+  String get bulkEditMetadataEnableFieldHint;
+
+  /// No description provided for @bulkEditMetadataSummaryBar.
+  ///
+  /// In zh, this message translates to:
+  /// **'已启用 {fieldCount} 个字段 · {comicCount} 本漫画'**
+  String bulkEditMetadataSummaryBar(int fieldCount, int comicCount);
+
+  /// No description provided for @bulkEditMetadataFieldSummaryCount.
+  ///
+  /// In zh, this message translates to:
+  /// **'{opLabel} · {count} 项'**
+  String bulkEditMetadataFieldSummaryCount(String opLabel, int count);
+
+  /// No description provided for @bulkEditMetadataFieldSummaryReplace.
+  ///
+  /// In zh, this message translates to:
+  /// **'替换'**
+  String get bulkEditMetadataFieldSummaryReplace;
+
+  /// No description provided for @bulkEditMetadataFieldSummaryClear.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除'**
+  String get bulkEditMetadataFieldSummaryClear;
 }
 
 class _AppLocalizationsDelegate

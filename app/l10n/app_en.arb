@@ -1033,5 +1033,23 @@
       "failed": {"type": "int"},
       "unchanged": {"type": "int"}
     }
-  }
+  },
+  "bulkEditMetadataSelectFieldHint": "Select a field on the left to edit",
+  "bulkEditMetadataEnableFieldHint": "Enable this field first",
+  "bulkEditMetadataSummaryBar": "{fieldCount} enabled field(s) · {comicCount} comics",
+  "@bulkEditMetadataSummaryBar": {
+    "placeholders": {
+      "fieldCount": {"type": "int"},
+      "comicCount": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataFieldSummaryCount": "{opLabel} · {count} item(s)",
+  "@bulkEditMetadataFieldSummaryCount": {
+    "placeholders": {
+      "opLabel": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataFieldSummaryReplace": "Replace",
+  "bulkEditMetadataFieldSummaryClear": "Clear"
 }

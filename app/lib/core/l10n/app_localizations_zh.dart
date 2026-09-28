@@ -2090,4 +2090,26 @@ class AppLocalizationsZh extends AppLocalizations {
   ) {
     return '已取消批量编辑（已更新 $succeeded，失败 $failed，无变化 $unchanged）';
   }
+
+  @override
+  String get bulkEditMetadataSelectFieldHint => '在左侧选择要编辑的字段';
+
+  @override
+  String get bulkEditMetadataEnableFieldHint => '请先启用该字段';
+
+  @override
+  String bulkEditMetadataSummaryBar(int fieldCount, int comicCount) {
+    return '已启用 $fieldCount 个字段 · $comicCount 本漫画';
+  }
+
+  @override
+  String bulkEditMetadataFieldSummaryCount(String opLabel, int count) {
+    return '$opLabel · $count 项';
+  }
+
+  @override
+  String get bulkEditMetadataFieldSummaryReplace => '替换';
+
+  @override
+  String get bulkEditMetadataFieldSummaryClear => '清除';
 }

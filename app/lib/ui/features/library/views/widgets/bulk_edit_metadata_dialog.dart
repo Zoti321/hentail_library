@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:hentai_library/core/l10n/app_localizations.dart';
 import 'package:hentai_library/core/l10n/app_localizations_x.dart';
@@ -5,6 +7,7 @@ import 'package:hentai_library/domain/library/comic_metadata_bulk_patch_types.da
 import 'package:hentai_library/domain/models/entity/comic/comic.dart';
 import 'package:hentai_library/domain/models/enums.dart';
 import 'package:hentai_library/domain/models/value_objects/comic_language.dart';
+import 'package:hentai_library/ui/core/layout/app_layout_breakpoints.dart';
 import 'package:hentai_library/ui/core/theme/theme.dart';
 import 'package:hentai_library/ui/core/widgets/chrome/capsule_tab_bar.dart';
 import 'package:hentai_library/ui/core/widgets/element/chip/outlined_meta_chip.dart';
@@ -17,62 +20,67 @@ import 'package:hentai_library/ui/core/widgets/form/parody_library_multi_select_
 import 'package:hentai_library/ui/core/widgets/form/tag_library_multi_select_field.dart';
 import 'package:hentai_library/ui/core/widgets/foundation/toggle_switch.dart';
 import 'package:hentai_library/ui/core/widgets/overlays/dialog/adaptive_form_surface.dart';
+import 'package:hentai_library/ui/core/widgets/overlays/dialog/dialog_side_tab_bar.dart';
 import 'package:hentai_library/ui/features/library/view_models/comic_metadata_smart_facet_providers.dart';
 import 'package:hentai_library/ui/features/shell/di/repos.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 const double _kBulkEditDialogWidth = 720;
+const double _kBulkEditDialogRadius = 4;
+const double _kBulkEditShellChromeReserve = 120;
+const double _kBulkEditBodyMinHeight = 240;
+const double _kBulkEditFieldListWidth = 200;
+
+enum _BulkEditTab { general, authorsAndTags }
 
 enum _BulkFieldKind {
-  tags,
-  authors,
-  languages,
-  parodies,
-  characters,
-  contentRating,
   description,
   publishedAt,
+  contentRating,
+  languages,
+  authors,
+  tags,
+  parodies,
+  characters,
+}
+
+extension _BulkEditTabFields on _BulkEditTab {
+  List<_BulkFieldKind> get fields => switch (this) {
+    _BulkEditTab.general => <_BulkFieldKind>[
+      _BulkFieldKind.description,
+      _BulkFieldKind.publishedAt,
+      _BulkFieldKind.contentRating,
+      _BulkFieldKind.languages,
+    ],
+    _BulkEditTab.authorsAndTags => <_BulkFieldKind>[
+      _BulkFieldKind.authors,
+      _BulkFieldKind.tags,
+      _BulkFieldKind.parodies,
+      _BulkFieldKind.characters,
+    ],
+  };
 }
 
 class _BulkMultiValueFieldState {
-  _BulkMultiValueFieldState({
-    this.enabled = false,
-    this.op = ComicMetadataBulkMultiValueOp.add,
-    this.values = const <String>[],
-    this.mixedValues = false,
-  });
-
-  bool enabled;
-  ComicMetadataBulkMultiValueOp op;
-  List<String> values;
-  bool mixedValues;
+  bool enabled = false;
+  ComicMetadataBulkMultiValueOp op = ComicMetadataBulkMultiValueOp.add;
+  List<String> values = const <String>[];
+  bool mixedValues = false;
 }
 
 class _BulkScalarFieldState {
-  _BulkScalarFieldState({
-    this.enabled = false,
-    this.op = ComicMetadataBulkScalarOp.replace,
-    this.mixedValues = false,
-  });
-
-  bool enabled;
-  ComicMetadataBulkScalarOp op;
-  bool mixedValues;
+  bool enabled = false;
+  ComicMetadataBulkScalarOp op = ComicMetadataBulkScalarOp.replace;
+  bool mixedValues = false;
   String description = '';
   DateTime? publishedAt;
 }
 
 class _BulkContentRatingFieldState {
-  _BulkContentRatingFieldState({
-    this.enabled = false,
-    this.isR18 = false,
-    this.mixedValues = false,
-  });
-
-  bool enabled;
-  bool isR18;
-  bool mixedValues;
+  bool enabled = false;
+  bool isR18 = false;
+  bool mixedValues = false;
 }
 
 Future<ComicMetadataBulkPatch?> showBulkEditMetadataDialog({
@@ -95,7 +103,8 @@ class BulkEditMetadataDialog extends ConsumerStatefulWidget {
       _BulkEditMetadataDialogState();
 }
 
-class _BulkEditMetadataDialogState extends ConsumerState<BulkEditMetadataDialog> {
+class _BulkEditMetadataDialogState
+    extends ConsumerState<BulkEditMetadataDialog> {
   final Map<_BulkFieldKind, _BulkMultiValueFieldState> _multiFields =
       <_BulkFieldKind, _BulkMultiValueFieldState>{
         for (final _BulkFieldKind kind in <_BulkFieldKind>[
@@ -111,6 +120,8 @@ class _BulkEditMetadataDialogState extends ConsumerState<BulkEditMetadataDialog>
   final _BulkScalarFieldState _publishedAtField = _BulkScalarFieldState();
   final _BulkContentRatingFieldState _contentRatingField =
       _BulkContentRatingFieldState();
+  _BulkEditTab _selectedTab = _BulkEditTab.general;
+  _BulkFieldKind? _selectedField;
   bool _loading = true;
   ComicMetadataSmartFacetScope? _scope;
 
@@ -146,7 +157,9 @@ class _BulkEditMetadataDialogState extends ConsumerState<BulkEditMetadataDialog>
       );
       _contentRatingField.mixedValues = _isMixed(
         comics.map(
-          (Comic c) => <String>[c.contentRating == ContentRating.r18 ? 'r18' : 'safe'],
+          (Comic c) => <String>[
+            c.contentRating == ContentRating.r18 ? 'r18' : 'safe',
+          ],
         ),
       );
       _descriptionField.mixedValues = _isMixed(
@@ -196,6 +209,119 @@ class _BulkEditMetadataDialogState extends ConsumerState<BulkEditMetadataDialog>
       }
     }
     return true;
+  }
+
+  bool _isFieldEnabled(_BulkFieldKind kind) {
+    return switch (kind) {
+      _BulkFieldKind.description => _descriptionField.enabled,
+      _BulkFieldKind.publishedAt => _publishedAtField.enabled,
+      _BulkFieldKind.contentRating => _contentRatingField.enabled,
+      _BulkFieldKind.languages ||
+      _BulkFieldKind.authors ||
+      _BulkFieldKind.tags ||
+      _BulkFieldKind.parodies ||
+      _BulkFieldKind.characters => _multiFields[kind]!.enabled,
+    };
+  }
+
+  int get _enabledFieldCount {
+    int count = 0;
+    for (final _BulkFieldKind kind in _BulkFieldKind.values) {
+      if (_isFieldEnabled(kind)) {
+        count += 1;
+      }
+    }
+    return count;
+  }
+
+  _BulkFieldKind _defaultFieldForTab(_BulkEditTab tab) {
+    for (final _BulkFieldKind kind in tab.fields) {
+      if (_isFieldEnabled(kind)) {
+        return kind;
+      }
+    }
+    return tab.fields.first;
+  }
+
+  void _selectTab(int index) {
+    final _BulkEditTab tab = _BulkEditTab.values[index];
+    if (tab == _selectedTab) {
+      return;
+    }
+    setState(() {
+      _selectedTab = tab;
+      _selectedField = _defaultFieldForTab(tab);
+    });
+  }
+
+  void _selectField(_BulkFieldKind kind) {
+    if (_selectedField == kind) {
+      return;
+    }
+    setState(() => _selectedField = kind);
+  }
+
+  void _setFieldEnabled(_BulkFieldKind kind, bool enabled) {
+    setState(() {
+      switch (kind) {
+        case _BulkFieldKind.description:
+          _descriptionField.enabled = enabled;
+        case _BulkFieldKind.publishedAt:
+          _publishedAtField.enabled = enabled;
+        case _BulkFieldKind.contentRating:
+          _contentRatingField.enabled = enabled;
+        case _BulkFieldKind.languages:
+        case _BulkFieldKind.authors:
+        case _BulkFieldKind.tags:
+        case _BulkFieldKind.parodies:
+        case _BulkFieldKind.characters:
+          _multiFields[kind]!.enabled = enabled;
+      }
+    });
+  }
+
+  String _fieldLabel(AppLocalizations l10n, _BulkFieldKind kind) {
+    return switch (kind) {
+      _BulkFieldKind.tags => l10n.bulkEditMetadataFieldTags,
+      _BulkFieldKind.authors => l10n.bulkEditMetadataFieldAuthors,
+      _BulkFieldKind.languages => l10n.bulkEditMetadataFieldLanguages,
+      _BulkFieldKind.parodies => l10n.bulkEditMetadataFieldParodies,
+      _BulkFieldKind.characters => l10n.bulkEditMetadataFieldCharacters,
+      _BulkFieldKind.contentRating => l10n.bulkEditMetadataFieldContentRating,
+      _BulkFieldKind.description => l10n.bulkEditMetadataFieldDescription,
+      _BulkFieldKind.publishedAt => l10n.bulkEditMetadataFieldPublishedAt,
+    };
+  }
+
+  String? _fieldSummary(AppLocalizations l10n, _BulkFieldKind kind) {
+    if (!_isFieldEnabled(kind)) {
+      return null;
+    }
+    return switch (kind) {
+      _BulkFieldKind.languages ||
+      _BulkFieldKind.authors ||
+      _BulkFieldKind.tags ||
+      _BulkFieldKind.parodies ||
+      _BulkFieldKind.characters => () {
+        final _BulkMultiValueFieldState state = _multiFields[kind]!;
+        return l10n.bulkEditMetadataFieldSummaryCount(
+          _multiOpLabels(l10n)[state.op] ?? state.op.name,
+          state.values.length,
+        );
+      }(),
+      _BulkFieldKind.description || _BulkFieldKind.publishedAt => () {
+        final _BulkScalarFieldState state = switch (kind) {
+          _BulkFieldKind.description => _descriptionField,
+          _BulkFieldKind.publishedAt => _publishedAtField,
+          _ => throw StateError('$kind'),
+        };
+        return state.op == ComicMetadataBulkScalarOp.clear
+            ? l10n.bulkEditMetadataFieldSummaryClear
+            : l10n.bulkEditMetadataFieldSummaryReplace;
+      }(),
+      _BulkFieldKind.contentRating =>
+        _contentRatingField.isR18 ? 'R18' : l10n.filterAgeAllAges,
+    };
   }
 
   ComicMetadataBulkPatch? _buildPatch() {
@@ -272,7 +398,8 @@ class _BulkEditMetadataDialogState extends ConsumerState<BulkEditMetadataDialog>
     if (patch == null) {
       return;
     }
-    final bool confirmed = await showDialog<bool>(
+    final bool confirmed =
+        await showDialog<bool>(
           context: context,
           builder: (BuildContext context) => AlertDialog(
             title: Text(l10n.bulkEditMetadataConfirmTitle),
@@ -301,209 +428,200 @@ class _BulkEditMetadataDialogState extends ConsumerState<BulkEditMetadataDialog>
     Navigator.of(context).pop(patch);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = context.l10n;
-    final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    final ComicMetadataSmartFacetScope? scope = _scope;
-    return AdaptiveFormSurface(
-      title: l10n.bulkEditMetadataTitle(widget.comicIds.length),
-      maxDialogWidth: _kBulkEditDialogWidth,
-      scrollableBody: true,
-      backgroundColor: cs.surface,
-      body: _loading || scope == null
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: EdgeInsets.all(tokens.spacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                spacing: tokens.spacing.lg,
-                children: <Widget>[
-                  _buildMultiValueField(
-                    l10n: l10n,
-                    kind: _BulkFieldKind.tags,
-                    label: l10n.bulkEditMetadataFieldTags,
-                    icon: LucideIcons.tag,
-                    scope: scope,
-                    childBuilder: (_BulkMultiValueFieldState state) =>
-                        TagLibraryMultiSelectField(
-                          label: l10n.bulkEditMetadataFieldTags,
-                          icon: LucideIcons.tag,
-                          selectedNames: state.values,
-                          scope: scope,
-                          onAdd: (String name) => _addMultiValue(
-                            _BulkFieldKind.tags,
-                            name,
-                          ),
-                          onRemove: (String name) => _removeMultiValue(
-                            _BulkFieldKind.tags,
-                            name,
-                          ),
-                        ),
-                  ),
-                  _buildMultiValueField(
-                    l10n: l10n,
-                    kind: _BulkFieldKind.authors,
-                    label: l10n.bulkEditMetadataFieldAuthors,
-                    icon: LucideIcons.penTool,
-                    scope: scope,
-                    childBuilder: (_BulkMultiValueFieldState state) =>
-                        AuthorLibraryMultiSelectField(
-                          label: l10n.bulkEditMetadataFieldAuthors,
-                          icon: LucideIcons.penTool,
-                          selectedNames: state.values,
-                          scope: scope,
-                          onAdd: (String name) => _addMultiValue(
-                            _BulkFieldKind.authors,
-                            name,
-                          ),
-                          onRemove: (String name) => _removeMultiValue(
-                            _BulkFieldKind.authors,
-                            name,
-                          ),
-                        ),
-                  ),
-                  _buildMultiValueField(
-                    l10n: l10n,
-                    kind: _BulkFieldKind.languages,
-                    label: l10n.bulkEditMetadataFieldLanguages,
-                    icon: LucideIcons.languages,
-                    scope: scope,
-                    childBuilder: (_BulkMultiValueFieldState state) =>
-                        _LanguageChipField(
-                          l10n: l10n,
-                          selected: state.values,
-                          onAdd: (String name) => _addMultiValue(
-                            _BulkFieldKind.languages,
-                            name,
-                          ),
-                          onRemove: (String name) => _removeMultiValue(
-                            _BulkFieldKind.languages,
-                            name,
-                          ),
-                        ),
-                  ),
-                  _buildMultiValueField(
-                    l10n: l10n,
-                    kind: _BulkFieldKind.parodies,
-                    label: l10n.bulkEditMetadataFieldParodies,
-                    icon: LucideIcons.bookMarked,
-                    scope: scope,
-                    childBuilder: (_BulkMultiValueFieldState state) =>
-                        ParodyLibraryMultiSelectField(
-                          label: l10n.bulkEditMetadataFieldParodies,
-                          icon: LucideIcons.bookMarked,
-                          selectedNames: state.values,
-                          scope: scope,
-                          onAdd: (String name) => _addMultiValue(
-                            _BulkFieldKind.parodies,
-                            name,
-                          ),
-                          onRemove: (String name) => _removeMultiValue(
-                            _BulkFieldKind.parodies,
-                            name,
-                          ),
-                        ),
-                  ),
-                  _buildMultiValueField(
-                    l10n: l10n,
-                    kind: _BulkFieldKind.characters,
-                    label: l10n.bulkEditMetadataFieldCharacters,
-                    icon: LucideIcons.userRound,
-                    scope: scope,
-                    childBuilder: (_BulkMultiValueFieldState state) =>
-                        CharacterLibraryMultiSelectField(
-                          label: l10n.bulkEditMetadataFieldCharacters,
-                          icon: LucideIcons.userRound,
-                          selectedNames: state.values,
-                          scope: scope,
-                          onAdd: (String name) => _addMultiValue(
-                            _BulkFieldKind.characters,
-                            name,
-                          ),
-                          onRemove: (String name) => _removeMultiValue(
-                            _BulkFieldKind.characters,
-                            name,
-                          ),
-                        ),
-                  ),
-                  _BulkContentRatingFieldEditor(
-                    label: l10n.bulkEditMetadataFieldContentRating,
-                    state: _contentRatingField,
-                    mixedLabel: l10n.bulkEditMetadataMixedValues,
-                    allAgesLabel: l10n.filterAgeAllAges,
-                    onChanged: () => setState(() {}),
-                  ),
-                  _BulkScalarFieldEditor(
-                    label: l10n.bulkEditMetadataFieldDescription,
-                    state: _descriptionField,
-                    mixedLabel: l10n.bulkEditMetadataMixedValues,
-                    opLabels: _scalarOpLabels(l10n),
-                    child: FluentTextField(
-                      labelText: l10n.bulkEditMetadataFieldDescription,
-                      initialValue: _descriptionField.description,
-                      maxLines: 4,
-                      enabled:
-                          _descriptionField.op ==
-                          ComicMetadataBulkScalarOp.replace,
-                      onChanged: (String value) {
-                        _descriptionField.description = value;
-                      },
-                    ),
-                    onChanged: () => setState(() {}),
-                  ),
-                  _BulkScalarFieldEditor(
-                    label: l10n.bulkEditMetadataFieldPublishedAt,
-                    state: _publishedAtField,
-                    mixedLabel: l10n.bulkEditMetadataMixedValues,
-                    opLabels: _scalarOpLabels(l10n),
-                    child: FluentDatePickerField(
-                      labelText: l10n.bulkEditMetadataFieldPublishedAt,
-                      value: _publishedAtField.publishedAt,
-                      enabled:
-                          _publishedAtField.op ==
-                          ComicMetadataBulkScalarOp.replace,
-                      onChanged: (DateTime? value) {
-                        _publishedAtField.publishedAt = value;
-                      },
-                    ),
-                    onChanged: () => setState(() {}),
-                  ),
-                ],
-              ),
-            ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.commonCancel),
+  List<DialogSideTabItem> _sideTabs(AppLocalizations l10n) =>
+      <DialogSideTabItem>[
+        DialogSideTabItem(
+          label: l10n.dialogEditMetadataTabGeneral,
+          icon: LucideIcons.textAlignCenter,
         ),
-        const SizedBox(width: 8),
-        FilledButton(
-          onPressed: _onSave,
-          child: Text(l10n.commonSaveChanges),
+        DialogSideTabItem(
+          label: l10n.dialogEditMetadataTabAuthorsTags,
+          icon: LucideIcons.users,
+        ),
+      ];
+
+  List<CapsuleTabItem> _capsuleTabs(AppLocalizations l10n) => <CapsuleTabItem>[
+    CapsuleTabItem(
+      label: l10n.dialogEditMetadataTabGeneral,
+      icon: LucideIcons.textAlignCenter,
+    ),
+    CapsuleTabItem(
+      label: l10n.dialogEditMetadataTabAuthorsTags,
+      icon: LucideIcons.users,
+    ),
+  ];
+
+  Widget _buildMasterDetail(
+    AppLocalizations l10n,
+    ComicMetadataSmartFacetScope scope,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        SizedBox(
+          width: _kBulkEditFieldListWidth,
+          child: _BulkEditFieldList(
+            fields: _selectedTab.fields,
+            selectedField: _selectedField,
+            labelFor: (_BulkFieldKind kind) => _fieldLabel(l10n, kind),
+            isEnabled: _isFieldEnabled,
+            isMixed: _isFieldMixed,
+            summaryFor: (_BulkFieldKind kind) => _fieldSummary(l10n, kind),
+            mixedLabel: l10n.bulkEditMetadataMixedValues,
+            onSelect: _selectField,
+            onToggle: _setFieldEnabled,
+          ),
+        ),
+        VerticalDivider(
+          width: 1,
+          color: Theme.of(context).colorScheme.hentai.borderSubtle,
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              context.tokens.spacing.lg,
+              0,
+              context.tokens.spacing.lg,
+              context.tokens.spacing.xs,
+            ),
+            child: _BulkEditFieldDetail(
+              selectedField: _selectedField,
+              isEnabled: _selectedField == null
+                  ? false
+                  : _isFieldEnabled(_selectedField!),
+              selectHint: l10n.bulkEditMetadataSelectFieldHint,
+              enableHint: l10n.bulkEditMetadataEnableFieldHint,
+              child: _selectedField == null || !_isFieldEnabled(_selectedField!)
+                  ? null
+                  : _buildFieldEditor(l10n, scope, _selectedField!),
+            ),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildMultiValueField({
-    required AppLocalizations l10n,
-    required _BulkFieldKind kind,
-    required String label,
-    required IconData icon,
-    required ComicMetadataSmartFacetScope scope,
-    required Widget Function(_BulkMultiValueFieldState state) childBuilder,
-  }) {
+  bool _isFieldMixed(_BulkFieldKind kind) {
+    return switch (kind) {
+      _BulkFieldKind.description => _descriptionField.mixedValues,
+      _BulkFieldKind.publishedAt => _publishedAtField.mixedValues,
+      _BulkFieldKind.contentRating => _contentRatingField.mixedValues,
+      _BulkFieldKind.languages ||
+      _BulkFieldKind.authors ||
+      _BulkFieldKind.tags ||
+      _BulkFieldKind.parodies ||
+      _BulkFieldKind.characters => _multiFields[kind]!.mixedValues,
+    };
+  }
+
+  Widget _buildFieldEditor(
+    AppLocalizations l10n,
+    ComicMetadataSmartFacetScope scope,
+    _BulkFieldKind kind,
+  ) {
+    return switch (kind) {
+      _BulkFieldKind.tags ||
+      _BulkFieldKind.authors ||
+      _BulkFieldKind.languages ||
+      _BulkFieldKind.parodies ||
+      _BulkFieldKind.characters => _BulkMultiValueFieldDetail(
+        state: _multiFields[kind]!,
+        opLabels: _multiOpLabels(l10n),
+        onChanged: () => setState(() {}),
+        child: _buildMultiValueInput(l10n, scope, kind),
+      ),
+      _BulkFieldKind.description || _BulkFieldKind.publishedAt => () {
+        final _BulkScalarFieldState state = switch (kind) {
+          _BulkFieldKind.description => _descriptionField,
+          _BulkFieldKind.publishedAt => _publishedAtField,
+          _ => throw StateError('$kind'),
+        };
+        return _BulkScalarFieldDetail(
+          state: state,
+          opLabels: _scalarOpLabels(l10n),
+          onChanged: () => setState(() {}),
+          child: kind == _BulkFieldKind.description
+              ? FluentTextField(
+                  labelText: l10n.bulkEditMetadataFieldDescription,
+                  initialValue: _descriptionField.description,
+                  maxLines: 4,
+                  enabled:
+                      _descriptionField.op == ComicMetadataBulkScalarOp.replace,
+                  onChanged: (String value) {
+                    _descriptionField.description = value;
+                  },
+                )
+              : FluentDatePickerField(
+                  labelText: l10n.bulkEditMetadataFieldPublishedAt,
+                  value: _publishedAtField.publishedAt,
+                  enabled:
+                      _publishedAtField.op == ComicMetadataBulkScalarOp.replace,
+                  onChanged: (DateTime? value) {
+                    _publishedAtField.publishedAt = value;
+                  },
+                ),
+        );
+      }(),
+      _BulkFieldKind.contentRating => _BulkContentRatingFieldDetail(
+        label: l10n.bulkEditMetadataFieldContentRating,
+        state: _contentRatingField,
+        allAgesLabel: l10n.filterAgeAllAges,
+        onChanged: () => setState(() {}),
+      ),
+    };
+  }
+
+  Widget _buildMultiValueInput(
+    AppLocalizations l10n,
+    ComicMetadataSmartFacetScope scope,
+    _BulkFieldKind kind,
+  ) {
     final _BulkMultiValueFieldState state = _multiFields[kind]!;
-    return _BulkMultiValueFieldEditor(
-      label: label,
-      state: state,
-      mixedLabel: l10n.bulkEditMetadataMixedValues,
-      opLabels: _multiOpLabels(l10n),
-      child: childBuilder(state),
-      onChanged: () => setState(() {}),
-    );
+    return switch (kind) {
+      _BulkFieldKind.tags => TagLibraryMultiSelectField(
+        label: l10n.bulkEditMetadataFieldTags,
+        icon: LucideIcons.tag,
+        selectedNames: state.values,
+        scope: scope,
+        onAdd: (String name) => _addMultiValue(_BulkFieldKind.tags, name),
+        onRemove: (String name) => _removeMultiValue(_BulkFieldKind.tags, name),
+      ),
+      _BulkFieldKind.authors => AuthorLibraryMultiSelectField(
+        label: l10n.bulkEditMetadataFieldAuthors,
+        icon: LucideIcons.penTool,
+        selectedNames: state.values,
+        scope: scope,
+        onAdd: (String name) => _addMultiValue(_BulkFieldKind.authors, name),
+        onRemove: (String name) =>
+            _removeMultiValue(_BulkFieldKind.authors, name),
+      ),
+      _BulkFieldKind.languages => _LanguageChipField(
+        l10n: l10n,
+        selected: state.values,
+        onAdd: (String name) => _addMultiValue(_BulkFieldKind.languages, name),
+        onRemove: (String name) =>
+            _removeMultiValue(_BulkFieldKind.languages, name),
+      ),
+      _BulkFieldKind.parodies => ParodyLibraryMultiSelectField(
+        label: l10n.bulkEditMetadataFieldParodies,
+        icon: LucideIcons.bookMarked,
+        selectedNames: state.values,
+        scope: scope,
+        onAdd: (String name) => _addMultiValue(_BulkFieldKind.parodies, name),
+        onRemove: (String name) =>
+            _removeMultiValue(_BulkFieldKind.parodies, name),
+      ),
+      _BulkFieldKind.characters => CharacterLibraryMultiSelectField(
+        label: l10n.bulkEditMetadataFieldCharacters,
+        icon: LucideIcons.userRound,
+        selectedNames: state.values,
+        scope: scope,
+        onAdd: (String name) => _addMultiValue(_BulkFieldKind.characters, name),
+        onRemove: (String name) =>
+            _removeMultiValue(_BulkFieldKind.characters, name),
+      ),
+      _ => throw StateError('$kind'),
+    };
   }
 
   void _addMultiValue(_BulkFieldKind kind, String name) {
@@ -517,8 +635,7 @@ class _BulkEditMetadataDialogState extends ConsumerState<BulkEditMetadataDialog>
 
   void _removeMultiValue(_BulkFieldKind kind, String name) {
     setState(() {
-      _multiFields[kind]!.values = _multiFields[kind]!
-          .values
+      _multiFields[kind]!.values = _multiFields[kind]!.values
           .where((String v) => v != name)
           .toList();
     });
@@ -541,6 +658,396 @@ class _BulkEditMetadataDialogState extends ConsumerState<BulkEditMetadataDialog>
       ComicMetadataBulkScalarOp.replace: l10n.bulkEditMetadataOpReplace,
       ComicMetadataBulkScalarOp.clear: l10n.bulkEditMetadataOpClear,
     };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final ComicMetadataSmartFacetScope? scope = _scope;
+    final bool compact = AppLayoutBreakpoints.isCompact(
+      MediaQuery.sizeOf(context).width,
+    );
+    final int selectedTabIndex = _selectedTab.index;
+
+    final Widget loadedBody;
+    if (scope == null) {
+      loadedBody = const SizedBox.shrink();
+    } else if (compact) {
+      loadedBody = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              tokens.spacing.lg,
+              0,
+              tokens.spacing.lg,
+              tokens.spacing.md,
+            ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: CapsuleTabBar(
+                items: _capsuleTabs(l10n),
+                selectedIndex: selectedTabIndex,
+                onSelected: _selectTab,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: tokens.spacing.lg),
+                  child: _BulkEditFieldList(
+                    fields: _selectedTab.fields,
+                    selectedField: _selectedField,
+                    labelFor: (_BulkFieldKind kind) => _fieldLabel(l10n, kind),
+                    isEnabled: _isFieldEnabled,
+                    isMixed: _isFieldMixed,
+                    summaryFor: (_BulkFieldKind kind) =>
+                        _fieldSummary(l10n, kind),
+                    mixedLabel: l10n.bulkEditMetadataMixedValues,
+                    onSelect: _selectField,
+                    onToggle: _setFieldEnabled,
+                  ),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      tokens.spacing.lg,
+                      tokens.spacing.md,
+                      tokens.spacing.lg,
+                      tokens.spacing.xs,
+                    ),
+                    child: _BulkEditFieldDetail(
+                      selectedField: _selectedField,
+                      isEnabled: _selectedField == null
+                          ? false
+                          : _isFieldEnabled(_selectedField!),
+                      selectHint: l10n.bulkEditMetadataSelectFieldHint,
+                      enableHint: l10n.bulkEditMetadataEnableFieldHint,
+                      child:
+                          _selectedField == null ||
+                              !_isFieldEnabled(_selectedField!)
+                          ? null
+                          : _buildFieldEditor(l10n, scope, _selectedField!),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    } else {
+      loadedBody = ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: _kBulkEditBodyMinHeight,
+          maxHeight: math.max(
+            _kBulkEditBodyMinHeight,
+            MediaQuery.sizeOf(context).height * 0.88 -
+                _kBulkEditShellChromeReserve,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            DialogSideTabBar(
+              items: _sideTabs(l10n),
+              selectedIndex: selectedTabIndex,
+              showDivider: false,
+              onSelected: _selectTab,
+            ),
+            Expanded(child: _buildMasterDetail(l10n, scope)),
+          ],
+        ),
+      );
+    }
+
+    return AdaptiveFormSurface(
+      title: l10n.bulkEditMetadataTitle(widget.comicIds.length),
+      maxDialogWidth: _kBulkEditDialogWidth,
+      borderRadius: _kBulkEditDialogRadius,
+      scrollableBody: false,
+      bodyPadding: EdgeInsets.zero,
+      backgroundColor: cs.surface,
+      showFooterDivider: false,
+      fitContentHeight: true,
+      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Expanded(child: loadedBody),
+                _BulkEditSummaryBar(
+                  label: l10n.bulkEditMetadataSummaryBar(
+                    _enabledFieldCount,
+                    widget.comicIds.length,
+                  ),
+                ),
+              ],
+            ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.commonCancel),
+        ),
+        const SizedBox(width: 8),
+        FilledButton(onPressed: _onSave, child: Text(l10n.commonSaveChanges)),
+      ],
+    );
+  }
+}
+
+class _BulkEditFieldList extends StatelessWidget {
+  const _BulkEditFieldList({
+    required this.fields,
+    required this.selectedField,
+    required this.labelFor,
+    required this.isEnabled,
+    required this.isMixed,
+    required this.summaryFor,
+    required this.mixedLabel,
+    required this.onSelect,
+    required this.onToggle,
+  });
+
+  final List<_BulkFieldKind> fields;
+  final _BulkFieldKind? selectedField;
+  final String Function(_BulkFieldKind kind) labelFor;
+  final bool Function(_BulkFieldKind kind) isEnabled;
+  final bool Function(_BulkFieldKind kind) isMixed;
+  final String? Function(_BulkFieldKind kind) summaryFor;
+  final String mixedLabel;
+  final ValueChanged<_BulkFieldKind> onSelect;
+  final void Function(_BulkFieldKind kind, bool enabled) onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: tokens.spacing.xs,
+      children: fields
+          .map(
+            (_BulkFieldKind kind) => _BulkEditFieldListRow(
+              label: labelFor(kind),
+              enabled: isEnabled(kind),
+              selected: selectedField == kind,
+              mixed: isMixed(kind),
+              summary: summaryFor(kind),
+              mixedLabel: mixedLabel,
+              onSelect: () => onSelect(kind),
+              onToggle: (bool value) => onToggle(kind, value),
+            ),
+          )
+          .toList(growable: false),
+    );
+  }
+}
+
+class _BulkEditFieldListRow extends StatelessWidget {
+  const _BulkEditFieldListRow({
+    required this.label,
+    required this.enabled,
+    required this.selected,
+    required this.mixed,
+    required this.summary,
+    required this.mixedLabel,
+    required this.onSelect,
+    required this.onToggle,
+  });
+
+  final String label;
+  final bool enabled;
+  final bool selected;
+  final bool mixed;
+  final String? summary;
+  final String mixedLabel;
+  final VoidCallback onSelect;
+  final ValueChanged<bool> onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    final Color? background = selected
+        ? cs.primary.withAlpha(20)
+        : enabled
+        ? cs.hentai.hoverBackground.withAlpha(80)
+        : null;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onSelect,
+        borderRadius: BorderRadius.circular(tokens.radius.sm),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: BorderRadius.circular(tokens.radius.sm),
+            border: Border(
+              left: BorderSide(
+                color: enabled ? cs.primary : Colors.transparent,
+                width: 2,
+              ),
+            ),
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: tokens.spacing.sm,
+              vertical: tokens.spacing.sm,
+            ),
+            child: Row(
+              children: <Widget>[
+                ToggleSwitch(
+                  checked: enabled,
+                  onChange: () => onToggle(!enabled),
+                ),
+                SizedBox(width: tokens.spacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: tokens.spacing.xs,
+                    children: <Widget>[
+                      Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: tokens.text.bodySm,
+                          fontWeight: FontWeight.w600,
+                          color: cs.hentai.textPrimary,
+                        ),
+                      ),
+                      if (summary != null || mixed)
+                        Row(
+                          children: <Widget>[
+                            if (summary != null)
+                              Flexible(
+                                child: Text(
+                                  summary!,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: tokens.text.labelXs,
+                                    color: cs.hentai.textSecondary,
+                                  ),
+                                ),
+                              ),
+                            if (mixed) ...<Widget>[
+                              if (summary != null)
+                                SizedBox(width: tokens.spacing.xs),
+                              Text(
+                                mixedLabel,
+                                style: TextStyle(
+                                  fontSize: tokens.text.labelXs,
+                                  color: cs.hentai.textTertiary,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BulkEditFieldDetail extends StatelessWidget {
+  const _BulkEditFieldDetail({
+    required this.selectedField,
+    required this.isEnabled,
+    required this.selectHint,
+    required this.enableHint,
+    required this.child,
+  });
+
+  final _BulkFieldKind? selectedField;
+  final bool isEnabled;
+  final String selectHint;
+  final String enableHint;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (selectedField == null) {
+      return _BulkEditDetailPlaceholder(message: selectHint);
+    }
+    if (!isEnabled) {
+      return _BulkEditDetailPlaceholder(message: enableHint);
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: context.tokens.spacing.md,
+      children: <Widget>[child!],
+    );
+  }
+}
+
+class _BulkEditDetailPlaceholder extends StatelessWidget {
+  const _BulkEditDetailPlaceholder({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(tokens.spacing.xl),
+        child: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: tokens.text.bodySm,
+            color: cs.hentai.textTertiary,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BulkEditSummaryBar extends StatelessWidget {
+  const _BulkEditSummaryBar({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppThemeTokens tokens = context.tokens;
+    final ColorScheme cs = Theme.of(context).colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: cs.hentai.borderSubtle)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          tokens.spacing.lg,
+          tokens.spacing.sm,
+          tokens.spacing.lg,
+          tokens.spacing.sm,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: tokens.text.bodySm,
+            color: cs.hentai.textSecondary,
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -590,156 +1097,108 @@ class _LanguageChipField extends StatelessWidget {
   }
 }
 
-class _BulkMultiValueFieldEditor extends StatelessWidget {
-  const _BulkMultiValueFieldEditor({
-    required this.label,
+class _BulkMultiValueFieldDetail extends StatelessWidget {
+  const _BulkMultiValueFieldDetail({
     required this.state,
-    required this.mixedLabel,
     required this.opLabels,
     required this.child,
     required this.onChanged,
   });
 
-  final String label;
   final _BulkMultiValueFieldState state;
-  final String mixedLabel;
   final Map<ComicMetadataBulkMultiValueOp, String> opLabels;
   final Widget child;
   final VoidCallback onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: tokens.spacing.sm,
+      spacing: context.tokens.spacing.sm,
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            ToggleSwitch(
-              checked: state.enabled,
-              onChange: () {
-                state.enabled = !state.enabled;
-                onChanged();
-              },
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: tokens.text.bodyMd,
-                  fontWeight: FontWeight.w600,
-                  color: cs.hentai.textPrimary,
-                ),
-              ),
-            ),
-            if (state.mixedValues)
-              Text(
-                mixedLabel,
-                style: TextStyle(
-                  fontSize: tokens.text.labelXs,
-                  color: cs.hentai.textTertiary,
-                ),
-              ),
-          ],
+        _BulkEditOperationSelector(
+          label: context.l10n.bulkEditMetadataOperationLabel,
+          items: ComicMetadataBulkMultiValueOp.values
+              .map(
+                (ComicMetadataBulkMultiValueOp op) =>
+                    CapsuleTabItem(label: opLabels[op] ?? op.name),
+              )
+              .toList(growable: false),
+          selectedIndex: ComicMetadataBulkMultiValueOp.values.indexOf(state.op),
+          onSelected: (int index) {
+            state.op = ComicMetadataBulkMultiValueOp.values[index];
+            onChanged();
+          },
         ),
-        if (state.enabled) ...<Widget>[
-          _BulkEditOperationSelector(
-            label: context.l10n.bulkEditMetadataOperationLabel,
-            items: ComicMetadataBulkMultiValueOp.values
-                .map(
-                  (ComicMetadataBulkMultiValueOp op) =>
-                      CapsuleTabItem(label: opLabels[op] ?? op.name),
-                )
-                .toList(growable: false),
-            selectedIndex: ComicMetadataBulkMultiValueOp.values.indexOf(state.op),
-            onSelected: (int index) {
-              state.op = ComicMetadataBulkMultiValueOp.values[index];
-              onChanged();
-            },
-          ),
-          child,
-        ],
+        child,
       ],
     );
   }
 }
 
-class _BulkScalarFieldEditor extends StatelessWidget {
-  const _BulkScalarFieldEditor({
-    required this.label,
+class _BulkScalarFieldDetail extends StatelessWidget {
+  const _BulkScalarFieldDetail({
     required this.state,
-    required this.mixedLabel,
     required this.opLabels,
     required this.child,
     required this.onChanged,
   });
 
-  final String label;
   final _BulkScalarFieldState state;
-  final String mixedLabel;
   final Map<ComicMetadataBulkScalarOp, String> opLabels;
   final Widget child;
   final VoidCallback onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: tokens.spacing.sm,
+      spacing: context.tokens.spacing.sm,
       children: <Widget>[
-        Row(
-          children: <Widget>[
-            ToggleSwitch(
-              checked: state.enabled,
-              onChange: () {
-                state.enabled = !state.enabled;
-                onChanged();
-              },
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: tokens.text.bodyMd,
-                  fontWeight: FontWeight.w600,
-                  color: cs.hentai.textPrimary,
-                ),
-              ),
-            ),
-            if (state.mixedValues)
-              Text(
-                mixedLabel,
-                style: TextStyle(
-                  fontSize: tokens.text.labelXs,
-                  color: cs.hentai.textTertiary,
-                ),
-              ),
-          ],
+        _BulkEditOperationSelector(
+          label: context.l10n.bulkEditMetadataOperationLabel,
+          items: ComicMetadataBulkScalarOp.values
+              .map(
+                (ComicMetadataBulkScalarOp op) =>
+                    CapsuleTabItem(label: opLabels[op] ?? op.name),
+              )
+              .toList(growable: false),
+          selectedIndex: ComicMetadataBulkScalarOp.values.indexOf(state.op),
+          onSelected: (int index) {
+            state.op = ComicMetadataBulkScalarOp.values[index];
+            onChanged();
+          },
         ),
-        if (state.enabled) ...<Widget>[
-          _BulkEditOperationSelector(
-            label: context.l10n.bulkEditMetadataOperationLabel,
-            items: ComicMetadataBulkScalarOp.values
-                .map(
-                  (ComicMetadataBulkScalarOp op) =>
-                      CapsuleTabItem(label: opLabels[op] ?? op.name),
-                )
-                .toList(growable: false),
-            selectedIndex: ComicMetadataBulkScalarOp.values.indexOf(state.op),
-            onSelected: (int index) {
-              state.op = ComicMetadataBulkScalarOp.values[index];
-              onChanged();
-            },
-          ),
-          child,
-        ],
+        child,
       ],
+    );
+  }
+}
+
+class _BulkContentRatingFieldDetail extends StatelessWidget {
+  const _BulkContentRatingFieldDetail({
+    required this.label,
+    required this.state,
+    required this.allAgesLabel,
+    required this.onChanged,
+  });
+
+  final String label;
+  final _BulkContentRatingFieldState state;
+  final String allAgesLabel;
+  final VoidCallback onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return FluentToggleField(
+      labelText: label,
+      value: state.isR18,
+      onChanged: (bool value) {
+        state.isR18 = value;
+        onChanged();
+      },
+      checkedLabel: 'R18',
+      uncheckedLabel: allAgesLabel,
     );
   }
 }
@@ -781,75 +1240,6 @@ class _BulkEditOperationSelector extends StatelessWidget {
             onSelected: onSelected,
           ),
         ),
-      ],
-    );
-  }
-}
-
-class _BulkContentRatingFieldEditor extends StatelessWidget {
-  const _BulkContentRatingFieldEditor({
-    required this.label,
-    required this.state,
-    required this.mixedLabel,
-    required this.allAgesLabel,
-    required this.onChanged,
-  });
-
-  final String label;
-  final _BulkContentRatingFieldState state;
-  final String mixedLabel;
-  final String allAgesLabel;
-  final VoidCallback onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppThemeTokens tokens = context.tokens;
-    final ColorScheme cs = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: tokens.spacing.sm,
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            ToggleSwitch(
-              checked: state.enabled,
-              onChange: () {
-                state.enabled = !state.enabled;
-                onChanged();
-              },
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: tokens.text.bodyMd,
-                  fontWeight: FontWeight.w600,
-                  color: cs.hentai.textPrimary,
-                ),
-              ),
-            ),
-            if (state.mixedValues)
-              Text(
-                mixedLabel,
-                style: TextStyle(
-                  fontSize: tokens.text.labelXs,
-                  color: cs.hentai.textTertiary,
-                ),
-              ),
-          ],
-        ),
-        if (state.enabled)
-          FluentToggleField(
-            labelText: label,
-            value: state.isR18,
-            onChanged: (bool value) {
-              state.isR18 = value;
-              onChanged();
-            },
-            checkedLabel: 'R18',
-            uncheckedLabel: allAgesLabel,
-          ),
       ],
     );
   }

@@ -1033,5 +1033,23 @@
       "failed": {"type": "int"},
       "unchanged": {"type": "int"}
     }
-  }
+  },
+  "bulkEditMetadataSelectFieldHint": "在左侧选择要编辑的字段",
+  "bulkEditMetadataEnableFieldHint": "请先启用该字段",
+  "bulkEditMetadataSummaryBar": "已启用 {fieldCount} 个字段 · {comicCount} 本漫画",
+  "@bulkEditMetadataSummaryBar": {
+    "placeholders": {
+      "fieldCount": {"type": "int"},
+      "comicCount": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataFieldSummaryCount": "{opLabel} · {count} 项",
+  "@bulkEditMetadataFieldSummaryCount": {
+    "placeholders": {
+      "opLabel": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "bulkEditMetadataFieldSummaryReplace": "替换",
+  "bulkEditMetadataFieldSummaryClear": "清除"
 }
